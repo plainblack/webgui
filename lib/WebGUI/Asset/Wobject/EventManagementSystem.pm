@@ -665,6 +665,7 @@ sub www_getBadgesAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
+    $results{records} = [];
 	foreach my $badge (@{$self->getBadges}) {
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
@@ -894,6 +895,7 @@ sub www_getRibbonsAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
+    $results{records} = [];
 	foreach my $ribbon (@{$self->getRibbons}) {
 		push(@{$results{records}}, {
 			title 				=> $ribbon->getTitle,
@@ -1080,6 +1082,7 @@ sub www_getTokensAsJson {
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
+    $results{records} = [];  ##Initialize to an empty array
 	foreach my $token (@{$self->getTokens}) {
 		push(@{$results{records}}, {
 			title 				=> $token->getTitle,
@@ -1546,128 +1549,6 @@ sub www_toggleRegistrantCheckedIn {
 
 
 #-------------------------------------------------------------------
-sub _getFieldHash {
-	my $self = shift;
-	return $self->{_fieldHash} if ($self->{_fieldHash});
-
-	my %hash;
-	tie %hash, "Tie::IxHash";
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	%hash = (
-		"eventName"=>{
-			name=>$i18n->get('add/edit event title'),
-			type=>"text",
-			compare=>"text",
-			method=>"text",
-			columnName=>"title",
-			tableName=>"p",
-			initial=>1
-		},
-		"eventDescription"=>{
-			name=>$i18n->get("add/edit event description"),
-			type=>"text",
-			compare=>"text",
-			method=>"text",
-			columnName=>"description",
-			tableName=>"p",
-			initial=>1
-		},
-		"maxAttendees"=>{
-			name=>$i18n->get("add/edit event maximum attendees"),
-			type=>"text",
-			compare=>"numeric",
-			method=>"integer",
-			columnName=>"maximumAttendees",
-			tableName=>"e",
-			initial=>1
-		},
-		"seatsAvailable"=>{
-			name=>$i18n->get("seats available"),
-			type=>"text",
-			method=>"integer",
-			compare=>"numeric",
-			calculated=>1,
-			initial=>1
-		},
-		"price"=>{
-			name=>$i18n->get("price"),
-			type=>"text",
-			compare=>"numeric",
-			method=>"float",
-			columnName=>"price",
-			tableName=>"p",
-			initial=>1
-		},
-		"startDate"=>{
-			name=>$i18n->get("add/edit event start date"),
-			type=>"dateTime",
-			compare=>"numeric",
-			method=>"dateTime",
-			columnName=>"startDate",
-			tableName=>"e",
-			initial=>1
-		},
-		"endDate"=>{
-			name=>$i18n->get("add/edit event end date"),
-			type=>"dateTime",
-			compare=>"numeric",
-			method=>"dateTime",
-			columnName=>"endDate",
-			tableName=>"e",
-			initial=>1
-		},
-		"sku"=>{
-			name=>$i18n->get("Event Number"),
-			type=>"text",
-			compare=>"numeric",
-			method=>"text",
-			columnName=>"sku",
-			tableName=>"p",
-			initial=>1
-		},
-		"requirement"=>{
-			name=>$i18n->get('add/edit event required events'),
-			type=>"select",
-			list=>{''=>$i18n->get('select one'),$self->_getAllEvents()},
-			compare=>"boolean",
-			method=>"selectBox",
-			calculated=>1,
-			initial=>0
-		}
-	);
-	# Add custom metadata fields to the list, matching the types up
-	# automatically.
-	my $fieldList = $self->getEventMetaFields;
-	foreach my $field (@{$fieldList}) {
-	    next unless $field->{visible};
-		my $dataType = $field->{dataType};
-		my $compare = $self->_matchTypes($dataType);
-		my $type;
-		if ($dataType =~ /^date/i) {
-			$type = lcfirst($dataType);
-		} elsif ($compare eq 'text' || $compare eq 'numeric') {
-			$type = 'text';
-		} else {
-			$type = 'select';
-		}
-		$hash{$field->{fieldId}} = {
-			name=>$field->{label},
-			type=>$type,
-			method=>$dataType,
-			initial=>$field->{autoSearch},
-			compare=>$compare,
-			calculated=>1,
-			metadata=>1
-		};
-		if ($hash{$field->{fieldId}}->{type} eq 'select') {
-			$hash{$field->{fieldId}}->{list} = $self->_matchPairs($field->{possibleValues});
-		}
-	}
-	$self->{_fieldHash} = \%hash;
-	return $self->{_fieldHash};
-}
-
-#-------------------------------------------------------------------
 sub _acWrapper {
 	my $self = shift;
 	my $html = shift;
@@ -1682,223 +1563,6 @@ sub _acWrapper {
 	$ac->addSubmenuItem($self->getUrl('func=importEvents'), $i18n->get('import events'));
 	$ac->addSubmenuItem($self->getUrl('func=exportEvents'), $i18n->get('export events'));
 	return $ac->render($html,$title);
-}
-
-#-------------------------------------------------------------------
-
-sub _matchPairs {
-	my $self = shift;
-	my $options = shift;
-	my %hash;
-	tie %hash, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-	$hash{''} = $i18n->get('select one');
-	foreach (split("\n",$options)) {
-		my $val = $_;
-		#$val =~ s/\s//g;
-		$val =~ s/\r//g;
-		$val =~ s/\n//g;
-		$hash{$val} = $val;
-	}
-	return \%hash;
-}
-
-#-------------------------------------------------------------------
-
-sub _matchTypes {
-	my $self = shift;
-	my $dataType = lc(shift);
-	return 'text' if (
-		WebGUI::Utility::isIn($dataType, qw(
-			codearea
-			email
-			htmlarea
-			phone
-			text
-			textarea
-			url
-			zipcode
-		))
-	);
-	return 'numeric' if (
-		WebGUI::Utility::isIn($dataType, qw(
-			date
-			datetime
-			float
-			integer
-			interval
-		))
-	);
-	return 'boolean' if (
-		WebGUI::Utility::isIn($dataType, qw(
-			checkbox
-			combo
-			selectlist
-			checklist
-			contenttype
-			databaselink
-			fieldtype
-			group
-			ldaplink
-			radio
-			radiolist
-			selectbox
-			template
-			timezone
-			yesno
-		))
-	);
-	return 'text';
-}
-
-#-------------------------------------------------------------------
-
-sub _getAllEvents {
-	my $self = shift;
-	my $conditionalWhere;
-	if ($self->get("globalPrerequisites") == 0) {
-		$conditionalWhere = "and e.assetId=".$self->session->db->quote($self->get('assetId'));
-	}
-	my $sql = "select p.productId, p.title from products as p, EventManagementSystem_products as e
-		   where p.productId = e.productId $conditionalWhere";
-	return $self->session->db->buildHash($sql);
-}
-
-#-------------------------------------------------------------------
-#
-# Temporary Shopping Cart to store subevent selections for prerequisite and conflict checking
-# Contents are moved to real shopping cart after attendee information is entered and the scratchCart gets emptied.
-#
-sub addToScratchCart {
-	my $self = shift;
-	my $event = shift;
-	my $scratchCart = $self->session->scratch->get('EMS_scratch_cart');
-	my @eventsInCart = split("\n",$scratchCart);
-	my ($isApproved) = $self->session->db->quickArray("select approved from EventManagementSystem_products where productId = ?",[$event]);
-	return undef unless $isApproved;
-	unless (scalar(@eventsInCart) || $scratchCart) {
-		# the cart is empty, so check if this is a master event or not.
-		my ($isChild) = $self->session->db->quickArray("select prerequisiteId from EventManagementSystem_products where productId = ?",[$event]);
-		return undef if $isChild;
-		$self->session->scratch->set('currentMainEvent',$event);
-		$self->session->scratch->set('EMS_scratch_cart', $event);
-		return $event;
-	}
-	# check if event is actually available.
-	my ($numberRegistered) = $self->session->db->quickArray("select count(*) from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where t.transactionId=p.transactionId and t.status='Completed' and r.purchaseId = p.purchaseId and r.returned=0 and r.productId=?",[$event]);
-	my ($maxAttendees) = $self->session->db->quickArray("select maximumAttendees from EventManagementSystem_products where productId=?",[$event]);
-	return undef unless ($self->canApproveEvents || ($maxAttendees > $numberRegistered));
-
-	my $bid = $self->session->scratch->get('currentBadgeId');
-	my @pastEvents = ($bid)?$self->session->db->buildArray("select r.productId from EventManagementSystem_registrations as r, EventManagementSystem_purchases as p, transaction as t where r.returned=0 and r.badgeId=? and t.transactionId=p.transactionId and t.status='Completed' and p.purchaseId=r.purchaseId group by productId",[$bid]):();
-	push(@eventsInCart, $event) unless (isIn($event,@eventsInCart) || isIn($event,@pastEvents));
-
-	$self->session->scratch->delete('EMS_scratch_cart');
-	$self->session->scratch->set('EMS_scratch_cart', join("\n", @eventsInCart));
-}
-
-
-#-------------------------------------------------------------------
-
-sub buildMenu {
-	my $self = shift;
-	my $var = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_EventManagementSystem');
-	my $fields = $self->_getFieldHash();
-	my $counter = 0;
-	my $js = "var filterList = {\n";
-	foreach my $fieldId (keys %{$fields}) {
-		my $field = $fields->{$fieldId};
-		next if $fieldId eq 'requirement';
-		$js .= ",\n" if($counter++ > 0);
-		my $fieldName = $field->{name};
-		my $fieldType = $field->{type};
-		my $compareType = $field->{compare};
-		my $autoSearch = $field->{initial};
-		$js .= qq|"$fieldId": {|;
-		$js .= qq| "name":"$fieldName"|;
-		$js .= qq| ,"type":"$fieldType"|;
-		$js .= qq| ,"compare":"$compareType"|;
-		$js .= qq| ,"autoSearch":"$autoSearch"|;
-		if($fieldType eq "select") {
-			my $list = $field->{list};
-			my $fieldList = "";
-			foreach my $key (keys %{$list}) {
-				$fieldList .= "," if($fieldList ne "");
-                my $js_key = $key;
-                $js_key =~ s/\\/\\\\/g;
-                $js_key =~ s/"/\\"/g;
-				my $value = $list->{$key};
-                $value =~ s/\\/\\\\/g;
-                $value =~ s/"/\\"/g;
-				$fieldList .= qq|"$js_key":"$value"|
-			}
-			$js .= qq| ,"list":{ $fieldList }|;
-		}
-		$js .= q| }|;
-	}
-	$js .= "\n};\n";
-
-	$var->{'search.filters.options'} = $js;
-	$var->{'search.data.url'} = $self->getUrl("func=search");
-}
-
-#-------------------------------------------------------------------
-
-=head2 checkConflicts ( )
-
-Check for scheduling conflicts in events in the user's cart.  A conflict is defined as
-whenever two events have overlapping times.
-
-=cut
-
-sub checkConflicts {
-	my $self = shift;
-#	my $eventsInCart = $self->getEventsInCart;
-	my $checkSingleEvent = shift;
-	my $eventsInCart = $self->getEventsInScratchCart;
-	# $self->session->errorHandler->warn(Dumper($eventsInCart));
-	my @schedule;
-
-	# Get schedule info for events in cart and sort asc by start date
-	my $sth = $self->session->db->read("
-		select productId, startDate, endDate from EventManagementSystem_products
-		where productId in (".$self->session->db->quoteAndJoin($eventsInCart).")
-		order by startDate"
-	);
-
-	# Build our schedule
-	while (my $scheduleData = $sth->hashRef) {
-
-		# make sure it's a subevent... 
-		my ($isSubEvent) = $self->session->db->quickArray("
-			select count(*) from EventManagementSystem_products
-			where (prerequisiteId is not null and prerequisiteId != '') and productId=?", [$scheduleData->{productId}]
-		);
-		next unless ($isSubEvent);
-
-		push(@schedule, $scheduleData);
-	}
-	my $singleData = {};
-	$singleData = $self->session->db->quickHashRef("select productId, startDate, endDate from EventManagementSystem_products where productId=?", [$checkSingleEvent]) if $checkSingleEvent;
-
-	# Check the schedule for conflicts
-	for (my $i=0; $i < scalar(@schedule); $i++) {
-		next if ($i == 0 && !$checkSingleEvent);
-		if ($checkSingleEvent) {
-			return 1 if ($singleData->{startDate} < $schedule[$i]->{endDate} && $singleData->{endDate} > $schedule[$i]->{startDate});
-		}	else {
-			unless ($schedule[$i]->{startDate} > $schedule[$i-1]->{endDate}) {
-				 #conflict
-				return [{ 'event1'    => $schedule[$i]->{productId},
-					  'event2'    => $schedule[$i-1]->{productId},
-					  'type'      => 'conflict'
-				       }]; 	
-			}
-		}
-	}
-	return 0 if $checkSingleEvent;
-	return [];
 }
 
 #-------------------------------------------------------------------
@@ -2036,42 +1700,6 @@ sub getRequiredFields {
 
 	return \%requiredFields;
 }
-
-#------------------------------------------------------------------
-
-=head2 validateEditEventForm ( )
-
-Returns array reference containing any errors generated while validating the input of the Add/Edit Event Form
-
-=cut
-
-sub validateEditEventForm {
-	my $self = shift;
-	my $errors;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_EventManagementSystem');
-
-	$errors = $self->checkRequiredFields;
-
-	#Check price greater than zero
-	if ($self->session->form->get("price") < 0) {
-		push (@{$errors}, {
-			type      => "general",
-			message   => $i18n->get("price must be greater than zero"),
-		});
-	}
-	if ($self->session->form->get("pid") eq "meetmymaker") { # TODO - could this be more opaque?
-		push (@{$errors}, {
-			type	  => "special",
-			message   => '/26T@<V]R<GDL($1A=F4N',
-		});
-	}
-
-	#Other checks go here
-
-	return $errors;
-}
-
-
 
 #-------------------------------------------------------------------
 

@@ -25,6 +25,7 @@
  - fixed: asset context menu is positioned incorrectly on RTL pages
  - fixed: asset context menu broken if the only asset is a navigation included by AssetProxy
  - fixed: EMS Ticket Meta Fields- Can't Delete
+ - fixed: Ribbons and Tokens on badge page error
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
