@@ -160,7 +160,6 @@ Deconstructor.
 	
 sub DESTROY {
 	my $self = shift;
-	$Log::Log4perl::caller_depth--;
 	undef $self;
 }
 
@@ -302,10 +301,8 @@ An active WebGUI::Session object.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	unless (Log::Log4perl->initialized()) {
-		$Log::Log4perl::caller_depth++;
- 		Log::Log4perl->init( $session->config->getWebguiRoot."/etc/log.conf" );   
-	}
+    $Log::Log4perl::caller_depth=1;
+    Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
 	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
 }

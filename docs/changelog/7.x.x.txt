@@ -27,6 +27,7 @@
  - fixed: EMS Ticket Meta Fields- Can't Delete
  - fixed: Ribbons and Tokens on badge page error
  - fixed: Variable 'description' not filled in RSS templates
+ - fixed: logging reports incorrect location
 
 7.5.17
  - fixed: Payment Methods Hover Help Incomplete
