@@ -1010,12 +1010,13 @@ sub getEditForm {
                             $options = "|" . $i18n->get("Select") . "\n" . $options;
                         }
                         $tabform->getTab("meta")->dynamicField(
-                                                name=>"metadata_".$meta->{$field}{fieldId},
-                                                label=>$meta->{$field}{fieldName},
-                                                uiLevel=>5,
-                                                value=>$meta->{$field}{value},
-                                                extras=>qq/title="$meta->{$field}{description}"/,
-                                                options=>$options,
+                                                name         => "metadata_".$meta->{$field}{fieldId},
+                                                label        => $meta->{$field}{fieldName},
+                                                uiLevel      => 5,
+                                                value        => $meta->{$field}{value},
+                                                extras       => qq/title="$meta->{$field}{description}"/,
+                                                options      => $options,
+                                                defaultValue => $meta->{$field}{defaultValue},
 						fieldType=>$fieldType
                                 );
                 }

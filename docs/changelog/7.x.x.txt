@@ -29,6 +29,7 @@
  - fixed: Variable 'description' not filled in RSS templates
  - fixed: logging reports incorrect location
  - fixed: Cart now redirects to ssl if the site is ssl enabled.
+ - fixed: Content Profiling fields not in Edit Branch 
  - added: Session/Url now has a forceToSecure method which takes a page or site url and redirects to that page or url if the site is ssl enabled.
 
 7.5.17
