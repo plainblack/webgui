@@ -51,7 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
-plan tests => 60 + scalar(@getRefererUrlTests);
+plan tests => 61 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -332,6 +332,7 @@ is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart
 # getBackToSiteURL
 #
 #######################################
+
 $sessionAsset = $session->asset;
 $session->{_asset} = undef;
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
@@ -397,14 +398,32 @@ is(
     q!getBackToSiteURL: When asset state is clipboard, it returns you to the default Asset!
 );
 
+#######################################
+#
+# forceSecureConnection
+#
+#######################################
+
+my $origSSLEnabled = $session->config->get('sslEnabled');
+
+##Test all the false cases, first
+
+$session->config->set('sslEnabled', 0);
+ok( ! $session->url->forceSecureConnection(), 'sslEnabled must be 1 to force SSL');
+
+$session->config->set('sslEnabled', $origSSLEnabled);
+
 END {  ##Always clean-up
 	$session->asset($sessionAsset);
 	$versionTag->rollback;
-	$session->config->set('sitename', \@config_sitename);
-	$session->setting->set('hostToUse', $setting_hostToUse);
+
+	$session->config->set('sitename',           \@config_sitename);
+    $session->config->set('gateway',            $gateway);
+    $session->config->set('extrasURL',          $origExtras);
+    $session->config->set('sslEnabled',         $origSSLEnabled) if defined $origSSLEnabled;
+
+	$session->setting->set('hostToUse',         $setting_hostToUse);
 	$session->setting->set('preventProxyCache', $preventProxyCache);
-    $session->config->set('gateway', $gateway);
-    $session->config->set('extrasURL', $origExtras);
 
 	if ($config_port) {
 		$session->config->set($config_port);
