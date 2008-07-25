@@ -51,6 +51,7 @@ my @getRefererUrlTests = (
 );
 
 use Test::More;
+use Test::MockObject::Extends;
 plan tests => 61 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
@@ -139,8 +140,10 @@ $session->url->setSiteURL('http://webgui.org');
 is( $session->url->getSiteURL, 'http://webgui.org', 'override config setting with setSiteURL');
 
 ##Create a fake environment hash so we can muck with it.
-our %mockEnv = %ENV;
-$session->{_env}->{_env} = \%mockEnv;
+my %mockEnv = %ENV;
+my $env = $session->env;
+$env = Test::MockObject::Extends->new($env);
+$env->mock('get', sub { return $mockEnv{$_[1]} } );
 
 $mockEnv{HTTPS} = "on";
 $session->url->setSiteURL(undef);
@@ -415,7 +418,7 @@ $session->config->set('sslEnabled', $origSSLEnabled);
 
 END {  ##Always clean-up
 	$session->asset($sessionAsset);
-	$versionTag->rollback;
+	$versionTag->rollback if defined $versionTag;
 
 	$session->config->set('sitename',           \@config_sitename);
     $session->config->set('gateway',            $gateway);
