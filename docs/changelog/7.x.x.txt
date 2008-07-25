@@ -1,4 +1,5 @@
 7.5.18
+ - fixed: Collateral Image Manager broken in Firefox 3
  - fixed: User is logged out if a fatal error occurs
  - fixed: Collaboration system includes header link even with RSS turned off
  - fixed: edit branch doesn't show list style metadata fields properly

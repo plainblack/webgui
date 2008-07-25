@@ -1,7 +1,9 @@
 var WGPageTreeDialog = {
     init : function(ed) {
         var iframe = document.getElementById('page_selecter');
-        iframe.src = tinyMCEPopup.getWindowArg('page_url') + '?op=formHelper;class=HTMLArea;sub=pageTree';
+        window.setTimeout(function() {
+            iframe.src = tinyMCEPopup.getWindowArg('page_url') + '?op=formHelper;class=HTMLArea;sub=pageTree';
+        }, 100);
     },
 
     setUrl : function(url) {

@@ -1,7 +1,9 @@
 var WGInsertImageDialog = {
     init : function(ed) {
         var iframe = document.getElementById('image-manager');
-        iframe.src = tinyMCEPopup.getWindowArg('page_url') + '?op=formHelper;class=HTMLArea;sub=imageTree';
+        window.setTimeout(function() {
+            iframe.src = tinyMCEPopup.getWindowArg('page_url') + '?op=formHelper;class=HTMLArea;sub=imageTree';
+        }, 100);
     },
 
     setUrl : function(url, thumburl) {
