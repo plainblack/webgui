@@ -19,7 +19,7 @@ use strict;
 use Log::Log4perl;
 use Apache2::RequestUtil;
 use JSON;
-use HTML::Entities;
+use HTML::Entities qw(encode_entities);
 
 =head1 NAME 
 
@@ -145,8 +145,9 @@ The message you wish to add to the log.
 sub debug {
 	my $self = shift;
 	my $message = shift;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->debug($message);
-        $self->{_debug_debug} .= $message."\n";
+    $self->{_debug_debug} .= $message."\n";
 }
 
 
@@ -180,6 +181,7 @@ The message you wish to add to the log.
 sub error {
 	my $self = shift;
 	my $message = shift;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->error($message);
 	$self->getLogger->debug("Stack trace for ERROR ".$message."\n".$self->getStackTrace());
         $self->{_debug_error} .= $message."\n";
@@ -202,6 +204,7 @@ sub fatal {
 	my $self = shift;
 	my $message = shift;
 
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->session->http->setStatus("500","Server Error");
 	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
@@ -228,7 +231,7 @@ sub fatal {
 		$self->session->output->print('<br />'.$self->session->setting->get("companyURL"),1);
 	}
 	$self->session->close();
-	die "fatal: " . $message;
+    last WEBGUI_FATAL;
 }
 
 
@@ -282,6 +285,7 @@ The message you wish to add to the log.
 sub info {
 	my $self = shift;
 	my $message = shift;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->info($message);
         $self->{_debug_info} .= $message."\n";
 }
@@ -301,7 +305,6 @@ An active WebGUI::Session object.
 sub new {
 	my $class = shift;
 	my $session = shift;
-    $Log::Log4perl::caller_depth=1;
     Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
 	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
@@ -326,12 +329,16 @@ sub query {
 	$self->{_queryCount}++;
 	my $plac;
 	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@{$placeholders})) {
-		$plac = "\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['".join("', '",@{$placeholders})."']";
+        $plac = "\n  with placeholders:  [" . join(', ', map {
+            defined $_ ? "'$_'" : 'undef';
+        } @$placeholders) . ']';
 	}
 	else {
 		$plac = '';
 	}
-	$self->debug("query  ".$self->{_queryCount}.':  '.$query.$plac);
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+    $query =~ s/^/  /gms;
+    $self->debug("query ".$self->{_queryCount}.":\n" . $query . $plac);
 }
 
 
@@ -380,31 +387,28 @@ errors, sql queries and form data.
 
 sub showDebug {
 	my $self = shift;
-	my $text = $self->{_debug_error};
-	$text =~  s/\n/\<br \/\>\n/g;
-	my $output = '<div style="text-align: left;background-color: #800000;color: #ffffff;">'.$text."</div>\n";
+    my $output = '<div style="text-align: left;color: #000000; white-space: pre; float: left;">';
+    my $text = $self->{_debug_error};
+    $text = encode_entities($text);
+    $output .= '<div style="background-color: #800000;color: #ffffff">'.$text."</div>";
 	$text = $self->{_debug_warn}; 
-	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #ffbdbd;color: #000000;">'.$text."</div>\n";
+    $text = encode_entities($text);
+    $output .= '<div style="background-color: #ffbdbd">'.$text."</div>";
 	$text = $self->{_debug_info}; 
-	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #bdffbd;color: #000000;">'.$text."</div>\n";
-	my $form = $self->session->form->paramsHashRef();
-	foreach my $key (keys %{$form}) {
-		if ($key eq "password" || $key eq "identifier") {
-			$form->{$key} = "********";
-		}
-	}
-	$text = JSON->new->utf8->pretty->encode($form);
-	$text =~ s/&/&amp;/sg;
-	$text =~ s/>/&gt;/sg;
-	$text =~ s/</&lt;/sg;
-	$text =~  s/\n/\<br \/\>\n/g;
-	$text =~  s/    /&nbsp; &nbsp; /g;
-	$output .= '<div style="text-align: left;background-color: #aaaaee;color: #000000;">'.$text."</div>\n";
+    $text = encode_entities($text);
+    $output .= '<div style="background-color: #bdffbd">'.$text."</div>";
+	my %form = %{ $self->session->form->paramsHashRef };
+    $form{password} = "*******"
+        if exists $form{password};
+    $form{identifier} = "*******"
+        if exists $form{identifier};
+    $text = JSON->new->utf8->pretty->encode(\%form);
+    $text = encode_entities($text);
+	$output .= '<div style="background-color: #aaaaee">'.$text."</div>";
 	$text = $self->{_debug_debug}; 
-	$text =~  s/\n/\<br \/\>\n/g;
-	$output .= '<div style="text-align: left;background-color: #cccc55;color: #000000;">'.$text."</div>\n";
+    $text = encode_entities($text);
+	$output .= '<div style="background-color: #cccc55">'.$text."</div>";
+	$output .= '</div>';
 	return $output;
 }
 
@@ -425,6 +429,7 @@ The message you wish to add to the log.
 sub warn {
 	my $self = shift;
 	my $message = shift;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->getLogger->warn($message);
         $self->{_debug_warn} .= $message."\n";
 }
