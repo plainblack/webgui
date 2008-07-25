@@ -16,6 +16,8 @@ package WebGUI::URL::Credits;
 
 use strict;
 use Apache2::Const -compile => qw(OK DECLINED);
+use APR::Finfo ();
+use APR::Const -compile => qw(FINFO_NORM);
 use WebGUI::Session;
 
 =head1 NAME
@@ -47,17 +49,14 @@ The Apache request handler for this package.
 
 sub handler {
     my ($request, $server, $config) = @_;
-    $request->push_handlers(PerlResponseHandler => sub { 
-        my $content = "";
-        open(my $FILE, "<", $config->getWebguiRoot."/docs/credits.txt");
-        while (my $line = <$FILE>) {
-            $content .= $line;
-        }
-        close($FILE);
-        $request->print($content);
+    my $filename = $config->getWebguiRoot."/docs/credits.txt";
+    $request->push_handlers(PerlResponseHandler => sub {
+        $request->content_type('text/plain');
+        $request->sendfile($filename);
         return Apache2::Const::OK;
-    } );
-	$request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
+    });
+    $request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
+    $request->push_handlers(PerlMapToStorageHandler => sub { return Apache2::Const::OK });
     return Apache2::Const::OK;
 }
 
