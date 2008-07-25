@@ -263,8 +263,10 @@ sub forceSecureConnection{
         $url = $self->session->url->page if(! $url);
         $url = $self->session->env->get('QUERY_STRING') if(! $url);
 
-        if($url !~ /^$self->getSiteURL()/i){
-            $url = $self->getSiteURL() . $url;
+        my $siteURL = $self->getSiteURL();
+
+        if($url !~ /^$ssiteURL/i){
+            $url = $siteURL . $url;
         }
         if($env->get('QUERY_STRING')){ 
             $url .= "?". $env->get('QUERY_STRING');
