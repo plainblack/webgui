@@ -265,7 +265,7 @@ sub forceSecureConnection{
 
         my $siteURL = $self->getSiteURL();
 
-        if($url !~ /^$ssiteURL/i){
+        if($url !~ /^$siteURL/i){
             $url = $siteURL . $url;
         }
         if($env->get('QUERY_STRING')){ 
