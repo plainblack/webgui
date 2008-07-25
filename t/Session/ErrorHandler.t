@@ -89,19 +89,19 @@ $eh->{'_debug_debug'} = ''; ##Manually clean debug
 my $queryCount = $eh->{_queryCount};
 $eh->query('select this');
 ++$queryCount;
-is($WebGUI::Test::logger_debug, "query  $queryCount:  select this", "query: Log4perl called debug via query");
+is($WebGUI::Test::logger_debug, "query $queryCount:\n  select this", "query: Log4perl called debug via query");
 
 $eh->query('select that', 'literal');
 ++$queryCount;
-is($WebGUI::Test::logger_debug, "query  $queryCount:  select that", "query: Log4perl called debug via query, literal placeholder");
+is($WebGUI::Test::logger_debug, "query $queryCount:\n  select that", "query: Log4perl called debug via query, literal placeholder");
 
 $eh->query('select more', []);
 ++$queryCount;
-is($WebGUI::Test::logger_debug, "query  $queryCount:  select more", "query: Log4perl called debug via query, empty placeholder");
+is($WebGUI::Test::logger_debug, "query $queryCount:\n  select more", "query: Log4perl called debug via query, empty placeholder");
 
 $eh->query('select many', [1, 2]);
 ++$queryCount;
-is($WebGUI::Test::logger_debug, "query  $queryCount:  select many\n&nbsp;&nbsp;with placeholders:&nbsp;&nbsp;['1', '2']", "query: Log4perl called debug via query, empty placeholder");
+is($WebGUI::Test::logger_debug, "query $queryCount:\n  select many\n  with placeholders:  ['1', '2']", "query: Log4perl called debug via query, empty placeholder");
 
 ####################################################
 #
