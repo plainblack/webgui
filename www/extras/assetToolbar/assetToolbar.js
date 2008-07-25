@@ -5,7 +5,8 @@ function initWGContextMenus() {
         if (menu.initialized) {
             continue;
         }
-        var ctx = menu.previousSibling;
+        menu.initialized = true;
+        var ctx = YAHOO.util.Dom.getPreviousSibling(menu);
         var myMenu = new YAHOO.widget.Menu(menu, {
             context             : [ctx, "tl", "bl"]
         });

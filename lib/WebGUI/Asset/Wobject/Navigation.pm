@@ -311,15 +311,15 @@ sub getToolbar {
             $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"))
                 if ($userUiLevel >= $uiLevels->{"edit"});
         }
-        $self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
         $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
         $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
         $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
-        $self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'), {type=>"text/javascript"});
         my $i18n = WebGUI::International->new($self->session, "Asset");
-        return '<div class="yui-skin-sam">'
-            . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" style="vertical-align: middle" />'
+        return '<div class="yui-skin-sam wg-toolbar">'
+            . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
             . '<div class="yuimenu wg-contextmenu">'
             . '<div class="bd">'
             . '<ul class="first-of-type">'

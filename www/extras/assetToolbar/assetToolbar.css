@@ -1,3 +1,8 @@
+.wg-toolbar-icon {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
 .wg-contextmenu {
     position: absolute;
     visibility: hidden;
@@ -7,3 +12,8 @@
 .wg-contextmenu .yuimenuitemlabel {
     font-size: 10px
 }
+
+.wg-contextmenu.yuimenu .yuimenuitemlabel {
+    padding: 0 8px;
+}
+
