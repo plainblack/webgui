@@ -40,10 +40,8 @@ The ID for a template to use for formatting the link.  The default template crea
 sub process {
 	my $session = shift;
 	return "" unless ($session->var->isAdminOn);
-    $session->style->setRawHeadTags('<script type="text/javascript" src="'.$session->url->extras("/yui/build/yahoo/yahoo-min.js").'"></script>
-    <script type="text/javascript" src="'.$session->url->extras("/yui/build/event/event-min.js").'"></script>
-    <script type="text/javascript" src="'.$session->url->extras("/yui/build/dom/dom-min.js").'"></script>
-    <script type="text/javascript" src="'.$session->url->extras("/yui/build/animation/animation-min.js").'"></script>');
+    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
+    $session->style->setScript($session->url->extras('yui/build/animation/animation-min.js'), {type=>"text/javascript"});
 	my @param = @_;
         my $templateId = $param[0] || "PBtmpl0000000000000090";
 	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
