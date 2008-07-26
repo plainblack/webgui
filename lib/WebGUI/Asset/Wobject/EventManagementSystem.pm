@@ -829,9 +829,9 @@ sub www_getRegistrantsAsJson {
 	my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canView;
     my ($db, $form) = $session->quick(qw(db form));
-    my $startIndex = $form->get('startIndex') || 0;
-    my $numberOfResults = $form->get('results') || 25;
-	my $keywords = $form->get('keywords');
+    my $startIndex      = $form->get('startIndex') || 0;
+    my $numberOfResults = $form->get('results')    || 25;
+	my $keywords        = $form->get('keywords');
 	
 	my $sql = "select SQL_CALC_FOUND_ROWS * from EMSRegistrant where purchaseComplete=1 and emsAssetId=?";
 	my @params = ($self->getId);
@@ -856,7 +856,7 @@ sub www_getRegistrantsAsJson {
 	my %results = ();
 	my $badges = $db->read($sql,\@params);
     $results{'recordsReturned'} = $badges->rows()+0;
-    $results{'totalRecords'} = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
+    $results{'totalRecords'}    = $db->quickScalar('select found_rows()') + 0; ##Convert to numeric
 	while (my $badgeInfo = $badges->hashRef) {
 		my $badge = WebGUI::Asset::Sku::EMSBadge->new($session, $badgeInfo->{badgeAssetId});
 		unless (defined $badge) {
