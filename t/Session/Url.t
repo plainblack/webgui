@@ -52,7 +52,7 @@ my @getRefererUrlTests = (
 
 use Test::More;
 use Test::MockObject::Extends;
-plan tests => 61 + scalar(@getRefererUrlTests);
+plan tests => 72 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -344,7 +344,7 @@ $pseudoRequest->uri('/goBackToTheSite');
 is($session->url->getBackToSiteURL, '/goBackToTheSite', 'getBackToSiteURL: when session asset is undefined, the method falls back to using page');
 
 $session->asset($sessionAsset);
-is($session->url->getBackToSiteURL, $session->asset->getUrl, q!getBackToSiteURL: for most regular old assets, it takes you back to the asset's container!);
+is($session->url->getBackToSiteURL, $session->asset->getUrl, q!getBackToSiteURL: for most regular old assets, it takes you back to the assets container!);
 
 my $defaultAssetUrl = WebGUI::Asset->getDefault($session)->getUrl;
 
@@ -384,7 +384,7 @@ $statefulAsset->{_properties}{state} = 'published';
 is(
     $session->url->getBackToSiteURL, 
     WebGUI::Asset->getRoot($session)->getUrl,
-    q!getBackToSiteURL: When asset state is published, it returns you to the Asset's container!
+    q!getBackToSiteURL: When asset state is published, it returns you to the Assets container!
 );
 
 $statefulAsset->{_properties}{state} = 'trash';
@@ -412,7 +412,44 @@ my $origSSLEnabled = $session->config->get('sslEnabled');
 ##Test all the false cases, first
 
 $session->config->set('sslEnabled', 0);
+$mockEnv{HTTPS}    = 'not on';
+$mockEnv{SSLPROXY} = 0;
 ok( ! $session->url->forceSecureConnection(), 'sslEnabled must be 1 to force SSL');
+
+$session->config->set('sslEnabled', 1);
+$mockEnv{HTTPS}    = 'on';
+$mockEnv{SSLPROXY} = 0;
+ok( ! $session->url->forceSecureConnection(), 'HTTPS must not be "on" to force SSL');
+
+$session->config->set('sslEnabled', 1);
+$mockEnv{HTTPS}    = 'not on';
+$mockEnv{SSLPROXY} = 1;
+ok( ! $session->url->forceSecureConnection(), 'SSLPROXY must not be true to force SSL');
+ok( ! $session->url->forceSecureConnection('/test/url'), 'all conditions must be met, even if a URL is directly passed in');
+
+##Validate the HTTP object state before we start
+$session->http->setStatus('200', 'OK');
+is($session->http->getStatus, 200, 'http status is okay, 200');
+is($session->http->getRedirectLocation, undef, 'redirect location is empty');
+
+$mockEnv{HTTPS}    = 'not on';
+$mockEnv{SSLPROXY} = 0;
+
+my $secureUrl = $session->url->getSiteURL . '/foo/bar/baz/buz';
+$secureUrl =~ s/http:/https:/;
+
+ok($session->url->forceSecureConnection('/foo/bar/baz/buz'), 'forced secure connection');
+is($session->http->getStatus, 302, 'http status set to redirect, 302');
+is($session->http->getRedirectLocation, $secureUrl, 'redirect location set to proper passed in URL with SSL and sitename added');
+
+$session->http->setStatus('200', 'OK');
+$session->http->setRedirectLocation(undef);
+
+$secureUrl = $session->url->getSiteURL . $session->url->page();
+$secureUrl =~ s/http:/https:/;
+ok($session->url->forceSecureConnection(), 'forced secure connection with no url param');
+ok($session->http->isRedirect, '... and redirect status code was set');
+is($session->http->getRedirectLocation, $secureUrl, '... and redirect status code was set');
 
 $session->config->set('sslEnabled', $origSSLEnabled);
 
