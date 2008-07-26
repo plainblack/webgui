@@ -462,10 +462,9 @@ sub deleteAttachedFiles {
     }
     else {
         my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
-        foreach my $entry (@$entries) {
-            my $entryData = decode_json($entry->{entryData});
-            $self->deleteEntryFiles($entryData);
-            for my $field ( @$fields ) {
+        foreach my $entry (@{ $entries}) {
+            my $entryData = decode_json($entry);
+            for my $field (@{ $fields }) {
                 my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
                 if ($form->can('getStorageLocation')) {
                     my $storage = $form->getStorageLocation;
