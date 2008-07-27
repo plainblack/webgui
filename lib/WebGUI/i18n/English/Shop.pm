@@ -1389,6 +1389,18 @@ our $I18N = {
         context => q|Message asking the user to choose one of the available payment options.|,
     },
 
+    'import tax' => {
+        message => q|Import Taxes|,
+        lastUpdated => 1217125374,
+        context => q|Label for the manage tax screen|,
+    },
+
+    'export tax' => {
+        message => q|Export Taxes|,
+        lastUpdated => 1217125391,
+        context => q|Label for the manage tax screen|,
+    },
+
 };
 
 1;

@@ -1096,6 +1096,13 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},
     },
+
+    'export' => {
+        message     => q{More},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
 };
 
 1;

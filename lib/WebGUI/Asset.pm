@@ -1354,7 +1354,7 @@ sub getToolbar {
     if ($userUiLevel >= $uiLevels->{"export"} && $self->session->config->get("exportPath")) {
         $output
             .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl('func=export') . '">' . $i18n->get("export") . '</a></li>';
+            . $self->getUrl('func=export') . '">' . $i18n->get('Export','Icon') . '</a></li>';
     }
     if ($userUiLevel >= $uiLevels->{"promote"}) {
         $output
