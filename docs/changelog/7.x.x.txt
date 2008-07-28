@@ -16,8 +16,6 @@
  - fixed: Manage Subscription Codes: No way to Select
  - fixed: Self registration that does not require passwords, now allows multiple users with empty passwords.  This means that users can self register without a password and might cause downstream bugs with other wobjects.
  - fixed: Calendar now uses the correct method to get the current user's time-zone
- - Shortcut ##userPref:<profile field>## macros now work even if Shortcut is not
-   under a Dashboard
  - fixed backwards compatibility with new form control API additions: getValue is now
    an alias to getValueFromForm instead of vice-versa. getValue is still the preferred 
    method, getValueFromForm is still the deprecated method.

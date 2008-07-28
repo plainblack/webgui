@@ -424,23 +424,22 @@ sub getOverrides {
 		} else {
 			$self->session->errorHandler->warn("Original asset could not be instanciated by shortcut ".$self->getId);
 		}
-
-                # Process shortcut macros  
-                my $u = WebGUI::User->new($self->session, $self->discernUserId);
-                my @userPrefs = $self->getPrefFieldsToImport;
-                foreach my $fieldId (@userPrefs) {
-                    my $field = WebGUI::ProfileField->new($self->session,$fieldId);
-                    next unless $field;
-                    my $fieldName = $field->getId;
-                    my $fieldValue = $u->profileField($field->getId);
-                    $overrides{userPrefs}{$fieldName}{value} = $fieldValue;
-                    $overrides{userPrefs}{$fieldName}{parsedValue} = $fieldValue;
-                    #  'myTemplateId is ##userPref:myTemplateId##', for example.
-                    foreach my $overr (keys %{$overrides{overrides}}) {
-                        $overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
-                    }
-                }
-
+		if ($self->isDashlet) {
+			my $u = WebGUI::User->new($self->session, $self->discernUserId);
+			my @userPrefs = $self->getPrefFieldsToImport;
+			foreach my $fieldId (@userPrefs) {
+				my $field = WebGUI::ProfileField->new($self->session,$fieldId);
+				next unless $field;
+				my $fieldName = $field->getId;
+				my $fieldValue = $u->profileField($field->getId);
+				$overrides{userPrefs}{$fieldName}{value} = $fieldValue;
+				$overrides{userPrefs}{$fieldName}{parsedValue} = $fieldValue;
+				#  'myTemplateId is ##userPref:myTemplateId##', for example.
+				foreach my $overr (keys %{$overrides{overrides}}) {
+					$overrides{overrides}{$overr}{parsedValue} =~ s/\#\#userPref\:${fieldName}\#\#/$fieldValue/gm;
+				}
+			}
+		}
 		$cache->set(\%overrides, 60*60);
 		$overridesRef = \%overrides;
 	}
