@@ -3,6 +3,8 @@
  - fixed: EMS not displaying all users with a badge
  - fixed: WebGUI::Search - joinClass not documented
  - fixed: thingy's checkbox field
+ - Inbox and ?op=viewInbox can now handle millions of rows without taking 10 minutes to return
+   some results
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3

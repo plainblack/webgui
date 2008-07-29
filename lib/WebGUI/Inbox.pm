@@ -128,32 +128,64 @@ An integer indicating the number of messages to fetch. Defaults to 50.
 =cut
 
 sub getMessagesForUser {
-	my $self     = shift;
-	my $user     = shift;
-	my $limit    = shift || 50;
-    my $page     = shift || 1;
-    my $sortBy   = shift;
+    my $self        = shift;
+    my $user        = shift;
+    my $perpage     = shift || 50;
+    my $page        = shift || 1;
+    my $sortBy      = shift;
     
-	my @messages = ();
-	my $counter  = 0;
-	
-    unless($sortBy eq "subject" || $sortBy eq "sentBy" || $sortBy eq "dateStamp") {
-        $sortBy = "status='pending' desc, dateStamp desc";
+    my @messages = ();
+    my $counter  = 0;
+    
+    my ( $sql, @bindvars );
+    my $start   = (($page-1) * $perpage);
+    my $end     = $start + $page * $perpage;
+    my $limit   = "$start, $perpage";
+
+    ### Here we're going to get enough rows to fill our needs ($end) from each subquery, then
+    ### use the UNION to grab only the rows we want to display ($limit)
+
+    # If we have a way to sort, use that
+    if ( grep { $_ eq $sortBy } qw( subject sentBy dateStamp ) ) {
+        $sql        = q{ ( SELECT messageId, userId, groupId, %s FROM inbox WHERE userId = "%s" ORDER BY %s LIMIT %s ) }
+                    . q{ UNION }
+                    . q{ ( SELECT messageId, userId, groupId, %s FROM inbox WHERE groupId IN ( %s ) ORDER BY %s LIMIT %s ) }
+                    . q{ ORDER BY %s LIMIT %s }
+                    ;
+        @bindvars   = ( 
+                        $sortBy, $user->userId, $sortBy, $end, 
+                        $sortBy, $self->session->db->quoteAndJoin( $user->getGroupIdsRecursive ), $sortBy, $end,
+                        $sortBy, $limit
+                    );
     }
-    
-    my $start = (($page-1) * $limit) + 1;
-    my $end   = $page * $limit;
-    my $rs = $self->session->db->read("select messageId, userId, groupId from inbox order by $sortBy");
-	while (my ($messageId, $userId, $groupId) = $rs->array) {
-		if ($user->userId eq $userId || ($groupId && $user->isInGroup($groupId))) {
-			$counter++;
-            next if ($counter < $start);
-            push(@messages, $self->getMessage($messageId));
-			last if ($counter >= $end);
-		}
-	}
-	$rs->finish;
-	return \@messages;	
+    # Otherwise put "pending" messages above "completed" messaged and sort by date descending
+    else {
+        $sql    = 
+                 q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="pending" AND groupId IN ( %s ) ORDER BY dateStamp DESC LIMIT %s ) }
+                . q{ UNION }
+                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="pending" AND userId = "%s" ORDER BY dateStamp DESC LIMIT %s ) }
+                . q{ UNION }
+                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="completed" AND groupId IN ( %s ) ORDER BY dateStamp DESC LIMIT %s ) }
+                . q{ UNION }
+                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="completed" AND userId = "%s" ORDER BY dateStamp DESC LIMIT %s ) }
+                . q{ ORDER BY status="pending" DESC, dateStamp DESC LIMIT %s }
+                ;
+
+        @bindvars   = ( 
+                        ( $self->session->db->quoteAndJoin( $user->getGroupIdsRecursive ), $end,
+                        $user->userId, $end, 
+                        ) x 2,
+                        $limit,
+                    );
+    }
+
+    my $rs      = $self->session->db->read( sprintf $sql, @bindvars );
+    while ( my ( $messageId ) = $rs->array ) {
+        push @messages, $self->getMessage( $messageId );
+    }
+    $rs->finish;
+
+    return \@messages;	
 }
 
 

@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addNewInboxIndexes( $session );
 
 finish($session); # this line required
 
@@ -42,6 +43,24 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add new indexes to the inbox to make millions of messages possible
+sub addNewInboxIndexes {
+    my $session = shift;
+    print "\tAdding new indexes to inbox. This may take a while... " unless $quiet;
+
+    print "\n\t\tIndex on userId..." unless $quiet;
+    $session->db->write( 
+        "CREATE INDEX pb_userId ON inbox ( userId )"
+    );
+
+    print "\n\t\tIndex on groupId..." unless $quiet;
+    $session->db->write(
+        "CREATE INDEX pb_groupId ON inbox ( groupId )"
+    );
+
+    print "\n\t\tDONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
