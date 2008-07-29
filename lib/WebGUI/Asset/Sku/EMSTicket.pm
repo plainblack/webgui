@@ -99,6 +99,8 @@ sub definition {
             noFormPost      => 1,
             fieldType       => "hidden",
             defaultValue    => $date->toDatabase,
+            label           => $i18n->get("add/edit event start date"),
+            hoverHelp       => $i18n->get("add/edit event start date help"),
             autoGenerate    => 0,
             },			    
 		duration => {
@@ -250,7 +252,7 @@ Extended to support event metadata.
 sub getEditForm {
 	my $self = shift;
 	my $form = $self->SUPER::getEditForm(@_);
-	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+	my $metadata = $self->getEventMetaData;
     my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
     my $date = WebGUI::DateTime->new($self->session, time());
 
@@ -273,6 +275,29 @@ sub getEditForm {
             value           => $self->get("startDate"),
     );
 	return $form;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getEventMetaData
+
+Decodes and returns metadata properties as a hashref.
+
+=head3 key
+
+If specified, returns a single value for the key specified.
+
+=cut
+
+sub getEventMetaData {
+	my $self = shift;
+	my $key = shift;
+	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+	if (defined $key) {
+		return $metadata->{$key};
+	}
+	return $metadata;
 }
 
 #-------------------------------------------------------------------
