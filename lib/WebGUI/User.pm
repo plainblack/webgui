@@ -332,6 +332,32 @@ sub getGroups {
         }
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getGroupIdsRecursive ( )
+
+Get the groups the user is in AND all the groups those groups are in, recursively.
+Returns a flattened array reference of unique group IDs
+
+=cut
+
+sub getGroupIdsRecursive {
+    my $self        = shift;
+    my $groupingIds = $self->getGroups( "withoutExpired" );
+    my %groupIds    = map { $_ => 1 } @{ $groupingIds };
+    while ( my $groupingId = shift @{ $groupingIds } ) {
+        my $group   = WebGUI::Group->new( $self->session, $groupingId );
+        for my $groupGroupingId ( @{ $group->getGroupsFor } ) { 
+            if ( !$groupIds{ $groupGroupingId } ) {
+                push @{ $groupingIds }, $groupGroupingId;
+            }
+            $groupIds{ $groupGroupingId } = 1;
+        }
+    }
+    
+    return [ keys %groupIds ];
+}
+
 #-------------------------------------------------------------------
 
 =head2 getWholeName ( )

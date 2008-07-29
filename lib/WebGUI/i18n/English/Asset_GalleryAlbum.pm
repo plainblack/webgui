@@ -550,6 +550,12 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'editForm othersCanAdd label' => {
+        message     => q{Others Can Add},
+        lastUpdated => 0,
+        context     => q{Description of asset property to allow people besides the owner to add files to the album},
+    },
+
 };
 
 1;

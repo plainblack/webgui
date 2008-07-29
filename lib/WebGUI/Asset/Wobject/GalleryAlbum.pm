@@ -500,6 +500,11 @@ sub getTemplateVars {
         }
     }    
  
+    # Set a flag for pending files
+    if ( $self->get( "status" ) eq "pending" ) {
+        $var->{ 'isPending' } = 1;
+    }
+
     # Permissions
     $var->{ canAddFile              } = $self->canAddFile;
     $var->{ canEdit                 } = $self->canEdit;
@@ -1064,6 +1069,12 @@ sub www_edit {
             value       => $form->get("description") || $self->get("description"),
             richEditId  => $self->getParent->get("richEditIdAlbum"),
         });
+
+    $var->{ form_othersCanAdd }
+        = WebGUI::Form::yesNo( $session, {
+            name        => "othersCanAdd",
+            value       => $form->get( "othersCanAdd" ) || $self->get( "othersCanAdd" ),
+        } );
 
     # Generate the file loop
     my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->get("assetIdThumbnail");

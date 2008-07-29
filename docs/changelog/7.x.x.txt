@@ -5,6 +5,7 @@
  - fixed: thingy's checkbox field
  - Inbox and ?op=viewInbox can now handle millions of rows without taking 10 minutes to return
    some results
+ - Exposed a form element for the GalleryAlbum Others Can Add property
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
