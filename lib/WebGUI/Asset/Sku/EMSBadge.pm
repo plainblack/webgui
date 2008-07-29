@@ -325,7 +325,7 @@ sub view {
 	$info->text(
 		name			=> 'name',
 		label			=> $i18n->get('name','Shop'),
-		defaultValue	=> (defined $address) ? $address->get("name") : $form->get('name'),
+		defaultValue	=> (defined $address) ? $address->get("firstName")." ".$address->get('lastName') : $form->get('name'),
 		);
 	$info->text(
 		name			=> 'organization',

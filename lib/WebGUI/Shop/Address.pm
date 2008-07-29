@@ -111,7 +111,7 @@ Returns an HTML formatted address for display.
 
 sub getHtmlFormatted {
     my $self = shift;
-    my $address = $self->get("name") . "<br />" . $self->get("address1") . "<br />";
+    my $address = $self->get("firstName"). "<br />" .$self->get("lastName") . "<br />" . $self->get("address1") . "<br />";
     $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
     $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
     $address .= $self->get("city") . ", ";
@@ -233,7 +233,8 @@ The address book that this address belongs to.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(address1 address2 address3 state code city label name country phoneNumber)) {
+    #foreach my $field (qw(address1 address2 address3 state code city label name country phoneNumber)) {
+    foreach my $field (qw(address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $properties{$id}{addressBookId} = $self->addressBook->getId;

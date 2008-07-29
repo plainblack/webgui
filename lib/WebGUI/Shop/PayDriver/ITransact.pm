@@ -636,12 +636,12 @@ sub www_getCredentials {
 	$f->text(
 		-name	    => 'firstName',
 		-label	    => $i18n->get('firstName'),
-		-value	    => $form->process("firstName") || $addressData->{ name } || $u->profileField('firstName'),
+		-value	    => $form->process("firstName") || $addressData->{ "firstName" } || $u->profileField('firstName'),
 	);
 	$f->text(
 		-name	    => 'lastName',
 		-label	    => $i18n->get('lastName'),
-		-value	    => $form->process("lastName") || $u->profileField('lastName'),
+		-value	    => $form->process("lastName") || $addressData->{ "lastName" } || $u->profileField('lastName'),
 	);
 	$f->text(
 		-name	    => 'address',

@@ -30,7 +30,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addNewInboxIndexes( $session );
-
+updateAddressTable( $session );
 finish($session); # this line required
 
 
@@ -42,6 +42,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Removes the name field and adds a firstName and lastName field
+sub updateAddressTable{
+    my $session = shift;
+    print "\tUpdating TABLE address... " unless $quiet;
+    $session->db->write("ALTER TABLE 'address' DROP COLUMN 'name';");
+    $session->db->write("ALTER TABLE 'address' ADD COLUMN 'firstName' VARCHAR(35)  AFTER 'label', ADD COLUMN 'lastName' VARCHAR(35)  AFTER 'firstName';");
+    print "\tDone.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add new indexes to the inbox to make millions of messages possible
