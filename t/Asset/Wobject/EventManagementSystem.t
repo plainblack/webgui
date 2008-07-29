@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
-use Data::Dumper;
+#use Data::Dumper;
 
 #----------------------------------------------------------------------------
 # Init
@@ -55,12 +55,16 @@ my $user = WebGUI::User->new($session, 3);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
+# check base module and all related
 use_ok('WebGUI::Asset::Wobject::EventManagementSystem');
 use_ok('WebGUI::Asset::Sku::EMSBadge');
+use_ok('WebGUI::Asset::Sku::EMSTicket');
+use_ok('WebGUI::Asset::Sku::EMSRibbon');
+use_ok('WebGUI::Asset::Sku::EMSToken');
 
 # login
 $mech       = getMechLogin( $baseUrl, $user, $identifier );
@@ -82,7 +86,9 @@ $versionTag->commit;
 my $emsUrl = $baseUrl . $ems->getUrl();
 $mech->get_ok( $emsUrl, "Get EMS url, $emsUrl");
 
-# Add badge
+#############
+# Add badge #
+#############
 $mech->get_ok( $emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSBadge' );
 
 # Complete the badge form
@@ -108,11 +114,13 @@ $mech->content_contains(
     'Badge instructions are displayed',
 );
 
-# Add badge
+#############
+# Add badge #
+#############
 $mech->get_ok( $emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSBadge' );
 
 # Complete the badge form
-my $properties  = {
+$properties  = {
     title           => 'Conference + Workshops',
     description     => 'This for the conference and workshops',
     price => 200,
@@ -127,8 +135,24 @@ my $badges = $ems->getBadges;
 ok(scalar(@{$badges}) == 2, 'Two badges added');
 ok($badges->[0]->getPrice == 100, 'Price of first badge');
 ok($badges->[1]->getPrice == 200, 'Price of second badge');
+isa_ok($badges->[0], 'WebGUI::Asset::Sku::EMSBadge');
+ok($badges->[0]->getId, 'BadgeId retrieved from badge object');
 
+# Tickets
+ok($ems->www_buildBadge($badges->[0]->getId), 'www_buildBadge returns something');
+$mech->get_ok($emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSTicket');
+$properties = {
+    title   => 'My Ticket',
+    price   => '50',
+};
+$mech->submit_form_ok( {
+    with_fields => $properties,
+}, 'Submit ticket form');
 
+$mech->content_contains(
+    'My Ticket',
+    'Ticket name is displayed',
+);
 
 #----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )
