@@ -55,7 +55,7 @@ my $user = WebGUI::User->new($session, 3);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 22;        # Increment this number for each test you create
+plan tests => 24;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -153,6 +153,10 @@ $mech->content_contains(
     'My Ticket',
     'Ticket name is displayed',
 );
+
+my $tickets = $ems->getTickets;
+isa_ok($tickets->[0], 'WebGUI::Asset::Sku::EMSTicket');
+ok($tickets->[0]->get('title') eq 'My Ticket', 'getTickets returns newly created ticket');
 
 #----------------------------------------------------------------------------
 # getMechLogin( baseUrl, WebGUI::User, "identifier" )
