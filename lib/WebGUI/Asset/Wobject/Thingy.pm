@@ -684,7 +684,10 @@ sub getFormElement {
     $param{fieldType} = $data->{fieldType};
 
     if ($data->{fieldType} eq "Checkbox") {
-        $param{value} = ($data->{defaultValue} =~ /checked/xi) ? 1 : "";
+        $param{value} = 1;
+        if ($data->{value} == 1){
+            $param{checked} = 1;
+        }
     }
 
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
