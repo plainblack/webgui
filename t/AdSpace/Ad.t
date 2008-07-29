@@ -36,7 +36,7 @@ my $newAdSettings = {
     priority          => "0",
 };
 
-my $numTests = 28; # increment this value for each test you create
+my $numTests = 29; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
