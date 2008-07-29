@@ -59,7 +59,7 @@ SKIP: {
     isa_ok($ad,"WebGUI::AdSpace::Ad");
 
     isa_ok($ad->session, 'WebGUI::Session');
-    isa($ad->get('type'), 'text', 'property set during object creation');
+    is($ad->get('type'), 'text', 'property set during object creation');
 
     my $ad2 = WebGUI::AdSpace::Ad->new($session, $ad->getId);
     cmp_deeply($ad2, $ad, "new returns an identical object to the original what was created");
