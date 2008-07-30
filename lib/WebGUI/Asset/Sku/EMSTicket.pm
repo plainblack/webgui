@@ -457,6 +457,24 @@ sub purge {
 
 #-------------------------------------------------------------------
 
+=head2 setEventMetaData
+
+Encodes the metadata for this event into an asset property.
+
+=head3 properties
+
+A hash reference containing all the metadata properties to set.
+
+=cut
+
+sub setEventMetaData {
+	my $self = shift;
+	my $properties = shift;
+	$self->update({eventMetaData => JSON->new->utf8->encode($properties)});
+}
+
+#-------------------------------------------------------------------
+
 =head2 view
 
 Displays the ticket description.

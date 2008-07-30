@@ -16,23 +16,22 @@ package WebGUI::Asset::Wobject::EventManagementSystem;
 
 use strict;
 use base 'WebGUI::Asset::Wobject';
-use Tie::IxHash;
-use WebGUI::HTMLForm;
-use JSON;
 use Digest::MD5;
-use WebGUI::Exception;
-use WebGUI::Workflow::Instance;
-use WebGUI::Cache;
-use WebGUI::International;
-use WebGUI::Utility;
+use JSON;
 use Text::CSV_XS;
-use IO::Handle;
-use File::Temp 'tempfile';
-use Data::Dumper;
+use Tie::IxHash;
+use Time::HiRes;
 use WebGUI::Asset::Sku::EMSBadge;
 use WebGUI::Asset::Sku::EMSTicket;
 use WebGUI::Asset::Sku::EMSRibbon;
 use WebGUI::Asset::Sku::EMSToken;
+use WebGUI::Cache;
+use WebGUI::Exception;
+use WebGUI::FormValidator;
+use WebGUI::HTMLForm;
+use WebGUI::International;
+use WebGUI::Utility;
+use WebGUI::Workflow::Instance;
 
 
 
@@ -203,7 +202,12 @@ Returns an array reference of hash references containing name, label, required o
 
 sub getEventFieldsForImport {
 	my $self = shift;
-	my @fields = ();
+	my @fields = ({
+			name		=> 'assetId',
+			label		=> WebGUI::International->new($self->session,'Asset')->get('asset id'),
+			type		=> 'asset',
+			required	=> 1,
+		});
 	my $count = 0;
 	foreach my $definition (@{WebGUI::Asset::Sku::EMSTicket->definition($self->session)}) {
 		$count++;
@@ -211,18 +215,24 @@ sub getEventFieldsForImport {
 			next if ($count > 1 && !isIn($field, qw(title description)));
 			next unless ($definition->{properties}{$field}{label} ne "");
 			push(@fields, {
-				name 	 	=> $field,
-				label 	  	=> $definition->{properties}{$field}{label},
-				required	=> ($field eq "eventNumber") ? 1 : 0,
+				name 	 		=> $field,
+				label 	  		=> $definition->{properties}{$field}{label},
+				required		=> ($field eq "eventNumber") ? 1 : 0,
+				type			=>  $definition->{properties}{$field}{fieldType},
+				options 		=> $definition->{properties}{$field}{options},
+				defaultValue	=> $definition->{properties}{$field}{defaultValue},
 				});
 		}
 	}
 	foreach my $field (@{$self->getEventMetaFields}) {
 		push(@fields, {
-			name 		=> $field->{fieldId},
-			label 		=> $field->{label},
-			required	=> $field->{required},
-			isMeta		=> 1,
+			name 			=> $field->{fieldId},
+			label 			=> $field->{label},
+			required		=> $field->{required},
+			isMeta			=> 1,
+			type			=> $field->{dataType},
+			options 		=> $field->{possibleValues},
+			defaultValue	=> $field->{defaultValues},
 			});
 	}
 	return \@fields;
@@ -265,11 +275,20 @@ sub getRibbons {
 
 Returns an array reference of ticket objects.
 
+=head3 options
+
+A hash reference containing optional toggles.
+
+=head4 returnIds
+
+By default this method returns objects, but setting this to 1 will make it return an array reference of asset ids instead of objects.
+
 =cut
 
 sub getTickets {
 	my $self = shift;
-	return $self->getLineage(['children'],{returnObjects=>1, includeOnlyClasses=>['WebGUI::Asset::Sku::EMSTicket']});
+	my $options = shift;
+	return $self->getLineage(['children'],{returnObjects=>(($options->{returnIds}) ? 0 : 1), includeOnlyClasses=>['WebGUI::Asset::Sku::EMSTicket']});
 }
 
 #-------------------------------------------------------------------
@@ -743,7 +762,7 @@ sub www_exportEvents {
 	$out->print($csv->string,1);
 
 	# process events
-	foreach my $id (@{$self->getLineage(["children"],{includeOnlyClasses=>["WebGUI::Asset::Sku::EMSTicket"]})}) {
+	foreach my $id (@{$self->getTickets({returnIds=>1})}) {
 		my $event = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
 		my @export = ();
 		if (defined $event) {
@@ -1249,22 +1268,12 @@ sub www_importEvents {
 	}
 
 	# create the form
-	my $f = WebGUI::HTMLForm->new( $self->session, action => $self->getUrl("func=doImportEvents"), enctype => 'multipart/form-data' );
+	my $f = WebGUI::HTMLForm->new( $self->session, action => $self->getUrl("func=importEventsSave"), enctype => 'multipart/form-data' );
 
 	$f->file(
 		-label     => $i18n->get('choose a file to import'),
 		-hoverHelp => $i18n->get('import hoverhelp file'),
 		-name      => 'file',
-	);
-	$f->selectBox(
-		-label   => $i18n->get('what about duplicates'),
-		-name    => 'duplicates_how',
-		-hoverHelp => $i18n->get('import hoverhelp dups'),
-		-defaultValue   => ($form->param('duplicates_how')||'skip'),
-		-options => {
-			skip      => $i18n->get('skip'),
-			overwrite => $i18n->get('overwrite'),
-		},
 	);
 	$f->yesNo(
 		-label   => $i18n->get('ignore first line'),
@@ -1272,33 +1281,24 @@ sub www_importEvents {
 		-hoverHelp => $i18n->get('import hoverhelp first line'),
 		-defaultValue   => $form->param('ignore_first_line'),
 	);
-	$f->fieldSetStart('Fields');
-	$f->raw(q[ <tr><td><table><tr><td style="width: 180px">&nbsp;</td><td style="width: 150px"> ].
-			q[ <b>File Contains Field</b></td><td><b>Field Is Duplicate Key</b></td></tr> ]);
 
 	# create the std & meta fields part of the form
+	my %importableFields = ();
+	tie %importableFields, 'Tie::IxHash';
 	foreach my $field (@{$self->getEventFieldsForImport}) {
-		$f->raw(qq[ <tr><td class="formDescription" style="width: 180px">$field->{label}</td><td> ]);
-		# insert the first checkbox
-		$f->raw(WebGUI::Form::Checkbox->new(
-			$self->session,{
-			-name    => "file_contains-$field->{name}",
-			-value   => 1,
-			-checked => ($field->{required} || $form->param("file_contains-$field->{name}")),
-		})->toHtml());
-		$f->raw(qq[ </td><td> ]);
-		# insert the second checkbox
-		$f->raw(WebGUI::Form::Checkbox->new(
-			$self->session,{
-			-name    => "check_duplicates-$field->{name}",
-			-value   => 1,
-			-checked => $form->param("check_duplicates-$field->{name}"),
-		})->toHtml());
-		$f->raw(qq[ </td></tr> ]);
+		$importableFields{$field->{name}} = $field->{label};
 	}
+	my @defaultImportableFields = keys %importableFields;
+	$f->checkList(
+		vertical			=> 1,
+		showSelectAllButton	=> 1,
+		label				=> 'Fields',
+		name				=> 'fieldsToImport',
+		defaultValue		=> \@defaultImportableFields,
+		options				=> \%importableFields,
+		value				=> $form->get('fieldsToImport'),
+	);
 
-	$f->raw(q[ </table></td></tr> ]);
-	$f->fieldSetEnd;
 	$f->submit(-value=>$i18n->get('import events'));
 
 	return $self->processStyle($page_header.'<p/>'.$f->print);
@@ -1308,13 +1308,12 @@ sub www_importEvents {
 
 #-------------------------------------------------------------------
 
-=head2 importEventsSave ( )
+=head2 www_importEventsSave ( )
 
 Handle the uploading of a CSV event data file, along with other options.
 
 =cut
 
-my $max_errors = 10; # number of errors to collect before showing them, when we're in error-collecting mode.
 sub www_importEventsSave {
 	my $self = shift;
 	my $session = $self->session;
@@ -1322,344 +1321,92 @@ sub www_importEventsSave {
 	return $session->privilege->insufficient unless $self->canEdit;
 
 	# set up
-	my $start = time;
+	$session->http->setMimeType("text/plain");
+	my $start = [Time::HiRes::gettimeofday];
 	my $i18n = WebGUI::International->new($session,'Asset_EventManagementSystem');
 	my $csv = Text::CSV_XS->new({ binary => 1 });
 	my $out = $session->output;
+	my $fields = $self->getEventFieldsForImport;
+	my $form = $session->form;
+	my $ignoreFirst = $form->get("ignore_first_line");
+	my $validate = WebGUI::FormValidator->new($session);
+	
+	# find fields to import
+	my @import = $form->get("fieldsToImport");
+	my $i = 0;
+	my $assetIdIndex = undef;
+	foreach my $field (@import) {
+		if ($field eq "assetId") {
+			$assetIdIndex = $i;
+			last;
+		}
+		$i++;
+	}
 	
 	# get csv data
-	$out->print('Reading file...',1);
+	$out->print("Reading file...\n",1);
 	my $storage		= WebGUI::Storage->createTemp($session);
     my $filename	= $storage->addFileFromFormPost("file_file");
 	
+	# do import
+	my $first = 1;
 	if (open my $file, "<", $storage->getPath($filename)) {
-		$out->print('Processing file...',1);
+		$out->print("Processing file...\n",1);
 		while (my $line = <$file>) {
+			if ($first) {
+				$first = 0;
+				if ($ignoreFirst) {
+					next;
+				}
+			}
 			if ($csv->parse($line)) {
 				my @row = $csv->fields;
+				my $event = undef;
+				if (defined $assetIdIndex) {
+					$event = WebGUI::Asset::Sku::EMSTicket->new($session, $row[$assetIdIndex]);
+				}
+				if (defined $event) {
+					$out->print('Updating '.$event->getId."\n",1);
+				}
+				else {
+					$event = $self->addChild({className=>'WebGUI::Asset::Sku::EMSTicket'});
+					$out->print("Adding new asset ".$event->getId."\n",1)
+				}
+				my %properties = ();
+				my %metadata = $event->getEventMetaData;
+				my $i = 0;
+				foreach my $field (@{$fields}) {
+					next unless isIn($field->{name}, @import);
+					my $type = $field->{type};
+					my $value = $validate->$type({
+							name			=> $field->{name},
+							defaultValue	=> $field->{defaultValue},
+							options			=> $field->{options},
+							},$row[$i]);
+					if ($field->{isMeta}) {
+						$metadata{$field->{name}} = $value;
+					}
+					else {
+						$properties{$field->{name}} = $value;
+					}
+					$i++;
+				}
+				$event->update(\%properties);
+				$event->setEventMetaData(\%metadata);
 			}
 			else {
-				$out->print($csv->error_input() . ": ". $line.'<br />',1);
+				$out->print($csv->error_input() . ": ". $line."\n",1);
 			}
 		}
 	}
 	else {
-		$out->print($i18n->get("no import took place").'<br />',1);
+		$out->print($i18n->get("no import took place")."\n",1);
 	}
 	
 	# clean up
+	$out->print("The import took ".Time::HiRes::tv_interval($start)." seconds to run.\n",1);
 	$storage->delete;
 	return "chunked";
-	
-	my $start_time = time;
-
-	my $no_action_taken_error = { # on error, always let the user know that we didn't partially import their data
-		type	=> 'general',
-		message	=> $i18n->get("no import took place"),
-	};
-
-	# get input: CSV data
-	my $storageId	= $self->session->form->param("file_file");
-	my $storage		= WebGUI::Storage->get($self->session, $storageId);
-	return $self->error([{ type => 'general', message => $i18n->get("enter import file") }], 'www_importEvents')
-		unless $storage;
-    my $filename	= $storage->addFileFromFormPost("file_file");
-	my $csv_data	= $storage->getFileContentsAsScalar($filename);
-	$storage->delete;
-
-	# store the input on disk for processing - TODO can we do this whole thing more easily?
-	my $fh = tempfile();
-	print $fh $csv_data;
-	seek $fh, 0, 0;
-
-	# organize meta input: sorted fields included and duplicate keys
-	my $skip_duplicates   = $self->session->form->process('duplicates_how')    eq 'skip' ? 1 : 0;
-	my $ignore_first_line = $self->session->form->process('ignore_first_line') eq 'yes'  ? 1 : 0;
-	my @params			= $self->session->form->param();
-	my @fields_included	= grep s/^file_contains-(.+)$/$1/,    @params;
-	my @dup_keys		= grep s/^check_duplicates-(.+)$/$1/, @params;
-	return $self->error([$no_action_taken_error,{
-				type	=> 'general',
-				message	=> $i18n->get('import need dup key'),
-			}], 'www_importEvents') unless @dup_keys;
-	my @all_data_fields = @{ $self->getEventDataFields() }; # aref of sorted hrefs with name, label, required, type keys
-	my $sku_is_required = grep { $_ eq 'sku' } @dup_keys;
-	if (!$sku_is_required) {
-		for my $field (@all_data_fields) { $field->{required} = 0 if $field->{name} eq 'sku' } # not required here
-	}
-	my @sorted_fields_included = ();
-	for my $field (@all_data_fields) {
-		if (grep { $_ eq $field->{name} } @fields_included) {
-			push @sorted_fields_included, $field->{name};
-		}
-	}
-	my @missing_required_fields = ();
-	for my $field (grep $_->{required}, @all_data_fields) {
-		if (!grep { $_ eq $field->{name} } @fields_included) {
-			push @missing_required_fields, $field->{label};
-		}
-	}
-	if (@missing_required_fields) {
-		return $self->error([$no_action_taken_error,{
-				type	=> 'general',
-				message	=> $i18n->get('check required fields')."@missing_required_fields",
-			}],
-			'www_importEvents',
-		);
-	}
-
-	# we sanity check all of the input before processing any of it
-	# check all records for required fields and field count
-	my $errors = [];
-	my $prerequisites_href = {};
-	if (grep /^prerequisiteId$/, @fields_included) {
-		$prerequisites_href = $self->session->db->buildHashRef(" SELECT name, prerequisiteId FROM EventManagementSystem_prerequisites");
-	}
-	my $templates_href = {};
-	if (grep /^templateId$/, @fields_included) {
-		$templates_href = $self->session->db->buildHashRef(<<"");
-				SELECT assetData.title, template.assetId
-				FROM template 
-				LEFT JOIN assetData
-				ON assetData.assetId = template.assetId
-				AND assetData.revisionDate = template.revisionDate
-
-	}
-	my %approved_values = ( Approved => 1, Denied => 0, Pending => -1, Cancelled => -2);
-	my $meta_fields_aref = $self->getEventMetaFields;
-	my %meta_fields = ();
-	@meta_fields{map {$_->{fieldId}} @$meta_fields_aref} = @$meta_fields_aref; # get them keyed by fieldId
-	my $first_line = 1;
-	my $before_check_time = time;
-	while (my $line = do { local $/ = "\n"; <$fh> }) {
-		if ($first_line and $ignore_first_line) {
-			$first_line = 0;
-			next;	
-		}
-
-		# line is blank - skip it, no error
-		next if $line =~ /^[\s\r\n]*$/;
-
-		# parse the line
-		if (!$csv->parse($line)) {
-			my $error_input = $csv->error_input;
-			push @$errors,{
-				type	=> 'general', # "There was an error processing this input: '$line'"
-				message	=> sprintf $i18n->get('import record parse error'),
-										$fh->input_line_number - $ignore_first_line, $error_input,
-			};
-			if (@$errors >= $max_errors) {
-				return $self->error($errors, 'www_importEvents');
-			}
-			next;
-		}
-
-		my @columns = $csv->fields();
-
-		# check the field count
-		if (@columns != @fields_included) {
-			push @$errors,{
-				type	=> 'general',
-				message	=> sprintf $i18n->get('field count mismatch'), $fh->input_line_number-$ignore_first_line, scalar @columns, scalar @fields_included,
-			};
-			if (@$errors >= $max_errors) {
-				return $self->error($errors, 'www_importEvents');
-			}
-			next;
-		}
-		# check the required fields
-		my %data = map { $sorted_fields_included[$_], $columns[$_] } 0..$#columns;
-		$data{sku} ||= 'do not check this here - we will create one later if necessary' unless $sku_is_required;
-		my $new_errors = $self->checkRequiredFields(\%data, $fh->input_line_number-$ignore_first_line);
-		if (@$new_errors) {
-			push @$errors, @$new_errors;
-			return $self->error([$no_action_taken_error,@$errors], 'www_importEvents') if @$errors >= $max_errors;
-		}
-		#check that approved, if present, is a good value
-		if (exists $data{approved} && ! grep { lc $_ eq lc $data{approved} } %approved_values) {
-			push @$errors, {
-				type	=>	'general',
-				message	=>	sprintf $i18n->get('import invalid status'), $fh->input_line_number-$ignore_first_line, $data{approved},
-			};
-			return $self->error([$no_action_taken_error,@$errors], 'www_importEvents') if @$errors >= $max_errors;
-		}
-		#check that prerequisiteId, if present, is a good value
-		if (exists $data{prerequisiteId} && !exists $prerequisites_href->{$data{prerequisiteId}}) {
-			push @$errors, {
-				type	=>	'general',
-				message	=>	sprintf $i18n->get('import invalid prereq'), $fh->input_line_number-$ignore_first_line, $data{prerequisiteId},
-			};
-			return $self->error([$no_action_taken_error,@$errors], 'www_importEvents') if @$errors >= $max_errors;
-		}
-		#check that templateId, if present, is a good value
-		if (exists $data{templateId} && !exists $templates_href->{$data{templateId}}) {
-			push @$errors, {
-				type	=>	'general',
-				message	=>	sprintf $i18n->get('import invalid template'), $fh->input_line_number-$ignore_first_line, $data{templateId},
-			};
-			return $self->error([$no_action_taken_error,@$errors], 'www_importEvents') if @$errors >= $max_errors;
-		}
-	}
-	my $after_check_time = time;
-
-	# errors? output them instead of proceeding with the import
-	return $self->error([$no_action_taken_error,@$errors], 'www_importEvents') if @$errors;
-
-	# organize our existing events by duplicate keys
-	my %duplicate_events = ();
-	for my $event_href (@{ $self->getAllStdEventDetails }) {
-		my $event_meta_data_href = $self->getEventMetaDataFields($event_href->{productId});
-		my $dup_key = join '|', map { /^metadata_(.+)/ ? $event_meta_data_href->{$1}->{fieldData} : $event_href->{$_} } @dup_keys;
-		$duplicate_events{$dup_key} = $event_href->{productId};
-	}
-
-	# input is deemed sane - time to process it
-	my $total_lines = $fh->input_line_number;
-	seek $fh, 0, 0; # start of the file, again
-	my %all_data_fields;
-	@all_data_fields{map $_->{name}, @all_data_fields} = @all_data_fields; # by name
-	my $existing_events_aref = $self->getAllStdEventDetails;
-	$first_line = 1;
-	my @skipped     = ();
-	my @overwritten = ();
-	my @blank_lines = ();
-	my $before_process_time = time;
-	while (my $line = do { local $/ = "\n"; <$fh> }) {
-		if ($first_line and $ignore_first_line) {
-			$first_line = 0;
-			next;
-		}
-
-		# line is blank - skip it, no error
-		if ($line =~ /^[\s\r\n]*$/) {
-			push @blank_lines, $fh->input_line_number - $ignore_first_line - $total_lines; # the record number
-			next;
-		}
-
-		# parse the line
-		if (!$csv->parse($line)) {
-			my $error_input = $csv->error_input;
-			push @$errors,{
-				type	=> 'general', # "There was an error processing this input: '$line'"
-				message	=> sprintf $i18n->get('import line parse error'), $error_input, $fh->input_line_number - $ignore_first_line - $total_lines,
-			};
-			# this should "never happen" (TM)
-			return $self->error($errors, 'www_importEvents');
-		}
-
-		my @columns = $csv->fields();
-		my %data = map { $sorted_fields_included[$_], $columns[$_] } 0..$#columns;
-
-		# get the data in the form in which it will be compared to existing events
-		#  to find dups, as well as how we'll store it in the db
-		for my $key (keys %data) {
-			if ($key eq 'approved') {
-				$data{$key} = $approved_values{$data{$key}};
-			}
-			else {
-				my $method = $all_data_fields{$key}->{type};
-				if ($method =~ /^(?:hidden|check|select)List$/i) {
-					$data{$key} = $self->session->form->$method(undef, split /;/, $data{$key});
-				}
-				else {
-					$data{$key} = $self->session->form->$method(undef, $data{$key});
-				}
-			}
-		}
-
-		# store it or skip it
-		my $is_new = 1;
-		my $this_dup_key = join '|', map $data{$_}, @dup_keys;
-		my $product_id = "new";
-		if (exists $duplicate_events{$this_dup_key}) {
-			if ($skip_duplicates) {
-				push @skipped, $fh->input_line_number - $ignore_first_line - $total_lines; # the record number
-				next;
-			}
-			push @overwritten, $fh->input_line_number - $ignore_first_line - $total_lines; # the record number
-			$is_new = 0;
-			$product_id = $duplicate_events{$this_dup_key}; # overwrite this product_id
-			# TODO load everything for this product_id so that we only overwrite the fields that are in the CSV file
-		}
-
-		# reasonable defaults?
-		$data{sku}      = $self->session->id->generate	unless exists $data{sku};
-		$data{approved} = $approved_values{Pending}		unless exists $data{approved};
-
-		# store data in the EMS_products table
-		my $ems_products_href = {
-			productId			=> $product_id,
-			startDate			=> $data{startDate},
-			endDate				=> $data{endDate},
-			maximumAttendees	=> $data{maximumAttendees},
-			approved			=> $data{approved},
-			prerequisiteId		=> $prerequisites_href->{$data{prerequisiteId}},
-			#passId				=> '', # NULL for these - there's no way to import them
-			#imageId			=> '',
-			#passType			=> '',
-		};
-		my $pid = $self->setCollateral("EventManagementSystem_products", "productId",$ems_products_href,1,1);
-
-		# store data in EMS_metaData
-		my @meta_fields = grep { $_->{name} =~ /^metadata_/ } @all_data_fields;
-		foreach my $field (@meta_fields) {
-			$field->{name} =~ /^metadata_(.+)$/;
-			my $field_id = $1;
-			my $data = $data{$field->{name}};
-			my $sql = "insert into EMSEventMetaData values (".
-										$self->session->db->quoteAndJoin([$field_id, $pid, $data]).
-										") on duplicate key update fieldData=".
-										$self->session->db->quote($data);
-			$self->session->db->write($sql);
-		}
-
-		# store data in products
-		my $data_href = {
-			productId	=> $pid,
-			title		=> $data{title},
-			description	=> $data{description},
-			price		=> $data{price},
-			useSalesTax	=> ($data{useSalesTax}||0),
-			weight		=> ($data{weight}||0),
-			sku			=> $data{sku},
-			skuTemplate	=> ($data{skuTemplate}||''),
-			templateId	=> ($templates_href->{$data{templateId}}||''),
-		};
-		if ($is_new) {
-			$self->session->db->setRow("products", "productId", $data_href, $pid);
-			$duplicate_events{$this_dup_key} = $product_id;
-		}
-		else {
-			$self->session->db->setRow("products", "productId", $data_href);
-		}
-	}
-	my $after_process_time = time;
-
-	# acknowledge success - &error will work fine - with the number of records processed/imported/skipped/overwritten
-	my $processed_count = $fh->input_line_number - $ignore_first_line - $total_lines;
-	my $other_count     = $skip_duplicates ? @skipped : @overwritten;
-	my $imported_count  = $processed_count - $other_count - @blank_lines;
-	my $what_done       = $i18n->get($skip_duplicates ? 'skipped' : 'overwritten');
-	my $message         = sprintf $i18n->get('import ok'), $processed_count, $imported_count, scalar(@blank_lines), $other_count, $what_done;
-	my $html            = "<li>$message</li>";
-	$html              .= join '', map "<li>".sprintf($i18n->get('import blank line'),$_)."</li>", @blank_lines;
-	$html              .= join '', map "<li>".sprintf($i18n->get('import other line'),$_,$what_done)."</li>", ($skip_duplicates ? @skipped : @overwritten);
-
-	my $total_time   = $after_process_time - $start_time;
-	my $prep_time    = $before_check_time - $start_time;
-	my $check_time   = $after_check_time - $before_check_time;
-	my $prep_time2   = $before_process_time - $after_check_time;
-	my $process_time = $after_process_time - $before_process_time;
-	my $time_block   = <<"";
-		<div style="display: none">
-			total time: $total_time<br/>
-			prep time: $prep_time<br/>
-			check time: $check_time<br/>
-			prep2 time: $prep_time2<br/>
-			process time: $process_time<br/>
-		</div>
-
-	return $self->processStyle("$time_block<ul>$html</ul>");
 }
 
 #-------------------------------------------------------------------

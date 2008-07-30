@@ -158,7 +158,7 @@ sub process {
 	my $self = shift;
 	my $args = shift || '';
 
-	die __PACKAGE__."::process requires an href" unless ref $args eq 'HASH';
+	die __PACKAGE__."::process requires a hash ref" unless ref $args eq 'HASH';
 
 	my ($name, $type, $default, $params) = @$args{qw( name type default params )};
 	$params->{name} = $name;
