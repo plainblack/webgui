@@ -55,8 +55,8 @@ addShoppingHandler($session);
 addAddressBook($session);
 insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
+upgradeEMS($session);  ##Need the transaction log for EMS upgrade.
 convertTransactionLog($session);
-upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 deleteOldProductTemplates($session);
@@ -686,7 +686,14 @@ sub upgradeEMS {
             }
         }
     	print "\t\t\tMigrating old registrants for $emsId.\n" unless ($quiet);
-        my $registrantResults = $db->read("select * from EventManagementSystem_badges where assetId=?",[$emsId]);
+        my $registrantResults = $db->read(<<EOSQL,[$emsId]);
+select * from EventManagementSystem_badges as b
+    join EventManagementSystem_registrations as r on b.badgeId=r.badgeId
+    join EventManagementSystem_purchases     as p on p.purchaseId=r.purchaseId
+    join transaction                         as t on p.transactionId=t.transactionId
+    where b.assetId=? and t.status='Completed'
+EOSQL
+#"select * from EventManagementSystem_badges where assetId=?",[$emsId]);
         while (my $registrantData = $registrantResults->hashRef) {
             $db->setRow("EMSRegistrant","badgeId",{
                 badgeId             => "new",
