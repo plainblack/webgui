@@ -48,8 +48,8 @@ finish($session); # this line required
 sub updateAddressTable{
     my $session = shift;
     print "\tUpdating TABLE address... " unless $quiet;
-    $session->db->write("ALTER TABLE 'address' DROP COLUMN 'name';");
-    $session->db->write("ALTER TABLE 'address' ADD COLUMN 'firstName' VARCHAR(35)  AFTER 'label', ADD COLUMN 'lastName' VARCHAR(35)  AFTER 'firstName';");
+    $session->db->write("ALTER TABLE address DROP COLUMN name");
+    $session->db->write("ALTER TABLE address ADD COLUMN firstName VARCHAR(35)  AFTER label, ADD COLUMN lastName VARCHAR(35)  AFTER firstName");
     print "\tDone.\n" unless $quiet;
 }
 
