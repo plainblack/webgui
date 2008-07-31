@@ -23,7 +23,8 @@ my @tests =
      ['all null', ['', '', ''], ',,'],
      ['single null', [], ''],
      ['escape commas', ['w,x', 'y,z'], '"w,x","y,z"'],
-     ['escape double quotes', ['abc"def', 'ghi-jkl', 'mnop'], '"abc""def",ghi-jkl,mnop']);
+     ['escape double quotes', ['abc"def', 'ghi-jkl', 'mnop'], '"abc""def",ghi-jkl,mnop'],
+     ['cruel embedded newlines', ['foo', 'bar', 'baz', "hello\nworld", 'how are you'], qq{foo,bar,baz,"hello\nworld","how are you"}]);
 plan(tests => scalar(@tests) * 2);
 
 foreach my $testspec (@tests) {

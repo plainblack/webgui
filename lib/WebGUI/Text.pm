@@ -18,6 +18,7 @@ package WebGUI::Text;
 use strict;
 #use warnings;
 
+use Text::CSV_XS;
 use base 'Exporter';
 
 our @EXPORT_OK = qw(
@@ -30,6 +31,9 @@ our %EXPORT_TAGS = (
 	
 	);
 
+
+# use a single CSV object instead of reconstructing one repeatedly
+my $csv = Text::CSV_XS->new( { binary => 1 } );
 
 =head1 NAME
 
@@ -63,24 +67,14 @@ string according to the de-facto standard outlined by RFC 4180.
 =cut
 
 sub joinCSV {
-	my @input	= @_;
-	my @fixed;	# The properly escaped data
-	for my $i (@input) {
-		# Ignore all characters that aren't ASCII printable characters
-		$i =~ s/[^\x09\x20-\x7e]//g;
-		
-		# All strings with these chars in them must be quoted
-		if ($i =~ /[",\n\t]/ || $i =~ /^\s|\s$/s) {
-			# " must be doubled ("")
-			$i =~ s/"/""/g;
-			
-			$i = qq{"$i"};
-		}
-		
-		push @fixed, $i;
-	}
-	
-	return join ",",@fixed;
+	my @inputColumns    = @_;
+    $csv->combine(@inputColumns);
+    my $joinedLine      = $csv->string;
+    if(my $errorString = $csv->error_diag) {
+        warn "Problems parsing @inputColumns: $errorString";
+        return;
+    }
+    return $joinedLine;
 }
 
 
@@ -94,31 +88,14 @@ Splits a CSV string and fixes any escaping done.
 =cut
 
 sub splitCSV {
-	my $s	= shift;
-	
-	# Split on ,
-	# Negative LIMIT so that empty trailing fields are preserved
-	my @array = split /,/, $s, -1; 
-	
-	for (my $i = 0; $i < @array; $i++) {
-		# Fix quoted strings being used to escape commas.
-		# If it begins with a " but doesn't end with an odd number of "
-		#  shift, add to previous, and try again
-		if ($array[$i] =~ /^"/s && length(($array[$i] =~ m/("*)$/s)[0]) % 2 == 0 ) {
-			# If there are no more elements, this line is erroneous
-			if ($i+1 > @array) { warn "Error parsing CSV line."; return undef; }
-			$array[$i] .= ",".splice(@array,$i+1,1);
-			redo;
-		}
-		
-		# Remove quotes on end of string
-		$array[$i] =~ s/^"|"$//sg;
-		
-		# Fix doubled quotes
-		$array[$i] =~ s/""/"/g;
-	}
-	
-	return @array;
+	my $inputString = shift;
+    $csv->parse($inputString);
+    my @splitColumns = $csv->fields;
+    if(my $errorString = $csv->error_diag) {
+        warn "Problems parsing $inputString: $errorString";
+        return;
+    }
+    return @splitColumns;
 }
 
 
