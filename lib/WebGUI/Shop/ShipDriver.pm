@@ -342,7 +342,7 @@ sub www_editSave {
     my $session = $self->session;
     return $session->privilege->insufficient() unless $session->user->isInGroup(3);
     $self->processPropertiesFromFormPost;
-    $session->http->setRedirect("/?shop=ship;method=manage");
+    $session->http->setRedirect($session->url->page('shop=ship;method=manage'));
     return undef;
 }
 
