@@ -11,8 +11,7 @@
  - fixed: EMS 2.0 migration badges
  - fixed: per item shipping
  - fixed: product title problem
- - Fixed a bug where ShipDriver and ShopDriver would ignore the gateway url
-   after adding or editing a driver.
+ - fixed: adding payment brings me to /
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
