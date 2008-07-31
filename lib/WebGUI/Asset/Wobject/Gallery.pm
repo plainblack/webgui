@@ -65,6 +65,11 @@ sub definition {
         DESC            => $i18n->get("viewListOrderDirection option desc"),
     );
 
+    tie my %imageDensityOptions, 'Tie::IxHash', (
+        72              => $i18n->get( "imageDensity option web" ),
+        300             => $i18n->get( "imageDensity option print" ),
+    );
+
     tie my %properties, 'Tie::IxHash', (
         groupIdAddComment => {
             tab             => "security",
@@ -101,6 +106,14 @@ sub definition {
             defaultValue    => 300,
             label           => $i18n->get("imageThumbnailSize label"),
             hoverHelp       => $i18n->get("imageThumbnailSize description"),
+        },
+        imageDensity        => {
+            tab             => "properties",
+            fieldType       => "selectBox",
+            options         => \%imageDensityOptions,
+            defaultValue    => 72,
+            label           => $i18n->get( "imageDensity label" ),
+            hoverHelp       => $i18n->get( "imageDensity description" ),
         },
         maxSpacePerUser => {
             tab             => "properties",

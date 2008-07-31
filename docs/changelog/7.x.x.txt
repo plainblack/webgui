@@ -12,6 +12,7 @@
  - fixed: per item shipping
  - fixed: product title problem
  - fixed: adding payment brings me to /
+ - fixed: Gallery uses too much disk space. Added a way to change an images pixel density.
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3

@@ -32,6 +32,7 @@ my $session = start(); # this line required
 addNewInboxIndexes( $session );
 updateAddressTable( $session );
 addProductShipping( $session );
+addGalleryImageDensity( $session );
 correctPayDriverReceiptTemplate( $session );
 finish($session); # this line required
 
@@ -44,6 +45,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Add the image density property to the Gallery
+sub addGalleryImageDensity {
+    my $session = shift;
+    print "\tAdding Image Density to Gallery... " unless $quiet;
+    
+    $session->db->write(
+        "ALTER TABLE Gallery ADD COLUMN imageDensity INT"
+    );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Corrects the asset id of the default receipt email template for the PayDriver

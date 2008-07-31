@@ -109,21 +109,28 @@ C<options> is a hash reference of options and is currently not used.
 
 sub applyConstraints {
     my $self        = shift;
+    my $options     = shift;
     my $gallery     = $self->getGallery;
     
     # Update the asset's size and make a thumbnail
-    my $maxImageSize    = $self->getGallery->get("imageViewSize") 
+    my $maxImageSize    = $gallery->get("imageViewSize") 
                         || $self->session->setting->get("maxImageSize");
-    my $thumbnailSize   = $self->getGallery->get("imageThumbnailSize")
-                        || $self->session->setting->get("thumbnailSize");
     my $parameters      = $self->get("parameters");
     my $storage         = $self->getStorageLocation;
     my $file            = $self->get("filename");
+
+    # Make resolutions before fixing image, so that we can get higher quality 
+    # resolutions
+    $self->makeResolutions;
+
+    # adjust density before size, so that the dimensions won't change
+    $storage->resize( $file, undef, undef, $gallery->get( 'imageDensity' ) );
     $storage->adjustMaxImageSize($file, $maxImageSize);
+
     $self->generateThumbnail;
     $self->setSize;
-    $self->makeResolutions;
     $self->updateExifDataFromFile;
+    $self->SUPER::applyConstraints( $options );
 }
 
 #-------------------------------------------------------------------
@@ -361,7 +368,7 @@ sub makeResolutions {
         }
         my $newFilename     = $res . ".jpg";
         $storage->copyFile( $self->get("filename"), $newFilename );
-        $storage->resize( $newFilename, $res );
+        $storage->resize( $newFilename, $res, undef, $self->getGallery->get( 'imageDensity' ) );
     }
 }
 

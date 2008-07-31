@@ -41,7 +41,7 @@ our $I18N = {
         context     => '',
     },
     "imageResolutions description" => {
-        message     => "The sizes of images (in pixels) available for download. Images will be altered to 72 DPI before proportionally constrained to the specified number of pixels. In other words, this number is the maximum height or width that the image will have.",
+        message     => "The sizes of images (in pixels) available for download. This number is the maximum height or width that the image will have.",
         lastUpdated => 0,
         context     => '',
     },
@@ -73,7 +73,7 @@ our $I18N = {
         context     => '',
     },
     "maxSpacePerUser description" => {
-        message     => "The maximum amount of disk space (in megabytes) a user is allowed to use in this Gallery.",
+        message     => "The maximum amount of disk space (in megabytes) a user is allowed to use in this Gallery. Each image will take up to 6 megabytes depending on what resolutions and density you choose.",
         lastUpdated => 0,
         context     => '',
     },
@@ -710,6 +710,30 @@ our $I18N = {
         message     => q{The number of files to show per page of the album view.},
         lastUpdated => 0,
         context     => q{Description of asset property},
+    },
+
+    'imageDensity label' => {
+        message     => q{Image Density},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'imageDensity description' => {
+        message     => q{The density of the image. Print-quality images are more than three times the size of web-quality images.},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
+
+    'imageDensity option web' => {
+        message     => q{Web quality (72 pixels per inch)},
+        lastUpdated => 0,
+        context     => q{Option label for 72 pixels-per-inch images, the highest that monitors can display},
+    },
+
+    'imageDensity option print' => {
+        message     => q{Print quality (300 pixels per inch)},
+        lastUpdated => 0,
+        context     => q{Option label for 300 pixels-per-inch images, good for printing images},
     },
 };
 

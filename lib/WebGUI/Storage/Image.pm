@@ -118,6 +118,8 @@ sub addFileFromCaptcha {
     return ($filename, $challenge);
 }
 
+#-------------------------------------------------------------------
+
 =head2 adjustMaxImageSize ( $file )
 
 Adjust the size of an image according to the C<maxImageSize> setting in the Admin
@@ -356,13 +358,20 @@ The new width of the image in pixels.
 
 The new height of the image in pixels.
 
+=head3 density
+
+The new image density in pixels per inch. 
+
 =cut
 
+# TODO: Make this take a hash reference with width, height, and density keys.
+
 sub resize { 
-    my $self = shift;
-    my $filename = shift;
-    my $width = shift;
-    my $height = shift;
+    my $self        = shift;
+    my $filename    = shift;
+    my $width       = shift;
+    my $height      = shift;
+    my $density     = shift;
     unless (defined $filename) {
         $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
         return 0;
@@ -371,7 +380,7 @@ sub resize {
         $self->session->errorHandler->error("Can't resize something that's not an image.");
         return 0;
     }
-    unless ($width || $height) {
+    unless ($width || $height || $density) {
         $self->session->errorHandler->error("Can't resize with no resizing parameters.");
         return 0;
     }
@@ -381,19 +390,33 @@ sub resize {
         $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
         return 0;
     }
-    my ($x, $y) = $image->Get('width','height');
-    if (!$height) { # proportional scale by width
-        $height = $width / $x * $y;
+
+    # First, change image density
+    if ( $density ) {
+        $self->session->errorHandler->info( "Setting $filename to $density" );
+        $image->Set( density => "${density}x${density}" );
     }
-    elsif (!$width) { # proportional scale by height
-        $width = $height * $x / $y;
+
+    # Next, resize dimensions
+    if ( $width || $height ) {
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
+        my ($x, $y) = $image->Get('width','height');
+        if (!$height) { # proportional scale by width
+            $height = $width / $x * $y;
+        }
+        elsif (!$width) { # proportional scale by height
+            $width = $height * $x / $y;
+        }
+        $image->Resize( height => $height, width => $width );
     }
-    $image->Resize( height => $height, width => $width, filter => "lanczos" );
+
+    # Write our changes to disk
     $error = $image->Write($self->getPath($filename));
     if ($error) {
         $self->session->errorHandler->error("Couldn't resize image: ".$error);
         return 0;
     }
+
     return 1;
 }
 
