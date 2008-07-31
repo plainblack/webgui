@@ -495,7 +495,6 @@ Overriding the method from Sku so that the user can configure it.
 
 sub isShippingRequired {
     my $self = shift;
-    $self->session->log->warn('is shipping required: '.$self->get('isShippingRequired'));
     return $self->get('isShippingRequired');
 }
 
