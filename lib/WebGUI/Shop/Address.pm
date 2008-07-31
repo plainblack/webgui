@@ -111,7 +111,7 @@ Returns an HTML formatted address for display.
 
 sub getHtmlFormatted {
     my $self = shift;
-    my $address = $self->get("firstName"). "<br />" .$self->get("lastName") . "<br />" . $self->get("address1") . "<br />";
+    my $address = $self->get("firstName"). " " .$self->get("lastName") . "<br />" . $self->get("address1") . "<br />";
     $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
     $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
     $address .= $self->get("city") . ", ";
