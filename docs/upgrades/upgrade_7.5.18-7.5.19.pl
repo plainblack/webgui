@@ -31,6 +31,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 addNewInboxIndexes( $session );
 updateAddressTable( $session );
+addProductShipping( $session );
 finish($session); # this line required
 
 
@@ -45,11 +46,20 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Removes the name field and adds a firstName and lastName field
-sub updateAddressTable{
+sub updateAddressTable {
     my $session = shift;
     print "\tUpdating TABLE address... " unless $quiet;
     $session->db->write("ALTER TABLE address DROP COLUMN name");
     $session->db->write("ALTER TABLE address ADD COLUMN firstName VARCHAR(35)  AFTER label, ADD COLUMN lastName VARCHAR(35)  AFTER firstName");
+    print "\tDone.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Removes the name field and adds a firstName and lastName field
+sub addProductShipping {
+    my $session = shift;
+    print "\tAdding shippingRequired to the Product table... " unless $quiet;
+    $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
     print "\tDone.\n" unless $quiet;
 }
 

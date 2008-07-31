@@ -841,6 +841,18 @@ be useful, others may not.|,
 		context => q|template variable|
 	},
 
+	'isShippingRequired' => {
+		message => q|Is shipping required?|,
+		lastUpdated => 0,
+		context => q|label for the edit sku|
+	},
+
+	'isShippingRequired help' => {
+		message => q|This determines whether shipping costs will be calculated when the user checks out.|,
+		lastUpdated => 0,
+		context => q|hover help for isShippingRequired in the edit sku screen|
+	},
+
 };
 
 1;

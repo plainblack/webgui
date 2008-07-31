@@ -128,6 +128,13 @@ sub definition {
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
             defaultValue=>undef
         },
+        isShippingRequired => {
+            tab          => "shop",
+            fieldType    => "yesNo",
+            label        => $i18n->get('isShippingRequired'),
+            hoverHelp    => $i18n->get('isShippingRequired help'),
+            defaultValue => 0,
+        },
         warranty=>{
             tab => "properties",
             fieldType=>"file",
@@ -477,6 +484,21 @@ sub getWeight {
     my $self = shift;
     return $self->getOptions->{weight};
 }
+
+#-------------------------------------------------------------------
+
+=head2 isShippingRequired
+
+Overriding the method from Sku so that the user can configure it.
+
+=cut
+
+sub isShippingRequired {
+    my $self = shift;
+    $self->session->log->warn('is shipping required: '.$self->get('isShippingRequired'));
+    return $self->get('isShippingRequired');
+}
+
 
 #-------------------------------------------------------------------
 
