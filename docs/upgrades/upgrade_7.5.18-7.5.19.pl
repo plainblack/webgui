@@ -20,7 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Shop::PayDriver;
 
 my $toVersion = '7.5.19';
 my $quiet; # this line required
@@ -32,6 +32,7 @@ my $session = start(); # this line required
 addNewInboxIndexes( $session );
 updateAddressTable( $session );
 addProductShipping( $session );
+correctPayDriverReceiptTemplate( $session );
 finish($session); # this line required
 
 
@@ -43,6 +44,23 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Corrects the asset id of the default receipt email template for the PayDriver
+sub correctPayDriverReceiptTemplate{
+    my $session = shift;
+
+    #Grab all PaymentDriver id's.
+    my @ids = $session->db->buildArray("select paymentGatewayId from paymentGateway");
+    for my $id(@ids){
+        my $paymentGateway = WebGUI::Shop::PayDriver->new($session,$id);
+        my $options = $paymentGateway->get();
+        if($options->{'receiptEmailTemplateId'} eq 'BMzuE91-XB8E-XGll1zpvA'){
+            $options->{'receiptEmailTemplateId'} = 'bPz1yk6Y9uwMDMBcmMsSCg';
+            $paymentGateway->update($options);
+        }
+    }
+}
 
 #----------------------------------------------------------------------------
 # Removes the name field and adds a firstName and lastName field
