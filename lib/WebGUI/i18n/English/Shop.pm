@@ -650,11 +650,13 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|a label in the address editor|
 	},
+
 	'firstName' => { 
 		message => q|First Name|,
 		lastUpdated => 0,
 		context => q|a label in the address editor|
 	},
+
 	'lastName' => { 
 		message => q|Last Name|,
 		lastUpdated => 0,
@@ -889,7 +891,7 @@ our $I18N = {
 		context => q|The label for the add to cart button.|
 	},
 
-'weekly' => {
+    'weekly' => {
         message => q|Week|,
         lastUpdated => 0,
         context => q|Period name for a weekly subscription.|
