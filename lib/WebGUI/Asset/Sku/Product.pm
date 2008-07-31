@@ -357,7 +357,7 @@ Product.
 
 sub getConfiguredTitle {
     my $self = shift;
-    return $self->getOptions->{shortdesc};
+    return join ' - ', $self->getTitle, $self->getOptions->{shortdesc};
 }
 
 

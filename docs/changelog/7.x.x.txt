@@ -10,6 +10,7 @@
  - Exposed a form element for the GalleryAlbum Others Can Add property
  - fixed: EMS 2.0 migration badges
  - fixed: per item shipping
+ - fixed: product title problem
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
