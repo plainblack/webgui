@@ -64,10 +64,13 @@ sub create {
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
     mode='singleton'",[$properties->{workflowId}]);
 	my $params = (exists $properties->{parameters}) 
-            ? JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}}) 
+            ? JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}})
             : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
-	return undef if ($isSingleton && $count);
+    if ($isSingleton && $count) {
+        $session->log->info("singleton workflow $properties->{workflowId} already running, not running again");
+        return undef
+    }
 
     # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
