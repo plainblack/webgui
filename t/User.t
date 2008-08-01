@@ -223,7 +223,7 @@ is($visitor->profileField('uiLevel'), 5, 'Visitor gets the default uiLevel of 5'
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['194.168.0.101', $session->getId]);
 
-my ($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
+($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
 is ($result, '194.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
@@ -563,9 +563,29 @@ is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessag
 #
 ################################################################
 
+##Build two sets of groups, which share one group in common
+my %groupSet;
+foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
+    $groupSet{$groupName} = WebGUI::Group->new($session, 'new');
+    $groupSet{$groupName}->name($groupName);
+}
+
+$groupSet{red }->addGroups( [ map { $groupSet{$_}->getId } qw/pink      orange    purple/ ] );
+$groupSet{blue}->addGroups( [ map { $groupSet{$_}->getId } qw/turquoise lightBlue purple/ ] );
+$groupSet{blue}->expireOffset(-2500);
+
+my $newFish = WebGUI::User->new($session, 'new');
+$newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId]);
+
 END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
+    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
+    }
+
+    foreach my $testGroup ($expiredGroup, values %groupSet) {
+        if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
+            $testGroup->delete;
+        }
     }
 
     (defined $expiredGroup  and ref $expiredGroup  eq 'WebGUI::Group') and $expiredGroup->delete;
