@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.19
+--------------------------------------------------------------------
+ * WebGUI now requires Text::CSV_XS version 0.52.  If you have been
+   using an earlier version you will need to upgrade this perl
+   module before you upgrade.
+
 7.5.17
 --------------------------------------------------------------------
  * If users are allowed to self register and emails are not required, this

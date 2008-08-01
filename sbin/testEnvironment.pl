@@ -92,7 +92,7 @@ checkModule("HTML::Template::Expr",         0.05,      2 );
 checkModule("XML::RSSLite",                 0.11         );
 checkModule("JSON",                         2.04         );
 checkModule("Config::JSON",                 "1.1.2"      );
-checkModule("Text::CSV_XS",                 "0.26"       );
+checkModule("Text::CSV_XS",                 "0.52"       );
 checkModule("Net::Subnets",                 0.21         );
 checkModule("Finance::Quote",               1.08         );
 checkModule("POE",                          0.3202       );
