@@ -1364,7 +1364,7 @@ sub getToolbar {
     if ($userUiLevel >= $uiLevels->{"demote"}) {
         $output
             .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=promote") . '">' . $i18n->get("demote") . '</a></li>';
+            . $self->getUrl("func=demote") . '">' . $i18n->get("demote") . '</a></li>';
     }
     if ($userUiLevel >= $uiLevels->{"manage"}) {
         $output
