@@ -124,7 +124,7 @@ sub authenticate {
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
 	my $i18n = WebGUI::International->new($self->session);
-	$self->error($i18n->get(68));
+	$self->error('<li>'.$i18n->get(68).'</li>');
 	return 0;
 }
 
@@ -143,7 +143,7 @@ sub createAccount {
         return $self->displayLogin;
     } 
 	my $i18n = WebGUI::International->new($self->session);
-    $vars->{'create.message'} = $message if ($message);
+    $vars->{'create.message'} = '<ul>'.$message.'</ul>' if ($message);
 	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
 	if ($vars->{useCaptcha}) {
 		use WebGUI::Form::Captcha;
@@ -204,7 +204,7 @@ sub createAccountSave {
     $error = $self->error unless($self->validUsername($username));
         if ($setting->get("webguiUseCaptcha")) {
             unless ($form->process('authWebGUI.captcha', "Captcha")) {
-                $error .= $i18n->get("captcha failure","AuthWebGUI");
+                $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
             }
         }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
@@ -317,11 +317,11 @@ sub displayLogin {
    	my $self = shift;
    	my $vars;
    	return $self->displayAccount($_[0]) if ($self->userId ne "1");
-	my $i18n = WebGUI::International->new($self->session);
-   	$vars->{'login.message'} = $_[0] if ($_[0]);
+    my $i18n = WebGUI::International->new($self->session);
+   	$vars->{'login.message'}             = '<ul>'.$_[0].'</ul>' if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
-   	$vars->{'recoverPassword.url'} = $self->session->url->page('op=auth;method=recoverPassword');
-   	$vars->{'recoverPassword.label'} = $i18n->get(59);
+   	$vars->{'recoverPassword.url'}       = $self->session->url->page('op=auth;method=recoverPassword');
+   	$vars->{'recoverPassword.label'}     = $i18n->get(59);
    	return $self->SUPER::displayLogin("login",$vars);
 }
 
@@ -1127,7 +1127,7 @@ sub resetExpiredPasswordSave {
    $error .= '<li>'.$i18n->get(12,'AuthWebGUI').'</li>' if ($self->session->form->process("oldPassword") eq $self->session->form->process("identifier"));
    $error .= $self->error if(!$self->_isValidPassword($self->session->form->process("identifier"),$self->session->form->process("identifierConfirm")));
    
-   return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1>".$error) if($error ne "");
+   return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1><ul>".$error.'</ul>') if ($error);
    
    $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
@@ -1165,7 +1165,7 @@ sub updateAccount {
    my $username = $self->session->form->process('authWebGUI.username');
    my $password = $self->session->form->process('authWebGUI.identifier');
    my $passConfirm = $self->session->form->process('authWebGUI.identifierConfirm');
-   my $display = '<li>'.$i18n->get(81).'</li>';
+   my $display = '<ul><li>'.$i18n->get(81).'</li></ul>';
    my $error = "";
    
    if($self->userId eq '1'){

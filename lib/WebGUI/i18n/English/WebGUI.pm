@@ -605,12 +605,11 @@ our $I18N = {
 	},
 
 	'77' => {
-		message => q|<li>That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
+		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
 %sToo<br />
 %s2<br />
-%s_%d<br />
-</li>|,
-		lastUpdated => 1140292461
+%s_%d<br />|,
+		lastUpdated => 1217216725
 	},
 
 	'444' => {
