@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 129; # increment this value for each test you create
+use Test::More tests => 130; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -28,7 +28,8 @@ my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
-my $numberOfUsers = $session->db->quickScalar('select count(*) from users');
+my $numberOfUsers  = $session->db->quickScalar('select count(*) from users');
+my $numberOfGroups = $session->db->quickScalar('select count(*) from groups');
 
 my $user;
 my $lastUpdate;
@@ -556,6 +557,12 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
 is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
 
+################################################################
+#
+# getGroupIdsRecursive
+#
+################################################################
+
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
@@ -574,8 +581,9 @@ END {
     $newProfileField->delete();
 
 	$testCache->flush;
-    my $newNumberOfUsers = $session->db->quickScalar('select count(*) from users');
-    is ($newNumberOfUsers, $numberOfUsers, 'no new additional users were leaked by this test');
-
+    my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');
+    my $newNumberOfGroups = $session->db->quickScalar('select count(*) from groups');
+    is ($newNumberOfUsers,  $numberOfUsers,  'no new additional users were leaked by this test');
+    is ($newNumberOfGroups, $numberOfGroups, 'no new additional groups were leaked by this test');
 }
 

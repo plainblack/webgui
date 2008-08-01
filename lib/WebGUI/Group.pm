@@ -861,7 +861,8 @@ like IP address, LDAP, dbQuery or scratchFilter.
 
 =head3 withoutExpired
 
-A boolean that if set true will return the users list minus the expired groupings.
+A boolean that if set to true will return only the groups that the user is in where
+their membership hasn't expired.
 
 =cut
 

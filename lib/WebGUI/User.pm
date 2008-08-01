@@ -189,7 +189,10 @@ sub dateCreated {
 
 =head2 delete ( )
 
-Deletes this user.
+Deletes this user, removes their user profile data, cleans up their
+inbox, removes userSessionScratch data and authentication information,
+removes them from any groups they belong to and deletes their
+Friend's group.
 
 =cut
 
