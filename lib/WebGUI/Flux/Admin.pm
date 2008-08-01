@@ -296,7 +296,7 @@ EOSM
     $add_icon =~ s{toolbar/bullet/delete}{flux/add2};
     my $rule_output = <<"END_RULEHEADER";
 <tr>
-    <td class='formDescription' valign="top" style="width: 180px;">
+    <td class='formDescription' valign="top" style="width: 350px;">
         $add_icon Add Rule
     </td>
 </tr>
@@ -311,7 +311,7 @@ END_RULEHEADER
 
         $rule_output .= <<"END_RULEROW";
 <tr>
-    <td class='formDescription' valign="top" style="width: 180px;">
+    <td class='formDescription' valign="top" style="width: 350px;">
         $name
     </td>
     <td class='tableData' valign="top">
@@ -929,7 +929,7 @@ sub www_manageRule {
     $add_icon =~ s{toolbar/bullet/delete}{flux/add2};
     $output .= <<"END_RULEHEADER";
 <tr>
-    <td class='formDescription' valign="top" style="width: 180px;">
+    <td class='formDescription' valign="top" style="width: 350px;">
         $add_icon Add Expression
     </td>
 </tr>
@@ -944,7 +944,7 @@ END_RULEHEADER
 
         $output .= <<"END_RULEROW";
 <tr>
-    <td class='formDescription' valign="top" style="width: 180px;">
+    <td class='formDescription' valign="top" style="width: 350px;">
         e$sequenceNumber: $name
     </td>
     <td class='tableData' valign="top">

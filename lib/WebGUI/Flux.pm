@@ -101,7 +101,7 @@ sub getRules {
 
     # Collect an array of Rules
     my @ruleObjects = ();
-    my $rules       = $session->db->read('select fluxRuleId from fluxRule');
+    my $rules       = $session->db->read('select fluxRuleId from fluxRule order by sequenceNumber');
     while ( my ($fluxRuleId) = $rules->array ) {
         push @ruleObjects, $class->getRule( $session, $fluxRuleId );
     }

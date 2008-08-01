@@ -76,6 +76,14 @@ A groupId of a group attached to this message.
 
 A userId that created this message. Defaults to '3' (Admin).
 
+=head4 emailMessage
+
+Email message to use rather than inbox message contents.
+
+=head4 emailSubject
+
+Email subject to use rather than inbox message subject.
+
 =cut
 
 sub create {
@@ -91,21 +99,26 @@ sub create {
 	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};
     $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
+    
 	if ($self->{_properties}{status} eq "completed") {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
 	}
-	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});	
+	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});
+	
+	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
 	my $mail = WebGUI::Mail::Send->create($session, {
 		toUser=>$self->{_properties}{userId},
 		toGroup=>$self->{_properties}{groupId},
-		subject=>$self->{_properties}{subject}
+		subject=>$subject,
 		});
 	if (defined $mail) {
-		if ($self->{_properties}{message} =~ m/\<.*\>/) {
-			$mail->addHtml($self->{_properties}{message});
+	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
+	       
+		if ($msg =~ m/\<.*\>/) {
+			$mail->addHtml($msg);
 		} else {
-			$mail->addText($self->{_properties}{message});
+			$mail->addText($msg);
 		}
 		$mail->addFooter;
 		$mail->queue;
