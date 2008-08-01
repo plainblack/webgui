@@ -17,6 +17,7 @@
  - fixed: Anonymous registration form produces invalid html
  - fixed: DEmote in toolbar menu has PROmote url
  - fixed: EMS purge now functions correctly
+ - improve behavior of preload.perl for custom lib dirs not ending in lib
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
