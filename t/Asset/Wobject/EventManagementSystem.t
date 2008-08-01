@@ -90,11 +90,15 @@ $versionTag->set({name=>"EventManagementSystem Test"});
 my @badges;
 push(@badges, $ems->addChild({
 	className=>'WebGUI::Asset::Sku::EMSBadge',
+    title => 'title',
+    description => 'desc',
 	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
 }));
 
 push(@badges, $ems->addChild({
 	className=>'WebGUI::Asset::Sku::EMSBadge',
+    title => 'title',
+    description => 'desc',
 	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
 }));
 $versionTag->commit;
@@ -105,9 +109,7 @@ foreach my $badge(@badges) {
 
 # Check that both badges exists
 my $badges = $ems->getBadges;
-ok(scalar($badges) == 2, 'Two Badges exist');
-
-#print Dumper($badges);
+ok(scalar(@$badges) == 2, 'Two Badges exist');
 
 # Add tickets
 my @tickets;
@@ -119,7 +121,8 @@ foreach my $ticket(@tickets) {
 }
 
 ok($ems->can('getTickets'), 'Can get tickets');
-ok(scalar($ems->getTickets) == 2, 'Two tickets exist');
+my $tickets = $ems->getTickets;
+ok(scalar(@$tickets) == 2, 'Two tickets exist');
 
 # Add ribbons
 my @ribbons;
@@ -131,7 +134,8 @@ foreach my $ribbon(@ribbons) {
 }
 
 ok($ems->can('getRibbons'), 'Can get ribbons');
-ok(scalar($ems->getRibbons) == 2, 'Two ribbons exist');
+my $ribbons = $ems->getRibbons;
+ok(scalar(@$ribbons) == 2, 'Two ribbons exist');
 
 #----------------------------------------------------------------------------
 # Cleanup
