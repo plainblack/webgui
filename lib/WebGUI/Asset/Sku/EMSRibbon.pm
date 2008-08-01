@@ -173,7 +173,7 @@ Deletes all entries in EMSRegistrationRibbon table for this sku. No refunds are 
 
 sub purge {
 	my $self = shift;
-	$self->session->db->write("delete from EMSRegistrantRibbon where tokenAssetId=?",[$self->getId]);
+	$self->session->db->write("delete from EMSRegistrantRibbon where ribbonAssetId=?",[$self->getId]);
 	$self->SUPER::purge;
 }
 
