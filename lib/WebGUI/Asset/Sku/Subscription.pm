@@ -808,9 +808,7 @@ sub www_listSubscriptionCodes {
 
 	my ($p, $codes, $output, $where, $ops, $delete);
 	return $session->privilege->insufficient unless $self->canEdit;
-$session->errorHandler->warn(1);
 	my $dcStart     = $session->form->date('dcStart');
-$session->errorHandler->warn(2);
 	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
 	my $duStart     = $session->form->date('duStart');
 	my $duStop      = $session->datetime->addToTime($session->form->date('duStop'), 23, 59);
