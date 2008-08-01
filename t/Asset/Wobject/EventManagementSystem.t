@@ -84,24 +84,19 @@ ok($ems->isRegistrationStaff == 0, 'User is not part of registration staff');
 $session->user({ userId => 3 });
 ok($ems->isRegistrationStaff == 1, 'User is part of registration staff');
 
-$versionTag->set({name=>"EventManagementSystem Test"});
-
 # Add two badges, using addChild instead of Mech
 my @badges;
 push(@badges, $ems->addChild({
 	className=>'WebGUI::Asset::Sku::EMSBadge',
     title => 'title',
     description => 'desc',
-	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
 }));
 
 push(@badges, $ems->addChild({
 	className=>'WebGUI::Asset::Sku::EMSBadge',
     title => 'title',
     description => 'desc',
-	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
 }));
-$versionTag->commit;
 
 foreach my $badge(@badges) {
 	ok(ref($badge) eq 'WebGUI::Asset::Sku::EMSBadge', 'Badge added');
