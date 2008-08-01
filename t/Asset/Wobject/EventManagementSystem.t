@@ -25,37 +25,17 @@ use WebGUI::Session;
 # Init
 my $session         = WebGUI::Test->session;
 
-# Do our work in the import node (root/import)
+# Do our work in the import node
 my $node = WebGUI::Asset->getImportNode($session);
 
 # Create a version tag to work in
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"EventManagementSystem Test"});
 
-# Setup Mech
-my ($mech, $redirect, $response);
-
-# Get the site's base URL
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
-my $identifier = '123qwe';
-
-if ( !eval { require Test::WWW::Mechanize; 1; } ) {
-    plan skip_all => 'Cannot load Test::WWW::Mechanize. Will not test.';
-}
-$mech    = Test::WWW::Mechanize->new;
-$mech->get( $baseUrl );
-if ( !$mech->success ) {
-    plan skip_all => "Cannot load URL '$baseUrl'. Will not test.";
-}
-
-my $i18n        = WebGUI::International->new( $session, 'Asset_EventManagementSystem' );
-my $user = WebGUI::User->new($session, 3);
-
-
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 24;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -65,13 +45,6 @@ use_ok('WebGUI::Asset::Sku::EMSBadge');
 use_ok('WebGUI::Asset::Sku::EMSTicket');
 use_ok('WebGUI::Asset::Sku::EMSRibbon');
 use_ok('WebGUI::Asset::Sku::EMSToken');
-
-# login
-$mech       = getMechLogin( $baseUrl, $user, $identifier );
-$mech->content_contains( 
-    'Hello',
-    'Welcome message shown on login',
-);
 
 # Add an EMS asset
 my $ems = $node->addChild({
@@ -83,104 +56,82 @@ my $ems = $node->addChild({
 });
 $versionTag->commit;
 
-my $emsUrl = $baseUrl . $ems->getUrl();
-$mech->get_ok( $emsUrl, "Get EMS url, $emsUrl");
+# Test for a sane object type
+isa_ok($ems, 'WebGUI::Asset::Wobject::EventManagementSystem');
 
-#############
-# Add badge #
-#############
-$mech->get_ok( $emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSBadge' );
-
-# Complete the badge form
-my $properties  = {
-    title           => 'Conference',
-    description     => 'This just for the conference',
-    price => 100,
+# Test to see if we can set new values
+my $newEMSSettings = {
+        timezone => 'America/New York',
 };
 
-$mech->submit_form_ok( {
-    with_fields     => $properties,
-}, 'Sent Badge creation form' );
+# update the new values for this instance
+$ems->update($newEMSSettings);
 
-# Shows the buy badge page
-$mech->content_contains( 
-    $i18n->get( 'buy' ),
-    'Buy button is displayed',
-);
-
-# Shows the Badge instructions
-$mech->content_contains( 
-    $ems->get('badgeInstructions'),
-    'Badge instructions are displayed',
-);
-
-#############
-# Add badge #
-#############
-$mech->get_ok( $emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSBadge' );
-
-# Complete the badge form
-$properties  = {
-    title           => 'Conference + Workshops',
-    description     => 'This for the conference and workshops',
-    price => 200,
-};
-
-$mech->submit_form_ok( {
-    with_fields     => $properties,
-}, 'Sent Badge creation form' );
-
-
-my $badges = $ems->getBadges;
-ok(scalar(@{$badges}) == 2, 'Two badges added');
-ok($badges->[0]->getPrice == 100, 'Price of first badge');
-ok($badges->[1]->getPrice == 200, 'Price of second badge');
-isa_ok($badges->[0], 'WebGUI::Asset::Sku::EMSBadge');
-ok($badges->[0]->getId, 'BadgeId retrieved from badge object');
-
-# Tickets
-ok($ems->www_buildBadge($badges->[0]->getId), 'www_buildBadge returns something');
-$mech->get_ok($emsUrl . '?func=add;class=WebGUI::Asset::Sku::EMSTicket');
-$properties = {
-    title   => 'My Ticket',
-    price   => '50',
-};
-$mech->submit_form_ok( {
-    with_fields => $properties,
-}, 'Submit ticket form');
-
-$mech->content_contains(
-    'My Ticket',
-    'Ticket name is displayed',
-);
-
-my $tickets = $ems->getTickets;
-isa_ok($tickets->[0], 'WebGUI::Asset::Sku::EMSTicket');
-ok($tickets->[0]->get('title') eq 'My Ticket', 'getTickets returns newly created ticket');
-
-#----------------------------------------------------------------------------
-# getMechLogin( baseUrl, WebGUI::User, "identifier" )
-# Returns a Test::WWW::Mechanize session after logging in the given user using
-# the given identifier (password)
-# baseUrl is a fully-qualified URL to the site to login to
-sub getMechLogin {
-    my $baseUrl     = shift;
-    my $user        = shift;
-    my $identifier  = shift;
-    
-    my $mech    = Test::WWW::Mechanize->new;
-    $mech->get( $baseUrl . '?op=auth;method=displayLogin' );
-    
-    $mech->submit_form( 
-    	form_number => 1,
-        fields => {
-            username        => $user->username,
-            identifier      => $identifier,
-        },
-    ); 
-
-    return $mech;
+# Let's check our updated values
+foreach my $newSetting (keys %{$newEMSSettings}) {
+        is ($ems->get($newSetting), $newEMSSettings->{$newSetting}, "updated $newSetting is ".$newEMSSettings->{$newSetting});
 }
+
+my $preparedView = $ems->prepareView();
+ok($preparedView, 'prepareView returns something');
+
+my $view = $ems->view();
+ok($view, 'View returns something');
+
+ok($ems->isRegistrationStaff == 0, 'User is not part of registration staff');
+
+# Become admin for testing
+$session->user({ userId => 3 });
+ok($ems->isRegistrationStaff == 1, 'User is part of registration staff');
+
+$versionTag->set({name=>"EventManagementSystem Test"});
+
+# Add two badges, using addChild instead of Mech
+my @badges;
+push(@badges, $ems->addChild({
+	className=>'WebGUI::Asset::Sku::EMSBadge',
+	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
+}));
+
+push(@badges, $ems->addChild({
+	className=>'WebGUI::Asset::Sku::EMSBadge',
+	workflowIdCommit    => 'pbworkflow000000000003', # Commit Content Immediately
+}));
+$versionTag->commit;
+
+foreach my $badge(@badges) {
+	ok(ref($badge) eq 'WebGUI::Asset::Sku::EMSBadge', 'Badge added');
+}
+
+# Check that both badges exists
+my $badges = $ems->getBadges;
+ok(scalar($badges) == 2, 'Two Badges exist');
+
+#print Dumper($badges);
+
+# Add tickets
+my @tickets;
+push(@tickets, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSTicket'}));
+push(@tickets, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSTicket'}));
+
+foreach my $ticket(@tickets) {
+	ok(ref($ticket) eq 'WebGUI::Asset::Sku::EMSTicket', 'Ticket added');
+}
+
+ok($ems->can('getTickets'), 'Can get tickets');
+ok(scalar($ems->getTickets) == 2, 'Two tickets exist');
+
+# Add ribbons
+my @ribbons;
+push(@ribbons, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSRibbon'}));
+push(@ribbons, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSRibbon'}));
+
+foreach my $ribbon(@ribbons) {
+	ok(ref($ribbon) eq 'WebGUI::Asset::Sku::EMSRibbon', 'Ribbon added');
+}
+
+ok($ems->can('getRibbons'), 'Can get ribbons');
+ok(scalar($ems->getRibbons) == 2, 'Two ribbons exist');
 
 #----------------------------------------------------------------------------
 # Cleanup
