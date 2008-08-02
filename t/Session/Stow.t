@@ -80,7 +80,7 @@ my $milList = $stow->get("military");
 
 push @{ $milList }, qw/foxtrot echo/;
 
-is_deeply($stow->get("military"), [ @orig_list, qw/foxtrot echo/ ], "modifying fetched list changes stow'ed list because it is a reference");
+is_deeply($stow->get("military"), [ @orig_list ], "modifying fetched list does not change original because it is a safe copy");
 
 is($stow->delete(), undef, 'deleting with no key returns undef');
 is($stow->delete('noSuchKey'), undef, 'deleting non-existant variable returns undef');
