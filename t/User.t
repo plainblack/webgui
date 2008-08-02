@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 130; # increment this value for each test you create
+use Test::More tests => 132; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -200,12 +200,6 @@ ok(!WebGUI::User->validUserId($session, 'eeee'), 'random illegal Id #1');
 ok(!WebGUI::User->validUserId($session, 37), 'random illegal Id #2');
 
 $user->delete;
-
-#identifier() and uncache()
-SKIP: {
-  skip("identifier() -- deprecated",1);
-  ok(undef, "identifier()");
-}
 
 SKIP: {
   skip("uncache() -- Don't know how to test uncache()",1);
@@ -451,12 +445,20 @@ $expiredGroup->expireOffset(-1000);
 $dude->addToGroups([$expiredGroup->getId]);
 
 my $dudeGroups = $dude->getGroups();
-cmp_bag($dudeGroups, ['12', '2', '7', $expiredGroup->getId], 'Dude belongs to Registered Users, Everyone and T.O.A');
+cmp_bag($dudeGroups, [12, 2, 7, $expiredGroup->getId], 'Dude belongs to Registered Users, Everyone and T.O.A');
 
 ##Group lookups are cached, so we'll clear the cache by removing Dude from T.O.A.
 $dude->deleteFromGroups([12]);
-$dudeGroups = $dude->getGroups(1);
-cmp_bag($dudeGroups, ['2', '7'], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
+$dudeGroups = $dude->getGroups(1);  ##This is the original call to getGroups;
+cmp_bag($dudeGroups, [2, 7], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
+
+##Safe copy check
+push @{ $dudeGroups }, 'not a groupId';
+cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the list of groups does not change the cached value');
+
+my $dudeGroups2 = $dude->getGroups(1); ##This call gets a cached version.
+push @{ $dudeGroups2 }, 'still not a groupId';
+cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the cached list of groups does not change the cached value');
 
 ################################################################
 #
@@ -570,12 +572,22 @@ foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
     $groupSet{$groupName}->name($groupName);
 }
 
-$groupSet{red }->addGroups( [ map { $groupSet{$_}->getId } qw/pink      orange    purple/ ] );
-$groupSet{blue}->addGroups( [ map { $groupSet{$_}->getId } qw/turquoise lightBlue purple/ ] );
-$groupSet{blue}->expireOffset(-2500);
+$groupSet{blue}->expireOffset(-1500);
+
+$groupSet{purple}->addGroups( [ map { $groupSet{$_}->getId } qw/red blue pink/ ] );
+$groupSet{lightBlue}->addGroups( [ map { $groupSet{$_}->getId } qw/blue/ ] );
+$groupSet{turquoise}->addGroups( [ map { $groupSet{$_}->getId } qw/blue/ ] );
+$groupSet{pink}->addGroups(   [ map { $groupSet{$_}->getId } qw/red/ ] );
+$groupSet{orange}->addGroups( [ map { $groupSet{$_}->getId } qw/red/ ] );
 
 my $newFish = WebGUI::User->new($session, 'new');
-$newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId]);
+$newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId ]);
+
+cmp_bag(
+    $newFish->getGroupIdsRecursive,
+    [ 2, 7, map { $_->getId } @groupSet{qw/red pink orange purple/} ],
+    'getGroupIdsRecursive returns the correct set of groups, ignoring expire date and not duplicating groups'
+);
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish) {
