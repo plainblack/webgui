@@ -20,6 +20,7 @@
  - improve behavior of preload.perl for custom lib dirs not ending in lib
  - fixed: Server side spellchecker doesn't work
  - fixed: DateTime Form Control Bug
+ - fixed: Tree Menu is always collapsed
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
