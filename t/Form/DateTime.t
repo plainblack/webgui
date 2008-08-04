@@ -29,7 +29,7 @@ my $session = WebGUI::Test->session;
 
 my $formType = 'datetime';
 
-my $numTests = 14;
+my $numTests = 15;
 
 plan tests => $numTests;
 
@@ -87,14 +87,18 @@ is($input->{maxlength}, 19, 'Checking maxlength param, set');
 #WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 
 my $date1 = WebGUI::Form::DateTime->new($session, {'defaultValue' => time()});
-$session->user->profileField( 'timeZone' , 'American/Chicago');
+$session->user->profileField( 'timeZone' , 'America/Chicago');
 is($date1->getValue(1217608466), 1217608466, "Epoch to Epch");
 is($date1->getValue('2008-08-01 16:34:26'), $session->datetime->setToEpoch("2008-08-01 16:34:26"), "MySQL to Epoch");
 
+my $date2 = WebGUI::Form::DateTime->new($session);
+is($date2->getValue(1217608466), 1217608466, "Default Epoch to Epch");
+is($date2->getValue('2008-08-01 16:34:26'), $session->datetime->setToEpoch("2008-08-01 16:34:26"), "Default MySQL to Epoch");
+
 #Dates to MySQL
-my $date2 = WebGUI::Form::DateTime->new($session, {'defaultValue' => '2008-08-01 16:34:26'});
-is($date2->getValue(1217608466), '2008-08-01 11:34:26', "Epoch to MySQL");
-is($date2->getValue('2008-08-01 11:34:26'), '2008-08-01 11:34:26', "MySQL to MySQL");
+my $date3 = WebGUI::Form::DateTime->new($session, {'defaultValue' => '2008-08-01 16:34:26'});
+is($date3->getValue(1217608466), '2008-08-01 11:34:26', "Epoch to MySQL");
+is($date3->getValue('2008-08-01 11:34:26'), '2008-08-01 16:34:26', "MySQL to MySQL");#UTC is 5 hours ahead of Chicago
 
 __END__
 

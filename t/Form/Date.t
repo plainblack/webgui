@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'date';
 
-my $numTests = 12 + scalar @{ $testBlock } ;
+my $numTests = 15 + scalar @{ $testBlock } ;
 
 
 plan tests => $numTests;
@@ -94,7 +94,10 @@ $html = join "\n",
 @inputs = $forms[0]->inputs;
 $input = $inputs[0];
 is($input->name, 'preDateValue', 'Checking input name');
-#is($input->value, 1217608466, 'Checking default value');
+TODO: {
+local $TODO = "Figure out why this is returning a MySQL value instead of an epoch.";
+    is($input->value, 1217608466, 'Checking default value');
+}
 is($input->{size}, 10, 'Checking size param, set');
 is($input->{maxlength}, 10, 'Checking maxlength param, set');
 
@@ -107,6 +110,10 @@ WebGUI::Form_Checking::auto_check($session, $formType, $testBlock);
 my $date2 = WebGUI::Form::Date->new($session, {'defaultValue' => '2008-08-01 16:34:26'});
 is($date2->getValue(1217608466), '2008-08-01 11:34:26', "Epoch to MySQL");
 is($date2->getValue('2008-08-01 11:34:26'), '2008-08-01 11:34:26', "MySQL to MySQL");
+
+my $date2 = WebGUI::Form::Date->new($session);
+is($date2->getValue(1217608466), 1217608466, "Default Epoch to Epoch");
+is($date2->getValue('2008-08-01 11:34:26'), 1217608466, "Default MySQL to Epoch");
 
 __END__
 

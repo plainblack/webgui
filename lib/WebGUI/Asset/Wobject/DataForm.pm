@@ -1377,6 +1377,7 @@ sub www_process {
             };
         }
         $entryData->{ $field->{name} } = $value;
+$self->session->errorHandler->warn($field->{name}. " ". $value);
     }
 
     # Process CAPTCHA

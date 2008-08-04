@@ -138,20 +138,29 @@ sub getValue {
 	my $self = shift;
     # This should probably be rewritten as a cascading ternary
     my $value = $self->SUPER::getValue(@_);
-	if (!$self->get("defaultValue") || $self->get("defaultValue") =~ m/^\d+$/ || !$self->get("value") || $self->get("value") =~ m/^\d+$/) {
+	
+    if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
 		# Epoch format
+        if($value =~ /^\d+$/){
+            return $value;
+        }
 		return $self->session->datetime->setToEpoch($value);
 	} 
     else {
 		# MySQL format
 		# YY(YY)?-MM-DD HH:MM:SS
+
+        if($value =~ /^\d+$/){
+            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+        }
 		
 		# Verify format
 		return undef
 			unless ($value =~ m/(?:\d{2}|\d{4})\D\d{2}\D\d{2}\D\d{2}\D\d{2}\D\d{2}/);
 		
 		# Fix time zone
-		$value 	= WebGUI::DateTime->new(mysql => $value, time_zone => $self->get("timeZone"))
+
+		$value 	= WebGUI::DateTime->new($self->session,mysql => $value, time_zone=>$self->session->user->profileField( 'timeZone' ))
 			    ->set_time_zone("UTC")->toMysql;
 		
 		return $value;

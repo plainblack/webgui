@@ -77,7 +77,8 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	push(@{$definition}, {
+	
+    push(@{$definition}, {
 		defaultValue=>{
 			defaultValue=>$session->datetime->time()
 			},
@@ -137,16 +138,29 @@ sub getValue {
     # This should probably be rewritten as a cascading ternary
     my $value = $self->SUPER::getValue(@_);
 	if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
-		return $self->session->datetime->setToEpoch($value);
+        # Epoch format
+        if($value =~ /^\d+$/){
+            return $value;
+        }
+        return $self->session->datetime->setToEpoch($value);
 	} 
     else {
 		# MySQL format
 		# YY(YY)?-MM-DD
 		
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
-		
-		return $1
-			if ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
+
+        # MySQL format
+        # YY(YY)?-MM-DD HH:MM:SS
+
+        if($value =~ /^\d+$/){
+            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+        }
+
+        # Verify format
+        return undef
+			unless ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
+        return $value;
 	}
 }
 
