@@ -244,6 +244,7 @@ sub appendTemplateLabels {
 	$var->{"views.label"} = $i18n->get("views");
         $var->{'visitorName.label'} = $i18n->get("visitor");
     $var->{"captcha_label"} = $i18n->get("captcha label");
+	$var->{'keywords.label'} = $i18n->get('keywords label');
 }
 
 #-------------------------------------------------------------------

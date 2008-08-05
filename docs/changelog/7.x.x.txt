@@ -26,6 +26,7 @@
  - fixed: EMS Formatting (Badge Page)
  - fixed: Thingy fields list on view screen tab
  - fixed: Importing data into Thingy that has newlines embedded in fields
+ - fixed: Keywords field is not available in collaboration system post template
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3

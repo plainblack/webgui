@@ -1646,6 +1646,11 @@ the Collaboration Asset, the user will be notified.|,
         context     => q{Hover help for asset property},
     },
 
+    'keywords label' => {
+        message => q|Keywords|,
+        lastUpdated => 1170543345,
+    },
+
 };
 
 1;

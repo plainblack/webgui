@@ -1372,6 +1372,12 @@ sub www_edit {
         }
         $var{meta_loop} = \@meta_loop;
     }
+	#keywords field
+    $var{'keywords.form'} = WebGUI::Form::text($session,{
+	    name        => 'keywords',
+        value       => $self->get('keywords'),
+    });
+
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }
