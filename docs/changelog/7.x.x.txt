@@ -25,6 +25,7 @@
  - fixed: Invitation EMails Escape Characters
  - fixed: EMS Formatting (Badge Page)
  - fixed: Thingy fields list on view screen tab
+ - fixed: Importing data into Thingy that has newlines embedded in fields
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3

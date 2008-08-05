@@ -2054,16 +2054,15 @@ sub www_import {
         my $lineNumber = 0;
         my @data = ();
         
-        while (my $line = <$importFile>) {
+        while ( my $row = WebGUI::Text::readCSV($importFile) ) {
             if ($lineNumber == 0 && $session->form->process('ignoreFirstLine')){
                 $lineNumber++;
                 $error->info("Skipping first line");
                 next;
             }
-            $error->info("Reading line $lineNumber: $line");            
+            $error->info("Reading line $lineNumber: @{ $row }");            
             $lineNumber++;
-            chomp($line);
-            @data = WebGUI::Text::splitCSV($line);
+            @data = @{ $row };
             
             # check for duplicates
             my $fieldNumber = 0;
@@ -2086,7 +2085,7 @@ sub www_import {
                 $query .= " limit 1";
                 ($foundDuplicateId) = $session->db->quickArray($query);
                 if ($foundDuplicateId){
-                    $error->info("found duplicate record: ".$foundDuplicateId." for data: ".$line);
+                    $error->info("found duplicate record: ".$foundDuplicateId." for data: ". @{ $row });
                 }
             }
 

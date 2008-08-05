@@ -22,12 +22,12 @@ use Text::CSV_XS;
 use base 'Exporter';
 
 our @EXPORT_OK = qw(
-	joinCSV splitCSV
+	joinCSV readCSV splitCSV
 	
 	);
 
 our %EXPORT_TAGS = (
-	"csv"	=> [qw( joinCSV splitCSV )],
+	"csv"	=> [qw( joinCSV readCSV splitCSV )],
 	
 	);
 
@@ -45,6 +45,11 @@ WebGUI::Text - Routines for manipulating text.
  use WebGUI::Text qw(:csv);
  my $string	= joinCSV(@array);
  my @array	= splitCSV($string);
+ 
+ while(my $row = readCSV($fileHandle) {
+     my @fields = @{ $row };
+     doSomethingWith(@fields);
+ }
 
 
 =head1 DESCRIPTION
@@ -81,6 +86,20 @@ sub joinCSV {
 
 #-------------------------------------------------------------------
 
+=head2 readCSV ( $fileHandle )
+
+Reads a record from the passed filehandle and returns an arrayref of the columns read.
+
+=cut
+
+sub readCSV {
+    my $fileHandle = shift;
+    my $row = $csv->getline($fileHandle);
+    return $row;
+}
+
+#-------------------------------------------------------------------
+
 =head2 splitCSV ( $string )
 
 Splits a CSV string and fixes any escaping done.
@@ -105,10 +124,9 @@ sub splitCSV {
 
 =item *
 
-splitCSV doesn't properly handle quoted fields with no text inside (...,"",...)
+None known.
 
 =back
-
 
 
 =head1 SEE ALSO
@@ -118,6 +136,10 @@ splitCSV doesn't properly handle quoted fields with no text inside (...,"",...)
 =item *
 
 RFC 4180 (http://tools.ietf.org/html/rfc4180)
+
+=item *
+
+L<Text::CSV_XS>
 
 =back
 
