@@ -23,6 +23,7 @@
  - fixed: Tree Menu is always collapsed
  - fixed: Form/Date and Form/DateTime to properly return MySQL formatted and epoch formatted times
  - fixed: Invitation EMails Escape Characters
+ - fixed: EMS Formatting (Badge Page)
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
