@@ -132,8 +132,6 @@ ok($ems->can('getRibbons'), 'Can get ribbons');
 my $ribbons = $ems->getRibbons;
 ok(scalar(@$ribbons) == 2, 'Two ribbons exist');
 
-print "Cleaning\n";
-
 #----------------------------------------------------------------------------
 # Cleanup
 END {
