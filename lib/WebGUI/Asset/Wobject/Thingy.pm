@@ -2060,7 +2060,7 @@ sub www_import {
                 $error->info("Skipping first line");
                 next;
             }
-            $error->info("Reading line $lineNumber: @{ $row }");            
+            $error->info("Reading line $lineNumber: @{ $row }");
             $lineNumber++;
             @data = @{ $row };
             
