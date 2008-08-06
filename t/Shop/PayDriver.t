@@ -279,8 +279,11 @@ is          ($driver->get('label'),     'Fast and harmless',    'get the label e
 
 my $optionsCopy = $driver->get;
 $optionsCopy->{label} = 'And now for something completely different';
-isnt        ($driver->get('label'),   'And now for something completely different', 
-                'hashref returned by get() is a copy of the internal hashref');
+isnt(
+    $driver->get('label'),
+    'And now for something completely different', 
+    'hashref returned by get() is a copy of the internal hashref'
+);
 
 #######################################################################
 #

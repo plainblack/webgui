@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 36;
+my $tests = 37;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -195,6 +195,9 @@ is (WebGUI::Shop::ShipDriver->getName($session), 'Shipper Driver', 'getName retu
 
 is($driver->get('enabled'), 1, 'get the enabled entry from the options');
 is($driver->get('label'),   'Slow and dangerous', 'get the label entry from the options');
+my $optionsCopy = $driver->get();
+$optionsCopy->{label} = 'fast and furious';
+is($driver->get('label'), 'Slow and dangerous', 'get returns a safe copy of the options');
 
 #######################################################################
 #
