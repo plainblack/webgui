@@ -636,7 +636,7 @@ sub update {
         shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel notes
         shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes ));
+        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes shopCreditDeduction));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
