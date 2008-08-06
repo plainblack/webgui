@@ -68,8 +68,8 @@ our $I18N = {
 	'auto request commit help' => {
 		message => q|Would you like the system to automatically request commits for you so that you don't have to
         remember to hit "Commit My Changes"? Note that when using this in conjunction with "Skip commit comments?"
-        and a realtime commit workflow it effectively hides the whole versioning and workflow process from users.|,
-		lastUpdated => 0,
+        it effectively hides the whole versioning and workflow process from users.|,
+		lastUpdated => 1218059129,
 	},
 
 	'select' => {
