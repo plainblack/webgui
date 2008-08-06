@@ -642,8 +642,10 @@ sub getFieldValue {
         }
     }
     else {
+        my %fieldProperties = %$field;
+        $fieldProperties{options} = $field->{possibleValues};
         $processedValue 
-            = WebGUI::Form::DynamicField->new( $self->session,  %$field, defaultValue => $value  )
+            = WebGUI::Form::DynamicField->new( $self->session,  %fieldProperties, defaultValue => $value  )
             ->getValueAsHtml;
     }
 

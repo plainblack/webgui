@@ -28,6 +28,7 @@
  - fixed: Importing data into Thingy that has newlines embedded in fields
  - fixed: Keywords field is not available in collaboration system post template
  - fixed: Payment Gateway creation bug
+ - fixed: thingy and select box 
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
