@@ -111,7 +111,9 @@ Returns a duplicated hash reference of this object’s data.
 
 =head3 property
 
-Any field − returns the value of a field rather than the hash reference.
+Any field − returns the value of a field rather than the hash reference.  If the property
+equals "options", it will decode the internally stored JSON and return you a hash reference
+of the JSON data.
 
 =cut
 
