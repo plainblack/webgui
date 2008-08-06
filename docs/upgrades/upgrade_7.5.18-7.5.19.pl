@@ -33,7 +33,7 @@ addNewInboxIndexes( $session );
 updateAddressTable( $session );
 addProductShipping( $session );
 addGalleryImageDensity( $session );
-correctPayDriverReceiptTemplate( $session );
+updatePaymentDrivers( $session );
 finish($session); # this line required
 
 
@@ -61,7 +61,7 @@ sub addGalleryImageDensity {
 
 #----------------------------------------------------------------------------
 # Corrects the asset id of the default receipt email template for the PayDriver
-sub correctPayDriverReceiptTemplate{
+sub updatePaymentDrivers{
     my $session = shift;
 
     #Grab all PaymentDriver id's.
@@ -69,8 +69,24 @@ sub correctPayDriverReceiptTemplate{
     for my $id(@ids){
         my $paymentGateway = WebGUI::Shop::PayDriver->new($session,$id);
         my $options = $paymentGateway->get();
+        my $needsUpdated = 0;
         if($options->{'receiptEmailTemplateId'} eq 'BMzuE91-XB8E-XGll1zpvA'){
             $options->{'receiptEmailTemplateId'} = 'bPz1yk6Y9uwMDMBcmMsSCg';
+            $needsUpdated = 1;
+        }
+        if ( exists $options->{'groupToUse'} and !defined $options->{'groupToUse'}) {
+            $options->{'groupToUse'} = 7; #Everyone
+            $needsUpdated = 1;
+        }
+        if ( !exists $options->{'saleNotificationGroupId'} ) {
+            $options->{'saleNotificationGroupId'} = 3; #Admins
+            $needsUpdated = 1;
+        }
+        if ( !exists $options->{'enabled'} ) {
+            $options->{'enabled'} = 1; #on
+            $needsUpdated = 1;
+        }
+        if ($needsUpdated) {
             $paymentGateway->update($options);
         }
     }
