@@ -54,6 +54,7 @@ Contributing Developers..............Lucas Bartholemy
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
                                      Yung Han Khoe
+                                     Diona Kidd / Knowmad Technologies
 
 
 The following are people/companies who didn't directly contribute
