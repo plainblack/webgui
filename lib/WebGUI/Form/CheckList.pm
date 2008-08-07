@@ -88,6 +88,41 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getValue ( [ value ] )
+
+Returns an array or a carriage return ("\n") separated scalar depending upon whether you're returning the values into an array or a scalar. Also parses the input values (wherever they come from) to see if it's a scalar then it splits on \n.
+
+=head3 value
+
+Optional values to process, instead of POST input.
+
+=cut
+
+sub getValue {
+    my ($self, $value) = @_;
+    my @values = ();
+    if (defined $value) {
+        if (ref $value eq "ARRAY") {
+            @values = @{$value};
+        }
+        else {
+            $value =~ s/\r//g;
+            @values = split "\n", $value;
+        }
+    }
+    if (scalar @values < 1 && $self->session->request) {
+        my $value = $self->session->form->param($self->get("name"));
+        if (defined $value) {
+            @values = $self->session->form->param($self->get("name"));
+        }
+    }
+    return wantarray ? @values : join("\n",@values);
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 getSelectAllButton ( )
 
 Returns the HTML / Script for the Select All button
