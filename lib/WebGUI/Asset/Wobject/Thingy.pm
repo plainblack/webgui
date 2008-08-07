@@ -1326,8 +1326,8 @@ sub www_editThing {
         else{
             $formElement = $self->getFormElement($field);     
         }
-        if ($field->{subText}){
-            $formElement .= '<span class="formSubtext">'.$field->{subText}.'</span>';
+        if ($field->{subtext}){
+            $formElement .= '<span class="formSubtext">'.$field->{subtext}.'</span>';
         }
 
         $fieldsHTML .= "<li class='list1' id='$field->{fieldId}'>"
@@ -1720,8 +1720,8 @@ sub www_editFieldSave {
     else{
         $formElement = $self->getFormElement(\%properties);
     }
-    if ($properties{subText}){
-        $formElement .= '<span class="formSubtext">'.$properties{subText}.'</span>';
+    if ($properties{subtext}){
+        $formElement .= '<br /><span class="formSubtext">'.$properties{subtext}.'</span>';
     }
 
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
@@ -1824,7 +1824,7 @@ sub www_editThingData {
             "isHidden" => $hidden,
             "isVisible" => ($field{status} eq "visible" && !$hidden),
             "isRequired" => ($field{status} eq "required" && !$hidden),
-            "subtext" => $field{subText},
+            "subtext" => $field{subtext},
         );
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
     }

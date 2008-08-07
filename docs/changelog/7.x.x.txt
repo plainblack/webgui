@@ -33,6 +33,7 @@
  - fixed: viewing badges in IE 6/7
  - fixed: Shop/Transaction was not updating shopCreditDeduction column.  Added that to the update and now users correctly have purchases deducted from their instore credit.
  - fixed: Hover Help outdated: automatically request commit
+ - fixed: Thingy: Subtext disappears when editing a field
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
