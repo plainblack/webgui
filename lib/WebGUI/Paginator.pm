@@ -492,8 +492,8 @@ sub getPageLinks {
 		my $output;
 		my $i = 1;
 		my $minPage = $self->getPageNumber - round($limit/2);
-		my $maxPage = $minPage + $limit;
 		my $start = ($minPage > 0) ? $minPage : 1;
+		my $maxPage = $start + $limit - 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
 		my @temp;
 		foreach my $page (@pages) {
