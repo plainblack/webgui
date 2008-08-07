@@ -25,6 +25,9 @@ use WebGUI::Session;
 
 ##Delay this so that the skip_all can work the way it should
 eval { require Test::Perl::Critic; };
+if ($@) {
+    plan skip_all => "Test::Perl::Critic not installed";
+}
 
 #----------------------------------------------------------------------------
 # Init
