@@ -200,7 +200,7 @@ The name of the vendor.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    my @fields = (qw(name));
+    my @fields = (qw(name userId url));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
@@ -253,7 +253,9 @@ sub www_edit {
     $f->hidden(name=>'method',value=>'editSave');
     $f->hidden(name=>'vendorId',value=>$properties->{vendorId});
     $f->readOnly(label=>$i18n->get('date created'),value=>$properties->{dateCreated});
-    $f->text(name=>'name', label=>$i18n->get('name'),defaultValue=>$properties->{name});
+    $f->text(name=>'name', label=>$i18n->get('name'),value=>$properties->{name});
+    $f->user(name=>'userId',label=>$i18n->get('username'),value=>$properties->{userId},defaultValue=>3);
+    $f->url(name=>'url', label=>$i18n->get('company url'),value=>$properties->{url});
     $f->submit();
 
     # Wrap in admin console
@@ -276,6 +278,8 @@ sub www_editSave {
     my $form = $session->form;
     my $properties = {
         name        => $form->get("name","text"),              
+        userId      => $form->get("userId","user",'3'),              
+        url         => $form->get("url","url"),              
         };
     my $self = eval{$class->new($session, $form->get("vendorId"))};
     if (!WebGUI::Error->caught && defined $self) {

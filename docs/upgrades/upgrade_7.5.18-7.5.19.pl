@@ -35,17 +35,17 @@ updateAddressTable( $session );
 addProductShipping( $session );
 addGalleryImageDensity( $session );
 updatePaymentDrivers( $session );
+extendVendors($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub extendVendors {
+    my $session = shift;
+    print "\tExtending vendor properties..." unless $quiet;
+    $session->db->write("alter table vendor add column url text");
+    print "DONE!\n" unless $quiet;
+}
 
 # Rename Thingy_fields subtext column
 sub renameThingyFieldsSubtextColumn {

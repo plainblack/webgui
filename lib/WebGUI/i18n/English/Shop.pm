@@ -831,6 +831,12 @@ our $I18N = {
 		context => q|a button a user clicks on to remove an item from the cart|
 	},
 
+	'company url' => { 
+		message => q|Company URL|,
+		lastUpdated => 0,
+		context => q|a field in the vendor screen|
+	},
+	
 	'checkout button' => { 
 		message => q|Checkout|,
 		lastUpdated => 0,

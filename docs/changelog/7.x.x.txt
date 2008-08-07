@@ -3,6 +3,7 @@
  - fixed: unable to purge trash
  - fixed: EMS not displaying all users with a badge
  - fixed: ems 2.0: ticket import/export borked
+ - Exposed user and url fields to shop vendors.
  - fixed: ems 2.0: code cleanup
  - fixed: WebGUI::Search - joinClass not documented
  - fixed: thingy's checkbox field
