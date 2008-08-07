@@ -358,7 +358,11 @@ sub _get_rss_data {
         # Convert encoding if needed
         $xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
         my $xmlEncoding = $1 || 'utf8';
-        $xml = Encode::decode($xmlEncoding, $xml);
+        
+	if (Encode::is_utf8($xml)) {
+	} else {
+ 	       $xml = Encode::decode($xmlEncoding, $xml);
+	}
 
                 my $rss_lite = {};
                 eval {
