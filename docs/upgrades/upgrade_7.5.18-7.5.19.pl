@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+renameThingyFieldsSubtextColumn( $session );
 addNewInboxIndexes( $session );
 updateAddressTable( $session );
 addProductShipping( $session );
@@ -46,6 +47,16 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+# Rename Thingy_fields subtext column
+sub renameThingyFieldsSubtextColumn {
+    my $session = shift;
+    print "\tRenaming Thingy_fields subtext column... " unless $quiet;
+
+    $session->db->write(
+        "alter table Thingy_fields change subText subtext varchar(255)"
+    );
+    print "Done!\n" unless $quiet;
+}
 #----------------------------------------------------------------------------
 # Add the image density property to the Gallery
 sub addGalleryImageDensity {
