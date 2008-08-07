@@ -80,6 +80,7 @@ $request->mock('body',
 		return 0;
 	}
 );
+$request->mock('param', sub {shift->body(@_)});
 
 $session->{_request} = $request;
 

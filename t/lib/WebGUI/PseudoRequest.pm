@@ -310,27 +310,7 @@ Compatibility method.  Works exactly like the body method.
 
 sub param {
 	my $self = shift;
-	my $value = shift;
-	return keys %{ $self->{param} } unless defined $value;
-	if ($self->{param}->{$value}) {
-        if (wantarray && ref $self->{param}->{$value} eq "ARRAY") {
-            return @{$self->{param}->{$value}};
-        }
-        elsif (ref $self->{param}->{$value} eq "ARRAY") {
-            return $self->{param}->{$value}->[0];
-        }
-        else {
-            return $self->{param}->{$value};
-        }
-    }
-    else {
-        if (wantarray) {
-            return ();
-        }
-        else {
-            return undef;
-        }
-    }
+    $self->body(@_);
 }
 
 #----------------------------------------------------------------------------
@@ -344,8 +324,7 @@ form variables and values.
 
 sub setup_param {
 	my $self = shift;
-	my $value = shift;
-	$self->{param} = $value;
+    $self->setup_body(@_);
 }
 
 #----------------------------------------------------------------------------

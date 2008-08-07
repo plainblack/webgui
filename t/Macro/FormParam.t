@@ -99,6 +99,7 @@ sub auto_check {
 			}
 		}
 	);
+    $request->mock('param', sub {shift->body(@_)});
 
 	$session->{_request} = $request;
 

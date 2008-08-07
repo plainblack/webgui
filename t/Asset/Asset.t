@@ -283,6 +283,7 @@ my $origRequest = $session->{_request};
 my $newRequest = Test::MockObject->new();
 my $func;
 $newRequest->set_bound('body', \$func);
+$newRequest->set_bound('param', \$func);
 $session->{_request} = $newRequest;
 $func = 'add';
 is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
