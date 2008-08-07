@@ -432,6 +432,21 @@ is($buster3->profileField('listProfile'), 'alpha', 'profile field with default d
 
 ################################################################
 #
+# Attempt to eval userProfileData
+#
+################################################################
+
+my %evalProfile = %copiedAliasProfile;
+$evalProfile{'fieldName'} = 'evalProfile';
+$evalProfile{'dataDefault'} = q!$session->scratch->set('hack','true'); 1;!;
+my $evalProfileField = WebGUI::ProfileField->create($session, 'evalProfile', \%evalProfile);
+
+$buster->uncache;
+my $buster4 = WebGUI::User->new($session, $buster->userId);
+is($session->scratch->get('hack'), undef, 'userProfile dataDefault is not executed when creating users');
+
+################################################################
+#
 # getGroups
 #
 ################################################################
@@ -608,6 +623,7 @@ END {
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
+    $evalProfileField->delete;
     $visitor->profileField('email', $originalVisitorEmail);
 
     $newProfileField->delete();

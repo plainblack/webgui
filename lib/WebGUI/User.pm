@@ -19,6 +19,7 @@ use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
 use WebGUI::Utility;
+use WebGUI::Operation::Shared;
 
 =head1 NAME
 
@@ -152,6 +153,25 @@ sub authMethod {
 			lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 cache ( )
+
+Saves the user object into the cache.
+
+=cut
+
+sub cache {
+    my $self = shift;
+    my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
+    # copy user object
+    my %userData;
+    for my $k (qw(_userId _user _profile)) {
+        $userData{$k} = $self->{$k};
+    }
+    $cache->set(%userData, 60*60*24);
 }
 
 #-------------------------------------------------------------------
@@ -534,8 +554,10 @@ sub new {
     my $overrideId  = shift;
     $userId         = _create($session, $overrideId) if ($userId eq "new");
     my $cache       = WebGUI::Cache->new($session,["user",$userId]);
-    my $userData    = $cache->get;
-    unless ($userData->{_userId} && $userData->{_user}{username}) {
+    my $self        = $cache->get || {};
+    bless $self, $class;
+    $self->{_session} = $session;
+    unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
         tie %user, 'Tie::CPHash';
         %user = $session->db->quickHash("select * from users where userId=?",[$userId]);
@@ -546,29 +568,22 @@ sub new {
             );
         delete $profile{userId};
 
-        my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
-        foreach my $key (keys %default) {
-            my $value;
-            if ($profile{$key} eq "" && $default{$key}) {
-                $value = eval($default{$key});
-                if (ref $value eq "ARRAY") {
-                    $profile{$key} = $value->[0];
-                } else {
-                    $profile{$key} = $value;
-                }
+        # remove undefined fields so they will fall back on defaults when requested
+        for my $key (keys %profile) {
+            if (!defined $profile{$key} || $profile{$key} eq '') {
+                delete $profile{$key};
             }
         }
+
         $profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
-        $userData = {
-            _userId => $userId,
-            _user => \%user,
-            _profile => \%profile
-        };
-        $cache->set($userData, 60*60*24);
+        $self->{_userId}    = $userId;
+        $self->{_user}      = \%user,
+        $self->{_profile}   = \%profile,
+        $self->cache;
     }
-    $userData->{_session} = $session;
-	bless $userData, $class;
+    return $self;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -649,7 +664,7 @@ sub profileField {
     my $fieldName   = shift;
     my $value       = shift;
     my $db          = $self->session->db;
-    if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
+    if (!$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
         $self->session->errorHandler->warn("No such profile field: $fieldName");
         return undef;
     }
@@ -663,7 +678,12 @@ sub profileField {
         my $time = $self->session->datetime->time;
         $self->{_user}{"lastUpdated"} = $time;
         $self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
-	}
+    }
+    elsif (!exists $self->{_profile}{$fieldName}) {
+        my $default = $self->session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$fieldName]);
+        $self->{_profile}{$fieldName} = WebGUI::Operation::Shared::secureEval($self->session, $default);
+        $self->cache;
+    }
 	return $self->{_profile}{$fieldName};
 }
 
@@ -752,7 +772,7 @@ Deletes this user object out of the cache.
 sub uncache {
 	my $self = shift;
 	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
-	$cache->delete;	
+	$cache->delete;
 }
 
 #-------------------------------------------------------------------
