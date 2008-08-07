@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 132; # increment this value for each test you create
+use Test::More tests => 133; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -39,7 +39,7 @@ my $userCreationTime = time();
 ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
-ok(scalar %{$user->{_profile}} > 0, 'new("new") -- profile property contains at least one key');  
+ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
 
 #Let's assign a username
 $user->username("bill_lumberg");
@@ -84,7 +84,7 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 
 ##Check for valid profileField access, even if it is not cached in the user object.
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
-is($user->profileField('testField'), undef, 'getting profile fields not cached in the user object returns undef');
+is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
 ################################################################
 #
@@ -401,8 +401,6 @@ is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy rece
 
 $profileField->set(\%originalFieldData);
 
-$buster->username('mythBuster');
-
 my $aliasProfile = WebGUI::ProfileField->new($session, 'alias');
 my %originalAliasProfile = %{ $aliasProfile->get() };
 my %copiedAliasProfile = %originalAliasProfile;
@@ -416,6 +414,8 @@ $copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
 $buster->uncache();
 
+$buster->username('mythBuster');
+
 $buster3 = WebGUI::User->new($session, $buster->userId);
 is($buster3->profileField('alias'), 'mythBuster', 'alias set to username since the default alias has only non-word characters');
 
@@ -428,7 +428,7 @@ my $listProfileField = WebGUI::ProfileField->create($session, 'listProfile', \%l
 
 $buster->uncache;
 $buster3 = WebGUI::User->new($session, $buster->userId);
-is($buster3->profileField('listProfile'), 'alpha', 'profile field with default data value that is a list gives the user the first value');
+is($buster3->profileField('listProfile'), 'alpha,delta,tango', 'profile field with default data value that is a list returns a string with all values as CSV');
 
 ################################################################
 #

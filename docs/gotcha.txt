@@ -13,6 +13,11 @@ save you many hours of grief.
    using an earlier version you will need to upgrade this perl
    module before you upgrade.
 
+ * If a user profile field allowed multiple selects, and it also had
+   more than one default value, the User method profileField would
+   return the first.  It will now return all default values as a string,
+   joined by commas.
+
 7.5.17
 --------------------------------------------------------------------
  * If users are allowed to self register and emails are not required, this

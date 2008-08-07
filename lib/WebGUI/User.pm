@@ -218,23 +218,24 @@ Friend's group.
 
 sub delete {
     my $self = shift;
+    my $userId = $self->userId;
 	$self->uncache;
     my $db = $self->session->db;
-	foreach my $groupId (@{$self->getGroups($self->userId)}) {
-		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
+	foreach my $groupId (@{$self->getGroups($userId)}) {
+		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$userId]);
 	}
     $self->friends->delete if ($self->{_user}{"friendsGroup"} ne "");
-	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$self->{_userId}]);
+	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$userId]);
 	require WebGUI::Operation::Auth;
-	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
-	$authMethod->deleteParams($self->{_userId});
-	my $rs = $db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$userId);
+	$authMethod->deleteParams($userId);
+	my $rs = $db->read("select sessionId from userSession where userId=?",[$userId]);
 	while (my ($id) = $rs->array) {
         	$db->write("delete from userSessionScratch where sessionId=?",[$id]);
 	}
-    $db->write("delete from userSession where userId=?",[$self->{_userId}]);
-    $db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
-    $db->write("delete from users where userId=?",[$self->{_userId}]);
+    $db->write("delete from userSession where userId=?",[$userId]);
+    $db->write("delete from userProfileData where userId=?",[$userId]);
+    $db->write("delete from users where userId=?",[$userId]);
 }
 
 #-------------------------------------------------------------------
@@ -575,7 +576,9 @@ sub new {
             }
         }
 
-        $profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
+        if (($profile{alias} =~ /^\W+$/ || $profile{alias} eq "") and $user{username}) {
+            $profile{alias} = $user{username};
+        }
         $self->{_userId}    = $userId;
         $self->{_user}      = \%user,
         $self->{_profile}   = \%profile,
@@ -684,6 +687,10 @@ sub profileField {
         $self->{_profile}{$fieldName} = WebGUI::Operation::Shared::secureEval($self->session, $default);
         $self->cache;
     }
+    if (ref $self->{_profile}{$fieldName} eq 'ARRAY') {
+        ##Return a scalar, that is a string with all the defaults
+        return join ',', @{ $self->{_profile}{$fieldName} };
+    }
 	return $self->{_profile}{$fieldName};
 }
 
@@ -788,16 +795,16 @@ If specified, the username is set to this value.
 =cut
 
 sub username {
-        my $self = shift;
-        my $value = shift;
-        if (defined $value) {
-		$self->uncache;
-                $self->{_user}{"username"} = $value;
-                $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
-                $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
-                    [$value, $self->session->datetime->time(), $self->userId]);
-        }
-        return $self->{_user}{"username"};
+    my $self = shift;
+    my $value = shift;
+    if (defined $value) {
+        $self->uncache;
+        $self->{_user}{"username"} = $value;
+        $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
+        $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
+            [$value, $self->session->datetime->time(), $self->userId]);
+    }
+    return $self->{_user}{"username"};
 }
 
 #-------------------------------------------------------------------
