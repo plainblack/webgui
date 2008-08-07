@@ -99,8 +99,3 @@ is( $inputs[0]->{value},
     WebGUI::International->new($session,"Form_CheckList")->get("selectAll label"), 
     'The value is internationalized'
 );
-
-my $checkl1 = WebGUI::Form::CheckList->new($session, {'defaultValue' => 1});
-is($checkl1->getValue(10), 10, "Get simple passed in value");
-is($checkl1->getValue(), '', "Get empty value in value");
-is($checkl1->get('defaultValue'), 1, "Check default value property");

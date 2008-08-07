@@ -39,7 +39,6 @@
  - fixed: WebGUI Search errors - boolean search using filtering does not work
  - Updated User->profileField method to return all default values as a scalar,
    rather than just the first option in the list.
- - fixed: Layout can now uncheck all Assets that are hidden.  This also resolves any CheckList issue so that all buttons can be left blank.
 
 7.5.18
  - fixed: Collateral Image Manager broken in Firefox 3
