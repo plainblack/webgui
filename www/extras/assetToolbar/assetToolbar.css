@@ -1,3 +1,7 @@
+.wg-toolbar {
+    display: inline;
+}
+
 .wg-toolbar-icon {
     vertical-align: middle;
     cursor: pointer;
