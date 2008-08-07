@@ -1,4 +1,5 @@
 7.5.19
+ - fixed: Syndicated Content UTF-8 check for decoded content
  - fixed: unable to purge trash
  - fixed: EMS not displaying all users with a badge
  - fixed: ems 2.0: ticket import/export borked
