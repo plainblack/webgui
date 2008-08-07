@@ -171,7 +171,7 @@ sub cache {
     for my $k (qw(_userId _user _profile)) {
         $userData{$k} = $self->{$k};
     }
-    $cache->set(%userData, 60*60*24);
+    $cache->set(\%userData, 60*60*24);
 }
 
 #-------------------------------------------------------------------
