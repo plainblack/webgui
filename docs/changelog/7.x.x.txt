@@ -4,6 +4,8 @@
  - fixed: Thingy: Setting the size of a field has no effect
  - fixed: Form/* now all use getOriginalValue (split off from getDefaultValue) which resolves the Layout bug not being able to uncheck all hidden assets.  
         Tests were updated, but need are still lacking and need a major overhaul.
+ - fixed: ITransact error message now shows a link to go back to checkout
+
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied
  - fixed: user profile defaults can contain arbitrary perl code

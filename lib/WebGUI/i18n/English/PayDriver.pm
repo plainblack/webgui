@@ -112,6 +112,11 @@ our $I18N = {
         context => q|Generic label for credit cards to be used through the pay drivers|,
     },
 
+    'try again' => {
+        message     => q{Go back to try again},
+        lastUpdated => 0,
+        context     => q{Link to begin checkout again after failure},
+    },
 };
 
 1;

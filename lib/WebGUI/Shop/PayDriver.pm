@@ -277,8 +277,12 @@ The default error message that gets displayed when a payment is rejected.
 
 sub displayPaymentError {
     my ($self, $transaction) = @_;
-    my $i18n = WebGUI::International->new($self->session, "PayDriver");
-    my $output = q{<h1>}.$i18n->get('error processing payment').q{</h1><p>}.$i18n->get('error processing payment message').q{</p><p>}.$transaction->get('statusMessage').{</p>};
+    my $i18n    = WebGUI::International->new($self->session, "PayDriver");
+    my $output  = q{<h1>} . $i18n->get('error processing payment') . q{</h1>}
+                . q{<p>} . $i18n->get('error processing payment message') . q{</p>}
+                . q{<p>} . $transaction->get('statusMessage') . q{</p>}
+                . q{<p><a href="?shop=cart;method=checkout">} . $i18n->get( 'try again' ) . q{</a></p>}
+                ;
     return $self->session->style->userStyle($output);
 }
 
