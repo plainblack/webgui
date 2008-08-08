@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addThingyFieldsSizeColumn( $session );
 
 finish($session); # this line required
 
@@ -42,6 +43,17 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add Thingy_fields size column
+sub addThingyFieldsSizeColumn {
+    my $session = shift;
+    print "\tAdding Thingy_fields size column... " unless $quiet;
+
+    $session->db->write(
+        "alter table Thingy_fields add size int(11)"
+    );
+    print "Done!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

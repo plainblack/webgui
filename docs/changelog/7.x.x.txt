@@ -1,6 +1,7 @@
 7.5.20
  - fixed: The indent loop of the Navigation wobject has an incorrect number of
    iterations in some cases. (Martin Kamerbeek / Oqapi)
+ - fixed: Thingy: Setting the size of a field has no effect
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied

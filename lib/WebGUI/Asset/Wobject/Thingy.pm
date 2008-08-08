@@ -1327,7 +1327,7 @@ sub www_editThing {
             $formElement = $self->getFormElement($field);     
         }
         if ($field->{subtext}){
-            $formElement .= '<span class="formSubtext">'.$field->{subtext}.'</span>';
+            $formElement .= '<br /><span class="formSubtext">'.$field->{subtext}.'</span>';
         }
 
         $fieldsHTML .= "<li class='list1' id='$field->{fieldId}'>"
@@ -1690,6 +1690,7 @@ sub www_editFieldSave {
         possibleValues=>$self->session->form->process("possibleValues"),
         subtext=>$self->session->form->process("subtext"),
         status=>$self->session->form->process("status"),
+        size=>$self->session->form->process("size"),
         width=>$self->session->form->process("width"),
         height=>$self->session->form->process("height"),
         vertical=>$self->session->form->process("vertical"),
