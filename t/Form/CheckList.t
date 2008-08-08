@@ -32,7 +32,7 @@ my $session = WebGUI::Test->session;
 my $formClass = 'WebGUI::Form::CheckList';
 my $formType = 'Checkbox';
 
-my $numTests = 15;
+my $numTests = 20;
 
 
 plan tests => $numTests;
@@ -99,3 +99,13 @@ is( $inputs[0]->{value},
     WebGUI::International->new($session,"Form_CheckList")->get("selectAll label"), 
     'The value is internationalized'
 );
+
+my $cl = WebGUI::Form::CheckList->new($session, {defaultValue => 'default'});
+is($cl->getValue(),'default','Check getvalue with null returns default value'); 
+is($cl->getValue("value"), "value", "Check getValue returns a value");
+$cl->set('value',"original");
+is($cl->getDefaultValue(), "default", "Check getDefaultValue returns the default value");
+my $c2 = WebGUI::Form::CheckList->new($session, {defaultValue => 'default'});
+is($c2->getOriginalValue(), "default", "Get original value returns the default value");
+$c2->set('value',"original");
+is($c2->getOriginalValue(), "original", "Get original value return original value");

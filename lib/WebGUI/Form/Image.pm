@@ -132,7 +132,7 @@ Returns the WebGUI::Storage object for this control.
 
 sub getStorageLocation {
     my $self = shift;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	my $storage = WebGUI::Storage::Image->get($self->session, $value) if ($value);
     return $storage;
 }
@@ -181,7 +181,7 @@ Displays the image using an img tag.
 
 sub getValueAsHtml {
 	my ($self) = @_;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage::Image->get($self->session, $value);
 	my $file = shift @{ $location->getFiles };

@@ -411,16 +411,28 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
-=head2 getDefaultValue ( )
+=head2 getOriginalValue ( )
 
 Returns the either the "value" or "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
 
 =cut
 
-sub getDefaultValue {
+sub getOriginalValue {
     my $self = shift;
     my $value = $self->get("value");
     return $value if (defined $value);
+	return $self->getDefaultValue();
+}
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( )
+
+Returns the "defaultValue" passed in to the object in that order
+
+=cut
+
+sub getDefaultValue {
+    my $self = shift;
 	return $self->get("defaultValue");
 }
 
@@ -660,7 +672,7 @@ Renders the form field to HTML. This method should be overridden by all subclass
 
 sub toHtml {
 	my $self = shift;
-	return $self->get("value");
+    return $self->getOriginalValue();
 }
 
 #-------------------------------------------------------------------
@@ -673,7 +685,8 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        return '<input type="hidden" name="'.$self->get("name").'" value="'.$self->fixQuotes($self->fixMacros($self->fixSpecialCharacters($self->get("value")))).'" />'."\n";
+        return '<input type="hidden" name="'.$self->get("name").'" value="'.
+            $self->fixQuotes($self->fixMacros($self->fixSpecialCharacters($self->getOriginalValue()))).'" />'."\n";
 }
 
 #-------------------------------------------------------------------

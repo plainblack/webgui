@@ -149,7 +149,7 @@ sub toHtml {
                 'weeks'=>$i18n->get(701),
                 'months'=>$i18n->get(702),
                 'years'=>$i18n->get(703));
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getDefaultValue);
+        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
 	# not sure why, but these things need to be defined like this or
 	# they fail under some circumstnaces 
 	my $cmd = "WebGUI::Form::Integer";
@@ -180,7 +180,7 @@ Returns the field as hidden controls rather than displayable controls.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getDefaultValue);
+        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
         return WebGUI::Form::Hidden->new($self->session,
                         name=>$self->get("name").'_interval',
                         value=>$interval

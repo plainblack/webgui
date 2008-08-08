@@ -120,7 +120,7 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $url = $self->getDefaultValue;
+    my $url = $self->getOriginalValue;
     return '<a href="'.$url.'">'.$url.'</a>';
 }
 

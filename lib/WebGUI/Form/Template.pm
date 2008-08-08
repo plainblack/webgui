@@ -169,7 +169,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->session,$self->get('value'));
+	my $template = WebGUI::Asset::Template->new($self->session,$self->getOriginalValue());
         if (defined $template && $template->canEdit) {
                 my $returnUrl;
                 if (defined $self->session->asset && ref $self->session->asset ne "WebGUI::Asset::Template") {

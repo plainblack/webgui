@@ -88,7 +88,7 @@ Returns the value that should be displayed initially.
 sub getDisplayValue {
 	my $self = shift;
 
-	return $self->getOptions->{$self->get('value')->[0]};
+	return $self->getOptions->{$self->getValue()->[0]};
 }
 
 #-------------------------------------------------------------------
@@ -104,7 +104,7 @@ sub getInputElement {
 
 	return WebGUI::Form::selectList($self->session, {
 		-name	=> $self->get('name'),
-		-value	=> $self->get('value'),
+		-value	=> $self->getValue(),
 		-options=> $self->getOptions,
 		-id	=> 'view-'.$self->get('id'),
 		-size	=> 1,
@@ -215,7 +215,7 @@ sub getSliderValue {
 
 	my @keys = keys %{$self->getOptions};
 	for (my $i = 0; $i < @keys; $i++) {
-		return $i if $keys[$i] eq $self->get('value')->[0];
+		return $i if $keys[$i] eq $self->getValue()->[0];
 	}
 
 	return undef;

@@ -73,7 +73,10 @@ my $input = $inputs[0];
 
 is($input->name, 'TestDate', 'Checking input name');
 is($input->type, 'text', 'Checking input type');
-#is($input->value, $defaultTime, "Checking default value");
+TODO: {
+    local $TODO = "Figure out why this is returning a MySQL value instead of an epoch.";
+    is($input->value, $defaultTime, "Checking default value");
+}
 is($input->{size}, 10, 'Checking size param, default');
 is($input->{maxlength}, 10, 'Checking maxlength param, default');
 
@@ -95,7 +98,7 @@ $html = join "\n",
 $input = $inputs[0];
 is($input->name, 'preDateValue', 'Checking input name');
 TODO: {
-local $TODO = "Figure out why this is returning a MySQL value instead of an epoch.";
+    local $TODO = "Figure out why this is returning a MySQL value instead of an epoch.";
     is($input->value, 1217608466, 'Checking default value');
 }
 is($input->{size}, 10, 'Checking size param, set');

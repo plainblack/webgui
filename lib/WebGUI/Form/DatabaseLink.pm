@@ -170,7 +170,7 @@ sub toHtmlWithWrapper {
 	if ($self->session->user->isInGroup(3)) {
 		my $subtext;
 		if ($self->get("afterEdit")) {
-			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->getDefaultValue.";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
+			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->getOriginalValue.";afterEdit=".$self->session->url->escape($self->get("afterEdit")));
 		}
 		$subtext .= $self->session->icon->manage("op=listDatabaseLinks");
 		$self->set("subtext", $subtext . $self->get("subtext"));

@@ -84,7 +84,7 @@ Renders the value.
 
 sub toHtml {
 	my $self = shift;
-	return $self->getDefaultValue;
+	return $self->getOriginalValue;
 }
 
 #-------------------------------------------------------------------

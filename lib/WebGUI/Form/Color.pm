@@ -117,7 +117,7 @@ sub toHtml {
     $style->setLink($url->extras('/colorpicker/colorpicker.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
     my $id = $self->get("id");
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
     my $name = $self->get("name");
     return qq{<a href="javascript:YAHOO.WebGUI.Form.ColorPicker.display('$id', '${id}_swatch');" id="${id}_swatch" class="colorPickerFormSwatch" style="background-color: $value"></a>
 <input onchange="YAHOO.util.Dom.setStyle('${id}_swatch', 'background-color', this.value)" 

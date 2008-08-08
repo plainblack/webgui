@@ -109,7 +109,7 @@ sub toHtml {
 	my $multiple = $self->get("multiple") ? ' multiple="multiple"' : '';
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').$multiple.'>';
     my $options = $self->getOptions;
-	my @values = $self->getDefaultValue();
+	my @values = $self->getOriginalValue();
 	foreach my $key (keys %{$options}) {
 		$output .= '<option value="'.$key.'"';
 		foreach my $item (@values) {

@@ -182,11 +182,11 @@ sub getValueAsHtml {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->epochToHuman($self->getDefaultValue,"%z %Z");
+		return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z %Z");
 	} 
     else {
 		# MySQL format
-		my $value = $self->getDefaultValue;
+		my $value = $self->getOriginalValue;
         # Fix time zone
         $value  = WebGUI::DateTime->new($self->session, mysql => $value)
                 ->set_time_zone($self->get("timeZone"))
@@ -224,10 +224,10 @@ sub toHtml {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		$value	= $self->session->datetime->epochToSet($self->getDefaultValue,1);
+		$value	= $self->session->datetime->epochToSet($self->getOriginalValue,1);
 	} else {
 		# MySQL format
-		$value	= $self->getDefaultValue;
+		$value	= $self->getOriginalValue;
 		# Fix time zone
 		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
                 ->set_time_zone($self->get("timeZone"))
@@ -269,10 +269,10 @@ sub toHtmlAsHidden {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		$value = $self->session->datetime->epochToSet($self->getDefaultValue,1);
+		$value = $self->session->datetime->epochToSet($self->getOriginalValue,1);
 	} else {
 		# MySQL format
-		$value = $self->getDefaultValue;
+		$value = $self->getOriginalValue;
 		# Fix Time zone
 		$value 	= WebGUI::DateTime->new($self->session, mysql => $value)
                 ->set_time_zone($self->get("timeZone"))

@@ -100,7 +100,7 @@ Renders and input tag of type radio.
 
 sub toHtml {
 	my$self = shift;
-	my $value = $self->get('value');
+	my $value = $self->getOriginalValue();
     $value = defined $value ? $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($value))) : '';
 	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
 	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';

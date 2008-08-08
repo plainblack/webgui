@@ -117,7 +117,7 @@ Formats as a name.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $user = WebGUI::User->new($self->session, $self->getDefaultValue);
+    my $user = WebGUI::User->new($self->session, $self->getOriginalValue);
     if (defined $user) {
         return $user->username;
     }
@@ -147,7 +147,7 @@ Renders a user selector.
 
 sub toHtml {
 	my $self = shift;
-        my $user = WebGUI::User->new($self->session, $self->getDefaultValue);
+        my $user = WebGUI::User->new($self->session, $self->getOriginalValue);
 	my $manage = undef;
         if ($self->session->user->isInGroup(3)) {
                  $manage = " ".$self->session->icon->manage('op=listUsers');

@@ -154,7 +154,7 @@ Returns the WebGUI::Storage object for this control.
 
 sub getStorageLocation {
     my $self = shift;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	my $storage = WebGUI::Storage->get($self->session, $value) if ( defined $value );
     return $storage;
 }
@@ -210,7 +210,7 @@ Displays the file as a link.
 
 sub getValueAsHtml {
 	my ($self) = @_;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage->get($self->session,$value);
 	my $file = shift @{ $location->getFiles };
@@ -274,7 +274,7 @@ sub toHtml {
     else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
             name    => $self->get("name"), 
-            value   => $self->getDefaultValue,
+            value   => $self->getOriginalValue,
             id      => $self->get("id")
             })->toHtml()."<br />";
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {

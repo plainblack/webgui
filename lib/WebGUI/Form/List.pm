@@ -203,6 +203,7 @@ Optional values to process, instead of POST input.
 
 sub getValue {
 	my ($self, $value) = @_;
+    
     my @values = ();
     if (defined $value) {
         if (ref $value eq "ARRAY") {
@@ -236,7 +237,47 @@ Returns the either the "value" ore "defaultValue" passed in to the object in tha
 sub getDefaultValue {
     my $self = shift;
     my @values = ();
-    foreach my $value ($self->get("value"), $self->get("defaultValue")) {
+    
+    foreach my $value ($self->get('defaultValue')) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+				$value =~ s/\r//g;
+                @values = split "\n", $value;
+            }
+        }
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+
+=head2 getOriginalValue ( )
+
+Returns the either the "value" ore "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
+
+=cut
+
+sub getOriginalValue {
+    my $self = shift;
+    my @values = ();
+    foreach my $value ($self->get("value")) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+				$value =~ s/\r//g;
+                @values = split "\n", $value;
+            }
+        }
+    }
+    if(@values){
+    	return wantarray ? @values : join("\n",@values);
+    }
+    
+    foreach my $value ($self->getDefaultValue()) {
         if (scalar @values < 1 && defined $value) {
             if (ref $value eq "ARRAY") {
                 @values = @{$value};
@@ -261,7 +302,7 @@ Return all the options
 sub getValueAsHtml {
 	my ($self) = @_;
     my $options = $self->getOptions;
-    return join ", ", map { $options->{$_} } $self->getDefaultValue;
+    return join ", ", map { $options->{$_} } $self->getOriginalValue;
 }
 
 #-------------------------------------------------------------------
@@ -290,7 +331,7 @@ sub toHtmlAsHidden {
 	my $self = shift;
 	my $options = $self->getOptions();
 	my $output;
-	my @values = $self->getDefaultValue();
+	my @values = $self->getOriginalValue();
     foreach my $key (keys %{$options}) {
         foreach my $item (@values) {
             if ($item eq $key) {
