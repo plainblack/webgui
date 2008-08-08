@@ -401,6 +401,7 @@ sub view {
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
+    my $absoluteDepthOfFirstPage = $assets->[0]->getLineageLength;
 	my %lastChildren;
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
@@ -437,7 +438,7 @@ sub view {
 		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$self->session->config->get("assetContainers") || []});
   		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$self->session->config->get("utilityAssets") || []});
 		$pageData->{"page.url"} = $asset->getUrl;
-		my $indent = $pageData->{"page.relDepth"};
+		my $indent = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.indent_loop"} = [];
 		push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
 		$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;
