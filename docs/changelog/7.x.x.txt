@@ -6,6 +6,8 @@
         Tests were updated, but need are still lacking and need a major overhaul.
  - fixed: ITransact error message now shows a link to go back to checkout
  - fixed: Gallery image information now does not overlap the snapshot.  Changed css .wgSnapshot to be 25% vs 20%.  
+ - fixed: ITransact now defaults to using shipping address for billing address. This prevents an
+   issue when users neglect to select a proper billing address.
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied

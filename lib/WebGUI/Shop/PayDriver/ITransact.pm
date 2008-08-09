@@ -608,10 +608,13 @@ sub www_getCredentials {
 	my $u           = WebGUI::User->new($self->session,$self->session->user->userId);
 
     # Process address from address book if passed
-    my $addressId   = $session->form->process('addressId');
-    my $addressData = {};
+    my $addressId   = $session->form->process( 'addressId' );
+    my $addressData;
     if ( $addressId ) {
         $addressData    = eval{ $self->getAddress( $addressId )->get() } || {};
+    }
+    else { 
+        $addressData    = $self->getCart->getShippingAddress;
     }
                    
     my $output;
@@ -704,9 +707,13 @@ sub www_getCredentials {
 
 #-------------------------------------------------------------------
 sub www_pay {
-    my $self    = shift;
-    my $session = $self->session;
-    my $address = $self->getAddress( $session->form->process( 'addressId' ) );
+    my $self        = shift;
+    my $session     = $self->session;
+    my $addressId   = $session->form->process( 'addressId' )
+    my $address     = $addressId
+                    ? $self->getAddress( $addressId )
+                    : $self->getCart->getShippingAddress
+                    ;
 
     # Check whether the user filled in the checkout form and process those.
     my $credentialsErrors = $self->processCredentials;
