@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'date';
 
-my $numTests = 15 + scalar @{ $testBlock } ;
+my $numTests = 16 + scalar @{ $testBlock } ;
 
 
 plan tests => $numTests;
