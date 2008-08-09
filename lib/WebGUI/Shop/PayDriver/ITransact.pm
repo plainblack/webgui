@@ -709,7 +709,7 @@ sub www_getCredentials {
 sub www_pay {
     my $self        = shift;
     my $session     = $self->session;
-    my $addressId   = $session->form->process( 'addressId' )
+    my $addressId   = $session->form->process( 'addressId' );
     my $address     = $addressId
                     ? $self->getAddress( $addressId )
                     : $self->getCart->getShippingAddress
