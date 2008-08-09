@@ -8,6 +8,8 @@
  - fixed: Gallery image information now does not overlap the snapshot.  Changed css .wgSnapshot to be 25% vs 20%.  
  - fixed: ITransact now defaults to using shipping address for billing address. This prevents an
    issue when users neglect to select a proper billing address.
+ - fixed: Thingy: System tables created for new things are not forced to use
+   charset=utf8
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied

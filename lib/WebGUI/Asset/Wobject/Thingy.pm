@@ -137,7 +137,7 @@ sub addThing {
         lastUpdated int not null,
         ipAddress varchar(255),
         primary key (thingDataId)
-    )");
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
     
     return $newThingId;
 }
