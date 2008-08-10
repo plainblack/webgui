@@ -20,7 +20,7 @@ use base 'WebGUI::Asset::File';
 use Carp qw( croak confess );
 use URI::Escape;
 use WebGUI::HTML;
-
+use List::MoreUtils qw{ first_index };
 
 
 =head1 NAME
@@ -479,7 +479,8 @@ sub getTemplateVars {
     }
 
     # Add some things from Album
-    my $albumVar    = $self->getParent->getTemplateVars;
+    my $album       = $self->getParent;
+    my $albumVar    = $album->getTemplateVars;
     for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
         $var->{ "album_" . $key } = $albumVar->{ $key };
     }
@@ -489,6 +490,14 @@ sub getTemplateVars {
 
     # Add a text-only synopsis
     $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->get('synopsis'), "all" );
+
+    # Figure out on what page of the album the gallery file belongs.
+    my $fileIdsInAlbum  = $album->getFileIds;
+    my $pageNumber      = 
+        int (
+            ( first_index { $_ eq $self->getId } @{ $fileIdsInAlbum } )     # Get index of file in album
+            / $album->getParent->get( 'defaultFilesPerPage' )               # Divide by the number of files per page
+        ) + 1;                                                              # Round upwards
 
     $var->{ canComment          } = $self->canComment;
     $var->{ canEdit             } = $self->canEdit;
@@ -500,7 +509,7 @@ sub getTemplateVars {
     $var->{ url_demote          } = $self->getUrl('func=demote');
     $var->{ url_edit            } = $self->getUrl('func=edit');
     $var->{ url_gallery         } = $self->getGallery->getUrl;
-    $var->{ url_album           } = $self->getParent->getUrl;
+    $var->{ url_album           } = $self->getParent->getUrl("pn=$pageNumber");
     $var->{ url_thumbnails      } = $self->getParent->getUrl('func=thumbnails');
     $var->{ url_slideshow       } = $self->getParent->getUrl('func=slideshow');
     $var->{ url_makeShortcut    } = $self->getUrl('func=makeShortcut');

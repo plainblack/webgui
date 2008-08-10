@@ -10,6 +10,8 @@
    issue when users neglect to select a proper billing address.
  - fixed: Thingy: System tables created for new things are not forced to use
    charset=utf8
+ - fixed: Gallery navigation back to album returns to page 1 (Martin 
+   Kamerbeek / Oqapi)
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied
