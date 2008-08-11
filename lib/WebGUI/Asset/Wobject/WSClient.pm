@@ -426,7 +426,7 @@ sub view {
          # services, but let's assume it might.  If our results array has
          # more than one element, let's hope if contains scalars
          $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
-	$p->setDataByArrayRef(\@result);
+     	 $p->setDataByArrayRef(\@result);
          @result = ();
          @result = @$p;
 
@@ -434,11 +434,12 @@ sub view {
 
          # In my experience, the most common case.  We have an array
          # containing a single hashref for which we have been given a key name
-         if (my $aref = $result[0]->{$self->get('paginateVar')}) {
-
+        my $aref;
+        eval{ $aref = $result[0]->{$self->get('paginateVar')} };
+        if(!$@) {
             $var{'numResults'} = scalar @$aref;
             $p = WebGUI::Paginator->new($self->session,$url,  $self->get('paginateAfter'));
-		$p->setDataByArrayRef($aref);
+    		$p->setDataByArrayRef($aref);
             $result[0]->{$self->get('paginateVar')} = $p->getPageData;
 
          } else {
@@ -459,13 +460,13 @@ sub view {
                
             } elsif ((ref $result[0]) =~ /ARRAY/) {
                $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
-		$p->setDataByArrayRef($result[0]);
+           		$p->setDataByArrayRef($result[0]);
                $result[0] = $p->getPageData;
 
             } else {
                $p = WebGUI::Paginator->new($self->session,$url, $self->get('paginateAfter'));
-		$p->setDataByArrayRef([$result[0]]);
-               $result[0] = $p->getPageData;
+       		   $p->setDataByArrayRef([$result[0]]);
+               @result = map({'result' => $_}, @{$p->getPageData});
             }
          }
       }
@@ -499,9 +500,9 @@ sub view {
    if ($self->session->config->get('soapHttpHeaderOverride') &&
       $self->get("httpHeader")) {
 
-      $self->session->http->setMimeType($self->get("httpHeader"));
-      $self->session->errorHandler->warn("changed mimetype: " .  $self->get("httpHeader"));
-   }
+          $self->session->http->setMimeType($self->get("httpHeader"));
+          $self->session->errorHandler->warn("changed mimetype: " .  $self->get("httpHeader"));
+       }
 
    # Note, we still process our template below even though it will never
    # be displayed if the redirectURL is set.  Not sure how important it is
