@@ -103,7 +103,7 @@ sub addArchive {
     
     my $archive     = Archive::Any->new( $filename );
 
-    croak "Archive will extract to directory outside of storage location!"
+    die "Archive will extract to directory outside of storage location!\n"
         if $archive->is_naughty;
 
     my $tempdirName = tempdir( "WebGUI-Gallery-XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
@@ -882,7 +882,12 @@ sub www_addArchiveSave {
     }
     my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
-    $self->addArchive( $filename, $properties );
+    eval { $self->addArchive( $filename, $properties ) };
+    if ( my $error = $@ ) {
+        return $self->www_addArchive({
+            error       => sprintf( $i18n->get('addArchive error generic'), $error ),
+        });
+    }
 
     $storage->delete;
 

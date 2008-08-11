@@ -13,6 +13,7 @@
  - fixed: Gallery navigation back to album returns to page 1 (Martin 
    Kamerbeek / Oqapi)
  - fixed: WSClient now correctly handles SOAP::Som returns of simple arrays of scalars and a exception producing if test turned into an eval.
+ - fixed: Gallery now gives an error message when a Zip archive is being naughty
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied

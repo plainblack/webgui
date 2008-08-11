@@ -311,6 +311,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'addArchive error generic' => {
+        message     => 'There was an error uploading your archive: %s',
+        lastUpdated => 0,
+        context     => 'Lead in to an error message from WebGUI',
+    },
+
     'template url_addPhoto' => {
         message     => 'Add a Photo',
         lastUpdated => 0,
