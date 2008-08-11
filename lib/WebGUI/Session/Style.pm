@@ -80,8 +80,6 @@ sub generateAdditionalHeadTags {
 	my $self = shift;
 	my $tags = $self->{_raw};
 	delete $self->{_raw};
-	delete $self->{_javascript};
-	delete $self->{_link};
 	WebGUI::Macro::process($self->session,\$tags);
 	return $tags;
 }
