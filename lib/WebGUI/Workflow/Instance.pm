@@ -443,7 +443,7 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	unless ($skipNotify) {
+    if ($self->{_started} && !$skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
 		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
@@ -505,7 +505,7 @@ sub start {
 		# we were able to complete the workflow in realtime
 		if ($status eq "done") {
 			$log->info('Completed workflow instance '.$self->getId.' in realtime.');
-			$self->delete;
+            $self->delete(1);
 			return undef;
 		}		
 	}
