@@ -15,6 +15,7 @@
  - fixed: WSClient now correctly handles SOAP::Som returns of simple arrays of scalars and a exception producing if test turned into an eval.
  - fixed: Gallery now gives an error message when a Zip archive is being naughty
  - fixed: Upgrade 7.5.10-7.5.11 upgrades transaction payment gateway info.
+ - fixed: Form CheckList select all button now functions properly
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied
