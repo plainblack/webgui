@@ -373,8 +373,7 @@ sub prompt {
         print "\n".$question." ";
         print "{".join("|",@answers)."} " if ($#answers > 0);
         print "[".$default."] " if (defined $default);
-   #     my $answer = <STDIN>;
-my $answer = 'y';
+        my $answer = <STDIN>;
         chomp $answer;
         $answer = $default if ($answer eq "");
         $answer = prompt($question,$default,@answers) if (($#answers > 0 && !(isIn($answer,@answers))) || $answer eq "");
