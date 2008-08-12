@@ -826,8 +826,6 @@ sub convertTransactionLog {
             paymentCode         => $u->profileField('homeZip'),
             paymentCountry      => $u->profileField('homeCountry'),
             paymentAddressName  => $u->profileField('firstName').' '.$u->profileField('lastName'),
-            paymentDriverId     => $oldTranny->{gatewayId},
-            paymentDriverLabel  => $oldTranny->{gateway},
             paymentPhoneNumber  => $u->profileField('homePhone'),
             dateOfPurchase      => $date->toDatabase,
             isRecurring         => $oldTranny->{recurring},
