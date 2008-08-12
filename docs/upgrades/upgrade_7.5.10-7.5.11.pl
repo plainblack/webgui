@@ -74,6 +74,7 @@ addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
 removeSqlForm($session);
 migratePaymentPlugins( $session );
+updateTransactionPaymentGateway( $session );
 removeRecurringPaymentActivity( $session );
 addLoginMessage( $session );
 addNewApprovalActivities( $session );
@@ -806,7 +807,7 @@ sub convertTransactionLog {
         $db->setRow("transaction","transactionId",{
             transactionId       => "new",
             isSuccessful        => (($oldTranny->{status} eq "Completed") ? 1 : 0),
-            transactionCode     => $oldTranny->{XID},
+            transactionCode     => $oldTranny->{gatewayId},
             statusCode          => $oldTranny->{authcode},
             statusMessage       => $oldTranny->{message},
             userId              => $oldTranny->{userId},
@@ -825,6 +826,8 @@ sub convertTransactionLog {
             paymentState        => $u->profileField('homeState'),
             paymentCode         => $u->profileField('homeZip'),
             paymentCountry      => $u->profileField('homeCountry'),
+            paymentDriverId     => $oldTranny->{gateway},
+            paymentDriverLabel  => $oldTranny->{gateway},
             paymentAddressName  => $u->profileField('firstName').' '.$u->profileField('lastName'),
             paymentPhoneNumber  => $u->profileField('homePhone'),
             dateOfPurchase      => $date->toDatabase,
@@ -1794,6 +1797,14 @@ sub migratePaymentPlugins {
     }
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub updateTransactionPaymentGateway {
+    my $session = shift;
+    print "\tUpdating the transaction paymentGatewayId's to the new and migrated payment gateways..." unless $quiet;
+    $session->db->write("update transaction t set t.paymentDriverId = (select p.paymentGatewayId from paymentGateway p where p.label = t.paymentDriverLabel)");
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

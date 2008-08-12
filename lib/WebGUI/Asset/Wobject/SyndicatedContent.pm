@@ -658,7 +658,7 @@ sub view {
 	}
 
 	$self->_createRSSURLs(\%var);
-        $var{item_loop} = $item_loop;
+    $var{item_loop} = $item_loop;
 
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);
