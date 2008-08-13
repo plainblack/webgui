@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 17;
+my $tests = 23;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -133,6 +133,26 @@ ok($fence->get('dateCreated'), 'dateCreated is not null');
 my $dateCreated = WebGUI::DateTime->new($session, $fence->get('dateCreated'));
 my $deltaDC = $dateCreated - $now;
 cmp_ok( $deltaDC->seconds, '<=', 2, 'dateCreated is set properly');
+
+#######################################################################
+#
+# get, update
+#
+#######################################################################
+
+ok($session->id->valid($fence->get('vendorId')),   'get: vendorId is a valid guid');
+is($fence->getId,         $fence->get('vendorId'), 'get: getId is an alias for get vendorId');
+is($fence->get('userId'), $fenceUser->userId,      'get: userId');
+is($fence->get('name'),   undef,                   'get: by default, no name is set');
+
+$fence->update({name =>  'Bogs Diamond'});
+is($fence->get('name'),  'Bogs Diamond',           'get: get name');
+is($fence->get('userId'), $fenceUser->userId,      'get: updating name did not affect userId');
+
+my $newProps = {
+    name => 'Warden Norton',
+    url  => 'http://www.shawshank.com',
+};
 
 }
 
