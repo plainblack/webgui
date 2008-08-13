@@ -121,7 +121,7 @@ A hash reference of optional flags.
 
 =head4 asHashRef
 
-A boolean indicating that the vendors should be returned as a hash reference of id/names rather than objects.
+A boolean indicating that the vendors should be returned as a hash reference of id/names rather than an array of objects.
 
 =cut
 
@@ -142,15 +142,18 @@ sub getVendors {
 
 =head2 new ( session, vendorId )
 
-Constructor. 
+Constructor.   Returns a WebGUI::Shop::Vendor object.
 
 =head3 session
 
-A reference to the current session.
+A reference to the current session.  If the session variable is not passed, then an WebGUI::Error::InvalidObject
+Exception will be thrown.
 
 =head3 vendorId
 
-A unique id for a vendor.
+A unique id for a vendor that already exists in the database.  If the vendorId is not passed
+in, then a WebGUI::Error::InvalidParam Exception will be thrown.  If the requested Id cannot
+be found in the database, then a WebGUI::Error::ObjectNotFound exception will be thrown.
 
 =cut
 
@@ -221,6 +224,22 @@ Sets properties of the vendor
 A hash reference that contains one of the following:
 
 =head4 name
+
+The name of the vendor.
+
+=head4 userId
+
+The name of the vendor.
+
+=head4 url
+
+The vendor's url.
+
+=head4 paymentInformation
+
+The name of the vendor.
+
+=head4 preferredPaymentType
 
 The name of the vendor.
 
