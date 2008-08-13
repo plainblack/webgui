@@ -170,7 +170,7 @@ sub commit {
 			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 			$u->karma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
-        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId) if ($self->isReply);
+        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId);# if ($self->isReply);
 	}
 }
 
