@@ -19,6 +19,7 @@ use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Macro;
+use HTML::Entities qw(encode_entities);
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -26,7 +27,7 @@ our @ISA = qw(WebGUI::Asset);
 sub _drawQueryBuilder {
 	my $self = shift;
 	# Initialize operators
-	my @textFields = qw|text yesNo selectList radioList|;
+	my @textFields = qw|text yesNo selectBox radioList|;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my %operator;
 	foreach (@textFields) {
@@ -93,7 +94,7 @@ sub _drawQueryBuilder {
 			name=>$valFieldName,
 			uiLevel=>5,
 			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
-			possibleValues=>$fields->{$field}{possibleValues},
+			options=>$fields->{$field}{possibleValues},
 		);
 		# An empty row
 		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
@@ -378,7 +379,7 @@ sub getOverridesList {
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{origValue};
 			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{newValue};
+			$output .= encode_entities($overrides{overrides}{$prop}{newValue}, '<>&"^');
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{parsedValue};
 			$output .= '</td></tr>';

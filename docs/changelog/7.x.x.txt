@@ -1,4 +1,6 @@
 7.5.20
+ - fixed: shortcut overrides new value column doesn't show macros as unparsed
+ - fixed: shortcut select by alternate criteria wizard doesn't show lists properly
  - fixed: The indent loop of the Navigation wobject has an incorrect number of
    iterations in some cases. (Martin Kamerbeek / Oqapi)
  - fixed: Thingy: Setting the size of a field has no effect
