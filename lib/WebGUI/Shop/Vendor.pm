@@ -81,6 +81,16 @@ Returns a duplicated hash reference of this object’s data. See update() for deta
 
 Any field returns the value of a field rather than the hash reference.
 
+=head3 Additional properties
+
+=head4 dateCreated
+
+The date this vendor was created in the system.
+
+=head4 vendorId
+
+The id of this vendor from the database.  Use getId() instead.
+
 =cut
 
 sub get {
@@ -237,11 +247,11 @@ The vendor's url.
 
 =head4 paymentInformation
 
-The name of the vendor.
+????
 
 =head4 preferredPaymentType
 
-The name of the vendor.
+????
 
 =cut
 
