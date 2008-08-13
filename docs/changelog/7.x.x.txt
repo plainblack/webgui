@@ -23,6 +23,7 @@
  - fixed: The bug enigmatically named "product".
  - fixed: CS Thread sort on last post reply is now working correctly.
  - fixed: Gallery Cross Publish now works properly
+ - fixed: Exposed a form element for the GalleryAlbum Others Can Add property
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied
