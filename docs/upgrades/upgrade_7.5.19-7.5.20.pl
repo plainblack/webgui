@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+maybeAddProductShippingColumn( $session );
 addThingyFieldsSizeColumn( $session );
 
 finish($session); # this line required
@@ -42,6 +43,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub maybeAddProductShippingColumn {
+    my $session = shift;
+    print "\tAdd the isShippingColumn to the Product table, if needed... " unless $quiet;
+
+    my $sth = $session->db->read('describe Product isShippingRequired');
+    if (! defined $sth->hashRef) {
+        $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
+    }
+    print "Done!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Add Thingy_fields size column

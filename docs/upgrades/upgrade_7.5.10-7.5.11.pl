@@ -1068,13 +1068,15 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
-    $session->db->write('alter table Product add column   thankYouMessage mediumtext');
-    $session->db->write('alter table Product add column     accessoryJSON mediumtext');
-    $session->db->write('alter table Product add column       benefitJSON mediumtext');
-    $session->db->write('alter table Product add column       featureJSON mediumtext');
-    $session->db->write('alter table Product add column       relatedJSON mediumtext');
-    $session->db->write('alter table Product add column specificationJSON mediumtext');
-    $session->db->write('alter table Product add column      variantsJSON mediumtext');
+    $session->db->write('alter table Product add column    thankYouMessage mediumtext');
+    $session->db->write('alter table Product add column      accessoryJSON mediumtext');
+    $session->db->write('alter table Product add column        benefitJSON mediumtext');
+    $session->db->write('alter table Product add column        featureJSON mediumtext');
+    $session->db->write('alter table Product add column        relatedJSON mediumtext');
+    $session->db->write('alter table Product add column  specificationJSON mediumtext');
+    $session->db->write('alter table Product add column       variantsJSON mediumtext');
+    $session->db->write('alter table Product add column isShippingRequired INT(11)');
+
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku

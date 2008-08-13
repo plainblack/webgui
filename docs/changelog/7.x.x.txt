@@ -17,6 +17,7 @@
  - fixed: Upgrade 7.5.10-7.5.11 upgrades transaction payment gateway info.
  - fixed: Form CheckList select all button now functions properly
  - fixed: Gallery slideshow JS now has better control over the buttons
+ - fixed: The bug enigmatically named "product".
 
 7.5.19
  - fixed: paginator doesn't show correct number of page links with a limit applied

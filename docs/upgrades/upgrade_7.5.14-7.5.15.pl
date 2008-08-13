@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 removeOldGalleryImport($session);
 addMissingWorkflowActivities($session);
+maybeAddProductShippingColumn( $session );
 
 finish($session); # this line required
 
@@ -52,6 +53,18 @@ sub removeOldGalleryImport {
     rmtree "../../lib/WebGUI/Utility";
     rmtree "../../t/Utility/Gallery";
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub maybeAddProductShippingColumn {
+    my $session = shift;
+    print "\tAdd the isShippingColumn to the Product table, if needed... " unless $quiet;
+
+    my $sth = $session->db->read('describe Product isShippingRequired');
+    if (! defined $sth->hashRef) {
+        $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
+    }
+    print "Done!\n" unless $quiet;
 }
 
 

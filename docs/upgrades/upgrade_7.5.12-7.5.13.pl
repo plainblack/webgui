@@ -28,6 +28,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
+maybeAddProductShippingColumn( $session );
 fixShop($session);
 addSelectableProfileTemplates($session); 
 addCouponThankYouMessage($session);
@@ -97,6 +98,18 @@ sub addCouponThankYouMessage {
     print "\tAdding Thank You Message to Coupon table...\n" unless $quiet;
     $session->db->write('alter table FlatDiscount add column thankYouMessage mediumtext');
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub maybeAddProductShippingColumn {
+    my $session = shift;
+    print "\tAdd the isShippingColumn to the Product table, if needed... " unless $quiet;
+
+    my $sth = $session->db->read('describe Product isShippingRequired');
+    if (! defined $sth->hashRef) {
+        $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
+    }
+    print "Done!\n" unless $quiet;
 }
 
 

@@ -32,6 +32,7 @@ use WebGUI::Utility;
 use WebGUI::Pluggable;
 use File::Path;
 use JSON;
+use Data::Dumper; #Don't ask my why, but there's an exposed call to this on line 2871
 
 my $toVersion = "7.5.16"; # make this match what version you're going to
 my $quiet; # this line required
@@ -1206,6 +1207,7 @@ sub migrateOldProduct {
     $session->db->write('alter table Product add column       relatedJSON mediumtext');
     $session->db->write('alter table Product add column specificationJSON mediumtext');
     $session->db->write('alter table Product add column      variantsJSON mediumtext');
+    $session->db->write('alter table Product add column isShippingRequired INT(11)');
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku

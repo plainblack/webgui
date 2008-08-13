@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 addIndexToInbox($session);
 fixEventSequenceNumbers($session);
+maybeAddProductShippingColumn( $session );
 
 finish($session); # this line required
 
@@ -49,6 +50,18 @@ sub fixEventSequenceNumbers {
     $session->db->write('select MAX(sequenceNumber) into @seqNum from Event');
     $session->db->write('update Event set sequenceNumber=@seqNum:=@seqNum+16384 where sequenceNumber IS NULL order by revisionDate');
     print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub maybeAddProductShippingColumn {
+    my $session = shift;
+    print "\tAdd the isShippingColumn to the Product table, if needed... " unless $quiet;
+
+    my $sth = $session->db->read('describe Product isShippingRequired');
+    if (! defined $sth->hashRef) {
+        $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
+    }
+    print "Done!\n" unless $quiet;
 }
 
 

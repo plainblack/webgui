@@ -28,6 +28,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 moveProductImportToShelf($session);
+maybeAddProductShippingColumn( $session );
 finish($session); # this line required
 
 
@@ -38,6 +39,18 @@ sub moveProductImportToShelf {
     unlink "../../lib/WebGUI/Shop/Products.pm";
     $session->db->write("update asset set isSystem=0 where assetId='PBproductimportnode001'");
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub maybeAddProductShippingColumn {
+    my $session = shift;
+    print "\tAdd the isShippingColumn to the Product table, if needed... " unless $quiet;
+
+    my $sth = $session->db->read('describe Product isShippingRequired');
+    if (! defined $sth->hashRef) {
+        $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
+    }
+    print "Done!\n" unless $quiet;
 }
 
 
