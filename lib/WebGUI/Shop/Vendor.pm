@@ -175,6 +175,35 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 newByUserId ( session, [userId] )
+
+Constructor. 
+
+=head3 session
+
+A reference to the current session.
+
+=head3 userId
+
+A unique userId. Will pull from the session if not specified.
+
+=cut
+
+sub newByUserId {
+    my ($class, $session, $userId) = @_;
+        unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    $userId ||= $session->user->userId;
+    unless (defined $userId) {
+        WebGUI::Error::InvalidParam->throw( param=>$userId, error=>"Need a userId.");
+    }
+    return $class->new($session, $session->db->quickScalar("select vendorId from vendor where userId=?",[$userId]));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 session () 
 
 Returns a reference to the current session.
