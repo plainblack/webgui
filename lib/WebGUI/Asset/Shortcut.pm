@@ -612,7 +612,8 @@ sub getPrefFieldsToImport {
 
 =head2 getTemplateVars
 
-Gets the template vars for this shortcut.
+Gets the template vars for the asset we're a shortcut to, with any overrides
+applied.
 
 =cut
 

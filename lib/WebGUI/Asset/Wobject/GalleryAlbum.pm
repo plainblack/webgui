@@ -162,7 +162,10 @@ sub addChild {
     # Load the class
     WebGUI::Pluggable::load( $properties->{className} );
 
-    if ( !$properties->{className}->isa( $fileClass ) ) {
+    # Make sure we only add appropriate child classes
+    if ( !$properties->{className}->isa( $fileClass ) 
+        && !$properties->{ className }->isa( "WebGUI::Asset::Shortcut" ) 
+        ) {
         $self->session->errorHandler->security(
             "add a ".$properties->{className}." to a ".$self->get("className")
         );
@@ -588,6 +591,9 @@ sub getThumbnailUrl {
     # Get the URL for the asset's thumbnail
     if ( $asset->can("getThumbnailUrl") ) {
         return $asset->getThumbnailUrl;
+    }
+    elsif ( $asset->isa( "WebGUI::Asset::Shortcut" ) ) {
+        return $asset->getShortcut->getThumbnailUrl;
     }
     else {
         return undef;

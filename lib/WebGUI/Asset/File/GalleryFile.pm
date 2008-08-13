@@ -989,16 +989,12 @@ sub www_editCommentSave {
 
 Display the form to make a shortcut.
 
-This page is only available to those who can edit this GalleryFile.
-
 =cut
 
 sub www_makeShortcut {
     my $self        = shift;
     my $session     = $self->session;
     
-    return $self->session->privilege->insufficient  unless $self->canEdit;
-
     # Create the form to make a shortcut
     my $var         = $self->getTemplateVars;
     
@@ -1043,8 +1039,6 @@ sub www_makeShortcutSave {
     my $self        = shift;
     my $form        = $self->session->form;
 
-    return $self->session->privilege->insufficient unless $self->canEdit;
-    
     my $parentId    = $form->get('parentId');
     my $shortcut    = $self->makeShortcut( $parentId );
     
