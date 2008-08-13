@@ -3,6 +3,18 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'Preferred Payment Type' => {
+		message 	=> q|Preferred Payment Type|,
+		lastUpdated	=> 0,
+		context		=> q|vendor label|,
+	},
+
+	'Payment Information' => {
+		message 	=> q|Payment Information|,
+		lastUpdated	=> 0,
+		context		=> q|vendor label|,
+	},
+
 	'thank you message' => {
 		message 	=> q|Thank you for your order! Please save this as your receipt.|,
 		lastUpdated	=> 0,

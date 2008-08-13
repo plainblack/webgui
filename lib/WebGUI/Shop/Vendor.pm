@@ -200,7 +200,7 @@ The name of the vendor.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    my @fields = (qw(name userId url));
+    my @fields = (qw(name userId url paymentInformation preferredPaymentType));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
@@ -256,6 +256,8 @@ sub www_edit {
     $f->text(name=>'name', label=>$i18n->get('name'),value=>$properties->{name});
     $f->user(name=>'userId',label=>$i18n->get('username'),value=>$properties->{userId},defaultValue=>3);
     $f->url(name=>'url', label=>$i18n->get('company url'),value=>$properties->{url});
+    $f->text(name=>'preferredPaymentType', label=>$i18n->get('Preferred Payment Type'),value=>$properties->{preferredPaymentType});
+    $f->textarea(name=>'paymentInformation', label=>$i18n->get('Payment Information'),value=>$properties->{paymentInformation});
     $f->submit();
 
     # Wrap in admin console
@@ -277,9 +279,11 @@ sub www_editSave {
     return $session->privilege->adminOnly() unless ($admin->canManage);
     my $form = $session->form;
     my $properties = {
-        name        => $form->get("name","text"),              
-        userId      => $form->get("userId","user",'3'),              
-        url         => $form->get("url","url"),              
+        name                    => $form->get("name","text"),              
+        preferredPaymentType    => $form->get("preferredPaymentType","text"),              
+        paymentInformation      => $form->get("paymentInformation","textarea"),              
+        userId                  => $form->get("userId","user",'3'),              
+        url                     => $form->get("url","url"),              
         };
     my $self = eval{$class->new($session, $form->get("vendorId"))};
     if (!WebGUI::Error->caught && defined $self) {
