@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 30;
+my $tests = 40;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -75,7 +75,6 @@ cmp_deeply(
     $e,
     methods(
         error => 'Need a vendorId.',
-        param => undef,
     ),
     'new: requires a vendorId',
 );
@@ -199,6 +198,42 @@ cmp_deeply(
     ),
     'create: requires a session variable',
 );
+
+eval { $fenceCopy = WebGUI::Shop::Vendor->newByUserId($session, 'neverAUserId'); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'newByUserId->new takes an exception to not giving it a bad user id that is in the db');
+cmp_deeply(
+    $e,
+    methods(
+        error    => 'Need a vendorId.',
+    ),
+    'create: requires a session variable',
+);
+
+eval { $fenceCopy = WebGUI::Shop::Vendor->newByUserId($session, '1'); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidParam', 'newByUserId->new takes an exception to not giving it a valid user id that is in the db');
+cmp_deeply(
+    $e,
+    methods(
+        error    => 'Need a vendorId.',
+    ),
+    'create: requires a session variable',
+);
+
+eval { $fenceCopy = WebGUI::Shop::Vendor->newByUserId($session, $fenceUser->userId); };
+$e = Exception::Class->caught();
+ok(!$e, 'newByUserId: No exception thrown with explicit, valid data');
+isa_ok($fenceCopy, 'WebGUI::Shop::Vendor', 'newByUserId returns correct type of object');
+is($fenceCopy->getId, $fence->getId, 'newByUserId returned the correct object');
+
+$session->user({user => $fenceUser});
+
+eval { $fenceCopy = WebGUI::Shop::Vendor->newByUserId($session); };
+$e = Exception::Class->caught();
+ok(!$e, 'newByUserId: No exception thrown with implicit user data');
+isa_ok($fenceCopy, 'WebGUI::Shop::Vendor', 'newByUserId returns correct type of object using session user');
+is($fenceCopy->getId, $fence->getId, 'newByUserId returned the correct object using session user');
 
 }
 
