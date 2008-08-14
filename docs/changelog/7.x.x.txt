@@ -1,4 +1,5 @@
 7.5.20
+ - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
  - fixed: Some multipart mail messages have parts chosen incorrectly
  - fixed: File Pile doesn't respect edit permissions of parent asset
  - fixed: shortcut overrides new value column doesn't show macros as unparsed

@@ -598,6 +598,7 @@ sub getListUrl {
 sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
+    my $entryData = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	$var->{"back.url"} = $self->getUrl;
 	$var->{"back.label"} = $i18n->get(18);
@@ -607,7 +608,6 @@ sub getRecordTemplateVars {
     my $fields = $self->getFieldConfig;
     # If we have an entry id, we're doing this based on existing data
     my $entry;
-    my $entryData;
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>"entryId",value=>$var->{entryId}});
         $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});

@@ -178,10 +178,8 @@ Return the date in a human readable format.
 sub getValueAsHtml {
 	my ($self) = @_;
     # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
+    my $formatValue = $self->getDefaultValue || $self->getOriginalValue;
+	if (!$formatValue || $formatValue =~ m/^\d+$/) {
 		return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z %Z");
 	} 
     else {
