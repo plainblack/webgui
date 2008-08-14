@@ -1,119 +1,124 @@
-var fileIcons = new Array();
-fileIcons["p65"] = "/extras/fileIcons/p65.gif";
-fileIcons["exe"] = "/extras/fileIcons/exe.gif";
-fileIcons["class"] = "/extras/fileIcons/class.gif";
-fileIcons["xls"] = "/extras/fileIcons/xls.gif";
-fileIcons["dia"] = "/extras/fileIcons/dia.gif";
-fileIcons["hqx"] = "/extras/fileIcons/hqx.gif";
-fileIcons["mp3"] = "/extras/fileIcons/mp3.gif";
-fileIcons["js"] = "/extras/fileIcons/js.gif";
-fileIcons["arj"] = "/extras/fileIcons/arj.gif";
-fileIcons["ace"] = "/extras/fileIcons/ace.gif";
-fileIcons["sxc"] = "/extras/fileIcons/sxc.gif";
-fileIcons["cnf"] = "/extras/fileIcons/cnf.gif";
-fileIcons["pict"] = "/extras/fileIcons/pict.gif";
-fileIcons["rar"] = "/extras/fileIcons/rar.gif";
-fileIcons["gz"] = "/extras/fileIcons/gz.gif";
-fileIcons["ai"] = "/extras/fileIcons/ai.gif";
-fileIcons["xlt"] = "/extras/fileIcons/xlt.gif";
-fileIcons["jar"] = "/extras/fileIcons/jar.gif";
-fileIcons["mov"] = "/extras/fileIcons/mov.gif";
-fileIcons["cab"] = "/extras/fileIcons/cab.gif";
-fileIcons["png"] = "/extras/fileIcons/png.gif";
-fileIcons["sxg"] = "/extras/fileIcons/sxg.gif";
-fileIcons["sxi"] = "/extras/fileIcons/sxi.gif";
-fileIcons["dot"] = "/extras/fileIcons/dot.gif";
-fileIcons["tiff"] = "/extras/fileIcons/tiff.gif";
-fileIcons["tif"] = "/extras/fileIcons/tif.gif";
-fileIcons["ppt"] = "/extras/fileIcons/ppt.gif";
-fileIcons["stc"] = "/extras/fileIcons/stc.gif";
-fileIcons["pic"] = "/extras/fileIcons/pic.gif";
-fileIcons["psd"] = "/extras/fileIcons/psd.gif";
-fileIcons["java"] = "/extras/fileIcons/java.gif";
-fileIcons["123"] = "/extras/fileIcons/123.gif";
-fileIcons["swf"] = "/extras/fileIcons/swf.gif";
-fileIcons["mpeg"] = "/extras/fileIcons/mpeg.gif";
-fileIcons["sdc"] = "/extras/fileIcons/sdc.gif";
-fileIcons["log"] = "/extras/fileIcons/log.gif";
-fileIcons["mrproject"] = "/extras/fileIcons/mrproject.gif";
-fileIcons["wri"] = "/extras/fileIcons/wri.gif";
-fileIcons["readme"] = "/extras/fileIcons/readme.gif";
-fileIcons["as"] = "/extras/fileIcons/as.gif";
-fileIcons["dwg"] = "/extras/fileIcons/dwg.gif";
-fileIcons["tgz"] = "/extras/fileIcons/tgz.gif";
-fileIcons["lyx"] = "/extras/fileIcons/lyx.gif";
-fileIcons["css"] = "/extras/fileIcons/css.gif";
-fileIcons["sxd"] = "/extras/fileIcons/sxd.gif";
-fileIcons["wk3"] = "/extras/fileIcons/wk3.gif";
-fileIcons["mpp"] = "/extras/fileIcons/mpp.gif";
-fileIcons["sti"] = "/extras/fileIcons/sti.gif";
-fileIcons["rtf"] = "/extras/fileIcons/rtf.gif";
-fileIcons["sdw"] = "/extras/fileIcons/sdw.gif";
-fileIcons["eps"] = "/extras/fileIcons/eps.gif";
-fileIcons["xla"] = "/extras/fileIcons/xla.gif";
-fileIcons["cif"] = "/extras/fileIcons/cif.gif";
-fileIcons["pps"] = "/extras/fileIcons/pps.gif";
-fileIcons["sylk"] = "/extras/fileIcons/sylk.gif";
-fileIcons["kpr"] = "/extras/fileIcons/kpr.gif";
-fileIcons["sdp"] = "/extras/fileIcons/sdp.gif";
-fileIcons["gnumeric"] = "/extras/fileIcons/gnumeric.gif";
-fileIcons["gif"] = "/extras/fileIcons/gif.gif";
-fileIcons["sea"] = "/extras/fileIcons/sea.gif";
-fileIcons["ksp"] = "/extras/fileIcons/ksp.gif";
-fileIcons["tab"] = "/extras/fileIcons/tab.gif";
-fileIcons["tar"] = "/extras/fileIcons/tar.gif";
-fileIcons["sdd"] = "/extras/fileIcons/sdd.gif";
-fileIcons["pdf"] = "/extras/fileIcons/pdf.gif";
-fileIcons["jpg"] = "/extras/fileIcons/jpg.gif";
-fileIcons["aw"] = "/extras/fileIcons/aw.gif";
-fileIcons["txt"] = "/extras/fileIcons/txt.gif";
-fileIcons["m3u"] = "/extras/fileIcons/m3u.gif";
-fileIcons["sql"] = "/extras/fileIcons/sql.gif";
-fileIcons["ram"] = "/extras/fileIcons/ram.gif";
-fileIcons["com"] = "/extras/fileIcons/com.gif";
-fileIcons["pm"] = "/extras/fileIcons/pm.gif";
-fileIcons["htm"] = "/extras/fileIcons/htm.gif";
-fileIcons["mdb"] = "/extras/fileIcons/mdb.gif";
-fileIcons["ra"] = "/extras/fileIcons/ra.gif";
-fileIcons["conf"] = "/extras/fileIcons/conf.gif";
-fileIcons["iso"] = "/extras/fileIcons/iso.gif";
-fileIcons["bat"] = "/extras/fileIcons/bat.gif";
-fileIcons["doc"] = "/extras/fileIcons/doc.gif";
-fileIcons["indd"] = "/extras/fileIcons/indd.gif";
-fileIcons["dxf"] = "/extras/fileIcons/dxf.gif";
-fileIcons["vdx"] = "/extras/fileIcons/vdx.gif";
-fileIcons["slk"] = "/extras/fileIcons/slk.gif";
-fileIcons["xlc"] = "/extras/fileIcons/xlc.gif";
-fileIcons["unknown"] = "/extras/fileIcons/unknown.gif";
-fileIcons[".svn"] = "/extras/fileIcons/.svn";
-fileIcons["oleo"] = "/extras/fileIcons/oleo.gif";
-fileIcons["tsv"] = "/extras/fileIcons/tsv.gif";
-fileIcons["abw"] = "/extras/fileIcons/abw.gif";
-fileIcons["wk4"] = "/extras/fileIcons/wk4.gif";
-fileIcons["mpg"] = "/extras/fileIcons/mpg.gif";
-fileIcons["sxm"] = "/extras/fileIcons/sxm.gif";
-fileIcons["rpm"] = "/extras/fileIcons/rpm.gif";
-fileIcons["pif"] = "/extras/fileIcons/pif.gif";
-fileIcons["rtx"] = "/extras/fileIcons/rtx.gif";
-fileIcons["vsd"] = "/extras/fileIcons/vsd.gif";
-fileIcons["kwd"] = "/extras/fileIcons/kwd.gif";
-fileIcons["jpeg"] = "/extras/fileIcons/jpeg.gif";
-fileIcons["ps"] = "/extras/fileIcons/ps.gif";
-fileIcons["wk1"] = "/extras/fileIcons/wk1.gif";
-fileIcons["wav"] = "/extras/fileIcons/wav.gif";
-fileIcons["mif"] = "/extras/fileIcons/mif.gif";
-fileIcons["bmp"] = "/extras/fileIcons/bmp.gif";
-fileIcons["sxw"] = "/extras/fileIcons/sxw.gif";
-fileIcons["z"] = "/extras/fileIcons/z.gif";
-fileIcons["dwf"] = "/extras/fileIcons/dwf.gif";
-fileIcons["zip"] = "/extras/fileIcons/zip.gif";
-fileIcons["csv"] = "/extras/fileIcons/csv.gif";
-fileIcons["stw"] = "/extras/fileIcons/stw.gif";
-fileIcons["xld"] = "/extras/fileIcons/xld.gif";
-fileIcons["html"] = "/extras/fileIcons/html.gif";
-fileIcons["avi"] = "/extras/fileIcons/avi.gif";
-fileIcons["xml"] = "/extras/fileIcons/xml.gif";
-fileIcons["wks"] = "/extras/fileIcons/wks.gif";
-fileIcons["psp"] = "/extras/fileIcons/psp.gif";
-fileIcons["config"] = "/extras/fileIcons/config.gif";
-fileIcons["sit"] = "/extras/fileIcons/sit.gif";
+var fileIcons;
+(function(){
+    var extras = getWebguiProperty('extrasURL');
+    fileIcons = {
+        "123"       : extras + "fileIcons/123.gif",
+        "abw"       : extras + "fileIcons/abw.gif",
+        "ace"       : extras + "fileIcons/ace.gif",
+        "ai"        : extras + "fileIcons/ai.gif",
+        "arj"       : extras + "fileIcons/arj.gif",
+        "as"        : extras + "fileIcons/as.gif",
+        "avi"       : extras + "fileIcons/avi.gif",
+        "aw"        : extras + "fileIcons/aw.gif",
+        "bat"       : extras + "fileIcons/bat.gif",
+        "bmp"       : extras + "fileIcons/bmp.gif",
+        "cab"       : extras + "fileIcons/cab.gif",
+        "cif"       : extras + "fileIcons/cif.gif",
+        "class"     : extras + "fileIcons/class.gif",
+        "cnf"       : extras + "fileIcons/cnf.gif",
+        "com"       : extras + "fileIcons/com.gif",
+        "conf"      : extras + "fileIcons/conf.gif",
+        "config"    : extras + "fileIcons/config.gif",
+        "css"       : extras + "fileIcons/css.gif",
+        "csv"       : extras + "fileIcons/csv.gif",
+        "dia"       : extras + "fileIcons/dia.gif",
+        "doc"       : extras + "fileIcons/doc.gif",
+        "dot"       : extras + "fileIcons/dot.gif",
+        "dwf"       : extras + "fileIcons/dwf.gif",
+        "dwg"       : extras + "fileIcons/dwg.gif",
+        "dxf"       : extras + "fileIcons/dxf.gif",
+        "eps"       : extras + "fileIcons/eps.gif",
+        "exe"       : extras + "fileIcons/exe.gif",
+        "gif"       : extras + "fileIcons/gif.gif",
+        "gnumeric"  : extras + "fileIcons/gnumeric.gif",
+        "gz"        : extras + "fileIcons/gz.gif",
+        "hqx"       : extras + "fileIcons/hqx.gif",
+        "htm"       : extras + "fileIcons/htm.gif",
+        "html"      : extras + "fileIcons/html.gif",
+        "indd"      : extras + "fileIcons/indd.gif",
+        "iso"       : extras + "fileIcons/iso.gif",
+        "jar"       : extras + "fileIcons/jar.gif",
+        "java"      : extras + "fileIcons/java.gif",
+        "jpeg"      : extras + "fileIcons/jpeg.gif",
+        "jpg"       : extras + "fileIcons/jpg.gif",
+        "js"        : extras + "fileIcons/js.gif",
+        "kpr"       : extras + "fileIcons/kpr.gif",
+        "ksp"       : extras + "fileIcons/ksp.gif",
+        "kwd"       : extras + "fileIcons/kwd.gif",
+        "log"       : extras + "fileIcons/log.gif",
+        "lyx"       : extras + "fileIcons/lyx.gif",
+        "m3u"       : extras + "fileIcons/m3u.gif",
+        "mdb"       : extras + "fileIcons/mdb.gif",
+        "mif"       : extras + "fileIcons/mif.gif",
+        "mov"       : extras + "fileIcons/mov.gif",
+        "mp3"       : extras + "fileIcons/mp3.gif",
+        "mpeg"      : extras + "fileIcons/mpeg.gif",
+        "mpg"       : extras + "fileIcons/mpg.gif",
+        "mpp"       : extras + "fileIcons/mpp.gif",
+        "mrproject" : extras + "fileIcons/mrproject.gif",
+        "oleo"      : extras + "fileIcons/oleo.gif",
+        "p65"       : extras + "fileIcons/p65.gif",
+        "pdf"       : extras + "fileIcons/pdf.gif",
+        "pic"       : extras + "fileIcons/pic.gif",
+        "pict"      : extras + "fileIcons/pict.gif",
+        "pif"       : extras + "fileIcons/pif.gif",
+        "pm"        : extras + "fileIcons/pm.gif",
+        "png"       : extras + "fileIcons/png.gif",
+        "pps"       : extras + "fileIcons/pps.gif",
+        "ppt"       : extras + "fileIcons/ppt.gif",
+        "ps"        : extras + "fileIcons/ps.gif",
+        "psd"       : extras + "fileIcons/psd.gif",
+        "psp"       : extras + "fileIcons/psp.gif",
+        "ra"        : extras + "fileIcons/ra.gif",
+        "ram"       : extras + "fileIcons/ram.gif",
+        "rar"       : extras + "fileIcons/rar.gif",
+        "readme"    : extras + "fileIcons/readme.gif",
+        "rpm"       : extras + "fileIcons/rpm.gif",
+        "rtf"       : extras + "fileIcons/rtf.gif",
+        "rtx"       : extras + "fileIcons/rtx.gif",
+        "sdc"       : extras + "fileIcons/sdc.gif",
+        "sdd"       : extras + "fileIcons/sdd.gif",
+        "sdp"       : extras + "fileIcons/sdp.gif",
+        "sdw"       : extras + "fileIcons/sdw.gif",
+        "sea"       : extras + "fileIcons/sea.gif",
+        "sit"       : extras + "fileIcons/sit.gif",
+        "slk"       : extras + "fileIcons/slk.gif",
+        "sql"       : extras + "fileIcons/sql.gif",
+        "stc"       : extras + "fileIcons/stc.gif",
+        "sti"       : extras + "fileIcons/sti.gif",
+        "stw"       : extras + "fileIcons/stw.gif",
+        "swf"       : extras + "fileIcons/swf.gif",
+        "sxc"       : extras + "fileIcons/sxc.gif",
+        "sxd"       : extras + "fileIcons/sxd.gif",
+        "sxg"       : extras + "fileIcons/sxg.gif",
+        "sxi"       : extras + "fileIcons/sxi.gif",
+        "sxm"       : extras + "fileIcons/sxm.gif",
+        "sxw"       : extras + "fileIcons/sxw.gif",
+        "sylk"      : extras + "fileIcons/sylk.gif",
+        "tab"       : extras + "fileIcons/tab.gif",
+        "tar"       : extras + "fileIcons/tar.gif",
+        "tgz"       : extras + "fileIcons/tgz.gif",
+        "tif"       : extras + "fileIcons/tif.gif",
+        "tiff"      : extras + "fileIcons/tiff.gif",
+        "tsv"       : extras + "fileIcons/tsv.gif",
+        "txt"       : extras + "fileIcons/txt.gif",
+        "unknown"   : extras + "fileIcons/unknown.gif",
+        "vdx"       : extras + "fileIcons/vdx.gif",
+        "vsd"       : extras + "fileIcons/vsd.gif",
+        "wav"       : extras + "fileIcons/wav.gif",
+        "wk1"       : extras + "fileIcons/wk1.gif",
+        "wk3"       : extras + "fileIcons/wk3.gif",
+        "wk4"       : extras + "fileIcons/wk4.gif",
+        "wks"       : extras + "fileIcons/wks.gif",
+        "wri"       : extras + "fileIcons/wri.gif",
+        "xla"       : extras + "fileIcons/xla.gif",
+        "xlc"       : extras + "fileIcons/xlc.gif",
+        "xld"       : extras + "fileIcons/xld.gif",
+        "xls"       : extras + "fileIcons/xls.gif",
+        "xlt"       : extras + "fileIcons/xlt.gif",
+        "xml"       : extras + "fileIcons/xml.gif",
+        "z"         : extras + "fileIcons/z.gif",
+        "zip"       : extras + "fileIcons/zip.gif"
+    };
+})();
+

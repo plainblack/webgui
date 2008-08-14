@@ -241,25 +241,23 @@ Renders a file upload control.
 sub toHtml {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session);
-	my $uploadControl = undef;
+	my $uploadControl = '';
 	my $storage = $self->getStorageLocation;
 	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        $uploadControl = '<script type="text/javascript" src="'.$self->session->url->extras('FileUploadControl.js') .'"></script>';
-
-        $uploadControl .= '<noscript>
-            
-            </noscript>'; 
-        $uploadControl .= '<script type="text/javascript" src="'.$self->session->url->extras('fileIcons.js') .'"</script>';
-        $uploadControl .= '<script type="text/javascript">';
-        $uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow(); </script>!
-		    , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size");
-		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
-            name    => $self->privateName('action'), 
-            value   => 'upload',
-            id      => $self->get('id')
-            })->toHtml()."<br />";
+        $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('fileIcons.js'),{type=>"text/javascript"});
+        $uploadControl = '<script type="text/javascript">'
+            . sprintf(q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow();!
+                , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size"))
+            . '</script>'
+            . WebGUI::Form::Hidden->new($self->session, {
+                name    => $self->privateName('action'), 
+                value   => 'upload',
+                id      => $self->get('id')
+            })->toHtml
+            . "<br />";
 	} 
     else {
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
