@@ -246,23 +246,13 @@ sub toHtml {
 	my @files = @{ $storage->getFiles } if (defined $storage);
 	my $maxFiles = $self->get('maxAttachments') - scalar(@files);
 	if ($maxFiles > 0) {
-        $self->session->style->setScript($self->session->url->extras('FileUploadControl.js'),{type=>"text/javascript"});
-        $uploadControl = '<noscript>
+        $uploadControl = '<script type="text/javascript" src="'.$self->session->url->extras('FileUploadControl.js') .'"></script>';
+
+        $uploadControl .= '<noscript>
             
             </noscript>'; 
-        $uploadControl .= '<script type="text/javascript">
-               	var fileIcons = new Array();
-               	';
-        opendir(DIR,$self->session->config->get("extrasPath").'/fileIcons');
-        my @icons = readdir(DIR);
-        closedir(DIR);
-        foreach my $file (@icons) {
-            unless ($file eq "." || $file eq "..") {
-                my $ext = $file;
-	            $ext =~ s/(.*?)\.gif/$1/;
-        	    $uploadControl .= 'fileIcons["'.$ext.'"] = "'.$self->session->url->extras('fileIcons/'.$file).'";'."\n";
-            }
-       	}
+        $uploadControl .= '<script type="text/javascript" src="'.$self->session->url->extras('fileIcons.js') .'"</script>';
+        $uploadControl .= '<script type="text/javascript">';
         $uploadControl .= sprintf q!var uploader = new FileUploadControl("%s", fileIcons, "%s","%d", "%s"); uploader.addRow(); </script>!
 		    , $self->get("name")."_file", $i18n->get("removeLabel"), $maxFiles, $self->get("size");
 		$uploadControl .= WebGUI::Form::Hidden->new($self->session, {
