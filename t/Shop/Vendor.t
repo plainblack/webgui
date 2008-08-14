@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 23;
+my $tests = 30;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Vendor');
 
 my $vendor;
-my $fence;
+my ($fence, $fenceCopy);
 my $fenceUser = WebGUI::User->new($session, 'new');
 
 SKIP: {
@@ -153,6 +153,52 @@ my $newProps = {
     name => 'Warden Norton',
     url  => 'http://www.shawshank.com',
 };
+
+$fence->update($newProps);
+is($fence->get('name'), 'Warden Norton',            'get: get name');
+is($fence->get('url'),  'http://www.shawshank.com', 'get: updating name did not affect userId');
+
+$newProps->{name} = 'Officer Hadley';
+is($fence->get('name'), 'Warden Norton',            'get: No leakage in passing hashref to get');
+
+my $currentProps = $fence->get();
+
+cmp_deeply(
+    $currentProps,
+    {
+        paymentInformation   => ignore(),
+        vendorId             => ignore(),
+        preferredPaymentType => ignore(),
+        paymentAddressId     => ignore(),
+        dateCreated          => ignore(),
+        url                  => 'http://www.shawshank.com',
+        userId               => $fenceUser->userId,
+        name                 => 'Warden Norton',
+    },
+    'get: returns all properties'
+);
+
+$currentProps->{name} = 'Jake the Raven';
+is($fence->get('name'), 'Warden Norton', 'get: No leakage returned hashref');
+
+#######################################################################
+#
+# newByUserId
+#
+#######################################################################
+
+eval { $fenceCopy = WebGUI::Shop::Vendor->newByUserId(); };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error::InvalidObject', 'newByUserId takes an exception to not giving it a session variable');
+cmp_deeply(
+    $e,
+    methods(
+        error    => 'Need a session.',
+        got      => '',
+        expected => 'WebGUI::Session',
+    ),
+    'create: requires a session variable',
+);
 
 }
 
