@@ -137,8 +137,9 @@ sub getFilePreview {
 		}
 		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
    		    .'<img src="'.$storage->getFileIconUrl($file).'" style="vertical-align:middle;border: 0px;" alt="'
-			.$file.'" /> '.$file.'</a></p><br />';
-	    $preview .= $i18n->get(392) .  ("&nbsp"x4) . WebGUI::Form::YesNo->new($self->session,{name=>$self->privateName('delete'), value=>0})->toHtml;
+			.$file.'" /> '.$file.'</a><br />';
+	    $preview .= $i18n->get(392) .  ("&nbsp"x4) . WebGUI::Form::YesNo->new($self->session,{name=>$self->privateName('delete_'.$file), value=>0})->toHtml;
+		$preview .= '</p><br /><br />';
 	}
     return $preview;
 }
@@ -173,17 +174,21 @@ deleting the file if it was specified.
 sub getValue {
 	my $self = shift;
 	my $value = $self->get("value");
-	if ($self->session->form->param($self->privateName('delete'))) {
-		my $storage = WebGUI::Storage->get($self->session,$value);
-		$storage->delete if defined $storage;
-		return '';
-	} elsif ($self->session->form->param($self->privateName('action')) eq 'keep') {
+	my $storage = WebGUI::Storage->get($self->session,$value);
+	foreach my $file (@{$storage->getFiles}) {
+		if ($self->session->form->param($self->privateName('delete_'.$file))) {
+			$storage->deleteFile($file);
+		}
+	}
+	if ($self->session->form->param($self->privateName('action')) eq 'keep') {
 		return $value;
-	} elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
+	}
+	elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
 		my $storage = undef;
 		if ($value ne "") {
 			$storage = WebGUI::Storage::Image->get($self->session, $value);
-		} else {
+		}
+		else {
 			$storage = WebGUI::Storage::Image->create($self->session);
 		}
 		$storage->addFileFromFormPost($self->get("name")."_file",1000);
@@ -191,7 +196,8 @@ sub getValue {
 		if (scalar(@files) < 1) {
 			$storage->delete;
 			return undef;
-		} else {
+		}
+		else {
 			my $id = $storage->getId;
 			$self->set("value", $id);
 			return $id;

@@ -3,6 +3,8 @@
    for assets are processed in addRevision() instead.
  - Changed update() so it can autodetect missing fields in asset tables and
    log them nicely instead of crashing.
+ - Fixed a problem with the file upload control where you couldn't delete the
+   file if you have multiple attached.
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields

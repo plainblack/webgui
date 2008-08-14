@@ -103,8 +103,9 @@ sub getFilePreview {
 		my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
 		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
 		    .'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
-			.$file.'" /> '.$file.'</a></p><br />';
-	    $preview .= $i18n->get(392) .  "&nbsp"x4 . WebGUI::Form::YesNo->new($self->session, {-name=>$self->privateName('delete'), -value=>0})->toHtml; 
+			.$file.'" /> '.$file.'</a> <br />';
+	    $preview .= $i18n->get(392) .  "&nbsp"x4 . WebGUI::Form::YesNo->new($self->session, {-name=>$self->privateName('delete_'.$file), -value=>0})->toHtml;
+		$preview .= '</p><br /><br />'
 	}
     return $preview;
 }
