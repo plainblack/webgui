@@ -2225,30 +2225,31 @@ sub update {
     }
 
     # check the definition of all properties against what was given to us
-
-    # get a DB object for the two conditionals below, and the description
-    my %assetDataFields;
-    my $sth = $self->session->db->read('DESCRIBE `assetData`');
-    while (my ($col) = $sth->array) {
-        $assetDataFields{$col} = 1;
-    }
-
     foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
+
+		# get a list of the fields available in this table so we don't try to insert
+		# something for a field that doesn't exist
+		my %tableFields = ();
+		my $sth = $self->session->db->read('DESCRIBE `'.$definition->{tableName}.'`');
+		while (my ($col) = $sth->array) {
+			$tableFields{$col} = 1;
+		}
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
 
-            # skip a property unless it was specified to be set by the properties field or has a default value
-			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+#            # skip a property unless it was specified to be set by the properties field or has a default value
+#			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+            # skip a property unless it was specified to be set by the properties field
+			next unless (exists $properties->{$property});
 
             # skip a property if it has the display only flag set
             next if ($definition->{properties}{$property}{displayOnly});
 
-            # if this is the new-to-7.5 isExportable field, check if the
-            # database field for it exists. if not, setting it will break, so
-            # skip it. this facilitates updating from previous versions.
-            if ($definition->{tableName} eq 'assetData' && !exists $assetDataFields{$property}) {
+            # skip properties that aren't yet in the table
+            if (!exists $tableFields{$property}) {
+				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
                 next;
             }
 
