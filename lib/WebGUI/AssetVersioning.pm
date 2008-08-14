@@ -86,7 +86,7 @@ Posts) will know not to send them under certain conditions.
 
 sub addRevision {
     my $self             = shift;
-    my $properties       = shift;
+    my $properties       = shift || {};
     my $now              = shift     || $self->session->datetime->time();
     my $options          = shift;
 
