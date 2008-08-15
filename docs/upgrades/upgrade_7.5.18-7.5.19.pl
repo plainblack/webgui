@@ -32,7 +32,6 @@ my $session = start(); # this line required
 renameThingyFieldsSubtextColumn( $session );
 addNewInboxIndexes( $session );
 updateAddressTable( $session );
-addProductShipping( $session );
 addGalleryImageDensity( $session );
 updatePaymentDrivers( $session );
 extendVendors($session);
@@ -111,15 +110,6 @@ sub updateAddressTable {
     print "\tUpdating TABLE address... " unless $quiet;
     $session->db->write("ALTER TABLE address DROP COLUMN name");
     $session->db->write("ALTER TABLE address ADD COLUMN firstName VARCHAR(35)  AFTER label, ADD COLUMN lastName VARCHAR(35)  AFTER firstName");
-    print "\tDone.\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-# Removes the name field and adds a firstName and lastName field
-sub addProductShipping {
-    my $session = shift;
-    print "\tAdding shippingRequired to the Product table... " unless $quiet;
-    $session->db->write("ALTER TABLE Product add COLUMN isShippingRequired INT(11)");
     print "\tDone.\n" unless $quiet;
 }
 

@@ -10,6 +10,7 @@
  - Fixed a problem with the file upload control where you couldn't delete the
    file if you have multiple attached.
  - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
+ - fixed again: The bug enigmatically named "product".
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
