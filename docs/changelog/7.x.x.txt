@@ -11,6 +11,7 @@
    file if you have multiple attached.
  - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
  - fixed again: The bug enigmatically named "product".
+ - fixed: packages don't include archived assets
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
