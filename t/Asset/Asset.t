@@ -146,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 98 
+plan tests => 99 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -769,6 +769,19 @@ my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
 $iufpAsset2->commit;
 is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+
+my $properties2a = {
+    #                       '1234567890123456789012'
+    id                   => 'inheritUrlFromParent2a',
+    title                => 'inheritUrlFromParent2a',
+    className            => 'WebGUI::Asset::Wobject::Layout',
+    url                  => 'inheriturlfromparent2a',
+    inheritUrlFromParent => 1,
+};
+
+my $iufpAsset2a = $iufpAsset->addChild($properties2a, $properties2a->{id});
+$iufpAsset2a->commit;
+is($iufpAsset2a->getUrl, '/inheriturlfromparent01/inheriturlfromparent2a', 'inheritUrlFromParent works when created with the property');
 
 # works for setting, now try disabling. Should not change the URL.
 $iufpAsset2->update( { inheritUrlFromParent => 0 } );
