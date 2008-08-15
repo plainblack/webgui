@@ -8,7 +8,7 @@
    isn't left wondering what happened to the data they just submitted.
  - Fixed a problem with the file upload control where you couldn't delete the
    file if you have multiple attached.
-
+ - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
