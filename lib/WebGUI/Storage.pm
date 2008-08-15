@@ -67,7 +67,7 @@ This package provides a mechanism for storing and retrieving files that are not 
  $store->copyFile($filename, $newFilename);
  $store->delete;
  $store->deleteFile($filename);
- $store->rename($filename, $newFilename);
+ $store->renameFile($filename, $newFilename);
  $store->setPrivileges($userId, $groupIdView, $groupIdEdit);
 
 =head1 METHODS
