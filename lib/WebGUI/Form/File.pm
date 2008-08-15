@@ -175,9 +175,11 @@ sub getValue {
 	my $self = shift;
 	my $value = $self->get("value");
 	my $storage = WebGUI::Storage->get($self->session,$value);
-	foreach my $file (@{$storage->getFiles}) {
-		if ($self->session->form->param($self->privateName('delete_'.$file))) {
-			$storage->deleteFile($file);
+	if (defined $storage) {
+		foreach my $file (@{$storage->getFiles}) {
+			if ($self->session->form->param($self->privateName('delete_'.$file))) {
+				$storage->deleteFile($file);
+			}
 		}
 	}
 	if ($self->session->form->param($self->privateName('action')) eq 'keep') {
