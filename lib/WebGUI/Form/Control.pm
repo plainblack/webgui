@@ -419,7 +419,9 @@ Returns the either the "value" or "defaultValue" passed in to the object in that
 
 sub getOriginalValue {
     my $self = shift;
-    return $self->get("value") || $self->getDefaultValue();
+    my $value = $self->get('value');
+    return $value if (defined $value);  ##Handle returning 0 and empty string
+    return $self->getDefaultValue;
 }
 
 #-------------------------------------------------------------------
