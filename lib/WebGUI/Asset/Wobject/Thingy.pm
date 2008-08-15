@@ -2407,7 +2407,7 @@ sequenceNumber');
             push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
         }
         if($field->{displayInSearch}){
-            my $orderByUrl = $currentUrl.";orderBy=".$field->{fieldId};
+            my $orderByUrl = $self->session->url->append($currentUrl,"orderBy=".$field->{fieldId});
             push(@displayInSearchFields_loop, {
                 "displayInSearchFields_fieldId" => $field->{fieldId},
                 "displayInSearchFields_label" => $field->{label},

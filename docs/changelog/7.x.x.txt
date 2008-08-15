@@ -6,6 +6,7 @@
  - Changed Thingy so it defaultly searches the default thing when you view the
    search screen for that thing. This way it displays everything and the user
    isn't left wondering what happened to the data they just submitted.
+ - Fixed the column ordering links in search on Thingy.
  - Fixed a problem with the file upload control where you couldn't delete the
    file if you have multiple attached.
  - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
