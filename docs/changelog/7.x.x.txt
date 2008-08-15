@@ -12,6 +12,7 @@
  - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
  - fixed again: The bug enigmatically named "product".
  - fixed: packages don't include archived assets
+ - fixed: Getting an i18n key from a file that does not exist.
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
