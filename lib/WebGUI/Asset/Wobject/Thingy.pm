@@ -2342,14 +2342,13 @@ sub www_search {
     my $session = $self->session;
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
-    my ($var,$url,$doSearch,$orderBy);
+    my ($var,$url,$orderBy);
     my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
     my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
 
     my $thingProperties = $self->getThing($thingId);
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdSearch});
 
-    $doSearch = $session->form->process("doSearch");
     $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
     $var = $self->get;
     $url = $self->getUrl;
@@ -2359,7 +2358,7 @@ sub www_search {
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
     $var->{"thing_label"} = $thingProperties->{label};
 
-    if ($doSearch && $self->hasPrivileges($thingProperties->{groupIdExport})){
+    if ($self->hasPrivileges($thingProperties->{groupIdExport})){
         $var->{"export_url"} = $session->url->append($url, 'func=export;thingId='.$thingId);
     }
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
@@ -2404,79 +2403,72 @@ sequenceNumber');
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
             });
-            if ($doSearch){
-                my $searchValue = $session->form->process("field_".$field->{fieldId});
-                push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
-            }
+            my $searchValue = $session->form->process("field_".$field->{fieldId});
+            push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
         }
-        if ($doSearch){
-            if($field->{displayInSearch}){
-                my $orderByUrl = $currentUrl.";orderBy=".$field->{fieldId};
-                push(@displayInSearchFields_loop, {
-                    "displayInSearchFields_fieldId" => $field->{fieldId},
-                    "displayInSearchFields_label" => $field->{label},
-                    "displayInSearchFields_orderByUrl" => $orderByUrl,
-                });
-                push(@displayInSearchFields, {
-                    fieldId => $field->{fieldId},
-                    properties => $field,
-                });
-            }
+        if($field->{displayInSearch}){
+            my $orderByUrl = $currentUrl.";orderBy=".$field->{fieldId};
+            push(@displayInSearchFields_loop, {
+                "displayInSearchFields_fieldId" => $field->{fieldId},
+                "displayInSearchFields_label" => $field->{label},
+                "displayInSearchFields_orderByUrl" => $orderByUrl,
+            });
+            push(@displayInSearchFields, {
+                fieldId => $field->{fieldId},
+                properties => $field,
+            });
         }
     }
 
-    if ($doSearch){
-        $query = "select thingDataId, ";
-        $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
-        $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
-        $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
-        if ($orderBy){
-            $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);
-        }
-        
-        # store query in cache for thirty minutes
-        WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
-
-        $paginatePage = $self->session->form->param('pn') || 1;
-        $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
-        
-        $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
-        $p->setDataByQuery($query);
-        $searchResults = $p->getPageData($paginatePage);
-        foreach my $searchResult (@$searchResults){
-            my (@field_loop);
-            foreach my $field (@displayInSearchFields){
-                my $fieldId = $field->{fieldId};
-                my $value = $self->getFieldValue($searchResult->{"field_".$fieldId},$field->{properties});
-                push(@field_loop,{
-                    "field_value" => $value,
-                    "field_id" => $fieldId,
-                });
-            }
-            my $thingDataId = $searchResult->{thingDataId};
-            my %templateVars = (
-                "searchResult_id" => $thingDataId,
-                "searchResult_view_url" => $session->url->append($url, 'func=viewThingData;thingId=' 
-                .$thingId.';thingDataId='.$thingDataId),
-                "searchResult_field_loop" => \@field_loop,
-            );
-            if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
-                $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
-                $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
-            }
-            push(@searchResult_loop,\%templateVars);
-        }
-        $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
-        $var->{searchResult_loop} = \@searchResult_loop;    
-        $p->appendTemplateVars($var);
+    $query = "select thingDataId, ";
+    $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
+    $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
+    $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
+    if ($orderBy){
+        $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);
     }
+    
+    # store query in cache for thirty minutes
+    WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
+
+    $paginatePage = $self->session->form->param('pn') || 1;
+    $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
+    
+    $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
+    $p->setDataByQuery($query);
+    $searchResults = $p->getPageData($paginatePage);
+    foreach my $searchResult (@$searchResults){
+        my (@field_loop);
+        foreach my $field (@displayInSearchFields){
+            my $fieldId = $field->{fieldId};
+            my $value = $self->getFieldValue($searchResult->{"field_".$fieldId},$field->{properties});
+            push(@field_loop,{
+                "field_value" => $value,
+                "field_id" => $fieldId,
+            });
+        }
+        my $thingDataId = $searchResult->{thingDataId};
+        my %templateVars = (
+            "searchResult_id" => $thingDataId,
+            "searchResult_view_url" => $session->url->append($url, 'func=viewThingData;thingId=' 
+            .$thingId.';thingDataId='.$thingDataId),
+            "searchResult_field_loop" => \@field_loop,
+        );
+        if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
+            $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
+            .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
+            .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+        }
+        push(@searchResult_loop,\%templateVars);
+    }
+    $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
+    $var->{searchResult_loop} = \@searchResult_loop;    
+    $p->appendTemplateVars($var);
 
     $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"search"});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingId",value=>$thingId});
-    $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"doSearch",value=>1});
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value=>$i18n->get("search button label")});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
 
