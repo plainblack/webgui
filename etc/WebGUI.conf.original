@@ -521,6 +521,7 @@
 "contentHandlers" : [
     "WebGUI::Content::Prefetch",
     "WebGUI::Content::Maintenance",
+    "WebGUI::Content::Referral",
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
