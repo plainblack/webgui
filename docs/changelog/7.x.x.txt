@@ -13,6 +13,7 @@
  - fixed again: The bug enigmatically named "product".
  - fixed: packages don't include archived assets
  - fixed: Getting an i18n key from a file that does not exist.
+ - fixed: Tree Navigation menu shows level numbers
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
