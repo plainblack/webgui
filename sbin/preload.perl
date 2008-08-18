@@ -2,7 +2,7 @@ use strict;
 
 my $webguiRoot = '/data/WebGUI';
 
-my @webguiLibs = ($webguiRoot."/lib");
+my @webguiLibs;
 
 # add custom lib directories to library search path
 for my $libDir (readLines($webguiRoot."/sbin/preload.custom")) {
@@ -12,6 +12,7 @@ for my $libDir (readLines($webguiRoot."/sbin/preload.custom")) {
     }
     push @webguiLibs, $libDir;
 }
+push @webguiLibs, $webguiRoot . "/lib";
 unshift @INC, @webguiLibs;
 
 #----------------------------------------

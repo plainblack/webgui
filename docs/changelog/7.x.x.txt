@@ -1,4 +1,5 @@
 7.5.21
+ - fixed: Custom library directories don't override WebGUI core modules
  - Changed update() so that it only updates fields passed in, and the defaults
    for assets are processed in addRevision() instead.
  - Changed update() so it can autodetect missing fields in asset tables and
