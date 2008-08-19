@@ -79,7 +79,7 @@ my $testTemplateVars    = {
     url_listFilesForOwner
         => $gallery->getUrl('func=listFilesForUser;userId=3'),
     url_promote         => $photo->getUrl('func=promote'),
-    url_album           => $album->getUrl,
+    url_album           => $album->getUrl('pn=1'),
     url_thumbnails      => $album->getUrl('func=thumbnails'),
     url_slideshow       => $album->getUrl('func=slideshow'),
     fileUrl             => $photo->getFileUrl,
