@@ -126,6 +126,9 @@ sub addRevision {
 		# get the default values of each property
 		foreach my $property (keys %{$definition->{properties}}) {
 			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
+            if (ref($defaults{$property}) eq 'ARRAY') {
+                $defaults{$property} = $defaults{$property}->[0];
+            }
 		}
 		
 		# prime the tables

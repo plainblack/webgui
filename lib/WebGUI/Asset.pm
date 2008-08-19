@@ -2270,6 +2270,9 @@ sub update {
             # use the default value because default and update were both undef
             if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
                 $value = $definition->{properties}{$property}{defaultValue};
+                if (ref($value) eq 'ARRAY') {
+                    $value = $value->[0];
+                }
             }
 
             # set the property

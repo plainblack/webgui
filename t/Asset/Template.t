@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 11; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -37,6 +37,8 @@ ok($output =~ m/\s(?:XY){5}\s/, "processRaw() - loops");
 my $importNode = WebGUI::Asset::Template->getImportNode($session);
 my $template = $importNode->addChild({className=>"WebGUI::Asset::Template", title=>"test", url=>"testingtemplates", template=>$template, namespace=>'WebGUI Test Template'});
 isa_ok($template, 'WebGUI::Asset::Template', "creating a template");
+
+is($template->get('parser'), 'WebGUI::Asset::Template::HTMLTemplate', 'default parser is HTMLTemplate');
 
 $var{variable} = "BBBBB";
 $output = $template->process(\%var);
