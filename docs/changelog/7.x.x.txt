@@ -21,6 +21,8 @@
  - fixed: Tree Navigation menu shows level numbers
  - fixed: loginBox macro no longer can return user to "logout" page, logging them out
  - fixed: Template Assets broken
+ - fixed: edit operation sql error, Thingy (Yung Han Khoe)
+ - fixed: Thingy: default thing property hidden (Yung Han Khoe) 
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields

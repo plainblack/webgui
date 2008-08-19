@@ -585,7 +585,7 @@ sub getEditForm {
 
     my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->get("assetId")]);
 
-    unless (scalar(keys(%{$things}))) {
+    if (scalar(keys(%{$things}))) {
     	$tabform->getTab("display")->selectBox(
 	    	-name=>"defaultThingId",
             -value=>$self->get("defaultThingId"),
@@ -2419,13 +2419,19 @@ sequenceNumber');
             });
         }
     }
-
-    $query = "select thingDataId, ";
-    $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
-    $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
-    $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
-    if ($orderBy){
-        $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);
+    
+    if (scalar(@displayInSearchFields)){
+        $query = "select thingDataId, ";
+        $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
+        $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
+        $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
+        if ($orderBy){
+            $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);
+        }
+    }
+    else{
+        $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
+        return undef;
     }
     
     # store query in cache for thirty minutes
