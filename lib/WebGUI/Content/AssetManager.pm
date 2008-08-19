@@ -238,6 +238,7 @@ sub handler {
     my ( $session ) = @_;
  
     if ( $session->form->get( 'op' ) eq 'assetManager' && getCurrentAsset( $session ) ) {
+        $session->asset(getCurrentAsset($session));
 
         return $session->privilege->noAccess unless getCurrentAsset( $session )->canEdit;
 

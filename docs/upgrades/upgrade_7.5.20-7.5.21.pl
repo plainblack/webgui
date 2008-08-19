@@ -29,8 +29,23 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+removeUnusedImportFolder( $session );
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+sub removeUnusedImportFolder {
+    my $session = shift;
+    print "\tRemoving legacy folders from Import node if empty... " unless $quiet;
+    for my $assetId (qw(lK9-YMfZ4mpc-Me-UydrFg j3P_Vvsy0OtvUJZRXC55Nw XP2W66c8vtDVpxN50Fiwww JJ-SZb9z2l_N46A0AWW7KA Cn2TOyQH3qqnQrWDrsGrxg sMuqO3Ynl6Lyn5fa2SsGmQ NYr6iP4pQaPRYqEYMryv4w)) {
+        my $asset = WebGUI::Asset->new($session, $assetId);
+        if ($asset->getChildCount == 0) {
+            $asset->purge;
+        }
+    }
+    print "Done.\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------

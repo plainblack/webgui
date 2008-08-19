@@ -1,4 +1,6 @@
 7.5.21
+ - fixed: Back to Site link in asset manager points to wrong location
+ - fixed: Some import node folders have invalid template
  - fixed: Scheduled workflows based on day of week run on wrong day
  - improved debug messages for sql queries
  - fixed: Custom library directories don't override WebGUI core modules
