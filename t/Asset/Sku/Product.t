@@ -34,11 +34,13 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 7;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
-my $node = WebGUI::Asset->getRoot($session);
+my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+isa_ok($node, 'WebGUI::Asset::Wobject::Folder', 'getProductImportNode returns a Folder');
+is($node->getId, 'PBproductimportnode001', 'Product Import Node has the correct GUID');
 
 my $product = $node->addChild({
     className => "WebGUI::Asset::Sku::Product",
@@ -51,10 +53,9 @@ my $image = WebGUI::Storage::Image->create($session);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
 
 my $imagedProduct = $node->addChild({
-    className          => "WebGUI::Asset::Sku::Product",
-    title              => "Bible",
-    image1             => $image->getId,
-    isShippingRequired => 1,
+    className => "WebGUI::Asset::Sku::Product",
+    title     => "Bible",
+    image1    => $image->getId,
 });
 
 ok($imagedProduct->getThumbnailUrl(), 'getThumbnailUrl is not empty');
@@ -65,24 +66,6 @@ $otherImage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jp
 
 ok($imagedProduct->getThumbnailUrl($otherImage), 'getThumbnailUrl with an explicit storageId returns something');
 is($imagedProduct->getThumbnailUrl($otherImage), $otherImage->getThumbnailUrl('gooey.jpg'), 'getThumbnailUrl with an explicit storageId returns the right path to the URL');
-
-is($imagedProduct->get('isShippingRequired'), 1, 'isShippingRequired set to 1 in db');
-is($imagedProduct->isShippingRequired,        1, 'isShippingRequired accessor works');
-
-my $englishVarId = $imagedProduct->setCollateral('variantsJSON', 'variantId', 'new',
-    {
-        shortdesc => 'English',
-        varSku    => 'english-bible',
-        price     => 10,
-        weight    => 5,
-        quantity  => 1000,
-    }
-);
-
-use Data::Dumper;
-$imagedProduct->applyOptions($imagedProduct->getCollateral('variantsJSON', 'variantId', $englishVarId));
-
-is($imagedProduct->getConfiguredTitle, 'Bible - English', 'getConfiguredTitle is overridden and concatenates the Product Title and the variant shortdesc');
 
 #----------------------------------------------------------------------------
 # Cleanup

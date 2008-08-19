@@ -97,7 +97,6 @@ sub hack_session_request {
             return $id
         },
     );
-    $request->mock('param', sub { shift->body(@_) });
     $session->{_request} = $request;
 }
 

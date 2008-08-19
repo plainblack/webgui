@@ -25,7 +25,7 @@ use WebGUI::Asset::Wobject::SyndicatedContent;
 
 my $session = WebGUI::Test->session;
 my %var;
-my (@rss_feeds);
+my ($items, @rss_feeds);
 
 ##############################
 ##          SETUP           ##
@@ -99,10 +99,8 @@ my $rss_info = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($session
 ok(ref($rss_info) eq 'HASH',  "Hashref returned from _get_rss_data");
 push(@rss_feeds, $rss_info);
 
-
-my $items = [];
-WebGUI::Asset::Wobject::SyndicatedContent::_create_interleaved_items($items, \@rss_feeds  , $max_headlines, $hasTermsRegex);
-ok($items , "Got results back from XML" );
+my $xml_list = WebGUI::Asset::Wobject::SyndicatedContent::_create_interleaved_items($items, \@rss_feeds  , $max_headlines, $hasTermsRegex);
+ok($xml_list , "Got results back from XML " );
 
 my($item_loop,$rss_feeds) = $syndicated_content->_get_items(\@validated_urls, $max_headlines);
 ok(ref($item_loop) eq 'ARRAY',"Arrayref of items returned from _get_items" );

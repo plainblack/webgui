@@ -19,6 +19,7 @@
  - fixed: packages don't include archived assets
  - fixed: Getting an i18n key from a file that does not exist.
  - fixed: Tree Navigation menu shows level numbers
+ - fixed: loginBox macro no longer can return user to "logout" page, logging them out
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields

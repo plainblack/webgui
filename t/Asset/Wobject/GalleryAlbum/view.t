@@ -69,27 +69,18 @@ plan tests => 7;
 
 #----------------------------------------------------------------------------
 # Test getFileIds and getFilePaginator
-cmp_bag( $album->getFileIds, [ map { $_->getId } @photos ], 'getFileIds returns ids of all photos' );
+cmp_bag( $album->getFileIds, [ map { $_->getId } @photos ] );
 
 my $p   = $album->getFilePaginator;
 isa_ok( $p, "WebGUI::Paginator" );
-cmp_deeply( $p->getPageData, subbagof( map { $_->getId } @photos ), 'getPageData contains a subset of the ids o the photos');
+cmp_deeply( $p->getPageData, subbagof( map { $_->getId } @photos ) );
 
 #----------------------------------------------------------------------------
 # Test getTemplateVars 
 
 # Is a superset of Asset->get
 # NOTE: url is Asset->getUrl
-# NOTE: undef description remapped to empty string ''
-cmp_deeply(
-    $album->getTemplateVars,
-    superhashof( {
-        %{$album->get},
-        url         => $album->getUrl,
-        description => '',
-    } ),
-    q|getTemplateVariables returns the Album's asset properties|
-);
+cmp_deeply( $album->getTemplateVars, superhashof( { %{$album->get}, url => $album->getUrl, } ) );
 
 # Contains specific keys/values
 my $expected = {
@@ -123,7 +114,7 @@ my $expected = {
         => WebGUI::User->new($session, 3)->username,
 };
 
-cmp_deeply( $album->getTemplateVars, superhashof( $expected ), '... and also returns a set of other template variables' );
+cmp_deeply( $album->getTemplateVars, superhashof( $expected ) );
 
 #----------------------------------------------------------------------------
 # Test appendTemplateVarsFileLoop
