@@ -1,4 +1,5 @@
 7.5.21
+ - improved debug messages for sql queries
  - fixed: Custom library directories don't override WebGUI core modules
  - Changed update() so that it only updates fields passed in, and the defaults
    for assets are processed in addRevision() instead.

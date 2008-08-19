@@ -110,6 +110,7 @@ Returns true if the user meets the condition to see debugging information and de
 
 sub canShowDebug {
 	my $self = shift;
+	return 0 unless ($self->session->hasSettings);
 	return 0 unless ($self->session->setting->get("showDebug"));
 	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
 	return $self->canShowBasedOnIP('debugIp');
@@ -324,21 +325,28 @@ A sql statement string.
 
 sub query {
 	my $self = shift;
+    return unless $self->canShowDebug || $self->getLogger->is_debug;
 	my $query = shift;
 	my $placeholders = shift;
 	$self->{_queryCount}++;
 	my $plac;
 	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@{$placeholders})) {
-        $plac = "\n  with placeholders:  [" . join(', ', map {
-            defined $_ ? "'$_'" : 'undef';
-        } @$placeholders) . ']';
+        $plac = "\n  with placeholders:  " . JSON->new->encode($placeholders);
 	}
 	else {
 		$plac = '';
 	}
-    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
+    my $depth = 0;
+    while (my ($caller) = caller(++$depth)) {
+        last
+            unless $caller eq __PACKAGE__ || $caller =~ /^WebGUI::SQL:?/;
+    }
+
     $query =~ s/^/  /gms;
-    $self->debug("query ".$self->{_queryCount}.":\n" . $query . $plac);
+    $self->{_debug_debug} .= sprintf "query %d - %s(%s) :\n%s%s\n",
+        $self->{_queryCount}, (caller($depth + 1))[3,2], $query, $plac;
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + $depth + 1;
+    $self->getLogger->debug("query $self->{_queryCount}:\n$query$plac");
 }
 
 
@@ -387,7 +395,7 @@ errors, sql queries and form data.
 
 sub showDebug {
 	my $self = shift;
-    my $output = '<div style="text-align: left;color: #000000; white-space: pre; float: left;">';
+    my $output = '<div class="webgui-debug" style="text-align: left;color: #000000; white-space: pre; float: left">';
     my $text = $self->{_debug_error};
     $text = encode_entities($text);
     $output .= '<div style="background-color: #800000;color: #ffffff">'.$text."</div>";
@@ -402,7 +410,7 @@ sub showDebug {
         if exists $form{password};
     $form{identifier} = "*******"
         if exists $form{identifier};
-    $text = JSON->new->utf8->pretty->encode(\%form);
+    $text = JSON->new->pretty->encode(\%form);
     $text = encode_entities($text);
 	$output .= '<div style="background-color: #aaaaee">'.$text."</div>";
 	$text = $self->{_debug_debug}; 

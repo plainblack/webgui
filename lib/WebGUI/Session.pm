@@ -301,6 +301,19 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 hasSettings
+
+Checks if the settings have been initialized yet
+
+=cut
+
+sub hasSettings {
+    my $self = shift;
+    return exists $self->{_setting};
+}
+
+#-------------------------------------------------------------------
+
 =head2 http ( )
 
 Returns a reference to the WebGUI::Session::Http object.
