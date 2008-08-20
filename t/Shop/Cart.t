@@ -32,7 +32,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 20;        # Increment this number for each test you create
+plan tests => 21;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
