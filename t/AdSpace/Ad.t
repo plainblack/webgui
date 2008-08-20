@@ -36,7 +36,7 @@ my $newAdSettings = {
     priority          => "0",
 };
 
-my $numTests = 29; # increment this value for each test you create
+my $numTests = 33; # increment this value for each test you create
 $numTests += scalar keys %{ $newAdSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -66,11 +66,11 @@ SKIP: {
 
     undef $ad2;
 
-	my $data = $session->db->quickHashRef("select adId, adSpaceId from advertisement where adId=?",[$ad->getId]);
+    my $data = $session->db->quickHashRef("select adId, adSpaceId from advertisement where adId=?",[$ad->getId]);
 
-	ok(exists $data->{adId}, "create()");
-	is($data->{adId}, $ad->getId, "getId()");
-	is($data->{adSpaceId}, $ad->get('adSpaceId'), "get() adSpaceId");
+    ok(exists $data->{adId}, "create()");
+    is($data->{adId}, $ad->getId, "getId()");
+    is($data->{adSpaceId}, $ad->get('adSpaceId'), "get() adSpaceId");
 
     foreach my $setting (keys %{ $newAdSettings } ) {
         is($newAdSettings->{$setting}, $ad->get($setting),
@@ -79,28 +79,28 @@ SKIP: {
 
     $richAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId);
     $richAd->set({
-    	type      => 'rich',
-	richMedia => 'This is rich, ^@;'
+        type      => 'rich',
+        richMedia => 'This is rich, ^@;'
     });
     my $renderedAd = $richAd->get('renderedAd');
     my $userName = $session->user->username;
     like($renderedAd, qr/This is rich, $userName/, 'Rich media ads render macros');
 
     ##In this series of tests, we'll render a text ad and then pick it apart and make
-    ##sure that all th requisite components are in there.
+    ##sure that all the requisite components are in there.
     $adSpace->set({
-	width => 102,
-	height => 202
+        width => 102,
+        height => 202
     });
 
     $textAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId);
     $textAd->set({
-    	type        => 'text',
-	borderColor => 'black',
-	backgroundColor => 'white',
-	textColor => 'blue',
-	title => 'This is a text ad',
-	adText => 'Will hack for Gooey dolls.',
+        type        => 'text',
+        borderColor => 'black',
+        backgroundColor => 'white',
+        textColor => 'blue',
+        title => 'This is a text ad',
+        adText => 'Will hack for Gooey dolls.',
     });
     my $renderedTextAd = $textAd->get('renderedAd');
     
@@ -137,8 +137,8 @@ SKIP: {
 
     ##Ditto for the image ad
     $adSpace->set({
-	width  => 250,
-	height => 250
+        width  => 250,
+        height => 250
     });
 
     $imageAd = WebGUI::AdSpace::Ad->create($session, $adSpace->getId);
@@ -196,18 +196,26 @@ SKIP: {
     $setAd->set({priority=>0});
     is($setAd->get('priority'), 0, 'set priority=0');
 
+    $setAd->set({ title => 'myTitle', url => 'http://www.nowhere.com', adText => 'Performing a valuable service for the community'});
+    is($setAd->get('url'),    'http://www.nowhere.com',                          'set: url');
+    is($setAd->get('adText'), 'Performing a valuable service for the community', 'set: adText');
+
+    $setAd->set({ url => '', adText => ''});
+    is($setAd->get('url'),    '', 'set: clearing url');
+    is($setAd->get('adText'), '', 'set: clearing adText');
+
 }
 
 END {
-	foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd, $setAd) {
-		if (defined $advertisement and ref $advertisement eq 'WebGUI::AdSpace::Ad') {
-			$advertisement->delete;
-		}
-	}
-	if (defined $adSpace and ref $adSpace eq 'WebGUI::AdSpace') {
-		$adSpace->delete;
-	}
-	if (defined $imageStorage and ref $imageStorage eq 'WebGUI::Storage::Image') {
-		$imageStorage->delete;
-	}
+        foreach my $advertisement ($ad, $richAd, $textAd, $imageAd, $nonAd, $setAd) {
+                if (defined $advertisement and ref $advertisement eq 'WebGUI::AdSpace::Ad') {
+                        $advertisement->delete;
+                }
+        }
+        if (defined $adSpace and ref $adSpace eq 'WebGUI::AdSpace') {
+                $adSpace->delete;
+        }
+        if (defined $imageStorage and ref $imageStorage eq 'WebGUI::Storage::Image') {
+                $imageStorage->delete;
+        }
 }

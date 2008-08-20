@@ -333,10 +333,15 @@ The height, in pixels, of this ad space.
 sub set {
 	my $self = shift;
 	my $properties = shift || {};
-	##create requires a name, default will never be used
-	$self->{_properties}{name} = $properties->{name} || $self->{_properties}{name} || "Unnamed";
-	$self->{_properties}{title} = $properties->{title} || $self->{_properties}{title} || "Untitled";
-	$self->{_properties}{description} = $properties->{description} || $self->{_properties}{description};
+
+	##create requires a name, default will never be used.  This prevents the name from being
+    ##erased
+	$self->{_properties}{name}  = $properties->{name} || $self->{_properties}{name}  || "Unnamed";
+
+    ##Allow title and description to be cleared
+	$self->{_properties}{title} = exists $properties->{title} ?  $properties->{title}
+                                : $self->{_properties}{title} || "Untitled";
+	$self->{_properties}{description} = exists $properties->{description} ? $properties->{description} : $self->{_properties}{description};
 	$self->{_properties}{costPerImpression} = exists $properties->{costPerImpression} ? $properties->{costPerImpression} : $self->{_properties}{costPerImpression};
 	$self->{_properties}{costPerClick} = exists $properties->{costPerClick} ? $properties->{costPerClick} : $self->{_properties}{costPerClick};
 	$self->{_properties}{minimumImpressions} = $properties->{minimumImpressions} || $self->{_properties}{minimumImpressions};
