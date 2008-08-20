@@ -1,4 +1,5 @@
 7.5.21
+ - Display empty cart message
  - fixed: Back to Site link in asset manager points to wrong location
  - fixed: Some import node folders have invalid template
  - fixed: Scheduled workflows based on day of week run on wrong day
