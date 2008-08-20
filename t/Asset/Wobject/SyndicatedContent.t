@@ -95,8 +95,7 @@ isnt ($output, "", 'Default view method returns something for RSS 1.0 format');
 #my $hasTerms = $syndicated_content->getValue('hasTerms');
 #ok($hasTerms, "hasTerms contains a value [$hasTerms]");
 
-#my $hasTermsRegex = $syndicated_content->_make_regex( $syndicated_content->getValue('hasTerms') );
-#isa_ok($hasTermsRegex, 'WebGUI::Asset::Wobject::SyndicatedContent');
+my $hasTermsRegex = $syndicated_content->_make_regex( $syndicated_content->getValue('hasTerms') );
 
 my $rss_info = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($session,$newSyndicatedContentSettings->{'rssUrl'});
 ok(ref($rss_info) eq 'HASH',  "Hashref returned from _get_rss_data");
