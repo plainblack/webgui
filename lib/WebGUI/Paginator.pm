@@ -484,7 +484,7 @@ sub getPageLinks {
 			push(@pages,($i+1));
 			push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
 		} else {
-			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a>');
+			push(@pages,'<span><a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a></span>');
 			push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
 		}
 	}
