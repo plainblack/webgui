@@ -358,7 +358,7 @@ sub getNextPageLink {
         $text = $ctext.'&raquo;';
         if ($pn < $self->getNumberOfPages) {
                 my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
-                return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
+                return wantarray ? ($url,$ctext,'<span id="nextPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
         } else {
                 return wantarray ? (undef,$ctext,$text) : $text;
         }
@@ -527,7 +527,7 @@ sub getPreviousPageLink {
 	$text = '&laquo;'.$ctext;
 	if ($pn > 1) {
 		my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
-		return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
+		return wantarray ? ($url,$ctext,'<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
         } else {
             return wantarray ? (undef,$ctext,$text) : $text;
         }
