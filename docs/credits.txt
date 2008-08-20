@@ -55,7 +55,7 @@ Contributing Developers..............Lucas Bartholemy
                                      Gerald Young
                                      Yung Han Khoe
                                      Diona Kidd / Knowmad Technologies
-
+                                     Alan Smithee
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but who's work has made WebGUI possible:
