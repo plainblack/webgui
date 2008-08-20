@@ -23,6 +23,7 @@ use HTML::Form;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Shop::Cart;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 20;
+my $tests = 22;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -155,10 +156,10 @@ isa_ok($driver, 'WebGUI::Shop::ShipDriver::FlatRate', 'added a new, configured F
 #######################################################################
 
 my $shippers;
-$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>1, label=>q{Tommy's cut-rate shipping}});
+$driver2 = $ship->addShipper('WebGUI::Shop::ShipDriver::FlatRate', { enabled=>0, label=>q{Tommy's cut-rate shipping}});
 
 $shippers = $ship->getShippers();
-is(scalar @{$shippers}, 3, 'getShippers: got both shippers');
+is(scalar @{$shippers}, 3, 'getShippers: got both shippers, even though one is not enabled');
 
 my @shipperNames = map { $_->get("label") } @{ $shippers };
 cmp_bag(
@@ -173,6 +174,8 @@ cmp_bag(
 #
 #######################################################################
 
+my $defaultDriver = WebGUI::Shop::ShipDriver->new($session, 'defaultfreeshipping000');
+
 eval { $shippers = $ship->getOptions(); };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'getOptions takes exception to not giving it a cart');
@@ -183,6 +186,28 @@ cmp_deeply(
     ),
     'getOptions takes exception to not giving it a cart',
 );
+
+my $cart = WebGUI::Shop::Cart->create($session);
+eval { $shippers = $ship->getOptions($cart) };
+$e = Exception::Class->caught();
+ok(!$e, 'No exception thrown for getOptions with a cart argument');
+
+cmp_deeply(
+    $shippers,
+    {
+        $defaultDriver->getId => {
+            label => $defaultDriver->get('label'),
+            price => ignore(),
+        },
+        $driver->getId => {
+            label => $driver->get('label'),
+            price => ignore(),
+        },
+    },
+    'getOptions returns the two enabled shipping drivers'
+);
+
+$cart->delete;
 
 }
 

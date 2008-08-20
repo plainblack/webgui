@@ -27,6 +27,7 @@
  - fixed: edit operation sql error, Thingy (Yung Han Khoe)
  - fixed: Thingy: default thing property hidden (Yung Han Khoe) 
  - fixed: Ad Space Description Text Keeps Repopulating
+ - fixed: Disabled Shipping methods still available
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
