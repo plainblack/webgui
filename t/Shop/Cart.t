@@ -27,7 +27,7 @@ use WebGUI::TestException;
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
-
+my $i18n = WebGUI::International->new($session, "Shop");
 
 #----------------------------------------------------------------------------
 # Tests
@@ -51,6 +51,9 @@ my $cart = WebGUI::Shop::Cart->newBySession($session);
 
 isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");
+
+my $message = $i18n->get('empty cart') . "\n";
+like($cart->www_view, qr/There are no items currently in your cart./, 'Display empty cart message');
 
 my $root = WebGUI::Asset->getRoot($session);
 my $product = $root->addChild({

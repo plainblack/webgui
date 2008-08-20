@@ -873,6 +873,13 @@ our $I18N = {
 		context => q|a button the user clicks on to go back to shopping after viewing the cart|
 	},
 
+    'empty cart' => { 
+		message => q|There are no items currently in your cart.|,
+		lastUpdated => 0,
+		context => q|a message to the user that the cart is empty|
+	},
+
+
 	'shop' => { 
 		message => q|Shop|,
 		lastUpdated => 0,
