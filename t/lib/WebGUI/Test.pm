@@ -141,7 +141,8 @@ END {
 
 =head2 interceptLogging
 
-Intercept logging request and capture them in buffer variables for testing
+Intercept logging request and capture them in buffer variables for testing.  Also,
+mock the isDebug flag so that debug output is always generated.
 
 =cut
 
@@ -149,10 +150,11 @@ sub interceptLogging {
     my $logger = $SESSION->log->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
 
-    $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
-    $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
-    $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
-    $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
+    $logger->mock( 'warn',    sub { $WebGUI::Test::logger_warns = $_[1]} );
+    $logger->mock( 'debug',   sub { $WebGUI::Test::logger_debug = $_[1]} );
+    $logger->mock( 'info',    sub { $WebGUI::Test::logger_info  = $_[1]} );
+    $logger->mock( 'error',   sub { $WebGUI::Test::logger_error = $_[1]} );
+    $logger->mock( 'isDebug', sub { return 1 } );
 }
 
 #----------------------------------------------------------------------------
