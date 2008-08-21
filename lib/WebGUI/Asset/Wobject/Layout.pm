@@ -175,6 +175,7 @@ sub prepareView {
     my %placeHolder;
     my $i = 1;
     my $template = WebGUI::Asset->new($self->session,$self->get("templateId"),"WebGUI::Asset::Template");
+    $template->prepare( $self->getMetaDataAsTemplateVariables );
     my $templateContent = $template->get("template");
     $self->{_viewTemplate} = $template;
     my $numPositions = 1;

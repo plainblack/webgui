@@ -1,4 +1,5 @@
 7.5.22
+ - fixed: Layout templates are now prepared correctly
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
