@@ -566,7 +566,7 @@ sub fixTitle {
 
 #-------------------------------------------------------------------
 
-=head2 fixUrl ( string )
+=head2 fixUrl ( url )
 
 Returns a URL, removing invalid characters and making it unique by
 adding a digit to the end if necessary.  URLs are not allowed to be
@@ -580,9 +580,10 @@ Assets have a maximum length of 250 characters.  Any URL longer than
 URLs will be passed through $session->url->urlize to make them WebGUI compliant.
 That includes any languages specific constraints set up in the default language pack.
 
-=head3 string
+=head3 url
 
-Any text string. Most likely will have been the Asset's name or title.
+Any text string. Most likely will have been the Asset's name or title.  If the string is not passed
+in, then a url will be constructed from
 
 =cut
 
@@ -600,12 +601,7 @@ sub fixUrl {
 
     # if we're inheriting the URL from our parent, set that appropriately
     if($self->get('inheritUrlFromParent')) {
-        my @parts = split(m{/},$url);
-
-        # don't do anything unless we need to
-        if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
-            $url = $self->getParent->getUrl . '/' . $parts[-1];
-        }
+       $url = $self->fixUrlFromParent($url); 
     }
 
 	# fix urls used by uploads and extras
@@ -659,6 +655,40 @@ sub fixUrl {
         $url = join(".",@parts);
         $url = $self->fixUrl($url);
     }
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fixUrlFromParent ( url )
+
+URLs will be passed through $session->url->urlize to make them WebGUI compliant.
+That includes any languages specific constraints set up in the default language pack.
+
+=head3 url
+
+Any text string.
+
+=cut
+
+sub fixUrlFromParent {
+	my $self      = shift;
+	my $url       = shift;
+
+    # if we're inheriting the URL from our parent, set that appropriately
+    my @parts = split(m{/}, $url);
+
+    # don't do anything unless we need to
+    if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
+        $url = $self->getParent->getUrl . '/' . $parts[-1];
+    }
+
+    ##Note we do not need to call fixUrl on the url argument.  Here's the reasoning why.
+    ##If a URL has not been set to updated at the same time that inheritUrlFromParent is
+    ##called, then it has already been "fixed".
+    ##On the other hand, if it has, the sideEffect nature of this method guarantees that
+    ##the URL was "fixed" before it was called.
     return $url;
 }
 
@@ -2218,6 +2248,12 @@ sub update {
             {keywords=>$properties->{keywords}, asset=>$self});
     }
 
+    ##If inheritUrlFromParent was sent, and it is true, then muck with the url
+    ##The URL may have been sent too, so use it or the current Asset's URL.
+    if (exists $properties->{inheritUrlFromParent} and $properties->{inheritUrlFromParent}) {
+        $properties->{'url'} = $self->fixUrlFromParent($properties->{'url'} || $self->get('url'));
+    }
+
     # check the definition of all properties against what was given to us
     foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
@@ -2271,14 +2307,15 @@ sub update {
 
             # set the property
 			$self->{_properties}{$property} = $value;
-			$setPairs{$property.'=?'} = $value;
+			$setPairs{$property} = $value;
 		}
 
         # if there's anything to update, then do so
 		if (scalar(keys %setPairs) > 0) {
 			my @values = values %setPairs;
+            my @columnNames = map { $_.'=?' } keys %setPairs;
 			push(@values, $self->getId, $self->get("revisionDate"));
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",keys %setPairs)." where assetId=? and revisionDate=?",\@values);
+			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
 		}
 	}
 

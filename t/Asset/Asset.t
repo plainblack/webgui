@@ -146,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 99 
+plan tests => 100 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -325,6 +325,7 @@ $properties->{id}  = 'fixUrlAsset00000000015';
 $properties->{url} = 'fixUrlFolderURL100';
 
 my $fixUrlAsset4 = $defaultAsset->addChild($properties, $properties->{id});
+is($fixUrlAsset4->get('url'), 'fixurlfolderurl100', 'asset setup correctly for 100->101 test');
 
 delete $properties->{url};
 #                          '1234567890123456789012'
