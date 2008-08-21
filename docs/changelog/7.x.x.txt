@@ -27,6 +27,7 @@
  - fixed: edit operation sql error, Thingy (Yung Han Khoe)
  - fixed: Thingy: default thing property hidden (Yung Han Khoe) 
  - fixed: Ad Space Description Text Keeps Repopulating
+ - fixed: choosing ITransact plugin during checkout causes error
  - fixed: Disabled Shipping methods still available
  - fixed: Inherit Url From Parent is broken
  - added: ability to have metadata tags in head blocks

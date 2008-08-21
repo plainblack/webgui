@@ -614,7 +614,7 @@ sub www_getCredentials {
         $addressData    = eval{ $self->getAddress( $addressId )->get() } || {};
     }
     else { 
-        $addressData    = $self->getCart->getShippingAddress;
+        $addressData    = $self->getCart->getShippingAddress->get;
     }
                    
     my $output;
