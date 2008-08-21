@@ -961,7 +961,7 @@ sub prepareViewListAlbums {
     my $self        = shift;
     my $template 
         = WebGUI::Asset::Template->new($self->session, $self->get("templateIdListAlbums"));
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
 

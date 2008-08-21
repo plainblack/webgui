@@ -445,7 +445,7 @@ sub prepareView {
 	$self->SUPER::prepareView();
 	my $templateId = $self->get("templateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 

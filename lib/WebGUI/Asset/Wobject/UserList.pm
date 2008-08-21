@@ -322,7 +322,7 @@ sub prepareView {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
     
     return undef;

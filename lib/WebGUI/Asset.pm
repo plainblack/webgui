@@ -2044,13 +2044,7 @@ sub processTemplate {
 
 	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
-        	my $meta = {};
-		if ($self->session->setting->get("metaDataEnabled")) {
-        		$meta = $self->getMetaDataFields();
-		}
-        	foreach my $field (keys %$meta) {
-			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
-		}
+        $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
 		$var->{'controls'} = $self->getToolbar;
                 my %vars = (
 			%{$self->{_properties}},

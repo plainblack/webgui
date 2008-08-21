@@ -99,7 +99,7 @@ sub www_view {
         return '' unless $self->getParent->canView; # Go to parent for auth
 	my $parent = $self->getParent;
 	my $template = WebGUI::Asset::Template->new($self->session, $parent->get('rssCapableRssTemplateId'));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->session->http->setMimeType('text/xml');
 
 	my $var = {};

@@ -117,6 +117,28 @@ sub deleteMetaDataField {
 
 #-------------------------------------------------------------------
 
+=head2 getMetaDataAsTemplateVariables
+
+Returns the metadata as template variables for use in the head block.
+
+=cut
+
+sub getMetaDataAsTemplateVariables {
+    my $self    = shift;
+    my $var     = {};
+    my $meta    = {};
+
+    if ($self->session->setting->get("metaDataEnabled")) {
+        $meta = $self->getMetaDataFields();
+    }
+    foreach my $field (keys %$meta) {
+        $var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
+    }
+    return $var;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getMetaDataFields ( [fieldId] )
 
 Returns a hash reference containing all metadata field properties for this Asset.

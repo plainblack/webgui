@@ -91,7 +91,7 @@ sub prepareView {
 	#} else {
 	   $template = WebGUI::Asset::Template->new($self->session, $self->get("userViewTemplateId"));
 	#}
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 

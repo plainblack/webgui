@@ -284,22 +284,27 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
-=head2 prepare ( )
+=head2 prepare ( headerTemplateVariables )
 
 This method sets the tags from the head block parameter of the template into the HTML head block in the style. You only need to call this method if you're using the HTML streaming features of WebGUI, like is done in the prepareView()/view()/www_view() methods of WebGUI assets.
+
+=head3 headerTemplateVariables
+
+A hash reference containing template variables to be processed for the head block. Typically obtained via $asset->getMetaDataAsTemplateVariables.
 
 =cut
 
 sub prepare {
 	my $self = shift;
+    my $vars = shift;
 	$self->{_prepared} = 1;
 	my $templateHeadersSent = $self->session->stow->get("templateHeadersSent") || [];
 	my @sent = @{$templateHeadersSent};
 	unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
 		if ($self->session->style->sent) {
-			$self->session->output->print($self->get("headBlock"));
+            $self->session->output->print($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
 		} else {
-			$self->session->style->setRawHeadTags($self->get("headBlock"));
+            $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
 		}
 	}
 	push(@sent, $self->getId);

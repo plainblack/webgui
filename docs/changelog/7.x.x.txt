@@ -28,6 +28,7 @@
  - fixed: Thingy: default thing property hidden (Yung Han Khoe) 
  - fixed: Ad Space Description Text Keeps Repopulating
  - fixed: Disabled Shipping methods still available
+ - added: ability to have metadata tags in head blocks
 
 7.5.20
  - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields

@@ -930,7 +930,7 @@ sub prepareView {
     #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
     
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     
     $self->{_viewTemplate} = $template;
 }
