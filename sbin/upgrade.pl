@@ -204,7 +204,7 @@ foreach my $filename (keys %config) {
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
 			$cmd .= " --add-drop-table ".$config{$filename}{db}." --result-file="
-				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}.".sql";
+				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}."_".time.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);
 			} else {
