@@ -195,6 +195,9 @@ cmp_deeply(
 #
 ####################################################
 
+my $origMetaEnabled = $session->setting->get("metaDataEnabled");
+$session->setting->set("metaDataEnabled", 1);
+
 # add another field for comparison
 $folder->addMetaDataField('new', 'book', '', 'Favorite book', 'radioList', "1984\nDune\nLord of the Rings\nFoundation Trilogy");
 
@@ -233,5 +236,6 @@ END {
             $tag->rollback;
         }
     }
+    $session->setting->set("metaDataEnabled", $origMetaEnabled);
 
 }

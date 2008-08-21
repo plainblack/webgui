@@ -101,7 +101,7 @@ is($WebGUI::Test::logger_debug, "query $queryCount:\n  select more", "query: Log
 
 $eh->query('select many', [1, 2]);
 ++$queryCount;
-is($WebGUI::Test::logger_debug, "query $queryCount:\n  select many\n  with placeholders:  ['1', '2']", "query: Log4perl called debug via query, empty placeholder");
+is($WebGUI::Test::logger_debug, "query $queryCount:\n  select many\n  with placeholders:  [1,2]", "query: Log4perl called debug via query, empty placeholder");
 
 ####################################################
 #
