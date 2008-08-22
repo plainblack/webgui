@@ -16,6 +16,7 @@ package WebGUI::Session::Form;
 
 use strict qw(vars subs);
 use WebGUI::HTML;
+use Encode;
 use base 'WebGUI::FormValidator';
 
 =head1 NAME
@@ -106,6 +107,9 @@ sub param {
 	if ($field) {
 		if ($self->session->request) {
 			my @data = $self->session->request->param($field);
+            foreach my $value (@data) {
+                $value = Encode::decode_utf8($value);
+            }
 			return wantarray ? @data : $data[0];
 		} else {
 			return undef;
