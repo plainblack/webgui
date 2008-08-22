@@ -5,6 +5,7 @@
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
+ - fixed: When user does not have permissions to search/edit a thing a proper error is shown.
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari

@@ -1088,11 +1088,16 @@ sub view {
     if ($defaultThingId ne ""){
         # get default view
         ($defaultView) = $db->quickArray("select defaultView from Thingy_things where thingId=?",[$defaultThingId]);
+        my $thingProperties = $self->getThing($defaultThingId);
         if ($defaultView eq "searchThing"){
-            return $self->search($defaultThingId);
+            return $i18n->get("no permission to search") if( ! $self->canSearch($defaultThingId, $thingProperties));
+$self->session->log->error('here1');
+            return $self->search($defaultThingId,$thingProperties) 
         }
         elsif ($defaultView eq "addThing"){
-            return $self->editThingData($defaultThingId,"new");
+            return $i18n->get("no permission to edit") if( ! $self->canEditThingData($defaultThingId, "new", $thingProperties));
+$self->session->log->error('here2');
+            return $self->editThingData($defaultThingId,"new", $thingProperties);
         }
         else{
             return $self->processTemplate($var, undef, $self->{_viewTemplate});
@@ -1750,6 +1755,30 @@ sub www_editThingData {
 
 #-------------------------------------------------------------------
 
+=head2 canEditThingData ( )
+
+Checks if the user can edit thing data.
+
+=cut
+
+sub canEditThingData {
+    my $self = shift;
+    my $thingId = shift || $self->session->form->process('thingId');
+    my $thingDataId = shift || $self->session->form->process('thingDataId') || "new";
+    my $thingProperties = shift || $self->getThing($thingId);
+    
+    my ($privilegedGroup);
+    if ($thingDataId eq "new"){
+        $privilegedGroup = $thingProperties->{groupIdAdd};
+    }
+    else {
+        $privilegedGroup = $thingProperties->{groupIdEdit};
+    }
+    return $self->hasPrivileges($privilegedGroup);
+}
+
+#-------------------------------------------------------------------
+
 =head2 editThingData ( )
 
 Shows a form to edit a things data.
@@ -1762,21 +1791,13 @@ sub editThingData {
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId') || "new";
+    my $thingProperties = shift || $self->getThing($thingId);
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     my $errors = shift;
     $var->{error_loop} = $errors if ($errors);
-
-    my $thingProperties = $self->getThing($thingId);
-    if ($thingDataId eq "new"){
-        $privilegedGroup = $thingProperties->{groupIdAdd};
-    }
-    else {
-        $privilegedGroup = $thingProperties->{groupIdEdit};
-    }
-    return $self->session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
@@ -2350,6 +2371,21 @@ sub www_search {
 
 #-------------------------------------------------------------------
 
+=head2 canSearch ( )
+
+Checks if the user can perform a search.
+
+=cut
+
+sub canSearch {
+    my $self = shift;
+    my $thingId = shift || $self->session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
+    return $self->hasPrivileges($thingProperties->{groupIdSearch});
+}
+
+#-------------------------------------------------------------------
+
 =head2 search ( )
 
 Shows the search screen and performs the search.
@@ -2360,15 +2396,13 @@ sub search {
 
     my $self = shift;
     my $thingId = shift || $self->session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
     my $session = $self->session;
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
     my ($var,$url,$orderBy);
     my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
     my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
-
-    my $thingProperties = $self->getThing($thingId);
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdSearch});
 
     $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
     $var = $self->get;
