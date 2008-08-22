@@ -695,33 +695,35 @@ sub getFormElement {
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
-                    @defaultValues = $self->session->form->selectList($name);
-                } else {
-                    foreach (split(/\n/x, $data->{value})) {
-                            s/\s+$//x; # remove trailing spaces
-                                push(@defaultValues, $_);
-                    }
-                }
+            @defaultValues = $self->session->form->selectList($name);
+        }
+        else {
+            foreach (split(/\n/x, $data->{value})) {
+                s/\s+$//x; # remove trailing spaces
+                push(@defaultValues, $_);
+            }
+        }
         $param{value} = \@defaultValues;
-    }    
+    }
 
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList))) {
         delete $param{size};
         my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/x, $data->{possibleValues})) {
-                    s/\s+$//x; # remove trailing spaces
-                        $options{$_} = $_;
-                }
+        tie %options, 'Tie::IxHash';
+        foreach (split(/\n/x, $data->{possibleValues})) {
+            s/\s+$//x; # remove trailing spaces
+                $options{$_} = $_;
+        }
         $param{options} = \%options;
     }
 
     if ($data->{fieldType} eq "YesNo") {
         if ($data->{defaultValue} =~ /yes/xi) {
-                    $param{value} = 1;
-                } elsif ($data->{defaultValue} =~ /no/xi) {
-                    $param{value} = 0;
-                }
+            $param{value} = 1;
+        }
+        elsif ($data->{defaultValue} =~ /no/xi) {
+            $param{value} = 0;
+        }
     }
 
     if ($data->{fieldType} =~ m/^otherThing/x){
@@ -1087,10 +1089,10 @@ sub view {
         # get default view
         ($defaultView) = $db->quickArray("select defaultView from Thingy_things where thingId=?",[$defaultThingId]);
         if ($defaultView eq "searchThing"){
-            return $self->www_search($defaultThingId);
+            return $self->search($defaultThingId);
         }
         elsif ($defaultView eq "addThing"){
-            return $self->www_editThingData($defaultThingId,"new");
+            return $self->editThingData($defaultThingId,"new");
         }
         else{
             return $self->processTemplate($var, undef, $self->{_viewTemplate});
@@ -1742,6 +1744,19 @@ Shows a form to edit a things data.
 =cut
 
 sub www_editThingData {
+    my $self = shift;
+    return $self->processStyle($self->editThingData(@_));
+}
+
+#-------------------------------------------------------------------
+
+=head2 editThingData ( )
+
+Shows a form to edit a things data.
+
+=cut
+
+sub editThingData {
 
     my $self = shift;
     my $session = $self->session;
@@ -1758,7 +1773,7 @@ sub www_editThingData {
     if ($thingDataId eq "new"){
         $privilegedGroup = $thingProperties->{groupIdAdd};
     }
-    else{
+    else {
         $privilegedGroup = $thingProperties->{groupIdEdit};
     }
     return $self->session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
@@ -1830,12 +1845,7 @@ sub www_editThingData {
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties->{saveButtonLabel}});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
     $self->appendThingsVars($var, $thingId);
-    if (WebGUI::Utility::isIn($session->form->process("func"),qw(editThingData editThingDataSave))){
-        return $self->session->style->process($self->processTemplate($var,$thingProperties->{editTemplateId}),$self->get("styleTemplateId"));
-    }
-    else{
-        return $self->processTemplate($var,$thingProperties->{editTemplateId});
-    }
+    return $self->processTemplate($var,$thingProperties->{editTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -1924,7 +1934,8 @@ sub www_editThingDataSave {
         if ($onAddWorkflowId){
             $self->triggerWorkflow($onAddWorkflowId);
         }
-    }else{
+    }
+    else {
         my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onEditWorkflowId){
@@ -1953,7 +1964,7 @@ sub www_editThingDataSave {
     }
     # if afterSave is thingy default or in any other case return view()
     else {
-        return $self->view();
+        return $self->www_view;
     }
 }
 
@@ -2213,7 +2224,7 @@ sub www_importForm {
     $form->submit;
 
     $output .= $form->print;
-    return $self->session->style->process($output,$self->get("styleTemplateId"));
+    return $self->processStyle($output);
 }
 
 #-------------------------------------------------------------------
@@ -2268,7 +2279,7 @@ sub www_manage {
 
     $var->{"things_loop"} = \@things_loop;
 
-    return $self->session->style->process($self->processTemplate($var, $self->get("templateId")),$self->get("styleTemplateId"));
+    return $self->processStyle($self->processTemplate($var, $self->get("templateId")));
 }
 
 #-------------------------------------------------------------------
@@ -2333,6 +2344,19 @@ Shows the search screen and performs the search.
 =cut
 
 sub www_search {
+    my $self = shift;
+    return $self->processStyle($self->search(@_));
+}
+
+#-------------------------------------------------------------------
+
+=head2 search ( )
+
+Shows the search screen and performs the search.
+
+=cut
+
+sub search {
 
     my $self = shift;
     my $thingId = shift || $self->session->form->process('thingId');
@@ -2478,12 +2502,7 @@ sequenceNumber');
     $var->{searchFields_loop} = \@searchFields_loop;
     $var->{displayInSearchFields_loop} = \@displayInSearchFields_loop;
     $self->appendThingsVars($var, $thingId);
-    if (WebGUI::Utility::isIn($session->form->process("func"),qw(search import editThingDataSave deleteThingDataConfirm))){
-        return $session->style->process($self->processTemplate($var,$thingProperties->{searchTemplateId}),$self->get("styleTemplateId"));
-    }
-    else{
-        return $self->processTemplate($var,$thingProperties->{searchTemplateId});
-    }
+    return $self->processTemplate($var,$thingProperties->{searchTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -2663,7 +2682,7 @@ sequenceNumber');
     $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
     $var->{field_loop} = \@field_loop;
     $self->appendThingsVars($var, $thingId);
-    return $self->session->style->process($self->processTemplate($var,$thingProperties->{viewTemplateId}),$self->get("styleTemplateId"));
+    return $self->processStyle($self->processTemplate($var,$thingProperties->{viewTemplateId}));
 
 }
 
