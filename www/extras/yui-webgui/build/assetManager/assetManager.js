@@ -157,9 +157,12 @@ WebGUI.AssetManager.formatRank
 WebGUI.AssetManager.formatRevisionDate
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
+    var minutes = revisionDate.getMinutes();
+    if (minutes < 10)
+        minutes = "0" + minutes;
     elCell.innerHTML    = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
                         + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
-                        + ':' + revisionDate.getMinutes()
+                        + ':' + minutes
                         ;
 };
 

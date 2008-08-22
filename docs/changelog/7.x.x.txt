@@ -1,6 +1,7 @@
 7.6.0
  - remove Do Nothing On Delete workflow and allow none to be selected for on delete etc workflow
  - remove remnants of realtime workflow selection code
+ - fixed: Asset view time format problem
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
