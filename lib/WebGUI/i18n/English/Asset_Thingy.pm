@@ -934,8 +934,12 @@ search has been done.|,
     'no permission to search' => {
         message => q|You do not have permissions to search this Thing.|,
         lastUpdated => 1219424285,
-    }
-
+    },
+    
+    'thing must have fields' => {
+        message => q|Error: You must assign fields to your new Thing.|,
+        lastUpdated => 1219424285,
+    },
 };
 
 1;

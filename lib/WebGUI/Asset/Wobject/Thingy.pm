@@ -1185,6 +1185,7 @@ before the form is submitted.
 
 sub www_editThing {
     my $self = shift;
+    my $warning = shift;
     my $session = $self->session;
     my ($tabForm, $output, %properties, $tab, %afterSave, %defaultView, $fields);
     my ($fieldsHTML, $fieldsViewScreen, $fieldsSearchScreen);
@@ -1563,8 +1564,9 @@ sub www_editThing {
         -value  => $properties{thingsPerPage},
     );
     $tab->raw($fieldsSearchScreen);
-
-    $output = $tabForm->print;
+    #if($warning){$output .= "<script> alert('$warning');</script>";}
+    if($warning){$output .= "$warning";}
+    $output .= $tabForm->print;
     
     my $dialog = "<div id='addDialog'>\n"
                 ."<div class='hd'>".$i18n->get('add field label')."</div>\n"
@@ -1599,6 +1601,10 @@ sub www_editThingSave {
     my $form = $self->session->form;
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
+
+    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+
+        
     $self->setCollateral("Thingy_things","thingId",{
         thingId=>$thingId,
         label=>$form->process("label"),
@@ -1625,7 +1631,12 @@ sub www_editThingSave {
         sortBy=>$form->process("sortBy"),
         },0,1);
     
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    if($fields->rows < 1){
+        $self->session->log->warn("Thing failed to create because it had no fields");
+        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+        return $self->www_editThing($i18n->get("thing must have fields"));
+    }
+    
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
         my $viewScreenTitle = $self->session->form->process("viewScreenTitle_".$field->{fieldId}) || 0;
