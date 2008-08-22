@@ -25,6 +25,12 @@ our $HELP = {
                     },
                 ],
             },
+            {
+                name => 'totalPrice',
+            },
+            {
+                name => 'totalItems',
+            },
         ],
         related => [
         ],
