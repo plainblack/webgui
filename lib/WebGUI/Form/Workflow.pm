@@ -75,11 +75,6 @@ A text label that will be displayed if toHtmlWithWrapper() is called. Defaults t
 
 If set to 1 then a "None" option will appear in the list of workflows, which will store a null value in the field. Defaults to 0.
 
-=head4 includeRealtime
-
-Most workflow triggers can't handle realtime workflows, so we leave out realtime workflows unless they should
-specifically be included.
-
 =cut
 
 sub definition {
@@ -103,9 +98,6 @@ sub definition {
                 noneLabel   => { 
                     defaultValue        => $i18n->get("form control none label"),
                 },
-        includeRealtime => {
-            defaultValue => 0
-            },
         });
     return $class->SUPER::definition($session, $definition);
 }
@@ -157,7 +149,7 @@ Renders a template picker control.
 
 sub toHtml {
     my $self = shift;
-    my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"), $self->get("includeRealtime"));
+    my $workflowList = WebGUI::Workflow->getList($self->session, $self->get("type"));
     
     if ( $self->get("none") ) {
         my $noneLabel   = $self->get("noneLabel");

@@ -235,7 +235,6 @@ sub www_editVersionTag {
 		$f->workflow(
 			value=>$workflowId,
 			type=>"WebGUI::VersionTag",
-            includeRealtime=>1,
 			);
 		$f->group(
 			value=>[$groupId],

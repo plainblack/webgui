@@ -28,10 +28,31 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+removeDoNothingOnDelete( $session );
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub removeDoNothingOnDelete {
+    my $session = shift;
+    print "\tRemoving 'Do Nothing On Delete workflow if not customized... " unless $quiet;
+    my $workflow = WebGUI::Workflow->new($session, 'DPWwf20061030000000001');
+    if ($workflow) {
+        my $activities = $workflow->getActivities;
+        if (@$activities == 0) {
+            # safe to delete.
+            for my $setting (qw(trashWorkflow purgeWorkflow changeUrlWorkflow)) {
+                my $setValue = $session->setting->get($setting);
+                if ($setValue eq 'DPWwf20061030000000001') {
+                    $session->setting->set($setting, undef);
+                }
+            }
+            $workflow->delete;
+        }
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

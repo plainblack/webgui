@@ -282,7 +282,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( session, [ type, includeRealtime ] )
+=head2 getList ( session, [ type ] )
 
 Returns a hash reference of workflowId/title pairs of all enabled workflows.  This is a class method.
 
@@ -294,26 +294,18 @@ A reference to the current session.
 
 If specified this will limit the list to a certain type of workflow based upon the object type that the workflow is set up to handle.
 
-=head3 includeRealtime
-
-If set to 1 the list returned will include workflows with a mode of "realtime", otherwise it won't.
-
 =cut
 
 sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $type = shift;
-    my $includeRealtime = shift;
 	my $sql = "select workflowId, title from Workflow where enabled=1";
     my @params;
 	if ($type) {
 		$sql .= " and type=?";
 		push(@params, $type);
 	}
-    unless ($includeRealtime) {
-        $sql .= " and mode<>'realtime'";
-    }
 	return $session->db->buildHashRef($sql, \@params);
 }
 

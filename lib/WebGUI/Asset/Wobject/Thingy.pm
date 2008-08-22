@@ -1458,7 +1458,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on add workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on add workflow description'),
         );
 
@@ -1468,7 +1467,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on edit workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on edit workflow description'),
         );
 
@@ -1478,7 +1476,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on delete workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on delete workflow description'),
         );
 
