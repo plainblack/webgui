@@ -1564,7 +1564,6 @@ sub www_editThing {
         -value  => $properties{thingsPerPage},
     );
     $tab->raw($fieldsSearchScreen);
-    #if($warning){$output .= "<script> alert('$warning');</script>";}
     if($warning){$output .= "$warning";}
     $output .= $tabForm->print;
     
