@@ -196,6 +196,10 @@ sub www_spellCheck {
     while ($session->request->read(my $buffer, 1024)) {
         $data .= $buffer;
     }
+
+    # work around TinyMCE JSON encoding bug
+    $data =~ s/([^\\](?:\\\\)*)\\'/$1'/g;
+
     my $params = JSON->new->utf8->decode($data);
 
     my $result;
