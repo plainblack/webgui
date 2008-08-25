@@ -401,17 +401,16 @@ sub view {
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
-
-    # Get the lineage 'depth' of the first asset if there are any assets at all
-    my $absoluteDepthOfFirstPage = exists $assets->[0]
-                                 ? $assets->[0]->getLineageLength
-                                 : 0
-                                 ;
- 
+    my $absoluteDepthOfFirstPage;   # Will set on first iteration of loop, below
 	my %lastChildren;
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
 	foreach my $asset (@{$assets}) {
+        # Set absoluteDepthOfFirstPage
+        if ( !defined $absoluteDepthOfFirstPage ) {
+            $absoluteDepthOfFirstPage   = $asset->getLineageLength;
+        }
+
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
 		next if ($pageLineage =~ m/^$lineageToSkip/);
