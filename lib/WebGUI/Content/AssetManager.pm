@@ -370,6 +370,22 @@ sub www_manage {
         }
     }
 
+    # Handle Auto Request Commit setting
+    if ($session->setting->get("autoRequestCommit")) {
+        # Make sure version tag hasn't already been committed by another process
+        my $versionTag = WebGUI::VersionTag->getWorking($session, "nocreate");
+
+        if ($versionTag && $session->setting->get("skipCommitComments")) {
+            $versionTag->requestCommit;
+        }
+        elsif ($versionTag) {
+            $session->http->setRedirect(
+                $currentAsset->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($session)->getId)
+            );
+            return undef;
+        }
+    }
+
     # Show the page
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
