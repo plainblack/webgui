@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: copying or duplicating an asset in the asset manager never autocommits
  - fixed: Server side spell checker errors when checking text with single quotes
  - remove Do Nothing On Delete workflow and allow none to be selected for on delete etc workflow
  - remove remnants of realtime workflow selection code
