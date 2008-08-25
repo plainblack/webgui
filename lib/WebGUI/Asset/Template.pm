@@ -324,6 +324,9 @@ A hash reference containing template variables and loops. Automatically includes
 
 =cut
 
+# TODO: Have this throw an error so we can catch it and print more information
+# about the template that has the error. Finding an "ERROR: Error in template" 
+# in the error log is not very helpful...
 sub process {
 	my $self = shift;
 	my $vars = shift;
