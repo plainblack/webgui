@@ -288,7 +288,7 @@ sub getEditForm {
 		);
 	}
 	$tabform->addTab('overrides',$i18n->get('Overrides'));
-	$tabform->getTab('overrides')->raw($self->getOverridesList);
+	$tabform->getTab('overrides')->raw('<tr><td>' . $self->getOverridesList . '</td></tr>');
 	if ($self->isDashlet) {
 		$tabform->addTab('preferences',$i18n->get('Preferences'));
 		$tabform->getTab('preferences')->raw($self->getFieldsList);
