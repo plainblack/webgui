@@ -8,6 +8,7 @@
  - fixed: DataForm doesn't work properly with internationalized fields
  - fixed: incoming data not properly decoded from utf8
  - fixed: Can't call method "getSku" on unblessed reference
+ - fixed: PurgeOldInboxMessages just didn't work
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
