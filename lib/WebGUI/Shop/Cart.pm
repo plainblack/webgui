@@ -695,8 +695,8 @@ sub www_view {
         </script>
         |);
 
-    my @items = @{$self->getItems};
-    if(scalar(@items) < 1) {
+    my @cartItems = @{$self->getItems};
+    if(scalar(@cartItems) < 1) {
         # there are no items in the cart, return a message to the template
         my %var = (
             message => $i18n->get('empty cart')
@@ -708,7 +708,7 @@ sub www_view {
     }
     
     # generate template variables for the items in the cart
-    foreach my $item (@items) {
+    foreach my $item (@cartItems) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
         my %properties = (
