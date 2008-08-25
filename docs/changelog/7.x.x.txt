@@ -1,5 +1,6 @@
 7.5.22
  - fixed: Layout templates are now prepared correctly
+ - fixed: Server side spell checker errors when checking text with single quotes
  - fixed: Asset view time format problem
  - fixed: DataForm doesn't work properly with internationalized fields
  - fixed: incoming data not properly decoded from utf8
