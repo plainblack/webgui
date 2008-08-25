@@ -3,6 +3,7 @@
  - fixed: Asset view time format problem
  - fixed: DataForm doesn't work properly with internationalized fields
  - fixed: incoming data not properly decoded from utf8
+ - fixed: Can't call method "getSku" on unblessed reference
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
