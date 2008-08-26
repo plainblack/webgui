@@ -165,6 +165,9 @@ SKIP: {
     $session->config->set( 'emailOverride', $oldEmailOverride );
 }
 
+# TODO: Test the emailToLog config setting
+
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
