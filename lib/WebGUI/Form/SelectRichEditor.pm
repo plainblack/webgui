@@ -111,23 +111,34 @@ the available Rich Text Editor assets.
 
 =cut
 
-sub new {
-    my $class       = shift;
-    my $self        = $class->SUPER::new(@_);
-    
-    # Get all the RTEs available to this site
-    my $options
-        = $self->session->db->buildHashRef( q{
-            SELECT DISTINCT(assetData.assetId), assetData.title 
-                FROM asset, assetData 
-                WHERE asset.className='WebGUI::Asset::RichEdit' 
-                    AND asset.assetId=assetData.assetId 
-                ORDER BY assetData.title
-        });
-    
-    $self->set( "options", $options );
+sub getOptions {
+    my $self = shift;
+    my $editors = WebGUI::Asset->getRoot($self->session)->getLineage(['descendants'], {includeOnlyClasses => ['WebGUI::Asset::RichEdit'], returnObjects => 1});
+    my %options = map { $_->getId => $_->getTitle } @$editors;
+    return \%options;
+}
 
-    return $self;
+#-------------------------------------------------------------------
+
+=head2 toHtmlWithWrapper ( )
+
+Renders the form field to HTML as a table row complete with labels, subtext, hoverhelp, etc. Also adds manage and edit icons next to the field if the current user is in the admins group.
+
+=cut
+
+sub toHtmlWithWrapper {
+    my $self = shift;
+    my $editor = WebGUI::Asset::RichEdit->new($self->session,$self->getOriginalValue);
+    if (defined $editor && $editor->canEdit) {
+        my $returnUrl = '';
+        if (defined $self->session->asset && !$self->session->asset->isa("WebGUI::Asset::RichEdit")) {
+            $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
+        }
+        my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$editor->get("url"));
+        $buttons .= $self->session->icon->manage("op=assetManager",$editor->getParent->get("url"));
+        $self->set("subtext", $buttons . $self->get("subtext"));
+    }
+    return $self->SUPER::toHtmlWithWrapper;
 }
 
 1;

@@ -181,9 +181,6 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, 'Asset_WikiMaster');
 
-	# BUGGO: duplication with Collaboration; move this into WebGUI::Asset::RichEdit
-	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
-
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties =
@@ -200,8 +197,7 @@ sub definition {
 				    hoverHelp => $i18n->get('groupToAdminister hoverHelp'),
 				    label => $i18n->get('groupToAdminister label') },
 
-	     richEditor => { fieldType => 'selectBox',
-			     options => $richEditorOptions,
+	     richEditor => { fieldType => 'selectRichEditor',
 			     defaultValue => 'PBrichedit000000000001',
 			     tab => 'display',
 			     hoverHelp => $i18n->get('richEditor hoverHelp'),
