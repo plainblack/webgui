@@ -1,5 +1,6 @@
 7.5.22
  - fixed: Layout templates are now prepared correctly
+ - fixed: Project Manager sometimes causes errors when adding users to a task
  - fixed: site navigation will sometimes show as half or not styled
  - fixed: after editting assets from the asset manager, it returns to site instead of manager
  - fixed: invalid HTML generated for Shortcut overrides tab
