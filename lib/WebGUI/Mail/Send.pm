@@ -430,7 +430,11 @@ sub retrieve {
 
 =head2 send ( )
 
-Sends the message via SMTP. Returns 1 if successful.
+Sends the message via the SMTP server defined in the settings.  If the config file setting
+emailToLog is set to a true value, then the message is sent to the WebGUI log file with
+priority WARN.
+
+Returns 1 if successful.
 
 =cut
 
