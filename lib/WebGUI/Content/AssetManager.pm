@@ -762,7 +762,7 @@ sub www_search {
                 if ( !$asset->lockedBy || $asset->canEditIfLocked ) {
                     $fields{ editLink } 
                         = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a>',
-                        $asset->getUrl( 'func=edit' )
+                        $asset->getUrl( 'func=edit;proceed=manageAssets' )
                         ;
                 }
 

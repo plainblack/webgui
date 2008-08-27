@@ -1,5 +1,6 @@
 7.5.22
  - fixed: Layout templates are now prepared correctly
+ - fixed: after editting assets from the asset manager, it returns to site instead of manager
  - fixed: invalid HTML generated for Shortcut overrides tab
  - fixed: copying or duplicating an asset in the asset manager never autocommits
  - fixed: Server side spell checker errors when checking text with single quotes

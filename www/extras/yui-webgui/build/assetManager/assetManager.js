@@ -86,7 +86,7 @@ WebGUI.AssetManager.formatActions
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
-    YAHOO.util.Event.addListener( more, "click", function () { menu.show(); menu.focus(); }, null, menu );
+    YAHOO.util.Event.addListener( more, "click", function (e) { menu.show(); menu.focus(); YAHOO.util.Event.stopEvent(e); }, null, menu );
 };
 
 /*---------------------------------------------------------------------------
