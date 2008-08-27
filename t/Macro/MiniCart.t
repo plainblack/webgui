@@ -88,7 +88,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
         {
             totalPrice => '20',
             totalItems => '2',
-            items      => [
+            items      => bag(
                 {
                     name     => $donation->getConfiguredTitle(),
                     quantity => 1,
@@ -101,7 +101,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
                     price    => 10,
                     url      => $donation->getUrl('shop=cart;method=viewItem;itemId='.$item2->getId),
                 },
-            ],
+            ),
         },
         'Cart with two items works'
     );
@@ -114,7 +114,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
         {
             totalPrice => '100',
             totalItems => '10',
-            items      => [
+            items      => bag(
                 {
                     name     => $donation->getConfiguredTitle(),
                     quantity => 1,
@@ -127,7 +127,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
                     price    => 10,
                     url      => $donation->getUrl('shop=cart;method=viewItem;itemId='.$item2->getId),
                 },
-            ],
+            ),
         },
         'Cart with two items and multiple quantities works'
     );
