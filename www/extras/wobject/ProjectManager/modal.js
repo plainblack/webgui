@@ -40,6 +40,7 @@ function hidePopWin() {
 
 function showPopWin( e ) {
    
+   YAHOO.util.Event.stopEvent(e);
    var link = YAHOO.util.Event.getTarget(e);
    
    if(link == "") {
