@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: site navigation will sometimes show as half or not styled
  - fixed: after editting assets from the asset manager, it returns to site instead of manager
  - improved Rich Text selection list, changed CS and Wiki to use it
  - fixed: invalid HTML generated for Shortcut overrides tab
