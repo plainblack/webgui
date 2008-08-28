@@ -151,19 +151,18 @@ sub handler {
 		$session->setting->set('companyName',$form->text("companyName")) if ($form->get("companyName"));
 		$session->setting->set('companyURL',$form->url("companyURL")) if ($form->get("companyURL"));
 		$session->setting->set('companyEmail',$form->email("companyEmail")) if ($form->get("companyEmail"));
-        $legend = "Site Starter";
-        $output .= ' <p>Do you wish to use the WebGUI Site Starter, which will lead you through options to create a custom
-            look and feel for your site, and set up some basic content areas?</p>
-            <p><a href="'.$session->url->gateway(undef, "step=7").'">No, thanks.</a> &nbsp; &nbsp; &nbsp;
-                <a href="'.$session->url->gateway(undef,"step=4").'">Yes, please!</a></p>
+        $legend = $i18n->get('site starter title');
+        $output .= ' <p>'.$i18n->get('site starter body').'</p>
+            <p><a href="'.$session->url->gateway(undef, "step=7").'">'.$i18n->get('no thanks').'</a> &nbsp; &nbsp; &nbsp;
+                <a href="'.$session->url->gateway(undef,"step=4").'">'.$i18n->get('yes please').'</a></p>
             ';
 	} 
     elsif ($session->form->process("step") eq "4") {
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden( name=>"step", value=>"5",);
-		$f->file(name=>"logo", label=>"Logo");
+		$f->file(name=>"logo", label=>$i18n->get('logo'));
 		$f->submit;
-        $legend = "Upload Your Logo";
+        $legend = $i18n->get('upload logo');
 		$output .= $f->print;
 	} 
     elsif ($session->form->process("step") eq "5") {
@@ -198,7 +197,7 @@ sub handler {
         $style->setScript($url->extras('/colorpicker/colorpicker.js'),{ type=>'text/javascript' });
         $style->setScript($url->extras("/styleDesigner/styleDesigner.js"), {type=>"text/javascript"});
         $style->setLink($url->extras("/styleDesigner/styleDesigner.css"), {rel=>"stylesheet", type=>"text/css"});
-        $legend = "Style Designer";
+        $legend = $i18n->get("style designer");
         $output .= '
             <form method="post">
             <input type="submit" value="Save">
@@ -207,7 +206,7 @@ sub handler {
             <script type="text/javascript">
             document.write(WebguiStyleDesigner.draw("^c;","'.$logoUrl.'","'.$storageId.'"));
             </script>
-            <input type="submit" value="Save">
+            <input type="submit" value="'.$i18n->get('save').'">
             </form>
             ';
 	} 
