@@ -13,6 +13,7 @@
  - fixed: incoming data not properly decoded from utf8
  - fixed: Can't call method "getSku" on unblessed reference
  - fixed: PurgeOldInboxMessages just didn't work
+ - fixed: Unable to delete data form entries
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

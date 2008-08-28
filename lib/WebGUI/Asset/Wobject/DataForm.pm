@@ -448,8 +448,8 @@ sub deleteAttachedFiles {
     my $fieldConfig = $self->getFieldConfig;
 
     if ($entryId) {
-        my $entry = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
-        $entryData = JSON::from_json($entry->{entryData});
+        my ($entry) = $self->session->db->buildArray("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
+        $entryData = JSON::from_json($entry);
     }
     if ($entryData) {
         for my $field ( @$fields ) {
