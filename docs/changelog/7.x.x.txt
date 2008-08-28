@@ -14,6 +14,7 @@
  - fixed: Can't call method "getSku" on unblessed reference
  - fixed: PurgeOldInboxMessages just didn't work
  - fixed: Unable to delete data form entries
+ - fixed: Select All checkbox in Asset Manager has returned
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
