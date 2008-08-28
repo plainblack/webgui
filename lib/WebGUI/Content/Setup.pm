@@ -118,7 +118,7 @@ sub handler {
 	my $i18n = WebGUI::International->new($session, "WebGUI");
     my ($output,$legend) = "";
 	if ($session->form->process("step") eq "2") {
-		$legend = 'Company Information';
+		$legend = $i18n->get('company information');
 		my $u = WebGUI::User->new($session,"3");
 		$u->username($session->form->process("username","text","Admin"));
 		$u->profileField("email",$session->form->email("email"));
@@ -200,7 +200,7 @@ sub handler {
         $legend = $i18n->get("style designer");
         $output .= '
             <form method="post">
-            <input type="submit" value="Save">
+            <input type="submit" value="'.$i18n->get('save').'">
             <input type="hidden" name="step" value="6" />
             <input type="hidden" name="logoUrl" value="'.$logoUrl.'" />
             <script type="text/javascript">
@@ -478,7 +478,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 		return undef;
 	} 
     else {
-        $legend = "Admin Acccount";
+        $legend = $i18n->get('admin account');
 		my $u = WebGUI::User->new($session,'3');
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden( -name=>"step", -value=>"2");

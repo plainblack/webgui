@@ -3019,11 +3019,11 @@ or are under your current version tag.</p>
                 context => q|Title of a tab in the global settings.|
         },
 
-	'company' => {
-		message => q|Company|,
-		lastUpdated =>1092930637,
-                context => q|Title of a tab in the global settings.|
-        },
+    'company' => {
+        message => q|Company|,
+        lastUpdated =>1092930637,
+        context => q|Title of a tab in the global settings.|
+    },
 
 	'misc' => {
 		message => q|Miscellaneous|,
@@ -3978,6 +3978,24 @@ LongTruncOk=1</p>
         message     => q{Save},
         lastUpdated => 0,
         context     => q{General purpose, similar to submit.},
+    },
+
+    'save' => {
+        message     => q{Save},
+        lastUpdated => 0,
+        context     => q{General purpose, similar to submit.},
+    },
+
+    'company information' => {
+        message     => q{Company Information},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
+    },
+
+    'admin account' => {
+        message     => q{Admin Account},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
     },
 
 };
