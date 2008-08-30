@@ -53,7 +53,9 @@ sub ERROR { return "error" };
 
 =head2 WAITING
 
-A constant to be sent to Spectre informing it that this actiivty is waiting for some other event to be triggered.
+A constant to be sent to Spectre informing it that this actiivty is
+waiting for some other event to be triggered.  This is also used for
+long running activities to be released by Spectre and to be requeued.
 
 =cut
 
