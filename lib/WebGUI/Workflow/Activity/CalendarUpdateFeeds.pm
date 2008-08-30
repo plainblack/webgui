@@ -354,8 +354,9 @@ sub execute {
             }
         }
     }
+    my $ttl = $self->getTTL;
     while (@$eventList) {
-        if ($startTime + 55 < time()) {
+        if ($startTime + $ttl < time()) {
             $instance->setScratch('events', encode_json($eventList));
             $instance->setScratch('feeds', encode_json($feedList));
             return $self->WAITING;

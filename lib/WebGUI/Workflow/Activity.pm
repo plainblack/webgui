@@ -265,6 +265,19 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getTTL ( )
+
+Returns the maximum amount of time, in seconds, that a Workflow
+Activity should run.  Currently 55 seconds.
+
+=cut
+
+sub getTTL {
+	return 55;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, activityId  )
 
 Constructor.

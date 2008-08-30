@@ -93,18 +93,20 @@ sub execute {
 	my @files = @$filesRef;
 	my @dirs = @{$instance->getScratch(PRUNE_DIRS_SCRATCH) || []};
 
+    my $ttl = $self->getTTL;
 	while (defined(my $filename = shift @files)) {
 		my $cfilename = $self->_canonExportPath($filename);
 		unlink $cfilename or $self->session->errorHandler->warn("DeleteExportedFiles: Couldn't unlink $filename: $!"), next;
 		push @dirs, $self->_pruneOfFile($filename);
-		goto pause if (time - $time > 55);
+		goto pause if (time - $time > $ttl);
 	}
 
+    my $ttl = $self->getTTL;
 	while (defined(my $dirname = shift @dirs)) {
 		my $cdirname = $self->_canonExportPath($dirname);
 		rmdir $cdirname or $self->session->errorHandler->warn("DeleteExportedFiles: couldn't rmdir $dirname: $!"), next;
 		push @dirs, $self->_pruneOfFile($dirname);
-		goto pause if (time - $time > 55);
+		goto pause if (time - $time > $ttl);
 	}
 
     done:

@@ -79,6 +79,7 @@ sub execute {
 
     # start time to check for timeouts
     my $time = time();
+    my $ttl  = $self->getTTL;
 
     my @syndicatedUrls = @{$self->getSyndicatedUrls($instance)};
     while (my $url = shift(@syndicatedUrls)) {
@@ -91,7 +92,7 @@ sub execute {
         }
         # Check for timeout
         last
-            if (time() - $time > 55);
+            if (time() - $time > $ttl);
     }
 
     # if there are urls left, we need to process again

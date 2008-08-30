@@ -70,6 +70,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $start = time();
+    my $ttl = $self->getTTL;
 	foreach my $id (@{WebGUI::Mail::Send->getMessageIdsInQueue($self->session)}) {
 		my $message = WebGUI::Mail::Send->retrieve($self->session, $id);
 		if (defined $message) {
@@ -79,7 +80,7 @@ sub execute {
 			}	
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of sending
-		last if (time() > $start + 60);
+		last if (time() > $start + $ttl);
 	}
 	return $self->COMPLETE;
 }
