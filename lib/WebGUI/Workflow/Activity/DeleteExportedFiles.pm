@@ -101,7 +101,6 @@ sub execute {
 		goto pause if (time - $time > $ttl);
 	}
 
-    my $ttl = $self->getTTL;
 	while (defined(my $dirname = shift @dirs)) {
 		my $cdirname = $self->_canonExportPath($dirname);
 		rmdir $cdirname or $self->session->errorHandler->warn("DeleteExportedFiles: couldn't rmdir $dirname: $!"), next;
