@@ -29,9 +29,16 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 removeDoNothingOnDelete( $session );
+fixIsPublicOnTemplates ( $session );
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub fixIsPublicOnTemplates {
+    my $session = shift;
+    $session->db->write('UPDATE `assetIndex` SET `isPublic` = 0 WHERE assetId IN (SELECT assetId FROM asset WHERE className IN ("WebGUI::Asset::RichEdit", "WebGUI::Asset::Snippet", "WebGUI::Asset::Template") )');
+}
 
 #----------------------------------------------------------------------------
 sub removeDoNothingOnDelete {
