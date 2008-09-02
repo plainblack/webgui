@@ -1233,7 +1233,7 @@ sub www_exportTab {
             'submissionDate',
             @exportFields,
         );
-        my $outText = $tsv->print;
+        my $outText = $tsv->string;
 
         while (my $entryData = $entries->hashRef) {
             my $entryFields = JSON::from_json($entryData->{entryData});
@@ -1245,7 +1245,7 @@ sub www_exportTab {
                 WebGUI::DateTime->new($self->session, $entryData->{submissionDate})->webguiDate,
                 @{ $entryFields }{@exportFields},
             );
-            $outText .= $tsv->print;
+            $outText .= $tsv->string;
         }
         $entries->finish;
         $self->session->http->setFilename($self->get("url").".tab","text/plain");
