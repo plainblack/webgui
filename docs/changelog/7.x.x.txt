@@ -1,5 +1,6 @@
 7.5.22
  - fixed: Layout templates are now prepared correctly
+ - fixed: Some templates ship with isPublic=1
  - fixed: DataForm export tab delimited doesn't work
  - fixed: Project Manager sometimes causes errors when adding users to a task
  - fixed: site navigation will sometimes show as half or not styled
