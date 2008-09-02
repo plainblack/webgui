@@ -125,7 +125,7 @@ Deletes this message from the inbox.
 sub delete {
 	my $self = shift;
 	my $sth = $self->session->db->prepare("delete from inbox where messageId=?");
-	$sth->execute($self->getId);
+	$sth->execute([$self->getId]);
 }
 
 #-------------------------------------------------------------------
@@ -189,7 +189,8 @@ sub getId {
 
 =head2 new ( session, messageId )
 
-Constructor.
+Constructor used to access existing messages.  Use create for making
+new messages.
 
 =head3 session
 
