@@ -1371,7 +1371,7 @@ sub www_process {
             });
             WebGUI::Macro::filter(\$value);
         }
-        if ($field->{status} eq "required" && (!$value || $value =~ /^\s*$/)) {
+        if ($field->{status} eq "required" && (! defined($value) || $value =~ /^\s*$/)) {
             push @errors, {
                 "error.message" => $field->{label} . " " . $i18n->get(29) . ".",
             };

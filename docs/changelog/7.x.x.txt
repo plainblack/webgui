@@ -17,6 +17,7 @@
  - fixed: PurgeOldInboxMessages just didn't work
  - fixed: Unable to delete data form entries
  - fixed: Select All checkbox in Asset Manager has returned
+ - fixed: DataForm Integer value zero does not pass validation
  - added: Page range (start-finish) to available paginator text
 
 7.5.22
