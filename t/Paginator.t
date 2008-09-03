@@ -27,12 +27,13 @@ my $startingRowNum =   0;
 my $endingRowNum   =  99;
 my @paginatingData = ($startingRowNum..$endingRowNum);
 
-plan tests => 13; # increment this value for each test you create
+plan tests => 15; # increment this value for each test you create
 
-my $rowCount       = $endingRowNum - $startingRowNum + 1;
-my $NumberOfPages  = ceil($rowCount/25); ##Default page size=25
+my $rowCount        = $endingRowNum - $startingRowNum + 1;
+my $NumberOfPages   = ceil($rowCount/25); ##Default page size=25
+my $url             = "/home";
 
-my $p = WebGUI::Paginator->new($session, '/home');
+my $p = WebGUI::Paginator->new($session, $url);
 
 isa_ok($p, 'WebGUI::Paginator', 'paginator object returned');
 
@@ -45,6 +46,19 @@ my $page1Data = $p->getPageData(1);
 cmp_bag([0..24],  $p->getPageData(1), 'page 1 data correct');
 cmp_bag([25..49], $p->getPageData(2), 'page 2 data correct');
 cmp_bag([      ], $p->getPageData(5), 'page 5 data correct');
+
+# Test getPageLinks
+cmp_deeply(
+    [ 
+        map { +{ 
+            'pagination.text'   => ( $_ + 1 ), 
+            'pagination.range'  => ( 25 * $_ + 1 ) . "-" . ( $_ * 25 + 25 <= $endingRowNum + 1 ? $_ * 25 + 25 : $endingRowNum + 1 ), # First row number - Last row number
+            'pagination.url'    => ( $_ != 0 ? $url . '?pn=' . ( $_ + 1 ) : '' ), # Current page has no URL
+        } } (0..$NumberOfPages-1)
+    ], 
+    ($p->getPageLinks)[0], 
+    'page links correct',
+);
 
 $startingRowNum =   0;
 $endingRowNum   = 100;
@@ -68,3 +82,17 @@ cmp_bag([100   ], $p->getPageData(5), '(101) page 5 data correct');
 is('100', $p->getPage(5), '(101) page 5 stringification okay');
 
 is($p->getPageNumber, 1, 'Default page number is 1'); ##Additional page numbers are specified at instantiation
+
+# Test getPageLinks
+cmp_deeply(
+    ($p->getPageLinks)[0], 
+    [ 
+        map { +{ 
+            'pagination.text'   => ( $_ + 1 ), 
+            'pagination.range'  => ( 25 * $_ + 1 ) . "-" . ( $_ * 25 + 25 <= $endingRowNum + 1 ? $_ * 25 + 25 : $endingRowNum + 1 ), # First row number - Last row number
+            'pagination.url'    => ( $_ != 0 ? $url . '?pn=' . ( $_ + 1 ) : '' ), # Current page has no URL
+        } } (0..$NumberOfPages-1)
+    ], 
+    'page links correct',
+);
+

@@ -34,15 +34,15 @@ our $HELP = {
             { 'name' => 'pagination.pageCount.isMultiple' },
             { 'name' => 'pagination.pageList', },
             {   'name'      => 'pagination.pageLoop',
-                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' } ]
+                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' }, { 'name' => 'pagination.range' } ]
             },
             { 'name' => 'pagination.pageList.upTo20' },
             {   'name'      => 'pagination.pageLoop.upTo20',
-                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' } ]
+                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' }, { 'name' => 'pagination.range' } ]
             },
             { 'name' => 'pagination.pageList.upTo10' },
             {   'name'      => 'pagination.pageLoop.upTo10',
-                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' } ]
+                'variables' => [ { 'name' => 'pagination.url' }, { 'name' => 'pagination.text' }, { 'name' => 'pagination.range' } ]
             }
         ],
         fields  => [],
