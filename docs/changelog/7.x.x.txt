@@ -13,6 +13,7 @@
  - fixed: incoming data not properly decoded from utf8
  - fixed: PurgeOldInboxMessages did not work properly
  - fixed: Can't call method "getSku" on unblessed reference
+ - fixed: DataForm Integer value zero does not pass validation
  - fixed: Unable to delete data form entries
  - fixed: Asset Manager now has Select All checkbox
 
