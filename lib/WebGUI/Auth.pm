@@ -895,9 +895,11 @@ sub showMessageOnLogin {
     # Add the link to continue
     my $redirectUrl =  $self->session->form->get( 'returnUrl' )
                     || $self->session->scratch->get( 'redirectAfterLogin' )
-                    || $self->session->url->getSiteURL
+                    || $self->session->url->getSiteURL . $self->session->url->gateway()
                     ;
 
+    $self->session->log->warn('getSiteURL='.$self->session->url->getSiteURL);
+    $self->session->log->warn('scratch='.$self->session->scratch->get( 'redirectAfterLogin' ));
     $output     .= '<p><a href="' . $redirectUrl . '">' . $i18n->get( 'showMessageOnLogin return' ) 
                 .  '</a></p>'
                 ;

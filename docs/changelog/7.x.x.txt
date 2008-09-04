@@ -20,6 +20,7 @@
  - fixed: DataForm Integer value zero does not pass validation
  - added: Page range (start-finish) to available paginator text
  - rfe: view profile
+ - fixed: Show Message On Login continue link
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
