@@ -2051,6 +2051,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1168464885,
 	},
 
+	'pagination.range' => {
+		message => q|Displays the range of available pages, in a start - end format.|,
+		lastUpdated => 1220541683,
+	},
+
 	'pagination.pageList.upTo20' => {
 		message => q|A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.|,
 		lastUpdated => 1149182026,
