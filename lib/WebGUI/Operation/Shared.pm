@@ -85,6 +85,12 @@ TODO: DOCUMENT ME
 	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.$i18n->get(65).'</a>';
 	   push(@array,\%hash);
 	}
+    { ##Return to site link
+        my %hash;
+        $hash{'options.display'} = '<a href="'.$session->url->getBackToSiteURL.'">'.$i18n->get(493).'</a>';
+        push(@array,\%hash);
+    }
+    
 	return \@array;
 }
 
