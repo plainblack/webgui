@@ -437,10 +437,9 @@ sub set {
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
-	if (! exists $properties->{parameters}) {
-        $properties->{parameters} = {};
+	if (exists $properties->{parameters}) {
+		$self->{_data}{parameters} = JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
 	}
-    $self->{_data}{parameters} = JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
