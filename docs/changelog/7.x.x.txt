@@ -16,6 +16,7 @@
  - fixed: DataForm Integer value zero does not pass validation
  - fixed: Unable to delete data form entries
  - fixed: Asset Manager now has Select All checkbox
+ - fixed: Show Message On Login continue link
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
