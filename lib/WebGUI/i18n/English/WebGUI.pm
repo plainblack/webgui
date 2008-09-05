@@ -4003,6 +4003,42 @@ LongTruncOk=1</p>
         context     => q{Title for the company information screen in the site starter.},
     },
 
+    'All Rights Reserved' => {
+        message     => q{All Rights Reserved},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Contact Us' => {
+        message     => q{All Rights Reserved},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Initial Pages' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Header for the Site Setup screen},
+    },
+
+    'Forums' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'About Us' => {
+        message     => q{About Us},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'Put your about us content here' => {
+        message     => q{Put your about us content here},
+        lastUpdated => 0,
+        context     => q{Default content for the Site Setup screen},
+    },
+
 };
 
 1;

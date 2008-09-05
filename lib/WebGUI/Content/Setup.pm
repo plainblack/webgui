@@ -268,7 +268,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         <div class="clearFloat"></div>
     </div>
     <div id="pageFooterContainer">
-        <div id="copyrightContainer">&copy;^D(%y); ^c;. All Rights Reserved.</div>
+        <div id="copyrightContainer">&copy;^D(%y); ^c;. ^International(All Rights Reserved);.</div>
         <div class="clearFloat"></div>
     </div>
 </div>
@@ -290,21 +290,21 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
         $f->hidden(name=>"step", value=>"7");
         $f->hidden(name=>"styleTemplateId", value=>$style->getId);
-        $f->yesNo(name=>"contactUs",label=>"Contact Us");
-        $f->yesNo(name=>"calendar",label=>"Calendar");
-        $f->yesNo(name=>"wiki",label=>"Wiki");
-        $f->yesNo(name=>"search",label=>"Search");
-        $f->yesNo(name=>"aboutUs",label=>"About Us");
+        $f->yesNo(name=>"contactUs",label=>$i18n->get('Contact Us'));
+        $f->yesNo(name=>"calendar",label=>$i18n->get("assetName", 'Asset_Calendar');
+        $f->yesNo(name=>"wiki",label=>$i18n->get('assetName', 'Asset_WikiMaster'));
+        $f->yesNo(name=>"search",label=>$i18n->get("assetName", 'Asset_Search'));
+        $f->yesNo(name=>"aboutUs",label=>$i18n->get("About Us"));
         $f->HTMLArea(name=>"aboutUsContent", richEditId=>"PBrichedit000000000002", 
-            value=>"Put your about us content here.");
+            value=>$i18n->get("Put your about us content here."));
         if (isIn("WebGUI::Asset::Wobject::Collaboration", @{$session->config->get("assets")})) {
-            $f->yesNo(name=>"news",label=>"News");
-            $f->yesNo(name=>"forums",label=>"Forums");
+            $f->yesNo(name=>"news",label=>$i18n->get(357));
+            $f->yesNo(name=>"forums",label=>$i18n->get("Forums"));
             $f->textarea(name=>"forumNames",subtext=>"One forum name per line", 
                 value=>"Support\nGeneral Discussion");
         }
         $f->submit;
-        $legend = "Initial Pages";
+        $legend = $i18n->get("Initial Pages");
         $output .= $f->print;
 	} 
     elsif ($session->form->process("step") eq "7") {
