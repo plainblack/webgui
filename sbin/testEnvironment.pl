@@ -133,7 +133,7 @@ if (eval { require WebGUI } && eval { require WebGUI::SQL } && eval { require We
 my $version = getLatestWebguiVersion();
 printTest("Your version");
 if ($version eq $WebGUI::VERSION."-".$WebGUI::STATUS) {
-	printResult("OK");
+	printResult("You are using the latest version - $WebGUI::VERSION-$WebGUI::STATUS");
 } else {
 	printResult("You are using ".$WebGUI::VERSION."-".$WebGUI::STATUS." and ".$version." is available.");
 }
