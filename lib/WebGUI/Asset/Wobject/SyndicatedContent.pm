@@ -345,7 +345,12 @@ sub _get_rss_data {
             $cache->set({'error' => 1, 'error_status' => $response->status_line}, 3600);
             return undef;
         }
-        my $xml = $response->decoded_content;
+        my $xmlEncoding;
+        if ($response->content =~ /<\?xml.*?encoding=['"](\S+)['"]/i) {
+            $xmlEncoding = $1;
+        }
+
+        my $xml = $response->decoded_content($xmlEncoding ? (charset => $xmlEncoding) : ());
 
 		# Approximate with current time if we don't have a Last-Modified
 		# header coming from the RSS source.
@@ -353,16 +358,7 @@ sub _get_rss_data {
 		my $last_modified = defined($http_lm)? $http_lm : time;
 
 		# XML::RSSLite does not handle <![CDATA[ ]]> so:
-                $xml =~ s/<!\[CDATA\[(.*?)\]\]>/$1/sg;
- 
-        # Convert encoding if needed
-        $xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
-        my $xmlEncoding = $1 || 'utf8';
-        
-	if (Encode::is_utf8($xml)) {
-	} else {
- 	       $xml = Encode::decode($xmlEncoding, $xml);
-	}
+                $xml =~ s/<!\[CDATA\[(.*?)\]\]>/HTML::Entities::encode_entities($1)/esg;
 
                 my $rss_lite = {};
                 eval {

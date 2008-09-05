@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: Syndicated Content doesn't decode alternate character sets
  - fixed: Some templates ship with isPublic=1
  - fixed: DataForm export tab delimited doesn't work
  - fixed: Project Manager sometimes causes errors when adding users to a task
