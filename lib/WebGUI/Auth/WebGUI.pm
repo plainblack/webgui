@@ -226,7 +226,6 @@ sub createAccountSave {
     $properties->{ passwordLastUpdated  } = $session->datetime->time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
-    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 
     # Send validation e-mail if required
     if ($setting->get("webguiValidateEmail")) {
@@ -251,7 +250,7 @@ sub createAccountSave {
         $self->logout;
         return $self->displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
-	return undef;
+    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
 #-------------------------------------------------------------------

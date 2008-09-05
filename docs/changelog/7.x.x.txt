@@ -21,6 +21,7 @@
  - added: Page range (start-finish) to available paginator text
  - rfe: view profile
  - fixed: Show Message On Login continue link
+ - fixed: Show Message On Login doesn't show after anon registration
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
