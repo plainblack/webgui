@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 87; # increment this value for each test you create
+use Test::More tests => 92; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -440,6 +440,58 @@ cmp_bag(
     [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
     $ids,
     'getLineage: descendants of topFolder',
+);
+
+####################################################
+#
+# getLineageIterator
+#
+####################################################
+
+sub getListFromIterator {
+    my $iterator = shift;
+    my @items;
+    while (my $item = $iterator->()) {
+        push @items, $item->getId;
+    }
+    return \@items;
+}
+
+@snipIds = map { $_->getId } @snippets;
+my $ids = getListFromIterator($folder->getLineageIterator(['descendants']));
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: get descendants of folder'
+);
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','descendants']));
+unshift @snipIds, $folder->getId;
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: get descendants of folder and self'
+);
+
+$ids = getListFromIterator($folder->getLineageIterator(['self','children']));
+cmp_bag(
+    \@snipIds,
+    $ids,
+    'getLineageIterator: descendants == children if there are no grandchildren'
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','children']));
+cmp_bag(
+    [$topFolder->getId, $folder->getId, $folder2->getId, ],
+    $ids,
+    'getLineageIterator: children (no descendants) of topFolder',
+);
+
+$ids = getListFromIterator($topFolder->getLineageIterator(['self','descendants']));
+cmp_bag(
+    [$topFolder->getId, @snipIds, $folder2->getId, $snippet2->getId],
+    $ids,
+    'getLineageIterator: descendants of topFolder',
 );
 
 ####################################################

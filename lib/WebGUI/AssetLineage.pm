@@ -380,6 +380,38 @@ sub getLineage {
 	return \@lineage;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLineageIterator ( relatives,rules )
+
+Takes the same parameters as getLineage, but instead of returning a list
+it returns an iterator.  Calling the iterator will return instantiated assets,
+or undef when there are no more assets available.
+
+=cut
+
+sub getLineageIterator {
+    my $self = shift;
+    my $relatives = shift;
+    my $rules = shift;
+
+    my $sql = $self->getLineageSql($relatives, $rules);
+
+    my $sth = $self->session->db->read($sql);
+    my $sub = sub {
+        my $assetInfo = $sth->hashRef;
+        return
+            if !$assetInfo;
+        my $asset = WebGUI::Asset->new(
+            $self->session, $assetInfo->{assetId}, $assetInfo->{className}, $assetInfo->{revisionDate}
+        );
+        if (!$asset) {
+            WebGUI::Error::ObjectNotFound->throw(id => $assetInfo->{assetId});
+        }
+        return $asset;
+    };
+    return $sub;
+}
 
 #-------------------------------------------------------------------
 
