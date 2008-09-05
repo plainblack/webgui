@@ -456,7 +456,7 @@ sub definition {
         tab             => "user",
         name            => "showMessageOnLogin",
         fieldType       => "yesNo",
-        defaultValue    => $setting->get('showMessageOnLoginTimes'),
+        defaultValue    => $setting->get('showMessageOnLogin'),
         label           => $i18n->get( 'showMessageOnLogin label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLogin description' ),
     };

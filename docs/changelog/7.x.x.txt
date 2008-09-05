@@ -22,6 +22,7 @@
  - rfe: view profile
  - fixed: Show Message On Login continue link
  - fixed: Show Message On Login doesn't show after anon registration
+ - fixed: Settings - Show Message On Login behaviour
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
