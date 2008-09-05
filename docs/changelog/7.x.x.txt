@@ -15,6 +15,8 @@
  - fixed: Can't call method "getSku" on unblessed reference
  - fixed: DataForm Integer value zero does not pass validation
  - fixed: Unable to delete data form entries
+ - fixed: Show Message On Login doesn't show after anon registration
+ - fixed: Settings - Show Message On Login behaviour
  - fixed: Asset Manager now has Select All checkbox
  - fixed: Show Message On Login continue link
 

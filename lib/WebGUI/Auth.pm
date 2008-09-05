@@ -240,7 +240,9 @@ sub createAccount {
 
 =head2 createAccountSave ( username,properties [,password,profile] )
 
-Superclass method that performs general functionality for saving new accounts.
+Superclass method that performs general functionality for saving new accounts.  Based
+on various settings and user actions, it may return output that should be displayed
+to the user.
 
 =head3 username
 
@@ -290,8 +292,10 @@ sub createAccountSave {
             status  => 'completed',
 		});
 	}
+
 	$self->session->user({user=>$u});
 	$self->_logLogin($userId,"success");
+
 	if ($self->session->setting->get("runOnRegistration")) {
 		WebGUI::Workflow::Instance->create($self->session, {
 			workflowId=>$self->session->setting->get("runOnRegistration"),
@@ -300,24 +304,6 @@ sub createAccountSave {
 			parameters=>$self->session->user->userId,
 			priority=>1
 			})->start;
-	}
-	
-	
-	# If we have something to do after login, do it
-        if ( $self->session->setting->get( 'showMessageOnLogin' ) ) {
-            return $self->showMessageOnLogin;
-        }
-        elsif ($self->session->form->get('returnUrl')) {
-		$self->session->http->setRedirect( $self->session->form->get('returnUrl') );
-	  	$self->session->scratch->delete("redirectAfterLogin");
-        }
-	elsif ($self->session->scratch->get("redirectAfterLogin")) {
-		my $url = $self->session->scratch->delete("redirectAfterLogin");
-		$self->session->http->setRedirect($url);
-            return undef;
-	} 
-        else {
-		$self->session->http->setStatus(201,"Account Registration Successful");
 	}
 
     ##Finalize the record in the user invitation table.
@@ -333,7 +319,24 @@ sub createAccountSave {
             },
         );
     }
-	
+
+    # If we have something to do after login, do it
+    if ( $self->session->setting->get( 'showMessageOnLogin' ) ) {
+        return $self->showMessageOnLogin;
+    }
+    elsif ($self->session->form->get('returnUrl')) {
+        $self->session->http->setRedirect( $self->session->form->get('returnUrl') );
+        $self->session->scratch->delete("redirectAfterLogin");
+    }
+    elsif ($self->session->scratch->get("redirectAfterLogin")) {
+        my $url = $self->session->scratch->delete("redirectAfterLogin");
+        $self->session->http->setRedirect($url);
+        return undef;
+    } 
+    else {
+        $self->session->http->setStatus(201,"Account Registration Successful");
+    }
+
 	return undef;
 }
 
