@@ -20,6 +20,7 @@
  - fixed: Settings - Show Message On Login behaviour
  - fixed: Asset Manager now has Select All checkbox
  - fixed: Show Message On Login continue link
+ - fixed: Page Layout templates generate invalid HTML with description
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
