@@ -279,7 +279,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 </html>';
         my $style = addAsset($importNode, {
                 className   => "WebGUI::Asset::Template",
-                title       => "My Style",
+                title       => $i18n->get("My Style"),
                 isHidden    => 1,
                 namespace   => "style",
                 template    => $styleTemplate
@@ -291,7 +291,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         $f->hidden(name=>"step", value=>"7");
         $f->hidden(name=>"styleTemplateId", value=>$style->getId);
         $f->yesNo(name=>"contactUs",label=>$i18n->get('Contact Us'));
-        $f->yesNo(name=>"calendar",label=>$i18n->get("assetName", 'Asset_Calendar');
+        $f->yesNo(name=>"calendar",label=>$i18n->get("assetName", 'Asset_Calendar'));
         $f->yesNo(name=>"wiki",label=>$i18n->get('assetName', 'Asset_WikiMaster'));
         $f->yesNo(name=>"search",label=>$i18n->get("assetName", 'Asset_Search'));
         $f->yesNo(name=>"aboutUs",label=>$i18n->get("About Us"));
@@ -300,8 +300,8 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         if (isIn("WebGUI::Asset::Wobject::Collaboration", @{$session->config->get("assets")})) {
             $f->yesNo(name=>"news",label=>$i18n->get(357));
             $f->yesNo(name=>"forums",label=>$i18n->get("Forums"));
-            $f->textarea(name=>"forumNames",subtext=>"One forum name per line", 
-                value=>"Support\nGeneral Discussion");
+            $f->textarea(name=>"forumNames",subtext=>$i18n->get("One forum name per line"), 
+                value=>$i18n->get("Support")."\n".$i18n->get("General Discussion"));
         }
         $f->submit;
         $legend = $i18n->get("Initial Pages");
@@ -320,9 +320,9 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # add new pages
         if ($form->get("aboutUs")) {
-            my $page = addPage($home, "About Us");
+            my $page = addPage($home, $i18n->get("About Us"));
             addAsset($page, {
-                title               => "About Us",
+                title               => $i18n->get("About Us"),
                 isHidden            => 1,
                 className           => "WebGUI::Asset::Wobject::Article",
                 description         => $form->get("aboutUsContent"),
@@ -331,12 +331,12 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # add forums
         if ($form->get("forums")) {
-            my $page = addPage($home, "Forums");
+            my $page = addPage($home, $i18n->get("Forums"));
             my $board = addAsset($page, {
-                title               => "Forums",
+                title               => $i18n->get("Forums"),
                 isHidden            => 1,
                 className           => "WebGUI::Asset::Wobject::MessageBoard",
-                description         => "Discuss your ideas and get help from our community.",
+                description         => $i18n->get("Discuss your ideas and get help from our community."),
                 });
             my $forumNames = $form->get("forumNames");
             $forumNames =~ s/\r//g;
@@ -352,9 +352,9 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # add news 
         if ($form->get("news")) {
-            my $page = addPage($home, "News");
+            my $page = addPage($home, $i18n->get(357));
             addAsset($page, {
-                title                   => "News",
+                title                   => $i18n->get(357),
                 isHidden                => 1,
                 className               => "WebGUI::Asset::Wobject::Collaboration",
                 collaborationTemplateId => "PBtmpl0000000000000112",
@@ -362,41 +362,41 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 attachmentsPerPost      => 5,
                 postFormTemplateId      => "PBtmpl0000000000000068",
                 threadTemplateId        => "PBtmpl0000000000000067",
-                description             => "All the news you need to know.",
+                description             => $i18n->get("All the news you need to know."),
                 });
         }
 
         # add wiki
         if ($form->get("wiki")) {
-            my $page = addPage($home, "Wiki");
+            my $page = addPage($home, $i18n->get("assetName", 'Asset_WikiMaster'));
             addAsset($page, {
-                title               => "Wiki",
+                title               => $i18n->get("assetName", 'Asset_WikiMaster'),
                 isHidden            => 1,
                 allowAttachments    => 5,
                 className           => "WebGUI::Asset::Wobject::WikiMaster",
-                description         => "Welcome to our wiki. Here you can help us keep information up to date.",
+                description         => $i18n->get("Welcome to our wiki. Here you can help us keep information up to date."),
                 });
         }
 
         # add calendar
         if ($form->get("calendar")) {
-            my $page = addPage($home, "Calendar");
+            my $page = addPage($home, $i18n->get('assetName', "Asset_Calendar"));
             addAsset($page, {
-                title               => "Calendar",
+                title               => $i18n->get('assetName', "Asset_Calendar"),
                 isHidden            => 1,
                 className           => "WebGUI::Asset::Wobject::Calendar",
-                description         => "Check out what's going on.",
+                description         => $i18n->get("Check out what is going on."),
                 });
         }
 
         # add contact us
         if ($form->get("contactUs")) {
-            my $page = addPage($home, "Contact Us");
-            my $i18n = WebGUI::International->new($session, "Asset_DataForm");
+            my $page = addPage($home, $i18n->get("Contact Us"));
+            my $i18n2 = WebGUI::International->new($session, "Asset_DataForm");
             my @fieldConfig = (
                 {
                     name=>"from",
-                    label=>"Your Email Address",
+                    label=>$i18n2->get("Your Email Address", 'WebGUI'),
                     status=>"required",
                     isMailField=>1,
                     width=>0,
@@ -404,7 +404,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 },
                 {
                     name=>"to",
-                    label=>$i18n->get(11),
+                    label=>$i18n2->get(11),
                     status=>"hidden",
                     isMailField=>1,
                     width=>0,
@@ -413,7 +413,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 },
                 {
                     name=>"cc",
-                    label=>$i18n->get(12),
+                    label=>$i18n2->get(12),
                     status=>"hidden",
                     isMailField=>1,
                     width=>0,
@@ -421,7 +421,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 },
                 {
                     name=>"bcc",
-                    label=>$i18n->get(13),
+                    label=>$i18n2->get(13),
                     status=>"hidden",
                     isMailField=>1,
                     width=>0,
@@ -429,7 +429,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 },
                 {
                     name=>"subject",
-                    label=>$i18n->get(14),
+                    label=>$i18n2->get(14),
                     status=>"hidden",
                     isMailField=>1,
                     width=>0,
@@ -438,18 +438,18 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 },
                 {
                     name                => "comments",
-                    label               => "Comments",
+                    label               => $i18n->get("comments", 'VersionTag'),
                     status              => "required",
                     type                => "textarea",
-                    subtext             => "Tell us how we can assist you.",
+                    subtext             => $i18n->get("Tell us how we can assist you."),
                 },
             );
             my $dataForm = addAsset($page, {
-                title               => "Contact Us",
+                title               => $i18n->get("Contact Us"),
                 isHidden            => 1,
                 className           => "WebGUI::Asset::Wobject::DataForm",
-                description         => "We welcome your feedback.",
-                acknowledgement     => "Thanks for for your interest in ^c;. We'll review your message shortly.",
+                description         => $i18n->get("We welcome your feedback."),
+                acknowledgement     => $i18n->get("Thanks for for your interest in ^c;. We will review your message shortly."),
                 mailData            => 1,
                 fieldConfiguration  => JSON::encode_json(\@fieldConfig),
                 });
@@ -457,12 +457,12 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 
         # add search
         if ($form->get("search")) {
-            my $page = addPage($home, "Search");
+            my $page = addPage($home, $i18n->get('assetName',"Asset_Search"));
             addAsset($page, {
-                title               => "Search",
+                title               => $i18n->get('assetName',"Asset_Search"),
                 isHidden            => 1,
                 className           => "WebGUI::Asset::Wobject::Search",
-                description         => "Can't find what you're looking for? Try our search.",
+                description         => $i18n->get("Cannot find what you are looking for? Try our search."),
                 searchRoot          => $home->getId,
                 });
         }
@@ -508,7 +508,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>WebGUI Initial Configuration :: '.$legend.'</title>
+		<title>'.$i18n->get('WebGUI Initial Configuration').' :: '.$legend.'</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script type="text/javascript">
 function getWebguiProperty (propName) {

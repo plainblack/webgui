@@ -4010,7 +4010,7 @@ LongTruncOk=1</p>
     },
 
     'Contact Us' => {
-        message     => q{All Rights Reserved},
+        message     => q{All Contact Us},
         lastUpdated => 0,
         context     => q{Template label for automatically created Page layouts during Site Setup.},
     },
@@ -4033,10 +4033,94 @@ LongTruncOk=1</p>
         context     => q{Label for the Site Setup screen},
     },
 
-    'Put your about us content here' => {
-        message     => q{Put your about us content here},
+    'Put your about us content here.' => {
+        message     => q{Put your about us content here.},
         lastUpdated => 0,
         context     => q{Default content for the Site Setup screen},
+    },
+
+    'One forum name per line' => {
+        message     => q{One forum name per line},
+        lastUpdated => 0,
+        context     => q{Instructions for the names of forums in the Site Setup screen},
+    },
+
+    'Support' => {
+        message     => q{Support},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'General Discussion' => {
+        message     => q{General Discussion},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'Discuss your ideas and get help from our community.' => {
+        message     => q{Discuss your ideas and get help from our community.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'All the news you need to know.' => {
+        message     => q{All the news you need to know.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'Welcome to our wiki. Here you can help us keep information up to date.' => {
+        message     => q{Welcome to our wiki. Here you can help us keep information up to date.},
+        lastUpdated => 0,
+        context     => q{Default description of a wiki in the Site Setup screen},
+    },
+
+    'Check out what is going on.' => {
+        message     => q{Check out what is going on.},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Your Email Address' => {
+        message     => q{Your Email Address},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Tell us how we can assist you.' => {
+        message     => q{Tell us how we can assist you.},
+        lastUpdated => 0,
+        context     => q{Subtext for the comments field in the Contact Us page of the Site Setup screen},
+    },
+
+    'We welcome your feedback.' => {
+        message     => q{We welcome your feedback.},
+        lastUpdated => 0,
+        context     => q{Default description of the Contact Us page of the Site Setup screen},
+    },
+
+    'Thanks for for your interest in ^c;. We will review your message shortly.' => {
+        message     => q{Thanks for for your interest in ^c;. We will review your message shortly.},
+        lastUpdated => 0,
+        context     => q{Default acknowledgement of the Contact Us page of the Site Setup screen},
+    },
+
+    'Cannot find what you are looking for? Try our search.' => {
+        message     => q{Cannot find what you are looking for? Try our search.},
+        lastUpdated => 0,
+        context     => q{Default description of the Search page of the Site Setup screen},
+    },
+
+    'WebGUI Initial Configuration' => {
+        message     => q{WebGUI Initial Configuration},
+        lastUpdated => 0,
+        context     => q{Main page title for the Site Setup screen},
+    },
+
+    'My Style' => {
+        message     => q{My Style},
+        lastUpdated => 0,
+        context     => q{Title of the template created by the Site Setup screen},
     },
 
 };
