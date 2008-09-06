@@ -67,6 +67,8 @@ while (my $templateAsset = $getATemplate->()) {
     }
     while ($template =~ /$macro/msgc) {
         my ($label, $namespace) = split /,/, $1;
+        $label     =~ tr/'//d;
+        $namespace =~ tr/'//d;
         push @templateLabels, {
             label      => $label,
             namespace  => $namespace,

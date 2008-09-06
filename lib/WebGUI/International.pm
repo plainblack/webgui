@@ -93,7 +93,7 @@ A string that specifies the language that the user should see.  Defaults to the 
 
 =cut
 
-my $safeRe = qr/[^\.\w\d\s\/'\^\;\?]/;
+my $safeRe = qr/[^\.\w\d\s\/\^\;\?]/;
 
 sub get {
 	my ($self, $id, $namespace, $language) = @_;
