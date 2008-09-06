@@ -324,6 +324,12 @@ This rule adds an additional where clause to the search.
 
  where => 'className NOT LIKE "WebGUI::Asset::Wobject%"'
 
+=head4 joinClass
+
+This is an array reference of asset classes.  Each asset class will be queried via its
+definition method to see what tables should be joined to the assetData table.  Only the
+most recent revisions of data will be added to the search.
+
 =head4 join
 
 This rule allows for an array reference of table join clauses.
@@ -363,7 +369,7 @@ sub search {
         		for (my $i = 0; $i < scalar(@terms); $i++) {
 			#-------------- Edited by zxp for Chinese Word Segment
 				utf8::decode($terms[$i]);
-				my @segs = split /([A-z|\d]+|\S)/, $terms[$i];
+				my @segs = split /([A-z,+-|\d]+|\S)/, $terms[$i];
 				$terms[$i] = join " ",@segs;
 				$terms[$i] =~ s/\s{2,}/ /g;
 				$terms[$i] =~ s/(^\s|\s$)//g;

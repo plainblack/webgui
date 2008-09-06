@@ -148,7 +148,7 @@ Renders an attachments control.
 
 sub toHtml {
 	my $self = shift;
-    my @assetIds = @{$self->getDefaultValue};
+    my @assetIds = @{$self->getOriginalValue};
     my $thumbnail = $self->get("thumbnailSize") || $self->session->setting->get("thumbnailSize");
     my $image = $self->get("maxImageSize") || $self->session->setting->get("maxImageSize");
     my $attachmentsList = "attachments=".join(";attachments=", @assetIds) if (scalar(@assetIds));

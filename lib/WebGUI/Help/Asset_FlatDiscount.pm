@@ -26,6 +26,8 @@ our $HELP = {
 			{ name => "templateId", description=>"template help" },
 			{ name => "hasAddedToCart" , required=>1 },
 			{ name => "thankYouMessage", description=>"thank you message help" },
+			{ name => "alreadyHasCoupon" },
+			{ name => "continueShoppingUrl" },
 		],
 		related => [  
 		],

@@ -206,24 +206,23 @@ sub www_editBranch {
         if ($self->session->setting->get("metaDataEnabled")) {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
-                        my $fieldType = $meta->{$field}{fieldType} || "text";
-                        my $options;
-                        # Add a "Select..." option on top of a select list to prevent from
-                        # saving the value on top of the list when no choice is made.
-                        if($fieldType eq "selectList") {
-                                $options = {"", $i18n->get("Select")};
-                        }
-                        $tabform->getTab("meta")->dynamicField(
-                                 name=>"metadata_".$meta->{$field}{fieldId},
-                                 label=>$meta->{$field}{fieldName},
-                                 uiLevel=>5,
-                                 value=>$meta->{$field}{value},
-                                 extras=>qq/title="$meta->{$field}{description}"/,
-                                 possibleValues=>$meta->{$field}{possibleValues},
-                                 options=>$options,
-				 subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_metadata_".$meta->{$field}{fieldId}}),
-				fieldType=>$fieldType
-                                );
+                    my $fieldType = $meta->{$field}{fieldType} || "text";
+                    my $options = $meta->{$field}{possibleValues};
+                    # Add a "Select..." option on top of a select list to prevent from
+                    # saving the value on top of the list when no choice is made.
+                    if("\l$fieldType" eq "selectBox") {
+                        $options = "|" . $i18n->get("Select") . "\n" . $options;
+                    }
+                    $tabform->getTab("meta")->dynamicField(
+                        name            => "metadata_".$meta->{$field}{fieldId},
+                        label           => $meta->{$field}{fieldName},
+                        uiLevel         => 5,
+                        value           => $meta->{$field}{value},
+                        extras          => qq/title="$meta->{$field}{description}"/,
+                        options         => $options,
+                        defaultValue    => $meta->{$field}{defaultValue},
+                        subtext         => '<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_metadata_".$meta->{$field}{fieldId}}),
+                    );
                 }
         }	
 	return $ac->render($tabform->print, $i18n->get('edit branch','Asset'));
@@ -285,21 +284,25 @@ sub www_editBranchSave {
             $wobjectData{url} = $data{url};
 		}
         my $newData = $descendant->isa('WebGUI::Asset::Wobject') ? \%wobjectData : \%data;
-        next
-            if (scalar %$newData == 0);
-        my $newRevision = $descendant->addRevision(
-            $newData,
-            undef,
-            {skipAutoCommitWorkflows => 1, skipNotification => 1},
-        );
-		foreach my $form ($self->session->form->param) {
-                	if ($form =~ /^metadata_(.*)$/) {
-				my $fieldName = $1;
-				if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
-                        		$newRevision->updateMetaData($fieldName,$self->session->form->process($form));
-				}
-                	}
-        	}
+        my $revision;
+        if (scalar %$newData > 0) {
+            $revision = $descendant->addRevision(
+                $newData,
+                undef,
+                {skipAutoCommitWorkflows => 1, skipNotification => 1},
+            );
+        }
+        else {
+            $revision = $descendant;
+        }
+        foreach my $form ($self->session->form->param) {
+            if ($form =~ /^metadata_(.*)$/) {
+                my $fieldName = $1;
+                if ($self->session->form->yesNo("change_metadata_".$fieldName)) {
+                    $revision->updateMetaData($fieldName,$self->session->form->process($form));
+                }
+            }
+        }
 	}
 	if ($self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {

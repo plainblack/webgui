@@ -1081,7 +1081,7 @@ our $I18N = {
         },
 
         'approval workflow' => {
-                message => q|Approval Workflow|,
+                message => q|Post Workflow|,
                 lastUpdated => 0,
         },
 
@@ -1510,8 +1510,8 @@ the Collaboration Asset, the user will be notified.|,
 	},
 
 	'feed description' => {
-		message => q|The description of the rss feed (comes from the collaboration description).|,
-		lastUpdated => 1149656056,
+		message => q|The description of the rss feed (comes from the collaboration synopsis).|,
+		lastUpdated => 1216913516,
 	},
 
 	'generator' => {
@@ -1644,6 +1644,11 @@ the Collaboration Asset, the user will be notified.|,
         message     => q{If Yes, Threads will be automatically hidden after a certain interval},
         lastUpdated => 0,
         context     => q{Hover help for asset property},
+    },
+
+    'keywords label' => {
+        message => q|Keywords|,
+        lastUpdated => 1170543345,
     },
 
 };

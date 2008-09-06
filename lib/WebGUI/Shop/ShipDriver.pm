@@ -158,7 +158,7 @@ sub get {
         $opts = {};
     }
     else {
-        $opts = JSON::from_json($opts);
+        $opts = decode_json($opts);
     }
     if (defined $param) {
         return $opts->{$param};
@@ -303,7 +303,7 @@ sub update {
     my $options = shift || {};
     WebGUI::Error::InvalidParam->throw(error => 'update was not sent a hashref of options to store in the database')
         unless ref $options eq 'HASH' and scalar keys %{ $options };
-    my $jsonOptions = to_json($options);
+    my $jsonOptions = encode_json($options);
     $options{id $self} = $jsonOptions;
     $self->session->db->write('update shipper set options=? where shipperId=?', [$jsonOptions, $self->getId]);
     return undef;
@@ -342,7 +342,7 @@ sub www_editSave {
     my $session = $self->session;
     return $session->privilege->insufficient() unless $session->user->isInGroup(3);
     $self->processPropertiesFromFormPost;
-    $session->http->setRedirect("/?shop=ship;method=manage");
+    $session->http->setRedirect($session->url->page('shop=ship;method=manage'));
     return undef;
 }
 

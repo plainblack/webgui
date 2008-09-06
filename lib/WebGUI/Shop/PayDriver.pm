@@ -9,6 +9,8 @@ use WebGUI::Exception::Shop;
 use WebGUI::Inbox;
 use WebGUI::International;
 use WebGUI::HTMLForm;
+use WebGUI::Macro;
+use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
 
@@ -80,9 +82,51 @@ sub cancelRecurringPayment {
     my $self        = shift;
     my $transaction = shift;
     WebGUI::Error::OverrideMe->throw();
-}    
+}
     
 #-------------------------------------------------------------------
+
+=head2 canUse ( user )
+
+Checks to see if the user can use this Payment Driver.
+
+=head3 user
+
+A hashref containing user information.  The user referenced will be checked
+to see if they can use the Payment Driver.  If missing, then $session->user
+will be used.
+
+=head4 userId
+
+A userId used to build a user object.
+
+=head4 user
+
+A user object that will be used directly.
+
+=cut
+
+sub canUse {
+    my $self = shift;
+    my $user = shift;
+    my $userObject;
+    if (!defined $user or ref($user) ne 'HASH') {
+        $userObject = $self->session->user;
+    }
+    else {
+        if (exists $user->{user}) {
+            $userObject = $user->{user};
+        }
+        elsif (exists $user->{userId}) {
+            $userObject = WebGUI::User->new($self->session, $user->{userId});
+        }
+        else {
+            WebGUI::Error::InvalidParam->throw(error => q{Must provide user information})
+        }
+    }
+    return $userObject->isInGroup($self->get('groupToUse'));
+}
+ #-------------------------------------------------------------------
 
 =head2 className (  )
 
@@ -233,8 +277,12 @@ The default error message that gets displayed when a payment is rejected.
 
 sub displayPaymentError {
     my ($self, $transaction) = @_;
-    my $i18n = WebGUI::International->new($self->session, "PayDriver");
-    my $output = q{<h1>}.$i18n->get('error processing payment').q{</h1><p>}.$i18n->get('error processing payment message').q{</p><p>}.$transaction->get('statusMessage').{</p>};
+    my $i18n    = WebGUI::International->new($self->session, "PayDriver");
+    my $output  = q{<h1>} . $i18n->get('error processing payment') . q{</h1>}
+                . q{<p>} . $i18n->get('error processing payment message') . q{</p>}
+                . q{<p>} . $transaction->get('statusMessage') . q{</p>}
+                . q{<p><a href="?shop=cart;method=checkout">} . $i18n->get( 'try again' ) . q{</a></p>}
+                ;
     return $self->session->style->userStyle($output);
 }
 
@@ -681,10 +729,12 @@ sub sendNotifications {
     # render
     my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
+    my $receipt = $template->process(\%var);
+    WebGUI::Macro::process($session, \$receipt);
 
     # purchase receipt
     $inbox->addMessage( {
-        message     => $template->process(\%var),
+        message     => $receipt,
         subject     => $i18n->get('receipt subject').' '.$transaction->get('orderNumber'),
         userId      => $transaction->get('userId'),
         status      => 'completed',
@@ -692,8 +742,10 @@ sub sendNotifications {
     
     # shop owner notification
     $var{viewDetailUrl} = $url->page('shop=transaction;method=view;transactionId='.$transaction->getId,1);
+    my $notification = $template->process(\%var);
+    WebGUI::Macro::process($session, \$notification);
     $inbox->addMessage( {
-        message     => $template->process(\%var),
+        message     => $notification,
         subject     => $i18n->get('a sale has been made').' '.$transaction->get('orderNumber'),
         groupId     => $self->get('saleNotificationGroupId'),
         status      => 'unread',
@@ -773,7 +825,7 @@ sub www_editSave {
     return $session->privilege->insufficient() unless $session->user->isInGroup(3);
 
     $self->processPropertiesFromFormPost;
-    $session->http->setRedirect("/?shop=pay;method=manage");
+    $session->http->setRedirect($session->url->page('shop=pay;method=manage'));
 
     return undef;
 }

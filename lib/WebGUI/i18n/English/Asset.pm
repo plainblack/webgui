@@ -1046,8 +1046,8 @@ Couldn't open %-s because %-s <br />
     },
 
     'make asset exportable description' => {
-        message => q|<p>Will this asset be exportable? This asset, and all of its parent assets, must be exportable for this asset to be exported.</p>|,
-        lastUpdated => 0,
+        message => q|<p>Is this asset allowed to be exported as static HTML, which is different from a package? This asset, and all of its parent assets, must be exportable for this asset to be exported.  Also, exporting has to be enabled in the WebGUI config file for this site.</p>|,
+        lastUpdated => 1214854199,
     },
 
     'does asset inherit URL from parent' => {
@@ -1096,6 +1096,13 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},
     },
+
+    'export' => {
+        message     => q{More},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
 };
 
 1;

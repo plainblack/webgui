@@ -179,6 +179,27 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
+=head2 hasProtected ( )
+
+Returns a boolean indicating whether any of the category's fields are protected.
+
+=cut
+
+sub hasProtected {
+	my $self = shift;
+    my $protected=0;
+    FIELD: foreach my $field (@{ $self->getFields }) {
+        if ($field->isProtected) {
+            $protected=1;
+            last FIELD;
+        }
+    }
+	return $protected;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 isEditable ( )
 
 Returns a boolean indicating whether the category's fields may be edited by a user.

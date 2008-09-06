@@ -183,6 +183,7 @@ An array reference of keywords to match.
 =head3 matchAssetKeywords
 
 A reference to an asset that has a list of keywords to match. This can help locate assets that are similar to another asset.
+If the referenced asset does not have any keywords, then an empty array reference is returned.
 
 =head3 isa
 
@@ -213,6 +214,7 @@ sub getMatchingAssets {
             asset       => $options->{matchAssetKeywords},
             asArrayRef  => 1,
             });
+        return [] unless scalar @{ $options->{keywords} };
     }
 
     # looking for a class name match
@@ -240,7 +242,7 @@ sub getMatchingAssets {
     # write the query
     my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
         where '.join(' and ', @clauses).' order by creationDate desc';
-        
+
     # perform the search
     if ($options->{usePaginator}) {
         my $p = WebGUI::Paginator->new($self->session);

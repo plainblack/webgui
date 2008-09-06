@@ -347,16 +347,28 @@ sub www_editAddress {
                                 .WebGUI::Form::hidden($session, {name=>"addressId", value=>$form->get("addressId")}),
         saveButton          => WebGUI::Form::submit($session),
         formFooter          => WebGUI::Form::formFooter($session),
-        address1Field       => WebGUI::Form::text($session, {name=>"address1", maxlength=>35, defaultValue=>($form->get("address1") || ((defined $address) ? $address->get('address1') : undef))}),
-        address2Field       => WebGUI::Form::text($session, {name=>"address2", maxlength=>35, defaultValue=>($form->get("address2") || ((defined $address) ? $address->get('address2') : undef))}),
-        address3Field       => WebGUI::Form::text($session, {name=>"address3", maxlength=>35, defaultValue=>($form->get("address3") || ((defined $address) ? $address->get('address3') : undef))}),
-        labelField          => WebGUI::Form::text($session, {name=>"label", maxlength=>35, defaultValue=>($form->get("label") || ((defined $address) ? $address->get('label') : undef))}),
-        nameField           => WebGUI::Form::text($session, {name=>"name", maxlength=>35, defaultValue=>($form->get("name") || ((defined $address) ? $address->get('name') : undef))}),
-        cityField           => WebGUI::Form::text($session, {name=>"city", maxlength=>35, defaultValue=>($form->get("city") || ((defined $address) ? $address->get('city') : undef))}),
-        stateField          => WebGUI::Form::text($session, {name=>"state", maxlength=>35, defaultValue=>($form->get("state") || ((defined $address) ? $address->get('state') : undef))}),
-        countryField        => WebGUI::Form::country($session, {name=>"country", defaultValue=>($form->get("country") || ((defined $address) ? $address->get('country') : undef))}),
-        codeField           => WebGUI::Form::zipcode($session, {name=>"code", defaultValue=>($form->get("code") || ((defined $address) ? $address->get('code') : undef))}),
-        phoneNumberField    => WebGUI::Form::phone($session, {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $address) ? $address->get('phoneNumber') : undef))}),
+        address1Field       => WebGUI::Form::text($session, 
+                {name=>"address1", maxlength=>35, defaultValue=>($form->get("address1") || ((defined $address) ? $address->get('address1') : undef))}),
+        address2Field       => WebGUI::Form::text($session, 
+                {name=>"address2", maxlength=>35, defaultValue=>($form->get("address2") || ((defined $address) ? $address->get('address2') : undef))}),
+        address3Field       => WebGUI::Form::text($session, 
+                {name=>"address3", maxlength=>35, defaultValue=>($form->get("address3") || ((defined $address) ? $address->get('address3') : undef))}),
+        labelField          => WebGUI::Form::text($session, 
+                {name=>"label", maxlength=>35, defaultValue=>($form->get("label") || ((defined $address) ? $address->get('label') : undef))}),
+        firstNameField      => WebGUI::Form::text($session, 
+                {name=>"firstName", maxlength=>35, defaultValue=>($form->get("firstName") || ((defined $address) ? $address->get('firstName') : undef))}),
+        lastNameField       => WebGUI::Form::text($session, 
+                {name=>"lastName", maxlength=>35, defaultValue=>($form->get("lastName") || ((defined $address) ? $address->get('lastName') : undef))}),
+        cityField           => WebGUI::Form::text($session, 
+                {name=>"city", maxlength=>35, defaultValue=>($form->get("city") || ((defined $address) ? $address->get('city') : undef))}),
+        stateField          => WebGUI::Form::text($session, 
+                {name=>"state", maxlength=>35, defaultValue=>($form->get("state") || ((defined $address) ? $address->get('state') : undef))}),
+        countryField        => WebGUI::Form::country($session, 
+                {name=>"country", defaultValue=>($form->get("country") || ((defined $address) ? $address->get('country') : undef))}),
+        codeField           => WebGUI::Form::zipcode($session, 
+                {name=>"code", defaultValue=>($form->get("code") || ((defined $address) ? $address->get('code') : undef))}),
+        phoneNumberField    => WebGUI::Form::phone($session, 
+                {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $address) ? $address->get('phoneNumber') : undef))}),
     );
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressTemplateId"));
     $template->prepare;
@@ -380,8 +392,11 @@ sub www_editAddressSave {
     if ($form->get("label") eq "") {
         return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('label')));
     }    
-    if ($form->get("name") eq "") {
-        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('name')));
+    if ($form->get("firstName") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('firstName')));
+    }    
+    if ($form->get("lastName") eq "") {
+        return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('lastName')));
     }    
     if ($form->get("address1") eq "") {
         return $self->www_editAddress(sprintf($i18n->get('is a required field'), $i18n->get('address')));
@@ -400,7 +415,8 @@ sub www_editAddressSave {
     }    
     my %addressData = (
         label           => $form->get("label"),
-        name            => $form->get("name"),
+        firstName       => $form->get("firstName"),
+        lastName        => $form->get("lastName"),
         address1        => $form->get("address1"),
         address2        => $form->get("address2"),
         address3        => $form->get("address3"),

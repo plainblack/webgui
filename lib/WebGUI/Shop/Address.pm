@@ -111,7 +111,7 @@ Returns an HTML formatted address for display.
 
 sub getHtmlFormatted {
     my $self = shift;
-    my $address = $self->get("name") . "<br />" . $self->get("address1") . "<br />";
+    my $address = $self->get("firstName"). " " .$self->get("lastName") . "<br />" . $self->get("address1") . "<br />";
     $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
     $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
     $address .= $self->get("city") . ", ";
@@ -188,9 +188,13 @@ A hash reference that contains one or more of the following:
 
 A human readable label like "home" or "work".
 
-=head4 name
+=head4 firstName
 
-The name of the company or person to address this to.
+The first name of the company or person to address this to.
+
+=head4 lastName
+
+The last name of the company or person to address this to.
 
 =head4 address1
 
@@ -233,7 +237,7 @@ The address book that this address belongs to.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(address1 address2 address3 state code city label name country phoneNumber)) {
+    foreach my $field (qw(address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $properties{$id}{addressBookId} = $self->addressBook->getId;

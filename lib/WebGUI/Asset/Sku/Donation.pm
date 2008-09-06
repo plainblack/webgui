@@ -132,7 +132,7 @@ sub prepareView {
 	$self->SUPER::prepareView();
 	my $templateId = $self->get("templateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 
@@ -155,6 +155,7 @@ sub view {
         donateButton    => WebGUI::Form::submit( $session, { value => $i18n->get("donate button") }),
         priceField      => WebGUI::Form::float($session, { name => "price", defaultValue => $self->getPrice }),
         hasAddedToCart  => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
         );
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }

@@ -68,8 +68,8 @@ our $I18N = {
 	'auto request commit help' => {
 		message => q|Would you like the system to automatically request commits for you so that you don't have to
         remember to hit "Commit My Changes"? Note that when using this in conjunction with "Skip commit comments?"
-        and a realtime commit workflow it effectively hides the whole versioning and workflow process from users.|,
-		lastUpdated => 0,
+        it effectively hides the whole versioning and workflow process from users.|,
+		lastUpdated => 1218059129,
 	},
 
 	'select' => {
@@ -605,12 +605,11 @@ our $I18N = {
 	},
 
 	'77' => {
-		message => q|<li>That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
+		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
 %sToo<br />
 %s2<br />
-%s_%d<br />
-</li>|,
-		lastUpdated => 1140292461
+%s_%d<br />|,
+		lastUpdated => 1217216725
 	},
 
 	'444' => {
@@ -3526,8 +3525,8 @@ LongTruncOk=1</p>
 	},
 
     'user profile view template description' => {
-        message => q|The template used show the user their user profile.|,
-        lastUpdated => 1213323173,
+        message => q|The template used to show the user their user profile.|,
+        lastUpdated => 1216588139,
     },
 
 	'user profile edit template' => {
@@ -3536,8 +3535,8 @@ LongTruncOk=1</p>
 	},
 
     'user profile edit template description' => {
-        message => q|The template used show to build a form so the user can edit their template.|,
-        lastUpdated => 1213323173,
+        message => q|The template used to build a form so the user can edit their user profile.|,
+        lastUpdated => 1216588137,
     },
 
     'send private message' => {

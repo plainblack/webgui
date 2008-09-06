@@ -64,10 +64,13 @@ sub create {
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
     mode='singleton'",[$properties->{workflowId}]);
 	my $params = (exists $properties->{parameters}) 
-            ? JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}}) 
+            ? JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}})
             : undef;
 	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
-	return undef if ($isSingleton && $count);
+    if ($isSingleton && $count) {
+        $session->log->info("singleton workflow $properties->{workflowId} already running, not running again");
+        return undef
+    }
 
     # create instance
 	my $instanceId = $session->db->setRow("WorkflowInstance","instanceId",{instanceId=>"new", runningSince=>time()});
@@ -330,7 +333,9 @@ sub run {
 	if ($class && $method) {
         $object = eval { WebGUI::Pluggable::instanciate($class, $method, [$self->session, $params]) };
         if ($@) {
-			$self->session->errorHandler->error($@);
+			$self->session->errorHandler->error(
+                            q{Error on workflow instance '} . $self->getId . q{': }. $@
+                        );
 			$self->set({lastStatus=>"error"}, 1);
 			return "error";
         } 
@@ -438,7 +443,7 @@ sub set {
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
-	unless ($skipNotify) {
+    if ($self->{_started} && !$skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 		$spectre->notify("workflow/deleteInstance",$self->getId);
 		$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
@@ -500,7 +505,7 @@ sub start {
 		# we were able to complete the workflow in realtime
 		if ($status eq "done") {
 			$log->info('Completed workflow instance '.$self->getId.' in realtime.');
-			$self->delete;
+            $self->delete(1);
 			return undef;
 		}		
 	}

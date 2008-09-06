@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 
 ## The goal of this test is to test the SelectRichEditor form control
 
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 

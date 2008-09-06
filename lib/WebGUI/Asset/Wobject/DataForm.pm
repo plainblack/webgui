@@ -462,10 +462,9 @@ sub deleteAttachedFiles {
     }
     else {
         my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
-        foreach my $entry (@$entries) {
-            my $entryData = decode_json($entry->{entryData});
-            $self->deleteEntryFiles($entryData);
-            for my $field ( @$fields ) {
+        foreach my $entry (@{ $entries}) {
+            my $entryData = decode_json($entry);
+            for my $field (@{ $fields }) {
                 my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
                 if ($form->can('getStorageLocation')) {
                     my $storage = $form->getStorageLocation;
@@ -599,6 +598,7 @@ sub getListUrl {
 sub getRecordTemplateVars {
 	my $self = shift;
 	my $var = shift;
+    my $entryData = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_DataForm");
 	$var->{"back.url"} = $self->getUrl;
 	$var->{"back.label"} = $i18n->get(18);
@@ -608,7 +608,6 @@ sub getRecordTemplateVars {
     my $fields = $self->getFieldConfig;
     # If we have an entry id, we're doing this based on existing data
     my $entry;
-    my $entryData;
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>"entryId",value=>$var->{entryId}});
         $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
@@ -676,7 +675,7 @@ sub getRecordTemplateVars {
         my %fieldLoopEntry;
         my %tabLoopEntry;
         while (my ($propKey, $propValue) = each %fieldProperties) {
-            $var->{"field.noloop.$field->{name}.$propKey"} = $propKey;
+            $var->{"field.noloop.$field->{name}.$propKey"} = $propValue;
             $fieldLoopEntry{"field.$propKey"} = $propValue;
             $tabLoopEntry{"tab.field.$propKey"} = $propValue;
         }

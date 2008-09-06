@@ -146,7 +146,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 98 
+plan tests => 100 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -283,6 +283,7 @@ my $origRequest = $session->{_request};
 my $newRequest = Test::MockObject->new();
 my $func;
 $newRequest->set_bound('body', \$func);
+$newRequest->set_bound('param', \$func);
 $session->{_request} = $newRequest;
 $func = 'add';
 is($importNode->addEditLabel, $i18n->get('add').' '.$importNode->getName, 'addEditLabel, use add mode');
@@ -324,6 +325,7 @@ $properties->{id}  = 'fixUrlAsset00000000015';
 $properties->{url} = 'fixUrlFolderURL100';
 
 my $fixUrlAsset4 = $defaultAsset->addChild($properties, $properties->{id});
+is($fixUrlAsset4->get('url'), 'fixurlfolderurl100', 'asset setup correctly for 100->101 test');
 
 delete $properties->{url};
 #                          '1234567890123456789012'
@@ -435,7 +437,7 @@ my $importNodeTitle = $importNode->getTitle();
 
 foreach my $test (@fixTitleTests) {
     my $fixedTitle    = $importNode->fixTitle($test->{title}, 'ownerUserId');
-    my $expectedTitle = $test->{fixed} || $importNodeTitle;
+    my $expectedTitle = defined $test->{fixed} ? $test->{fixed} : $importNodeTitle;
     is($fixedTitle, $expectedTitle, $test->{comment});
 }
 
@@ -697,9 +699,7 @@ is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
 ################################################################
 my $assetProps = $rootAsset->get();
 my $funkyTitle = q{Miss Annie's Whoopie Emporium and Sasparilla Shop};
-diag $assetProps->{title};
 $assetProps->{title} = $funkyTitle;
-diag $assetProps->{title};
 
 isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Asset properties');
 
@@ -708,7 +708,7 @@ isnt( $rootAsset->get('title'), $funkyTitle, 'get returns a safe copy of the Ass
 # getIsa
 #
 ################################################################
-my $node = WebGUI::Asset::Sku::Product->getProductImportNode($session);
+my $node = WebGUI::Asset->getRoot($session);
 my $product1 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product2 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
 my $product3 = $node->addChild({ className => 'WebGUI::Asset::Sku::Product'});
@@ -770,6 +770,19 @@ my $iufpAsset2 = $iufpAsset->addChild($properties2, $properties2->{id});
 $iufpAsset2->update( { inheritUrlFromParent => 1 } );
 $iufpAsset2->commit;
 is($iufpAsset2->getUrl, '/inheriturlfromparent01/inheriturlfromparent02', 'inheritUrlFromParent works');
+
+my $properties2a = {
+    #                       '1234567890123456789012'
+    id                   => 'inheritUrlFromParent2a',
+    title                => 'inheritUrlFromParent2a',
+    className            => 'WebGUI::Asset::Wobject::Layout',
+    url                  => 'inheriturlfromparent2a',
+    inheritUrlFromParent => 1,
+};
+
+my $iufpAsset2a = $iufpAsset->addChild($properties2a, $properties2a->{id});
+$iufpAsset2a->commit;
+is($iufpAsset2a->getUrl, '/inheriturlfromparent01/inheriturlfromparent2a', 'inheritUrlFromParent works when created with the property');
 
 # works for setting, now try disabling. Should not change the URL.
 $iufpAsset2->update( { inheritUrlFromParent => 0 } );
@@ -881,29 +894,29 @@ sub getFixIdTests {
 }
 
 ##Return an array of hashrefs.  Each hashref describes a test
-##for the fixTitle method.  If "fixed" != 0, it should
+##for the fixTitle method.  If "fixed" != undef, it should
 ##contain what the fixTitle method will return.
 
 sub getFixTitleTests {
     my $session = shift;
     return ({
         title   => undef,
-        fixed   => 0,
+        fixed   => undef,
         comment => "undef returns the Asset's title",
     },
     {
         title   => '',
-        fixed    => 0,
+        fixed    => undef,
         comment => "null string returns the Asset's title",
     },
     {
         title   => 'untitled',
-        fixed    => 0,
+        fixed    => undef,
         comment => "'untitled' returns the Asset's title",
     },
     {
         title   => 'UnTiTlEd',
-        fixed    => 0,
+        fixed    => undef,
         comment => "'untitled' in any case returns the Asset's title",
     },
     {
@@ -925,6 +938,11 @@ sub getFixTitleTests {
         title   => 'This is a good Title',
         fixed    => 'This is a good Title',
         comment => "Good titles are passed",
+    },
+    {
+        title   => '<b></b>',
+        fixed    => '',
+        comment => "If there is no title left after processing, then it is set to untitled.",
     },
     );
 }

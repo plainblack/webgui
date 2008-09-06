@@ -1,7 +1,5 @@
 package WebGUI::Asset::Wobject::GalleryAlbum;
 
-$VERSION = "1.0.0";
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -105,7 +103,7 @@ sub addArchive {
     
     my $archive     = Archive::Any->new( $filename );
 
-    croak "Archive will extract to directory outside of storage location!"
+    die "Archive will extract to directory outside of storage location!\n"
         if $archive->is_naughty;
 
     my $tempdirName = tempdir( "WebGUI-Gallery-XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
@@ -164,7 +162,10 @@ sub addChild {
     # Load the class
     WebGUI::Pluggable::load( $properties->{className} );
 
-    if ( !$properties->{className}->isa( $fileClass ) ) {
+    # Make sure we only add appropriate child classes
+    if ( !$properties->{className}->isa( $fileClass ) 
+        && !$properties->{ className }->isa( "WebGUI::Asset::Shortcut" ) 
+        ) {
         $self->session->errorHandler->security(
             "add a ".$properties->{className}." to a ".$self->get("className")
         );
@@ -494,7 +495,19 @@ sub getTemplateVars {
     my $gallery     = $self->getParent;
     my $var         = $self->get;
     my $owner       = WebGUI::User->new( $session, $self->get("ownerUserId") );
-    
+
+    # Fix 'undef' vars since HTML::Template does inheritence on them
+    for my $key ( qw( description ) ) {
+        unless ( defined $var->{$key} ) {
+            $var->{ $key } = '';
+        }
+    }    
+ 
+    # Set a flag for pending files
+    if ( $self->get( "status" ) eq "pending" ) {
+        $var->{ 'isPending' } = 1;
+    }
+
     # Permissions
     $var->{ canAddFile              } = $self->canAddFile;
     $var->{ canEdit                 } = $self->canEdit;
@@ -579,6 +592,9 @@ sub getThumbnailUrl {
     if ( $asset->can("getThumbnailUrl") ) {
         return $asset->getThumbnailUrl;
     }
+    elsif ( $asset->isa( "WebGUI::Asset::Shortcut" ) ) {
+        return $asset->getShortcut->getThumbnailUrl;
+    }
     else {
         return undef;
     }
@@ -613,7 +629,7 @@ sub prepareView {
 
     my $template 
         = WebGUI::Asset::Template->new($self->session, $templateId);
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
 
     $self->{_viewTemplate} = $template;
 }
@@ -872,7 +888,12 @@ sub www_addArchiveSave {
     }
     my $filename    = $storage->getPath( $storage->getFiles->[0] );
 
-    $self->addArchive( $filename, $properties );
+    eval { $self->addArchive( $filename, $properties ) };
+    if ( my $error = $@ ) {
+        return $self->www_addArchive({
+            error       => sprintf( $i18n->get('addArchive error generic'), $error ),
+        });
+    }
 
     $storage->delete;
 
@@ -1059,6 +1080,12 @@ sub www_edit {
             value       => $form->get("description") || $self->get("description"),
             richEditId  => $self->getParent->get("richEditIdAlbum"),
         });
+
+    $var->{ form_othersCanAdd }
+        = WebGUI::Form::yesNo( $session, {
+            name        => "othersCanAdd",
+            value       => $form->get( "othersCanAdd" ) || $self->get( "othersCanAdd" ),
+        } );
 
     # Generate the file loop
     my $assetIdThumbnail    = $form->get("assetIdThumbnail") || $self->get("assetIdThumbnail");

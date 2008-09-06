@@ -62,7 +62,10 @@ These subroutines are available from this package:
 
 =head2 append ( url, pairs )
 
-Returns a URL after adding some information to the end of it.
+Returns a URL after adding form parameters to the end of it.  This will always
+use the correct character for appending form parameters, so it can safely
+be called several times.  If no parameters exist in the string, it will append
+with '?'.  Otherwise, it uses a semicolon.
 
 =head3 url
 
@@ -70,9 +73,11 @@ The URL to append information to.
 
 =head3 pairs
 
-Name value pairs to add to the URL in the form of:
+Name value pairs, as a single string, to add to the end of the URL
 
- name1=value1;name2=value2;name3=value3
+    name1=value1;name2=value2;name3=value3
+ or name1=value1
+ or name1=value1;name2=value2
 
 =cut
 
@@ -239,6 +244,49 @@ sub getRefererUrl {
 	} else {
 		return $url;
 	}
+}
+
+#-------------------------------------------------------------------
+
+=head2 forceSecureConnection( url )
+
+Attempts to create an SSL connection with the current or passed in url.  Returns 1
+if it was forced to use SSL.  Returns 0 if it wasn't.
+
+When this method returns 1, the calling method should return the 'redirect' flag.
+
+=head3 url
+
+The optional url that the page should forward to as an SSL connection.  If the URL
+is not passed in, it will attempt to get one from the L<page> method, or finally from %ENV.
+
+=cut
+
+sub forceSecureConnection {
+    my $self = shift;
+    my $url = shift;
+    my ($conf, $env, $http) = $self->session->quick(qw(config env http));
+   
+    if ($conf->get("sslEnabled") && $env->get("HTTPS") ne "on" && !$env->get("SSLPROXY")){
+   
+        $url = $self->session->url->page if(! $url);
+        $url = $env->get('QUERY_STRING') if(! $url);
+
+        my $siteURL = $self->getSiteURL();
+
+        if($url !~ /^$siteURL/i){
+            $url = $siteURL . $url;
+        }
+        if($env->get('QUERY_STRING')){ 
+            $url .= "?". $env->get('QUERY_STRING');
+        }
+        if($url =~ /^http/i) {
+            $url =~ s/^https?/https/i;
+            $http->setRedirect($url);
+            return 1;
+        }
+    } 
+    return 0;
 }
 
 

@@ -89,7 +89,7 @@ sub getInputElement {
 
 	return WebGUI::Form::Integer($self->session, {
 		name	=> $self->get('name'),
-		value	=> $self->get('value'),
+		value	=> $self->getValue(),
 		size	=> $self->get('size'),
 		id	=> 'view-'.$self->get('id'),
 	});

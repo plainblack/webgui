@@ -72,7 +72,7 @@ Renders the form field to HTML as a table row. The row is not displayed because 
 
 sub toHtmlWithWrapper {
 	my $self         = shift;
-    my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getDefaultValue))) || '';
+    my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getOriginalValue))) || '';
     my $manageButton = "&nbsp;";
     if ($value) {
         $manageButton = $self->session->icon->manage("op=editGroup;gid=".$value);

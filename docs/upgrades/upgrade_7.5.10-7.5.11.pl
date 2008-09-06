@@ -55,8 +55,8 @@ addShoppingHandler($session);
 addAddressBook($session);
 insertCommercePayDriverTable($session);
 addPaymentDrivers($session);
+upgradeEMS($session);  ##Need the transaction log for EMS upgrade.
 convertTransactionLog($session);
-upgradeEMS($session);
 migrateOldProduct($session);
 mergeProductsWithCommerce($session);
 deleteOldProductTemplates($session);
@@ -74,6 +74,7 @@ addDBLinkAccessToSQLMacro($session);
 addAssetManager( $session );
 removeSqlForm($session);
 migratePaymentPlugins( $session );
+updateTransactionPaymentGateway( $session );
 removeRecurringPaymentActivity( $session );
 addLoginMessage( $session );
 addNewApprovalActivities( $session );
@@ -686,7 +687,14 @@ sub upgradeEMS {
             }
         }
     	print "\t\t\tMigrating old registrants for $emsId.\n" unless ($quiet);
-        my $registrantResults = $db->read("select * from EventManagementSystem_badges where assetId=?",[$emsId]);
+        my $registrantResults = $db->read(<<EOSQL,[$emsId]);
+select * from EventManagementSystem_badges as b
+    join EventManagementSystem_registrations as r on b.badgeId=r.badgeId
+    join EventManagementSystem_purchases     as p on p.purchaseId=r.purchaseId
+    join transaction                         as t on p.transactionId=t.transactionId
+    where b.assetId=? and t.status='Completed'
+EOSQL
+#"select * from EventManagementSystem_badges where assetId=?",[$emsId]);
         while (my $registrantData = $registrantResults->hashRef) {
             $db->setRow("EMSRegistrant","badgeId",{
                 badgeId             => "new",
@@ -799,7 +807,7 @@ sub convertTransactionLog {
         $db->setRow("transaction","transactionId",{
             transactionId       => "new",
             isSuccessful        => (($oldTranny->{status} eq "Completed") ? 1 : 0),
-            transactionCode     => $oldTranny->{XID},
+            transactionCode     => $oldTranny->{gatewayId},
             statusCode          => $oldTranny->{authcode},
             statusMessage       => $oldTranny->{message},
             userId              => $oldTranny->{userId},
@@ -818,6 +826,8 @@ sub convertTransactionLog {
             paymentState        => $u->profileField('homeState'),
             paymentCode         => $u->profileField('homeZip'),
             paymentCountry      => $u->profileField('homeCountry'),
+            paymentDriverId     => $oldTranny->{gateway},
+            paymentDriverLabel  => $oldTranny->{gateway},
             paymentAddressName  => $u->profileField('firstName').' '.$u->profileField('lastName'),
             paymentPhoneNumber  => $u->profileField('homePhone'),
             dateOfPurchase      => $date->toDatabase,
@@ -829,6 +839,7 @@ sub convertTransactionLog {
                 $status = 'NotShipped' if $status eq 'NotSent';
                 $db->setRow("transactionItem","itemId",{
                     itemId                  => "new",
+                    assetId                 => $oldItem->{itemId},
                     transactionId           => $oldItem->{transactionId},
                     configuredTitle         => $oldItem->{itemName},
                     options                 => '{}',
@@ -838,7 +849,7 @@ sub convertTransactionLog {
                     quantity                => $oldItem->{quantity},
                     price                   => $oldItem->{amount},
                     vendorId                => "defaultvendor000000000",
-                    }, $oldItem->{itemId});
+                    });
             }
     }
     $db->write("drop table oldtransaction");
@@ -1057,13 +1068,15 @@ sub migrateOldProduct {
     $session->db->write(q!update asset set className='WebGUI::Asset::Sku::Product' where className='WebGUI::Asset::Wobject::Product'!);
 
     ## Add variants collateral column to Sku/Product
-    $session->db->write('alter table Product add column   thankYouMessage mediumtext');
-    $session->db->write('alter table Product add column     accessoryJSON mediumtext');
-    $session->db->write('alter table Product add column       benefitJSON mediumtext');
-    $session->db->write('alter table Product add column       featureJSON mediumtext');
-    $session->db->write('alter table Product add column       relatedJSON mediumtext');
-    $session->db->write('alter table Product add column specificationJSON mediumtext');
-    $session->db->write('alter table Product add column      variantsJSON mediumtext');
+    $session->db->write('alter table Product add column    thankYouMessage mediumtext');
+    $session->db->write('alter table Product add column      accessoryJSON mediumtext');
+    $session->db->write('alter table Product add column        benefitJSON mediumtext');
+    $session->db->write('alter table Product add column        featureJSON mediumtext');
+    $session->db->write('alter table Product add column        relatedJSON mediumtext');
+    $session->db->write('alter table Product add column  specificationJSON mediumtext');
+    $session->db->write('alter table Product add column       variantsJSON mediumtext');
+    $session->db->write('alter table Product add column isShippingRequired INT(11)');
+
     ##Build a variant for each Product.
     my $productQuery = $session->db->read(<<EOSQL1);
 SELECT p.assetId, p.price, p.productNumber, p.revisionDate, a.title, s.sku
@@ -1109,7 +1122,7 @@ EOSQL1
         while (my $acc = $accessorySth->hashRef()) {
             push @accessories, $acc;
         }
-        my $accJson = to_json(\@accessories);
+        my $accJson = encode_json(\@accessories);
         $session->db->write('update Product set accessoryJSON=? where assetId=?',[$accJson, $assetId]);
 
         ##Related
@@ -1118,7 +1131,7 @@ EOSQL1
         while (my $acc = $relatedSth->hashRef()) {
             push @related, $acc;
         }
-        my $relJson = to_json(\@related);
+        my $relJson = encode_json(\@related);
         $session->db->write('update Product set relatedJSON=? where assetId=?',[$relJson, $assetId]);
 
         ##Specification
@@ -1127,7 +1140,7 @@ EOSQL1
         while (my $spec = $specificationSth->hashRef()) {
             push @specification, $spec;
         }
-        my $specJson = to_json(\@specification);
+        my $specJson = encode_json(\@specification);
         $session->db->write('update Product set specificationJSON=? where assetId=?',[$specJson, $assetId]);
 
         ##Feature
@@ -1136,7 +1149,7 @@ EOSQL1
         while (my $feature = $featureSth->hashRef()) {
             push @features, $feature;
         }
-        my $featJson = to_json(\@features);
+        my $featJson = encode_json(\@features);
         $session->db->write('update Product set featureJSON=? where assetId=?',[$featJson, $assetId]);
 
         ##Benefit
@@ -1145,7 +1158,7 @@ EOSQL1
         while (my $benefit = $benefitSth->hashRef()) {
             push @benefits, $benefit;
         }
-        my $beneJson = to_json(\@benefits);
+        my $beneJson = encode_json(\@benefits);
         $session->db->write('update Product set benefitJSON=? where assetId=?',[$beneJson, $assetId]);
 
     }
@@ -1786,6 +1799,14 @@ sub migratePaymentPlugins {
     }
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub updateTransactionPaymentGateway {
+    my $session = shift;
+    print "\tUpdating the transaction paymentGatewayId's to the new and migrated payment gateways..." unless $quiet;
+    $session->db->write("update transaction t set t.paymentDriverId = (select p.paymentGatewayId from paymentGateway p where p.label = t.paymentDriverLabel)");
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

@@ -16,6 +16,7 @@ package WebGUI::Form::Asset;
 
 use strict;
 use base 'WebGUI::Form::Control';
+use HTML::Entities;
 use WebGUI::Asset;
 use WebGUI::Form::Button;
 use WebGUI::Form::Hidden;
@@ -117,7 +118,8 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getDefaultValue);
+#    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getDefaultValue);
+    my $asset = WebGUI::Asset->newByDynamicClass($self->session,$self->getOriginalValue);
     if (defined $asset) {
         return '<a href="'.$asset->getUrl.'">'.$asset->getTitle.'</a>';
     }
@@ -147,7 +149,7 @@ Renders an asset selector.
 
 sub toHtml {
 	my $self = shift;
-        my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->getDefaultValue) || WebGUI::Asset->getRoot($self->session);
+    my $asset = WebGUI::Asset->newByDynamicClass($self->session, $self->getOriginalValue) || WebGUI::Asset->getRoot($self->session);
 	my $url = $asset->getUrl("op=formHelper;sub=assetTree;class=Asset;formId=".$self->get('id'));
 	$url .= ";classLimiter=".$self->get("class") if ($self->get("class"));
         return WebGUI::Form::Hidden->new($self->session,
@@ -228,9 +230,11 @@ sub www_assetTree {
 	foreach my $child (@{$children}) {
 		next unless $child->canView;
 		if ($limit eq "" || $child->get("className") =~ /^$limit/) {
+            my $tempChild = $child->get("title");
+            $tempChild =~ s/(\'|\")/\\$1/g;
 			$output .= '<a href="#" class="selectLink" onclick="window.opener.document.getElementById(\''.$session->form->process("formId")
 				.'\').value=\''.$child->getId.'\';window.opener.document.getElementById(\''.
-				$session->form->process("formId").'_display\').value=\''.$child->get("title").'\';window.close();">['.$i18n->get("select").']</a> ';
+				$session->form->process("formId").'_display\').value=\''.encode_entities($tempChild).'\';window.close();">['.$i18n->get("select").']</a> ';
 		} else {
 			$output .= '['.$i18n->get("select").'] ';
 		}

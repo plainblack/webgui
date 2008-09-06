@@ -402,7 +402,7 @@ sub www_addFolderSave {
 		className                => 'WebGUI::Asset::Wobject::Folder',
 		#filename                 => $filename,
 		});
-	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLForm;sub=imageTree'));
+	$session->http->setRedirect($base->getUrl('op=formHelper;class=HTMLArea;sub=imageTree'));
 	return undef;
 }
 
@@ -464,9 +464,9 @@ sub www_addImageSave {
 	# check if user can edit the current asset
 	return $session->privilege->insufficient('bare') unless $base->canEdit;
 
-	#my $imageId = WebGUI::Form::Image->create($session);
-	my $imageId = WebGUI::Form::Image->new($session,{name => 'filename'})->getDefaultValue;
-    my $imageObj = WebGUI::Storage::Image->get($session, $imageId);
+	my $imageForm = WebGUI::Form::Image->new($session,{name => 'filename'});
+    $imageForm->set('value', $imageForm->getValue);
+    my $imageObj = $imageForm->getStorageLocation;
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.
 	my $filename = $imageObj->getFiles->[0];

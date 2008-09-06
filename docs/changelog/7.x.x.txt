@@ -1,5 +1,213 @@
+7.5.21
+ - fixed: purchase detail screen shows incorrectly in Safari
+ - Adding span class and ids for styling pagination
+ - Display empty cart message
+ - fixed: Back to Site link in asset manager points to wrong location
+ - fixed: Some import node folders have invalid template
+ - fixed: Scheduled workflows based on day of week run on wrong day
+ - improved debug messages for sql queries
+ - fixed: Custom library directories don't override WebGUI core modules
+ - Changed update() so that it only updates fields passed in, and the defaults
+   for assets are processed in addRevision() instead.
+ - Changed update() so it can autodetect missing fields in asset tables and
+   log them nicely instead of crashing.
+ - Changed Thingy so it defaultly searches the default thing when you view the
+   search screen for that thing. This way it displays everything and the user
+   isn't left wondering what happened to the data they just submitted.
+ - Fixed the column ordering links in search on Thingy.
+ - Fixed a problem with the file upload control where you couldn't delete the
+   file if you have multiple attached.
+ - fixed: Gallery album thumbnail titles now link to the image info rather than back to the album.
+ - fixed again: The bug enigmatically named "product".
+ - fixed: packages don't include archived assets
+ - fixed: Getting an i18n key from a file that does not exist.
+ - fixed: Tree Navigation menu shows level numbers
+ - fixed: loginBox macro no longer can return user to "logout" page, logging them out
+ - fixed: Template Assets broken
+ - fixed: edit operation sql error, Thingy (Yung Han Khoe)
+ - fixed: Thingy: default thing property hidden (Yung Han Khoe) 
+ - fixed: Ad Space Description Text Keeps Repopulating
+ - fixed: choosing ITransact plugin during checkout causes error
+ - fixed: Disabled Shipping methods still available
+ - fixed: Inherit Url From Parent is broken
+ - added: ability to have metadata tags in head blocks
+
+7.5.20
+ - fixed: DataForm acknowledgement screen shows incorrect value for Date/Time fields
+ - fixed: Some multipart mail messages have parts chosen incorrectly
+ - fixed: File Pile doesn't respect edit permissions of parent asset
+ - fixed: shortcut overrides new value column doesn't show macros as unparsed
+ - fixed: shortcut select by alternate criteria wizard doesn't show lists properly
+ - fixed: The indent loop of the Navigation wobject has an incorrect number of
+   iterations in some cases. (Martin Kamerbeek / Oqapi)
+ - fixed: Thingy: Setting the size of a field has no effect
+ - fixed: Form/* now all use getOriginalValue (split off from getDefaultValue) which resolves the Layout bug not being able to uncheck all hidden assets.  
+        Tests were updated, but need are still lacking and need a major overhaul.
+ - fixed: ITransact error message now shows a link to go back to checkout
+ - fixed: Gallery image information now does not overlap the snapshot.  Changed css .wgSnapshot to be 25% vs 20%.  
+ - fixed: ITransact now defaults to using shipping address for billing address. This prevents an
+   issue when users neglect to select a proper billing address.
+ - fixed: Thingy: System tables created for new things are not forced to use
+   charset=utf8
+ - fixed: Gallery navigation back to album returns to page 1 (Martin 
+   Kamerbeek / Oqapi)
+ - fixed: WSClient now correctly handles SOAP::Som returns of simple arrays of scalars and a exception producing if test turned into an eval.
+ - fixed: Gallery now gives an error message when a Zip archive is being naughty
+ - fixed: Upgrade 7.5.10-7.5.11 upgrades transaction payment gateway info.
+ - fixed: Form CheckList select all button now functions properly
+ - fixed: Gallery slideshow JS now has better control over the buttons
+ - fixed: The bug enigmatically named "product".
+ - fixed: CS Thread sort on last post reply is now working correctly.
+ - fixed: Gallery Cross Publish now works properly
+ - fixed: Exposed a form element for the GalleryAlbum Others Can Add property
+ - fixed: Form attachment icons no longer break Safari 3 (no longer loaded inline).
+
+7.5.19
+ - fixed: paginator doesn't show correct number of page links with a limit applied
+ - fixed: user profile defaults can contain arbitrary perl code
+ - fixed: Syndicated Content UTF-8 check for decoded content
+ - fixed: unable to purge trash
+ - fixed: EMS not displaying all users with a badge
+ - fixed: ems 2.0: ticket import/export borked
+ - Exposed user and url fields to shop vendors.
+ - fixed: ems 2.0: code cleanup
+ - fixed: WebGUI::Search - joinClass not documented
+ - fixed: thingy's checkbox field
+ - Inbox and ?op=viewInbox can now handle millions of rows without taking 10 minutes to return
+   some results
+ - Exposed a form element for the GalleryAlbum Others Can Add property
+ - fixed: EMS 2.0 migration badges
+ - fixed: per item shipping
+ - fixed: product title problem
+ - fixed: adding payment brings me to /
+ - fixed: Gallery uses too much disk space. Added a way to change an images pixel density.
+ - fixed: splitCSV and joinCSV had issues with complex CSV data
+ - fixed: Anonymous registration form produces invalid html
+ - fixed: DEmote in toolbar menu has PROmote url
+ - fixed: EMS purge now functions correctly
+ - improve behavior of preload.perl for custom lib dirs not ending in lib
+ - fixed: Server side spellchecker doesn't work
+ - fixed: DateTime Form Control Bug
+ - fixed: Tree Menu is always collapsed
+ - fixed: Form/Date and Form/DateTime to properly return MySQL formatted and epoch formatted times
+ - fixed: Invitation EMails Escape Characters
+ - fixed: EMS Formatting (Badge Page)
+ - fixed: Thingy fields list on view screen tab
+ - fixed: Importing data into Thingy that has newlines embedded in fields
+ - fixed: Keywords field is not available in collaboration system post template
+ - fixed: Payment Gateway creation bug
+ - fixed: thingy and select box 
+ - fixed: viewing badges in IE 6/7
+ - fixed: Shop/Transaction was not updating shopCreditDeduction column.  Added that to the update and now users correctly have purchases deducted from their instore credit.
+ - fixed: Hover Help outdated: automatically request commit
+ - fixed: Thingy: Subtext disappears when editing a field
+ - fixed: WebGUI Search errors - boolean search using filtering does not work
+ - Updated User->profileField method to return all default values as a scalar,
+   rather than just the first option in the list.
+
+7.5.18
+ - fixed: Collateral Image Manager broken in Firefox 3
+ - fixed: User is logged out if a fatal error occurs
+ - fixed: Collaboration system includes header link even with RSS turned off
+ - fixed: edit branch doesn't show list style metadata fields properly
+ - fixed: Product no longer shows "Continue Shopping" view when a different user adds the Product to their Cart.  The issue was the Product cached itself when an item was added to the cart.  Now it checks for if a cart asset exists for this session.
+ - fixed: HTML Export now creates a new session for each asset it exports to 
+   stop problems from certain flags that get set once per session.
+ - fixed: Clicking on Widget gear causes user to jump to another part of the page.
+ - fixed: Manage Subscription Code Batches: Names of Batches not Displayed
+ - fixed: Manage Subscription Codes: No way to Select
+ - fixed: Self registration that does not require passwords, now allows multiple users with empty passwords.  This means that users can self register without a password and might cause downstream bugs with other wobjects.
+ - fixed: Calendar now uses the correct method to get the current user's time-zone
+ - fixed backwards compatibility with new form control API additions: getValue is now
+   an alias to getValueFromForm instead of vice-versa. getValue is still the preferred 
+   method, getValueFromForm is still the deprecated method.
+ - fixed: Image Collateral Uploader in Rich Editor now works correctly
+ - fixed: problem with Calendar in EMS "Ticket" tab, "Start" field
+ - fixed: Manage Subscription Codes: Search on wrong screen?
+ - fixed: Bad International macro calls in Gallery Template
+ - fixed: more i18n (Shop tags)
+ - fixed: i18nagain
+ - fixed: Cash available as a payment option to everyone
+ - fixed: Web::Form::Asset can now accept assets with '|" in their names.
+ - fixed: Shop: remove an item and Apache segfaults
+ - Converted asset context menus to YUI menus
+ - fixed: asset context menu is positioned incorrectly on RTL pages
+ - fixed: asset context menu broken if the only asset is a navigation included by AssetProxy
+ - fixed: EMS Ticket Meta Fields- Can't Delete
+ - fixed: Ribbons and Tokens on badge page error
+ - fixed: Variable 'description' not filled in RSS templates
+ - fixed: logging reports incorrect location
+ - fixed: Cart now redirects to ssl if the site is ssl enabled.
+ - fixed: Content Profiling: Default not set
+ - added: Session/Url now has a forceToSecure method which takes a page or site url and redirects to that page or url if the site is ssl enabled.
+
+7.5.17
+ - fixed: Payment Methods Hover Help Incomplete
+ - fixed: Payment Method Titles Don't Match Buttons
+ - fixed: Gallery: Description Text appearing in Album
+ - Moved product imports to shelves
+ - fixed: Deleting Ticket from Event Management System Asset
+ - fixed: Thingy Search Broken
+ - fixed: DataForm noloop template variables have incorrect values
+ - fixed: Alias field in user profiling
+ - fixed: Email Receipt after Successful Checkout
+ - fixed: DataForm captcha doesn't show up
+ - fixed: edit branch only changes meta data fields if another value is changed
+ - fixed: Gallery reverts to undeletable bare asset if created with default
+   view "Single Album"
+ - fixed: The Sku's, Donation, Product, Subscription and FlatDiscount have a
+   continue shopping url that will take the user back the Sku in its normal
+   mode.
+ - fixed: Cannot enter floating point percentages (Kaleb Murphy, aka
+   perlmonkey2)
+ - fixed: Thing list drop down broken when multiple thingy's on one page.
+ - fixed: Shop Tax pagination and sorting now work.
+ - fixed: Keywords and SKU assets
+
+7.5.16
+ - Created a migration from 7.4.40 directly to 7.5.16.
+ - fixed: transactions lost during 7.5.11 upgrade
+ - Fixed a problem where shop could create internal server errors instead of
+   catching the exceptions.
+ - Made the iTransact terminal link a button that automatically logs you in.
+ - iTransact now more gracefully handles recurring payment postback errors.
+ - fixed: More permissive DSN checking to allow use of SQLite (thanks pathma)
+ - fixed: Project manager modal dialog doesn't work in some instances.
+ - fixed: Syndicated Content doesn't always decode text properly
+ - fixed: Syndicated Content caches improperly
+ - added File::Path 2.04 as a prerequisite
+ - fixed: Asset Manager shows data error when no child assets to display
+ - changed: show 25 items per page in asset manager
+ - fixed: Asset Manager buttons now work in IE6
+ - fixed: Donation: Add to Cart still visible in Thank You Message screen
+ - optimized PurgeOldInboxMessages workflow
+ - fixed: Calendar: Reorder Events in Week View Broken
+ - Added more information about workflow instance errors, so we can debug without having 
+   to watch SPECTRE's debug output.
+ - fixed: List style Content profile fields broken
+ - Added additional error messages
+ - fixed: Added a friendly message so when a user who approves a version tag, 
+   but cannot view the version tag (is not in Turn Admin On group), they do 
+   not see "Permission Denied"
+
+7.5.15
+ - fixed: Colorpicker window would not open (Martin Kamerbeek / Oqapi)
+ - fixed: Reverted change to RichEdit that caused IE6 to stop working
+ - fixed: Subscription: Price not displaying
+ - Replaced CLI gallery import system with a better one.
+ - fixed: Flat Discount Coupon: Add to Cart button seems broken
+ - fixed: Deleting unProtected user profile fields
+ - fixed: Synopsis doesn't update after editting posts
+ - fixed: Mail messages not properly decoded
+ - fixed: Style 1, other areas broken due to case sensitivity in uploads
+ - fixed: Wait Until, new approval request workflow not available to add
+ - cleaned up style 3 and top navigation
+
 7.5.14
+ - fixed: RSS feeds report modified date instead of create date
+ - fixed: Rich editor collateral image uploader is broken
  - fixed: ems 2.0: tickets get created as badges also
+ - shortcut overrides display titles instead of field names
  - fixed: Non-admin users can now add Gallery assets
  - fixed: Thingy Data now retains File and Images if they aren't explicitly deleted
  - fixed: Rich Editor no longer makes other form controls show up as code in Safari 3
@@ -12,6 +220,9 @@
  - fixed: Shop: Product asset- image not showing
  - fixed: User List- Missing Hover Help (Yung Han Khoe)
  - fixed: UserList wobject not in new content menu (Yung Han Khoe)
+ - fixed: Default Product template does not show an "out of stock" message
+   when there are no available variants.
+ - fixed: "Permission Denied" when editing Shelf Template
 
 7.5.13
  - fixed: storage locations for some assets in packages not imported correctly

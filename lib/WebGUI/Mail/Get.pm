@@ -242,32 +242,41 @@ sub parseParts {
 	}
 	my $body = $message->bodyhandle;
 	if (defined $body) {
-		my $disposition = $message->head->get("Content-Disposition");
-		my $filename = "";
-        if($disposition =~ m/filename=\"(.*)\"/) {
-		    $filename = $1;
+        my $filename = $message->head->mime_attr('content-disposition.filename');
+        my $charset = $message->head->mime_attr('content-type.charset');
+        my $decoder;
+        if ($charset) {
+            $decoder = Encode::find_encoding($charset);
         }
-		return [{content => $body->as_string, type=>$type, filename=>$filename}];
+        return [{
+            content     => $decoder ? $decoder->decode($body->as_string) : $body->as_string,
+            type        => $type,
+            $filename ? (filename    => $filename) : (),
+        }];
 	}
-	my @parts = ();
-	foreach my $part ($message->parts) {
-		@parts = (@parts, @{$self->parseParts($part)});
-	}
-	# deal with messages that have two or more chunks of the same content with different formatting
-	if ($type =~ m{multipart/alternative}i) {
-		my $first = {};
-		my @others = ();
-		foreach my $part (reverse @parts) {
-			if ($first->{type} eq "" && ($part->{type} eq "text/html" || $part->{type} eq "text/plain")) {
-				$first = $part;
-			} else {
-				push @others, $part;
-			}
-		}
-		$first->{alternative} = \@others;
-		return [$first];
-	}
-	return \@parts;
+    if ($type =~ m{multipart/alternative}i) {
+        foreach my $part (reverse $message->parts) {
+            my $parsedParts = $self->parseParts($part);
+            my $supported = 1;
+            foreach my $parsedPart (@$parsedParts) {
+                # we support html, text, and attachments
+                if ($parsedPart->{type} !~ /^text\/html/ && $parsedPart->{type} !~ /^text\/plain/ && !$parsedPart->{filename}) {
+                    $supported = 0;
+                }
+            }
+            if ($supported) {
+                return $parsedParts;
+            }
+        }
+        return [];
+    }
+    else {
+        my @parts;
+        foreach my $part ($message->parts) {
+            push @parts, @{ $self->parseParts($part) };
+        }
+        return \@parts;
+    }
 }
 
 #-------------------------------------------------------------------

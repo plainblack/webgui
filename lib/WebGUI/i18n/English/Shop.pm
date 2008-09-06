@@ -3,6 +3,18 @@ package WebGUI::i18n::English::Shop;
 use strict;
 
 our $I18N = { 
+	'Preferred Payment Type' => {
+		message 	=> q|Preferred Payment Type|,
+		lastUpdated	=> 0,
+		context		=> q|vendor label|,
+	},
+
+	'Payment Information' => {
+		message 	=> q|Payment Information|,
+		lastUpdated	=> 0,
+		context		=> q|vendor label|,
+	},
+
 	'thank you message' => {
 		message 	=> q|Thank you for your order! Please save this as your receipt.|,
 		lastUpdated	=> 0,
@@ -651,6 +663,18 @@ our $I18N = {
 		context => q|a label in the address editor|
 	},
 
+	'firstName' => { 
+		message => q|First Name|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
+	'lastName' => { 
+		message => q|Last Name|,
+		lastUpdated => 0,
+		context => q|a label in the address editor|
+	},
+
 	'address' => { 
 		message => q|Address|,
 		lastUpdated => 0,
@@ -819,6 +843,12 @@ our $I18N = {
 		context => q|a button a user clicks on to remove an item from the cart|
 	},
 
+	'company url' => { 
+		message => q|Company URL|,
+		lastUpdated => 0,
+		context => q|a field in the vendor screen|
+	},
+	
 	'checkout button' => { 
 		message => q|Checkout|,
 		lastUpdated => 0,
@@ -842,6 +872,13 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|a button the user clicks on to go back to shopping after viewing the cart|
 	},
+
+    'empty cart' => { 
+		message => q|There are no items currently in your cart.|,
+		lastUpdated => 0,
+		context => q|a message to the user that the cart is empty|
+	},
+
 
 	'shop' => { 
 		message => q|Shop|,
@@ -879,7 +916,7 @@ our $I18N = {
 		context => q|The label for the add to cart button.|
 	},
 
-'weekly' => {
+    'weekly' => {
         message => q|Week|,
         lastUpdated => 0,
         context => q|Period name for a weekly subscription.|
@@ -925,30 +962,6 @@ our $I18N = {
         message => q|Year|,
         lastUpdated => 0,
         context => q|Period name for a yearly subscription.|
-    },
-
-    'import' => {
-        message => q|Import|,
-        lastUpdated => 1212550974,
-        context => q|Label for bringing data into the Shop (Tax, Product, etc.)|
-    },
-
-	'export' => {
-		message => q|Export|,
-		lastUpdated => 1212550978,
-		context => q|Label for taking data out of the Shop (Tax, Product, etc.)|,
-	},
-
-    'import successful' => {
-        message => q|Your products have been imported.|,
-        lastUpdated => 1213047491,
-        context => q|Message telling the user the their products have been imported successfully.|
-    },
-
-    'view products' => {
-        message => q|View all imported products|,
-        lastUpdated => 1213047491,
-        context => q|Label for a shortcut to the import products folder|
     },
 
     'address1 help' => {
@@ -1108,8 +1121,8 @@ our $I18N = {
     },
 
     'shippingAddressCountry' => {
-        message => q|The state from the shipping address.|,
-        lastUpdated => 1213133715,
+        message => q|The country from the shipping address.|,
+        lastUpdated => 1216654340,
         context => q|Template variable for email receipt template|,
     },
 
@@ -1180,8 +1193,8 @@ our $I18N = {
     },
 
     'paymentAddressCountry' => {
-        message => q|The state from the payment address.|,
-        lastUpdated => 1213133715,
+        message => q|The country from the payment address.|,
+        lastUpdated => 1216654356,
         context => q|Template variable for email receipt template|,
     },
 
@@ -1318,8 +1331,8 @@ our $I18N = {
     },
 
     'item shippingAddressCountry' => {
-        message => q|The state from the shipping address for this item.|,
-        lastUpdated => 1213133715,
+        message => q|The country from the shipping address for this item.|,
+        lastUpdated => 1216787074,
         context => q|Template variable for email receipt template|,
     },
 
@@ -1411,6 +1424,18 @@ our $I18N = {
         message => q|How would you like to pay?|,
         lastUpdated => 42,
         context => q|Message asking the user to choose one of the available payment options.|,
+    },
+
+    'import tax' => {
+        message => q|Import Taxes|,
+        lastUpdated => 1217125374,
+        context => q|Label for the manage tax screen|,
+    },
+
+    'export tax' => {
+        message => q|Export Taxes|,
+        lastUpdated => 1217125391,
+        context => q|Label for the manage tax screen|,
     },
 
 };

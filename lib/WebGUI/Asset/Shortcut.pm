@@ -19,6 +19,7 @@ use WebGUI::Operation::Profile;
 use WebGUI::ProfileField;
 use WebGUI::ProfileCategory;
 use WebGUI::Macro;
+use HTML::Entities qw(encode_entities);
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -26,7 +27,7 @@ our @ISA = qw(WebGUI::Asset);
 sub _drawQueryBuilder {
 	my $self = shift;
 	# Initialize operators
-	my @textFields = qw|text yesNo selectList radioList|;
+	my @textFields = qw|text yesNo selectBox radioList|;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
 	my %operator;
 	foreach (@textFields) {
@@ -93,7 +94,7 @@ sub _drawQueryBuilder {
 			name=>$valFieldName,
 			uiLevel=>5,
 			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
-			possibleValues=>$fields->{$field}{possibleValues},
+			options=>$fields->{$field}{possibleValues},
 		);
 		# An empty row
 		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
@@ -369,15 +370,16 @@ sub getOverridesList {
 	foreach my $definition (@{$shortcut->definition($self->session)}) {
 		foreach my $prop (keys %{$definition->{properties}}) {
 			next if $definition->{properties}{$prop}{fieldType} eq 'hidden';
+            next if $definition->{properties}{$prop}{label} eq '';
 			$output .= '<tr>';
-			$output .= '<td class="tableData"><a href="'.$self->getUrl('func=editOverride;fieldName='.$prop).'">'.$prop.'</a></td>';
+            $output .= '<td class="tableData">'.$definition->{properties}{$prop}{label}.'</td>';
 			$output .= '<td class="tableData">';
 			$output .= $self->session->icon->edit('func=editOverride;fieldName='.$prop,$self->get("url"));
 			$output .= $self->session->icon->delete('func=deleteOverride;fieldName='.$prop,$self->get("url")) if exists $overrides{overrides}{$prop};
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{origValue};
 			$output .= '</td><td>';
-			$output .= $overrides{overrides}{$prop}{newValue};
+			$output .= encode_entities($overrides{overrides}{$prop}{newValue}, '<>&"^');
 			$output .= '</td><td>';
 			$output .= $overrides{overrides}{$prop}{parsedValue};
 			$output .= '</td></tr>';
@@ -610,7 +612,8 @@ sub getPrefFieldsToImport {
 
 =head2 getTemplateVars
 
-Gets the template vars for this shortcut.
+Gets the template vars for the asset we're a shortcut to, with any overrides
+applied.
 
 =cut
 
@@ -653,7 +656,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $shortcut = $self->getShortcut;
 	$shortcut->prepareView if defined $shortcut;

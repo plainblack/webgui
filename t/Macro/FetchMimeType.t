@@ -21,6 +21,11 @@ my $session = WebGUI::Test->session;
 
 my @testSets = (
 	{
+		input => 'webgui.txt',
+		output => 'text/plain',
+		comment => q|text|,
+	},
+	{
 		input => 'plainblack.gif',
 		output => 'image/gif',
 		comment => q|gif|,

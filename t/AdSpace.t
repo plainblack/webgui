@@ -31,7 +31,7 @@ my $newAdSpaceSettings = {
     height             => "300",
 };
 
-my $numTests = 32; # increment this value for each test you create
+my $numTests = 35; # increment this value for each test you create
 $numTests += 2 * scalar keys %{ $newAdSpaceSettings };
 ++$numTests; ##For conditional testing on module load
 
@@ -104,6 +104,11 @@ SKIP: {
         is($newAdSpaceSettings->{$setting}, $catWoman->get($setting),
             sprintf "empty call to set does not change %s", $setting);
     }
+
+    $catWoman->set({title => '', name => '', description => '', });
+    is ($catWoman->get('title'),       '', 'set can clear the title');
+    is ($catWoman->get('description'), '', 'set can clear the title');
+    is ($catWoman->get('name' ), $newAdSpaceSettings->{'name'}, 'set can not clear the name');
 
     ##Create a set of ads for general purpose testing
 

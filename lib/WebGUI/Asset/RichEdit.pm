@@ -20,9 +20,6 @@ use WebGUI::Form;
 use WebGUI::Utility;
 use WebGUI::International;
 use JSON;
-BEGIN {
-    eval { require Text::Aspell };  # Optional
-}
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -494,7 +491,9 @@ sub getRichEditor {
 		);
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
-			push(@plugins,"spellchecker");
+            push(@plugins,"-wgspellchecker");
+            $loadPlugins{wgspellchecker} = $self->session->url->extras("tinymce-webgui/plugins/wgspellchecker/editor_plugin.js");
+			$config{spellchecker_rpc_url} = $self->session->url->gateway('', "op=spellCheck");
 			$config{spellchecker_languages} = 
 			join(',', map { ($_->{default} ? '+' : '').$_->{name}.'='.$_->{id} } @{$self->session->config->get('availableDictionaries')});
 		}
@@ -557,14 +556,11 @@ sub getRichEditor {
 
     $self->session->style->setScript($self->session->url->extras('tinymce/jscripts/tiny_mce/tiny_mce.js'),{type=>"text/javascript"});
     $self->session->style->setScript($self->session->url->extras("tinymce-webgui/callbacks.js"),{type=>"text/javascript"});
-    $self->session->style->setScript( $self->session->url->extras( "yui/build/yahoo-dom-event/yahoo-dom-event.js" ), { type => "text/javascript" } );
     my $out = "<script type=\"text/javascript\">\n";
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "YAHOO.util.Event.addListener( window, 'load', function () { \n"
-            . "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
-            . "} );\n"
+    $out    .= "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
             . "</script>";
 }
 

@@ -18,7 +18,7 @@ use strict;
 use base 'WebGUI::Asset::Sku';
 use Tie::IxHash;
 use JSON;
-
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -95,13 +95,14 @@ sub definition {
 			label           => $i18n->get("event number"),
 			hoverHelp       => $i18n->get("event number help"),
 			},
-		startDate => {
-			tab             => "properties",
-			fieldType       => "dateTime",
-			defaultValue    => $date->toDatabase,
-			label           => $i18n->get("add/edit event start date"),
-			hoverHelp       => $i18n->get("add/edit event start date help"),
-			},
+        startDate => {
+            noFormPost      => 1,
+            fieldType       => "hidden",
+            defaultValue    => $date->toDatabase,
+            label           => $i18n->get("add/edit event start date"),
+            hoverHelp       => $i18n->get("add/edit event start date help"),
+            autoGenerate    => 0,
+            },			    
 		duration => {
 			tab             => "properties",
 			fieldType       => "float",
@@ -251,7 +252,10 @@ Extended to support event metadata.
 sub getEditForm {
 	my $self = shift;
 	my $form = $self->SUPER::getEditForm(@_);
-	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+	my $metadata = $self->getEventMetaData;
+    my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+    my $date = WebGUI::DateTime->new($self->session, time());
+
 	foreach my $field (@{$self->getParent->getEventMetaFields}) {
 		$form->getTab("meta")->DynamicField(
 			name			=> "eventmeta ".$field->{label},
@@ -262,7 +266,38 @@ sub getEditForm {
 			label			=> $field->{label},
 			);
 	}
+    $form->getTab("properties")->DateTime(
+            name            => "startDate", 
+            defaultValue    => $date->toDatabase,
+            label           => $i18n->get("add/edit event start date"),
+            hoverHelp       => $i18n->get("add/edit event start date help"),
+            timeZone        => $self->getParent->get("timezone"),
+            value           => $self->get("startDate"),
+    );
 	return $form;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getEventMetaData
+
+Decodes and returns metadata properties as a hashref.
+
+=head3 key
+
+If specified, returns a single value for the key specified.
+
+=cut
+
+sub getEventMetaData {
+	my $self = shift;
+	my $key = shift;
+	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+	if (defined $key) {
+		return $metadata->{$key};
+	}
+	return $metadata;
 }
 
 #-------------------------------------------------------------------
@@ -400,7 +435,10 @@ sub processPropertiesFromFormPost {
 		$metadata{$field->{label}} = $form->process('eventmeta '.$field->{label}, $field->{dataType},
 			{ defaultValue => $field->{defaultValues}, options => $field->{possibleValues}});
 	}
-	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata)});
+    my $date = WebGUI::DateTime->new($self->session, time())->toDatabase;
+    my $startDate = $form->process('startDate', "dateTime", $date, 
+        { defaultValue => $date, timeZone => $self->getParent->get("timezone")});
+	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata), startDate => $startDate});
 }
 
 #-------------------------------------------------------------------
@@ -415,6 +453,24 @@ sub purge {
 	my $self = shift;
 	$self->session->db->write("delete from EMSRegistrantTicket where ticketAssetId=?",[$self->getId]);
 	$self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setEventMetaData
+
+Encodes the metadata for this event into an asset property.
+
+=head3 properties
+
+A hash reference containing all the metadata properties to set.
+
+=cut
+
+sub setEventMetaData {
+	my $self = shift;
+	my $properties = shift;
+	$self->update({eventMetaData => JSON->new->utf8->encode($properties)});
 }
 
 #-------------------------------------------------------------------
@@ -476,7 +532,10 @@ Override to return to appropriate page.
 
 sub www_delete {
 	my ($self) = @_;
-	$self->SUPER::www_delete;
+	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->canEditIfLocked);
+    return $self->session->privilege->vitalComponent() if $self->get('isSystem');
+    return $self->session->privilege->vitalComponent() if (isIn($self->getId, $self->session->setting->get("defaultPage"), $self->session->setting->get("notFoundPage")));
+    $self->trash;
 	return $self->getParent->www_buildBadge(undef,'tickets');
 }
 

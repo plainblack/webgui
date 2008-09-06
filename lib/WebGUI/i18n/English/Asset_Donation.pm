@@ -87,6 +87,12 @@ our $I18N = {
 		context => q|help for default price field|
 	},
 
+	'continueShoppingUrl' => {
+		message => q|A URL to reset the Product so that the user can continue shopping.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
 	'assetName' => {
 		message => q|Donation|,
 		lastUpdated => 0,

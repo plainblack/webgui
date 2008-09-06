@@ -210,6 +210,7 @@ function initAddFieldDialog() {
 		
 		// Add table row to fields on search tab
 		var search_fields_table = new YAHOO.util.Element('search_fields_table'); 
+		var search_fields_table_rows = search_fields_table.getElementsByTagName("tr");
 		var search_tr = document.createElement('tr');
 		search_tr.id = "search_tr_"+listItemId;
 		search_fields_table.appendChild(search_tr);
@@ -221,19 +222,24 @@ function initAddFieldDialog() {
 		search_tr.appendChild(label_td);
 		
 		var displayInSearch_td = document.createElement('td');
-		displayInSearch_td.id = "search_label_"+listItemId;
+		displayInSearch_td.id = "search_displayInSearch_"+listItemId;
 		displayInSearch_td.className = 'tableData';
 		displayInSearch_td.innerHTML = "<input type='checkbox' name='displayInSearch_"+listItemId+"' value='1' checked='checked'  />";
 		search_tr.appendChild(displayInSearch_td);
 		
 		var searchIn_td = document.createElement('td');
-		searchIn_td.id = "search_label_"+listItemId;
+		searchIn_td.id = "search_searchIn_"+listItemId;
 		searchIn_td.className = 'tableData';
-		searchIn_td.innerHTML = "<input type='checkbox' name='searchIn_"+listItemId+"' value='1' />";
+		// only the first field should be checked by default
+		if (search_fields_table_rows.length == 2){
+			searchIn_td.innerHTML = "<input type='checkbox' name='searchIn_"+listItemId+"' value='1' checked='checked' />";
+		}else{
+		        searchIn_td.innerHTML = "<input type='checkbox' name='searchIn_"+listItemId+"' value='1' />";
+		}
 		search_tr.appendChild(searchIn_td);
 		
 		var sortBy_td = document.createElement('td');
-		sortBy_td.id = "search_label_"+listItemId;
+		sortBy_td.id = "search_sortBy_"+listItemId;
 		sortBy_td.className = 'tableData';
 		sortBy_td.innerHTML = "<input type='radio' name='sortBy' value='"+listItemId+"' />";
 		search_tr.appendChild(sortBy_td);
@@ -252,13 +258,13 @@ function initAddFieldDialog() {
 		view_tr.appendChild(view_label_td);
 		
 		var display_td = document.createElement('td');
-		display_td.id = "search_label_"+listItemId;
+		display_td.id = "view_display_"+listItemId;
 		display_td.className = 'tableData';
 		display_td.innerHTML = "<input type='checkbox' name='display_"+listItemId+"' value='1' checked='checked'  />";
 		view_tr.appendChild(display_td);
 		
 		var viewScreenTitle_td = document.createElement('td');
-		viewScreenTitle_td.id = "search_label_"+listItemId;
+		viewScreenTitle_td.id = "view_viewScreenTitle_"+listItemId;
 		viewScreenTitle_td.className = 'tableData';
 
 		// only the first field should be checked by default

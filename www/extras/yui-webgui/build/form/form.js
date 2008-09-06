@@ -33,7 +33,8 @@ WebGUI.Form.toggleAllCheckboxesInForm
             // Change the state
             input.checked = state;
             // Run the appropriate scripts
-            input.onchange();
+            if ( input.onchange )
+                input.onchange();
         }
 
         // Update the saved state

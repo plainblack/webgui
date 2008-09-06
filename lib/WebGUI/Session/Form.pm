@@ -105,21 +105,16 @@ sub param {
 	my $field = shift;
 	if ($field) {
 		if ($self->session->request) {
-			my @data = $self->session->request->body($field);
-			return wantarray ? @data : $data[0] if (scalar(@data));
-			@data = $self->session->request->param($field);
+			my @data = $self->session->request->param($field);
 			return wantarray ? @data : $data[0];
 		} else {
 			return undef;
 		}
 	} else {
 		if ($self->session->request) {
-			my %params = ();
+			my %params;
 			foreach ($self->session->request->param) {
 				$params{$_} = 1;
-			}
-			foreach ($self->session->request->body) {
-				$params{$_} = 1; 
 			}
 			return keys %params;
 		} else {

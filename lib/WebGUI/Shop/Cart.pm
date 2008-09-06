@@ -37,7 +37,6 @@ These subroutines are available from this package:
 readonly session => my %session;
 private properties => my %properties;
 private error => my %error;
-private itemCache => my %itemCache;
 private addressBookCache => my %addressBookCache;
 
 #-------------------------------------------------------------------
@@ -191,8 +190,6 @@ sub delete {
     my ($self) = @_;
     $self->empty;
     $self->session->db->write("delete from cart where cartId=?",[$self->getId]);
-    undef $self;
-    $itemCache{ref $self} = {};
     return undef;
 }
 
@@ -209,7 +206,6 @@ sub empty {
     foreach my $item (@{$self->getItems}) {
         $item->remove;
     }
-    $itemCache{ref $self} = {};
 }
 
 #-------------------------------------------------------------------
@@ -301,11 +297,7 @@ sub getItem {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
     my $id = ref $self;
-    if (exists $itemCache{$id}{$itemId}) {
-        return $itemCache{$id}{$itemId};
-    }
     my $item = WebGUI::Shop::CartItem->new($self, $itemId);
-    $itemCache{$id}{$itemId} = $item;
     return $item;
 }
 
@@ -454,7 +446,7 @@ sub newBySession {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $cartId = $session->db->quickScalar("select cartId from cart where sessionId=?",[$session->getId]);
-    return $class->new($session, $cartId) if (defined $cartId);
+    return $class->new($session, $cartId) if (defined $cartId and $cartId ne '');
     return $class->create($session);
 }
 
@@ -633,7 +625,6 @@ Remove an item from the cart and then display the cart again.
 sub www_removeItem {
     my $self = shift;
     my $item = $self->getItem($self->session->form->get("itemId"));
-    delete $itemCache{ref $self}{$item->getId};
     $item->remove;
     return $self->www_view;
 }
@@ -687,7 +678,10 @@ sub www_view {
     my $url = $session->url;
     my $i18n = WebGUI::International->new($session, "Shop");
     my @items = ();
-    
+
+    if($url->forceSecureConnection()){
+            return "redirect";
+    }
     # set up html header
     $session->style->setRawHeadTags(q|
         <script type="text/javascript">
@@ -700,9 +694,21 @@ sub www_view {
         }
         </script>
         |);
+
+    my @items = @{$self->getItems};
+    if(scalar(@items) < 1) {
+        # there are no items in the cart, return a message to the template
+        my %var = (
+            message => $i18n->get('empty cart')
+        );
+
+        # render the cart
+        my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
+        return $session->style->userStyle($template->process(\%var));
+    }
     
     # generate template variables for the items in the cart
-    foreach my $item (@{$self->getItems}) {
+    foreach my $item (@items) {
         my $sku = $item->getSku;
         $sku->applyOptions($item->get("options"));
         my %properties = (

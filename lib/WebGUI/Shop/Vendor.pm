@@ -81,6 +81,16 @@ Returns a duplicated hash reference of this objectÕs data. See update() for deta
 
 Any field returns the value of a field rather than the hash reference.
 
+=head3 Additional properties
+
+=head4 dateCreated
+
+The date this vendor was created in the system.
+
+=head4 vendorId
+
+The id of this vendor from the database.  Use getId() instead.
+
 =cut
 
 sub get {
@@ -121,7 +131,7 @@ A hash reference of optional flags.
 
 =head4 asHashRef
 
-A boolean indicating that the vendors should be returned as a hash reference of id/names rather than objects.
+A boolean indicating that the vendors should be returned as a hash reference of id/names rather than an array of objects.
 
 =cut
 
@@ -142,15 +152,18 @@ sub getVendors {
 
 =head2 new ( session, vendorId )
 
-Constructor. 
+Constructor.   Returns a WebGUI::Shop::Vendor object.
 
 =head3 session
 
-A reference to the current session.
+A reference to the current session.  If the session variable is not passed, then an WebGUI::Error::InvalidObject
+Exception will be thrown.
 
 =head3 vendorId
 
-A unique id for a vendor.
+A unique id for a vendor that already exists in the database.  If the vendorId is not passed
+in, then a WebGUI::Error::InvalidParam Exception will be thrown.  If the requested Id cannot
+be found in the database, then a WebGUI::Error::ObjectNotFound exception will be thrown.
 
 =cut
 
@@ -175,6 +188,35 @@ sub new {
 
 #-------------------------------------------------------------------
 
+=head2 newByUserId ( session, [userId] )
+
+Constructor. 
+
+=head3 session
+
+A reference to the current session.
+
+=head3 userId
+
+A unique userId. Will pull from the session if not specified.
+
+=cut
+
+sub newByUserId {
+    my ($class, $session, $userId) = @_;
+        unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
+    $userId ||= $session->user->userId;
+    unless (defined $userId) {
+        WebGUI::Error::InvalidParam->throw( param=>$userId, error=>"Need a userId.");
+    }
+    return $class->new($session, $session->db->quickScalar("select vendorId from vendor where userId=?",[$userId]));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 session () 
 
 Returns a reference to the current session.
@@ -195,12 +237,28 @@ A hash reference that contains one of the following:
 
 The name of the vendor.
 
+=head4 userId
+
+The name of the vendor.
+
+=head4 url
+
+The vendor's url.
+
+=head4 paymentInformation
+
+????
+
+=head4 preferredPaymentType
+
+????
+
 =cut
 
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    my @fields = (qw(name));
+    my @fields = (qw(name userId url paymentInformation preferredPaymentType));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
@@ -253,7 +311,11 @@ sub www_edit {
     $f->hidden(name=>'method',value=>'editSave');
     $f->hidden(name=>'vendorId',value=>$properties->{vendorId});
     $f->readOnly(label=>$i18n->get('date created'),value=>$properties->{dateCreated});
-    $f->text(name=>'name', label=>$i18n->get('name'),defaultValue=>$properties->{name});
+    $f->text(name=>'name', label=>$i18n->get('name'),value=>$properties->{name});
+    $f->user(name=>'userId',label=>$i18n->get('username'),value=>$properties->{userId},defaultValue=>3);
+    $f->url(name=>'url', label=>$i18n->get('company url'),value=>$properties->{url});
+    $f->text(name=>'preferredPaymentType', label=>$i18n->get('Preferred Payment Type'),value=>$properties->{preferredPaymentType});
+    $f->textarea(name=>'paymentInformation', label=>$i18n->get('Payment Information'),value=>$properties->{paymentInformation});
     $f->submit();
 
     # Wrap in admin console
@@ -275,7 +337,11 @@ sub www_editSave {
     return $session->privilege->adminOnly() unless ($admin->canManage);
     my $form = $session->form;
     my $properties = {
-        name        => $form->get("name","text"),              
+        name                    => $form->get("name","text"),              
+        preferredPaymentType    => $form->get("preferredPaymentType","text"),              
+        paymentInformation      => $form->get("paymentInformation","textarea"),              
+        userId                  => $form->get("userId","user",'3'),              
+        url                     => $form->get("url","url"),              
         };
     my $self = eval{$class->new($session, $form->get("vendorId"))};
     if (!WebGUI::Error->caught && defined $self) {

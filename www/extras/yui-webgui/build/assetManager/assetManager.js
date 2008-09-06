@@ -186,7 +186,7 @@ WebGUI.AssetManager.initManager
     var assetPaginator = new YAHOO.widget.Paginator({
         containers         : ['pagination'],
         pageLinks          : 7,
-        rowsPerPage        : 15,
+        rowsPerPage        : 25,
         template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
     });
 

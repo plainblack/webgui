@@ -265,7 +265,7 @@ Returns an array reference of relative asset ids based upon rules.
 
 =head3 relatives
 
-An array reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree".  If you want to retrieve all assets in the tree, use getRoot->getLineage(["self","descendants"],{returnObjects=>1});
+An array reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree".  If you want to retrieve all assets in the tree, use getRoot($session)->getLineage(["self","descendants"],{returnObjects=>1});
 
 =head3 rules
 

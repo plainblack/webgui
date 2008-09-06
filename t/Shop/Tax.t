@@ -616,7 +616,7 @@ SKIP: {
             startIndex      => 0,
             totalRecords    => 1778,
             recordsReturned => 25,
-            dir             => 'desc',
+            dir             => 'asc',
             records         => array_each({
                 taxId=>ignore,
                 country => 'USA',
@@ -686,5 +686,5 @@ END {
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
-    #$storage->delete;
+    $storage->delete;
 }

@@ -47,10 +47,10 @@ printResult($webguiRoot);
 ###################################
 
 printTest("Perl Interpreter");
-if ($] >= 5.006) {
+if ($] >= 5.008) {
 	printResult("OK");
 } else {
-	failAndExit("Please upgrade to 5.6 or later! Cannot continue without Perl 5.6 or higher.");
+	failAndExit("Please upgrade to 5.8 or later! Cannot continue without Perl 5.8 or higher.");
 }
 
 
@@ -92,7 +92,7 @@ checkModule("HTML::Template::Expr",         0.05,      2 );
 checkModule("XML::RSSLite",                 0.11         );
 checkModule("JSON",                         2.04         );
 checkModule("Config::JSON",                 "1.1.2"      );
-checkModule("Text::CSV_XS",                 "0.26"       );
+checkModule("Text::CSV_XS",                 "0.52"       );
 checkModule("Net::Subnets",                 0.21         );
 checkModule("Finance::Quote",               1.08         );
 checkModule("POE",                          0.3202       );
@@ -105,7 +105,6 @@ checkModule("POSIX"                                      );
 checkModule("List::Util"                                 );
 checkModule("Color::Calc"                                );
 checkModule("Text::Aspell",                 0.01,2       );
-checkModule("Locale::US"                                 );
 checkModule("Weather::Com::Finder",         "0.5.1"      );
 checkModule("Class::InsideOut",             "1.06"       );
 checkModule("HTML::TagCloud",               "0.34"       );
@@ -114,6 +113,7 @@ checkModule("Archive::Any",                 "0.093"      );
 checkModule("Path::Class",                  '0.16'       );
 checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
+checkModule("File::Path",                   "2.04"       );
 
 
 ###################################

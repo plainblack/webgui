@@ -52,8 +52,8 @@ sub handler {
     my ($request, $server, $config) = @_;
     $request->push_handlers(PerlResponseHandler => sub {
         my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
-        foreach my $handler (@{$config->get("contentHandlers")}) {
-            my $output = WebGUI::Pluggable::run($handler, "handler", [ $session ] );
+        WEBGUI_FATAL: foreach my $handler (@{$config->get("contentHandlers")}) {
+            my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
             if ( my $e = WebGUI::Error->caught ) {
                 $session->errorHandler->error($e->package.":".$e->line." - ".$e->error);
                 $session->errorHandler->debug($e->package.":".$e->line." - ".$e->trace);
@@ -80,12 +80,13 @@ sub handler {
                 elsif ($session->http->getStatus < 200 || $session->http->getStatus > 299) {
                     $session->http->sendHeader;
                     last;
-                } 
+                }
             }
         }
         $session->close;
         return Apache2::Const::OK;
     });
+    $request->push_handlers(PerlMapToStorageHandler => sub { return Apache2::Const::OK });
     $request->push_handlers(PerlTransHandler => sub { return Apache2::Const::OK });
     return Apache2::Const::OK;
 }

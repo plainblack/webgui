@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 12;
+plan tests => 13;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -189,6 +189,34 @@ cmp_deeply(
     'Snippet does not have a value, yet'
 );
 
+####################################################
+#
+# getMetaDataAsTemplateVariables
+#
+####################################################
+
+my $origMetaEnabled = $session->setting->get("metaDataEnabled");
+$session->setting->set("metaDataEnabled", 1);
+
+# add another field for comparison
+$folder->addMetaDataField('new', 'book', '', 'Favorite book', 'radioList', "1984\nDune\nLord of the Rings\nFoundation Trilogy");
+
+# set it; need to update $foMetaData and $byName.
+$foMetaData = $folder->getMetaDataFields;
+$byName = buildNameIndex($foMetaData);
+$folder->updateMetaData( $byName->{'book'}, '1984' );
+
+# check that they're equal
+cmp_deeply(
+    $folder->getMetaDataAsTemplateVariables,
+    {
+        'book'              => '1984',
+        'sport'             => 'underwaterHockey',
+        'searchEngine'      => undef,
+    },
+    'getMetaDataAsTemplateVariables returns proper values for folder'
+);
+
 sub buildNameIndex {
     my ($fidStruct) = @_;
     my $nameStruct;
@@ -208,5 +236,6 @@ END {
             $tag->rollback;
         }
     }
+    $session->setting->set("metaDataEnabled", $origMetaEnabled);
 
 }

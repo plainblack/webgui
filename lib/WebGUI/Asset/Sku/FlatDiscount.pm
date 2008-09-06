@@ -52,10 +52,7 @@ Checks to make sure there isn't already a coupon of this type in the cart.
 
 sub addToCart {
     my ($self, $options) = @_;
-	my $found = 0;
-	foreach my $item (@{$self->getCart->getItems()}) {
-		$found =1 if (ref($item->getSku) eq ref($self));
-	}
+	my $found = $self->hasCoupon();
 	unless ($found) {
         $self->{_hasAddedToCart} = 1;
 		$self->SUPER::addToCart($options);
@@ -168,6 +165,28 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 hasCoupon
+
+Returns 1 if this coupon is already in the user's cart.  It does a short-circuiting
+search for speed.
+
+=cut
+
+sub hasCoupon {
+    my $self = shift;
+    my $hasCoupon = 0;
+	ITEM: foreach my $item (@{$self->getCart->getItems()}) {
+		if (ref($item->getSku) eq ref($self)) {
+            $hasCoupon=1;
+            last ITEM;
+        }
+	}
+    return $hasCoupon;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 isCoupon
 
 Returns 1.
@@ -192,7 +211,7 @@ sub prepareView {
 	$self->SUPER::prepareView();
 	my $templateId = $self->get("templateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 
@@ -214,7 +233,10 @@ sub view {
         formFooter      => WebGUI::Form::formFooter($session),
         addToCartButton => WebGUI::Form::submit( $session, { value => $i18n->get("add to cart") }),
         hasAddedToCart  => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
         );
+    $var{alreadyHasCoupon} = $self->hasCoupon();
+
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 

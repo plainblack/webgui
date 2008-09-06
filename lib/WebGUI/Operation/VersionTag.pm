@@ -159,19 +159,32 @@ sub www_approveVersionTag {
     my $instance    = $tag->getWorkflowInstance;
     my $activity    = $instance->getNextActivity;
 
-    if ( $session->form->process("status", "selectBox") eq "approve" ) {
+    my $approve     = $session->form->process( "status", "selectBox" ) eq "approve";
+    if ( $approve ) { 
         $activity->setApproved( $instance );
-    }
+    }   
     else {
         $activity->setDenied( $instance );
-    }
+    }   
 
     $tag->set( { 
         comments    => $session->form->process("comments", "textarea"),
-    });
+    }); 
 
-    return www_manageVersions($session);
+    # If we can't view the version tag after this, show a different message
+    if ( !canViewVersionTag( $session, $tag ) ) { 
+        my $i18n    = WebGUI::International->new( $session, "VersionTag" ); 
+        return $session->style->userStyle( 
+            sprintf $i18n->get( 'approveVersionTag message' ), 
+                ( $approve ? $i18n->get( "approved" ) : $i18n->get( "denied" ) ),
+                $session->url->getBackToSiteURL,
+        );  
+    }   
+    else { 
+        return www_manageVersions($session);
+    }   
 }
+
 
 #-------------------------------------------------------------------
 
@@ -706,6 +719,8 @@ sub www_manageRevisionsInTag {
     );
 
     # Output the revisions
+    ### FIXME: Users who only pass canApproveVersionTag() and not canViewVersionTag() should
+    # probably not be allowed to see the Actions or modify the Start and End dates
     $output 
         .= WebGUI::Form::formHeader( $session, {} )
         . WebGUI::Form::hidden( $session, { name => 'op', value=> 'manageRevisionsInTag' } )

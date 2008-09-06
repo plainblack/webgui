@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 129; # increment this value for each test you create
+use Test::More tests => 133; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -28,7 +28,8 @@ my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
-my $numberOfUsers = $session->db->quickScalar('select count(*) from users');
+my $numberOfUsers  = $session->db->quickScalar('select count(*) from users');
+my $numberOfGroups = $session->db->quickScalar('select count(*) from groups');
 
 my $user;
 my $lastUpdate;
@@ -38,7 +39,7 @@ my $userCreationTime = time();
 ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
-ok(scalar %{$user->{_profile}} > 0, 'new("new") -- profile property contains at least one key');  
+ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
 
 #Let's assign a username
 $user->username("bill_lumberg");
@@ -83,7 +84,7 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 
 ##Check for valid profileField access, even if it is not cached in the user object.
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
-is($user->profileField('testField'), undef, 'getting profile fields not cached in the user object returns undef');
+is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
 ################################################################
 #
@@ -200,12 +201,6 @@ ok(!WebGUI::User->validUserId($session, 37), 'random illegal Id #2');
 
 $user->delete;
 
-#identifier() and uncache()
-SKIP: {
-  skip("identifier() -- deprecated",1);
-  ok(undef, "identifier()");
-}
-
 SKIP: {
   skip("uncache() -- Don't know how to test uncache()",1);
   ok(undef, "uncache");
@@ -222,7 +217,7 @@ is($visitor->profileField('uiLevel'), 5, 'Visitor gets the default uiLevel of 5'
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['194.168.0.101', $session->getId]);
 
-my ($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
+($result) = $session->db->quickArray('select lastIP,sessionId from userSession where sessionId=?',[$session->getId]);
 is ($result, '194.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
@@ -406,8 +401,6 @@ is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy rece
 
 $profileField->set(\%originalFieldData);
 
-$buster->username('mythBuster');
-
 my $aliasProfile = WebGUI::ProfileField->new($session, 'alias');
 my %originalAliasProfile = %{ $aliasProfile->get() };
 my %copiedAliasProfile = %originalAliasProfile;
@@ -421,6 +414,8 @@ $copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
 $buster->uncache();
 
+$buster->username('mythBuster');
+
 $buster3 = WebGUI::User->new($session, $buster->userId);
 is($buster3->profileField('alias'), 'mythBuster', 'alias set to username since the default alias has only non-word characters');
 
@@ -433,7 +428,22 @@ my $listProfileField = WebGUI::ProfileField->create($session, 'listProfile', \%l
 
 $buster->uncache;
 $buster3 = WebGUI::User->new($session, $buster->userId);
-is($buster3->profileField('listProfile'), 'alpha', 'profile field with default data value that is a list gives the user the first value');
+is($buster3->profileField('listProfile'), 'alpha,delta,tango', 'profile field with default data value that is a list returns a string with all values as CSV');
+
+################################################################
+#
+# Attempt to eval userProfileData
+#
+################################################################
+
+my %evalProfile = %copiedAliasProfile;
+$evalProfile{'fieldName'} = 'evalProfile';
+$evalProfile{'dataDefault'} = q!$session->scratch->set('hack','true'); 1;!;
+my $evalProfileField = WebGUI::ProfileField->create($session, 'evalProfile', \%evalProfile);
+
+$buster->uncache;
+my $buster4 = WebGUI::User->new($session, $buster->userId);
+is($session->scratch->get('hack'), undef, 'userProfile dataDefault is not executed when creating users');
 
 ################################################################
 #
@@ -450,12 +460,20 @@ $expiredGroup->expireOffset(-1000);
 $dude->addToGroups([$expiredGroup->getId]);
 
 my $dudeGroups = $dude->getGroups();
-cmp_bag($dudeGroups, ['12', '2', '7', $expiredGroup->getId], 'Dude belongs to Registered Users, Everyone and T.O.A');
+cmp_bag($dudeGroups, [12, 2, 7, $expiredGroup->getId], 'Dude belongs to Registered Users, Everyone and T.O.A');
 
 ##Group lookups are cached, so we'll clear the cache by removing Dude from T.O.A.
 $dude->deleteFromGroups([12]);
-$dudeGroups = $dude->getGroups(1);
-cmp_bag($dudeGroups, ['2', '7'], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
+$dudeGroups = $dude->getGroups(1);  ##This is the original call to getGroups;
+cmp_bag($dudeGroups, [2, 7], 'Dude belongs to Registered Users, Everyone as unexpired group memberships');
+
+##Safe copy check
+push @{ $dudeGroups }, 'not a groupId';
+cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the list of groups does not change the cached value');
+
+my $dudeGroups2 = $dude->getGroups(1); ##This call gets a cached version.
+push @{ $dudeGroups2 }, 'still not a groupId';
+cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the cached list of groups does not change the cached value');
 
 ################################################################
 #
@@ -556,9 +574,45 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
 is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
 
+################################################################
+#
+# getGroupIdsRecursive
+#
+################################################################
+
+##Build two sets of groups, which share one group in common
+my %groupSet;
+foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
+    $groupSet{$groupName} = WebGUI::Group->new($session, 'new');
+    $groupSet{$groupName}->name($groupName);
+}
+
+$groupSet{blue}->expireOffset(-1500);
+
+$groupSet{purple}->addGroups( [ map { $groupSet{$_}->getId } qw/red blue pink/ ] );
+$groupSet{lightBlue}->addGroups( [ map { $groupSet{$_}->getId } qw/blue/ ] );
+$groupSet{turquoise}->addGroups( [ map { $groupSet{$_}->getId } qw/blue/ ] );
+$groupSet{pink}->addGroups(   [ map { $groupSet{$_}->getId } qw/red/ ] );
+$groupSet{orange}->addGroups( [ map { $groupSet{$_}->getId } qw/red/ ] );
+
+my $newFish = WebGUI::User->new($session, 'new');
+$newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId ]);
+
+cmp_bag(
+    $newFish->getGroupIdsRecursive,
+    [ 2, 7, map { $_->getId } @groupSet{qw/red pink orange purple/} ],
+    'getGroupIdsRecursive returns the correct set of groups, ignoring expire date and not duplicating groups'
+);
+
 END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend) {
+    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
+    }
+
+    foreach my $testGroup ($expiredGroup, values %groupSet) {
+        if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
+            $testGroup->delete;
+        }
     }
 
     (defined $expiredGroup  and ref $expiredGroup  eq 'WebGUI::Group') and $expiredGroup->delete;
@@ -569,13 +623,15 @@ END {
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
+    $evalProfileField->delete;
     $visitor->profileField('email', $originalVisitorEmail);
 
     $newProfileField->delete();
 
 	$testCache->flush;
-    my $newNumberOfUsers = $session->db->quickScalar('select count(*) from users');
-    is ($newNumberOfUsers, $numberOfUsers, 'no new additional users were leaked by this test');
-
+    my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');
+    my $newNumberOfGroups = $session->db->quickScalar('select count(*) from groups');
+    is ($newNumberOfUsers,  $numberOfUsers,  'no new additional users were leaked by this test');
+    is ($newNumberOfGroups, $numberOfGroups, 'no new additional groups were leaked by this test');
 }
 

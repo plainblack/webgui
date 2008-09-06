@@ -20,6 +20,7 @@ use Tie::CPHash;
 use WebGUI::SQL;
 use WebGUI::International;
 use WebGUI::Utility;
+use DBI;
 
 =head1 NAME
 
@@ -238,16 +239,19 @@ sub db {
 	if ($self->getId eq "0") {
 		$self->{_dbh} = $self->session->db;
 		return $self->{_dbh};
-	} elsif ($dsn =~ /\DBI\:\w+\:\w+/i) {
-		my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
-		unless (defined $dbh) {
-			$self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
-		}
-		$self->{_dbh} = $dbh;
-		return $self->{_dbh};
-	} else {
-		$self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	}
+    else {
+        my ($scheme, $driver, $attr_string, $attr_hash, $driver_dsn) = DBI->parse_dsn($dsn);
+        if ($driver) {
+            my $dbh = WebGUI::SQL->connect($self->session,$dsn,$username,$identifier,$parameters);
+            unless (defined $dbh) {
+                $self->session->errorHandler->warn("Cannot connect to DatabaseLink [".$self->getId."]");
+            }
+            $self->{_dbh} = $dbh;
+            return $self->{_dbh};
+        }
+	}
+    $self->session->errorHandler->warn("DatabaseLink [".$self->getId."] The DSN specified is of an improper format.");
 	return undef;
 }
 

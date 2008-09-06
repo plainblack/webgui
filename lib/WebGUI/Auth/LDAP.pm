@@ -48,7 +48,7 @@ sub _isValidLDAPUser {
    $username = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
    $password = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
    
-   $uri = URI->new($connection->{ldapUrl}) or $error = $i18n->get(2,'AuthLDAP');
+   $uri = URI->new($connection->{ldapUrl}) or $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
    
    if($error ne ""){
       $self->error($error);
@@ -110,12 +110,12 @@ sub _isValidLDAPUser {
          }
       }
       else { # Unable to bind with proxy user credentials or anonymously for our search
-         $error = $i18n->get(2,'AuthLDAP');
+         $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
 	 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
       }
    }
    else { # Could not create our LDAP object
-      $error = $i18n->get(2,'AuthLDAP');
+      $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
       $self->session->errorHandler->error("Couldn't create LDAP object: ".$uri->host);
    }
   
@@ -150,8 +150,8 @@ sub authenticate {
    my $identifier = $_[1];
    my $userData = $self->getParams;
 		
-   $error .= $i18n->get(12,'AuthLDAP') if ($userData->{ldapUrl} eq "");
-   $error .= $i18n->get(11,'AuthLDAP') if ($userData->{connectDN} eq "");
+   $error .= '<li>'.$i18n->get(12,'AuthLDAP').'</li>' if ($userData->{ldapUrl} eq "");
+   $error .= '<li>'.$i18n->get(11,'AuthLDAP').'</li>' if ($userData->{connectDN} eq "");
    $self->error($error);
 
    if($error ne ""){
@@ -162,7 +162,7 @@ sub authenticate {
    if($uri = URI->new($userData->{ldapUrl})) {
 
       # Create an LDAP object
-      $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= $i18n->get(2,'AuthLDAP');
+      $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
 
       if($error ne ""){
          $self->user(WebGUI::User->new($self->session,1));
@@ -174,17 +174,17 @@ sub authenticate {
 
       # Authentication failed
       if ($auth->code == 48 || $auth->code == 49){
-         $error .= $i18n->get(68);
+         $error .= '<li>'.$i18n->get(68).'</li>';
       }
       elsif ($auth->code > 0) { # Some other LDAP error happened
-         $error .= 'LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69);
+         $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
 	 $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
       }
 	   
       $ldap->unbind;
    }
    else { 
-      $error .= $i18n->get(13,'AuthLDAP');
+      $error .= '<li>'.$i18n->get(13,'AuthLDAP').'</li>';
       $self->session->errorHandler->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
    }
 	
@@ -291,7 +291,7 @@ sub createAccountSave {
    #Validate profile data.
    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
    $error .= $temp;
-   return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$error) unless ($error eq "");
+   return $self->createAccount("<li>".$error."</li1>") unless ($error eq "");
    #If Email address is not unique, a warning is displayed
    if($warning ne "" && !$self->session->form->process("confirm")){
       return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);

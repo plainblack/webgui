@@ -77,17 +77,23 @@ sub process {
         $var{'logout.label'} = $i18n->get(49);
         
         # A hidden field with the current URL
+        my $returnUrl   = $session->url->page;
+        if ( !$session->form->get("op") eq "auth" ) {
+            $returnUrl  .= '?' . $session->env->get( "QUERY_STRING" );
+        }
         $var{'form.returnUrl'} 
             = WebGUI::Form::hidden( $session, {
                 name        => 'returnUrl',
                 value       => $session->url->page($session->env->get("QUERY_STRING")),
             });
-        
+            
+        # Fix box size
         my $boxSize = $param[0];
         $boxSize = 12 unless ($boxSize);
         if (index(lc($session->env->get("HTTP_USER_AGENT")),"msie") < 0) {
         	$boxSize = int($boxSize=$boxSize*2/3);
         }
+
 	my $action;
         if ($session->setting->get("encryptLogin")) {
                 $action = $session->url->page(undef,1);

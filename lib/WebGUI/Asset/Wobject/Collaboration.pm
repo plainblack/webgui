@@ -244,6 +244,7 @@ sub appendTemplateLabels {
 	$var->{"views.label"} = $i18n->get("views");
         $var->{'visitorName.label'} = $i18n->get("visitor");
     $var->{"captcha_label"} = $i18n->get("captcha label");
+	$var->{'keywords.label'} = $i18n->get('keywords label');
 }
 
 #-------------------------------------------------------------------
@@ -816,11 +817,17 @@ sub getContentLastModified {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditTabs
+
+Add a tab for the mail interface.
+
+=cut
+
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-
-	return (['mail', $i18n->get('mail'), 9]);
+	return ($self->SUPER::getEditTabs(), ['mail', $i18n->get('mail'), 9]);
 }
 
 #-------------------------------------------------------------------
@@ -886,7 +893,7 @@ SQL
 		    'link'          => $postUrl, 
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
-		    pubDate         => $datetime->epochToMail($post->get('revisionDate')),
+		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
 		    attachmentLoop  => $attachmentLoop, 
 			userDefined1 => $post->get("userDefined1"),
 			userDefined2 => $post->get("userDefined2"),
@@ -1170,8 +1177,10 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
-	$self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
-	$template->prepare;
+    if ($self->get('rssCapableRssEnabled')) {
+        $self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
+    }
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 

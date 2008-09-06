@@ -103,7 +103,6 @@ sub _setDataByQuery {
 		$sth = $dbh->read($sql,$placeholders);
 	}
 	my $defaultPageNumber = $self->getPageNumber;
-	$self->{_totalRows} = $sth->rows;
 	$self->{_columnNames} = [ $sth->getColumnNames ];  
 	my $pageCount = 1;
 	while (my $data = $sth->hashRef) {
@@ -125,6 +124,7 @@ sub _setDataByQuery {
 			}
 		}
 	}
+	$self->{_totalRows} = $sth->rows;
 	$sth->finish;
 	$self->{_rowRef} = \@row;
     #Purposely do not set $self->{_setByQuery} = 1 so the data is processed appropriately
@@ -358,7 +358,7 @@ sub getNextPageLink {
         $text = $ctext.'&raquo;';
         if ($pn < $self->getNumberOfPages) {
                 my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
-                return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
+                return wantarray ? ($url,$ctext,'<span id="nextPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
         } else {
                 return wantarray ? (undef,$ctext,$text) : $text;
         }
@@ -484,7 +484,7 @@ sub getPageLinks {
 			push(@pages,($i+1));
 			push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
 		} else {
-			push(@pages,'<a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a>');
+			push(@pages,'<span><a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a></span>');
 			push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
 		}
 	}
@@ -492,8 +492,8 @@ sub getPageLinks {
 		my $output;
 		my $i = 1;
 		my $minPage = $self->getPageNumber - round($limit/2);
-		my $maxPage = $minPage + $limit;
 		my $start = ($minPage > 0) ? $minPage : 1;
+		my $maxPage = $start + $limit - 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
 		my @temp;
 		foreach my $page (@pages) {
@@ -527,7 +527,7 @@ sub getPreviousPageLink {
 	$text = '&laquo;'.$ctext;
 	if ($pn > 1) {
 		my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
-		return wantarray ? ($url,$ctext,'<a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a>';
+		return wantarray ? ($url,$ctext,'<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
         } else {
             return wantarray ? (undef,$ctext,$text) : $text;
         }

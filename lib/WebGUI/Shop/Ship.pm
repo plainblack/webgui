@@ -98,6 +98,7 @@ sub getOptions {
     my $session = $cart->session; 
     my %options = ();
     foreach my $shipper (@{$self->getShippers()}) {
+        next unless $shipper->get('enabled');
         $options{$shipper->getId} = {
             label => $shipper->get("label"),
             price => $shipper->calculate($cart),

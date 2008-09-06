@@ -1,8 +1,8 @@
 package WebGUI;
 
 
-our $VERSION = '7.5.14';
-our $STATUS = "beta";
+our $VERSION = '7.5.21';
+our $STATUS = "stable";
 
 
 =head1 LEGAL
@@ -66,15 +66,14 @@ sub handler {
     my $error = "";
     my $matchUri = $request->uri;
     my $gateway = $config->get("gateway");
-    $matchUri =~ s{^$gateway(.*)}{/$1};
+    $matchUri =~ s{^$gateway}{/};
 	my $gotMatch = 0;
-    foreach my $handler (@{$config->get("urlHandlers")}) {
+    WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
         if ($matchUri =~ m{$regex}i) {
             my $output = eval { WebGUI::Pluggable::run($handler->{$regex}, "handler", [$request, $server, $config]) };
             if ($@) {
 				$error = $@;
-                warn $@ if ($@ =~ "^fatal:");
                 last;
             }
             else {
@@ -82,7 +81,7 @@ sub handler {
 				if ($output ne Apache2::Const::DECLINED) {
 					return $output;
 				}
-            }                
+            }
         }
 	}
 	return Apache2::Const::DECLINED if ($gotMatch);

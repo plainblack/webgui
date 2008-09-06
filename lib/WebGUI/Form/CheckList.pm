@@ -148,7 +148,7 @@ sub toHtml {
     my $options = $self->getOptions;
 	foreach my $key (keys %{$options}) {
 	    $i++;
-        my @values = $self->getDefaultValue;
+        my @values = $self->getOriginalValue;
         my $checked = (grep { $_ eq $key } @values)
                     ? 1
                     : 0

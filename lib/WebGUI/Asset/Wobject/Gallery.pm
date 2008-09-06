@@ -1,7 +1,5 @@
 package WebGUI::Asset::Wobject::Gallery;
 
-$VERSION = "1.0.0";
-
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -54,7 +52,7 @@ sub definition {
         list        => $i18n->get("viewDefault option list"),
         album       => $i18n->get("viewDefault option album"),
     );
-
+   
     tie my %viewListOrderByOptions, 'Tie::IxHash', (
         creationDate    => $i18n->get("viewListOrderBy option creationDate"),
         lineage         => $i18n->get("viewListOrderBy option lineage"),
@@ -65,6 +63,11 @@ sub definition {
     tie my %viewListOrderDirectionOptions, 'Tie::IxHash', (
         ASC             => $i18n->get("viewListOrderDirection option asc"),
         DESC            => $i18n->get("viewListOrderDirection option desc"),
+    );
+
+    tie my %imageDensityOptions, 'Tie::IxHash', (
+        72              => $i18n->get( "imageDensity option web" ),
+        300             => $i18n->get( "imageDensity option print" ),
     );
 
     tie my %properties, 'Tie::IxHash', (
@@ -103,6 +106,14 @@ sub definition {
             defaultValue    => 300,
             label           => $i18n->get("imageThumbnailSize label"),
             hoverHelp       => $i18n->get("imageThumbnailSize description"),
+        },
+        imageDensity        => {
+            tab             => "properties",
+            fieldType       => "selectBox",
+            options         => \%imageDensityOptions,
+            defaultValue    => 72,
+            label           => $i18n->get( "imageDensity label" ),
+            hoverHelp       => $i18n->get( "imageDensity description" ),
         },
         maxSpacePerUser => {
             tab             => "properties",
@@ -921,11 +932,17 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
 
-    if ( $self->get("viewDefault") eq "album" ) {
+    if ( $self->get("viewDefault") eq "album" && $self->get("viewAlbumAssetId") && $self->get("viewAlbumAssetId")
+ne 'PBasset000000000000001') {
         my $asset
             = WebGUI::Asset->newByDynamicClass( $self->session, $self->get("viewAlbumAssetId") );
-        $asset->prepareView;
-        $self->{_viewAsset} = $asset;
+        if ($asset) {
+            $asset->prepareView;
+            $self->{_viewAsset} = $asset;
+        }
+        else {
+            $self->prepareViewListAlbums;
+        }
     }
     else {
         $self->prepareViewListAlbums;
@@ -944,7 +961,7 @@ sub prepareViewListAlbums {
     my $self        = shift;
     my $template 
         = WebGUI::Asset::Template->new($self->session, $self->get("templateIdListAlbums"));
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
 
@@ -961,7 +978,7 @@ sub view {
     my $session = $self->session;	
     my $var     = $self->get;
 
-    if ( $self->get("viewDefault") eq "album" ) {
+    if ( $self->get("viewDefault") eq "album" && $self->{_viewAsset}) {
         return $self->{_viewAsset}->view;
     }
     else {

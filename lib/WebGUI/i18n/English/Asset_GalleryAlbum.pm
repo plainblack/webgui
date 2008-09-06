@@ -311,6 +311,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'addArchive error generic' => {
+        message     => 'There was an error uploading your archive: %s',
+        lastUpdated => 0,
+        context     => 'Lead in to an error message from WebGUI',
+    },
+
     'template url_addPhoto' => {
         message     => 'Add a Photo',
         lastUpdated => 0,
@@ -548,6 +554,12 @@ our $I18N = {
         message     => q{The URL to the thumbnail image for the previous album in the list.},
         lastUpdated => 0,
         context     => q{Description of template variable},
+    },
+
+    'editForm othersCanAdd label' => {
+        message     => q{Others Can Add},
+        lastUpdated => 0,
+        context     => q{Description of asset property to allow people besides the owner to add files to the album},
     },
 
 };

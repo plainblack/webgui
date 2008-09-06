@@ -63,7 +63,7 @@ Turns this package into a package file and returns the storage location object o
 sub exportPackage {
 	my $self = shift;
 	my $storage = WebGUI::Storage->createTemp($self->session);
-	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1})}) {
+	foreach my $asset (@{$self->getLineage(["self","descendants"],{returnObjects=>1, statusToInclude=>['approved', 'archived']})}) {
 		my $data = $asset->exportAssetData;
 		$storage->addFileFromScalar($data->{properties}{lineage}.".json", JSON->new->utf8->pretty->encode($data));
 		foreach my $storageId (@{$data->{storage}}) {
@@ -285,7 +285,7 @@ Returns a tarball file for the user to download containing the package data.
 
 sub www_exportPackage {
     my $self = shift;
-    return $self->session->privilege->insufficient() unless ($self->get("isPackage") && $self->canEdit && $self->session->user->isInGroup(4));
+    return $self->session->privilege->insufficient() unless ($self->canEdit);
     my $storage = $self->exportPackage;
     my $filename = $storage->getFiles->[0];
     $self->session->http->setRedirect($storage->getUrl($storage->getFiles->[0]));

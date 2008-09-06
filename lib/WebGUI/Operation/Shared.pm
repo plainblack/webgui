@@ -104,13 +104,19 @@ sub secureEval {
 	my $code = shift;
 
 	# Handle WebGUI function calls
-	my $i18n = WebGUI::International->new($session);
+    my $i18n;
 	my %trusted = (
-		'WebGUI::International::get' => sub {$i18n->get(@_)},
-		'WebGUI::International::getLanguages' => sub { $i18n->getLanguages(@_) },
+        'WebGUI::International::get' => sub {
+            $i18n ||= WebGUI::International->new($session);
+            $i18n->get(@_);
+        },
+        'WebGUI::International::getLanguages' => sub {
+            $i18n ||= WebGUI::International->new($session);
+            $i18n->getLanguages(@_);
+        },
 		'WebGUI::DateTime::epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
 		'$session->datetime->epochToHuman' => sub { $session->datetime->epochToHuman(@_) },
-		'WebGUI::Icon::getToolbarOptions' => sub { $session->icon->getToolbarOptions() },		
+		'WebGUI::Icon::getToolbarOptions' => sub { $session->icon->getToolbarOptions() },
 	);
 	foreach my $function (keys %trusted ) {
 		while ($code =~ /($function\(([^)]*)\)\s*;*)/g) {

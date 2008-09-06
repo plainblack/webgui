@@ -354,29 +354,29 @@ sub definition {
     %fields = (
         vendorId        => {
            fieldType    => 'text',
-           label        => $i18n->echo('vendorId'),
-           hoverHelp    => $i18n->echo('vendorId help'),
+           label        => $i18n->get('vendorId'),
+           hoverHelp    => $i18n->get('vendorId help'),
         },
         password        => {
             fieldType   => 'password',
-            label       => $i18n->echo('password'),
-            hoverHelp   => $i18n->echo('password help'),
+            label       => $i18n->get('password'),
+            hoverHelp   => $i18n->get('password help'),
         },
         useCVV2         => {
             fieldType   => 'yesNo',
-            label       => $i18n->echo('use cvv2'),
-            hoverHelp   => $i18n->echo('use cvv2 help'),
+            label       => $i18n->get('use cvv2'),
+            hoverHelp   => $i18n->get('use cvv2 help'),
         },
         emailMessage    => {
             fieldType   => 'textarea',
-            label       => $i18n->echo('emailMessage'),
-            hoverHelp   => $i18n->echo('emailMessage help'),
+            label       => $i18n->get('emailMessage'),
+            hoverHelp   => $i18n->get('emailMessage help'),
         },
         # readonly stuff from old plugin here?
     );
  
     push @{ $definition }, {
-        name        => $i18n->echo('Itransact'),
+        name        => $i18n->get('Itransact'),
         properties  => \%fields,
     };
 
@@ -430,41 +430,14 @@ sub doXmlRequest {
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITansact');
+    my $i18n    = WebGUI::International->new($session, 'PayDriver');
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->echo('ITransact') })
+        . WebGUI::Form::submit($session, {value => $i18n->get('credit card') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
-}
-
-#-------------------------------------------------------------------
-sub getEditForm {
-    my $self    = shift;
-    my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
-
-    my $f       = $self->SUPER::getEditForm( @_ );
-    $f->readOnly(
-        -value  => '<br />'
-    );
-    $f->readOnly(
-            -value => '<a target="_blank" href="https://secure.paymentclearing.com/support/login.html">'.$i18n->get('show terminal').'</a>'
-    ) if $self->get('vendorId');
-    $f->readOnly(
-        -value  => '<br />'
-    );
-    $f->readOnly(
-        -value  => 
-            $i18n->get('extra info')
-            .'<br />'
-            .'<b>https://'.$session->config->get("sitename")->[0]
-            .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>'
-    );
-
-    return $f;
 }
 
 #-------------------------------------------------------------------
@@ -588,6 +561,44 @@ sub processPayment {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Generates an edit form.
+
+=cut
+
+sub www_edit {
+    my $self    = shift;
+    my $session = $self->session;
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    my $i18n    = WebGUI::International->new($session, 'PayDriver_ITransact');
+
+    return $session->privilege->insufficient() unless $admin->canManage;
+
+    my $form = $self->getEditForm;
+    $form->submit;
+
+    my $terminal = WebGUI::HTMLForm->new($session, action=>"https://secure.paymentclearing.com/cgi-bin/rc/sess.cgi", extras=>'target="_blank"');
+    $terminal->hidden(name=>"ret_addr", value=>"/cgi-bin/rc/sure/sure.cgi?sure_template_code=session_check&sure_use_session_mid=1");
+    $terminal->hidden(name=>"override", value=>1);
+    $terminal->hidden(name=>"cookie_precheck", value=>0);
+    $terminal->hidden(name=>"mid", value=>$self->get('vendorId'));
+    $terminal->hidden(name=>"pwd", value=>$self->get('password'));
+    $terminal->submit(value=>$i18n->get('show terminal'));
+    
+    my $output = '<br />';
+    if ($self->get('vendorId')) {
+        $output .= $terminal->print.'<br />';
+    }
+    $output .= $i18n->get('extra info').'<br />'
+            .'<b>https://'.$session->config->get("sitename")->[0]
+            .'/?shop=pay;method=do;do=processRecurringTransactionPostback;paymentGatewayId='.$self->getId.'</b>';
+
+    return $admin->getAdminConsole->render($form->print.$output, $i18n->get('payment methods','PayDriver'));
+}
+
+#-------------------------------------------------------------------
 sub www_getCredentials {
     my $self        = shift;
     my $errors      = shift;
@@ -597,10 +608,13 @@ sub www_getCredentials {
 	my $u           = WebGUI::User->new($self->session,$self->session->user->userId);
 
     # Process address from address book if passed
-    my $addressId   = $session->form->process('addressId');
-    my $addressData = {};
+    my $addressId   = $session->form->process( 'addressId' );
+    my $addressData;
     if ( $addressId ) {
         $addressData    = eval{ $self->getAddress( $addressId )->get() } || {};
+    }
+    else { 
+        $addressData    = $self->getCart->getShippingAddress->get;
     }
                    
     my $output;
@@ -608,7 +622,7 @@ sub www_getCredentials {
     # Process form errors
     if ( $errors ) {
     #### TODO: i18n
-        $output .= $i18n->echo('The following errors occurred:')
+        $output .= $i18n->get('error occurred message')
             . '<ul><li>' . join( '</li><li>', @{ $errors } ) . '</li></ul>';
     }
     
@@ -625,12 +639,12 @@ sub www_getCredentials {
 	$f->text(
 		-name	    => 'firstName',
 		-label	    => $i18n->get('firstName'),
-		-value	    => $form->process("firstName") || $addressData->{ name } || $u->profileField('firstName'),
+		-value	    => $form->process("firstName") || $addressData->{ "firstName" } || $u->profileField('firstName'),
 	);
 	$f->text(
 		-name	    => 'lastName',
 		-label	    => $i18n->get('lastName'),
-		-value	    => $form->process("lastName") || $u->profileField('lastName'),
+		-value	    => $form->process("lastName") || $addressData->{ "lastName" } || $u->profileField('lastName'),
 	);
 	$f->text(
 		-name	    => 'address',
@@ -693,9 +707,13 @@ sub www_getCredentials {
 
 #-------------------------------------------------------------------
 sub www_pay {
-    my $self    = shift;
-    my $session = $self->session;
-    my $address = $self->getAddress( $session->form->process( 'addressId' ) );
+    my $self        = shift;
+    my $session     = $self->session;
+    my $addressId   = $session->form->process( 'addressId' );
+    my $address     = $addressId
+                    ? $self->getAddress( $addressId )
+                    : $self->getCart->getShippingAddress
+                    ;
 
     # Check whether the user filled in the checkout form and process those.
     my $credentialsErrors = $self->processCredentials;
@@ -727,13 +745,14 @@ sub www_processRecurringTransactionPostback {
     my $errorMessage    = $form->process( 'error_message'   );
 
     # Fetch the original transaction
-    my $baseTransaction = WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId );
+    my $baseTransaction = eval{WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId )};
 
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
-    unless ( $baseTransaction ) {   
-        $session->errorHandler->warn->("Check recurring postback: No base transction for XID: [$originatingXid]");
-        return "Check recurring postback: No base transction for XID: [$originatingXid]";
+    if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
+        $session->errorHandler->warn("Check recurring postback: No base transction for XID: [$originatingXid]");
+	$session->http->setStatus('500', "No base transction for XID: [$originatingXid]");
+        return "Check recurring postback. No base transction for XID: [$originatingXid]";
     }
 
     # Secondly check if the postback is coming from secure.paymentclearing.com

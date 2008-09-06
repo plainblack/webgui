@@ -10,13 +10,10 @@ package WebGUI::Asset::Wobject::SyndicatedContent;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use HTML::Entities;
 use strict;
-use Storable;
-use Tie::CPHash;
+use HTML::Entities;
 use Tie::IxHash;
 use WebGUI::Cache;
-use WebGUI::HTMLForm;
 use WebGUI::HTML;
 use WebGUI::International;
 use WebGUI::Asset::Wobject;
@@ -24,9 +21,7 @@ use WebGUI::Macro;
 use XML::RSSLite;
 use XML::RSS::Creator;
 use LWP::UserAgent;
-use POSIX qw/floor/;
-my $hasEncode=1;
-eval ' use Encode qw(from_to); '; $hasEncode=0 if $@;
+use Encode;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -331,14 +326,14 @@ sub _normalize_items {
 sub _get_rss_data {
     my $session = shift;
     my $url = shift;
-    my $cache = WebGUI::Cache->new($session,'url:' . $url, 'RSS');
-    my $rss_serial = $cache->get;
-    my $rss = {};
-    if ($rss_serial) {
-        $rss = Storable::thaw($rss_serial);
-    }
-    if ($rss->{error}) {
-        return undef;
+    # format of cache was changed, differentiate
+    my $cache = WebGUI::Cache->new($session,'url2:' . $url, 'RSS');
+    my $rss = $cache->get;
+    if ($rss) {
+        if ($rss->{error}) {
+            return undef;
+        }
+        return $rss;
     }
     else {
         my $ua = LWP::UserAgent->new(timeout => 5);
@@ -347,10 +342,10 @@ sub _get_rss_data {
         if (!$response->is_success()) {
             $session->errorHandler->warn("Error retrieving url '$url': " . 
                 $response->status_line());
-            $cache->set(Storable::nfreeze({'error' => 1, 'error_status' => $response->status_line}), 3600);
+            $cache->set({'error' => 1, 'error_status' => $response->status_line}, 3600);
             return undef;
         }
-        my $xml = $response->content();
+        my $xml = $response->decoded_content;
 
 		# Approximate with current time if we don't have a Last-Modified
 		# header coming from the RSS source.
@@ -360,17 +355,14 @@ sub _get_rss_data {
 		# XML::RSSLite does not handle <![CDATA[ ]]> so:
                 $xml =~ s/<!\[CDATA\[(.*?)\]\]>/$1/sg;
  
-		# Convert encoding if needed / Perl 5.8.0 or up required.
-		if ($] >= 5.008 && $hasEncode) {
-			$xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
-			my $xmlEncoding = $1 || 'utf8';
-			my $encoding = 'utf8';
-			if (lc($xmlEncoding) ne lc($encoding)) {
-				eval {	from_to($xml, $xmlEncoding, $encoding) };
-				$session->errorHandler->warn($@) if ($@);
-			}
-				
-		}
+        # Convert encoding if needed
+        $xml =~ /<\?xml.*?encoding=['"](\S+)['"]/i;
+        my $xmlEncoding = $1 || 'utf8';
+        
+	if (Encode::is_utf8($xml)) {
+	} else {
+ 	       $xml = Encode::decode($xmlEncoding, $xml);
+	}
 
                 my $rss_lite = {};
                 eval {
@@ -390,6 +382,7 @@ sub _get_rss_data {
                 # structure.
 
                 $rss_lite = {channel => $rss_lite};
+                $rss = {};
                 if (!($rss->{channel} = 
                       _find_record($rss_lite, qr/^channel$/))) {
                         $session->errorHandler->warn("unable to find channel info for url $url");
@@ -412,7 +405,7 @@ sub _get_rss_data {
 		$rss->{last_modified} = $last_modified;
 
                 #Default to an hour timeout
-                $cache->set(Storable::nfreeze($rss), 3600);
+                $cache->set($rss, 3600);
         }
 
         return $rss;
@@ -548,14 +541,10 @@ sub _get_items {
 
 	my $hasTermsRegex=_make_regex($self->getValue('hasTerms'));
 
-	# Cache format changes:
-	#   - aggregate: $items
-	#   - aggregate2 (2006-08-26): [$items, \@rss_feeds]
-
-	my $key=join(':',('aggregate2', $displayMode,$hasTermsRegex,$maxHeadlines,$self->getRssUrl));
-
-        my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
-        my $cached = Storable::thaw($cache->get());
+    # Format of cache has changed several times
+    my $key=join(':', 'aggregate3', $displayMode,$hasTermsRegex,$maxHeadlines,$self->getRssUrl);
+    my $cache = WebGUI::Cache->new($self->session,$key, 'RSS');
+    my $cached = $cache->get;
 	my ($items, @rss_feeds);
 
 	if ($cached) {
@@ -584,7 +573,7 @@ sub _get_items {
 
                 #@{$items} = sort { $b->{date} <=> $a->{date} } @{$items};
 
-                $cache->set(Storable::freeze([$items, \@rss_feeds]), 3600);
+                $cache->set([$items, \@rss_feeds], 3600);
 	}
 
 	#So return the item loop and the first RSS feed, because 
@@ -606,7 +595,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $i18n = WebGUI::International->new($self->session,'Asset_SyndicatedContent');
 	my $rssFeedSuffix=$i18n->get('RSS Feed Title Suffix');
@@ -669,7 +658,7 @@ sub view {
 	}
 
 	$self->_createRSSURLs(\%var);
-        $var{item_loop} = $item_loop;
+    $var{item_loop} = $item_loop;
 
 	if ($rssObject) {
 	    $self->_constructRSS($rssObject,\%var);

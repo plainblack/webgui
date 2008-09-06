@@ -267,9 +267,9 @@ sub getAdminConsoleWithSubmenu {
 	my $ac      = $self->getAdminConsole;
 	my $i18n    = WebGUI::International->new( $session, 'Asset_Subscription' );
 
-	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'), $i18n->get('generate batch'));
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes'),       $i18n->get('manage codes')  );
-	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'), $i18n->get('manage batches'));
+	$ac->addSubmenuItem( $self->getUrl('func=createSubscriptionCodeBatch'),        $i18n->get('generate batch'));
+	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodes;selection=dc'), $i18n->get('manage codes')  );
+	$ac->addSubmenuItem( $self->getUrl('func=listSubscriptionCodeBatches'),        $i18n->get('manage batches'));
 
 	return $ac;
 }
@@ -445,7 +445,7 @@ sub prepareView {
 	$self->SUPER::prepareView();
 	my $templateId = $self->get("templateId");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 
@@ -504,11 +504,13 @@ sub view {
         formFooter          => WebGUI::Form::formFooter($session),
         purchaseButton      => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
         hasAddedToCart      => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
         codeControls        => join (' &middot; ', (
             '<a href="'.$self->getUrl('func=createSubscriptionCodeBatch') .'">'.$i18n->get('generate batch').'</a>',
             '<a href="'.$self->getUrl('func=listSubscriptionCodes')       .'">'.$i18n->get('manage codes').'</a>',
             '<a href="'.$self->getUrl('func=listSubscriptionCodeBatches') .'">'.$i18n->get('manage batches').'</a>',
             )),
+        price               => sprintf("%.2f", $self->getPrice),
     );
     my $hasCodes = $self->session->db->quickScalar('select count(*) from Subscription_code as t1, Subscription_codeBatch as t2 where t1.batchId = t2.batchId and t2.subscriptionId=?', [$self->getId]);
     if ($hasCodes) {
@@ -721,24 +723,62 @@ sub www_listSubscriptionCodeBatches {
 
     # Check privs
     return $session->privilege->insufficient unless $self->canEdit;
-	
+
+	my $dcStart     = $session->form->date('dcStart');
+	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
+    my $selection   = $session->form->process('selection');
+
+    my $f = WebGUI::HTMLForm->new( $session );
+    $f->hidden(
+        name    => 'func',
+        value   => 'listSubscriptionCodeBatches',
+    );
+
+    $f->readOnly(
+        label   =>
+            WebGUI::Form::radio( $session, { name => 'selection', value => 'dc', checked => ($selection eq 'dc') } )
+            . $i18n->get('selection created'),
+        value   =>
+            WebGUI::Form::date( $session,   { name => 'dcStart',    value=> $dcStart } )
+            . ' ' . $i18n->get( 'and' ) . ' ' 
+            . WebGUI::Form::date( $session, { name => 'dcStop',     value=> $dcStop } ),
+    );
+    $f->readOnly(
+        label   =>
+            WebGUI::Form::radio( $session, { name => 'selection', value => 'all', checked => ($selection ne 'dc') } )
+            . $i18n->get('display all'),
+        value   => '',
+    );
+    $f->submit(
+        value   => $i18n->get('select'),
+    );
+
+    ##Configure the SQL query based on what the user has selected.
+    my $sqlQuery  = 'select * from Subscription_codeBatch where subscriptionId=?';
+    my $sqlParams = [ $self->getId ];
+    if ($selection eq 'dc') {
+        $sqlQuery .= ' and dateCreated >= ? and dateCreated <= ?';
+        push @{ $sqlParams }, $dcStart, $dcStop;
+    }
+
     # Set up a paginator to paginate the list of batches
 	my $p = WebGUI::Paginator->new( $session, $self->getUrl('func=listSubscriptionCodeBatches') );
-	$p->setDataByQuery( 'select * from Subscription_codeBatch where subscriptionId=?', undef, 1, [
-        $self->getId,
-    ]);
+	$p->setDataByQuery( $sqlQuery, undef, 1, $sqlParams);
 
     # Fetch the list of batches at the current paginition index
     my $batches = $p->getPageData;
 
-	my $output = $p->getBarTraditional($session->form->process("pn"));
+	my $output = $f->print;
+	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	foreach my $batch ( @{$batches} ) {
 		$output .= '<tr><td>';		
-		$output .= $session->icon->delete(
+        $output .= $session->icon->delete(
             'func=deleteSubscriptionCodeBatch;bid='.$batch->{batchId}, 
             $self->getUrl,
             $i18n->get('delete batch confirm'));
+		$output .= '</td>';		
+		$output .= '<td>' . $batch->{ name        } . '</td>';
 		$output .= '<td>' . $batch->{ description } . '</td>';
 		$output .= '<td>'
             . '<a href="' . $self->getUrl('func=listSubscriptionCodes;selection=b;bid=' . $batch->{ batchId }) . '">'
@@ -748,7 +788,7 @@ sub www_listSubscriptionCodeBatches {
 	$output .= '</table>';
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	
-	$output = $i18n->get('no subscription code batches') unless ( @{$batches} );
+	$output = $i18n->get('no subscription code batches') unless $session->db->quickScalar('select count(*) from Subscription_codeBatch');
 
 	return $self->getAdminConsoleWithSubmenu->render( $output, $i18n->get('manage batches') );
 }
@@ -768,7 +808,6 @@ sub www_listSubscriptionCodes {
 
 	my ($p, $codes, $output, $where, $ops, $delete);
 	return $session->privilege->insufficient unless $self->canEdit;
-
 	my $dcStart     = $session->form->date('dcStart');
 	my $dcStop      = $session->datetime->addToTime($session->form->date('dcStop'), 23, 59);
 	my $duStart     = $session->form->date('duStart');
@@ -776,7 +815,7 @@ sub www_listSubscriptionCodes {
     my $batchId     = $session->form->process('bid');
     my $selection   = $session->form->process('selection');
 	my $batches = 
-        $session->db->buildHashRef('select batchId, description from Subscription_codeBatch where subscriptionId=?',
+        $session->db->buildHashRef('select batchId, name from Subscription_codeBatch where subscriptionId=?',
         [
             $self->getId,
         ]);	
@@ -812,7 +851,7 @@ sub www_listSubscriptionCodes {
     $f->readOnly(
         label   =>
             WebGUI::Form::radio( $session, { name => 'selection', value => 'b', checked => ($selection eq 'b') } )
-            . $i18n->get('selection batch id'),
+            . $i18n->get('selection batch name'),
         value   =>
             WebGUI::Form::selectBox( $session, { name => 'bid', value => $batchId, options => $batches } ),
     );
@@ -851,12 +890,12 @@ sub www_listSubscriptionCodes {
 
 	$output = $i18n->get('selection message');
     $output .= $f->print;
-	$output .= '<br />'.$delete.'<br />' if ($delete);
+	$output .= '<br />'.$delete.'<br />' if ($delete) and $p->getRowCount;
 	$output .= $p->getBarTraditional($session->form->process("pn"));
 	$output .= '<br />';
 	$output .= '<table border="1" cellpadding="5" cellspacing="0" align="center">';
 	$output .= '<tr>';
-	$output .= '<th>'.$i18n->get('batch id').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
+	$output .= '<th>&nbsp;</th><th>'.$i18n->get('batch id').'</th><th>'.$i18n->get('code').'</th><th>'.$i18n->get('creation date').
 		'</th><th>'.$i18n->get('dateUsed').'</th><th>'.$i18n->get('status').'</th>';	$output .= '</tr>';
 	foreach (@{$codes}) {
 		$output .= '<tr>';

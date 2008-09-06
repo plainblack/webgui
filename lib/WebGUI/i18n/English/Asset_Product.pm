@@ -662,8 +662,8 @@ be useful, others may not.|,
 	},
 
     'shortdesc description' => {
-        message => q|The will be displayed to the user so they can purchase this variant of your product.  It will be limited to 30 characters in length|,
-        lastUpdated => 1210191460,
+        message => q|The short description will be displayed to the user so they can purchase this variant of your product.  It is limited to 30 characters in length.|,
+        lastUpdated => 1215532125,
     },
 
     'add variant' => {
@@ -833,6 +833,24 @@ be useful, others may not.|,
 		message => q|A boolean that is true if the user can edit this Product.|,
 		lastUpdated => 0,
 		context => q|template variable|
+	},
+
+	'continueShoppingUrl' => {
+		message => q|A URL to reset the Product so that the user can continue shopping.|,
+		lastUpdated => 0,
+		context => q|template variable|
+	},
+
+	'isShippingRequired' => {
+		message => q|Is shipping required?|,
+		lastUpdated => 0,
+		context => q|label for the edit sku|
+	},
+
+	'isShippingRequired help' => {
+		message => q|This determines whether shipping costs will be calculated when the user checks out.|,
+		lastUpdated => 0,
+		context => q|hover help for isShippingRequired in the edit sku screen|
 	},
 
 };

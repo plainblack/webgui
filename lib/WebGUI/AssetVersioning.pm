@@ -86,7 +86,7 @@ Posts) will know not to send them under certain conditions.
 
 sub addRevision {
     my $self             = shift;
-    my $properties       = shift;
+    my $properties       = shift || {};
     my $now              = shift     || $self->session->datetime->time();
     my $options          = shift;
 
@@ -120,7 +120,18 @@ sub addRevision {
         $self->getId,
     ]);
     
+	my %defaults = ();
     foreach my $definition (@{$self->definition($self->session)}) {
+		
+		# get the default values of each property
+		foreach my $property (keys %{$definition->{properties}}) {
+			$defaults{$property} = $definition->{properties}{$property}{defaultValue};
+            if (ref($defaults{$property}) eq 'ARRAY') {
+                $defaults{$property} = $defaults{$property}->[0];
+            }
+		}
+		
+		# prime the tables
         unless ($definition->{tableName} eq "assetData") {
             $self->session->db->write(
                 "insert into ".$definition->{tableName}." (assetId,revisionDate) values (?,?)", 
@@ -129,15 +140,16 @@ sub addRevision {
         }
     }
     $self->session->db->commit;
+	
+	# merge the defaults, current values, and the user set properties
+	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
     
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
     $newVersion->updateHistory("created revision");
-    $newVersion->update($self->get);
     $newVersion->setVersionLock;
-    $properties->{status} = 'pending';
-    $newVersion->update($properties);
+    $newVersion->update(\%mergedProperties);
     $newVersion->setAutoCommitTag($workingTag) if (defined $autoCommitId);
     
     return $newVersion;

@@ -285,10 +285,10 @@ Deletes all badges and things attached to the badges. No refunds are given.
 sub purge {
 	my $self = shift;
 	my $db = $self->session->db;
-	$db->write("delete from EMSRegistrantTicket where badgeAssetId=?",[$self->getId]);
-	$db->write("delete from EMSRegistrantToken where badgeAssetId=?",[$self->getId]);
-	$db->write("delete from EMSRegistrantRibbon where badgeAssetId=?",[$self->getId]);
-	$db->write("delete from EMSRegistrant where badgeAssetId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrantTicket where badgeId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrantToken where badgeId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrantRibbon where badgeId=?",[$self->getId]);
+	$db->write("delete from EMSRegistrant where badgeId=?",[$self->getId]);
 	$self->SUPER::purge;
 }
 
@@ -325,7 +325,7 @@ sub view {
 	$info->text(
 		name			=> 'name',
 		label			=> $i18n->get('name','Shop'),
-		defaultValue	=> (defined $address) ? $address->get("name") : $form->get('name'),
+		defaultValue	=> (defined $address) ? $address->get("firstName")." ".$address->get('lastName') : $form->get('name'),
 		);
 	$info->text(
 		name			=> 'organization',

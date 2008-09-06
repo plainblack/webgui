@@ -410,7 +410,7 @@ sub www_addTax {
     $params->{state}   = $form->get('state',   'text');
     $params->{city}    = $form->get('city',    'text');
     $params->{code}    = $form->get('code',    'text');
-    $params->{taxRate} = $form->get('taxRate', 'integer');
+    $params->{taxRate} = $form->get('taxRate', 'float');
     $self->add($params);
     return $self->www_manage;
 }
@@ -452,16 +452,19 @@ sub www_getTaxesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my $startIndex      = $form->get('startIndex') || 0;
     my $numberOfResults = $form->get('results')    || 25;
-    my $sortKey         = $form->get('sortKey')    || 'country';
-    my $sortDir         = $form->get('sortDir')    || 'desc';
+    my %goodKeys = qw/country 1 state 1 city 1 code 1 'tax rate' 1/;
+    my $sortKey = $form->get('sortKey');
+    $sortKey = $goodKeys{$sortKey} == 1 ? $sortKey : 'country';
+    my $sortDir = $form->get('sortDir');
+    $sortDir = lc($sortDir) eq 'desc' ? 'desc' : 'asc';
     my @placeholders = ();
     my $sql = 'select SQL_CALC_FOUND_ROWS * from tax';
     my $keywords = $form->get("keywords");
     if ($keywords ne "") {
         $db->buildSearchQuery(\$sql, \@placeholders, $keywords, [qw{country state city code}])
     }
-    push(@placeholders, $sortKey, $sortDir, $startIndex, $numberOfResults);
-    $sql .= ' order by ? ? limit ?,?';
+    push(@placeholders, $startIndex, $numberOfResults);
+    $sql .= sprintf (" order by %s limit ?,?","$sortKey $sortDir");
     my %results = ();
     my @records = ();
     my $sth = $db->read($sql, \@placeholders);
@@ -474,7 +477,8 @@ sub www_getTaxesAsJson {
     $results{'totalRecords'} = $db->quickScalar('select found_rows()')+0; ##Convert to numeric
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
-    $results{'dir'}          = "desc";
+#    $results{'dir'}          = "desc";
+    $results{'dir'}          = $sortDir;
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
 }
@@ -548,10 +552,10 @@ sub www_manage {
     my $i18n=WebGUI::International->new($session, 'Tax');
 
     my $exportForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=exportTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('export','Shop'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('export tax','Shop'), extras=>q{style="float: left;"} })
                    . WebGUI::Form::formFooter($session);
     my $importForm = WebGUI::Form::formHeader($session,{action => $url->page('shop=tax;method=importTax')})
-                   . WebGUI::Form::submit($session,{value=>$i18n->get('import','Shop'), extras=>q{style="float: left;"} })
+                   . WebGUI::Form::submit($session,{value=>$i18n->get('import tax','Shop'), extras=>q{style="float: left;"} })
                    . q{<input type="file" name="importFile" size="10" />}
                    . WebGUI::Form::formFooter($session);
 
@@ -576,7 +580,7 @@ sub www_manage {
         hoverHelp => $i18n->get('code help'),
         name      => 'code',
     );
-    $addForm->integer(
+    $addForm->float(
         label     => $i18n->get('tax rate'),
         hoverHelp => $i18n->get('tax rate help'),
         name      => 'taxRate',
@@ -635,7 +639,7 @@ EODSURL
         return ";startIndex=" + state.pagination.recordOffset +
                ";keywords="   + Dom.get('keywordsField').value +
                ";sortKey="    + state.sorting.key +
-               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc") +
+               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC || state.sorting.dir == 'desc') ? "desc" : "asc") +
                ";results="    + state.pagination.rowsPerPage;
     };
 
@@ -650,9 +654,15 @@ EODSURL
 
     // Custom function to handle pagination requests
     var handlePagination = function (state,dt) {
-        var sortedBy  = dt.get('sortedBy');
 
+        var sortedBy = dt.get('sortedBy');
+	if(sortedBy == null){
+		sortedBy = {'key': "country",'dir':"desc"};
+	}
         // Define the new state
+    if(sortedBy.dir == "desc" || sortedBy.dir == "asc"){
+	    sortedBy.dir = sortedBy.dir == "desc" ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC;
+    }
         var newState = {
             startIndex: state.recordOffset,
             sorting: {
@@ -664,7 +674,6 @@ EODSURL
                 rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
             }
         };
-
         // Create callback object for the request
         var oCallback = {
             success: dt.onDataReturnSetRows,
@@ -682,7 +691,8 @@ EODSURL
         initialRequest         : ';startIndex=0;results=25',
         generateRequest        : buildQueryString,
         paginationEventHandler : handlePagination,
-        //paginator              : myPaginator
+        sortedBy               : {key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC},
+        //paginator            : myPaginator
         paginator              : new YAHOO.widget.Paginator({rowsPerPage:25})
     };
 STOP
@@ -711,7 +721,6 @@ EOCHJS
     myTable.sortColumn = function(oColumn) { 
         // Default ascending 
         var sDir = "asc"; 
-         
         // If already sorted, sort in opposite direction 
         if(oColumn.key === this.get("sortedBy").key) { 
             sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ? 

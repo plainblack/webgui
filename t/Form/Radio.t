@@ -60,6 +60,7 @@ my $html = join "\n",
 		checked => 1,
 	})->toHtml,
 	$footer;
+use Data::Dumper;
 
 my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 

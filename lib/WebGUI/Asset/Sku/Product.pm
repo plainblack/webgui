@@ -128,6 +128,13 @@ sub definition {
             deleteFileUrl=>$session->url->page("func=deleteFileConfirm;file=manual;filename="),
             defaultValue=>undef
         },
+        isShippingRequired => {
+            tab          => "shop",
+            fieldType    => "yesNo",
+            label        => $i18n->get('isShippingRequired'),
+            hoverHelp    => $i18n->get('isShippingRequired help'),
+            defaultValue => 0,
+        },
         warranty=>{
             tab => "properties",
             fieldType=>"file",
@@ -213,6 +220,13 @@ sub deleteCollateral {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate
+
+Override the duplicate method so uploaded files and images also get copied.
+
+=cut
+
 sub duplicate {
     my $self = shift;
     my $newAsset = $self->SUPER::duplicate(@_);
@@ -246,7 +260,7 @@ sub getAllCollateral {
     my $json = $self->get($tableName);
     my $table;
     if ($json) {
-        $table = from_json($json);
+        $table = decode_json($json);
     }
     else {
         $table = [];
@@ -343,7 +357,7 @@ Product.
 
 sub getConfiguredTitle {
     my $self = shift;
-    return $self->getOptions->{shortdesc};
+    return join ' - ', $self->getTitle, $self->getOptions->{shortdesc};
 }
 
 
@@ -410,23 +424,6 @@ sub getPrice {
     }
 }
 
-#-------------------------------------------------------------------
-
-=head2 getProductImportNode ( session )
-
-Constructor. Returns the product import node object. This is where the product import system will create new products.
-
-=head3 session
-
-A reference to the current session.
-
-=cut
-
-sub getProductImportNode {
-    my $class = shift;
-    my $session = shift;
-    return WebGUI::Asset->newByDynamicClass($session, 'PBproductimportnode001');
-}
 
 #-------------------------------------------------------------------
 
@@ -487,6 +484,20 @@ sub getWeight {
     my $self = shift;
     return $self->getOptions->{weight};
 }
+
+#-------------------------------------------------------------------
+
+=head2 isShippingRequired
+
+Overriding the method from Sku so that the user can configure it.
+
+=cut
+
+sub isShippingRequired {
+    my $self = shift;
+    return $self->get('isShippingRequired');
+}
+
 
 #-------------------------------------------------------------------
 
@@ -665,7 +676,7 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView();
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
 }
 
@@ -774,7 +785,7 @@ The name of the table to insert the data.
 sub setAllCollateral {
     my $self       = shift;
     my $tableName  = shift;
-    my $json = to_json($self->{_collateral}->{$tableName});
+    my $json = encode_json($self->{_collateral}->{$tableName});
     $self->update({ $tableName => $json });
     return;
 }
@@ -1402,7 +1413,7 @@ sub view {
     my $self = shift;
     my $error = shift;
     my $session = $self->session;
-    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10){
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
@@ -1593,11 +1604,12 @@ sub view {
         $var{'addvariant_label'} = $i18n->get('add a variant');
         $var{'canEdit'}          = 1;
     }
-    $var{variant_loop} = \@variantLoop;
-    $var{hasAddedToCart} = $self->{_hasAddedToCart};
+    $var{variant_loop}        = \@variantLoop;
+    $var{hasAddedToCart}      = $self->{_hasAddedToCart};
+    $var{continueShoppingUrl} = $self->getUrl;
 
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+    if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && $self->{_hasAddedToCart} != 1){
         WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
     }
     return $out;

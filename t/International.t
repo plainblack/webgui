@@ -20,7 +20,7 @@ use File::Spec;
 my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
-my $langTests = 2; ##For language look-up tests
+my $langTests = 4; ##For language look-up tests
 $numTests    += 11 + $langTests;
 
 plan tests => $numTests;
@@ -65,6 +65,16 @@ SKIP: {
 		$i18n->get('webgui','WebGUI','PigLatin'),
 		'ebGUIWay',
 		'Language check: existing key returns native language key'
+	);
+	is(
+		$i18n->get('104','Asset','PigLatin'),
+		$i18n->get('104', 'WebGUI', 'English'),
+		'Language check: key from missing file return English key'
+	);
+	is(
+		$i18n->get('neverAValidKey','notAValidFile','PigLatin'),
+		'',
+		'Language check: key from non-existant file returns an empty string'
 	);
 
 }

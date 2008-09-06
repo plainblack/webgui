@@ -19,6 +19,7 @@ use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
 use WebGUI::Utility;
+use WebGUI::Operation::Shared;
 
 =head1 NAME
 
@@ -156,6 +157,25 @@ sub authMethod {
 
 #-------------------------------------------------------------------
 
+=head2 cache ( )
+
+Saves the user object into the cache.
+
+=cut
+
+sub cache {
+    my $self = shift;
+    my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
+    # copy user object
+    my %userData;
+    for my $k (qw(_userId _user _profile)) {
+        $userData{$k} = $self->{$k};
+    }
+    $cache->set(\%userData, 60*60*24);
+}
+
+#-------------------------------------------------------------------
+
 =head2 canUseAdminMode ( )
 
 Returns a boolean indicating whether the user has the basic privileges needed to turn on admin mode and use basic admin functions. Note this isn't checking for any special privileges like whether the user can create new users, etc.
@@ -189,29 +209,33 @@ sub dateCreated {
 
 =head2 delete ( )
 
-Deletes this user.
+Deletes this user, removes their user profile data, cleans up their
+inbox, removes userSessionScratch data and authentication information,
+removes them from any groups they belong to and deletes their
+Friend's group.
 
 =cut
 
 sub delete {
     my $self = shift;
+    my $userId = $self->userId;
 	$self->uncache;
     my $db = $self->session->db;
-	foreach my $groupId (@{$self->getGroups($self->userId)}) {
-		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$self->userId]);
+	foreach my $groupId (@{$self->getGroups($userId)}) {
+		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$userId]);
 	}
     $self->friends->delete if ($self->{_user}{"friendsGroup"} ne "");
-	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$self->{_userId}]);
+	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$userId]);
 	require WebGUI::Operation::Auth;
-	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$self->{_userId});
-	$authMethod->deleteParams($self->{_userId});
-	my $rs = $db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$userId);
+	$authMethod->deleteParams($userId);
+	my $rs = $db->read("select sessionId from userSession where userId=?",[$userId]);
 	while (my ($id) = $rs->array) {
         	$db->write("delete from userSessionScratch where sessionId=?",[$id]);
 	}
-    $db->write("delete from userSession where userId=?",[$self->{_userId}]);
-    $db->write("delete from userProfileData where userId=?",[$self->{_userId}]);
-    $db->write("delete from users where userId=?",[$self->{_userId}]);
+    $db->write("delete from userSession where userId=?",[$userId]);
+    $db->write("delete from userProfileData where userId=?",[$userId]);
+    $db->write("delete from users where userId=?",[$userId]);
 }
 
 #-------------------------------------------------------------------
@@ -301,7 +325,8 @@ sub getFirstName {
 
 =head2 getGroups ( [ withoutExpired ] )
 
-Returns an array reference containing a list of groups this user is in.
+Returns an array reference containing a list of groups this user is in.  Group lookups are cached.
+If a cached lookup is returned, it will be a safe copy of the data in the cache.
 
 =head3 withoutExpired
 
@@ -310,26 +335,56 @@ If set to "1" then the listing will not include expired groupings. Defaults to "
 =cut
 
 sub getGroups {
-	my $self = shift;
-        my $withoutExpired = shift;
-        my $clause = "";
-	if ($withoutExpired) {
-        	$clause = "and expireDate>".$self->session->datetime->time();
-	}
-	my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
-        if (exists $gotGroupsForUser->{$self->userId}) {
-                return $gotGroupsForUser->{$self->userId};
-        } else {
-                my @groups = $self->session->db->buildArray("select groupId from groupings where userId=? $clause", [$self->userId]);
-		my $isInGroup = $self->session->stow->get("isInGroup");
-                foreach my $gid (@groups) {	
-                        $isInGroup->{$self->userId}{$gid} = 1;
-                }
-		$self->session->stow->set("isInGroup",$isInGroup);
-                $gotGroupsForUser->{$self->userId} = \@groups;
-		$self->session->stow->set("gotGroupsForUser",$gotGroupsForUser);
-                return \@groups;
+    my $self = shift;
+    my $withoutExpired = shift;
+    my $clause = "";
+    if ($withoutExpired) {
+        $clause = "and expireDate>".$self->session->datetime->time();
+    }
+    my $gotGroupsForUser = $self->session->stow->get("gotGroupsForUser");
+    if (exists $gotGroupsForUser->{$self->userId}) {
+        my $cachedGroups = $gotGroupsForUser->{$self->userId};
+        my @safeCopy = @{ $cachedGroups };
+        return \@safeCopy;
+    }
+    else {
+        my @groups = $self->session->db->buildArray("select groupId from groupings where userId=? $clause", [$self->userId]);
+        my $isInGroup = $self->session->stow->get("isInGroup");
+        foreach my $gid (@groups) {
+            $isInGroup->{$self->userId}{$gid} = 1;
         }
+        $self->session->stow->set("isInGroup",$isInGroup);
+        $gotGroupsForUser->{$self->userId} = \@groups;
+        $self->session->stow->set("gotGroupsForUser",$gotGroupsForUser);
+        my @safeGroups = @groups;
+        return \@safeGroups;
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getGroupIdsRecursive ( )
+
+Get the groups the user is in AND all the groups those groups are in, recursively.
+Returns a flattened array reference of unique group IDs
+
+=cut
+
+sub getGroupIdsRecursive {
+    my $self        = shift;
+    my $groupingIds = $self->getGroups( "withoutExpired" );
+    my %groupIds    = map { $_ => 1 } @{ $groupingIds };
+    while ( my $groupingId = shift @{ $groupingIds } ) {
+        my $group   = WebGUI::Group->new( $self->session, $groupingId );
+        for my $groupGroupingId ( @{ $group->getGroupsFor } ) { 
+            if ( !$groupIds{ $groupGroupingId } ) {
+                push @{ $groupingIds }, $groupGroupingId;
+            }
+            $groupIds{ $groupGroupingId } = 1;
+        }
+    }
+
+    return [ keys %groupIds ];
 }
 
 #-------------------------------------------------------------------
@@ -500,8 +555,10 @@ sub new {
     my $overrideId  = shift;
     $userId         = _create($session, $overrideId) if ($userId eq "new");
     my $cache       = WebGUI::Cache->new($session,["user",$userId]);
-    my $userData    = $cache->get;
-    unless ($userData->{_userId} && $userData->{_user}{username}) {
+    my $self        = $cache->get || {};
+    bless $self, $class;
+    $self->{_session} = $session;
+    unless ($self->{_userId} && $self->{_user}{username}) {
         my %user;
         tie %user, 'Tie::CPHash';
         %user = $session->db->quickHash("select * from users where userId=?",[$userId]);
@@ -512,29 +569,24 @@ sub new {
             );
         delete $profile{userId};
 
-        my %default = $session->db->buildHash("select fieldName, dataDefault from userProfileField");
-        foreach my $key (keys %default) {
-            my $value;
-            if ($profile{$key} eq "" && $default{$key}) {
-                $value = eval($default{$key});
-                if (ref $value eq "ARRAY") {
-                    $profile{$key} = $value->[0];
-                } else {
-                    $profile{$key} = $value;
-                }
+        # remove undefined fields so they will fall back on defaults when requested
+        for my $key (keys %profile) {
+            if (!defined $profile{$key} || $profile{$key} eq '') {
+                delete $profile{$key};
             }
         }
-        $profile{alias} = $user{username} if ($profile{alias} =~ /^\W+$/ || $profile{alias} eq "");
-        $userData = {
-            _userId => $userId,
-            _user => \%user,
-            _profile => \%profile
-        };
-        $cache->set($userData, 60*60*24);
+
+        if (($profile{alias} =~ /^\W+$/ || $profile{alias} eq "") and $user{username}) {
+            $profile{alias} = $user{username};
+        }
+        $self->{_userId}    = $userId;
+        $self->{_user}      = \%user,
+        $self->{_profile}   = \%profile,
+        $self->cache;
     }
-    $userData->{_session} = $session;
-	bless $userData, $class;
+    return $self;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -615,7 +667,7 @@ sub profileField {
     my $fieldName   = shift;
     my $value       = shift;
     my $db          = $self->session->db;
-    if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName]) ) {
+    if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
         $self->session->errorHandler->warn("No such profile field: $fieldName");
         return undef;
     }
@@ -629,7 +681,16 @@ sub profileField {
         my $time = $self->session->datetime->time;
         $self->{_user}{"lastUpdated"} = $time;
         $self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
-	}
+    }
+    elsif (!exists $self->{_profile}{$fieldName}) {
+        my $default = $self->session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$fieldName]);
+        $self->{_profile}{$fieldName} = WebGUI::Operation::Shared::secureEval($self->session, $default);
+        $self->cache;
+    }
+    if (ref $self->{_profile}{$fieldName} eq 'ARRAY') {
+        ##Return a scalar, that is a string with all the defaults
+        return join ',', @{ $self->{_profile}{$fieldName} };
+    }
 	return $self->{_profile}{$fieldName};
 }
 
@@ -718,7 +779,7 @@ Deletes this user object out of the cache.
 sub uncache {
 	my $self = shift;
 	my $cache = WebGUI::Cache->new($self->session,["user",$self->userId]);
-	$cache->delete;	
+	$cache->delete;
 }
 
 #-------------------------------------------------------------------
@@ -734,16 +795,16 @@ If specified, the username is set to this value.
 =cut
 
 sub username {
-        my $self = shift;
-        my $value = shift;
-        if (defined $value) {
-		$self->uncache;
-                $self->{_user}{"username"} = $value;
-                $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
-                $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
-                    [$value, $self->session->datetime->time(), $self->userId]);
-        }
-        return $self->{_user}{"username"};
+    my $self = shift;
+    my $value = shift;
+    if (defined $value) {
+        $self->uncache;
+        $self->{_user}{"username"} = $value;
+        $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
+        $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
+            [$value, $self->session->datetime->time(), $self->userId]);
+    }
+    return $self->{_user}{"username"};
 }
 
 #-------------------------------------------------------------------

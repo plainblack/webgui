@@ -300,24 +300,38 @@ sub getToolbar {
 	return
 	    unless $self->canEdit;
 	if ($self->getToolbarState) {
-		my $returnUrl;
-		if ($self->session->asset) {
-			$returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);	
-		}
-		my $toolbar;
-		if (!$self->isLocked || $self->get("isLockedBy") eq $self->session->user->userId) {
-			$toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"));
-		}
-		my $i18n = WebGUI::International->new($self->session, "Asset");
-		return '<script type="text/javascript">
-                var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");
-                contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("copy").'");
-                contextMenu.addLink("'.$self->getUrl("op=assetManager").'","'.$i18n->get("manage").'");
-                contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");
-                contextMenu.print();
-                </script>'.$toolbar;
-	}
-	return $self->SUPER::getToolbar();
+        my $toolbar = '';
+        if ($self->canEditIfLocked) {
+            my $userUiLevel = $self->session->user->profileField("uiLevel");
+            my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
+            my $returnUrl = '';
+            if ($self->session->asset) {
+                $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
+            }
+            $toolbar = $self->session->icon->edit('func=edit'.$returnUrl,$self->get("url"))
+                if ($userUiLevel >= $uiLevels->{"edit"});
+        }
+        $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
+        $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
+        $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'), {type=>"text/javascript"});
+        my $i18n = WebGUI::International->new($self->session, "Asset");
+        return '<div class="yui-skin-sam wg-toolbar">'
+            . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
+            . '<div class="yuimenu wg-contextmenu">'
+            . '<div class="bd">'
+            . '<ul class="first-of-type">'
+            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=copy") . '">' . $i18n->get("copy") . '</a></li>'
+            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>'
+            . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl . '">' . $i18n->get("view") . '</a></li>'
+            . "</ul></div></div>$toolbar</div>";
+    }
+    return $self->SUPER::getToolbar;
 }
 
 
@@ -334,7 +348,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 
@@ -387,6 +401,7 @@ sub view {
 	my $currentLineage = $current->get("lineage");
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
+    my $absoluteDepthOfFirstPage = $assets->[0]->getLineageLength;
 	my %lastChildren;
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
@@ -423,7 +438,7 @@ sub view {
 		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$self->session->config->get("assetContainers") || []});
   		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$self->session->config->get("utilityAssets") || []});
 		$pageData->{"page.url"} = $asset->getUrl;
-		my $indent = $pageData->{"page.relDepth"};
+		my $indent = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.indent_loop"} = [];
 		push(@{$pageData->{"page.indent_loop"}},{'indent'=>$_}) for(1..$indent);
 		$pageData->{"page.indent"} = "&nbsp;&nbsp;&nbsp;" x $indent;

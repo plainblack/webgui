@@ -24,6 +24,7 @@ our $HELP = {
 			{	name => "hasAddedToCart" , required=>1 },
 			{	name => "thankYouMessage", description=>"thank you message help" },
 			{	name => "defaultPrice", description=>"default price help" },
+			{   name => "continueShoppingUrl" },
 			{	name => "templateId", description=>"donation template help" },
 		],
 		related => [  

@@ -50,6 +50,9 @@ sub process {
 
     # construct the absolute URL and get the asset ID
     my $asset           = WebGUI::Asset->newByUrl($session, $url);
+    if ( !$asset ) {
+        return "Widget: Could not find asset with URL '$url'";
+    }
     my $assetId         = $asset->getId;
 
     # ... and the full URL. If there's an exportWidget scratch variable, we're
@@ -62,15 +65,15 @@ sub process {
         $fullUrl            = $exportUrl . $storage->getUrl("$assetId.html");
         $wgWidgetPath       = $exportUrl . $extras . '/wgwidget.js';
         $scratch->delete('exportUrl');
-        my $content         = $asset->view;
-        WebGUI::Macro::process($session, \$content);
+        my $viewContent    = $asset->view;
+        WebGUI::Macro::process($session, \$viewContent);
         my $containerCss    = $extras . '/yui/build/container/assets/container.css';
         my $containerJs     = $extras . '/yui/build/container/container-min.js';
         my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
         my $wgWidgetJs      = $extras . '/wgwidget.js';
         my $wgWidgetPath    = $extras . '/wgwidget.js';
 
-        my $output          = <<OUTPUT;
+        my $fullHtmlOutput          = <<OUTPUT;
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -88,11 +91,11 @@ sub process {
         </script>
     </head>
     <body id="widget$assetId">
-        $content
+        $viewContent
     </body>
 </html>
 OUTPUT
-        $storage->addFileFromScalar("$assetId.html", $content);
+        $storage->addFileFromScalar("$assetId.html", $fullHtmlOutput);
     }
     else {
         $fullUrl            = "http://" . $conf->get("sitename")->[0] . $asset->getUrl;

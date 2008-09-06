@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 46;
+my $tests = 49;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -97,8 +97,8 @@ cmp_deeply  (
                 fieldType       => 'template',
                 label           => ignore(),
                 hoverHelp       => ignore(),
-                defaultValue    => 'BMzuE91-XB8E-XGll1zpvA',
-                namespace       => 'Shop/ReceiptEmail',
+                defaultValue    => 'bPz1yk6Y9uwMDMBcmMsSCg',
+                namespace       => 'Shop/EmailReceipt',
             },
             saleNotificationGroupId  => {
                 fieldType       => 'group',
@@ -279,8 +279,11 @@ is          ($driver->get('label'),     'Fast and harmless',    'get the label e
 
 my $optionsCopy = $driver->get;
 $optionsCopy->{label} = 'And now for something completely different';
-isnt        ($driver->get('label'),   'And now for something completely different', 
-                'hashref returned by get() is a copy of the internal hashref');
+isnt(
+    $driver->get('label'),
+    'And now for something completely different', 
+    'hashref returned by get() is a copy of the internal hashref'
+);
 
 #######################################################################
 #
@@ -461,6 +464,21 @@ cmp_deeply(
 
 #######################################################################
 #
+# canUse
+#
+#######################################################################
+
+$session->user({userId => 3});
+ok($driver->canUse, 'canUse: session->user is used if no argument is passed');
+ok(!$driver->canUse({userId => 1}), 'canUse: userId explicit works, visitor cannot use this driver');
+
+TODO: {
+    local $TODO = 'tests for canUse';
+    ok(0, 'Test other users and groups');
+}
+
+#######################################################################
+#
 # delete
 #
 #######################################################################
@@ -471,7 +489,7 @@ my $count = $session->db->quickScalar('select count(*) from paymentGateway where
     $driver->paymentGatewayId
 ]);
 
-is          ($count, 0, 'delete deleted the object');
+is ($count, 0, 'delete deleted the object');
 
 undef $driver;
 
@@ -481,5 +499,4 @@ undef $driver;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from paymentGateway');
 }

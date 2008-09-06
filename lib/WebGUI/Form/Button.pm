@@ -88,7 +88,7 @@ Renders a button.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixQuotes($self->getDefaultValue);
+ 	my $value = $self->fixQuotes($self->getOriginalValue);
 	my $html = '<input type="button" ';
 	$html .= 'name="'.$self->get("name").'" ' if ($self->get("name"));
 	$html .= 'id="'.$self->get('id').'" ' unless ($self->get('id') eq "_formId");

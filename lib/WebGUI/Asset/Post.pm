@@ -170,7 +170,7 @@ sub commit {
 			my $u = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 			$u->karma($self->getThread->getParent->get("karmaPerPost"), $self->getId, "Collaboration post");
 		}
-        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId) if ($self->isReply);
+        	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId);# if ($self->isReply);
 	}
 }
 
@@ -835,6 +835,8 @@ sub processPropertiesFromFormPost {
 			$self->getThread->stick if ($self->session->form->process("stick"));
 		}
 	}
+    # force the value to be empty so it gets updated properly by content
+    $self->update({synopsis => ($self->session->form->process("synopsis") || "")});
 	if ($self->session->form->process("archive") && $self->getThread->getParent->canModerate) {
 		$self->getThread->archive;
 	} elsif ($self->getThread->get("status") eq "archived") {
@@ -1370,6 +1372,12 @@ sub www_edit {
         }
         $var{meta_loop} = \@meta_loop;
     }
+	#keywords field
+    $var{'keywords.form'} = WebGUI::Form::text($session,{
+	    name        => 'keywords',
+        value       => $self->get('keywords'),
+    });
+
 	$self->getThread->getParent->appendTemplateLabels(\%var);
 	return $self->getThread->getParent->processStyle($self->processTemplate(\%var,$self->getThread->getParent->get("postFormTemplateId")));
 }

@@ -73,7 +73,7 @@ function showPopWin( e ) {
 }
 
 function doDialog (req) {
-   var contentArea = document.getElementById("contentArea");
+   var contentArea = document.getElementById("PMproject");
    contentArea.innerHTML = "" + contentArea.innerHTML + req.responseText;
    var taskDialog = document.getElementById("popupInner");
    

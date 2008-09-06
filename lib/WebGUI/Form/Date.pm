@@ -54,11 +54,11 @@ The following additional parameters have been added via this sub class.
 
 =head4 maxlength
 
-Defaults to 10. Determines the maximum number of characters allowed in this field.
+Originals to 10. Determines the maximum number of characters allowed in this field.
 
 =head4 size
 
-Defaults to 10. The displayed size of the box for the date to be typed in.
+Originals to 10. The displayed size of the box for the date to be typed in.
 
 =head4 noDate
 
@@ -66,7 +66,7 @@ A default date is placed in the value field. Set this to "1" to leave it empty.
 
 =head4 defaultValue
 
-If no value is specified, this will be used. Defaults to today and now.
+If no value is specified, this will be used. Originals to today and now.
 
 If the defaultValue is a MySQL date string, this form control will return MySQL
 date strings instead of epoch times.
@@ -77,7 +77,8 @@ sub definition {
 	my $class = shift;
 	my $session = shift;
 	my $definition = shift || [];
-	push(@{$definition}, {
+	
+    push(@{$definition}, {
 		defaultValue=>{
 			defaultValue=>$session->datetime->time()
 			},
@@ -137,16 +138,29 @@ sub getValue {
     # This should probably be rewritten as a cascading ternary
     my $value = $self->SUPER::getValue(@_);
 	if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
-		return $self->session->datetime->setToEpoch($value);
+        # Epoch format
+        if($value =~ /^\d+$/){
+            return $value;
+        }
+        return $self->session->datetime->setToEpoch($value);
 	} 
     else {
 		# MySQL format
 		# YY(YY)?-MM-DD
 		
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
-		
-		return $1
-			if ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
+
+        # MySQL format
+        # YY(YY)?-MM-DD HH:MM:SS
+
+        if($value =~ /^\d+$/){
+            return $self->session->datetime->epochToSet($value,$self->session->user->profileField( 'timeZone' ));
+        }
+
+        # Verify format
+        return undef
+			unless ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
+        return $value;
 	}
 }
 
@@ -165,11 +179,11 @@ sub getValueAsHtml {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->epochToHuman($self->getValue,"%z");
+		return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z");
 	} 
     else {
 		# MySQL format
-		my $value = $self->getDefaultValue;
+		my $value = $self->getOriginalValue;
         return $value;
 	}
 }
@@ -207,11 +221,11 @@ sub toHtml {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		$value = $self->set("value",$self->session->datetime->epochToSet($self->getDefaultValue));
+		$value = $self->set("value",$self->session->datetime->epochToSet($self->getOriginalValue));
 	} 
     else {
 		# MySQL format
-		$value = $self->getDefaultValue;
+		$value = $self->getOriginalValue;
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 	}
 
@@ -251,10 +265,10 @@ sub toHtmlAsHidden {
         || $self->get("defaultValue") =~ m/^\d+$/
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
-		$value = $self->session->datetime->epochToSet($self->getDefaultValue,"%z");
+		$value = $self->session->datetime->epochToSet($self->getOriginalValue,"%z");
 	} else {
 		# MySQL format
-		$value = $self->getDefaultValue;
+		$value = $self->getOriginalValue;
 		# NOTE: Cannot fix time zone since we don't have a complete date/time
 	}
 	

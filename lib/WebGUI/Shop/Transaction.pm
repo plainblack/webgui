@@ -593,7 +593,7 @@ sub update {
         $newProperties->{taxes} = $cart->calculateTaxes;
         my $address = $cart->getShippingAddress;
         $newProperties->{shippingAddressId} = $address->getId;
-        $newProperties->{shippingAddressName} = $address->get('name');
+        $newProperties->{shippingAddressName} = $address->get('firstName') . " " .$address->get('lastName');
         $newProperties->{shippingAddress1} = $address->get('address1');
         $newProperties->{shippingAddress2} = $address->get('address2');
         $newProperties->{shippingAddress3} = $address->get('address3');
@@ -616,7 +616,7 @@ sub update {
     if (exists $newProperties->{paymentAddress}) {
         my $address = $newProperties->{paymentAddress};
         $newProperties->{paymentAddressId} = $address->getId;
-        $newProperties->{paymentAddressName} = $address->get('name');
+        $newProperties->{paymentAddressName} = $address->get('firstName') ." ". $address->get('lastName');
         $newProperties->{paymentAddress1} = $address->get('address1');
         $newProperties->{paymentAddress2} = $address->get('address2');
         $newProperties->{paymentAddress3} = $address->get('address3');
@@ -636,7 +636,7 @@ sub update {
         shippingCountry shippingCode shippingPhoneNumber shippingDriverId shippingDriverLabel notes
         shippingPrice paymentAddressId paymentAddressName originatingTransactionId isRecurring
         paymentAddress1 paymentAddress2 paymentAddress3 paymentCity paymentState paymentCountry paymentCode
-        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes ));
+        paymentPhoneNumber paymentDriverId paymentDriverLabel taxes shopCreditDeduction));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }

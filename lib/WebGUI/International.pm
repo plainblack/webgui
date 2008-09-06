@@ -97,13 +97,24 @@ my $safeRe = qr/[^\.\w\d\s\/]/;
 
 sub get {
 	my ($self, $id, $namespace, $language) = @_;
+    my $session = $self->session;
 	$namespace = $namespace || $self->{_namespace} || "WebGUI";
-	$language = $language || $self->{_language} || $self->session->user->profileField("language") || "English";
+	$language = $language || $self->{_language} || $session->user->profileField("language") || "English";
 	$id =~ s/$safeRe//g;
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
     my $cmd = "WebGUI::i18n::".$language."::".$namespace;
-    WebGUI::Pluggable::load($cmd);
+    eval { WebGUI::Pluggable::load($cmd); };
+    if ($@) {
+        if ($language eq 'English') {
+            $session->log->error('Unable to load $cmd');
+            return '';
+        }
+        else {
+            my $output = $self->get($id, $namespace, 'English');
+            return $output;
+        }
+    }
     our $table;
     *table = *{"$cmd\::I18N"};  ##Create alias into symbol table
 	my $output = $table->{$id}->{message};

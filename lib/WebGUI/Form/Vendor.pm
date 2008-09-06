@@ -119,7 +119,7 @@ Formats as a name.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $vendor = eval{WebGUI::Shop::Vendor->new($self->session, $self->getDefaultValue)};
+    my $vendor = eval{WebGUI::Shop::Vendor->new($self->session, $self->getOriginalValue)};
     if (!$@ && defined $vendor) {
         return $vendor->get('name');
     }

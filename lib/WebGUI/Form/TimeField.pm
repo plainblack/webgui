@@ -184,7 +184,7 @@ Renders a time field.
 
 sub toHtml {
     my $self = shift;
-	my $value = $self->getDefaultValue;
+	my $value = $self->getOriginalValue;
 	my $i18n = WebGUI::International->new($self->session);
 	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
 	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'0123456789:\')"');
@@ -206,7 +206,7 @@ Renders the field as a hidden field.
 
 sub toHtmlAsHidden {
 	my $self = shift;
-	my $value = $self->getDefaultValue;
+	my $value = $self->getOriginalValue;
 	return WebGUI::Form::Hidden->new($self->session,
 		name=>$self->get("name"),
 		value=>$value

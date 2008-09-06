@@ -203,7 +203,7 @@ foreach my $filename (keys %config) {
 			my $cmd = qq!$dumpcmd -u"$config{$filename}{dbuser}" -p"$config{$filename}{dbpass}"!;
 			$cmd .= " --host=".$config{$filename}{host} if ($config{$filename}{host});
 			$cmd .= " --port=".$config{$filename}{port} if ($config{$filename}{port});
-			$cmd .= " --add-drop-table --databases ".$config{$filename}{db}." --result-file="
+			$cmd .= " --add-drop-table ".$config{$filename}{db}." --result-file="
 				.$backupTo.$slash.$config{$filename}{db}."_".$upgrade{$upgrade}{from}.".sql";
 			unless (system($cmd)) {
 				print "OK\n" unless ($quiet);

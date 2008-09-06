@@ -53,12 +53,12 @@ BEGIN {
     $CONFIG_FILE = $ENV{ WEBGUI_CONFIG };
 
     unless ( defined $CONFIG_FILE ) {
-        warn qq/Enviroment variable WEBGUI_CONFIG must be set.\n/;
+        warn qq/Enviroment variable WEBGUI_CONFIG must be set to the full path to a WebGUI config file.\n/;
         exit(1);
     }
    
     unless ( $CONFIG_FILE ) {
-        warn qq/Enviroment variable WEBGUI_CONFIG must not be empty.\n/;
+        warn qq/Enviroment variable WEBGUI_CONFIG must not be empty.  It must be set to the full path of a WebGUI config file.\n/;
         exit(1);
     }
 

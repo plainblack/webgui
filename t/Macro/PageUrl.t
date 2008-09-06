@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 5;
+my $numTests = 7;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -49,6 +49,12 @@ is($output, $session->url->gateway.$homeAsset->get('url'), 'fetching url for sit
 $output = WebGUI::Macro::PageUrl::process($session, '/sub/page');
 is($output, $session->url->gateway.$homeAsset->get('url').'/sub/page', 'fetching url for site default asset with sub url');
 
+$output = WebGUI::Macro::PageUrl::process($session, '/sub/page', 'query=this');
+is($output, $session->url->gateway.$homeAsset->get('url').'/sub/page?query=this', 'Using the query argument to the macro');
+
+$output = WebGUI::Macro::PageUrl::process($session, '', 'query=this');
+is($output, $session->url->gateway.$homeAsset->get('url').'?query=this', 'Using the query argument to the macro with no URL fragment');
+
 $session->setting->set('preventProxyCache', 1);
 
 $output = WebGUI::Macro::PageUrl::process($session);
@@ -57,11 +63,9 @@ like($output, qr{\?noCache=\d+:\d+$}, 'checking the cache settings in the page U
 $output = WebGUI::Macro::PageUrl::process($session, '/sub/page');
 like($output, qr{/sub/page\?noCache=\d+:\d+$}, 'checking the cache settings in the URL are at the end of the page URL');
 
-}
+$output = WebGUI::Macro::PageUrl::process($session, '/sub/page', 'query=this');
+like($output, qr{/sub/page\?noCache=\d+:\d+;query=this$}, 'checking that the query arg works with preventProxyCache');
 
-TODO: {
-	local $TODO = "Tests to make later";
-	ok(0, 'Fetch url from locally made asset with known url');
 }
 
 END {

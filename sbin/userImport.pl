@@ -166,7 +166,7 @@ while(my $line = <FILE>) {
         my $class = "WebGUI::Auth::".$authMethod;
         (my $mod = "$class.pm") =~ s{::|'}{/}g;
         if (! eval { require $mod; 1 } ) {
-            $session->log->fatal("Authentication module failed to compile: $cmd.".$@) if($@);
+            $session->log->fatal("Authentication module failed to compile: $mod.".$@) if($@);
             exit;
         }
         my $auth = $class->new($session, $authMethod,$u->userId);

@@ -28,7 +28,6 @@ These subroutines are available from this package:
 
 readonly cart => my %cart;
 private properties => my %properties;
-private skuCache => my %skuCache;
 
 #-------------------------------------------------------------------
 
@@ -101,7 +100,6 @@ Removes this item from the cart without calling $sku->onRemoveFromCart which wou
 sub delete {
     my $self = shift;
     $self->cart->session->db->deleteRow("cartItem","itemId",$self->getId);
-    undef $self;
     return undef;
 }
 
@@ -113,7 +111,9 @@ Returns a duplicated hash reference of this object’s data.
 
 =head3 property
 
-Any field − returns the value of a field rather than the hash reference.
+Any field − returns the value of a field rather than the hash reference.  If the property
+equals "options", it will decode the internally stored JSON and return you a hash reference
+of the JSON data.
 
 =cut
 
@@ -175,13 +175,7 @@ sub getSku {
     my ($self) = @_;
     my $id = ref $self;
     my $asset = '';
-    if (exists $skuCache{$id}{$self->get("assetId")}) {
-        $asset = $skuCache{$id}{$self->get("assetId")};
-    }
-    else {
-        $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
-        $skuCache{$id}{$self->get("assetId")} = $asset;
-    }
+    $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
     $asset->applyOptions($self->get("options"));
     return $asset;
 }

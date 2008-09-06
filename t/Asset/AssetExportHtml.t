@@ -742,30 +742,35 @@ $exportPath->rmtree;
 # list of files that should exist. obtained by running previous known working
 # export function on a full stock asset tree
 @createdFiles = (
-    [ qw/ getting_started getting-started index.html /],
-    [ qw/ getting_started getting-started-part2 index.html /],
-    [ qw/ getting_started index.html /],
-    [ qw/ home ad index.html /],
-    [ qw/ home ad2 index.html /],
-    [ qw/ home index.html /],
-    [ qw/ home key-benefits index.html /],
-    [ qw/ home welcome index.html /],
-    [ qw/ site_map index.html /],
-    [ qw/ site_map site_map index.html /],
-    [ qw/ tell_a_friend index.html /],
-    [ qw/ tell_a_friend tell_a_friend index.html /],
-    [ qw/ the_latest_news index.html /],
-    [ qw/ the_latest_news the_latest_news index.html /],
-    [ qw/ yns docs index.html /],
-    [ qw/ yns experts index.html /],
-    [ qw/ yns features index.html /],
-    [ qw/ yns hosting index.html /],
-    [ qw/ yns promotion index.html /],
-    [ qw/ yns style index.html /],
-    [ qw/ yns support index.html /],
-    [ qw/ yns translated index.html /],
-    [ qw/ your_next_step index.html /],
+    [ qw/ getting_started getting-started          index.html /],
+    [ qw/ getting_started getting-started-part2    index.html /],
+    [ qw/ getting_started                          index.html /],
+    [ qw/ home            ad                       index.html /],
+    [ qw/ home            ad2                      index.html /],
+    [ qw/ home                                     index.html /],
+    [ qw/ home            key-benefits             index.html /],
+    [ qw/ home            welcome                  index.html /],
+    [ qw/ site_map                                 index.html /],
+    [ qw/ site_map        site_map                 index.html /],
+    [ qw/ tell_a_friend                            index.html /],
+    [ qw/ tell_a_friend   tell_a_friend            index.html /],
+    [ qw/ the_latest_news                          index.html /],
+    [ qw/ the_latest_news the_latest_news          index.html /],
+    [ qw/ yns             docs                     index.html /],
+    [ qw/ yns             experts                  index.html /],
+    [ qw/ yns             features                 index.html /],
+    [ qw/ yns             hosting                  index.html /],
+    [ qw/ yns             promotion                index.html /],
+    [ qw/ yns             style                    index.html /],
+    [ qw/ yns             support                  index.html /],
+    [ qw/ yns             translated               index.html /],
+    [ qw/ your_next_step                           index.html /],
+    [ qw/ documentation                           index.html /],
+    [ qw/ documentation  commercial-documentation index.html /],
+    [ qw/ documentation  free-documentation       index.html /],
 );
+
+my $numberCreatedAll = scalar @createdFiles;
 
 # turn them into Path::Class::File objects
 my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
@@ -773,9 +778,9 @@ my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->st
 # ensure that the files that should exist do exist
 my @doExist;
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_deeply(sort @shouldExist, sort @doExist, "exportAsHtml on home writes correct files");
+cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home writes correct files");
 is($success, 1, "exportAsHtml on home returns true");
-like($message, qr/Exported 23 pages/, "exportAsHtml on home returns correct message");
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on home returns correct message");
 
 $exportPath->rmtree;
 @doExist = ();
@@ -861,13 +866,17 @@ $gettingStarted->update({ isExportable => 0 });
     [ qw/ yns support index.html /],
     [ qw/ yns translated index.html /],
     [ qw/ your_next_step index.html /],
+    [ qw/ documentation                           index.html /],
+    [ qw/ documentation  commercial-documentation index.html /],
+    [ qw/ documentation  free-documentation       index.html /],
 );
+my $numberCreated = scalar @createdFiles;
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_deeply(sort @shouldExist, sort @doExist, "exportAsHtml on home with non-exportable getting-started writes correct files");
+cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home with non-exportable getting-started writes correct files");
 is($success, 1, "exportAsHtml on home with non-exportable getting-started returns true");
-like($message, qr/Exported 19 pages/, "exportAsHtml on home with non-exportable getting-started returns correct message");
+like($message, qr/Exported $numberCreated pages/, "exportAsHtml on home with non-exportable getting-started returns correct message");
 
 # restore the original setting
 $gettingStarted->update({ isExportable => 1 });
@@ -906,24 +915,24 @@ $config->delete('exportPath');
 
 # undefined exportPath
 eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@, '', "exportAsHtml catches undefined exportPath exception");
-is($success, 0, "exportAsHtml returns 0 for undefined exportPath");
+is($@,       '', "exportAsHtml catches undefined exportPath exception");
+is($success, 0,  "exportAsHtml returns 0 for undefined exportPath");
 is($message, 'exportPath must be defined and not ""', "exportAsHtml returns correct message for undefined exportPath");
 
 # inaccessible exportPath
 $config->set('exportPath', Path::Class::Dir->new('')->stringify);
 
 eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@, '', "exportAsHtml catches inaccessible exportPath ");
-is($success, 0, "exportAsHtml returns 0 for inaccessible exportPath");
+is($@,       '', "exportAsHtml catches inaccessible exportPath ");
+is($success, 0,  "exportAsHtml returns 0 for inaccessible exportPath");
 is($message, "can't access " . Path::Class::Dir->new('')->stringify, "exportAsHtml returns correct message for inaccessible exportPath");
 
 # exportPath is a file, not a directory
 $config->set('exportPath', $exportPathFile);
 
 eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@, '', "exportAsHtml catches exportPath is file exception");
-is($success, 0, "exportAsHtml returns 0 if exportPath is a file");
+is($@,       '', "exportAsHtml catches exportPath is file exception");
+is($success, 0,  "exportAsHtml returns 0 if exportPath is a file");
 is($message, "$exportPathFile isn't a directory", "exportAsHtml returns correct message if exportPath is a file");
 
 # can't create export path
@@ -931,8 +940,8 @@ chmod 0000, $tempDirectory;
 $config->set('exportPath', $inaccessibleDirectory->stringify);
 
 eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@, '', "exportAsHtml catches uncreatable exportPath exception");
-is($success, 0, "exportAsHtml returns 0 for uncreatable exportPath");
+is($@,       '',                                               "exportAsHtml catches uncreatable exportPath exception");
+is($success, 0,                                                "exportAsHtml returns 0 for uncreatable exportPath");
 is($message, "can't create exportPath $inaccessibleDirectory", "exportAsHtml returns correct message for uncreatable exportPath");
 
 # user can't view asset
@@ -966,18 +975,21 @@ $exportPath->rmtree;
 ($success, $message)    = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'symlink', quiet => 1 } );
 $extrasSymlink          = Path::Class::File->new($exportPath, $extrasUrl);
 $uploadsSymlink         = Path::Class::File->new($exportPath, $uploadsUrl);
-is($success, 1, "exportAsHtml when linking extras and uploads returns true");
-like($message, qr/Exported 23 pages/, "exportAsHtml when linking extras and uploads returns correct message");
-ok(-e $extrasSymlink->absolute->stringify, "exportAsHtml writes extras symlink");
+
+is($success,   1,                                    "exportAsHtml when linking extras and uploads returns true");
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml when linking extras and uploads returns correct message");
+
+ok(-e $extrasSymlink->absolute->stringify,                    "exportAsHtml writes extras symlink");
 is($extrasPath, readlink $extrasSymlink->absolute->stringify, "exportAsHtml extras symlink points to right place");
-ok(-e $uploadsSymlink->absolute->stringify, "exportAsHtml writes uploads symlink");
+
+ok(-e $uploadsSymlink->absolute->stringify,                     "exportAsHtml writes uploads symlink");
 is($uploadsPath, readlink $uploadsSymlink->absolute->stringify, "exportAsHtml uploads symlink points to right place");
 
 # next, make sure the root URL symlinking works.
 ($success, $message)    = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'symlink', quiet => 1 } );
 my $rootUrlSymlink      = Path::Class::File->new($exportPath, 'index.html');
 is($success, 1, 'exportAsHtml when linking root URL returns true');
-like($message, qr/Exported 23 pages/, "exportAsHtml when linking root URL returns correct message");
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml when linking root URL returns correct message");
 ok(-e $rootUrlSymlink->absolute->stringify, "exportAsHtml writes root URL symlink");
 is($home->exportGetUrlAsPath->absolute->stringify, readlink $rootUrlSymlink->absolute->stringify, "exportAsHtml root URL symlink points to right place");
 

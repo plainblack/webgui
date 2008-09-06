@@ -90,16 +90,24 @@ sub getValue {
 	my $self = shift;
 	my $value = $self->SUPER::getValue(@_);
 	$value =~ tr/\r\n//d;
-     	if ($value =~ /mailto:/) {
-                return $value;
-        } 
-        elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
-                return "mailto:".$value;
-        } 
-        elsif ($value =~ /^\// || $value =~ /:\/\// || $value =~ /^\^/) {
-                return $value;
-        }
-        return "http://".$value;
+	# empty
+	if ($value eq "" || $value =~ m{^http://$}i) {
+		return undef;
+	}
+	# proper email url
+    elsif ($value =~ /mailto:/) {
+        return $value;
+    }
+	# improper email url
+    elsif ($value =~ /^([A-Z0-9]+[._+-]?){1,}([A-Z0-9]+[_+-]?)+\@(([A-Z0-9]+[._-]?){1,}[A-Z0-9]+\.){1,}[A-Z]{2,4}$/i) {
+        return "mailto:".$value;
+    }
+	# proper web url
+    elsif ($value =~ /^\// || $value =~ /:\/\// || $value =~ /^\^/) {
+        return $value;
+    }
+	# improper web url
+    return "http://".$value;
 }
 
 #-------------------------------------------------------------------
@@ -112,7 +120,7 @@ Formats as a link.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $url = $self->getDefaultValue;
+    my $url = $self->getOriginalValue;
     return '<a href="'.$url.'">'.$url.'</a>';
 }
 

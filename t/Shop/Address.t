@@ -130,7 +130,8 @@ cmp_deeply(
     $address->get,
     {
         label       => undef,
-        name        => undef,
+        firstName   => undef,
+        lastName    => undef,
         address1    => undef,
         address2    => undef,
         address3    => undef,

@@ -247,7 +247,8 @@ sub set {
 	$self->{_properties}{title} = $properties->{title} || $self->{_properties}{title} || "Untitled";
 	$self->{_properties}{clicksBought} = $properties->{clicksBought} || $self->{_properties}{clicksBought};
 	$self->{_properties}{impressionsBought} = $properties->{impressionsBought} || $self->{_properties}{impressionsBought};
-	$self->{_properties}{url} = $properties->{url} || $self->{_properties}{url};
+	$self->{_properties}{url}    = exists $properties->{url}    ? $properties->{url}    : $self->{_properties}{url};
+	$self->{_properties}{adText} = exists $properties->{adText} ? $properties->{adText} : $self->{_properties}{adText};
 	$self->{_properties}{adText} = $properties->{adText} || $self->{_properties}{adText};
 	$self->{_properties}{storageId} = $properties->{storageId} || $self->{_properties}{storageId};
 	$self->{_properties}{richMedia} = $properties->{richMedia} || $self->{_properties}{richMedia};

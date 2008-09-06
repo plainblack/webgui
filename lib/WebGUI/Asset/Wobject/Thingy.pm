@@ -137,7 +137,7 @@ sub addThing {
         lastUpdated int not null,
         ipAddress varchar(255),
         primary key (thingDataId)
-    )");
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
     
     return $newThingId;
 }
@@ -585,7 +585,7 @@ sub getEditForm {
 
     my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->get("assetId")]);
 
-    unless (scalar(keys(%{$things}))) {
+    if (scalar(keys(%{$things}))) {
     	$tabform->getTab("display")->selectBox(
 	    	-name=>"defaultThingId",
             -value=>$self->get("defaultThingId"),
@@ -642,8 +642,10 @@ sub getFieldValue {
         }
     }
     else {
+        my %fieldProperties = %$field;
+        $fieldProperties{options} = $field->{possibleValues};
         $processedValue 
-            = WebGUI::Form::DynamicField->new( $self->session,  %$field, defaultValue => $value  )
+            = WebGUI::Form::DynamicField->new( $self->session,  %fieldProperties, defaultValue => $value  )
             ->getValueAsHtml;
     }
 
@@ -684,7 +686,10 @@ sub getFormElement {
     $param{fieldType} = $data->{fieldType};
 
     if ($data->{fieldType} eq "Checkbox") {
-        $param{value} = ($data->{defaultValue} =~ /checked/xi) ? 1 : "";
+        $param{value} = 1;
+        if ($data->{value} == 1){
+            $param{checked} = 1;
+        }
     }
 
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
@@ -941,7 +946,7 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
     return undef;
 }
@@ -1321,8 +1326,8 @@ sub www_editThing {
         else{
             $formElement = $self->getFormElement($field);     
         }
-        if ($field->{subText}){
-            $formElement .= '<span class="formSubtext">'.$field->{subText}.'</span>';
+        if ($field->{subtext}){
+            $formElement .= '<br /><span class="formSubtext">'.$field->{subtext}.'</span>';
         }
 
         $fieldsHTML .= "<li class='list1' id='$field->{fieldId}'>"
@@ -1339,12 +1344,14 @@ sub www_editThing {
             ."</td><td valign='top' class='tableData'>";
         $fieldsViewScreen .= WebGUI::Form::checkbox($self->session, {                 
                 checked => $field->{display},
-                name  => "display_".$field->{fieldId}
+                name  => "display_".$field->{fieldId},
+                value => 1,
             });
         $fieldsViewScreen .= "</td>\n<td valign='top' class='tableData'>";
         $fieldsViewScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{viewScreenTitle},
-                name  => "viewScreenTitle_".$field->{fieldId}
+                name  => "viewScreenTitle_".$field->{fieldId},
+                value => 1,
             });
         $fieldsViewScreen .= "</td>\n</tr>\n</fieldset>";
 
@@ -1353,12 +1360,14 @@ sub www_editThing {
             ."</td>\n<td valign='top' class='tableData'>";
         $fieldsSearchScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{displayInSearch},
-                name  => "displayInSearch_".$field->{fieldId}
+                name  => "displayInSearch_".$field->{fieldId},
+                value => 1,
             });
         $fieldsSearchScreen .= "</td>\n<td valign='top' class='tableData'>";
         $fieldsSearchScreen .= WebGUI::Form::checkbox($self->session, {
                 checked => $field->{searchIn},
-                name  => "searchIn_".$field->{fieldId}
+                name  => "searchIn_".$field->{fieldId},
+                value => 1,
             });
         my $sortBy;
         $sortBy = 1 if ($properties{sortBy} eq $field->{fieldId});
@@ -1681,6 +1690,7 @@ sub www_editFieldSave {
         possibleValues=>$self->session->form->process("possibleValues"),
         subtext=>$self->session->form->process("subtext"),
         status=>$self->session->form->process("status"),
+        size=>$self->session->form->process("size"),
         width=>$self->session->form->process("width"),
         height=>$self->session->form->process("height"),
         vertical=>$self->session->form->process("vertical"),
@@ -1711,8 +1721,8 @@ sub www_editFieldSave {
     else{
         $formElement = $self->getFormElement(\%properties);
     }
-    if ($properties{subText}){
-        $formElement .= '<span class="formSubtext">'.$properties{subText}.'</span>';
+    if ($properties{subtext}){
+        $formElement .= '<br /><span class="formSubtext">'.$properties{subtext}.'</span>';
     }
 
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
@@ -1815,7 +1825,7 @@ sub www_editThingData {
             "isHidden" => $hidden,
             "isVisible" => ($field{status} eq "visible" && !$hidden),
             "isRequired" => ($field{status} eq "required" && !$hidden),
-            "subtext" => $field{subText},
+            "subtext" => $field{subtext},
         );
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
     }
@@ -2047,16 +2057,15 @@ sub www_import {
         my $lineNumber = 0;
         my @data = ();
         
-        while (my $line = <$importFile>) {
+        while ( my $row = WebGUI::Text::readCSV($importFile) ) {
             if ($lineNumber == 0 && $session->form->process('ignoreFirstLine')){
                 $lineNumber++;
                 $error->info("Skipping first line");
                 next;
             }
-            $error->info("Reading line $lineNumber: $line");            
+            $error->info("Reading line $lineNumber: @{ $row }");
             $lineNumber++;
-            chomp($line);
-            @data = WebGUI::Text::splitCSV($line);
+            @data = @{ $row };
             
             # check for duplicates
             my $fieldNumber = 0;
@@ -2079,7 +2088,7 @@ sub www_import {
                 $query .= " limit 1";
                 ($foundDuplicateId) = $session->db->quickArray($query);
                 if ($foundDuplicateId){
-                    $error->info("found duplicate record: ".$foundDuplicateId." for data: ".$line);
+                    $error->info("found duplicate record: ".$foundDuplicateId." for data: ". @{ $row });
                 }
             }
 
@@ -2191,12 +2200,14 @@ sub www_importForm {
         $fieldOptions .= "<tr><td>".$field->{label}."</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
                 checked => "",
-                name  => "fileContains_".$field->{fieldId}
+                name  => "fileContains_".$field->{fieldId},
+                value => 1,
             });
         $fieldOptions .= "</td><td>";
         $fieldOptions .= WebGUI::Form::checkbox($self->session, {
                 checked => "",
-                name  => "checkDuplicates_".$field->{fieldId}
+                name  => "checkDuplicates_".$field->{fieldId},
+                value => 1,
             });
         $fieldOptions .= "</td></tr>";
     }
@@ -2331,14 +2342,13 @@ sub www_search {
     my $session = $self->session;
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
-    my ($var,$url,$doSearch,$orderBy);
+    my ($var,$url,$orderBy);
     my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
     my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
 
     my $thingProperties = $self->getThing($thingId);
     return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdSearch});
 
-    $doSearch = $session->form->process("doSearch");
     $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
     $var = $self->get;
     $url = $self->getUrl;
@@ -2348,7 +2358,7 @@ sub www_search {
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
     $var->{"thing_label"} = $thingProperties->{label};
 
-    if ($doSearch && $self->hasPrivileges($thingProperties->{groupIdExport})){
+    if ($self->hasPrivileges($thingProperties->{groupIdExport})){
         $var->{"export_url"} = $session->url->append($url, 'func=export;thingId='.$thingId);
     }
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
@@ -2393,28 +2403,24 @@ sequenceNumber');
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
             });
-            if ($doSearch){
-                my $searchValue = $session->form->process("field_".$field->{fieldId});
-                push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
-            }
+            my $searchValue = $session->form->process("field_".$field->{fieldId});
+            push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
         }
-        if ($doSearch){
-            if($field->{displayInSearch}){
-                my $orderByUrl = $currentUrl.";orderBy=".$field->{fieldId};
-                push(@displayInSearchFields_loop, {
-                    "displayInSearchFields_fieldId" => $field->{fieldId},
-                    "displayInSearchFields_label" => $field->{label},
-                    "displayInSearchFields_orderByUrl" => $orderByUrl,
-                });
-                push(@displayInSearchFields, {
-                    fieldId => $field->{fieldId},
-                    properties => $field,
-                });
-            }
+        if($field->{displayInSearch}){
+            my $orderByUrl = $self->session->url->append($currentUrl,"orderBy=".$field->{fieldId});
+            push(@displayInSearchFields_loop, {
+                "displayInSearchFields_fieldId" => $field->{fieldId},
+                "displayInSearchFields_label" => $field->{label},
+                "displayInSearchFields_orderByUrl" => $orderByUrl,
+            });
+            push(@displayInSearchFields, {
+                fieldId => $field->{fieldId},
+                properties => $field,
+            });
         }
     }
-
-    if ($doSearch){
+    
+    if (scalar(@displayInSearchFields)){
         $query = "select thingDataId, ";
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
         $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
@@ -2422,50 +2428,53 @@ sequenceNumber');
         if ($orderBy){
             $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);
         }
-        
-        # store query in cache for thirty minutes
-        WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
-
-        $paginatePage = $self->session->form->param('pn') || 1;
-        $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
-        
-        $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
-        $p->setDataByQuery($query);
-        $searchResults = $p->getPageData($paginatePage);
-        foreach my $searchResult (@$searchResults){
-            my (@field_loop);
-            foreach my $field (@displayInSearchFields){
-                my $fieldId = $field->{fieldId};
-                my $value = $self->getFieldValue($searchResult->{"field_".$fieldId},$field->{properties});
-                push(@field_loop,{
-                    "field_value" => $value,
-                    "field_id" => $fieldId,
-                });
-            }
-            my $thingDataId = $searchResult->{thingDataId};
-            my %templateVars = (
-                "searchResult_id" => $thingDataId,
-                "searchResult_view_url" => $session->url->append($url, 'func=viewThingData;thingId=' 
-                .$thingId.';thingDataId='.$thingDataId),
-                "searchResult_field_loop" => \@field_loop,
-            );
-            if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
-                $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
-                $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
-                .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
-            }
-            push(@searchResult_loop,\%templateVars);
-        }
-        $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
-        $var->{searchResult_loop} = \@searchResult_loop;    
-        $p->appendTemplateVars($var);
     }
+    else{
+        $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
+        return undef;
+    }
+    
+    # store query in cache for thirty minutes
+    WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
+
+    $paginatePage = $self->session->form->param('pn') || 1;
+    $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
+    
+    $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
+    $p->setDataByQuery($query);
+    $searchResults = $p->getPageData($paginatePage);
+    foreach my $searchResult (@$searchResults){
+        my (@field_loop);
+        foreach my $field (@displayInSearchFields){
+            my $fieldId = $field->{fieldId};
+            my $value = $self->getFieldValue($searchResult->{"field_".$fieldId},$field->{properties});
+            push(@field_loop,{
+                "field_value" => $value,
+                "field_id" => $fieldId,
+            });
+        }
+        my $thingDataId = $searchResult->{thingDataId};
+        my %templateVars = (
+            "searchResult_id" => $thingDataId,
+            "searchResult_view_url" => $session->url->append($url, 'func=viewThingData;thingId=' 
+            .$thingId.';thingDataId='.$thingDataId),
+            "searchResult_field_loop" => \@field_loop,
+        );
+        if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
+            $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
+            .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
+            .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+        }
+        push(@searchResult_loop,\%templateVars);
+    }
+    $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
+    $var->{searchResult_loop} = \@searchResult_loop;    
+    $p->appendTemplateVars($var);
 
     $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"search"});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingId",value=>$thingId});
-    $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"doSearch",value=>1});
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value=>$i18n->get("search button label")});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
 

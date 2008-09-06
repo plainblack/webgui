@@ -454,14 +454,14 @@ sub definition {
 					    label=>'Who Can View (Flux Rule)',
 					    hoverHelp=>'Who Can View (Flux Rule)',
 					    uiLevel=>6,
-                        fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
+                       fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
                     },
                     fluxRuleIdEdit=>{
 					    tab=>"security",
 					    label=>'Who Can Edit (Flux Rule)',
 					    hoverHelp=>'Who Can Edit (Flux Rule)',
 					    uiLevel=>6,
-                        fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
+                       fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
                     },
                     synopsis=>{
 					    tab=>"meta",
@@ -607,7 +607,7 @@ sub fixTitle {
 
 #-------------------------------------------------------------------
 
-=head2 fixUrl ( string )
+=head2 fixUrl ( url )
 
 Returns a URL, removing invalid characters and making it unique by
 adding a digit to the end if necessary.  URLs are not allowed to be
@@ -621,9 +621,10 @@ Assets have a maximum length of 250 characters.  Any URL longer than
 URLs will be passed through $session->url->urlize to make them WebGUI compliant.
 That includes any languages specific constraints set up in the default language pack.
 
-=head3 string
+=head3 url
 
-Any text string. Most likely will have been the Asset's name or title.
+Any text string. Most likely will have been the Asset's name or title.  If the string is not passed
+in, then a url will be constructed from
 
 =cut
 
@@ -641,12 +642,7 @@ sub fixUrl {
 
     # if we're inheriting the URL from our parent, set that appropriately
     if($self->get('inheritUrlFromParent')) {
-        my @parts = split(m{/},$url);
-
-        # don't do anything unless we need to
-        if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
-            $url = $self->getParent->getUrl . '/' . $parts[-1];
-        }
+       $url = $self->fixUrlFromParent($url); 
     }
 
 	# fix urls used by uploads and extras
@@ -700,6 +696,40 @@ sub fixUrl {
         $url = join(".",@parts);
         $url = $self->fixUrl($url);
     }
+    return $url;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 fixUrlFromParent ( url )
+
+URLs will be passed through $session->url->urlize to make them WebGUI compliant.
+That includes any languages specific constraints set up in the default language pack.
+
+=head3 url
+
+Any text string.
+
+=cut
+
+sub fixUrlFromParent {
+	my $self      = shift;
+	my $url       = shift;
+
+    # if we're inheriting the URL from our parent, set that appropriately
+    my @parts = split(m{/}, $url);
+
+    # don't do anything unless we need to
+    if("/$url" ne $self->getParent->getUrl . '/' . $parts[-1]) {
+        $url = $self->getParent->getUrl . '/' . $parts[-1];
+    }
+
+    ##Note we do not need to call fixUrl on the url argument.  Here's the reasoning why.
+    ##If a URL has not been set to updated at the same time that inheritUrlFromParent is
+    ##called, then it has already been "fixed".
+    ##On the other hand, if it has, the sideEffect nature of this method guarantees that
+    ##the URL was "fixed" before it was called.
     return $url;
 }
 
@@ -889,6 +919,33 @@ Returns a list of arrayrefs, one per extra tab to add to the edit
 form.  The default is no extra tabs.  Override this in a subclass to
 add extra tabs.
 
+Each array ref will have 3 fields:
+
+=over 4
+
+=item tabName
+
+This is the name of the tab that you will use in the definition subroutine to
+add fields to the new tab.
+
+=item label
+
+This should be an internationalized label that will be displayed on the tab.
+
+=item uiLevel
+
+This is the UI level for the tab.
+
+=back
+
+Please see the example below for adding 1 tab.
+
+    sub getEditTabs {
+        my $self = shift;
+        my $i18n = WebGUI::International->new($self->session,"myNamespace");
+        return ($self->SUPER::getEditTabs, ['myTab', $i18n->get('myTabName'), 9]);
+    }
+
 =cut
 
 sub getEditTabs {
@@ -900,7 +957,8 @@ sub getEditTabs {
 
 =head2 getEditForm ()
 
-Creates and returns a tabform to edit parameters of an Asset.
+Creates and returns a tabform to edit parameters of an Asset. See L<getEditTabs> for
+adding additional tabs.
 
 =cut
 
@@ -1016,20 +1074,20 @@ sub getEditForm {
                 my $meta = $self->getMetaDataFields();
                 foreach my $field (keys %$meta) {
                         my $fieldType = $meta->{$field}{fieldType} || "text";
-                        my $options;
+                        my $options = $meta->{$field}{possibleValues};
                         # Add a "Select..." option on top of a select list to prevent from
                         # saving the value on top of the list when no choice is made.
-                        if($fieldType eq "selectList") {
-                                $options = {"", $i18n->get("Select")};
+                        if("\l$fieldType" eq "selectBox") {
+                            $options = "|" . $i18n->get("Select") . "\n" . $options;
                         }
                         $tabform->getTab("meta")->dynamicField(
-                                                name=>"metadata_".$meta->{$field}{fieldId},
-                                                label=>$meta->{$field}{fieldName},
-                                                uiLevel=>5,
-                                                value=>$meta->{$field}{value},
-                                                extras=>qq/title="$meta->{$field}{description}"/,
-                                                possibleValues=>$meta->{$field}{possibleValues},
-                                                options=>$options,
+                                                name         => "metadata_".$meta->{$field}{fieldId},
+                                                label        => $meta->{$field}{fieldName},
+                                                uiLevel      => 5,
+                                                value        => $meta->{$field}{value},
+                                                extras       => qq/title="$meta->{$field}{description}"/,
+                                                options      => $options,
+                                                defaultValue => $meta->{$field}{defaultValue},
 						fieldType=>$fieldType
                                 );
                 }
@@ -1285,76 +1343,107 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 =cut
 
 sub getToolbar {
-	my $self = shift;
-	return undef unless $self->canEdit;
-	return $self->{_toolbar} if (exists $self->{_toolbar});
-	my $userUiLevel = $self->session->user->profileField("uiLevel");
-	my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
-	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $toolbar = "";
-	my $commit;
-	if ($self->canEditIfLocked) {
-		$toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43)) if ($userUiLevel >= $uiLevels->{"delete"});
-        	$toolbar .= $self->session->icon->edit('func=edit',$self->get("url")) if ($userUiLevel >= $uiLevels->{"edit"});
-	} else {
-		$toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url")) if ($userUiLevel >= $uiLevels->{"revisions"});
-	}
-        $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))  if ($userUiLevel >= $uiLevels->{"cut"});
+    my $self = shift;
+    return undef unless $self->canEdit;
+    return $self->{_toolbar}
+        if (exists $self->{_toolbar});
+    my $userUiLevel = $self->session->user->profileField("uiLevel");
+    my $uiLevels = $self->session->config->get("assetToolbarUiLevel");
+    my $i18n = WebGUI::International->new($self->session, "Asset");
+    my $toolbar = "";
+    my $commit;
+    if ($self->canEditIfLocked) {
+        $toolbar .= $self->session->icon->delete('func=delete',$self->get("url"),$i18n->get(43))
+            if ($userUiLevel >= $uiLevels->{"delete"});
+        $toolbar .= $self->session->icon->edit('func=edit',$self->get("url"))
+            if ($userUiLevel >= $uiLevels->{"edit"});
+    }
+    else {
+        $toolbar .= $self->session->icon->locked('func=manageRevisions',$self->get("url"))
+            if ($userUiLevel >= $uiLevels->{"revisions"});
+    }
+    $toolbar .= $self->session->icon->cut('func=cut',$self->get("url"))
+        if ($userUiLevel >= $uiLevels->{"cut"});
 
+    if ($userUiLevel >= $uiLevels->{"copy"}) {
+        $toolbar .= $self->session->icon->copy('func=copy',$self->get("url"));
         # if this asset has children, create a more full-featured menu for copying
         if ($self->getChildCount) {
-            my $copy = '<script type="text/javascript">
-                //<![CDATA[
-                var contextMenu = new contextMenu_createWithImage("'.$self->session->icon->getBaseURL().'copy.gif","'.$self->getId.'_2","'.$i18n->get('copy').'",true);';
-            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy").'","'.$i18n->get("this asset only").'");';
-            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy;with=children").'","'.$i18n->get("with children").'");';
-            $copy .= 'contextMenu.addLink("'.$self->getUrl("func=copy;with=descendants").'","'.$i18n->get("with descendants").'");';
-            $copy .= 'contextMenu.print();
-                //]]>
-                </script>';
-            $toolbar .= $copy;
+            $toolbar
+                .= '<div class="yuimenu wg-contextmenu">'
+                . '<div class="bd">'
+                . '<ul class="first-of-type">'
+                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+                . $self->getUrl("func=copy") . '">' . $i18n->get("this asset only") . '</a></li>'
+                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+                . $self->getUrl("func=copy;with=children") . '">' . $i18n->get("with children") . '</a></li>'
+                . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+                . $self->getUrl("func=copy;with=descendants") . '">' . $i18n->get("with descendants") . '</a></li>'
+                . '</ul></div></div>';
         }
-        else {
-            $toolbar .= $self->session->icon->copy('func=copy',$self->get("url")) if ($userUiLevel >= $uiLevels->{"copy"});
-        }
-        
-        $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url")) if ($userUiLevel >= $uiLevels->{"shortcut"} && !($self->get("className") =~ /Shortcut/));
-	$self->session->style->setLink($self->session->url->extras('contextMenu/contextMenu.css'), {rel=>"stylesheet",type=>"text/css"});
-	$self->session->style->setScript($self->session->url->extras('contextMenu/contextMenu.js'), {type=>"text/javascript"});
-	my $output = '<script type="text/javascript">
-                //<![CDATA[
-                var contextMenu = new contextMenu_createWithImage("'.$self->getIcon(1).'","'.$self->getId.'","'.$self->getName.'");';
-	if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=changeUrl").'","'.$i18n->get("change url").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"editBranch"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=editBranch").'","'.$i18n->get("edit branch").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"revisions"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=manageRevisions").'","'.$i18n->get("revisions").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"view"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl.'","'.$i18n->get("view").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=lock").'","'.$i18n->get("lock").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"export"} && defined $self->session->config->get("exportPath")) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=export").'","'.$i18n->get("Export","Icon").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"promote"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=promote").'","'.$i18n->get("promote").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"demote"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("func=demote").'","'.$i18n->get("demote").'");';
-	}
-	if ($userUiLevel >= $uiLevels->{"manage"}) {
-		$output .= 'contextMenu.addLink("'.$self->getUrl("op=assetManager").'","'.$i18n->get("manage").'");';
-	}
-	$output .= 'contextMenu.print();
-                //]]>
-                </script>'.$toolbar;
-	return $output;
+    }
+    $toolbar .= $self->session->icon->shortcut('func=createShortcut',$self->get("url"))
+        if ($userUiLevel >= $uiLevels->{"shortcut"} && !$self->isa('WebGUI::Asset::Shortcut'));
+
+    $self->session->style->setLink($self->session->url->extras('assetToolbar/assetToolbar.css'), {rel=>"stylesheet",type=>"text/css"});
+    $self->session->style->setLink($self->session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>"stylesheet",type=>"text/css"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/container/container_core-min.js'), {type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type=>"text/javascript"});
+    $self->session->style->setScript($self->session->url->extras('assetToolbar/assetToolbar.js'), {type=>"text/javascript"});
+    my $output
+        = '<div class="yui-skin-sam wg-toolbar">'
+        . '<img src="' . $self->getIcon(1) . '" title="' . $self->getName . '" alt="' . $self->getName . '" class="wg-toolbar-icon" />'
+        . '<div class="yuimenu wg-contextmenu">'
+        . '<div class="bd">'
+        . '<ul class="first-of-type">';
+    if ($userUiLevel >= $uiLevels->{"changeUrl"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=changeUrl") . '">' . $i18n->get("change url") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"editBranch"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=editBranch") . '">' . $i18n->get("edit branch") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"revisions"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=manageRevisions") . '">' . $i18n->get("revisions") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"view"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl . '">' . $i18n->get("view") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"lock"} && !$self->isLocked) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl('func=lock') . '">' . $i18n->get("lock") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"export"} && $self->session->config->get("exportPath")) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl('func=export') . '">' . $i18n->get('Export','Icon') . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"promote"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=promote") . '">' . $i18n->get("promote") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"demote"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("func=demote") . '">' . $i18n->get("demote") . '</a></li>';
+    }
+    if ($userUiLevel >= $uiLevels->{"manage"}) {
+        $output
+            .= '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
+            . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
+    }
+    $output .= '</ul></div></div>' . $toolbar . '</div>';
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1419,6 +1508,23 @@ sub getUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModified
+
+Returns the overall modification time of the object and its content in Unix
+epoch format, for the purpose of the Last-Modified HTTP header.  Override this
+for subclasses that contain content that is not solely dependent on the
+revisionDate of the asset.
+
+=cut
+
+sub getContentLastModified {
+	my $self = shift;
+	return $self->get("revisionDate");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getValue ( key )
 
 Tries to look up C<key> in the asset object's property cache.  If it can't find it in there, then it
@@ -1465,6 +1571,19 @@ sub indexContent {
 	$indexer->setIsPublic(0) if ($self->getId eq "PBasset000000000000001");
 	return $indexer;
 }
+
+#-------------------------------------------------------------------
+
+=head2 isValidRssItem ( )
+
+Returns true iff this asset should be included in RSS feeds from the
+RSS From Parent asset.  If false, this asset will be ignored when
+generating feeds, even if it appears in the item list.  Defaults to
+true.
+
+=cut
+
+sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
 
@@ -1746,6 +1865,130 @@ sub newPending {
 
 #-------------------------------------------------------------------
 
+=head2 outputWidgetMarkup ( width, height, templateId )
+
+Output the markup required for the widget view. Includes markup to handle the
+widget macro in the iframe holding the widgetized asset. This does the following: 
+
+=over 4
+
+=item *
+
+retrieves the content for this asset using its L</view> method
+
+=item *
+
+processes macros in that content
+
+=item *
+
+serializes the processed content in JSON
+
+=item *
+
+writes the JSON to a storage location
+
+=item *
+
+refers the user to download this JSON
+
+=item *
+
+references the appropriate JS files for the templating engine and the widget macro
+
+=item *
+
+invokes the templating engine on this JSON
+
+=back
+
+=head3 width
+
+The width of the iframe. Required for making widget-in-widget function properly.
+
+=head3 height
+
+The height of the iframe. Required for making widget-in-widget function properly.
+
+=head3 templateId
+
+The templateId for this widgetized asset to use. Required for making
+widget-in-widget function properly.
+
+=cut
+
+sub outputWidgetMarkup {
+    # get our parameters.
+    my $self            = shift;
+    my $width           = shift;
+    my $height          = shift;
+    my $templateId      = shift;
+
+    # construct / retrieve the values we'll use later.
+    my $assetId         = $self->getId;
+    my $session         = $self->session;
+    my $conf            = $session->config;
+    my $extras          = $conf->get('extrasURL');
+
+    # the widgetized version of content that has the widget macro in it is
+    # executing in an iframe. this iframe doesn't have a style object.
+    # therefore, the macro won't be able to output the stylesheet and JS
+    # information it needs to do its work. because of this, we need to output
+    # that content manually. construct the filesystem paths for those files.
+    my $containerCss    = $extras . '/yui/build/container/assets/container.css';
+    my $containerJs     = $extras . '/yui/build/container/container-min.js';
+    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
+    my $wgWidgetJs      = $extras . '/wgwidget.js';
+    my $ttJs            = $extras . '/tt.js';
+    
+    # the templating engine requires its source data to be in json format.
+    # write this out to disk and then serve the URL to the user. in this case,
+    # we'll be serializing the content of the asset which is being widgetized. 
+    my $storage         = WebGUI::Storage->get($session, $assetId);
+    my $content         = $self->view;
+    WebGUI::Macro::process($session, \$content);
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
+    $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
+    my $jsonUrl         = $storage->getUrl("$assetId.js");
+
+    # WebGUI.widgetBox.initButton() needs the full URL of the asset being
+    # widgetized, and also the full URL of the JS file that does most of the
+    # work.
+    my $fullUrl         = "http://" . $conf->get("sitename")->[0] . $self->getUrl;
+    my $wgWidgetPath    = 'http://' . $conf->get('sitename')->[0] . $extras . '/wgwidget.js';
+
+    # finally, given all of the above, construct our output. WebGUI outputs
+    # fully valid XHTML 1.0 Strict, and there's no reason this should be any
+    # different.
+    my $output          = <<OUTPUT;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="$containerCss" />
+        <script type="text/javascript" src="$jsonUrl"></script>
+        <script type="text/javascript" src="$ttJs"></script>
+        <script type='text/javascript' src='$yahooDomJs'></script>
+        <script type='text/javascript' src='$containerJs'></script>
+        <script type='text/javascript' src='$wgWidgetJs'></script>
+        <script type='text/javascript'>
+            function setupPage() {
+                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
+                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+            }
+            YAHOO.util.Event.addListener(window, 'load', setupPage);
+        </script>
+    </head>
+    <body id="widget$assetId">
+        \${asset$assetId.content}
+    </body>
+</html>
+OUTPUT
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 Executes what is necessary to make the view() method work with content chunking. This includes things like processing template head tags.
@@ -1754,7 +1997,9 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-	$self->{_toolbar} = $self->getToolbar;
+    if ($self->session->var->isAdminOn) {
+        $self->{_toolbar} = $self->getToolbar;
+    }
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
@@ -1764,6 +2009,27 @@ sub prepareView {
             }); 
     }
 	$style->setRawHeadTags($self->getExtraHeadTags);
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareWidgetView ( )
+
+Prepares the widget view for this asset. Specifically, sets up some JS to
+ensure that links selected / forms submitted in the widgetized form of the
+asset open in a new window.
+
+=cut
+
+sub prepareWidgetView {
+    my $self            = shift;
+    my $templateId      = shift;
+    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
+    my $extras          = $self->session->config->get('extrasURL');
+
+    $template->prepare;
+
+    $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -1849,13 +2115,7 @@ sub processTemplate {
 
 	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
-        	my $meta = {};
-		if ($self->session->setting->get("metaDataEnabled")) {
-        		$meta = $self->getMetaDataFields();
-		}
-        	foreach my $field (keys %$meta) {
-			$var->{$meta->{$field}{fieldName}} = $meta->{$field}{value};
-		}
+        $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
 		$var->{'controls'} = $self->getToolbar;
                 my %vars = (
 			%{$self->{_properties}},
@@ -2029,31 +2289,38 @@ sub update {
             {keywords=>$properties->{keywords}, asset=>$self});
     }
 
-    # check the definition of all properties against what was given to us
-
-    # get a DB object for the two conditionals below, and the description
-    my %assetDataFields;
-    my $sth = $self->session->db->read('DESCRIBE `assetData`');
-    while (my ($col) = $sth->array) {
-        $assetDataFields{$col} = 1;
+    ##If inheritUrlFromParent was sent, and it is true, then muck with the url
+    ##The URL may have been sent too, so use it or the current Asset's URL.
+    if (exists $properties->{inheritUrlFromParent} and $properties->{inheritUrlFromParent}) {
+        $properties->{'url'} = $self->fixUrlFromParent($properties->{'url'} || $self->get('url'));
     }
 
+    # check the definition of all properties against what was given to us
     foreach my $definition (reverse @{$self->definition($self->session)}) {
 		my %setPairs = ();
+
+		# get a list of the fields available in this table so we don't try to insert
+		# something for a field that doesn't exist
+		my %tableFields = ();
+		my $sth = $self->session->db->read('DESCRIBE `'.$definition->{tableName}.'`');
+		while (my ($col) = $sth->array) {
+			$tableFields{$col} = 1;
+		}
 
         # deal with all the properties in this part of the definition
 		foreach my $property (keys %{$definition->{properties}}) {
 
-            # skip a property unless it was specified to be set by the properties field or has a default value
-			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+#            # skip a property unless it was specified to be set by the properties field or has a default value
+#			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
+            # skip a property unless it was specified to be set by the properties field
+			next unless (exists $properties->{$property});
 
             # skip a property if it has the display only flag set
             next if ($definition->{properties}{$property}{displayOnly});
 
-            # if this is the new-to-7.5 isExportable field, check if the
-            # database field for it exists. if not, setting it will break, so
-            # skip it. this facilitates updating from previous versions.
-            if ($definition->{tableName} eq 'assetData' && !exists $assetDataFields{$property}) {
+            # skip properties that aren't yet in the table
+            if (!exists $tableFields{$property}) {
+				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
                 next;
             }
 
@@ -2074,18 +2341,22 @@ sub update {
             # use the default value because default and update were both undef
             if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
                 $value = $definition->{properties}{$property}{defaultValue};
+                if (ref($value) eq 'ARRAY') {
+                    $value = $value->[0];
+                }
             }
 
             # set the property
 			$self->{_properties}{$property} = $value;
-			$setPairs{$property.'=?'} = $value;
+			$setPairs{$property} = $value;
 		}
 
         # if there's anything to update, then do so
 		if (scalar(keys %setPairs) > 0) {
 			my @values = values %setPairs;
+            my @columnNames = map { $_.'=?' } keys %setPairs;
 			push(@values, $self->getId, $self->get("revisionDate"));
-			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",keys %setPairs)." where assetId=? and revisionDate=?",\@values);
+			$self->session->db->write("update ".$definition->{tableName}." set ".join(",",@columnNames)." where assetId=? and revisionDate=?",\@values);
 		}
 	}
 
@@ -2404,19 +2675,6 @@ sub www_manageAssets {
 
 #-------------------------------------------------------------------
 
-=head2 getContentLastModified
-
-Returns the overall modification time of the object and its content in Unix epoch format, for the purpose of the Last-Modified HTTP header.  Override this for subclasses that contain content that is not solely dependent on the revisionDate of the asset.
-
-=cut
-
-sub getContentLastModified {
-	my $self = shift;
-	return $self->get("revisionDate");
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_view ( )
 
 Returns the view() method of the asset object if the requestor canView.
@@ -2441,19 +2699,6 @@ sub www_view {
 	$self->session->output->print($self->view);
 	return undef;
 }
-
-#-------------------------------------------------------------------
-
-=head2 isValidRssItem ( )
-
-Returns true iff this asset should be included in RSS feeds from the
-RSS From Parent asset.  If false, this asset will be ignored when
-generating feeds, even if it appears in the item list.  Defaults to
-true.
-
-=cut
-
-sub isValidRssItem { 1 }
 
 #-------------------------------------------------------------------
 
@@ -2483,152 +2728,4 @@ sub www_widgetView {
         return $self->outputWidgetMarkup($width, $height, $templateId);
 }
 
-#-------------------------------------------------------------------
-
-=head2 prepareWidgetView ( )
-
-Prepares the widget view for this asset. Specifically, sets up some JS to
-ensure that links selected / forms submitted in the widgetized form of the
-asset open in a new window.
-
-=cut
-
-sub prepareWidgetView {
-    my $self            = shift;
-    my $templateId      = shift;
-    my $template        = WebGUI::Asset::Template->new($self->session, $templateId);
-    my $session         = $self->session;
-    my $extras          = $session->config->get('extrasURL');
-
-    $template->prepare;
-
-    $self->{_viewTemplate} = $template;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 outputWidgetMarkup ( width, height, templateId )
-
-Output the markup required for the widget view. Includes markup to handle the
-widget macro in the iframe holding the widgetized asset. This does the following: 
-
-=over 4
-
-=item *
-
-retrieves the content for this asset using its L</view> method
-
-=item *
-
-processes macros in that content
-
-=item *
-
-serializes the processed content in JSON
-
-=item *
-
-writes the JSON to a storage location
-
-=item *
-
-refers the user to download this JSON
-
-=item *
-
-references the appropriate JS files for the templating engine and the widget macro
-
-=item *
-
-invokes the templating engine on this JSON
-
-=back
-
-=head3 width
-
-The width of the iframe. Required for making widget-in-widget function properly.
-
-=head3 height
-
-The height of the iframe. Required for making widget-in-widget function properly.
-
-=head3 templateId
-
-The templateId for this widgetized asset to use. Required for making
-widget-in-widget function properly.
-
-=cut
-
-sub outputWidgetMarkup {
-    # get our parameters.
-    my $self            = shift;
-    my $width           = shift;
-    my $height          = shift;
-    my $templateId      = shift;
-
-    # construct / retrieve the values we'll use later.
-    my $assetId         = $self->getId;
-    my $session         = $self->session;
-    my $conf            = $session->config;
-    my $extras          = $conf->get('extrasURL');
-
-    # the widgetized version of content that has the widget macro in it is
-    # executing in an iframe. this iframe doesn't have a style object.
-    # therefore, the macro won't be able to output the stylesheet and JS
-    # information it needs to do its work. because of this, we need to output
-    # that content manually. construct the filesystem paths for those files.
-    my $containerCss    = $extras . '/yui/build/container/assets/container.css';
-    my $containerJs     = $extras . '/yui/build/container/container-min.js';
-    my $yahooDomJs      = $extras . '/yui/build/yahoo-dom-event/yahoo-dom-event.js';
-    my $wgWidgetJs      = $extras . '/wgwidget.js';
-    my $ttJs            = $extras . '/tt.js';
-    
-    # the templating engine requires its source data to be in json format.
-    # write this out to disk and then serve the URL to the user. in this case,
-    # we'll be serializing the content of the asset which is being widgetized. 
-    my $storage         = WebGUI::Storage->get($session, $assetId);
-    my $content         = $self->view;
-    WebGUI::Macro::process($session, \$content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
-    $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
-    my $jsonUrl         = $storage->getUrl("$assetId.js");
-
-    # WebGUI.widgetBox.initButton() needs the full URL of the asset being
-    # widgetized, and also the full URL of the JS file that does most of the
-    # work.
-    my $fullUrl         = "http://" . $conf->get("sitename")->[0] . $self->getUrl;
-    my $wgWidgetPath    = 'http://' . $conf->get('sitename')->[0] . $extras . '/wgwidget.js';
-
-    # finally, given all of the above, construct our output. WebGUI outputs
-    # fully valid XHTML 1.0 Strict, and there's no reason this should be any
-    # different.
-    my $output          = <<OUTPUT;
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title></title>
-        <link rel="stylesheet" type="text/css" href="$containerCss" />
-        <script type="text/javascript" src="$jsonUrl"></script>
-        <script type="text/javascript" src="$ttJs"></script>
-        <script type='text/javascript' src='$yahooDomJs'></script>
-        <script type='text/javascript' src='$containerJs'></script>
-        <script type='text/javascript' src='$wgWidgetJs'></script>
-        <script type='text/javascript'>
-            function setupPage() {
-                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
-                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
-            }
-            YAHOO.util.Event.addListener(window, 'load', setupPage);
-        </script>
-    </head>
-    <body id="widget$assetId">
-        \${asset$assetId.content}
-    </body>
-</html>
-OUTPUT
-    return $output;
-}
-
 1;
-

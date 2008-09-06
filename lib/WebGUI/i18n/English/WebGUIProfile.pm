@@ -123,8 +123,8 @@ If you wish to set the Default Value for any other field.  Create the field with
 	},
 
 	'466' => {
-		message => q|Are you certain you wish to delete this category and move all of its fields to the Miscellaneous category?|,
-		lastUpdated => 1031514049
+		message => q|Are you certain you wish to delete this category and all of its fields?|,
+		lastUpdated => 1214599497,
 	},
 
         '470 description' => {

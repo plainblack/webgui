@@ -103,8 +103,9 @@ sub getFilePreview {
 		my $image = $storage->isImage($file) ? $storage->getThumbnailUrl($file) : $storage->getFileIconUrl($file);
 		$preview .= '<p style="display:inline;vertical-align:middle;"><a href="'.$storage->getUrl($file).'">'
 		    .'<img src="'.$image.'" style="vertical-align:middle;border: 0px;" alt="'
-			.$file.'" /> '.$file.'</a></p><br />';
-	    $preview .= $i18n->get(392) .  "&nbsp"x4 . WebGUI::Form::YesNo->new($self->session, {-name=>$self->privateName('delete'), -value=>0})->toHtml; 
+			.$file.'" /> '.$file.'</a> <br />';
+	    $preview .= $i18n->get(392) .  "&nbsp"x4 . WebGUI::Form::YesNo->new($self->session, {-name=>$self->privateName('delete_'.$file), -value=>0})->toHtml;
+		$preview .= '</p><br /><br />'
 	}
     return $preview;
 }
@@ -132,7 +133,7 @@ Returns the WebGUI::Storage object for this control.
 
 sub getStorageLocation {
     my $self = shift;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	my $storage = WebGUI::Storage::Image->get($self->session, $value) if ($value);
     return $storage;
 }
@@ -181,7 +182,7 @@ Displays the image using an img tag.
 
 sub getValueAsHtml {
 	my ($self) = @_;
-    my $value = $self->getDefaultValue;
+    my $value = $self->getOriginalValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage::Image->get($self->session, $value);
 	my $file = shift @{ $location->getFiles };

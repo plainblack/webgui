@@ -91,7 +91,7 @@ Returns the value that should be displayed initially.
 sub getDisplayValue {
 	my $self = shift;
 
-	return $self->get('value');
+	return $self->getValue();
 }
 
 #-------------------------------------------------------------------
@@ -237,7 +237,7 @@ Returns the initial position of the slider in slider units.
 sub getSliderValue {
 	my $self = shift;
 
-	return $self->get('value');
+	return $self->getValue();
 }
 
 #-------------------------------------------------------------------
@@ -283,7 +283,7 @@ sub toHtml {
 	$output .= '<td><div class="slider" id="'.$self->get('id').'" '.$self->get("extras").' tabindex="1">';
 	$output .= WebGUI::Form::hidden($self->session, {
 		-name	=> 'slider-'.$self->get('name'),
-		-value	=> $self->get('value'),
+		-value	=> $self->getValue(),
 		-id	=> $self->get('id').'-input',
 		-extras	=> 'class="slider-input"',
 	});

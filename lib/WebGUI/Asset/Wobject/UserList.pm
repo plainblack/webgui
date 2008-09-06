@@ -322,7 +322,7 @@ sub prepareView {
         $templateId = $self->session->form->process("overrideTemplateId");
     }
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     $self->{_viewTemplate} = $template;
     
     return undef;
@@ -356,6 +356,7 @@ sub view {
         ."field.dataDefault, field.possibleValues "
         ."FROM userProfileField as field "
 		."left join userProfileCategory as category USING(profileCategoryId) "
+        ."where !(field.fieldName like '______________________contentPositions')"
 		."ORDER BY category.sequenceNumber, field.sequenceNumber");
 	while ($profileField = $sth->hashRef){
         my $label = WebGUI::Operation::Shared::secureEval($self->session,$profileField->{label});

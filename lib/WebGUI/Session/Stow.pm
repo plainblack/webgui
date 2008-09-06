@@ -109,6 +109,18 @@ sub get {
 	my $self = shift;
 	my $var = shift;
 	return undef if $self->session->config->get("disableCache");
+    my $ref = $self->{_data}{$var};
+    if (ref $ref eq 'ARRAY') {
+        my @safeArray = @{ $ref };
+        return \@safeArray;
+    }
+    elsif (ref $ref eq 'HASH') {
+        my %safeHash = %{ $ref };
+        return \%safeHash;
+    }
+    else {
+        return $ref
+    }
 	return $self->{_data}{$var};
 }
 

@@ -322,7 +322,7 @@ sub getDateTimeStart {
     my $self    = shift;
     my $date    = $self->get("startDate");
     my $time    = $self->get("startTime");
-    my $tz      = $self->session->user->profileField("timeZone");
+    my $tz      = $self->session->datetime->getTimeZone;
     
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
@@ -361,7 +361,7 @@ sub getDateTimeEnd {
     my $self    = shift;
     my $date    = $self->get("endDate");
     my $time    = $self->get("endTime");
-    my $tz      = $self->session->user->profileField("timeZone");
+    my $tz      = $self->session->datetime->getTimeZone;
     
     #$self->session->errorHandler->warn($self->getId.":: Date: $date -- Time: $time");
     if (!$date) {
@@ -1435,7 +1435,7 @@ sub prepareView {
     }
     
     my $template = WebGUI::Asset::Template->new($self->session,$templateId);
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     
     $self->{_viewTemplate}    = $template;
 }
@@ -1900,7 +1900,7 @@ sub www_edit {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
-    my $tz          = $form->param('timeZone') || $self->get('timeZone') || $session->user->profileField('timeZone');
+    my $tz          = $form->param('timeZone') || $self->get('timeZone') || $session->datetime->getTimeZone;
     my $func        = lc $session->form->param("func");
     my $var         = {};
 

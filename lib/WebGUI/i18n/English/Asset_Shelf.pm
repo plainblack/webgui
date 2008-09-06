@@ -3,6 +3,24 @@ package WebGUI::i18n::English::Asset_Shelf;
 use strict;
 
 our $I18N = { 
+    'import' => {
+        message => q|Import Products|,
+        lastUpdated => 1212550974,
+        context => q|Label for bringing data into the Shop (Tax, Product, etc.)|
+    },
+
+	'export' => {
+		message => q|Export Products|,
+		lastUpdated => 1212550978,
+		context => q|Label for taking data out of the Shop (Tax, Product, etc.)|,
+	},
+
+    'import successful' => {
+        message => q|Your products have been imported.|,
+        lastUpdated => 1213047491,
+        context => q|Message telling the user the their products have been imported successfully.|
+    },
+
 	'price' => {
 		message 	=> q|The price of this sku.|,
 		lastUpdated => 0,

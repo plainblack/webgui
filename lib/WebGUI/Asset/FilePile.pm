@@ -141,6 +141,13 @@ sub edit {
 #-------------------------------------------------------------------
 sub editSave {
 	my $self = shift;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    if ($self->session->config("maximumAssets")) {
+        my ($count) = $self->session->db->quickArray("select count(*) from asset");
+        my $i18n = WebGUI::International->new($self->session, "Asset");
+        return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
+    }
 
 	##This is a hack.  File uploads should go through the WebGUI::Form::File API
     my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValue;
@@ -248,9 +255,6 @@ sub www_edit {
 		return $self->editSave;
 	}
 }
-
-
-
 
 1;
 

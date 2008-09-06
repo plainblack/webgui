@@ -220,6 +220,12 @@ our $I18N = {
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
 
+	'display all' => {
+		message => q|display all|,
+		lastUpdated => 1216612381,
+		context => q|Shows up in the selection part of listSubscriptionCodes.|
+	},
+
 	'manage batches' => {
 		message => q|Manage subscription code batches|,
 		lastUpdated => 1101228391,
@@ -281,8 +287,8 @@ our $I18N = {
 	},
 
 	'delete codes' => {
-		message => q|Delete selected codes|,
-		lastUpdated => 1101228391,
+		message => q|Delete all these codes.|,
+		lastUpdated => 1216673469,
 		context => q|Shows up in listSubscriptionCodes.|
 	},
 
@@ -345,8 +351,9 @@ characters long.</p>|,
 		lastUpdated => 0,
 		context => q|The enter a code message for the code redemption function.|
 	},
-	'selection batch id' => {
-		message => q|batch ID|,
+
+	'selection batch name' => {
+		message => q|batch name|,
 		lastUpdated => 0,
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
@@ -360,9 +367,9 @@ The description of the batch tied to the subscription code.<br />
 <b>message</b><br />
 The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br />
 <br />
-<b>codeForm</b>
+<b>codeForm</b><br />
 The form in which the user can enter his subscription code.<br />|,
-		lastUpdated => 1146593261,
+		lastUpdated => 1215618652,
 		context => q|The body of the help page of the code redemption template.|
 	},
 
@@ -481,6 +488,18 @@ The form in which the user can enter his subscription code.<br />|,
 	'redeemCodeUrl' => {
 		message => q|The URL to redeem a subscription code.  If there are no subscription codes, this will be blank.|,
 		lastUpdated => 1213936341,
+		context => q|template variable|
+	},
+
+	'price' => {
+		message => q|The price for the subscription, formatted to two decimal places|,
+		lastUpdated => 1214592963,
+		context => q|template variable|
+	},
+
+	'continueShoppingUrl' => {
+		message => q|A URL to reset the Product so that the user can continue shopping.|,
+		lastUpdated => 0,
 		context => q|template variable|
 	},
 

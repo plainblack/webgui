@@ -115,16 +115,30 @@ Returns the either the "value" ore "defaultValue" passed in to the object in tha
 
 sub getDefaultValue {
     my $self = shift;
-    my $value = $self->get("value");
-    unless (defined $value) {
-		$value = $self->get("defaultValue");
-	}
+    my $value = $self->get("defaultValue");
 	if (ref $value eq 'ARRAY') {
 		$value = $value->[0];
 	}
 	return $value;
 }
 
+=head2 getOriginalValue ( )
+
+Returns the either the "value" ore "defaultValue" passed in to the object in that order, and doesn't take into account form processing.
+
+=cut
+
+sub getOriginalValue {
+    my $self = shift;
+    my $value = $self->get("value");
+    unless (defined $value) {
+		$value = $self->getDefaultValue();
+	}
+	if (ref $value eq 'ARRAY') {
+		$value = $value->[0];
+	}
+	return $value;
+}
 
 #-------------------------------------------------------------------
 
@@ -150,7 +164,7 @@ sub toHtml {
 	my $self = shift;
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').'>';
     my $options = $self->getOptions;
-	my $value = $self->getDefaultValue();
+	my $value = $self->getOriginalValue();
     foreach my $key (keys %{$options}) {
 		$output .= '<option value="'.$key.'"';
 		if ($value eq $key) {

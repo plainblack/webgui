@@ -99,7 +99,7 @@ sub www_view {
         return '' unless $self->getParent->canView; # Go to parent for auth
 	my $parent = $self->getParent;
 	my $template = WebGUI::Asset::Template->new($self->session, $parent->get('rssCapableRssTemplateId'));
-	$template->prepare;
+	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->session->http->setMimeType('text/xml');
 
 	my $var = {};
@@ -120,7 +120,7 @@ sub www_view {
 			$subvar = {};
 			@$subvar{'title', 'link', 'description'} = $self->_tlsOfAsset($item);
 			$subvar->{guid} = $subvar->{link};
-			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('revisionDate')));
+			$subvar->{pubDate} = _escapeXml($self->session->datetime->epochToMail($item->get('creationDate')));
 		} elsif (ref $item eq 'HASH') {
             foreach my $key (keys %$item) {
                 $subvar->{$key} = _escapeXml($item->{$key});

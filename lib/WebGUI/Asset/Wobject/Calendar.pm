@@ -715,7 +715,7 @@ sub getEventsIn {
     $params->{order} = '' if $params->{order} !~ /^(?:time|sequencenumber)/i;
     my $order_by_type = $params->{order} ? lc($params->{order}) : $self->get('sortEventsBy');
 
-    my $tz      = $self->session->user->profileField("timeZone");
+    my $tz      = $self->session->datetime->getTimeZone;
     
     # Warn and return undef if no startDate or endDate
     unless ($start && $end) {
@@ -930,7 +930,7 @@ sub prepareView {
     #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
     
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
-    $template->prepare;
+    $template->prepare($self->getMetaDataAsTemplateVariables);
     
     $self->{_viewTemplate} = $template;
 }
@@ -1302,7 +1302,7 @@ sub viewMonth {
     my $params      = shift;
     my $i18n        = WebGUI::International->new($session,"Asset_Calendar");
     my $var         = $self->getTemplateVars;
-    my $tz          = $session->user->profileField("timeZone");
+    my $tz          = $session->datetime->getTimeZone;
     my $today       = WebGUI::DateTime->new($self->session, time)
                     ->set_time_zone($tz)->toMysqlDate;
     
@@ -1442,7 +1442,7 @@ sub viewWeek {
     my $params  = shift;
     my $i18n    = WebGUI::International->new($session,"Asset_Calendar");
     my $var     = $self->getTemplateVars;
-    my $tz      = $session->user->profileField("timeZone");
+    my $tz      = $session->datetime->getTimeZone;
     my $today   = WebGUI::DateTime->new($self->session, time)->set_time_zone($tz)
                 ->toMysqlDate;
     
@@ -1825,12 +1825,12 @@ sub www_ical {
         $dt_start   
             = WebGUI::DateTime->new($session, 
                 mysql       => $start, 
-                time_zone   => $user->profileField("timeZone")
+                time_zone   => $session->datetime->getTimeZone,
             );
     }
     else {
         $dt_start = WebGUI::DateTime->new($self->session, time);
-        $dt_start->set_time_zone( $user->profileField("timeZone") );
+        $dt_start->set_time_zone( $session->datetime->getTimeZone );
     }
     
     my $dt_end;
@@ -1839,7 +1839,7 @@ sub www_ical {
         $dt_end 
             = WebGUI::DateTime->new($self->session, 
                 mysql       => $end, 
-                time_zone   => $user->profileField("timeZone")
+                time_zone   => $session->datetime->getTimeZone,
             );
     }
     else {
@@ -2009,7 +2009,7 @@ sub www_search {
                     || $user->isInGroup($data->{groupIdEdit})   ) {
                 # Format the date
                 my $dt    = WebGUI::DateTime->new($self->session, $data->{startDate}." ".($data->{startTime}?$data->{startTime}:"00:00:00"));
-                $dt->set_time_zone($self->session->user->profileField("timeZone"))
+                $dt->set_time_zone( $self->session->datetime->getTimeZone )
                     if ($data->{startTime});
             
                 push(@results, {

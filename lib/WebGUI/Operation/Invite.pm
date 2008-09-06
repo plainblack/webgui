@@ -121,7 +121,7 @@ sub www_inviteUserSave {
     );
 
     ##No sneaky attack paths...
-    $message = WebGUI::HTML::filter($message);
+    $message = WebGUI::HTML::html2text(WebGUI::HTML::filter($message));
 
     ##Create the invitation url.
     my $inviteId = $session->id->generate();

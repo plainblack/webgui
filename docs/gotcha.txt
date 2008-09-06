@@ -7,6 +7,36 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.21
+--------------------------------------------------------------------
+ * Previous versions of WebGUI used the wrong day of the week for
+   scheduled workflows.  This resulted in them being run a day later
+   than they should have.  If you relied on the old behavior, you
+   will need to update your workflow schedules.
+
+
+7.5.19
+--------------------------------------------------------------------
+ * WebGUI now requires Text::CSV_XS version 0.52.  If you have been
+   using an earlier version you will need to upgrade this perl
+   module before you upgrade.
+
+ * If a user profile field allowed multiple selects, and it also had
+   more than one default value, the User method profileField would
+   return the first.  It will now return all default values as a string,
+   joined by commas.
+
+7.5.17
+--------------------------------------------------------------------
+ * If users are allowed to self register and emails are not required, this
+   might cause downstream bugs in other assets that require email addresses.
+
+7.5.16
+--------------------------------------------------------------------
+ * You need the following Perl Modules installed before you upgrade:
+    File::Path
+
+
 7.5.13
 --------------------------------------------------------------------
  * RSSFromParent now uses the parent asset's canView method to 
@@ -30,10 +60,10 @@ save you many hours of grief.
 7.5.11
 --------------------------------------------------------------------
  * You need the following new Perl Modules installed before you upgrade:
-	Archive::Any
-	Exception::Class
-	Path::Class
-	Image::ExifTool
+    Archive::Any
+    Exception::Class
+    Path::Class
+    Image::ExifTool
     List::MoreUtils
 
  * SQL Form is no longer part of the official distribution of WebGUI,
