@@ -347,6 +347,10 @@ sub getLineage {
 	
     my $sql = $self->getLineageSql($relatives,$rules);
 
+    unless ($sql) {
+        return [];
+    }
+
 	my @lineage;
 	my %relativeCache;
 	my $sth = $self->session->db->read($sql);
@@ -613,7 +617,7 @@ sub getLineageSql {
 	}
 	## finish up our where clause
 	if (!scalar(@whereModifiers)) {
-        return [];
+        return "";
     }
 	$where .= ' and ('.join(" or ",@whereModifiers).')';
 	if (exists $rules->{whereClause} && $rules->{whereClause}) {
