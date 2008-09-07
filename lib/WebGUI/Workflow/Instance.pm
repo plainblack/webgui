@@ -151,7 +151,7 @@ sub get {
     my $self = shift;
     my $name = shift;
     if ($name eq "parameters") {
-        if (exists $self->{_data}{parameters}) {
+        if ($self->{_data}{parameters}) {
             my $parameters = JSON::decode_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
