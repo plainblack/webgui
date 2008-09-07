@@ -22,6 +22,7 @@
  - fixed: DataForm Integer value zero does not pass validation
  - added: Page range (start-finish) to available paginator text
  - rfe: view profile
+ - rfe: Shop: workflow warning for almost out of stock
  - fixed: Show Message On Login continue link
  - fixed: Show Message On Login doesn't show after anon registration
  - fixed: Settings - Show Message On Login behaviour
