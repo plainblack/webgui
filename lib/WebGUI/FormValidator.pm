@@ -177,6 +177,7 @@ sub process {
 		if ($value =~ /^[\s]+$/) {
 			return undef;
 		}
+$self->session->log->error("FormValidator $value");
 		return $value;
 	}
 }
