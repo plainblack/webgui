@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 29; # increment this value for each test you create
+use Test::More tests => 36; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -45,6 +45,15 @@ $session->log->warn('Interesting');
 $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
 
+is($wf->get('mode'), 'parallel', 'default mode for created workflows is parallel');
+ok(! $wf->isSingleton, 'Is not singleton');
+ok(! $wf->isSerial,    'Is not serial');
+ok(  $wf->isParallel,  'Is parallel');
+$wf->set({'mode', 'serial'});
+is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '010', 'Is checks after setting mode to serial');
+$wf->set({'mode', 'singleton'});
+is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '100', 'Is checks after setting mode to singleton');
+
 $wf->delete;
 ok(!defined WebGUI::Workflow->new($session, $wfId), 'deleted workflow cannot be retrieved');
 
@@ -61,6 +70,7 @@ isa_ok($activity, 'WebGUI::Workflow::Activity', 'activity');
 my $actId = $activity->getId;
 ok(defined $actId, 'activity has an ID');
 is(scalar @{$wf2->getActivities}, 1, 'workflow has one activity');
+is($wf2->getActivities->[0]->getId, $actId, 'Workflow has the correct activity');
 
 TODO: {
 	local $TODO = "Tests that test things that do not work yet";
