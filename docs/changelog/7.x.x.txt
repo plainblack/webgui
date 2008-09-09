@@ -29,7 +29,7 @@
  - fixed: Page Layout templates generate invalid HTML with description
  - fixed: Form/Integer now shows 0 in the results page
  - added: Email from field now prefixed with username
-
+ - added: Inbox messages now tell you who the message was from
 7.5.22
  - fixed: Layout template now gets prepared correctly
  - fixed: When user does not have permissions to search/edit a thing a proper error is shown.

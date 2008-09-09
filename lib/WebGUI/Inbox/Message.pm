@@ -16,7 +16,7 @@ package WebGUI::Inbox::Message;
 
 use strict;
 use WebGUI::Mail::Send;
-
+use WebGUI::International;
 =head1 NAME
 
 Package WebGUI::Inbox::Message;
@@ -112,12 +112,14 @@ sub create {
 		subject=>$subject,
 		});
 	if (defined $mail) {
+        my $i18n = WebGUI::International->new($session, 'Inbox_Message');
+        my $pref = $i18n->get("from user preface");
+        $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userid = ?",[$properties->{sentBy}]). ".";
 	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
-	       
 		if ($msg =~ m/\<.*\>/) {
-			$mail->addHtml($msg);
+			$mail->addHtml("<p>$pref</p><br>".$msg);
 		} else {
-			$mail->addText($msg);
+			$mail->addText($pref."\n\n".$msg);
 		}
 		$mail->addFooter;
 		$mail->queue;
