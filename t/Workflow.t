@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 49; # increment this value for each test you create
+use Test::More tests => 51; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -151,7 +151,7 @@ $wf3->demoteActivity($cleanTemp->getId);
 cmp_deeply(
     [ map { $_->getId } @{ $wf3->getActivities } ],
     [ map { $_->getId } $decayKarma, $oldTrash, $cleanTemp],
-    'demote works'
+    'demote activity works'
 );
 
 $wf3->promoteActivity($oldTrash->getId);
@@ -159,7 +159,23 @@ $wf3->promoteActivity($oldTrash->getId);
 cmp_deeply(
     [ map { $_->getId } @{ $wf3->getActivities } ],
     [ map { $_->getId } $oldTrash, $decayKarma, $cleanTemp],
-    'promote works'
+    'promote activity works'
+);
+
+my $trashClipboard = $wf3->addActivity('WebGUI::Workflow::Activity::TrashClipboard');
+
+$wf3->deleteActivity($cleanTemp->getId);
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $oldTrash, $decayKarma, $trashClipboard],
+    'delete activity works'
+);
+
+cmp_deeply(
+    [ map { $_->get('sequenceNumber') } @{ $wf3->getActivities } ],
+    [ 1,2,3 ],
+    'delete updates the sequence numbers of its activities'
 );
 
 $wf3->delete;
