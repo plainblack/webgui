@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 51; # increment this value for each test you create
+use Test::More tests => 61; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -39,15 +39,24 @@ is_deeply($wf->getActivities, [], 'workflow has no activities');
 is_deeply($wf->getInstances, [], 'workflow has no instances');
 is_deeply($wf->getCrons, [], 'workflow has no crons');
 
+##################################################
+#
+# getList tests
+#
+##################################################
+
 isa_ok(WebGUI::Workflow->getList($session), 'HASH', 'getList returns a hashref');
 
 ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in enabled list');
+is(scalar keys %{WebGUI::Workflow->getList($session)}, 10, 'There are ten default workflows, of all types, shipped with WebGUI');
 
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
 ok(isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow in enabled list');
 $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
+
+is(scalar keys %{WebGUI::Workflow->getList($session, 'WebGUI::User')}, 1, 'There is only 1 WebGUI::User based workflow that ships with WebGUI');
 
 ##################################################
 #
@@ -58,6 +67,7 @@ ok(!$wf->get('enabled'), 'workflow is disabled again');
 is($wf->get('mode'), 'parallel', 'default mode for created workflows is parallel');
 ok(! $wf->isSingleton, 'Is not singleton');
 ok(! $wf->isSerial,    'Is not serial');
+ok(! $wf->isRealtime,  'Is not realtime, and never will be');
 ok(  $wf->isParallel,  'Is parallel');
 $wf->set({'mode', 'serial'});
 is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '010', 'Is checks after setting mode to serial');
@@ -118,11 +128,23 @@ my $decayKarma = $wf3->addActivity('WebGUI::Workflow::Activity::DecayKarma');
 my $cleanTemp  = $wf3->addActivity('WebGUI::Workflow::Activity::CleanTempStorage');
 my $oldTrash   = $wf3->addActivity('WebGUI::Workflow::Activity::PurgeOldTrash');
 
-##########################################################
+#####################################################################
 #
-# Activity ordering tests, promote, demote, reorder
+# Activity tests, promote, demote, reorder, accessing, deleting
 #
-##########################################################
+#####################################################################
+
+my $nextActivity;
+$nextActivity = $wf3->getNextActivity($cleanTemp->getId);
+isa_ok($nextActivity, 'WebGUI::Workflow::Activity', 'getNextActivity returns a Workflow::Activity object');
+is($nextActivity->getId, $oldTrash->getId, 'getNextActivity returns the activity after the specified activity');
+
+$nextActivity = $wf3->getNextActivity($oldTrash->getId);
+is($nextActivity, undef, 'getNextActivity returns undef if there is no next activity');
+
+my $getActivity = $wf3->getActivity($decayKarma->getId);
+isa_ok($getActivity, 'WebGUI::Workflow::Activity', 'getNextActivity returns a Workflow::Activity object');
+is($getActivity->getId, $decayKarma->getId, 'getActivity returns the requested activity by activityId');
 
 cmp_deeply(
     $wf3->getActivities,
@@ -176,6 +198,22 @@ cmp_deeply(
     [ map { $_->get('sequenceNumber') } @{ $wf3->getActivities } ],
     [ 1,2,3 ],
     'delete updates the sequence numbers of its activities'
+);
+
+$decayKarma->delete();
+
+cmp_deeply(
+    [ map { $_->get('sequenceNumber') } @{ $wf3->getActivities } ],
+    [ 1,3 ],
+    'Manual delete of an activity does not update the sequence numbers'
+);
+
+$wf3->reorderActivities();
+
+cmp_deeply(
+    [ map { $_->get('sequenceNumber') } @{ $wf3->getActivities } ],
+    [ 1,2 ],
+    'reorder activities works'
 );
 
 $wf3->delete;
