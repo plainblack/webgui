@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 36; # increment this value for each test you create
+use Test::More tests => 38; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -26,6 +26,7 @@ isa_ok($wf, 'WebGUI::Workflow', 'workflow');
 
 my $wfId = $wf->getId;
 ok(defined $wfId, 'workflow has an ID');
+ok($session->id->valid($wfId), 'Workflow has a valid Id');
 ok(defined WebGUI::Workflow->new($session, $wfId), 'workflow can be retrieved');
 
 is($wf->get('title'), 'Title', 'workflow title is set');
@@ -36,14 +37,22 @@ ok(!$wf->get('enabled'), 'workflow is not enabled');
 is_deeply($wf->getActivities, [], 'workflow has no activities');
 is_deeply($wf->getInstances, [], 'workflow has no instances');
 is_deeply($wf->getCrons, [], 'workflow has no crons');
+
+isa_ok(WebGUI::Workflow->getList($session), 'HASH', 'getList returns a hashref');
+
 ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in enabled list');
 
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
 ok(isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow in enabled list');
-$session->log->warn('Interesting');
 $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
+
+##################################################
+#
+# Mode tests
+#
+##################################################
 
 is($wf->get('mode'), 'parallel', 'default mode for created workflows is parallel');
 ok(! $wf->isSingleton, 'Is not singleton');
