@@ -498,7 +498,7 @@ A string indicating the type of object this workflow will be operating on. Valid
 =head4 mode
 
 A string containing one of "singleton", "parallel", "serial", or "realtime". Parallel is the default and should be
-used in most situations. Singltons will allow only one instance of the workflow to be created at one time. New
+used in most situations. Singletons will allow only one instance of the workflow to be created at one time. New
 instances will be destroyed immediately if a one instance of a singleton already exists. Serial workflows will run
 instances sequentially in FIFO. Realtime workflows will run immediately without being handed off to Spectre for
 governance.
