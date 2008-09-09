@@ -28,6 +28,7 @@
  - fixed: Settings - Show Message On Login behaviour
  - fixed: Page Layout templates generate invalid HTML with description
  - fixed: Form/Integer now shows 0 in the results page
+ - added: Email from field now prefixed with username
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
