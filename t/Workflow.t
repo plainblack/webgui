@@ -16,7 +16,8 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 38; # increment this value for each test you create
+use Test::More tests => 49; # increment this value for each test you create
+use Test::Deep;
 
 my $session = WebGUI::Test->session;
 my $wf = WebGUI::Workflow->create($session, {title => 'Title', description => 'Description',
@@ -104,6 +105,64 @@ $cron->delete;
 # More activity and cron tests here?
 
 $wf2->delete;
+
+my $wf3 = WebGUI::Workflow->create($session, {});
+isa_ok($wf3, 'WebGUI::Workflow', 'workflow created with all defaults');
+is($wf3->get('title'),       'Untitled', 'Default title is Untitled');
+is($wf3->get('description'), undef,      'Default description is undefined');
+is($wf3->get('type'),        'None',     'Default type is None');
+is($wf3->get('enabled'),     0,          'By default, enabled is 0');
+is($wf3->get('mode'),        'parallel', 'Default mode is parallel');
+
+my $decayKarma = $wf3->addActivity('WebGUI::Workflow::Activity::DecayKarma');
+my $cleanTemp  = $wf3->addActivity('WebGUI::Workflow::Activity::CleanTempStorage');
+my $oldTrash   = $wf3->addActivity('WebGUI::Workflow::Activity::PurgeOldTrash');
+
+##########################################################
+#
+# Activity ordering tests, promote, demote, reorder
+#
+##########################################################
+
+cmp_deeply(
+    $wf3->getActivities,
+    [$decayKarma, $cleanTemp, $oldTrash],
+    'getActivities returns activties in the order they were added to the Workflow'
+);
+
+$wf3->demoteActivity($oldTrash->getId);
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $decayKarma, $cleanTemp, $oldTrash],
+    'demote works on first activity, even though it does not move'
+);
+
+$wf3->promoteActivity($decayKarma->getId);
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $decayKarma, $cleanTemp, $oldTrash],
+    'promote works on last activity, even though it does not move'
+);
+
+$wf3->demoteActivity($cleanTemp->getId);
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $decayKarma, $oldTrash, $cleanTemp],
+    'demote works'
+);
+
+$wf3->promoteActivity($oldTrash->getId);
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $oldTrash, $decayKarma, $cleanTemp],
+    'promote works'
+);
+
+$wf3->delete;
 
 # Local variables:
 # mode: cperl
