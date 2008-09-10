@@ -1472,9 +1472,13 @@ The web method to unsubscribe from a collaboration.
 =cut
 
 sub www_unsubscribe {
-	my $self = shift;
-	$self->unsubscribe if $self->canSubscribe;
-	return $self->www_view;
+    my $self = shift;
+    if($self->canSubscribe){
+        $self->unsubscribe;
+        return $self->www_view;
+    }else{
+        return $self->session->privilege->noAccess;
+    } 
 }
 
 #-------------------------------------------------------------------
