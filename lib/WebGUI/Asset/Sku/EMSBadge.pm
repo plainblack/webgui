@@ -100,7 +100,7 @@ sub definition {
 			fieldType		=> "template",
 			label           => $i18n->get("view badge template"),
 			hoverHelp       => $i18n->get("view badge template help"),
-            defaultValue    => 'PB_EMS_BADGE_TEMPLATE0',
+            defaultValue    => 'PBEmsBadgeTemplate0000',
             namespace       => 'EMSBadge',
 			},
 	    );
