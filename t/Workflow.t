@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 61; # increment this value for each test you create
+use Test::More tests => 64; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -72,6 +72,10 @@ ok(  $wf->isParallel,  'Is parallel');
 $wf->set({'mode', 'serial'});
 is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '010', 'Is checks after setting mode to serial');
 $wf->set({'mode', 'singleton'});
+is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '100', 'Is checks after setting mode to singleton');
+$wf->set({'isSerial' => 1});
+is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '010', 'Is checks after setting mode to singleton');
+$wf->set({'isSingleton' => 1});
 is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '100', 'Is checks after setting mode to singleton');
 
 $wf->delete;
@@ -192,6 +196,14 @@ cmp_deeply(
     [ map { $_->getId } @{ $wf3->getActivities } ],
     [ map { $_->getId } $oldTrash, $decayKarma, $trashClipboard],
     'delete activity works'
+);
+
+$wf3->deleteActivity('neverAWebGUIId');
+
+cmp_deeply(
+    [ map { $_->getId } @{ $wf3->getActivities } ],
+    [ map { $_->getId } $oldTrash, $decayKarma, $trashClipboard],
+    'delete activity requires a valid activityId to delete'
 );
 
 cmp_deeply(
