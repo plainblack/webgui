@@ -30,6 +30,7 @@
  - fixed: Form/Integer now shows 0 in the results page
  - added: Email from field now prefixed with username
  - added: Inbox messages now tell you who the message was from
+ - fixed: Reoccurring transactions now update the correct user id
 7.5.22
  - fixed: Layout template now gets prepared correctly
  - fixed: When user does not have permissions to search/edit a thing a proper error is shown.
