@@ -95,6 +95,14 @@ sub definition {
 			label           => $i18n->get("related badge groups"),
 			hoverHelp       => $i18n->get("related badge groups badge help"),
 			},
+		templateId => {
+			tab             => "display",
+			fieldType		=> "template",
+			label           => $i18n->get("view badge template"),
+			hoverHelp       => $i18n->get("view badge template help"),
+            defaultValue    => 'PBEmsBadgeTemplate0000',
+            namespace       => 'EMSBadge',
+			},
 	    );
 	push(@{$definition}, {
 		assetName           => $i18n->get('ems badge'),
@@ -276,6 +284,22 @@ sub onRemoveFromCart {
 
 #-------------------------------------------------------------------
 
+=head2 prepareView
+
+See Asset.pm, prepareView for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+    $self->SUPER::prepareView();
+    my $templateId = $self->get('templateId');
+    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $self->{_viewTemplate} = $template;
+}
+
+#-------------------------------------------------------------------
+
 =head2 purge
 
 Deletes all badges and things attached to the badges. No refunds are given.
@@ -296,97 +320,89 @@ sub purge {
 
 =head2 view
 
-Displays badge description.
+Displays badge description using a template.
 
 =cut
 
 sub view {
-	my ($self) = @_;
+    my ($self) = @_;
+
+    my $i18n    = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
+    my $form    = $self->session->form;
+    my %vars    = ();
+    my $session = $self->session;
+
+    # build the form to allow the user to choose from their address book
+    $vars{error} = $self->{_errorMessage};
+    $vars{addressBook}  = WebGUI::Form::formHeader($session, {action => $self->getUrl})
+                        . WebGUI::Form::hidden($session, {name=>"shop",   value =>'address'})
+                        . WebGUI::Form::hidden($session, {name=>"method", value =>'view'})
+                        . WebGUI::Form::hidden($session,
+                            {
+                                name  => "callback",
+                                value => JSON->new->utf8->encode({ url => $self->getUrl})
+                            })
+                        . WebGUI::Form::submit($session, {value => $i18n->get("populate from address book")})
+                        . WebGUI::Form::formFooter($session)
+                        ;
 	
-	my $error = $self->{_errorMessage};
-	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
-	my $form = $self->session->form;
+    # instanciate address
+    my $address = WebGUI::Shop::AddressBook->newBySession($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
+
+    # build the form that the user needs to fill out with badge holder information
+    $vars{formHeader} = WebGUI::Form::formHeader($session, {action => $self->getUrl})
+                      . WebGUI::Form::hidden($session, {name=>"func", value =>'addToCart'});
+    $vars{formFooter} = WebGUI::Form::formFooter($session);
+    $vars{name}       = WebGUI::Form::text($session, {
+                            name         => 'name',
+                            defaultValue => (defined $address) ? $address->get("firstName")." ".$address->get('lastName') : $form->get('name'),
+                        });
+    $vars{organization} = WebGUI::Form::text($session, {
+                            name         => 'organization',
+                            defaultValue => $form->get("organization"),
+                        });
+    $vars{address1} = WebGUI::Form::text($session, {
+                            name         => 'address1',
+                            defaultValue => (defined $address) ? $address->get("address1") : $form->get('address1'),
+                        });
+    $vars{address2} = WebGUI::Form::text($session, {
+                            name         => 'address2',
+                            defaultValue => (defined $address) ? $address->get("address2") : $form->get('address2'),
+                        });
+    $vars{address3} = WebGUI::Form::text($session, {
+                            name         => 'address3',
+                            defaultValue => (defined $address) ? $address->get("address3") : $form->get('address3'),
+                        });
+    $vars{city}     = WebGUI::Form::text($session, {
+                            name         => 'city',
+                            defaultValue => (defined $address) ? $address->get("city") : $form->get('city'),
+                        });
+    $vars{state}    = WebGUI::Form::text($session, {
+                            name         => 'state',
+                            defaultValue => (defined $address) ? $address->get("state") : $form->get('state'),
+                        });
+    $vars{zipcode}  = WebGUI::Form::text($session, {
+                            name         => 'zipcode',
+                            defaultValue => (defined $address) ? $address->get("code") : $form->get('zipcode','zipcode'),
+                        });
+    $vars{country}  = WebGUI::Form::text($session, {
+                            name         => 'country',
+                            defaultValue => (defined $address) ? $address->get("country") : ($form->get('country') || 'United States'),
+                        });
+    $vars{phone}  = WebGUI::Form::text($session, {
+                            name         => 'phone',
+                            defaultValue => (defined $address) ? $address->get('phoneNumber') : $form->get('phone','phone'),
+                        });
+    $vars{email}  = WebGUI::Form::text($session, {
+                            name         => 'email',
+                            defaultValue => $form->get('email','email'),
+                        });
+    $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});
+    $vars{title}       = $self->getTitle;
+    $vars{description} = $self->get('description');
 	
-	# build the form to allow the user to choose from their address book
-	my $book = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-	$book->hidden(name=>"shop", value=>"address");
-	$book->hidden(name=>"method", value=>"view");
-	$book->hidden(name=>"callback", value=>JSON->new->utf8->encode({
-		url		=> $self->getUrl,
-		}));
-	$book->submit(value=>$i18n->get("populate from address book"));
-	
-	# instanciate address
-	my $address = WebGUI::Shop::AddressBook->newBySession($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
-	
-	# build the form that the user needs to fill out with badge holder information
-	my $info = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
-	$info->hidden(name=>"func", value=>"addToCart");
-	$info->text(
-		name			=> 'name',
-		label			=> $i18n->get('name','Shop'),
-		defaultValue	=> (defined $address) ? $address->get("firstName")." ".$address->get('lastName') : $form->get('name'),
-		);
-	$info->text(
-		name			=> 'organization',
-		label			=> $i18n->get('organization'),
-		defaultValue	=> $form->get("organization"),
-		);
-	$info->text(
-		name			=> 'address1',
-		label			=> $i18n->get('address','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("address1") : $form->get('address1'),
-		);
-	$info->text(
-		name			=> 'address2',
-		defaultValue	=> (defined $address) ? $address->get("address2") : $form->get('address2'),
-		);
-	$info->text(
-		name			=> 'address3',
-		defaultValue	=> (defined $address) ? $address->get("address3") : $form->get('address3'),
-		);
-	$info->text(
-		name			=> 'city',
-		label			=> $i18n->get('city','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("city") : $form->get('city'),
-		);
-	$info->text(
-		name			=> 'state',
-		label			=> $i18n->get('state','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("state") : $form->get('state'),
-		);
-	$info->zipcode(
-		name			=> 'zipcode',
-		label			=> $i18n->get('code','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("code") : $form->get('zipcode','zipcode'),
-		);
-	$info->country(
-		name			=> 'country',
-		label			=> $i18n->get('country','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("country") : ($form->get('country') || 'United States'),
-		);
-	$info->phone(
-		name			=> 'phoneNumber',
-		label			=> $i18n->get('phone number','Shop'),		
-		defaultValue	=> (defined $address) ? $address->get("phoneNumber") : $form->get("phone","phone"),
-		);
-	$info->email(
-		name			=> 'email',
-		label			=> $i18n->get('email address'),
-		defaultValue	=> $form->get("email","email")
-		);
-	$info->submit(value=>$i18n->get('add to cart'));
-	
-	# render the page;
-	my $output = '<h1>'.$self->getTitle.'</h1>'
-		.'<p>'.$self->get('description').'</p>'
-		.'<h2>'.$i18n->get("badge holder information").'</h2>'
-		.$book->print;
-	if ($error ne "") {
-		$output .= '<p><b>'.$error.'</b></p>';
-	}
-	$output .= $info->print;
-	return $output;
+    # render the page;
+    return $self->processTemplate(\%vars, undef, $self->{_viewTemplate});
 }
 
 

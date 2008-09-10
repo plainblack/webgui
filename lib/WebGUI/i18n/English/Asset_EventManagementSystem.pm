@@ -92,6 +92,126 @@ our $I18N = {
         context        => q|a link label|,
     },
 
+    'view badge template' => {
+        message     => q|EMS Badge Template|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field|,
+    },
+
+    'view badge template help' => {
+        message     => q|The template used to display a form where the user enters badge information.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field hover help|,
+    },
+
+    'ems view badge error' => {
+        message     => q|Any errors from trying to add this badge to the user's cart.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field help|,
+    },
+
+    'addressBook' => {
+        message     => q|A button to fetch an address from the user's address book.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field help|,
+    },
+
+    'formHeader' => {
+        message     => q|Form header for the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field help|,
+    },
+
+    'formFooter' => {
+        message     => q|Form footer for the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field help|,
+    },
+
+    'ems view badge name' => {
+        message     => q|Form for the user's name in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge organization' => {
+        message     => q|Form for the user's organization in the EMS View Badge template|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge address1' => {
+        message     => q|Form for the first address field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge address2' => {
+        message     => q|Form for the second address field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge address3' => {
+        message     => q|Form for the third address field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge city' => {
+        message     => q|Form for the city field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge state' => {
+        message     => q|Form for the state field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge zipcode' => {
+        message     => q|Form for the zipcode field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge country' => {
+        message     => q|Form for the country field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge phone' => {
+        message     => q|Form for the phone field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge email' => {
+        message     => q|Form for the email field in the EMS View Badge template.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge submitAddress' => {
+        message     => q|Button to submit the address data.|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge title' => {
+        message     => q|The title of the EMS Badge|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
+    'ems view badge description' => {
+        message     => q|The description of the EMS Badge|,
+        lastUpdated    => 0,
+        context        => q|View EMS Badge Template form field help|,
+    },
+
     'buy badge' => {
         message     => q|Buy A Badge|,
         lastUpdated    => 0,
