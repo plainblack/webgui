@@ -17,6 +17,7 @@ package WebGUI::Inbox::Message;
 use strict;
 use WebGUI::Mail::Send;
 use WebGUI::International;
+
 =head1 NAME
 
 Package WebGUI::Inbox::Message;
