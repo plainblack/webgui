@@ -341,9 +341,10 @@ sub view {
                             {
                                 name  => "callback",
                                 value => JSON->new->utf8->encode({ url => $self->getUrl})
-                            }
+                            })
                         . WebGUI::Form::submit($session, {value => $i18n->get("populate from address book")})
-                        );
+                        . WebGUI::Form::formFooter($session)
+                        ;
 	
     # instanciate address
     my $address = WebGUI::Shop::AddressBook->newBySession($self->session)->getAddress($form->get("addressId")) if ($form->get("addressId"));
@@ -396,7 +397,7 @@ sub view {
                             name         => 'email',
                             defaultValue => $form->get('email','email'),
                         });
-    $vars{submitAddress} = WebGUI::Form::text($session, {value => $i18n->get('add to cart'),});
+    $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});
     $vars{title}       = $self->getTitle;
     $vars{description} = $self->get('description');
 	

@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 removeDoNothingOnDelete( $session );
 fixIsPublicOnTemplates ( $session );
+addEMSBadgeTemplate ( $session );
 
 finish($session); # this line required
 
@@ -38,6 +39,14 @@ finish($session); # this line required
 sub fixIsPublicOnTemplates {
     my $session = shift;
     $session->db->write('UPDATE `assetIndex` SET `isPublic` = 0 WHERE assetId IN (SELECT assetId FROM asset WHERE className IN ("WebGUI::Asset::RichEdit", "WebGUI::Asset::Snippet", "WebGUI::Asset::Template") )');
+}
+
+#----------------------------------------------------------------------------
+sub addEMSBadgeTemplate {
+    my $session = shift;
+    print "\tAdding EMS Badge Template" unless $quiet;
+    $session->db->write('ALTER TABLE EMSBadge ADD COLUMN templateId VARCHAR(22) BINARY NOT NULL');
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
