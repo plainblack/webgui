@@ -53,7 +53,6 @@ my @sqlLabels;
 my @libLabels;
 my @objLabels;
 
-
 @helpLabels = getHelpLabels();
 
 $numTests = scalar(@helpLabels);
@@ -68,6 +67,7 @@ foreach my $label ( @helpLabels ) {
 }
 
 sub getHelpLabels {
+    my %seenLabel = ();
 	my @helpLabels = ();
 	foreach my $topic ( keys %helpTable ) {
 		foreach my $entry ( keys %{ $helpTable{$topic} }) {
@@ -78,15 +78,15 @@ sub getHelpLabels {
 				tag=>'title',
 				namespace=>$topic, ##default
 				label=>$helpTable{$topic}{$entry}{'title'},
-			};
-			if (ref $helpTable{$topic}{$entry}{'body'} ne 'CODE') {
+			} unless $seenLabel{$topic}{$helpTable{$topic}{$entry}{'title'}}++;
+			if ($helpTable{$topic}{$entry}{'body'} and ref $helpTable{$topic}{$entry}{'body'} ne 'CODE') {
 				push @helpLabels, {
 					topic=>$topic,
 					entry=>$entry,
 					tag=>'body',
 					namespace=>$topic, ##default
 					label=>$helpTable{$topic}{$entry}{'body'},
-				} if $helpTable{$topic}{$entry}{'body'};
+				} unless $seenLabel{$topic}{$helpTable{$topic}{$entry}{'title'}}++;
 			}
 
 			##Add all labels in the fields array
@@ -97,14 +97,14 @@ sub getHelpLabels {
 					tag=>'fields',
 					namespace=>$field->{namespace},
 					label=>$field->{title},
-				},
-				{
+				} unless $seenLabel{$field->{namespace}}{$field->{title}}++;
+				push @helpLabels, {
 					topic=>$topic,
 					entry=>$entry,
 					tag=>'fields',
 					namespace=>$field->{namespace},
 					label=>$field->{description},
-				},;
+				} unless $seenLabel{$field->{namespace}}{$field->{description}}++;
 			}
 			my $variableEntries = getHelpVariables($helpTable{$topic}{$entry}{variables});
 			foreach my $variable ( @{ $variableEntries } ) {
@@ -121,7 +121,8 @@ sub getHelpLabels {
 				else {
 					$one->{label} = $variable->{name},
 				}
-				push @helpLabels, $one;
+				push @helpLabels, $one
+                    unless $seenLabel{$namespace}{$one->{label}}++;
 			}
 		}
 	}
