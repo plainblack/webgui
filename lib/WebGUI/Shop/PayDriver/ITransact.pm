@@ -748,7 +748,7 @@ sub www_processRecurringTransactionPostback {
     my $baseTransaction = eval{WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId )};
 
     #make sure the same user is used in this transaction as the last {mostly needed for reoccurring transactions
-    $self->session->user({userId=>$baseTransaction->get('userId')})
+    $self->session->user({userId=>$baseTransaction->get('userId')});
 
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
