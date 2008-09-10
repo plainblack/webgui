@@ -92,6 +92,18 @@ our $I18N = {
         context        => q|a link label|,
     },
 
+    'view badge template' => {
+        message     => q|EMS Badge Template|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field|,
+    },
+
+    'view badge template help' => {
+        message     => q|The template used to display a form where the user enters badge information.|,
+        lastUpdated    => 0,
+        context        => q|Edit EMS Badge Template form field hover help|,
+    },
+
     'buy badge' => {
         message     => q|Buy A Badge|,
         lastUpdated    => 0,
