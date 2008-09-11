@@ -147,23 +147,17 @@ sub toHtml {
         $style->setScript($url->extras("yui/build/element/element-beta.js"), {type=>"text/javascript"});
         $style->setScript($url->extras("yui/build/resize/resize-beta.js"), {type=>"text/javascript"});
         $out = qq|
-            <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 10) . qq|px; height: | . ($height + 10) . qq|px; overflow: hidden">
+            <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 6) . qq|px; height: | . ($height + 6) . qq|px; overflow: hidden">
             $out
             </div>
 
             <script type="text/javascript">
-
-            YAHOO.util.Event.onDOMReady(function() {
-                var Dom = YAHOO.util.Dom,
-                    Event = YAHOO.util.Event,
-                    textAreaElement = document.getElementById('| . $self->get('id') . qq|');
-
+            YAHOO.util.Event.onContentReady('| . $self->get('id') . qq|', function() {
+                var Dom = YAHOO.util.Dom;
                 var resize = new YAHOO.util.Resize('resize_| . $self->get('id'). qq|');
                 resize.on('resize', function(ev) {
-                    var w = ev.width;
-                    var h = ev.height;
-                    textAreaElement.style.width = (w - 6) + "px";
-                    textAreaElement.style.height = (h - 6) + "px";
+                    Dom.setStyle('| . $self->get('id') . qq|', 'width', (ev.width - 6) + "px");
+                    Dom.setStyle('| . $self->get('id') . qq|', 'height', (ev.height - 6) + "px");
                 });
             });
             </script>
