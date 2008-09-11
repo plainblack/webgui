@@ -651,7 +651,7 @@ sub getRecordTemplateVars {
         if ($entry) {
             $value = $entryData->{ $field->{name} };
         }
-        elsif (!$ignoreForm && (my $formValue = $self->session->form->process($field->{name}))) {
+        elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
             $value = $formValue;
         }
         my $hidden = ($field->{status} eq 'hidden' && !$self->session->var->isAdminOn) || ($field->{isMailField} && !$self->get('mailData'));
