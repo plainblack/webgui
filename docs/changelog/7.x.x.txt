@@ -33,6 +33,7 @@
  - fixed: Reoccurring transactions now update the correct user id
  - fixed: I need a template for this display
  - fixed: If a user clicks on an unsubscribe link in an email and they are not logged into WebGUI, they are now prompted to log in so that they can then unsbscribe.
+ - fixed: Using a password recovery token a second time informs the user of the reuse instead of having a style inside a style with a login form.
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
