@@ -752,6 +752,7 @@ sub emailRecoverPassword {
     );
 
     $output .= $f->print;
+$self->session->log->error($output);
     return  $output;
  }
  
@@ -1004,8 +1005,9 @@ sub emailResetPassword {
        $self->session->user({user=>$u});
 
 #      do not proceed unless we have an incoming guid from the email, and that guid corresponds to a valid user.
-       unless ($passwordRecoveryToken && $userId) {    
-               return $session->privilege->insufficient;
+       if(!defined $userId){
+	        my $i18n = WebGUI::International->new($self->session,"AuthWebGUI");
+            return $i18n->get("token already used");
        }
 
 #      login the user and take them to a page where they can change their password.
@@ -1068,8 +1070,11 @@ sub emailResetPasswordFinish {
        my $passwordRecoveryToken = $form->param('token');
 
        my $userId = $self->getUserIdByPasswordRecoveryToken($session, $passwordRecoveryToken);
-
-       return $session->privilege->insufficient unless $userId;
+       
+       if(!defined $userId){
+	        my $i18n = WebGUI::International->new($self->session,"AuthWebGUI");
+            return $i18n->get("token already used");
+       }
 
        if ($self->_isValidPassword($password, $passwordConfirm)) {
                $self->user(WebGUI::User->new($self->session, $userId));

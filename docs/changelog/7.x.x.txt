@@ -22,6 +22,7 @@
  - fixed: Show Message On Login continue link
  - fixed: Page Layout templates generate invalid HTML with description
  - fixed: I need a template for this display
+ - fixed: Using a password recovery token a second time informs the user of the reuse instead of having a style inside a style with a login form.
  - fixed: Thingy now requires at least 1 field for a new Thing.
 
 7.5.21
