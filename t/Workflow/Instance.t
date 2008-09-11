@@ -16,12 +16,23 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Test::Deep;
+
+use Test::MockObject;
+my $mockSpectre = Test::MockObject->new();
+$mockSpectre->fake_module('WebGUI::Workflow::Spectre');
+$mockSpectre->fake_new();
+my @spectreGuts = ();
+$mockSpectre->mock('notify', sub{
+    my ($message, $data) = @_;
+    push @spectreGuts, [$message, $data];
+});
+
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;
 use JSON;
-use Data::Dumper;
 
 #----------------------------------------------------------------------------
 # Init
@@ -31,7 +42,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -66,7 +77,19 @@ ok($session->getId, 'getId returns something');
 ok($session->id->valid($instance->getId), 'New workflow instance has a valid ID');
 is($instance->get('priority'), 2, 'Default instance priority is 2');
 cmp_ok(abs ($instance->get('lastUpdate')-$dateUpdated), '<=', 3, 'Date updated field set correctly when instance is created');
-diag $instance->get('lastStatus');
+
+##Singleton checks
+
+###############################################################################3
+#
+#  getWorkflow
+#
+###############################################################################3
+
+my $instanceWorkflow = $instance->getWorkflow;
+is($instanceWorkflow->getId, $wf->getId, 'getWorkflow returns a copy of the workflow for the instance');
+is($instanceWorkflow->getId, $wf->getId, 'getWorkflow, caching check');
+
 
 
 #----------------------------------------------------------------------------
