@@ -178,6 +178,8 @@ save you many hours of grief.
 
 7.5.0
 --------------------------------------------------------------------
+ * You must upgrade to 7.4.40 before you upgrade to 7.5
+
  * Event related links are now displayed using a template loop 
    rather than a template variable. See the default templates for 
    details.
