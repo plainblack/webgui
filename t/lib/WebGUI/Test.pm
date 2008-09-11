@@ -149,11 +149,12 @@ sub interceptLogging {
     my $logger = $SESSION->log->getLogger;
     $logger = Test::MockObject::Extends->new( $logger );
 
-    $logger->mock( 'warn',  sub { $WebGUI::Test::logger_warns = $_[1]} );
-    $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
-    $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
-    $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
-    $logger->mock( 'is_debug',  sub { return 1 } );
+    $logger->mock( 'warn',     sub { $WebGUI::Test::logger_warns = $_[1]} );
+    $logger->mock( 'debug',    sub { $WebGUI::Test::logger_debug = $_[1]} );
+    $logger->mock( 'info',     sub { $WebGUI::Test::logger_info  = $_[1]} );
+    $logger->mock( 'error',    sub { $WebGUI::Test::logger_error = $_[1]} );
+    $logger->mock( 'isDebug',  sub { return 1 } );
+    $logger->mock( 'is_debug', sub { return 1 } );
 }
 
 #----------------------------------------------------------------------------
