@@ -2482,7 +2482,7 @@ sequenceNumber');
             });
         }
     }
-    
+    my $noFields = 0;    
     if (scalar(@displayInSearchFields)){
         $query = "select thingDataId, ";
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
@@ -2494,7 +2494,7 @@ sequenceNumber');
     }
     else{
         $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
-        return undef;
+        $noFields = 1;
     }
     
     # store query in cache for thirty minutes
@@ -2504,7 +2504,7 @@ sequenceNumber');
     $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
     
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
-    $p->setDataByQuery($query);
+    $p->setDataByQuery($query) if ! $noFields;
     $searchResults = $p->getPageData($paginatePage);
     foreach my $searchResult (@$searchResults){
         my (@field_loop);
