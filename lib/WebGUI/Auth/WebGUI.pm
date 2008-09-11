@@ -752,7 +752,6 @@ sub emailRecoverPassword {
     );
 
     $output .= $f->print;
-$self->session->log->error($output);
     return  $output;
  }
  
