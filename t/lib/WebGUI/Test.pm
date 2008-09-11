@@ -153,6 +153,7 @@ sub interceptLogging {
     $logger->mock( 'debug', sub { $WebGUI::Test::logger_debug = $_[1]} );
     $logger->mock( 'info',  sub { $WebGUI::Test::logger_info  = $_[1]} );
     $logger->mock( 'error', sub { $WebGUI::Test::logger_error = $_[1]} );
+    $logger->mock( 'is_debug',  sub { return 1 } );
 }
 
 #----------------------------------------------------------------------------
