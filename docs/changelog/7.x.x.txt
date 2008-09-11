@@ -22,6 +22,7 @@
  - fixed: Show Message On Login continue link
  - fixed: Page Layout templates generate invalid HTML with description
  - fixed: I need a template for this display
+ - fixed: Thingy now requires at least 1 field for a new Thing.
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
