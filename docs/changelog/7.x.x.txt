@@ -1,3 +1,5 @@
+7.5.23
+
 7.5.22
  - fixed: Layout templates are now prepared correctly
  - fixed: Syndicated Content doesn't decode alternate character sets
