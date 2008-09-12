@@ -97,10 +97,15 @@ my $instanceWorkflow = $instance->getWorkflow;
 is($instanceWorkflow->getId, $wf->getId, 'getWorkflow returns a copy of the workflow for the instance');
 is($instanceWorkflow->getId, $wf->getId, 'getWorkflow, caching check');
 
+###############################################################################
+#
+#  set
+#
+###############################################################################
 
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    #$wf->delete;  ##Deleting a Workflow deletes its instances, too.
+    $wf->delete;  ##Deleting a Workflow deletes its instances, too.
 }
