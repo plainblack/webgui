@@ -857,11 +857,12 @@ sub www_getRegistrantAsJson {
 	my $existingTickets = $db->read("select ticketAssetId from EMSRegistrantTicket where badgeId=? and purchaseComplete=1",[$badgeId]);
 	while (my ($id) = $existingTickets->array) {
 		my $ticket = WebGUI::Asset::Sku::EMSTicket->new($session, $id);
+        my $startTime = WebGUI::DateTime->new($ticket->get('startDate'))->set_time_zone($self->get('timezone'));
 		push(@tickets, {
 			title			=> $ticket->getTitle,
 			eventNumber		=> $ticket->get('eventNumber'),
 			hasPurchased 	=> 1,
-			startDate		=> $ticket->get('startDate'),
+			startDate		=> $startTime,
 			endDate			=> $ticket->get('endDate'),
 			location		=> $ticket->get('location'),
 			assetId			=> $ticket->getId,
@@ -903,11 +904,12 @@ sub www_getRegistrantAsJson {
 		my $sku = $item->getSku;
 		# it's a ticket
 		if ($sku->isa('WebGUI::Asset::Sku::EMSTicket')) {
+            my $startTime = WebGUI::DateTime->new($sku->get('startDate'))->set_time_zone($self->get('timezone'));
 			push(@tickets, {
 				title			=> $sku->getTitle,
 				eventNumber		=> $sku->get('eventNumber'),
 				itemId 			=> $item->getId,
-				startDate		=> $sku->get('startDate'),
+				startDate		=> $startTime,
 				endDate			=> $sku->get('endDate'),
 				location		=> $sku->get('location'),
 				assetId			=> $sku->getId,
