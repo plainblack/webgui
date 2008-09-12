@@ -61,12 +61,17 @@ sub create {
 	my ($class, $session, $properties, $skipRealtime) = @_;
 
     # do singleton check
-	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
-    mode='singleton'",[$properties->{workflowId}]);
-	my $params = (exists $properties->{parameters}) 
-            ? JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}})
-            : undef;
-	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
+    my $placeHolders = [$properties->{workflowId}];
+	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and mode='singleton'",$placeHolders);
+    my $sql = "select count(*) from WorkflowInstance where workflowId=?";
+	if (exists $properties->{parameters}) {
+        push @{ $placeHolders }, JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
+        $sql .= ' and parameters=?';
+    }
+    else {
+        $sql .= ' and parameters IS NULL';
+    }
+	my ($count) = $session->db->quickArray($sql,$placeHolders);
     if ($isSingleton && $count) {
         $session->log->info("An instance of singleton workflow $properties->{workflowId} already exists, not creating a new one");
         return undef

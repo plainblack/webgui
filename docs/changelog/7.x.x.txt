@@ -38,6 +38,8 @@
  - fixed: Thingy Things can now have no fields and still be functional.
  - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
  - fixed: Tickets on add to badge screen now show the time at the event's timezone
+ - It was possible to run multiple singleton workflows at the same time.
+
 7.5.22
  - fixed: Layout template now gets prepared correctly
  - fixed: When user does not have permissions to search/edit a thing a proper error is shown.
