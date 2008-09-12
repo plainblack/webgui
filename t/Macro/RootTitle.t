@@ -46,6 +46,7 @@ my %properties_A = (
 		#              '1234567890123456789012'
 );
 
+
 my $assetA = $root->addChild(\%properties_A, $properties_A{id});
 
 my %properties_B = (
@@ -116,7 +117,7 @@ my $asset_ = $root->addChild(\%properties__, $properties__{id});
 
 $versionTag->commit;
 
-my $origLineage = $asset_->getLineage;
+my $origLineage = $asset_->get('lineage');
 my $newLineage = substr $origLineage, 0, length($origLineage)-1; 
 $session->db->write('update asset set lineage=? where assetId=?',[$newLineage, $asset_->getId]);
 
