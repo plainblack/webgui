@@ -21,7 +21,7 @@ use Test::Deep;
 use Test::MockObject;
 my $mockSpectre = Test::MockObject->new();
 $mockSpectre->fake_module('WebGUI::Workflow::Spectre');
-$mockSpectre->fake_new();
+$mockSpectre->fake_new('WebGUI::Workflow::Spectre');
 my @spectreGuts = ();
 $mockSpectre->mock('notify', sub{
     my ($message, $data) = @_;
