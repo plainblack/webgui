@@ -141,7 +141,8 @@ END {
 
 =head2 interceptLogging
 
-Intercept logging request and capture them in buffer variables for testing
+Intercept logging request and capture them in buffer variables for testing.  Also,
+mock the isDebug flag so that debug output is always generated.
 
 =cut
 
