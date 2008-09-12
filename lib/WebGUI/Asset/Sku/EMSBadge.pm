@@ -51,6 +51,9 @@ Adds this badge as configured for an individual to the cart.
 
 sub addToCart {
 	my ($self, $badgeInfo) = @_;
+    if($self->getQuantityAvailable() < 1){ 
+        return WebGUI::International->new($self->session, "Asset_EventManagementSystem")->get('no more available');
+    }
 	$badgeInfo->{badgeId} = "new";
 	$badgeInfo->{badgeAssetId} = $self->getId;
 	$badgeInfo->{emsAssetId} = $self->getParent->getId;
@@ -397,7 +400,9 @@ sub view {
                             name         => 'email',
                             defaultValue => $form->get('email','email'),
                         });
-    $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});
+    if($self->getQuantityAvailable() > 0){ 
+        $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});
+    }
     $vars{title}       = $self->getTitle;
     $vars{description} = $self->get('description');
 	

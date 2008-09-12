@@ -895,6 +895,11 @@ our $I18N = {
         context        => q|heading on add badge to cart screen|,
     },
 
+    'no more available' => {
+        message     => q|Error: No more items available for purcahse.|,
+        lastUpdated    => 0,
+    },
+
     'add to cart' => {
         message     => q|Add To Cart|,
         lastUpdated    => 0,
