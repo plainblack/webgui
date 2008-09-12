@@ -42,23 +42,24 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 8;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-###############################################################################3
+###############################################################################
 #
 # create a workflow instance
 #
-###############################################################################3
+###############################################################################
 
 my $wf = WebGUI::Workflow->create(
     $session,
     {
         title => 'WebGUI::Workflow::Instance Test',
         description => 'Description',
-        type => 'None'
+        type => 'None',
+        mode => 'singleton',
     }
 );
 isa_ok($wf, 'WebGUI::Workflow', 'workflow created for test');
@@ -66,9 +67,6 @@ isa_ok($wf, 'WebGUI::Workflow', 'workflow created for test');
 # create an instance of $wfId
 my $properties = {
     workflowId=>$wf->getId,
-    methodName=>"new",
-    className=>"None",
-    parameters=>'encode me',
 };
 my $dateUpdated = time();
 my $instance = WebGUI::Workflow::Instance->create($session, $properties);
@@ -79,12 +77,21 @@ is($instance->get('priority'), 2, 'Default instance priority is 2');
 cmp_ok(abs ($instance->get('lastUpdate')-$dateUpdated), '<=', 3, 'Date updated field set correctly when instance is created');
 
 ##Singleton checks
+my $otherInstance = WebGUI::Workflow::Instance->create($session, $properties);
+is ($otherInstance, undef, 'create: only allows one instance of a singleton to be created');
 
-###############################################################################3
+$instance->set({ 'parameters' => {session => 1}, });
+$otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
+is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
+$otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 2,}});
+isnt ($otherInstance, undef, 'create: another singleton instance can be created if it has different parameters');
+$otherInstance->delete;
+
+###############################################################################
 #
 #  getWorkflow
 #
-###############################################################################3
+###############################################################################
 
 my $instanceWorkflow = $instance->getWorkflow;
 is($instanceWorkflow->getId, $wf->getId, 'getWorkflow returns a copy of the workflow for the instance');
@@ -95,5 +102,5 @@ is($instanceWorkflow->getId, $wf->getId, 'getWorkflow, caching check');
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $wf->delete;  ##Deleting a Workflow deletes its instances, too.
+    #$wf->delete;  ##Deleting a Workflow deletes its instances, too.
 }
