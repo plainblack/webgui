@@ -1,4 +1,5 @@
 7.5.23
+ - fixed: Change <spam> tag to <span> tag in default product template
 
 7.5.22
  - fixed: Layout templates are now prepared correctly
