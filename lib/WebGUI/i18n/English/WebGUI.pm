@@ -4123,6 +4123,12 @@ LongTruncOk=1</p>
         context     => q{Title of the template created by the Site Setup screen},
     },
 
+    'WebGUI password recovery' => {
+        message     => q{WebGUI password recovery},
+        lastUpdated => 0,
+        context     => q{Title of the template created by the Site Setup screen},
+    },
+
 };
 
 1;
