@@ -1,5 +1,4 @@
-# Enable Flux for a given site
-# You need to run this against any newly created site otherwise the Flux-dependent code will die horribly..
+# Enables Flux for a given site (see FLUX_README.txt for more information)
 
 our ($webguiRoot);
 
@@ -52,7 +51,7 @@ if ( $session->db->quickScalar('select count(*) from settings where name = "flux
 modify_db_schema_for_flux();
 modify_config_files_for_flux();
 create_demo_data();
-print "Finished!\n";
+print "Finished. Don't forget to restart modperl.\n";
 
 #----------------------------------------------------------------------------
 sub modify_db_schema_for_flux {
