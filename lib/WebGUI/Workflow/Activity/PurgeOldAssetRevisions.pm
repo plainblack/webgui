@@ -90,6 +90,7 @@ sub execute {
     my $sth = $session->db->read("select assetData.assetId,asset.className,assetData.revisionDate from asset
         left join assetData on asset.assetId=assetData.assetId where assetData.revisionDate<? 
         order by assetData.revisionDate asc", [$suspectDate]);
+    my $ttl = $self->getTTL;
     while (my ($id, $class, $version) = $sth->array) {
 
         # we never want to purge the current version
@@ -110,7 +111,7 @@ sub execute {
 		}
 
         # give up if we're taking too long
-        if (time() - $start > 55) { 
+        if (time() - $start > $ttl) { 
             $log->info("Ran out of time, will pick up with revision $version when we start again."); 
             $instance->setScratch("purgeOldAssetsLastRevisionDate", $version);
             $sth->finish;

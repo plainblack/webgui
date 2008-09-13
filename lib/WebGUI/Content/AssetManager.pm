@@ -370,7 +370,30 @@ sub www_manage {
         }
     }
 
+    # Handle Auto Request Commit setting
+    if ($session->setting->get("autoRequestCommit")) {
+        # Make sure version tag hasn't already been committed by another process
+        my $versionTag = WebGUI::VersionTag->getWorking($session, "nocreate");
+
+        if ($versionTag && $session->setting->get("skipCommitComments")) {
+            $versionTag->requestCommit;
+        }
+        elsif ($versionTag) {
+            $session->http->setRedirect(
+                $currentAsset->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($session)->getId)
+            );
+            return undef;
+        }
+    }
+
     # Show the page
+    # i18n we'll need later
+    # TODO: Add all i18n to this hash so we can better format our JS code
+    my %i18n    = (
+        "select all"    => $i18n->get( "select all" ),
+    );
+
+    # Add script and stylesheets
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
@@ -383,6 +406,7 @@ sub www_manage {
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
+
     my $extras      = $session->url->extras;
     $session->style->setRawHeadTags( <<ENDHTML );
     <script type="text/javascript">
@@ -512,7 +536,7 @@ ENDHTML
                     . 'WebGUI.AssetManager.MoreMenuItems = ' . getMoreMenu( $session ) . ';'
                     ;
 
-    $output         .= <<'ENDJS';
+    $output         .= <<"ENDJS";
     // Start the data source
     WebGUI.AssetManager.DataSource
         = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
@@ -552,12 +576,15 @@ ENDHTML
             return query;
         };
 
+    var selectAllButton = "<input type=\\"checkbox\\" title=\\"$i18n{"select all"}\\" onclick=\\"WebGUI.Form.toggleAllCheckboxesInForm( document.forms[0], 'assetId' );\\" />";
 ENDJS
 
+    # Column defs have i18n, so be careful
+    # Can't be Perl datastructure because formatter must be a function ref not a string
     $output .= q(
     WebGUI.AssetManager.ColumnDefs
         = [ 
-            { key: 'assetId', label: "", formatter: WebGUI.AssetManager.formatAssetIdCheckbox },
+            { key: 'assetId', label: selectAllButton, formatter: WebGUI.AssetManager.formatAssetIdCheckbox },
             { key: 'lineage', label: ") . $i18n->get( 'rank' ) . q(", sortable: true, formatter: WebGUI.AssetManager.formatRank },
             { key: 'actions', label: "", formatter: WebGUI.AssetManager.formatActions },
             { key: 'title', label: ") . $i18n->get( 99 ) . q(", formatter: WebGUI.AssetManager.formatTitle, sortable: true },
@@ -746,7 +773,7 @@ sub www_search {
                 if ( !$asset->lockedBy || $asset->canEditIfLocked ) {
                     $fields{ editLink } 
                         = sprintf '<a href="%s">' . $i18n->get( "edit" ) . '</a>',
-                        $asset->getUrl( 'func=edit' )
+                        $asset->getUrl( 'func=edit;proceed=manageAssets' )
                         ;
                 }
 

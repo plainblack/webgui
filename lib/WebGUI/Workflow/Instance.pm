@@ -61,14 +61,19 @@ sub create {
 	my ($class, $session, $properties, $skipRealtime) = @_;
 
     # do singleton check
-	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and
-    mode='singleton'",[$properties->{workflowId}]);
-	my $params = (exists $properties->{parameters}) 
-            ? JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}})
-            : undef;
-	my ($count) = $session->db->quickArray("select count(*) from WorkflowInstance where workflowId=? and parameters=?",[$properties->{workflowId},$params]);
+    my $placeHolders = [$properties->{workflowId}];
+	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and mode='singleton'",$placeHolders);
+    my $sql = "select count(*) from WorkflowInstance where workflowId=?";
+	if (exists $properties->{parameters}) {
+        push @{ $placeHolders }, JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
+        $sql .= ' and parameters=?';
+    }
+    else {
+        $sql .= ' and parameters IS NULL';
+    }
+	my ($count) = $session->db->quickArray($sql,$placeHolders);
     if ($isSingleton && $count) {
-        $session->log->info("singleton workflow $properties->{workflowId} already running, not running again");
+        $session->log->info("An instance of singleton workflow $properties->{workflowId} already exists, not creating a new one");
         return undef
     }
 
@@ -151,7 +156,7 @@ sub get {
     my $self = shift;
     my $name = shift;
     if ($name eq "parameters") {
-        if (exists $self->{_data}{parameters}) {
+        if ($self->{_data}{parameters}) {
             my $parameters = JSON::decode_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
@@ -263,6 +268,10 @@ A reference to the current session.
 =head3 instanceId 
 
 A unique id refering to a workflow instance.
+
+=head3 isNew 
+
+A boolean, that, if true, sets that the instance is ready to run.
 
 =cut
 
@@ -406,15 +415,17 @@ The id of the workflow we're executing.
 
 =head4 className
 
-The classname of an object that will be created to pass into the workflow.
+The classname of an object that will be created to pass into the workflow.  The object will not
+be constructed unless both className and methodName are true.
 
 =head4 methodName
 
-The method name of the constructor for className.
+The method name of the constructor for className.  The object will not
+be constructed unless both className and methodName are true.
 
 =head4 parameters
 
-The parameters to be passed into the constructor. Note that the system will always pass in the session as the first argument.
+A hashref of parameters to be passed into the constructor for className. Note that the system will always pass in the session as the first argument.
 
 =head4 currentActivityId
 

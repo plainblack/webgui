@@ -48,8 +48,7 @@ function taskEdit_updateResources(resources) {
 
 	var component = encodeURIComponent(resources.join(';'));
 	var url = document.location.toString();
-	var queryIndex = url.indexOf('?');
-	if (queryIndex > -1) url = url.substr(0, queryIndex);
+    url = url.replace(/[#\?].*/, '');
 	url += '?func=innerHtmlOfResources;resources=' + component;
 	taskEdit_updateExclude("taskEdit_resourceList_addUser_a", 'user', resources);
 	taskEdit_updateExclude("taskEdit_resourceList_addGroup_a", 'group', resources);

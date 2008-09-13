@@ -70,13 +70,14 @@ sub execute {
 	my $self = shift;
 	my $sth = $self->session->db->read("select sessionId from userSession where expires<?",[time()]);
 	my $time = time();
+    my $ttl = $self->getTTL;
         while (my ($sessionId) = $sth->array) {
 		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename, undef, undef, $sessionId, 1);
 		if (defined $session) {
 			$session->var->end;
 			$session->close;
 		}
-		if ((time() - $time) > 55) {
+		if ((time() - $time) > $ttl) {
         		$sth->finish;
 			return $self->WAITING;
 		}

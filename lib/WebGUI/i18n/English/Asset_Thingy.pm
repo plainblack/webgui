@@ -925,6 +925,21 @@ search has been done.|,
         message => q|The Thing to which this field refers does not exist or has no table.|,
         lastUpdated => 1104630516,
     },
+
+    'no permission to edit' => {
+        message => q|You do not have permissions to edit this Thing.|,
+        lastUpdated => 1219424285,
+    },
+
+    'no permission to search' => {
+        message => q|You do not have permissions to search this Thing.|,
+        lastUpdated => 1219424285,
+    },
+    
+    'thing must have fields' => {
+        message => q|Error: You must assign fields to your new Thing.|,
+        lastUpdated => 1219424285,
+    },
 };
 
 1;

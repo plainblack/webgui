@@ -16,6 +16,7 @@ package WebGUI::Inbox::Message;
 
 use strict;
 use WebGUI::Mail::Send;
+use WebGUI::International;
 
 =head1 NAME
 
@@ -99,7 +100,6 @@ sub create {
 	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};
     $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
-    
 	if ($self->{_properties}{status} eq "completed") {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
@@ -113,12 +113,14 @@ sub create {
 		subject=>$subject,
 		});
 	if (defined $mail) {
+        my $i18n = WebGUI::International->new($session, 'Inbox_Message');
+        my $pref = $i18n->get("from user preface");
+        $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userid = ?",[$properties->{sentBy}]). ".";
 	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
-	       
 		if ($msg =~ m/\<.*\>/) {
-			$mail->addHtml($msg);
+			$mail->addHtml("<p>$pref</p><br>".$msg);
 		} else {
-			$mail->addText($msg);
+			$mail->addText($pref."\n\n".$msg);
 		}
 		$mail->addFooter;
 		$mail->queue;
@@ -138,7 +140,7 @@ Deletes this message from the inbox.
 sub delete {
 	my $self = shift;
 	my $sth = $self->session->db->prepare("delete from inbox where messageId=?");
-	$sth->execute($self->getId);
+	$sth->execute([$self->getId]);
 }
 
 #-------------------------------------------------------------------
@@ -202,7 +204,8 @@ sub getId {
 
 =head2 new ( session, messageId )
 
-Constructor.
+Constructor used to access existing messages.  Use create for making
+new messages.
 
 =head3 session
 

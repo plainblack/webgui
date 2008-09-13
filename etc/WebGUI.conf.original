@@ -161,6 +161,11 @@
 
 # "emailOverride" : "joe@example.com",
 
+# Set this value if you wish to bypass sending email to the mailserver alltogether.
+# This will instead pipe email messages to the log, removing them from the queue normally
+
+# "emailToLog" : "1",
+
 # By adding CIDR based subnets to the following array you can limit the
 # subnets by which users can turn admin mode on.
 

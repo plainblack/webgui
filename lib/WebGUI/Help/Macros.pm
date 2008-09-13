@@ -18,14 +18,25 @@ our $HELP = {
             closedir(DIR);
 
             ##Build list of enabled macros, by namespace, by reversing session hash:
-            my %macros = reverse %{ $session->config->get("macros") };
+            my %configMacros = %{ $session->config->get("macros") };
+            #my %macros = reverse %{ $session->config->get("macros") };
+            my %macros;
+            while (my ($alias, $macroName) = each %configMacros) {
+                $alias = '&#94;'. $alias . '();';
+                if (exists $macros{$macroName}) {
+                    $macros{$macroName} .= '<br/>' . $alias;
+                }
+                else {
+                    $macros{$macroName} = $alias;
+                }
+            }
 
             my $i18n = WebGUI::International->new( $session, 'Macros' );
             my $yes  = $i18n->get( 138,                      'WebGUI' );
             my $no   = $i18n->get( 139,                      'WebGUI' );
             my $macro_table = join "\n", map {
                 join '', '<tr><td>', $_, '</td><td>', ( $macros{$_} ? $yes : $no ), '</td><td>',
-                    ( $macros{$_} ? ( '&#94;', $macros{$_}, '();' ) : '&nbsp;' ), '</td></tr>'
+                    ( $macros{$_} ? $macros{$_} : '&nbsp;' ), '</td></tr>'
             } @macros;
 
             $macro_table = join( "\n",

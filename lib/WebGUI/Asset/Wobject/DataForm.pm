@@ -31,7 +31,7 @@ use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
 use WebGUI::Group;
-use JSON qw(encode_json decode_json);
+use JSON;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -170,7 +170,7 @@ sub _saveFieldConfig {
     my @config = map {
         $self->getFieldConfig($_)
     } @{ $self->getFieldOrder };
-    my $data = encode_json(\@config);
+    my $data = JSON::to_json(\@config);
     $self->update({fieldConfiguration => $data});
 }
 
@@ -179,7 +179,7 @@ sub _saveTabConfig {
     my @config = map {
         $self->getTabConfig($_)
     } @{ $self->getTabOrder };
-    my $data = encode_json(\@config);
+    my $data = JSON::to_json(\@config);
     $self->update({tabConfiguration => $data});
 }
 
@@ -343,7 +343,7 @@ sub definition {
             defaultValue=>$i18n->get(2),
         },
     );
-    $properties{fieldConfiguration}{defaultValue} = JSON::encode_json(\@defFieldConfig);
+    $properties{fieldConfiguration}{defaultValue} = JSON::to_json(\@defFieldConfig);
     push @$definition, {
         assetName           => $i18n->get('assetName'),
         uiLevel             => 5,
@@ -361,7 +361,7 @@ sub _cacheFieldConfig {
     if (!$self->{_fieldConfig}) {
         my $jsonData = $self->get("fieldConfiguration");
         my $fieldData;
-        if ($jsonData && eval { $jsonData = decode_json($jsonData) ; 1 }) {
+        if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
             $self->{_fieldConfig} = {
                 map { $_->{name}, $_ } @{ $jsonData }
@@ -383,7 +383,7 @@ sub _cacheTabConfig {
     if (!$self->{_tabConfig}) {
         my $jsonData = $self->get("tabConfiguration");
         my $fieldData;
-        if ($jsonData && eval { $jsonData = decode_json($jsonData) ; 1 }) {
+        if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
             $self->{_tabConfig} = {
                 map { $_->{tabId}, $_ } @{ $jsonData }
@@ -448,8 +448,8 @@ sub deleteAttachedFiles {
     my $fieldConfig = $self->getFieldConfig;
 
     if ($entryId) {
-        my $entry = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
-        $entryData = decode_json($entry->{entryData});
+        my ($entry) = $self->session->db->buildArray("select entryData from DataForm_entry where assetId=? and DataForm_entryId=?", [$self->getId, $entryId]);
+        $entryData = JSON::from_json($entry);
     }
     if ($entryData) {
         for my $field ( @$fields ) {
@@ -463,7 +463,7 @@ sub deleteAttachedFiles {
     else {
         my $entries = $self->session->db->buildArrayRef("select entryData from DataForm_entry where assetId=?", [$self->getId]);
         foreach my $entry (@{ $entries}) {
-            my $entryData = decode_json($entry);
+            my $entryData = JSON::from_json($entry);
             for my $field (@{ $fields }) {
                 my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
                 if ($form->can('getStorageLocation')) {
@@ -514,7 +514,7 @@ sub getListTemplateVars {
         FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC", [$self->getId]);
     while (my $record = $entries->hashRef) {
         my $recordData;
-        if (!eval { $recordData = decode_json($record->{entryData}) ; 1 }) {
+        if (!eval { $recordData = JSON::from_json($record->{entryData}) ; 1 }) {
             $self->session->errorHandler->warn('DataForm ' . $self->getId . ' entry ' . $record->{DataForm_entryId} . ' contains invalid data');
             next;
         }
@@ -611,7 +611,7 @@ sub getRecordTemplateVars {
 	if ($var->{entryId}) {
 		$var->{"form.start"} .= WebGUI::Form::hidden($self->session,{name=>"entryId",value=>$var->{entryId}});
         $entry = $self->getCollateral("DataForm_entry","DataForm_entryId",$var->{entryId});
-        $entryData = decode_json( $entry->{entryData} );
+        $entryData = JSON::from_json( $entry->{entryData} );
         my $date = WebGUI::DateTime->new($self->session, $entry->{submissionDate})->cloneToUserTimeZone;
 		$var->{ipAddress} = $entry->{ipAddress};
 		$var->{username} = $entry->{username};
@@ -651,7 +651,7 @@ sub getRecordTemplateVars {
         if ($entry) {
             $value = $entryData->{ $field->{name} };
         }
-        elsif (!$ignoreForm && (my $formValue = $self->session->form->process($field->{name}))) {
+        elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
             $value = $formValue;
         }
         my $hidden = ($field->{status} eq 'hidden' && !$self->session->var->isAdminOn) || ($field->{isMailField} && !$self->get('mailData'));
@@ -1233,10 +1233,10 @@ sub www_exportTab {
             'submissionDate',
             @exportFields,
         );
-        my $outText = $tsv->print;
+        my $outText = $tsv->string;
 
         while (my $entryData = $entries->hashRef) {
-            my $entryFields = decode_json($entryData->{entryData});
+            my $entryFields = JSON::from_json($entryData->{entryData});
             $tsv->combine(
                 $entryData->{DataForm_entryId},
                 $entryData->{ipAddress},
@@ -1245,7 +1245,7 @@ sub www_exportTab {
                 WebGUI::DateTime->new($self->session, $entryData->{submissionDate})->webguiDate,
                 @{ $entryFields }{@exportFields},
             );
-            $outText .= $tsv->print;
+            $outText .= $tsv->string;
         }
         $entries->finish;
         $self->session->http->setFilename($self->get("url").".tab","text/plain");
@@ -1352,7 +1352,7 @@ sub www_process {
     if ($entryId) {
         my $entry = $self->getCollateral("DataForm_entry","DataForm_entryId", $entryId);
         eval {
-            $entryData = decode_json($entry->{entryData});
+            $entryData = JSON::from_json($entry->{entryData});
         };
     }
 
@@ -1371,7 +1371,7 @@ sub www_process {
             });
             WebGUI::Macro::filter(\$value);
         }
-        if ($field->{status} eq "required" && (!$value || $value =~ /^\s*$/)) {
+        if ($field->{status} eq "required" && (! defined($value) || $value =~ /^\s*$/)) {
             push @errors, {
                 "error.message" => $field->{label} . " " . $i18n->get(29) . ".",
             };
@@ -1398,7 +1398,7 @@ sub www_process {
         $self->sendEmail($var, $entryData);
     }
     if ($self->get('storeData')) {
-        my $entryJSON = encode_json($entryData);
+        my $entryJSON = JSON::to_json($entryData);
         my $collData = {
             DataForm_entryId    => $entryId,
             userId              => $self->session->user->userId,

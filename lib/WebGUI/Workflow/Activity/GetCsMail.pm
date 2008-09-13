@@ -167,6 +167,7 @@ sub execute {
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
 	my $postGroup = $cs->get("postGroupId"); #group that's allowed to post to the CS
     
+    my $ttl = $self->getTTL;
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
@@ -227,7 +228,7 @@ sub execute {
 			$send->send;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
-		last if (time() > $start + 60);
+		last if (time() > $start + $ttl);
 	}
 	$mail->disconnect;
 	return $self->COMPLETE;

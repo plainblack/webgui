@@ -695,33 +695,35 @@ sub getFormElement {
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
-                    @defaultValues = $self->session->form->selectList($name);
-                } else {
-                    foreach (split(/\n/x, $data->{value})) {
-                            s/\s+$//x; # remove trailing spaces
-                                push(@defaultValues, $_);
-                    }
-                }
+            @defaultValues = $self->session->form->selectList($name);
+        }
+        else {
+            foreach (split(/\n/x, $data->{value})) {
+                s/\s+$//x; # remove trailing spaces
+                push(@defaultValues, $_);
+            }
+        }
         $param{value} = \@defaultValues;
-    }    
+    }
 
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList))) {
         delete $param{size};
         my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/x, $data->{possibleValues})) {
-                    s/\s+$//x; # remove trailing spaces
-                        $options{$_} = $_;
-                }
+        tie %options, 'Tie::IxHash';
+        foreach (split(/\n/x, $data->{possibleValues})) {
+            s/\s+$//x; # remove trailing spaces
+                $options{$_} = $_;
+        }
         $param{options} = \%options;
     }
 
     if ($data->{fieldType} eq "YesNo") {
         if ($data->{defaultValue} =~ /yes/xi) {
-                    $param{value} = 1;
-                } elsif ($data->{defaultValue} =~ /no/xi) {
-                    $param{value} = 0;
-                }
+            $param{value} = 1;
+        }
+        elsif ($data->{defaultValue} =~ /no/xi) {
+            $param{value} = 0;
+        }
     }
 
     if ($data->{fieldType} =~ m/^otherThing/x){
@@ -1086,11 +1088,14 @@ sub view {
     if ($defaultThingId ne ""){
         # get default view
         ($defaultView) = $db->quickArray("select defaultView from Thingy_things where thingId=?",[$defaultThingId]);
+        my $thingProperties = $self->getThing($defaultThingId);
         if ($defaultView eq "searchThing"){
-            return $self->www_search($defaultThingId);
+            return $i18n->get("no permission to search") if( ! $self->canSearch($defaultThingId, $thingProperties));
+            return $self->search($defaultThingId,$thingProperties) 
         }
         elsif ($defaultView eq "addThing"){
-            return $self->www_editThingData($defaultThingId,"new");
+            return $i18n->get("no permission to edit") if( ! $self->canEditThingData($defaultThingId, "new", $thingProperties));
+            return $self->editThingData($defaultThingId,"new", $thingProperties);
         }
         else{
             return $self->processTemplate($var, undef, $self->{_viewTemplate});
@@ -1180,6 +1185,7 @@ before the form is submitted.
 
 sub www_editThing {
     my $self = shift;
+    my $warning = shift;
     my $session = $self->session;
     my ($tabForm, $output, %properties, $tab, %afterSave, %defaultView, $fields);
     my ($fieldsHTML, $fieldsViewScreen, $fieldsSearchScreen);
@@ -1458,7 +1464,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on add workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on add workflow description'),
         );
 
@@ -1468,7 +1473,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on edit workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on edit workflow description'),
         );
 
@@ -1478,7 +1482,6 @@ sub www_editThing {
         -type=>"WebGUI::Asset::Wobject::Thingy",
         -label=>$i18n->get('on delete workflow label'),
         -none=>1,
-        -includeRealtime=>1,
         -hoverHelp=>$i18n->get('on delete workflow description'),
         );
 
@@ -1561,8 +1564,8 @@ sub www_editThing {
         -value  => $properties{thingsPerPage},
     );
     $tab->raw($fieldsSearchScreen);
-
-    $output = $tabForm->print;
+    if($warning){$output .= "$warning";}
+    $output .= $tabForm->print;
     
     my $dialog = "<div id='addDialog'>\n"
                 ."<div class='hd'>".$i18n->get('add field label')."</div>\n"
@@ -1597,6 +1600,10 @@ sub www_editThingSave {
     my $form = $self->session->form;
     my ($thingId, $fields);
     $thingId = $self->session->form->process("thingId");
+
+    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+
+        
     $self->setCollateral("Thingy_things","thingId",{
         thingId=>$thingId,
         label=>$form->process("label"),
@@ -1623,7 +1630,12 @@ sub www_editThingSave {
         sortBy=>$form->process("sortBy"),
         },0,1);
     
-    $fields = $self->session->db->read('select * from Thingy_fields where assetId = '.$self->session->db->quote($self->get("assetId")).' and thingId = '.$self->session->db->quote($thingId).' order by sequenceNumber');
+    if($fields->rows < 1){
+        $self->session->log->warn("Thing failed to create because it had no fields");
+        my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+        return $self->www_editThing($i18n->get("thing must have fields"));
+    }
+    
     while (my $field = $fields->hashRef) {
         my $display = $self->session->form->process("display_".$field->{fieldId}) || 0;
         my $viewScreenTitle = $self->session->form->process("viewScreenTitle_".$field->{fieldId}) || 0;
@@ -1745,26 +1757,55 @@ Shows a form to edit a things data.
 =cut
 
 sub www_editThingData {
+    my $self = shift;
+    return $self->processStyle($self->editThingData(@_));
+}
+
+#-------------------------------------------------------------------
+
+=head2 canEditThingData ( )
+
+Checks if the user can edit thing data.
+
+=cut
+
+sub canEditThingData {
+    my $self = shift;
+    my $thingId = shift || $self->session->form->process('thingId');
+    my $thingDataId = shift || $self->session->form->process('thingDataId') || "new";
+    my $thingProperties = shift || $self->getThing($thingId);
+    
+    my ($privilegedGroup);
+    if ($thingDataId eq "new"){
+        $privilegedGroup = $thingProperties->{groupIdAdd};
+    }
+    else {
+        $privilegedGroup = $thingProperties->{groupIdEdit};
+    }
+    return $self->hasPrivileges($privilegedGroup);
+}
+
+#-------------------------------------------------------------------
+
+=head2 editThingData ( )
+
+Shows a form to edit a things data.
+
+=cut
+
+sub editThingData {
 
     my $self = shift;
     my $session = $self->session;
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId') || "new";
+    my $thingProperties = shift || $self->getThing($thingId);
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     my $errors = shift;
     $var->{error_loop} = $errors if ($errors);
-
-    my $thingProperties = $self->getThing($thingId);
-    if ($thingDataId eq "new"){
-        $privilegedGroup = $thingProperties->{groupIdAdd};
-    }
-    else{
-        $privilegedGroup = $thingProperties->{groupIdEdit};
-    }
-    return $self->session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
     $var->{canEditThings} = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
@@ -1833,12 +1874,7 @@ sub www_editThingData {
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value => $thingProperties->{saveButtonLabel}});
     $var->{"form_end"} = WebGUI::Form::formFooter($self->session);
     $self->appendThingsVars($var, $thingId);
-    if (WebGUI::Utility::isIn($session->form->process("func"),qw(editThingData editThingDataSave))){
-        return $self->session->style->process($self->processTemplate($var,$thingProperties->{editTemplateId}),$self->get("styleTemplateId"));
-    }
-    else{
-        return $self->processTemplate($var,$thingProperties->{editTemplateId});
-    }
+    return $self->processTemplate($var,$thingProperties->{editTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -1927,7 +1963,8 @@ sub www_editThingDataSave {
         if ($onAddWorkflowId){
             $self->triggerWorkflow($onAddWorkflowId);
         }
-    }else{
+    }
+    else {
         my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onEditWorkflowId){
@@ -1956,7 +1993,7 @@ sub www_editThingDataSave {
     }
     # if afterSave is thingy default or in any other case return view()
     else {
-        return $self->view();
+        return $self->www_view;
     }
 }
 
@@ -2216,7 +2253,7 @@ sub www_importForm {
     $form->submit;
 
     $output .= $form->print;
-    return $self->session->style->process($output,$self->get("styleTemplateId"));
+    return $self->processStyle($output);
 }
 
 #-------------------------------------------------------------------
@@ -2271,7 +2308,7 @@ sub www_manage {
 
     $var->{"things_loop"} = \@things_loop;
 
-    return $self->session->style->process($self->processTemplate($var, $self->get("templateId")),$self->get("styleTemplateId"));
+    return $self->processStyle($self->processTemplate($var, $self->get("templateId")));
 }
 
 #-------------------------------------------------------------------
@@ -2336,18 +2373,44 @@ Shows the search screen and performs the search.
 =cut
 
 sub www_search {
+    my $self = shift;
+    return $self->processStyle($self->search(@_));
+}
+
+#-------------------------------------------------------------------
+
+=head2 canSearch ( )
+
+Checks if the user can perform a search.
+
+=cut
+
+sub canSearch {
+    my $self = shift;
+    my $thingId = shift || $self->session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
+    return $self->hasPrivileges($thingProperties->{groupIdSearch});
+}
+
+#-------------------------------------------------------------------
+
+=head2 search ( )
+
+Shows the search screen and performs the search.
+
+=cut
+
+sub search {
 
     my $self = shift;
     my $thingId = shift || $self->session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
     my $session = $self->session;
     my $dbh = $session->db->dbh;
     my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
     my ($var,$url,$orderBy);
     my ($fields,@searchFields_loop,@displayInSearchFields_loop,$query,@constraints);
     my (@searchResult_loop,$searchResults,@searchResults,@displayInSearchFields,$paginatePage,$currentUrl,$p);
-
-    my $thingProperties = $self->getThing($thingId);
-    return $session->privilege->insufficient() unless $self->hasPrivileges($thingProperties->{groupIdSearch});
 
     $orderBy = $session->form->process("orderBy") || $thingProperties->{sortBy};
     $var = $self->get;
@@ -2419,7 +2482,7 @@ sequenceNumber');
             });
         }
     }
-    
+    my $noFields = 0;    
     if (scalar(@displayInSearchFields)){
         $query = "select thingDataId, ";
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
@@ -2431,7 +2494,7 @@ sequenceNumber');
     }
     else{
         $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
-        return undef;
+        $noFields = 1;
     }
     
     # store query in cache for thirty minutes
@@ -2441,7 +2504,7 @@ sequenceNumber');
     $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
     
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
-    $p->setDataByQuery($query);
+    $p->setDataByQuery($query) if ! $noFields;
     $searchResults = $p->getPageData($paginatePage);
     foreach my $searchResult (@$searchResults){
         my (@field_loop);
@@ -2481,12 +2544,7 @@ sequenceNumber');
     $var->{searchFields_loop} = \@searchFields_loop;
     $var->{displayInSearchFields_loop} = \@displayInSearchFields_loop;
     $self->appendThingsVars($var, $thingId);
-    if (WebGUI::Utility::isIn($session->form->process("func"),qw(search import editThingDataSave deleteThingDataConfirm))){
-        return $session->style->process($self->processTemplate($var,$thingProperties->{searchTemplateId}),$self->get("styleTemplateId"));
-    }
-    else{
-        return $self->processTemplate($var,$thingProperties->{searchTemplateId});
-    }
+    return $self->processTemplate($var,$thingProperties->{searchTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -2666,7 +2724,7 @@ sequenceNumber');
     $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
     $var->{field_loop} = \@field_loop;
     $self->appendThingsVars($var, $thingId);
-    return $self->session->style->process($self->processTemplate($var,$thingProperties->{viewTemplateId}),$self->get("styleTemplateId"));
+    return $self->processStyle($self->processTemplate($var,$thingProperties->{viewTemplateId}));
 
 }
 

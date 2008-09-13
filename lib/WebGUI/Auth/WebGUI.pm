@@ -226,7 +226,6 @@ sub createAccountSave {
     $properties->{ passwordLastUpdated  } = $session->datetime->time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
-    $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 
     # Send validation e-mail if required
     if ($setting->get("webguiValidateEmail")) {
@@ -251,7 +250,7 @@ sub createAccountSave {
         $self->logout;
         return $self->displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
-	return undef;
+    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
 #-------------------------------------------------------------------
@@ -1005,8 +1004,9 @@ sub emailResetPassword {
        $self->session->user({user=>$u});
 
 #      do not proceed unless we have an incoming guid from the email, and that guid corresponds to a valid user.
-       unless ($passwordRecoveryToken && $userId) {    
-               return $session->privilege->insufficient;
+       if(!defined $userId){
+	        my $i18n = WebGUI::International->new($self->session,"AuthWebGUI");
+            return $i18n->get("token already used");
        }
 
 #      login the user and take them to a page where they can change their password.
@@ -1069,8 +1069,11 @@ sub emailResetPasswordFinish {
        my $passwordRecoveryToken = $form->param('token');
 
        my $userId = $self->getUserIdByPasswordRecoveryToken($session, $passwordRecoveryToken);
-
-       return $session->privilege->insufficient unless $userId;
+       
+       if(!defined $userId){
+	        my $i18n = WebGUI::International->new($self->session,"AuthWebGUI");
+            return $i18n->get("token already used");
+       }
 
        if ($self->_isValidPassword($password, $passwordConfirm)) {
                $self->user(WebGUI::User->new($self->session, $userId));

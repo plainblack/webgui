@@ -286,7 +286,7 @@ sub create {
 			}	
 		}
 	}
-	my $from    = $headers->{from} || $session->setting->get("companyEmail");
+    my $from    = $headers->{from} || $session->user->username." <".$session->setting->get("companyEmail").">";
 	my $type    = $headers->{contentType} || "multipart/mixed";
     my $replyTo = $headers->{replyTo} ||  $session->setting->get("mailReturnPath");
 
@@ -430,28 +430,42 @@ sub retrieve {
 
 =head2 send ( )
 
-Sends the message via SMTP. Returns 1 if successful.
+Sends the message via the SMTP server defined in the settings.  If the config file setting
+emailToLog is set to a true value, then the message is sent to the WebGUI log file with
+priority WARN.
+
+Returns 1 if successful.
 
 =cut
 
 sub send {
-    my $self    = shift;
-    my $mail    = $self->getMimeEntity;
-
-    my $status = 1;
+    my $self       = shift;
+    my $session    = $self->session;
+    my $log        = $session->log;
+    
+    my $mail       = $self->getMimeEntity;
+    my $smtpServer = $session->setting->get("smtpServer"); 
+    my $status     = 1;
+    
     if ($mail->head->get("To")) {
-        if ($self->session->setting->get("smtpServer") =~ /\/sendmail/) {
-            if (open(MAIL,"| ".$self->session->setting->get("smtpServer")." -t -oi -oem")) {
+        if ($session->config->get("emailToLog")){
+            my $message = $mail->stringify;
+            $log->warn(qq{$message
+            \nTHIS MESSAGE WAS NOT SENT THROUGH THE MAIL SERVER.  TO RE-ENABLE MAIL, DISABLE THE emailToLog SETTING IN THE CONFIG FILE.
+            });
+        }
+        elsif ($smtpServer =~ /\/sendmail/) {
+            if (open(MAIL,"| ".$smtpServer." -t -oi -oem")) {
                 $mail->print(\*MAIL);
-                close(MAIL) or $self->session->errorHandler->error("Couldn't close connection to mail server: ".$self->session->setting->get("smtpServer"));
+                close(MAIL) or $log->error("Couldn't close connection to mail server: ".$smtpServer);
             } 
             else {
-                $self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+                $log->error("Couldn't connect to mail server: ".$smtpServer);
                 $status = 0;
             }
         } 
         else {
-            my $smtp = Net::SMTP->new($self->session->setting->get("smtpServer")); # connect to an SMTP server
+            my $smtp = Net::SMTP->new($smtpServer); # connect to an SMTP server
             if (defined $smtp) {
                 $smtp->mail($mail->head->get("X-Return-Path")); 
                 $smtp->to(split(",",$mail->head->get("to"))); 
@@ -463,7 +477,7 @@ sub send {
                 $smtp->quit;                # Close the SMTP connection
             } 
             else {
-                $self->session->errorHandler->error("Couldn't connect to mail server: ".$self->session->setting->get("smtpServer"));
+                $log->error("Couldn't connect to mail server: ".$smtpServer);
                 $status = 0;
             }
         }

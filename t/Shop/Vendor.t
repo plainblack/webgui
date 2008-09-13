@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 40;
+my $tests = 44;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -39,13 +39,18 @@ plan tests => 1 + $tests;
 
 my $loaded = use_ok('WebGUI::Shop::Vendor');
 
-my $vendor;
+my ($vendor, $guard, $numberOfVendors);
 my ($fence, $fenceCopy);
 my $fenceUser = WebGUI::User->new($session, 'new');
+$fenceUser->username('fence');
+my $guardUser = WebGUI::User->new($session, 'new');
+$guardUser->username('guard');
 
 SKIP: {
 
 skip 'Unable to load module WebGUI::Shop::Vendor', $tests unless $loaded;
+
+$numberOfVendors = scalar @{ WebGUI::Shop::Vendor->getVendors($session) };
 
 #######################################################################
 #
@@ -179,6 +184,7 @@ cmp_deeply(
 
 $currentProps->{name} = 'Jake the Raven';
 is($fence->get('name'), 'Warden Norton', 'get: No leakage returned hashref');
+$fence->update({name => 'Bogs Diamond', });
 
 #######################################################################
 #
@@ -235,6 +241,50 @@ ok(!$e, 'newByUserId: No exception thrown with implicit user data');
 isa_ok($fenceCopy, 'WebGUI::Shop::Vendor', 'newByUserId returns correct type of object using session user');
 is($fenceCopy->getId, $fence->getId, 'newByUserId returned the correct object using session user');
 
+my $defaultVendor = WebGUI::Shop::Vendor->newByUserId($session, 3);
+
+#######################################################################
+#
+# getVendors
+#
+#######################################################################
+
+$guard = WebGUI::Shop::Vendor->create($session, { userId => $guardUser->userId, name => q|Warden Norton|});
+my $vendorsList = WebGUI::Shop::Vendor->getVendors($session);
+cmp_deeply(
+    $vendorsList,
+    [ $guard, $fence, $defaultVendor, ],
+    'getVendors returns all 3 vendors as an array ref'
+);
+
+my $vendorsHash = WebGUI::Shop::Vendor->getVendors($session, { asHashRef => 1 });
+cmp_deeply(
+    $vendorsHash,
+    {
+        $guard->getId         => $guard->get('name'),
+        $fence->getId         => $fence->get('name'),
+        $defaultVendor->getId => $defaultVendor->get('name'),
+    },
+    'getVendors returns all 3 vendors as an hash ref, when requested'
+);
+
+
+#######################################################################
+#
+# delete
+#
+#######################################################################
+
+$guard->delete();
+$vendorsList = WebGUI::Shop::Vendor->getVendors($session);
+cmp_deeply(
+    $vendorsList,
+    [ $fence, $defaultVendor, ],
+    'delete removed the correct vendor'
+);
+
+undef $guard;
+
 }
 
 #----------------------------------------------------------------------------
@@ -242,4 +292,6 @@ is($fenceCopy->getId, $fence->getId, 'newByUserId returned the correct object us
 END {
     $fence->delete;
     $fenceUser->delete;
+    $guardUser->delete;
+    is( scalar @{  WebGUI::Shop::Vendor->getVendors($session) }, $numberOfVendors, 'No vendors leaked');
 }

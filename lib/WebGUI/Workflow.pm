@@ -282,7 +282,7 @@ sub getId {
 
 #-------------------------------------------------------------------
 
-=head2 getList ( session, [ type, includeRealtime ] )
+=head2 getList ( session, [ type ] )
 
 Returns a hash reference of workflowId/title pairs of all enabled workflows.  This is a class method.
 
@@ -294,26 +294,18 @@ A reference to the current session.
 
 If specified this will limit the list to a certain type of workflow based upon the object type that the workflow is set up to handle.
 
-=head3 includeRealtime
-
-If set to 1 the list returned will include workflows with a mode of "realtime", otherwise it won't.
-
 =cut
 
 sub getList {
 	my $class = shift;
 	my $session = shift;
 	my $type = shift;
-    my $includeRealtime = shift;
 	my $sql = "select workflowId, title from Workflow where enabled=1";
     my @params;
 	if ($type) {
 		$sql .= " and type=?";
 		push(@params, $type);
 	}
-    unless ($includeRealtime) {
-        $sql .= " and mode<>'realtime'";
-    }
 	return $session->db->buildHashRef($sql, \@params);
 }
 
@@ -506,7 +498,7 @@ A string indicating the type of object this workflow will be operating on. Valid
 =head4 mode
 
 A string containing one of "singleton", "parallel", "serial", or "realtime". Parallel is the default and should be
-used in most situations. Singltons will allow only one instance of the workflow to be created at one time. New
+used in most situations. Singletons will allow only one instance of the workflow to be created at one time. New
 instances will be destroyed immediately if a one instance of a singleton already exists. Serial workflows will run
 instances sequentially in FIFO. Realtime workflows will run immediately without being handed off to Spectre for
 governance.

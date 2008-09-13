@@ -470,10 +470,10 @@ sub getPageLinks {
 	my @pages_loop;
 	for (my $i=0; $i<$self->getNumberOfPages; $i++) {
 		my $altTag;
+        my $first = $i * $self->{_rpp};
+        my $last = (($i+1) * $self->{_rpp})-1;
+        $last = $self->{_totalRows} - 1 if $last >= $self->{_totalRows};
 		if ($self->{abKey}) {
-			my $first = $i * $self->{_rpp};
-			my $last = (($i+1) * $self->{_rpp})-1;
-			$last = $self->{_totalRows} - 1 if $last >= $self->{_totalRows};
 			if ($self->{abInitialOnly}) {
 				$altTag = ' title="'.substr($self->{_rowRef}[$first]->{$self->{abKey}},0,1).'-'.substr($self->{_rowRef}[$last]->{$self->{abKey}},0,1).'"';
 			} else {
@@ -481,11 +481,19 @@ sub getPageLinks {
 			}
 		}
 		if ($i+1 == $pn) {
-			push(@pages,($i+1));
-			push(@pages_loop,{ "pagination.url" => '', "pagination.text" => $i+1});
+			push @pages, $i+1;
+			push @pages_loop, { 
+                "pagination.url"    => '', 
+                "pagination.text"   => $i+1,
+                'pagination.range'  => ($first+1) . "-" . ($last+1),
+            };
 		} else {
-			push(@pages,'<span><a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a></span>');
-			push(@pages_loop,{ "pagination.url" => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), "pagination.text" => $i+1});
+			push @pages, '<span><a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a></span>';
+			push @pages_loop, { 
+                "pagination.url"    => $self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))), 
+                "pagination.text"   => $i+1,
+                'pagination.range'  => ($first+1) . "-" . ($last+1),
+            };
 		}
 	}
 	if ($limit) {

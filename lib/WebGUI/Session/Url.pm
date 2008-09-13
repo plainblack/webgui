@@ -194,7 +194,8 @@ sub gateway {
 =head2 getBackToSiteURL ( )
 
 Tries to return a URL to take the user back to the last page they were at before
-using an operation or other function.
+using an operation or other function.  This will always include the gateway
+url from the config file.
 
 =cut
 
@@ -406,7 +407,7 @@ sub new {
 
 =head2 page ( [ pairs, useSiteUrl, skipPreventProxyCache ] )
 
-Returns the URL of the current page.
+Returns the URL of the current page, including the configured site gateway.
 
 =head3 pairs
 

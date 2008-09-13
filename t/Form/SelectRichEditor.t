@@ -53,7 +53,7 @@ my $richEditOptions
 my $control 
     = WebGUI::Form::SelectRichEditor->new( $session, { name => "richEditId" } );
 cmp_deeply( 
-    $control->get("options"), 
+    $control->getOptions, 
     $richEditOptions,
     "SelectRichEditor control has options for all Rich Editors in this site",
 );

@@ -86,7 +86,7 @@ WebGUI.AssetManager.formatActions
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
-    YAHOO.util.Event.addListener( more, "click", function () { menu.show(); menu.focus(); }, null, menu );
+    YAHOO.util.Event.addListener( more, "click", function (e) { menu.show(); menu.focus(); YAHOO.util.Event.stopEvent(e); }, null, menu );
 };
 
 /*---------------------------------------------------------------------------
@@ -157,9 +157,12 @@ WebGUI.AssetManager.formatRank
 WebGUI.AssetManager.formatRevisionDate
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
+    var minutes = revisionDate.getMinutes();
+    if (minutes < 10)
+        minutes = "0" + minutes;
     elCell.innerHTML    = revisionDate.getFullYear() + '-' + ( revisionDate.getMonth() + 1 )
                         + '-' + revisionDate.getDate() + ' ' + ( revisionDate.getHours() )
-                        + ':' + revisionDate.getMinutes()
+                        + ':' + minutes
                         ;
 };
 

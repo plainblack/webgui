@@ -79,7 +79,6 @@ sub definition {
 		type=>"WebGUI::VersionTag",
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help'),
-        includeRealtime=>1,
 		});
 	push(@fields, {
 		tab=>"content",
@@ -104,7 +103,8 @@ sub definition {
 		defaultValue=>$setting->get("trashWorkflow"),
 		type=>"None",
 		label=>$i18n->get("trash workflow"),
-		hoverHelp=>$i18n->get('trash workflow help')
+		hoverHelp=>$i18n->get('trash workflow help'),
+        none => 1,
 		});
 	push(@fields, {
 		tab=>"content",
@@ -113,7 +113,8 @@ sub definition {
 		defaultValue=>$setting->get("purgeWorkflow"),
 		type=>"None",
 		label=>$i18n->get("purge workflow"),
-		hoverHelp=>$i18n->get('purge workflow help')
+		hoverHelp=>$i18n->get('purge workflow help'),
+        none => 1,
 		});
 	push(@fields, {
 		tab=>"content",
@@ -122,7 +123,8 @@ sub definition {
 		defaultValue=>$setting->get("changeUrlWorkflow"),
 		type=>"None",
 		label=>$i18n->get("changeUrl workflow"),
-		hoverHelp=>$i18n->get('changeUrl workflow help')
+		hoverHelp=>$i18n->get('changeUrl workflow help'),
+        none => 1,
 		});
 
         my %htmlFilter = (
@@ -454,7 +456,7 @@ sub definition {
         tab             => "user",
         name            => "showMessageOnLogin",
         fieldType       => "yesNo",
-        defaultValue    => $setting->get('showMessageOnLoginTimes'),
+        defaultValue    => $setting->get('showMessageOnLogin'),
         label           => $i18n->get( 'showMessageOnLogin label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLogin description' ),
     };

@@ -2116,7 +2116,7 @@ sub processTemplate {
 	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
 	if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-		$var->{'controls'} = $self->getToolbar;
+		$var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
                 my %vars = (
 			%{$self->{_properties}},
 			%{$var}

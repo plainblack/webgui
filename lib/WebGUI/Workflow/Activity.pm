@@ -53,7 +53,9 @@ sub ERROR { return "error" };
 
 =head2 WAITING
 
-A constant to be sent to Spectre informing it that this actiivty is waiting for some other event to be triggered.
+A constant to be sent to Spectre informing it that this actiivty is
+waiting for some other event to be triggered.  This is also used for
+long running activities to be released by Spectre and to be requeued.
 
 =cut
 
@@ -259,6 +261,19 @@ sub getName {
 	my $self = shift;
 	my $definition = $self->definition($self->session);
 	return $definition->[0]{name};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getTTL ( )
+
+Returns the maximum amount of time, in seconds, that a Workflow
+Activity should run.  Currently 55 seconds.
+
+=cut
+
+sub getTTL {
+	return 55;
 }
 
 #-------------------------------------------------------------------

@@ -2,6 +2,10 @@ package WebGUI::i18n::English::AuthWebGUI;
 use strict;
 
 our $I18N = {
+	'token already used' => {
+		message => q|This password recovery authentication token has already been used.|,
+		lastUpdated => 0
+    },
 	'no registration hack' => {
 		message => q|complete anonymous registration by calling createAccountSave directly from the URL.|,
 		lastUpdated => 1078852836

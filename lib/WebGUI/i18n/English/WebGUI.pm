@@ -1901,91 +1901,6 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1056151382
 	},
 
-	'890' => {
-		message => q|<p>WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
-</p>
-
-<p>The following style sheet classes are available:
-</p>
-
-<p><b>.tab</b><br />
-The default look of each tab.
-</p>
-
-<p><b>div.tabs</b><br />
-This also sets some properties for all of the tabs. This should be used for the text labels in the tabs.
-</p>
-
-<p><b>.tabBody</b><br />
-The content area for each tab. This is where the form will show up. Note that for best results the background color of this should match the background color of .tabActive.
-</p>
-
-<p><b>.tabHover</b><br />
-The look of a tab as the mouse hovers over it.
-</p>
-
-<p><b>.tabActive</b><br />
-The look of the tab that is currently visible.
-</p>
-
-<p><i>Examples</i><br />
-You can use these instead of creating your own if you wish. Or just use these as guidelines for creating your own.
-</p>
-
-<table width="100%"><tr><td valign="top">
-<b>White or Light Colored Styles</b>
-<pre>
-.tab {
-  border: 1px solid black;
-   background-color: #eeeeee;
-}
-.tabBody {
-   border: 1px solid black;
-   border-top: 1px solid black;
-   border-left: 1px solid black;
-   background-color: #dddddd; 
-}
-div.tabs {
-    line-height: 15px;
-    font-size: 14px;
-}
-.tabHover {
-   background-color: #cccccc;
-}
-.tabActive { 
-   background-color: #dddddd; 
-}
-</pre>
-</td><td valign="top">
-<b>Black or Dark Colored Styles</b>
-<pre>
-.tab {
-  border: 1px solid white;
-   background-color: #333333;
-}
-.tabBody {
-   border: 1px solid white;
-   border-top: 1px solid white;
-   border-left: 1px solid white;
-   background-color: #444444; 
-}
-div.tabs {
-    line-height: 15px;
-    font-size: 14px;
-}
-.tabHover {
-   background-color: #555555;
-}
-.tabActive { 
-   background-color: #444444; 
-}
-</pre>
-</td></tr></table>
-
-|,
-		lastUpdated => 1146592150
-	},
-
 	'440' => {
 		message => q|Contact Information|,
 		lastUpdated => 1031514049
@@ -2134,6 +2049,11 @@ div.tabs {
 	'pagination.text' => {
 		message => q|The number of a page in the page loop.|,
 		lastUpdated => 1168464885,
+	},
+
+	'pagination.range' => {
+		message => q|Displays the range of available pages, in a start - end format.|,
+		lastUpdated => 1220541683,
 	},
 
 	'pagination.pageList.upTo20' => {
@@ -3104,11 +3024,11 @@ or are under your current version tag.</p>
                 context => q|Title of a tab in the global settings.|
         },
 
-	'company' => {
-		message => q|Company|,
-		lastUpdated =>1092930637,
-                context => q|Title of a tab in the global settings.|
-        },
+    'company' => {
+        message => q|Company|,
+        lastUpdated =>1092930637,
+        context => q|Title of a tab in the global settings.|
+    },
 
 	'misc' => {
 		message => q|Miscellaneous|,
@@ -3628,17 +3548,17 @@ LongTruncOk=1</p>
         message => q|Private Message Options|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message allow label' => {
         message => q|Allow All|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message friends only label' => {
         message => q|Allow From My Friends Only|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message allow none label' => {
         message => q|Allow None|,
 		lastUpdated => 1181019679,
@@ -3728,7 +3648,7 @@ LongTruncOk=1</p>
         message     => q{Group to view and expire active sessions.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminAdSpace label' => {
         message     => q{AdSpace},
@@ -3738,7 +3658,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage advertising.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminCache label' => {
         message     => q{Cache},
@@ -3748,7 +3668,7 @@ LongTruncOk=1</p>
         message     => q{Group to view and flush cache.},
         lastUpdated => 0,
     },
-        
+
 
 
     'settings groupIdAdminCron label' => {
@@ -3759,7 +3679,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage scheduled workflows.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminDatabaseLink label' => {
         message     => q{Database Link},
@@ -3769,7 +3689,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage database links.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGraphics label' => {
         message     => q{Graphics},
@@ -3779,7 +3699,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage fonts and palettes.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGroup label' => {
         message     => q{Groups},
@@ -3789,7 +3709,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage all groups.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGroupAdmin label' => {
         message     => q{Groups (limited)},
@@ -3799,7 +3719,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage groups that user is administrator of.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminHelp label' => {
         message     => q{Help},
@@ -3809,7 +3729,7 @@ LongTruncOk=1</p>
         message     => q{Group that can view help.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminLDAPLink label' => {
         message     => q{LDAP},
@@ -3819,7 +3739,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage LDAP links.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminLoginHistory label' => {
         message     => q{Login History},
@@ -3829,7 +3749,7 @@ LongTruncOk=1</p>
         message     => q{Group to view login history.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminProfileSettings label' => {
         message     => q{User Profiling},
@@ -3839,7 +3759,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage user profile fields.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminReplacements label' => {
         message     => q{Content Filters},
@@ -3849,7 +3769,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage content filters.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminSpectre label' => {
         message     => q{Spectre},
@@ -3859,7 +3779,7 @@ LongTruncOk=1</p>
         message     => q{Group to view Spectre status},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminStatistics label' => {
         message     => q{Statistics},
@@ -3869,7 +3789,7 @@ LongTruncOk=1</p>
         message     => q{Group to view statistics},
         lastUpdated => 0,
     },
-        
+
     'settings groupIdAdminUser label' => {
         message     => q{Users},
         lastUpdated => 0,
@@ -3878,7 +3798,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage users. Can add and edit users.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminUserAdd label' => {
         message     => q{Users (add only)},
@@ -3888,7 +3808,7 @@ LongTruncOk=1</p>
         message     => q{Group that can only add new users.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminVersionTag label' => {
         message     => q{Version Tags},
@@ -3898,7 +3818,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage version tags},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminWorkflow label' => {
         message     => q{Workflow},
@@ -3908,7 +3828,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage workflows},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminWorkflowRun label' => {
         message     => q{Workflow (run)},
@@ -3958,7 +3878,7 @@ LongTruncOk=1</p>
         message     => q{Rich Editor},
         lastUpdated => 1202274234,
     },
-    
+
     'SubscriptionGroup formName' => {
         message     => q{Subscription Group},
         lastUpdated => 1202274234,
@@ -3974,49 +3894,235 @@ LongTruncOk=1</p>
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLogin description' => {
             message     => q{If yes, show a message after a user logs in.},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginTimes label' => {
             message     => q{Show Message Number of Times},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginTimes description' => {
             message     => q{The number of times a user sees the message, one per login},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginReset label' => {
             message     => q{Reset All Users Number of Times Seen},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginReset description' => {
             message     => q{If "yes", will force all users to see the login message again},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginBody label' => {
             message     => q{Message on Login Body},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginBody description' => {
             message     => q{The body of the message to show on login. Macros are allowed.},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
+    'site starter title' => {
+        message     => q{Site Starter},
+        lastUpdated => 0,
+        context     => q{Title for the site starter screen.},
+    },
+
+    'site starter body' => {
+        message     => q{Do you wish to use the WebGUI Site Starter, which will lead you through options to create a custom look and feel for your site, and set up some basic content areas?},
+        lastUpdated => 0,
+        context     => q{Body for the site starter screen.},
+    },
+
+    'no thanks' => {
+        message     => q{No, thanks},
+        lastUpdated => 0,
+        context     => q{Option in site starter to not run it},
+    },
+
+    'yes please' => {
+        message     => q{Yes, please},
+        lastUpdated => 0,
+        context     => q{Option in site starter to run the site starter},
+    },
+
+    'logo' => {
+        message     => q{Logo},
+        lastUpdated => 0,
+        context     => q{Label for the Logo upload field in the site starter.},
+    },
+
+    'upload logo' => {
+        message     => q{Upload Your Logo},
+        lastUpdated => 0,
+        context     => q{Title for the Logo upload screen in the site starter.},
+    },
+
+    'style designer' => {
+        message     => q{Style Designer},
+        lastUpdated => 0,
+        context     => q{Title for the style designer screen in the site starter.},
+    },
+
+    'save' => {
+        message     => q{Save},
+        lastUpdated => 0,
+        context     => q{General purpose, similar to submit.},
+    },
+
+    'save' => {
+        message     => q{Save},
+        lastUpdated => 0,
+        context     => q{General purpose, similar to submit.},
+    },
+
+    'company information' => {
+        message     => q{Company Information},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
+    },
+
+    'admin account' => {
+        message     => q{Admin Account},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
+    },
+
+    'All Rights Reserved' => {
+        message     => q{All Rights Reserved},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Contact Us' => {
+        message     => q{All Contact Us},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Initial Pages' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Header for the Site Setup screen},
+    },
+
+    'Forums' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'About Us' => {
+        message     => q{About Us},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'Put your about us content here.' => {
+        message     => q{Put your about us content here.},
+        lastUpdated => 0,
+        context     => q{Default content for the Site Setup screen},
+    },
+
+    'One forum name per line' => {
+        message     => q{One forum name per line},
+        lastUpdated => 0,
+        context     => q{Instructions for the names of forums in the Site Setup screen},
+    },
+
+    'Support' => {
+        message     => q{Support},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'General Discussion' => {
+        message     => q{General Discussion},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'Discuss your ideas and get help from our community.' => {
+        message     => q{Discuss your ideas and get help from our community.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'All the news you need to know.' => {
+        message     => q{All the news you need to know.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'Welcome to our wiki. Here you can help us keep information up to date.' => {
+        message     => q{Welcome to our wiki. Here you can help us keep information up to date.},
+        lastUpdated => 0,
+        context     => q{Default description of a wiki in the Site Setup screen},
+    },
+
+    'Check out what is going on.' => {
+        message     => q{Check out what is going on.},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Your Email Address' => {
+        message     => q{Your Email Address},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Tell us how we can assist you.' => {
+        message     => q{Tell us how we can assist you.},
+        lastUpdated => 0,
+        context     => q{Subtext for the comments field in the Contact Us page of the Site Setup screen},
+    },
+
+    'We welcome your feedback.' => {
+        message     => q{We welcome your feedback.},
+        lastUpdated => 0,
+        context     => q{Default description of the Contact Us page of the Site Setup screen},
+    },
+
+    'Thanks for for your interest in ^c;. We will review your message shortly.' => {
+        message     => q{Thanks for for your interest in ^c;. We will review your message shortly.},
+        lastUpdated => 0,
+        context     => q{Default acknowledgement of the Contact Us page of the Site Setup screen},
+    },
+
+    'Cannot find what you are looking for? Try our search.' => {
+        message     => q{Cannot find what you are looking for? Try our search.},
+        lastUpdated => 0,
+        context     => q{Default description of the Search page of the Site Setup screen},
+    },
+
+    'WebGUI Initial Configuration' => {
+        message     => q{WebGUI Initial Configuration},
+        lastUpdated => 0,
+        context     => q{Main page title for the Site Setup screen},
+    },
+
+    'My Style' => {
+        message     => q{My Style},
+        lastUpdated => 0,
+        context     => q{Title of the template created by the Site Setup screen},
+    },
+
 };
 
 1;

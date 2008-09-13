@@ -414,8 +414,6 @@ sub definition {
 			  ($useKarma? (karmaRank=>$i18n->get('karma rank')) : ()),
 			 );
 
-	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
-    
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -612,12 +610,11 @@ sub definition {
 			hoverHelp=>$i18n->get('filter code description'),
 			},
 		richEditor =>{
-			fieldType=>"selectBox",
+			fieldType=>"selectRichEditor",
 			defaultValue=>"PBrichedit000000000002",
 			tab=>'display',
 			label=>$i18n->get('rich editor'),
 			hoverHelp=>$i18n->get('rich editor description'),
-			options=>$richEditorOptions,
 			},
 		attachmentsPerPost =>{
 			fieldType=>"integer",
@@ -1475,9 +1472,13 @@ The web method to unsubscribe from a collaboration.
 =cut
 
 sub www_unsubscribe {
-	my $self = shift;
-	$self->unsubscribe if $self->canSubscribe;
-	return $self->www_view;
+    my $self = shift;
+    if($self->canSubscribe){
+        $self->unsubscribe;
+        return $self->www_view;
+    }else{
+        return $self->session->privilege->noAccess;
+    } 
 }
 
 #-------------------------------------------------------------------

@@ -205,7 +205,7 @@ sub view {
 	}
 	my $output = $self->get("snippet");
 	WebGUI::Macro::process($self->session,\$output);
-	$output = $self->getToolbar.$output if ($self->session->var->get("adminOn") && !$calledAsWebMethod);
+	$output = $self->getToolbar.$output if ($self->session->var->isAdminOn && !$calledAsWebMethod);
 	if ($self->getValue("processAsTemplate")) {
 		$output = WebGUI::Asset::Template->processRaw($self->session, $output, $self->get);
 	}

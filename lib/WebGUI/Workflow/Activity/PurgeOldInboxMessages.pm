@@ -83,14 +83,11 @@ sub execute {
 
     # keep track of how much time it's taking
     my $start   = time;
-
-    # Only purge this many per operation to prevent MySQL returning
-    # a half-million rows (which will take longer than the time we have)
     my $limit   = 2_500;
 
     my $sth 
         = $session->db->read(
-            "SELECT messageId FROM inbox WHERE completedOn IS NOT NULL AND dateStamp < ? ASC LIMIT $limit",
+            "SELECT messageId FROM inbox WHERE completedOn IS NOT NULL AND dateStamp < ?",
             [ $start - $self->get('purgeAfter') ],
         );
 
