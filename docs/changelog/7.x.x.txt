@@ -2,6 +2,7 @@
  - fixed: Change <spam> tag to <span> tag in default product template
  - It was possible to run multiple singleton workflows at the same time.
  - fixed: Tickets on add to badge screen now show the time at the event's timezone
+ - fixed: WebGUI Password Recovery email subject hard-coded
 
 7.5.22
  - fixed: Layout templates are now prepared correctly
