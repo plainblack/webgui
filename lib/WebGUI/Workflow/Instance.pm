@@ -257,7 +257,7 @@ sub getWorkflow {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, instanceId )
+=head2 new ( session, instanceId, [isNew] )
 
 Constructor.
 
@@ -271,7 +271,9 @@ A unique id refering to a workflow instance.
 
 =head3 isNew 
 
-A boolean, that, if true, sets that the instance is ready to run.
+A boolean, that, if true, sets that the instance is new and hasn't been started
+yet.  This option is really for the L<create> method to use, and should not
+be used by developers unless your name starts with JT and ends in Smith.
 
 =cut
 

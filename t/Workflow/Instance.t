@@ -20,13 +20,17 @@ use Test::Deep;
 
 use Test::MockObject;
 my $mockSpectre = Test::MockObject->new();
-$mockSpectre->fake_module('WebGUI::Workflow::Spectre');
-$mockSpectre->fake_new('WebGUI::Workflow::Spectre');
 my @spectreGuts = ();
+$mockSpectre->fake_module('WebGUI::Workflow::Spectre',
+'notify', sub{
+    my ($message, $data) = @_;
+    push @spectreGuts, [$message, $data];
+});
 $mockSpectre->mock('notify', sub{
     my ($message, $data) = @_;
     push @spectreGuts, [$message, $data];
 });
+$mockSpectre->fake_new('WebGUI::Workflow::Spectre');
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -42,7 +46,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 12;        # Increment this number for each test you create
+plan tests => 17;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -103,10 +107,18 @@ is($instanceWorkflow->getId, $wf->getId, 'getWorkflow, caching check');
 
 ###############################################################################
 #
-#  set
+#  new
 #
 ###############################################################################
 
+$otherInstance = WebGUI::Workflow::Instance->new($session, 'neverAWebGUIId');
+is($otherInstance, undef, 'new: non-existant id returns undef');
+$otherInstance = WebGUI::Workflow::Instance->new($session, $instance->getId);
+isa_ok($otherInstance, 'WebGUI::Workflow::Instance', 'new with a valid id returns an Instance object');
+is($otherInstance->getId, $instance->getId, 'new returned the correct instance');
+is($otherInstance->{_started}, 1, 'By default, _started = 0');
+$otherInstance = WebGUI::Workflow::Instance->new($session, $instance->getId, 1);
+is($otherInstance->{_started}, 0, 'By default, _started = 1');
 
 #----------------------------------------------------------------------------
 # Cleanup
