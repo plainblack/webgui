@@ -428,7 +428,6 @@
     "None" : [ 
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
-	"WebGUI::Workflow::Activity::CheckFluxRules",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
         "WebGUI::Workflow::Activity::CleanFileCache",
         "WebGUI::Workflow::Activity::CleanLoginHistory",
@@ -531,7 +530,6 @@
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
-    "WebGUI::Content::Flux",
     "WebGUI::Content::Shop",
     "WebGUI::Content::Asset",
     "WebGUI::Content::NotFound"

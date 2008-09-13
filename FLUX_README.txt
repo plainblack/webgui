@@ -1,5 +1,4 @@
-= README =
-Patrick Donelan (patspam)
+= FLUX README =
 
 = Installation =
 To make merging changes from trunk to the Flux branch, the database schema changes needed by Flux are contained in a separate
@@ -15,3 +14,5 @@ e.g. prove t/Flux
 
 = More Information =
 Check out the docs in the fluxdesigndocs directory and/or catch me on IRC
+
+- Patrick Donelan (patspam) http://patspam.com

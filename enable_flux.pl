@@ -16,6 +16,7 @@ use Readonly;
 use WebGUI::Session;
 use Carp;
 use Tie::IxHash;
+use List::MoreUtils qw(none insert_after_string);
 
 #----------------------------------------------------------------------------
 # Settings..
@@ -49,6 +50,7 @@ if ( $session->db->quickScalar('select count(*) from settings where name = "flux
 
 # Ok, let's do it
 modify_db_schema_for_flux();
+modify_config_files_for_flux();
 create_demo_data();
 print "Finished!\n";
 
@@ -143,6 +145,27 @@ CREATE TABLE `fluxExpression` (
 }
 
 #----------------------------------------------------------------------------
+sub modify_config_files_for_flux {
+    print "Modifying config files for flux..";
+    
+    # Add Flux to the list of Content Handlers
+    my @content_handlers = @{$session->config->get('contentHandlers') };
+    if ( none { $_ eq 'WebGUI::Content::Flux' } @content_handlers ) {
+        insert_after_string 'WebGUI::Content::Setup', 'WebGUI::Content::Flux', @content_handlers;
+        $session->config->set('contentHandlers', \@content_handlers);
+    }
+
+    # Add WebGUI::Workflow::Activity::CheckFluxRules to the list of Activities
+    # (keep the list sorted, because we're good citizens)
+    my @activities_none = @{$session->config->get('workflowActivities/None') };
+    if ( none { $_ eq 'WebGUI::Workflow::Activity::CheckFluxRules' } @activities_none ) {
+        push @activities_none, 'WebGUI::Workflow::Activity::CheckFluxRules';
+        @activities_none = sort @activities_none;
+        $session->config->set('workflowActivities/None', \@activities_none);
+    }
+}
+
+#----------------------------------------------------------------------------
 sub create_demo_data {
     print "Creating demo data..";
     $session->db->write(
@@ -158,6 +181,7 @@ INSERT INTO `fluxExpression` (`fluxExpressionId`, `fluxRuleId`, `name`, `sequenc
     print "done\n";
 }
 
+#----------------------------------------------------------------------------
 sub drop_col {
     my ( $table, $col ) = @_;
     my @cols = $session->db->quickArray("show columns from $table where Field = '$col'");
