@@ -224,7 +224,7 @@ sub exportAsHtml {
     }
 
     # we take either a numeric userId or a WebGUI::User object
-    if( ref $userId ne 'WebGUI::User' && !looks_like_number($userId) ) {
+    if( ref $userId ne 'WebGUI::User' && ! (looks_like_number($userId) || $session->id->valid($userId))) {
         $returnCode = 0;
         $message    = "'$userId' is not a valid userId";
         return ($returnCode, $message);
@@ -826,7 +826,7 @@ sub www_export {
         -value          => "index.html"
     );
     $f->text(
-        -label          => 'Export site root URL',
+        -label          => $i18n->get("Export site root URL"),
         -name           => 'exportUrl',
         -value          => '',
     );
