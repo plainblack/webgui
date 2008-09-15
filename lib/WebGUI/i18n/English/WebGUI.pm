@@ -1125,22 +1125,22 @@ to add or remove users from their groups.
 Here are some examples for other databases.</p>
 <div>
 <dl>
-<dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::Oracle#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
 <dd>DBI:Oracle:SID<br />
 DBD::Oracle must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv ORACLE_HOME /home/oracle/product/8.1.7</b> in httpd.conf. Without setting ORACLE_HOME, you can connect using DBI:Oracle:host=myhost.com;sid=SID
 </dd>
-<dt><a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::PgPP#THE_DBI_CLASS">PostgreSQL</a>:</dt>
 <dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br />
 DBD::PgPP must be installed.
 </dd>
-<dt><a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::Sybase#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
 <dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br />
 DBD::Sybase must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
 </dd>
 </dl></div>|,
-                lastUpdated => 1146630103,
+                lastUpdated => 1221362751,
         },
 
         '994 description' => {

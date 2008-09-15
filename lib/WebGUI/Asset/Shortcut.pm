@@ -307,7 +307,7 @@ sub getEditForm {
 
 =head2 getExtraHeadTags (  )
 
-Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Layout::view for its child assets.  Overriden here in Shortcut.pm.
+Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Asset::Wobject::Layout for its child assets.  Overriden to also add tags from shortcutted asset.
 
 =cut
 

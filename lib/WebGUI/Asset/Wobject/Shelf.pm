@@ -382,7 +382,7 @@ sub www_importProducts {
 		}
 		else {
 			$status_message = $i18n->get('import successful');
-			##Copy and paste from Asset.pm, www_editSave
+			##Copy and paste from WebGUI::Asset, www_editSave
 			if ($self->session->setting->get("autoRequestCommit")) {
 				# Make sure version tag hasn't already been committed by another process
 				my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");

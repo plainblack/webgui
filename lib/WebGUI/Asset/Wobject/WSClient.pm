@@ -504,10 +504,6 @@ sub view {
           $self->session->errorHandler->warn("changed mimetype: " .  $self->get("httpHeader"));
        }
 
-   # Note, we still process our template below even though it will never
-   # be displayed if the redirectURL is set.  Not sure how important it is
-   # to do it this way, but it certainly is the least obtrusive to default
-   # webgui flow.  This feature currently requires a patched WebGUI.pm file.
    if ($self->session->form->process('redirectURL')) {
     $self->session->http->setRedirect($self->session->form->process('redirectURL'));
     return undef;

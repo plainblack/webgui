@@ -289,7 +289,7 @@ sub onRemoveFromCart {
 
 =head2 prepareView
 
-See Asset.pm, prepareView for details.
+See WebGUI::Asset, prepareView for details.
 
 =cut
 

@@ -280,7 +280,7 @@ sub makeAbsolute {
 
 	my $linkParser = sub {
 		my ($tagname, $attr, $text) = @_;
-		my %linkElements =            # from HTML::Element.pm
+		my %linkElements =            # from HTML::Element
 		(
 			body   => 'background',
 			base   => 'href',

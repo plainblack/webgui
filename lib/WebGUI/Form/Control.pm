@@ -103,7 +103,7 @@ If no starting value is specified, this will be used instead.
 =head4 _defaulted
 
 This flag indicates that the defaultValue was used.  It is used by Form types that support
-an initial blank field, instead of using a default, like WebGUI::Form::Date.pm
+an initial blank field, instead of using a default, like WebGUI::Form::Date
 
 =head4 extras
 
