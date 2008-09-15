@@ -16,13 +16,15 @@ use WebGUI::Test;
 use File::Find;
 use WebGUI::Session;
 use Test::More;
+use File::Spec;
 
 plan skip_all => 'set TEST_SYNTAX to enable this test' unless $ENV{TEST_SYNTAX};
 
 my @modules;
 my $wgLib = WebGUI::Test->lib;
+my $wgRoot = WebGUI::Test->root;
 #diag("Checking modules in $wgLib");
-File::Find::find( \&getWebGUIModules, $wgLib);
+File::Find::find( \&getWebGUIModules, $wgLib, File::Spec->join($wgRoot, 'sbin'), File::Spec->join($wgRoot, 'docs', 'upgrades') );
 
 my $numTests = scalar @modules;
 
@@ -38,5 +40,5 @@ foreach my $package (@modules) {
 
 #----------------------------------------
 sub getWebGUIModules {
-	push( @modules, $File::Find::name ) if /\.pm$/;
+	push( @modules, $File::Find::name ) if /\.p[ml]$/;
 }
