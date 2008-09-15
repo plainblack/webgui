@@ -4,8 +4,16 @@ use strict;
 our $I18N = {
 
     'invalid url' => {
-        message => q|Invalid Asset URL|,
-        lastUpdated => 1134769012,
+        message     => q|AssetProxy: Invalid Asset URL|,
+        lastUpdated => 1221160383,
+    },
+
+    'asset in trash' => {
+        message     => q|AssetProxy: Asset in trash|,
+    },
+
+    'asset in clipboard' => {
+        message     => q|AssetProxy: Asset in clipboard|,
     },
 
 };
