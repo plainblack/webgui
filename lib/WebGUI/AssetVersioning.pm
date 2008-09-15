@@ -491,10 +491,11 @@ If not specified, current user is used.
 
 sub updateHistory {
 	my $self = shift;
+    my $session = $self->session;
 	my $action = shift;
-	my $userId = shift || $self->session->user->userId || '3';
-	my $dateStamp =$self->session->datetime->time();
-	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
+	my $userId = shift || $session->user->userId || '3';
+	my $dateStamp =$session->datetime->time();
+	$session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp, url) values (?,?,?,?,?)", [$self->getId, $userId, $action, $dateStamp, $self->get('url')]);
 }
 
 
