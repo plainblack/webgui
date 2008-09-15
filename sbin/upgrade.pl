@@ -226,12 +226,18 @@ foreach my $filename (keys %config) {
                 	}
 		}
 		if ($upgrade{$upgrade}{pl} ne "") {
-			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$filename;
-			$cmd .= " --quiet" if ($quiet);
-			if (system($cmd)) {
-				print "\tProcessing upgrade executable failed!\n";
-				fatalError();
-			}
+            my $pid = fork;
+            if (!$pid) {
+                @ARGV = ("--configFile=$filename", $quiet ? ('--quiet') : ());
+                $0 = $upgrade{$upgrade}{pl};
+                do $0;
+                exit;
+            }
+            waitpid $pid, 0;
+            if ($?) {
+                print "\tProcessing upgrade executable failed!\n";
+                fatalError();
+            }
 		}
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
