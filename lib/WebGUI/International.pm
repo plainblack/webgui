@@ -107,7 +107,7 @@ sub get {
     eval { WebGUI::Pluggable::load($cmd); };
     if ($@) {
         if ($language eq 'English') {
-            $session->log->error('Unable to load $cmd');
+            $session->log->error("Unable to load $cmd");
             return '';
         }
         else {
@@ -115,10 +115,13 @@ sub get {
             return $output;
         }
     }
-    our $table;
-    *table = *{"$cmd\::I18N"};  ##Create alias into symbol table
-	my $output = $table->{$id}->{message};
-	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
+    my $table = do {
+        no strict 'refs';
+        ${"$cmd\::I18N"};
+    };
+    my $output = $table->{$id}->{message};
+    $output = $self->get($id, $namespace, "English")
+        if ($output eq "" && $language ne "English");
     return $output;
 }
 
@@ -142,16 +145,18 @@ If this is specified, only the value of the property will be returned, instead o
 sub getLanguage {
 	my ($self, $language, $property) = @_;
 	$language = $language || $self->{_language} || "English";
-	my $cmd = "WebGUI::i18n::".$language;
-    WebGUI::Pluggable::load($cmd);
-    $cmd = '$'.$cmd.'::LANGUAGE';
-    my $hashRef = eval($cmd);
+    my $pack = "WebGUI::i18n::" . $language;
+    WebGUI::Pluggable::load($pack);
+    my $langInfo = do {
+        no strict 'refs';
+        ${"$pack\::LANGUAGE"};
+    };
     $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
     if ($property) {
-        return $hashRef->{$property};
+        return $langInfo->{$property};
     }
     else {
-        return $hashRef;
+        return $langInfo;
     }
 }
 
@@ -179,18 +184,17 @@ Returns a hash reference to the languages installed on this WebGUI system.
 
 sub getLanguages {
 	my ($self) = @_;
-        my ($hashRef);
+    my $hashRef;
 	my $dir = $self->session->config->getWebguiRoot."/lib/WebGUI/i18n";
-	opendir (DIR,$dir) or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		if ($file =~ /(.*?)\.pm$/) {
-			my $language = $1;
-			$hashRef->{$language} = $self->getLanguage($language,"label");
-		}
-	}
-        return $hashRef;
+    opendir my $dh, $dir or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
+    while (my $file = readdir($dh)) {
+        next
+            unless $file =~ s/\.pm$//;
+        my $language = $file;
+        $hashRef->{$language} = $self->getLanguage($language, "label");
+    }
+    closedir $dh;
+    return $hashRef;
 }
 
 
