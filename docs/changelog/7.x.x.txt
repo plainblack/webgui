@@ -43,6 +43,7 @@
  - fixed: WebGUI Password Recovery email subject hard-coded
  - rfe: Add url to list of attributes tracked in assetHistory
  - fixed: Article now only allows 2 files to be uploaded
+ - fixed: DataForms can now export all non-default fields
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

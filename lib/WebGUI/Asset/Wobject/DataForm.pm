@@ -1219,7 +1219,7 @@ sub www_exportTab {
         my @exportRows;
         my $entries = $self->session->db->read("select * from DataForm_entry where assetId=?", [$self->getId]);
         my @exportFields;
-        for my $field ( map { $self->getFieldConfig($_) } $self->getFieldOrder ) {
+        for my $field ( map { $self->getFieldConfig($_) } @{$self->getFieldOrder} ) {
             next
                 if $field->{isMailField} && !$self->get('mailData');
             push @exportFields, $field->{name};
