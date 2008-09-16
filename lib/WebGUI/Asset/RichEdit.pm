@@ -174,7 +174,7 @@ sub getEditForm {
 		'search' => $i18n->get('search'),
 		'replace' => $i18n->get('replace'),
 		'cut' => $i18n->get('cut'),
-		'copy' => $i18n->get('copy'),
+		'copy' => $i18n->get('Copy'),
 		'paste' => $i18n->get('paste'),
 		'pastetext' => $i18n->get('pastetext'),
 		'pasteword' => $i18n->get('pasteword'),
