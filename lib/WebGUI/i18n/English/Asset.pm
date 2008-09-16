@@ -235,19 +235,25 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
 	'duplicate' => {
 		message => q|Duplicate|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
-	'copy' => {
+
+	'Copy' => {
 		message => q|Copy|,
-		lastUpdated => 0,
+		lastUpdated => 1221540086,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'copy' => {
+		message => q|copy|,
+		lastUpdated => 1221540088,
+		context => q|Same as Copy, but lower case.|
+	},
+
 	'this asset only' => {
 		message => q|This&nbsp;Asset&nbsp;Only|,
 		lastUpdated => 0,

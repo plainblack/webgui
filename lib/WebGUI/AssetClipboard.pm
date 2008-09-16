@@ -205,7 +205,8 @@ sub www_copy {
     else {
         $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
     }
-    $newAsset->update({ title=>$self->getTitle.' (copy)'});
+    my $i18n = WebGUI::International->new($self->session, 'Asset');
+    $newAsset->update({ title=>sprintf("%s (%s)",$self->getTitle,$i18n->get('copy'))});
     $newAsset->cut;
     if ($self->session->setting->get("autoRequestCommit")) {
         if ($self->session->setting->get("skipCommitComments")) {
