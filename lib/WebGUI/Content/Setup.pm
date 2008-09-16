@@ -122,7 +122,10 @@ sub handler {
 		my $u = WebGUI::User->new($session,"3");
 		$u->username($session->form->process("username","text","Admin"));
 		$u->profileField("email",$session->form->email("email"));
+		$u->profileField("timeZone",$session->form->timeZone("timeZone"));
 		$u->identifier(Digest::MD5::md5_base64($session->form->process("identifier","password","123qwe")));
+		$u = WebGUI::User->new($session,"1");
+		$u->profileField("timeZone",$session->form->timeZone("timeZone"));
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden( name=>"step", value=>"3");
 		$f->text(
@@ -500,6 +503,11 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 			-value=>$u->profileField("email"),
 			-label=>$i18n->get(56),
 			-hoverHelp=>$i18n->get('56 description'),
+			);
+		$f->timeZone(
+			-name=>"timeZone",
+			-value=>$u->profileField("timeZone"),
+			-label=>$i18n->get('timezone','DateTime'),
 			);
 		$f->submit;
 		$output .= $f->print; 
