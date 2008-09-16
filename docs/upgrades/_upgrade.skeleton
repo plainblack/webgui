@@ -104,3 +104,4 @@ sub updateTemplates {
     }
 }
 
+#vim:ft=perl

@@ -317,3 +317,4 @@ sub uninstall {
 
 1;
 
+#vim:ft=perl

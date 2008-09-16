@@ -102,3 +102,5 @@ Shows this documentation, then exits.
 Copyright 2001-2008 Plain Black Corporation.
 
 =cut
+
+#vim:ft=perl
