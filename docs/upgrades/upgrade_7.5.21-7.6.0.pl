@@ -35,14 +35,28 @@ addSortOrderToFolder( $session );
 addLoginTimeStats( $session );
 addEMSBadgeTemplate ( $session );
 redirectChoice ($session);
+badgePriceDates ($session);
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub badgePriceDates {
+    my $session = shift;
+    print "\tAllowing badges to have multiple prices set by date." unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table EMSBadge add column earlyBirdPrice float not null default 0.0");
+    $db->write("alter table EMSBadge add column earlyBirdPriceEndDate bigint");
+    $db->write("alter table EMSBadge add column preRegistrationPrice float not null default 0.0");
+    $db->write("alter table EMSBadge add column preRegistrationPriceEndDate bigint");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub fixIsPublicOnTemplates {
     my $session = shift;
+    print "\tFixing 'is public' on templates" unless $quiet;
     $session->db->write('UPDATE `assetIndex` SET `isPublic` = 0 WHERE assetId IN (SELECT assetId FROM asset WHERE className IN ("WebGUI::Asset::RichEdit", "WebGUI::Asset::Snippet", "WebGUI::Asset::Template") )');
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

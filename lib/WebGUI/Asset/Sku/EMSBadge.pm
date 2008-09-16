@@ -84,6 +84,34 @@ sub definition {
 			label           => $i18n->get("price"),
 			hoverHelp       => $i18n->get("price help"),
 			},
+		earlyBirdPrice => {
+			tab             => "shop",
+			fieldType       => "float",
+			defaultValue    => 0.00,
+			label           => $i18n->get("early bird price"),
+			hoverHelp       => $i18n->get("early bird price help"),
+			},
+		earlyBirdPriceEndDate => {
+			tab             => "shop",
+			fieldType       => "date",
+			defaultValue    => undef,
+			label           => $i18n->get("early bird price end date"),
+			hoverHelp       => $i18n->get("early bird price end date help"),
+			},
+		preRegistrationPrice => {
+			tab             => "shop",
+			fieldType       => "float",
+			defaultValue    => 0.00,
+			label           => $i18n->get("pre registration price"),
+			hoverHelp       => $i18n->get("pre registration price help"),
+			},
+		preRegistrationPriceEndDate => {
+			tab             => "shop",
+			fieldType       => "date",
+			defaultValue    => undef,
+			label           => $i18n->get("pre registration price end date"),
+			hoverHelp       => $i18n->get("pre registration price end date help"),
+			},
 		seatsAvailable => {
 			tab             => "shop",
 			fieldType       => "integer",
@@ -174,7 +202,13 @@ Returns the price field value.
 
 sub getPrice {
     my $self = shift;
-    return $self->get("price");
+	if ($self->get('earlyBirdPriceEndDate') < time) {
+		return $self->get('price');
+	}
+	elsif ($self->get('preRegistrationPriceEndDate') < time) {
+		return $self->get('earlyBirdPrice');
+	}
+	return $self->get('preRegistrationPrice');
 }
 
 #-------------------------------------------------------------------
