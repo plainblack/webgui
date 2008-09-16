@@ -1,4 +1,5 @@
 7.6.0
+ - rewrite macro parser, improving speed and making parameter parsing more sane
  - Made the charset metatag the highest thing in the head block.
  - fixed: AssetProxy allows proxying content in the trash or clipboard
  - fixed: Textarea resizer has a gap between textbox and resizer initially
