@@ -67,6 +67,7 @@
  - rfe: Add template variables for every property of all assets referenced in the Navigation.
  - rfe: VIM perl mode for skeletons
  - rfe: Add edit button to Manage Revisions page
+ - rfe: Protected profile fields don't show delete icon
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
