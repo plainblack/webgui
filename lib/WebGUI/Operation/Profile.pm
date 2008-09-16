@@ -225,12 +225,16 @@ sub www_editProfile {
 				});
 		}
 		push(@array, {
-			'profile.form.category' => $category->getLabel,
-                        'profile.form.category.loop' => \@temp
-			});
+            'profile.form.category' => $category->getLabel,
+            'profile.form.category.loop' => \@temp
+        });
 	}
 	$vars->{'profile.form.elements'} = \@array;
 	$vars->{'profile.form.submit'} = WebGUI::Form::submit($session,{});
+	$vars->{'profile.form.cancel'} = WebGUI::Form::button($session,{
+        value => $i18n->get('cancel'),
+        extras=>q|onclick="history.go(-1);" class="backwardButton"|,
+    });
 	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
 	return $session->style->userStyle(WebGUI::Asset::Template->new($session, $session->setting->get('editUserProfileTemplate'))->process($vars));
 }
