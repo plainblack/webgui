@@ -1,4 +1,5 @@
 7.6.0
+ - added fieldsets around form controls with multiple elements
  - rfe: Town Hall: Menu title in search results
  - rfe: Process Macros in HTTP Proxy's URL
  - rfe: TimeZone for the User Profiles displays incorrectly after installation
