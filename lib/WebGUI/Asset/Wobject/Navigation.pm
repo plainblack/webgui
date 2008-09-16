@@ -384,11 +384,11 @@ sub view {
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->get('reversePageLoop'));
-	
+	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
-    while (my ($property, $propertyValue) = each %{ $current->get() }) {
-		$var->{'currentPage.'.$property} = $propertyValue;
+    foreach my $property (@interestingProperties) {
+		$var->{'currentPage.'.$property} = $current->get($property);
 	}
 	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
 	$var->{'currentPage.title'}     = $current->getTitle;
@@ -484,14 +484,14 @@ sub view {
 
 		my $parent = $asset->getParent;
 		if (defined $parent) {
-            while (my ($property, $propertyValue) = each %{ $parent->get() }) {
-				$pageData->{"page.parent.".$property} = $propertyValue;
+            foreach my $property (@interestingProperties) {
+				$pageData->{"page.parent.".$property} = $parent->get($property);
 			}
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
-			$pageData->{'page.parent.title'}     = $parent->getTitle;
-			$pageData->{"page.parent.url"}       = $parent->getUrl;
-			$pageData->{"page.parent.rank"}      = $parent->getRank;
-			$pageData->{"page.isRankedFirst"}    = 1 unless exists $lastChildren{$parent->getId};
+			$pageData->{'page.parent.title'} = $parent->getTitle;
+			$pageData->{"page.parent.url"} = $parent->getUrl;
+			$pageData->{"page.parent.rank"} = $parent->getRank;
+			$pageData->{"page.isRankedFirst"} = 1 unless exists $lastChildren{$parent->getId};
 			$lastChildren{$parent->getId} = $asset->getId;			
 		}
 		$previousPageData->{"page.hasViewableChildren"} = ($previousPageData->{"page.assetId"} eq $pageData->{"page.parentId"});
