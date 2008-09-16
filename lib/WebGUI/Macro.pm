@@ -123,13 +123,18 @@ sub process {
             "Too many levels of macro recursion. Stopping.";
         }
         else {
-            my $replaceText = processMacro($session, $2, $3);
+            my $replaceText = _processMacro($session, $2, $3);
             defined $replaceText ? $replaceText : $1;           # processMacro returns undef on failure, use original text
         }
     }ge;
 }
 
-sub processMacro {
+
+# _processMacro ( $session, $macroname, $parameters )
+# processes an individual macro, taking the macro name and parameters as a string
+# returns the result text or undef on failure
+
+sub _processMacro {
     my $session = shift;
     my $macroname = shift;
     my $parameters = shift;
