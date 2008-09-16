@@ -301,6 +301,19 @@ sub getTagCount {
 
 #-------------------------------------------------------------------
 
+=head2 hasBeenCommitted ( )
+
+Returns whether or not this asset has been committed
+
+=cut
+
+sub hasBeenCommitted {
+	my $self = shift; 
+	return $self->getTagCount > 1  || $self->get('status') ne "pending";
+}
+
+#-------------------------------------------------------------------
+
 =head2 isLocked ( )
 
 Returns a boolean indicating whether the asset is locked for editing by the versioning system.

@@ -1650,6 +1650,11 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Keywords|,
         lastUpdated => 1170543345,
     },
+    
+    'asset not committed' => {
+		message => q{<h1>Error!</h1><p>You need to commit this collaboration system before you can create a new thread</p>},
+        lastUpdated => 1166848379,
+    },
 
 };
 

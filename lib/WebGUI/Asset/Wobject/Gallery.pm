@@ -1033,15 +1033,12 @@ instead of having to block things from being added.
 sub www_add {
     my $self        = shift;
     
-    if ( $self->getRevisionCount <= 1 && $self->get('status') eq "pending" ) {
+    unless ( $self->hasBeenCommitted ) {
         my $i18n    = WebGUI::International->new($self->session, 'Asset_Gallery');
-        return $self->processStyle(
-            $i18n->get("error add uncommitted")
-        );
+        return $self->processStyle($i18n->get("error add uncommitted"));
     }
-    else {
-        return $self->SUPER::www_add( @_ );
-    }
+
+    return $self->SUPER::www_add( @_ );
 }
 
 #----------------------------------------------------------------------------

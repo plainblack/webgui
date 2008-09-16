@@ -321,13 +321,8 @@ sub canStartThread {
                 : $self->session->user
                 ;
     return (
-            (
-                    $self->get("status") eq "approved" || 
-                    $self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
-            ) && (
-                    $user->isInGroup($self->get("canStartThreadGroupId")) 
-                    || $self->SUPER::canEdit( $userId )
-            )
+        $user->isInGroup($self->get("canStartThreadGroupId")) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 
@@ -1381,6 +1376,26 @@ sub view {
 	}
     return $out;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_add ( )
+
+Returns an error message if the collaboration system has not yet been posted.
+
+=cut
+
+sub www_add {
+	my $self    = shift;
+    
+    #Check to see if the asset has been committed
+    unless ( $self->hasBeenCommitted ) {
+        my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
+        return $self->processStyle($i18n->get("asset not committed"));
+    }
+	return $self->SUPER::www_add( @_ );
+}
+
 
 #-------------------------------------------------------------------
 

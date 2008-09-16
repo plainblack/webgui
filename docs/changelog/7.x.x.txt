@@ -57,6 +57,7 @@
  - rfe: Added canEdit and canAddFile template vars to Folder assets
  - rfe: Add logged-in time to Login History
  - rfe: cancel button (for edit profile screen)
+ - rfe: Better info for Assets that require commit before adding children.  Add link is always availble now.  If the asset has not yet been committed an error is displayed.
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

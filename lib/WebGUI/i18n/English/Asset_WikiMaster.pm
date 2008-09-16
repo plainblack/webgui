@@ -489,6 +489,11 @@ listing of pages that are related to a specific keyword?| },
 		lastUpdated=> 0,
 	},
 
+    'asset not committed' => {
+		message => q{<h1>Error!</h1><p>You need to commit this wiki before you can create a new wiki entry</p>},
+        lastUpdated => 1166848379,
+    },
+
 };
 
 1;
