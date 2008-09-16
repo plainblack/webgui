@@ -427,7 +427,8 @@ sub view {
 			next;
 		}
 		my $pageData = {};
-        while (my ($property, $propertyValue) = each %{ $asset->get() }) {
+        my $pageProperties = $asset->get;
+        while (my ($property, $propertyValue) = each %{ $pageProperties }) {
 			$pageData->{"page.".$property} = $propertyValue;
 		}
 		$pageData->{'page.menuTitle'} = $asset->getMenuTitle;
