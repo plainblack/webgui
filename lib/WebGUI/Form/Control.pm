@@ -583,7 +583,7 @@ sub passUiLevelCheck {
 	} else { # use programmed default
 		$passUiLevelCheck = ($self->get("uiLevel") <= $self->session->user->profileField("uiLevel"));
 	}
-	$passUiLevelCheck = $self->session->user->isInGroup(3) unless ($passUiLevelCheck); # override if in admins group
+	$passUiLevelCheck = $self->session->user->isAdmin unless ($passUiLevelCheck); # override if in admins group
 	return $passUiLevelCheck;
 }
 

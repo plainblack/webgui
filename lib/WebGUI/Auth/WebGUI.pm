@@ -136,7 +136,7 @@ sub createAccount {
     my $vars        = shift || {}; 
     
     #$self->session->errorHandler->warn('WebGUI::Auth::createAccount called');
-    if ($self->session->user->userId ne "1") {
+    if ($self->session->user->isRegistered) {
         return $self->displayAccount;
     }
     elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
@@ -188,7 +188,7 @@ sub createAccountSave {
     my $i18n        = WebGUI::International->new($session);
 
     # Logged in users cannot see this page
-    return $self->displayAccount if ($session->user->userId ne "1");
+    return $self->displayAccount if ($session->user->isRegistered);
 
     # Make sure anonymous registration is enabled 
     if (!$setting->get("anonymousRegistration") && !$setting->get("userInvitationsEnabled")) {    
@@ -256,7 +256,7 @@ sub createAccountSave {
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
-   return $self->displayLogin if($self->userId eq '1');
+   return $self->displayLogin if($self->isVisitor);
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
@@ -283,7 +283,7 @@ sub deactivateAccountConfirm {
 sub displayAccount {
    my $self = shift;
    my $vars;
-   return $self->displayLogin($_[0]) if ($self->userId eq '1');
+   return $self->displayLogin($_[0]) if ($self->isVisitor);
 	my $i18n = WebGUI::International->new($self->session);
    my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
@@ -315,7 +315,7 @@ The initial login screen an unauthenticated user sees
 sub displayLogin {
    	my $self = shift;
    	my $vars;
-   	return $self->displayAccount($_[0]) if ($self->userId ne "1");
+   	return $self->displayAccount($_[0]) if ($self->isRegistered);
     my $i18n = WebGUI::International->new($self->session);
    	$vars->{'login.message'}             = '<ul>'.$_[0].'</ul>' if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
@@ -693,7 +693,7 @@ passed directly to the approprate method.
 sub recoverPassword {
     my $self = shift;
 
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
 
     my $type = $self->getPasswordRecoveryType;
 
@@ -829,7 +829,7 @@ sub profileRecoverPasswordFinish {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($self->session);
     my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
   
     my $username;
     if ($self->getSetting('passwordRecoveryRequireUsername')) {
@@ -942,7 +942,7 @@ sub profileRecoverPasswordFinish {
 
 sub emailRecoverPasswordFinish {
     my $self = shift;
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
 
     my $i18n        = WebGUI::International->new($self->session);
     my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
@@ -1171,7 +1171,7 @@ sub updateAccount {
    my $display = '<ul><li>'.$i18n->get(81).'</li></ul>';
    my $error = "";
    
-   if($self->userId eq '1'){
+   if($self->isVisitor){
       return $self->displayLogin;
    }
    

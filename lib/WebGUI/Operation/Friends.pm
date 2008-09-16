@@ -37,7 +37,7 @@ Form for inviting a user to become your friend.
 
 sub www_addFriend {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     my $friendId = $session->form->get('userId');
     my $protoFriend = WebGUI::User->new($session, $friendId);
 
@@ -105,7 +105,7 @@ members (determined by email address) and send the email.
 
 sub www_addFriendSave {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 
     my $friendId = $session->form->get('friendId');
     my $protoFriend = WebGUI::User->new($session, $friendId);
@@ -147,7 +147,7 @@ Form for the friend to accept or deny the request.
 
 sub www_friendRequest {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 
     my $i18n = WebGUI::International->new($session, 'Friends');
 
@@ -241,7 +241,7 @@ Handle form data from the friend's response to the invitation
 
 sub www_friendRequestSave {
     my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 
     my $i18n = WebGUI::International->new($session, 'Friends');
     my $doWhat   = $session->form->get('doWhat');
@@ -296,7 +296,7 @@ send private messages to a subset of them.
 sub www_manageFriends {
 	my $session = shift;
     my ($user, $url, $style) = $session->quick(qw(user url style));
-	return $session->privilege->insufficient() unless ($user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($user->isRegistered);
     my $i18n = WebGUI::International->new($session, 'Friends');
 
     ##You have no friends!
@@ -349,7 +349,7 @@ Removes friends from the current user's friends list.
 
 sub www_removeFriends {
     my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     my @users = $session->form->param("userId");
     WebGUI::Friends->new($session)->delete(\@users);
     return www_manageFriends($session);
@@ -366,7 +366,7 @@ Sends a message to selected friends.
 
 sub www_sendMessageToFriends {
     my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     my @users = $session->form->param("userId");
     my $friends = WebGUI::Friends->new($session);
     $friends->sendMessage($session->form->process("subject", "text"), $session->form->process("message","textarea"), \@users);

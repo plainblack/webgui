@@ -193,7 +193,7 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_mySubscriptions {
     my $self = shift;
-    return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->userId ne "1");
+    return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->isRegistered);
     my %var = ();
     my $meta = $self->getMetaDataFields;
     my @categories = ();
@@ -233,7 +233,7 @@ sub www_mySubscriptions {
 #-------------------------------------------------------------------
 sub www_mySubscriptionsSave {
     my $self = shift;
-    return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->userId ne "1");
+    return $self->session->privilege->insufficient unless ($self->canView && $self->session->user->isRegistered);
     my $subscriptions = $self->session->form->process("subscriptions", "checkList");
     $self->setUserSubscriptions($subscriptions);
     return $self->www_view;

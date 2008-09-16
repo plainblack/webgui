@@ -627,7 +627,7 @@ sub hasRated {
 	my $self = shift;
         return 1 if $self->isPoster;
 	my $flag = 0;
-	if ($self->session->user->userId eq "1") {
+	if ($self->session->user->isVisitor) {
         	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and ipAddress=?",[$self->getId, $self->session->env->getIp]);
 	} else {
         	($flag) = $self->session->db->quickArray("select count(*) from Post_rating where assetId=? and userId=?",[$self->getId, $self->session->user->userId]);
@@ -1255,7 +1255,7 @@ sub www_edit {
 	$var{'form.footer'     } = WebGUI::Form::formFooter($session);
 	$var{'usePreview'      } = $self->getThread->getParent->get("usePreview");
 	$var{'user.isModerator'} = $self->getThread->getParent->canModerate;
-	$var{'user.isVisitor'  } = ($user->userId eq '1');
+	$var{'user.isVisitor'  } = ($user->isVisitor);
 	$var{'visitorName.form'} = WebGUI::Form::text($session, {
 		name => "visitorName",
 		value => $form->process('visitorName') || $self->getValue("visitorName")

@@ -321,7 +321,7 @@ Generates an edit form.
 sub www_edit {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
     my $admin = WebGUI::Shop::Admin->new($session);
     my $i18n = WebGUI::International->new($session, "Shop");
     my $form = $self->getEditForm;
@@ -340,7 +340,7 @@ Saves the data from the post.
 sub www_editSave {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
     $self->processPropertiesFromFormPost;
     $session->http->setRedirect($session->url->page('shop=ship;method=manage'));
     return undef;

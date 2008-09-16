@@ -374,7 +374,7 @@ sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)))}) {
+	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isAdmin))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -395,7 +395,7 @@ sub www_manageClipboard {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my ($header,$limit);
-	if ($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)) {
+	if ($self->session->form->process("systemClipboard") && $self->session->user->isAdmin) {
 		$header = $i18n->get(966);
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), $i18n->get(959), 

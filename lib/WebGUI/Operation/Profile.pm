@@ -201,7 +201,7 @@ A reference to the current session.
 
 sub www_editProfile {
 	my $session = shift;
-	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->userId eq '1');
+	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->isVisitor);
 	my $i18n = WebGUI::International->new($session);
 	my $vars = {};
 	$vars->{displayTitle} .= $i18n->get(338);
@@ -261,7 +261,7 @@ A reference to the current session.
 sub www_editProfileSave {
 	my $session = shift;
 	my ($profile, $error, $warning);
-	return WebGUI::Operation::Auth::www_auth($session, "init") if ($session->user->userId eq '1');
+	return WebGUI::Operation::Auth::www_auth($session, "init") if ($session->user->isVisitor);
 	($profile, $error, $warning) = validateProfileData($session);
 	$error .= $warning;
 	return www_editProfile($session, '<ul>'.$error.'</ul>') if($error ne "");
@@ -295,8 +295,8 @@ sub www_viewProfile {
 
     return $session->privilege->notMember() if($u->username eq "");
 
-    return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isInGroup(3)));
-    return $session->privilege->insufficient() if(!$session->user->isInGroup(2));
+    return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isAdmin));
+    return $session->privilege->insufficient() if(!$session->user->isRegistered);
 
     my @array = ();
     foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {

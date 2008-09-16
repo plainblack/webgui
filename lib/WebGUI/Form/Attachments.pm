@@ -293,7 +293,7 @@ sub www_upload {
     my $asset = "";
 
     # prevent malicious visitors from being able to publish children things they've published to tempsace
-    my $owner = ($session->user->userId eq "1") ? "3" : $session->user->userId;
+    my $owner = ($session->user->isVisitor) ? "3" : $session->user->userId;
 
     my %properties = (
         title       => $filename,

@@ -194,7 +194,7 @@ sub view {
 	my $self    = shift;
 	
     # Use cached version for visitors
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -258,7 +258,7 @@ sub view {
     my $out = $self->processTemplate( $vars, undef, $self->{_viewTemplate} );
 
     # Update the cache
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)
             ->set($out,$self->get("visitorCacheTimeout"));
 	}
@@ -277,7 +277,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
 	$self->SUPER::www_view(@_);
 }
 

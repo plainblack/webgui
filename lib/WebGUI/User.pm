@@ -422,6 +422,19 @@ sub identifier {
 
 #-------------------------------------------------------------------
 
+=head2 isAdmin ()
+
+Returns 1 if the user is in the admins group.
+
+=cut
+
+sub isAdmin {
+	my $self = shift;
+	return $self->isInGroup(3);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isInGroup ( [ groupId ] )
 
 Returns a boolean (0|1) value signifying that the user has the required privileges. Always returns true for Admins.
@@ -479,6 +492,32 @@ sub isOnline {
     my ($flag) = $self->session->db->quickArray('select count(*) from userSession where userId=? and lastPageView>=?',
         [$self->userId, time() - 60*10]); 
     return $flag;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRegistered ()
+
+Returns 1 if the user is not a visitor.
+
+=cut
+
+sub isRegistered {
+	my $self = shift;
+	return $self->userId ne '1';
+}
+
+#-------------------------------------------------------------------
+
+=head2 isVisitor ()
+
+Returns 1 if the user is a visitor.
+
+=cut
+
+sub isVisitor {
+	my $self = shift;
+	return $self->userId eq '1';
 }
 
 
@@ -611,7 +650,7 @@ sub newByEmail {
 	my $email = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
+	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
 	return $user;
 }
@@ -640,7 +679,7 @@ sub newByUsername {
 	my $username = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from users where username=?",[$username]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
+	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
 	return $user;
 }

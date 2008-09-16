@@ -59,7 +59,7 @@ sub _isDuplicateUsername {
 	my $self = shift;
 	my $username = shift;
 	#Return false if the user is already logged in, but not changing their username.
-	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
+	return 0 if($self->isRegistered && $self->session->user->username eq $username);
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
 	my $i18n = WebGUI::International->new($self->session);
@@ -80,7 +80,7 @@ sub _isValidUsername {
 	my $username = shift;
 	my $error = "";
 
-	return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
+	return 1 if($self->isRegistered && $self->session->user->username eq $username);
 
     my $i18n = WebGUI::International->new($self->session);
 
@@ -360,7 +360,7 @@ Auth method that the form for creating users should call
 sub deactivateAccount {
 	my $self = shift;
 	my $method = $_[0];
-	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+	return $self->session->privilege->vitalComponent() if($self->isVisitor || $self->isAdmin);
 	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
 	my $i18n = WebGUI::International->new($self->session);
 	my %var;
@@ -386,7 +386,7 @@ sub deactivateAccountConfirm {
     
     # Cannot deactivate "Visitor" or "Admin" users this way
     return $self->session->privilege->vitalComponent 
-        if $self->userId eq '1' || $self->userId eq '3';
+        if $self->isVisitor || $self->isAdmin;
 
     my $i18n    = WebGUI::International->new($self->session);
 
@@ -675,6 +675,19 @@ sub init {
 
 #-------------------------------------------------------------------
 
+=head2 isAdmin ()
+
+Returns 1 if the user is user 3 (admin).
+
+=cut
+
+sub isAdmin {
+	my $self = shift;
+	return $self->userId eq '3';
+}
+
+#-------------------------------------------------------------------
+
 =head2 isCallable ( method )
 
 Returns whether or not a method is callable
@@ -686,6 +699,31 @@ sub isCallable {
 	return isIn($_[0],@{$self->{callable}})
 }
 
+#-------------------------------------------------------------------
+
+=head2 isRegistered ()
+
+Returns 1 if the user is not a visitor.
+
+=cut
+
+sub isRegistered {
+	my $self = shift;
+	return $self->userId ne '1';
+}
+
+#-------------------------------------------------------------------
+
+=head2 isVisitor ()
+
+Returns 1 if the user is a visitor.
+
+=cut
+
+sub isVisitor {
+	my $self = shift;
+	return $self->userId eq '1';
+}
 
 #-------------------------------------------------------------------
 

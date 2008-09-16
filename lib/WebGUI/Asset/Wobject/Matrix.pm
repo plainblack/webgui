@@ -293,7 +293,7 @@ sub www_compare {
 	$var{isTooMany} = (scalar(@cmsList)>$max);
 	$var{isTooFew} = (scalar(@cmsList)<2);
 	$var{'compare.form'} = $self->getCompareForm(@cmsList);
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->isRegistered);
 	if ($var{isTooMany} || $var{isTooFew}) {
 		return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
 	}
@@ -985,7 +985,7 @@ sub www_search {
 			$var{isTooFew} = ($count<2);
 		}
 	}
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->isRegistered);
 	$var{'compare.form'} = $self->getCompareForm(@list);
 	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
 		.WebGUI::Form::hidden($self->session,{
@@ -1032,14 +1032,14 @@ sub www_search {
 #-------------------------------------------------------------------
 sub view {
         my $self = shift;
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
         my (%var);
 	$var{'compare.form'} = $self->getCompareForm;
 	$var{'search.url'} = $self->getUrl("func=search");
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->isRegistered);
 	$var{'field.list.url'} = $self->getUrl('func=listFields');	
 	$var{'listing.add.url'} = $self->formatURL("editListing","new");
 
@@ -1132,7 +1132,7 @@ sub view {
         }
         $sth->finish;
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
 	}
        	return $out;
@@ -1148,7 +1148,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
 	$self->SUPER::www_view(@_);
 }
 
@@ -1167,7 +1167,7 @@ sub www_viewDetail {
 		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
 	}
 	$var{"discussion"} = $forum && $forum->view;
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
+	$var{'isLoggedIn'} = ($self->session->user->isRegistered);
 	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {
 		if ($self->session->form->process("body") ne "") {
 			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});

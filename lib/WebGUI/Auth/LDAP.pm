@@ -221,7 +221,7 @@ sub createAccount {
 	my $message = shift;
 	my $confirm = shift || $self->session->form->process("confirm");
     my $vars;
-    if ($self->session->user->userId ne "1") {
+    if ($self->session->user->isRegistered) {
        return $self->displayAccount;
     }
     elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
@@ -308,7 +308,7 @@ sub createAccountSave {
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
-   return $self->displayLogin if($self->userId eq '1');
+   return $self->displayLogin if($self->isVisitor);
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
@@ -323,7 +323,7 @@ sub deactivateAccountConfirm {
 sub displayAccount {
    my $self = shift;
    my $vars;
-   return $self->displayLogin($_[0]) if ($self->userId eq '1');
+   return $self->displayLogin($_[0]) if ($self->isVisitor);
 	my $i18n = WebGUI::International->new($self->session);
    $vars->{displayTitle} = '<h1>'.$i18n->get(61).'</h1>';
    $vars->{'account.message'} = $i18n->get(856);
@@ -339,7 +339,7 @@ sub displayAccount {
 sub displayLogin {
    my $self = shift;
    my $vars;
-   return $self->displayAccount($_[0]) if ($self->userId ne "1");
+   return $self->displayAccount($_[0]) if ($self->isRegistered);
    $vars->{'login.message'} = $_[0] if ($_[0]);
    return $self->SUPER::displayLogin("login",$vars);
 }

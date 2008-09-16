@@ -86,7 +86,7 @@ sub execute {
         # get user object
         $eh->info("Getting user $userId");
         my $user = WebGUI::User->new($self->session, $userId);
-        next if ($user->userId eq "1");
+        next if ($user->isVisitor);
         my $emailAddress = $user->profileField("email");
         next if ($emailAddress eq "");
 

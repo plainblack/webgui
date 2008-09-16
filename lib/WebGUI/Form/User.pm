@@ -149,7 +149,7 @@ sub toHtml {
 	my $self = shift;
         my $user = WebGUI::User->new($self->session, $self->getOriginalValue);
 	my $manage = undef;
-        if ($self->session->user->isInGroup(3)) {
+        if ($self->session->user->isAdmin) {
                  $manage = " ".$self->session->icon->manage('op=listUsers');
         }
         return WebGUI::Form::Hidden->new($self->session,

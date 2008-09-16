@@ -854,7 +854,7 @@ sub view {
 	my $currentPost = shift || $self;
     $self->markRead;
     $self->incrementViews unless ($self->session->form->process("func") eq 'rate');
-	if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
+	if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
         my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
         return $out if $out;
     }
@@ -864,7 +864,7 @@ sub view {
 	$self->getParent->appendTemplateLabels($var);
 	
     $var->{'karmaIsEnabled'     }  = $self->session->setting->get("useKarma");
-    $var->{'user.isVisitor'     }  = ($self->session->user->userId eq '1');
+    $var->{'user.isVisitor'     }  = ($self->session->user->isVisitor);
     $var->{'user.isModerator'   }  = $self->getParent->canModerate;
     $var->{'user.canPost'       }  = $self->getParent->canPost;
     $var->{'user.canReply'      }  = $self->canReply;
@@ -961,7 +961,7 @@ sub view {
     $var->{'collaboration.description'} = $self->getParent->get("description");
     my $out                             = $self->processTemplate($var,undef,$self->{_viewTemplate});
 	
-    if ($self->session->user->userId eq '1' && !$self->session->form->process("layout")) {
+    if ($self->session->user->isVisitor && !$self->session->form->process("layout")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->getThread->getParent->get("visitorCacheTimeout"));
 	}
     return $out;
@@ -1158,7 +1158,7 @@ sub www_view {
 	return $self->session->privilege->noAccess() unless $self->canView;
 	my $check = $self->checkView;
 	return $check if (defined $check);
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
         $self->session->http->sendHeader;    
         $self->prepareView;
         my $style = $self->getParent->processStyle("~~~");

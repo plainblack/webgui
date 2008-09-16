@@ -128,7 +128,7 @@ Form for sending private messages
 
 sub www_sendPrivateMessage {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));   
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);   
 	
     my $i18n     = WebGUI::International->new($session);
 	my $form     = $session->form;
@@ -176,7 +176,7 @@ members (determined by email address) and send the email.
 
 sub www_sendPrivateMessageSave {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     
     my $i18n     = WebGUI::International->new($session);
 	my $form     = $session->form;
@@ -250,7 +250,7 @@ Templated display all messages for the current user.
 
 sub www_viewInbox {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 	
     my $i18n     = WebGUI::International->new($session);
 	my $vars     = {};
@@ -303,7 +303,7 @@ sub www_viewInbox {
             my $u = WebGUI::User->new($session,$sentBy);
             #If the user that sent the message is valid, get the username 
             #This case would happen if the user was deleted after sending a private message
-            if($u->userId ne "1") {
+            if($u->isRegistered) {
                 $from = $u->username;    
             }
         } 
@@ -341,7 +341,7 @@ Mark a private message in the inbox as deleted.
 
 sub www_deletePrivateMessage {
     my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 
     #Get the message
     my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));
@@ -362,7 +362,7 @@ Templated display of a single message for the user.
 
 sub www_viewInboxMessage {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     
     #Get the message
     my $message = WebGUI::Inbox->new($session)->getMessage($session->form->param("messageId"));

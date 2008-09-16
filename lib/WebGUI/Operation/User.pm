@@ -341,7 +341,7 @@ sub www_editUser {
 	my $tabform = WebGUI::TabForm->new($session,\%tabs);
 	$tabform->formHeader({extras=>'autocomplete="off"'});	
 	my $u = WebGUI::User->new($session,($uid eq 'new') ? '' : $uid); #Setting uid to '' when uid is 'new' so visitor defaults prefill field for new user
-	my $username = ($u->userId eq '1' && $uid ne "1") ? '' : $u->username;
+	my $username = ($u->isVisitor && $uid ne "1") ? '' : $u->username;
     	$tabform->hidden({name=>"op",value=>"editUserSave"});
     	$tabform->hidden({name=>"uid",value=>$uid});
     	$tabform->getTab("account")->raw('<tr><td width="170">&nbsp;</td><td>&nbsp;</td></tr>');
@@ -395,7 +395,7 @@ sub www_editUser {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			my $label = $field->getLabel . ($field->isRequired ? "*" : '');
-			if ($field->getId eq "alias" && $u->userId eq '1') {
+			if ($field->getId eq "alias" && $u->isVisitor) {
 				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,undef,1));
 			} else {
 				$tabform->getTab("profile")->raw($field->formField({label=>$label},1,$u));
@@ -408,7 +408,7 @@ sub www_editUser {
 	@exclude = (@exclude,"1","2","7");
     my $secondaryAdmin = $session->user->isInGroup('11');
     my @extraExclude = ();
-    if ($secondaryAdmin && !$session->user->isInGroup(3)) {
+    if ($secondaryAdmin && !$session->user->isAdmin) {
         @extraExclude = $session->db->buildArray('select groupId from groups where groupId not in (select groupId from groupings where userId=?)',[$session->user->userId]);
     }
     push @extraExclude, @exclude;
@@ -425,7 +425,7 @@ sub www_editUser {
 		unless (
 			$group eq "1" || $group eq "2" || $group eq "7" # can't remove user from magic groups 
 			|| ($session->user->userId eq $u->userId  && $group eq 3) # cannot remove self from admin
-			|| ($u->userId eq "3" && $group eq "3") # admin user cannot be remove from admin
+			|| ($u->isAdmin && $group eq "3") # admin user cannot be remove from admin
 			) {
 			push(@include,$group);
 		}

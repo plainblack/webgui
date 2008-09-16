@@ -58,7 +58,7 @@ sub _visitorCacheKey {
 #-------------------------------------------------------------------
 sub _visitorCacheOk {
 	my $self = shift;
-	return ($self->session->user->userId eq '1'
+	return ($self->session->user->isVisitor
 		&& !$self->session->form->process('sortBy'));
 }
 
@@ -308,7 +308,7 @@ sub canSubscribe {
                 ? WebGUI::User->new( $session, $userId )
                 : $self->session->user
                 ;
-    return ($user->userId ne "1" && $self->canView( $userId ) );
+    return ($user->isRegistered && $self->canView( $userId ) );
 }
 
 #-------------------------------------------------------------------
@@ -1063,7 +1063,7 @@ sub getViewTemplateVars {
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
+        $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -1500,7 +1500,7 @@ sub www_unsubscribe {
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1" && !$disableCache);
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor && !$disableCache);
 	return $self->SUPER::www_view(@_);
 }
 

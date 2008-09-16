@@ -778,7 +778,7 @@ sub getAssetAdderLinks {
 			$self->session->errorHandler->error("Couldn't get UI level of ".$class.". Root cause: ".$@);
 			next;
 		}
-		next if ($uiLevel > $self->session->user->profileField("uiLevel"));# && !$self->session->user->isInGroup(3));
+		next if ($uiLevel > $self->session->user->profileField("uiLevel"));# && !$self->session->user->isAdmin);
 		my $canAdd = eval{$class->canAdd($self->session)};
 		if ($@) {
 			$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
@@ -1050,7 +1050,7 @@ sub getEditForm {
 						fieldType=>$fieldType
                                 );
                 }
-		if ($self->session->user->isInGroup(3)) {
+		if ($self->session->user->isAdmin) {
                 	# Add a quick link to add field
                 	$tabform->getTab("meta")->readOnly(
                                         -value=>'<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.

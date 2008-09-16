@@ -24,14 +24,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub canManage {
 	my $self = shift;
-	return 0 if $self->session->user->userId eq '1';
+	return 0 if $self->session->user->isVisitor;
 	return $self->session->user->isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
-	return 0 if $self->session->user->userId eq '1';
+	return 0 if $self->session->user->isVisitor;
 	return $self->session->user->isInGroup($self->get("usersGroupId"));
 }
 
@@ -273,7 +273,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
@@ -286,7 +286,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 						}
@@ -309,7 +309,7 @@ sub view {
 					shortcutUrl=>$child->getUrl,
 					showReloadIcon=>$child->{_properties}{showReloadIcon},
 					canPersonalize=>$self->canPersonalize,
-					canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+					canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 				});
 				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
@@ -329,7 +329,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
-	return 'Visitors cannot save settings' if($self->session->user->userId eq '1');
+	return 'Visitors cannot save settings' if($self->session->user->isVisitor);
 	return $self->session->privilege->insufficient() unless ($self->canPersonalize);
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");

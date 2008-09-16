@@ -364,7 +364,7 @@ sub www_selectPaymentGateway {
     my $i18n    = WebGUI::International->new( $session, 'Shop' );
 
     # Make sure the user is logged in.
-    if ($session->user->userId eq '1') {
+    if ($session->user->isVisitor) {
         $session->scratch->set( 'redirectAfterLogin', $session->url->page('shop=pay;method=selectPaymentGateway') );
 
         # We cannot use WebGUI::Operation::execute( $session, 'auth'); because the method form param used by the

@@ -771,7 +771,7 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return 'You are no longer logged in' if $self->session->user->userId eq '1';
+	return 'You are no longer logged in' if $self->session->user->isVisitor;
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;

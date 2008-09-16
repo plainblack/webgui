@@ -487,7 +487,7 @@ sub getRichEditor {
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
 		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
-		wg_userIsVisitor => $self->session->user->userId eq '1' ? JSON::true() : JSON::false(),
+		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {
