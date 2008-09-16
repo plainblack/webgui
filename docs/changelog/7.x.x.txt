@@ -62,6 +62,7 @@
  - rfe: Move hardcoded words to i18n
  - rfe: Better info for Assets that require commit before adding children.  Add link is always availble now.  If the asset has not yet been committed an error is displayed.
  - rfe: Add template variables for every property of all assets referenced in the Navigation.
+ - rfe: Add edit button to Manage Revisions page
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

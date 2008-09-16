@@ -555,7 +555,8 @@ sub www_manageRevisions {
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'
 			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
-			.$self->session->icon->view("func=view;revision=".$date)
+			.$self->session->icon->view( "func=view;revision=" . $date )
+            .$self->session->icon->edit( "func=edit;revision=" . $date )
 			.'</td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$by.'</td>
