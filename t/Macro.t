@@ -35,12 +35,15 @@ $session->user({user => $registeredUser});
 
 my %originalMacros = %{ $session->config->get('macros') };
 ##Overwrite any local configuration so that we know how to call it.
-foreach my $macro (qw/GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest ReverseParams InfiniteMacro VisualMacro/) {
+foreach my $macro (qw/
+    GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest
+    ReverseParams InfiniteMacro VisualMacro MacroEmpty MacroUndef
+/) {
 	$session->config->addToHash('macros', $macro, $macro);
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan 'no_plan'; #tests => 10;
+plan tests => 33;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -206,8 +209,8 @@ tie my %quotingEdges, 'Tie::IxHash';
     '^VisualMacro^VisualMacro(this);;'              => '^VisualMacro@MacroCall[`this`]:;',
     '^VisualMacro(^VisualMacro);'                   => '@MacroCall[`^VisualMacro`]:',
     '^VisualMacro(^VisualMacro(this));'             => '@MacroCall[`^VisualMacro(this)`]:',
+    '^VisualMacro("quotes\\");'                     => '@MacroCall[`"quotes"`]:',
 );
-my $index = 0;
 while (my ($inText, $outText) = each %quotingEdges) {
     my $procText = $inText;
     WebGUI::Macro::process($session, \$procText),
@@ -218,26 +221,40 @@ while (my ($inText, $outText) = each %quotingEdges) {
     );
 }
 
-tie my %invalidCalls, 'Tie::IxHash';
-%invalidCalls = (
-    '^;'                                            => '^;',
-    '^();'                                          => '^();',
-    '^MacroThatDoesntExist;'                        => '^MacroThatDoesntExist;',
-    "^Ex'tras;"                                     => "^Ex'tras;",
-    '^Extras(;'                                     => '^Extras(;',
-    '^Extras);'                                     => '^Extras);',
-    '^Extras(;)'                                    => '^Extras(;)',
+my @invalidCalls = (
+    '^;',
+    '^();',
+    '^MacroThatDoesntExist;',
+    "^Ex'tras;",
+    '^Extras(;',
+    '^Extras);',
+    '^Extras(;)',
 );
-my $index = 0;
-while (my ($inText, $outText) = each %invalidCalls) {
-    my $procText = $inText;
-    WebGUI::Macro::process($session, \$procText),
+for my $inText (@invalidCalls) {
+    my $outText = $inText;
+    WebGUI::Macro::process($session, \$outText),
     is(
-        $procText,
         $outText,
+        $inText,
         "Invalid macro call: $inText",
     );
 }
+
+my $macroText = "^MacroEmpty;";
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    '',
+    "Macro can return empty string",
+);
+
+my $macroText = "^MacroUndef;";
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    '',
+    "Macro can return undef",
+);
 
 
 END {

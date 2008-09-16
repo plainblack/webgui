@@ -123,8 +123,9 @@ sub process {
             "Too many levels of macro recursion. Stopping.";
         }
         else {
+            my $d = $1;
             my $replaceText = _processMacro($session, $2, $3);
-            defined $replaceText ? $replaceText : $1;           # processMacro returns undef on failure, use original text
+            defined $replaceText ? $replaceText : $d;       # processMacro returns undef on failure, use original text
         }
     }ge;
 }
@@ -189,6 +190,8 @@ sub _processMacro {
         $session->log->error("Unable to process macro '$macroname': $@");
         return;
     }
+    $output = ''
+        if !defined $output;
     process($session, \$output);                                            # also need to process macros on output
     return $output;
 }
