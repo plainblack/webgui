@@ -48,7 +48,7 @@
  - rfe: Add url to list of attributes tracked in assetHistory
  - fixed: Article now only allows 2 files to be uploaded
  - fixed: DataForms can now export all non-default fields
-
+ - rfe: After committing a version there is now a back to site link
 7.5.22
  - fixed: Layout template now gets prepared correctly
  - fixed: When user does not have permissions to search/edit a thing a proper error is shown.
