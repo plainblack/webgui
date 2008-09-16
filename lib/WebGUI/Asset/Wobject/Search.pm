@@ -163,20 +163,15 @@ sub view {
 		my $rs = $search->getResultSet;
 		while (my $data = $rs->hashRef) {
 			if ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit})) {
-            my $url = $data->{url};
-            if ($self->get("useContainers")) {
-                my $asset = WebGUI::Asset->new($self->session, $data->{assetId}, $data->{className});
-                if (defined $asset) {
-                    $url = $asset->getContainer->get("url");
-                }
-            }
-			push(@results, {
-				url         => $url,
-				title       => $data->{title},
-				synopsis    => $data->{synopsis},
-				assetId     => $data->{assetId},
-				});
-             $var{results_found} = 1;
+				my $asset = WebGUI::Asset->new($self->session, $data->{assetId}, $data->{className});
+				if (defined $asset) {
+					my $properties = $asset->get;
+					if ($self->get("useContainers")) {
+							$properties->{url} = $asset->getContainer->get("url");
+					}
+					push(@results, $properties);
+					$var{results_found} = 1;
+				}
 			}
 		} 
 		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));
