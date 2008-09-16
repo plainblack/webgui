@@ -31,6 +31,7 @@ my $session = start(); # this line required
 addUrlToAssetHistory ( $session ); ##This sub MUST GO FIRST
 removeDoNothingOnDelete( $session );
 fixIsPublicOnTemplates ( $session );
+addSortOrderToFolder( $session );
 addEMSBadgeTemplate ( $session );
 
 finish($session); # this line required
@@ -55,6 +56,14 @@ sub addUrlToAssetHistory {
     my $session = shift;
     print "\tAdding URL column to assetHistory" unless $quiet;
     $session->db->write('ALTER TABLE assetHistory ADD COLUMN url VARCHAR(255)');
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addSortOrderToFolder {
+    my $session = shift;
+    print "\tAdding Sort Order to Folder... " unless $quiet;
+    $session->db->write( 'alter table Folder add column sortOrder ENUM("ASC","DESC") DEFAULT "ASC"' );
     print "Done.\n" unless $quiet;
 }
 

@@ -253,6 +253,42 @@ be useful, others may not.|,
 		message => q|In seconds, how long output from this Asset will be cached.|,
 		lastUpdated => 1167416930
 	},
+    
+    'editForm sortOrder label' => {
+        message     => q{Sort Order},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'editForm sortOrder description' => {
+        message     => q{The order in which to sort the files and folders.},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
+
+    'editForm sortOrder ascending' => {
+        message     => q{Ascending},
+        lastUpdated => 0,
+        context     => q{Label for sort order},
+    },
+
+    'editForm sortOrder descending' => {
+        message     => q{Descending},
+        lastUpdated => 0,
+        context     => q{Label for sort order},
+    },
+
+    'helpvar canAddFile' => {
+        message     => q{Is true if the user can add a file to the Folder},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
+
+    'helpvar canEdit' => {
+        message     => q{Is true if the user can edit the folder},
+        lastUpdated => 0,
+        context     => q{Help for template variable},
+    },
 
 };
 
