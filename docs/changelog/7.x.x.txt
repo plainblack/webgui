@@ -3,6 +3,7 @@
  - rfe: Town Hall: Menu title in search results
  - rfe: Process Macros in HTTP Proxy's URL
  - rfe: TimeZone for the User Profiles displays incorrectly after installation
+ - rfe: choice of type of redirect on redirect assets
  - rewrite macro parser, improving speed and making parameter parsing more sane
  - Made the charset metatag the highest thing in the head block.
  - fixed: AssetProxy allows proxying content in the trash or clipboard

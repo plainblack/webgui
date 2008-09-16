@@ -33,6 +33,7 @@ removeDoNothingOnDelete( $session );
 fixIsPublicOnTemplates ( $session );
 addSortOrderToFolder( $session );
 addEMSBadgeTemplate ( $session );
+redirectChoice ($session);
 
 finish($session); # this line required
 
@@ -89,13 +90,12 @@ sub removeDoNothingOnDelete {
 }
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub redirectChoice {
+    my $session = shift;
+    print "\tGiving a user choice about which type of redirect they'd like to perform... " unless $quiet;
+    $session->db->write("alter table redirect add column redirectType int not null default 302");
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
