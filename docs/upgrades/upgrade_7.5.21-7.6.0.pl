@@ -48,7 +48,7 @@ sub fixIsPublicOnTemplates {
 #----------------------------------------------------------------------------
 sub addEMSBadgeTemplate {
     my $session = shift;
-    print "\tAdding EMS Badge Template" unless $quiet;
+    print "\tAdding EMS Badge Template... " unless $quiet;
     $session->db->write('ALTER TABLE EMSBadge ADD COLUMN templateId VARCHAR(22) BINARY NOT NULL');
     print "Done.\n" unless $quiet;
 }
