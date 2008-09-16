@@ -520,11 +520,16 @@ ENDHTML
                     .$session->icon->export("func=exportPackage",$asset->get("url"))
                     .'<br />';
     }
-    $output .= '<br />'.WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
-            .WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
-            .'<input type="file" name="packageFile" size="10" style="font-size: 10px;" />'
-            .WebGUI::Form::submit($session, {value=>$i18n->get("import"), extras=>'style="font-size: 10px;"'})
-            .WebGUI::Form::formFooter($session);
+    $output .= '<br />'
+        . WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
+        . WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
+        . '<div><input type="file" name="packageFile" size="30" style="font-size: 10px;" /></div>'
+        . '<div style="font-size: 10px">'
+        . WebGUI::Form::checkbox($session, { label => $i18n->get('inherit parent permissions'), checked => 1, name => 'inheritPermissions', value => 1 })
+        . ' &nbsp; ' .  WebGUI::Form::submit($session, { value=>$i18n->get("import"), 'extras' => ' ' })
+        . '</div>'
+        . WebGUI::Form::formFooter($session)
+        ;
     $output .= ' </fieldset></div>';
 
     ### Clearing div

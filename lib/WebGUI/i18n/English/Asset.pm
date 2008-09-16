@@ -1115,6 +1115,11 @@ Couldn't open %-s because %-s <br />
         context     => q{Error message in Asset.pm},
     },
 
+    'inherit parent permissions' => {
+        message     => q{Inherit parent's permissions}
+
+    }
+
 };
 
 1;
