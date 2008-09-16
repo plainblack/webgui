@@ -32,6 +32,7 @@ addUrlToAssetHistory ( $session ); ##This sub MUST GO FIRST
 removeDoNothingOnDelete( $session );
 fixIsPublicOnTemplates ( $session );
 addSortOrderToFolder( $session );
+addLoginTimeStats( $session );
 addEMSBadgeTemplate ( $session );
 redirectChoice ($session);
 
@@ -65,6 +66,15 @@ sub addSortOrderToFolder {
     my $session = shift;
     print "\tAdding Sort Order to Folder... " unless $quiet;
     $session->db->write( 'alter table Folder add column sortOrder ENUM("ASC","DESC") DEFAULT "ASC"' );
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addLoginTimeStats {
+    my $session     = shift;
+    print "\tAdding login time statistics... " unless $quiet;
+    $session->db->write( "alter table userLoginLog add column sessionId varchar(22)" );
+    $session->db->write( "alter table userLoginLog add column lastPageViewed int(11)" );
     print "Done.\n" unless $quiet;
 }
 

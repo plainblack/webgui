@@ -55,6 +55,7 @@
  - rfe: After committing a version there is now a back to site link
  - rfe: Added sort order to Folder assets
  - rfe: Added canEdit and canAddFile template vars to Folder assets
+ - rfe: Add logged-in time to Login History
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

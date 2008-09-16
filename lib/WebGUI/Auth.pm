@@ -102,13 +102,18 @@ sub _isValidUsername {
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?)",
-		[ $_[0],
-		$_[1],
-		$self->session->datetime->time(),
-		$self->session->env->getIp,
-		$self->session->env->get("HTTP_USER_AGENT") ]
-		);
+    $self->timeRecordSession;
+	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?,?,?)",
+		[ 
+            $_[0],
+            $_[1],
+            $self->session->datetime->time(),
+            $self->session->env->getIp,
+            $self->session->env->get("HTTP_USER_AGENT"),
+            $self->session->getId,
+            $self->session->datetime->time(),
+        ]
+    );
 }
 
 
@@ -909,6 +914,32 @@ sub showMessageOnLogin {
     $self->session->scratch->delete( 'redirectAfterLogin' );
 
     return $output;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 timeRecordSession 
+
+Record the last page viewed and the time viewed for the user
+
+=cut
+
+sub timeRecordSession {
+    my $self = shift;
+    my ($nonTimeRecordedRows) = $self->session->db->quickArray("select count(*) from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
+    if ($nonTimeRecordedRows eq "1") {
+        # We would normally expect to only find one entry
+        $self->session->db->write("update userLoginLog set lastPageViewed = (select lastPageView from userSession where sessionId = ?) where lastPageViewed = timeStamp and sessionId = ? ",
+            [ $self->session->getId,
+            $self->session->getId]);
+    } elsif ($nonTimeRecordedRows eq "0") {
+        # Do nothing
+    } else {
+        # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
+        # could end up with ridiculously long user recorded times)
+        $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+        $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
+    }
 }
 
 #-------------------------------------------------------------------

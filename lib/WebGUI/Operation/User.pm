@@ -663,33 +663,54 @@ sub www_listUsers {
                 <td class="tableHeader">'.$i18n->get(454).'</td>
                 <td class="tableHeader">'.$i18n->get(429).'</td>
                 <td class="tableHeader">'.$i18n->get(434).'</td>
+                <td class="tableHeader">'.$i18n->get(430).'</td>
+                <td class="tableHeader">'.$i18n->get( "time recorded" ).'</td>
 		</tr>';
 	my $p = doUserSearch($session,"listUsers",1);
 	foreach my $data (@{$p->getPageData}) {
-		$output .= '<tr class="tableData">';
-		$output .= '<td>'.$status{$data->{status}}.'</td>';
-		$output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})
-			.'">'.$data->{username}.'</a></td>';
-		$output .= '<td class="tableData">'.$data->{email}.'</td>';
-		$output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
-		$output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
-		my ($lastLoginStatus, $lastLogin) = $session->db->quickArray("select status,timeStamp from userLoginLog where 
-                        userId=".$session->db->quote($data->{userId})." order by timeStamp DESC");
-                if ($lastLogin) {
-                        $output .= '<td class="tableData">'.$session->datetime->epochToHuman($lastLogin).'</td>';
-                } else {
-                        $output .= '<td class="tableData"> - </td>';
-                }
-                if ($lastLoginStatus) {
-                        $output .= '<td class="tableData">'.$lastLoginStatus.'</td>';
-                } else {
-                        $output .= '<td class="tableData"> - </td>';
-                }
-		$output .= '</tr>';
+        $output .= '<tr class="tableData">';
+        $output .= '<td>'.$status{$data->{status}}.'</td>';
+        $output .= '<td><a href="'.$session->url->page('op=editUser;uid='.$data->{userId})
+           .'">'.$data->{username}.'</a></td>';
+        $output .= '<td class="tableData">'.$data->{email}.'</td>';
+        $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
+        $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
+        # Total Time Recorded is computed from userLoginLog table
+        my ($totalTimeRecorded)= $session->db->quickArray("select sum(lastPageViewed-timeStamp) from userLoginLog where userId = ?", [$data->{userId}]);
+        my ($lastLoginStatus, $lastLogin, $lastPageView) 
+            = $session->db->quickArray(
+                "select ull.status, ull.timeStamp, us.lastPageView 
+                from userLoginLog ull, userSession us 
+                where ull.sessionId = us.sessionId and ull.lastPageViewed != ull.timeStamp and
+                ull.userId=".$session->db->quote($data->{userId})." 
+                order by ull.timeStamp DESC"
+            );
+        if ($lastLogin) {
+            $output .= '<td class="tableData">'.$session->datetime->epochToHuman($lastLogin).'</td>';
+        } 
+        else {
+            $output .= '<td class="tableData"> - </td>';
+        }
+        if ($lastLoginStatus) {
+            $output .= '<td class="tableData">'.$lastLoginStatus.'</td>';
+        } 
+        else {
+            $output .= '<td class="tableData"> - </td>';
+        }
+        if ($lastPageView) {
+            $output .= '<td class="tableData"> '.$session->datetime->epochToHuman($lastPageView).'</td>';
+            my ($interval, $units) = $session->datetime->secondsToInterval($totalTimeRecorded);
+            $output .= "<td class='tableData'>$interval $units</td></tr>";
+        } 
+        else {
+            $output .= "<td class='tableData'> - </td>";
+            $output .= "<td class='tableData'> - </td></tr>";
+        }
+        $output .= '</tr>';
 	}
-        $output .= '</table>';
-        $p->setAlphabeticalKey('username');
-        $output .= $p->getBarTraditional;
+    $output .= '</table>';
+    $p->setAlphabeticalKey('username');
+    $output .= $p->getBarTraditional;
 	my $submenu = _submenu(
                     $session,
                     { workarea => $output, }

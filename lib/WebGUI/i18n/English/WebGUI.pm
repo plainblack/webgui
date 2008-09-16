@@ -4129,6 +4129,18 @@ LongTruncOk=1</p>
         context     => q{Title of the template created by the Site Setup screen},
     },
 
+    'session length' => {
+        message     => q{Session Length},
+        lastUpdated => 0,
+        context     => q{The length the session has been alive},
+    },
+
+    "time recorded" => {
+        message     => q{Time Recorded (excludes active sessions)},
+        lastUpdated => 0,
+        context     => q{Column heading for the total logged in time for the user},
+    },
+
 };
 
 1;
