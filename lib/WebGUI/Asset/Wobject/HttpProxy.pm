@@ -21,6 +21,7 @@ use WebGUI::Storage;
 use WebGUI::Asset::Wobject;
 use WebGUI::Asset::Wobject::HttpProxy::Parse;
 use WebGUI::Cache;
+use WebGUI::Macro;
 use Apache2::Upload;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -238,8 +239,9 @@ sub view {
 	my $redirect 	= 0; 
 	my $response; 
 	my $header; 
-	my $proxiedUrl; 
-	
+	my $proxiedUrl = $self->get("proxiedUrl");
+	WebGUI::Macro::process($self->session,\$proxiedUrl);
+
 	my $i18n = WebGUI::International->new($self->session, 'Asset_HttpProxy');
 	
 	### Set up a cookie jar
@@ -251,9 +253,7 @@ sub view {
 	
 	### Find the URL we're proxying
 	if ($self->session->form->param("func")!~/editSave/i) {	# Ignore ?func=editSave
-		$proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $self->get("proxiedUrl") ;
-	} else {
-		$proxiedUrl = $self->get("proxiedUrl");
+		$proxiedUrl = $self->session->form->process("FormAction") || $self->session->form->process("proxiedUrl") || $proxiedUrl ;
 	}
 	
 	return $self->processTemplate({},$self->get("templateId")) 
@@ -269,7 +269,6 @@ sub view {
 		$var{header} 	= $cacheHeader->get;
 		$var{content} 	= $cacheContent->get;
 	}
-	
 	
 	# Unless we have cached content
 	unless ($var{content}) {
