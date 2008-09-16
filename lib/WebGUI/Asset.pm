@@ -2061,10 +2061,10 @@ Instead of passing in a templateId, you may pass in a template object.
 =cut
 
 sub processTemplate {
-	my $self = shift;
-	my $var = shift;
-	my $templateId = shift;
-	my $template = shift;
+    my $self = shift;
+    my $var = shift;
+    my $templateId = shift;
+    my $template = shift;
 
     # Sanity checks
     if (ref $var ne "HASH") {
@@ -2072,19 +2072,21 @@ sub processTemplate {
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
 
-	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
-	if (defined $template) {
+    $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-		$var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
-                my %vars = (
-			%{$self->{_properties}},
-			%{$var}
-			);
-		return $template->process(\%vars);
-	} else {
-		$self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
-		return "Error: Can't instantiate template ".$templateId;
-	}
+        $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
+        my %vars = (
+            %{$self->{_properties}},
+            %{$var}
+        );
+        return $template->process(\%vars);
+    }
+    else {
+        $self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        my $i18n = WebGUI::International->new($self->session, 'Asset');
+        return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
+    }
 }
 
 #-------------------------------------------------------------------

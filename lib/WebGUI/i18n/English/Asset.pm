@@ -1103,6 +1103,12 @@ Couldn't open %-s because %-s <br />
         context     => q{Label for the menu to show actions to perform on an asset},
     },
 
+    'Error: Cannot instantiate template' => {
+        message     => q{Error: Cannot instantiate template},
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
+    },
+
 };
 
 1;
