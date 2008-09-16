@@ -442,7 +442,7 @@ sub www_commitVersionTagConfirm {
 				.'<ul>
 				<li><a href="'.$default->getUrl.'">'.$i18n->get("back to home").'</a></li>
 				<li><a href="'.$default->getUrl("op=manageVersions").'">'.$i18n->get("manage versions").'</a></li>
-                <li><a href="'.$session->url->page().'">Back to site.</a></li>
+                <li><a href="'.$session->url->page().'">'.$i18n->get("back to site").'</a></li>
 				</ul>'	
 				);
 		}
