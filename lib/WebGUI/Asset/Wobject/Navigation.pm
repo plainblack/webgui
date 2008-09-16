@@ -324,7 +324,7 @@ sub getToolbar {
             . '<div class="bd">'
             . '<ul class="first-of-type">'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=copy") . '">' . $i18n->get("copy") . '</a></li>'
+            . $self->getUrl("func=copy") . '">' . $i18n->get("Copy") . '</a></li>'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
@@ -387,12 +387,11 @@ sub view {
 	
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
-	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
-	foreach my $property (@interestingProperties) {
-		$var->{'currentPage.'.$property} = $current->get($property);
+    while (my ($property, $propertyValue) = each %{ $current->get() }) {
+		$var->{'currentPage.'.$property} = $propertyValue;
 	}
 	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
-	$var->{'currentPage.title'} = $current->getTitle;
+	$var->{'currentPage.title'}     = $current->getTitle;
 	$var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
@@ -428,13 +427,13 @@ sub view {
 			next;
 		}
 		my $pageData = {};
-		foreach my $property (@interestingProperties) {
-			$pageData->{"page.".$property} = $asset->get($property);
+        while (my ($property, $propertyValue) = each %{ $asset->get() }) {
+			$pageData->{"page.".$property} = $propertyValue;
 		}
 		$pageData->{'page.menuTitle'} = $asset->getMenuTitle;
-		$pageData->{'page.title'} = $asset->getTitle;
+		$pageData->{'page.title'}     = $asset->getTitle;
 		# build nav variables
-		$pageData->{"page.rank"} = $asset->getRank;
+		$pageData->{"page.rank"}     = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
 		$pageData->{"page.relDepth"} = $asset->getLineageLength - $start->getLineageLength;
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
@@ -485,14 +484,14 @@ sub view {
 
 		my $parent = $asset->getParent;
 		if (defined $parent) {
-			foreach my $property (@interestingProperties) {
-				$pageData->{"page.parent.".$property} = $parent->get($property);
+            while (my ($property, $propertyValue) = each %{ $parent->get() }) {
+				$pageData->{"page.parent.".$property} = $propertyValue;
 			}
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
-			$pageData->{'page.parent.title'} = $parent->getTitle;
-			$pageData->{"page.parent.url"} = $parent->getUrl;
-			$pageData->{"page.parent.rank"} = $parent->getRank;
-			$pageData->{"page.isRankedFirst"} = 1 unless exists $lastChildren{$parent->getId};
+			$pageData->{'page.parent.title'}     = $parent->getTitle;
+			$pageData->{"page.parent.url"}       = $parent->getUrl;
+			$pageData->{"page.parent.rank"}      = $parent->getRank;
+			$pageData->{"page.isRankedFirst"}    = 1 unless exists $lastChildren{$parent->getId};
 			$lastChildren{$parent->getId} = $asset->getId;			
 		}
 		$previousPageData->{"page.hasViewableChildren"} = ($previousPageData->{"page.assetId"} eq $pageData->{"page.parentId"});
