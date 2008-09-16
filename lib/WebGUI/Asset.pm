@@ -2078,7 +2078,9 @@ sub processTemplate {
         $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
         my %vars = (
             %{$self->{_properties}},
-            %{$var}
+            'title'     => $self->getTitle,
+            'menuTitle' => $self->getMenuTitle,
+            %{$var},
         );
         return $template->process(\%vars);
     }
