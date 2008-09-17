@@ -58,7 +58,7 @@ The settable properties of the workflow instance. See the set() method for detai
 =cut
 
 sub create {
-	my ($class, $session, $properties, $skipRealtime) = @_;
+	my ($class, $session, $properties) = @_;
 
     # do singleton check
     my $placeHolders = [$properties->{workflowId}];
