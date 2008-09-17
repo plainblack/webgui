@@ -18,6 +18,7 @@ package WebGUI::International;
 use strict qw(vars subs);
 use WebGUI::Session;
 use WebGUI::Pluggable;
+use Module::Find qw(findsubmod);
 
 =head1 NAME
 
@@ -185,15 +186,10 @@ Returns a hash reference to the languages installed on this WebGUI system.
 sub getLanguages {
 	my ($self) = @_;
     my $hashRef;
-	my $dir = $self->session->config->getWebguiRoot."/lib/WebGUI/i18n";
-    opendir my $dh, $dir or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
-    while (my $file = readdir($dh)) {
-        next
-            unless $file =~ s/\.pm$//;
-        my $language = $file;
-        $hashRef->{$language} = $self->getLanguage($language, "label");
+    for my $lang ( findsubmod 'WebGUI::i18n' ) {
+        $lang =~ s/^WebGUI::i18n:://;
+        $hashRef->{$lang} = $self->getLanguage($lang, "label");
     }
-    closedir $dh;
     return $hashRef;
 }
 

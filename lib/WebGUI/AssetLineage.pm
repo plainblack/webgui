@@ -564,11 +564,8 @@ sub getLineageSql {
 	my $tables = "asset left join assetData on asset.assetId=assetData.assetId ";
 	if (exists $rules->{joinClass}) {
 		my $className = $rules->{joinClass};
-        my $file = $className;
-        $file =~ s{::}{/}g;
-        $file .= '.pm';
-        if (!exists $INC{ $file }) {  ##Alread loaded?
-            eval{ require $file };
+        (my $module = $className . '.pm') =~ s{::|'}{/}g;
+        if ( ! eval { require $module; 1 }) {
             $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
 		foreach my $definition (@{$className->definition($self->session)}) {

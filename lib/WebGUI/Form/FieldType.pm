@@ -20,6 +20,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use Module::Find qw(findsubmod);
 
 =head1 NAME
 
@@ -112,15 +113,15 @@ sub getTypes {
     my $self = shift;
     my @types = @{$self->get('types')};
     unless (scalar(@types)) {
-        opendir(DIR,$self->session->config->getWebguiRoot."/lib/WebGUI/Form/");
-        foreach my $type (readdir(DIR)) {
-            if ($type =~ s/^(.*)\.pm$/$1/) {
-                if (WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type),'isDynamicCompatible')) {
+        my @classes = findsubmod 'WebGUI::Form';
+        for my $class (@classes) {
+            if ($class =~ /^WebGUI::Form::(.*)/) {
+                my $type = $1;
+                if (WebGUI::Pluggable::instanciate($class, 'isDynamicCompatible')) {
                     push @types, $type;
                 }
             }
         }
-        closedir(DIR);
     }
     my %fields = ();
     foreach my $type (@types) {
