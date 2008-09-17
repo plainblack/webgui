@@ -2,18 +2,18 @@ use strict;
 
 my $webguiRoot = '/data/WebGUI';
 
-my @webguiLibs;
+unshift @INC, $webguiRoot . "/lib";
 
 # add custom lib directories to library search path
-for my $libDir (readLines($webguiRoot."/sbin/preload.custom")) {
-    if (!-d $libDir) {
-        warn "WARNING: Not adding lib directory '$libDir' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
-        next;
+unshift @INC, grep {
+    if (!-d $_) {
+        warn "WARNING: Not adding lib directory '$_' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
+        0;
     }
-    push @webguiLibs, $libDir;
-}
-push @webguiLibs, $webguiRoot . "/lib";
-unshift @INC, @webguiLibs;
+    else {
+        1;
+    }
+} readLines($webguiRoot."/sbin/preload.custom");
 
 #----------------------------------------
 # Logger
@@ -32,44 +32,41 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 # WebGUI modules.
 #----------------------------------------
 require WebGUI;
+require WebGUI::Config;
 
-require File::Find;
+require Module::Find;
 
 # these modules should always be skipped
 my @excludes = qw(WebGUI::i18n::English::Automated_Information WebGUI::PerformanceProfiler);
 push @excludes, readLines($webguiRoot."/sbin/preload.exclude");
 
-foreach my $libDir (@webguiLibs) {
-    File::Find::find({
-        no_chdir => 1,
-        wanted => sub {
-            my $module = $_;
-            return
-                unless $module =~ m/\.pm$/;
-            # clip off library path
-            $module =~ s{^\Q$libDir\E/?}{};
-            my $package = $module;
-            $package =~ s{\.pm$}{};
-            $package =~ s{/}{::}g;
-            if (grep { $package eq $_ } @excludes) {
-                next;
-            }
-            if (!eval { require $module; 1 }) {
-                warn "Error loading $package! - $@";
-            }
-        },
-    }, "$libDir/WebGUI");
+my @webguiLibs = Module::Find::findallmod('WebGUI');
+
+for my $module ( @webguiLibs ) {
+    # filter out excludes
+    next
+        if grep { $_ eq $module } @excludes;
+    # filter any files found starting with a period
+    next
+        if $module =~ /::\./;
+
+    (my $moduleFile = $module . ".pm") =~ s{::|'}{/}g;
+    if (!eval { require $moduleFile; 1 }) {
+        warn "Error loading $module! - $@\n";
+    }
 }
 
 require APR::Request::Apache2;
 require Apache2::Cookie;
 require Apache2::ServerUtil;
 
-# Add WebGUI to Apache version tokens
-my $server = Apache2::ServerUtil->server;
-$server->push_handlers(PerlPostConfigHandler => sub {
-    $server->add_version_component("WebGUI/".$WebGUI::VERSION);
-});
+if ( $ENV{MOD_PERL} ) {
+    # Add WebGUI to Apache version tokens
+    my $server = Apache2::ServerUtil->server;
+    $server->push_handlers(PerlPostConfigHandler => sub {
+        $server->add_version_component("WebGUI/".$WebGUI::VERSION);
+    });
+}
 
 $| = 1;
 
@@ -80,7 +77,8 @@ print "\nStarting WebGUI ".$WebGUI::VERSION."\n";
 #----------------------------------------
 WebGUI::Config->loadAllConfigs($webguiRoot);
 
-# reads lines from into an array, trimming white space and ignoring commented lines
+
+# reads lines from a file into an array, trimming white space and ignoring commented lines
 sub readLines {
     my $file = shift;
     my @lines;

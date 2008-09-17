@@ -1,4 +1,5 @@
 7.6.0
+ - no longer preloads files that start with .
  - rfe: let package import inherit permissions
  - added fieldsets around form controls with multiple elements
  - rfe: Town Hall: Menu title in search results
