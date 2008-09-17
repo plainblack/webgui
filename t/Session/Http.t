@@ -23,7 +23,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 52;
+my $num_tests = 53;
 
 plan tests => $num_tests;
  
@@ -70,10 +70,13 @@ is($http->getStatusDescription, 'packets are great', 'getStatusDescription: retu
 ####################################################
 
 $http->setStatus('200');
-is($http->isRedirect, '', 'isRedirect: is not');
+ok(!$http->isRedirect, 'isRedirect: 200 is not');
+
+$http->setStatus('301');
+ok($http->isRedirect, 'isRedirect: 301 is');
 
 $http->setStatus('302');
-is($http->isRedirect, 1, 'isRedirect: is too');
+ok($http->isRedirect, 'isRedirect: 302 is too');
 $http->setStatus('200');
 
 ####################################################
@@ -216,7 +219,7 @@ $session->{_request} = $request;
 
 $http->setRedirect('/here/there');
 $http->sendHeader;
-is($request->status, 301, 'sendHeader as redirect: status set to 301');
+is($request->status, 302, 'sendHeader as redirect: status set to 301');
 is_deeply($request->headers_out->fetch, {'Location' => '/here/there'}, 'sendHeader as redirect: location set');
 
 ####################################################
