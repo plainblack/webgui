@@ -6,6 +6,7 @@
  - fixed: DataForm doesn't include fields and contents when exporting
  - fixed: Article now only allows 2 files to be uploaded
  - added: After committing a version, there is now a back to site link
+ - fixed: Asset Manager now returns to asset manager screen after done editing asset
 
 7.5.22
  - fixed: Layout templates are now prepared correctly

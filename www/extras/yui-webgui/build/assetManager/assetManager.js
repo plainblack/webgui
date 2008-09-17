@@ -51,7 +51,7 @@ WebGUI.AssetManager.findRow
 WebGUI.AssetManager.formatActions 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML 
-        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit">Edit</a>'
+        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit;proceed=manageAssets">Edit</a>'
         + ' | '
         ;
     var more    = document.createElement( 'a' );
