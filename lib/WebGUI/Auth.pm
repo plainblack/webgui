@@ -187,8 +187,8 @@ sub createAccount {
     my $i18n    = WebGUI::International->new($self->session);
     $vars->{title} = $i18n->get(54);
     
-    $vars->{'create.form.header'} 
-        = WebGUI::Form::formHeader($self->session,{})
+    $vars->{'create.form.header'}
+        = WebGUI::Form::formHeader($self->session)
         . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
         . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
         ;
@@ -197,11 +197,18 @@ sub createAccount {
     my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
     $vars->{'create.form.profile'} = [];
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
-        my $id           = $field->getId;
-        my $label        = $field->getLabel;
+        my $id         = $field->getId;
+        my $label      = $field->getLabel;
+        my $required   = $field->isRequired;
         
-        # Get the default email from the invitation
+        my $properties = {};
+        if ($required) {
+            my $fieldValue = $self->session->form->process($field->getId,$field->get("fieldType"));
+            $properties->{extras} = $self->getExtrasStyle($fieldValue);
+        }
+
         my $formField;
+        # Get the default email from the invitation
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
             my $code = $self->session->form->get('code')
                     || $self->session->form->get('uniqueUserInvitationCode');
@@ -211,12 +218,12 @@ sub createAccount {
                     [$code]
                 );
             $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
-            $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
+            $formField   = $field->formField($properties, undef, undef, undef, $defaultValue);
         }
         else {
-            $formField   = $field->formField();
+            $formField   = $field->formField($properties);
         }
-        my $required    = $field->isRequired;
+       
 
         # Old-style field loop.
         push @{$vars->{'create.form.profile'}}, { 
@@ -615,7 +622,28 @@ sub getCreateAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ( )
+=head2 getExtrasStyle ( )
+
+This method returns the proper field to display for required fields.
+
+=cut
+
+sub getExtrasStyle {
+    my $self  = shift;
+    my $value = shift;
+    
+    my $requiredStyleOff = q{class="authfield_required_off"}; 
+    my $requiredStyle    = q{class="authfield_required"};
+    my $errorStyle       = q{class="authfield_error"};     #Required Field Not Filled In and Error Returend
+
+    return $errorStyle if($self->error && $value eq "");
+    return $requiredStyle unless($value);
+    return $requiredStyleOff;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLoginTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the login screen.
 

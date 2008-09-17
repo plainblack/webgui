@@ -68,6 +68,7 @@
  - rfe: VIM perl mode for skeletons
  - rfe: Add edit button to Manage Revisions page
  - rfe: Protected profile fields don't show delete icon
+ - rfe: Registration form to keep user entries on error - required and errored fields are now highlighted.
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

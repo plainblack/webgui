@@ -131,43 +131,63 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub createAccount {
     my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $session->form;
+    my $setting     = $session->setting;
+
     my $message     = shift;
-    my $confirm     = shift || $self->session->form->process("confirm");
-    my $vars        = shift || {}; 
+    my $confirm     = shift || $form->process("confirm");
+    my $vars        = shift || {};
+    my $i18n        = WebGUI::International->new($session);
     
-    #$self->session->errorHandler->warn('WebGUI::Auth::createAccount called');
     if ($self->session->user->isRegistered) {
         return $self->displayAccount;
     }
-    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
+    elsif (!$setting->get("anonymousRegistration") && !$setting->get('userInvitationsEnabled')) {
         return $self->displayLogin;
     } 
-	my $i18n = WebGUI::International->new($self->session);
+    
     $vars->{'create.message'} = '<ul>'.$message.'</ul>' if ($message);
-	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
+	$vars->{'useCaptcha'    } = $setting->get("webguiUseCaptcha");
+    
 	if ($vars->{useCaptcha}) {
 		use WebGUI::Form::Captcha;
-		my $captcha = WebGUI::Form::Captcha->new($self->session,{"name"=>"authWebGUI.captcha"});
+		my $captcha = WebGUI::Form::Captcha->new($session,{
+            name   => "authWebGUI.captcha",
+            extras => $self->getExtrasStyle
+        });
    		$vars->{'create.form.captcha'} 
             = $captcha->toHtml . '<span class="formSubtext">' . $captcha->get('subtext').'</span>';
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
-    $vars->{'create.form.username'} 
+
+    my $username = $form->process("authWebGUI.username");
+   $vars->{'create.form.username'} 
         = WebGUI::Form::text($self->session, {
-            "name"      => "authWebGUI.username",
-            "value"     => $self->session->form->process("authWebGUI.username"),
+            name   => "authWebGUI.username",
+            value  => $username,
+            extras => $self->getExtrasStyle($username)
         });
     $vars->{'create.form.username.label'} = $i18n->get(50);
-    $vars->{'create.form.password'} 
+    
+    my $password = $form->process("authWebGUI.identifier");
+    $vars->{'create.form.password'}
         = WebGUI::Form::password($self->session, {
-            "name"      => "authWebGUI.identifier"
+            name    => "authWebGUI.identifier",
+            value   => $password,
+            extras  => $self->getExtrasStyle($password)
         });
     $vars->{'create.form.password.label'} = $i18n->get(51);
+
+    my $passwordConfirm = $form->process("authWebGUI.identifierConfirm");
     $vars->{'create.form.passwordConfirm'} 
         = WebGUI::Form::password($self->session, {
-            "name"      => "authWebGUI.identifierConfirm"
+            name   => "authWebGUI.identifierConfirm",
+            value  =>  $passwordConfirm,
+            extras => $self->getExtrasStyle($passwordConfirm)
         });
     $vars->{'create.form.passwordConfirm.label'} = $i18n->get(2,'AuthWebGUI');
+
     $vars->{'create.form.hidden'} 
         = WebGUI::Form::hidden($self->session, {
             "name"      => "confirm",
@@ -211,7 +231,10 @@ sub createAccountSave {
     my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session, {regOnly => 1});
     $error .= $temp;
      
-    return $self->createAccount($error) unless ($error eq "");
+    unless ($error eq "") {
+        $self->error($error);
+        return $self->createAccount($error);
+    }
 
     # If Email address is not unique, a warning is displayed
     if ($warning ne "" && !$self->session->form->process("confirm")) {
