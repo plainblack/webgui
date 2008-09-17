@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: editting DataForm email fields resets their name
  - no longer preloads files that start with .
  - rfe: let package import inherit permissions
  - added fieldsets around form controls with multiple elements

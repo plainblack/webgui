@@ -1095,6 +1095,12 @@ sub www_editFieldSave {
     my $fieldName = $form->process('fieldName');
     my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
     $newName =~ tr{-/}{};
+    if ($fieldName) {
+        my $field = $self->getFieldConfig($fieldName);
+        if ($field->{isMailField}) {
+            $newName = $fieldName;
+        }
+    }
     if (!$fieldName || $fieldName ne $newName) {
         my $i = '';
         while ($self->getFieldConfig($newName . $i)) {
