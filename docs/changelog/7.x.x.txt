@@ -67,7 +67,9 @@
  - rfe: Add template variables for every property of all assets referenced in the Navigation.
  - rfe: VIM perl mode for skeletons
  - rfe: Add edit button to Manage Revisions page
+ - fixed: Asset Edit Form has URL of asset we went to, not asset we're editing
  - rfe: Protected profile fields don't show delete icon
+ - fixed: Asset manager now sets "proceed" so we go back to asset manager after editing an asset
  - rfe: Registration form to keep user entries on error - required and errored fields are now highlighted.
 
 7.5.22
