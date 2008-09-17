@@ -18,6 +18,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Text;
 use WebGUI::Form::File;
+use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 
@@ -2699,6 +2700,8 @@ sequenceNumber');
         my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
 
         my $originalValue = $thingData{"field_".$field{fieldId}};
+        my $dateCreated = $thingData{"dateCreated"};
+        my $lastUpdated = $thingData{"lastUpdated"};
         my $value = $self->getFieldValue($originalValue,\%field);
 
         my $otherThingUrl;
@@ -2717,6 +2720,8 @@ sequenceNumber');
             "label" => $field{label},
             "isHidden" => $hidden,
             "url" => $otherThingUrl,
+            "dateCreated" => WebGUI::DateTime->new($self->session,$dateCreated)->toUserTimeZone(),
+            "lastUpdated" => WebGUI::DateTime->new($self->session,$lastUpdated)->toUserTimeZone(),
         );
         push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });

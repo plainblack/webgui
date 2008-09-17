@@ -222,11 +222,11 @@ sub createAccountSave {
     # Validate input
     my $error;
     $error = $self->error unless($self->validUsername($username));
-        if ($setting->get("webguiUseCaptcha")) {
-            unless ($form->process('authWebGUI.captcha', "Captcha")) {
-                $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
-            }
+    if ($setting->get("webguiUseCaptcha")) {
+        unless ($form->process('authWebGUI.captcha', "Captcha")) {
+            $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
         }
+    }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
     my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session, {regOnly => 1});
     $error .= $temp;
