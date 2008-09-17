@@ -115,6 +115,7 @@ A scalar reference of HTML to be processed.
 sub process {
     my $session = shift;
     my $content = shift;
+    return '' if !defined $content;
     our $macrodepth ||= 0;
     local $macrodepth = $macrodepth + 1;
     ${ $content } =~ s{$macro_re}{
