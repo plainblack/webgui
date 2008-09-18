@@ -48,6 +48,7 @@ our $HELP = {
             { 'name' => 'addvariant_label' },
             {   'name'      => 'variant_loop',
                 'variables' => [
+                    { 'name' => 'variant_id' },
                     { 'name' => 'variant_controls' },
                     { 'name' => 'variant_sku' },
                     { 'name' => 'variant_title' },
