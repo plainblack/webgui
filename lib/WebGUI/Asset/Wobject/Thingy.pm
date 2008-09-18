@@ -1855,7 +1855,7 @@ sub editThingData {
         $field{value} = $fieldValue || $field{defaultValue};     
         my $formElement .= $self->getFormElement(\%field);
         
-        my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
+        my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
         my $value = $field{value};
         $value = $self->getFieldValue($value,\%field);
 
@@ -2697,7 +2697,7 @@ sub www_viewThingData {
 sequenceNumber');
     while (my %field = $fields->hash) {
         next unless ($field{display} eq '1');
-        my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
+        my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
 
         my $originalValue = $thingData{"field_".$field{fieldId}};
         my $dateCreated = $thingData{"dateCreated"};

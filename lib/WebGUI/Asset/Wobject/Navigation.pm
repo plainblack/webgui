@@ -515,50 +515,6 @@ sub www_goBackToPage {
 	return undef;
 }
 
-
-#-------------------------------------------------------------------
-# we eventually should reaadd this
-sub www_preview {
-	my $self = shift;
-	$self->session->var->get("adminOn") = 0;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isAdmin);
-	my $nav = WebGUI::Navigation->new(	depth=>$self->session->form->process("depth"),
-						method=>$self->session->form->process("method"),
-						startAt=>$self->session->form->process("startAt"),
-						stopAtLevel=>$self->session->form->process("stopAtLevel"),
-						templateId=>$self->session->form->process("templateId"),
-						showSystemPages=>$self->session->form->process("showSystemPages"),
-						showHiddenPages=>$self->session->form->process("showHiddenPages"),
-						showUnprivilegedPages=>$self->session->form->process("showUnprivilegedPages"),
-	                       			'reverse'=>$self->session->form->process("'reverse'"),
-                                );
-	my $output = qq(
-		<table width="100%" border="0" cellpadding="5" cellspacing="0">
-		<tr><td class="tableHeader" valign="top">
-		Configuration
-		</td><td class="tableHeader" valign="top">Output</td></tr>
-		<tr><td class="tableHeader" valign="top">
-		<font size=1>
-			Identifier: $self->session->form->process("identifier")<br />
-			startAt: $self->session->form->process("startAt")<br />
-			method: $self->session->form->process("method")<br />
-			stopAtLevel: $self->session->form->process("stopAtLevel")<br />
-			depth: $self->session->form->process("depth")<br />
-			templateId: $self->session->form->process("templateId")<br />
-			reverse: $self->session->form->process("'reverse'")<br />
-			showSystemPages: $self->session->form->process("showSystemPages")<br />
-			showHiddenPages: $self->session->form->process("showHiddenPages")<br />
-			showUnprivilegedPages: $self->session->form->process("showUnprivilegedPages")<br />
-		</font>
-		</td><td class="tableData" valign="top">
-		) . $nav->build . qq(</td></tr></table>);
-	
-	# Because of the way the system is set up, the preview is cached. So let's remove it again...
-	WebGUI::Cache->new($self->session,$nav->{_identifier}.$self->session->asset->getId, "Navigation-".$self->session->config->getFilename)->delete;
-	
-	return _submenu($output,"preview"); 
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_view
@@ -579,4 +535,7 @@ sub www_view {
 		$self->session->http->setMimeType($mimeType || 'text/html');
 		return $self->view();
 	}
-}1;
+}
+
+1;
+

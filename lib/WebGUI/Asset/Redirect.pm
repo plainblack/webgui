@@ -118,7 +118,7 @@ Display the redirect url when in admin mode.
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->get("adminOn")) {
+	if ($self->session->var->isAdminOn) {
 		return $self->getToolbar.' '.$self->getTitle.' '.$self->get('redirectUrl');
 	}
     else {

@@ -38,7 +38,7 @@ TODO: DOCUMENT ME
 	
 	if ($session->user->isInGroup(12)) {
 		my %hash;
-		if ($session->var->get("adminOn")) {
+		if ($session->var->isAdminOn) {
 			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.$i18n->get(12).'</a>';
 		} else {
 			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.$i18n->get(63).'</a>';

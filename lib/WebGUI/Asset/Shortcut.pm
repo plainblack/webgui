@@ -393,7 +393,7 @@ sub getOverridesList {
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->get("adminOn")];
+	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->isAdminOn];
 }
 
 #-------------------------------------------------------------------
@@ -492,7 +492,7 @@ sub getShortcutByCriteria {
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
 		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
-			unless ($self->session->var->get("adminOn")) {
+			unless ($self->session->var->isAdminOn) {
 				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
 			}
 		}

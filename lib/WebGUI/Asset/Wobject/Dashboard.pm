@@ -315,7 +315,7 @@ sub view {
 			}
 		}
 	}
-	$vars{showAdmin} = ($self->session->var->get("adminOn") && $self->canEdit);
+	$vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
 			dragable_init("'.$self->getUrl.'");
@@ -352,10 +352,10 @@ sub www_view {
         unless ($self->canView) {
                 if ($self->get("state") eq "published") { # no privileges, make em log in
                         return $self->session->privilege->noAccess();
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+                } elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
                         $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
                         return undef;
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+                } elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
                         $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
                         return undef;
                 } else { # tell em it doesn't exist anymore
