@@ -286,7 +286,7 @@ sub create {
 			}	
 		}
 	}
-    my $from    = $headers->{from} || $session->user->username." <".$session->setting->get("companyEmail").">";
+    my $from    = $headers->{from} || $session->setting->get('comanyName') . " <".$session->setting->get("companyEmail").">";
 	my $type    = $headers->{contentType} || "multipart/mixed";
     my $replyTo = $headers->{replyTo} ||  $session->setting->get("mailReturnPath");
 
