@@ -7,6 +7,7 @@
  - fixed: Article now only allows 2 files to be uploaded
  - added: After committing a version, there is now a back to site link
  - fixed: Asset Manager now returns to asset manager screen after done editing asset
+ - fixed: Folders are cached by the client too long for visitors
  - added variant id template variable to product variant loop
  - fixed: editting DataForm email fields resets their name
  - fixed: Mailed inbox messages don't indicate who sent the message
