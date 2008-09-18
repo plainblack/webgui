@@ -55,16 +55,16 @@ our $HELP = {
                         ],
                     },
                 ],
-                {   'name'      => 'question_loop',
-                    'variables' => [
-                        { 'name' => 'question.question' },
-                        { 'name' => 'question.allowComment' },
-                        { 'name' => 'question.id' },
-                        { 'name' => 'question.comment.field' },
-                        { 'name' => 'question.comment.label' },
-                        { 'name' => 'question.answer.field' }
-                    ]
-                },
+            },
+            {   'name'      => 'question_loop',
+                'variables' => [
+                    { 'name' => 'question.question' },
+                    { 'name' => 'question.allowComment' },
+                    { 'name' => 'question.id' },
+                    { 'name' => 'question.comment.field' },
+                    { 'name' => 'question.comment.label' },
+                    { 'name' => 'question.answer.field' }
+                ]
             },
         ],
         related => []
