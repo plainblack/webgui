@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: Folders are cached by the client too long for visitors
  - added variant id template variable to product variant loop
  - fixed: editting DataForm email fields resets their name
  - no longer preloads files that start with .

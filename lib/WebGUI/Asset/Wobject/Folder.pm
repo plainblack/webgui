@@ -111,7 +111,23 @@ sub definition {
     return $class->SUPER::definition($session, $definition);
 }
 
+#-------------------------------------------------------------------
 
+=head2 getContentLastModified
+
+Overridden to check the revision dates of children as well
+
+=cut
+
+sub getContentLastModified {
+    my $self = shift;
+    my $mtime = $self->get("revisionDate");
+    foreach my $child (@{ $self->getLineage(["children"],{returnObjects=>1}) }) {
+        my $child_mtime = $child->getContentLastModified;
+        $mtime = $child_mtime if ($child_mtime > $mtime);
+    }
+    return $mtime;
+}
 
 #-------------------------------------------------------------------
 
