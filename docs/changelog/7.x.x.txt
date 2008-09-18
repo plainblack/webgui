@@ -9,6 +9,7 @@
  - fixed: Asset Manager now returns to asset manager screen after done editing asset
  - added variant id template variable to product variant loop
  - fixed: editting DataForm email fields resets their name
+ - fixed: Mailed inbox messages don't indicate who sent the message
 
 7.5.22
  - fixed: Layout templates are now prepared correctly

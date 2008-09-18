@@ -16,7 +16,7 @@ package WebGUI::Inbox::Message;
 
 use strict;
 use WebGUI::Mail::Send;
-
+use WebGUI::International;
 =head1 NAME
 
 Package WebGUI::Inbox::Message;
@@ -102,11 +102,18 @@ sub create {
 		subject=>$self->{_properties}{subject}
 		});
 	if (defined $mail) {
-		if ($self->{_properties}{message} =~ m/\<.*\>/) {
-			$mail->addHtml($self->{_properties}{message});
-		} else {
-			$mail->addText($self->{_properties}{message});
-		}
+        my $preface = "";
+        my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
+        if ($fromUser) {
+            my $i18n = WebGUI::International->new($session, 'Inbox_Message');
+            $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
+        }
+        if ($self->{_properties}{message} =~ m/\<.*\>/) {
+            $mail->addHtml('<p>' . $preface . '</p><br />' . $self->{_properties}{message});
+        }
+        else {
+            $mail->addText($preface . "\n\n" . $self->{_properties}{message});
+        }
 		$mail->addFooter;
 		$mail->queue;
 	}
