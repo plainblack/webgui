@@ -1566,6 +1566,7 @@ sub view {
         my $price = sprintf('%.2f', $collateral->{price});
         my $desc  = $collateral->{shortdesc};
         push(@variantLoop,{
+                                   'variant_id'       => $id,
                                    'variant_controls' => $segment,
                                    'variant_sku'      => $collateral->{varSku},
                                    'variant_title'    => $desc,
