@@ -46,7 +46,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 26;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -119,6 +119,36 @@ is($otherInstance->getId, $instance->getId, 'new returned the correct instance')
 is($otherInstance->{_started}, 1, 'By default, _started = 0');
 $otherInstance = WebGUI::Workflow::Instance->new($session, $instance->getId, 1);
 is($otherInstance->{_started}, 0, 'By default, _started = 1');
+
+###############################################################################
+#
+#  set
+#
+###############################################################################
+
+$instance->set({
+    priority          => 3,
+    lastStatus        => 'undefined',
+    workflowId        => 'notAWorkflowId',
+    className         => 'WebGUI::Session',
+    methodName        => 'open',
+    currentActivityId => 'notAnActivityId',
+} , 1);
+is($instance->get('priority'),           3,                 'set priority');
+is($instance->get('lastStatus'),         'undefined',       'set lastStatus');
+is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId');
+is($instance->get('className'),          'WebGUI::Session', 'set workflowId');
+is($instance->get('methodName'),         'open',            'set workflowId');
+is($instance->get('currentActivityId'),  'notAnActivityId', 'set workflowId');
+
+$instance->set({
+    priority          => 0,
+    lastStatus        => '',
+    workflowId        => '',
+} , 1);
+is($instance->get('priority'),           3,                 'set priority, is sticky');
+is($instance->get('lastStatus'),         'undefined',       'set lastStatus is sticky');
+is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId is sticky');
 
 #----------------------------------------------------------------------------
 # Cleanup
