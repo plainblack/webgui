@@ -1,6 +1,6 @@
 7.5.24
  - fixed: Spelling mistake on site starter
-
+ - fixed: DatePicker.js can now use different first days of the week.
 7.5.23
  - fixed: Change <spam> tag to <span> tag in default product template
  - It was possible to run multiple singleton workflows at the same time.
