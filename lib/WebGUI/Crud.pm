@@ -188,6 +188,22 @@ sub get {
 }
 
 #-------------------------------------------------------------------
+sub getAll {
+	my ($class, $session, $options) = @_;
+	my @objects;
+	my $ids = $session->db->read("select `".$class->crud_getTableKey."` from `".$class->crud_getTableName."`");
+	while (my ($id) = $ids->array) {
+		if ($options->{return} eq "ids") {
+			push @objects, $id;
+		}
+		else {
+			push @objects, $class->new($session, $id);
+		}
+	}
+	return \@objects;
+}
+
+#-------------------------------------------------------------------
 sub getId {
 	my $self = shift;
 	return $self->objectData->{$self->crud_getTableKey};
