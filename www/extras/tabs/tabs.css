@@ -35,6 +35,7 @@ div.tabs {
          z-index: 10000;
          background: white;
          top: -2px;
+         position: relative;
 }
 
 
