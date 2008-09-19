@@ -31,8 +31,13 @@ sub create {
 
 	# determine sequence
 	my $sequenceKey = $class->crud_getSequenceKey;
-	my $clause = "where `".$sequenceKey."`" if ($sequenceKey);
-	my $sequenceNumber = $db->getScalar("select max(sequenceNumber) from `".$tableName."` $clause");
+	my $clause;
+	my @params;
+	if ($sequenceKey) {
+		$clause = "where `".$sequenceKey."`=?";
+		push @params, $properties->{$sequenceKey};
+	}
+	my $sequenceNumber = $db->getScalar("select max(sequenceNumber) from `".$tableName."` $clause", \@params);
 	$sequenceNumber++;
 	
 	# create object
