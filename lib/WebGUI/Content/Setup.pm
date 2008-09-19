@@ -479,7 +479,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 		return undef;
 	} 
     else {
-        $legend = "Admin Acccount";
+        $legend = "Admin Account";
 		my $u = WebGUI::User->new($session,'3');
 		my $f = WebGUI::HTMLForm->new($session,action=>$session->url->gateway());
 		$f->hidden( -name=>"step", -value=>"2");
