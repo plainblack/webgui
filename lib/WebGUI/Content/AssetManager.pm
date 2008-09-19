@@ -308,6 +308,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
     $session->http->setMimeType( 'application/json' );
+
     return encode_json( $assetInfo );
 }
 
@@ -544,7 +545,7 @@ ENDHTML
     $output         .= <<"ENDJS";
     // Start the data source
     WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage',{connTimeout:30000} );
     WebGUI.AssetManager.DataSource.responseType
         = YAHOO.util.DataSource.TYPE_JSON;
     WebGUI.AssetManager.DataSource.responseSchema

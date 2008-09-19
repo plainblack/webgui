@@ -76,6 +76,7 @@
  - fixed: Asset manager now sets "proceed" so we go back to asset manager after editing an asset
  - rfe: Registration form to keep user entries on error - required and errored fields are now highlighted.
  - added: Thingy view template now has access to field_dateCreated and field_lastUpdated for Things.
+ - added: AssetManager now times out after 30 seconds on the AJAX call to load assets. This will help people realize they are having network issues. 
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
