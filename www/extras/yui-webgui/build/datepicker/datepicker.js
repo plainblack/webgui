@@ -22,7 +22,7 @@ YAHOO.WebGUI.Form.DatePicker = {
             MDY_DAY_POSITION: 3
         };
         if (window.webguiFirstDayOfWeek) {
-            config.START_WEEKDAY = webguiFirstDayofWeek;
+            config.START_WEEKDAY = window.webguiFirstDayOfWeek;
         }
         this.calendar = new YAHOO.widget.Calendar(null, cal, config);
         this.calendar.selectEvent.subscribe(this.handleSelect, this, true);
