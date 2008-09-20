@@ -362,15 +362,18 @@ sub get {
 
 =head2 getAllIds ( )
 
-Returns a list of all the ids in this object type. Has the same signature of getAllSql().
+A class method that returns a list of all the ids in this object type. Has the same signature of getAllSql().
 
 =cut
 
 sub getAllIds {
-	my $class = shift;
-	my $session = shift;
+	my ($class, $session, $options) = @_;
 	my @objects;
-	my $ids = $session->db->read($class->getAllSql($session, @_));
+	my @params;
+	if ($options->{sequenceKeyValue}) {
+		push @params, $options->{sequenceKeyValue};
+	}
+	my $ids = $session->db->read($class->getAllSql($session, $options, @_), \@params);
 	while (my ($id) = $ids->array) {
 		push @objects, $id;
 	}
@@ -381,15 +384,14 @@ sub getAllIds {
 
 =head2 getAllIterator ( )
 
-Returns an iterator of all the instanciated objects in this object type. Has the same signature of getAllSql().
+A class method that returns an iterator of all the instanciated objects in this object type. Has the same signature of getAllSql().
 
 =cut
 
 sub getAllIterator {
-	my $class = shift;
-	my $session = shift;
+	my ($class, $session, $options) = @_;
 	my @objects;
-	my $ids = $class->getAllIds($session, @_);
+	my $ids = $class->getAllIds($session, $options, @_);
     my $sub = sub {
         my ($id) = $ids->array;
         return if !$id;
@@ -404,20 +406,69 @@ sub getAllIterator {
 
 #-------------------------------------------------------------------
 
-=head2 getAllSql ( session )
+=head2 getAllSql ( session, [ options ] )
 
-Returns the SQL 
+A class method that returns the SQL necessary to retrieve all of the records for this object.
 
 =head3 session
 
 A reference to a WebGUI::Session.
 
+=head3 options
+
+A hash reference of optional rules to modify the returned results.
+
+=head4 limit
+
+Either an integer representing the number of records to return, or an array reference of an integer of the starting record position and another integer representing the number of records to return.
+
+=head4 orderBy
+
+A field name to order the results by. Defaults to sequenceNumber.
+
+=head4 sequenceKeyValue
+
+If specified will limit the query to a specific sequence identified by this sequence key value. Note the object must have a sequenceKey specified in the crud_definition for this to work.
+
 =cut
 
 sub getAllSql {
-	my ($class, $session) = @_;
+	my ($class, $session, $options) = @_;
 	my $dbh = $session->db->dbh;
-	return "select ".$dbh->quote_identifier($class->crud_getTableKey)." from ".$dbh->quote_identifier($class->crud_getTableName);
+	my @where;
+	my $limit;
+	my $order = " order by sequenceNumber";
+	
+	# the base query
+	my $sql = "select ".$dbh->quote_identifier($class->crud_getTableKey)." from ".$dbh->quote_identifier($class->crud_getTableName);
+
+	# limit to our sequence
+	my $sequenceKey = $class->crud_getSequenceKey;
+	unless ($options->{sequenceKeyValue} && $sequenceKey) {
+		$sql .= $dbh->quote_identifier($sequenceKey)."=?";
+	}
+
+	# merge all clauses with the main query
+	if (scalar(@where)) {
+		$sql .= join(" AND ", @where);
+	}
+	
+	# construct a record limit
+	if ( exists $options->{limit}) {
+		if (ref $options->{limit} eq "ARRAY") {
+			$limit = " limit ".$options->{limit}[0].",".$options->{limit}[1];
+		}
+		else {
+			$limit = " limit ".$options->{limit};
+		}
+	}
+	
+	# custom order by field
+	if (exists $options->{orderBy}) {
+		$order = " order by ".$dbh->quote_identifier($options->{orderBy});
+	}
+	
+	return $sql . $order . $limit;
 }
 
 #-------------------------------------------------------------------
