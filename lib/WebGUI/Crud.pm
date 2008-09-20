@@ -61,7 +61,7 @@ sub create {
 		$clause = "where ".$dbh->quote_identifier($sequenceKey)."=?";
 		push @params, $data->{$sequenceKey};
 	}
-	my $sequenceNumber = $db->getScalar("select max(sequenceNumber) from ".$dbh->quote_identifier($tableName)." $clause", \@params);
+	my $sequenceNumber = $db->quickScalar("select max(sequenceNumber) from ".$dbh->quote_identifier($tableName)." $clause", \@params);
 	$sequenceNumber++;
 
 	# create object
@@ -87,15 +87,19 @@ sub crud_createTable {
 	my ($class, $session) = @_;
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write('create table '.$dbh->quote_identifier($class->crud_getTableName).' (
+	my $tableName = $class->crud_getTableName;
+	$db->write('create table '.$dbh->quote_identifier($tableName).' (
 		'.$dbh->quote_identifier($class->crud_getTableKey).' varchar(22) binary not null primary key,
 		sequenceNumber int not null default 1,
 		dateCreated datetime,
 		lastUpdated datetime
 		)');
 	$class->crud_updateTable($session);
-	$db->write('alter table '.dbh->quote_identifier($class->crud_getTableName).'
-		add index '.$dbh->quote_identifier($class->crud_getTableKey).' ('.$dbh->quote_identifier($class->crud_getTableKey).')');
+	my $sequenceKey = $class->crud_getSequenceKey;
+	if ($sequenceKey) {
+		$db->write('alter table '.dbh->quote_identifier($tableName).'
+			add index '.$dbh->quote_identifier($sequenceKey).' ('.$dbh->quote_identifier($sequenceKey).')');
+	}
 	return 1;
 }
 
@@ -110,7 +114,7 @@ B<NOTE:> When you subclass WebGUI::Crud, note the properties you're defining in 
 Returns a hash reference that looks like this:
 
  {
-	tableName	=> 'unamed_crud_table',
+	tableName	=> 'unnamed_crud_table',
 	tableKey	=> 'id',
 	sequenceKey => '',
 	properties  => {},
@@ -150,7 +154,7 @@ sub crud_definition {
 	my $class = shift;
 	tie my %properties, 'Tie::IxHash';
 	my %definition = (
-		tableName 	=> 'unamed_crud_table',
+		tableName 	=> 'unnamed_crud_table',
 		tableKey	=> 'id',
 		sequenceKey => '',
 		properties	=> \%properties,
@@ -174,7 +178,7 @@ sub crud_dropTable {
 	my ($class, $session) = @_;
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write("drop table ".$dbh->quote_identifier($class->crud_getTableName)."");
+	$db->write("drop table ".$dbh->quote_identifier($class->crud_getTableName));
 	return 1;
 }
 
@@ -255,6 +259,10 @@ sub crud_updateTable {
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
 	while (my ($col, $type) = $sth->array) {
+		next if ($col eq $class->crud_getTableKey);
+		next if ($col eq 'lastUpdated');
+		next if ($col eq 'dateCreated');
+		next if ($col eq 'sequenceNumber');
 		$tableFields{$col} = $type;
 	}
 	
@@ -350,11 +358,11 @@ sub get {
 	
 	# return a specific property
 	if (defined $name) {
-		return $self->objectData->{$name};
+		return $objectData{id $self}{$name};
 	}
 	
 	# return a copy of all properties
-	my %copy = %{$self->objectData};	
+	my %copy = %{$objectData{id $self}};	
 	return \%copy;
 }
 
@@ -481,7 +489,7 @@ Returns a guid, this object's unique identifier.
 
 sub getId {
 	my $self = shift;
-	return $self->objectData->{$self->crud_getTableKey};
+	return $objectData{id $self}{$self->crud_getTableKey};
 }
 
 #-------------------------------------------------------------------
