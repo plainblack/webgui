@@ -1109,6 +1109,12 @@ Couldn't open %-s because %-s <br />
         context     => q{Label for the menu to show actions to perform on an asset},
     },
 
+    'Export site root URL' => {
+        message     => q{Export site root URL},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
     'Error: Cannot instantiate template' => {
         message     => q{Error: Cannot instantiate template},
         lastUpdated => 1221593874,
@@ -1117,7 +1123,8 @@ Couldn't open %-s because %-s <br />
 
     'inherit parent permissions' => {
         message     => q{Inherit parent's permissions}
-
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
     }
 
 };
