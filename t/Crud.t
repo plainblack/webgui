@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 43;        # Increment this number for each test you create
+plan tests => 47;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -108,8 +108,14 @@ is(WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'}), "select `id` from
 is(scalar(@{WebGUI::Crud->getAllIds($session)}), 3, "getAllIds()");
 my $iterator = WebGUI::Crud->getAllIterator($session);
 while (my $object = $iterator->()) {
-	isa_ok($object, 'WebGUI::Crud');
+	isa_ok($object, 'WebGUI::Crud', 'Put your trust in the Lord. Your ass belongs to me.');
 }
+
+#crud management stuff
+is(ref WebGUI::Crud->crud_getProperties, 'HASH', 'properties work');
+is(WebGUI::Crud->crud_getTableKey, 'id', 'default key is id');
+is(WebGUI::Crud->crud_getTableName, 'unnamed_crud_table', 'default table is unnamed_crud_table');
+is(WebGUI::Crud->crud_getSequenceKey, '', 'default sequence key is blank');
 
 #----------------------------------------------------------------------------
 # Cleanup
