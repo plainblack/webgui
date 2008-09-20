@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 29;        # Increment this number for each test you create
+plan tests => 43;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -87,6 +87,29 @@ is($record2->get('sequenceNumber'), 3, "demotion from middle works");
 $record2->promote;
 is($record2->get('sequenceNumber'), 2, "promotion from middle works");
 
+# deleting
+ok($record2->delete, "deletion reports success");
+my $copyOfRecord3 = WebGUI::Crud->new($session, $record3->getId);
+my $copyOfRecord4 = WebGUI::Crud->new($session, $record4->getId);
+is($copyOfRecord3->get('sequenceNumber'), '2', "deletion of record 2 moved record 3 to sequence 2");
+is($copyOfRecord4->get('sequenceNumber'), '3', "deletion of record 2 moved record 4 to sequence 3");
+
+# updating
+sleep 1;
+ok($copyOfRecord4->update, "update returns success");
+isnt($copyOfRecord4->get('lastUpdated'), $copyOfRecord4->get('dateCreated'), "updates work");
+
+# retrieve data
+is(WebGUI::Crud->getAllSql($session), "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() no options");
+is(WebGUI::Crud->getAllSql($session,{sequenceKeyValue=>1}), "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() sequence key value with no key specified");
+is(WebGUI::Crud->getAllSql($session,{limit=>5}), "select `id` from `unnamed_crud_table` order by sequenceNumber limit 5", "getAllSql() with a row limit");
+is(WebGUI::Crud->getAllSql($session,{limit=>[10,20]}), "select `id` from `unnamed_crud_table` order by sequenceNumber limit 10,20", "getAllSql() with a start and row limit");
+is(WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'}), "select `id` from `unnamed_crud_table` order by `lastUpdated`", "getAllSql() with a custom order by clause");
+is(scalar(@{WebGUI::Crud->getAllIds($session)}), 3, "getAllIds()");
+my $iterator = WebGUI::Crud->getAllIterator($session);
+while (my $object = $iterator->()) {
+	isa_ok($object, 'WebGUI::Crud');
+}
 
 #----------------------------------------------------------------------------
 # Cleanup

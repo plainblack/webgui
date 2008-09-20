@@ -402,7 +402,7 @@ sub getAllIterator {
 	my @objects;
 	my $ids = $class->getAllIds($session, $options, @_);
     my $sub = sub {
-        my ($id) = $ids->array;
+        my ($id) = shift @{$ids};
         return if !$id;
         my $object = $class->new($session, $id);
         if (!$object) {
@@ -453,8 +453,8 @@ sub getAllSql {
 
 	# limit to our sequence
 	my $sequenceKey = $class->crud_getSequenceKey;
-	unless ($options->{sequenceKeyValue} && $sequenceKey) {
-		$sql .= $dbh->quote_identifier($sequenceKey)."=?";
+	if ($options->{sequenceKeyValue} && $sequenceKey) {
+		push @where, $dbh->quote_identifier($sequenceKey)."=?";
 	}
 
 	# merge all clauses with the main query
@@ -599,9 +599,13 @@ sub reorder {
 	my $dbh = $db->dbh;
 	
 	# find all the items in this sequence
+	my @params = ();
+	if ($sequenceKey) {
+		push @params, $sequenceKeyValue;
+	}
 	my $clause = ($sequenceKey) ? "where ".$dbh->quote_identifier($sequenceKey)."=?" : '';
 	my $current = $db->read("select ".$dbh->quote_identifier($tableKey)." from ".$dbh->quote_identifier($tableName)."
-			$clause order by sequenceNumber", [$sequenceKeyValue]);
+			$clause order by sequenceNumber", \@params);
 	
 	# query to update items in the sequence
 	$clause = ($sequenceKey) ? "and ".$dbh->quote_identifier($sequenceKey)."=?" : '';
@@ -614,7 +618,11 @@ sub reorder {
 		if ($id eq $self->getId) {
 			$objectData{id $self} = $i;
 		}
-		$change->execute([$i, $id, $sequenceKeyValue]);
+		my @params = ($i, $id);
+		if ($sequenceKey) {
+			push @params, $sequenceKeyValue;
+		}
+		$change->execute(\@params);
         $i++;
     }
 	$db->commit;
