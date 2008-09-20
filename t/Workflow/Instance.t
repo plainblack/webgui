@@ -89,7 +89,8 @@ WebGUI::Test->interceptLogging;
 $instance->set({ 'parameters' => {session => 1}, });
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
 is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
-like($WebGUI::Test::logger_info, qr/An instance of singleton workflow \w{22} already exists/, 'create: Warning logged for trying to make another singleton');
+my $expectedId = $wf->getId;
+like($WebGUI::Test::logger_info, qr/workflow $expectedId already running/, 'create: Warning logged for trying to make another singleton');
 
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 2,}});
 isnt ($otherInstance, undef, 'create: another singleton instance can be created if it has different parameters');
