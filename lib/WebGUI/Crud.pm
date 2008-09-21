@@ -1,5 +1,21 @@
 package WebGUI::Crud;
 
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+
 use strict;
 use Class::InsideOut qw(readonly private id register);
 use JSON;
@@ -11,6 +27,92 @@ use WebGUI::Exception;
 private objectData => my %objectData;
 readonly session => my %session;
 
+=head1 NAME
+
+Package WebGUI::Crud
+
+=head1 DESCRIPTION
+
+CRUD = Create, Read, Update, and Delete. This package should be the base class for almost all database backed objects. It provides all the basics you will need when creating such objects, and creates a nice uniform class signature to boot. 
+
+=head1 SYNOPSIS
+
+WebGUI::Crud can be used in one of two ways. You can create a subclass with a defined definition. Or you can create a subclass that dynamically generates it's definition.
+
+=head2 Static Subclass
+
+The normal way to use WebGUI::Crud is to create a subclass that defines a specific definition. In your subclass you'd override the crud_definition() method with your own like this:
+
+ sub crud_definition {
+	my ($class, $session) = @_;
+	my $definition = $class->SUPER::crud_definition($session);
+	$definition->{tableName} = 'ambassador';
+	$definition->{tableKey} = 'ambassadorId';
+	$definition->{properties}{name} = {
+			fieldType		=> 'text',
+			defaultValue	=> undef,
+		};
+	$definition->{properties}{emailAddress} = {
+			fieldType		=> 'email',
+			defaultValue	=> undef,
+		};
+	return $definition;
+ }
+ 
+=head2 Dynamic Subclass
+
+A more advanced approach is to create a subclass that dynamically generates a definition from a database table or a config file.
+
+ sub crud_definition {
+	my ($class, $session) = @_;
+	my $definition = $class->SUPER::crud_definition($session);
+	my $config = Config::JSON->new('/path/to/file.cfg');
+	$definition->{tableName} = $config->get('tableName');
+	$definition->{tableKey} = $config->get('tableKey');
+	my $fields = $config->get('fields');
+	foreach my $fieldName (keys %{$fields}) {
+		$definition->{properties}{$fieldName} = $fields->{$fieldName};
+	}
+	return $definition;
+ }
+
+=head2 Usage
+
+Once you have a crud class, you can use it's methods like this:
+
+ use WebGUI::Crud::Subclass;
+
+ $sequenceKey = WebGUI::Crud::Subclass->crud_getSequenceKey($session);
+ $tableKey = WebGUI::Crud::Subclass->crud_getTableKey($session);
+ $tableName = WebGUI::Crud::Subclass->crud_getTableName($session);
+ $propertiesHashRef = WebGUI::Crud::Subclass->crud_getProperties($session);
+ $definitionHashRef = WebGUI::Crud::Subclass->crud_definition($session);
+
+ $crud = WebGUI::Crud::Subclass->create($session, $properties);
+ $crud = WebGUI::Crud::Subclass->new($session, $id);
+
+ $sql = WebGUI::Crud::Subclass->getAllSql($session, $options);
+ $arrayRef = WebGUI::Crud::Subclass->getAllIds($session, $options);
+ $iterator = WebGUI::Crud::Subclass->getAllIterator($session, $options);
+ while (my $object = $iterator->()) {
+	...
+ }
+ 
+ $id = $crud->getId;
+ $hashRef = $crud->get;
+ $value = $crud->get($propertyName);
+ 
+ $success = $crud->promote;
+ $success = $crud->demote;
+ $success = $crud->delete;
+ $success = $crud->update($properties);
+ $success = $crud->reorder;
+ 
+=head1 METHODS
+
+These methods are available from this package:
+
+=cut
 
 #-------------------------------------------------------------------
 
@@ -37,9 +139,9 @@ sub create {
     }
 	
 	# initialize
-	my $definition = $class->crud_definition;
-	my $tableKey = $class->crud_getTableKey;
-	my $tableName = $class->crud_getTableName;
+	my $definition = $class->crud_definition($session);
+	my $tableKey = $class->crud_getTableKey($session);
+	my $tableName = $class->crud_getTableName($session);
 	my $db = $session->db;
 	my $dbh = $db->dbh;
 
@@ -48,13 +150,13 @@ sub create {
 	$data->{lastUpdated} = $now;
 
 	# add defaults
-	my $properties = $class->crud_getProperties;
+	my $properties = $class->crud_getProperties($session);
 	foreach my $property (keys %{$properties}) {
 		$data->{$property} ||= $properties->{$property}{defaultValue};
 	}
 	
 	# determine sequence
-	my $sequenceKey = $class->crud_getSequenceKey;
+	my $sequenceKey = $class->crud_getSequenceKey($session);
 	my $clause;
 	my @params;
 	if ($sequenceKey) {
@@ -87,15 +189,15 @@ sub crud_createTable {
 	my ($class, $session) = @_;
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $class->crud_getTableName;
+	my $tableName = $class->crud_getTableName($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
-		'.$dbh->quote_identifier($class->crud_getTableKey).' varchar(22) binary not null primary key,
+		'.$dbh->quote_identifier($class->crud_getTableKey($session)).' varchar(22) binary not null primary key,
 		sequenceNumber int not null default 1,
 		dateCreated datetime,
 		lastUpdated datetime
 		)');
 	$class->crud_updateTable($session);
-	my $sequenceKey = $class->crud_getSequenceKey;
+	my $sequenceKey = $class->crud_getSequenceKey($session);
 	if ($sequenceKey) {
 		$db->write('alter table '.dbh->quote_identifier($tableName).'
 			add index '.$dbh->quote_identifier($sequenceKey).' ('.$dbh->quote_identifier($sequenceKey).')');
@@ -151,7 +253,10 @@ serialize tells WebGUI::Crud to automatically serialize this field in a JSON wra
 =cut
 
 sub crud_definition {
-	my $class = shift;
+	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
 	tie my %properties, 'Tie::IxHash';
 	my %definition = (
 		tableName 	=> 'unnamed_crud_table',
@@ -176,63 +281,94 @@ A reference to a WebGUI::Session.
 
 sub crud_dropTable {
 	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write("drop table ".$dbh->quote_identifier($class->crud_getTableName));
+	$db->write("drop table ".$dbh->quote_identifier($class->crud_getTableName($session)));
 	return 1;
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getProperties ()
+=head2 crud_getProperties ( session )
 
 A management class method that returns just the 'properties' from crud_definition().
+
+=head3 session
+
+A reference to a WebGUI::Session.
 
 =cut
 
 sub crud_getProperties {
-	my $class = shift;
-	return $class->crud_definition->{properties};
+	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
+	return $class->crud_definition($session)->{properties};
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getSequenceKey ()
+=head2 crud_getSequenceKey ( session )
 
 A management class method that returns just the 'sequenceKey' from crud_definition().
+
+=head3 session
+
+A reference to a WebGUI::Session.
 
 =cut
 
 sub crud_getSequenceKey {
-	my $class = shift;
-	my $definition = $class->crud_definition;
+	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
+	my $definition = $class->crud_definition($session);
 	return $definition->{sequenceKey};
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableName ()
+=head2 crud_getTableName ( session )
 
 A management class method that returns just the 'tableName' from crud_definition().
+
+=head3 session
+
+A reference to a WebGUI::Session.
 
 =cut
 
 sub crud_getTableName {
-	my $class = shift;
-	return $class->crud_definition->{tableName};
+	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
+	return $class->crud_definition($session)->{tableName};
 }
 
 #-------------------------------------------------------------------
 
-=head2 crud_getTableKey ()
+=head2 crud_getTableKey ( session )
 
 A management class method that returns just the 'tableKey' from crud_definition().
+
+=head3 session
+
+A reference to a WebGUI::Session.
 
 =cut
 
 sub crud_getTableKey {
-	my $class = shift;
-	return $class->crud_definition->{tableKey};
+	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
+	return $class->crud_definition($session)->{tableKey};
 }
 
 #-------------------------------------------------------------------
@@ -251,15 +387,19 @@ A reference to a WebGUI::Session.
 
 sub crud_updateTable {
 	my ($class, $session) = @_;
+	unless (defined $session && $session->isa('WebGUI::Session')) {
+        WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
+    }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	my $tableName = $dbh->quote_identifier($class->crud_getTableName);
+	my $tableName = $dbh->quote_identifier($class->crud_getTableName($session));
 	
 	# find out what fields already exist
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
+	my $tableKey = $class->crud_getTableKey($session);
 	while (my ($col, $type) = $sth->array) {
-		next if ($col eq $class->crud_getTableKey);
+		next if ($col eq $tableKey);
 		next if ($col eq 'lastUpdated');
 		next if ($col eq 'dateCreated');
 		next if ($col eq 'sequenceNumber');
@@ -267,7 +407,7 @@ sub crud_updateTable {
 	}
 	
 	# update existing and create new fields
-	my $properties = $class->crud_getProperties;
+	my $properties = $class->crud_getProperties($session);
 	foreach my $property (keys %{$properties}) {
 		my $control = WebGUI::Form::DynamicField->new( $session, %{ $properties->{ $property } });
 		my $fieldType = $control->getDatabaseFieldType;
@@ -301,7 +441,7 @@ Deletes this object from the database. Returns 1 on success.
 
 sub delete {
 	my $self = shift;
-	$self->session->db->deleteRow($self->crud_getTableName, $self->crud_getTableKey, $self->getId);
+	$self->session->db->deleteRow($self->crud_getTableName($self->session), $self->crud_getTableKey($self->session), $self->getId);
 	$self->reorder;
 	return 1;
 }
@@ -316,9 +456,9 @@ Moves this object one position closer to the end of its sequence. If the object 
 
 sub demote {
 	my $self = shift;
-	my $tableKey = $self->crud_getTableKey;
-	my $tableName = $self->crud_getTableName;
-	my $sequenceKey = $self->crud_getSequenceKey;
+	my $tableKey = $self->crud_getTableKey($self->session);
+	my $tableName = $self->crud_getTableName($self->session);
+	my $sequenceKey = $self->crud_getSequenceKey($self->session);
 	my @params = ($self->get('sequenceNumber') + 1);
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
@@ -449,10 +589,10 @@ sub getAllSql {
 	my $order = " order by sequenceNumber";
 	
 	# the base query
-	my $sql = "select ".$dbh->quote_identifier($class->crud_getTableKey)." from ".$dbh->quote_identifier($class->crud_getTableName);
+	my $sql = "select ".$dbh->quote_identifier($class->crud_getTableKey($session))." from ".$dbh->quote_identifier($class->crud_getTableName($session));
 
 	# limit to our sequence
-	my $sequenceKey = $class->crud_getSequenceKey;
+	my $sequenceKey = $class->crud_getSequenceKey($session);
 	if ($options->{sequenceKeyValue} && $sequenceKey) {
 		push @where, $dbh->quote_identifier($sequenceKey)."=?";
 	}
@@ -490,7 +630,7 @@ Returns a guid, this object's unique identifier.
 
 sub getId {
 	my $self = shift;
-	return $objectData{id $self}{$self->crud_getTableKey};
+	return $objectData{id $self}{$self->crud_getTableKey($self->session)};
 }
 
 #-------------------------------------------------------------------
@@ -511,7 +651,7 @@ A guid, the unique identifier for this object.
 
 sub new {
 	my ($class, $session, $id) = @_;
-	my $tableKey = $class->crud_getTableKey;
+	my $tableKey = $class->crud_getTableKey($session);
 	
 	# validate
 	unless (defined $session && $session->isa('WebGUI::Session')) {
@@ -522,13 +662,13 @@ sub new {
     }
 	
 	# retrieve object data
-	my $data = $session->db->getRow($class->crud_getTableName, $tableKey, $id);
+	my $data = $session->db->getRow($class->crud_getTableName($session), $tableKey, $id);
 	if ($data->{$tableKey} eq '') {
         WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$id);
     }
 	
 	# deserialize data
-	my $properties = $class->crud_getProperties;
+	my $properties = $class->crud_getProperties($session);
 	foreach my $name (keys %{$properties}) {
 		if ($properties->{$name}{serialize}) {
 			$data->{$name} = JSON->new->canonical->decode($data->{$name});
@@ -553,9 +693,9 @@ Moves this object one position closer to the beginning of its sequence. If the o
 
 sub promote {
 	my $self = shift;
-	my $tableKey = $self->crud_getTableKey;
-	my $tableName = $self->crud_getTableName;
-	my $sequenceKey = $self->crud_getSequenceKey;
+	my $tableKey = $self->crud_getTableKey($self->session);
+	my $tableName = $self->crud_getTableName($self->session);
+	my $sequenceKey = $self->crud_getSequenceKey($self->session);
 	my $sequenceKeyValue = $self->get($sequenceKey);
 	my @params = ($self->get('sequenceNumber')-1);
 	my $clause = '';
@@ -590,9 +730,9 @@ Removes gaps in the sequence. Usually only called by delete(), but may be useful
 
 sub reorder {
 	my ($self) = @_;
-	my $tableKey = $self->crud_getTableKey;
-	my $tableName = $self->crud_getTableName;
-	my $sequenceKey = $self->crud_getSequenceKey;
+	my $tableKey = $self->crud_getTableKey($self->session);
+	my $tableName = $self->crud_getTableName($self->session);
+	my $sequenceKey = $self->crud_getSequenceKey($self->session);
 	my $sequenceKeyValue = $self->get($sequenceKey);	
 	my $i = 1;
 	my $db = $self->session->db;
@@ -645,7 +785,7 @@ sub update {
 	my ($self, $data) = @_;
 	
 	# validate incoming data
-	my $properties = $self->crud_getProperties;
+	my $properties = $self->crud_getProperties($self->session);
 	foreach my $property (keys %{$data}) {
 		
 		# don't save fields that aren't part of our definition
@@ -671,7 +811,7 @@ sub update {
 	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
 	
 	# update the database
-	$self->session->db->setRow($self->crud_getTableName, $self->crud_getTableKey, $objectData{$refId});
+	$self->session->db->setRow($self->crud_getTableName($self->session), $self->crud_getTableKey($self->session), $objectData{$refId});
 	return 1;
 }
 
