@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 47;        # Increment this number for each test you create
+plan tests => 52;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -100,16 +100,29 @@ ok($copyOfRecord4->update, "update returns success");
 isnt($copyOfRecord4->get('lastUpdated'), $copyOfRecord4->get('dateCreated'), "updates work");
 
 # retrieve data
-is(WebGUI::Crud->getAllSql($session), "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() no options");
-is(WebGUI::Crud->getAllSql($session,{sequenceKeyValue=>1}), "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() sequence key value with no key specified");
-is(WebGUI::Crud->getAllSql($session,{limit=>5}), "select `id` from `unnamed_crud_table` order by sequenceNumber limit 5", "getAllSql() with a row limit");
-is(WebGUI::Crud->getAllSql($session,{limit=>[10,20]}), "select `id` from `unnamed_crud_table` order by sequenceNumber limit 10,20", "getAllSql() with a start and row limit");
-is(WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'}), "select `id` from `unnamed_crud_table` order by `lastUpdated`", "getAllSql() with a custom order by clause");
+my ($sql, $params) = WebGUI::Crud->getAllSql($session);
+is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() SQL no options");
+($sql, $params) = WebGUI::Crud->getAllSql($session, {sequenceKeyValue=>1});
+is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber", "getAllSql() SQL sequence key value with no key specified");
+is($params->[0], undef, "getAllSql() PARAMS sequence key value with no key specified");
+($sql, $params) = WebGUI::Crud->getAllSql($session, {limit=>5});
+is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber limit 5", "getAllSql() SQL with a row limit");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{limit=>[10,20]});
+is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber limit 10,20", "getAllSql() SQL with a start and row limit");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'});
+is($sql, "select `id` from `unnamed_crud_table` order by `lastUpdated`", "getAllSql() with a custom order by clause");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=?'=>1}]});
+is($sql, "select `id` from `unnamed_crud_table` where (sequenceNumber=?) order by sequenceNumber", "getAllSql() SQL with a constraint");
+is($params->[0], 1, "getAllSql PARAMS with a constraint");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=? or sequenceNumber=?'=>[1,2]}]});
+is($sql, "select `id` from `unnamed_crud_table` where (sequenceNumber=? or sequenceNumber=?) order by sequenceNumber", "getAllSql() SQL with two constraints");
+is($params->[1], 2, "getAllSql PARAMS with two constraints");
 is(scalar(@{WebGUI::Crud->getAllIds($session)}), 3, "getAllIds()");
 my $iterator = WebGUI::Crud->getAllIterator($session);
 while (my $object = $iterator->()) {
 	isa_ok($object, 'WebGUI::Crud', 'Put your trust in the Lord. Your ass belongs to me.');
 }
+
 
 #crud management stuff
 is(ref WebGUI::Crud->crud_getProperties($session), 'HASH', 'properties work');
