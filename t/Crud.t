@@ -112,10 +112,10 @@ while (my $object = $iterator->()) {
 }
 
 #crud management stuff
-is(ref WebGUI::Crud->crud_getProperties, 'HASH', 'properties work');
-is(WebGUI::Crud->crud_getTableKey, 'id', 'default key is id');
-is(WebGUI::Crud->crud_getTableName, 'unnamed_crud_table', 'default table is unnamed_crud_table');
-is(WebGUI::Crud->crud_getSequenceKey, '', 'default sequence key is blank');
+is(ref WebGUI::Crud->crud_getProperties($session), 'HASH', 'properties work');
+is(WebGUI::Crud->crud_getTableKey($session), 'id', 'default key is id');
+is(WebGUI::Crud->crud_getTableName($session), 'unnamed_crud_table', 'default table is unnamed_crud_table');
+is(WebGUI::Crud->crud_getSequenceKey($session), '', 'default sequence key is blank');
 
 #----------------------------------------------------------------------------
 # Cleanup
