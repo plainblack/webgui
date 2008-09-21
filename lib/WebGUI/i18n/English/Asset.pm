@@ -1122,7 +1122,7 @@ Couldn't open %-s because %-s <br />
     },
 
     'inherit parent permissions' => {
-        message     => q{Inherit parent's permissions}
+        message     => q{Inherit parent's permissions},
         lastUpdated => 1221593874,
         context     => q{Error message in Asset.pm},
     }
