@@ -122,7 +122,7 @@ Constructor. Creates a new instance of this object. Returns a reference to the o
 
 =head3 session
 
-A reference to a WebGUI::Session.
+A reference to a WebGUI::Session or an object that has a session method. If it's an object that has a session method, then this object will be passed to new() instead of session as well. This is useful when you are creating WebGUI::Crud subclasses that require another object to function.
 
 =head3 properties
 
@@ -131,7 +131,13 @@ The properties that you wish to create this object with. Note that if this objec
 =cut
 
 sub create {
-	my ($class, $session, $data) = @_;
+	my ($class, $someObject, $data) = @_;
+	
+	# dynamic recognition of object or session
+	my $session = $someObject;
+	unless ($session->isa('WebGUI::Session')) {
+		$session = $someObject->session;
+	}
 	
 	# validate 
 	unless (defined $session && $session->isa('WebGUI::Session')) {
@@ -168,7 +174,7 @@ sub create {
 
 	# create object
 	my $id = $db->setRow($tableName, $tableKey, {$tableKey=>'new', dateCreated=>$now, sequenceNumber=>$sequenceNumber});
-	my $self = $class->new($session, $id);
+	my $self = $class->new($someObject, $id);
 	$self->update($data);
 	return $self;
 }
