@@ -46,7 +46,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 26;        # Increment this number for each test you create
+plan tests => 32;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -122,7 +122,7 @@ is($otherInstance->{_started}, 0, 'By default, _started = 1');
 
 ###############################################################################
 #
-#  set
+#  set, get
 #
 ###############################################################################
 
@@ -137,9 +137,9 @@ $instance->set({
 is($instance->get('priority'),           3,                 'set priority');
 is($instance->get('lastStatus'),         'undefined',       'set lastStatus');
 is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId');
-is($instance->get('className'),          'WebGUI::Session', 'set workflowId');
-is($instance->get('methodName'),         'open',            'set workflowId');
-is($instance->get('currentActivityId'),  'notAnActivityId', 'set workflowId');
+is($instance->get('className'),          'WebGUI::Session', 'set className');
+is($instance->get('methodName'),         'open',            'set methodName');
+is($instance->get('currentActivityId'),  'notAnActivityId', 'set currentActivityId');
 
 $instance->set({
     priority          => 0,
@@ -150,8 +150,39 @@ is($instance->get('priority'),           3,                 'set priority, is st
 is($instance->get('lastStatus'),         'undefined',       'set lastStatus is sticky');
 is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId is sticky');
 
+$instance->set({
+    className         => '',
+    methodName        => '',
+    currentActivityId => 0,
+} , 1);
+is($instance->get('className'),          '', 'set: className can be cleared');
+is($instance->get('methodName'),         '', 'set: methodName can be cleared');
+is($instance->get('currentActivityId'),  0,  'set: currentActivityId can be cleared');
+
+my $setTime = time();
+$instance->set({priority => 2}, 1);
+cmp_ok( abs($instance->get('lastUpdate') - $setTime), '<=', 2, 'set: lastUpdate set correctly');
+
+my $params = [ '.38 revolver', 'oily', 'black and evil'];
+
+$instance->set({parameters => $params},1);
+cmp_deeply($instance->get('parameters'), $params, 'set, get with parameter');
+
+my $wf2 = WebGUI::Workflow->create(
+    $session,
+    {
+        title => 'WebGUI::Workflow::Instance Test',
+        description => 'Non-singleton test',
+        type => 'None',
+    }
+);
+
+my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
+cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $wf->delete;  ##Deleting a Workflow deletes its instances, too.
+    $wf2->delete;
 }
