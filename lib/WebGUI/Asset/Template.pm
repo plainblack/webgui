@@ -40,7 +40,6 @@ These methods are available from this class:
 
 =cut
 
-
 #-------------------------------------------------------------------
 
 =head2 definition ( session, definition )
@@ -58,45 +57,49 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Template");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'template.gif',
-                tableName=>'template',
-                className=>'WebGUI::Asset::Template',
-                properties=>{
-                                template=>{
-                                        fieldType=>'codearea',
-                                        defaultValue=>undef
-                                        },
-				isEditable=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>1
-					},
-				showInForms=>{
-					fieldType=>'yesNo',
-					defaultValue=>1
-				},
-				parser=>{
-					noFormPost=>1,
-					fieldType=>'selectList',
-					defaultValue=>[$session->config->get("defaultTemplateParser")]
-				},	
-				headBlock=>{
-					fieldType=>"codearea",
-					defaultValue=>undef
-					},
-				namespace=>{
-					fieldType=>'combo',
-					defaultValue=>undef
-					}
-                        }
-                });
-        return $class->SUPER::definition($session,$definition);
+    my $class       = shift;
+	my $session     = shift;
+    my $definition  = shift;
+	my $i18n        = WebGUI::International->new($session,"Asset_Template");
+    push @{$definition}, {
+		assetName   => $i18n->get('assetName'),
+		icon        => 'template.gif',
+        tableName   => 'template',
+        className   => 'WebGUI::Asset::Template',
+        properties  => {
+            template => {
+                fieldType       => 'codearea',
+                defaultValue    => undef,
+            },
+            isEditable => {
+                noFormPost      => 1,
+                fieldType       => 'hidden',
+                defaultValue    => 1,
+            },
+            isDefault => {
+                fieldType       => 'hidden',
+                defaultValue    => 0,
+            },
+            showInForms => {
+                fieldType       => 'yesNo',
+                defaultValue    => 1,
+            },
+            parser => {
+                noFormPost      => 1,
+                fieldType       => 'selectList',
+                defaultValue    => [$session->config->get("defaultTemplateParser")],
+            },	
+            headBlock => {
+                fieldType       => "codearea",
+                defaultValue    => undef,
+            },
+            namespace => {
+                fieldType       => 'combo',
+                defaultValue    => undef,
+            },
+        },
+    };
+    return $class->SUPER::definition($session,$definition);
 }
 
 #-------------------------------------------------------------------
@@ -104,6 +107,7 @@ sub definition {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
+    # TODO: Perhaps add a way to check template syntax before it blows stuff up?
 	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
 		my %data;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
@@ -374,9 +378,48 @@ sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $url     = $session->url;
+    my $i18n    = WebGUI::International->new($session, "Asset_Template");
+    my $output  = '';
+
+    # Add an unfriendly warning message if this is a default template
+    if ( $self->get( 'isDefault' ) ) {
+        # Get a proper URL to make the duplicate
+        my $duplicateUrl = $self->getUrl( "func=editDuplicate" );
+        if ( $form->get( "proceed" ) ) {
+            $duplicateUrl = $url->append( $duplicateUrl, "proceed=" . $form->get( "proceed" ) );
+            if ( $form->get( "returnUrl" ) ) {
+                $duplicateUrl = $url->append( $duplicateUrl, "returnUrl=" . $form->get( "returnUrl" ) );
+            }
+        }
+        
+        $session->style->setRawHeadTags( <<'ENDHTML' );
+<style type="text/css">
+.wGwarning { 
+    border              : 1px solid red;
+    background-color    : #FF6666;
+    padding             : 10px;
+    margin              : 5px;
+    /* TODO: Add a nice little image here */
+    /* TODO: Make this a generic warning class from the default webgui stylesheet */
+}
+</style>
+ENDHTML
+
+        $output .= q{<div class="wGwarning"><p>}
+                . $i18n->get( "warning default template" )
+                . q{</p><p>}
+                . sprintf( q{<a href="} . $duplicateUrl . q{">%s</a>}, $i18n->get( "make duplicate label" ) )
+                . q{</p></div}
+                ;
+    }
+    
+    $output .= $self->getEditForm->print;
+
     $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
-    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
+    return $self->getAdminConsole->render( $output, $i18n->get('edit template') );
 }
 
 #-------------------------------------------------------------------
@@ -386,6 +429,21 @@ sub www_goBackToPage {
 	return undef;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_editDuplicate
+
+Make a duplicate of this template and edit that instead.
+
+=cut
+
+sub www_editDuplicate {
+    my $self        = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    my $newAsset    = $self->duplicate;
+    $newAsset->update( { isDefault => 0 } );
+    return $newAsset->www_edit;
+}
 
 #-------------------------------------------------------------------
 sub www_manage {

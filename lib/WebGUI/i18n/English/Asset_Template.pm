@@ -297,6 +297,19 @@ Any scratch variables will be available in the template with this syntax:<br/>
 		lastUpdated => 1162088018,
 	},
 
+    'warning default template' => {
+        message     => q{You are attempting to edit a default template. Any changes you make to this template
+                    may be lost when you next upgrade WebGUI. To be safe, you should make a duplicate of this template.},
+        lastUpdated => 0,
+        context     => q{Warning for users attempting to edit a default template},
+    },
+
+    'make duplicate label' => {
+        message     => q{Duplicate this template and edit},
+        lastUpdated => 0,
+        context     => q{Label for URL to make a duplicate and open the duplicate's edit screen},
+    },
+
 };
 
 1;

@@ -929,6 +929,13 @@ sub getEditForm {
 	my $uiLevelOverride = $self->get("className");
 	$uiLevelOverride =~ s/\:\:/_/g;
 	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
+
+    # Set the appropriate URL
+    # If we're adding a new asset, don't set anything
+    if ( $self->session->form->get( "func" ) ne "add" ) {
+        $tabform->formHeader( { action => $self->getUrl, method => "POST" } );
+    }
+
 	if ($self->session->config->get("enableSaveAndCommit")) {
 		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
             name    => "saveAndCommit", 

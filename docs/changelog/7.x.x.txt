@@ -79,6 +79,9 @@
  - added: Thingy view template now has access to field_dateCreated and field_lastUpdated for Things.
  - added: AssetManager now times out after 30 seconds on the AJAX call to load assets. This will help people realize they are having network issues. 
  - fixed: DatePicker.js can now use different first days of the week.
+ - added: Default templates now show big warning message. All templates added via upgrade scripts
+   are set to be a "default" template.
+ - fixed: Utility script skeleton now more complete and less annoying
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
