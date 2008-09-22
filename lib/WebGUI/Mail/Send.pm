@@ -489,8 +489,7 @@ sub send {
     delete $self->{_toGroup};
     if ($group) {
         my $group = WebGUI::Group->new($self->session, $group);
-        return $status
-        if !defined $group;
+        return $status if !defined $group;
         $mail->head->replace("bcc", undef);
         $mail->head->replace("cc", undef);
         foreach my $userId (@{$group->getAllUsers(1)}) {
@@ -501,6 +500,8 @@ sub send {
                 $self->queue;
             }
         }
+        #Delete the group if it is flagged as an AdHocMailGroup
+        $group->delete if ($group->isAdHocMailGroup);
     }
 
     return $status;

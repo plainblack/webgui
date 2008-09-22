@@ -37,6 +37,7 @@ addEMSBadgeTemplate ( $session );
 redirectChoice ($session);
 badgePriceDates ($session);
 addIsDefaultTemplates( $session );
+addAdHocMailGroups( $session );
 
 finish($session); # this line required
 
@@ -225,6 +226,13 @@ sub redirectChoice {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addAdHocMailGroups {
+    my $session = shift;
+    print "\tAdding AdHocMailGroups to Groups.. " unless $quiet;
+    $session->db->write("alter table groups add column isAdHocMailGroup tinyint(4) not null default 0");
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

@@ -103,6 +103,7 @@ sub _defaults {
 		autoDelete=>0,
 		isEditable=>1,
 		showInForms=>1,
+        isAdHocMailGroup=>0,
 		};
 }
 
@@ -877,6 +878,55 @@ sub getUsers {
 	return \@users;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getUsersNotIn ( group [,withoutExpired])
+
+Returns an array reference containing a list of all of the users that are in this group
+and are not in the group passed in
+
+=head3 groupId
+
+groupId to check the users in this group against.
+
+=head3 withoutExpired
+
+A boolean that if set to true will return only the groups that the user is in where
+their membership hasn't expired.
+
+=cut
+
+sub getUsersNotIn {
+	my $self           = shift;
+    my $groupId        = shift;
+	my $withoutExpired = shift;
+
+    if($groupId eq "") {
+        return $self->getUsers($withoutExpired);
+    }
+	
+    my $expireTime = 0;
+	if ($withoutExpired) {
+		$expireTime = $self->session->datetime->time();
+	}
+
+    my $sql = q{
+        select
+            userId
+        from
+            groupings
+        where
+            expireDate > ?
+            and groupId=?
+            and userId not in (select userId from groupings where expireDate > ? and groupId=?)
+    };
+
+	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$self->getId]);
+	return \@users;
+
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -899,6 +949,27 @@ sub karmaThreshold {
         return $self->get("karmaThreshold");
 }
 
+#-------------------------------------------------------------------
+
+=head2 isAdHocMailGroup ( [ value ] )
+
+Returns a boolean value indicating whether the group is flagged as an AdHoc Mail Group or not.
+AdHoc Mail Groups are automatically deleted once the mail they are associated to has been sent.
+
+=head3 value
+
+If specified, isAdHocMailGroup is set to this value.
+
+=cut
+
+sub isAdHocMailGroup {
+    my $self  = shift;
+    my $value = shift;
+    if (defined $value) {
+        $self->set("isAdHocMailGroup",$value);
+    }
+    return $self->get("isAdHocMailGroup");
+}
 
 #-------------------------------------------------------------------
 
