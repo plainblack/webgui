@@ -1569,6 +1569,11 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149656056,
 	},
 
+	'epochDate' => {
+		message => q|The date the item was published as an epoch date so that the Date macro can be used for custom date formatting.|,
+		lastUpdated => 1222106027,
+	},
+
 	'attachmentLoop' => {
 		message => q|A loop containg all attachements to this item (post).|,
 		lastUpdated => 1149656056,
