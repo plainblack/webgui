@@ -1,4 +1,6 @@
 7.6.0
+ - added an epochDate field to the template for CS RSS items. The ^D();
+   macro can then format the epoch date.
  - fixed: actove admin console tab isn't highlighted
  - fixed: Folders are cached by the client too long for visitors
  - added variant id template variable to product variant loop
