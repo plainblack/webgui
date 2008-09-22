@@ -256,7 +256,6 @@ sub addPackage {
             next;
         }
         $asset->update( { isDefault => 1 } );
-        print "Updated $assetId\n";
     }
     
     return;
