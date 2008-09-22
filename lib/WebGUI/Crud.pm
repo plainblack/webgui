@@ -58,7 +58,7 @@ The normal way to use WebGUI::Crud is to create a subclass that defines a specif
 		};
 	return $definition;
  }
- 
+
 =head2 Dynamic Subclass
 
 A more advanced approach is to create a subclass that dynamically generates a definition from a database table or a config file.
@@ -97,17 +97,17 @@ Once you have a crud class, you can use it's methods like this:
  while (my $object = $iterator->()) {
 	...
  }
- 
+
  $id = $crud->getId;
  $hashRef = $crud->get;
  $value = $crud->get($propertyName);
- 
+
  $success = $crud->promote;
  $success = $crud->demote;
  $success = $crud->delete;
  $success = $crud->update($properties);
  $success = $crud->reorder;
- 
+
 =head1 METHODS
 
 These methods are available from this package:
@@ -132,18 +132,18 @@ The properties that you wish to create this object with. Note that if this objec
 
 sub create {
 	my ($class, $someObject, $data) = @_;
-	
+
 	# dynamic recognition of object or session
 	my $session = $someObject;
 	unless ($session->isa('WebGUI::Session')) {
 		$session = $someObject->session;
 	}
-	
+
 	# validate 
 	unless (defined $session && $session->isa('WebGUI::Session')) {
         WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
     }
-	
+
 	# initialize
 	my $definition = $class->crud_definition($session);
 	my $tableKey = $class->crud_getTableKey($session);
@@ -160,7 +160,7 @@ sub create {
 	foreach my $property (keys %{$properties}) {
 		$data->{$property} ||= $properties->{$property}{defaultValue};
 	}
-	
+
 	# determine sequence
 	my $sequenceKey = $class->crud_getSequenceKey($session);
 	my $clause;
@@ -399,7 +399,7 @@ sub crud_updateTable {
 	my $db = $session->db;
 	my $dbh = $db->dbh;
 	my $tableName = $dbh->quote_identifier($class->crud_getTableName($session));
-	
+
 	# find out what fields already exist
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
@@ -411,7 +411,7 @@ sub crud_updateTable {
 		next if ($col eq 'sequenceNumber');
 		$tableFields{$col} = $type;
 	}
-	
+
 	# update existing and create new fields
 	my $properties = $class->crud_getProperties($session);
 	foreach my $property (keys %{$properties}) {
@@ -429,7 +429,7 @@ sub crud_updateTable {
 			delete $tableFields{$property};
 		}
 	}
-	
+
 	# delete fields that are no longer in the definition
 	foreach my $property (keys %tableFields) {
 		$db->write("alter table $tableName drop column ".$dbh->quote_identifier($property));	
@@ -469,13 +469,13 @@ sub demote {
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
 	my $clause = '';
-	
+
 	# determine sequence
 	if ($sequenceKey) {
 		$clause = $dbh->quote_identifier($sequenceKey)."=? and";
 		unshift @params, $self->get($sequenceKey)
 	}
-	
+
 	# update database
 	$db->beginTransaction;
     my $id = $db->quickScalar("select ".$dbh->quote_identifier($tableKey)." from ".$dbh->quote_identifier($tableName)." where $clause sequenceNumber=?", \@params);
@@ -502,12 +502,12 @@ If specified, returns the value of the property associated with this this proper
 
 sub get {
 	my ($self, $name) = @_;
-	
+
 	# return a specific property
 	if (defined $name) {
 		return $objectData{id $self}{$name};
 	}
-	
+
 	# return a copy of all properties
 	my %copy = %{$objectData{id $self}};	
 	return \%copy;
@@ -529,7 +529,7 @@ sub getAllIds {
 	unless ($session->isa('WebGUI::Session')) {
 		$session = $someObject->session;
 	}
-	
+
 	# generate the array
 	my @objects;
 	my $ids = $session->db->read($class->getAllSql($session, $options, @_));
@@ -555,7 +555,7 @@ sub getAllIterator {
 	unless ($session->isa('WebGUI::Session')) {
 		$session = $someObject->session;
 	}
-	
+
 	my @objects;
 	my $ids = $class->getAllIds($session, $options, @_);
     my $sub = sub {
@@ -618,7 +618,7 @@ sub getAllSql {
 		$session = $someObject->session;
 	}
 	my $dbh = $session->db->dbh;
-	
+
 	# the base query
 	my $sql = "select ".$dbh->quote_identifier($class->crud_getTableKey($session))." from ".$dbh->quote_identifier($class->crud_getTableName($session));
 
@@ -650,7 +650,7 @@ sub getAllSql {
 	if (scalar(@where)) {
 		$sql .= " where ".join(" AND ", @where);
 	}
-	
+
 	# construct a record limit
 	my $limit;
 	if ( exists $options->{limit}) {
@@ -661,13 +661,13 @@ sub getAllSql {
 			$limit = " limit ".$options->{limit};
 		}
 	}
-	
+
 	# custom order by field
 	my $order = " order by sequenceNumber";
 	if (exists $options->{orderBy}) {
 		$order = " order by ".$dbh->quote_identifier($options->{orderBy});
 	}
-	
+
 	return $sql . $order . $limit, \ @params;
 }
 
@@ -703,7 +703,7 @@ A guid, the unique identifier for this object.
 sub new {
 	my ($class, $session, $id) = @_;
 	my $tableKey = $class->crud_getTableKey($session);
-	
+
 	# validate
 	unless (defined $session && $session->isa('WebGUI::Session')) {
         WebGUI::Error::InvalidObject->throw(expected=>'WebGUI::Session', got=>(ref $session), error=>'Need a session.');
@@ -711,13 +711,13 @@ sub new {
     unless (defined $id && $id =~ m/^[A-Za-z0-9_-]{22}$/) {
         WebGUI::Error::InvalidParam->throw(error=>'need a '.$tableKey);
     }
-	
+
 	# retrieve object data
 	my $data = $session->db->getRow($class->crud_getTableName($session), $tableKey, $id);
 	if ($data->{$tableKey} eq '') {
         WebGUI::Error::ObjectNotFound->throw(error=>'no such '.$tableKey, id=>$id);
     }
-	
+
 	# deserialize data
 	my $properties = $class->crud_getProperties($session);
 	foreach my $name (keys %{$properties}) {
@@ -725,7 +725,7 @@ sub new {
 			$data->{$name} = JSON->new->canonical->decode($data->{$name});
 		}
 	}
-	
+
 	# set up object
 	my $self = register($class);
 	my $refId = id $self;
@@ -752,13 +752,13 @@ sub promote {
 	my $clause = '';
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
-	
+
 	# determine sequence type
 	if ($sequenceKey) {
 		$clause = $dbh->quote_identifier($sequenceKey)."=? and";
 		unshift @params, $self->get($sequenceKey)
 	}
-	
+
 	# make database changes
 	$db->beginTransaction;
     my ($id) = $db->quickArray("select ".$dbh->quote_identifier($tableKey)." from ".$dbh->quote_identifier($tableName)." where $clause sequenceNumber=?", \@params);
@@ -788,7 +788,7 @@ sub reorder {
 	my $i = 1;
 	my $db = $self->session->db;
 	my $dbh = $db->dbh;
-	
+
 	# find all the items in this sequence
 	my @params = ();
 	if ($sequenceKey) {
@@ -797,12 +797,12 @@ sub reorder {
 	my $clause = ($sequenceKey) ? "where ".$dbh->quote_identifier($sequenceKey)."=?" : '';
 	my $current = $db->read("select ".$dbh->quote_identifier($tableKey)." from ".$dbh->quote_identifier($tableName)."
 			$clause order by sequenceNumber", \@params);
-	
+
 	# query to update items in the sequence
 	$clause = ($sequenceKey) ? "and ".$dbh->quote_identifier($sequenceKey)."=?" : '';
 	my $change = $db->prepare("update ".$dbh->quote_identifier($tableName)." set sequenceNumber=?
 			where ".$dbh->quote_identifier($tableKey)."=? $clause");
-	
+
 	# make the changes
 	$db->beginTransaction;
     while (my ($id) = $current->array) {
@@ -834,33 +834,33 @@ A hash reference of properties to be set. See crud_definition() for a list of th
 
 sub update {
 	my ($self, $data) = @_;
-	
+
 	# validate incoming data
 	my $properties = $self->crud_getProperties($self->session);
 	foreach my $property (keys %{$data}) {
-		
+
 		# don't save fields that aren't part of our definition
 		unless (exists $properties->{$property} || $property eq 'lastUpdated') {
 			delete $data->{$property};
 			next;
 		}
-		
+
 		# set a default value if it's empty or undef
 		$data->{$property} ||= $properties->{$property}{defaultValue};
-		
+
 		# serialize if needed
 		if ($properties->{$property}{serialize}) {
 			$data->{property} = JSON->new->canonical->encode($data->{property});
 		}
 	}
-	
+
 	# set last updated
 	$data->{lastUpdated} ||= WebGUI::DateTime->new($self->session, time())->toDatabase;
-	
+
 	# update memory
 	my $refId = id $self;
 	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
-	
+
 	# update the database
 	$self->session->db->setRow($self->crud_getTableName($self->session), $self->crud_getTableKey($self->session), $objectData{$refId});
 	return 1;
