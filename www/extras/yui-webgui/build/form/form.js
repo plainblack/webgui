@@ -7,49 +7,9 @@ if (typeof WebGUI.Form == "undefined") {
     WebGUI.Form = {};
 }
 
-
 /**
  * This object contains generic form modification functions
  */
-
-/****************************************************************************
- * WebGUI.Form.toggleAllCheckboxesInForm ( formElement [, checkboxesName] )
- * Toggles all the checkboxes in the form, optionally limited by name.
- * Will automatically set them all to "checked" the first time
- */
-WebGUI.Form.toggleAllCheckboxesInForm 
-    = function (formElement, checkboxesName) {
-        // Get the state to set
-        var oldState    = WebGUI.Form.toggleAllCheckboxesState[formElement+checkboxesName]
-        var state       = oldState ? "" : "checked";
-
-        for (var i = 0; i < formElement.elements.length; i++) {
-            var input = formElement.elements[i];
-            if (!/^check/.test(input.type))
-                continue;
-            if (checkboxesName && input.name != checkboxesName) 
-                continue;
-
-            // Change the state
-            input.checked = state;
-            // Run the appropriate scripts
-            if ( input.onchange )
-                input.onchange();
-        }
-
-        // Update the saved state
-        WebGUI.Form.toggleAllCheckboxesState[formElement+checkboxesName] = state;
-    };
-
-
-/*
- * WebGUI.Form.toggleAllCheckboxesState
- * An object containing a hash of <formname>+<checkboxesName> : 0|1 to save
- * the state of the toggled checkboxes. You can use this to set what the 
- * first run of toggleAllCheckboxesInForm will do.
- */
-WebGUI.Form.toggleAllCheckboxesState = {};
-
 
 /***********************************************************************************
    * @description This method assembles the form label and value pairs and
@@ -135,4 +95,89 @@ WebGUI.Form.buildQueryString = function ( formId, excludes ) {
 	sFormData = sFormData.substr(0, sFormData.length - 1);
 	return sFormData;
 };
+
+/***********************************************************************************
+   * @description This method gets the proper value of the form element passed in
+   * @method getFormValue
+   * @public
+   * @static
+   * @param {string || object} id or object of the form element to get the value of.
+   */
+
+WebGUI.Form.getFormValue = function ( oElement ) {
+
+    if(typeof oElement != 'object') oElement = document.getElementById(oElement);
+
+    var oType   = oElement.type;
+	var oValue  = "";
+
+    switch(oType) {
+		case 'select-one':
+		case 'select-multiple':
+			for(var i=0; i<oElement.options.length; i++){
+				if(oElement.options[i].selected){
+					if(window.ActiveXObject){
+						oValue = oElement.options[i].attributes['value'].specified?oElement.options[i].value:oElement.options[i].text;
+					}
+					else{
+						oValue = oElement.options[i].hasAttribute('value')?oElement.options[i].value:oElement.options[i].text;
+					}
+				}
+			}
+			break;
+        case 'radio':
+		case 'checkbox':
+			var form = oElement.form;
+            var elem = null;
+            for(var i = 0; i < form.length; i++) {
+                if(form.elements[i].checked == true) {
+                    oValue = form.elements[i].value;
+                }
+            }
+			break;
+		default:
+			oValue = oElement.value;
+	}
+
+    return oValue;
+};
+
+
+/****************************************************************************
+ * WebGUI.Form.toggleAllCheckboxesInForm ( formElement [, checkboxesName] )
+ * Toggles all the checkboxes in the form, optionally limited by name.
+ * Will automatically set them all to "checked" the first time
+ */
+WebGUI.Form.toggleAllCheckboxesInForm 
+    = function (formElement, checkboxesName) {
+        // Get the state to set
+        var oldState    = WebGUI.Form.toggleAllCheckboxesState[formElement+checkboxesName]
+        var state       = oldState ? "" : "checked";
+
+        for (var i = 0; i < formElement.elements.length; i++) {
+            var input = formElement.elements[i];
+            if (!/^check/.test(input.type))
+                continue;
+            if (checkboxesName && input.name != checkboxesName) 
+                continue;
+
+            // Change the state
+            input.checked = state;
+            // Run the appropriate scripts
+            if ( input.onchange )
+                input.onchange();
+        }
+
+        // Update the saved state
+        WebGUI.Form.toggleAllCheckboxesState[formElement+checkboxesName] = state;
+    };
+
+
+/*
+ * WebGUI.Form.toggleAllCheckboxesState
+ * An object containing a hash of <formname>+<checkboxesName> : 0|1 to save
+ * the state of the toggled checkboxes. You can use this to set what the 
+ * first run of toggleAllCheckboxesInForm will do.
+ */
+WebGUI.Form.toggleAllCheckboxesState = {};
 
