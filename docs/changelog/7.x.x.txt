@@ -84,6 +84,8 @@
  - added: Default templates now show big warning message. All templates added via upgrade scripts
    are set to be a "default" template.
  - fixed: Utility script skeleton now more complete and less annoying
+ - fixed: HttpProxy parser now handles self-closing tags correctly
+ - fixed: HttpProxy parser now doesn't try to rewrite forms unless also rewriting URLs
 
 7.5.22
  - fixed: Layout template now gets prepared correctly
