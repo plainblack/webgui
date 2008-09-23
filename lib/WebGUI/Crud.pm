@@ -601,7 +601,16 @@ Either an integer representing the number of records to return, or an array refe
 
 =head4 orderBy
 
-A field name to order the results by. Defaults to sequenceNumber.
+A field name to order the results by. Defaults to sequenceNumber. You can also specify a complex data structure for this. You can pass a hash reference which contains a field name and then ascending or descending like this:
+
+ { "dateCreated" => "desc" }
+ 
+Or you can have multiple order by clauses in an array reference like this:
+
+ [
+	{ "objectType" => "asc" },
+	{ "dateCreated" => "desc" },
+ ]
 
 =head4 sequenceKeyValue
 
@@ -665,7 +674,21 @@ sub getAllSql {
 	# custom order by field
 	my $order = " order by sequenceNumber";
 	if (exists $options->{orderBy}) {
-		$order = " order by ".$dbh->quote_identifier($options->{orderBy});
+		if (ref $options->{orderBy} eq "ARRAY") {
+			my @clauses = ();
+			foreach my $pair (@{$options->{orderBy}}) {
+				my ($field) = keys %{$pair};
+				push @clauses, $dbh->quote_identifier($field)." ".$pair->{$field};
+			}
+			$order = " order by ". join(", ", @clauses);
+		}
+		elsif (ref $options->{orderBy} eq "HASH") {
+			my ($field) = keys %{$options->{orderBy}};
+			$order = " order by ".$dbh->quote_identifier($field)." ".$options->{orderBy}{$field};
+		}
+		else {
+			$order = " order by ".$dbh->quote_identifier($options->{orderBy});
+		}
 	}
 
 	return $sql . $order . $limit, \ @params;
