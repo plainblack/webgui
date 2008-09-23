@@ -390,7 +390,8 @@ sub getLineage {
 
 Takes the same parameters as getLineage, but instead of returning a list
 it returns an iterator.  Calling the iterator will return instantiated assets,
-or undef when there are no more assets available.
+or undef when there are no more assets available.  The iterator is just a sub
+ref, call like $asset = $iterator->()
 
 =cut
 
