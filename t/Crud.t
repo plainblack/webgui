@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 52;        # Increment this number for each test you create
+plan tests => 54;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -111,6 +111,10 @@ is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber limit 5"
 is($sql, "select `id` from `unnamed_crud_table` order by sequenceNumber limit 10,20", "getAllSql() SQL with a start and row limit");
 ($sql, $params) = WebGUI::Crud->getAllSql($session,{orderBy=>'lastUpdated'});
 is($sql, "select `id` from `unnamed_crud_table` order by `lastUpdated`", "getAllSql() with a custom order by clause");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{orderBy=>{lastUpdated=>'desc'}});
+is($sql, "select `id` from `unnamed_crud_table` order by `lastUpdated` desc", "getAllSql() with a custom two part order by clause");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{orderBy=>[{lastUpdated=>'desc'},{sequenceNumber=>'asc'}]});
+is($sql, "select `id` from `unnamed_crud_table` order by `lastUpdated` desc, `sequenceNumber` asc", "getAllSql() with a custom multi-field order by clause");
 ($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=?'=>1}]});
 is($sql, "select `id` from `unnamed_crud_table` where (sequenceNumber=?) order by sequenceNumber", "getAllSql() SQL with a constraint");
 is($params->[0], 1, "getAllSql PARAMS with a constraint");
