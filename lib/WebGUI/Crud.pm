@@ -599,11 +599,18 @@ Here's an example of this structure:
  
 =head4 join
 
-An array reference containing the tables you wish to join together, and the mechanisms to join them. Here's an example.
+An array reference containing the tables you wish to join with this one, and the mechanisms to join them. Here's an example.
 
  [
-	"anotherTable using (someId)",
 	"yetAnotherTable on yetAnotherTable.this = anotherTable.that",
+ ]
+
+=head4 joinUsing
+
+An array reference of hash references containing the tables you wish to join with this one and the field to use to join.
+
+ [
+	{"someTable" => "thisId"},
  ]
 
 =head4 limit
@@ -638,6 +645,12 @@ sub getAllSql {
 
 	# process joins
 	my @joins;
+	if (exists $options->{joinUsing}) {
+		foreach my $joint (@{$options->{joinUsing}}) {
+			my ($table) = keys %{$joint};
+			push @joins, " left join ".$dbh->quote_identifier($table)." using (".$dbh->quote_identifier($joint->{$table}).")";
+		}		
+	}
 	if (exists $options->{join}) {
 		foreach my $thejoin (@{$options->{join}}) {
 			push @joins, " left join ".$thejoin;
