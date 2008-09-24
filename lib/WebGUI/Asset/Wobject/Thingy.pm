@@ -14,6 +14,7 @@ use strict;
 use warnings;
 use version;
 use Tie::IxHash;
+use JSON;
 use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Text;
@@ -328,6 +329,43 @@ sub deleteField {
 
 #-------------------------------------------------------------------
 
+=head2 deleteThingData ( )
+
+Deletes data in a Thing.
+
+=head3 thingId
+
+The id of the Thing that should be deleted.
+
+=head3 thingDataId
+
+The id of row of data that should be deleted.
+
+=cut
+
+sub deleteThingData {
+
+    my $self = shift;
+    my $thingId = shift;
+    my $thingDataId = shift;
+    my $db = $self->session->db;
+
+    my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
+    return undef unless $self->hasPrivileges($groupIdEdit);
+
+    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+
+    my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
+            ,[$thingId]);
+    if ($onDeleteWorkflowId){
+        $self->triggerWorkflow($onDeleteWorkflowId);
+    }
+
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 deleteThing ( thingId )
 
 Deletes a Thing and its fields from Collateral and drops the things table.
@@ -353,6 +391,105 @@ sub deleteThing {
     return undef;
 }
 
+#-------------------------------------------------------------------
+
+=head2 editThingDataSave ( )
+
+Saves a row of thing data and triggers the appropriate workflow triggers.
+
+=head3 thingId
+
+The id of the Thing which this row of data is an instance of.
+
+=head3 thingDataId
+
+The id of the row of data. This can be an existing id or 'new'.
+
+=head3 thingData
+
+An optional hashref containing the new data. This will override values passed in by a form post. 
+Use this hashref for testing purposes.
+
+=cut
+
+sub editThingDataSave {
+
+    my $self = shift;
+    my $thingId = shift;
+    my $thingDataId = shift;
+    my $thingData = shift;
+    my $session = $self->session;
+    my (%thingData,$fields,@errors,$hadErrors,$newThingDataId);
+    my $i18n = WebGUI::International->new($session, 'Asset_Thingy');
+    
+    if ($thingDataId eq "new"){
+        $thingData{dateCreated} = time();
+        $thingData{createdById} = $session->user->userId;
+        $thingData{ipAddress} = $session->env->getIp;
+    }
+    else {
+        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+            ." where thingDataId = ?",[$thingDataId]);
+    }
+
+    %thingData = ( %thingData, 
+        thingDataId=>$thingDataId,
+        updatedById=>$session->user->userId,
+        updatedByName=>$session->user->username,
+        lastUpDated=>time(),
+    );
+    
+    $fields = $session->db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
+        [$self->get("assetId"),$thingId]);
+    while (my $field = $fields->hashRef) {
+        my $fieldName = 'field_'.$field->{fieldId};
+        my $fieldValue;
+        if ($field->{status} eq "required" || $field->{status} eq "editable"){
+            my $fieldType = $field->{fieldType};
+            $fieldType = "" if ($fieldType =~ m/^otherThing/x);
+            # Modify the defaultValue for certain field types. For most types we want to use
+            # the default in the database, for these we want the last known value for this thingData
+            if ( $fieldType eq "File" || $fieldType eq "Image" ) {
+                $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
+            }
+            $fieldValue = $thingData->{$fieldName} || $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
+        }
+        if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
+            push (@errors,{
+                "error_message"=>$field->{label}." ".$i18n->get('is required error').".",
+                });
+            #$hadErrors = 1;
+        }
+        if ($field->{status} eq "hidden") {
+            $fieldValue = $field->{defaultValue};
+            WebGUI::Macro::process($self->session,\$fieldValue);
+        }
+        if ($field->{status} eq "visible") {
+            $fieldValue = $field->{defaultValue};
+            #WebGUI::Macro::process($self->session,\$fieldValue);
+        }
+        $thingData{$fieldName} = $fieldValue;
+    }
+
+    $newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
+
+    # trigger workflow
+    if($thingDataId eq "new"){
+        my ($onAddWorkflowId) = $session->db->quickArray("select onAddWorkflowId from Thingy_things where thingId=?"
+            ,[$thingId]);
+        if ($onAddWorkflowId){
+            $self->triggerWorkflow($onAddWorkflowId);
+        }
+    }else{
+        my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
+            ,[$thingId]);
+        if ($onEditWorkflowId){
+            $self->triggerWorkflow($onEditWorkflowId);
+        }
+    }
+
+    return($newThingDataId,\@errors);	
+}
 
 #-------------------------------------------------------------------
 
@@ -822,6 +959,65 @@ sub getThing {
     return $self->session->db->quickHashRef("select * from Thingy_things where thingId=?",[$thingId]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 getViewThingVars  (  )
+
+Returns the field values of a thing instance and the title for its view screen in a tmpl var hashref. 
+If a tmpl var hashref is supplied values will be appended to that.
+
+=cut
+
+sub getViewThingVars {
+    my ($self, $thingId, $thingDataId,$var) = @_;
+    my $db = $self->session->db;
+    my (@field_loop, @viewScreenTitleFields, $viewScreenTitle);
+    
+    my %thingData = $db->quickHash("select * from ".$db->dbh->quote_identifier("Thingy_".$thingId)
+        ." where thingDataId = ?",[$thingDataId]);
+
+    if (%thingData) {
+        my $fields = $db->read('select * from Thingy_fields where assetId = ? and thingId = ? order by sequenceNumber',
+            [$self->get('assetId'),$thingId]);
+        while (my %field = $fields->hash) {
+            next unless ($field{display} eq '1');
+            my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
+
+            my $originalValue = $thingData{"field_".$field{fieldId}};
+            my $value = $self->getFieldValue($originalValue,\%field);
+
+            my $otherThingUrl;
+            if ($field{fieldType} =~ m/^otherThing/x) {
+                my $otherThingId = $field{fieldType};
+                $otherThingId =~ s/^otherThing_//x;
+                if($self->canViewThing($otherThingId)){
+                    $otherThingUrl = $self->session->url->append(
+                        $self->getUrl,
+                        "func=viewThingData;thingId=$otherThingId;thingDataId=$originalValue"
+                    );
+                }
+            }
+
+            my %fieldProperties = (
+                "id" => $field{fieldId},
+                "name" => "field_".$field{fieldId},
+                "value" => $value,
+                "label" => $field{label},
+                "isHidden" => $hidden,
+                "url" => $otherThingUrl,
+            );
+            push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
+            push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
+        }
+        $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
+        $var->{field_loop} = \@field_loop;
+        return $var;
+    }
+    else{
+        return undef;
+    }
+
+}
 
 #-------------------------------------------------------------------
 
@@ -1143,6 +1339,7 @@ sub www_deleteThingConfirm {
     
     return $self->www_manage;
 }
+
 #-------------------------------------------------------------------
 
 =head2 www_deleteThingDataConfirm ( )
@@ -1162,15 +1359,51 @@ sub www_deleteThingDataConfirm {
     my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
     return $self->session->privilege->insufficient() unless $self->hasPrivileges($groupIdEdit);
 
-    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
-
-    my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
-            ,[$thingId]);
-    if ($onDeleteWorkflowId){
-        $self->triggerWorkflow($onDeleteWorkflowId);
-    }
+    $self->deleteThingData($thingId,$thingDataId);
 
     return $self->www_search;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteThingDataConfirmViaAjax ( )
+
+Deletes data in a Thing.
+
+=cut
+
+sub www_deleteThingDataViaAjax {
+
+    my $self 	= shift;
+    my $session = $self->session;
+    my $db 	    = $session->db;
+
+    my $thingId     = $self->session->form->process("thingId");
+    my $thingDataId = $self->session->form->process('thingDataId');
+
+    $session->http->setMimeType("application/json");
+
+    unless ($thingId && $thingDataId) {
+        $session->http->setStatus("400", "Bad Request");
+        return JSON->new->utf8->encode([
+	    {message => "Can't get thing data without a thingId and a thingDataId."}
+	]);
+    }
+
+    my $thingProperties = $self->getThing($thingId);
+    if ($thingProperties->{thingId}){
+    	my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
+        return $session->privilege->insufficient() unless $self->hasPrivileges($groupIdEdit);
+
+        $self->deleteThingData($thingId,$thingDataId);
+
+        $session->http->setMimeType("application/json");
+        return JSON->new->utf8->encode([{message => "Data with thingDataId $thingDataId was deleted."}]);
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return JSON->new->utf8->encode([{message => "The thingId you specified can not be found."}]);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -1890,7 +2123,7 @@ sub www_editThingDataSave {
 
     my $self = shift;
     my $session = $self->session;
-    my ($var,$newThingDataId, $fields,%thingData,@errors,$hadErrors,$otherThingId);
+    my ($var,$newThingDataId, $fields,%thingData,@errors,$errors,$otherThingId);
     my ($privilegedGroup,$workflowId);
     my $thingId = $session->form->process('thingId');
     my $thingDataId = $session->form->process('thingDataId');
@@ -1905,73 +2138,11 @@ sub www_editThingDataSave {
     }
     return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
 
-    if ($thingDataId eq "new"){
-        $thingData{dateCreated} = time();
-        $thingData{createdById} = $session->user->userId;
-        $thingData{ipAddress} = $session->env->getIp;
-    }
-    else {
-        %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
-            ." where thingDataId = ?",[$thingDataId]);
-    }
+    ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
-    %thingData = ( %thingData, 
-        thingDataId=>$thingDataId,
-        updatedById=>$session->user->userId,
-        updatedByName=>$session->user->username,
-        lastUpDated=>time(),
-    );
-    
-    $fields = $session->db->read('select * from Thingy_fields where assetId = '.$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by sequenceNumber');
-    while (my $field = $fields->hashRef) {
-        my $fieldName = 'field_'.$field->{fieldId};
-        my $fieldValue;
-        if ($field->{status} eq "required" || $field->{status} eq "editable"){
-            my $fieldType = $field->{fieldType};
-            $fieldType = "" if ($fieldType =~ m/^otherThing/x);
-            # Modify the defaultValue for certain field types. For most types we want to use
-            # the default in the database, for these we want the last known value for this thingData
-            if ( $fieldType eq "File" || $fieldType eq "Image" ) {
-                $field->{ defaultValue } = $thingData{ "field_" . $field->{ fieldId } };
-            }
-            $fieldValue = $session->form->process($fieldName,$fieldType,$field->{defaultValue},$field);
-        }
-        if ($field->{status} eq "required" && ($fieldValue =~ /^\s$/x || $fieldValue eq "" || !(defined $fieldValue))) {
-            push (@errors,{
-                "error_message"=>$field->{label}." ".$i18n->get('is required error').".",
-                });
-            $hadErrors = 1;
-        }
-        if ($field->{status} eq "hidden") {
-            $fieldValue = $field->{defaultValue};
-            WebGUI::Macro::process($self->session,\$fieldValue);
-        }
-        if ($field->{status} eq "visible") {
-            $fieldValue = $field->{defaultValue};
-            #WebGUI::Macro::process($self->session,\$fieldValue);
-        }
-        $thingData{$fieldName} = $fieldValue;
-    }
-    if ($hadErrors){
-        return $self->www_editThingData($thingId,$thingDataId,\@errors);        
-    }
-    $newThingDataId = $self->setCollateral("Thingy_".$thingId,"thingDataId",\%thingData,0,0);
-
-    # trigger workflow
-    if($thingDataId eq "new"){
-        my ($onAddWorkflowId) = $session->db->quickArray("select onAddWorkflowId from Thingy_things where thingId=?"
-            ,[$thingId]);
-        if ($onAddWorkflowId){
-            $self->triggerWorkflow($onAddWorkflowId);
-        }
-    }
-    else {
-        my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
-            ,[$thingId]);
-        if ($onEditWorkflowId){
-            $self->triggerWorkflow($onEditWorkflowId);
-        }
-    }
+    if (scalar @$errors > 0){
+        return $self->www_editThingData($thingId,$thingDataId,'',$errors);        
+    }	
 
     if ($thingProperties->{afterSave} eq "searchThisThing") {
         return $self->www_search($thingId);
@@ -1994,7 +2165,62 @@ sub www_editThingDataSave {
     }
     # if afterSave is thingy default or in any other case return view()
     else {
-        return $self->www_view;
+        return $self->view();
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editThingDataSaveViaAjax ( )
+
+Returns a thing instance as JSON data.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingDataId
+
+The unique id of a row of thing data. When this is 'new' a new row of data will be added.
+
+=cut
+
+sub www_editThingDataSaveViaAjax {
+
+    my $self        = shift;
+    my $session     = $self->session;
+    my $thingId     = shift || $session->form->process('thingId');
+    my $thingDataId = shift || $session->form->process('thingDataId');
+
+    unless ($thingId && $thingDataId) {
+        $session->http->setStatus("400", "Bad Request");
+        return JSON->new->utf8->encode([
+	    {message => "Can't get thing data without a thingId and a thingDataId."}
+	]);
+    }
+
+    my $thingProperties = $self->getThing($thingId);
+    if ($thingProperties->{thingId}){
+        my ($privilegedGroup,$workflowId);
+	
+    	if ($thingDataId eq "new"){
+	    	$privilegedGroup = $thingProperties->{groupIdAdd};
+	    }
+	    else{
+		    $privilegedGroup = $thingProperties->{groupIdEdit};
+	    }
+	    return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
+
+    	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
+
+    	if ($errors){
+	    $session->http->setStatus("400", "Bad Request");
+            return JSON->new->utf8->encode($errors);
+    	}
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
     }
 }
 
@@ -2054,6 +2280,79 @@ sub www_export {
     return $out;
 
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_getThingViaAjax ( )
+
+Returns a things properties as JSON.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=cut
+
+sub www_getThingViaAjax {
+
+    my $self    = shift;
+    my $session = $self->session;
+    my $thingId = shift || $session->form->process('thingId');
+    $session->http->setMimeType("application/json");
+
+    unless ($thingId) {
+        $session->http->setStatus("400", "Bad Request");
+        return JSON->new->utf8->encode([{message => "Can't return thing properties without a thingId."}]);
+    }
+
+    my $thingProperties = $self->getThing($thingId);
+    if ($thingProperties->{thingId}){
+        return $session->privilege->insufficient() unless $self->canViewThing($thingId,
+            $thingProperties->{groupIdView});
+
+        $session->http->setMimeType("application/json");
+        return JSON->new->utf8->encode($thingProperties);
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getThingsViaAjax ( )
+
+Returns the Things in a Thingy as JSON. 
+
+=cut
+
+sub www_getThingsViaAjax {
+
+    my $self    = shift;
+    my $session = $self->session;
+
+    $session->http->setMimeType("application/json");
+
+    my @visibleThings;
+    my $things = $self->getThings;
+    while (my $thing = $things->hashRef) {
+        if ($self->canViewThing($thing->{thingId},$thing->{groupIdView})){
+            $thing->{canSearch} = $self->canSearch($thing->{thingId},$thing);
+            $thing->{canEdit}   = $self->hasPrivileges($thing->{groupIdEdit}); 
+            $thing->{canAdd}    = $self->hasPrivileges($thing->{groupIdAdd});
+            push(@visibleThings,$thing);
+        }
+    }
+    if (scalar @visibleThings > 0){
+        return JSON->new->utf8->encode(\@visibleThings);
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return JSON->new->utf8->encode([{message => "No visible Things were found in this Thingy."}]);
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2369,13 +2668,59 @@ sub www_moveFieldConfirm {
 
 =head2 www_search ( )
 
-Shows the search screen and performs the search.
+Shows the search screen wrapped in a style.
 
 =cut
 
 sub www_search {
     my $self = shift;
     return $self->processStyle($self->search(@_));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_searchViaAjax ( )
+
+Shows the search screen wrapped in a style.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingProperties
+
+A hashref containing the properties of a thing.
+
+
+=cut
+
+sub www_searchViaAjax {
+
+    my $self            = shift;
+    my $session         = $self->session;
+    my $thingId         = shift || $session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
+    my $i18n            = WebGUI::International->new($self->session,"Asset_Thingy");
+
+    unless ($thingId) {
+        $session->http->setStatus("400", "Bad Request");
+        return "Can't perform search without a thingId.";
+    }
+
+    if ($thingProperties->{thingId}){
+
+        return $session->privilege->insufficient() unless $self->canViewThing($thingId,
+            $thingProperties->{groupIdView});
+
+        my $var = $self->getSearchTemplateVars($thingId,$thingProperties);
+
+        $session->http->setMimeType("application/json");
+        return JSON->new->utf8->encode($var);
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return "The thingId you requested can not be found.";
+    }
 }
 
 #-------------------------------------------------------------------
@@ -2397,11 +2742,33 @@ sub canSearch {
 
 =head2 search ( )
 
-Shows the search screen and performs the search.
+Returns the search screen without style.
 
 =cut
 
 sub search {
+
+    my $self = shift;
+    my $thingId = shift || $self->session->form->process('thingId');
+    my $thingProperties = shift || $self->getThing($thingId);
+    my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
+
+    return $i18n->get("no permission to search") if( ! $self->canSearch($thingId, $thingProperties));
+
+    my $var = $self->getSearchTemplateVars($thingId,$thingProperties);    
+    return $self->processTemplate($var,$thingProperties->{searchTemplateId}); 
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 getSearchTemplateVars ( )
+
+Performs the search and returns the tmpl var hashref.
+
+=cut
+
+sub getSearchTemplateVars {
 
     my $self = shift;
     my $thingId = shift || $self->session->form->process('thingId');
@@ -2545,7 +2912,8 @@ sequenceNumber');
     $var->{searchFields_loop} = \@searchFields_loop;
     $var->{displayInSearchFields_loop} = \@displayInSearchFields_loop;
     $self->appendThingsVars($var, $thingId);
-    return $self->processTemplate($var,$thingProperties->{searchTemplateId});
+    return $var;	
+    #return $self->processTemplate($var,$thingProperties->{searchTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -2653,26 +3021,34 @@ sub www_selectFieldInThing {
 
 Shows the view screen of a Thing
 
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingDataId
+
+The unique id of a row of thing data.
+
 =cut
 
 sub www_viewThingData {
 
-    my $self = shift;
-    my $session = $self->session;
-    my $thingId = shift || $session->form->process('thingId');
+    my $self        = shift;
+    my $session     = $self->session;
+    my $thingId     = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
-    my (%thingData, $fields,@field_loop,@viewScreenTitleFields);
-    my $var = $self->get;
-    my $url = $self->getUrl;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
+    
+    my $var     = $self->get;
+    my $url     = $self->getUrl;
+    my $i18n    = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $thingProperties = $self->getThing($thingId);
     return $self->session->privilege->insufficient() unless $self->canViewThing($thingId, $thingProperties->{groupIdView});
 
-    $var->{canEditThings} = $self->canEdit;
-    $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
-    $var->{"manage_url"} = $session->url->append($url, 'func=manage');
-    $var->{"thing_label"} = $thingProperties->{label};
+    $var->{canEditThings}   = $self->canEdit;
+    $var->{"addThing_url"}  = $session->url->append($url, 'func=editThing;thingId=new');
+    $var->{"manage_url"}    = $session->url->append($url, 'func=manage');
+    $var->{"thing_label"}   = $thingProperties->{label};
 
     if($self->hasPrivileges($thingProperties->{groupIdEdit})){
         $var->{"edit_url"} = $session->url->append($url,'func=editThingData;thingId='
@@ -2688,49 +3064,60 @@ sub www_viewThingData {
         $var->{"search_url"} = $session->url->append($url, 'func=search;thingId='.$thingId);
     }
 
-    # Get Field Values
-    %thingData = $session->db->quickHash("select * from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
-        ." where thingDataId = ?",[$thingDataId]);
-
-    $fields = $session->db->read('select * from Thingy_fields where assetId = '
-    .$session->db->quote($self->get("assetId")).' and thingId = '.$session->db->quote($thingId).' order by
-sequenceNumber');
-    while (my %field = $fields->hash) {
-        next unless ($field{display} eq '1');
-        my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
-
-        my $originalValue = $thingData{"field_".$field{fieldId}};
-        my $dateCreated = $thingData{"dateCreated"};
-        my $lastUpdated = $thingData{"lastUpdated"};
-        my $value = $self->getFieldValue($originalValue,\%field);
-
-        my $otherThingUrl;
-        if ($field{fieldType} =~ m/^otherThing/x) {
-            my $otherThingId = $field{fieldType};
-            $otherThingId =~ s/^otherThing_//x;
-            if($self->canViewThing($otherThingId)){ 
-                $otherThingUrl = $session->url->append($url,"func=viewThingData;thingId=$otherThingId;thingDataId=$originalValue");
-            }
-        }
-
-        my %fieldProperties = (
-            "id" => $field{fieldId},
-            "name" => "field_".$field{fieldId},
-            "value" => $value,
-            "label" => $field{label},
-            "isHidden" => $hidden,
-            "url" => $otherThingUrl,
-            "dateCreated" => WebGUI::DateTime->new($self->session,$dateCreated)->toUserTimeZone(),
-            "lastUpdated" => WebGUI::DateTime->new($self->session,$lastUpdated)->toUserTimeZone(),
-        );
-        push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
-        push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
-    }
-    $var->{viewScreenTitle} = join(" ",@viewScreenTitleFields);
-    $var->{field_loop} = \@field_loop;
+    $self->getViewThingVars($thingId,$thingDataId,$var);
     $self->appendThingsVars($var, $thingId);
-    return $self->processStyle($self->processTemplate($var,$thingProperties->{viewTemplateId}));
+    return $self->session->style->process($self->processTemplate($var,$thingProperties->{viewTemplateId}),$self->get("styleTemplateId"));
 
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewThingDataViaAjax ( )
+
+Returns a thing instance as JSON data.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingDataId
+
+The unique id of a row of thing data.
+
+=cut
+
+sub www_viewThingDataViaAjax {
+
+    my $self        = shift;
+    my $session     = $self->session;
+    my $thingId     = shift || $session->form->process('thingId');
+    my $thingDataId = shift || $session->form->process('thingDataId');
+
+    $session->http->setMimeType("application/json");
+
+    unless ($thingId && $thingDataId) {
+        $session->http->setStatus("400", "Bad Request");
+        return JSON->new->utf8->encode([{message => "Can't get thing data without a thingId and a thingDataId."}]);
+    }
+
+    my $thingProperties = $self->getThing($thingId);
+    if ($thingProperties->{thingId}){
+        return $session->privilege->insufficient() unless $self->canViewThing($thingId, $thingProperties->{groupIdView});
+
+        my $output = $self->getViewThingVars($thingId,$thingDataId);
+
+        if ($output){
+            return JSON->new->utf8->encode($output);
+        }
+        else{
+            $session->http->setStatus("404", "Not Found");
+            return JSON->new->utf8->encode([{message => "The thingDataId you requested can not be found."}]);
+        }
+    }
+    else {
+        $session->http->setStatus("404", "Not Found");
+        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
+    }
 }
 
 1;

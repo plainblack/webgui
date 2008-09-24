@@ -17,7 +17,9 @@ use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::PseudoRequest;
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 12; # increment this value for each test you create
+use Test::Deep;
+use JSON;
 use WebGUI::Asset::Wobject::Thingy;
 
 my $session = WebGUI::Test->session;
@@ -89,6 +91,7 @@ my %fieldProperties = (
     dateCreated=>time(),    
     fieldType=>"textarea",
     status=>"editable",
+    display=>1,
 );
 
 my $fieldId = $thingy->addField(\%fieldProperties,0);
@@ -104,14 +107,67 @@ my ($fieldLabel, $columnType, $Null, $Key, $Default, $Extra) = $session->db->qui
 is($fieldLabel,"field_".$fieldId,"A column for the new field Field_$fieldId exists.");
 is($columnType,"longtext","The columns is the right type");
 
-=cut
-my $request = WebGUI::PseudoRequest->new();
-$session->{_request} = $request;
+# Test adding, editing and getting thing data
 
-$session->request->uri($thingy->get("url"));
+my ($newThingDataId,$errors) = $thingy->editThingDataSave($thingId,'new',{"field_".$fieldId => 'test value'});
 
-$request->setup_body({ param1 => 'value1' });
-=cut
+my $isValidThingDataId = $session->id->valid($newThingDataId);
+
+is($isValidId,1,"Adding thing data: editFieldSave returned a valid id: ".$newThingDataId);
+
+my $viewThingVars = $thingy->getViewThingVars($thingId,$newThingDataId);
+
+cmp_deeply(
+        $viewThingVars->{field_loop},
+        [{
+            field_id    => $fieldId,
+            field_isHidden => "",
+            field_value => 'test value',
+            field_url => undef,
+            field_name => "field_".$fieldId,
+            field_label => $i18n->get('assetName')." field"
+        }],
+        'Getting newly added field data: getViewThingVars returns correct field_loop.'
+    );
+
+$session->user({userId => 3});
+my $json = $thingy->www_viewThingDataViaAjax($thingId,$newThingDataId);
+my $dataFromJSON = JSON->new->utf8->decode($json);
+
+cmp_deeply(
+        $dataFromJSON,
+        {
+        field_loop => [{
+            field_id    => $fieldId,
+            field_isHidden => "", 
+            field_value => 'test value',
+            field_url => undef,
+            field_name => "field_".$fieldId,
+            field_label => $i18n->get('assetName')." field"
+            }], 
+        viewScreenTitle => "",
+        },
+        'Getting newly added field data as JSON: www_viewThingDataViaAjax returns correct data as JSON.'
+    );  
+
+my ($updatedThingDataId,$errors) = $thingy->editThingDataSave($thingId,$newThingDataId,{"field_".$fieldId => 'new test value'});
+
+my $viewThingVars = $thingy->getViewThingVars($thingId,$newThingDataId);
+
+cmp_deeply(
+        $viewThingVars->{field_loop},
+        [{
+            field_id    => $fieldId,
+            field_isHidden => "",
+            field_value => 'new test value',
+            field_url => undef,
+            field_name => "field_".$fieldId,
+            field_label => $i18n->get('assetName')." field"
+        }],
+        'Getting updated field data: getViewThingVars returns correct field_loop with updated value.'
+    );
+
+
 END {
 	# Clean up after thy self
 	$versionTag->rollback();
