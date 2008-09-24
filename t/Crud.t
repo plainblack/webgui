@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 53;        # Increment this number for each test you create
+plan tests => 54;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -113,6 +113,8 @@ is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by `u
 is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` order by lastUpdated", "getAllSql() with a custom order by clause");
 ($sql, $params) = WebGUI::Crud->getAllSql($session,{join=>['someTable using (someId)']});
 is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` left join someTable using (someId) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() with a custom join");
+($sql, $params) = WebGUI::Crud->getAllSql($session,{joinUsing=>[{myTable => 'myId'}]});
+is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` left join `myTable` using (`myId`) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() with a custom joinUsing");
 ($sql, $params) = WebGUI::Crud->getAllSql($session,{constraints=>[{'sequenceNumber=?'=>1}]});
 is($sql, "select `unnamed_crud_table`.`id` from `unnamed_crud_table` where (sequenceNumber=?) order by `unnamed_crud_table`.`sequenceNumber`", "getAllSql() SQL with a constraint");
 is($params->[0], 1, "getAllSql PARAMS with a constraint");
