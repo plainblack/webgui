@@ -87,6 +87,7 @@
  - fixed: HttpProxy parser now handles self-closing tags correctly
  - fixed: HttpProxy parser now doesn't try to rewrite forms unless also rewriting URLs
  - fixed: WebGUI::HTML->cleanSegment now also keeps <link> if preserving script and style
+ - rfe: Teach Thingy to be a Web Service (SDH Consulting Group)
 
 7.5.22
  - fixed: Layout template now gets prepared correctly

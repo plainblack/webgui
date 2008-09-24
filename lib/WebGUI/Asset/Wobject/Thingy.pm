@@ -964,7 +964,7 @@ sub getThing {
 =head2 getViewThingVars  (  )
 
 Returns the field values of a thing instance and the title for its view screen in a tmpl var hashref. 
-If a tmpl var hashref is supplied values will be appended to that.
+If a tmpl var hashref is supplied tmpl_var's will be appended to that.
 
 =cut
 
@@ -972,6 +972,8 @@ sub getViewThingVars {
     my ($self, $thingId, $thingDataId,$var) = @_;
     my $db = $self->session->db;
     my (@field_loop, @viewScreenTitleFields, $viewScreenTitle);
+
+    return undef unless ($thingId && $thingDataId);
     
     my %thingData = $db->quickHash("select * from ".$db->dbh->quote_identifier("Thingy_".$thingId)
         ." where thingDataId = ?",[$thingDataId]);
@@ -1366,7 +1368,7 @@ sub www_deleteThingDataConfirm {
 
 #-------------------------------------------------------------------
 
-=head2 www_deleteThingDataConfirmViaAjax ( )
+=head2 www_deleteThingDataViaAjax ( )
 
 Deletes data in a Thing.
 
@@ -1385,9 +1387,7 @@ sub www_deleteThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode([
-	    {message => "Can't get thing data without a thingId and a thingDataId."}
-	]);
+        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -1398,11 +1398,11 @@ sub www_deleteThingDataViaAjax {
         $self->deleteThingData($thingId,$thingDataId);
 
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode([{message => "Data with thingDataId $thingDataId was deleted."}]);
+        return JSON->new->utf8->encode({message => "Data with thingDataId $thingDataId was deleted."});
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode([{message => "The thingId you specified can not be found."}]);
+        return JSON->new->utf8->encode({message => "The thingId you specified can not be found."});
     }
 }
 
@@ -2194,9 +2194,7 @@ sub www_editThingDataSaveViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode([
-	    {message => "Can't get thing data without a thingId and a thingDataId."}
-	]);
+        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2220,7 +2218,7 @@ sub www_editThingDataSaveViaAjax {
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
+        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2302,7 +2300,7 @@ sub www_getThingViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode([{message => "Can't return thing properties without a thingId."}]);
+        return JSON->new->utf8->encode({message => "Can't return thing properties without a thingId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2315,7 +2313,7 @@ sub www_getThingViaAjax {
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
+        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2349,7 +2347,7 @@ sub www_getThingsViaAjax {
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode([{message => "No visible Things were found in this Thingy."}]);
+        return JSON->new->utf8->encode({message => "No visible Things were found in this Thingy."});
     }
 }
 
@@ -2704,7 +2702,7 @@ sub www_searchViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return "Can't perform search without a thingId.";
+        return JSON->new->utf8->encode({message => "Can't perform search without a thingId."});
     }
 
     if ($thingProperties->{thingId}){
@@ -2719,7 +2717,7 @@ sub www_searchViaAjax {
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return "The thingId you requested can not be found.";
+        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -3097,7 +3095,7 @@ sub www_viewThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode([{message => "Can't get thing data without a thingId and a thingDataId."}]);
+        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -3111,12 +3109,12 @@ sub www_viewThingDataViaAjax {
         }
         else{
             $session->http->setStatus("404", "Not Found");
-            return JSON->new->utf8->encode([{message => "The thingDataId you requested can not be found."}]);
+            return JSON->new->utf8->encode({message => "The thingDataId you requested can not be found."});
         }
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode([{message => "The thingId you requested can not be found."}]);
+        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
     }
 }
 
