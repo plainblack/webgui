@@ -33,7 +33,9 @@ Package WebGUI::Crud
 
 =head1 DESCRIPTION
 
-CRUD = Create, Read, Update, and Delete. This package should be the base class for almost all database backed objects. It provides all the basics you will need when creating such objects, and creates a nice uniform class signature to boot. 
+CRUD = Create, Read, Update, and Delete. This package should be the base class for almost all database backed objects. It provides all the basics you will need when creating such objects.
+
+This package is very light weight compared to it's cousins (like DBIx::Class), and is very specific to WebGUI. That's because we aren't afraid of SQL, and don't want to automate everything. If you need something more powerful then consider DBIx::Class.
 
 =head1 SYNOPSIS
 
@@ -594,6 +596,15 @@ Here's an example of this structure:
 	{ "price <= ?" 			=> 44 },
 	{ "color=? or color=?" 	=> ['blue','black'] },
  ]
+ 
+=head4 join
+
+An array reference containing the tables you wish to join together, and the mechanisms to join them. Here's an example.
+
+ [
+	"anotherTable using (someId)",
+	"yetAnotherTable on yetAnotherTable.this = anotherTable.that",
+ ]
 
 =head4 limit
 
@@ -601,16 +612,7 @@ Either an integer representing the number of records to return, or an array refe
 
 =head4 orderBy
 
-A field name to order the results by. Defaults to sequenceNumber. You can also specify a complex data structure for this. You can pass a hash reference which contains a field name and then ascending or descending like this:
-
- { "dateCreated" => "desc" }
- 
-Or you can have multiple order by clauses in an array reference like this:
-
- [
-	{ "objectType" => "asc" },
-	{ "dateCreated" => "desc" },
- ]
+A scalar containing an order by clause. Defaults to 'sequenceNumber'.
 
 =head4 sequenceKeyValue
 
@@ -626,10 +628,22 @@ sub getAllSql {
 	unless ($session->isa('WebGUI::Session')) {
 		$session = $someObject->session;
 	}
+
+	# setup
 	my $dbh = $session->db->dbh;
+	my $tableName = $class->crud_getTableName($session);
 
 	# the base query
-	my $sql = "select ".$dbh->quote_identifier($class->crud_getTableKey($session))." from ".$dbh->quote_identifier($class->crud_getTableName($session));
+	my $sql = "select ".$dbh->quote_identifier($tableName, $class->crud_getTableKey($session))." from ".$dbh->quote_identifier($tableName);
+
+	# process joins
+	my @joins;
+	if (exists $options->{join}) {
+		foreach my $thejoin (@{$options->{join}}) {
+			push @joins, " left join ".$thejoin;
+		}		
+	}
+	$sql .= join(" ", @joins);
 
 	# process constraints
 	my @params;
@@ -647,12 +661,12 @@ sub getAllSql {
 			}
 		}		
 	}
-
+	
 	# limit to our sequence
 	my $sequenceKey = $class->crud_getSequenceKey($session);
 	if (exists $options->{sequenceKeyValue} && $sequenceKey) {
 		push @params, $options->{sequenceKeyValue};
-		push @where, $dbh->quote_identifier($sequenceKey)."=?";
+		push @where, $dbh->quote_identifier($tableName, $sequenceKey)."=?";
 	}
 
 	# merge all clauses with the main query
@@ -660,6 +674,13 @@ sub getAllSql {
 		$sql .= " where ".join(" AND ", @where);
 	}
 
+	# custom order by field
+	my $order = " order by ".$dbh->quote_identifier($tableName, 'sequenceNumber');
+	if (exists $options->{orderBy}) {
+		$order = " order by ".$options->{orderBy};
+	}
+	$sql .= $order;
+	
 	# construct a record limit
 	my $limit;
 	if ( exists $options->{limit}) {
@@ -670,28 +691,9 @@ sub getAllSql {
 			$limit = " limit ".$options->{limit};
 		}
 	}
+	$sql .= $limit;
 
-	# custom order by field
-	my $order = " order by sequenceNumber";
-	if (exists $options->{orderBy}) {
-		if (ref $options->{orderBy} eq "ARRAY") {
-			my @clauses = ();
-			foreach my $pair (@{$options->{orderBy}}) {
-				my ($field) = keys %{$pair};
-				push @clauses, $dbh->quote_identifier($field)." ".$pair->{$field};
-			}
-			$order = " order by ". join(", ", @clauses);
-		}
-		elsif (ref $options->{orderBy} eq "HASH") {
-			my ($field) = keys %{$options->{orderBy}};
-			$order = " order by ".$dbh->quote_identifier($field)." ".$options->{orderBy}{$field};
-		}
-		else {
-			$order = " order by ".$dbh->quote_identifier($options->{orderBy});
-		}
-	}
-
-	return $sql . $order . $limit, \ @params;
+	return $sql, \@params;
 }
 
 #-------------------------------------------------------------------
