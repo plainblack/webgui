@@ -7,7 +7,7 @@ Survey.Comm = new function(){
 
     var request = function(sUrl,callback,postData){
         if(callMade == 1){
-            alert("Waiting on previous call");
+            alert("Waiting on previous request");
         }else{
             callMade = 1;
             YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
@@ -16,6 +16,7 @@ Survey.Comm = new function(){
     this.callback = {
         success:function(o){
             callMade = 0;
+console.log(o.responseText);
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },
         failure: function(o){

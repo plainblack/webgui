@@ -16,6 +16,9 @@ use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
+
+use Data::Dumper;
+
 #<tmpl if admin <tmpl_if canEditSurvey><a href="<tmpl_var editSUrvey_url>"><tmpl_var editSurvey_label></a></tmpl_if>
 #-------------------------------------------------------------------
 sub definition {
@@ -80,21 +83,21 @@ sub definition {
                 tab         => 'display',
                 fieldType   => 'template',
                 label => "Survey edit template id",
-                defaultValue    => 'lWcFPcZOf6f84fNNKo3LGw',
+                defaultValue    => 'GRUNFctldUgop-qRLuo_DA',
                 namespace  => 'Survey/Edit',
                 },
             surveyTakeTemplateId => {
                 tab         => 'display',
                 fieldType   => 'template',
                 label => "Take survey template id",
-                defaultValue    => 'TOCwx3VNHVmNr5eSPIAMNg',
+                defaultValue    => 'd8jMMMRddSQ7twP4l1ZSIw',
                 namespace  => 'Survey/Take',
                 },
             surveyQuestionsId => {
                 tab         => 'display',
                 fieldType   => 'template',
                 label => "Questions template id",
-                defaultValue    => 'h0pJBF7LVqCCfWYr_g6YXQ',
+                defaultValue    => 'CxMpE_UPauZA3p8jdrOABw',
                 namespace  => 'Survey/Take',
                 },
         );
@@ -137,219 +140,123 @@ This overloads the normal call to the super, to call the super call like normal 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
     my $self = shift;
-     $self->SUPER::processPropertiesFromFormPost;
-    my $firstSection = $self->getFirstSection();
-    if(! $firstSection){
-        $self->insertSection( [$self->getId,$self->session->id->generate(),'',"First Section",1,1,"Tis is the first page",0,0,1,0,0,'',''] );
-#        $self->insertSection( [$self->getId,$self->session->id->generate(),"Last Section",9999,0,"This is the last page",0,0] );
+    $self->SUPER::processPropertiesFromFormPost;
+
+    $self->loadSurveyJSON();
+    if($#{$self->{_data}->{sections}} < 0){
+        $self->{_data}->update({ids=>['NEW'],object=>{}});
     }
+    $self->saveSurveyJSON();
 }
 
+#-------------------------------------------------------------------
+
+=head2 loadSurveyJSON ( )
+
+Loads the survey collateral into memory so that the survey objects can be created
+
+=cut
+
+sub loadSurveyJSON{
+    my $self = shift;
+
+    if(defined $self->{_data}){return;}#already loaded
+
+    my $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]);
+use Data::Dumper;
+$self->session->errorHandler->error("LOADING".Dumper $jsonHash);
+    my $hashRef = {};
+    $hashRef = decode_json($jsonHash) if defined $jsonHash;
+
+    $self->{_data} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($hashRef);#,$self->session->errorHandler);
+}
+
+#-------------------------------------------------------------------
+
+=head2 saveSurveyJSON ( )
+
+Saves the survey collateral to the DB
+
+=cut
+
+sub saveSurveyJSON{
+    my $self = shift;
+    $self->{_data}->{log} = $self->session->errorHandler;
+    my $data = $self->{_data}->freeze();
+
+use Data::Dumper;
+$self->session->errorHandler->error("SAVING".Dumper $data);
+    
+    $data = encode_json($data);
+    $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
+}
 
 
 #-------------------------------------------------------------------
 
-=head2 prepareView ( )
+=head2 www_editSurvey ( )
 
-See WebGUI::Asset::prepareView() for details.
+Loads the initial edit survey page.  All other edit actions are JSON calls from this page.
 
 =cut
 
 sub www_editSurvey {
     my $self = shift;
+
     my %var;
-#    my $out = $self->processStyle($self->processTemplate(\%var,$self->get("surveyEditTemplateId")));
     my $out = $self->processTemplate(\%var,$self->get("surveyEditTemplateId"));
 
     return $out;
 }
 
 #-------------------------------------------------------------------
-sub www_submitAnswerEdit{
-    my $self = shift;
-    my $ref = $self->session->form->paramsHashRef();
-    
-    if($ref->{'Survey_answerId'}){
-        $self->session->db->write("
-                update Survey_answer
-                set answerText = ?, gotoQuestion = ?, recordedAnswer = ?, isCorrect = ?, min = ?, max = ?, step = ?, verbatim = ?, textCols = ?, textRows = ?
-                where Survey_answerId = ?",
-            [
-                $$ref{'answerText'},$$ref{'gotoQuestion'},$$ref{'recordedAnswer'},$$ref{'isCorrect'},$$ref{'min'},
-                $$ref{'max'},$$ref{'step'},$$ref{'verbatim'},$$ref{'textCols'},$$ref{'textRows'}
-                ,$$ref{'Survey_answerId'}
-            ]
-            );
-    }else{
-        my $seqNum = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_answer where Survey_questionId = ?",[$ref->{'Survey_questionId'}]);
-        $seqNum++;
-        $ref->{'Survey_answerId'} = $self->session->id->generate(); 
-        $self->session->db->write("insert into Survey_answer values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-          [ $self->getId,$$ref{'Survey_sectionId'},$$ref{'Survey_questionId'},$$ref{'Survey_answerId'},$seqNum,$$ref{'gotoQuestion'},$$ref{'answerText'},
-            $$ref{'recordedAnswer'},$$ref{'isCorrect'},$$ref{'min'},$$ref{'max'},$$ref{'step'},$$ref{'verbatim'},$$ref{'textCols'},$$ref{'textRows'} ]
-        );
-    }
-    return $self->www_loadSurvey($ref->{'Survey_sectionId'}."||||".$ref->{'Survey_questionId'}."||||".$$ref{'Survey_answerId'});
-}
-#-------------------------------------------------------------------
-sub www_submitQuestionEdit{
-    my $self = shift;
-    my $ref = $self->session->form->paramsHashRef();
-    
-    if($ref->{'Survey_questionId'}){
-        my $type = $self->session->db->quickScalar("select questionType from Survey_question where Survey_questionId = ?",[$ref->{'Survey_questionId'}]);
-        
-        $self->session->db->write("
-                update Survey_question
-                set questionText = ?, allowComment = ?, randomizeAnswers = ?, questionType = ?, randomizedWords = ?, previousAnswerWords = ?, verticalDisplay = ?, 
-                    required = ?, maxAnswers = ?, questionVariable = ?, points = ?, commentCols = ?, commentRows = ?, textInButton = ?
-                where Survey_questionId = ?",
-            [
-                $$ref{'questionText'},$$ref{'allowComment'},$$ref{'randomizeAnswers'},$$ref{'questionType'},$$ref{'randomizedWords'},
-                $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'questionVariable'}, $$ref{'points'},
-                $$ref{'commentCols'},$$ref{'commentRows'},$$ref{'textInButton'},
-                $$ref{'Survey_questionId'}
-            ]
-            );
-
-$self->session->errorHandler->warn("textInButton was ".$$ref{'textInButton'});
-        if($type ne $ref->{'questionType'}){
-            $self->createDefaultAnswers($ref->{'Survey_sectionId'},$ref->{'Survey_questionId'},$ref->{'questionType'});
-        }
-
-    }else{
-        my $seqNum = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$ref->{'Survey_sectionId'}]);
-        $seqNum++;
-        $ref->{'Survey_questionId'} = $self->session->id->generate(); 
-        $self->session->db->write("insert into Survey_question values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            [ $self->getId,$$ref{'Survey_questionId'},$$ref{'questionVariable'},$$ref{'questionText'},$seqNum,$$ref{'allowComment'},$$ref{'commentCols'},$$ref{'commentRows'},
-                $$ref{'randomizeAnswers'},$$ref{'questionType'}, $$ref{'Survey_sectionId'},$$ref{'randomizedWords'},
-                $$ref{'previousAnswerWords'},$$ref{'verticalDisplay'},$$ref{'required'},$$ref{'maxAnswers'}, $$ref{'points'}, $$ref{'textInButton'} ]
-          );
-        
-        $self->createDefaultAnswers($ref->{'Survey_sectionId'},$ref->{'Survey_questionId'},$ref->{'questionType'});
-    }
-    return $self->www_loadSurvey($ref->{'Survey_sectionId'}."||||".$ref->{'Survey_questionId'});
-}
-
-
-#-------------------------------------------------------------------
-sub www_submitSectionEdit{
+sub www_submitEditObject{
     my $self = shift;
     
-    my $p = $self->session->form->paramsHashRef();
-    if(!$p->{'Survey_sectionId'}){
-        my $seqNum = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_section where assetId = ?",[$self->getId]);
-        my $id = $self->session->id->generate();
+    my $ref = @{decode_json($self->session->form->process("data"))};
 
-        $self->insertSection([$self->getId, $id, $p->{'sectionVariable'},$p->{'sectionName'},$seqNum+1,$p->{'questionsPerPage'},$p->{'sectionText'},$p->{'randomizeQuestions'},
-            $p->{'questionsOnSectionPage'}, $p->{'everyPageTitle'},$p->{'everyPageText'},$p->{'terminal'},$p->{'terminalURL'},$p->{'goto'}]); 
+    $self->loadSurveyJSON();
 
-        $p->{'Survey_sectionId'} = $id;
+    my $message = $self->{_data}->update($ref);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
 
-    }else{
+    $self->saveSurveyJSON();
 
-        $self->session->db->write("update Survey_section set sectionName = ?, questionsPerPage = ?, sectionText = ?, randomizeQuestions = ?, questionsOnSectionPage = ?,
-                everyPageTitle = ?, everyPageText = ?,terminal = ?, terminalURL = ?,sectionVariable = ?, goto = ?
-            where Survey_sectionId = ?",
-            [ $p->{'sectionName'}, $p->{'questionsPerPage'}, $p->{'sectionText'}, $p->{'randomizeQuestions'}, $p->{'questionsOnSectionPage'},$p->{'everyPageTitle'}, 
-                $p->{'everyPageText'}, $p->{'terminal'}, $p->{'terminalURL'}, $p->{'sectionVariable'},$p->{'goto'}, 
-            $p->{'Survey_sectionId'} ]
-        );
-
-$self->session->errorHandler->warn("here");
-    } 
-    use Data::Dumper;
-    $self->session->errorHandler->warn(Dumper $p);
-    return $self->www_loadSurvey($p->{'Survey_sectionId'});
+    return $self->www_loadSurvey({address => $ref->{ids},message=>$message});
 }
 
 
 #-------------------------------------------------------------------
-sub www_newAnswer{
+sub www_deleteObject{
     my $self = shift;
-    my ($sid,$qid) = @{decode_json($self->session->form->process("data"))};
-$self->session->errorHandler->warn("NEW ANSWER ".$sid."\t\t".$qid);
 
-    my $id = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_answer where Survey_questionId = ?",[$qid]);
-    if(!$id){$id = 1;}else{$id++;}
-    my $edit;
-    $edit->{'type'} = 'loadAnswer';
-    $edit->{'params'} = {'assetId', $self->getId, 'Survey_sectionId', $sid, 'Survey_questionId',$qid, 'Survey_answerId','', 'sequenceNumber', $id, 'gotoQuestion','',
-            'answerText','','recordedAnswer','','isCorrect',1,'min',1,'max',10,'step',1,'verbatim',0 };
-    $sid .= "||||".$qid;
-    return $self->www_loadSurvey($sid,$edit);
+    my $ref = @{decode_json($self->session->form->process("data"))};
+
+    $self->loadSurveyJSON();
+
+    my $message = $self->{_data}->remove($ref);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+
+    $self->saveSurveyJSON();
+
+    #The last address in ideas is to a deleted object so that should not be returned.
+    pop(@{$ref->{ids}});    
+
+    return $self->www_loadSurvey({address => $ref->{ids}, message=>$message});
 }
-
-
-#-------------------------------------------------------------------
-sub www_newQuestion{
+sub www_newObject{
     my $self = shift;
-    my $sid = $self->session->form->process("data");
-
-    my $id = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$sid]);
-    if(!$id){$id = 1;}else{$id++;}
-    my $edit;
-    $edit->{'type'} = 'loadQuestion';
-    $edit->{'params'} = {'assetId', $self->getId, 'Survey_sectionId', $sid, 'Survey_questionId','', 'questionText','', 'sequenceNumber', $id,
-            'allowComment',0, 'randomizeAnswers',0, 'questionType',1, 'required',0,'randomizedWords','','previousAnswerWords','','verticalDisplay',0,'maxAnswers','1',
-            'questionVariable','','commentCols',20,'commentRows',1, 'textInButton',0 };
-    return $self->www_loadSurvey($sid,$edit); 
-}
-
-
-#-------------------------------------------------------------------
-sub www_newSection{
-    my $self = shift;
-    my $last = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_section where assetId = ?",[$self->getId]);
-    my $focus = '';
-    my $edit;
-    $edit->{'type'} = 'loadSection';
-    $edit->{'params'} = {'assetId', $self->getId, 'Survey_sectionId', $focus, 'sectionName', 'New Section', 'sequenceNumber', ++$last,
-            'questionsPerPage',1, 'sectionText', 'Text goes here', 'randomizeQuestions',0, 'questionsOnSectionPage', 0, 'everyPageTitle',1,'everyPageText',0,'terminal',0};
-    return $self->www_loadSurvey('',$edit); 
-}
-
-
-
-#-------------------------------------------------------------------
-sub www_deleteAnswer{
-    my $self = shift;
-    my $id = $self->session->form->process("data");
-    my $ref = $self->session->db->quickHashRef("select Survey_sectionId,Survey_questionId,sequenceNumber from Survey_answer where Survey_answerId = ?",[$id]);
-    $self->session->db->write("update Survey_answer set sequenceNumber = sequenceNumber -1 where Survey_questionId = ? and sequenceNumber > ?",
-        [$$ref{'Survey_questionId'},$$ref{'sequenceNumber'}]);
-    $self->session->db->write("delete from Survey_answer where Survey_answerId = ?",[$id]);
-    return $self->www_loadSurvey($$ref{'Survey_sectionId'}."||||".$$ref{'Survey_questionId'});
-}
-sub www_deleteQuestion{
-    my $self = shift;
-    my $id = $self->session->form->process("data");
-    my $ref = $self->session->db->quickHashRef("select Survey_sectionId,sequenceNumber from Survey_question where Survey_questionId = ?",[$id]);
-
-    $self->session->db->write("update Survey_question set sequenceNumber = sequenceNumber -1 where Survey_sectionId = ? and sequenceNumber > ?",
-        [$$ref{'Survey_sectionId'},$$ref{'sequenceNumber'}]);
-
-    $self->session->db->write("delete from Survey_question where Survey_questionId = ?",[$id]);
-    $self->session->db->write("delete from Survey_answer where Survey_questionId = ?",[$id]);
-    return $self->www_loadSurvey($$ref{'Survey_sectionId'});
-}
-sub www_deleteSection{
-    my $self = shift;
-    my $id = $self->session->form->process("data");
-
-    my $seq = $self->session->db->quickScalar("select sequenceNumber from Survey_section where Survey_sectionId = ?",[$id]);
+    my $ref;
     
-    $self->session->db->write("update Survey_section set sequenceNumber = sequenceNumber -1 where assetId= ? and sequenceNumber > ?",
-        [$self->getId(),$seq]);
+    $ref->{ids} = @{decode_json($self->session->form->process("data"))};
     
-    $self->session->db->write("delete from Survey_answer where Survey_sectionId = ?",[$id]);
-    $self->session->db->write("delete from Survey_question where Survey_sectionId = ?",[$id]);
-    $self->session->db->write("delete from Survey_section where Survey_sectionId = ?",[$id]);
-    return $self->www_loadSurvey('undefined');#faking an empty JS entry
+    $self->loadSurveyJSON();
+
+    my $object = $self->{_data}->createTemp($ref);
+   
+    #The new temp object has an address of NEW, which means it is not a real final address. 
+    push(@{$ref->{ids}},'NEW');
+
+    return $self->www_loadSurvey({address => $ref->{ids}, message => undef, object => $object});
 }
-
-
 
 
 #-------------------------------------------------------------------
@@ -463,60 +370,26 @@ sub www_dragDrop{
  
 #-------------------------------------------------------------------
 sub www_loadSurvey{
-    my $self = shift;
-    my $p = shift;#The id of the the object(s) in focus, can be empty.
-    my $edit = shift;#If edit data has already been generated and does not need to be grabbed for the focus id, usually is empty.
-
-    if(!$p){ 
-        $p = $self->session->form->process("data");
-    }
-
-    my $focus;#Survey object that has the focus
-
-    if($p eq "undefined"){
-        $focus = $self->getFirstSection();
-    }else{$focus = $p;}
-
-    my @dfocus = split(/\|\|\|\|/,$focus);
+    my ($self,$options) = @_;
     
-    my $sections = $self->getSections();
-    my $questions = $self->getQuestions($dfocus[0]);#pass in the section
-    my $answers = $self->getAnswers($dfocus[1]);#pass in the question
+    $self->loadSurveyJSON();
+$self->session->errorHandler->error("The object isa ".Dumper $self->{_data});
 
+    my $address = $options->{address} ? defined $options : [0];
+    my $message = $options->{message} ? defined $options : '';
+    my $object = $options->{object} ? defined $options : $self->{_data}->getObject($address);
+$self->session->errorHandler->error("The object isa ".Dumper $object);
+    $object = $object->freeze();#just want the hashref
 
-    if(! $edit){
-        if($#dfocus == 0){
-            $edit->{"type"} = "loadSection";
-            $edit->{"params"} = $self->getSpecificSection($dfocus[0]);
-            #get specific data/edit template for section
-        }elsif($#dfocus == 1){
-            $edit->{"type"} = "loadQuestion";
-            $edit->{"params"} = $self->getSpecificQuestion($dfocus[1]);
-            #get specific data/edit template for question
-        }elsif($#dfocus == 2){
-            $edit->{"type"} = "loadAnswer";
-            $edit->{"params"} = $self->getSpecificAnswer($dfocus[2]);
-            #get specific data/edit template for answer
-        }
-    }
-    
+$self->session->errorHandler->error(1);
+
     my @data;
-    foreach my $s(@$sections){
-        push( @data, { "type","section","text",$s->{"sectionName"},"id",$s->{'Survey_sectionId'} } ); 
-        if($#$questions >= 0 and $questions->[0]->{'Survey_sectionId'} eq $s->{'Survey_sectionId'}){
-            foreach my $q(@$questions){
-                push( @data, { "type","question","text",$q->{"text"},"id",$q->{'Survey_questionId'} } ); 
-                if($#$answers >= 0 and $answers->[0]->{'Survey_questionId'} eq $q->{'Survey_questionId'}){
-                    foreach my $a(@$answers){
-                        push( @data, { "type","answer","text",$a->{"text"},"id",$a->{'Survey_answerId'}, "recorded", $a->{'recordedAnswer'} } ); 
-                    }
-                }
-            }
-        }
-    }
+    @data = $self->{_data}->getDragDropList($address,\@data);
+$self->session->errorHandler->error(2);
 
-    my $return = {"focus",$focus,"data",\@data,"edit",$edit};
-#    $self->session->errorHandler->warn(encode_json($return));
+    my $return = {"address",$address,"data",\@data,"object",$object};
+    $self->session->errorHandler->warn(encode_json($return));
+$self->session->errorHandler->error(3);
     return encode_json($return);
 }
 
@@ -1623,10 +1496,5 @@ sub AnswersInsert{
     $self->session->db->write("insert into Survey_answer values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",$array);
 }
 
-1;
 
-package ktest;
-use Class::InsideOut qw( public readonly private register id );
-    public     name => my %name;
-    sub new{register(shift)}
 1;

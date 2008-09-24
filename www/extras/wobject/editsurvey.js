@@ -4,7 +4,7 @@ if (typeof Survey == "undefined") {
 
 Survey.Data = new function(){
     var lastDataSet = {};
-    var focus;
+    var address;
 
 
     this.dragDrop = function(did){
@@ -45,7 +45,7 @@ Survey.Data = new function(){
 
 
     this.loadData = function(d){
-        focus = d.focus;//What is the current highlighted item.
+        address = d.address;//What is the current highlighted item.
         var lastType = '';//What was the last type created.
         var lastId = {'section': '', 'question': '', 'answer': ''};//what is the last id of each type placed, so we know a child's parent.
         var buttons = {'question':0,'answer':0,'section':0}; //array of bools on if buttons put down
@@ -81,13 +81,13 @@ Survey.Data = new function(){
                 acount = 1;
                 qcount = 1;
             }
-            else if(d.data[x].type == 'section' && lastType == 'section' && lastId['section'] == focus){
+            else if(d.data[x].type == 'section' && lastType == 'section' && lastId['section'] == address){
                 this.addQuestionButton(lastId['section']);
                 buttons['question'] = 1;
                 acount = 1;
                 qcount = 1;
             }
-            else if(d.data[x].type != 'answer' && lastType == 'question' && lastId['section'] + '||||'+ lastId['question'] == focus){
+            else if(d.data[x].type != 'answer' && lastType == 'question' && lastId['section'] + '||||'+ lastId['question'] == address){
                 this.addAnswerButton(lastId['section'],lastId['question']);
                 buttons['answer']=1;
                 acount = 1;
@@ -95,12 +95,12 @@ Survey.Data = new function(){
             }
 
             var node = document.createElement('li');
-            if(focus != undefined && focus.indexOf(d.data[x].id) > -1){
+            if(address != undefined && address.indexOf(d.data[x].id) > -1){
                 node.className = "s"+d.data[x].type;
             }else{
                 node.className = d.data[x].type;
             }
-            if(d.data[x].text == undefined){//== 'null'){
+            if(d.data[x].text == undefined){
                 d.data[x].text = '<empty>';
             }
             var id = '';
@@ -108,17 +108,20 @@ Survey.Data = new function(){
             var pre;
             if(d.data[x].type == 'section'){
                 pre = 'S'+ scount++ +':';
-                id = d.data[x].id;
+                //id = d.data[x].id;
+                id = scount-1;
             }
             else if(d.data[x].type == 'question'){
-                pre = 'Q'+ qcount++ +':';
-                id = lastId['section'] + delim + d.data[x].id;
+                pre = 'Q'+ qcount++ + ':';
+                id = scount-1 +"-"+qcount-1;
+                //id = lastId['section'] + delim + d.data[x].id;
             }
             else if(d.data[x].type == 'answer'){
                 if(d.data[x].recordedAnswers != null){
                 }
                 pre = 'A'+ acount++ +':';
-                id = lastId['section'] + delim + lastId['question'] + delim + d.data[x].id;
+                id = scount-1 +"-"+qcount-1+"-"+acount-1;
+                //id = lastId['section'] + delim + lastId['question'] + delim + d.data[x].id;
             }
             node.innerHTML = pre + ' ' + d.data[x].text;
             node.id = id;
@@ -127,7 +130,8 @@ Survey.Data = new function(){
             YAHOO.util.Event.addListener(id, "click", this.clicked); 
 
             lastType = d.data[x].type;
-            lastId[d.data[x].type] = d.data[x].id;
+            //lastId[d.data[x].type] = d.data[x].id;
+            lastId[d.data[x].type] = id;
         }
         if(lastType == 'answer' && ! buttons['answer']){
             this.addAnswerButton(lastId['section'],lastId['question']);

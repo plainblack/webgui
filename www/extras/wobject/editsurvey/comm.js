@@ -9,6 +9,8 @@ Survey.Comm = new function(){
     }
     this.callback = {
         success:function(o){
+alert('here');
+this.logger('hi');
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },
         failure: function(o){
