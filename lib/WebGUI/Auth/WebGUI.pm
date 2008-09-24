@@ -250,18 +250,19 @@ sub createAccountSave {
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
 
+    my $afterCreateMessage = $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+
     # Send validation e-mail if required
     if ($setting->get("webguiValidateEmail")) {
-        my $key = $session->id->generate();
+        my $key = $session->id->generate;
         $self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
-        my $mail = WebGUI::Mail::Send->create($self->session,{
+        my $mail = WebGUI::Mail::Send->create($self->session, {
             to      => $profile->{email},
             subject => $i18n->get('email address validation email subject','AuthWebGUI')
-            });
+        });
         $mail->addText(
             $i18n->get('email address validation email body','AuthWebGUI') . "\n\n"
-            . $session->url->getSiteURL() 
-            . $session->url->page("op=auth;method=validateEmail;key=".$key) . "\n\n"
+            . $session->url->page("op=auth;method=validateEmail;key=".$key, 'full') . "\n\n"
         );
         $mail->addFooter;
         $mail->send;
@@ -273,7 +274,7 @@ sub createAccountSave {
         $self->logout;
         return $self->displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
-    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+    return $afterCreateMessage;
 }
 
 #-------------------------------------------------------------------

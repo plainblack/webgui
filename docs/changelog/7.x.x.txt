@@ -1,4 +1,5 @@
 7.6.0
+ - fixed: anonymous registration with email confirmation is broken
  - added an epochDate field to the template for CS RSS items. The ^D();
    macro can then format the epoch date.
  - fixed: actove admin console tab isn't highlighted
