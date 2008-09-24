@@ -164,7 +164,7 @@ sub loadSurveyJSON{
 
     my $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]);
 use Data::Dumper;
-$self->session->errorHandler->error("LOADING".Dumper $jsonHash);
+$self->session->errorHandler->error("LOADING\n".Dumper $jsonHash."\n\n");
     my $hashRef = {};
     $hashRef = decode_json($jsonHash) if defined $jsonHash;
 
@@ -181,13 +181,21 @@ Saves the survey collateral to the DB
 
 sub saveSurveyJSON{
     my $self = shift;
-    $self->{_data}->{log} = $self->session->errorHandler;
+#    $self->{_data}->{log} = $self->session->errorHandler;
+    
     my $data = $self->{_data}->freeze();
 
 use Data::Dumper;
-$self->session->errorHandler->error("SAVING".Dumper $data);
-    
-    $data = encode_json($data);
+$self->session->errorHandler->error(Dumper $data);
+$self->session->errorHandler->error("Log defined:".defined $data->{log});
+   
+    eval{ 
+$self->session->errorHandler->error(join(',',keys %{$data}));
+        $data = encode_json($data);
+    };
+    if($@){
+        $self->session->errorHandler->error("Could not encode Survey object".$@);
+    }
     $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
 
@@ -373,19 +381,19 @@ sub www_loadSurvey{
     my ($self,$options) = @_;
     
     $self->loadSurveyJSON();
-$self->session->errorHandler->error("The object isa ".Dumper $self->{_data});
+$self->session->errorHandler->error("The object isa\n".Dumper $self->{_data});
 
     my $address = $options->{address} ? defined $options : [0];
     my $message = $options->{message} ? defined $options : '';
     my $object = $options->{object} ? defined $options : $self->{_data}->getObject($address);
-$self->session->errorHandler->error("The object isa ".Dumper $object);
+$self->session->errorHandler->error("The object isa\n".Dumper $object);
     $object = $object->freeze();#just want the hashref
 
 $self->session->errorHandler->error(1);
 
     my @data;
-    @data = $self->{_data}->getDragDropList($address,\@data);
-$self->session->errorHandler->error(2);
+    $self->{_data}->getDragDropList($address,\@data,$self->session->errorHandler);
+$self->session->errorHandler->error("In Survey".Dumper @data);
 
     my $return = {"address",$address,"data",\@data,"object",$object};
     $self->session->errorHandler->warn(encode_json($return));

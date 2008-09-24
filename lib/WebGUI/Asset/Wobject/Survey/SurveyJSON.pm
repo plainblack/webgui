@@ -3,6 +3,7 @@ package WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use strict;
 use Data::Structure::Util qw/unbless/;
 use WebGUI::Asset::Wobject::Survey::SectionJSON;
+use Data::Dumper;
 
 sub new{
     my $class = shift;
@@ -19,12 +20,23 @@ sub new{
     bless($self,$class);
     return $self;
 }
+sub log{
+    my ($self,$message) = @_;
+    if(defined $self->{log}){
+        $self->{log}->error($message);
+    }
+}
 #address is the array of objects currently selected in the edit screen
 #data is the array of hash items for displaying  
 sub getDragDropList{
-    my ($self,$address,$data) = @_;
+    my $self = shift;
+    my $address = shift;
+    my $data = shift;
+    $self->{log} = shift;
     for(my $i=0; $i<=$#{$self->{sections}}; $i++){
+        $self->log("Survey passing ".Dumper $data);#,$address,$i, $$address[0]");
         $self->{sections}->[$i]->getDragDropList($data, $address, $i == $address->[0]);
+        $self->log("Survey passing ".Dumper $data);#,$address,$i, $$address[0]");
     }
 }
 
@@ -70,9 +82,10 @@ sub freeze{
     my $self = shift;
     my %temp = %{$self};
     $temp{sections} = [];
-    $temp{log} = undef;
+    $temp{PPPPPPPOOOOOOOOOOOOOOOOPPPPPPPPPPPP} = 1;
+    delete $temp{log};
     foreach (@{$self->{sections}}){
-        push(@{$temp{sections}},$_->freeze($self->{log}));
+#        push(@{$temp{sections}},$_->freeze());
     }
     return \%temp;
 }

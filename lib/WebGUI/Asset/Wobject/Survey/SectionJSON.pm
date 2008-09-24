@@ -18,7 +18,7 @@ sub new{
     }
 
     $self->{text}                       = $self->{text} || '';
-    $self->{title}                      = $self->{title} || '';
+    $self->{title}                      = $self->{title} || 'New Section';
     $self->{parent}                     = $parent;
     $self->{questionsPerPage}           = $self->{questionsPerPage} || 5;
     $self->{questionsOnSectionPage}     = $self->{questionsOnSectionPage} || 1;
@@ -106,8 +106,9 @@ sub getQuestion{
 
 sub freeze{
     my $self = shift;
-    $self->{parent} = undef;
+
     my %temp = %{$self};
+    $temp{parent} = undef;
     $temp{questions} = [];
     foreach(@{$self->{questions}}){
         push(@{$temp{questions}}, $_->freeze());
