@@ -16,7 +16,6 @@ Survey.Comm = new function(){
     this.callback = {
         success:function(o){
             callMade = 0;
-console.log(o.responseText);
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },
         failure: function(o){

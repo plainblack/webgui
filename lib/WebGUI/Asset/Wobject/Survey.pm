@@ -169,6 +169,7 @@ $self->session->errorHandler->error("LOADING\n".Dumper $jsonHash."\n\n");
     $hashRef = decode_json($jsonHash) if defined $jsonHash;
 
     $self->{_data} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($hashRef);#,$self->session->errorHandler);
+
 }
 
 #-------------------------------------------------------------------
@@ -181,13 +182,20 @@ Saves the survey collateral to the DB
 
 sub saveSurveyJSON{
     my $self = shift;
-#    $self->{_data}->{log} = $self->session->errorHandler;
-    
-    my $data = $self->{_data}->freeze();
+    $self->{_data}->{log} = $self->session->errorHandler;
+    my $data;
+$self->session->errorHandler->error("Calling Freeze");
+$self->session->errorHandler->error("data type = ".ref $self->{_data});
+eval{    
+    $data = $self->{_data}->freeze();
+};
+$self->session->errorHandler->error("Freeze error".$@);
+$self->session->errorHandler->error("data type = ".ref $data);
+
 
 use Data::Dumper;
-$self->session->errorHandler->error(Dumper $data);
 $self->session->errorHandler->error("Log defined:".defined $data->{log});
+#$self->session->errorHandler->error(Dumper $data);
    
     eval{ 
 $self->session->errorHandler->error(join(',',keys %{$data}));
@@ -392,11 +400,94 @@ $self->session->errorHandler->error("The object isa\n".Dumper $object);
 $self->session->errorHandler->error(1);
 
     my @data;
+    my %buttons;
     $self->{_data}->getDragDropList($address,\@data,$self->session->errorHandler);
-$self->session->errorHandler->error("In Survey".Dumper @data);
+    my $html;
+    my ($scount,$qcount,$acount) = (0,0,0);
+    my $lastType;
+    my %lastId;
+    my @ids;
+    my ($s,$q,$a) = (0,0,0);#bools on if a button has already been created
 
-    my $return = {"address",$address,"data",\@data,"object",$object};
-    $self->session->errorHandler->warn(encode_json($return));
+    foreach (@data){
+        if($_->{type} eq 'section'){
+            if($lastType eq 'answer'){
+                $html .= "<span id='newAnswer'></span><br>";
+                $buttons{answer} = "$lastId{section}-$lastId{question}"; 
+                $a = 1;
+            }
+            elsif($lastType eq 'question'){
+                $html .= "<span id='newQuestion'></span><br>";
+                $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+                $q = 1;
+            }
+            $html .= "<li id='$scount' class='section'>S". ($scount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,$scount);
+            $lastId{section} = $scount++;
+            $lastType = 'section';
+        }
+        elsif($_->{type} eq 'question'){
+            if($lastType eq 'answer'){
+                $html .= "<span id='newAnswer'></span><br>";
+                $buttons{answer} = "$lastId{section}-$lastId{question}"; 
+                $a = 1;
+            }
+            $html .= "<li id='$scount-$qcount' class='question'>Q". ($qcount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,$qcount);
+            $lastId{question} = $qcount++;
+            $lastType = 'question';
+        }
+        elsif($_->{type} eq 'answer'){
+            $html .= "<li id='$scount-$qcount-$acount' class='answer'>A". ($acount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,$acount);
+            $lastId{answer} = $acount++;
+            $lastType = 'answer';
+        }
+    }
+    if($lastType eq 'answer'){
+        if(!$a){
+            $html .= "<span id='newAnswer'></span><br>";
+            $buttons{'answer'} = "$lastId{section}-$lastId{question}"; 
+        }
+        if(!$b){
+            $html .= "<span id='newQuestion'></span><br>";
+            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+        }
+        if(!$s){
+            $html .= "<span id='newSection'></span><br>";
+            $buttons{'section'} = "$lastId{section}"; 
+        }
+    }
+    elsif($lastType eq 'question'){
+        if(!$b){
+            $html .= "<span id='newQuestion'></span><br>";
+            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+        }
+        if(!$s){
+            $html .= "<span id='newSection'></span><br>";
+            $buttons{'section'} = "$lastId{section}"; 
+        }
+    }
+    elsif($lastType eq 'section'){
+        if(!$b){
+            $html .= "<span id='newQuestion'></span><br>";
+            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+        }
+        if(!$s){
+            $html .= "<span id='newSection'></span><br>";
+            $buttons{'section'} = "$lastId{section}"; 
+        }
+    }
+    #my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+$self->session->errorHandler->error($html);
+
+    #address is the address of the focused object
+    #buttons are the data to create the Add buttons
+    #object is the data to create the edited object
+    #ddhtml is the html to create the draggable html divs
+    #ids is a list of all ids passed in which are draggable (for adding events)
+    my $return = {"address",$address,"buttons",\%buttons,"object",$object,"ddhtml",$html,"ids",\@ids};
+    $self->session->errorHandler->error(encode_json($return));
 $self->session->errorHandler->error(3);
     return encode_json($return);
 }

@@ -32,6 +32,7 @@ sub new{
     $self->{textInButton};
     $self->{terminal};
     $self->{terminalUrl};
+    $self->{type}       = 'question';
     bless($self,$class);
     return $self;
 }
@@ -45,7 +46,7 @@ sub update{
         }
     #is a new answer
     }elsif($$ref{ids}->[2] eq 'NEW'){
-        push(@{$self->{answers}}, WebGUI::Assest::Wobject::Survey::AnswerJSON->new( $self,@{$self->{object}}) );
+        push(@{$self->{answers}}, WebGUI::Assest::Wobject::Survey::AnswerJSON->new( @{$self->{object}}) );
     #is updating a answer
     }else{
         $self->{answers}->[$$ref{ids}->[2]]->update($ref);
@@ -90,7 +91,7 @@ sub freeze{
 #data is the array of hash items for displaying  
 sub getDragDropList{
     my ($self,$data,$address,$selected) = @_;
-    push(@$data, { "type","question","text",$self->{text} });
+    push(@$data, { "type",$self->{type},"text",$self->{text} });
     if($selected){
         for (@{$self->{answers}}){
             $_->getDragDropList($data, $address);

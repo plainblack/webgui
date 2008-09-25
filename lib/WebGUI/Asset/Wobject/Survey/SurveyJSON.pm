@@ -54,7 +54,7 @@ sub update{
     if(ref $$ref{ids} eq 'ARRAY' and $$ref{ids}->[0] ne 'NEW'){
         $self->{sections}->[$$ref{ids}->[0]]->update($ref);
     }else{
-        push(@{$self->{sections}}, WebGUI::Asset::Wobject::Survey::SectionJSON->new($self,$ref->{object}));
+        push(@{$self->{sections}}, WebGUI::Asset::Wobject::Survey::SectionJSON->new($ref->{object}));
     }
 }
 #determine what to add and add it.
@@ -77,16 +77,15 @@ sub createTemp{
         return  WebGUI::Asset::Wobject::Survey::SectionJSON->new($self);
     }
 }
-
 sub freeze{
-    my $self = shift;
+    my ($self) = @_;
     my %temp = %{$self};
     $temp{sections} = [];
-    $temp{PPPPPPPOOOOOOOOOOOOOOOOPPPPPPPPPPPP} = 1;
     delete $temp{log};
     foreach (@{$self->{sections}}){
-#        push(@{$temp{sections}},$_->freeze());
+        push(@{$temp{sections}},$_->freeze());
     }
+$self->{log}->error(Dumper %temp);
     return \%temp;
 }
 1;

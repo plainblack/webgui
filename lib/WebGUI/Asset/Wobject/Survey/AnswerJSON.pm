@@ -5,8 +5,8 @@ use Data::Structure::Util qw/unbless/;
 
 sub new{
     my $class = shift;
-    my $parent = shift;
     my $self = shift || {};
+    my $parent = shift;
     $self->{answers} = $self->{answers} || [];
     $self->{text};
     $self->{index};
@@ -24,6 +24,7 @@ sub new{
     $self->{value};
     $self->{terminal};
     $self->{terminalUrl};
+    $self->{type} = 'answer';
     bless($self,$class);
     return $self;
 }
@@ -50,6 +51,6 @@ sub freeze{
 #data is the array of hash items for displaying  
 sub getDragDropList{
     my ($self,$data,$address,$selected) = @_;
-    push(@$data, { "type","answer","text",$self->{"text"}, "recorded", $self->{'recordedAnswer'} });
+    push(@$data, { "type",$self->{type},"text",$self->{"text"}, "recorded", $self->{'recordedAnswer'} });
 }
 1;

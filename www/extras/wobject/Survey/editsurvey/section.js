@@ -58,7 +58,7 @@ Survey.SectionTemplate = new function(){
         ";
         html = html + "<p>Title on every page: " + this.makeRadio('everyPageTitle',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageTitle);
         html = html + "<p>Text on every page: " + this.makeRadio('everyPageText',[{text:'Yes',value:1},{text:'No',value:0}],params.everyPageText);
-        html = html + "<p>Terminal section: " + this.makeRadio('terminal',[{text:'Yes',value:1},{text:'No',value:0}],params.terminal);
+        html = html + "<vr><p>Terminal section: " + this.makeRadio('terminal',[{text:'Yes',value:1},{text:'No',value:0}],params.terminal);
         html = html + "<p>  Terminal section URL: <input type=text name=terminalURL value='"+params.terminalURL+"'>";
         document.getElementById('edit').innerHTML = html;
 

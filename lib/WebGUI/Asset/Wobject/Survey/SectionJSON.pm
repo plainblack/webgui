@@ -29,6 +29,7 @@ sub new{
     $self->{terminalUrl};
     $self->{goto};
     $self->{timeLimit};
+    $self->{type}                       = 'section';
 
     bless($self,$class);
     return $self;
@@ -91,7 +92,7 @@ sub deleteQuestion{
 #data is the array of hash items for displaying  
 sub getDragDropList{
     my ($self,$data,$address,$selected) = @_;
-    push(@$data,{ "type","section","text",$self->{"title"} });
+    push(@$data,{ "type",$self->{type},"text",$self->{"title"} });
     if($selected){
         for(my $i=0; $i<=$#{$self->{questions}}; $i++){
             $self->{questions}->[$i]->getDragDropList($data, $address, $i == $address->[1]);
