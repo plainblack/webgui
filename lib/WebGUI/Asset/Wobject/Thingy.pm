@@ -2308,6 +2308,15 @@ sub www_getThingViaAjax {
         return $session->privilege->insufficient() unless $self->canViewThing($thingId,
             $thingProperties->{groupIdView});
 
+        my @field_loop;
+        my $fields = $session->db->read('select * from Thingy_fields where assetId=? and thingId=? order by sequenceNumber'
+        ,[$self->getId,$thingId]);
+        while (my $field = $fields->hashRef) {
+            $field->{formElement} = $self->getFormElement($field);
+            push(@field_loop,$field);
+        }
+        $thingProperties->{field_loop} = \@field_loop;
+        
         $session->http->setMimeType("application/json");
         return JSON->new->utf8->encode($thingProperties);
     }

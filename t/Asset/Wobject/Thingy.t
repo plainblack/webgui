@@ -116,6 +116,7 @@ cmp_deeply(
             onEditWorkflowId=>undef,
             onDeleteWorkflowId=>undef,
             sortBy=>undef,
+            field_loop=>[],
         },
         'Getting newly added thing as JSON: www_getThingViaAjax returns correct data as JSON.'
     );
