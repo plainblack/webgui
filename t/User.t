@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 137; # increment this value for each test you create
+use Test::More tests => 139; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -326,6 +326,13 @@ ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdm
 $newEnv{REMOTE_ADDR} = '10.0.0.2';
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
+
+##Check for multiple IP settings
+$session->config->set('adminModeSubnets', ['10.0.0.0/24', '192.168.0.0/24', ]);
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, first IP range');
+
+$newEnv{REMOTE_ADDR} = '192.168.0.127';
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, second IP range');
 
 ##restore the original session variables
 $session->env->{_env} = $origEnvHash;
