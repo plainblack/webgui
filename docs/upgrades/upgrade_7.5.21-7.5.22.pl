@@ -36,7 +36,9 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub fixIsPublicOnTemplates {
     my $session = shift;
+    print "\tFixing 'is public' on templates" unless $quiet;
     $session->db->write('UPDATE `assetIndex` SET `isPublic` = 0 WHERE assetId IN (SELECT assetId FROM asset WHERE className IN ("WebGUI::Asset::RichEdit", "WebGUI::Asset::Snippet", "WebGUI::Asset::Template") )');
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
