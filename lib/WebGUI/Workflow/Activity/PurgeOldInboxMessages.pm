@@ -83,6 +83,7 @@ sub execute {
 
     # keep track of how much time it's taking
     my $start   = time;
+    my $limit   = 2_500;
 
     my $sth 
         = $session->db->read(
