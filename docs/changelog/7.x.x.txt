@@ -4,6 +4,7 @@
  - fixed: HttpProxy parse now handles self-closing tags correctly
  - fixed: HttpProxy parse now only rewrites form control names when also rewriting URLs
  - fixed: WebGUI::HTML->cleanSegment now keeps <link> when preserving script and style
+ - fixed: multiple default templates broken with prevent proxy caching
 
 7.5.23
  - fixed: Change <spam> tag to <span> tag in default product template
