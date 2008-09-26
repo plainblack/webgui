@@ -983,7 +983,7 @@ sub getViewThingVars {
             [$self->get('assetId'),$thingId]);
         while (my %field = $fields->hash) {
             next unless ($field{display} eq '1');
-            my $hidden = ($field{status} eq "hidden" && !$self->session->var->get("adminOn"));
+            my $hidden = ($field{status} eq "hidden" && !$self->session->var->isAdminOn);
 
             my $originalValue = $thingData{"field_".$field{fieldId}};
             my $value = $self->getFieldValue($originalValue,\%field);
