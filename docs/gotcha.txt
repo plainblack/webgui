@@ -11,6 +11,8 @@ save you many hours of grief.
 --------------------------------------------------------------------
  * WebGUI now requires Module::Find version 0.06 or greater.
 
+ * You must be fully upgraded to 7.5.24 before upgrading to 7.6.0
+
 
 7.5.21
 --------------------------------------------------------------------
