@@ -49,6 +49,7 @@ sub getObject{
 
 sub getEditVars{
     my ($self,$address) = @_;
+$self->{log}->error("SurveyJSON geteditvars for: ".@$address);
     return $self->{sections}->[$address->[0]]->getEditVars($address);
 }
 
@@ -90,12 +91,6 @@ sub freeze{
     foreach (@{$self->{sections}}){
         push(@{$temp{sections}},$_->freeze());
     }
-foreach my $key (keys %temp){
-    if($key ne 'log'){
-        $self->{log}->error("$key $temp{$key}");
-    }
-}
-    $temp{log} = undef;
     delete $temp{log};
     return \%temp;
 }

@@ -54,6 +54,7 @@ sub getObject{
 }
 sub getEditVars{
     my ($self,$address) = @_;
+$self->{log}->error("section geteditvars");
     if(@$address > 1){
         return $self->{questions}->[$address->[1]]->getEditVars($address);
     }
@@ -139,7 +140,6 @@ sub freeze{
     foreach(@{$self->{questions}}){
         push(@{$temp{questions}}, $_->freeze());
     }
-    $temp{log} = undef;
     delete $temp{log};
     return \%temp;
 }

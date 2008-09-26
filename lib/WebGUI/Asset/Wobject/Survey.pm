@@ -256,7 +256,10 @@ sub deleteObject{
     $self->saveSurveyJSON();
 
     #The last address in ideas is to a deleted object so that should not be returned.
-    pop(@{$address});    
+    pop(@{$address});
+    if(@$address < 1){
+        $$address[0] = 0;
+    }
 
     return $self->www_loadSurvey({address => $address, message=>$message});
 }
@@ -399,8 +402,10 @@ $self->session->errorHandler->error("Loaded JSON");
 
     my $address = $options->{address} ? defined $options : [0];
     my $message = $options->{message} ? defined $options : '';
+$self->session->errorHandler->error("Getting edit vars");
     my $var = $options->{var} ? defined $options : $self->{_data}->getEditVars($address);
-$self->session->errorHandler->error("Loaded beginning params");
+$self->session->errorHandler->error("Got edit vars");
+$self->session->errorHandler->error("Loaded beginning params ".@$address);
     my $editHtml;
     if($var->{type} eq 'section'){
         $var->{id} = join('-',@$address);
