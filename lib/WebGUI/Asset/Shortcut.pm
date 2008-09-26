@@ -223,6 +223,14 @@ END_SQL
 }
 
 #-------------------------------------------------------------------
+sub getContentLastModified {
+    my $self = shift;
+    my $assetRev = $self->get('revisionDate');
+    my $shortcuttedRev = $self->getShortcut->get('revisionDate');
+    return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+}
+
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -962,7 +970,7 @@ sub www_view {
         # Make sure the www_view method won't be skipped b/c the asset is cached.
         $shortcut->purgeCache();
 
-        if ($shortcut->get("className") =~ m/Asset::Wobject/) {
+        if ($shortcut->isa('WebGUI::Asset::Wobject')) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
                 $shortcut->prepareView;
