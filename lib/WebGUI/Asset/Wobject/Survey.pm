@@ -100,6 +100,13 @@ sub definition {
                 defaultValue    => 'CxMpE_UPauZA3p8jdrOABw',
                 namespace  => 'Survey/Take',
                 },
+            sectionEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Section Edit Tempalte",
+                defaultValue    => '1oBRscNIcFOI-pETrCOspA',
+                namespace  => 'Survey/Edit',
+                },
         );
 
     push(@{$definition}, {
@@ -144,7 +151,10 @@ sub processPropertiesFromFormPost {
 
     $self->loadSurveyJSON();
     if($#{$self->{_data}->{sections}} < 0){
-        $self->{_data}->update({ids=>['NEW'],object=>{}});
+$self->session->errorHandler->error("In Processing from Post\n");
+        $self->{_data}->update(['NEW'],undef,$self->session->errorHandler);
+
+$self->session->errorHandler->error("Processing from creation\n".Dumper $self->{_data});
     }
     $self->saveSurveyJSON();
 }
@@ -163,12 +173,11 @@ sub loadSurveyJSON{
     if(defined $self->{_data}){return;}#already loaded
 
     my $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]);
-use Data::Dumper;
-$self->session->errorHandler->error("LOADING\n".Dumper $jsonHash."\n\n");
+#$self->session->errorHandler->error("LOADING\n".Dumper $jsonHash."\n\n");
     my $hashRef = {};
     $hashRef = decode_json($jsonHash) if defined $jsonHash;
 
-    $self->{_data} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($hashRef);#,$self->session->errorHandler);
+    $self->{_data} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($hashRef,$self->session->errorHandler);
 
 }
 
@@ -184,26 +193,10 @@ sub saveSurveyJSON{
     my $self = shift;
     $self->{_data}->{log} = $self->session->errorHandler;
     my $data;
-$self->session->errorHandler->error("Calling Freeze");
-$self->session->errorHandler->error("data type = ".ref $self->{_data});
-eval{    
     $data = $self->{_data}->freeze();
-};
-$self->session->errorHandler->error("Freeze error".$@);
-$self->session->errorHandler->error("data type = ".ref $data);
-
-
-use Data::Dumper;
-$self->session->errorHandler->error("Log defined:".defined $data->{log});
-#$self->session->errorHandler->error(Dumper $data);
-   
-    eval{ 
-$self->session->errorHandler->error(join(',',keys %{$data}));
-        $data = encode_json($data);
-    };
-    if($@){
-        $self->session->errorHandler->error("Could not encode Survey object".$@);
-    }
+$self->session->errorHandler->error("----------------SAving THIS DATA".Dumper $data);
+    $data = encode_json($data);
+    
     $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
 
@@ -225,39 +218,51 @@ sub www_editSurvey {
     return $out;
 }
 
+
 #-------------------------------------------------------------------
-sub www_submitEditObject{
+sub www_submitObjectEdit{
     my $self = shift;
+$self->session->errorHandler->error("Submit Edit Object");
     
-    my $ref = @{decode_json($self->session->form->process("data"))};
-
+#    my $ref = @{decode_json($self->session->form->process("data"))};
+    my $responses = $self->session->form->paramsHashRef();
+    my @address = split/-/,$responses->{id};
+#$self->session->errorHandler->error("Submit Edit Object".Dumper $responses);
     $self->loadSurveyJSON();
+    if($responses->{delete}){
+$self->session->errorHandler->error("Deleting ".join(',',@address));
+        return $self->deleteObject(\@address);
+    }
+$self->session->errorHandler->error("Updating ".join(',',@address)."Which has $$responses{terminalUrl} as the tu");
+    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->{_data}->update(\@address,$responses,$self->session->errorHandler);
 
-    my $message = $self->{_data}->update($ref);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+#    $self->saveSurveyJSON();
 
+#    return $self->www_loadSurvey({address => $ref->{ids},message=>$message});
     $self->saveSurveyJSON();
-
-    return $self->www_loadSurvey({address => $ref->{ids},message=>$message});
+    return $self->www_loadSurvey();
 }
 
 
 #-------------------------------------------------------------------
-sub www_deleteObject{
-    my $self = shift;
-
-    my $ref = @{decode_json($self->session->form->process("data"))};
+sub deleteObject{
+    my ($self,$address) = @_;
 
     $self->loadSurveyJSON();
 
-    my $message = $self->{_data}->remove($ref);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->{_data}->remove($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
 
     $self->saveSurveyJSON();
 
     #The last address in ideas is to a deleted object so that should not be returned.
-    pop(@{$ref->{ids}});    
+    pop(@{$address});    
 
-    return $self->www_loadSurvey({address => $ref->{ids}, message=>$message});
+    return $self->www_loadSurvey({address => $address, message=>$message});
 }
+
+
+#-------------------------------------------------------------------
 sub www_newObject{
     my $self = shift;
     my $ref;
@@ -388,16 +393,24 @@ sub www_dragDrop{
 sub www_loadSurvey{
     my ($self,$options) = @_;
     
+$self->session->errorHandler->error("Entering loadSurvey");
     $self->loadSurveyJSON();
-$self->session->errorHandler->error("The object isa\n".Dumper $self->{_data});
+$self->session->errorHandler->error("Loaded JSON");
 
     my $address = $options->{address} ? defined $options : [0];
     my $message = $options->{message} ? defined $options : '';
-    my $object = $options->{object} ? defined $options : $self->{_data}->getObject($address);
-$self->session->errorHandler->error("The object isa\n".Dumper $object);
-    $object = $object->freeze();#just want the hashref
+    my $var = $options->{var} ? defined $options : $self->{_data}->getEditVars($address);
+$self->session->errorHandler->error("Loaded beginning params");
+    my $editHtml;
+    if($var->{type} eq 'section'){
+        $var->{id} = join('-',@$address);
+        $var->{displayed_id} = $address->[$#$address];
+        if($var->{displayed_id} ne 'NEW'){$var->{displayed_id}++;}
 
-$self->session->errorHandler->error(1);
+        $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
+    }
+
+$self->session->errorHandler->error(Dumper $var);
 
     my @data;
     my %buttons;
@@ -478,17 +491,17 @@ $self->session->errorHandler->error(1);
             $buttons{'section'} = "$lastId{section}"; 
         }
     }
-    #my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-$self->session->errorHandler->error($html);
+#$self->session->errorHandler->error($html);
 
     #address is the address of the focused object
     #buttons are the data to create the Add buttons
-    #object is the data to create the edited object
+    #edithtml is the html edit the object
     #ddhtml is the html to create the draggable html divs
     #ids is a list of all ids passed in which are draggable (for adding events)
-    my $return = {"address",$address,"buttons",\%buttons,"object",$object,"ddhtml",$html,"ids",\@ids};
+    #type is the object type
+    my $return = {"address",$address,"buttons",\%buttons,"edithtml",$editHtml,"ddhtml",$html,"ids",\@ids,"type",$var->{type}};
     $self->session->errorHandler->error(encode_json($return));
-$self->session->errorHandler->error(3);
+$self->session->errorHandler->error("Returning from loadSurvey");
     return encode_json($return);
 }
 

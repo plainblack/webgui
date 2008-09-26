@@ -67,7 +67,7 @@ Survey.Data = new function(){
             button.on("click", this.addQuestion,d.buttons['answer']); 
         }
 
-        this.loadObjectEdit(d.object);
+        this.loadObjectEdit(d.edithtml,d.type);
         lastDataSet = d;
     }
 
@@ -84,20 +84,9 @@ Survey.Data = new function(){
         Survey.Comm.newAnswer(ids[0],ids[1]);
     }
 
-    this.loadObjectEdit = function(edit){
+    this.loadObjectEdit = function(edit,type){
         if(edit){
-            if(edit.type == "section"){
-console.log('made it here section');
-                Survey.SectionTemplate.loadSection(edit);
-            }
-            else if(edit.type == "question"){
-console.log('made it here question');
-                Survey.QuestionTemplate.loadQuestion(edit);
-            }
-            else if(edit.type == "answer"){
-console.log('made it here answer');
-                Survey.AnswerTemplate.loadAnswer(edit);
-            }
+            Survey.ObjectTemplate.loadObject(edit,type);
         }
     }
 

@@ -6,7 +6,7 @@ use Data::Structure::Util qw/unbless/;
 sub new{
     my $class = shift;
     my $self = shift || {};
-    my $parent = shift;
+    my $posts = shift;
 
     if(defined $self->{answers}){
         foreach(@{$self->{answers}}){
@@ -18,21 +18,29 @@ sub new{
 
     $self->{variableName} = $self->{variableName} || '';
     $self->{text} = $self->{text} || '';
-    $self->{parent} = $self->{parent} || $parent;  
-    $self->{allowComment};
-    $self->{commentCols};
-    $self->{commentRows};
-    $self->{randomizeAnswers};
-    $self->{questionType};
-    $self->{randomizedWords};
-    $self->{verticalDisplay};
-    $self->{required};
-    $self->{maxAnswers};
-    $self->{value};
-    $self->{textInButton};
-    $self->{terminal};
-    $self->{terminalUrl};
+    $self->{allowComment} = $self->{allowComment} || 0;
+    $self->{commentCols} = $self->{commentCols} || 10;
+    $self->{commentRows} = $self->{commentRows} || 5;
+    $self->{randomizeAnswers} = $self->{randomizeAnswers} || 0;
+    $self->{questionType} = $self->{questionType} || '';
+    $self->{randomizedWords} = $self->{randomizedWords} || '';
+    $self->{verticalDisplay} = $self->{verticalDisplay} || 0;
+    $self->{required} = $self->{required} || 0;
+    $self->{maxAnswers} = $self->{maxAnswers} || 1;
+    $self->{value} = $self->{value} || 1;
+    $self->{textInButton} = $self->{textInButton} || 0;
+    $self->{terminal} = $self->{terminal} || 0;
+    $self->{terminalUrl} = $self->{terminalUrl} || '';
     $self->{type}       = 'question';
+
+    if(defined $posts and ref $posts eq 'HASH'){
+        while(my ($key,$value) = each %$posts){
+            if(defined $self->{$key}){
+                $self->{$key} = $value;
+            }
+        }
+    }
+
     bless($self,$class);
     return $self;
 }
@@ -46,7 +54,7 @@ sub update{
         }
     #is a new answer
     }elsif($$ref{ids}->[2] eq 'NEW'){
-        push(@{$self->{answers}}, WebGUI::Assest::Wobject::Survey::AnswerJSON->new( @{$self->{object}}) );
+        push(@{$self->{answers}}, WebGUI::Assest::Wobject::Survey::AnswerJSON->new( {},$ref) );
     #is updating a answer
     }else{
         $self->{answers}->[$$ref{ids}->[2]]->update($ref);
@@ -63,17 +71,8 @@ sub createTemp{
 }
 
 sub remove{
-    my ($self,$ref) = @_;
-    if(@$$ref{ids} <= 1){
-        $self->{parent} = undef;
-        for my $answer(@{$self->{answers}}){
-            $answer->remove();
-        }
-    }
-    elsif(@$$ref{ids} == 2){
-        $self->{answers}->[$$ref{ids}->[2]]->remove();
-        splice(@{$self->{answers}},$$ref->{ids}->[2],1);
-    }
+    my ($self,$address) = @_;
+    splice(@{$self->{answers}},$$address[2],1);
 }
 
 

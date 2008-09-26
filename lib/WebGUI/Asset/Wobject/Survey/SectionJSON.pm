@@ -4,11 +4,13 @@ use strict;
 use Data::Structure::Util qw/unbless/;
 use WebGUI::Asset::Wobject::Survey::QuestionJSON;
 
+use Data::Dumper;
+
 sub new{
     my $class = shift;
     my $self = shift || {};
-    my $parent = shift;
-
+    my $postInfo = shift;
+    my $log = shift; 
     if(defined $self->{questions}){
         foreach(@{$self->{questions}}){
             $_ = WebGUI::Asset::Wobject::Survey::QuestionJSON->new($_);
@@ -16,65 +18,88 @@ sub new{
     }else{
         $self->{questions} = [];
     }
-
+    $self->{log}                        = $log if defined $log;
     $self->{text}                       = $self->{text} || '';
     $self->{title}                      = $self->{title} || 'New Section';
-    $self->{parent}                     = $parent;
+    $self->{variable}                   = $self->{variable} || '';
     $self->{questionsPerPage}           = $self->{questionsPerPage} || 5;
-    $self->{questionsOnSectionPage}     = $self->{questionsOnSectionPage} || 1;
+    $self->{questionsOnSectionPage}     = defined $self->{questionsOnSectionPage} ? $self->{questionsOnSectionPage} : 1;
     $self->{randomizeQuestions}         = $self->{randomizeQuestions} || 0;
-    $self->{everyPageTitle}             = $self->{everyPageTitle} || 1;
-    $self->{everyPageText}              = $self->{everyPageText} || 1;
+    $self->{everyPageTitle}             = defined $self->{everyPageTitle} ? $self->{everyPageTitle} : 1;
+    $self->{everyPageText}              = defined $self->{everyPageText} ? $self->{everyPageText} : 1;
     $self->{terminal}                   = $self->{terminal} || 0;
-    $self->{terminalUrl};
-    $self->{goto};
-    $self->{timeLimit};
+    $self->{terminalUrl}                = $self->{terminalUrl} || '';
+    $self->{goto}                       = $self->{goto} || '';
+    $self->{timeLimit}                  = $self->{timeLimit} || 0;
     $self->{type}                       = 'section';
+    
+    if(defined $postInfo and ref $postInfo eq 'HASH'){
+        while(my ($key,$value) = each %$postInfo){
+            if(defined $self->{$key}){
+                $self->{$key} = $value;
+            }
+        }
+    }
 
     bless($self,$class);
     return $self;
 }
 sub getObject{ 
     my ($self,$address) = @_;
-    if(@$address == 1){
+    if(@$address == 2){
         return $self->{questions}->[$address->[1]];
     }else{
         return $self->{questions}->[$address->[1]]->getObject($address);
     }
+}
+sub getEditVars{
+    my ($self,$address) = @_;
+    if(@$address > 1){
+        return $self->{questions}->[$address->[1]]->getEditVars($address);
+    }
+    #Fill in a template var hash and return it
+    my %var;
+    while (my ($key,$value) = each %{$self}){
+        if($key ne 'questions' and $key ne 'questionsPerPage' and $key ne 'log'){
+            $var{$key} = $value;
+        }
+    }
+    for(1 .. 10){
+        if($_ == $self->{questionsPerPage}){
+            push(@{$var{questionsPerPage}},{'index',$_,'selected',1});
+        }else{
+            push(@{$var{questionsPerPage}},{'index',$_,'selected',0});
+        }
+    }
+    return \%var;
+        
 }
 sub newQuestion{
     my $self = shift;
     push(@{$self->{questions}}, WebGUI::Assest::Wobject::Survey::QuestionJSON->new( $self,@{$self->{questions}}) );
 }
 sub remove{
-    my ($self,$ref) = @_;
-    $self->{questions}->[$$ref{ids}->[1]]->remove($ref);
-    if(@$$ref{ids} == 0){
-        for my $question(@{$self->{questions}}){
-            $question->remove($ref);
-        }
-        $self->{parent} = undef;
-    }
-    if(@$$ref{ids} == 1){
-        splice(@{$self->{questions}},$$ref->{ids}->[1],1);
+    my ($self,$address) = @_;
+    if(@$address == 2){
+        splice(@{$self->{questions}},$$address[1],1);
+    }else{
+        $self->{questions}->[$$address[1]]->remove($address);
     }
 }
 
 sub update{
-    my ($self,$ref) = @_;
-
-    #is a section
-    if(@{$$ref{ids}} == 0){
-        while(my ($key,$value) = keys %{$ref->{object}}){
-            $self->{$key} = $value;
+    my ($self,$address,$ref,$log) = @_;
+    if(@{$address} == 1){
+        while(my ($key,$value) = each %{$ref}){
+            $self->{$key} = $value if defined $self->{$key};
         }
     #is a new question
     }elsif($$ref{ids}->[1] eq 'NEW'){
-        push(@{$self->{questions}}, WebGUI::Assest::Wobject::Survey::QuestionJSON->new( $self,@{$self->{object}}) );
+        push(@{$self->{questions}}, WebGUI::Assest::Wobject::Survey::QuestionJSON->new({},$ref) );
 
     #is updating a question or answer
     }else{
-        $self->{questions}->[$$ref{ids}->[1]]->update($ref);
+        $self->{questions}->[$$ref{ids}->[1]]->update($address,$ref);
     }
 }
 
@@ -109,11 +134,13 @@ sub freeze{
     my $self = shift;
 
     my %temp = %{$self};
-    $temp{parent} = undef;
+
     $temp{questions} = [];
     foreach(@{$self->{questions}}){
         push(@{$temp{questions}}, $_->freeze());
     }
+    $temp{log} = undef;
+    delete $temp{log};
     return \%temp;
 }
 
