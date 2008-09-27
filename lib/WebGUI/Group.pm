@@ -921,7 +921,7 @@ sub getUsersNotIn {
             and userId not in (select userId from groupings where expireDate > ? and groupId=?)
     };
 
-	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$self->getId]);
+	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$groupId]);
 	return \@users;
 
 }
