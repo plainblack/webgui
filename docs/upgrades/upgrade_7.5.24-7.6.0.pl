@@ -38,8 +38,187 @@ redirectChoice ($session);
 badgePriceDates ($session);
 addIsDefaultTemplates( $session );
 addAdHocMailGroups( $session );
+makeAdminConsolePluggable( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub makeAdminConsolePluggable {
+    my $session     = shift;
+    print "\tMaking admin console pluggable... " unless $quiet;
+    $session->config->set("adminConsole",{
+		"spectre" => {
+			title => "^International(spectre,Spectre);",
+			icon    => "spectre.gif",
+            url     => "^PageUrl(\"\",op=spectreStatus);",
+            uiLevel => 9,
+			groupSetting   => "groupIdAdminSpectre"
+		},
+		"assets" => {
+			title   => "^International(assets,Asset);",
+			icon    => "assets.gif",
+			url      => "^PageUrl(\"\",op=assetManager);",
+            uiLevel => 5,
+			group   => "12"
+		},
+		"versions" => {
+			title => "^International(version tags,VersionTag);",
+			icon    => "versionTags.gif",
+			url      => "^PageUrl(\"\",op=manageVersions);",
+            uiLevel => 7,
+			groupSetting   => "groupIdAdminVersionTag"
+		},
+		"workflow" => {
+			title => "^International(topicName,Workflow);",
+			icon    => "workflow.gif",
+			url      => "^PageUrl(\"\",manageWorkflows);",
+            uiLevel => 7,
+			groupSetting   => "groupIdAdminWorkflow"
+		},
+		"adSpace" => {
+			title => "^International(topicName,AdSpace);",
+			icon    => "advertising.gif",
+			url      => "^PageUrl(\"\",op=manageAdSpaces);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminAdSpace"
+		},
+		"cron" => {
+			title => "^International(topicName,Workflow_Cron);",
+			icon    => "cron.gif",
+			url      => "^PageUrl(\"\",op=manageCron);",
+            uiLevel => 9,
+			groupSetting   => "groupIdAdminCron"
+		},
+		"users" => {
+			title => "^International(149,WebGUI);",
+			icon    => "users.gif",
+			url      => "^PageUrl(\"\",op=listUsers);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminUser"
+		},
+		"clipboard" => {
+			title => "^International(948,WebGUI);",
+			icon    => "clipboard.gif",
+			url    => "^PageUrl(\"\",func=manageClipboard);",
+            uiLevel => 5,
+			group   => "12"
+		},
+		"trash" => {
+			title => "^International(trash,WebGUI);",
+			icon    => "trash.gif",
+			url    => "^PageUrl(\"\",func=manageTrash);",
+            uiLevel => 5,
+			group   => "12"
+		},
+		"databases" => {
+			title => "^International(databases,WebGUI);",
+			icon    => "databases.gif",
+			url      => "^PageUrl(\"\",op=listDatabaseLinks);",
+            uiLevel => 9,
+			groupSetting   => "groupIdAdminDatabaseLink"
+		},
+		"ldapconnections" => {
+			title => "^International(ldapconnections,AuthLDAP);",
+			icon    => "ldap.gif",
+			url      => "^PageUrl(\"\",op=listLDAPLinks);",
+            uiLevel => 9,
+			groupSetting   => "groupIdAdminLDAPLink"
+		},
+		"groups" => {
+			title => "^International(89,WebGUI);",
+			icon    => "groups.gif",
+			url      => "^PageUrl(\"\",op=listGroups);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminGroup"
+		},
+		"settings" => {
+			title => "^International(settings,WebGUI);",
+			icon    => "settings.gif",
+			url      => "^PageUrl(\"\",op=editSettings);",
+            uiLevel => 5,
+			group   => "3"
+		},
+		"help" => {
+			title => "^International(help,WebGUI);",
+			icon    => "help.gif",
+			url      => "^PageUrl(\"\",op=viewHelpIndex);",
+            uiLevel => 1,
+			groupSetting   => "groupIdAdminHelp"
+ 		},
+		"statistics" => {
+			title => "^International(437,WebGUI);",
+			icon    => "statistics.gif",
+			url      => "^PageUrl(\"\",op=viewStatistics);",
+            uiLevel => 1,
+			groupSetting   => "groupIdAdminStatistics"
+		},
+		"contentProfiling" => {
+			title => "^International(content profiling,Asset);",
+			icon    => "contentProfiling.gif",
+			url    => "^PageUrl(\"\",func=manageMetaData);",
+            uiLevel => 5,
+			group   => "4"
+		},
+		"contentFilters" => {
+			title => "^International(content filters,WebGUI);",
+			icon    => "contentFilters.gif",
+			url      => "^PageUrl(\"\",op=listReplacements);",
+            uiLevel => 3,
+			groupSetting   => "groupIdAdminReplacements"
+		},
+		"userProfiling" => {
+			title => "^International(user profiling,WebGUIProfile);",
+			icon    => "userProfiling.gif",
+			url      => "^PageUrl(\"\",op=editProfileSettings);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminProfileSettings"
+		},
+		"loginHistory" => {
+			title => "^International(426,WebGUI);",
+			icon    => "loginHistory.gif",
+			url      => "^PageUrl(\"\",op=viewLoginHistory);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminLoginHistory"
+		},
+		"inbox" => {
+			title => "^International(159,WebGUI);",
+			icon    => "inbox.gif",
+			url      => "^PageUrl(\"\",op=viewInbox);",
+            uiLevel => 1,
+			group   => "2"
+		},
+		"activeSessions" => {
+			title => "^International(425,WebGUI);",
+			icon    => "activeSessions.gif",
+			url      => "^PageUrl(\"\",op=viewActiveSessions);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminActiveSessions"
+		},
+		"shop" => {
+			title => "^International(shop,Shop);",
+			icon    => "shop.gif",
+			url      => "^PageUrl(\"\",shop=admin);",
+            uiLevel => 5,
+            groupSetting   => 'groupIdAdminCommerce'
+		},
+		"cache" => {
+            title => "^International(manage cache,WebGUI);",
+            icon    => "cache.gif",
+            url      => "^PageUrl(\"\",op=manageCache);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminCache"
+        },
+		"graphics" => {
+			title => "^International(manage graphics,Graphics);",
+			icon    => "graphics.gif",
+			url      => "^PageUrl(\"\",op=listGraphicsOptions);",
+            uiLevel => 5,
+			groupSetting   => "groupIdAdminGraphics"
+		},                                          
+        });
+    print "DONE!\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Add the "isDefault" flag and set it for the right templates
