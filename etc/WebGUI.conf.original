@@ -213,6 +213,180 @@
     "htm"    : "/bin/cat"
     },
 
+
+# define what appears in the admin console and who can view it
+
+"adminConsole" : {
+   "loginHistory" : {
+      "icon" : "loginHistory.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewLoginHistory);",
+      "title" : "^International(426,WebGUI);",
+      "groupSetting" : "groupIdAdminLoginHistory"
+   },
+   "clipboard" : {
+      "icon" : "clipboard.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageClipboard);",
+      "title" : "^International(948,WebGUI);"
+   },
+   "statistics" : {
+      "icon" : "statistics.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewStatistics);",
+      "title" : "^International(437,WebGUI);",
+      "groupSetting" : "groupIdAdminStatistics"
+   },
+   "users" : {
+      "icon" : "users.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listUsers);",
+      "title" : "^International(149,WebGUI);",
+      "groupSetting" : "groupIdAdminUser"
+   },
+   "activeSessions" : {
+      "icon" : "activeSessions.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewActiveSessions);",
+      "title" : "^International(425,WebGUI);",
+      "groupSetting" : "groupIdAdminActiveSessions"
+   },
+   "inbox" : {
+      "icon" : "inbox.gif",
+      "group" : "2",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewInbox);",
+      "title" : "^International(159,WebGUI);"
+   },
+   "versions" : {
+      "icon" : "versionTags.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",op=manageVersions);",
+      "title" : "^International(version tags,VersionTag);",
+      "groupSetting" : "groupIdAdminVersionTag"
+   },
+   "help" : {
+      "icon" : "help.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewHelpIndex);",
+      "title" : "^International(help,WebGUI);",
+      "groupSetting" : "groupIdAdminHelp"
+   },
+   "groups" : {
+      "icon" : "groups.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGroups);",
+      "title" : "^International(89,WebGUI);",
+      "groupSetting" : "groupIdAdminGroup"
+   },
+   "userProfiling" : {
+      "icon" : "userProfiling.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editProfileSettings);",
+      "title" : "^International(user profiling,WebGUIProfile);",
+      "groupSetting" : "groupIdAdminProfileSettings"
+   },
+   "ldapconnections" : {
+      "icon" : "ldap.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listLDAPLinks);",
+      "title" : "^International(ldapconnections,AuthLDAP);",
+      "groupSetting" : "groupIdAdminLDAPLink"
+   },
+   "contentProfiling" : {
+      "icon" : "contentProfiling.gif",
+      "group" : "4",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageMetaData);",
+      "title" : "^International(content profiling,Asset);"
+   },
+   "databases" : {
+      "icon" : "databases.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listDatabaseLinks);",
+      "title" : "^International(databases,WebGUI);",
+      "groupSetting" : "groupIdAdminDatabaseLink"
+   },
+   "adSpace" : {
+      "icon" : "advertising.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageAdSpaces);",
+      "title" : "^International(topicName,AdSpace);",
+      "groupSetting" : "groupIdAdminAdSpace"
+   },
+   "settings" : {
+      "icon" : "settings.gif",
+      "group" : "3",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editSettings);",
+      "title" : "^International(settings,WebGUI);"
+   },
+   "workflow" : {
+      "icon" : "workflow.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",manageWorkflows);",
+      "title" : "^International(topicName,Workflow);",
+      "groupSetting" : "groupIdAdminWorkflow"
+   },
+   "assets" : {
+      "icon" : "assets.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=assetManager);",
+      "title" : "^International(assets,Asset);"
+   },
+   "graphics" : {
+      "icon" : "graphics.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGraphicsOptions);",
+      "title" : "^International(manage graphics,Graphics);",
+      "groupSetting" : "groupIdAdminGraphics"
+   },
+   "shop" : {
+      "icon" : "shop.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",shop=admin);",
+      "title" : "^International(shop,Shop);",
+      "groupSetting" : "groupIdAdminCommerce"
+   },
+   "trash" : {
+      "icon" : "trash.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageTrash);",
+      "title" : "^International(trash,WebGUI);"
+   },
+   "cron" : {
+      "icon" : "cron.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=manageCron);",
+      "title" : "^International(topicName,Workflow_Cron);",
+      "groupSetting" : "groupIdAdminCron"
+   },
+   "spectre" : {
+      "icon" : "spectre.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=spectreStatus);",
+      "title" : "^International(spectre,Spectre);",
+      "groupSetting" : "groupIdAdminSpectre"
+   },
+   "contentFilters" : {
+      "icon" : "contentFilters.gif",
+      "uiLevel" : 3,
+      "url" : "^PageUrl(\"\",op=listReplacements);",
+      "title" : "^International(content filters,WebGUI);",
+      "groupSetting" : "groupIdAdminReplacements"
+   },
+   "cache" : {
+      "icon" : "cache.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageCache);",
+      "title" : "^International(manage cache,WebGUI);",
+      "groupSetting" : "groupIdAdminCache"
+   }
+},
+
 # Enter the maximum number of assets that should be allowed to
 # be created on this site. Keep in mind that a base install of
 # WebGUI has around 300 assets. Enter zero (0) if you want to
