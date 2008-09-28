@@ -1,4 +1,5 @@
 7.5.25
+ - fixed: ~~~ showing up on my site.
 
 7.5.24
  - fixed: Spelling mistake on site starter
