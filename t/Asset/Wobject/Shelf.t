@@ -50,7 +50,7 @@ SKIP: {
 
     skip "Unable to load module $class", $tests unless $loaded;
 
-    my $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+    $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
 
     #######################################################################
     #
@@ -100,6 +100,7 @@ SKIP: {
 
     }
 
+    $failure=0;
     eval {
         $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/missingHeaders.csv'),
@@ -117,6 +118,7 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
+    $failure=0;
     eval {
         $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/badHeaders.csv'),
@@ -134,7 +136,8 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
-    my $pass = $shelf->importProducts(
+    my $pass=0;
+    $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/goodProductTable.csv'),
     );
     ok($pass, 'Products imported');
@@ -203,7 +206,7 @@ SKIP: {
     is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
     is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
     @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
-    my ($sodas, $shirts);
+    my ($sodas, $shirts) = ([], []);
     foreach my $productData (@productData) {
         if ($productData->[0] eq 'soda') {
             push @{ $sodas }, $productData;
@@ -228,6 +231,7 @@ SKIP: {
     #
     #######################################################################
 
+    $pass=0;
     $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
     );
@@ -302,6 +306,7 @@ SKIP: {
     #
     #######################################################################
 
+    $pass=0;
     $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/thirdProductTable.csv'),
     );
@@ -361,7 +366,6 @@ SKIP: {
         ],
         'collateral added correctly for classical record'
     );
-
 
 }
 
