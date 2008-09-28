@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 41;
+my $tests = 44;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ my $loaded = use_ok($class);
 
 my $storage;
 my ($e, $failure);
-my $shelf;
+my ($shelf, $shelf2);
 
 SKIP: {
 
@@ -367,6 +367,30 @@ SKIP: {
         'collateral added correctly for classical record'
     );
 
+    $shelf->purge;
+    undef $shelf;
+
+    $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
+    is($record, undef, 'deleting a shelf deletes all products beneath it');
+
+    #######################################################################
+    #
+    # import, quoted headers and fields
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/quotedTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with quoted fields');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file with quoted fields');
+    is($shelf2->getChildCount, 3, 'imported 3 children skus for shelf2 with quoted fields');
 }
 
 #----------------------------------------------------------------------------
@@ -374,5 +398,8 @@ SKIP: {
 END {
     if (defined $shelf and ref $shelf eq $class) {
         $shelf->purge;
+    }
+    if (defined $shelf2 and ref $shelf2 eq $class) {
+        $shelf2->purge;
     }
 }
