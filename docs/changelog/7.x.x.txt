@@ -5,6 +5,10 @@
    macro can then format the epoch date.
  - fixed: actove admin console tab isn't highlighted
  - Added WebGUI::Crud API as a base for all database backed objects.
+ - Added Admin Console plugability.
+ - Reconfigured Asset management in config file.
+ - Rebuilt AdminBar. Now renders faster, and has categories in the new content
+   menu.
  - no longer preloads files that start with .
  - rfe: let package import inherit permissions
  - added fieldsets around form controls with multiple elements

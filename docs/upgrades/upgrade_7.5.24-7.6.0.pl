@@ -39,8 +39,189 @@ badgePriceDates ($session);
 addIsDefaultTemplates( $session );
 addAdHocMailGroups( $session );
 makeAdminConsolePluggable( $session );
+migrateAssetsToNewConfigFormat($session);
+deleteAdminBarTemplates($session);
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+sub deleteAdminBarTemplates {
+    my $session     = shift;
+    print "\tDeleting AdminBar templates... " unless $quiet;
+    foreach my $id (qw(PBtmpl0000000000000090 Ov2ssJHwp_1eEWKlDyUKmg)) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        if (defined $asset) {
+            $asset->trash;
+        }
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub migrateAssetsToNewConfigFormat {
+    my $session     = shift;
+    print "\tRestructuring asset configuration... " unless $quiet;
+    my $config = $session->config;
+    
+    # devs doing multiple upgrades
+    # the list has already been updated by a previous run
+    my $assetList = $config->get("assets");
+    unless (ref $assetList eq "ARRAY") {
+        print "ERROR: Looks like you've already run this upgrade.\n";
+        return undef;
+    }
+    
+    # add categories
+    $config->set('assetCategories', {
+        basic => {
+            title   => "^International(basic,Macro_AdminBar);",
+            uiLevel => 1,
+        },
+        intranet => {
+            title   => "^International(intranet,Macro_AdminBar);",
+            uiLevel => 5,
+        },
+        shop => {
+            title   => "^International(shop,Shop);",
+            uiLevel => 5,
+        },
+        utilities => {
+            title   => "^International(utilities,Macro_AdminBar);",
+            uiLevel => 9,
+        },
+        community => {
+            title   => "^International(community,Macro_AdminBar);",
+            uiLevel => 5,
+        },
+    });
+
+    # deal with the old asset list
+    my $assetContainers = $config->get("assetContainers");
+    $assetContainers = [] unless (ref $assetContainers eq "ARRAY");
+    my $utilityAssets = $config->get("utilityAssets");
+    $utilityAssets = [] unless (ref $utilityAssets eq "ARRAY");
+    my @oldAssetList = (@$assetList, @$utilityAssets, @$assetContainers);
+    my %assets = (
+        'WebGUI::Asset::Wobject::Collaboration::Newsletter' => {
+            category    => "community",    
+            }
+        );
+    foreach my $class (@oldAssetList) {
+        my %properties;
+        if (isIn($class, qw(
+            WebGUI::Asset::Wobject::Article
+            WebGUI::Asset::Wobject::Layout
+            WebGUI::Asset::Wobject::Folder
+            WebGUI::Asset::Wobject::Calendar
+            WebGUI::Asset::Wobject::Poll
+            WebGUI::Asset::Wobject::Search
+            WebGUI::Asset::FilePile
+            WebGUI::Asset::Snippet
+            WebGUI::Asset::Wobject::DataForm
+            ))) {
+            $properties{category} = 'basic';
+        }
+        elsif (isIn($class, qw(
+            WebGUI::Asset::Wobject::Collaboration::Newsletter
+            WebGUI::Asset::Wobject::WikiMaster
+            WebGUI::Asset::Wobject::Collaboration
+            WebGUI::Asset::Wobject::Survey
+            WebGUI::Asset::Wobject::Gallery
+            WebGUI::Asset::Wobject::MessageBoard
+            WebGUI::Asset::Wobject::Matrix
+            ))) {
+            $properties{category} = 'community';
+        }
+        elsif (isIn($class, qw(
+            WebGUI::Asset::Wobject::StockData
+            WebGUI::Asset::Wobject::Dashboard
+            WebGUI::Asset::Wobject::InOutBoard
+            WebGUI::Asset::Wobject::MultiSearch
+            WebGUI::Asset::Wobject::ProjectManager
+            WebGUI::Asset::Wobject::TimeTracking
+            WebGUI::Asset::Wobject::UserList
+            WebGUI::Asset::Wobject::WeatherData
+            WebGUI::Asset::Wobject::Thingy
+            ))) {
+            $properties{category} = 'intranet';
+        }
+        elsif (isIn($class, qw(
+            WebGUI::Asset::Wobject::Bazaar
+            WebGUI::Asset::Wobject::EventManagementSystem
+            WebGUI::Asset::Wobject::Shelf
+            WebGUI::Asset::Sku::Product
+            WebGUI::Asset::Sku::FlatDiscount
+            WebGUI::Asset::Sku::Donation
+            WebGUI::Asset::Sku::Subscription
+            ))) {
+            $properties{category} = 'shop';
+        }
+        elsif (isIn($class, qw(
+            WebGUI::Asset::Wobject::WSClient
+            WebGUI::Asset::Wobject::SQLReport
+            WebGUI::Asset::Wobject::SyndicatedContent
+            WebGUI::Asset::Redirect
+            WebGUI::Asset::Template
+            WebGUI::Asset::Wobject::Navigation
+            WebGUI::Asset::File
+            WebGUI::Asset::Wobject::HttpProxy
+            WebGUI::Asset::File::Image
+            WebGUI::Asset::File::ZipArchive
+            WebGUI::Asset::RichEdit
+            ))) {
+            $properties{category} = 'utilities';
+        }
+        else {
+            # other assets listed but not in the core
+            $properties{category} = 'utilities';
+        }       
+        $assets{$class} = \%properties;
+    }
+    
+    # deal with containers
+    foreach my $class (@$assetContainers) {
+        $assets{$class}{isContainer} = 1;
+    }
+    
+    # deal with custom add privileges
+    my $addGroups = $config->get("assetAddPrivilege");
+    if (ref $addGroups eq "HASH") {
+        foreach my $class (keys %{$addGroups}) {
+            $assets{$class}{addGroup} = $addGroups->{$class};
+        }
+    }
+    
+    # deal with custom ui levels
+    my $uiLevels = $config->get("assetUiLevel");
+    if (ref $uiLevels eq "HASH") {
+        foreach my $class (keys %{$addGroups}) {
+            $assets{$class}{uiLevel} = $uiLevels->{$class};
+        }
+    }
+
+    # deal with custom field ui levels
+    foreach my $class (keys %assets) {
+        my $directive =~ s/::/_/g;
+        $directive .= '_uiLevel';
+        my $value = $config->get($directive);
+        if (ref $value eq "HASH") {
+            foreach my $field (keys %{$value}) {
+                $assets{$class}{fields}{$field}{uiLevel} = $value->{$field};
+            }
+            $config->delete($directive);
+        }
+    }
+    
+    # write the file
+    $config->delete('assetContainers');
+    $config->delete('utilityAssets');
+    $config->delete("assetUiLevel");
+    $config->delete("assetAddPrivilege");
+    $config->set("assets",\%assets);
+        
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub makeAdminConsolePluggable {
