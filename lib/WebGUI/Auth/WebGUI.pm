@@ -1071,7 +1071,7 @@ sub emailResetPassword {
     );
 
     $f->submit(
-        value       => 'submit',
+        value       => $i18n->get('submit'),
         uiLevel     => 0,
     );
 
