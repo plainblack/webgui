@@ -1111,9 +1111,14 @@ while (my $product = $productIterator->()) {
 sub getIsa {
     my $class    = shift;
     my $session  = shift;
+    my $offset   = shift;
     my $def = $class->definition($session);
     my $tableName = $def->[0]->{tableName};
-    my $sth = $session->db->read("select distinct(assetId) from $tableName");
+    my $sql = "select distinct(assetId) from $tableName";
+    if (defined $offset) {
+        $sql .= ' LIMIT '. $offset . ',1234567890';
+    }
+    my $sth = $session->db->read($sql);
     return sub {
         my ($assetId) = $sth->array;
         if (!$assetId) {
@@ -1406,6 +1411,8 @@ Returns a URL of Asset based upon WebGUI's gateway script.
 Name value pairs to add to the URL in the form of:
 
  name1=value1;name2=value2;name3=value3
+
+=cut
 
 =cut
 
