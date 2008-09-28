@@ -60,6 +60,7 @@
  - fixed: Utility script skeleton now more complete and less annoying
  - rfe: Teach Thingy to be a Web Service (SDH Consulting Group)
  - fixed: ~~~ showing up on my site.
+ - fixed: Shelf/Product import export does not work
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari

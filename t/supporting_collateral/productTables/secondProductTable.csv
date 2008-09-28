@@ -1,4 +1,4 @@
-mastersku,sku,title,shortdescription,price,weight,quantity
+mastersku,varSku,title,shortdescription,price,weight,quantity
 ##alter existing with two collateral
 t-shirt,red-t-shirt,Colored T-Shirts,Red T-Shirt,5.00,1.33,500
 ##alter existing with one collateral

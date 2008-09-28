@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 44;
+my $tests = 45;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ SKIP: {
         $sodaCollateral,
         [
             {
-                sku       => 'soda-sweet',
+                varSku    => 'soda-sweet',
                 shortdesc => 'Sweet Soda',
                 price     => 0.95,
                 weight    => 0.95,
@@ -172,7 +172,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -180,7 +180,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -204,7 +204,7 @@ SKIP: {
     my $productData = $productsOut->getFileContentsAsScalar($productsOut->getFiles->[0]);
     my @productData = split /\n/, $productData;
     is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
-    is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
+    is($productData[0], 'mastersku,title,varSku,shortdescription,price,weight,quantity', 'header line is okay');
     @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
     my ($sodas, $shirts) = ([], []);
     foreach my $productData (@productData) {
@@ -246,7 +246,7 @@ SKIP: {
         $sodaCollateral,
         [
             {
-                sku       => 'soda-sweet',
+                varSku    => 'soda-sweet',
                 shortdesc => 'Sweet Soda',
                 price     => '1.00',
                 weight    => 0.85,
@@ -263,7 +263,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -271,7 +271,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -289,7 +289,7 @@ SKIP: {
         $recordCollateral,
         [
             {
-                sku       => 'track-16',
+                varSku    => 'track-16',
                 shortdesc => 'Track 16',
                 price     => '3.25',
                 weight    => '0.00',
@@ -323,7 +323,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -331,7 +331,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -348,7 +348,7 @@ SKIP: {
         $recordCollateral,
         [
             {
-                sku       => 'track-16',
+                varSku    => 'track-16',
                 shortdesc => 'Track 16',
                 price     => '3.25',
                 weight    => '0.00',
@@ -356,7 +356,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'track-9',
+                varSku    => 'track-9',
                 shortdesc => 'Track 9',
                 price     => '3.25',
                 weight    => '0.00',

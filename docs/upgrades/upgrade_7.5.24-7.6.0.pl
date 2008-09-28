@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Sku::Product;
 
 
 my $toVersion = '7.6.0';
@@ -41,6 +42,7 @@ addAdHocMailGroups( $session );
 makeAdminConsolePluggable( $session );
 migrateAssetsToNewConfigFormat($session);
 deleteAdminBarTemplates($session);
+repairBrokenProductSkus($session);
 
 finish($session); # this line required
 
@@ -53,6 +55,22 @@ sub deleteAdminBarTemplates {
         my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
         if (defined $asset) {
             $asset->trash;
+        }
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub repairBrokenProductSkus {
+    my $session     = shift;
+    print "\tRepairing broken Products that were imported... " unless $quiet;
+    my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+    while (my $product = $getAProduct->()) {
+        COLLATERAL: foreach my $collateral ($product->getAllCollateral('variantsJSON')) {
+            next COLLATERAL unless exists $collateral->{sku};
+            $collateral->{varSku} = $collateral->{sku};
+            delete $collateral->{sku};
+            $product->setCollateral('variantsJSON', 'variantId', $collateral->{variantId}, $collateral);
         }
     }
     print "DONE!\n" unless $quiet;
