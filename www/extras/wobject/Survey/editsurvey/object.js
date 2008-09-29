@@ -13,7 +13,8 @@ Survey.ObjectTemplate = new function(){
             ];
 
         var form = new YAHOO.widget.Dialog(type,
-           { width : "500px",
+           { 
+             width : "500px",
              fixedcenter : true,
              visible : false,
              constraintoviewport : true,

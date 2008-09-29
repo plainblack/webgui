@@ -107,6 +107,13 @@ sub definition {
                 defaultValue    => '1oBRscNIcFOI-pETrCOspA',
                 namespace  => 'Survey/Edit',
                 },
+            questionEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Section Edit Tempalte",
+                defaultValue    => 'wAc4azJViVTpo-2NYOXWvg',
+                namespace  => 'Survey/Edit',
+                },
         );
 
     push(@{$definition}, {
@@ -145,19 +152,20 @@ This overloads the normal call to the super, to call the super call like normal 
 
 
 #-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-    my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
+#sub processPropertiesFromFormPost {
+#    my $self = shift;
+#    $self->SUPER::processPropertiesFromFormPost;
 
-    $self->loadSurveyJSON();
-    if($#{$self->{_data}->{sections}} < 0){
-$self->session->errorHandler->error("In Processing from Post\n");
-        $self->{_data}->update(['NEW'],undef,$self->session->errorHandler);
+#    $self->loadSurveyJSON();
+#    if($#{$self->{_data}->{sections}} < 0){
+#$self->session->errorHandler->error("In Processing from Post\n");
+#        my $section = $self->{_data}->newSection();
+#        $self->{_data}->addSection($section);
 
-$self->session->errorHandler->error("Processing from creation\n".Dumper $self->{_data});
-    }
-    $self->saveSurveyJSON();
-}
+#$self->session->errorHandler->error("Processing from creation\n".Dumper $self->{_data});
+#    }
+#    $self->saveSurveyJSON();
+#}
 
 #-------------------------------------------------------------------
 
@@ -170,15 +178,15 @@ Loads the survey collateral into memory so that the survey objects can be create
 sub loadSurveyJSON{
     my $self = shift;
 
-    if(defined $self->{_data}){return;}#already loaded
+    if(defined $self->helper){return;}#already loaded
 
     my $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]);
-#$self->session->errorHandler->error("LOADING\n".Dumper $jsonHash."\n\n");
-    my $hashRef = {};
-    $hashRef = decode_json($jsonHash) if defined $jsonHash;
+    
+$self->session->errorHandler->error("LOADING JSON");
+    
+    $self->{jsonHelper} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($jsonHash,$self->session->errorHandler);
 
-    $self->{_data} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($hashRef,$self->session->errorHandler);
-
+$self->session->errorHandler->error("Loaded JSON\n\n".Dumper $self->helper->freeze);
 }
 
 #-------------------------------------------------------------------
@@ -188,14 +196,17 @@ sub loadSurveyJSON{
 Saves the survey collateral to the DB
 
 =cut
+sub helper{ return shift->{jsonHelper}; }
+sub littleBuddy{ return shift->{jsonHelper}; }
+sub allyourbases{ return shift->{jsonHelper}; }
+sub helpmehelpme{ return shift->{jsonHelper}; }
 
 sub saveSurveyJSON{
     my $self = shift;
-    $self->{_data}->{log} = $self->session->errorHandler;
-    my $data;
-    $data = $self->{_data}->freeze();
-$self->session->errorHandler->error("----------------SAving THIS DATA".Dumper $data);
-    $data = encode_json($data);
+    
+    my $data = $self->helper->freeze();
+    
+$self->session->errorHandler->error("Saving THIS DATA\n\n".$data);
     
     $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
@@ -226,22 +237,21 @@ $self->session->errorHandler->error("Submit Edit Object");
     
 #    my $ref = @{decode_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
+
     my @address = split/-/,$responses->{id};
-#$self->session->errorHandler->error("Submit Edit Object".Dumper $responses);
+    
     $self->loadSurveyJSON();
     if($responses->{delete}){
 $self->session->errorHandler->error("Deleting ".join(',',@address));
         return $self->deleteObject(\@address);
     }
-$self->session->errorHandler->error("Updating ".join(',',@address)."Which has $$responses{terminalUrl} as the tu");
+$self->session->errorHandler->error("Updating ".join(',',@address));
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    my $message = $self->{_data}->update(\@address,$responses,$self->session->errorHandler);
+    my $message = $self->helper->update(\@address,$responses);
 
-#    $self->saveSurveyJSON();
-
-#    return $self->www_loadSurvey({address => $ref->{ids},message=>$message});
     $self->saveSurveyJSON();
-    return $self->www_loadSurvey();
+
+    return $self->www_loadSurvey({address => \@address});
 }
 
 
@@ -251,15 +261,11 @@ sub deleteObject{
 
     $self->loadSurveyJSON();
 
-    my $message = $self->{_data}->remove($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->helper->remove($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
 
     $self->saveSurveyJSON();
-
-    #The last address in ideas is to a deleted object so that should not be returned.
-    pop(@{$address});
-    if(@$address < 1){
-        $$address[0] = 0;
-    }
+    #The parent address of the deleted object is returned.
+    pop(@{$address}) unless @$address == 1 and $$address[0] == 0;
 
     return $self->www_loadSurvey({address => $address, message=>$message});
 }
@@ -270,16 +276,23 @@ sub www_newObject{
     my $self = shift;
     my $ref;
     
-    $ref->{ids} = @{decode_json($self->session->form->process("data"))};
+$self->session->errorHandler->error("Entering newObject");
+    my $ids = $self->session->form->process("data");
+
+    my @inAddress = split/-/,$ids;
+$self->session->errorHandler->error("Address is:".join(',', @inAddress));
     
     $self->loadSurveyJSON();
 
-    my $object = $self->{_data}->createTemp($ref);
+    #Don't save after this as the new object should not stay in the survey
+    my $address = $self->helper->newObject(\@inAddress);
+
+$self->session->errorHandler->error("New objects address is:".join(',', @$address));
    
     #The new temp object has an address of NEW, which means it is not a real final address. 
-    push(@{$ref->{ids}},'NEW');
 
-    return $self->www_loadSurvey({address => $ref->{ids}, message => undef, object => $object});
+    return $self->www_loadSurvey({address => $address, message => undef});
+
 }
 
 
@@ -288,107 +301,39 @@ sub www_dragDrop{
     my $self = shift;
     my $p = decode_json($self->session->form->process("data"));
 
-    my $target = $p->{'target'};#The item moved
-    my $before = $p->{'before'};#The item directly in front of it, empty for first in list
+$self->session->errorHandler->error("In Drag Drop ".Dumper $p);
 
-    if($target->{'type'} eq 'section'){
-        my $pid;
+    my @tid = split/-/,$p->{target}->{id};
+    my @bid = split/-/,$p->{before}->{id};
 
-        my $tseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_section where Survey_sectionId = ?",[$target->{'id'}]);
-
-        if($before->{'id'} eq ''){#before doens't exist, object was moved to the front
-            $self->session->db->write("update Survey_section set sequenceNumber = sequenceNumber +1 where sequenceNumber < ? and assetId = ?",[$tseqNum,$self->getId]);
-            $self->session->db->write("update Survey_section set sequenceNumber = 1 where Survey_sectionId = ?",[$target->{'id'}]);
-        }else{#before exists
-            $pid = $before->{'id'};
-            if($before->{'type'} eq 'question'){
-                $pid = my $section =  $self->session->db->quickScalar("select Survey_sectionId from Survey_question where Survey_questionId = ?",[$before->{'id'}]);
-            }
-            elsif($before->{'type'} eq 'answer'){
-                $pid = my $section =  $self->session->db->quickScalar("
-                    select sq.Survey_sectionId 
-                    from Survey_answer sa, Survey_question sq 
-                    where sa.Survey_answerId = ? and sa.Survey_questionId = sq.Survey_questionId",
-                    [$before->{'id'}]);
-            }
-            my $bseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_section where Survey_sectionId = ?",[$pid]);
-            if($tseqNum > $bseqNum){
-                $self->session->db->write("
-                    update Survey_section 
-                    set sequenceNumber = sequenceNumber+1 
-                    where sequenceNumber > ? and sequenceNumber < ? and assetId = ?",[$bseqNum, $tseqNum,$self->getId]);
-                $self->session->db->write("update Survey_section set sequenceNumber = ? where Survey_sectionId = ?",[$bseqNum+1,$target->{'id'}]);
-            }elsif($bseqNum > $tseqNum){
-                $self->session->db->write("
-                    update Survey_section 
-                    set sequenceNumber = sequenceNumber-1 
-                    where sequenceNumber > ? and sequenceNumber <= ? and assetId = ?",[$tseqNum, $bseqNum,$self->getId]);
-                $self->session->db->write("update Survey_section set sequenceNumber = ? where Survey_sectionId = ?",[$bseqNum,$target->{'id'}]);
-            } 
-        }
-
-            
-    }
-
-    elsif($target->{'type'} eq 'question'){
-        if($before->{'id'} ne ''){
-            my @tids = split(/\|\|\|\|/,$target->{'id'});
-            my $tseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_question where Survey_questionId = ?",[$tids[1]]);
-            if($before->{'type'} eq 'section' and $before->{'id'} eq $tids[0]){#moved to front of section question belongs to
-                $self->session->db->write("update Survey_question set sequenceNumber = sequenceNumber +1 where sequenceNumber < ? and Survey_sectionId = ?",
-                   [$tseqNum,$tids[0]]);
-                $self->session->db->write("update Survey_question set sequenceNumber = 1 where Survey_questionId = ?",[$tids[1]]);
-            }
-            elsif($before->{'type'} eq 'section' and $before->{'id'} ne $tids[0]){#question moved to new section
-                #move down 1 seqnumber all questions higher up in section
-                $self->session->db->write("update Survey_question set sequenceNumber = sequenceNumber - 1 where sequenceNumber > ? and Survey_sectionId = ?",
-                    [$tseqNum,$tids[0]]);
-                #append question to last question in new section
-                my $lastSeq = $self->session->db->quickScalar("select max(sequenceNumber) from Survey_question where Survey_sectionId = ?",[$$before{'id'}]);
-                $self->session->db->write("update Survey_question set Survey_sectionId = ?, sequenceNumber = ? where Survey_questionId = ?",
-                    [ $$before{'id'}, $lastSeq + 1, $tids[1] ]); 
-                $target->{'id'} = $before->{'id'}."||||".$tids[1];
-            }
-            elsif($before->{'type'} eq 'question'){#will always have the same sectionid.
-                my @bids = split(/\|\|\|\|/,$before->{'id'});
-                my $bseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_question where Survey_questionId = ?",[$bids[1]]);
-                if($bseqNum > $tseqNum){#target was in front of before so before + all in between moved up
-                    $self->session->db->write("update Survey_question set sequenceNumber = sequenceNumber - 1 where sequenceNumber > ? and 
-                        sequenceNumber <= ? and Survey_sectionId = ?",[$tseqNum,$bseqNum,$tids[0]]);
-                    $self->session->db->write("update Survey_question set sequenceNumber = ? where Survey_questionId = ?",[$bseqNum,$tids[1]]);
-                }else{
-                    $self->session->db->write("update Survey_question set sequenceNumber = sequenceNumber + 1 where sequenceNumber > ? and 
-                        sequenceNumber < ? and Survey_sectionId = ?",[$bseqNum,$tseqNum,$tids[0]]);
-                    $self->session->db->write("update Survey_question set sequenceNumber = ? where Survey_questionId = ?",[$bseqNum+1,$tids[1]]);
-                } 
-                
-            }
-        }
-    }
-
-    else{#is an answer
-
-        my @tids = split(/\|\|\|\|/,$target->{'id'});
-        my @bids = split(/\|\|\|\|/,$before->{'id'});
-        my $tseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_answer where Survey_answerId = ?",[$tids[2]]);
-        if($before->{'type'} eq 'question' and $bids[1] eq $tids[1]){#answer has been moved to the front
-            $self->session->db->write("update Survey_answer set sequenceNumber = sequenceNumber + 1 where Survey_questionId = ? and sequenceNumber < ?",[$tids[1],$tseqNum]); 
-            $self->session->db->write("update Survey_answer set sequenceNumber = 1 where Survey_answerId = ?",[$tids[2]]); 
-        }elsif($before->{'type'} eq 'answer'){#will always be in the same quesiton
-            my $bseqNum = $self->session->db->quickScalar("select sequenceNumber from Survey_answer where Survey_answerId = ?",[$bids[2]]);
-            if($tseqNum > $bseqNum){
-                $self->session->db->write("update Survey_answer set sequenceNumber = sequenceNumber + 1 where Survey_questionId = ? 
-                    and sequenceNumber > ? and sequenceNumber < ?",[$tids[1],$bseqNum,$tseqNum]); 
-                $self->session->db->write("update Survey_answer set sequenceNumber = ? + 1 where Survey_answerId = ?",[$bseqNum,$tids[2]]); 
+    $self->loadSurveyJSON();
+    my $target = $self->helper->getObject(\@tid);
+    $self->helper->remove(\@tid,1);
+    my $address = [0];
+    if(@tid == 1){
+        $#bid = 0;#sections can only be inserted after another section so chop off the question and answer portion of 
+        $bid[0] = -1 if(! defined $bid[0]);
+        $self->helper->insertObject($target, [$bid[0]]);
+    }elsif(@tid == 2){#questions can be moved to any section, but a pushed to the end of a new section.  
+        if(@bid == 1){#moved to a new section or head of current section
+            if($bid[0] == $tid[0]){#moved to top of current section
+                $bid[1] = -1;
             }else{
-                $self->session->db->write("update Survey_answer set sequenceNumber = sequenceNumber - 1 where Survey_questionId = ? 
-                    and sequenceNumber <= ? and sequenceNumber > ?",[$tids[1],$bseqNum,$tseqNum]); 
-                $self->session->db->write("update Survey_answer set sequenceNumber = ? where Survey_answerId = ?",[$bseqNum,$tids[2]]); 
+                $bid[1] = $#{$self->helper->questions([$bid[0]])};
             }
         }
+        $self->helper->insertObject($target, [$bid[0],$bid[1]]);
+    }elsif(@tid == 3){#answers can only be rearranged in the same question
+        if(@$bid == 2 and $bid[1] == $tid[1]){
+            $bid[2] = -1;
+            $self->helper->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
+        }elsif(@$bid == 3){
+            $self->helper->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
+        }else{
+            $self->helper->insertObject($target, \@tid);#else put it back where it was
     }
-
-    return $self->www_loadSurvey($target->{'id'}); 
+            
+    return $self->www_loadSurvey({address => $address});
 }
    
  
@@ -398,37 +343,43 @@ sub www_loadSurvey{
     
 $self->session->errorHandler->error("Entering loadSurvey");
     $self->loadSurveyJSON();
-$self->session->errorHandler->error("Loaded JSON");
 
-    my $address = $options->{address} ? defined $options : [0];
-    my $message = $options->{message} ? defined $options : '';
-$self->session->errorHandler->error("Getting edit vars");
-    my $var = $options->{var} ? defined $options : $self->{_data}->getEditVars($address);
-$self->session->errorHandler->error("Got edit vars");
-$self->session->errorHandler->error("Loaded beginning params ".@$address);
-    my $editHtml;
-    if($var->{type} eq 'section'){
-        $var->{id} = join('-',@$address);
-        $var->{displayed_id} = $address->[$#$address];
-        if($var->{displayed_id} ne 'NEW'){$var->{displayed_id}++;}
-
-        $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
+    my $address = defined $options->{address} ? $options->{address} : undef;
+    if(! defined $address){
+        if(my $inAddress = $self->session->form->process("data")){
+            $address = [split/-/,$inAddress];
+        }else{
+            $address = [0];
+        }
     }
+    my $message = defined $options->{message} ? $options->{message} : '';
+$self->session->errorHandler->error("Getting edit vars:".join(',',@$address));
+    my $var = defined $options->{var} ? $options->{var} : $self->helper->getEditVars($address);
 
-$self->session->errorHandler->error(Dumper $var);
+$self->session->errorHandler->error("Got edit vars");
+$self->session->errorHandler->error("Loaded beginning params ".join(',',@$address));
+    my $editHtml;
+$self->session->errorHandler->error("The edit vars:".Dumper $var);
+    if($var->{type} eq 'section'){
+        $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
+    }elsif($var->{type} eq 'question'){
+        $editHtml = $self->processTemplate($var,$self->get("questionEditTemplateId"));
+    }
+#$self->session->errorHandler->error("The HTML :$editHtml");
 
-    my @data;
     my %buttons;
-    $self->{_data}->getDragDropList($address,\@data,$self->session->errorHandler);
+    my $data = $self->helper->getDragDropList($address);
+$self->session->errorHandler->error("The DD data :".Dumper $data);
     my $html;
-    my ($scount,$qcount,$acount) = (0,0,0);
+    my ($scount,$qcount,$acount) = (-1,-1,-1);
     my $lastType;
     my %lastId;
     my @ids;
     my ($s,$q,$a) = (0,0,0);#bools on if a button has already been created
 
-    foreach (@data){
+    foreach (@$data){
         if($_->{type} eq 'section'){
+            $lastId{section} = ++$scount;
             if($lastType eq 'answer'){
                 $html .= "<span id='newAnswer'></span><br>";
                 $buttons{answer} = "$lastId{section}-$lastId{question}"; 
@@ -441,24 +392,26 @@ $self->session->errorHandler->error(Dumper $var);
             }
             $html .= "<li id='$scount' class='section'>S". ($scount + 1). ": $_->{text}<\/li><br>\n";
             push(@ids,$scount);
-            $lastId{section} = $scount++;
             $lastType = 'section';
+            $qcount = -1;
+            $acount = -1;
         }
         elsif($_->{type} eq 'question'){
+            $lastId{question} = ++$qcount;
             if($lastType eq 'answer'){
                 $html .= "<span id='newAnswer'></span><br>";
                 $buttons{answer} = "$lastId{section}-$lastId{question}"; 
                 $a = 1;
             }
             $html .= "<li id='$scount-$qcount' class='question'>Q". ($qcount + 1). ": $_->{text}<\/li><br>\n";
-            push(@ids,$qcount);
-            $lastId{question} = $qcount++;
+            push(@ids,"$scount-$qcount");
             $lastType = 'question';
+            $acount = -1;
         }
         elsif($_->{type} eq 'answer'){
+            $lastId{answer} = ++$acount;
             $html .= "<li id='$scount-$qcount-$acount' class='answer'>A". ($acount + 1). ": $_->{text}<\/li><br>\n";
-            push(@ids,$acount);
-            $lastId{answer} = $acount++;
+            push(@ids,"$scount-$qcount-$acount");
             $lastType = 'answer';
         }
     }
@@ -469,7 +422,7 @@ $self->session->errorHandler->error(Dumper $var);
         }
         if(!$b){
             $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+            $buttons{'question'} = "$lastId{section}"; 
         }
         if(!$s){
             $html .= "<span id='newSection'></span><br>";
@@ -479,7 +432,7 @@ $self->session->errorHandler->error(Dumper $var);
     elsif($lastType eq 'question'){
         if(!$b){
             $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+            $buttons{'question'} = "$lastId{section}"; 
         }
         if(!$s){
             $html .= "<span id='newSection'></span><br>";
@@ -489,14 +442,14 @@ $self->session->errorHandler->error(Dumper $var);
     elsif($lastType eq 'section'){
         if(!$b){
             $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
+            $buttons{'question'} = "$lastId{section}"; 
         }
         if(!$s){
             $html .= "<span id='newSection'></span><br>";
             $buttons{'section'} = "$lastId{section}"; 
         }
     }
-#$self->session->errorHandler->error($html);
+$self->session->errorHandler->error($html);
 
     #address is the address of the focused object
     #buttons are the data to create the Add buttons
@@ -505,7 +458,12 @@ $self->session->errorHandler->error(Dumper $var);
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {"address",$address,"buttons",\%buttons,"edithtml",$editHtml,"ddhtml",$html,"ids",\@ids,"type",$var->{type}};
+$self->session->errorHandler->error(Dumper $return);
+eval{
     $self->session->errorHandler->error(encode_json($return));
+};
+$self->session->errorHandler->error($@);
+
 $self->session->errorHandler->error("Returning from loadSurvey");
     return encode_json($return);
 }

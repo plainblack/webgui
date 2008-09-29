@@ -9,7 +9,7 @@ Survey.Data = new function(){
 
     this.dragDrop = function(did){
         var type;
-
+console.log('In drag drop');
         if(did.className.match("section")){type = 'section';}
         else if(did.className.match("question")){type = 'question';}
         else{ type = 'answer';}
@@ -32,7 +32,7 @@ Survey.Data = new function(){
             else{ type = 'answer';}
             data = {id:before.id,type:type};
         }
-
+console.log(first.id+' '+data.id);
         Survey.Comm.dragDrop(first,data);
     }
 
@@ -50,7 +50,9 @@ Survey.Data = new function(){
         
         //add event handlers for if a tag is clicked
         for(var x in d.ids){
+console.log('adding handler for '+ d.ids[x]);
             YAHOO.util.Event.addListener(d.ids[x], "click", this.clicked); 
+            new Survey.DDList(d.ids[x],"sections");
         }
         
         //add the add object buttons
@@ -64,7 +66,7 @@ Survey.Data = new function(){
         }
         if(d.buttons['answer']){
             var button = new YAHOO.widget.Button({ label:"Add Answer", id:"addanswer", container:"newAnswer" });
-            button.on("click", this.addQuestion,d.buttons['answer']); 
+            button.on("click", this.addAnswer,d.buttons['answer']); 
         }
 
         this.loadObjectEdit(d.edithtml,d.type);
@@ -76,12 +78,12 @@ Survey.Data = new function(){
     }
 
 
-    this.addQuestion = function(e,sid){
-        Survey.Comm.newQuestion(sid);
+    this.addQuestion = function(e,id){
+        Survey.Comm.newQuestion(id);
     }
 
-    this.addAnswer = function(e,ids){
-        Survey.Comm.newAnswer(ids[0],ids[1]);
+    this.addAnswer = function(e,id){
+        Survey.Comm.newAnswer(id);
     }
 
     this.loadObjectEdit = function(edit,type){

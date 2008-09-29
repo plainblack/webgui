@@ -44,17 +44,17 @@ Survey.Comm = new function(){
         request(sUrl,this.callback,postData);
     }
     this.newSection = function(){
-        var sUrl = "?func=newSection";
+        var sUrl = "?func=newObject";
         request(sUrl,this.callback);
     }
-    this.newQuestion = function(sid){
-        var postData = "data="+sid;
-        var sUrl = "?func=newQuestion";
+    this.newQuestion = function(id){
+        var postData = "data="+id;
+        var sUrl = "?func=newObject";
         request(sUrl,this.callback,postData);
     }
-    this.newAnswer = function(sid,qid){
-        var postData = "data="+YAHOO.lang.JSON.stringify([sid,qid]);
-        var sUrl = "?func=newAnswer";
+    this.newAnswer = function(id){
+        var postData = "data="+id;
+        var sUrl = "?func=newObject";
         request(sUrl,this.callback,postData);
     }
     this.deleteAnswer = function(id){

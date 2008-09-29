@@ -66,7 +66,7 @@ Survey.Data = new function(){
             else if(lastType == 'answer' && d.data[x].type == 'section'){
                 this.addAnswerButton(lastId['section'],lastId['question']);
                 buttons['answer'] = 1;
-                this.addQuestionButton(lastId['section']);
+//                this.addQuestionButton(lastId['section']);
                 buttons['question'] = 1;
                 acount = 1;
                 qcount = 1;
@@ -135,16 +135,16 @@ Survey.Data = new function(){
         }
         if(lastType == 'answer' && ! buttons['answer']){
             this.addAnswerButton(lastId['section'],lastId['question']);
-            this.addQuestionButton(lastId['section']);
+//            this.addQuestionButton(lastId['section']);
         }
         if(lastType == 'question' && ! buttons['question']){
             this.addAnswerButton(lastId['section'],lastId['question']);
         }
         if(lastType == 'question' || lastType == 'section' && ! buttons['question']){
-            this.addQuestionButton(lastId['section']);
+//            this.addQuestionButton(lastId['section']);
         } 
 
-        this.addSectionButton(); 
+//        this.addSectionButton(); 
         
         this.loadObjectEdit(d.edit);
         lastDataSet = d;
@@ -157,7 +157,7 @@ Survey.Data = new function(){
 
 
     this.addQuestion = function(e,sid){
-        Survey.Comm.newQuestion(sid);
+//        Survey.Comm.newQuestion(sid);
     }
 
     this.addAnswer = function(e,ids){
