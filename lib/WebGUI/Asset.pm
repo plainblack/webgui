@@ -1965,21 +1965,32 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	my %data;
     my $form = $self->session->form;
+	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
+
 	foreach my $definition (@{$self->definition($self->session)}) {
 		foreach my $property (keys %{$definition->{properties}}) {
-			if ($definition->{properties}{$property}{noFormPost}) {
+			my %params = %{$definition->{properties}{$property}};
+
+			# apply config file changes
+			foreach my $key (keys %{$overrides->{$property}}) {
+				$params{$key} = $overrides->{$property}{$key};
+			}
+			
+			# deal with properties that can't be posted through the form
+			if ($params{noFormPost}) {
 				if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
-					$data{$property} = $definition->{properties}{$property}{defaultValue};
+					$data{$property} = $params{defaultValue};
 				}
 				next;
 			}
-			my %params = %{$definition->{properties}{$property}};
+			
+			# process the form element
 			$params{name} = $property;
 			$params{value} = $self->get($property);
 			$data{$property} = $form->process(
 				$property,
-				$definition->{properties}{$property}{fieldType},
-				$definition->{properties}{$property}{defaultValue},
+				$params{fieldType},
+				$params{defaultValue},
 				\%params
 				);
 		}
@@ -2205,7 +2216,7 @@ to set the keywords for this asset.
 sub update {
 	my $self = shift;
 	my $properties = shift;
-
+	
     # if keywords were specified, then let's set them the right way
     if (exists $properties->{keywords}) {
         WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
@@ -2246,7 +2257,6 @@ sub update {
 				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
                 next;
             }
-
 
             # use the update value
 			my $value = $properties->{$property};
