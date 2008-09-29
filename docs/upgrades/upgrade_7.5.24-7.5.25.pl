@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Sku::Product;
 
 
 my $toVersion = '7.5.25';
@@ -29,6 +30,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+repairBrokenProductSkus($session);
 
 finish($session); # this line required
 
@@ -41,6 +43,22 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub repairBrokenProductSkus {
+    my $session     = shift;
+    print "\tRepairing broken Products that were imported... " unless $quiet;
+    my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
+    while (my $product = $getAProduct->()) {
+        COLLATERAL: foreach my $collateral ($product->getAllCollateral('variantsJSON')) {
+            next COLLATERAL unless exists $collateral->{sku};
+            $collateral->{varSku} = $collateral->{sku};
+            delete $collateral->{sku};
+            $product->setCollateral('variantsJSON', 'variantId', $collateral->{variantId}, $collateral);
+        }
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
