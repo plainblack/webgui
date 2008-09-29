@@ -35,6 +35,7 @@ fixIsPublicOnTemplates ( $session );
 addSortOrderToFolder( $session );
 addLoginTimeStats( $session );
 addEMSBadgeTemplate ( $session );
+addCSPostReceivedTemplate ( $session );
 redirectChoice ($session);
 badgePriceDates ($session);
 addIsDefaultTemplates( $session );
@@ -547,6 +548,13 @@ sub addEMSBadgeTemplate {
     my $session = shift;
     print "\tAdding EMS Badge Template... " unless $quiet;
     $session->db->write('ALTER TABLE EMSBadge ADD COLUMN templateId VARCHAR(22) BINARY NOT NULL');
+    print "Done.\n" unless $quiet;
+}
+#----------------------------------------------------------------------------
+sub addCSPostReceivedTemplate {
+    my $session = shift;
+    print "\tAdding Post Received Template ID field for CS..." unless $quiet;
+    $session->db->write("ALTER TABLE Collaboration ADD COLUMN postReceivedTemplateId VARCHAR(22) DEFAULT 'default-post-received';");
     print "Done.\n" unless $quiet;
 }
 
