@@ -440,8 +440,8 @@ sub view {
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
 		$pageData->{"page.isHidden"} = $asset->get("isHidden");
 		$pageData->{"page.isViewable"} = $asset->canView;
-		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$self->session->config->get("assetContainers") || []});
-  		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$self->session->config->get("utilityAssets") || []});
+		$pageData->{'page.isContainer'} = $self->session->config->get("assets/".$asset->get("className")."/isContainer");
+  		$pageData->{'page.isUtility'} = $self->session->config->get("assets/".$asset->get("className")."/category") eq "utilities";
 		$pageData->{"page.url"} = $asset->getUrl;
 		my $indent = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.indent_loop"} = [];
