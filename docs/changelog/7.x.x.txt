@@ -61,6 +61,7 @@
  - rfe: Teach Thingy to be a Web Service (SDH Consulting Group)
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
+ - fixed: Shelf/Product import does not work with windows files
 
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
