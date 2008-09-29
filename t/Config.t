@@ -13,7 +13,7 @@ use strict;
 use lib "$FindBin::Bin/lib";
 
 use WebGUI::Test;
-use Test::More tests => 14; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use Test::Deep;
 
 my $config     = WebGUI::Test->config;
@@ -22,21 +22,22 @@ my $webguiRoot = WebGUI::Test->root;
 
 ok( defined $config, "load config" );
 ok( $config->get("dsn") ne "", "get()" );
-is( ref $config->get("macros"), "HASH", "get() hash" );
-is( ref $config->get("assets"), "ARRAY", "get() array" );
+is( ref $config->get("macros"), "HASH", "get() macros hash" );
+is( ref $config->get("assets"), "HASH", "get() assets hash" );
+is( ref $config->get("shippingDrivers"), "ARRAY", "get() shippingDrivers array" );
 is( $config->getFilename,$configFile,"getFilename()" );
 is( $config->getWebguiRoot, $webguiRoot, "getWebguiRoot()" );
 ok( defined WebGUI::Config->readAllConfigs($webguiRoot), "readAllConfigs" );
-$config->addToArray("assets","TEST");
+$config->addToArray("shippingDrivers","TEST");
 my $found = 0;
-foreach my $asset ( @{$config->get("assets")}) {
-	$found = 1 if ($asset eq "TEST");
+foreach my $driver ( @{$config->get("shippingDrivers")}) {
+	$found = 1 if ($driver eq "TEST");
 }
 ok($found, "addToArray()");
-$config->deleteFromArray("assets","TEST");
+$config->deleteFromArray("shippingDrivers","TEST");
 my $found = 0;
-foreach my $asset ( @{$config->get("assets")}) {
-	$found = 1 if ($asset eq "TEST");
+foreach my $driver ( @{$config->get("shippingDrivers")}) {
+	$found = 1 if ($driver eq "TEST");
 }
 ok(!$found, "deleteFromArray()");
 $config->addToHash("macros","TEST","VALUE");
@@ -61,8 +62,7 @@ if ($cookieName eq "") {
 {
 	my $ok = 1;
 
-	foreach my $assetClass (@{$config->get('assets')}, @{$config->get('assetContainers')},
-				@{$config->get('utilityAssets')}) {
+	foreach my $assetClass (keys %{$config->get('assets')}) {
 		unless ($assetClass =~ /\A(?:[A-Za-z0-9_]+::)*[A-Za-z0-9_]+\z/) {
 			diag "$assetClass is not a valid class name";
 			$ok = 0; next;
