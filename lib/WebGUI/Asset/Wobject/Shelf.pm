@@ -158,6 +158,7 @@ sub importProducts {
     my $headers;
     $headers = <$table>;
     chomp $headers;
+    $headers =~ tr/\r//d;
     my @headers = WebGUI::Text::splitCSV($headers);
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
         unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-title-varSku-weight')
@@ -167,6 +168,7 @@ sub importProducts {
     my $line = 1;
     while (my $productRow = <$table>) {
         chomp $productRow;
+        $productRow =~ tr/\r//d;
         $productRow =~ s/\s*#.+$//;
         next unless $productRow;
         local $_;

@@ -1,6 +1,7 @@
 7.5.25
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
+ - fixed: Shelf/Product import does not work with windows files
 
 7.5.24
  - fixed: Spelling mistake on site starter

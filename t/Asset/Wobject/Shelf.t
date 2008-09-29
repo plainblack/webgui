@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 45;
+my $tests = 48;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -367,6 +367,30 @@ SKIP: {
         'collateral added correctly for classical record'
     );
 
+
+    $shelf2->purge;
+    undef $shelf2;
+
+    #######################################################################
+    #
+    # import, windows line endings
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/windowsTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with windows style newlines');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file with quoted fields');
+    is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with windows line endings fields');
+
+    $shelf2->purge;
 }
 
 #----------------------------------------------------------------------------
