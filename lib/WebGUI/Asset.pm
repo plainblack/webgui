@@ -791,10 +791,7 @@ sub getEditForm {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my $ago = $i18n->get("ago");
-	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
-	my $uiLevelOverride = $self->get("className");
-	$uiLevelOverride =~ s/\:\:/_/g;
-	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
+	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl());
 	my $overrides = $self->session->config->get("assets/".$self->get("className"));
 
     # Set the appropriate URL
@@ -824,8 +821,10 @@ sub getEditForm {
 			});
 	}
 	else {
+		# revision history
 		my $ac = $self->getAdminConsole;
 		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
+		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
 		while (my ($version) = $rs->array) {
 			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
@@ -2390,7 +2389,7 @@ sub www_add {
 		assetId=>"new",
 		url=>$self->session->form->param("url")
 		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
+	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return $newAsset->www_edit();

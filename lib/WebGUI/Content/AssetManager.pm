@@ -415,7 +415,7 @@ sub www_manage {
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
+    my $output          = WebGUI::Macro::AdminBar::process($session).'<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
@@ -458,30 +458,6 @@ ENDHTML
     
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
-
-    ### New Content
-    $output         .= q{<div class="functionPane"><fieldset><legend>} . $i18n->get( '1083' ) . '</legend>';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '</fieldset></div>';
 
     tie my %options, 'Tie::IxHash';
     my $hasClips = 0;

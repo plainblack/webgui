@@ -6,7 +6,6 @@ var AccordionMenu = new function()
 	var oMenuCache = {};
 	var dLastHoverTitle ;
 	YUD.addClass(document.documentElement,'accordion-menu-js');
-    YAHOO.util.Event.on(window, "load", function () { document.body.style.marginLeft = "250px"; });
 
 	function getDT(e)
 	{
