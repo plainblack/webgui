@@ -1454,7 +1454,20 @@ sub www_showConfirmation {
 	} else {
 		$url = $self->getThread->getParent->getUrl;
 	}
-	return $self->getThread->getParent->processStyle('<p>'.$i18n->get("post received").'</p><p><a href="'.$url.'">'.$i18n->get("493","WebGUI").'</a></p>');
+    my $parent = $self->getThread;
+    my ($collabSystem, $templateId);
+    if($parent->isa('WebGUI::Asset::Wobject::Collaboration')) {
+        $collabSystem = $parent;
+    }
+    else {
+        $collabSystem = $parent->getParent;
+    }
+    my $templateId = $collabSystem->get('postReceivedTemplateId');
+    my $template = WebGUI::Asset->new($self->session, $templateId);
+    my %var = (
+        url     => $url,
+    );
+    return $self->getThread->getParent->processStyle($template->process(\%var));
 }
 
 

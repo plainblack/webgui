@@ -1661,6 +1661,15 @@ the Collaboration Asset, the user will be notified.|,
         lastUpdated => 1166848379,
     },
 
+    'post received template' => {
+        message => q|Post received template|,
+        lastUpdated => 1221247761,
+    },
+    'post received template hoverHelp' => {
+        message => q|The template for the message received when a user makes a post.|,
+        lastUpdated => 1221247761,
+    },
+
 };
 
 1;

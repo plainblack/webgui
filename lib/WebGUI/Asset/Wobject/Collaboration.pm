@@ -781,6 +781,14 @@ sub definition {
             filter=>'fixId',
             defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
         },
+        postReceivedTemplateId =>{
+            fieldType=>'template',
+            namespace=>'Collaboration',
+            tab=>'display',
+            label=>$i18n->get('post received template'),
+            hoverHelp=>$i18n->get('post received template hoverHelp'),
+            defaultValue=>'default_post_received',
+        },
         );
 
         push(@{$definition}, {
