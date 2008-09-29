@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 48;
+my $tests = 51;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -415,6 +415,30 @@ SKIP: {
     is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with windows line endings fields');
 
     $shelf2->purge;
+    undef $shelf2;
+
+    #######################################################################
+    #
+    # import, old sku column header
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/windowsTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with old style, sku instead of varSku');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file old headers');
+    is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with old headers');
+
+    $shelf2->purge;
+    undef $shelf2;
+
 }
 
 #----------------------------------------------------------------------------
