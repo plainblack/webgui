@@ -56,7 +56,7 @@ var AccordionMenu = new function()
 	function expand(dl,dt,dd)
 	{
     var bodyPanels = YUD.getElementsByClassName("a-m-d", "dd",dl); 
-    var bodyPanelHeight = YUD.getViewportHeight() - (30 * bodyPanels.length) - 20;
+    var bodyPanelHeight = YUD.getViewportHeight() - (30 * bodyPanels.length);
 	
 		dl.hasAnimation +=1;
 		YUD.addClass(dd,'a-m-d-before-expand');		
