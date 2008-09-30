@@ -316,22 +316,29 @@ $self->session->errorHandler->error("In Drag Drop ".Dumper $p);
         $self->helper->insertObject($target, [$bid[0]]);
     }elsif(@tid == 2){#questions can be moved to any section, but a pushed to the end of a new section.  
         if(@bid == 1){#moved to a new section or head of current section
-            if($bid[0] == $tid[0]){#moved to top of current section
+            if($bid[0] == $tid[0]){
+                #moved to top of current section
                 $bid[1] = -1;
             }else{
+                #else move to the end of the selected section
                 $bid[1] = $#{$self->helper->questions([$bid[0]])};
             }
         }
         $self->helper->insertObject($target, [$bid[0],$bid[1]]);
     }elsif(@tid == 3){#answers can only be rearranged in the same question
-        if(@$bid == 2 and $bid[1] == $tid[1]){
+        if(@bid == 2 and $bid[1] == $tid[1]){
             $bid[2] = -1;
             $self->helper->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
-        }elsif(@$bid == 3){
+        }elsif(@bid == 3){
             $self->helper->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
         }else{
-            $self->helper->insertObject($target, \@tid);#else put it back where it was
+            #else put it back where it was
+            $self->helper->insertObject($target, \@tid);
+        }
     }
+    
+    $self->saveSurveyJSON();
+$self->session->errorHandler->error("Finsihed Drag Drop ".Dumper $self->helper->freeze());
             
     return $self->www_loadSurvey({address => $address});
 }
@@ -353,13 +360,13 @@ $self->session->errorHandler->error("Entering loadSurvey");
         }
     }
     my $message = defined $options->{message} ? $options->{message} : '';
-$self->session->errorHandler->error("Getting edit vars:".join(',',@$address));
+#$self->session->errorHandler->error("Getting edit vars:".join(',',@$address));
     my $var = defined $options->{var} ? $options->{var} : $self->helper->getEditVars($address);
 
 $self->session->errorHandler->error("Got edit vars");
 $self->session->errorHandler->error("Loaded beginning params ".join(',',@$address));
     my $editHtml;
-$self->session->errorHandler->error("The edit vars:".Dumper $var);
+#$self->session->errorHandler->error("The edit vars:".Dumper $var);
     if($var->{type} eq 'section'){
         $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
     }elsif($var->{type} eq 'question'){
@@ -369,7 +376,7 @@ $self->session->errorHandler->error("The edit vars:".Dumper $var);
 
     my %buttons;
     my $data = $self->helper->getDragDropList($address);
-$self->session->errorHandler->error("The DD data :".Dumper $data);
+#$self->session->errorHandler->error("The DD data :".Dumper $data);
     my $html;
     my ($scount,$qcount,$acount) = (-1,-1,-1);
     my $lastType;
@@ -449,7 +456,7 @@ $self->session->errorHandler->error("The DD data :".Dumper $data);
             $buttons{'section'} = "$lastId{section}"; 
         }
     }
-$self->session->errorHandler->error($html);
+#$self->session->errorHandler->error($html);
 
     #address is the address of the focused object
     #buttons are the data to create the Add buttons
@@ -458,11 +465,11 @@ $self->session->errorHandler->error($html);
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {"address",$address,"buttons",\%buttons,"edithtml",$editHtml,"ddhtml",$html,"ids",\@ids,"type",$var->{type}};
-$self->session->errorHandler->error(Dumper $return);
+#$self->session->errorHandler->error(Dumper $return);
 eval{
-    $self->session->errorHandler->error(encode_json($return));
+#    $self->session->errorHandler->error(encode_json($return));
 };
-$self->session->errorHandler->error($@);
+#$self->session->errorHandler->error($@);
 
 $self->session->errorHandler->error("Returning from loadSurvey");
     return encode_json($return);

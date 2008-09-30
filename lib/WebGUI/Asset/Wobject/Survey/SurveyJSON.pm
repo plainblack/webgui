@@ -58,11 +58,11 @@ eval{
         if($address->[0] == $i){
 
             for(my $x = 0; $x <= $#{$self->questions($address)}; $x++){
-$self->log("dd'ing questions".$#{$self->questions});
+#$self->log("dd'ing questions".$#{$self->questions});
                 push(@data,{text=>$self->question([$i,$x])->{text}, type=>'question'});
                 if($address->[1] == $x){
                     for(my $y = 0; $y <= $#{$self->answers($address)}; $y++){
-$self->log("dd'ing answers".$#{$self->answers});
+#$self->log("dd'ing answers".$#{$self->answers});
                         push(@data,{text=>$self->answer([$i,$x,$y])->{text}, type=>'answer'});
                     }
                 }
@@ -71,7 +71,7 @@ $self->log("dd'ing answers".$#{$self->answers});
     }
 };
 $self->log($@);
-$self->log('finished dding');
+#$self->log('finished dding');
     return \@data;
 }
 
@@ -166,25 +166,29 @@ $self->log("$object didn't exist");
 # ref should contain all the information for the new
 sub insertObject{
     my ($self,$object,$address) = @_;
-
+$self->log("Inserting ".join(',',@$address));
     if(@$address == 1){
         splice(@{$self->sections($address)},$$address[0] + 1, 0, $object);
-    }elsif(@$address == 2) 
+    }elsif(@$address == 2){ 
         splice(@{$self->questions($address)},$$address[1] + 1, 0, $object);
-    }elsif(@$address == 3) 
+    }elsif(@$address == 3){ 
         splice(@{$self->answers($address)},$$address[2] + 1, 0, $object);
     }
+$self->log("Finished inserting ");
 
 }
 sub remove{
     my ($self,$address,$movingOverride) = @_;
     if(@$address == 1){
-            splice(@{$self->{sections}},$$address[0],1) if($$address[0] != 0 and ! defined $movingOverride);#can't delete the first section
+$self->log("removing here $$address[0] :".$#{$self->sections}) if($$address[0] != 0 or defined $movingOverride);;
+            splice(@{$self->{sections}},$$address[0],1) if($$address[0] != 0 or defined $movingOverride);#can't delete the first section
+$self->log("removing here $$address[0] :".$#{$self->sections});
     }elsif(@$address == 2){
-$self->log('removing here');
+$self->log("removing here $$address[0] $$address[1]");
             splice(@{$self->questions($address)},$$address[1],1);
-
     }elsif(@$address == 3){
+$self->log("removing here $$address[0] $$address[1] $$address[2]");
+            splice(@{$self->answers($address)},$$address[2],1);
     }
 }
 
