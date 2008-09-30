@@ -15,7 +15,6 @@ package WebGUI::Macro;
 =cut
 
 use strict;
-use warnings;
 use WebGUI::Pluggable;
 
 =head1 NAME
