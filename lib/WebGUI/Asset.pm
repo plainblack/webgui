@@ -1458,8 +1458,6 @@ Name value pairs to add to the URL in the form of:
 
 =cut
 
-=cut
-
 sub getUrl {
 	my $self = shift;
 	my $params = shift;
