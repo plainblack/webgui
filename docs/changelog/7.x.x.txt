@@ -64,6 +64,58 @@
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
 
+7.5.24
+ - fixed: Spelling mistake on site starter
+ - fixed: DatePicker.js can now use different first days of the week.
+ - fixed: HttpProxy parse now handles self-closing tags correctly
+ - fixed: HttpProxy parse now only rewrites form control names when also rewriting URLs
+ - fixed: WebGUI::HTML->cleanSegment now keeps <link> when preserving script and style
+ - fixed: multiple default templates broken with prevent proxy caching
+
+7.5.23
+ - fixed: Change <spam> tag to <span> tag in default product template
+ - It was possible to run multiple singleton workflows at the same time.
+ - fixed: Tickets on add to badge screen now show the time at the event's timezone
+ - fixed: WebGUI Password Recovery email subject hard-coded
+ - fixed: DataForm doesn't include fields and contents when exporting
+ - fixed: Article now only allows 2 files to be uploaded
+ - added: After committing a version, there is now a back to site link
+ - fixed: Asset Manager now returns to asset manager screen after done editing asset
+ - fixed: Folders are cached by the client too long for visitors
+ - added variant id template variable to product variant loop
+ - fixed: editting DataForm email fields resets their name
+ - fixed: Mailed inbox messages don't indicate who sent the message
+
+7.5.22
+ - fixed: Layout templates are now prepared correctly
+ - fixed: Syndicated Content doesn't decode alternate character sets
+ - fixed: Some templates ship with isPublic=1
+ - fixed: DataForm export tab delimited doesn't work
+ - fixed: Project Manager sometimes causes errors when adding users to a task
+ - fixed: site navigation will sometimes show as half or not styled
+ - fixed: after editting assets from the asset manager, it returns to site instead of manager
+ - fixed: invalid HTML generated for Shortcut overrides tab
+ - fixed: copying or duplicating an asset in the asset manager never autocommits
+ - fixed: Server side spell checker errors when checking text with single quotes
+ - fixed: Asset view time format problem
+ - fixed: DataForm doesn't work properly with internationalized fields
+ - fixed: incoming data not properly decoded from utf8
+ - fixed: PurgeOldInboxMessages did not work properly
+ - fixed: Can't call method "getSku" on unblessed reference
+ - fixed: DataForm Integer value zero does not pass validation
+ - fixed: Unable to delete data form entries
+ - fixed: Show Message On Login doesn't show after anon registration
+ - fixed: Settings - Show Message On Login behaviour
+ - fixed: Asset Manager now has Select All checkbox
+ - fixed: Show Message On Login continue link
+ - fixed: Page Layout templates generate invalid HTML with description
+ - fixed: I need a template for this display
+ - fixed: Using a password recovery token a second time informs the user of the reuse instead of having a style inside a style with a login form.
+ - fixed: If a user clicks on an unsubscribe link in an email and they are not logged into WebGUI, they are now prompted to log in so that they can then unsbscribe.
+ - fixed: Form/Integer now shows 0 in the results page
+ - fixed: When user does not have permissions to search/edit a thing a proper error is shown.
+ - fixed: Thingy now requires at least 1 field for a new Thing.
+
 7.5.21
  - fixed: purchase detail screen shows incorrectly in Safari
  - Adding span class and ids for styling pagination
