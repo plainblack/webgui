@@ -1,3 +1,5 @@
+7.6.1
+
 7.6.0
  - added: users may now customize the post received page for the CS
  - fixed: shortcuts don't notify browsers of updates to their shortcutted asset
