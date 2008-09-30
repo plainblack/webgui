@@ -110,10 +110,17 @@ sub definition {
             questionEditTemplateId => {
                 tab         => 'display',
                 fieldType   => 'template',
-                label => "Section Edit Tempalte",
+                label => "Question Edit Tempalte",
                 defaultValue    => 'wAc4azJViVTpo-2NYOXWvg',
                 namespace  => 'Survey/Edit',
                 },
+            answerEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Answer Edit Tempalte",
+                defaultValue    => 'AjhlNO3wZvN5k4i4qioWcg',
+                namespace  => 'Survey/Edit',
+                }
         );
 
     push(@{$definition}, {
@@ -183,10 +190,12 @@ sub loadSurveyJSON{
     my $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]);
     
 $self->session->errorHandler->error("LOADING JSON");
-    
+eval{    
     $self->{jsonHelper} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($jsonHash,$self->session->errorHandler);
+};
+$self->session->errorHandler->error("Loaded JSON".$@);
 
-$self->session->errorHandler->error("Loaded JSON\n\n".Dumper $self->helper->freeze);
+#$self->session->errorHandler->error("Loaded JSON\n\n".Dumper $self->helper->freeze);
 }
 
 #-------------------------------------------------------------------
@@ -206,7 +215,7 @@ sub saveSurveyJSON{
     
     my $data = $self->helper->freeze();
     
-$self->session->errorHandler->error("Saving THIS DATA\n\n".$data);
+$self->session->errorHandler->error("Saving THIS DATA");#\n\n".$data);
     
     $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
@@ -315,7 +324,14 @@ $self->session->errorHandler->error("In Drag Drop ".Dumper $p);
         $bid[0] = -1 if(! defined $bid[0]);
         $self->helper->insertObject($target, [$bid[0]]);
     }elsif(@tid == 2){#questions can be moved to any section, but a pushed to the end of a new section.  
-        if(@bid == 1){#moved to a new section or head of current section
+        if($bid[0] !~ /\d/){
+            $bid[0] = $tid[0]; 
+            $bid[1] = $tid[1];
+        }elsif(@bid == 1){#moved to a new section or head of current section
+            if($bid[0] !~ /\d/){
+                $bid[0] = $tid[0]; 
+                $bid[1] = $tid[1];
+            }
             if($bid[0] == $tid[0]){
                 #moved to top of current section
                 $bid[1] = -1;
@@ -363,18 +379,25 @@ $self->session->errorHandler->error("Entering loadSurvey");
 #$self->session->errorHandler->error("Getting edit vars:".join(',',@$address));
     my $var = defined $options->{var} ? $options->{var} : $self->helper->getEditVars($address);
 
-$self->session->errorHandler->error("Got edit vars");
+$self->session->errorHandler->error("Got edit vars".Dumper $self->helper->freeze);
 $self->session->errorHandler->error("Loaded beginning params ".join(',',@$address));
     my $editHtml;
-#$self->session->errorHandler->error("The edit vars:".Dumper $var);
+$self->session->errorHandler->error("The edit vars:".Dumper $var);
     if($var->{type} eq 'section'){
         $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
     }elsif($var->{type} eq 'question'){
         $editHtml = $self->processTemplate($var,$self->get("questionEditTemplateId"));
+    }elsif($var->{type} eq 'answer'){
+        $editHtml = $self->processTemplate($var,$self->get("answerEditTemplateId"));
     }
-#$self->session->errorHandler->error("The HTML :$editHtml");
+$self->session->errorHandler->error("The HTML :$editHtml");
 
     my %buttons;
+    $buttons{question} = $$address[0]; 
+    if(@$address == 2 or @$address == 3){
+        $buttons{answer} = "$$address[0]-$$address[1]";
+    }
+        
     my $data = $self->helper->getDragDropList($address);
 #$self->session->errorHandler->error("The DD data :".Dumper $data);
     my $html;
@@ -388,26 +411,17 @@ $self->session->errorHandler->error("Loaded beginning params ".join(',',@$addres
         if($_->{type} eq 'section'){
             $lastId{section} = ++$scount;
             if($lastType eq 'answer'){
-                $html .= "<span id='newAnswer'></span><br>";
-                $buttons{answer} = "$lastId{section}-$lastId{question}"; 
                 $a = 1;
             }
             elsif($lastType eq 'question'){
-                $html .= "<span id='newQuestion'></span><br>";
-                $buttons{'question'} = "$lastId{section}-$lastId{question}"; 
                 $q = 1;
             }
             $html .= "<li id='$scount' class='section'>S". ($scount + 1). ": $_->{text}<\/li><br>\n";
             push(@ids,$scount);
-            $lastType = 'section';
-            $qcount = -1;
-            $acount = -1;
         }
         elsif($_->{type} eq 'question'){
             $lastId{question} = ++$qcount;
             if($lastType eq 'answer'){
-                $html .= "<span id='newAnswer'></span><br>";
-                $buttons{answer} = "$lastId{section}-$lastId{question}"; 
                 $a = 1;
             }
             $html .= "<li id='$scount-$qcount' class='question'>Q". ($qcount + 1). ": $_->{text}<\/li><br>\n";
@@ -420,40 +434,6 @@ $self->session->errorHandler->error("Loaded beginning params ".join(',',@$addres
             $html .= "<li id='$scount-$qcount-$acount' class='answer'>A". ($acount + 1). ": $_->{text}<\/li><br>\n";
             push(@ids,"$scount-$qcount-$acount");
             $lastType = 'answer';
-        }
-    }
-    if($lastType eq 'answer'){
-        if(!$a){
-            $html .= "<span id='newAnswer'></span><br>";
-            $buttons{'answer'} = "$lastId{section}-$lastId{question}"; 
-        }
-        if(!$b){
-            $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}"; 
-        }
-        if(!$s){
-            $html .= "<span id='newSection'></span><br>";
-            $buttons{'section'} = "$lastId{section}"; 
-        }
-    }
-    elsif($lastType eq 'question'){
-        if(!$b){
-            $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}"; 
-        }
-        if(!$s){
-            $html .= "<span id='newSection'></span><br>";
-            $buttons{'section'} = "$lastId{section}"; 
-        }
-    }
-    elsif($lastType eq 'section'){
-        if(!$b){
-            $html .= "<span id='newQuestion'></span><br>";
-            $buttons{'question'} = "$lastId{section}"; 
-        }
-        if(!$s){
-            $html .= "<span id='newSection'></span><br>";
-            $buttons{'section'} = "$lastId{section}"; 
         }
     }
 #$self->session->errorHandler->error($html);

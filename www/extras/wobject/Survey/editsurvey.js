@@ -56,16 +56,19 @@ console.log('adding handler for '+ d.ids[x]);
         }
         
         //add the add object buttons
-        if(d.buttons['section']){
-            var button = new YAHOO.widget.Button({ label:"Add Section", id:"addsection", container:"newSection" });
+//        if(d.buttons['section']){
+            document.getElementById('addSection').innerHTML = '';
+            document.getElementById('addQuestion').innerHTML = '';
+            document.getElementById('addAnswer').innerHTML = '';
+            var button = new YAHOO.widget.Button({ label:"Add Section", id:"addsection", container:"addSection" });
             button.on("click", this.addSection); 
-        }
-        if(d.buttons['question']){
-            var button = new YAHOO.widget.Button({ label:"Add Question", id:"addquestion", container:"newQuestion" });
+//        }
+//        if(d.buttons['question']){
+            var button = new YAHOO.widget.Button({ label:"Add Question", id:"addquestion", container:"addQuestion" });
             button.on("click", this.addQuestion,d.buttons['question']); 
-        }
+//        }
         if(d.buttons['answer']){
-            var button = new YAHOO.widget.Button({ label:"Add Answer", id:"addanswer", container:"newAnswer" });
+            var button = new YAHOO.widget.Button({ label:"Add Answer", id:"addanswer", container:"addAnswer" });
             button.on("click", this.addAnswer,d.buttons['answer']); 
         }
 

@@ -13,7 +13,6 @@ sub new{
     my $temp = decode_json($json) if defined $json;
     $self->{sections} = defined $temp->{sections} ? $temp->{sections} : [];
     $self->{survey} = defined $temp->{survey} ? $temp->{survey} : {};
-    $self->{gotoMap} = defined $temp->{gotoMap} ? $temp->{gotoMap} : {};
     bless($self,$class);
     if(@{$self->sections} == 0){
         $self->newObject([]);
@@ -25,7 +24,6 @@ sub freeze{
     my %temp;
     $temp{sections} = $self->{sections};
     $temp{survey} = $self->{survey};
-    $temp{gotoMap} = $self->{gotoMap};
     return encode_json(\%temp);
 }
 sub newObject{
@@ -40,7 +38,7 @@ sub newObject{
         return $address;
     }elsif(@$address == 2){
         push(@{$self->answers($address)}, $self->newAnswer($address));
-        $$address[2] = $#{$self->answers($$address)};
+        $$address[2] = $#{$self->answers($address)};
         return $address;
     }
 }
@@ -138,6 +136,13 @@ sub getQuestionEditVars{
     return \%var;
 }
 sub getAnswerEditVars{
+    my $self = shift;
+    my $address = shift;
+    my $object = $self->answer($address);
+    my %var = %{$object};
+    $var{id} = $address->[0]."-".$address->[1]."-".$address->[2];
+    $var{displayed_id} = $address->[2]+1;
+    return \%var;
 }
 
 sub update{
@@ -157,6 +162,12 @@ $self->log("$object didn't exist");
             push(@{$self->questions($address)},$object);
         }
     }elsif(@$address == 3){
+        $object = $self->answer($address);
+        if(! defined $object){
+$self->log("$object didn't exist");
+            $object = $self->newAnswer();
+            push(@{$self->answers($address)},$object);
+        }
     }
     for my $key(keys %$object){
         $object->{$key} = $ref->{$key} if(defined $$ref{$key});
@@ -234,6 +245,23 @@ sub newQuestion{
     return \%members;
 }
 sub newAnswer{
+    my %members = (
+                'text', '',
+                'verbatim',0,
+                'textCols',10,
+                'textRows',5,
+                'goto','',
+                'recordedAnswer','',
+                'isCorrect',1,
+                'min',1,
+                'max',10,
+                'step',1,
+                'value',1,
+                'terminal',0,
+                'terminalUrl','',
+                'type','answer'
+            );
+    return \%members;
 }
 
 
