@@ -81,7 +81,7 @@ sub repairBrokenProductSkus {
     print "\tRepairing broken Products that were imported... " unless $quiet;
     my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
     while (my $product = $getAProduct->()) {
-        COLLATERAL: foreach my $collateral ($product->getAllCollateral('variantsJSON')) {
+        COLLATERAL: foreach my $collateral (@{ $product->getAllCollateral('variantsJSON') }) {
             next COLLATERAL unless exists $collateral->{sku};
             $collateral->{varSku} = $collateral->{sku};
             delete $collateral->{sku};
