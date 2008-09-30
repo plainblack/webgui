@@ -118,7 +118,7 @@ sub process {
     our $macrodepth ||= 0;
     local $macrodepth = $macrodepth + 1;
     ${ $content } =~ s{$macro_re}{
-        if ( $macrodepth > 64 ) {
+        if ( $macrodepth > 16 ) {
             $session->errorHandler->error($2 . " : Too many levels of macro recursion.  Stopping.");
             "Too many levels of macro recursion. Stopping.";
         }
