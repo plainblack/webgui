@@ -217,8 +217,8 @@ sub canAdd {
     my $userId = shift || $session->user->userId;
     my $user = WebGUI::User->new($session, $userId);
     my $subclassGroupId = shift;
-    my $addPrivs = $session->config->get("assets/".$className."/addGroup");
-    my $groupId = $addPrivs || $subclassGroupId || '12';
+    my $addPrivsGroup = $session->config->get("assets/".$className."/addGroup");
+    my $groupId = $addPrivsGroup || $subclassGroupId || '12';
     return $user->isInGroup($groupId);
 }
 
