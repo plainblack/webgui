@@ -44,9 +44,23 @@ makeAdminConsolePluggable( $session );
 migrateAssetsToNewConfigFormat($session);
 deleteAdminBarTemplates($session);
 repairBrokenProductSkus($session);
+removeUnusedTemplates($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub removeUnusedTemplates {
+    my $session     = shift;
+    print "\tDeleting old unused templates... " unless $quiet;
+    foreach my $id (qw(PBtmpl0000000000000046 e-WvgcKROPCoHwiiHLktCg PBtmpl0000000000000034 AFdXZZmGnSKalNSobQMB5w)) {
+        my $asset = WebGUI::Asset->new($session, $id);
+        if (defined $asset && $asset->getChildCount == 0) {
+            $asset->purge;
+        }
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub deleteAdminBarTemplates {
@@ -443,18 +457,17 @@ sub setDefaultTemplates {
           'DashboardViewTmpl00001','EBlxJpZQ9o-8VBOaGQbChA','GNvjCFQWjY2AF2uf0aCM8Q',
           'IOB0000000000000000001','IOB0000000000000000002','KAMdiUdJykjN02CPHpyZOw',
           'MultiSearchTmpl0000001','OOyMH33plAy6oCj_QWrxtg','OkphOEdaSGTXnFGhK4GT5A',
-          'OxJWQgnGsgyGohP2L3zJPQ','PBnav00000000000bullet',
-          'PBnav00000000indentnav','PBnav000000style01lvl2','PBtmpl0000000000000001',
-          'PBtmpl0000000000000002','PBtmpl0000000000000004','PBtmpl0000000000000005',
-          'PBtmpl0000000000000006','PBtmpl0000000000000010','PBtmpl0000000000000011',
-          'PBtmpl0000000000000012','PBtmpl0000000000000013','PBtmpl0000000000000014',
-          'PBtmpl0000000000000020','PBtmpl0000000000000021','PBtmpl0000000000000024',
-          'PBtmpl0000000000000026','PBtmpl0000000000000027','PBtmpl0000000000000029',
-          'PBtmpl0000000000000031','PBtmpl0000000000000032','PBtmpl0000000000000033',
-          'PBtmpl0000000000000034','PBtmpl0000000000000036','PBtmpl0000000000000037',
-          'PBtmpl0000000000000038','PBtmpl0000000000000039','PBtmpl0000000000000040',
-          'PBtmpl0000000000000041','PBtmpl0000000000000042','PBtmpl0000000000000043',
-          'PBtmpl0000000000000044','PBtmpl0000000000000045','PBtmpl0000000000000046',
+          'OxJWQgnGsgyGohP2L3zJPQ','PBnav00000000000bullet','PBnav00000000indentnav',
+          'PBnav000000style01lvl2','PBtmpl0000000000000001','PBtmpl0000000000000002',
+          'PBtmpl0000000000000004','PBtmpl0000000000000005','PBtmpl0000000000000006',
+          'PBtmpl0000000000000010','PBtmpl0000000000000011','PBtmpl0000000000000012',
+          'PBtmpl0000000000000013','PBtmpl0000000000000014','PBtmpl0000000000000020',
+          'PBtmpl0000000000000021','PBtmpl0000000000000024','PBtmpl0000000000000026',
+          'PBtmpl0000000000000027','PBtmpl0000000000000029','PBtmpl0000000000000031',
+          'PBtmpl0000000000000032','PBtmpl0000000000000033','PBtmpl0000000000000036',
+          'PBtmpl0000000000000037','PBtmpl0000000000000038','PBtmpl0000000000000039',
+          'PBtmpl0000000000000040','PBtmpl0000000000000041','PBtmpl0000000000000042',
+          'PBtmpl0000000000000043','PBtmpl0000000000000044','PBtmpl0000000000000045',
           'PBtmpl0000000000000047','PBtmpl0000000000000048','PBtmpl0000000000000051',
           'PBtmpl0000000000000052','PBtmpl0000000000000053','PBtmpl0000000000000054',
           'PBtmpl0000000000000055','PBtmpl0000000000000056','PBtmpl0000000000000057',
