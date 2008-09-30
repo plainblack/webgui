@@ -218,7 +218,7 @@ sub canAdd {
     my $user = WebGUI::User->new($session, $userId);
     my $subclassGroupId = shift;
     my $addPrivs = $session->config->get("assets/".$className."/addGroup");
-    my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
+    my $groupId = $addPrivs || $subclassGroupId || '12';
     return $user->isInGroup($groupId);
 }
 
@@ -1014,10 +1014,10 @@ Please see the example below for adding 1 tab.
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
-	return ["properties", $i18n->get("properties"), 1],
+	return (["properties", $i18n->get("properties"), 1],
 		["display", $i18n->get(105), 5],
 		["security", $i18n->get(107), 6],
-		["meta", $i18n->get("Metadata"), 3];
+		["meta", $i18n->get("Metadata"), 3]);
 }
 
 
