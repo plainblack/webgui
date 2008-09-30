@@ -84,7 +84,6 @@ BEGIN {
     unless ( File::Spec->file_name_is_absolute($WEBGUI_ROOT) ) {
         $WEBGUI_ROOT = File::Spec->rel2abs($WEBGUI_ROOT);
     }
-    warn $WEBGUI_ROOT."\n";
 
     $CONFIG_FILE = ( File::Spec->splitpath( $WEBGUI_ROOT ) )[2];
     $WEBGUI_ROOT = substr( $WEBGUI_ROOT, 0, index( $WEBGUI_ROOT, File::Spec->catdir( 'etc', $CONFIG_FILE ) ) );

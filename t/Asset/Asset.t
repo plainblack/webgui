@@ -811,10 +811,14 @@ is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheritu
 
 
 END {
-    $session->config->set( 'extrasURL',    $origExtras);
-    $session->config->set( 'uploadsURL',   $origUploads);
-    $session->setting->set('urlExtension', $origUrlExtension);
-    $session->setting->set('notFoundPage', $origNotFoundPage);
+    $session->config->set( 'extrasURL',    $origExtras)
+        if defined $origExtras;
+    $session->config->set( 'uploadsURL',   $origUploads)
+        if defined $origUploads;
+    $session->setting->set('urlExtension', $origUrlExtension)
+        if defined $origUrlExtension;
+    $session->setting->set('notFoundPage', $origNotFoundPage)
+        if defined $origNotFoundPage;
     if (defined $origAssetAddPrivileges) {
         $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
     }
