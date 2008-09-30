@@ -28,6 +28,7 @@ use Test::More;
 use Test::Deep;
 use Test::MockObject;
 use HTML::TokeParser;
+use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
 
@@ -36,7 +37,7 @@ my @fixTitleTests = getFixTitleTests($session);
 my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
-my $originalAssetOverrides = $session->config->get('assets');
+my $originalAssetOverrides = dclone($session->config->get('assets'));
 
 ##Test users.
 ##All users in here will be deleted at the end of the test.  DO NOT PUT
@@ -584,7 +585,7 @@ $session->config->set('assets/WebGUI::Asset/uiLevel', 8);
 $session->config->set('assets/WebGUI::Asset::Snippet/uiLevel', 8);
 
 is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
-is($fixTitleAsset->getUiLevel, 9, 'getUiLevel: Snippet has a configured uiLevel of 9');
+is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel of 8');
 
 
 ################################################################
