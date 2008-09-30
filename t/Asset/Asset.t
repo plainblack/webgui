@@ -495,7 +495,7 @@ $session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset
 
 $canAddMaker->run;
 
-diag 'Without proper group setup, Turn On Admin is excluded from adding assets via assets/WebGUI::Asset/groupAdd';
+#Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege
 
 $canAddMaker2->run;
 
