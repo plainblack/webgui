@@ -87,7 +87,7 @@ sub migrateAssetsToNewConfigFormat {
     # the list has already been updated by a previous run
     my $assetList = $config->get("assets");
     unless (ref $assetList eq "ARRAY") {
-        print "ERROR: Looks like you've already run this upgrade.\n";
+        warn "ERROR: Looks like you've already run this upgrade.\n";
         return undef;
     }
     
