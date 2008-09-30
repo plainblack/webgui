@@ -228,9 +228,14 @@ foreach my $filename (keys %config) {
 		if ($upgrade{$upgrade}{pl} ne "") {
             my $pid = fork;
             if (!$pid) {
-                @ARGV = ("--configFile=$filename", $quiet ? ('--quiet') : ());
-                $0 = $upgrade{$upgrade}{pl};
+                local @ARGV = ("--configFile=$filename", $quiet ? ('--quiet') : ());
+                local $0 = $upgrade{$upgrade}{pl};
+                local $@;
                 do $0;
+                if ($@) {
+                    warn $@;
+                    exit 255;
+                };
                 exit;
             }
             waitpid $pid, 0;
