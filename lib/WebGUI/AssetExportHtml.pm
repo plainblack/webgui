@@ -528,10 +528,8 @@ sub exportGetUrlAsPath {
     # if we're still here, it's valid. get it.
     my $exportPath      = $config->get('exportPath');
     
-    # specify a list of file types apache recognises to be passed through as-is
-    my @fileTypes = qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml
-    .rss .bmp .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx
-    .zip .tar .rar .gz .bz2/;
+    # get a list of file types to pass through as-is
+    my $fileTypes       = $config->get('exportBinaryExtensions');
 
     # get the asset's URL as a URI::URL object for easy parsing of components
     my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
@@ -550,7 +548,7 @@ sub exportGetUrlAsPath {
         # check if the file type is recognised by apache. if it is, return it
         # as-is. if not, slap on the directory separator, $index, and return
         # it.
-        if( isIn($extension, @fileTypes) ) {
+        if( isIn($extension, @{ $fileTypes } ) ) {
             return Path::Class::File->new($exportPath, @pathComponents, $filename);
         }
         else { # don't know what it is

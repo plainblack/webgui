@@ -27,20 +27,25 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
-
-# upgrade functions go here
-
+addExportExtensionsToConfigFile($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+# make sure each config file has the extensions to export as-is. however, if
+# this system received a backport, leave the field as is.
+sub addExportExtensionsToConfigFile {
+    my $session = shift;
+
+    # skip if the field has been defined already by backporting
+    return if defined $session->config->get('exportBinaryExtensions');
+
+    # otherwise, set the field
+    $session->config->set('exportBinaryExtensions',
+        [ qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml .rss .bmp
+        .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx .zip .tar
+        .rar .gz .bz2/ ] );
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
