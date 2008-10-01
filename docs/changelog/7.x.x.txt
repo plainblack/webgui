@@ -2,6 +2,7 @@
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
+ - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
 
 7.5.24
  - fixed: Spelling mistake on site starter
