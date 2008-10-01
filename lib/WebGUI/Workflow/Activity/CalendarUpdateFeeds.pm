@@ -88,7 +88,6 @@ sub execute {
     my $startTime = time();
     my $dt      = WebGUI::DateTime->new($session, $startTime)->toMysql;
 
-    local $JSON::UnMapping = 1;
     my $eventList   = [];
     my $feedList;
     if ($instance->getScratch('events')) {

@@ -19,6 +19,7 @@ use Weather::Com::Finder;
 BEGIN {
     # This is horrible, and needs to be removed when Weather::Com > 0.5.3 is released.
     my $old_get_weather = \&Weather::Com::Base::get_weather;
+    no warnings 'redefine';
     *Weather::Com::Base::get_weather = sub {
         my $self = shift;
         $self->{LINKS} = 1;
