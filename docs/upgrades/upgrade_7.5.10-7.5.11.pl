@@ -85,7 +85,7 @@ fixAdminConsoleTemplateTitles( $session );
 makeLongerAssetMetadataValues( $session );
 removeOldCommerceCode($session);
 convertDataForm( $session );
-#ensureCorrectDefaults( $session );
+ensureCorrectDefaults( $session );
 
 finish($session); # this line required
 
