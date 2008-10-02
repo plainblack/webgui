@@ -31,6 +31,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 repairBrokenProductSkus($session);
+addDataFormDataIndexes($session);
 
 finish($session); # this line required
 
@@ -58,6 +59,14 @@ sub repairBrokenProductSkus {
         }
     }
     print "DONE!\n" unless $quiet;
+}
+
+sub addDataFormDataIndexes {
+    my $session     = shift;
+    print "\tAssing indexes to DataForm entry table... " unless $quiet;
+    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId` (`assetId`)');
+    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId_submissionDate` (`assetId_submissionDate`)');
+    print "Done.\n" unless $quiet;
 }
 
 

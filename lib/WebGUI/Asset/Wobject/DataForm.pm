@@ -514,7 +514,7 @@ sub getListTemplateVars {
     my @recordLoop;
     my $entries = $self->session->db->read(
         "SELECT `ipAddress`, `username`, `userId`, `submissionDate`, `DataForm_entryId`, `entryData`
-        FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC", [$self->getId]);
+        FROM `DataForm_entry` WHERE `assetId` = ? ORDER BY `submissionDate` DESC LIMIT 500", [$self->getId]);
     while (my $record = $entries->hashRef) {
         my $recordData;
         if (!eval { $recordData = JSON::from_json($record->{entryData}) ; 1 }) {
