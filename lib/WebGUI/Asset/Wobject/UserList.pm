@@ -167,7 +167,7 @@ sub definition {
     %properties = (
        	templateId =>{
             fieldType=>"template",  
-            defaultValue=>'UserListTmpl0000001',
+            defaultValue=>'UserListTmpl0000000001',
 		    namespace=>'UserList',
     		tab=>"display",
             hoverHelp=>$i18n->get("template description"),

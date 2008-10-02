@@ -783,11 +783,11 @@ sub definition {
         },
         postReceivedTemplateId =>{
             fieldType=>'template',
-            namespace=>'Collaboration',
+            namespace=>'Collaboration/PostReceived',
             tab=>'display',
             label=>$i18n->get('post received template'),
             hoverHelp=>$i18n->get('post received template hoverHelp'),
-            defaultValue=>'default_post_received',
+            defaultValue=>'default_post_received1',
         },
         );
 

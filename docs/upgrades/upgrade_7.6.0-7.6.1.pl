@@ -27,7 +27,10 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+
 addExportExtensionsToConfigFile($session);
+fixShortAssetIds( $session );
+
 finish($session); # this line required
 
 
@@ -36,7 +39,7 @@ finish($session); # this line required
 # this system received a backport, leave the field as is.
 sub addExportExtensionsToConfigFile {
     my $session = shift;
-
+    print "Adding binary export extensions to config file... " unless $quiet;
     # skip if the field has been defined already by backporting
     return if defined $session->config->get('exportBinaryExtensions');
 
@@ -45,8 +48,30 @@ sub addExportExtensionsToConfigFile {
         [ qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml .rss .bmp
         .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx .zip .tar
         .rar .gz .bz2/ ] );
+    print "Done.\n" unless $quiet;
 }
 
+sub fixShortAssetIds {
+    print "Fixing assets with short ids... " unless $quiet;
+    my %assetIds = (
+        'default_post_received'     => 'default_post_received1',
+        'SQLReportDownload0001'     => 'SQLReportDownload00001',
+        'UserListTmpl0000001'       => 'UserListTmpl0000000001',
+        'UserListTmpl0000002'       => 'UserListTmpl0000000002',
+        'UserListTmpl0000003'       => 'UserListTmpl0000000003',
+    );
+    while (my ($fromId, $toId) = each %assetIds) {
+        $session->db->write('UPDATE `template` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `assetData` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `asset` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `assetIndex` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `template` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `Collaboration` SET `postReceivedTemplateId`=? WHERE `postReceivedTemplateId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `UserList` SET `templateId`=? WHERE `templateId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `SQLReport` SET `downloadTemplateId`=? WHERE `downloadTemplateId`=?', [$toId, $fromId]);
+    }
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
