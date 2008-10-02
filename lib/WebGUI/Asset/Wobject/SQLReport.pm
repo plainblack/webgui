@@ -166,7 +166,7 @@ sub definition {
 				},
 			downloadTemplateId=>{
 				fieldType=>"template",
-				defaultValue=>'SQLReportDownload0001',
+				defaultValue=>'SQLReportDownload00001',
 				},
 			downloadMimeType=>{
 				fieldType=>"text",

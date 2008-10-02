@@ -69,6 +69,26 @@ sub addDataFormDataIndexes {
     print "Done.\n" unless $quiet;
 }
 
+sub fixShortAssetIds {
+    print "\tFixing assets with short ids... " unless $quiet;
+    my %assetIds = (
+        'SQLReportDownload0001'     => 'SQLReportDownload00001',
+        'UserListTmpl0000001'       => 'UserListTmpl0000000001',
+        'UserListTmpl0000002'       => 'UserListTmpl0000000002',
+        'UserListTmpl0000003'       => 'UserListTmpl0000000003',
+    );
+    while (my ($fromId, $toId) = each %assetIds) {
+        $session->db->write('UPDATE `template` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `assetData` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `asset` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `assetIndex` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `template` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `UserList` SET `templateId`=? WHERE `templateId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `SQLReport` SET `downloadTemplateId`=? WHERE `downloadTemplateId`=?', [$toId, $fromId])
+    }
+    print "Done.\n" unless $quiet;
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

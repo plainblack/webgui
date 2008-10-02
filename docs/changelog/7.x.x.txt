@@ -2,6 +2,7 @@
  - fixed: failure when submitting a dataform that sends mail with an empty file field
  - fixed: DataForm ignores height on textarea fields
  - fixed: DataForm doesn't keep posted values properly when data fails validation
+ - fixed: some default assets have ids shorter than 22 characters
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
