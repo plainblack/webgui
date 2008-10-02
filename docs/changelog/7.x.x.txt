@@ -7,6 +7,7 @@
  - fixed: Shelf/Product import does not work with windows files
  - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
  - fixed: DataForm entry table isn't properly indexed
+ - fixed: DataForm can't export fields containing newlines
 
 7.5.24
  - fixed: Spelling mistake on site starter

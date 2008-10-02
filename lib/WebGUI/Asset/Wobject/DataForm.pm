@@ -1233,7 +1233,7 @@ sub www_exportTab {
                 if $field->{isMailField} && !$self->get('mailData');
             push @exportFields, $field->{name};
         }
-        my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n"});
+        my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n", binary => 1});
         $tsv->combine(
             'entryId',
             'ipAddress',
