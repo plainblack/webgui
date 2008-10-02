@@ -965,7 +965,6 @@ sub www_view {
         if ($shortcut->get("className") =~ m/Asset::Wobject/) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
-                $shortcut->prepareView;
                 my $style = $shortcut->processStyle("~~~");
                 my ($head, $foot) = split("~~~",$style);
                 $self->session->output->print($head, 1);
