@@ -651,7 +651,7 @@ sub getRecordTemplateVars {
     for my $field (@fields) {
         # need a copy
         my $value;
-        if ($entry) {
+        if ($entryData) {
             $value = $entryData->{ $field->{name} };
         }
         elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
