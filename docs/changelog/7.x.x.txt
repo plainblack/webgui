@@ -3,6 +3,7 @@
    unmodified has been moved to the configuration file under the
    "exportBianryExtensions" field.
  - fixed: some default assets have ids shorter than 22 characters
+ - fixed: failure when submitting a dataform that sends mail with an empty file field
 
 7.6.0
  - added: users may now customize the post received page for the CS

@@ -485,7 +485,9 @@ sub getAttachedFiles {
         my $form = $self->_createForm($field, $entryData->{$field->{name}});
         if ($form->can('getStorageLocation')) {
             my $storage = $form->getStorageLocation;
-            push @paths, $storage->getPath($storage->getFiles->[0]);
+            if ($storage) {
+                push @paths, $storage->getPath($storage->getFiles->[0]);
+            }
         }
     }
     return \@paths;
