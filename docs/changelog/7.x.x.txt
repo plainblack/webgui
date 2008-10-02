@@ -8,6 +8,7 @@
  - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
  - fixed: DataForm entry table isn't properly indexed
  - fixed: DataForm can't export fields containing newlines
+ - fixed: Documentation for DataForm and Thingy "Possible Values" field
 
 7.5.24
  - fixed: Spelling mistake on site starter
