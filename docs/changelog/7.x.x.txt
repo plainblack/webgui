@@ -1,5 +1,6 @@
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
+ - fixed: DataForm ignores height on textarea fields
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files

@@ -56,9 +56,10 @@ sub _createForm {
     my $data = shift;
     my $value = shift;
     # copy select entries
-    my %param = map { $_ => $data->{$_} } qw(name height width extras vertical defaultValue options);
+    my %param = map { $_ => $data->{$_} } qw(name width extras vertical defaultValue options);
     $param{value} = $value;
     $param{size} = $param{width};
+    $param{height} = $data->{rows};
 
     WebGUI::Macro::process($self->session, \( $param{defaultValue} ));
 
