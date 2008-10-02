@@ -65,7 +65,7 @@ sub addDataFormDataIndexes {
     my $session     = shift;
     print "\tAssing indexes to DataForm entry table... " unless $quiet;
     $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId` (`assetId`)');
-    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId_submissionDate` (`assetId_submissionDate`)');
+    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId_submissionDate` (`assetId`, `submissionDate`)');
     print "Done.\n" unless $quiet;
 }
 
