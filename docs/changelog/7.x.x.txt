@@ -1,3 +1,5 @@
+7.5.26
+
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
  - fixed: DataForm ignores height on textarea fields
