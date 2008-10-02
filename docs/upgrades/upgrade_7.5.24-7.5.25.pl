@@ -32,6 +32,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 repairBrokenProductSkus($session);
 addDataFormDataIndexes($session);
+fixShortAssetIds($session);
 
 finish($session); # this line required
 
