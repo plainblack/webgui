@@ -6,6 +6,7 @@
  - fixed: failure when submitting a dataform that sends mail with an empty file field
  - fixed: DataForm ignores height on textarea fields
  - fixed: DataForm doesn't keep posted values properly when data fails validation
+ - fixed: Documentation for DataForm and Thingy updated for Possible Values field
 
 7.6.0
  - added: users may now customize the post received page for the CS
