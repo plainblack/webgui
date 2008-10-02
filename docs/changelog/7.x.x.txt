@@ -11,6 +11,7 @@
  - fixed: DataForm can't export fields containing newlines
  - fixed: Documentation for DataForm and Thingy "Possible Values" field
  - fixed: Shortcuts includes HTML head data twice
+ - fixed: UserList templates use incorrect variable names
 
 7.5.24
  - fixed: Spelling mistake on site starter
