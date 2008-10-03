@@ -87,7 +87,7 @@ sub create {
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status}    = $properties->{status} || "pending";
 	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
-	$self->{_properties}{message}   = $properties->{message};
+	$self->{_properties}{message}   = $session->crypt->encrypt_hex($properties->{message});
 	$self->{_properties}{dateStamp} = time();
 	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};
@@ -96,7 +96,8 @@ sub create {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
 	}
-	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});	
+	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});
+	$self->{_properties}{message}   = $properties->{message}; # undo encryption for memory/cache	
 	my $mail = WebGUI::Mail::Send->create($session, {
 		toUser=>$self->{_properties}{userId},
 		toGroup=>$self->{_properties}{groupId},
@@ -213,7 +214,9 @@ sub new {
 	my $class = shift;
 	my $session = shift;
 	my $messageId = shift;
-	bless {_properties=>$session->db->getRow("inbox","messageId",$messageId), _session=>$session, _messageId=>$messageId}, $class;
+	my $properties = $session->db->getRow("inbox","messageId",$messageId);
+	$properties->{message} = $session->crypt->decrypt_hex($properties->{message});
+	bless {_properties=>$properties, _session=>$session, _messageId=>$messageId}, $class;
 }
 
 #-------------------------------------------------------------------

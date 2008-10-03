@@ -49,6 +49,16 @@ use Exception::Class (
         description     => "The file you have provided has errors.",
         fields          => [qw{ brokenFile brokenLine }],
         },
+    'WebGUI::Error::Pluggable::LoadFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'WebGUI::Pluggable failed to load module.',
+        fields      => ['module'],
+    },
+    'WebGUI::Error::Pluggable::RunFailed' => {
+        isa         => 'WebGUI::Error',
+        description => 'WebGUI::Pluggable failed to run subroutine.',
+        fields      => [ 'module', 'subroutine', 'params' ],
+    },
 );
 
 
