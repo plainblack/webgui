@@ -601,14 +601,33 @@ sub www_manageRevisionsInTag {
     my $tag     = WebGUI::VersionTag->new($session, $tagId);
     return www_manageVersions( $session ) unless $tag;
     
+    my $i18n    = WebGUI::International->new($session,"VersionTag");
+
     ### Permissions check
     # This screen is also used to approve/deny the tag, so check that first
     if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) ) {
-        return $session->privilege->insufficient;
+        if ( $session->user->isVisitor ) {
+            return $session->privilege->noAccess;
+        }
+        else {
+            # Return a nice error message, since people are getting confused when they try 
+            # to approve a tag that's already approved
+            my $html    = '<h1>%s</h1>' . "\n"
+                        . '<p>%s</p>' . "\n"
+                        . q{<p><a href="%s">%s</a></p>} . "\n"
+                        ;
+
+            return $session->style->userStyle(
+                sprintf $html, 
+                    $i18n->get( "error permission www_manageRevisionsInTag title" ),
+                    $i18n->get( "error permission www_manageRevisionsInTag body" ),
+                    $session->url->getSiteURL,
+                    $i18n->get( "back to site" ),
+                );
+        }
     }
 
     my $ac      = WebGUI::AdminConsole->new($session,"versions");
-    my $i18n    = WebGUI::International->new($session,"VersionTag");
     $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
     $ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));

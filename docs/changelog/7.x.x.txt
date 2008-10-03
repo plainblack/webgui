@@ -7,6 +7,7 @@
  - fixed: DataForm ignores height on textarea fields
  - fixed: DataForm doesn't keep posted values properly when data fails validation
  - fixed: Documentation for DataForm and Thingy updated for Possible Values field
+ - added a new permission denied page for version tag approval
 
 7.6.0
  - added: users may now customize the post received page for the CS

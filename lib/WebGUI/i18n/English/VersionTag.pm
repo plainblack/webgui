@@ -459,6 +459,18 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Message for when someone approves a version tag},
     },
+    
+    "error permission www_manageRevisionsInTag title" => {
+        message     => q{Permission Denied},
+        lastUpdated => 0,
+        context     => q{Title of "permission denied" page for Manage Revisions In Tag},
+    },
+
+    "error permission www_manageRevisionsInTag body" => {
+        message     => q{You are not allowed to view this version tag. It is possible that it has already been approved or denied. },
+        lastUpdated => 0,
+        context     => q{Explanation of Permission Denied message},
+    },
 };
 
 1;
