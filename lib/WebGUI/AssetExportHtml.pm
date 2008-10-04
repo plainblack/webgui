@@ -219,27 +219,27 @@ sub exportAsHtml {
     # verify them
     if(!defined $userId) {
         $returnCode = 0;
-        $message    = 'need a userId parameter';
+        $message    = $i18n->get('need a userId parameter');
         return ($returnCode, $message);
     }
 
     # we take either a numeric userId or a WebGUI::User object
     if( ref $userId ne 'WebGUI::User' && ! (looks_like_number($userId) || $session->id->valid($userId))) {
         $returnCode = 0;
-        $message    = "'$userId' is not a valid userId";
+        $message    = "'$userId' ".$i18n->get('is not a valid userId');
         return ($returnCode, $message);
     }
 
     # depth is required.
     if(!defined $depth) {
         $returnCode = 0;
-        $message    = 'need a depth';
+        $message    = $i18n->get('need a depth');
         return ($returnCode, $message);
     }
     # and it must be a number.
     if( !looks_like_number($depth) ) {
         $returnCode = 0;
-        $message    = "'$depth' is not a valid depth";
+        $message    = sprintf $i18n->get('%d is not a valid depth'), $depth;
         return ($returnCode, $message);
     }
 

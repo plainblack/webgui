@@ -1127,6 +1127,30 @@ Couldn't open %-s because %-s <br />
         context     => q{Error message in Asset.pm},
     }
 
+    'need a userId parameter' => {
+        message     => q{need a userId parameter},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'is not a valid userId' => {
+        message     => q{is not a valid userId},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'need a depth' => {
+        message     => q{need a depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    '%s is not a valid depth' => {
+        message     => q{%s is not a valid depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
 };
 
 1;
