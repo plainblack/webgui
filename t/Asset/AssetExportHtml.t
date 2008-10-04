@@ -41,13 +41,7 @@ my $originalExportPath = $session->config->get('exportPath');
 
 my $testRan = 1;
 
-if ($originalExportPath) {
-    plan tests => 146;        # Increment this number for each test you create
-}
-else {
-    $testRan = 0;
-    plan skip_all => 'No exportPath in the config file';
-}
+plan tests => 146;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # exportCheckPath()
@@ -86,25 +80,7 @@ cmp_deeply(
     "exportCheckPath throws if exportPath isn't defined"
 );
 
-# we'll restore the original exportPath setting after performing these tests.
-# for now, we need a controlled environment.
-
-# first, let's test a directory to which we hopefully cannot write.
-my $rootDirectory = Path::Class::Dir->new('');
-$config->set('exportPath', $rootDirectory->stringify);
-
-eval { WebGUI::Asset->exportCheckPath($session) };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if we can't access the exportPath");
-cmp_deeply(
-    $e,
-    methods(
-        error       => "can't access $rootDirectory",
-    ),
-    "exportCheckPath throws if we can't access the exportPath"
-);
-
-# next, let's set the exportPath to a non-directory file and make sure that it explodes.
+# set the exportPath to a non-directory file and make sure that it explodes.
 my $exportPathFile;
 (undef, $exportPathFile)          = tempfile('webguiXXXXX', UNLINK => 1);
 $config->set('exportPath', $exportPathFile); 
@@ -138,6 +114,19 @@ cmp_deeply(
         error       => "can't create exportPath $inaccessibleDirectory",
     ),
     "exportCheckPath throws if it can't create the directory it needs"
+);
+
+chmod 0444, $tempDirectory; 
+$config->set('exportPath', $tempDirectory); 
+eval { WebGUI::Asset->exportCheckPath($session) };
+$e = Exception::Class->caught();
+isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't access the exportPath for writing");
+cmp_deeply(
+    $e,
+    methods(
+        error       => "can't access $tempDirectory",
+    ),
+    "exportCheckPath throws if we can't access the exportPath"
 );
 
 # we're finished making sure that the code explodes on bad stuff, so let's make
@@ -348,7 +337,7 @@ is($fileAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)
 # we need to be tricky here and call code in wG proper which calls www_ methods
 # even though we don't have access to modperl. the following hack lets us do
 # that.
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 
 $session->user( { userId => 1 } );
 my $content;
@@ -375,7 +364,7 @@ my $unwritablePath = Path::Class::Dir->new($config->get('uploadsPath'), 'temp', 
 chmod 0000, $guidPath->stringify;
 $config->set('exportPath', $unwritablePath->absolute->stringify);
 
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 eval { $home->exportWriteFile() };
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error', "exportWriteFile throws if it can't create the export path");
@@ -402,7 +391,7 @@ $config->set('exportPath', $guidPath->absolute->stringify);
 chmod 0755, $guidPath->stringify;
 $unwritablePath->remove;
 
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 eval { $gettingStarted->exportWriteFile() };
 is($@, '', "exportWriteFile works for getting_started");
 
@@ -417,7 +406,7 @@ is(scalar $gettingStarted->exportGetUrlAsPath->absolute->slurp, $content, "expor
 # working.
 $guidPath->rmtree;
 
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 $session->user( { userId => 1 } );
 eval { $grandChild->exportWriteFile() };
 is($@, '', "exportWriteFile works for grandchild");
@@ -432,7 +421,7 @@ is(scalar $grandChild->exportGetUrlAsPath->absolute->slurp, $content, "exportWri
 # test different extensions
 $guidPath->rmtree;
 $asset = WebGUI::Asset->new($session, 'ExportTest000000000001');
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 eval { $asset->exportWriteFile() };
 is($@, '', 'exportWriteFile for perl file works');
 
@@ -459,7 +448,7 @@ $guidPath->rmtree;
 # isn't allowed to see. this means that we'll need to temporarily change the
 # permissions on something.
 $home->update( { groupIdView => 3 } ); # admins
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 eval { $home->exportWriteFile() }; 
 $e = Exception::Class->caught();
 isa_ok($e, 'WebGUI::Error', "exportWriteFile throws when user can't view asset");
@@ -515,8 +504,6 @@ cmp_deeply(
 
 
 # now test that it works as it should, when it should
-#$config->set('exportPath', $originalExportPath);
-#$exportPath             = Path::Class::Dir->new($originalExportPath);
 $exportPath             = $config->get('exportPath');
 my $extrasPath          = $config->get('extrasPath');
 my $extrasUrl           = $config->get('extrasURL');
@@ -953,7 +940,7 @@ is($message, "can't create exportPath $inaccessibleDirectory", "exportAsHtml ret
 
 # user can't view asset
 $home->update( { groupIdView => 3 } );
-$session->http->{_http}->{noHeader} = 1;
+$session->http->setNoHeader(1);
 
 chmod 0755, $tempDirectory;
 eval { ($success, $message) = $home->exportAsHtml( { userId => 1, depth => 99 } ) };
@@ -970,8 +957,8 @@ $home->update( { groupIdView => 7 } );
 # for valid paths and URLs for these values in the config file. the site would
 # be horridly, totally broken if they were incorrect. assume that they're
 # valid.
-$config->set('exportPath', $originalExportPath);
-$exportPath         = Path::Class::Dir->new($originalExportPath);
+$config->set('exportPath', $tempDirectory);
+$exportPath         = Path::Class::Dir->new($tempDirectory);
 $extrasPath         = $config->get('extrasPath');
 $extrasUrl          = $config->get('extrasURL');
 $uploadsPath        = $config->get('uploadsPath');
@@ -980,11 +967,12 @@ $uploadsUrl         = $config->get('uploadsURL');
 $exportPath->rmtree;
 
 ($success, $message)    = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'symlink', quiet => 1 } );
-$extrasSymlink          = Path::Class::File->new($exportPath, $extrasUrl);
-$uploadsSymlink         = Path::Class::File->new($exportPath, $uploadsUrl);
 
 is($success,   1,                                    "exportAsHtml when linking extras and uploads returns true");
 like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml when linking extras and uploads returns correct message");
+
+$extrasSymlink          = Path::Class::File->new($exportPath, $extrasUrl);
+$uploadsSymlink         = Path::Class::File->new($exportPath, $uploadsUrl);
 
 ok(-e $extrasSymlink->absolute->stringify,                    "exportAsHtml writes extras symlink");
 is($extrasPath, readlink $extrasSymlink->absolute->stringify, "exportAsHtml extras symlink points to right place");
@@ -1004,25 +992,21 @@ is($home->exportGetUrlAsPath->absolute->stringify, readlink $rootUrlSymlink->abs
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if ($testRan) {
-        # remove $tempDirectory since it now exists in the filesystem
-        rmtree($tempDirectory);
+    # remove $tempDirectory since it now exists in the filesystem
+    rmtree($tempDirectory);
 
-        # restore the original exportPath setting, now that we're done testing
-        # exportCheckPath.
-        $session->config->set('exportPath', $originalExportPath);
+    # restore the original exportPath setting, now that we're done testing
+    # exportCheckPath.
+    $session->config->set('exportPath', $originalExportPath) if $originalExportPath;
 
-        # we created a couple of assets; roll them back so they don't stick around
-        $versionTag->rollback();
+    # we created a couple of assets; roll them back so they don't stick around
+    $versionTag->rollback();
 
-        # make sure people can view /home
-        $home->update( { groupIdView => 7 } ); # everyone
+    # make sure people can view /home
+    $home->update( { groupIdView => 7 } ); # everyone
 
-        # delete test user
-        if ($randomUser and ref $randomUser eq 'WebGUI::User') {
-            $randomUser->delete;
-        }
-
-
+    # delete test user
+    if ($randomUser and ref $randomUser eq 'WebGUI::User') {
+        $randomUser->delete;
     }
 }
