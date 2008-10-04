@@ -725,7 +725,7 @@ is($message, "need a depth", "exportAsHtml returns correct message when not give
 
 ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 'orly? yarly!' } );
 is($success, 0, "exportAsHtml returns 0 when given bogus, memetic depth");
-is($message, "'orly? yarly!' is not a valid depth", "exportAsHtml returns correct message when given bogus, memetic depth");
+is($message, "orly? yarly! is not a valid depth", "exportAsHtml returns correct message when given bogus, memetic depth");
 
 # next, let's make sure some simple exports work. export 'home', but clean up
 # the exportPath first to make sure there are no residuals from the tests
