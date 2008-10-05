@@ -55,7 +55,7 @@ $versionTag->commit;
 
 #----------------------------------------------------------------------------
 # Tests
-plan skip_all => 1;
+plan tests => 36;
 
 #----------------------------------------------------------------------------
 # By default, GalleryAlbum inherits its permissions from the Gallery, but 
@@ -76,7 +76,7 @@ $maker->prepare({
     fail        => [ 1, $user{"2"}, ], 
 }, {
     object      => $album, 
-    method      => "canAddComment",
+    method      => "canComment",
     pass        => [ 3, $user{"2"}, ],
     fail        => [ 1, ],
 });
