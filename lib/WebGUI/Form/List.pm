@@ -168,7 +168,7 @@ sub getOptions {
     }
     else {
         foreach my $line (split "\n", $possibleValues) {
-			$line =~ s/^(.*)\r|\s*$/$1/;
+            $line =~ s/^(.*)\r|\s*$/$1/;
             if ($line =~ m/(.*)\|(.*)/) {
                 $options{$1} = $2;
             }

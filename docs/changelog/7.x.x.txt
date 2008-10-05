@@ -13,6 +13,7 @@
  - fixed: DataForm can't export fields containing newlines
  - fixed: UserList templates use incorrect variable names
  - fixed: International characters in password prevents login
+ - fixed: SelectSlider form control is broken
 
 7.6.0
  - added: users may now customize the post received page for the CS

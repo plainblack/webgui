@@ -60,7 +60,7 @@ sub _getColorForm {
 	);
 	$f->selectSlider(
 		-name	=> 'fillAlpha',
-		-value	=> [ $color->getFillAlpha ],
+		-value	=> $color->getFillAlpha,
 		-options=> \%transparencies, 
 		-label	=> $i18n->get('fill alpha'),
 		-hoverHelp => $i18n->get('fill alpha description'),
@@ -78,7 +78,7 @@ sub _getColorForm {
 	);
 	$f->selectSlider(
 		-name	=> 'strokeAlpha',
-		-value	=> [ $color->getStrokeAlpha ],
+		-value	=> $color->getStrokeAlpha,
 		-options=> \%transparencies,
 		-label	=> $i18n->get('stroke alpha'),
 		-hoverHelp => $i18n->get('stroke alpha description'),
