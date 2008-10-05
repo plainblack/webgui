@@ -10,6 +10,7 @@
  - added a new permission denied page for version tag approval
  - fixed: Shortcuts includes HTML head data twice
  - fixed: DataForm entry table isn't properly indexed
+ - fixed: DataForm can't export fields containing newlines
 
 7.6.0
  - added: users may now customize the post received page for the CS
