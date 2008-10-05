@@ -21,6 +21,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
+use Encode ();
 
 our @ISA = qw(WebGUI::Auth);
 
@@ -119,7 +120,7 @@ sub authenticate {
 	
 	$identifier = $_[1];
 	$userData = $self->getParams;
-	if ((Digest::MD5::md5_base64($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
+	if ((Digest::MD5::md5_base64(Encode::encode_utf8($identifier)) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));

@@ -12,6 +12,7 @@
  - fixed: DataForm entry table isn't properly indexed
  - fixed: DataForm can't export fields containing newlines
  - fixed: UserList templates use incorrect variable names
+ - fixed: International characters in password prevents login
 
 7.6.0
  - added: users may now customize the post received page for the CS
