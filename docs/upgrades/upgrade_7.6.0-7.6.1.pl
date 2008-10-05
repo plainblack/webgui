@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 addExportExtensionsToConfigFile($session);
 fixShortAssetIds( $session );
+addDataFormDataIndexes($session);
 
 finish($session); # this line required
 
@@ -72,6 +73,15 @@ sub fixShortAssetIds {
     }
     print "Done.\n" unless $quiet;
 }
+
+sub addDataFormDataIndexes {
+    my $session     = shift;
+    print "\tAssing indexes to DataForm entry table... " unless $quiet;
+    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId` (`assetId`)');
+    $session->db->write('ALTER TABLE `DataForm_entry` ADD INDEX `assetId_submissionDate` (`assetId`,`submissionDate`)');
+    print "Done.\n" unless $quiet;
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
