@@ -1125,7 +1125,7 @@ Couldn't open %-s because %-s <br />
         message     => q{Inherit parent's permissions},
         lastUpdated => 1221593874,
         context     => q{Error message in Asset.pm},
-    }
+    },
 
     'need a userId parameter' => {
         message     => q{need a userId parameter},
