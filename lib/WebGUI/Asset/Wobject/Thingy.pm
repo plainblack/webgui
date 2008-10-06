@@ -692,7 +692,7 @@ sub getFormElement {
         }
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments SelectSlider))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
                     @defaultValues = $self->session->form->selectList($name);
@@ -705,15 +705,22 @@ sub getFormElement {
         $param{value} = \@defaultValues;
     }    
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList SelectSlider))) {
         delete $param{size};
-        my %options;
-                tie %options, 'Tie::IxHash';
-                foreach (split(/\n/x, $data->{possibleValues})) {
-                    s/\s+$//x; # remove trailing spaces
-                        $options{$_} = $_;
-                }
-        $param{options} = \%options;
+
+        my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
+        if (ref $values eq 'HASH') {
+            $param{options} = $values;
+        }
+        else{
+            my %options;
+            tie %options, 'Tie::IxHash';
+            foreach (split(/\n/x, $data->{possibleValues})) {
+                s/\s+$//x; # remove trailing spaces
+                    $options{$_} = $_;
+            }
+            $param{options} = \%options;
+        }
     }
 
     if ($data->{fieldType} eq "YesNo") {
