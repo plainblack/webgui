@@ -14,7 +14,7 @@ You can run enable_flux.pl multiple times against the same site without any adve
 The official Flux test suite lives under t/Flux
 You obviously need to run enable_flux.pl against the site you want to run the tests against.
 
-> prove t/Flux
+> prove -r t/Flux
 
 = More Information =
 Check out the docs in the fluxdesigndocs directory and/or catch me on IRC

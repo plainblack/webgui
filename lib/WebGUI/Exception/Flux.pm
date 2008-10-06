@@ -9,16 +9,6 @@ use Exception::Class (
         description => 'Feature not implemented yet.',
         fields      => ['module'],
     },
-    'WebGUI::Error::Pluggable::LoadFailed' => {
-        isa         => 'WebGUI::Error',
-        description => 'WebGUI::Pluggable failed to load module.',
-        fields      => ['module'],
-    },
-    'WebGUI::Error::Pluggable::RunFailed' => {
-        isa         => 'WebGUI::Error',
-        description => 'WebGUI::Pluggable failed to run subroutine.',
-        fields      => [ 'module', 'subroutine', 'params' ],
-    },
     'WebGUI::Error::InvalidNamedParamHashRef' => {
         isa         => 'WebGUI::Error::InvalidParam',
         description => 'Expected to get a hash reference of named subroutine parameters.',
