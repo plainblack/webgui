@@ -2,8 +2,11 @@
  - fixed: International characters in password prevents login
  - fixed: SelectSlider form control is broken
  - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
- - fixed: Thingy list type form elements do not support key/value pairs
- - fixed: Select Slider borked in Thingy
+ - fixed: Thingy list type form elements do not support key/value pairs (SDH
+   Consulting Group)
+ - fixed: Select Slider borked in Thingy (SDH Consulting Group)
+ - fixed: Combo box does not show possible values in Thingy (SDH Consulting
+   Group)
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
