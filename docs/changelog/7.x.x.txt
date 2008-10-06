@@ -7,6 +7,7 @@
  - fixed: Select Slider borked in Thingy (SDH Consulting Group)
  - fixed: Combo box does not show possible values in Thingy (SDH Consulting
    Group)
+ - fixed: Cross site scripting issue on operation pages
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
