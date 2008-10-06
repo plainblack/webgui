@@ -529,7 +529,19 @@ vertically.|,
     },
 
     'possible values description' => {
-        message => q{This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line. If you want a different label for a value, seperate them with a | (pipe) character: value|label },
+        message => q{This field is used for the list types (like Checkbox List and Select List).  Enter the values
+you wish to appear, one per line. <br />
+<br />If you want a different label for a value, the possible values list has to be
+formatted as follows:
+<pre>
+&#123;
+   "key1"=>"value1",
+   "key2"=>"value2",
+   "key3"=>"value3"
+   ...
+&#125;
+</pre>
+Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs},
         lastUpdated => 1104630516,
     },
 
