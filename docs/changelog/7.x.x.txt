@@ -20,6 +20,7 @@
  - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
  - fixed: Combo box does not show possible values in Thingy (SDH Consulting
    Group)
+ - fixed: Cross site scripting issue on operation pages
 
 7.6.0
  - added: users may now customize the post received page for the CS
