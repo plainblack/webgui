@@ -8,15 +8,18 @@
  - fixed: DataForm doesn't keep posted values properly when data fails validation
  - fixed: Documentation for DataForm and Thingy updated for Possible Values field
  - added a new permission denied page for version tag approval
- - fixed: Thingy list type form elements do not support key/value pairs
- - fixed: Select Slider borked in Thingy
- - fixed: Shortcuts includes HTML head data twice
+ - fixed: Thingy list type form elements do not support key/value pairs (SDH
+   Consulting Group)
+ - fixed: Select Slider borked in Thingy (SDH Consulting Group)
+ - fixed: Shortcuts includes HTML head data twice 
  - fixed: DataForm entry table isn't properly indexed
  - fixed: DataForm can't export fields containing newlines
  - fixed: UserList templates use incorrect variable names
  - fixed: International characters in password prevents login
  - fixed: SelectSlider form control is broken
  - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
+ - fixed: Combo box does not show possible values in Thingy (SDH Consulting
+   Group)
 
 7.6.0
  - added: users may now customize the post received page for the CS

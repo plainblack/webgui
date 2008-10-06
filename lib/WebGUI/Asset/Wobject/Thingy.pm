@@ -830,7 +830,7 @@ sub getFormElement {
         }
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments Combo))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
             @defaultValues = $self->session->form->selectList($name);
@@ -844,7 +844,7 @@ sub getFormElement {
         $param{value} = \@defaultValues;
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList SelectSlider))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList SelectSlider Combo))) {
         delete $param{size};
 
         my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
