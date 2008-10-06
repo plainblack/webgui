@@ -1,5 +1,6 @@
 7.5.26
  - fixed: International characters in password prevents login
+ - fixed: SelectSlider form control is broken
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
