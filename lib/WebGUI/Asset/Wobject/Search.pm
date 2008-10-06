@@ -180,7 +180,7 @@ sub view {
         #Instantiate the highlighter
         my @words     = split(/\s+/,$keywords);
         my @wildcards = map { "%" } @words;
-        my $hl = new HTML::Highlight (
+        my $hl = HTML::Highlight->new(
             words     => \@words,
             wildcards => \@wildcards
         );
@@ -189,10 +189,10 @@ sub view {
         my $p         = $search->getPaginatorResultSet (
             $self->getUrl('doit=1;keywords='.$session->url->escape($keywords))            
         );
-        
-        my @results   = ();        
-    	foreach my $data (@{$p->getPageData}) {
-        	next unless (
+
+        my @results   = ();
+        foreach my $data (@{$p->getPageData}) {
+            next unless (
                 $user->userId eq $data->{ownerUserId}
                 || $user->isInGroup($data->{groupIdView})
                 || $user->isInGroup($data->{groupIdEdit})
@@ -205,9 +205,9 @@ sub view {
                     $properties->{url} = $asset->getContainer->get("url");
                 }
                 #Add highlighting
-                $properties->{'title'               } = $hl->highlight($properties->{title});
+                $properties->{'title'               } = $hl->highlight($properties->{title} || '');
                 $properties->{'title_nohighlight'   } = $properties->{title};
-                $properties->{'synopsis'            } = $hl->highlight($properties->{synopsis});
+                $properties->{'synopsis'            } = $hl->highlight($properties->{synopsis} || '');
                 $properties->{'synopsis_nohighlight'} = $properties->{synopsis};
                 push(@results, $properties);
                 $var{results_found} = 1;
