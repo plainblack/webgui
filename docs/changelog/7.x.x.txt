@@ -14,6 +14,7 @@
  - fixed: UserList templates use incorrect variable names
  - fixed: International characters in password prevents login
  - fixed: SelectSlider form control is broken
+ - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
 
 7.6.0
  - added: users may now customize the post received page for the CS

@@ -20,6 +20,7 @@ use strict;
 use CPAN;
 use Getopt::Long;
 use Pod::Usage;
+use Cwd ();
 
 
 my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
@@ -335,7 +336,9 @@ sub getOs {
 sub installModule {
         my $module = shift;
         print "Attempting to install ".$module."...\n";
+        my $cwd = Cwd::cwd;
         CPAN::Shell->install($module);
+        chdir $cwd;
 }
 
 #----------------------------------------
