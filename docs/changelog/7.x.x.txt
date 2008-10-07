@@ -8,6 +8,7 @@
  - fixed: Combo box does not show possible values in Thingy (SDH Consulting
    Group)
  - fixed: Cross site scripting issue on operation pages
+ - fixed: Shop: Percentage of Weight Shipping Method doesn't work
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
