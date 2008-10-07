@@ -181,10 +181,16 @@ cmp_bag(\@metas, $expectedMetas, 'setRedirect:sets meta tags in the style object
 
 $request->uri('/here/now');
 $session->url->{_requestedUrl} = '';
-is($http->setRedirect('/here/now'), undef, 'setRedirect: returns undef if returning to self and no params');
+my $sessionAsset = $session->asset;
+$session->{_asset} = WebGUI::Asset->getDefault($session);
+my $defaultAssetUrl = $session->asset->getUrl;
+
+is($http->setRedirect($defaultAssetUrl), undef, 'setRedirect: returns undef if returning to self and no params');
 
 $request->setup_body({ param1 => 'value1' });
 isnt($http->setRedirect('/here/now'), undef, 'setRedirect: does not return undef if returning to self but there are params');
+
+$session->{_asset} = $sessionAsset;
 
 ####################################################
 #
@@ -307,9 +313,9 @@ $http->setFilename('');
 $request->protocol('HTTP 1.0');
 $http->setCacheControl(500);
 $http->sendHeader();
-my $headers_out = $request->headers_out->fetch;
-my $expire_header = delete $headers_out->{Expires};
-my $delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
+$headers_out = $request->headers_out->fetch;
+$expire_header = delete $headers_out->{Expires};
+$delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
 cmp_ok($delta->seconds, '<=', 2, 'sendHeader, old HTTP protocol, cacheControl=500: adds extra cache header field');
 is_deeply(
 	$request->headers_out->fetch,

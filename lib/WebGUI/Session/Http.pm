@@ -501,7 +501,8 @@ Sets the necessary information in the HTTP header to redirect to another URL.
 
 =head3 url
 
-The URL to redirect to.
+The URL to redirect to.  To prevent infinite loops, no redirect will be set if
+url is the same as the current page, as found through $session->url->page.
 
 =head3 type
 
