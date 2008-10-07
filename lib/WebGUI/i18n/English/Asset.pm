@@ -1145,8 +1145,8 @@ Couldn't open %-s because %-s <br />
         context     => q{Error message in exportAsHtml for an illegal parameter.},
     },
 
-    '%s is not a valid depth' => {
-        message     => q{%s is not a valid depth},
+    '%d is not a valid depth' => {
+        message     => q{%d is not a valid depth},
         lastUpdated => 0,
         context     => q{Error message in exportAsHtml for an illegal parameter.},
     },
