@@ -24,6 +24,7 @@
  - fixed: Search asset shows blank page after searching
  - rfe: Updated Thingy's edit instructions and search description fields to
    HTMLAreas (SDH Consulting Group)
+ - rfe: Thingy Private Rows (SDH Consulting Group)
 
 7.6.0
  - added: users may now customize the post received page for the CS

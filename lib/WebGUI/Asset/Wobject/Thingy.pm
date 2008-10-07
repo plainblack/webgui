@@ -1428,10 +1428,11 @@ sub www_editThing {
     my $self = shift;
     my $warning = shift;
     my $session = $self->session;
-    my ($tabForm, $output, %properties, $tab, %afterSave, %defaultView, $fields);
+    my ($tabForm, $output, %properties, $tab, %afterSave, %defaultView, $fields, %editViewOptions);
     my ($fieldsHTML, $fieldsViewScreen, $fieldsSearchScreen);
     my (@hasHeightWidth,@hasSize,@hasVertical,@hasValues);
     tie %afterSave, 'Tie::IxHash';
+    tie %editViewOptions, 'Tie::IxHash';
     return $session->privilege->insufficient() unless $self->canEdit;
     my $i18n = WebGUI::International->new($session, "Asset_Thingy");
 
@@ -1659,11 +1660,18 @@ sub www_editThing {
         -hoverHelp=> $i18n->get('who can add description'),
         -label => $i18n->get('who can add label')
     );
-    $tab->group(
+
+    # create the options hash for the 'Who can edit' and 'Who can view' selectBoxes.
+    %editViewOptions = ('owner'=>'owner',$session->db->buildHash(
+        "select groupId,groupName from groups where showInForms=1 order by groupName"
+    ));
+
+    $tab->selectBox(
         -name=> "groupIdEdit",
         -value=> $properties{groupIdEdit},
         -hoverHelp=> $i18n->get('who can edit description'),
-        -label => $i18n->get('who can edit label')
+        -label => $i18n->get('who can edit label'),
+        -options => \%editViewOptions,
     );
     $tab->text(
         -name   => 'saveButtonLabel',
@@ -1730,11 +1738,12 @@ sub www_editThing {
 
     $tabForm->addTab('view', $i18n->get('view screen tab label'));
     $tab = $tabForm->getTab('view');
-    $tab->group(
+    $tab->selectBox(
         -name=> "groupIdView",
         -value=> $properties{groupIdView},
         -hoverHelp=> $i18n->get('who can view description'),
-        -label => $i18n->get('who can view label')
+        -label => $i18n->get('who can view label'),
+        -options => \%editViewOptions,
     );
     $tab->template(
         -name=>"viewTemplateId",
@@ -2012,12 +2021,24 @@ sub www_editThingData {
 
 Checks if the user can edit thing data.
 
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingDataId
+
+The unique id of a row of thing data.
+
+=head3 thingProperties
+
+A hashRef containing the properties of a thing.
 =cut
 
 sub canEditThingData {
     my $self = shift;
-    my $thingId = shift || $self->session->form->process('thingId');
-    my $thingDataId = shift || $self->session->form->process('thingDataId') || "new";
+    my $session = $self->session;
+    my $thingId = shift || $session->form->process('thingId');
+    my $thingDataId = shift || $session->form->process('thingDataId') || "new";
     my $thingProperties = shift || $self->getThing($thingId);
     
     my ($privilegedGroup);
@@ -2025,10 +2046,68 @@ sub canEditThingData {
         $privilegedGroup = $thingProperties->{groupIdAdd};
     }
     else {
-        $privilegedGroup = $thingProperties->{groupIdEdit};
+        if ($thingProperties->{groupIdEdit} eq 'owner'){
+            my $owner = $session->db->quickScalar("select createdById "
+                ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+                ." where thingDataId = ?",[$thingDataId]);
+            if ($session->user->userId eq $owner || $self->canEdit){
+                return 1;
+            }
+            else{
+                return undef;
+            }
+        }
+        else{
+            $privilegedGroup = $thingProperties->{groupIdEdit};
+        }
     }
     return $self->hasPrivileges($privilegedGroup);
 }
+
+#-------------------------------------------------------------------
+
+=head2 canViewThingData ( )
+
+Checks if the user can view a specific row of thing data.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=head3 thingDataId
+
+The unique id of a row of thing data.
+
+=head3 thingProperties
+
+A hashRef containing the properties of a thing.
+
+=cut
+
+
+sub canViewThingData {
+    my $self = shift;
+    my $session = $self->session;
+    my $thingId = shift || $session->form->process('thingId');
+    my $thingDataId = shift || $session->form->process('thingDataId') || "new";
+    my $thingProperties = shift || $self->getThing($thingId);
+
+    if ($thingProperties->{groupIdView} eq 'owner'){
+        my $owner = $session->db->quickScalar("select createdById "
+            ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)
+            ." where thingDataId = ?",[$thingDataId]);
+        if ($session->user->userId eq $owner || $self->canEdit){
+            return 1;
+        }
+        else{
+            return undef;
+        }
+    }
+    else{
+        return $self->hasPrivileges($thingProperties->{groupIdView});
+    }
+}
+
 
 #-------------------------------------------------------------------
 
@@ -2045,6 +2124,9 @@ sub editThingData {
     my $thingId = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId') || "new";
     my $thingProperties = shift || $self->getThing($thingId);
+
+    return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId, $thingProperties);
+
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
@@ -2141,13 +2223,8 @@ sub www_editThingDataSave {
     my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $thingProperties = $self->getThing($thingId);
-    if ($thingDataId eq "new"){
-        $privilegedGroup = $thingProperties->{groupIdAdd};
-    }
-    else{
-        $privilegedGroup = $thingProperties->{groupIdEdit};
-    }
-    return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
+    return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
+        ,$thingProperties);
 
     ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
@@ -2211,15 +2288,9 @@ sub www_editThingDataSaveViaAjax {
     my $thingProperties = $self->getThing($thingId);
     if ($thingProperties->{thingId}){
         my ($privilegedGroup,$workflowId);
-	
-    	if ($thingDataId eq "new"){
-	    	$privilegedGroup = $thingProperties->{groupIdAdd};
-	    }
-	    else{
-		    $privilegedGroup = $thingProperties->{groupIdEdit};
-	    }
-	    return $session->privilege->insufficient() unless $self->hasPrivileges($privilegedGroup);
-
+	    
+        return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
+            ,$thingProperties);
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
     	if ($errors){
@@ -2890,7 +2961,16 @@ sequenceNumber');
     $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
     
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
-    $p->setDataByQuery($query) if ! $noFields;
+
+    my $sth = $self->session->db->read($query) if ! $noFields;
+    my @visibleResults;
+    while (my $result = $sth->hashRef){
+        if ($self->canViewThingData($thingId,$result->{thingDataId})){
+            push(@visibleResults,$result);
+        }
+    }
+    $p->setDataByArrayRef(\@visibleResults) if ! $noFields;
+
     $searchResults = $p->getPageData($paginatePage);
     foreach my $searchResult (@$searchResults){
         my (@field_loop);
@@ -2909,7 +2989,8 @@ sequenceNumber');
             .$thingId.';thingDataId='.$thingDataId),
             "searchResult_field_loop" => \@field_loop,
         );
-        if ($self->hasPrivileges($thingProperties->{groupIdEdit})){
+        if ($self->canEditThingData($thingId,$thingDataId,$thingProperties)){
+            $templateVars{canEditThingData} = 1;
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
@@ -2917,7 +2998,6 @@ sequenceNumber');
         }
         push(@searchResult_loop,\%templateVars);
     }
-    $var->{canEditThingData} = $self->hasPrivileges($thingProperties->{groupIdEdit});
     $var->{searchResult_loop} = \@searchResult_loop;    
     $p->appendTemplateVars($var);
 
@@ -2931,7 +3011,6 @@ sequenceNumber');
     $var->{displayInSearchFields_loop} = \@displayInSearchFields_loop;
     $self->appendThingsVars($var, $thingId);
     return $var;	
-    #return $self->processTemplate($var,$thingProperties->{searchTemplateId});
 }
 
 #-------------------------------------------------------------------
@@ -3061,7 +3140,8 @@ sub www_viewThingData {
     my $i18n    = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $thingProperties = $self->getThing($thingId);
-    return $self->session->privilege->insufficient() unless $self->canViewThing($thingId, $thingProperties->{groupIdView});
+    return $self->session->privilege->insufficient() unless $self->canViewThingData(
+        $thingId, $thingDataId, $thingProperties);
 
     $var->{canEditThings}   = $self->canEdit;
     $var->{"addThing_url"}  = $session->url->append($url, 'func=editThing;thingId=new');
@@ -3120,7 +3200,8 @@ sub www_viewThingDataViaAjax {
 
     my $thingProperties = $self->getThing($thingId);
     if ($thingProperties->{thingId}){
-        return $session->privilege->insufficient() unless $self->canViewThing($thingId, $thingProperties->{groupIdView});
+        return $self->session->privilege->insufficient() unless $self->canViewThingData(
+        $thingId, $thingDataId, $thingProperties);
 
         my $output = $self->getViewThingVars($thingId,$thingDataId);
 

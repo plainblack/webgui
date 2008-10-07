@@ -128,8 +128,10 @@ our $I18N = {
     },
 
     'who can edit description' => {
-        message => q|The group that can edit this thing.|,
-        lastUpdated => 1104630516,
+        message => q|Select either:<br />- 'owner' if this things data should only be editable by the person who added it
+<br />or<br />- a group that can edit all the data in this thing.<br />A user who can edit this Thingy
+wobject can always view and edit all data.|,
+        lastUpdated => 1223372150,
     },
 
     'save button label label' => {
@@ -229,8 +231,10 @@ our $I18N = {
     },
 
     'who can view description' => {
-        message => q|The group that can view this thing.|,
-        lastUpdated => 1104630516,
+        message => q|Select either:<br />- 'owner' if this things data should only be viewable by the person who
+added it <br />or<br />- a group that can view all the data in this thing.<br />A user who can edit this Thingy
+wobject can always view and edit all data.|,
+        lastUpdated => 1223372150,
     },
 
     'view template label' => {
@@ -419,8 +423,9 @@ our $I18N = {
     },
 
     'default value description' => {
-        message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
-        lastUpdated => 1119156590,
+        message => q|Enter the default value (if any) for the field. If you have defined the possible values for
+this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
+        lastUpdated => 1223372150,
     },
 
     'default value subtext' => {
@@ -542,7 +547,7 @@ formatted as follows:
 &#125;
 </pre>
 Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs},
-        lastUpdated => 1104630516,
+        lastUpdated => 1223372150,
     },
 
     'possible values subtext' => {
