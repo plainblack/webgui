@@ -630,7 +630,7 @@ sub getEditFieldForm {
                 value=>$defaultValue,
                 subtext=>'<br />'.$i18n->get('default value subtext'),
                 width=>200,
-                height=>60,
+                height=>40,
                 resizable=>0,
             });
     $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultValue_module",$defaultValueForm,
@@ -1644,12 +1644,14 @@ sub www_editThing {
         -value  => $properties{editScreenTitle},
         -maxlength => 64,
     );
-    $tab->textarea(
+    $tab->HTMLArea(
         -name   => 'editInstructions',
         -label  => $i18n->get('edit instructions label'),
         -hoverHelp  => $i18n->get('edit instructions description'),
         -value  => $properties{editInstructions},
         -maxlength => 64,
+        -width => 300,
+        -height => 200,
     );
     $tab->group(
         -name=> "groupIdAdd",
@@ -1765,12 +1767,14 @@ sub www_editThing {
         -maxlength => 64,
     );
 
-    $tab->textarea(
+    $tab->HTMLArea(
         -name   => 'searchDescription',
         -label  => $i18n->get('search description label'),
         -hoverHelp  => $i18n->get('search description description'),
         -value  => $properties{searchDescription},
         -maxlength => 64,
+        -width => 300,
+        -height => 200,
     );
 
     $tab->group(
