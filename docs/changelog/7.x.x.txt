@@ -28,6 +28,7 @@
  - rfe: Updated Thingy's edit instructions and search description fields to
    HTMLAreas (SDH Consulting Group)
  - rfe: Thingy Private Rows (SDH Consulting Group)
+ - fixed: Shop: Percentage of Weight Shipping Method doesn't work
 
 7.6.0
  - added: users may now customize the post received page for the CS
