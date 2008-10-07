@@ -102,32 +102,37 @@ cmp_deeply(
 
 my $tempDirectory           = tempdir('webguiXXXXX', CLEANUP => 1);
 my $inaccessibleDirectory   = Path::Class::Dir->new($tempDirectory, 'unwritable');
-chmod 0000, $tempDirectory; 
-$config->set('exportPath', $inaccessibleDirectory->stringify); 
 
-eval { WebGUI::Asset->exportCheckPath($session) };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't create the directory it needs");
-cmp_deeply(
-    $e,
-    methods(
-        error       => "can't create exportPath $inaccessibleDirectory",
-    ),
-    "exportCheckPath throws if it can't create the directory it needs"
-);
+    SKIP: {
+        skip 'Root will cause this test to fail since it does not obey file permissions', 4
+            if $< == 0;
+        chmod 0000, $tempDirectory; 
+        $config->set('exportPath', $inaccessibleDirectory->stringify); 
 
-chmod 0444, $tempDirectory; 
-$config->set('exportPath', $tempDirectory); 
-eval { WebGUI::Asset->exportCheckPath($session) };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't access the exportPath for writing");
-cmp_deeply(
-    $e,
-    methods(
-        error       => "can't access $tempDirectory",
-    ),
-    "exportCheckPath throws if we can't access the exportPath"
-);
+        eval { WebGUI::Asset->exportCheckPath($session) };
+        $e = Exception::Class->caught();
+        isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't create the directory it needs");
+        cmp_deeply(
+            $e,
+            methods(
+                error       => "can't create exportPath $inaccessibleDirectory",
+            ),
+            "exportCheckPath throws if it can't create the directory it needs"
+        );
+
+        chmod 0444, $tempDirectory; 
+        $config->set('exportPath', $tempDirectory); 
+        eval { WebGUI::Asset->exportCheckPath($session) };
+        $e = Exception::Class->caught();
+        isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't access the exportPath for writing");
+        cmp_deeply(
+            $e,
+            methods(
+                error       => "can't access $tempDirectory",
+            ),
+            "exportCheckPath throws if we can't access the exportPath"
+        );
+    }
 
 # we're finished making sure that the code explodes on bad stuff, so let's make
 # sure that it really works when it's really supposed to.
