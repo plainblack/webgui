@@ -10,6 +10,9 @@
  - added a new permission denied page for version tag approval
  - fixed: Thingy list type form elements do not support key/value pairs (SDH
    Consulting Group)
+ - Removed cart icon from ViewCart macro.
+ - Updated WebGUI::Shop::PayDriver::processTransaction() to accept a
+   transaction as a param.
  - fixed: Select Slider borked in Thingy (SDH Consulting Group)
  - fixed: Shortcuts includes HTML head data twice 
  - fixed: DataForm entry table isn't properly indexed
