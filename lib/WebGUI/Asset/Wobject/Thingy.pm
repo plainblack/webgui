@@ -2032,6 +2032,7 @@ The unique id of a row of thing data.
 =head3 thingProperties
 
 A hashRef containing the properties of a thing.
+
 =cut
 
 sub canEditThingData {
