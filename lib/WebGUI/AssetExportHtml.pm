@@ -239,7 +239,7 @@ sub exportAsHtml {
     # and it must be a number.
     if( !looks_like_number($depth) ) {
         $returnCode = 0;
-        $message    = sprintf $i18n->get('%d is not a valid depth'), $depth;
+        $message    = sprintf $i18n->get('%s is not a valid depth'), $depth;
         return ($returnCode, $message);
     }
 
