@@ -27,12 +27,12 @@ my @testSets = (
 	{
 		comment => 'default',
 		label => q!!,
-		output => '<a href="'.$session->url->page('shop=cart').'"><img src="/extras/macro/ViewCart/cart.gif" alt="View Cart" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$session->url->page('shop=cart').'">View Cart</a>',
+		output => '<a href="'.$session->url->page('shop=cart').'">View Cart</a>',
 	},
 	{
 		comment => 'custom text',
 		label => q!A Rock Hammer!,
-		output => '<a href="'.$session->url->page('shop=cart').'"><img src="/extras/macro/ViewCart/cart.gif" alt="A Rock Hammer" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$session->url->page('shop=cart').'">A Rock Hammer</a>',
+		output => '<a href="'.$session->url->page('shop=cart').'">A Rock Hammer</a>',
 	},
 );
 
