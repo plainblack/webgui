@@ -370,16 +370,20 @@ chmod 0000, $guidPath->stringify;
 $config->set('exportPath', $unwritablePath->absolute->stringify);
 
 $session->http->setNoHeader(1);
-eval { $home->exportWriteFile() };
-$e = Exception::Class->caught();
-isa_ok($e, 'WebGUI::Error', "exportWriteFile throws if it can't create the export path");
-cmp_deeply(
-    $e,
-    methods(
-        error       => "can't create exportPath $unwritablePath",
-    ),
-    "exportWriteFile throws if it can't create the export path"
-);
+SKIP: {
+    skip 'Root will cause this test to fail since it does not obey file permissions', 2
+        if $< == 0;
+    eval { $home->exportWriteFile() };
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error', "exportWriteFile throws if it can't create the export path");
+    cmp_deeply(
+        $e,
+        methods(
+            error       => "can't create exportPath $unwritablePath",
+        ),
+        "exportWriteFile throws if it can't create the export path"
+    );
+}
 
 # the exception was thrown, but make sure that the file also wasn't written
 # can't call exportGetUrlAsPath on $home right now, since the path is
@@ -940,14 +944,19 @@ is($@,       '', "exportAsHtml catches exportPath is file exception");
 is($success, 0,  "exportAsHtml returns 0 if exportPath is a file");
 is($message, "$exportPathFile isn't a directory", "exportAsHtml returns correct message if exportPath is a file");
 
-# can't create export path
-chmod 0000, $tempDirectory;
 $config->set('exportPath', $inaccessibleDirectory->stringify);
+SKIP: {
+    skip 'Root will cause this test to fail since it does not obey file permissions', 3
+        if $< == 0;
 
-eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@,       '',                                               "exportAsHtml catches uncreatable exportPath exception");
-is($success, 0,                                                "exportAsHtml returns 0 for uncreatable exportPath");
-is($message, "can't create exportPath $inaccessibleDirectory", "exportAsHtml returns correct message for uncreatable exportPath");
+    # can't create export path
+    chmod 0000, $tempDirectory;
+
+    eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+    is($@,       '',                                               "exportAsHtml catches uncreatable exportPath exception");
+    is($success, 0,                                                "exportAsHtml returns 0 for uncreatable exportPath");
+    is($message, "can't create exportPath $inaccessibleDirectory", "exportAsHtml returns correct message for uncreatable exportPath");
+}
 
 # user can't view asset
 $home->update( { groupIdView => 3 } );
