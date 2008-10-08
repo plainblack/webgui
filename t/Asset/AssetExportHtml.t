@@ -103,36 +103,36 @@ cmp_deeply(
 my $tempDirectory           = tempdir('webguiXXXXX', CLEANUP => 1);
 my $inaccessibleDirectory   = Path::Class::Dir->new($tempDirectory, 'unwritable');
 
-    SKIP: {
-        skip 'Root will cause this test to fail since it does not obey file permissions', 4
-            if $< == 0;
-        chmod 0000, $tempDirectory; 
-        $config->set('exportPath', $inaccessibleDirectory->stringify); 
+SKIP: {
+    skip 'Root will cause this test to fail since it does not obey file permissions', 4
+        if $< == 0;
+    chmod 0000, $tempDirectory; 
+    $config->set('exportPath', $inaccessibleDirectory->stringify); 
 
-        eval { WebGUI::Asset->exportCheckPath($session) };
-        $e = Exception::Class->caught();
-        isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't create the directory it needs");
-        cmp_deeply(
-            $e,
-            methods(
-                error       => "can't create exportPath $inaccessibleDirectory",
-            ),
-            "exportCheckPath throws if it can't create the directory it needs"
-        );
+    eval { WebGUI::Asset->exportCheckPath($session) };
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't create the directory it needs");
+    cmp_deeply(
+        $e,
+        methods(
+            error       => "can't create exportPath $inaccessibleDirectory",
+        ),
+        "exportCheckPath throws if it can't create the directory it needs"
+    );
 
-        chmod 0444, $tempDirectory; 
-        $config->set('exportPath', $tempDirectory); 
-        eval { WebGUI::Asset->exportCheckPath($session) };
-        $e = Exception::Class->caught();
-        isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't access the exportPath for writing");
-        cmp_deeply(
-            $e,
-            methods(
-                error       => "can't access $tempDirectory",
-            ),
-            "exportCheckPath throws if we can't access the exportPath"
-        );
-    }
+    chmod 0444, $tempDirectory; 
+    $config->set('exportPath', $tempDirectory); 
+    eval { WebGUI::Asset->exportCheckPath($session) };
+    $e = Exception::Class->caught();
+    isa_ok($e, 'WebGUI::Error', "exportCheckPath throws if it can't access the exportPath for writing");
+    cmp_deeply(
+        $e,
+        methods(
+            error       => "can't access $tempDirectory",
+        ),
+        "exportCheckPath throws if we can't access the exportPath"
+    );
+}
 
 # we're finished making sure that the code explodes on bad stuff, so let's make
 # sure that it really works when it's really supposed to.
@@ -918,13 +918,19 @@ is($@,       '', "exportAsHtml catches undefined exportPath exception");
 is($success, 0,  "exportAsHtml returns 0 for undefined exportPath");
 is($message, 'exportPath must be defined and not ""', "exportAsHtml returns correct message for undefined exportPath");
 
-# inaccessible exportPath
-$config->set('exportPath', Path::Class::Dir->new('')->stringify);
+SKIP: {
+    skip 'Root will cause this test to fail since it does not obey file permissions', 3
+        if $< == 0;
 
-eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@,       '', "exportAsHtml catches inaccessible exportPath ");
-is($success, 0,  "exportAsHtml returns 0 for inaccessible exportPath");
-is($message, "can't access " . Path::Class::Dir->new('')->stringify, "exportAsHtml returns correct message for inaccessible exportPath");
+    # inaccessible exportPath
+    chmod 0000, $tempDirectory; 
+    $config->set('exportPath', $inaccessibleDirectory->stringify); 
+
+    eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+    is($@,       '', "exportAsHtml catches inaccessible exportPath ");
+    is($success, 0,  "exportAsHtml returns 0 for inaccessible exportPath");
+    is($message, "can't access " . $inaccessibleDirectory->stringify, "exportAsHtml returns correct message for inaccessible exportPath");
+}
 
 # exportPath is a file, not a directory
 $config->set('exportPath', $exportPathFile);
