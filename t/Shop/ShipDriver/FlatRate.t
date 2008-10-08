@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 12;
+my $tests = 13;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -291,15 +291,18 @@ $options = {
                 flatFee => 1.00,
                 percentageOfPrice => 0,
                 pricePerWeight    => 100,
-                pricePerItem      => 0,
+                pricePerItem      => 10,
               };
 
 $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
 my $cart = WebGUI::Shop::Cart->newBySession($session);
-$car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
 
-is($driver->calculate($cart), 1501, 'calculate by weight and flat fee work');
+$car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
+is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
+
+$car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
+is($driver->calculate($cart), 4521, 'calculate by weight, perItem and flat fee work for two items');
 
 }
 
