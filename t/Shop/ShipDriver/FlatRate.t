@@ -249,7 +249,7 @@ undef $driver;
 #
 #######################################################################
 
-my $car = WebGUI::Asset->getImportNode($session)->addChild({
+$car = WebGUI::Asset->getImportNode($session)->addChild({
     className          => 'WebGUI::Asset::Sku::Product',
     title              => 'Automobiles',
     isShippingRequired => 1,
@@ -312,7 +312,7 @@ END {
     if (defined $cart and ref $cart eq 'WebGUI::Shop::Cart') {
         $cart->delete;
     }
-    if (defined $car and ref $car eq 'WebGUI::Asset:Sku::Product') {
+    if (defined $car and (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
     }
 }
