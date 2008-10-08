@@ -45,6 +45,7 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Tax');
 
 my $storage;
+my ($taxableDonation, $taxFreeDonation);
 
 SKIP: {
 
@@ -551,7 +552,7 @@ SKIP: {
         WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
     ),
 
-    my $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
+    $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Taxable donation',
         defaultPrice => 100.00,
@@ -576,7 +577,7 @@ SKIP: {
     $cart->update({ shippingAddressId => $taxingAddress->getId});
     is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
 
-    my $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
+    $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Tax Free Donation',
         defaultPrice => 100.00,
@@ -687,4 +688,12 @@ END {
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
     $storage->delete;
+
+    if (defined $taxableDonation and ref $taxableDonation eq 'WebGUI::Sku::Donation') {
+        $taxableDonation->purge;
+    }
+
+    if (defined $taxFreeDonation and ref $taxFreeDonation eq 'WebGUI::Sku::Donation') {
+        $taxFreeDonation->purge;
+    }
 }
