@@ -23,6 +23,7 @@ use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 use WebGUI::DateTime;
 use DateTime::TimeZone;
+use WebGUI::VersionTag;
 
 use LWP::UserAgent;
 use JSON qw(encode_json decode_json);
@@ -88,7 +89,6 @@ sub execute {
     my $startTime = time();
     my $dt      = WebGUI::DateTime->new($session, $startTime)->toMysql;
 
-    local $JSON::UnMapping = 1;
     my $eventList   = [];
     my $feedList;
     if ($instance->getScratch('events')) {
@@ -354,6 +354,9 @@ sub execute {
             }
         }
     }
+    my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
+    my $versionTag = WebGUI::VersionTag->create($session, {'name' => 'Calendar Feed Update', 'workflowId' => 'pbworkflow000000000003'});
+    $versionTag->setWorking;
     while (@$eventList) {
         if ($startTime + 55 < time()) {
             $instance->setScratch('events', encode_json($eventList));
@@ -376,7 +379,6 @@ sub execute {
             
             if ($event) {
                 $event->update($properties);
-                $event->requestAutoCommit;
                 $feed->{updated}++;
             }
         }
@@ -384,10 +386,12 @@ sub execute {
             my $calendar = WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
             if (!defined $calendar) {
                 $self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate.  Did you commit the calendar wobject?");
+                $versionTag->requestCommit;
+                $oldVersionTag->setWorking
+                    if $oldVersionTag;
                 return $self->ERROR;
             }
-            my $event   = $calendar->addChild($properties);
-            $event->requestAutoCommit;
+            my $event   = $calendar->addChild($properties, undef, undef, {skipAutoCommitWorkflows => 1});
             $feed->{added}++;
             if ($recur) {
                 $event->setRecurrence($recur);
@@ -398,6 +402,9 @@ sub execute {
         # TODO: Only update if last-updated field is 
         # greater than the event's lastUpdated property
     }
+    $versionTag->requestCommit;
+    $oldVersionTag->setWorking
+        if $oldVersionTag;
     for my $feedId (keys %$feedList) {
         my $feed = $feedList->{$feedId};
         $self->session->db->write("update Calendar_feeds set lastResult=?,lastUpdated=? where feedId=?",

@@ -215,6 +215,7 @@ Will croak on failure.
 
 sub generateRecurringEvents {
     my $self    = shift;
+    my $useAssetTag  = shift;
     my $parent  = $self->getParent;
     my $session = $self->session;
     
@@ -275,8 +276,10 @@ sub generateRecurringEvents {
                 $properties->{startTime} = $startDate->toDatabaseTime;
                 $properties->{endTime} = $endDate->toDatabaseTime;
             }
-            my $newEvent = $parent->addChild($properties);
-            $newEvent->requestAutoCommit;
+            my $newEvent = $parent->addChild($properties, undef, undef, {skipAutoCommitWorkflows => 1});
+            if ($useAssetTag) {
+                $newEvent->setVersionTag($self->get('tagId'));
+            }
         }
     }
     
@@ -1603,6 +1606,7 @@ sub processPropertiesFromFormPost {
 
     $self->setRelatedLinks(\@rel_link_saves);
 
+    my $haveVersionTag = WebGUI::VersionTag->getWorking($self->session, 'nocreate');
 
     # Determine if the pattern has changed
     if ($form->param("recurType")) {
@@ -1628,7 +1632,7 @@ sub processPropertiesFromFormPost {
                     unless $new_id;
                 
                 # Generate the new recurring events
-                $self->generateRecurringEvents();
+                $self->generateRecurringEvents(1);
             }
             else {
                 $self->update({recurId => undef});
@@ -1670,9 +1674,17 @@ sub processPropertiesFromFormPost {
                 $properties{ endDate    } = $event->get("endDate");
                 
                 # addRevision returns the new revision
-                $event  = $event->addRevision(\%properties);
-                $event->requestAutoCommit();
+                $event  = $event->addRevision(\%properties, undef, {skipAutoCommitWorkflows => 1});
+                $event->setVersionTag($self->get('tagId'));
             }
+        }
+    }
+
+    # if we started without a version tag, we may have created an empty one.  if so, delete it.
+    unless ($haveVersionTag) {
+        my $versionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
+        if ($versionTag) {
+            $versionTag->rollback;
         }
     }
 
