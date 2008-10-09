@@ -11,6 +11,7 @@
  - fixed: Shop: Percentage of Weight Shipping Method doesn't work
  - fixed #8776: duplicate does not duplicate keywords
  - fixed: anonymous registration with email confirmation is broken
+ - fixed #8790: email password recovery allows sending recovery mail to arbitrary address
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
