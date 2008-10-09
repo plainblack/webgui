@@ -10,6 +10,7 @@
  - fixed: Cross site scripting issue on operation pages
  - fixed: Shop: Percentage of Weight Shipping Method doesn't work
  - fixed #8776: duplicate does not duplicate keywords
+ - fixed: anonymous registration with email confirmation is broken
 
 7.5.25
  - fixed: failure when submitting a dataform that sends mail with an empty file field
