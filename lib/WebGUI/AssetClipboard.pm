@@ -90,6 +90,17 @@ sub duplicate {
         $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
     }
 
+    # Duplicate keywords
+    my $k = WebGUI::Keyword->new( $self->session );
+    my $keywords    = $k->getKeywordsForAsset( {
+        asset       => $self,
+        asArrayRef  => 1,
+    } );
+    $k->setKeywordsForAsset( {
+        asset       => $newAsset,
+        keywords    => $keywords,
+    } );
+
     return $newAsset;
 }
 
