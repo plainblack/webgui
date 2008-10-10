@@ -28,10 +28,19 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
+addEMSBadgeTemplate ( $session );
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub addEMSBadgeTemplate {
+    my $session = shift;
+    print "\tAdding EMS Badge Template" unless $quiet;
+    $session->db->write('ALTER TABLE EMSBadge ADD COLUMN templateId VARCHAR(22) BINARY NOT NULL');
+    $session->db->write('UPDATE `EMSBadge` SET `templateId`=?', ['PBEmsBadgeTemplate0000']);
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
