@@ -806,6 +806,14 @@ sub getEditForm {
             value   => $i18n->get("save and commit"),
             }));
 	}
+
+    $tabform->submitAppend( 
+        WebGUI::Form::submit ( $self->session, {
+            name    => "saveAndReturn",
+            value   => $i18n->get( "apply" ),
+        } ) 
+    );
+
 	$tabform->hidden({
 		name=>"func",
 		value=>"editSave"
@@ -2565,6 +2573,11 @@ sub www_editSave {
             );
             return undef;
         }
+    }
+
+    # Handle "saveAndReturn" button
+    if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
+        return $self->www_edit;
     }
 
     # Handle "proceed" form parameter

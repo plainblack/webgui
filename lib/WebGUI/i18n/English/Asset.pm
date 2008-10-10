@@ -8,6 +8,12 @@ our $I18N = {
 		context => q|A button added to all asset properties pages when save and commit mode is enabled.|
 	},
 
+    'apply' => {
+        message     => q{Apply},
+        lastUpdated => 0,
+        context     => q{The label for the button to save and then return to the edit page.},
+    },
+
 	'keywords' => {
 		message => q|Keywords|,
 		lastUpdated => 0,

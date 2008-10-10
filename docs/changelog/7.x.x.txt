@@ -36,6 +36,7 @@
  - fixed: #4174: UserList template show links that should be hidden (Yung Han
    Khoe)
  - fixed #8802: isImage not functioning in Folders
+ - added RFE #480: Apply button for assets
 
 7.6.0
  - added: users may now customize the post received page for the CS
