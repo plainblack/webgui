@@ -10,6 +10,7 @@
  - added a new permission denied page for version tag approval
  - fixed: Thingy list type form elements do not support key/value pairs (SDH
    Consulting Group)
+ - rfe: enable/disable pagination in asset manager  (#756)
  - Removed cart icon from ViewCart macro.
  - Updated WebGUI::Shop::PayDriver::processTransaction() to accept a
    transaction as a param.
