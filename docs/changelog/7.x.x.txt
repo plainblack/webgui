@@ -32,6 +32,8 @@
  - fixed #8776: duplicate does not duplicate keywords
  - rfe: Thingy: export extra rows, meta data (SDH Consulting Group)
  - rfe: Thingy: Max entries per user (SDH Consulting Group) 
+ - fixed: #4174: UserList template show links that should be hidden (Yung Han
+   Khoe)
 
 7.6.0
  - added: users may now customize the post received page for the CS
