@@ -195,31 +195,37 @@ sub view {
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,
-				});
-		} else {
-			my $isImage = (ref($child) =~ /^WebGUI::Asset::File::Image/);
-			my $thumbnail = $child->getThumbnailUrl if ($isImage);
-			my $isFile = (ref($child) =~ /^WebGUI::Asset::File/);
-			my $file = $child->getFileUrl if ($isFile);
-			push(@{$vars{"file_loop"}},{
-				id=>$child->getId,
-				canView => $child->canView(),
-				title=>$child->get("title"),
-				menuTitle=>$child->get("menuTitle"),
-				synopsis=>$child->get("synopsis") || '',
-				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
-				"date.epoch"=>$child->get("revisionDate"),
-				"icon.small"=>$child->getIcon(1),
-				"icon.big"=>$child->getIcon,
-				type=>$child->getName,
-				url=>$child->getUrl,
-				isImage=>$isImage,
-				canEdit=>$child->canEdit,
-				controls=>$child->getToolbar,
-				isFile=>$isFile,
-				"thumbnail.url"=>$thumbnail,
-				"file.url"=>$file
-				});
+			};
+		} 
+        else {
+            my $childVars   = {
+				id              => $child->getId,
+				canView         => $child->canView(),
+				title           => $child->get("title"),
+				menuTitle       => $child->get("menuTitle"),
+				synopsis        => $child->get("synopsis") || '',
+				size            => WebGUI::Utility::formatBytes($child->get("assetSize")),
+				"date.epoch"    => $child->get("revisionDate"),
+				"icon.small"    => $child->getIcon(1),
+				"icon.big"      => $child->getIcon,
+				type            => $child->getName,
+				url             => $child->getUrl,
+				canEdit         => $child->canEdit,
+				controls        => $child->getToolbar,
+            };
+            
+            $self->session->log->warn(ref $child);
+            if ( $child->isa('WebGUI::Asset::File::Image') ) {
+                $childVars->{ "isImage"         } = 1;
+                $childVars->{ "thumbnail.url"   } = $child->getThumbnailUrl;
+            }
+            
+            if ( $child->isa('WebGUI::Asset::File') ) {
+                $childVars->{ "isFile"          } = 1;
+                $childVars->{ "file.url"        } = $child->getFileUrl;
+            }
+
+			push @{ $vars->{ "file_loop" } }, $childVars;
 		}
 	}
 	

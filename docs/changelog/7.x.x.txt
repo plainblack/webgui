@@ -1,4 +1,5 @@
 7.5.27
+ - fixed #8802: isImage not functioning in Folders
 
 7.5.26
  - fixed: International characters in password prevents login
