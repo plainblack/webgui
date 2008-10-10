@@ -222,8 +222,6 @@ sub view {
 	my $self = shift;
 	my $var = $self->get; # $var is a hash reference.
 	$var->{controls} = $self->getToolbar;
-	$var->{fileUrl} = $self->getFileUrl;
-	$var->{fileIcon} = $self->getFileIconUrl;
 	return $self->processTemplate($var,undef, $self->{_viewTemplate});
 }
 
@@ -241,25 +239,6 @@ sub www_edit {
    return $self->session->privilege->insufficient() unless $self->canEdit;
    return $self->session->privilege->locked() unless $self->canEditIfLocked;
    return $self->getAdminConsole->render($self->getEditForm->print,WebGUI::International::get('edit asset',"Asset_NewAsset"));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_view ( )
-
-Web facing method which is the default view page.  This method does a 
-302 redirect to the "showPage" file in the storage location.
-
-=cut
-
-sub www_view {
-	my $self = shift;
-	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->isAdminOn) {
-		return $self->getContainer->www_view;
-	}
-	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
-	return undef;
 }
 
 #-------------------------------------------------------------------
