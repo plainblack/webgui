@@ -1,3 +1,5 @@
+7.5.27
+
 7.5.26
  - fixed: International characters in password prevents login
  - fixed: SelectSlider form control is broken
