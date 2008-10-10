@@ -1,7 +1,7 @@
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the
-   "exportBianryExtensions" field.
+   "exportBinaryExtensions" field.
  - fixed: some default assets have ids shorter than 22 characters
  - fixed: failure when submitting a dataform that sends mail with an empty file field
  - fixed: DataForm ignores height on textarea fields
@@ -30,6 +30,8 @@
  - rfe: Thingy Private Rows (SDH Consulting Group)
  - fixed: Shop: Percentage of Weight Shipping Method doesn't work
  - fixed #8776: duplicate does not duplicate keywords
+ - rfe: Thingy: export extra rows, meta data (SDH Consulting Group)
+ - rfe: Thingy: Max entries per user (SDH Consulting Group) 
 
 7.6.0
  - added: users may now customize the post received page for the CS

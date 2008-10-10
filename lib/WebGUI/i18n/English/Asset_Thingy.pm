@@ -112,6 +112,21 @@ our $I18N = {
         lastUpdated => 1104630516,
     },
 
+    'max entries per user label' => {
+        message => q|Max entries per user|,
+        lastUpdated => 1223638290,
+    },
+
+    'max entries per user description' => {
+        message => q|The maximum number of entries a user can add of this thing.|,
+        lastUpdated => 1223638290,
+    },
+
+    'has entered max per user message' => {
+        message => q|You have reached the maximum number of entries.|,
+        lastUpdated => 1223638290,
+    },
+
     'who can add label' => {
         message => q|Who can add?|,
         lastUpdated => 1104630516,
@@ -320,6 +335,17 @@ wobject can always view and edit all data.|,
     'who can export description' => {
         message => q|The group that can export this things data.|,
         lastUpdated => 1104630516,
+    },
+
+    'export metadata label' => {
+        message => q|Export meta data?|,
+        lastUpdated => 1223555688,
+    },
+
+    'export metadata description' => {
+        message => q|Should the export function include the meta data fields like thingDataId, lastUpdated,
+ipAddress etc?|,
+        lastUpdated => 1223555688,
     },
 
     'search button label' => {

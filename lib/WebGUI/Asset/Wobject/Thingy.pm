@@ -350,8 +350,7 @@ sub deleteThingData {
     my $thingDataId = shift;
     my $db = $self->session->db;
 
-    my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
-    return undef unless $self->hasPrivileges($groupIdEdit);
+    return undef unless $self->canEditThingData($thingId, $thingDataId);;
 
     $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
 
@@ -1044,6 +1043,38 @@ sub getThings {
 
 #-------------------------------------------------------------------
 
+=head2 hasEnteredMaxPerUser
+
+Check whether the current user has entered the maximum number of entries allowed for this thing.
+
+=head3 thingId
+
+The unique id of a thing.
+
+=cut
+
+sub hasEnteredMaxPerUser {
+    my ($self,$thingId) = @_;
+    my $session         = $self->session;
+    my $db              = $session->db;
+
+    my $maxEntriesPerUser = $db->quickScalar("select maxEntriesPerUser from Thingy_things where thingId=?",[$thingId]);
+
+    return 0 unless $maxEntriesPerUser;
+     
+    my $numberOfEntries = $session->db->quickScalar("select count(*) "
+        ."from ".$session->db->dbh->quote_identifier("Thingy_".$thingId)." where createdById=?",[$session->user->userId]);   
+
+    if($numberOfEntries < $maxEntriesPerUser){
+        return 0;
+    }
+    else{
+        return 1;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 hasPrivileges  ( groupId )
 
 Checks if the current user has a certain privilege on a Thing.
@@ -1359,14 +1390,11 @@ Deletes data in a Thing.
 
 sub www_deleteThingDataConfirm {
 
-    my $self = shift;
-    my $db = $self->session->db;
-
-    my $thingId = $self->session->form->process("thingId");
+    my $self        = shift;
+    my $thingId     = $self->session->form->process("thingId");
     my $thingDataId = $self->session->form->process('thingDataId');
 
-    my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
-    return $self->session->privilege->insufficient() unless $self->hasPrivileges($groupIdEdit);
+    return $self->session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId);
 
     $self->deleteThingData($thingId,$thingDataId);
 
@@ -1385,7 +1413,6 @@ sub www_deleteThingDataViaAjax {
 
     my $self 	= shift;
     my $session = $self->session;
-    my $db 	    = $session->db;
 
     my $thingId     = $self->session->form->process("thingId");
     my $thingDataId = $self->session->form->process('thingDataId');
@@ -1399,8 +1426,8 @@ sub www_deleteThingDataViaAjax {
 
     my $thingProperties = $self->getThing($thingId);
     if ($thingProperties->{thingId}){
-    	my ($groupIdEdit) = $db->quickArray("select groupIdEdit from Thingy_things where thingId=?",[$thingId]);
-        return $session->privilege->insufficient() unless $self->hasPrivileges($groupIdEdit);
+        return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
+            ,$thingProperties);
 
         $self->deleteThingData($thingId,$thingDataId);
 
@@ -1459,6 +1486,8 @@ sub www_editThing {
             groupIdImport=>$groupIdEdit,
             searchTemplateId=>"ThingyTmpl000000000004",
             thingsPerPage=>25,
+            exportMetaData=>undef, 
+            maxEntriesPerUser=>undef,
         );
         $thingId = $self->addThing(\%properties,0);
     }
@@ -1654,6 +1683,12 @@ sub www_editThing {
         -width => 300,
         -height => 200,
     );
+    $tab->integer(
+        -name=> "maxEntriesPerUser",
+        -value=> $properties{maxEntriesPerUser},
+        -hoverHelp=> $i18n->get('max entries per user description'),
+        -label => $i18n->get('max entries per user label')
+    );
     $tab->group(
         -name=> "groupIdAdd",
         -value=> $properties{groupIdAdd},
@@ -1804,6 +1839,12 @@ sub www_editThing {
         -hoverHelp=> $i18n->get('who can export description'),
         -label=>$i18n->get('who can export label')
     );
+    $tab->yesNo(
+        -name=> "exportMetaData",
+        -value=> $properties{exportMetaData},
+        -hoverHelp=> $i18n->get('export metadata description'),
+        -label=>$i18n->get('export metadata label')
+    );
     $tab->template(
         -name=>"searchTemplateId",
         -value=>$properties{searchTemplateId},
@@ -1881,7 +1922,9 @@ sub www_editThingSave {
         groupIdExport=>$form->process("groupIdExport"),
         searchTemplateId=>$form->process("searchTemplateId") || 1,
         thingsPerPage=>$form->process("thingsPerPage") || 25,
-        sortBy=>$form->process("sortBy"),
+        sortBy=>$form->process("sortBy") || '',
+        exportMetaData=>$form->process("exportMetaData") || '',
+        maxEntriesPerUser=>$form->process("maxEntriesPerUser") || '',
         },0,1);
     
     if($fields->rows < 1){
@@ -2120,18 +2163,24 @@ Shows a form to edit a things data.
 
 sub editThingData {
 
-    my $self = shift;
-    my $session = $self->session;
-    my $thingId = shift || $session->form->process('thingId');
-    my $thingDataId = shift || $session->form->process('thingDataId') || "new";
+    my $self            = shift;
+    my $session         = $self->session;
+    my $thingId         = shift || $session->form->process('thingId');
+    my $thingDataId     = shift || $session->form->process('thingDataId') || "new";
     my $thingProperties = shift || $self->getThing($thingId);
+    my $i18n            = WebGUI::International->new($self->session, "Asset_Thingy");
 
-    return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId, $thingProperties);
+    my $canEditThingData = $self->canEditThingData($thingId, $thingDataId, $thingProperties);
+
+    return $session->privilege->insufficient() unless $canEditThingData;
+
+    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+        return $i18n->get("has entered max per user message");
+    }
 
     my (%thingData, $fields,@field_loop,$fieldValue, $privilegedGroup);
     my $var = $self->get;
     my $url = $self->getUrl;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
     my $errors = shift;
     $var->{error_loop} = $errors if ($errors);
 
@@ -2140,14 +2189,14 @@ sub editThingData {
     $var->{"manage_url"} = $session->url->append($url, 'func=manage');
     $var->{"thing_label"} = $thingProperties->{label};
 
-    if($self->hasPrivileges($thingProperties->{groupIdEdit})){
+    if($canEditThingData){
         if ($thingDataId ne "new"){
             $var->{"delete_url"} = $session->url->append($url, 'func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId);
         }
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
-    if($self->hasPrivileges($thingProperties->{groupIdAdd})){    
+    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){    
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){
@@ -2215,17 +2264,22 @@ Processes and saves data for a Thing.
 
 sub www_editThingDataSave {
 
-    my $self = shift;
-    my $session = $self->session;
+    my $self        = shift;
+    my $session     = $self->session;
+    my $thingId     = $session->form->process('thingId');
+    my $thingDataId = $session->form->process('thingDataId');
+    my $i18n        = WebGUI::International->new($session, "Asset_Thingy");
+    
     my ($var,$newThingDataId, $fields,%thingData,@errors,$errors,$otherThingId);
     my ($privilegedGroup,$workflowId);
-    my $thingId = $session->form->process('thingId');
-    my $thingDataId = $session->form->process('thingDataId');
-    my $i18n = WebGUI::International->new($self->session, "Asset_Thingy");
 
     my $thingProperties = $self->getThing($thingId);
     return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
         ,$thingProperties);
+
+    if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+        return $i18n->get("has entered max per user message");
+    }
 
     ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
@@ -2280,6 +2334,7 @@ sub www_editThingDataSaveViaAjax {
     my $session     = $self->session;
     my $thingId     = shift || $session->form->process('thingId');
     my $thingDataId = shift || $session->form->process('thingDataId');
+    my $i18n        = WebGUI::International->new($self->session, "Asset_Thingy");
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
@@ -2292,6 +2347,12 @@ sub www_editThingDataSaveViaAjax {
 	    
         return $session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId
             ,$thingProperties);
+
+        if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
+            $session->http->setStatus("400", "Bad Request");
+            return JSON->new->utf8->encode({message => $i18n->get("has entered max per user message")});
+        }
+
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
     	if ($errors){
@@ -2333,6 +2394,10 @@ sub www_export {
             push(@fieldLabels,$field->{label});
         }
     }
+    my @metaDataFields = ('thingDataId','dateCreated','createdById','updatedById','updatedByName','lastUpdated','ipAddress');
+    if ($thingProperties->{exportMetaData}){
+        push(@fieldLabels,@metaDataFields)
+    }
  
     $query = WebGUI::Cache->new($self->session,"query_".$thingId)->get;
     $sth = $session->db->read($query);
@@ -2349,6 +2414,9 @@ sub www_export {
             # Export date and dateTime fields in an importable format.
             my $value = $self->getFieldValue($data->{"field_".$fieldId},$field->{properties},"%y-%m-%d","%y-%m-%d %j:%n:%s");
             push(@fieldValues, $value);
+        }
+        foreach my $metaDataField (@metaDataFields){
+            push(@fieldValues,$data->{$metaDataField});
         }
         $out .= "\n".WebGUI::Text::joinCSV(
         @fieldValues
@@ -2500,11 +2568,12 @@ sub www_import {
             my @duplicatesConstraint;
 
             # Create duplicate constraint
-            foreach my $insertValue (@data){
-                my $fieldId = $insertColumns[$fieldNumber]->{fieldId};
-                if ($session->form->process("checkDuplicates_".$fieldId)){
+            foreach my $insertColumn (@insertColumns){
+                my $insertValue = $data[$fieldNumber];
+                if ($session->form->process("checkDuplicates_".$insertColumn->{fieldId})){
                     #$error->info("adding $fieldId to duplicates constraint");
-                    push(@duplicatesConstraint,$dbh->quote_identifer("field_".$fieldId)." = ".$session->db->quote($insertValue));
+                    push(@duplicatesConstraint,$dbh->quote_identifier("field_".$insertColumn->{fieldId})
+                        ." = ".$session->db->quote($insertValue));
                 }
                 $fieldNumber++;
             }
@@ -2523,10 +2592,11 @@ sub www_import {
             $fieldNumber = 0;
 
             # Populate thingData hash
-            foreach my $fieldValue (@data){     
-                my $fieldName = "field_".$insertColumns[$fieldNumber]->{fieldId};
-                my $fieldType = $insertColumns[$fieldNumber]->{fieldType};
-                my $fieldInOtherThingId = $insertColumns[$fieldNumber]->{fieldInOtherThingId};
+            foreach my $insertColumn (@insertColumns){     
+                my $fieldValue = $data[$fieldNumber];    
+                my $fieldName = "field_".$insertColumn->{fieldId};
+                my $fieldType = $insertColumn->{fieldType};
+                my $fieldInOtherThingId = $insertColumn->{fieldInOtherThingId};
                 # TODO: process dates and otherThing field id's 
                 if ($fieldType eq "date" || $fieldType eq "dateTime"){
                     $fieldValue =~ s/\//-/gx;
@@ -2885,7 +2955,7 @@ sub getSearchTemplateVars {
     if ($self->hasPrivileges($thingProperties->{groupIdImport})){
         $var->{"import_url"} = $session->url->append($url, 'func=importForm;thingId='.$thingId);
     }
-    if ($self->hasPrivileges($thingProperties->{groupIdAdd})){
+    if ($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     $var->{searchScreenTitle} = $thingProperties->{searchScreenTitle};    
@@ -2943,6 +3013,9 @@ sequenceNumber');
     my $noFields = 0;    
     if (scalar(@displayInSearchFields)){
         $query = "select thingDataId, ";
+        if ($thingProperties->{exportMetaData}){
+            $query .= "dateCreated, createdById, updatedById, updatedByName, lastUpdated, ipAddress, ";
+        }
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
         $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
         $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
@@ -3156,7 +3229,7 @@ sub www_viewThingData {
         .$thingId.';thingDataId='.$thingDataId);
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
-    if($self->hasPrivileges($thingProperties->{groupIdAdd})){
+    if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){
         $var->{"add_url"} = $session->url->append($url, 'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
     if($self->hasPrivileges($thingProperties->{groupIdSearch})){    

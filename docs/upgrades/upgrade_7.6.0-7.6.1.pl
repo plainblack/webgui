@@ -31,6 +31,7 @@ my $session = start(); # this line required
 addExportExtensionsToConfigFile($session);
 fixShortAssetIds( $session );
 addDataFormDataIndexes($session);
+addThingyColumns( $session );
 
 finish($session); # this line required
 
@@ -82,6 +83,13 @@ sub addDataFormDataIndexes {
     print "Done.\n" unless $quiet;
 }
 
+sub addThingyColumns {
+    my $session     = shift;
+    print "\tAdding exportMetaData and maxEntriesPerUser columns to Thingy_things table... " unless $quiet;
+    $session->db->write('ALTER TABLE `Thingy_things` ADD exportMetaData int(11)');
+    $session->db->write('ALTER TABLE `Thingy_things` ADD maxEntriesPerUser int(11)');
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
