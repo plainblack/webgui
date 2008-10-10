@@ -35,6 +35,7 @@
  - rfe: Thingy: Max entries per user (SDH Consulting Group) 
  - fixed: #4174: UserList template show links that should be hidden (Yung Han
    Khoe)
+ - fixed #8802: isImage not functioning in Folders
 
 7.6.0
  - added: users may now customize the post received page for the CS

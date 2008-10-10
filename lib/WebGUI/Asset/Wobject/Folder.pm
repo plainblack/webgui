@@ -255,16 +255,20 @@ sub view {
 				url             => $child->getUrl,
 				canEdit         => $child->canEdit,
 				controls        => $child->getToolbar,
+                class           => ref $child,
             };
             
-            if ( ref $child =~ /^WebGUI::Asset::File::Image/ ) {
-                $child->{ "isImage"         } = 1;
-                $child->{ "thumbnail.url"   } = $child->getThumbnailUrl;
+            $self->session->log->warn(ref $child);
+            if ( $child->isa('WebGUI::Asset::File::Image') ) {
+                $self->session->log->warn('is image');
+                $childVars->{ "isImage"         } = 1;
+                $childVars->{ "thumbnail.url"   } = $child->getThumbnailUrl;
             }
             
-            if ( ref $child =~ /^WebGUI::Asset::File/ ) {
-                $child->{ "isFile"          } = 1;
-                $child->{ "file.url"        } = $child->getFileUrl;
+            if ( $child->isa('WebGUI::Asset::File') ) {
+                $self->session->log->warn('is file');
+                $childVars->{ "isFile"          } = 1;
+                $childVars->{ "file.url"        } = $child->getFileUrl;
             }
 
 			push @{ $vars->{ "file_loop" } }, $childVars;
