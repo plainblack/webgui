@@ -11,6 +11,9 @@
  - fixed: Thingy list type form elements do not support key/value pairs (SDH
    Consulting Group)
  - rfe: enable/disable pagination in asset manager  (#756)
+ - Added Comments asset aspect, which allows comments to be added to any asset
+   easily.
+ - Added comments aspect to wiki.
  - Removed cart icon from ViewCart macro.
  - Updated WebGUI::Shop::PayDriver::processTransaction() to accept a
    transaction as a param.

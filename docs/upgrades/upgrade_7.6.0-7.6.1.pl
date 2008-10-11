@@ -32,8 +32,36 @@ addExportExtensionsToConfigFile($session);
 fixShortAssetIds( $session );
 addDataFormDataIndexes($session);
 addThingyColumns( $session );
+addCommentsAspect( $session );
+addCommentsAspectToWiki( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addCommentsAspectToWiki {
+    my $session = shift;
+    print "\tAdding comments aspect to wiki..." unless $quiet;
+    my $db = $session->db;
+    my $pages = $db->read("select assetId,revisionDate from WikiPage");
+    while (my ($id, $rev) = $pages->array) {
+        $db->write("insert into assetAspectComments (assetId, revisionDate, comments, averageCommentRating) values (?,?,'[]',0)",[$id,$rev]);
+    }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addCommentsAspect {
+    my $session = shift;
+    print "\tAdding comments asset aspect..." unless $quiet;
+    $session->db->write("create table assetAspectComments (
+        assetId char(22) binary not null,
+        revisionDate bigint not null,
+        comments mediumtext,
+        averageCommentRating int,
+        primary key (assetId, revisionDate)
+        )");
+    print "Done.\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------
@@ -41,7 +69,7 @@ finish($session); # this line required
 # this system received a backport, leave the field as is.
 sub addExportExtensionsToConfigFile {
     my $session = shift;
-    print "Adding binary export extensions to config file... " unless $quiet;
+    print "\tAdding binary export extensions to config file... " unless $quiet;
     # skip if the field has been defined already by backporting
     return if defined $session->config->get('exportBinaryExtensions');
 
@@ -53,6 +81,7 @@ sub addExportExtensionsToConfigFile {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 sub fixShortAssetIds {
     print "Fixing assets with short ids... " unless $quiet;
     my %assetIds = (
