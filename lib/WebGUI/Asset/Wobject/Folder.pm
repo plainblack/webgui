@@ -186,8 +186,8 @@ sub view {
 	my $children = $self->getLineage( ["children"], \%rules);
 	my %vars;
 	foreach my $child (@{$children}) {
-		if (ref($child) eq "WebGUI::Asset::Wobject::Folder") {
-			push(@{$vars{"subfolder_loop"}}, {
+		if ($child->isa("WebGUI::Asset::Wobject::Folder")) {
+			push(@{ $vars{"subfolder_loop"} }, {
 				id           => $child->getId,
 				url          => $child->getUrl,
 				title        => $child->get("title"),
@@ -195,7 +195,7 @@ sub view {
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,
-			};
+			});
 		} 
         else {
             my $childVars   = {
@@ -225,18 +225,18 @@ sub view {
                 $childVars->{ "file.url"        } = $child->getFileUrl;
             }
 
-			push @{ $vars->{ "file_loop" } }, $childVars;
+			push @{ $vars{ "file_loop" } }, $childVars;
 		}
 	}
 	
 	$vars{'addFile.label'} = $i18n->get('add file label');
 	$vars{'addFile.url'} = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
 	
-       	my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
+    my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
 	if ($self->session->user->userId eq '1') {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
 	}
-       	return $out;
+    return $out;
 }
 
 
