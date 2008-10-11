@@ -37,6 +37,7 @@
    Khoe)
  - fixed #8802: isImage not functioning in Folders
  - added RFE #480: Apply button for assets
+ - fixed #8807: _NewAsset.skeleton out of date
 
 7.6.0
  - added: users may now customize the post received page for the CS

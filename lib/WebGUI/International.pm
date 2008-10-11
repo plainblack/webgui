@@ -31,15 +31,7 @@ This package provides an interface to the internationalization system.
 =head1 SYNOPSIS
 
  use WebGUI::International;
- $string = WebGUI::International::get($session,$internationalId,$namespace);
- $hashRef = WebGUI::International::getLanguage($session,$lang);
- $hashRef = WebGUI::International::getLanguages($session);
- $url = WebGUI::International::makeUrlCompliant($session,$url);
-
-This package can also be used in object-oriented (OO) style.
-
- use WebGUI::International;
- my $i = WebGUI::International->new($session,$namespace);
+ my $i = WebGUI::International->new($session, $namespace);
 
  $string = $i->get($internationalId);
  $string = $i->get($internationalId, $otherNamespace);
