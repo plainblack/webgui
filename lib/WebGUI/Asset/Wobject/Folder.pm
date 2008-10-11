@@ -229,7 +229,7 @@ sub view {
 	my $children    = $self->getLineage( ["children"], \%rules);
 	foreach my $child ( @{ $children } ) {
         # TODO: Instead of this it should be using $child->getTemplateVars || $child->get
-		if ( ref $child eq "WebGUI::Asset::Wobject::Folder" ) {
+		if ( $child->isa("WebGUI::Asset::Wobject::Folder") ) {
 			push @{ $vars->{ "subfolder_loop" } }, {
 				id           => $child->getId,
 				url          => $child->getUrl,
@@ -255,10 +255,8 @@ sub view {
 				url             => $child->getUrl,
 				canEdit         => $child->canEdit,
 				controls        => $child->getToolbar,
-                class           => ref $child,
             };
             
-            $self->session->log->warn(ref $child);
             if ( $child->isa('WebGUI::Asset::File::Image') ) {
                 $self->session->log->warn('is image');
                 $childVars->{ "isImage"         } = 1;
