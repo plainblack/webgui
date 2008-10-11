@@ -150,8 +150,10 @@ seperated values|,
         },
 
         'alphabetSearchField description' => {
-                message => q|Select the profile field in which  the alphabet search will be done.|,
-                lastUpdated => 1081514049
+                message => q|Select the profile field in which the alphabet search will be done. You can disable
+the aplhapbet search function by selecting 'Disable Alphabet Search'. This will improve the performance of the
+User List.|,
+                lastUpdated => 1223651066
         },
 
         'Profile not public message' => {
