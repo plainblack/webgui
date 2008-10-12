@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.1
+--------------------------------------------------------------------
+ * WebGUI now requires Class::C3 version 0.19 or greater.
+
+
 7.6.0
 --------------------------------------------------------------------
  * WebGUI now requires Module::Find version 0.06 or greater.
