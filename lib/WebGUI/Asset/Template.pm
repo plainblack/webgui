@@ -440,9 +440,43 @@ Make a duplicate of this template and edit that instead.
 sub www_editDuplicate {
     my $self        = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
-    my $newAsset    = $self->duplicate;
-    $newAsset->update( { isDefault => 0 } );
-    return $newAsset->www_edit;
+
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+
+    my $newTemplate = $self->duplicate;
+    $newTemplate->update( { 
+        isDefault   => 0, 
+        title       => $self->get( "title" ) . " (copy)",
+        menuTitle   => $self->get( "menuTitle" ) . " (copy)",
+    } );
+
+    # Make our asset use our new template
+    if ( $self->session->form->get( "proceed" ) eq "goBackToPage" ) {
+        if ( my $asset = WebGUI::Asset->newByUrl( $session, $form->get( "returnUrl" ) ) ) {
+            # Find which property we should set by comparing namespaces and current values
+            DEF: for my $def ( @{ $asset->definition( $self->session ) } ) {
+                my $properties  = $def->{ properties };
+                PROP: for my $prop ( keys %{ $properties } ) {
+                    next PROP unless lc $properties->{ $prop }->{ fieldType } eq "template";
+                    next PROP unless $asset->get( $prop ) eq $self->getId;
+                    if ( $properties->{ $prop }->{ namespace } eq $self->get( "namespace" ) ) {
+                        $asset->addRevision( { $prop => $newTemplate->getId } );
+
+                        # Auto-commit our revision if necessary
+                        # TODO: This needs to be handled automatically somehow...
+                        if ($session->setting->get("autoRequestCommit")) {
+                            my $tag = WebGUI::VersionTag->getWorking($session)->requestCommit;
+                        }
+                        
+                        last DEF;
+                    }
+                }
+            }
+        }
+    }
+    
+    return $newTemplate->www_edit;
 }
 
 #-------------------------------------------------------------------
