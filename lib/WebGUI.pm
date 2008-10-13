@@ -53,7 +53,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 basicAuth ( requestObject, user, pass )
+=head2 authen ( requestObject, [ user, pass ])
 
 HTTP Basic auth for WebGUI.
 
@@ -61,12 +61,33 @@ HTTP Basic auth for WebGUI.
 
 The Apache2::RequestRec object passed in by Apache's mod_perl.
 
+=head3 user
+
+The username to authenticate with. Will pull from the request object if not specified.
+
+=head3 pass
+
+The password to authenticate with. Will pull from the request object if not specified.
+
 =cut
 
 
-sub basicAuth {
+sub authen {
     my ($request, $username, $password) = @_;
-    my $server = Apache2::ServerUtil->server; 
+    $request = Apache2::Request->new($request);
+    my $server = Apache2::ServerUtil->server;
+	my $status = Apache2::Const::OK;
+
+	# set username and password if it's an auth handler
+	if ($username eq "") {
+		if ($request->auth_type eq "Basic") {
+			($status, $password) = $request->get_basic_auth_pw;
+			$username = $request->user;
+		}
+		else {
+			return Apache2::Const::HTTP_UNAUTHORIZED;
+		}
+	}
 
 	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
 	my $cookies = APR::Request::Apache2->handle($request)->jar();
@@ -79,7 +100,11 @@ sub basicAuth {
 
 	if (defined $sessionId && $session->user->isRegistered) { # got a session id passed in or from a cookie
 		$log->info("BASIC AUTH: using cookie");
-		return;
+		return Apache2::Const::OK;
+	}
+	elsif ($status != Apache2::Const::OK) { # prompt the user for their username and password
+		$log->info("BASIC AUTH: prompt for user/pass");
+		return $status; 
 	}
 	elsif (defined $username && $username ne "") { # no session cookie, let's try to do basic auth
 		$log->info("BASIC AUTH: using user/pass");
@@ -90,26 +115,28 @@ sub basicAuth {
 				my $auth = eval { WebGUI::Pluggable::instanciate("WebGUI::Auth::".$authMethod, "new", [ $session, $authMethod ] ) };
 				if ($@) { # got an error
 					$log->error($@);
-					return;
+					return Apache2::Const::SERVER_ERROR;
 				}
 				elsif ($auth->authenticate($username, $password)) { # lets try to authenticate
+					$log->info("BASIC AUTH: authenticated successfully");
 					$sessionId = $session->db->quickScalar("select sessionId from userSession where userId=?",[$user->userId]);
 					unless (defined $sessionId) { # no existing session found
+						$log->info("BASIC AUTH: creating new session");
 						$sessionId = $session->id->generate;
 						$auth->_logLogin($user->userId, "success (HTTP Basic)");
 					}
 					$session->{_var} = WebGUI::Session::Var->new($session, $sessionId);
 					$session->user({user=>$user});
-					return;
+					return Apache2::Const::OK;
 				}
 			}
 		}
 		$log->security($username." failed to login using HTTP Basic Authentication");
 		$request->note_basic_auth_failure;
-		return;
+		return Apache2::Const::HTTP_UNAUTHORIZED;
 	}
 	$log->info("BASIC AUTH: skipping");
-	return;
+	return Apache2::Const::HTTP_UNAUTHORIZED;
 }
 
 #-------------------------------------------------------------------
@@ -138,11 +165,14 @@ sub handler {
 
 	# handle basic auth
 	my $auth = $request->headers_in->{'Authorization'};
-    if ($auth) {
+    if ($auth =~ m/^Basic/) { # machine oriented
 		$auth =~ s/Basic //;
-		basicAuth($request, split(":",MIME::Base64::decode_base64($auth)));
+		authen($request, split(":",MIME::Base64::decode_base64($auth)));
     }
-
+	else { # realm oriented
+		$request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request)});
+	}
+	
 	# url handlers
     WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {
         my ($regex) = keys %{$handler};
