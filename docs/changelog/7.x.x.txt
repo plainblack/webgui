@@ -38,6 +38,7 @@
  - fixed #8776: duplicate does not duplicate keywords
  - rfe: Thingy: export extra rows, meta data (SDH Consulting Group)
  - rfe: Thingy: Max entries per user (SDH Consulting Group) 
+ - Added the Asset Discovery web service content handler.
  - fixed: #4174: UserList template show links that should be hidden (Yung Han
    Khoe)
  - fixed #8802: isImage not functioning in Folders

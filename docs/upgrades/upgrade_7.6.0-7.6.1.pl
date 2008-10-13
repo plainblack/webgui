@@ -34,8 +34,23 @@ addDataFormDataIndexes($session);
 addThingyColumns( $session );
 addCommentsAspect( $session );
 addCommentsAspectToWiki( $session );
+addAssetDiscoveryService( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addAssetDiscoveryService {
+    my $session = shift;
+    print "\tAdding asset discovery service..." unless $quiet;
+    my @handlers;
+    foreach my $handler (@{$session->config->get("contentHandlers")}) {
+        if ($handler eq "WebGUI::Content::Operation") {
+            push @handlers, 'WebGUI::Content::AssetDiscovery';
+        }
+        push @handlers, $handler;
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addCommentsAspectToWiki {
