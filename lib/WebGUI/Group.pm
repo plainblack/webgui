@@ -1382,6 +1382,8 @@ sub userIsAdmin {
 		$self->session->db->write("update groupings set groupAdmin=? where groupId=? and userId=?",[$value, $self->getId, $userId]);
 		return $value;
 	} else {
+        my $user = WebGUI::User->new($self->session, $userId);
+        return 1 if $user->isInGroup(3);
 		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=? and userId=?", [$self->getId, $userId]);
 		return ($admin ? 1 : 0);
 	}
