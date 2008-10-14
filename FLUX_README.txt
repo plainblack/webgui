@@ -19,4 +19,4 @@ You obviously need to run enable_flux.pl against the site you want to run the te
 = More Information =
 Check out the docs in the fluxdesigndocs directory and/or catch me on IRC
 
-- Patrick Donelan (patspam) http://patspam.com
+- Patrick Donelan (patspam) http://patspam.com 
