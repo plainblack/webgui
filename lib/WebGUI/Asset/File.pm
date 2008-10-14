@@ -378,24 +378,31 @@ sub purgeRevision {
 
 #----------------------------------------------------------------------------
 
-=head2 setFile ( filename )
+=head2 setFile ( [pathtofile] )
 
-Set the file being handled by this storage location with a file from the 
-system.
+Tells the asset to do all the postprocessing on the file (setting privs, thubnails, or whatever).
+
+=head3 pathtofile
+
+If specified will copy a new file into the storage location from this path and delete any existing file.
+
 
 =cut
 
 sub setFile {
     my $self        = shift;
     my $filename    = shift;
-    my $storage     = $self->getStorageLocation;
 
-    # Clear the old file if any
-    $storage->clear;
-
-    $storage->addFileFromFilesystem($filename) 
-        || croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
-        # NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+	if ($filename) {
+	    my $storage     = $self->getStorageLocation;
+		# Clear the old file if any
+		$storage->clear;
+	
+		$storage->addFileFromFilesystem($filename) 
+			|| croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
+			# NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+			
+	}
 
     $self->updatePropertiesFromStorage;
     $self->applyConstraints;

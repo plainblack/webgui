@@ -29,6 +29,8 @@
  - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
  - fixed: Combo box does not show possible values in Thingy (SDH Consulting
    Group)
+ - Added some web services to the Gallery asset to support the use of remote
+   apps to post photos and create albums.
  - fixed: Cross site scripting issue on operation pages
  - fixed: Search asset shows blank page after searching
  - rfe: Updated Thingy's edit instructions and search description fields to

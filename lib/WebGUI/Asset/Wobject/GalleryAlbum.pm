@@ -902,6 +902,93 @@ sub www_addArchiveSave {
     );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_addFileService ( )
+
+A web service to create files in albums. Returns a json string that looks like this:
+
+    {
+       "lastUpdated" : "2008-10-13 20:06:13",
+       "thumbnailUrl" : "http://dev.localhost.localdomain/uploads/W1/X9/W1X9A95iagNbq4n1utdXug/thumb-jt_25.jpg",
+       "url" : "http://dev.localhost.localdomain/cool-gallery/the-cool-album3/jt13",
+       "title" : "JT",
+       "dateCreated" : "2008-10-13 20:06:13"
+    }
+
+You can make the request as a post to the gallery url with the following variables:
+
+=head3 func
+
+Required. Must have a value of "addFileService"
+
+=head3 as
+
+Defaults to 'json', but if specified as 'xml' then the return result will be:
+
+    <opt>
+      <dateCreated>2008-10-13 20:08:18</dateCreated>
+      <lastUpdated>2008-10-13 20:08:18</lastUpdated>
+      <thumbnailUrl>http://dev.localhost.localdomain/uploads/1k/-B/1k-BTF8m4e6wmXJKRxraIA/thumb-jt_25.jpg</thumbnailUrl>
+      <title>JT</title>
+      <url>http://dev.localhost.localdomain/cool-gallery/the-cool-album3/jt14</url>
+    </opt>
+    
+=head3 title
+
+The title of the album you wish to create.
+
+=head3 synopsis
+
+A brief description of the album you wish to create.
+
+=cut
+
+sub www_addFileService {
+    my $self        = shift;
+    my $session     = $self->session;
+    
+    return $session->privilege->insufficient unless ($self->canAddFile);
+    my $form = $session->form;
+    
+    
+    my $file = $self->addChild({
+        className       => "WebGUI::Asset::File::GalleryFile::Photo",
+        title           => $form->get('title','text'),
+        synopsis        => $form->get('description','textarea'),
+    });
+
+    my $storage = $file->getStorageLocation;
+    my $filename = $storage->addFileFromFormPost('file');
+    $file->setFile;
+#  my $storageId =  $form->get('file','File');
+#    my $filePath = $storage->getPath( $storage->getFiles->[0] );
+ #   $self->setFile( $filePath );
+  #  $storage->delete;
+    $session->log->warn('XX:'. $filename);
+    
+    $file->requestAutoCommit;
+    
+    my $siteUrl = $session->url->getSiteURL;
+    my $date = $session->datetime;
+    my $as = $form->get('as') || 'json';
+
+    my $document = {
+        title           => $file->getTitle,
+        url             => $siteUrl.$file->getUrl,
+        thumbnailUrl    => $siteUrl.$file->getThumbnailUrl,
+        dateCreated     => $date->epochToHuman($file->get('creationDate'), '%y-%m-%d %j:%n:%s'),
+        lastUpdated     => $date->epochToHuman($file->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+    };
+    if ($as eq "xml") {
+        $session->http->setMimeType('text/xml');
+        return XML::Simple::XMLout($document, NoAttr => 1);
+    }
+        
+    $session->http->setMimeType('text/json');
+    return JSON->new->pretty->encode($document);
+}
+
 #-----------------------------------------------------------------------------
 
 =head2 www_delete ( )

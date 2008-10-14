@@ -11,10 +11,12 @@ package WebGUI::Asset::Wobject::Gallery;
 #-------------------------------------------------------------------
 
 use strict;
+use base 'WebGUI::Asset::Wobject';
+use JSON;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
-use base 'WebGUI::Asset::Wobject';
+use XML::Simple;
 
 =head1 NAME
 
@@ -1043,6 +1045,89 @@ sub www_add {
 
 #----------------------------------------------------------------------------
 
+=head2 www_addAlbumService ( )
+
+A web service to create albums. Returns a json string that looks like this:
+
+    {
+       "lastUpdated" : "2008-10-13 17:31:32",
+       "canAddFiles" : 1,
+       "url" : "http://dev.localhost.localdomain/cool-gallery/the-cool-album2",
+       "title" : "The Cool Album",
+       "dateCreated" : "2008-10-13 17:31:32"
+    }
+
+You can make the request as a post to the gallery url with the following variables:
+
+=head3 func
+
+Required. Must have a value of "addAlbumService"
+
+=head3 as
+
+Defaults to 'json', but if specified as 'xml' then the return result will be:
+
+    <opt>
+      <canAddFiles>1</canAddFiles>
+      <dateCreated>2008-10-13 17:39:22</dateCreated>
+      <lastUpdated>2008-10-13 17:39:22</lastUpdated>
+      <title>The Cool Album</title>
+      <url>http://dev.localhost.localdomain/cool-gallery/the-cool-album3</url>
+    </opt>
+
+=head3 title
+
+The title of the album you wish to create.
+
+=head3 synopsis
+
+A brief description of the album you wish to create.
+
+=head3 othersCanAdd
+
+A 1 or a 0 depending on whether you want other people to be able to add images to this album.
+
+=cut
+
+sub www_addAlbumService {
+    my $self        = shift;
+    my $session     = $self->session;
+    
+    return $session->privilege->insufficient unless ($self->canAddFile);
+    my $form = $session->form;
+    
+    my $album = $self->addChild({
+        className       => "WebGUI::Asset::Wobject::GalleryAlbum",
+        title           => $form->get('title','text'),
+        description     => $form->get('synopsis','textarea'),
+        synopsis        => $form->get('synopsis','textarea'),
+        othersCanAdd    => $form->get('othersCanAdd','yesNo'),
+    });
+    
+    $album->requestAutoCommit;
+
+    my $siteUrl = $session->url->getSiteURL;
+    my $date = $session->datetime;
+    my $as = $form->get('as') || 'json';
+
+    my $document = {
+        canAddFiles     => $album->canAddFile,
+        title           => $album->getTitle,
+        url             => $siteUrl.$album->getUrl,
+        dateCreated     => $date->epochToHuman($album->get('creationDate'), '%y-%m-%d %j:%n:%s'),
+        lastUpdated     => $date->epochToHuman($album->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+    };
+    if ($as eq "xml") {
+        $session->http->setMimeType('text/xml');
+        return XML::Simple::XMLout($document, NoAttr => 1);
+    }
+
+    $session->http->setMimeType('text/json');
+    return JSON->new->pretty->encode($document);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 www_listAlbums ( )
 
 Show a paginated list of the albums in this gallery.
@@ -1074,7 +1159,7 @@ sub www_listAlbumsRss {
     my $var         = $self->getTemplateVars;
 
     for my $assetId ( @{ $self->getAlbumIds } ) {
-        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum');
         my $assetVar    = $asset->getTemplateVars;
 
         # Fix URLs
@@ -1091,6 +1176,147 @@ sub www_listAlbumsRss {
 
     $self->session->http->setMimeType('text/xml');
     return $self->processTemplate( $var, $self->get("templateIdListAlbumsRss") );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_listAlbumsService ( )
+
+A web service to retrieve album information. You may request information from this gallery with a straight GET request:
+
+http://admin:123qwe@www.example.com/gallery-url?func=listAlbumsService
+
+The following parameters are optional, but may be passed along the query to change the output of this method.
+
+=head3 as
+
+Defaults to 'json', but can be overridden as 'xml'. If specified as 'json' the document returned will look like this:
+
+    {
+       "pageNumber" : 1,
+       "gallery" : {
+          "lastUpdated" : "2008-10-13 14:56:49",
+          "synopsis" : "This is the summary.",
+          "menuTitle" : "My Cool Gallery",
+          "url" : "http://dev.localhost.localdomain/cool-gallery",
+          "title" : "My Cool Gallery",
+          "canAddAlbums" : 1,
+          "dateCreated" : "2008-10-13 14:48:44"
+       },
+       "albums" : [
+          {
+             "thumbnailUrl" : "http://dev.localhost.localdomain",
+             "lastUpdated" : "2008-10-13 14:51:38",
+             "canAddFiles" : 1,
+             "url" : "http://dev.localhost.localdomain/cool-gallery/the-gallery-you-can-post-to",
+             "title" : "The Gallery You Can Post To",
+             "dateCreated" : "2008-10-13 14:50:22"
+          },
+          {
+             "thumbnailUrl" : "http://dev.localhost.localdomain",
+             "lastUpdated" : "2008-10-13 14:51:20",
+             "canAddFiles" : 0,
+             "url" : "http://dev.localhost.localdomain/cool-gallery/another-album",
+             "title" : "Another Album",
+             "dateCreated" : "2008-10-13 14:51:20"
+          }
+       ]
+    }
+
+If specified as 'xml' the document returned will look like this:
+
+    <opt>
+      <albums>
+        <canAddFiles>1</canAddFiles>
+        <dateCreated>2008-10-13 14:50:22</dateCreated>
+        <lastUpdated>2008-10-13 14:51:38</lastUpdated>
+        <thumbnailUrl>http://dev.localhost.localdomain</thumbnailUrl>
+        <title>The Gallery You Can Post To</title>
+        <url>http://dev.localhost.localdomain/cool-gallery/the-gallery-you-can-post-to</url>
+      </albums>
+      <albums>
+        <canAddFiles>0</canAddFiles>
+        <dateCreated>2008-10-13 14:51:20</dateCreated>
+        <lastUpdated>2008-10-13 14:51:20</lastUpdated>
+        <thumbnailUrl>http://dev.localhost.localdomain</thumbnailUrl>
+        <title>Another Album</title>
+        <url>http://dev.localhost.localdomain/cool-gallery/another-album</url>
+      </albums>
+      <gallery>
+        <canAddAlbums>1</canAddAlbums>
+        <dateCreated>2008-10-13 14:48:44</dateCreated>
+        <lastUpdated>2008-10-13 14:56:49</lastUpdated>
+        <menuTitle>My Cool Gallery</menuTitle>
+        <synopsis>This is the summary.</synopsis>
+        <title>My Cool Gallery</title>
+        <url>http://dev.localhost.localdomain/cool-gallery</url>
+      </gallery>
+      <pageNumber>1</pageNumber>
+    </opt>
+
+=head3 pn
+
+Defaults to 1. This represents the page number. It will return up to 100 albums at a time.
+
+=cut
+
+sub www_listAlbumsService {
+    my $self        = shift;
+    my $session     = $self->session;
+    
+    return $session->privilege->insufficient unless ($self->canView);
+    
+    my $siteUrl = $session->url->getSiteURL;
+    my @assets;
+    my $date = $session->datetime;
+    my $form = $session->form;
+    my $as = $form->get('as') || 'json';
+    my $pageNumber = $form->get('pn') || 1;
+    my $user = $session->user;
+    my $count = 1;
+
+    for my $assetId ( @{ $self->getAlbumIds } ) {
+        if ($count < $pageNumber * 100 - 99) { # skip low page numbers
+            next;
+        }
+        if ($count > $pageNumber * 100) { # skip high page numbers
+            last;
+        }        
+        my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum' );
+        if (defined $asset) {
+            if ($asset->canView) {
+                push @assets, {
+                    title           => $asset->getTitle,
+                    url             => $siteUrl.$asset->getUrl,
+                    dateCreated     => $date->epochToHuman($asset->get('creationDate'), '%y-%m-%d %j:%n:%s'),
+                    lastUpdated     => $date->epochToHuman($asset->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+                    thumbnailUrl    => $siteUrl.$asset->getThumbnailUrl,
+                    canAddFiles     => $asset->canAddFile,
+                };
+            }
+        }
+        $count++;
+    }
+
+    my $document = {
+        pageNumber  => $pageNumber,
+        gallery     => {
+            canAddAlbums    => $self->canAddFile,
+            title           => $self->getTitle,
+            menuTitle       => $self->get('menuTitle'),
+            synopsis        => $self->get('synopsis'),
+            url             => $siteUrl.$self->getUrl,
+            dateCreated     => $date->epochToHuman($self->get('creationDate'), '%y-%m-%d %j:%n:%s'),
+            lastUpdated     => $date->epochToHuman($self->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+        },
+        albums      => \@assets
+    };
+    if ($as eq "xml") {
+        $session->http->setMimeType('text/xml');
+        return XML::Simple::XMLout($document, NoAttr => 1);
+    }
+    $session->http->setMimeType('text/json');
+    return JSON->new->pretty->encode($document);
 }
 
 #----------------------------------------------------------------------------
