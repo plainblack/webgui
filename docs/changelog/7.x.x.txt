@@ -1,3 +1,5 @@
+7.6.2
+
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the
