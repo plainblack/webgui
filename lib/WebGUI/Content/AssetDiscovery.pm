@@ -80,7 +80,7 @@ If it is 'xml' it will look like:
       <className>WebGUI::Asset::Wobject::Article</className>
       <pageNumber>1</pageNumber>
     </opt>
-    
+
 =head2 pn
 
 Defaults to 1. pn stands for Page Number. The result set from this service returns up to 100 assets at a time. If you need more than that you can set pn to the next page number and so on. B<Caveat:> Due to the calculations based upon branch and user privileges this service does not know the maximum number of pages of data there will be.

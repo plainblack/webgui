@@ -933,7 +933,7 @@ Defaults to 'json', but if specified as 'xml' then the return result will be:
       <title>JT</title>
       <url>http://dev.localhost.localdomain/cool-gallery/the-cool-album3/jt14</url>
     </opt>
-    
+
 =head3 title
 
 The title of the album you wish to create.
