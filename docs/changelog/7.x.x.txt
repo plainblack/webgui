@@ -50,6 +50,7 @@
  - fixed #8818: Visitor sends a welcome message
  - added: "EditArea" code highlighter and editing tool for WebGUI::Form::Codearea, used
     in Template, Snippet, SQLReport, and more
+ - fixed: email password recovery allows sending recovery mail to arbitrary address
 
 7.6.0
  - added: users may now customize the post received page for the CS

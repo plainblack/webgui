@@ -602,14 +602,9 @@ our $I18N = {
 		lastUpdated => 177127324,
 	},
 
-	'email recover password finish message1' => {
-		message => q|An email has been sent to |,
-		lastUpdated => 177127324,
-	},
-
-	'email recover password finish message2' => {
-		message => q| with instructions for resetting your password.|,
-		lastUpdated => 177127324,
+	'email recover password finish message' => {
+		message => q|An email has been sent with instructions for resetting your password.|,
+		lastUpdated => 1223309904,
 	},
 
 	'email recover password start message' => {
