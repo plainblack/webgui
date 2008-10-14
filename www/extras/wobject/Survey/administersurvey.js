@@ -40,14 +40,14 @@ Survey.Form = new function() {
 //YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});   
 
         if(qs[0] != undefined){
-            if(lastSection != s.Survey_sectionId || s.everyPageTitle > 0){
+            if(lastSection != s.id|| s.everyPageTitle > 0){
                 document.getElementById('headertitle').style.display='block';
             }
-            if(lastSection != s.Survey_sectionId || s.everyPageText > 0){
+            if(lastSection != s.id|| s.everyPageText > 0){
                 document.getElementById('headertext').style.display = 'block';
             }
 
-            if(lastSection != s.Survey_sectionId && s.questionsOnSectionPage != '1'){
+            if(lastSection != s.id && s.questionsOnSectionPage != '1'){
                 var span = document.createElement("div"); 
                 span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                 span.style.display = 'block';
@@ -69,7 +69,7 @@ Survey.Form = new function() {
                 document.getElementById('questions').style.display='inline';
                 Survey.Form.addWidgets(qs);             
             }
-            lastSection = s.Survey_sectionId;
+            lastSection = s.id;
         }else{
             document.getElementById('headertitle').style.display='block';
             document.getElementById('headertext').style.display = 'block';
@@ -92,9 +92,9 @@ Survey.Form = new function() {
 
             //Check if this question should be validated
             if(q.required == 1){
-               toValidate[q.Survey_questionId] = new Array();
-               toValidate[q.Survey_questionId]['type'] = q.questionType;
-               toValidate[q.Survey_questionId]['answers'] = new Array();
+               toValidate[q.id] = new Array();
+               toValidate[q.id]['type'] = q.questionType;
+               toValidate[q.id]['answers'] = new Array();
             } 
             
 
@@ -103,37 +103,37 @@ Survey.Form = new function() {
                 verb = 0; 
                 for(var x = 0; x < q.answers.length; x++){
                     var a = q.answers[x];
-                    if(toValidate[a.Survey_questionId]){
-                        toValidate[a.Survey_questionId]['answers'][a.Survey_answerId] = 1; 
+                    if(toValidate[q.id]){
+                        toValidate[q.id]['answers'][a.id] = 1; 
                     }
-                    var b = document.getElementById(a.Survey_answerId+'button');
+                    var b = document.getElementById(a.id+'button');
                     /*
-                        b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.Survey_answerId+'button', name: a.Survey_answerId+'button',
-                        value: a.Survey_answerId, 
-                        container: a.Survey_answerId+"container", checked: false });
+                        b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
+                        value: a.id, 
+                        container: a.id+"container", checked: false });
                     */
-//                    b.on("click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length,a.Survey_answerId]);
-//                    YAHOO.util.Event.addListener(a.Survey_answerId+'button', "click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length,a.Survey_answerId]);
+//                    b.on("click", this.buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+//                    YAHOO.util.Event.addListener(a.id+'button', "click", this.buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
                     if(a.verbatim == 1){
                         verb = 1;
                     }
-                    YAHOO.util.Event.addListener(a.Survey_answerId+'button', "click", this.buttonChanged,[b,a.Survey_questionId,q.maxAnswers,butts,qs.length,a.Survey_answerId]);
-                    b.hid = a.Survey_answerId;
+                    YAHOO.util.Event.addListener(a.id+'button', "click", this.buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+                    b.hid = a.id;
                     butts.push(b);
                 }
             }
             else if(dateType[q.questionType]){
                 for(var x = 0; x < q.answers.length; x++){
                     var a = q.answers[x];
-                    if(toValidate[a.Survey_questionId]){
-                        toValidate[a.Survey_questionId]['answers'][a.Survey_answerId] = 1; 
+                    if(toValidate[q.id]){
+                        toValidate[q.id]['answers'][a.id] = 1; 
                     }
-                    var calid = a.Survey_answerId+'container';
+                    var calid = a.id+'container';
                     var c = new YAHOO.widget.Calendar(calid,{title:'Choose a date:', close:true});
-                    c.selectEvent.subscribe(this.selectCalendar,[c,a.Survey_answerId],true);
+                    c.selectEvent.subscribe(this.selectCalendar,[c,a.id],true);
                     c.render();
                     c.hide();
-                    var b = new YAHOO.widget.Button({  label:"Select Date",  id:"pushbutton"+a.Survey_answerId, container:a.Survey_answerId+'button' });
+                    var b = new YAHOO.widget.Button({  label:"Select Date",  id:"pushbutton"+a.id, container:a.id+'button' });
                     b.on("click", this.showCalendar,[c]);
                 }
             }
@@ -145,7 +145,7 @@ Survey.Form = new function() {
                 }else{
                     for(var s in q.answers){
                         var a = q.answers[s];
-                        YAHOO.util.Event.addListener(a.Survey_answerId, "blur", this.sliderTextSet);   
+                        YAHOO.util.Event.addListener(a.id, "blur", this.sliderTextSet);   
                         if(a.max - a.min > max){max = a.max - a.min;}
                     }
                 }
@@ -153,9 +153,9 @@ Survey.Form = new function() {
                     //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
                     for(var x = 0; x < q.answers.length; x++){
                         var a = q.answers[x];
-                        if(toValidate[a.Survey_questionId]){
-                            toValidate[a.Survey_questionId]['total'] =  a.max; 
-                            toValidate[a.Survey_questionId]['answers'][a.Survey_answerId] = 1; 
+                        if(toValidate[q.id]){
+                            toValidate[q.id]['total'] =  a.max; 
+                            toValidate[q.id]['answers'][a.id] = 1; 
                         }
                     }
                     new this.sliderManager(q,max);
@@ -171,8 +171,8 @@ Survey.Form = new function() {
 
             else if(text[q.questionType]){
                 var a = q.answers[x];
-                if(toValidate[a.Survey_questionId]){
-                    toValidate[a.Survey_questionId]['answers'][a.Survey_answerId] = 1; 
+                if(toValidate[q.id]){
+                    toValidate[q.id]['answers'][a.id] = 1; 
                 }
             }
         }
@@ -211,6 +211,7 @@ Survey.Form = new function() {
             }
         }
         if(submit == 1){
+console.log("Submitting");
             Survey.Comm.callServer('','submitQuestions','surveyForm',hasFile);
         }
     }
@@ -225,9 +226,9 @@ Survey.Form = new function() {
             var a2 = q.answers[1];
             var scale = sliderWidth/a1.max;
 
-            var id = q.Survey_questionId;
-            var a1id = a1.Survey_answerId;
-            var a2id = a2.Survey_answerId;
+            var id = q.id;
+            var a1id = a1.id;
+            var a2id = a2.id;
 
             var a1h = document.getElementById(a1id);
             var a2h = document.getElementById(a2id);
@@ -237,6 +238,7 @@ Survey.Form = new function() {
                 a1id+"slider-min-thumb", a2id+"slider-max-thumb", 
                 sliderWidth, 1*scale, [1,sliderWidth]);
             sliders[id] = s;
+//console.log(1);
 
             s.minRange = 4; 
             var updateUI = function () { 
@@ -263,13 +265,13 @@ Survey.Form = new function() {
             var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
             var scale = Math.round(sliderWidth/distance);
             var lang  = YAHOO.lang;
-            var id = a.Survey_answerId;
+            var id = a.id;
             var s = YAHOO.widget.Slider.getHorizSlider(id+'slider-bg', id+'slider-thumb', 
                 0, sliderWidth, (scale*step));
             s.scale = scale;
             sliders[q.Survey_questionid] = new Array();
             sliders[q.Survey_questionid][id] = s;
-            s.input = a.Survey_answerId; 
+            s.input = a.id; 
             s.scale = scale;
             document.getElementById(id).value = a.min;
             var check = function() {
@@ -293,20 +295,20 @@ Survey.Form = new function() {
             var a = q.answers[i];
             var Event = YAHOO.util.Event;
             var lang  = YAHOO.lang;
-            var id = a.Survey_answerId+'slider-bg';
-            var s = YAHOO.widget.Slider.getHorizSlider(id, a.Survey_answerId+'slider-thumb', 
+            var id = a.id+'slider-bg';
+            var s = YAHOO.widget.Slider.getHorizSlider(id, a.id+'slider-thumb', 
                 0, sliderWidth, scale*step);
             s.animate = false;
-            if(sliders[q.Survey_questionId] == undefined){
-                sliders[q.Survey_questionId] = new Array();
+            if(sliders[q.id] == undefined){
+                sliders[q.id] = new Array();
             }
-            sliders[q.Survey_questionId][a.Survey_answerId] = s;
-            s.input = a.Survey_answerId;
+            sliders[q.id][a.id] = s;
+            s.input = a.id;
             s.lastValue = 0;
             var check = function() {
                 var t = 0;
-                for(var x in sliders[q.Survey_questionId]){
-                    t+= sliders[q.Survey_questionId][x].getValue();
+                for(var x in sliders[q.id]){
+                    t+= sliders[q.id][x].getValue();
                 }
                 if(t > total){
                     t -= this.getValue();
@@ -328,9 +330,9 @@ Survey.Form = new function() {
 //                  v *= scale;
                   v = ( ( (v-min) / distance))*total;
                   // convert the real value into a pixel offset 
-                  for(var sl in sliders[q.Survey_questionId]){
-                    if(sliders[q.Survey_questionId][sl].input == this.id){
-                        sliders[q.Survey_questionId][sl].setValue(Math.round(v)); 
+                  for(var sl in sliders[q.id]){
+                    if(sliders[q.id][sl].input == this.id){
+                        sliders[q.id][sl].setValue(Math.round(v)); 
                     }
                   }
               } 

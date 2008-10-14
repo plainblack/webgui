@@ -148,6 +148,7 @@ sub getAnswerEditVars{
 sub update{
     my ($self,$address,$ref) = @_;
     my $object;
+    my $newQuestion = 0;
     if(@$address == 1){
         $object = $self->section($address);
         if(! defined $object){
@@ -157,16 +158,20 @@ sub update{
     }elsif(@$address == 2){
         $object = $self->question($address);
         if(! defined $object){
-$self->log("$object didn't exist");
+            my $newQuestion = 1;
             $object = $self->newQuestion();
             push(@{$self->questions($address)},$object);
         }
     }elsif(@$address == 3){
         $object = $self->answer($address);
         if(! defined $object){
-$self->log("$object didn't exist");
             $object = $self->newAnswer();
             push(@{$self->answers($address)},$object);
+        }
+    }
+    if(@$address == 2 and ! $newQuestion){
+        if($ref->{questionType} ne $self->question($address)->{questionType}){
+            $self->updateQuestionAnswers($address,$ref->{questionType});
         }
     }
     for my $key(keys %$object){
@@ -264,6 +269,115 @@ sub newAnswer{
     return \%members;
 }
 
+sub updateQuestionAnswers{
+    my $self = shift;
+    my $address = shift;
+    my $type = shift;
+
+$self->log("In updateQuestion");
+
+    my @addy = @{$address};
+    my $question = $self->question($address);
+    $question->{answers} = [];
+
+    if($type eq 'Date Range' or $type eq  'Multi Slider - Allocate' or $type eq 'Dual Slider - Range'){
+        push(@{$question->{answers}},$self->newAnswer()); 
+        push(@{$question->{answers}},$self->newAnswer()); 
+    }elsif($type eq 'Currency'){
+        push(@{$question->{answers}},$self->newAnswer()); 
+        $addy[2] = 0;
+        $self->update(\@addy,{'text','Currency Amount'});
+    }elsif($type eq 'Text Date'){
+        push(@{$question->{answers}},$self->newAnswer()); 
+        $addy[2] = 0;
+        $self->update(\@addy,{'text','Date:'});
+    }elsif($type eq 'Phone Number'){
+        push(@{$question->{answers}},$self->newAnswer()); 
+        $addy[2] = 0;
+        $self->update(\@addy,{'text','Phone Number:'});
+    }elsif($type eq 'Email'){
+        push(@{$question->{answers}},$self->newAnswer()); 
+        $addy[2] = 0;
+        $self->update(\@addy,{'text','Email:'});
+    }elsif($type eq 'Education'){
+        my @ans = ('Elementary or some high school','High school/GED','Some college/vocational school','College graduate',
+                    'Some graduate work','Master\'s degree','Doctorate (of any type)','Other degree (verbatim)');
+        $self->addAnswersToQuestion(\@addy,\@ans,{7,1});
+    }elsif($type eq 'Party'){
+        my @ans = ('Democratic party','Republican party (or GOP)','Independant party','Other party (verbatim)');
+        $self->addAnswersToQuestion(\@addy,\@ans,{3,1});
+    }elsif($type eq 'Race'){
+        my @ans = ('American Indian','Asian','Black','Hispanic','White non-Hispanic','Something else (verbatim)');
+        $self->addAnswersToQuestion(\@addy,\@ans,{5,1});
+    }elsif($type eq 'Ideology'){
+        my @ans = ('Strongly liberal','Liberal','Somewhat liberal','Middle of the road','Slightly conservative','Conservative','Strongly conservative');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Security'){
+        my @ans = ('Not at all secure','','','','','','','','','','Extremely secure');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Threat'){
+        my @ans = ('No threat','','','','','','','','','','Extreme threat');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Risk'){
+        my @ans = ('No risk','','','','','','','','','','Extreme risk');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Concern'){
+        my @ans = ('Not at all concerned','','','','','','','','','','Extremely concerned');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Effectiveness'){
+        my @ans = ('Not at all effective','','','','','','','','','','Extremely effective');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Confidence'){
+        my @ans = ('Not at all confident','','','','','','','','','','Extremely confident');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Satisfaction'){
+        my @ans = ('Not at all satisfied','','','','','','','','','','Extremely satisfied');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Certainty'){
+        my @ans = ('Not at all certain','','','','','','','','','','Extremely certain');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Likelihood'){
+        my @ans = ('Not at all likely','','','','','','','','','','Extremely likely');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Importance'){
+        my @ans = ('Not at all important','','','','','','','','','','Extremely important');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Oppose/Support'){
+        my @ans = ('Strongly oppose','','','','','','Strongly Support');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Agree/Disagree'){
+        my @ans = ('Strongly disagree','','','','','','Strongly agree');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'True/False'){
+        my @ans = ('True','False');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Yes/No'){
+        my @ans = ('Yes','No');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }elsif($type eq 'Gender'){
+        my @ans = ('Male','Female');
+        $self->addAnswersToQuestion(\@addy,\@ans,{});
+    }else{
+        push(@{$question->{answers}},$self->newAnswer()); 
+    }
+}
+sub addAnswersToQuestion{
+    my $self = shift;
+    my $addy = shift;
+    my $ans = shift;
+    my $verbs = shift;
+$self->log(Dumper $verbs);
+    for(0 .. $#$ans){
+        push(@{$self->question($addy)->{answers}},$self->newAnswer()); 
+        $$addy[2] = $_;
+$self->log("$_:".defined $$verbs{$_}." ".$$verbs{$_});
+        if(defined $$verbs{$_} and $_ == $$verbs{$_}){
+            $self->update($addy,{'text',$$ans[$_],'recordedAnswer',$_+1,'verbatim',1});
+        }else{
+            $self->update($addy,{'text',$$ans[$_],'recordedAnswer',$_+1});
+        }
+    }
+}
 
 
 #------------------------------

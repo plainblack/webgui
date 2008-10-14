@@ -23,6 +23,7 @@ Survey.Comm= new function(){
             alert("Waiting on previous request");
         }else{
             callMade = 1;
+console.log(sUrl);
             YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
         }
     }
