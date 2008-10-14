@@ -44,6 +44,8 @@ if ($hasServer) {
     $oldSettings{ smtpServer } = $session->setting->get('smtpServer');
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
 }
+$oldSettings{ emailToLog } = $session->setting->get('emailToLog');
+$session->setting->set('emailToLog', 0);
 
 #----------------------------------------------------------------------------
 # Tests

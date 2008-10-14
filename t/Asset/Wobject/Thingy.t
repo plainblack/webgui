@@ -117,6 +117,8 @@ cmp_deeply(
             onDeleteWorkflowId=>undef,
             sortBy=>undef,
             field_loop=>[],
+            exportMetaData=>undef,
+            maxEntriesPerUser=>undef,
         },
         'Getting newly added thing as JSON: www_getThingViaAjax returns correct data as JSON.'
     );
@@ -158,6 +160,8 @@ cmp_deeply(
             canEdit=>1,
             canAdd=>1,
             canSearch=>1,
+            exportMetaData=>undef,
+            maxEntriesPerUser=>undef,
         }],
         'Getting all things in Thingy as JSON: www_getThingsViaAjax returns correct data as JSON.'
     );
