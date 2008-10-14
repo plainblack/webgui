@@ -20,13 +20,17 @@ use Test::Deep;
 
 use Test::MockObject;
 my $mockSpectre = Test::MockObject->new();
-$mockSpectre->fake_module('WebGUI::Workflow::Spectre');
-$mockSpectre->fake_new('WebGUI::Workflow::Spectre');
 my @spectreGuts = ();
+$mockSpectre->fake_module('WebGUI::Workflow::Spectre',
+'notify', sub{
+    my ($message, $data) = @_;
+    push @spectreGuts, [$message, $data];
+});
 $mockSpectre->mock('notify', sub{
     my ($message, $data) = @_;
     push @spectreGuts, [$message, $data];
 });
+$mockSpectre->fake_new('WebGUI::Workflow::Spectre');
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -42,7 +46,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 12;        # Increment this number for each test you create
+plan tests => 32;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -85,7 +89,8 @@ WebGUI::Test->interceptLogging;
 $instance->set({ 'parameters' => {session => 1}, });
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 1,} });
 is($otherInstance, undef, 'create: another singleton instance can not be created if it the same parameters as a currently existing instance');
-like($WebGUI::Test::logger_info, qr/An instance of singleton workflow \w{22} already exists/, 'create: Warning logged for trying to make another singleton');
+my $expectedId = $wf->getId;
+like($WebGUI::Test::logger_info, qr/An instance of singleton workflow $expectedId already exists/, 'create: Warning logged for trying to make another singleton');
 
 $otherInstance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf->getId, parameters => { session => 2,}});
 isnt ($otherInstance, undef, 'create: another singleton instance can be created if it has different parameters');
@@ -103,13 +108,82 @@ is($instanceWorkflow->getId, $wf->getId, 'getWorkflow, caching check');
 
 ###############################################################################
 #
-#  set
+#  new
 #
 ###############################################################################
 
+$otherInstance = WebGUI::Workflow::Instance->new($session, 'neverAWebGUIId');
+is($otherInstance, undef, 'new: non-existant id returns undef');
+$otherInstance = WebGUI::Workflow::Instance->new($session, $instance->getId);
+isa_ok($otherInstance, 'WebGUI::Workflow::Instance', 'new with a valid id returns an Instance object');
+is($otherInstance->getId, $instance->getId, 'new returned the correct instance');
+is($otherInstance->{_started}, 1, 'By default, _started = 0');
+$otherInstance = WebGUI::Workflow::Instance->new($session, $instance->getId, 1);
+is($otherInstance->{_started}, 0, 'By default, _started = 1');
+
+###############################################################################
+#
+#  set, get
+#
+###############################################################################
+
+$instance->set({
+    priority          => 3,
+    lastStatus        => 'undefined',
+    workflowId        => 'notAWorkflowId',
+    className         => 'WebGUI::Session',
+    methodName        => 'open',
+    currentActivityId => 'notAnActivityId',
+} , 1);
+is($instance->get('priority'),           3,                 'set priority');
+is($instance->get('lastStatus'),         'undefined',       'set lastStatus');
+is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId');
+is($instance->get('className'),          'WebGUI::Session', 'set className');
+is($instance->get('methodName'),         'open',            'set methodName');
+is($instance->get('currentActivityId'),  'notAnActivityId', 'set currentActivityId');
+
+$instance->set({
+    priority          => 0,
+    lastStatus        => '',
+    workflowId        => '',
+} , 1);
+is($instance->get('priority'),           3,                 'set priority, is sticky');
+is($instance->get('lastStatus'),         'undefined',       'set lastStatus is sticky');
+is($instance->get('workflowId'),         'notAWorkflowId',  'set workflowId is sticky');
+
+$instance->set({
+    className         => '',
+    methodName        => '',
+    currentActivityId => 0,
+} , 1);
+is($instance->get('className'),          '', 'set: className can be cleared');
+is($instance->get('methodName'),         '', 'set: methodName can be cleared');
+is($instance->get('currentActivityId'),  0,  'set: currentActivityId can be cleared');
+
+my $setTime = time();
+$instance->set({priority => 2}, 1);
+cmp_ok( abs($instance->get('lastUpdate') - $setTime), '<=', 2, 'set: lastUpdate set correctly');
+
+my $params = [ '.38 revolver', 'oily', 'black and evil'];
+
+$instance->set({parameters => $params},1);
+cmp_deeply($instance->get('parameters'), $params, 'set, get with parameter');
+
+my $wf2 = WebGUI::Workflow->create(
+    $session,
+    {
+        title => 'WebGUI::Workflow::Instance Test',
+        description => 'Non-singleton test',
+        type => 'None',
+    }
+);
+
+my $wf2Instance = WebGUI::Workflow::Instance->create($session, {workflowId => $wf2->getId});
+cmp_deeply($wf2Instance->get('parameters'), {}, 'get returns {} for parameters when there are no parameters stored');
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
     $wf->delete;  ##Deleting a Workflow deletes its instances, too.
+    $wf2->delete;
 }

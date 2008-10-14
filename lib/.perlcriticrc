@@ -1,2 +1,2 @@
-severity = gentle
+severity = gentle 
 exclude  = ProhibitExplicitReturnUndef

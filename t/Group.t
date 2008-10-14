@@ -169,10 +169,14 @@ $lGroup->delete;
 my $gid = $g->getId;
 is (length($gid), 22, "GroupId is proper length");
 
-is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
-is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
-is_deeply ($g->getUsers(), [], 'No users added by default');
-is_deeply ($g->getAllUsers(), [3], 'No users added by default in any method');
+{
+    # our invalid db query from earlier is going to error, keep it quiet
+    local $SIG{__WARN__} = sub {};
+    is_deeply ($g->getGroupsIn(), [3], 'Admin group added by default to this group');
+    is_deeply ($g->getGroupsFor(), [], 'Group not added to any other group');
+    is_deeply ($g->getUsers(), [], 'No users added by default');
+    is_deeply ($g->getAllUsers(), [3], 'No users added by default in any method');
+}
 
 my $gname = '**TestGroup**';
 is ($g->name($gname), $gname, 'Set name');

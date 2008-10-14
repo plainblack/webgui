@@ -1,5 +1,6 @@
 package WebGUI::Help::Macros;
 use strict;
+use Module::Find qw(findsubmod);
 
 our $HELP = {
 
@@ -7,15 +8,8 @@ our $HELP = {
         title => 'macros list title',
         body  => sub {
             my $session = shift;
-            my $dir = join '/', $session->config->getWebguiRoot, "lib", "WebGUI", "Macro";
-            opendir( DIR, $dir ) or $session->errorHandler->fatal("Can't open Macro directory: $dir!");
-            my @macros = ();
-            foreach my $dir (readdir(DIR)) {
-                next unless $dir =~ /\.pm$/;
-                $dir =~ s/\.pm//;
-                push @macros, $dir;
-            }
-            closedir(DIR);
+            my @macroModules = findsubmod 'WebGUI::Macro';
+            my @macros = map { /^WebGUI::Macro::(.*)/; $1 } @macroModules;
 
             ##Build list of enabled macros, by namespace, by reversing session hash:
             my %configMacros = %{ $session->config->get("macros") };

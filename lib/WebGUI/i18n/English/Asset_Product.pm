@@ -723,6 +723,11 @@ be useful, others may not.|,
 		lastUpdated => 1210029452,
 	},
 
+	'variant_id' => {
+		message => q|The unique identifier for this variant.|,
+		lastUpdated => 1221777106,
+	},
+
 	'variant_controls' => {
 		message => q|An icon toolbar for editing, deleting, or reordering this variant.|,
 		lastUpdated => 1210029452,

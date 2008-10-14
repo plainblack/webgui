@@ -52,4 +52,4 @@ sub handler {
 }
 
 1;
-
+#vim:ft=perl

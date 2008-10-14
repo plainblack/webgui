@@ -308,6 +308,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
     $session->http->setMimeType( 'application/json' );
+
     return encode_json( $assetInfo );
 }
 
@@ -414,7 +415,7 @@ sub www_manage {
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
+    my $output          = WebGUI::Macro::AdminBar::process($session).'<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
@@ -458,30 +459,6 @@ ENDHTML
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
 
-    ### New Content
-    $output         .= q{<div class="functionPane"><fieldset><legend>} . $i18n->get( '1083' ) . '</legend>';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '</fieldset></div>';
-
     tie my %options, 'Tie::IxHash';
     my $hasClips = 0;
     foreach my $asset (@{$currentAsset->getAssetsInClipboard(1)}) {
@@ -520,11 +497,16 @@ ENDHTML
                     .$session->icon->export("func=exportPackage",$asset->get("url"))
                     .'<br />';
     }
-    $output .= '<br />'.WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
-            .WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
-            .'<input type="file" name="packageFile" size="10" style="font-size: 10px;" />'
-            .WebGUI::Form::submit($session, {value=>$i18n->get("import"), extras=>'style="font-size: 10px;"'})
-            .WebGUI::Form::formFooter($session);
+    $output .= '<br />'
+        . WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
+        . WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
+        . '<div><input type="file" name="packageFile" size="30" style="font-size: 10px;" /></div>'
+        . '<div style="font-size: 10px">'
+        . WebGUI::Form::checkbox($session, { label => $i18n->get('inherit parent permissions'), checked => 1, name => 'inheritPermissions', value => 1 })
+        . ' &nbsp; ' .  WebGUI::Form::submit($session, { value=>$i18n->get("import"), 'extras' => ' ' })
+        . '</div>'
+        . WebGUI::Form::formFooter($session)
+        ;
     $output .= ' </fieldset></div>';
 
     ### Clearing div
@@ -539,7 +521,7 @@ ENDHTML
     $output         .= <<"ENDJS";
     // Start the data source
     WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage',{connTimeout:30000} );
     WebGUI.AssetManager.DataSource.responseType
         = YAHOO.util.DataSource.TYPE_JSON;
     WebGUI.AssetManager.DataSource.responseSchema

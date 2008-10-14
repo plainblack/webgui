@@ -900,8 +900,10 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of the asset property workflowIdCommit',
     },
-
-
+    'asset not committed' => {
+		message => q{<h1>Error!</h1><p>You need to commit this calendar before you can create a new event</p>},
+        lastUpdated => 1166848379,
+    },
 };
 
 1;

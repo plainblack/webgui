@@ -25,3 +25,4 @@ sub makeUrlCompliant {			# you have to have this method, but it can do URL trans
 
 
 1;
+#vim:ft=perl

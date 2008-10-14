@@ -15,6 +15,8 @@ our $HELP = {
         variables => [
             { name => 'addFile.url', },
             { name => "addFile.label", },
+            { name => "canAddFile", description => 'helpvar canAddFile', },
+            { name => "canEdit", description => 'helpvar canEdit', },
             {   name      => "subfolder_loop",
                 variables => [
                     {   name        => "id",

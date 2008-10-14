@@ -636,7 +636,7 @@ sub processCommentEditForm {
                     : 0
                     ;
 
-    my $visitorIp   = $session->user->userId eq "1"
+    my $visitorIp   = $session->user->isVisitor
                     ? $session->env->get("REMOTE_ADDR")
                     : undef
                     ;

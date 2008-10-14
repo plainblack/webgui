@@ -36,7 +36,6 @@ use WebGUI::Keyword;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;
-use WebGUI::Flux;
 
 =head1 NAME
 
@@ -218,8 +217,8 @@ sub canAdd {
     my $userId = shift || $session->user->userId;
     my $user = WebGUI::User->new($session, $userId);
     my $subclassGroupId = shift;
-    my $addPrivs = $session->config->get("assetAddPrivilege");
-    my $groupId = $addPrivs->{$className} || $subclassGroupId || '12';
+    my $addPrivsGroup = $session->config->get("assets/".$className."/addGroup");
+    my $groupId = $addPrivsGroup || $subclassGroupId || '12';
     return $user->isInGroup($groupId);
 }
 
@@ -240,21 +239,12 @@ sub canEdit {
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
     my $user = WebGUI::User->new($self->session, $userId);
-    
-    # See if we should delegate to Flux..
-    if ($self->get('fluxEnabled')) {
-        return WebGUI::Flux->evaluateFor({
-            user => $user, 
-            assetId => $self->getId(), 
-            fluxRuleId => $self->get('fluxRuleIdEdit')
-        });
-    }
-    
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
     return $user->isInGroup($self->get("groupIdEdit"));
 }
+
 
 #-------------------------------------------------------------------
 
@@ -282,16 +272,6 @@ sub canView {
         $user =  $self->session->user;
         $userId = $user->userId();
     }
-    
-    # See if we should delegate to Flux..
-    if ($self->get('fluxEnabled') && $self->session->setting->get('fluxEnabled')) {
-        return WebGUI::Flux->evaluateFor({
-            user => $user, 
-            assetId => $self->getId(), 
-            fluxRuleId => $self->get('fluxRuleIdView')
-        });
-    }
-    
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
@@ -441,27 +421,6 @@ sub definition {
                         fieldType=>'group',
 					    filter=>'fixId',
                         defaultValue=>'4'
-                    },
-                    fluxEnabled=>{
-					    tab=>"security",
-					    label=>'Enable Flux',
-					    hoverHelp=>'Enable Flux',
-					    uiLevel=>6,
-					    fieldType       => ($session->setting->get("fluxEnabled") ? 'yesNo' : 'hidden'),
-                    },
-                    fluxRuleIdView=>{
-					    tab=>"security",
-					    label=>'Who Can View (Flux Rule)',
-					    hoverHelp=>'Who Can View (Flux Rule)',
-					    uiLevel=>6,
-                       fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
-                    },
-                    fluxRuleIdEdit=>{
-					    tab=>"security",
-					    label=>'Who Can Edit (Flux Rule)',
-					    hoverHelp=>'Who Can Edit (Flux Rule)',
-					    uiLevel=>6,
-                       fieldType       => ($session->setting->get("fluxEnabled") ? 'fluxRule' : 'hidden'),
                     },
                     synopsis=>{
 					    tab=>"meta",
@@ -781,99 +740,6 @@ sub getAdminConsole {
 	return $self->{_adminConsole};
 }
 
-#-------------------------------------------------------------------
-
-=head2 getAssetAdderLinks ( [addToUrl, type] )
-
-Returns an arrayref that contains a label (name of the class of Asset) and url (url link to function to add the class).
-
-=head3 addToUrl
-
-Any text to append to the getAssetAdderLinks URL. Usually name/variable pairs to pass in the url. If addToURL is specified, the character ";" and the text in addToUrl is appended to the returned url.
-
-=head3 type
-
-A string indicating which type of adders to return. Defaults to "assets". Choose from "assets", "assetContainers", or "utilityAssets".
-
-=cut
-
-sub getAssetAdderLinks {
-	my $self = shift;
-	my $addToUrl = shift;
-	my $type = shift || "assets";
-	my %links;
-	my $classesInType = $self->session->config->get($type);
-	if (ref $classesInType ne "ARRAY") {
-		$classesInType = [];
-	}
-	foreach my $class (@{$classesInType}) {
-		next unless $class;
-		my %properties = (
-			className=>$class,
-			dummy=>1
-		);
-		my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
-		next unless $newAsset;
-		my $uiLevel = eval{$newAsset->getUiLevel()};
-		if ($@) {
-			$self->session->errorHandler->error("Couldn't get UI level of ".$class.". Root cause: ".$@);
-			next;
-		}
-		next if ($uiLevel > $self->session->user->profileField("uiLevel"));# && !$self->session->user->isInGroup(3));
-		my $canAdd = eval{$class->canAdd($self->session)};
-		if ($@) {
-			$self->session->errorHandler->error("Couldn't determine if user can add ".$class." because ".$@);
-			next;
-		} 
-		next unless ($canAdd);
-		my $label = eval{$newAsset->getName()};
-		if ($@) {
-			$self->session->errorHandler->error("Couldn't get the name of ".$class."because ".$@);
-			next;
-		}
-		my $url = $self->getUrl("func=add;class=".$class);
-		$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
-		$links{$label}{url} = $url;
-		$links{$label}{icon} = $newAsset->getIcon;
-		$links{$label}{'icon.small'} = $newAsset->getIcon(1);
-	}
-	my $constraint;
-	if ($type eq "assetContainers") {
-		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("assetContainers"));
-	} elsif ($type eq "utilityAssets") {
-		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("utilityAssets"));
-	} else {
-		$constraint = $self->session->db->quoteAndJoin($self->session->config->get("assets"));
-	}
-	if ($constraint) {
-		my $sth = $self->session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset left join assetData on asset.assetId=assetData.assetId where assetData.isPrototype=1 and asset.state='published' and asset.className in ($constraint) and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId) group by assetData.assetId");
-		while (my ($class,$id,$date) = $sth->array) {
-			my $asset = WebGUI::Asset->new($self->session,$id,$class,$date);
-			next unless ($asset->canView && $asset->canAdd($self->session) && $asset->getUiLevel <= $self->session->user->profileField("uiLevel"));
-			my $url = $self->getUrl("func=add;class=".$class.";prototype=".$id);
-			$url = $self->session->url->append($url,$addToUrl) if ($addToUrl);
-			$links{$asset->getTitle}{url} = $url;
-			$links{$asset->getTitle}{icon} = $asset->getIcon;
-			$links{$asset->getTitle}{'icon.small'} = $asset->getIcon(1);
-			$links{$asset->getTitle}{'isPrototype'} = 1;
-			$links{$asset->getTitle}{'asset'} = $asset;
-		}
-		$sth->finish;
-	}
-	my @sortedLinks;
-	foreach my $label (sort keys %links) {
-		push(@sortedLinks,{
-			label=>$label,
-			url=>$links{$label}{url},
-			icon=>$links{$label}{icon},
-			'icon.small'=>$links{$label}{'icon.small'},
-			isPrototype=>$links{$label}{isPrototype},
-			asset=>$links{$label}{asset}
-			});	
-	}
-	return \@sortedLinks;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -885,10 +751,10 @@ Returns a reference to the container asset. If this asset is a container it retu
 
 sub getContainer {
 	my $self = shift;
-	if (WebGUI::Utility::isIn($self->get("className"), @{$self->session->config->get("assetContainers")})) {
+	if ($self->session->config->get("assets/".$self->get("className")."/isContainer")) {
 		return $self;
-	} else {
-#		$self->session->asset($self->getParent);
+	}
+	else {
 		return $self->getParent;
 	}
 }
@@ -910,6 +776,203 @@ sub getDefault {
 	my $session = shift;
 	return $class->newByDynamicClass($session, $session->setting->get("defaultPage"));
 }
+
+
+#-------------------------------------------------------------------
+
+=head2 getEditForm ()
+
+Creates and returns a tabform to edit parameters of an Asset. See L<getEditTabs> for
+adding additional tabs.
+
+=cut
+
+sub getEditForm {
+	my $self = shift;
+	my $i18n = WebGUI::International->new($self->session, "Asset");
+	my $ago = $i18n->get("ago");
+	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl());
+	my $overrides = $self->session->config->get("assets/".$self->get("className"));
+
+    # Set the appropriate URL
+    # If we're adding a new asset, don't set anything
+    if ( $self->session->form->get( "func" ) ne "add" ) {
+        $tabform->formHeader( { action => $self->getUrl, method => "POST" } );
+    }
+
+	if ($self->session->config->get("enableSaveAndCommit")) {
+		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
+            name    => "saveAndCommit", 
+            value   => $i18n->get("save and commit"),
+            }));
+	}
+	$tabform->hidden({
+		name=>"func",
+		value=>"editSave"
+		});
+	if ($self->getId eq "new") {
+		$tabform->hidden({
+			name=>"assetId",
+			value=>"new"
+			});
+		$tabform->hidden({
+			name=>"class",
+			value=>$self->session->form->process("class","className")
+			});
+	}
+	else {
+		# revision history
+		my $ac = $self->getAdminConsole;
+		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
+		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
+		while (my ($version) = $rs->array) {
+			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
+			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
+		}
+	}
+	if ($self->session->form->process("proceed")) {
+		$tabform->hidden({
+			name=>"proceed",
+			value=>$self->session->form->process("proceed")
+			});
+	}
+	
+	# create tabs
+	tie my %tabs, 'Tie::IxHash';
+	foreach my $tabspec ($self->getEditTabs) {
+		$tabs{$tabspec->[0]} = {
+			label	=> $tabspec->[1],
+			uiLevel	=> $tabspec->[2],
+			};
+	}
+	foreach my $tab (keys %{$overrides->{tabs}}) {
+		foreach my $key (keys %{$overrides->{tabs}{$tab}}) {
+			$tabs{$tab}{$key} = $overrides->{tabs}{$tab}{$key};
+		}
+	}
+	foreach my $tab (keys %tabs) {
+		$tabform->addTab($tab, $tabs{$tab}{label}, $tabs{$tab}{uiLevel});
+	}
+
+	# process errors
+	my $errors = $self->session->stow->get('editFormErrors');
+	if ($errors) {
+		$tabform->getTab("properties")->readOnly(
+			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
+		);
+	}
+
+	# build the definition to the generate form
+	my @definitions = reverse @{$self->definition($self->session)};
+	tie my %baseProperties, 'Tie::IxHash';
+	%baseProperties = (
+		assetId	=> {
+			fieldType	=> "readOnly",
+			label		=> $i18n->get("asset id"),
+			value		=> $self->get("assetId"),
+			hoverHelp	=> $i18n->get('asset id description'),
+			tab			=> "properties",
+		},
+		keywords => {
+			label       => $i18n->get('keywords'),
+			hoverHelp   => $i18n->get('keywords help'),
+			value       => $self->get('keywords'),
+			fieldType	=> 'text',
+			tab			=> 'meta',
+		}
+	);
+	unshift @definitions, {
+		autoGenerateForms	=> 1,
+		properties			=> \%baseProperties
+		};
+
+	# extend the definition with metadata
+	tie my %extendedProperties, 'Tie::IxHash';
+    if ($self->session->setting->get("metaDataEnabled")) {
+		my $meta = $self->getMetaDataFields();
+		foreach my $field (keys %$meta) {
+			my $fieldType = $meta->{$field}{fieldType} || "text";
+			my $options = $meta->{$field}{possibleValues};
+			# Add a "Select..." option on top of a select list to prevent from
+			# saving the value on top of the list when no choice is made.
+			if("\l$fieldType" eq "selectBox") {
+				$options = "|" . $i18n->get("Select") . "\n" . $options;
+			}
+			$extendedProperties{"metadata_".$meta->{$field}{fieldId}} = {
+				tab				=> "meta",
+				label        	=> $meta->{$field}{fieldName},
+				uiLevel      	=> 5,
+				value        	=> $meta->{$field}{value},
+				extras       	=> qq/title="$meta->{$field}{description}"/,
+				options      	=> $options,
+				defaultValue 	=> $meta->{$field}{defaultValue},
+				fieldType		=> $fieldType
+			};
+		}
+		# add metadata management
+		if ($self->session->user->isAdmin) {
+			$extendedProperties{_metadatamanagement} = {
+				tab			=> "meta",
+				fieldType	=> "readOnly",
+				value		=> '<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.$i18n->get('Add new field').'</a></p>',
+				hoverHelp	=> $i18n->get('Add new field description'),
+			};
+		}
+    }
+	push @definitions, {
+		autoGenerateForms	=> 1,
+		properties			=> \%extendedProperties
+		};
+	
+	# generate the form	
+	foreach my $definition (@definitions) {
+		my $properties = $definition->{properties};
+		
+		# depricated...by WebGUI 8 they all must autogen forms
+		next unless ($definition->{autoGenerateForms});
+
+		foreach my $fieldName (keys %{$properties}) {
+			my %fieldHash = %{$properties->{$fieldName}};
+			my %params = (name => $fieldName, value => $self->getValue($fieldName));
+			next if exists $fieldHash{autoGenerate} and not $fieldHash{autoGenerate};
+
+			# apply config file changes
+			foreach my $key (keys %{$overrides->{fields}{$fieldName}}) {
+				$fieldHash{$key} = $overrides->{fields}{$fieldName}{$key};
+			}
+
+			# Kludge.
+			if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
+				$params{value} = [$params{value}];
+			}
+
+			if (exists $fieldHash{visible} and not $fieldHash{visible}) {
+				$params{fieldType} = 'hidden';
+			}
+			else {
+				%params = (%params, %fieldHash);
+				delete $params{tab};
+			}
+
+			# if there isnt a tab specified lets define one
+			my $tab = $fieldHash{tab} || "properties";
+
+            # use a custom draw method
+            my $drawMethod = $properties->{$fieldName}{customDrawMethod};
+            if ($drawMethod) {
+                $params{value} = $self->$drawMethod(\%params);
+                $params{fieldType} = "readOnly";
+            }
+
+            #draw the field
+		    $tabform->getTab($tab)->dynamicField(%params);
+		}
+	}
+
+	# send back the rendered form
+	return $tabform;
+}
+
 
 #-------------------------------------------------------------------
 
@@ -950,160 +1013,12 @@ Please see the example below for adding 1 tab.
 
 sub getEditTabs {
 	my $self = shift;
-	return ();
-}
-
-#-------------------------------------------------------------------
-
-=head2 getEditForm ()
-
-Creates and returns a tabform to edit parameters of an Asset. See L<getEditTabs> for
-adding additional tabs.
-
-=cut
-
-sub getEditForm {
-	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, "Asset");
-	my $ago = $i18n->get("ago");
-	my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
-	my $uiLevelOverride = $self->get("className");
-	$uiLevelOverride =~ s/\:\:/_/g;
-	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl(),$uiLevelOverride);
-	if ($self->session->config->get("enableSaveAndCommit")) {
-		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
-            name    => "saveAndCommit", 
-            value   => $i18n->get("save and commit"),
-            }));
-	}
-	$tabform->hidden({
-		name=>"func",
-		value=>"editSave"
-		});
-	if ($self->getId eq "new") {
-		$tabform->hidden({
-			name=>"assetId",
-			value=>"new"
-			});
-		$tabform->hidden({
-			name=>"class",
-			value=>$self->session->form->process("class","className")
-			});
-	} else {
-		my $ac = $self->getAdminConsole;
-		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
-		while (my ($version) = $rs->array) {
-			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
-			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
-		}
-	}
-	if ($self->session->form->process("proceed")) {
-		$tabform->hidden({
-			name=>"proceed",
-			value=>$self->session->form->process("proceed")
-			});
-	}
-	# create tabs
-	$tabform->addTab("properties",$i18n->get("properties"));
-	$tabform->addTab("display",$i18n->get(105),5);
-	$tabform->addTab("security",$i18n->get(107),6);
-	$tabform->addTab("meta",$i18n->get("Metadata"),3);
-	# process errors
-	my $errors = $self->session->stow->get('editFormErrors');
-	if ($errors) {
-		$tabform->getTab("properties")->readOnly(
-			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
-		)
-	}
-	$tabform->getTab("properties")->readOnly(
-		-label=>$i18n->get("asset id"),
-		-value=>$self->get("assetId"),
-		-hoverHelp=>$i18n->get('asset id description'),
-		);
-
-	foreach my $tabspec ($self->getEditTabs) {
-		$tabform->addTab(@$tabspec);
-	}
-
-	foreach my $definition (reverse @{$self->definition($self->session)}) {
-		my $properties = $definition->{properties};
-		next unless ($definition->{autoGenerateForms});
-
-		foreach my $fieldName (keys %{$properties}) {
-			my %fieldHash = %{$properties->{$fieldName}};
-			my %params = (name => $fieldName,
-				      value => $self->getValue($fieldName));
-			next if exists $fieldHash{autoGenerate} and not $fieldHash{autoGenerate};
-
-			# Kludge.
-			if (isIn($fieldHash{fieldType}, 'selectBox', 'workflow') and ref $params{value} ne 'ARRAY') {
-				$params{value} = [$params{value}];
-			}
-
-			if (exists $fieldHash{visible} and not $fieldHash{visible}) {
-				$params{fieldType} = 'hidden';
-			} else {
-				%params = (%params, %fieldHash);
-				delete $params{tab};
-			}
-
-			my $tab = $fieldHash{tab} || "properties";
-
-            # use a custom draw method
-            my $drawMethod = $properties->{$fieldName}{customDrawMethod};
-            if ($drawMethod) {
-                $params{value} = $self->$drawMethod(\%params);
-                $params{fieldType} = "readOnly";
-            }
-
-            #draw the field
-		    $tabform->getTab($tab)->dynamicField(%params);
-		}
-	}
-
-    # display keywords field
-    $tabform->getTab('meta')->text(
-        name        => 'keywords',
-        label       => $i18n->get('keywords'),
-        hoverHelp   => $i18n->get('keywords help'),
-        value       => $self->get('keywords'),
-        );
-
-    # metadata / content profiling
-    if ($self->session->setting->get("metaDataEnabled")) {
-                my $meta = $self->getMetaDataFields();
-                foreach my $field (keys %$meta) {
-                        my $fieldType = $meta->{$field}{fieldType} || "text";
-                        my $options = $meta->{$field}{possibleValues};
-                        # Add a "Select..." option on top of a select list to prevent from
-                        # saving the value on top of the list when no choice is made.
-                        if("\l$fieldType" eq "selectBox") {
-                            $options = "|" . $i18n->get("Select") . "\n" . $options;
-                        }
-                        $tabform->getTab("meta")->dynamicField(
-                                                name         => "metadata_".$meta->{$field}{fieldId},
-                                                label        => $meta->{$field}{fieldName},
-                                                uiLevel      => 5,
-                                                value        => $meta->{$field}{value},
-                                                extras       => qq/title="$meta->{$field}{description}"/,
-                                                options      => $options,
-                                                defaultValue => $meta->{$field}{defaultValue},
-						fieldType=>$fieldType
-                                );
-                }
-		if ($self->session->user->isInGroup(3)) {
-                	# Add a quick link to add field
-                	$tabform->getTab("meta")->readOnly(
-                                        -value=>'<p><a href="'.$self->session->url->page("func=editMetaDataField;fid=new").'">'.
-                                                        $i18n->get('Add new field').
-                                                        '</a></p>',
-                                        -hoverHelp=>$i18n->get('Add new field description'),
-                	);
-		}
-        }
-	return $tabform;
+	return (["properties", $i18n->get("properties"), 1],
+		["display", $i18n->get(105), 5],
+		["security", $i18n->get(107), 6],
+		["meta", $i18n->get("Metadata"), 3]);
 }
-
 
 
 #-------------------------------------------------------------------
@@ -1195,9 +1110,14 @@ while (my $product = $productIterator->()) {
 sub getIsa {
     my $class    = shift;
     my $session  = shift;
+    my $offset   = shift;
     my $def = $class->definition($session);
     my $tableName = $def->[0]->{tableName};
-    my $sth = $session->db->read("select distinct(assetId) from $tableName");
+    my $sql = "select distinct(assetId) from $tableName";
+    if (defined $offset) {
+        $sql .= ' LIMIT '. $offset . ',1234567890';
+    }
+    my $sth = $session->db->read($sql);
     return sub {
         my ($assetId) = $sth->array;
         if (!$assetId) {
@@ -1470,13 +1390,12 @@ Returns the UI Level specified in the asset definition or from the config file i
 
 sub getUiLevel {
 	my $self = shift;
-	my $definition = $self->get("className")->definition($self->session);
-	my $uiLevel = $self->session->config->get("assetUiLevel");
-	if ($uiLevel && ref $uiLevel eq 'HASH') {
-		return $uiLevel->{$definition->[0]{className}} || $definition->[0]{uiLevel} || 1 ;
-	} else {
-		return $definition->[0]{uiLevel} || 1 ;
-	}
+	my $uiLevel = shift;
+	my $className = $self->get("className");
+	return $uiLevel														# passed in
+		|| $self->session->config->get("assets/".$className."/uiLevel")	# from config
+		|| $self->definition($self->session)->[0]{uiLevel}				# from definition
+		|| 1;															# if all else fails
 }
 
 
@@ -2046,21 +1965,32 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	my %data;
     my $form = $self->session->form;
+	my $overrides = $self->session->config->get("assets/".$self->get("className")."/fields");
+
 	foreach my $definition (@{$self->definition($self->session)}) {
 		foreach my $property (keys %{$definition->{properties}}) {
-			if ($definition->{properties}{$property}{noFormPost}) {
+			my %params = %{$definition->{properties}{$property}};
+
+			# apply config file changes
+			foreach my $key (keys %{$overrides->{$property}}) {
+				$params{$key} = $overrides->{$property}{$key};
+			}
+			
+			# deal with properties that can't be posted through the form
+			if ($params{noFormPost}) {
 				if ($form->process("assetId") eq "new" && $self->get($property) eq "") {
-					$data{$property} = $definition->{properties}{$property}{defaultValue};
+					$data{$property} = $params{defaultValue};
 				}
 				next;
 			}
-			my %params = %{$definition->{properties}{$property}};
+			
+			# process the form element
 			$params{name} = $property;
 			$params{value} = $self->get($property);
 			$data{$property} = $form->process(
 				$property,
-				$definition->{properties}{$property}{fieldType},
-				$definition->{properties}{$property}{defaultValue},
+				$params{fieldType},
+				$params{defaultValue},
 				\%params
 				);
 		}
@@ -2102,10 +2032,10 @@ Instead of passing in a templateId, you may pass in a template object.
 =cut
 
 sub processTemplate {
-	my $self = shift;
-	my $var = shift;
-	my $templateId = shift;
-	my $template = shift;
+    my $self = shift;
+    my $var = shift;
+    my $templateId = shift;
+    my $template = shift;
 
     # Sanity checks
     if (ref $var ne "HASH") {
@@ -2113,19 +2043,23 @@ sub processTemplate {
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
 
-	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
-	if (defined $template) {
+    $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-		$var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
-                my %vars = (
-			%{$self->{_properties}},
-			%{$var}
-			);
-		return $template->process(\%vars);
-	} else {
-		$self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
-		return "Error: Can't instantiate template ".$templateId;
-	}
+        $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
+        my %vars = (
+            %{$self->{_properties}},
+            'title'     => $self->getTitle,
+            'menuTitle' => $self->getMenuTitle,
+            %{$var},
+        );
+        return $template->process(\%vars);
+    }
+    else {
+        $self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
+        my $i18n = WebGUI::International->new($self->session, 'Asset');
+        return $i18n->get('Error: Cannot instantiate template').' '.$templateId;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -2282,7 +2216,7 @@ to set the keywords for this asset.
 sub update {
 	my $self = shift;
 	my $properties = shift;
-
+	
     # if keywords were specified, then let's set them the right way
     if (exists $properties->{keywords}) {
         WebGUI::Keyword->new($self->session)->setKeywordsForAsset(
@@ -2323,7 +2257,6 @@ sub update {
 				$self->session->log->error("update() tried to set field named '".$property."' which doesn't exist in table '".$definition->{tableName}."'");
                 next;
             }
-
 
             # use the update value
 			my $value = $properties->{$property};
@@ -2418,7 +2351,7 @@ The default view method for any asset that doesn't define one. Under all normal 
 
 sub view {
 	my $self = shift;
-	if ($self->session->var->get("adminOn")) {
+	if ($self->session->var->isAdminOn) {
 		return $self->getToolbar.' '.$self->getTitle;
 	} else {
 		return "";
@@ -2455,9 +2388,6 @@ sub www_add {
 		parentId => $self->getId,
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
-		fluxEnabled => $self->get("fluxEnabled"),
-		fluxRuleIdView => $self->get("fluxEnabled"),
-		fluxRuleIdEdit => $self->get("fluxEnabled"),
 		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
 		styleTemplateId => $self->get("styleTemplateId"),
@@ -2467,7 +2397,7 @@ sub www_add {
 		assetId=>"new",
 		url=>$self->session->form->param("url")
 		);
-	$properties{isHidden} = 1 unless (WebGUI::Utility::isIn($class, @{$self->session->config->get("assetContainers")}));
+	$properties{isHidden} = 1 unless $self->session->config->get("assets/".$class."/isContainer");
 	my $newAsset = WebGUI::Asset->newByPropertyHashRef($self->session,\%properties);
 	$newAsset->{_parent} = $self;
 	return $newAsset->www_edit();

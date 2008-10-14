@@ -30,6 +30,7 @@ our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL
 use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
+use Cwd        qw[];
 use Test::MockObject::Extends;
 use WebGUI::PseudoRequest;
 use Scalar::Util qw( blessed );
@@ -87,6 +88,7 @@ BEGIN {
     $CONFIG_FILE = ( File::Spec->splitpath( $WEBGUI_ROOT ) )[2];
     $WEBGUI_ROOT = substr( $WEBGUI_ROOT, 0, index( $WEBGUI_ROOT, File::Spec->catdir( 'etc', $CONFIG_FILE ) ) );
     $WEBGUI_ROOT = File::Spec->canonpath($WEBGUI_ROOT);
+    $WEBGUI_ROOT = Cwd::realpath($WEBGUI_ROOT);
     $WEBGUI_TEST_COLLATERAL = File::Spec->catdir($WEBGUI_ROOT, 't', 'supporting_collateral');
 
     my ($volume,$directories) = File::Spec->splitpath( $WEBGUI_ROOT, 'no_file' );

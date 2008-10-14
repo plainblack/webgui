@@ -8,6 +8,26 @@ our $I18N = {
                 lastUpdated => 0,
         },
 
+        '302 Moved Temporarily' => {
+                message => q|302 Moved Temporarily|,
+                lastUpdated => 0,
+        },
+
+        '301 Moved Permanently' => {
+                message => q|301 Moved Permanently|,
+                lastUpdated => 0,
+        },
+
+        'Redirect Type' => {
+                message => q|Redirect Type|,
+                lastUpdated => 0,
+        },
+
+        'redirect type description' => {
+                message => q|The type of HTTP header that the Redirect asset will send.|,
+                lastUpdated => 0,
+        },
+
         'go to the redirect url' => {
                 message => q|Go to the redirect URL.|,
                 lastUpdated => 0,

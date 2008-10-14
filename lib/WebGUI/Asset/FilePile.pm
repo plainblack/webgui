@@ -91,13 +91,13 @@ sub edit {
        	        );
 	$tabform->addTab("security",$i18n->get(107,"Asset"),6);
 	my $subtext;
-       	if ($self->session->user->isInGroup(3)) {
+       	if ($self->session->user->isAdmin) {
                	 $subtext = $self->session->icon->manage('op=listUsers');
         } else {
        	         $subtext = "";
        	}
        	my $clause;
-       	if ($self->session->user->isInGroup(3)) {
+       	if ($self->session->user->isAdmin) {
        		my $group = WebGUI::Group->new($self->session,4);
                	my $contentManagers = $group->getAllUsers();
                 push (@$contentManagers, $self->session->user->userId);

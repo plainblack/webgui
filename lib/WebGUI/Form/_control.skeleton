@@ -110,4 +110,4 @@ sub toHtml {
 }
 
 1;
-
+#vim:ft=perl

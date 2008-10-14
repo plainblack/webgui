@@ -1095,6 +1095,12 @@ sub www_editFieldSave {
     my $fieldName = $form->process('fieldName');
     my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
     $newName =~ tr{-/}{};
+    if ($fieldName) {
+        my $field = $self->getFieldConfig($fieldName);
+        if ($field->{isMailField}) {
+            $newName = $fieldName;
+        }
+    }
     if (!$fieldName || $fieldName ne $newName) {
         my $i = '';
         while ($self->getFieldConfig($newName . $i)) {
@@ -1219,7 +1225,7 @@ sub www_exportTab {
         my @exportRows;
         my $entries = $self->session->db->read("select * from DataForm_entry where assetId=?", [$self->getId]);
         my @exportFields;
-        for my $field ( map { $self->getFieldConfig($_) } $self->getFieldOrder ) {
+        for my $field ( map { $self->getFieldConfig($_) } @{$self->getFieldOrder} ) {
             next
                 if $field->{isMailField} && !$self->get('mailData');
             push @exportFields, $field->{name};

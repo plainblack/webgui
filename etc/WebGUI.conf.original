@@ -213,6 +213,180 @@
     "htm"    : "/bin/cat"
     },
 
+
+# define what appears in the admin console and who can view it
+
+"adminConsole" : {
+   "loginHistory" : {
+      "icon" : "loginHistory.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewLoginHistory);",
+      "title" : "^International(426,WebGUI);",
+      "groupSetting" : "groupIdAdminLoginHistory"
+   },
+   "clipboard" : {
+      "icon" : "clipboard.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageClipboard);",
+      "title" : "^International(948,WebGUI);"
+   },
+   "statistics" : {
+      "icon" : "statistics.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewStatistics);",
+      "title" : "^International(437,WebGUI);",
+      "groupSetting" : "groupIdAdminStatistics"
+   },
+   "users" : {
+      "icon" : "users.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listUsers);",
+      "title" : "^International(149,WebGUI);",
+      "groupSetting" : "groupIdAdminUser"
+   },
+   "activeSessions" : {
+      "icon" : "activeSessions.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewActiveSessions);",
+      "title" : "^International(425,WebGUI);",
+      "groupSetting" : "groupIdAdminActiveSessions"
+   },
+   "inbox" : {
+      "icon" : "inbox.gif",
+      "group" : "2",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewInbox);",
+      "title" : "^International(159,WebGUI);"
+   },
+   "versions" : {
+      "icon" : "versionTags.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",op=manageVersions);",
+      "title" : "^International(version tags,VersionTag);",
+      "groupSetting" : "groupIdAdminVersionTag"
+   },
+   "help" : {
+      "icon" : "help.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewHelpIndex);",
+      "title" : "^International(help,WebGUI);",
+      "groupSetting" : "groupIdAdminHelp"
+   },
+   "groups" : {
+      "icon" : "groups.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGroups);",
+      "title" : "^International(89,WebGUI);",
+      "groupSetting" : "groupIdAdminGroup"
+   },
+   "userProfiling" : {
+      "icon" : "userProfiling.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editProfileSettings);",
+      "title" : "^International(user profiling,WebGUIProfile);",
+      "groupSetting" : "groupIdAdminProfileSettings"
+   },
+   "ldapconnections" : {
+      "icon" : "ldap.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listLDAPLinks);",
+      "title" : "^International(ldapconnections,AuthLDAP);",
+      "groupSetting" : "groupIdAdminLDAPLink"
+   },
+   "contentProfiling" : {
+      "icon" : "contentProfiling.gif",
+      "group" : "4",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageMetaData);",
+      "title" : "^International(content profiling,Asset);"
+   },
+   "databases" : {
+      "icon" : "databases.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listDatabaseLinks);",
+      "title" : "^International(databases,WebGUI);",
+      "groupSetting" : "groupIdAdminDatabaseLink"
+   },
+   "adSpace" : {
+      "icon" : "advertising.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageAdSpaces);",
+      "title" : "^International(topicName,AdSpace);",
+      "groupSetting" : "groupIdAdminAdSpace"
+   },
+   "settings" : {
+      "icon" : "settings.gif",
+      "group" : "3",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editSettings);",
+      "title" : "^International(settings,WebGUI);"
+   },
+   "workflow" : {
+      "icon" : "workflow.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",manageWorkflows);",
+      "title" : "^International(topicName,Workflow);",
+      "groupSetting" : "groupIdAdminWorkflow"
+   },
+   "assets" : {
+      "icon" : "assets.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=assetManager);",
+      "title" : "^International(assets,Asset);"
+   },
+   "graphics" : {
+      "icon" : "graphics.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGraphicsOptions);",
+      "title" : "^International(manage graphics,Graphics);",
+      "groupSetting" : "groupIdAdminGraphics"
+   },
+   "shop" : {
+      "icon" : "shop.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",shop=admin);",
+      "title" : "^International(shop,Shop);",
+      "groupSetting" : "groupIdAdminCommerce"
+   },
+   "trash" : {
+      "icon" : "trash.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageTrash);",
+      "title" : "^International(trash,WebGUI);"
+   },
+   "cron" : {
+      "icon" : "cron.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=manageCron);",
+      "title" : "^International(topicName,Workflow_Cron);",
+      "groupSetting" : "groupIdAdminCron"
+   },
+   "spectre" : {
+      "icon" : "spectre.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=spectreStatus);",
+      "title" : "^International(spectre,Spectre);",
+      "groupSetting" : "groupIdAdminSpectre"
+   },
+   "contentFilters" : {
+      "icon" : "contentFilters.gif",
+      "uiLevel" : 3,
+      "url" : "^PageUrl(\"\",op=listReplacements);",
+      "title" : "^International(content filters,WebGUI);",
+      "groupSetting" : "groupIdAdminReplacements"
+   },
+   "cache" : {
+      "icon" : "cache.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageCache);",
+      "title" : "^International(manage cache,WebGUI);",
+      "groupSetting" : "groupIdAdminCache"
+   }
+},
+
 # Enter the maximum number of assets that should be allowed to
 # be created on this site. Keep in mind that a base install of
 # WebGUI has around 300 assets. Enter zero (0) if you want to
@@ -220,78 +394,221 @@
 
 "maximumAssets" : 0,
 
+# Specify the list of categories to display in the "New Content"
+# menu. The category names should match those used in the "assets"
+# hash later in this config. Each category can have three properties:
+#
+#   title   - The human readable name of the category.
+#   uiLevel - The minimum UI level the user must have to see the category.
+#   group   - A group id the user must be in to see the category.
+
+"assetCategories" : {
+   "basic" : {
+      "uiLevel" : 1,
+      "title" : "^International(basic,Macro_AdminBar);"
+   },
+   "shop" : {
+      "uiLevel" : 5,
+      "title" : "^International(shop,Shop);"
+   },
+   "utilities" : {
+      "uiLevel" : 9,
+      "title" : "^International(utilities,Macro_AdminBar);"
+   },
+   "community" : {
+      "uiLevel" : 5,
+      "title" : "^International(community,Macro_AdminBar);"
+   },
+   "intranet" : {
+      "uiLevel" : 5,
+      "title" : "^International(intranet,Macro_AdminBar);"
+   }
+},
+
 # Specify a the list of assets you want to appear in your
-# Add Content menus.
+# "New Content" menu categories. See "assetCategories" for details
+# about categories. Each listing has a key of class name, and then
+# has several properties, which are:
+#
+#   category    - The category the asset should appear in.
+#   isContainer - Whether or not the assets main purpose to display the data from other assets.
+#   addGroup    - The group the user must be in to add this asset.
+#   uiLevel     - The minimum UI level the user must have to add the asset.
+#   fields      - Edit the properties of the asset.
+#   tabs        - Edit the tabs on which the fields are displayed when editing the asset.
+#
+# The "fields" property above may override any property of any field in this
+# asset class. Examples are label, tab, uiLevel. You must know what you're
+# doing with this, because you could break an asset if you set something wrong
+# with these properties. Here's an example of wha the fields poperty might look like:
+#
+#            "fields" : {
+#                "title" : {
+#                    "label" : "Name",
+#                    "tab" : "basic"
+#                },
+#                "synopsis" : {
+#                    "label" : "Abstract",
+#                    "uiLevel" : 3
+#                }
+#            }
+#
+# The "tabs" property allows you to to create new, hide, and update existing tabs in
+# the asset. Each tab has two properties:
+#
+#   uiLevel - The minimum UI level the user must have to view the tab.
+#   label   - The human readable label for the tab.
+#
+# Here's an example of what a tabls section might look like:
+#
+#            "tabs" : {
+#                "basic" : {
+#                    "label" : "Basic",
+#                    "uiLevel" : 1
+#                },
+#                "meta" : {
+#                    "uiLevel" : 99999
+#                },
+#                "security" : {
+#                    "label" : "Protection"
+#                }
+#            }
 
-"assets" : [
-    "WebGUI::Asset::FilePile", 
-    "WebGUI::Asset::File::ZipArchive",
-    "WebGUI::Asset::Redirect", 
-    "WebGUI::Asset::Sku::Donation",
-    "WebGUI::Asset::Sku::FlatDiscount",
-    "WebGUI::Asset::Sku::Product",
-    "WebGUI::Asset::Sku::Subscription",
-    "WebGUI::Asset::Snippet", 
-    "WebGUI::Asset::Wobject::Article", 
-    "WebGUI::Asset::Wobject::Calendar", 
-    "WebGUI::Asset::Wobject::Collaboration", 
-    "WebGUI::Asset::Wobject::DataForm", 
-    "WebGUI::Asset::Wobject::EventManagementSystem",
-    "WebGUI::Asset::Wobject::Gallery",
-    "WebGUI::Asset::Wobject::HttpProxy", 
-    "WebGUI::Asset::Wobject::InOutBoard",
-    "WebGUI::Asset::Wobject::Matrix", 
-    "WebGUI::Asset::Wobject::MultiSearch",
-    "WebGUI::Asset::Wobject::Navigation", 
-    "WebGUI::Asset::Wobject::Poll", 
-    "WebGUI::Asset::Wobject::ProjectManager",
-    "WebGUI::Asset::Wobject::Search",
-    "WebGUI::Asset::Wobject::Shelf", 
-    "WebGUI::Asset::Wobject::SQLReport", 
-    "WebGUI::Asset::Wobject::StockData",
-    "WebGUI::Asset::Wobject::Survey", 
-    "WebGUI::Asset::Wobject::SyndicatedContent",
-    "WebGUI::Asset::Wobject::Thingy",
-    "WebGUI::Asset::Wobject::TimeTracking",
-    "WebGUI::Asset::Wobject::UserList",
-    "WebGUI::Asset::Wobject::WeatherData",
-    "WebGUI::Asset::Wobject::WSClient"
-    ],
-
-# Specify the list assets that are used for utility purposes only
-# and are not typically used as a normal part of content
-# management.
-
-"utilityAssets" : [
-    "WebGUI::Asset::File",
-    "WebGUI::Asset::File::Image",
-    "WebGUI::Asset::RichEdit",
-    "WebGUI::Asset::Template"
-    ],
-
-# Specify the list of assets you want to appear in your add
-# content menus that should act as containers for other content.
-# These items are typically not content themselves, but rather
-# layout mechanisms.
-
-"assetContainers" : [
-    "WebGUI::Asset::Sku::Product", 
-    "WebGUI::Asset::Wobject::Dashboard",
-    "WebGUI::Asset::Wobject::Folder",
-    "WebGUI::Asset::Wobject::Layout",
-    "WebGUI::Asset::Wobject::MessageBoard", 
-    "WebGUI::Asset::Wobject::WikiMaster"
-    ],
-
-# Optionally specify a group id for assets to tell WebGUI what
-# group a user needs to be part of in order to add that type of
-# asset.
-
-# "assetAddPrivilege" : {
-#     "WebGUI::Asset::Template"           : 4
-#     "WebGUI::Asset::Wobject::SQLReport" : 3, 
-#     },
-
+"assets" : {
+   "WebGUI::Asset::Wobject::Shelf" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::Layout" : {
+      "isContainer" : 1,
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Gallery" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::DataForm" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Sku::Donation" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::UserList" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::EventManagementSystem" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Sku::Subscription" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::WikiMaster" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::WSClient" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::StockData" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::FilePile" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Collaboration" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::Survey" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::File::ZipArchive" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::RichEdit" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::SyndicatedContent" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::HttpProxy" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::MultiSearch" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::File::Image" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Sku::Product" : {
+      "isContainer" : 1,
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::WeatherData" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Redirect" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Article" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Search" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::MessageBoard" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::SQLReport" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::TimeTracking" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Calendar" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Poll" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::ProjectManager" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Folder" : {
+      "isContainer" : 1,
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Navigation" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Matrix" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Sku::FlatDiscount" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::Thingy" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::File" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Collaboration::Newsletter" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Snippet" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::InOutBoard" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Dashboard" : {
+      "isContainer" : 1,
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Template" : {
+      "category" : "utilities"
+   }
+},
+   
 # Optionally add a "Save and Commit" button to assets so that you
 # don't have to hit "Commit My Changes" seperately.
 
@@ -300,11 +617,6 @@
 # Optionally override the default UI Level of any asset. This
 # determines whether the current user has the appropriate UI Level
 # to add assets of that type.
-
-# "assetUiLevel" : {
-#    "WebGUI::Asset::RichEdit"          : 4
-#    "WebGUI::Asset::Wobject::WSClient" : 7,
-#    },
 
 # Configure the UI Levels of the asset toolbar links.
 
@@ -325,26 +637,11 @@
     "export"     : 9
     },
 
-# You can override the UI Levels of any field in the edit form of
-# any asset using the following variables. Basically just take the
-# class name of the asset separated by underscores, and append
-# _uiLevel to the end of it, then you can start specifying field
-# names and associated UI Level.
-
-# "WebGUI_Asset_Wobject_Article_uiLevel" : { "menuTitle" : 9, "url" : 8 },
-# "WebGUI_Asset_RichEdit_uiLevel" : { "askAboutRichEdit" : 7, "preformatted" : 3 },
-
 # If exportPath is defined, an "Export" toolbar icon will appear
 # which allows you to export assets to static HTML. This folder
 # needs to be writable by your web server.
 
 # "exportPath" : "/path/to/export",
-
-# If soapHttpHeaderOverride is set to 1 it will enable Web 
-# Service Client assets to override the default MIME types of 
-# SOAP/WDSL content
-
-"soapHttpHeaderOverride" : 0,
 
 # Enable streaming Image and File assets thru mod_perl process instead of 
 # simple redirect. WARNING has impact on performance.

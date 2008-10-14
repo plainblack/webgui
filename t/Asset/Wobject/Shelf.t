@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 41;
+my $tests = 51;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -44,13 +44,13 @@ my $loaded = use_ok($class);
 
 my $storage;
 my ($e, $failure);
-my $shelf;
+my ($shelf, $shelf2);
 
 SKIP: {
 
     skip "Unable to load module $class", $tests unless $loaded;
 
-    my $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+    $shelf = WebGUI::Asset->getRoot($session)->addChild({className => $class});
 
     #######################################################################
     #
@@ -100,6 +100,7 @@ SKIP: {
 
     }
 
+    $failure=0;
     eval {
         $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/missingHeaders.csv'),
@@ -117,6 +118,7 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
+    $failure=0;
     eval {
         $failure = $shelf->importProducts(
             WebGUI::Test->getTestCollateralPath('productTables/badHeaders.csv'),
@@ -134,7 +136,8 @@ SKIP: {
         'importProducts: error handling for a file with a missing header',
     );
 
-    my $pass = $shelf->importProducts(
+    my $pass=0;
+    $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/goodProductTable.csv'),
     );
     ok($pass, 'Products imported');
@@ -150,7 +153,7 @@ SKIP: {
         $sodaCollateral,
         [
             {
-                sku       => 'soda-sweet',
+                varSku    => 'soda-sweet',
                 shortdesc => 'Sweet Soda',
                 price     => 0.95,
                 weight    => 0.95,
@@ -169,7 +172,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -177,7 +180,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -201,9 +204,9 @@ SKIP: {
     my $productData = $productsOut->getFileContentsAsScalar($productsOut->getFiles->[0]);
     my @productData = split /\n/, $productData;
     is(scalar @productData, 4, 'productData should have 4 entries, 1 header + 3 data');
-    is($productData[0], 'mastersku,title,sku,shortdescription,price,weight,quantity', 'header line is okay');
+    is($productData[0], 'mastersku,title,varSku,shortdescription,price,weight,quantity', 'header line is okay');
     @productData = map { [ WebGUI::Text::splitCSV($_) ] } @productData[1..3];
-    my ($sodas, $shirts);
+    my ($sodas, $shirts) = ([], []);
     foreach my $productData (@productData) {
         if ($productData->[0] eq 'soda') {
             push @{ $sodas }, $productData;
@@ -228,6 +231,7 @@ SKIP: {
     #
     #######################################################################
 
+    $pass=0;
     $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/secondProductTable.csv'),
     );
@@ -242,7 +246,7 @@ SKIP: {
         $sodaCollateral,
         [
             {
-                sku       => 'soda-sweet',
+                varSku    => 'soda-sweet',
                 shortdesc => 'Sweet Soda',
                 price     => '1.00',
                 weight    => 0.85,
@@ -259,7 +263,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -267,7 +271,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -285,7 +289,7 @@ SKIP: {
         $recordCollateral,
         [
             {
-                sku       => 'track-16',
+                varSku    => 'track-16',
                 shortdesc => 'Track 16',
                 price     => '3.25',
                 weight    => '0.00',
@@ -302,6 +306,7 @@ SKIP: {
     #
     #######################################################################
 
+    $pass=0;
     $pass = $shelf->importProducts(
         WebGUI::Test->getTestCollateralPath('productTables/thirdProductTable.csv'),
     );
@@ -318,7 +323,7 @@ SKIP: {
         $shirtCollateral,
         [
             {
-                sku       => 'red-t-shirt',
+                varSku    => 'red-t-shirt',
                 shortdesc => 'Red T-Shirt',
                 price     => '5.00',
                 weight    => '1.33',
@@ -326,7 +331,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'blue-t-shirt',
+                varSku    => 'blue-t-shirt',
                 shortdesc => 'Blue T-Shirt',
                 price     => '5.25',
                 weight    => '1.33',
@@ -343,7 +348,7 @@ SKIP: {
         $recordCollateral,
         [
             {
-                sku       => 'track-16',
+                varSku    => 'track-16',
                 shortdesc => 'Track 16',
                 price     => '3.25',
                 weight    => '0.00',
@@ -351,7 +356,7 @@ SKIP: {
                 variantId => ignore(),
             },
             {
-                sku       => 'track-9',
+                varSku    => 'track-9',
                 shortdesc => 'Track 9',
                 price     => '3.25',
                 weight    => '0.00',
@@ -362,6 +367,77 @@ SKIP: {
         'collateral added correctly for classical record'
     );
 
+    $shelf->purge;
+    undef $shelf;
+
+    $record = WebGUI::Asset::Sku->newBySku($session, 'classical-records-1');
+    is($record, undef, 'deleting a shelf deletes all products beneath it');
+
+    #######################################################################
+    #
+    # import, quoted headers and fields
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/quotedTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with quoted fields');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file with quoted fields');
+    is($shelf2->getChildCount, 3, 'imported 3 children skus for shelf2 with quoted fields');
+
+    $shelf2->purge;
+    undef $shelf2;
+
+    #######################################################################
+    #
+    # import, windows line endings
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/windowsTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with windows style newlines');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file with quoted fields');
+    is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with windows line endings fields');
+
+    $shelf2->purge;
+    undef $shelf2;
+
+    #######################################################################
+    #
+    # import, old sku column header
+    #
+    #######################################################################
+
+    $shelf2 = WebGUI::Asset->getRoot($session)->addChild({className => $class});
+
+    $pass = 0;
+    eval {
+        $pass = $shelf2->importProducts(
+            WebGUI::Test->getTestCollateralPath('productTables/windowsTable.csv'),
+        );
+    };
+    ok($pass, 'Able to load a table with old style, sku instead of varSku');
+    $e = Exception::Class->caught();
+    is($e, '', 'No exception thrown on a file old headers');
+    is($shelf2->getChildCount, 2, 'imported 2 children skus for shelf2 with old headers');
+
+    $shelf2->purge;
+    undef $shelf2;
 
 }
 
@@ -370,5 +446,8 @@ SKIP: {
 END {
     if (defined $shelf and ref $shelf eq $class) {
         $shelf->purge;
+    }
+    if (defined $shelf2 and ref $shelf2 eq $class) {
+        $shelf2->purge;
     }
 }

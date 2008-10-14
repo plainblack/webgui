@@ -13,8 +13,8 @@ package WebGUI::Macro::AdminBar;
 use strict qw(refs vars);
 use WebGUI::AdminConsole;
 use WebGUI::Asset;
-use WebGUI::Asset::Template;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::Utility;
 use WebGUI::VersionTag;
 
@@ -26,137 +26,163 @@ Package WebGUI::Macro::AdminBar
 
 Macro for displaying administrative functions to a user with Admin turned on.
 
-=head2 process ( [templateId ] )
+=head2 process ( )
 
 process takes one optional parameters for customizing the layout of the Admin bar.
 
-=head3 templateId
-
-The ID for a template to use for formatting the link.  The default template creates the sliding Admin bar to the left of the screen.
-
 =cut
 
-#-------------------------------------------------------------------
+
 sub process {
 	my $session = shift;
-	return "" unless ($session->var->isAdminOn);
-    $session->style->setScript($session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>"text/javascript"});
-    $session->style->setScript($session->url->extras('yui/build/animation/animation-min.js'), {type=>"text/javascript"});
-	my @param = @_;
-        my $templateId = $param[0] || "PBtmpl0000000000000090";
+	return undef unless $session->var->isAdminOn;
 	my $i18n = WebGUI::International->new($session,'Macro_AdminBar');
-	my @adminbar = ();
-   	my $ac = WebGUI::AdminConsole->new($session);
-	my @adminConsole = ();
+	my ($url, $style, $asset, $user, $config) = $session->quick(qw(url style asset user config));
+	$style->setScript($url->extras('yui/build/utilities/utilities.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('accordion/accordion.js'), {type=>'text/javascript'});
+	$style->setLink($url->extras('macro/AdminBar/slidePanel.css'), {type=>'text/css', rel=>'stylesheet'});
+
+	my $out = q{<dl class="accordion-menu">};
+
+	# admin console
+	my $ac = WebGUI::AdminConsole->new($session);
+    $out .= q{<dt class="a-m-t">}.$i18n->get("admin console","AdminConsole").q{</dt><dd class="a-m-d"><div class="bd">};
 	foreach my $item (@{$ac->getAdminFunction}) {
-		push(@adminConsole, {
-			title=>$item->{title},
-			icon=>$item->{'icon.small'},
-			url=>$item->{url}
-			}) if ($item->{canUse});
+		next unless $item->{canUse};
+		$out .= q{<a class="link" href="}.$item->{url}.q{">}
+			.q{<img src="}.$item->{'icon.small'}.q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
+			.$item->{title}.q{</a>};
 	}
-	push(@adminbar, {
-		label => $i18n->get("admin console","AdminConsole"),
-		name => "adminConsole",
-		items => \@adminConsole
-		});
-	if ($session->asset) {
-		my @clipboard = ();
-		foreach my $asset (@{$session->asset->getAssetsInClipboard(1)}) {
-			my $title = $asset->getTitle;
-			$title =~ s/'//g; # stops it from breaking the javascript menus
-			push(@clipboard, {
-				'title'=>$title,
-				'url'=>$session->asset->getUrl("func=paste;assetId=".$asset->getId),
-				icon=>$asset->getIcon(1),
-				});
+	$out .= qq{</div></dd>\n};
+
+	# version tags
+	my $versionTags = WebGUI::VersionTag->getOpenTags($session);
+	if (scalar(@$versionTags)) {
+		$out .= q{<dt class="a-m-t">}.$i18n->get("version tags","VersionTag").q{</dt><dd class="a-m-d"><div class="bd">};
+		my $working = WebGUI::VersionTag->getWorking($session, 1);
+		my $workingId = "";
+		if ($working) {
+			$workingId = $working->getId;
+			my $commitUrl = "";
+			if ($session->setting->get("skipCommitComments")) {
+				$commitUrl = $url->page("op=commitVersionTagConfirm;tagId=".$workingId);
+			}
+			else {
+				$commitUrl = $url->page("op=commitVersionTag;tagId=".$workingId);
+			}
+			$out .= q{<a class="link" href="}.$commitUrl.q{">}
+				.q{<img src="}.$url->extras('adminConsole/small/versionTags.gif').q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
+				.$i18n->get("commit my changes").q{</a>};
 		}
-		if (scalar(@clipboard)) {
-			push(@adminbar, {
-				label => $i18n->get(1082),
-				name => "clipboard",
-				items => \@clipboard
-				});
+		foreach my $tag (@{$versionTags}) {
+			next unless $user->isInGroup($tag->get("groupToUse"));
+			my $switchUrl = $url->page("op=" . ($tag->getId eq $workingId ? "editVersionTag" : "setWorkingVersionTag") . ";backToSite=1;tagId=".$tag->getId);
+			my $title = ($tag->getId eq $workingId) ?  '<span style="color: #000080;">* '.$tag->get("name").'</span>' : $tag->get("name");
+			$out .= q{<a class="link" href="}.$switchUrl.q{">}.$title.q{</a>};
 		}
-		my @packages = ();
+		$out .= qq{</div></dd>\n};
+	}
+
+	
+	# stuff to do if we're on a page with an asset
+	if ($asset) {
+		
+		# clipboard
+		my $clipboardItems = $session->asset->getAssetsInClipboard(1);
+		if (scalar (@$clipboardItems)) {
+			$out .= q{<dt class="a-m-t">}.$i18n->get("1082").q{</dt><dd class="a-m-d"><div class="bd">};
+			foreach my $item (@{$clipboardItems}) {
+				my $title = $asset->getTitle;
+				$out .= q{<a class="link" href="}.$asset->getUrl("func=paste;assetId=".$item->getId).q{">}
+					.q{<img src="}.$item->getIcon(1).q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
+					.$item->getTitle.q{</a>};
+			}
+			$out .= qq{</div></dd>\n};
+		}
+
+		### new content menu
+
+		# determine new content categories
+		my %rawCategories = %{$config->get('assetCategories')};
+		my %categories;
+		my %categoryTitles;
+		my $userUiLevel = $user->profileField('uiLevel');
+		foreach my $category (keys %rawCategories) {
+			next if $rawCategories{$category}{uiLevel} > $userUiLevel;
+			next if (exists $rawCategories{$category}{group} && !$user->isInGroup($rawCategories{$category}{group}));
+			my $title = $rawCategories{$category}{title};
+			WebGUI::Macro::process($session, \$title);
+			$categories{$category}{title} = $title;
+			$categoryTitles{$title} = $category;
+		}
+
+		# assets
+		my %assetList = %{$config->get('assets')};
+		foreach my $assetClass (keys %assetList) {
+			my $dummy = WebGUI::Asset->newByPropertyHashRef($session,{dummy=>1, className=>$assetClass});
+			next if $dummy->getUiLevel($assetList{$assetClass}{uiLevel}) > $userUiLevel;
+			next unless ($dummy->canAdd($session));
+			next unless exists $categories{$assetList{$assetClass}{category}};
+			$categories{$assetList{$assetClass}{category}}{items}{$dummy->getTitle} = {
+				icon	=> $dummy->getIcon(1),
+				url		=> $asset->getUrl("func=add;class=".$dummy->get('className')),
+				};
+		}
+
+		# packages
 		foreach my $package (@{$session->asset->getPackageList}) {
-			my $title = $package->getTitle;
-			$title =~ s/'//g; # stops it from breaking the javascript menus
-                	push(@packages,{
-				'url'=>$session->asset->getUrl("func=deployPackage;assetId=".$package->getId),
-				'title'=>$title,
-				icon=>$package->getIcon(1),
-				});
-        	}
-		if ($session->user->profileField("uiLevel") >= 7 && scalar(@packages)) {
-			push(@adminbar, {
-				label => $i18n->get(376),
-				name => "packages",
-				items => \@packages
-				});
-		}
-	}
-	my $working = WebGUI::VersionTag->getWorking($session, 1);
-	my $workingId = "";
-	my @tags = ();
-	if ($working) {
-		$workingId = $working->getId;
-        my $commitUrl = "";
-        if ($session->setting->get("skipCommitComments")) {
-            $session->url->page("op=commitVersionTagConfirm;tagId=".$workingId);
+			next unless ($package->canView && $package->canAdd($session) && $package->getUiLevel <= $userUiLevel);
+            $categories{packages}{items}{$package->getTitle} = {
+				url		=> $asset->getUrl("func=deployPackage;assetId=".$package->getId),
+				icon	=> $package->getIcon(1),
+				};
         }
-        else {
-            $session->url->page("op=commitVersionTag;tagId=".$workingId);
-        }
-		push(@tags, {
-			url=>$session->url->page("op=commitVersionTag;tagId=".$workingId),
-			title=>$i18n->get("commit my changes"),
-			icon=>$session->url->extras('adminConsole/small/versionTags.gif')
-			});
-	}
-	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {
-		next unless $session->user->isInGroup($tag->get("groupToUse"));
-		push(@tags, {
-			url=>$session->url->page("op=" . ($tag->getId eq $workingId ? "editVersionTag" : "setWorkingVersionTag") . ";backToSite=1;tagId=".$tag->getId),
-			title=>($tag->getId eq $workingId) ?  '<span style="color: #000080;">* '.$tag->get("name").'</span>' : $tag->get("name"),
-			icon=>$session->url->extras('spacer.gif')
-			});
-	}
-	if (scalar(@tags)) {
-		push(@adminbar, {
-			label => $i18n->get("version tags","VersionTag"),
-			name => "versions",
-			items => \@tags
-			});
-	}
-	if ($session->asset) {
-		my @assets = ();
-		foreach my $asset (@{$session->asset->getAssetAdderLinks(undef,"assetContainers")}) {
-			push(@assets, {
-				title=>$asset->{label},
-				icon=>$asset->{'icon.small'},
-				url=>$asset->{url}
-				});
+		if (scalar keys %{$categories{packages}{items}}) {
+			$categories{packages}{title} = $i18n->get('packages');
+			$categoryTitles{$i18n->get('packages')} = "packages";
 		}
-		push(@assets, {icon=>$session->url->extras('spacer.gif'),label=>'<hr />'});
-		foreach my $asset (@{$session->asset->getAssetAdderLinks}) {
-			push(@assets, {
-				title=>$asset->{label},
-				icon=>$asset->{'icon.small'},
-				url=>$asset->{url}
-				});
+		
+		# prototypes
+		my $sth = $session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset
+			left join assetData on asset.assetId=assetData.assetId
+			where assetData.isPrototype=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
+			group by assetData.assetId");
+		while (my ($class, $id, $date) = $sth->array) {
+			my $prototype = WebGUI::Asset->new($session,$id,$class,$date);
+			next unless ($prototype->canView && $prototype->canAdd($session) && $prototype->getUiLevel <= $userUiLevel);
+            $categories{prototypes}{items}{$prototype->getTitle} = {
+				url		=> $asset->getUrl("func=add;class=".$class.";prototype=".$prototype->getId),
+				icon	=> $prototype->getIcon(1),
+				};
 		}
-		push(@adminbar, {
-			label => $i18n->get(1083),
-			name => "newContent",
-			items => \@assets 
-			});
+		if (scalar keys %{$categories{prototypes}{items}}) {
+			$categories{prototypes}{title} = $i18n->get('prototypes');
+			$categoryTitles{$i18n->get('prototypes')} = "prototypes";
+		}
+		
+		# render new content menu
+	    $out .= q{<dt id="newContentMenu" class="a-m-t">}.$i18n->get("1083").q{</dt><dd class="a-m-d"><div class="bd">};
+		foreach my $categoryTitle (sort keys %categoryTitles) {
+			$out .= '<div class="ncmct">'.$categoryTitle.'</div>';
+			my $items = $categories{$categoryTitles{$categoryTitle}}{items};
+			next unless (ref $items eq 'HASH'); # in case the category is empty
+			foreach my $title (sort keys %{$items}) {
+				$out .= q{<a class="link" href="}.$items->{$title}{url}.q{">}
+					.q{<img src="}.$items->{$title}{icon}.q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
+					.$title.q{</a>};
+			}
+			$out .= '<br />';
+		}
+		$out .= qq{</div></dd>\n};
 	}
-	return WebGUI::Asset::Template->new($session,$templateId)->process({adminbar_loop=>\@adminbar});
+	
+	$out .= q{</dl>
+	<script type="text/javascript">
+	    YAHOO.util.Event.on(window, "load", function () { document.body.style.marginLeft = "160px"; });
+		AccordionMenu.openDtById("newContentMenu");
+	</script>};
+	return $out;
 }
-
-
-
 
 1;
 

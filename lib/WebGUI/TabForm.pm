@@ -96,7 +96,7 @@ sub addTab {
 	my $name = shift;
 	my $label = shift;
 	my $uiLevel = shift || 0;
-	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$self->{_uiLevelOverride});
+	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session);
 	$self->{_tab}{$name}{label} = $label;
 	$self->{_tab}{$name}{uiLevel} = $uiLevel;
 	return $self->{_tab}{$name}{form};
@@ -198,11 +198,10 @@ sub new {
 	my $startingTabs = shift;
 	my $css = shift || $session->url->extras('tabs/tabs.css');
 	my $cancelUrl = shift || $session->url->page();
-	my $uiLevelOverride = shift;
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
-		$tabs{$key}{form} = WebGUI::HTMLForm->new($session,uiLevelOverride=>$uiLevelOverride);
+		$tabs{$key}{form} = WebGUI::HTMLForm->new($session);
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
@@ -211,8 +210,7 @@ sub new {
 			value=>$i18n->get('cancel'),
 			extras=>q|onclick="history.go(-1);" class="backwardButton"|
 			});
-	bless {	_session=>$session, _uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel,
-        _submit=>WebGUI::Form::submit($session), 
+	bless {	_session=>$session, _cancel=>$cancel, _submit=>WebGUI::Form::submit($session), 
         _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 

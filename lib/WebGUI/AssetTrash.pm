@@ -318,7 +318,7 @@ sub www_manageTrash {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
-	if ($self->session->form->process("systemTrash") && $self->session->user->isInGroup(3)) {
+	if ($self->session->form->process("systemTrash") && $self->session->user->isAdmin) {
 		$header = $i18n->get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
 	} else {

@@ -235,19 +235,25 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
 	'duplicate' => {
 		message => q|Duplicate|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
-	'copy' => {
+
+	'Copy' => {
 		message => q|Copy|,
-		lastUpdated => 0,
+		lastUpdated => 1221540086,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'copy' => {
+		message => q|copy|,
+		lastUpdated => 1221540088,
+		context => q|Same as Copy, but lower case.|
+	},
+
 	'this asset only' => {
 		message => q|This&nbsp;Asset&nbsp;Only|,
 		lastUpdated => 0,
@@ -1102,6 +1108,24 @@ Couldn't open %-s because %-s <br />
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},
     },
+
+    'Export site root URL' => {
+        message     => q{Export site root URL},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
+    'Error: Cannot instantiate template' => {
+        message     => q{Error: Cannot instantiate template},
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
+    },
+
+    'inherit parent permissions' => {
+        message     => q{Inherit parent's permissions},
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
+    }
 
 };
 

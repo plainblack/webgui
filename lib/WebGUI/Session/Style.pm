@@ -168,8 +168,8 @@ sub process {
 		$templateId = 'PBtmpl0000000000000132';
 	}
 $var{'head.tags'} = '
-<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <script type="text/javascript">
@@ -183,7 +183,7 @@ return props[propName];
 <!--morehead-->
 ';
 
-if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventProxyCache")) {
+if ($self->session->user->isRegistered || $self->session->setting->get("preventProxyCache")) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 	$var{'head.tags'} .= '
 <meta http-equiv="Pragma" content="no-cache" />

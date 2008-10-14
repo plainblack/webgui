@@ -66,6 +66,10 @@ sub cleanSegment {
     my $headers = "";
     if ($html =~ s{(.*)<body\b.*?>}{}is && $preserveStyleScript) {
         my $head = $1;
+        # extract every link tag
+        while ( $head =~ m{(<link\b[^>]+>)}isg ) {
+            $headers .= $1;
+        }
         # extract every script or style tag
         while ($head =~ m{(<(script|style)\b.*?</\2>)}isg) {
             $headers .= $1;
@@ -280,7 +284,7 @@ sub makeAbsolute {
 
 	my $linkParser = sub {
 		my ($tagname, $attr, $text) = @_;
-		my %linkElements =            # from HTML::Element.pm
+		my %linkElements =            # from HTML::Element
 		(
 			body   => 'background',
 			base   => 'href',

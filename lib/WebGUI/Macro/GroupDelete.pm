@@ -46,7 +46,7 @@ sub process {
 	my ($session, $groupName, $text, $template) = @_;
 	return "" if ($groupName eq "");
 	return "" if ($text eq "");
-        return "" if ($session->user->userId eq '1');
+        return "" if ($session->user->isVisitor);
 	my $g = WebGUI::Group->find($session, $groupName);
 	return "" unless defined $g->getId;
 	return "" unless ($g->autoDelete);

@@ -188,7 +188,7 @@ sub execute {
 					my $send = WebGUI::Mail::Send->create($self->session, {
 						to=>$message->{from},
 						inReplyTo=>$message->{messageId},
-						subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+						subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$message->{subject},
 						from=>$cs->get("mailAddress")
 						});
 					$send->addText($i18n->get("rejected because no user account"));

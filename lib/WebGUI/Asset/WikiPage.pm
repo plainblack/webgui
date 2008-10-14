@@ -424,7 +424,7 @@ sub www_view {
 	$self->update({ views => $self->get('views')+1 });
 	# TODO: This should probably exist, as the CS has one.
 #	$self->session->http->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
-#	    if ($self->session->user->userId eq '1');
+#	    if ($self->session->user->isVisitor);
 	$self->session->http->sendHeader;
 	$self->prepareView;
 	return $self->getWiki->processStyle($self->view);

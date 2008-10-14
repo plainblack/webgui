@@ -58,7 +58,7 @@ sub _visitorCacheKey {
 #-------------------------------------------------------------------
 sub _visitorCacheOk {
 	my $self = shift;
-	return ($self->session->user->userId eq '1'
+	return ($self->session->user->isVisitor
 		&& !$self->session->form->process('sortBy'));
 }
 
@@ -308,7 +308,7 @@ sub canSubscribe {
                 ? WebGUI::User->new( $session, $userId )
                 : $self->session->user
                 ;
-    return ($user->userId ne "1" && $self->canView( $userId ) );
+    return ($user->isRegistered && $self->canView( $userId ) );
 }
 
 #-------------------------------------------------------------------
@@ -321,13 +321,8 @@ sub canStartThread {
                 : $self->session->user
                 ;
     return (
-            (
-                    $self->get("status") eq "approved" || 
-                    $self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
-            ) && (
-                    $user->isInGroup($self->get("canStartThreadGroupId")) 
-                    || $self->SUPER::canEdit( $userId )
-            )
+        $user->isInGroup($self->get("canStartThreadGroupId")) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 
@@ -786,6 +781,14 @@ sub definition {
             filter=>'fixId',
             defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
         },
+        postReceivedTemplateId =>{
+            fieldType=>'template',
+            namespace=>'Collaboration',
+            tab=>'display',
+            label=>$i18n->get('post received template'),
+            hoverHelp=>$i18n->get('post received template hoverHelp'),
+            defaultValue=>'default_post_received',
+        },
         );
 
         push(@{$definition}, {
@@ -890,6 +893,7 @@ SQL
 		    'link'          => $postUrl, 
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
+            epochDate       => $post->get('creationDate'),
 		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
 		    attachmentLoop  => $attachmentLoop, 
 			userDefined1 => $post->get("userDefined1"),
@@ -1068,7 +1072,7 @@ sub getViewTemplateVars {
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
+        $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -1384,6 +1388,26 @@ sub view {
 
 #-------------------------------------------------------------------
 
+=head2 www_add ( )
+
+Returns an error message if the collaboration system has not yet been posted.
+
+=cut
+
+sub www_add {
+	my $self    = shift;
+    
+    #Check to see if the asset has been committed
+    unless ( $self->hasBeenCommitted ) {
+        my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
+        return $self->processStyle($i18n->get("asset not committed"));
+    }
+	return $self->SUPER::www_add( @_ );
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 www_editSave ( )
 
 We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
@@ -1485,7 +1509,7 @@ sub www_unsubscribe {
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1" && !$disableCache);
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor && !$disableCache);
 	return $self->SUPER::www_view(@_);
 }
 

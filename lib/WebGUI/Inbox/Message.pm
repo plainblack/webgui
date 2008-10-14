@@ -118,7 +118,7 @@ sub create {
         $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userid = ?",[$properties->{sentBy}]). ".";
 	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
 		if ($msg =~ m/\<.*\>/) {
-			$mail->addHtml("<p>$pref</p><br>".$msg);
+			$mail->addHtml("<p>$pref</p><br />".$msg);
 		} else {
 			$mail->addText($pref."\n\n".$msg);
 		}

@@ -299,7 +299,7 @@ Save the submitted new workflow priority.
 sub www_editWorkflowPriority {
     my $session = shift;
 
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     my $i18n = WebGUI::International->new($session, 'Workflow');
     my $ac = WebGUI::AdminConsole->new($session,"workflow");

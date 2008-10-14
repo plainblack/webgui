@@ -274,6 +274,7 @@ If you wish to set the Default Value for any other field.  Create the field with
 
 	'displayTitle' => {
         message => q|An internationalized title containing the user's name.|,
+        context => q|Template variable for edit and view profile field|,
         lastUpdated => 1213326336,
     },
 
@@ -319,22 +320,74 @@ If you wish to set the Default Value for any other field.  Create the field with
 
 	'profile.message' => {
         message => q|Messages from the system, in case of errors or further work on the user's part.|,
+        context => q|Template variable for edit profile field|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.header' => {
         message => q|HTML code to begin the form|,
+        context => q|Template variable for edit profile field|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.footer' => {
         message => q|HTML code to end the form|,
+        context => q|Template variable for edit profile field|,
         lastUpdated => 1213326336,
     },
 
 	'profile.form.hidden' => {
         message => q|HTML code for directing the form's action|,
+        context => q|Template variable for edit profile field|,
         lastUpdated => 1213326336,
+    },
+
+	'profile.form.submit' => {
+        message => q|A button to submit edits to the user's profile.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.form.cancel' => {
+        message => q|A button to return the user to the last page they viewed without submitting any form data.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1213326336,
+    },
+
+	'profile.form.elements' => {
+        message => q|A loop containing all profile fields, sorted by category.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
+    },
+
+	'profile.form.category' => {
+        message => q|The name of this category.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
+    },
+
+	'profile.form.category.loop' => {
+        message => q|A loop containing all fields in this category.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
+    },
+
+	'profile.form.element' => {
+        message => q|The form element for this profile field.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
+    },
+
+	'profile.form.element.label' => {
+        message => q|The label assigned to this profile field.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
+    },
+
+	'profile.form.element.subtext' => {
+        message => q|If this profile field is a required profile field, then this will contain an asterisk "*".|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1221580083,
     },
 
 };

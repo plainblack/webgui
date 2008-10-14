@@ -114,6 +114,7 @@ checkModule("Path::Class",                  '0.16'       );
 checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
+checkModule("Module::Find",                 "0.06"       );
 
 
 ###################################

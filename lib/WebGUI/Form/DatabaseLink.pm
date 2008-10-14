@@ -167,7 +167,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	if ($self->session->user->isInGroup(3)) {
+	if ($self->session->user->isAdmin) {
 		my $subtext;
 		if ($self->get("afterEdit")) {
 			$subtext = $self->session->icon->edit("op=editDatabaseLink;lid=".$self->getOriginalValue.";afterEdit=".$self->session->url->escape($self->get("afterEdit")));

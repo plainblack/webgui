@@ -50,7 +50,11 @@ ok($sth->rows > 1, "rows()");
 ok($sth->finish, "finish()");
 
 # unconditionalRead
-ok(my $sth = $session->db->unconditionalRead("select * from tableThatDoesntExist"), "unconditionalRead()");
+{
+    # we know this will fail, so keep it quiet
+    local $SIG{__WARN__} = sub {};
+    ok(my $sth = $session->db->unconditionalRead("select * from tableThatDoesntExist"), "unconditionalRead()");
+}
 
 # errorCode 
 is($sth->errorCode, "1146" ,"errorCode()");

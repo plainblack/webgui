@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 133; # increment this value for each test you create
+use Test::More tests => 139; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -222,6 +222,7 @@ is ($result, '194.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
 ok ($admin->isInGroup($cm->getId), "Admin is member of group");
+ok($admin->isAdmin, "Admin user is in admins group");
 
 my $origFilter = $cm->ipFilter;
 
@@ -230,6 +231,8 @@ $cm->ipFilter('194.168.0.0/24');
 is( $cm->ipFilter, "194.168.0.0/24", "ipFilter assignment to local net, 194.168.0.0/24");
 
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
+ok ($visitor->isVisitor, "User checks out as visitor");
+ok (!$visitor->isAdmin,"User that isn't an admin doesn't look like admin");
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['193.168.0.101', $session->getId]);
 
@@ -244,7 +247,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 $user = WebGUI::User->new($session, "new");
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
-
+ok($user->isRegistered, "User is not a visitor");
 $user->addToGroups([3]);
 
 ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
@@ -323,6 +326,13 @@ ok($dude->canUseAdminMode, 'canUseAdminMode: with no subnets set, user canUseAdm
 $newEnv{REMOTE_ADDR} = '10.0.0.2';
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
+
+##Check for multiple IP settings
+$session->config->set('adminModeSubnets', ['10.0.0.0/24', '192.168.0.0/24', ]);
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, first IP range');
+
+$newEnv{REMOTE_ADDR} = '192.168.0.127';
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, second IP range');
 
 ##restore the original session variables
 $session->env->{_env} = $origEnvHash;

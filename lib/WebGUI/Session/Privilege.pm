@@ -160,7 +160,7 @@ Returns a message stating that the user does not have the privileges necessary t
 sub noAccess {
 	my $self = shift;
 	$self->session->http->setStatus("401", "No Access");
-   	if ($self->session->user->userId eq '1') {
+   	if ($self->session->user->isVisitor) {
       		return WebGUI::Operation::Auth::www_auth($self->session, "init");
    	} else {
 		my $i18n = WebGUI::International->new($self->session);

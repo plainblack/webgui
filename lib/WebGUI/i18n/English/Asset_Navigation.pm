@@ -273,8 +273,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page_loop' => {
-		message => q|A loop containing pages in nested, hierarchical order.|,
-		lastUpdated => 1149394665,
+		message => q|A loop containing pages in nested, hierarchical order.  Every property of each page is available.  A handfull of them are listed below.  Please consult the template variables for each Asset type for a full list.|,
+		lastUpdated => 1221602778,
 	},
 
 	'page.assetId' => {
@@ -528,9 +528,11 @@ the Navigation Template to determine who can see them in the menu.</p>
 	'1097' => {
 		message => q|<p>These variables are available in Navigation Templates:</p>
 <p><b>currentPage</b> refers to the page that the user is currently looking at. <b>page</b> refers to any
-given page inside of the <b>page_loop</b></p>
+given page inside of the <b>page_loop</b></p>.
+<p>When referring to a page every Asset property is available.  Only the most useful
+ones are listed below.</p>
 	|,
-		lastUpdated => 1163720438,
+		lastUpdated => 1221602772,
 	},
 
 	'mimeType' => {

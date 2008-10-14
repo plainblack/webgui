@@ -48,3 +48,4 @@ our $HELP = {
 };
 
 1;  ##All perl modules must return true
+#vim:ft=perl

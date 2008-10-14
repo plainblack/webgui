@@ -390,7 +390,8 @@ sub getLineage {
 
 Takes the same parameters as getLineage, but instead of returning a list
 it returns an iterator.  Calling the iterator will return instantiated assets,
-or undef when there are no more assets available.
+or undef when there are no more assets available.  The iterator is just a sub
+ref, call like $asset = $iterator->()
 
 =cut
 
@@ -564,11 +565,8 @@ sub getLineageSql {
 	my $tables = "asset left join assetData on asset.assetId=assetData.assetId ";
 	if (exists $rules->{joinClass}) {
 		my $className = $rules->{joinClass};
-        my $file = $className;
-        $file =~ s{::}{/}g;
-        $file .= '.pm';
-        if (!exists $INC{ $file }) {  ##Alread loaded?
-            eval{ require $file };
+        (my $module = $className . '.pm') =~ s{::|'}{/}g;
+        if ( ! eval { require $module; 1 }) {
             $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
 		foreach my $definition (@{$className->definition($self->session)}) {

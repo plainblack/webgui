@@ -98,7 +98,7 @@ See WebGUI::Asset::view() for details.
 
 sub view {
 	my $self = shift;
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -163,7 +163,7 @@ sub view {
 	$var{forum_loop} = \@forum_loop;
 
 	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1') {
+	if ($self->session->user->isVisitor) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
 	}
        	return $out;
@@ -179,7 +179,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
 	$self->SUPER::www_view(@_);
 }
 

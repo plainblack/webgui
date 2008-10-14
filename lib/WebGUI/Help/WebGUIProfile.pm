@@ -69,19 +69,38 @@ our $HELP = {
                 required    => 1,
             },
             {
-                name        => 'profile.elements',
+                name        => 'profile.form.submit',
+                required    => 1,
+            },
+            {
+                name        => 'profile.form.cancel',
+                required    => 1,
+            },
+            {
+                name        => 'profile.form.elements',
                 required    => 1,
                 variables   => [
                     {
-                        name        => 'profile.category',
+                        name        => 'profile.form.category',
                     },
                     {
-                        name        => 'profile.label',
+                        name        => 'profile.form.category',
+                        required    => 1,
+                        variables   => [
+                            {
+                                name        => 'profile.form.element',
+                                required    => 1,
+                            },
+                            {
+                                name        => 'profile.form.element.label',
+                                required    => 1,
+                            },
+                            {
+                                name        => 'profile.form.element.subtext',
+                                required    => 1,
+                            },
+                        ],
                     },
-                    {
-                        name        => 'profile.value',
-                    },
-                    
                 ],
             },
             {

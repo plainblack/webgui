@@ -576,7 +576,7 @@ keys:
 sub www_editSettings {
 	my $session     = shift;
     my $argsHash    = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isAdmin);
 	my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $output      = '';
 
@@ -646,7 +646,7 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 
 sub www_saveSettings {
     my $session     = shift;
-    return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    return $session->privilege->adminOnly() unless ($session->user->isAdmin);
     my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $setting     = $session->setting;
     my $form        = $session->form;

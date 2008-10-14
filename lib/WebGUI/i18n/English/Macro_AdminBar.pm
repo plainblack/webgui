@@ -3,58 +3,51 @@ use strict;
 
 our $I18N = {
 
-	'admin bar title' => {
-		message => q|Admin Bar Macro Template Variables|,
-		lastUpdated => 1184691377,
+	'packages' => {
+		message => q|Packages|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
-	'adminbar_loop' => {
-		message => q|A loop containing the various lists of data to display.|,
-		lastUpdated => 1149178356,
+	'prototypes' => {
+		message => q|Prototypes|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
-	'label' => {
-		message => q|A heading label for this category.|,
-		lastUpdated => 1149178356,
+	'basic' => {
+		message => q|Basic|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
-	'name' => {
-		message => q|A javascript friendly name for this category.|,
-		lastUpdated => 1149178356,
+	'community' => {
+		message => q|Community|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
-	'items' => {
-		message => q|A loop containing the list if items in this category.|,
-		lastUpdated => 1149178356,
+	'intranet' => {
+		message => q|Intranet|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
-	'title' => {
-		message => q|The displayable link title for this item.|,
-		lastUpdated => 1149178356,
-	},
-
-	'url' => {
-		message => q|The link URL for this item.|,
-		lastUpdated => 1149178356,
-	},
-
-	'icon' => {
-		message => q|The URL of an icon to associate with this item.|,
-		lastUpdated => 1149178356,
-	},
-
-	'376' => {
-		message => q|Package|,
-		lastUpdated => 1031514049
+	'utilities' => {
+		message => q|Utilities|,
+		lastUpdated => 0,
+		context	=> 'A category heading in the New Content menu.'
 	},
 
 	'1083' => {
 		message => q|New Content|,
+		context	=> 'A tab heading in the admin bar accordion.',
 		lastUpdated => 1076866510
 	},
 
 	'1082' => {
 		message => q|Clipboard|,
+		context	=> 'A tab heading in the admin bar accordion.',
 		lastUpdated => 1076866475
 	},
 

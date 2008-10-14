@@ -61,7 +61,21 @@ sub www_viewLoginHistory {
 		$row[$i] .= '<td>'.$data{status}.'</td>';
 		$row[$i] .= '<td>'.$session->datetime->epochToHuman($data{timeStamp},"%H:%n%p %M/%D/%y").'</td>';
 		$row[$i] .= '<td>'.$data{ipAddress}.'</td>';
-		$row[$i] .= '<td>'.$data{userAgent}.'</td></tr>';
+		$row[$i] .= '<td>'.$data{userAgent}.'</td>';
+        $row[$i] .= '<td>'.$data{sessionId}.'</td>';
+        if ($data{lastPageViewed}) {
+            if ($data{lastPageViewed} == $data{timeStamp}) {
+                $row[$i] .= "<td>Active</td>";
+                $row[$i] .= "<td>Active</td></tr>";
+            } else {
+                $row[$i] .= '<td>'.$session->datetime->epochToHuman($data{lastPageViewed},"%H:%n%p %M/%D/%y").'</td>';
+                my ($interval, $units) = $session->datetime->secondsToInterval($data{lastPageViewed} - $data{timeStamp});
+                $row[$i] .= "<td>$interval $units</td></tr>";
+            }
+        } else {
+            $row[$i] .= "<td></td>";
+            $row[$i] .= "<td></td></tr>";
+        }
 		$i++;
 	}
 	$sth->finish;
@@ -72,7 +86,10 @@ sub www_viewLoginHistory {
 	$output .= '<td>'.$i18n->get(434).'</td>';
 	$output .= '<td>'.$i18n->get(429).'</td>';
 	$output .= '<td>'.$i18n->get(431).'</td>';
-	$output .= '<td>'.$i18n->get(433).'</td></tr>';
+    $output .= '<td>'.$i18n->get(433).'</td>';
+    $output .= '<td>' . $i18n->get( 435 ) . '</td>';
+    $output .= '<td>' . $i18n->get( 430 ) . '</td>';
+    $output .= '<td>' . $i18n->get( "session length" ) . '</td></tr>';
         $output .= $p->getPage($session->form->process("pn"));
         $output .= '</table>';
         $output .= $p->getBar($session->form->process("pn"));

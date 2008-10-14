@@ -39,3 +39,4 @@ plan tests => 1;        # Increment this number for each test you create
 END {
 
 }
+#vim:ft=perl

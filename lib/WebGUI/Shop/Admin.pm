@@ -113,7 +113,7 @@ Displays the general commerce settings.
 
 sub www_editSettings {
     my $self = shift;
-    return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
+    return $self->session->privilege->adminOnly() unless ($self->session->user->isAdmin);
     my $i18n = WebGUI::International->new($self->session, "Shop");    
     my $ac = $self->getAdminConsole; 
     my $setting = $self->session->setting;
@@ -176,7 +176,7 @@ Saves the general commerce settings.
 
 sub www_editSettingsSave {
     my $self = shift;
-    return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
+    return $self->session->privilege->adminOnly() unless ($self->session->user->isAdmin);
     my ($setting, $form) = $self->session->quick(qw(setting form));
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
         shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {

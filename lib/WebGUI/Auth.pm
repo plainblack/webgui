@@ -59,7 +59,7 @@ sub _isDuplicateUsername {
 	my $self = shift;
 	my $username = shift;
 	#Return false if the user is already logged in, but not changing their username.
-	return 0 if($self->userId ne "1" && $self->session->user->username eq $username);
+	return 0 if($self->isRegistered && $self->session->user->username eq $username);
 	my ($otherUser) = $self->session->db->quickArray("select count(*) from users where username=".$self->session->db->quote($username));
 	return 0 if !$otherUser;
 	my $i18n = WebGUI::International->new($self->session);
@@ -80,7 +80,7 @@ sub _isValidUsername {
 	my $username = shift;
 	my $error = "";
 
-	return 1 if($self->userId ne "1" && $self->session->user->username eq $username);
+	return 1 if($self->isRegistered && $self->session->user->username eq $username);
 
     my $i18n = WebGUI::International->new($self->session);
 
@@ -102,13 +102,18 @@ sub _isValidUsername {
 #-------------------------------------------------------------------
 sub _logLogin {
 	my $self = shift;
-	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?)",
-		[ $_[0],
-		$_[1],
-		$self->session->datetime->time(),
-		$self->session->env->getIp,
-		$self->session->env->get("HTTP_USER_AGENT") ]
-		);
+    $self->timeRecordSession;
+	$self->session->db->write("insert into userLoginLog values (?,?,?,?,?,?,?)",
+		[ 
+            $_[0],
+            $_[1],
+            $self->session->datetime->time(),
+            $self->session->env->getIp,
+            $self->session->env->get("HTTP_USER_AGENT"),
+            $self->session->getId,
+            $self->session->datetime->time(),
+        ]
+    );
 }
 
 
@@ -182,8 +187,8 @@ sub createAccount {
     my $i18n    = WebGUI::International->new($self->session);
     $vars->{title} = $i18n->get(54);
     
-    $vars->{'create.form.header'} 
-        = WebGUI::Form::formHeader($self->session,{})
+    $vars->{'create.form.header'}
+        = WebGUI::Form::formHeader($self->session)
         . WebGUI::Form::hidden($self->session,{"name"=>"op","value"=>"auth"})
         . WebGUI::Form::hidden($self->session,{"name"=>"method","value"=>$method})
         ;
@@ -192,11 +197,18 @@ sub createAccount {
     my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
     $vars->{'create.form.profile'} = [];
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
-        my $id           = $field->getId;
-        my $label        = $field->getLabel;
+        my $id         = $field->getId;
+        my $label      = $field->getLabel;
+        my $required   = $field->isRequired;
         
-        # Get the default email from the invitation
+        my $properties = {};
+        if ($required) {
+            my $fieldValue = $self->session->form->process($field->getId,$field->get("fieldType"));
+            $properties->{extras} = $self->getExtrasStyle($fieldValue);
+        }
+
         my $formField;
+        # Get the default email from the invitation
         if ($field->get('fieldName') eq "email" && $userInvitation ) {
             my $code = $self->session->form->get('code')
                     || $self->session->form->get('uniqueUserInvitationCode');
@@ -206,12 +218,12 @@ sub createAccount {
                     [$code]
                 );
             $vars->{'create.form.header'} .= WebGUI::Form::hidden($self->session, {name=>"uniqueUserInvitationCode", value=>$code});
-            $formField   = $field->formField(undef, undef, undef, undef, $defaultValue);
+            $formField   = $field->formField($properties, undef, undef, undef, $defaultValue);
         }
         else {
-            $formField   = $field->formField();
+            $formField   = $field->formField($properties);
         }
-        my $required    = $field->isRequired;
+       
 
         # Old-style field loop.
         push @{$vars->{'create.form.profile'}}, { 
@@ -355,7 +367,7 @@ Auth method that the form for creating users should call
 sub deactivateAccount {
 	my $self = shift;
 	my $method = $_[0];
-	return $self->session->privilege->vitalComponent() if($self->userId eq '1' || $self->userId eq '3');
+	return $self->session->privilege->vitalComponent() if($self->isVisitor || $self->isAdmin);
 	return $self->session->privilege->adminOnly() if(!$self->session->setting->get("selfDeactivation"));
 	my $i18n = WebGUI::International->new($self->session);
 	my %var;
@@ -381,7 +393,7 @@ sub deactivateAccountConfirm {
     
     # Cannot deactivate "Visitor" or "Admin" users this way
     return $self->session->privilege->vitalComponent 
-        if $self->userId eq '1' || $self->userId eq '3';
+        if $self->isVisitor || $self->isAdmin;
 
     my $i18n    = WebGUI::International->new($self->session);
 
@@ -610,7 +622,28 @@ sub getCreateAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ( )
+=head2 getExtrasStyle ( )
+
+This method returns the proper field to display for required fields.
+
+=cut
+
+sub getExtrasStyle {
+    my $self  = shift;
+    my $value = shift;
+    
+    my $requiredStyleOff = q{class="authfield_required_off"}; 
+    my $requiredStyle    = q{class="authfield_required"};
+    my $errorStyle       = q{class="authfield_error"};     #Required Field Not Filled In and Error Returend
+
+    return $errorStyle if($self->error && $value eq "");
+    return $requiredStyle unless($value);
+    return $requiredStyleOff;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLoginTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the login screen.
 
@@ -670,6 +703,19 @@ sub init {
 
 #-------------------------------------------------------------------
 
+=head2 isAdmin ()
+
+Returns 1 if the user is user 3 (admin).
+
+=cut
+
+sub isAdmin {
+	my $self = shift;
+	return $self->userId eq '3';
+}
+
+#-------------------------------------------------------------------
+
 =head2 isCallable ( method )
 
 Returns whether or not a method is callable
@@ -681,6 +727,31 @@ sub isCallable {
 	return isIn($_[0],@{$self->{callable}})
 }
 
+#-------------------------------------------------------------------
+
+=head2 isRegistered ()
+
+Returns 1 if the user is not a visitor.
+
+=cut
+
+sub isRegistered {
+	my $self = shift;
+	return $self->userId ne '1';
+}
+
+#-------------------------------------------------------------------
+
+=head2 isVisitor ()
+
+Returns 1 if the user is a visitor.
+
+=cut
+
+sub isVisitor {
+	my $self = shift;
+	return $self->userId eq '1';
+}
 
 #-------------------------------------------------------------------
 
@@ -909,6 +980,32 @@ sub showMessageOnLogin {
     $self->session->scratch->delete( 'redirectAfterLogin' );
 
     return $output;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 timeRecordSession 
+
+Record the last page viewed and the time viewed for the user
+
+=cut
+
+sub timeRecordSession {
+    my $self = shift;
+    my ($nonTimeRecordedRows) = $self->session->db->quickArray("select count(*) from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
+    if ($nonTimeRecordedRows eq "1") {
+        # We would normally expect to only find one entry
+        $self->session->db->write("update userLoginLog set lastPageViewed = (select lastPageView from userSession where sessionId = ?) where lastPageViewed = timeStamp and sessionId = ? ",
+            [ $self->session->getId,
+            $self->session->getId]);
+    } elsif ($nonTimeRecordedRows eq "0") {
+        # Do nothing
+    } else {
+        # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
+        # could end up with ridiculously long user recorded times)
+        $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+        $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$self->session->getId] );
+    }
 }
 
 #-------------------------------------------------------------------

@@ -83,7 +83,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'result_set' => {
-		message => q|Paginated search results with pagination controls.|,
+		message => q|Paginated search results with pagination controls. The list of variables below are the main ones used, however every property of each asset in the result set is exposed and is usable in the template.|,
 		lastUpdated => 1149567859,
 	},
 

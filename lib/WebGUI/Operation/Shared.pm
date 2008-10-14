@@ -38,7 +38,7 @@ TODO: DOCUMENT ME
 	
 	if ($session->user->isInGroup(12)) {
 		my %hash;
-		if ($session->var->get("adminOn")) {
+		if ($session->var->isAdminOn) {
 			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.$i18n->get(12).'</a>';
 		} else {
 			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.$i18n->get(63).'</a>';
@@ -80,7 +80,7 @@ TODO: DOCUMENT ME
 	my %logout;
 	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.$i18n->get(64).'</a>'; 
 	push(@array,\%logout);
-	if ($session->setting->get("selfDeactivation") && !$session->user->isInGroup(3)){
+	if ($session->setting->get("selfDeactivation") && !$session->user->isAdmin){
 	   my %hash;
 	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.$i18n->get(65).'</a>';
 	   push(@array,\%hash);

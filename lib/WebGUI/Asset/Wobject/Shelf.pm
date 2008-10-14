@@ -69,7 +69,7 @@ file will be named siteProductData.csv.
 sub exportProducts {
     my $self    = shift;
     my $session = $self->session;
-    my @columns = qw{sku shortdescription price weight quantity};
+    my @columns = qw{varSku shortdescription price weight quantity};
     my $productData = WebGUI::Text::joinCSV(qw{mastersku title}, @columns) . "\n";
     @columns = map { $_ eq 'shortdescription' ? 'shortdesc' : $_ } @columns;
     my $getAProduct = WebGUI::Asset::Sku::Product->getIsa($session);
@@ -109,7 +109,7 @@ mastersku
 
 =item *
 
-sku
+varsku
 
 =item *
 
@@ -158,15 +158,18 @@ sub importProducts {
     my $headers;
     $headers = <$table>;
     chomp $headers;
+    $headers =~ tr/\r//d;
+    $headers =~ s/\bsku\b/varSku/;
     my @headers = WebGUI::Text::splitCSV($headers);
     WebGUI::Error::InvalidFile->throw(error => qq{Bad header found in the CSV file}, brokenFile => $filePath)
-        unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-sku-title-weight')
+        unless (join(q{-}, sort @headers) eq 'mastersku-price-quantity-shortdescription-title-varSku-weight')
            and (scalar @headers == 7);
 
     my @productData = ();
     my $line = 1;
     while (my $productRow = <$table>) {
         chomp $productRow;
+        $productRow =~ tr/\r//d;
         $productRow =~ s/\s*#.+$//;
         next unless $productRow;
         local $_;
@@ -213,7 +216,7 @@ sub importProducts {
             my $collaterals = $product->getAllCollateral('variantsJSON');
             my $collateralSet = 0;
             ROW: foreach my $collateral (@{ $collaterals }) {
-                next ROW unless $collateral->{sku} eq $productRow{sku};
+                next ROW unless $collateral->{varSku} eq $productRow{varSku};
                 @{ $collateral}{ @collateralFields } = @productCollateral{ @collateralFields };  ##preserve the variant Id field, assign all others
                 $product->setCollateral('variantsJSON', 'variantId', $collateral->{variantId}, $collateral);
                 $collateralSet=1;
@@ -382,7 +385,7 @@ sub www_importProducts {
 		}
 		else {
 			$status_message = $i18n->get('import successful');
-			##Copy and paste from Asset.pm, www_editSave
+			##Copy and paste from WebGUI::Asset, www_editSave
 			if ($self->session->setting->get("autoRequestCommit")) {
 				# Make sure version tag hasn't already been committed by another process
 				my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");

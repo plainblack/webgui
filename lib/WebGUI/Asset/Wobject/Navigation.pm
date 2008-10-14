@@ -324,7 +324,7 @@ sub getToolbar {
             . '<div class="bd">'
             . '<ul class="first-of-type">'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
-            . $self->getUrl("func=copy") . '">' . $i18n->get("copy") . '</a></li>'
+            . $self->getUrl("func=copy") . '">' . $i18n->get("Copy") . '</a></li>'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>'
             . '<li class="yuimenuitem"><a class="yuimenuitemlabel" href="'
@@ -384,15 +384,14 @@ sub view {
 	$rules{assetToPedigree} = $current if (isIn("pedigree",@includedRelationships));
 	$rules{ancestorLimit} = $self->get("ancestorEndPoint");
 	$rules{orderByClause} = 'rpad(asset.lineage, 255, 9) desc' if ($self->get('reversePageLoop'));
-	
+	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
 	my $assets = $start->getLineage(\@includedRelationships,\%rules);	
 	my $var = {'page_loop' => []};
-	my @interestingProperties = ('assetId', 'parentId', 'ownerUserId', 'synopsis', 'newWindow');
-	foreach my $property (@interestingProperties) {
+    foreach my $property (@interestingProperties) {
 		$var->{'currentPage.'.$property} = $current->get($property);
 	}
 	$var->{'currentPage.menuTitle'} = $current->getMenuTitle;
-	$var->{'currentPage.title'} = $current->getTitle;
+	$var->{'currentPage.title'}     = $current->getTitle;
 	$var->{'currentPage.isHome'} = ($current->getId eq $self->session->setting->get("defaultPage"));
 	$var->{'currentPage.url'} = $current->getUrl;
     	$var->{'currentPage.hasChild'} = $current->hasChildren;
@@ -428,20 +427,21 @@ sub view {
 			next;
 		}
 		my $pageData = {};
-		foreach my $property (@interestingProperties) {
-			$pageData->{"page.".$property} = $asset->get($property);
+        my $pageProperties = $asset->get;
+        while (my ($property, $propertyValue) = each %{ $pageProperties }) {
+			$pageData->{"page.".$property} = $propertyValue;
 		}
 		$pageData->{'page.menuTitle'} = $asset->getMenuTitle;
-		$pageData->{'page.title'} = $asset->getTitle;
+		$pageData->{'page.title'}     = $asset->getTitle;
 		# build nav variables
-		$pageData->{"page.rank"} = $asset->getRank;
+		$pageData->{"page.rank"}     = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
 		$pageData->{"page.relDepth"} = $asset->getLineageLength - $start->getLineageLength;
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
 		$pageData->{"page.isHidden"} = $asset->get("isHidden");
 		$pageData->{"page.isViewable"} = $asset->canView;
-		$pageData->{'page.isContainer'} = isIn($asset->get('className'), @{$self->session->config->get("assetContainers") || []});
-  		$pageData->{'page.isUtility'} = isIn($asset->get('className'), @{$self->session->config->get("utilityAssets") || []});
+		$pageData->{'page.isContainer'} = $self->session->config->get("assets/".$asset->get("className")."/isContainer");
+  		$pageData->{'page.isUtility'} = $self->session->config->get("assets/".$asset->get("className")."/category") eq "utilities";
 		$pageData->{"page.url"} = $asset->getUrl;
 		my $indent = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.indent_loop"} = [];
@@ -485,7 +485,7 @@ sub view {
 
 		my $parent = $asset->getParent;
 		if (defined $parent) {
-			foreach my $property (@interestingProperties) {
+            foreach my $property (@interestingProperties) {
 				$pageData->{"page.parent.".$property} = $parent->get($property);
 			}
 			$pageData->{'page.parent.menuTitle'} = $parent->getMenuTitle;
@@ -515,50 +515,6 @@ sub www_goBackToPage {
 	return undef;
 }
 
-
-#-------------------------------------------------------------------
-# we eventually should reaadd this
-sub www_preview {
-	my $self = shift;
-	$self->session->var->get("adminOn") = 0;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(3));
-	my $nav = WebGUI::Navigation->new(	depth=>$self->session->form->process("depth"),
-						method=>$self->session->form->process("method"),
-						startAt=>$self->session->form->process("startAt"),
-						stopAtLevel=>$self->session->form->process("stopAtLevel"),
-						templateId=>$self->session->form->process("templateId"),
-						showSystemPages=>$self->session->form->process("showSystemPages"),
-						showHiddenPages=>$self->session->form->process("showHiddenPages"),
-						showUnprivilegedPages=>$self->session->form->process("showUnprivilegedPages"),
-	                       			'reverse'=>$self->session->form->process("'reverse'"),
-                                );
-	my $output = qq(
-		<table width="100%" border="0" cellpadding="5" cellspacing="0">
-		<tr><td class="tableHeader" valign="top">
-		Configuration
-		</td><td class="tableHeader" valign="top">Output</td></tr>
-		<tr><td class="tableHeader" valign="top">
-		<font size=1>
-			Identifier: $self->session->form->process("identifier")<br />
-			startAt: $self->session->form->process("startAt")<br />
-			method: $self->session->form->process("method")<br />
-			stopAtLevel: $self->session->form->process("stopAtLevel")<br />
-			depth: $self->session->form->process("depth")<br />
-			templateId: $self->session->form->process("templateId")<br />
-			reverse: $self->session->form->process("'reverse'")<br />
-			showSystemPages: $self->session->form->process("showSystemPages")<br />
-			showHiddenPages: $self->session->form->process("showHiddenPages")<br />
-			showUnprivilegedPages: $self->session->form->process("showUnprivilegedPages")<br />
-		</font>
-		</td><td class="tableData" valign="top">
-		) . $nav->build . qq(</td></tr></table>);
-	
-	# Because of the way the system is set up, the preview is cached. So let's remove it again...
-	WebGUI::Cache->new($self->session,$nav->{_identifier}.$self->session->asset->getId, "Navigation-".$self->session->config->getFilename)->delete;
-	
-	return _submenu($output,"preview"); 
-}
-
 #-------------------------------------------------------------------
 
 =head2 www_view
@@ -579,4 +535,7 @@ sub www_view {
 		$self->session->http->setMimeType($mimeType || 'text/html');
 		return $self->view();
 	}
-}1;
+}
+
+1;
+

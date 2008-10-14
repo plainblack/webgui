@@ -137,7 +137,7 @@ Renders a series of checkboxes.
 
 sub toHtml {
 	my $self        = shift;
-	my $output;
+    my $output = '<fieldset style="border:none;margin:0;padding:0">';
 	my $alignment   = $self->alignmentSeparator;
 
     # Add the select all button
@@ -164,7 +164,7 @@ sub toHtml {
             . $alignment
             ;
     }
-
+    $output .= "</fieldset>";
     return $output;
 }
 

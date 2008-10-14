@@ -58,14 +58,14 @@ The settable properties of the workflow instance. See the set() method for detai
 =cut
 
 sub create {
-	my ($class, $session, $properties, $skipRealtime) = @_;
+	my ($class, $session, $properties) = @_;
 
     # do singleton check
     my $placeHolders = [$properties->{workflowId}];
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and mode='singleton'",$placeHolders);
     my $sql = "select count(*) from WorkflowInstance where workflowId=?";
 	if (exists $properties->{parameters}) {
-        push @{ $placeHolders }, JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
+        push @{ $placeHolders }, JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
         $sql .= ' and parameters=?';
     }
     else {
@@ -257,7 +257,7 @@ sub getWorkflow {
 
 #-------------------------------------------------------------------
 
-=head2 new ( session, instanceId )
+=head2 new ( session, instanceId, [isNew] )
 
 Constructor.
 
@@ -271,7 +271,9 @@ A unique id refering to a workflow instance.
 
 =head3 isNew 
 
-A boolean, that, if true, sets that the instance is ready to run.
+A boolean, that, if true, sets that the instance is new and hasn't been started
+yet.  This option is really for the L<create> method to use, and should not
+be used by developers unless your name starts with JT and ends in Smith.
 
 =cut
 
@@ -443,16 +445,16 @@ A boolean, that if set to 1 will not inform Spectre of the change in settings.
 
 sub set {
 	my ($self, $properties, $skipNotify) = @_;
+	$self->{_data}{lastUpdate} = time();
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{lastStatus} = $properties->{lastStatus} || $self->{_data}{lastStatus};
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	if (exists $properties->{parameters}) {
-		$self->{_data}{parameters} = JSON->new->utf8->pretty->encode({parameters => $properties->{parameters}});
+		$self->{_data}{parameters} = JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
 	}
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
-	$self->{_data}{lastUpdate} = time();
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});
     if ($self->{_started} && !$skipNotify) {
 		my $spectre = WebGUI::Workflow::Spectre->new($self->session);

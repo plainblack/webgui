@@ -8,6 +8,11 @@ our $I18N = {
 		lastUpdated => 0 
 	},
 
+	'back to site' => {
+		message => q|Back to site.|,
+		lastUpdated => 0 
+	},
+
 	'bad commit' => {
 		message => q|Something bad happened while trying to commit your content. Please contact your system
         administrator.|,

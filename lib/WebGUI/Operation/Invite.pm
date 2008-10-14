@@ -37,7 +37,7 @@ Form for inviting a user.
 
 sub www_inviteUser {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     my $formError = shift;
     my $vars = {};
 	my $i18n = WebGUI::International->new($session, 'Invite');
@@ -88,7 +88,7 @@ members (determined by email address) and send the email.
 
 sub www_inviteUserSave {
 	my $session = shift;
-	return $session->privilege->insufficient() unless ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() unless ($session->user->isRegistered);
 
     #Mandatory field checks
     my $hisEmailAddress = $session->form->get('invite_email');
@@ -168,7 +168,7 @@ create account page.  Otherwise, scourge and flay them.
 
 sub www_acceptInvite {
 	my $session = shift;
-	return $session->privilege->insufficient() if ($session->user->isInGroup(2));
+	return $session->privilege->insufficient() if ($session->user->isRegistered);
 
     my $i18n = WebGUI::International->new($session, 'Invite');
 

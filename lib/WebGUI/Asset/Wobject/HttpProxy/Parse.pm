@@ -127,6 +127,9 @@ sub start {
   	my $self = shift;
   	my ($tag, $attr, $attrseq, $origtext) = @_;
     
+    # Set a flag for self-closing tags
+    my $selfclose;
+    
     # Check on the div class and div id attributes to see if we're proxying ourself.
 	if($tag eq "div" && $attr->{'class'} eq 'wobjectHttpProxy' && $attr->{'id'} eq ('assetId'.$self->{assetId})) { 
 		$self->{recurseCheck} = 1;
@@ -134,12 +137,12 @@ sub start {
   	$self->output("<$tag");
   	for (keys %$attr) {
 		if ($_ eq '/') {
-		   $self->output('/');
+		   $selfclose   = 1;
 		   next;
 		}
     		$self->output(" $_=\"");
     		my $val = $attr->{$_};
-    		if ((lc($tag) eq "input" || lc($tag) eq "textarea" || lc($tag) eq "select") 
+    		if ( $self->{ rewriteUrls } && (lc($tag) eq "input" || lc($tag) eq "textarea" || lc($tag) eq "select") 
        			&& (lc($_) eq "name" || lc($_) eq "submit")) {  # Rewrite input type names
       			$val = 'HttpProxy_' . $val;
     		}
@@ -187,8 +190,15 @@ sub start {
     		}
     		$self->output($val.'"');
   	}
+
+    # Close the tag
+    if ( $selfclose ) {
+        $self->output( " /" );
+    }
   	$self->output(">");
-  	if ($self->{FormAction} ne "") {
+
+    # Prepare our form action if necessary
+  	if ($self->{ rewriteUrls } && $self->{FormAction} ne "") {
     		$self->output('<input type="hidden" name="FormAction" value="'.$self->{FormAction}.'">');
     		$self->output('<input type="hidden" name="func" value="view">');
     		$self->{FormAction} = '';

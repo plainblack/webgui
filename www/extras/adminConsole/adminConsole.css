@@ -220,10 +220,12 @@ div.tabs {
 
 .tabHover {
    	background-color: #cccccc;
+    background-image: none;
 }
 
 .tabActive { 
    	background-color: #dddddd; 
+    background-image: none;
 }
 
 /* form stuff */

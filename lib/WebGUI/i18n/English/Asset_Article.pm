@@ -8,8 +8,8 @@ our $I18N = {
 		},
 
 	'attachments help' => {
-		message => q|Attach files and images directly to this Article. Please note that these files will not be accessible through the asset manager to other assets.|,
-		lastUpdated => 0
+		message => q|Attach up to a total of 2 files and images directly to this Article. Please note that these files will not be accessible through the asset manager to other assets.|,
+		lastUpdated => 1221511061
 		},
 
 	'cache timeout' => {

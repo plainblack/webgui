@@ -803,7 +803,7 @@ sub www_edit {
     my $admin   = WebGUI::Shop::Admin->new($session);
     my $i18n    = WebGUI::International->new($session, "PayDriver");
 
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     my $form = $self->getEditForm;
     $form->submit;
@@ -822,7 +822,7 @@ Saves the data from the post.
 sub www_editSave {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
 
     $self->processPropertiesFromFormPost;
     $session->http->setRedirect($session->url->page('shop=pay;method=manage'));

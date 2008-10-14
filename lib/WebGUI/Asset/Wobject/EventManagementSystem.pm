@@ -1422,7 +1422,7 @@ Displays the badges purchased by the current user, or all users if the user is p
 sub www_lookupRegistrant {
 	my ($self) = @_;
 	my $session = $self->session;
-	return $session->privilege->noAccess() unless ($self->canView && $self->session->user->userId ne "1");
+	return $session->privilege->noAccess() unless ($self->canView && $self->session->user->isRegistered);
 
 	# set up template variables
 	my %var = (

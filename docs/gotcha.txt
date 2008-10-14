@@ -7,6 +7,17 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.0
+--------------------------------------------------------------------
+ * WebGUI now requires Module::Find version 0.06 or greater.
+
+ * You must be fully upgraded to 7.5.24 before upgrading to 7.6.0
+
+ * You can no longer template the AdminBar macro. Any custom template
+   id that you pass it will be ignored, and the original template will
+   be removed from your site.
+
+
 7.5.21
 --------------------------------------------------------------------
  * Previous versions of WebGUI used the wrong day of the week for

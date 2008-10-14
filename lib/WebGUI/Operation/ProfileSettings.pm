@@ -397,7 +397,8 @@ sub www_editProfileSettings {
 		foreach my $field (@{$category->getFields}) {
 			next if $field->getId =~ /contentPositions/;
 			$output .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                        $output .= $session->icon->delete('op=deleteProfileFieldConfirm;fid='.$field->getId,'',$i18n->get(467));
+                        $output .= $session->icon->delete('op=deleteProfileFieldConfirm;fid='.$field->getId,'',$i18n->get(467))
+                                        unless $field->isProtected;
        	                $output .= $session->icon->edit('op=editProfileField;fid='.$field->getId);
                	        $output .= $session->icon->moveUp('op=moveProfileFieldUp;fid='.$field->getId);
                        	$output .= $session->icon->moveDown('op=moveProfileFieldDown;fid='.$field->getId);
