@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (139 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (144 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -100,6 +100,7 @@ foreach my $gid ('new', '') {
 	is ($g->autoDelete(), 0, 'auto Delete is off by default');
 	is ($g->isEditable(), 1, 'isEditable is on by default');
 	is ($g->showInForms(), 1, 'show in forms is on by default');
+	is ($g->isAdHocMailGroup(), 0, 'is adHoc group is off by default');
 
 	$g->delete;
 }
@@ -138,6 +139,9 @@ is($g->showInForms(), 0, 'showInForms set and get correctly');
 
 $g->dbQuery('select userId from someOtherDatabase');
 is($g->dbQuery(), 'select userId from someOtherDatabase', 'dbQuery set and get correctly');
+
+$g->isAdHocMailGroup(1); 
+is($g->isAdHocMailGroup(),  1, 'isAdHocMailGroup set and get correctly');
 
 ################################################################
 #
@@ -287,6 +291,13 @@ my $user = WebGUI::User->new($session, "new");
 $gX->userIsAdmin($user->userId, "yes");
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User who isn't secondary admin can't be group admin");
 isnt($gX->userIsAdmin($user->userId), 'yes', "userIsAdmin returns 1 or 0, not value");
+
+my $originalSessionUserId = $session->user->userId;
+$session->user({userId => 1});
+is($gX->userIsAdmin, 0, 'userIsAdmin: using session user Visitor');
+$session->user({userId => 3});
+is($gX->userIsAdmin, 1, 'userIsAdmin: using session user Admin');
+$session->user({userId => $originalSessionUserId});
 
 $gX->userIsAdmin($user->userId, 1);
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User must be member of group to be group admin");
