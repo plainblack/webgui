@@ -1017,7 +1017,7 @@ END {
 
     # restore the original exportPath setting, now that we're done testing
     # exportCheckPath.
-    $session->config->set('exportPath', $originalExportPath) if $originalExportPath;
+    $session->config->set('exportPath', $originalExportPath);
 
     # we created a couple of assets; roll them back so they don't stick around
     $versionTag->rollback();
