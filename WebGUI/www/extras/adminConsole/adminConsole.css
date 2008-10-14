@@ -1,0 +1,254 @@
+html,body {
+   margin: 0px;
+   padding: 0px;
+}
+
+.forwardButton {
+    background-color: #008000;
+    border: 2px outset #00a000;
+    color: white; 
+}
+
+.backwardButton {
+    background-color: #800000;
+    border: 2px outset #a00000;
+    color: white; 
+}
+
+.wrapper {
+	background-image: url(bg.jpg);
+	background-repeat: repeat-x;
+	border: 5px #214A7A solid; 
+	margin:0px;
+	padding:0px;
+	position: relative;
+	top:0px;
+}
+
+th {
+	text-align: left;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+}
+
+.adminConsoleTitleIcon {
+	position: absolute;
+	top: 12px;
+	left: 22px;
+	width: 48px;
+	height: 48px;
+	text-align: center;
+	z-index: 10;
+}
+
+.adminConsoleTitleIconMedalian {
+	z-index: 5;
+	position: absolute;
+	top: 4px;
+	left: 14px;
+}
+
+.adminConsoleTitle {
+	position: absolute;
+	top: 0px;
+	left: 85px;
+	font-size: 50px;
+	text-align: left;
+	padding: 20px 0px 0px 0px;
+	font-family: "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+	color: white;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	font-size: 25px;
+	/*height: 73px;*/
+	vertical-align: middle;
+}
+
+.adminConsoleWorkArea {
+ 	border: 1px solid #D7D7D7;
+	margin: 65px 170px 10px 9px;
+	padding: 15px;
+	-moz-border-radius: 10px;
+	background-color: #fafafa;
+	width: 78%;
+	z-index: 10;
+	position: relative;
+}
+/* Hides from non-ie: the holly hack \*/
+* html .adminConsoleWorkArea {
+	zoom: 1.00;
+	display: inline;
+	}
+/* End hide from non-ie */
+
+
+.adminConsoleMenu {
+	z-index: 0;
+	position: absolute;
+	top: 65px;
+	left: 78%;
+	margin-top: 10px;
+	margin-left: 31px;
+	width: 180px;
+	font-family: helvetica, arial;
+	font-size: 12px;
+}
+
+.adminConsoleMainMenu:hover, .adminConsoleUtilityMenu:hover, .adminConsoleVersionTags:hover {
+	opacity: 1.0;
+	z-index: 10;
+	background-color: #fafafa;
+}
+
+.adminConsoleMainMenu {
+	z-index: 1;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
+	padding: 5px;
+	padding-left: 10px;
+	margin: 5px;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
+	opacity: 0.7;
+}
+
+.adminConsoleSubmenu {
+	z-index: 10;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
+	padding: 5px;
+	padding-left: 10px;
+	margin: 5px;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
+}
+
+.adminConsoleUtilityMenu, .adminConsoleVersionTags {
+	z-index: 1;
+	opacity: 0.6;
+ 	border-top: 1px solid #D7D7D7;
+ 	border-bottom: 1px solid #D7D7D7;
+ 	border-right: 1px solid #D7D7D7;
+	padding: 5px;
+	padding-left: 10px;
+	margin: 5px;
+	-moz-border-radius: 5px;
+	background-color: #fafafa;
+}
+
+.adminConsoleHidden {
+	display: none;
+	height: 0px;
+}
+
+.adminConsoleApplication {
+	float: left;
+	text-align: center;
+	width: 100px;
+	font-size: 14px;
+	font-family: helvetica, arial;
+	opacity: 1.0; 
+	height: 110px;
+}
+
+.adminConsoleApplication:hover {
+	opacity: 0.7; 
+}
+
+.adminConsoleSpacer {
+	clear: both;
+}
+
+.adminConsoleToggle {
+	display: block;
+}
+
+.adminConsoleHelpIcon {
+	position: absolute;
+	top: 72px;
+	left: 17px;
+	z-index: 999;
+}
+
+/* tables */
+
+.tableMenu {
+  	background-color: #CCCCCC;
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+.tableMenu a {
+  	font-size: 10pt;
+  	text-decoration: none;
+}
+
+.tableHeader {
+  	background-color: #CECECE;
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+.tableData {
+  	font-size: 10pt;
+  	font-family: Helvetica, Arial;
+}
+
+/* tab forms */
+
+.tab {
+  	border: 1px solid #dddddd;
+   	background-color: #eeeeee;
+	background-image: url(bg_console.gif);
+	background-repeat: repeat-x;		
+	/*-moz-border-radius: 6px 6px 0px 0px;*/
+}
+
+.tabBody {
+   	border: 1px solid #dddddd;
+   	border-top: 1px solid #dddddd;
+   	border-left: 1px solid #dddddd;
+   	background-color: #ffffff; 
+	-moz-border-radius: 10px;
+}
+
+div.tabs {
+    	line-height: 15px;
+    	font-size: 14px;
+}
+
+.tabHover {
+   	background-color: #cccccc;
+    background-image: none;
+}
+
+.tabActive { 
+    background-color: #ffffff;
+    background-image: none;
+}
+
+/* form stuff */
+
+.formDescription {
+	font-family: helvetica, arial;
+	font-size: 12px;
+}
+
+.formSubtext {
+	font-family: helvetica, arial;
+	font-size: 11px;
+}
+
+a{
+	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+	color: #0f3ccc;
+	text-decoration: none;
+}
+
+a:hover{
+	font-family:  "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, Arial, sans-serif;
+	color: #000080;
+	text-decoration: underline;	
+	
+}

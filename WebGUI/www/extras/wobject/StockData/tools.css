@@ -1,0 +1,262 @@
+.qmmt_main
+{
+    background-color: #ffffff;
+    border: 1px solid #999999;
+}
+.qmmt_tab
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+    color: #000000;
+    background-color: #dddddd;
+    padding: 1px;
+    padding-left: 2px; 
+    padding-right: 2px;
+    text-align: center;
+    border-left: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+    border-top: 1px solid #999999;
+    cursor: pointer;
+    voice-family: "\"}\"";
+    voice-family:inherit;
+}
+.qmmt_tabactive
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+    color: #000000;
+    background-color: #ffffff;
+    padding: 1px;
+    padding-left: 2px; 
+    padding-right: 2px;
+    text-align: center;
+    border-left: 1px solid #999999;
+	cursor: pointer;
+    voice-family: "\"}\"";
+    voice-family:inherit;
+}
+
+.qmmt_realtime_text
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #008000;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.qmmt_text
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #000000;
+}
+.qmmt_text_bold
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #000000;
+}
+.qmmt_text_up
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #009900;
+}
+.qmmt_text_down
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #ff0000;
+}
+.qmmt_cycle
+{
+    background-color: #eeeeee;
+}
+
+.qmmt_cycleup
+{
+    background-color: #eeffee;
+    color: #000000;
+}
+.qmmt_cycledown
+{
+    background-color: #ffeeee;
+    color: #000000;
+}
+.qmmt_header_text
+{
+    font: 11px Tahoma, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+}
+.qmmt_header_bar
+{
+    background-color: #dddddd;
+    border: 0px solid #999999;
+    padding-left: 3px;
+    text-align: left;
+}
+.qmmt_sub_header_bar
+{
+    background-color: #dddddd;
+    border: 0px solid #999999;
+    padding-left: 3px;
+    text-align: left;
+}
+.qmmt_input
+{
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+}
+a.qmmt {
+    color: #0000aa;
+    text-decoration: none;
+}
+a:visited.qmmt {
+    color: #0000aa;
+    text-decoration: none;
+}
+a:hover.qmmt {
+    color: #ff0000;
+    text-decoration: none;
+}
+
+.qmmt_options_in_money {
+  background-color: #FFFFCC;
+  font: 10px Tahoma, Arial, Helvetica, sans-serif;
+  color: #000000;
+}
+
+/* CSS for Tools using Tree Menu/View */
+.qm_tree {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #000000;
+	white-space: nowrap;
+}
+.qm_tree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.qm_tree a {
+	color: #000000;
+	text-decoration: none;
+}
+.qm_tree a.node, .qm_tree a.nodeSel {
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+.qm_tree a.node:hover, .qm_tree a.nodeSel:hover {
+	color: #0000aa;
+	text-decoration: underline;
+}
+.qm_tree a.nodeSel {
+	background-color: #dddddd;
+}
+.qm_tree .clip {
+	overflow: hidden;
+}
+
+
+/* No Need to really edit this, for Market Depth / Level II row colors */
+/* Level II Cycles */
+.qmmt_L2_cycle1 {     
+   font: 10px Tahoma, Arial, Helvetica, sans-serif;              
+   background-color:           #FFFEEF;
+   font-weight: normal;
+   color:                      #000000; }
+.qmmt_L2_cycle2 {     
+   font: 10px Tahoma, Arial, Helvetica, sans-serif;                     
+   background-color:           #F0F7DE;
+   font-weight: normal;
+   color:                      #000000; }
+.qmmt_L2_cycle3 {     
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                     
+    background-color:           #F4F0E8;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle4 {       
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                     
+    background-color:           #E0E0F7;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle5 {       
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                    
+    background-color:           #F7F7F7;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle6 {         
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                 
+    background-color:           #F5E8E8;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle7 {         
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                 
+    background-color:           #F6EDDA;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle8 {        
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                  
+    background-color:           #DCEAEE;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle9 {        
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                  
+    background-color:           #E9E2F4;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle10 {        
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                  
+    background-color:           #EEF2FA;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle11 {        
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                  
+    background-color:           #E1E2FA;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle12 {       
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                   
+    background-color:           #EEFAE1;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle13 {         
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                 
+    background-color:           #EDFCFB;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle14 {        
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                  
+    background-color:           #FBEBE8;
+	font-weight: normal;
+    color:                      #000000; }
+.qmmt_L2_cycle15 {       
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                   
+    background-color:           #EDEDED;
+	font-weight: normal;
+    color:                      #000000; }	
+.qmmt_L2_cycle16 {       
+	font: 10px Tahoma, Arial, Helvetica, sans-serif;                   
+    background-color:           #F6EDDA;
+	font-weight: normal;
+    color:                      #000000; }
+    
+.qmmt_cycleup
+{
+    background-color: #eeffee;
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #000000;
+	font-weight: normal;
+}
+.qmmt_cycledown
+{
+    background-color: #ffeeee;
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #000000;
+	font-weight: normal;
+}    
+
+.qmmt_cyclenochange
+{
+    background-color: #ffffff;
+    font: 10px Tahoma, Arial, Helvetica, sans-serif;
+    color: #000000;
+	font-weight: normal;
+}    

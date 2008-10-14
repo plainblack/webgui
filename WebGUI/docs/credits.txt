@@ -1,0 +1,81 @@
+####################################################################
+#                          WebGUI Credits                          #
+####################################################################
+
+The following people/companies are responsible for WebGUI:
+
+
+WebGUI Core..........................JT Smith / Plain Black
+
+Contributing Developers..............Meg O'Keefe Andrea / Plain Black
+                                     Lucas Bartholemy
+                                     Peter Beardsley / Appropriate Solutions
+                                     Doug Bell / Plain Black
+                                     Leendert Bottelberghs / United Knowledge
+                                     Richard Caelius / 100 World
+                                     Irving Carrion
+                                     Richard Clark
+                                     Doug Collinge
+                                     Misja Op de Coul / E-Wise
+                                     Flavio Curti
+                                     John Dagitz / Plain Black
+                                     Michele Dell'Aquila / CSU
+                                     Jeff Depons / Adaptive Dynamics
+                                     Frank Dillon / Plain Black
+                                     Arne Dokken
+                                     Junying Du / Brunswick
+                                     Ed Van Duinen / UNC
+                                     Greg Fast / Brunswick
+                                     Chris Gebhardt / OpenServe
+                                     Andy Grundman
+                                     Chris Jackson
+                                     Roy Johnson / Plain Black
+                                     Koen de Jonge / ProcoliX
+                                     Martin Kamerbeek / Oqapi
+                                     Yung Han Khoe
+                                     Diona Kidd / Knowmad Technologies
+                                     Graham Knop / Plain Black
+                                     Christian Kocourek
+                                     John W. Krahn
+                                     Len Kranendonk
+                                     Colin Kuskie / perlDreamer Consulting LLC
+                                     Christophe Marcant
+                                     Kristi McCombs / Plain Black
+                                     Tony Mountifield
+                                     Kaleb Murphy / Plain Black
+                                     Chris Nehren / Plain Black
+                                     Ernesto Hernandez Novich
+                                     Tavis Parker / Plain Black
+                                     Daniel Quinlan
+                                     Jukka Raimovaara / Axxion Oy
+                                     Alan Ritari / DonorWare
+                                     Hal Roberts / Harvard
+                                     Laura Rummage / Plain Black
+                                     Tera Runde / Plain Black
+                                     Steve Simms
+                                     Ben Simpson
+                                     Alan Smithee
+                                     Steve Swanson / Plain Black
+                                     Jeff Szpak / Plain Black
+                                     Sean Tu / WDI
+                                     Vladimir Vitkovsky / WebGUI Worldwide
+                                     Jamie Vrbsky / Plain Black
+                                     Madsen Wikholm
+                                     Matt Wilson / Plain Black
+                                     Zhou Xiaopeng / WebGUI Worldwide
+                                     Gerald Young
+                                     Tabitha Zipperer / Plain Black
+
+The following are people/companies who didn't directly contribute
+to WebGUI, but whose work has made WebGUI possible:
+
+
+Perl.................................Larry Wall / O'Reilly
+                                     The Entire CPAN Community (search.cpan.org)
+
+TinyMCE..............................MoxieCode
+                                     http://www.moxiecode.com
+
+Yahoo User Interface (YUI)...........Yahoo!
+                                     http://www.yahoo.com
+

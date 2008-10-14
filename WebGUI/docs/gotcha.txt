@@ -1,0 +1,1154 @@
+####################################################################
+#                      WebGUI Upgrade Gotchas                      #
+####################################################################
+
+This file contains a list of any changes you should be aware of when
+upgrading from one version to the next, or even between multiple
+versions. Be sure to heed the warnings contained herein as they will
+save you many hours of grief.
+
+7.6.1
+--------------------------------------------------------------------
+ * WebGUI now requires Class::C3 version 0.19 or greater.
+
+
+7.6.0
+--------------------------------------------------------------------
+ * WebGUI now requires Module::Find version 0.06 or greater.
+
+ * You must be fully upgraded to 7.5.24 before upgrading to 7.6.0
+
+ * You can no longer template the AdminBar macro. Any custom template
+   id that you pass it will be ignored, and the original template will
+   be removed from your site.
+
+
+7.5.21
+--------------------------------------------------------------------
+ * Previous versions of WebGUI used the wrong day of the week for
+   scheduled workflows.  This resulted in them being run a day later
+   than they should have.  If you relied on the old behavior, you
+   will need to update your workflow schedules.
+
+
+7.5.19
+--------------------------------------------------------------------
+ * WebGUI now requires Text::CSV_XS version 0.52.  If you have been
+   using an earlier version you will need to upgrade this perl
+   module before you upgrade.
+
+ * If a user profile field allowed multiple selects, and it also had
+   more than one default value, the User method profileField would
+   return the first.  It will now return all default values as a string,
+   joined by commas.
+
+7.5.17
+--------------------------------------------------------------------
+ * If users are allowed to self register and emails are not required, this
+   might cause downstream bugs in other assets that require email addresses.
+
+7.5.16
+--------------------------------------------------------------------
+ * You need the following Perl Modules installed before you upgrade:
+    File::Path
+
+
+7.5.13
+--------------------------------------------------------------------
+ * RSSFromParent now uses the parent asset's canView method to 
+   determine if the user is allowed to see the RSS feed.
+   The upshot of this is that a user must be able to view the 
+   Collaboration System in order to view its RSS feed.
+   Previously, RSSFromParent did no view restrictions, allowing 
+   anyone with the right URL to see an RSS feed, even if they do not
+   have permission to view the Collaboration System it came from.
+
+ * The 7.5.11 upgrade contained a bug that didn't import existing
+   Data Form entries properly.  The script has been corrected, so if
+   you didn't already upgrade to 7.5.11, there is nothing to worry
+   about.  If you already upgraded, the information can be restored
+   from a backup. See
+   http://www.webgui.org/bugs/tracker/data-form-listing-existing-entries-wrong-missing-data
+   for information on how to retrieve this information without having
+   to revert entirely to a past backup.
+
+
+7.5.11
+--------------------------------------------------------------------
+ * You need the following new Perl Modules installed before you upgrade:
+    Archive::Any
+    Exception::Class
+    Path::Class
+    Image::ExifTool
+    List::MoreUtils
+
+ * SQL Form is no longer part of the official distribution of WebGUI,
+   but is still being actively maintained by third-parties. However, if you
+   don't want to use SQL Form any longer, make sure you delete all SQL Forms
+   from your site prior to the upgrade *and* purge them from your trash. Then
+   the upgrade will automatically uninstall the SQL Form from your site.
+
+ * WebGUI versions since 7.3.0 (when the new Calendar was added) 
+   have allowed users to post Events to Calendars, but the owner of
+   the Event has been saved as Admin (user ID 3). Also, anyone who
+   was allowed to add an Event was allowed to edit any Event in the
+   Calendar.
+   The permissions have now been fixed, but it is not possible to
+   fix the owner of Events posted by individual users. Users are
+   not allowed to edit the owner of an Event from the web interface
+   as a security measure.
+   The new permissions are:
+        * Users who post an Event are allowed to edit and delete the
+          Events they post
+        * Users who can edit the Calendar are allowed to add, edit,
+          and delete all Events
+
+ * The commerce system was completely rewritten. As such you will need
+   to tweak some settings to get commerce back up and running.
+
+ * Shipping configurations are going to be lost when you upgrade. You'll
+   need to set up a shipping option if you're using the commerce system.
+
+ * Products in the old Commerce system have been converted to new Asset-based
+   Products in a new folder called Products.  Instead of using the ^Product()
+   macro to display a Product on a page, either place the Product directly
+   onto a page (like any other asset) or use the AssetProxy macro.  In all
+   Wobjects, Templates and Snippets, the Product macro has been replaced
+   with the AssetProxy macro.
+
+ * The Product template variables now use the new WebGUI standard of not
+   using dots in their names.  For example, brochure.icon is now brochure_icon
+
+ * All Product Templates that shipped with earlier versions of WebGUI have
+   been deleted, except for the Default Product Macro.  During the upgrade,
+   all products have been updated to use the Default Product Macro.  If you want
+   to keep these, you will need to make a copy of them before the upgrade.
+
+ * All Commerce Templates that shipped with earlier versions of WebGUI have
+   been deleted.  If you want to keep these, you will need to make a copy of
+   them before the upgrade.
+
+ * Subscriptions have been converted to assets. These assets will be placed in 
+   the import node in the folder 'Migrated Subscriptions'. 
+   
+ * It used to be possible to link subscription codes to multiple subscriptions. 
+   This is no longer the case. Subscription code that are not yet expired or used
+   and link to multiple subscriptions will be migrated in the following manner:
+     1) The subscription codes will remain valid for one of the subscriptions they
+        linked to.
+     2) For the other subscriptions connected to these codes new subscription codes 
+        will be generated. The upgrade script print all the new codes in the case.
+        The new codes will also be logged in the webgui log file.
+
+ * With the new shop system the Payment plugins have been changed too. The default
+   WebGUI Payment Plugins are automatically migrated for you, but custom plugins 
+   will have to be adapted to use the new WebGUI::Shop API.
+
+ * If you are using the ITransact payment plugin you'll have to change the postback
+   url. The new value is printed by the upgrade script and can also be found in
+   the edit screen of the ITransact plugin.
+
+ * The Commit With Approval and Commit Without Approval workflows have been
+   rebuilt.  If you have changed these default workflows and wish to retain your
+   changes, be sure to back them up before you install 7.5.11
+
+7.5.9
+--------------------------------------------------------------------
+ * WebGUI 7.5.6 uses a Unicode database connection, but this can cause problems
+   with old data stored in an erroneous format.  The 7.5.6 upgrade has been
+   adjusted to compensate for this.  If you are upgrading from prior to 7.5.6,
+   the data should be repaired automatically.  However, if you had already upgraded
+   past 7.5.6, there is no automated way to resolve the differences in the data.
+   For information on how to resolve this if you have already upgraded, see
+        http://www.webgui.org/bugs/tracker/charset-db-connection
+
+
+7.5.4
+--------------------------------------------------------------------
+ * YUI has been upgraded to 2.5.0.  The resizable textarea implementation in
+   WebGUI has been rewritten using YUI instead of the Ext library.  This has
+   removed Ext as a depenancy, and it has been removed.
+
+
+7.5.1
+--------------------------------------------------------------------
+ * The resizable textarea implementation in WebGUI has been reimplemented to use
+   the code present in YUI 2.5.0. As such, WebGUI's YUI implementation has been
+   updated to version 2.5.0, and the no-longer-needed extjs library has been
+   removed.
+
+
+7.5.1
+--------------------------------------------------------------------
+ * There was a corrupt template in a package for the 7.5.0 upgrade.
+   If you already upgraded to 7.5.0, please import the package 
+   located at: 
+   WebGUI/docs/upgrades/packages-7.5.0/root_import_timetracking_user.wgpkg
+
+ * WebGUI requires newer versions of some existing modules. Be sure to
+   install them BEFORE upgrading. They are:
+
+        JSON 2.04
+        Config::JSON 1.1.2
+
+
+7.5.0
+--------------------------------------------------------------------
+ * You must upgrade to 7.4.40 before you upgrade to 7.5
+
+ * Event related links are now displayed using a template loop 
+   rather than a template variable. See the default templates for 
+   details.
+   Your custom Event Edit and Event View templates may need fixing.
+
+ * If you want to use the beta, you must first upgrade to 7.4.21 then
+   upgrade to the beta. If you upgrade past 7.4.21 then you cannot
+   use the beta.
+
+
+7.4.12
+--------------------------------------------------------------------
+ * Any customizations made to the Matrix default Search, Compare or
+    Detailed listing templates will be lost.  Please back up your
+    custom templates before running the upgrade.
+
+
+7.4.11
+--------------------------------------------------------------------
+ * The 7.4.8 upgrade script had an error for sites using Dashboards.
+    This would prevent the script from completing successfully.  The
+    script has been fixed for future releases.
+
+
+7.4.3
+--------------------------------------------------------------------
+
+ * You must upgrade to Config::JSON 1.1.0 or higher prior to upgrading.
+    Due to a bug in CPAN you should type "force install Config::JSON" in
+    order to upgrade to this version.
+ 
+ * For Poll Wobjects, we're using a new way to store the graph 
+    configuration. If you were having problems with your Poll graphs, 
+    you will need to re-create the graph's configuration. It may not
+    be possible to read your graph configuration, so if you have 
+    problems with the Poll graphs you will need to re-create the graph's
+    configuration. After you create a new configuration, everything will
+    work fine.
+
+
+7.4.0
+--------------------------------------------------------------------
+
+ * You must upgrade to the latest 7.3.x release before upgrading to
+    7.4.0 or you will encounter fatal errors during the upgrade
+    process.
+
+ * The userProfileData table has been completely re-done. Now, each
+   user profile field has its own column in the userProfileData table.
+
+   Any applications that you may have that makes raw SQL queries against
+   the userProfileData table will need to be updated to reflect these
+   changes.
+
+ * DatabaseLinks no longer automatically set LongReadLen and LongTruncOk
+   for Oracle or ODBC databases.  These parameters, and others, can now
+   be set in the DatabaseLink.  The old settings used were
+     LongReadLen: 512*1024
+     LongTruncOK: 1
+
+ * WebGUI now requires the following additional perl modules to operate,
+   and you should install them prior to upgrading:
+
+    Config::JSON
+    Text::CSV_XS
+    Class::InsideOut
+    HTML::TagCloud
+
+ * WebGUI now uses Graphics::Magick instead of Image::Magick for
+   image processing functions. However, for the next few versions you
+   will still be able to use Image::Magick if you already have it
+   installed, to make the transition easier. Graphics::Magick is a
+   fork of Image::Magick, but it's focus is stability and compatibility
+   over adding new features. Another note will be added to this file
+   when support for Image::Magick is officially removed. That will
+   most likely happen in WebGUI 7.6.0. Note that WRE 0.8.0 includes
+   Graphics::Magick, so if you upgrade to WRE 0.8.0 then you'll
+   automatically be ready for the future.
+
+ * Any customizations made to the Inbox or Inbox/Message templates 
+   will be lost. Please back up your custom templates before running
+   the upgrade
+   
+ * The Transaction Error template in commerce has been merged with the Checkout 
+   template.  All Transaction Error templates are purged from the system on upgrade.
+   Make sure you back up your custom templates and apply them to the Checkout template.
+   None of the template variables have changed.
+
+
+7.3.19
+--------------------------------------------------------------------
+
+ * There was a bug fixed in this release relating to the Image asset.
+   The bug was that if you edited an Image, then the original image file
+   in the asset was replaced with its thumbnail.  There is no easy way to
+   automatically fix this the results of this bug.  To recover affected
+   Image Assets, then just upload a copy of the original image file.  You
+   do not need to Trash/Delete the Image Asset.
+
+
+7.3.16
+--------------------------------------------------------------------
+
+ * There was an inadvertent override of the Asset method isLocked inside
+   of WebGUI::Asset::Post::Thread.pm.  Normally, isLocked will return true
+   if the Asset is being edited by another user.  However, the isLocked inside
+   of Thread.pm returned true if the Thread was locked to prevent more
+   replies from being added to the it.
+
+   In 7.3.16, the thread lock method inside Thread.pm was renamed
+   isThreadLocked.  No template variables, field names or database
+   columns were changed.
+
+ * The create.sql script for 7.3.15 was released with 7.3.16. While
+   upgrading to 7.3.17 you'll notice it also processing the 7.3.15-
+   7.3.16 upgrade. This is to be expected.
+
+7.3.15
+--------------------------------------------------------------------
+
+ * The Event Management System now uses an extra table to store
+   information about events in the user's cart. This fixes a bug
+   where a user that logs out after adding events to their cart but
+   before they complete their transaction will be charged for their
+   events but not registered for them.
+
+   Existing sessions affected by this bug are not fixed, so there may still 
+   be errors. This SQL query will get the session IDs of the
+   sessions affected by this bug:
+
+    select distinct(sessionId) 
+        from shoppingCart 
+        where itemId IN (SELECT productId from EventManagementSystem_products) 
+            AND sessionId IN (SELECT distinct(sessionId) FROM userSessionScratch WHERE name LIKE "purchaseId%");
+   
+   You may want to expire these sessions from the Admin Console > 
+   Active Sessions screen.
+
+7.3.12
+--------------------------------------------------------------------
+
+ * The sbin/thumbnailer.pl script was almost completely rewritten.
+   It now accepts a script to only thumbnail things that do not
+   already have thumbnails, to help compensate for problems with
+   the RTE Collateral Image manager upload/thumbnail bug.
+   Run the script with no arguments to get a summary of the new
+   usage.
+
+7.3.11
+--------------------------------------------------------------------
+
+ * The weather data asset stopped working because our old weather
+   provider went away. We've remade the weather asset using a data
+   feed from weather.com. The feed is free, but you'll have to
+   register to use it on your site. The up side is that the weather
+   asset now supports international cities.
+
+   You must now also have Weather::Com::Finder 0.5.1 installed. Do
+   this before you upgrade.
+
+7.3.10
+--------------------------------------------------------------------
+ * This version fixes a bug in the 7.2.3-7.3.0 upgrade where the
+   incorrect revision of an Event would be migrated.
+   
+   If you have already upgraded, either restore from a backup or
+   go over your Calendars and ensure that your Event's informations
+   are accurate.
+   
+   If you have not yet upgraded, you do not need to do anything.
+
+7.3.9
+--------------------------------------------------------------------
+ * This upgrade may appear to freeze when it gets to the "Adding
+   thread rating column" step, especially if your site has a large
+   number of collaboration systems and posts.  Let it run, it's
+   working.  We have to recalculate the rating for every single post
+   and it can take upwards of an hour on large sites.
+
+ * If you're using the Events Management System and have a custom
+   checkout template, you will need to use the following template
+   variables to implement the fix: isError, errorLoop, error.
+   Documentation on their use is in the online help and you can also
+   look at the default template for an example use.
+
+ * The c_companyName macro now uses HTML encodings for comma and
+   single quote to make it safe to embed inside other macros.
+
+7.3.8
+--------------------------------------------------------------------
+ * For those who upgraded to 7.3.7, any EventsCalendars (with their 
+   attached events) in the trash or on the clipboard during the 
+   7.2.3 - 7.3.0 upgrade were NOT migrated. This version will delete 
+   those from the database, since it is not possible to recover them 
+   based on their current state.
+   
+   Those who are upgrading from 7.2.3 - 7.3.8 will not lose any 
+   data.
+
+   NOTE: Any Events Calendars in the trash will be purged and no 
+   longer recoverable.
+   
+
+7.3.7
+--------------------------------------------------------------------
+ * For those who performed a multiple site upgrade from 7.2.3 to 
+   7.3.1 or higher and began having problems with navigation and 
+   calendar wobjects, you can fix those problems by restoring your 
+   7.2.3 database, restoring the 7.2.3 WebGUI source, re-applying 
+   the 7.3.7 WebGUI code, and running the upgrade again.
+   If you are not affected by these problems, you do not need to 
+   restore.
+
+7.3.5
+--------------------------------------------------------------------
+ * Template variables used in templates that use XML, or that are used
+   inside of Javascript need to be escaped to make quotes and other
+   characters safe.  This can be done by appending ESCAPE="HTML" or
+   ESCAPE="JS" to the tmpl_var tag.  Examples were added to the
+   Template Language help page.
+
+ * A javascript confirmation was added to the default Edit Wiki Page
+   template.  It will need to be manually added to custom templates.
+
+7.3.2
+--------------------------------------------------------------------
+ * The testCodebase.pl script will now automatically set the CODE_COP
+   script unless you give it the --noLongTests switch.
+
+7.3.0
+--------------------------------------------------------------------
+ * The i18n/label.t and help/setHelp.t test now require that you set
+   an environment variable, CODE_COP to run them.  This should make
+   running the entire test suite prior to SVN commits easier to do
+   since it won't take so long.
+
+ * Password recovery has been redone, and is now based on profile fields
+   rather than email access.  Since there's no real way to migrate the
+   one to the other, this upgrade _disables password recovery_.  The template
+   variables for password recovery are also different, so if
+   you have a custom template, you will have to update it.
+
+   To enable password recovery, you must first pick a set of profile fields
+   to use such that any user who knows that set of fields can reset their
+   password based on those.  Edit each of those profile fields to turn the
+   "Required for password recovery?" flag on; then you will be able to
+   enable password recovery.  It is highly advisable to pick several fields,
+   as one field only is very easy to break.
+
+   There is a new Calendar wobject which replaces the current EventsCalendar
+   wobject.  The upgrade will migrate all of your events but it will *not*
+   migrate any of your custom templates.  All custom event calendar templates
+   will be *_D E L E T E D_* so make sure you have a backup if you need them.
+   Also, the Event List view of the calendar works a little different
+   than it used to.
+
+   The upgrade script takes an unusually long time to migrate EventCalendar
+   wobjects to the new Calendar wobjects.  We're looking into the cause but
+   don't kill your upgrade thinking its hung up, we promise it will finish.
+
+7.2.0
+--------------------------------------------------------------------
+ * NOTE: if you tried to upgrade to 7.2.0 and it failed during the
+   addition of RSS From Parent capability, there have been bugs fixed
+   in that section of the relevant upgrade script in 7.2.1.
+
+ * Server side spellchecking has been added to this release. You must 
+   install Text::Aspell, and any dictionary you like. If you want to 
+   use spellchecking you have to setup the dictionaries you want your 
+   users to use in the config file. Also you'll have to check the 
+   spellchecker checkbox in the RichEdit asset you're using.
+
+ * The sales tax in the commerce system requires the Locale::US perl
+   module.  You will need to install it.
+
+ * To combat a phishing exploit, all image form controls used in the
+   user profiling system now default to a state that only allows 
+   image files to be uploaded through them. If you have a user profile
+   field that needs to accept images and files you will need to edit
+   that field and set the "Force Image Only" property to No.
+	
+7.1.3
+--------------------------------------------------------------------
+ * The column that stores the graph configuration in the Poll table 
+   has the wrong type. In MySQL 5 this results in corruption of this 
+   hash. The upgrade script will fix the column type, but not the 
+   corrupted graph configs. Polls with an erroneous configuration
+   will display the old text based graphs. To fix the Polls, just edit
+   them, set the correct graphing options again and finally save.
+   
+7.0.8
+--------------------------------------------------------------------
+ * 7.0.7 was released with a critical bug that broke the search engine
+   for many sites, but not all. This bug has been corrected and tests
+   have been written to help ensure it doesn't happen again. However,
+   as a result you must rerun the search indexer program (sbin/search.pl)
+   on all your sites.
+
+
+7.0.4
+--------------------------------------------------------------------
+
+ * Version 7.0.3 shipped with a 7.0.2 create.sql script. This doesn't
+   really hurt anything, it just means that if you installed 7.0.3
+   as your starting point, you'll see an extra upgrade go through
+   when you upgrade to 7.0.4.
+
+
+
+7.0.3
+--------------------------------------------------------------------
+
+ * Numbers generated by the Splat_random macro were not evenly
+   distributed.  It returned numbers between 0 and 'max' (inclusive)
+   with this two numbers occurring about half as much as other numbers.
+   This is now fixed, so it will return numbers between 0 and 'max-1'
+   (inclusive), with an equal probability of any of these numbers.
+   If you're using this macro, you might need to increment the max
+   parameter.
+
+ * We've made a number of improvements and bug fixes to the search
+   indexing system in this release. You may want to use the search.pl
+   utility in sbin to reindex your site to get better search results.
+
+
+7.0.2
+--------------------------------------------------------------------
+
+ * We've cut the memory leak in half. It turns out we had a bad perl
+   module that was causing a big part of the memory leak. As such,
+   you now need to install POE::Component::Client::HTTP.
+
+
+7.0.0
+--------------------------------------------------------------------
+
+ * There is a memory leak in Spectre. We're working on a solution to
+   this problem, but in the mean time you will need to restart spectre
+   every so often to clear out the memory. We recommend setting up a
+   cron job to restart it once per day.
+
+
+6.99.5
+--------------------------------------------------------------------
+
+ * In transferring LDAP from the users to group module, it was discovered
+   the ldap link must also be saved with the group.  The upgrade attempts 
+   to determine the proper LDAP Link to use, however it is not guaranteed
+   to be accurate.  If you use LDAP groups in WebGUI, be sure and check 
+   each one to make sure they are assigned to the appropriate LDAP Link.
+
+
+6.99.4
+--------------------------------------------------------------------
+
+ * A bug was just discovered in the WebGUI::Auth API in that it was
+	missing the editUserSettingsFormSave() method. If you have
+	built your own auth module, then you need to add this method
+	or your auth settings will not save. See WebGUI::Auth::WebGUI
+	for an example of how to do this. If you are not using custom
+	auth, then don't worry about this.
+
+
+6.99.0
+--------------------------------------------------------------------
+
+ * The 6.99 series is the last round of changes before 7.0.0 is
+	released. It will serve as the beta, gamma, and release
+	candidates for 7.0.0.
+
+ * The group SQL query mechanism has been changed to be more efficient,
+	more practical, and more consistent with the rest of WebGUI. As
+	such, your old query will no longer work. You used to do something
+	like "select 1 from table where foo='bar'", but now you need to
+	"select userId from table where foo='bar'".
+
+ * The "messageLog" table will be deleted during the upgrade process,
+	and all of the messages in it. This is because the messages
+	contained in there are no longer useful because they won't
+	work with the new workflow system. If you need the data in
+	that table, you should save it before performing the upgrade.
+
+ * The session system has been replaced by a new object-oriented one,
+	which has caused massive API changes. Please consult
+	migration.txt to bring your custom code up to date with the
+	new API.
+
+ * You need to upgrade to the latest 6.8 release before you can
+	upgrade to 6.99.
+
+ * If you wish to use one of the new optional template engines
+	you'll need to install the perl modules for them:
+
+	Template
+	HTML::Template::Expr
+
+ * In order to make the upgrades run quickly, the upgrade process
+	will not automatically index your sites for the new search
+	engine. You need to do this manually after the upgrades
+	have completed by running the search.pl script in the
+	sbin folder.
+
+ * The following perl modules are now required:
+
+	MIME::Tools
+	POE
+	POE::Component::IKC::Server
+	POE::Component::Client::UserAgent
+	Net::Subnets
+	DateTime::Format::Mail
+	Net::POP3
+	List::Util
+	Color::Calc
+
+ * The upgrade script is going to convert your WebGUI config files
+	from the current PlainConfig format to the new JSON format.
+	Don't be alarmed by this, it's a normal part of the upgrade
+	procedure.
+
+ * You no longer need the cron job for runHourly.pl. Instead, you
+	must start sbin/spectre.pl when your server starts up.
+	Spectre is WebGUI's offline execution engine. It triggers
+	scheduled events and executes workflow tasks. Be sure to
+	edit each of your WebGUI config files to set the
+	spectreSubnet setting to match your IP address or IP range.
+
+	Running spectre requires a spectre.conf file.  Like the
+	log.conf file, the name is fixed.  Make a copy of the sample
+	spectre.conf, etc/spectre.conf.original, and place it in the
+	etc directory.	Then make any final edits or configurations
+	and start /sbin/spectre.pl.
+
+	You must have a spectre.conf file before you run the upgrade
+	to 6.99.0.
+
+ * If you wish to run the full test suite, you'll need to install
+	these optional modules:
+
+	Test::Deep
+	Test::MockObject
+
+ * The content in the import node has had inappropriate privileges
+	since it was created. We're resetting the privileges to be
+	viewable by everyone and editable by the turn admin on
+	group. If this is not what you want for your site, or for
+	segments of the content in your import node, you'll need
+	to change it after the upgrade.
+
+ * Because collaboration system posts are now integrated with
+	the workflow engine, the approve/deny links are no longer
+	needed or used in your templates. In addition if you wish
+	to use an approval process on any of your collaboration 
+	systems, you'll need to re-enable it after this upgrade.
+
+
+6.8.4
+--------------------------------------------------------------------
+ * The If macro has been removed because it's far too dangerous and
+   	error prone. If you use the If macro you may continue to use
+        it at your own risk, maintenance, and support cost, but it
+        is no longer supported by Plain Black.
+
+
+
+
+6.8.1
+--------------------------------------------------------------------
+ * Before upgrading you must install the following new Perl modules:
+	Data::Structure::Util
+
+ * Fixed a major versioning system bug in this release where when purging 
+	the last revision of an asset, if it had children, the children were 
+	not purged with it. This may have caused problems in some people's 
+	databases if they used any 6.7.x version or 6.8.0. If it has all you 
+	need to do to fix it is upgrade to this release and then run 
+	sbin/rebuildLineage.pl
+
+
+6.8.0
+--------------------------------------------------------------------
+
+NOTE: If you're upgrading from MySQL 4 to 5 you MUST do a mysqldump on your
+databases from 4 and then after upgrading to 5, reimport them. If you do not
+do this your databases will become corrupted.
+
+
+ * Before upgrading you must install the following new Perl modules:
+	DateTime
+	DateTime::Format::Strptime
+	DateTime::Cron::Simple
+	JSON
+	Finance::Quote
+	Archive::Zip
+
+   And optionally, these:
+
+	Test::More
+        Pod::Coverage
+
+ * If you have previously installed the community contributed version
+	of the In/Out Board (IOB) then you will need to completely
+	uninstall it before you can proceed with this upgrade.
+
+ * The core API has changed. Check docs/migration.txt for details.
+
+ * WebGUI now requires Apache2 with mod_perl2 so CGI, FastCGI, PerlEx,
+	although never officially supported, are no longer possible.
+	Making this change gave us more than 70% performance improvement
+	and opens up even more possibilities for performance and other
+	optimizations.
+
+	You'll need to make the following changes in Apache to upgrade
+	to this release:
+
+	Install libapreq2. You can either download and compile this
+	from the mod_perl web site, CPAN as Apache2::Request, or by
+	getting the version of the WRE 0.6.0 or higher.
+
+	Edit your httpd.conf or httpd.modperl.conf and add the following
+	directives to your global server config:
+
+  	LoadModule apreq_module modules/mod_apreq2.so
+ 	PerlSetVar WebguiRoot /data/WebGUI
+
+	You may also remove this block if you have it:
+
+	<Files ~ "\.(pl)$">
+    		SetHandler perl-script
+    		PerlHandler ModPerl::Registry::handler
+    		PerlOptions +ParseHeaders
+	</Files>
+
+	You also no longer need the ExecCGI directive.
+
+	Edit each of your virtual hosts and add the following directives,
+	changing them to suit your needs:
+
+	SetHandler perl-script
+        PerlInitHandler WebGUI
+        PerlSetVar WebguiConfig www.example.com.conf
+
+	If you were using mod rewrite you'll need to adjust your rules
+	because they no longer need to remove the gateway (index.pl)
+	from the URL.
+
+	If you were using the uploadsAccessHandler.perl you no longer
+	need that as it is built in to the WebGUI handler.
+
+	For more information consult the WebGUI Done Right documentation.
+
+ * WebGUI now requires MySQL 5.0 to operate. This is due to the huge
+	number of new features afforded us in the MySQL 5.0 database,
+	which will increase performance, and add to our functionality
+	for the future.
+
+ * WebGUI now requires Perl 5.8 to operate.
+
+ * The Macro API has been changed. If you have any third-party macros
+	installed make sure to update them prior to upgrading. See
+	docs/migration.txt for details.
+
+ * You may now optionally create sbin/preload.exclude with a carriage
+	return seperated list of modules you don't want to be preloaded.
+	This file requires each line to contain exactly one full module
+	name such as "WebGUI::Asset::Wobject::WSClient" (without the
+	quotes) per line. No spaces or additional formatting can be
+	present. You may, for example, just copy sbin/preload.exclude.example
+	to sbin/preload.exclude and save yourself about 5MB of memory
+	because that will eliminate some of the least commonly used
+	components. 
+
+	If you mistakenly exclude modules that WebGUI actually needs
+	to run, it will load them at run time, and just use more RAM,
+	so you don't need to worry about breaking WebGUI. However, this
+	doesn't mean you should just exclude everything because doing
+	runtime loading will likely use 5-10 times more RAM than just
+	preloading them to begin with.
+
+
+6.7.0
+--------------------------------------------------------------------
+ * In order to upgrade to 6.7 you must first upgrade to at least 6.6.1.
+
+ * The asset API has changed slightly due to versioning, so if you
+	have any custom assets, check out migration.txt to make
+	sure they will comply.
+
+
+ * The templates for Survey assets has changed a little.  After
+        upgrading you will notice that your custom view templates
+	will not display your questions for editing in Admin mode.
+	You will need to put your questions loop inside of a section
+	loop.  See the default view template for an example.
+
+ * If you have any SQL reports going against the asset table, note that
+	it has been split into two tables "asset" and "assetData" and
+	your SQL reports will need to change.
+
+ * The indexed search asset has been disabled until 6.8 where it will
+ 	be entirely rewritten from the ground up.
+
+
+6.6.4
+--------------------------------------------------------------------
+ * Please ensure you're running HTML::Template version 2.7, which
+        supports javascript escaping and is needed to ensure js
+        menus work everywhere. To see what version you're running,
+        type:
+        perl -MHTML::Template -e 'print $HTML::Template::VERSION."\n"'
+        at a command prompt, or alternatively use the
+        sbin/testEnvironment.pl script included with WebGUI. If
+  	you've had your WebGUI site running on versions prior to 6.4
+	then you should delete your lib/HTML folder as it contains
+	an outdated version of HTML::Template.
+
+
+6.6.3
+--------------------------------------------------------------------
+ * If you created your site using the create.sql script from 6.6.2
+        you will need to recreate it from the new create.sql script
+        from 6.6.3. The 6.6.2 version has some unrecoverable
+        problems in it. If you just upgraded to 6.6.2, you need not
+        worry, the upgrade is unaffected by this problem.
+
+ * If you're randomly getting logged out before upgrading to this
+        release, clear your browser cache and cookies after upgrading
+        to this release and the problem will go away.
+
+
+6.6.0
+--------------------------------------------------------------------
+ * Perl modules that used to be shipped with WebGUI are now required
+	to be installed on your system manually. You can optionally
+	just use the WebGUI runtime environment to save yourself
+	the hassle of downloading all of them. You can also install
+	them using testEnvironment.pl The new modules you'll need 
+	to install are:
+
+	Log::Log4perl
+	Net::LDAP
+	Date::Manip
+	DBIx::FullTextSearch
+	HTML::Highlight
+	HTML::TagFilter
+	HTML::Template
+	Parse::PlainConfig	
+	Tie::IxHash
+	Tie::CPHash
+	XML::RSSLite
+	XML::Simple
+
+ * After upgrading you'll need to create a log.conf file in your etc
+	folder for the new logger. For most situations you can just copy 
+	log.conf.original to log.conf and you'll be fine. If you want
+	to set up custom logging rules, see this web page:
+	http://log4perl.sourceforge.net/releases/Log-Log4perl/docs/html/Log/Log4perl/Config.html
+
+* The Payment plugins should provide two new methods: shippingCost and 
+	shippingDescription. Plugins that do not have these methods
+	will fatal error when checking out.
+
+* The Commerce/ConfirmCheckout template has a lot of new variables to
+	use, but also some (existing ones) have been renamed. Please refer
+	to the corresponding help file.
+
+
+6.5.6
+--------------------------------------------------------------------
+ * The uploadsAccessHandler.perl script has specific issues with
+   various versions of mod_perl and Perl CGI due to the many recent
+   changes in mod_perl and Perl CGI. For this reason it may not work
+   on your platform. We're working to make a script that will work
+   everywhere. Until then, using the latest versions of mod_perl and
+   Perl CGI should produce working results.
+
+
+6.5.0
+--------------------------------------------------------------------
+ * The International Macro must be enabled in all WebGUI configuration
+   files for the Help to work correctly.
+
+6.4.0
+--------------------------------------------------------------------
+ * Image Magick is no longer optional.
+
+
+6.3.0
+--------------------------------------------------------------------
+ * After upgrading your site you'll have to reset the privileges on
+        your uploads folder to make sure that the web server has
+        the privileges it needs to write due to a large number of
+        changes on the filesystem.
+
+ * In order to upgrade to 6.3.0 or beyond you need to have already
+	already upgraded to 6.2.0 or above. The upgrades will fail if
+	you try to jump from any 6.1 (or prior) version directly to
+	6.3.
+
+ * Your upgrade process will be a little different from here on out.
+	Use the following steps to do the upgrade:
+
+	a) Back up everything.
+
+	b) Extract the 6.3 archive over your existing install.
+
+	c) Restart apache (don't shut down as normal, just restart).
+
+	d) Run upgrade.pl in the sbin folder.
+
+	e) Test.
+
+	The reason for this is that WebGUI has an innovative new way
+	of releasing sites for public view as soon as they become
+	available during the upgrade, even while the other sites are
+	still being upgraded. Each site will have a maintenance 
+	message displayed until its upgrade is complete.
+
+ * The EmptyTrash scheduler plugin has been removed since there's no
+	need for it with the more useful DeleteExpiredTrash module in
+	place.
+
+ * This upgrade process will run for a very long time and output a
+	lot of debug information which will be useful if something
+	goes wrong. You may wish to pipe the debug info to a log
+	file like this:
+	
+	perl upgrade.pl --yourcommandlineoptions > /tmp/upgrade.log
+
+ * If you're using languages other than English, you'll need to get
+	new versions of those language files before upgrading. The
+	language file format has a new requirement. Also, the
+	language files are now all converted to UTF-8.
+
+ * If you were using any non-English language files on your site,
+	you may now have to convert your site content to UTF-8
+	format. Check with your language file provider for details.
+
+ * If you're upgrading from a release earlier than 5.5.0 then you'll
+	need to download and upgrade to 5.5.x before you can upgrade
+	to 6.3 or higher.
+
+ * All Site Map wobjects will be migrated to Navigation assets 
+	during the upgrade. All the site map templates will
+	be lost. If you want them, save them before the upgrade. Also
+	check your site after the upgrade for all site maps to make
+	sure that they look the way you want them to look.
+
+ * All File Manager wobjects have been migrated to File Folder Layout
+	assets. The File Manager templates will be deleted during the
+	upgrade, so if you want to keep yours, get them before upgrading.
+
+ * If you have any SQL reports querying internal WebGUI database tables,
+	you'll need to update them after the upgrade. Most of WebGUI's 
+	database tables will be changed during the upgrade process.
+
+ * If you have any custom page templates, they'll need to be updated
+	to work with the new Layout system. The templates have been 
+	changed significantly enough that automatic migration of them is
+	not possible.
+
+ * You may add optional protection for your uploaded WebGUI files. This
+	will check the privileges of the files from the WebGUI database
+	before sending them to the browser. To enable this you must use
+	these directives:
+
+	PerlSetVar WebguiRoot /data/WebGUI
+	PerlRequire /data/WebGUI/sbin/uploadsAccessHandler.perl
+
+	And then add this to each virtual host you wish to protect:
+
+	PerlSetVar WebguiConfig www.example.com.conf
+	<Location /uploads>
+		PerlAccessHandler WebGUI::UploadsAccessHandler
+	</Location>
+
+ * If you have any custom code, please check out docs/migration.txt as
+	there have been many changes to the API in this release.
+
+ * There are many new components in this release, and as a result many
+	tables. Here is a list of the new tables. Make sure you have no
+	plug-ins installed that conflict with this, or tables you've
+	created for your own uses: Collaboration, Post, Thread,
+	Post_rating, Post_read, Folder, FileAsset, ITransact_recurringStatus,
+	ImageAsset, Layout, Shortcut, asset, assetHistory, commerceSettings,
+	redirect, shoppingCart, snippet, subscription, subscriptionCode, 
+	subscriptionCodeBatch, subscriptionCodeSubscriptions, transaction,
+	transactionItem
+
+ * Due to the sweeping changes in this release the migration script may not
+	work perfectly on your site. It should get you 90% of the way there,
+	but it will be up to you to fix the problems it can't catch. Some of
+	the things to look out for are Collaboration System (formerly USS
+	and forum) templates. Also look at images and navigations as they've
+	been moved from outside the content system, to inside it as assets
+	in the new asset tree.
+
+ * If you are using the SMB auth module, please note that it has been removed
+	from this release. It has been long deprecated and is no longer an
+	official part of WebGUI. It will be made available in the user
+	contribs section of plainblack.com for people wishing to continue to
+	use/maintain it.
+
+
+6.2.10
+--------------------------------------------------------------------
+ * The recommended default location for the WebGUI log is now
+	/var/log/webgui.log instead of /data/webgui.log
+
+ * The default path for WebGUI backups is now /tmp/backups rather than
+	/data/backups
+
+
+6.2.8
+--------------------------------------------------------------------
+ * Due to a bug in the theme system, if you created any themes in any
+	6.2.x version prior to 6.2.8 they will need to be deleted and
+	recreated. Otherwise they will export a corrupt theme file.
+
+
+6.2.2
+--------------------------------------------------------------------
+ * If you used 6.1.1 for a while, and feel like there's something
+	wrong with your navigation or page tree, then there just
+	might be. We corrected a rather large problem in the Page
+	system that could have caused page tree corruption. To test
+	and fix this problem, get the page tree tools from the user
+	contribs area of plainblack.com. Be sure to back up your
+	databases before using this tool.
+
+
+6.2.0
+--------------------------------------------------------------------
+ * WebGUI now requires Time::HiRes to operate. Be sure to have it 
+	installed prior to upgrading or the the upgrade will fail.
+
+ * Parts of the WebGUI API have changed once again, so be sure that
+	any third-party plug-ins you have installed have been updated
+	to work with 6.2 before upgrading.
+
+ * A new configuration option has been introduced: 
+	exportPath = /path/to/export/dir
+	If exportPath is defined in the WebGUI config file, a new 
+	"Export" icon will appear in the page toolbar.
+
+
+6.1.0
+--------------------------------------------------------------------
+ * See docs/migration.txt for changes in plug-in coding.
+
+ * You no longer need Data::Serializer.
+
+ * See docs/migration.txt for changes in the template system.
+
+ * See docs/migration.txt for changes in the Internationalization
+	and help systems.
+
+ * If you're using any third-party plug-ins, you'll need to get
+	updated versions to work with 6.1.
+
+ * If you're using a language other than English on your current site,
+ 	you'll need to obtain a language pack from either the user
+	contributions or one of the WebGUI Worldwide sites.
+
+ * Each user's language has been reset to the default language for
+	the site as specified in the profile settings.
+
+ * We removed a bunch of the cryptic-hack code that was allowing
+	backward compatibility all the way back to some 2.x, 3.x, and
+	4.x stuff. To be sure that your site will still work, copy
+	the gateway script (index.pl) over your old one. Also make
+	sure you have extrasPath and extrasURL defined in your config
+	file.
+
+ * The ThumbnailLinker macro has been removed. You can now use the
+	Thumbnail macro because it is templated.
+
+
+6.0.2
+--------------------------------------------------------------------
+ * You need to add all of your site aliases to the sitename variable
+        in your WebGUI config file.
+
+
+6.0.1
+--------------------------------------------------------------------
+ * Apache 2.0 is now the recommended web server for WebGUI. As such
+	sbin/preload.perl has been defaulted for use with mod_perl
+	2.0. If you are still using Apache 1.3, don't worry, WebGUI
+	will still work great for you. You just need to edit
+	sbin/preload.perl to match your environment.
+
+
+6.0.0
+--------------------------------------------------------------------
+ * As part of the upgrade process our scripts will attempt to
+	migrate your styles, page, FAQ, Item, Link List, and
+	SQL Report templates. However, the migration scripts are not
+	perfect due to the wide-variety of templates out there, so
+	you may need to update some portions of your templates
+	manually.
+
+ * The Authentication Module API has been completely rewritten.
+	Please see docs/migration.txt for details.
+
+ * The Paginator API has been significantly changed.
+	Please see docs/migration.txt for details.
+
+ * WebGUI now requires the following Perl modules to be installed:
+	Data::Serializer
+	SOAP::Lite
+	Cache::Cache (no longer optional)
+
+   WARNING: Be sure you install these modules BEFORE you attempt to
+	upgrade or the upgrade will fail and you'll have a mess to
+	clean up!
+
+ * If you've created any custom Events Calendar templates, they will
+	no longer work due to the new template structure for events
+	calendars. Your old templates will remain intact, however,
+	so that you can migrate them manually to the new template
+	variables.
+
+ * The Synopsis macro no longer exists. If you were using it to
+	retrieve the current page's synopsis, then please use the
+	^Page("synopsis"); macro. If you were using it to build a
+	synopsis style navigation please use the new ^Navigation();
+	macro.
+
+ * The old navigation system has been entirely replaced. If you've
+	built or are using any navigation components that did not
+	come with WebGUI then you'll need to remove them and use
+	the new configurable navigation system. See migration.txt
+	for additional details.
+
+ * The old realtime search subsystem has been replaced with the new
+	indexed search wobject. As such, we've removed the ^?; macro.
+	If you were using the ^?; macro then you'll need to set up
+	a search wobject to replace it.
+ 
+ * Themes that were created with 5.x versions of WebGUI will fail to
+	import into WebGUI 6.0. Sometime after the release of 6.0
+	(gamma) there will be a theme converter available on
+	plainblack.com to convert your old 5.x themes into 6.0
+	themes. If you've already imported a 5.x theme you have
+	nothing to worry about. All of the theme components will
+	automatically be converted to 6.0.
+
+ * If you have any SQL Reports going against any USS, they will need
+	to be updated as the USS tables have changed.
+
+ * During the upgrade process you may see some database errors during
+	the migration of SQL Reports. Don't be alarmed. Your upgrade
+	has not failed. Instead, some of the queries in the SQL Reports
+	may have failed and will cause the SQL Report templates to not
+	be automatically generated.
+

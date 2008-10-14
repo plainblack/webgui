@@ -1,0 +1,187 @@
+package WebGUI::Session::Stow;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+
+=head1 NAME
+
+Package WebGUI::Session::Stow
+
+=head1 DESCRIPTION
+
+This package allows you to "stow" a scalar or a reference to any other perl structure for the duration of the request. It's sort of like a mini in memory cache that only exists until $session->close is called. It is great to stow stuff that might otherwise have to be requested many times during a single page view, but that you would't want to store in the regular cache. Note that this is NOT supposed to be used as a global variable system. It's simply an in memory cache.
+
+=head1 SYNOPSIS
+
+$stow = WebGUI::Session::Stow->new($session);
+
+$stow->delete('temp');
+$stow->set('temp',$value);
+$value = $stow->get('temp');
+
+$stow->deleteAll;
+
+
+=head1 METHODS
+
+These methods are available from this package:
+
+=cut
+
+
+
+#-------------------------------------------------------------------
+
+=head2 delete ( name )
+
+Deletes a stow variable.
+
+=head3 name
+
+The name of the stow variable.
+
+=cut
+
+sub delete {
+	my $self = shift;
+	my $name = shift;
+	return undef unless ($name);
+	delete $self->{_data}{$name};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 deleteAll ( )
+
+Deletes all stow variables for this session.
+
+=cut
+
+sub deleteAll {
+	my $self = shift;
+	delete $self->{_data};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 get( varName ) 
+
+Retrieves the current value of a stow variable.  Note that if you use references, you're
+getting back a reference and modifying the contents of the reference will change the
+contents of the stow variable.
+
+=head3 varName
+
+The name of the variable.
+
+=cut
+
+sub get {
+	my $self = shift;
+	my $var = shift;
+	return undef if $self->session->config->get("disableCache");
+    my $ref = $self->{_data}{$var};
+    if (ref $ref eq 'ARRAY') {
+        my @safeArray = @{ $ref };
+        return \@safeArray;
+    }
+    elsif (ref $ref eq 'HASH') {
+        my %safeHash = %{ $ref };
+        return \%safeHash;
+    }
+    else {
+        return $ref
+    }
+	return $self->{_data}{$var};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 new ( session )
+
+Constructor. Returns a stow object.
+
+=head3 session
+
+A reference to the session.
+
+=cut
+
+sub new {
+	my $class = shift;
+	my $session = shift;
+	bless {_session=>$session}, $class;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 session ( )
+
+Returns a reference to the current session.
+
+=cut
+
+sub session {
+	my $self = shift;
+	return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
+=head2 set ( name, value )
+
+Stows some data.
+
+=head3 name
+
+The name of the stow variable.
+
+=head3 value
+
+The value of the stow variable.  Any scalar or reference.
+
+=cut
+
+sub set {
+	my $self = shift;
+	$self->session->errorHandler->debug('Stow->set() is being called but cache has been disabled')
+		if $self->session->config->get("disableCache");
+	my $name = shift;
+	my $value = shift;
+	return undef unless ($name);
+	$self->{_data}{$name} = $value;
+}
+
+
+1;

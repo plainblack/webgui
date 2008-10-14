@@ -1,0 +1,60 @@
+div.dragable:hover {
+	border: 1px dashed #aaaaaa;
+}
+.dragable{
+  	position: relative;
+	border: 1px dotted #cccccc; 
+}
+.dragTrigger{
+  cursor: move;
+  padding: 0px;
+  margin: 0px;
+}
+.dragTriggerWrap{
+  width: 100%;
+  height: 18px;
+  font-size: 10px;
+  color: #888888;
+  background-color: #cccccc;
+  border: 1px solid #888888;
+  opacity: 0.5;
+  text-align: right;
+}
+.dragging{
+  position: relative;
+   opacity:0.6;
+   -moz-opacity:0.6;
+   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+  cursor: pointer;
+  z-index: 2000; 
+}
+.draggedOverTop{
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-top: 8px #aaaaaa dotted;
+}
+.draggedOverBottom {
+  position: relative;
+  border: 1px dotted #aaaaaa;
+  border-bottom: 8px #aaaaaa dotted;
+}
+.hidden{
+  display: none;
+}
+.blank {
+  position: relative;
+  cursor: pointer;
+  background-color: white;
+}
+.blankOver {
+  position: relative;
+  cursor: pointer;
+  background-color: black;
+}
+.empty {
+  position: relative;
+  padding: 25px;
+  width: 50px;
+  height: 100px;
+}
+

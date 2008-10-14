@@ -1,0 +1,9 @@
+country,state,city,code,taxRate
+#header lines above
+
+#This is just a country.
+USA,,,,0.0
+USA,Wisconsin,,,5.0 #Wisconsin is expensive
+
+
+USA,Wisconsin,Madison,53701,0.5

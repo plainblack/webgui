@@ -1,0 +1,2280 @@
+6.99.5
+ - fix: Add a Related Product not working
+ - fix: Edit button missing in timetracker projects
+ - fix: Upgrade from 6.8.10 to 6.99.4 failed
+ - fix: Missing label in HTTP Proxy: Filter Content
+ - fix: Wobject.pm confirm() is broken (Matthew Wilson)
+ - fix: Survey - editQuestionSave - yesNo fields always "yes" (Matthew Wilson)
+ - Fixed a memory leak in Spectre that could cause it to double in size
+   roughly every 30 hours under certain conditions.
+ - fix: Problems with page.isSibling and page.inBranch
+ - Added new EMS event approval states
+ - Fix: 6.99.2-6.99.3 upgrade fails if spectre.conf doesn't exist
+ - fix: Payment in commerce system
+ - fix: packages don't take on new pages style when deployed
+ - fix: Payment in commerce system (Part II)
+ - fix: viewIndividualSurvey shows "Answer" lines in Survey mode
+ - fix: Attachment label but no field in CS posts
+ - fix: isInGroup now processes LDAP users correctly
+ - fix: WG user not logged in Apache
+ - Upgraded to TinyMCE 2.0.6.1, which fixes a number of bugs that WebGUI users
+   have been experiencing with the Rich Editor.
+ - Added an option to update a half indexed site, without the need to start
+   over from scratch.
+ - fix: Very very bad commerce bug that caused ITransact to charge the user more
+   than it was supposed to and more than it told them it was charging.
+ - fix: Deleted assets reappear upon paste of parent
+ - fix: select all checkbox does not work on clipboard / asset manager in IE
+ - fix: yes/no required profile fields evaluate as false if user chooses no
+ - fix: Shortcuts w/multiple criteria
+ - fix: Search displays already deleted files
+
+
+6.99.4
+ - fix: better checking of selected template type
+ - fix: SQLForm - added missing privilege check
+ - fix: typo in spectre 
+ - fixed a bug where a user could transfer a negative amount of karma to a
+   thread and actually gain karma from the thread.
+ - fix: Make Package not in Admin Bar
+ - fix: Survey Asset Copy Problems
+ - fix: EMS Add Subevent
+ - fix: POST_MAX
+ - fix: HTTPproxy
+ - fix: i18n reserved section name in Surveys
+ - fix: typo in Asset_ProjectManager i18n
+ - fix: captcha image is blank (Martink Kamerbeek / Procolix)
+ - fix: Pagination of search results does not work (Martin Kamerbeek / Procolix)
+ - fix: Workflow Commit with approval Error (Martin Kamerbeek / Procolix)
+ - fix: Incorrect method call in Auth.pm
+ - fix: No Help link icon in Matrix edit page
+ - fix: Problems with In/Out Board (labeling only)
+ - fix: Adding HTTP Proxy
+ - fix: op=saveSettings broken
+ - fix: EMS Discount Pass Not Applied
+ - fix: Commerce checkout confirmation very confusing
+ - fix: HttpProxy turns ampersands into semicolons
+ - Added a better confirmation message when deleting content.
+ - Added a "commit" option as well as a listing of version tags per the rough
+   edges discussions on IRC.
+ - Added a "close" or "archive" option to replies.
+ - fix: Uncommitted, new Assets BREAK Navigations
+ - fix: I get on the chewed page
+ - fix: Bug in updateMetaData function in AssetMetaData.pm
+ - fix: Problems with In/Out Board
+ - fix: Alternate Apache Port breaks "Commit with Approval"
+ - Rearranged the "Getting Started" page in the default content to make it
+   easier to follow for noobs.
+ - fix: Tinymce insertImage
+ - fix: Edit Style returns wrong page
+ - fix: Can not make Shortcut for CollaborationSystem
+ - fix: EMS Transactions Dropping Free Events
+ - fix: EMS Prerequisite Cache Stale
+ - Fixed a macro processing problem on the Redirect asset.
+ - Added a log info entry when a redirect occurs.
+ - Better handling of automated messages and post bounces for CS Mail.
+ - fix: "Link to a page in the webgui asset tree" has default "open in a new
+   window"
+ - fix: cs - attachments
+ - fix: op=listTransactions causes fatal
+ - Session/DateTime addToDate, addToTime, and addToDateTime now default to the current epoch for a starting point.
+ - fix: changed right click menu to left click for project management assets
+ - fix: gaant chart not aligning correctly in firefox
+ - fix: fixed obscure bug which was causing dependencies to display incorrectly in certain cases
+ - fix: various time tracking issues
+ - fix: cs mail posts - no url prepending
+ - Multiple "Re:"'s on CS Mail posts are now a thing of the past.
+ - Made mail message ids follow convention.
+ - fix: shortcut bombs
+ - fix: DataForm
+ - Many template fixes.
+ - fix: Dashboard - can't instantiate
+ - fix: More DataForm bugs
+ - Added new template vars to DataForm
+ - fix: op=editSubscription causes fatal
+ - fix: Commerce and groups
+ - fix: 6.99rc0 - shippingOptions not serialized
+ - fix: Orphaned asset data (modified test to fix bug in test)
+
+
+6.99.3
+ - Someone removed the status from the submission templates. That has been
+   fixed.
+ - fix: Column Layout seems a little messed up
+ - Fixed the EMS default templates to expose all functionality.
+ - fix: FieldName incorrect after adding profile field
+ - fix: preload.perl for other roots than /data/WebGUI
+ - Fixed a bug where polls weren't distributing karma.
+ - fix: Asset menu
+ - fix: Event Manager - can't add event
+ - fix: v6.99.1, security: Spectre listens to INADDR_ANY (profo)
+ - fix: Manage groups in this group doesn't work
+ - fix: New page layout instead of not found
+ - fix: Rollback
+ - fix: debug output
+ - fix: Can't delete images at product asset
+ - fix: Link to page in Webgui Page Tree not working in IE
+ - fix: Not Found page not working
+ - Made debug output more colorful, and set queries as info rather than debug.
+ - fix: 6.8.7 - CSS layout templates still don't work right in IE
+ - fix: 6.8 - Unable to change Home page or Not Found [...] blank
+ - fix: WebGUI creating bad Live Bookmarks for all SyndicatedObjects
+ - fix: RSS Feeds Don't Combine
+ - fix: Suspicious code in SyndicatedContent.pm
+ - fix: MySQL5.0.9 bug
+ - fix: DataForm corrupts text area fields
+ - All assets now have an autoGenerateForms property just like wobjects per the
+   rough edges discussions in Community IRC.
+ - fix: not set UTF-8 in setup page
+ - fix: 6.99 nothing write to assetData.groupIdView & assetData.groupIdEdit
+ - fix: Insert A Link page has no head & body tags has no style
+ - fix: Username blank when editing user Visitor
+ - fix: Thread Count is off in the Collaboration system
+ - Fixed an indexing problem with Product assets.
+ - fix: Reply count off when restoring from trash
+ - fix: Karma not spent properly
+ - fix: Avatar Message Board Template Not Working
+ - Added a check to Syndicated Content asset to throw out urls that are not
+   fully qualified.
+ - fix: Deleted items are still partially accessible.
+ - fix: Help is missing style
+ - fix: Setting expire password on user creation does nothing
+ - fix: Collaboration settings in help
+ - Lots of template fixes.
+ - fixed another Events Calendar bug
+ - added template variable 'owner' for Events Calendar templates
+ - added template variables to the EventManagementSystem
+
+6.99.2
+ - fix - demo.plainblack.com getting started
+ - Added UI Levels to asset toolbar icons, as discussed in Community IRC.
+ - Data Forms now send email as HTML. 
+ - The back to site link generated after a CS post now leads back to the
+   thread if the new post is a reply to a thread as discussed in Community IRC.
+ - fix - create.sql / style3
+ - fix - Spectre memory consumption
+ - fix - password vidible in debug mode
+ - fix - No way to add an advertisment to an adspace.
+ - Added full drag bar to the top of each asset as discussed in Community IRC.
+ - fixed a bug in the project management app that was causing a no privilege error when trying to display the view.
+ - fixed various bugs in the project management app.
+ - added right click menu to project management app.
+ - If a storage object is deleted, it will prune the directory structure
+   upward if the directories are empty, until it reaches the uploads dir.
+ - fix [ 1489017 ] Changing default time zone can disable site
+ - fix - demo.plainblack.com I beam cursor on menu
+ - fix [ 1490812 ] Events cannot be purged.
+ - fix [ 1466902 ] $u->status('Deactivated') does not expire existing sessions
+ - fix - msgs with only text/html not accepted as such
+ - fix - getCsMail doesn't recognize References
+ - Added duplicate button in asset manager as discussed in Community IRC.
+ - fix - WebGUI::Form::File doesn't use WebGUI::Form::Hidden
+ - fixed various bugs in the time tracking app
+ - fixed a few bugs in the graphic system
+ - fix - Link to a page in the Webgui Page Tree not working in IE
+ - fix - Event calendar SCOPE doesn't work!! (Wouter van Oijen / ProcoliX)
+ - better HTML compliancy
+ - fixed a lot of POD
+ - fix - Changing rank ot the asset (Martin kamerbeek / Procolix)
+ - Fixed a bug where context menu links would take on the properties of the
+   page.
+ - Added a context menu to the last item in the crumb trail in the asset
+   manager as discussed in Community IRC.
+ - Login boxes are now Section 508 compliant as discussed in Community IRC.
+
+6.99.1
+ - Bugfixes on dashboard to fix template errors.
+ - fix [ 1488849 ] Can't instantiate template (Dashboard)
+ - Bug fixes to make WebGUI work with the WRE demo system.
+ - Fixed a typo in the activities in the config file.
+ - fixed a bug that caused threadId's to be empty in new posts
+ - fix [ 1489123 ] problem with graphing (Martin Kamerbeek / Procolix) 
+ - Fixed a problem where anybody could see the complete list of admin console
+   functions in the adminbar, even though they couldn't actually use them.
+ - fix [ 1488598 ] edit workflow broken
+ - fix [ 1488561 ] webggui
+ - fix [ 1488557 ] new styles are missing ^/; in link
+ - fix [ 1488530 ] search has no toolbar
+ - fix [ 1488663 ] Add new subscription broken
+ - fix [ 1485461 ] Internationalized the Date in Mail headers
+ - fix [ 1488518 ] Snippet has no cacheTimeout field
+ - fix [ 1486788 ] karma isn't working on forums
+ - fix [ 1489094 ] DataForm Record edit link wrong for list mode (Michelle LaMar)
+ - fix [ 1488663 ] Add new subscription broken (Martin Kamerbeek / Procolix)
+ - Added a 2.7% speed increase by precaching i18n messages. This should also
+   help increase shared memory amongst Apache children. (Matt Wilson)
+ - fix [ 1488921 ] Help: Commerce, Manage
+ - fix [ Add user to group ]  typo in www_manageUsersInGroup
+ - fix [ 1489152 ] user to group doesn't give proper privs
+ - Added two new mail posting properties to the collaboration system to get
+   around a couple of problems clients have brought up.
+ - fix [ 1435382 ] 6.8.6 always "unsubscribe" link for Admin
+ - fix [ 1488850 ] Collaboration front page slow to load
+ - The CS main listing is now 863% faster.
+ - Fixed a problem where last reply column wasn't being updated in the thread.
+ - fix [ 1488556 ] blank page after setup
+ - fix [ 1489528 ] HTTP header contains invalid time-stamp
+ - Added the quick() convenience method to WebGUI::Session.
+ - fix [ 1487054 ] 6.99 Orphaning ads in AdSpace
+ - fix [ 1490336 ] all versions - deleting a user fails to existing sessions
+ - fix [ 1451684 ] Post/Thread isMarkedRead doesn't work well
+ - fix [ 1475305 ] 6.8.8 - SQL Lookup for group membership fails - bugfix
+   incl. 
+ - fix [ 1475205 ] newly created users' group memberships aren't effective
+ - fix [ 1489150 ] message board template hosed (Martin Kamerbeek / Procolix)
+
+6.99.0
+ - Added an Events Management System asset that can help people run
+   conferences, conventions, and large meetings.
+ - Added a workflow system.
+ - Added a workflow scheduler system.
+ - Converted the runHourly.pl scripts to run as scheduled workflows. 
+ - Added version tags menu to admin bar.
+ - Added versioning commit comments.
+ - Removed autocommit mode in favor of workflow controlled commits.
+ - Added a revisions list to the edit screen of assets, so that you can
+   quickly edit/view an old revision.
+ - Addded a lock menu item to explicitly lock an asset from editing.
+ - Run on registration and alert on new user have been converted to a single
+   workflow.
+ - Added a Photogallery prototype to the default installation.
+ - Changed the Group property dbCacheTimeout to be groupCacheTimeout and made
+   it cache all the users in a group during that time.
+ - Added an option for hosters to limit the number of assets that may be
+   created on a WebGUI site.
+ - Added a change url function that will allow an editor to change the URL of
+   an asset permanently (circumventing normal versioning).
+ - Added a wiki-like feature that will automatically bring a user to the
+   create a page form if they are in admin mode, and click on a link to
+   a page that doesn't exist yet.
+ - Help is now capable of using inheritance.
+ - Template help can/should now be broken out as seperate fields going
+   forward.
+ - Many changes for better XHTML compliance.
+ - Refactored admin bar to be more dynamic.
+ - Removed start/end dates from assets in favor of the workflow system.
+ - Readded the purge option to the trash manager.
+ - Added an advertising management system.
+ - Added a field set grouping mechanism to HTMLForm and TabForm.
+ - Added save buttons at the top of all the HTML forms for easier access.
+ - Added archive/unarchive options to CS threads.
+ - Added a mechanism to send emails to a CS which will accept them as posts.
+ - Increased the performance of CS Thread viewing by 500%.
+ - Changed the CS post rating mechinism to thumbs up/down to be less
+   confusing.
+ - Added CS templates to run a request tracker (trouble ticket) style system.
+ - Updated TinyMCE rich text editor to version 2.0.5.1.
+ - Disabled the rich editor for Safari because it doesn't work correctly.
+ - Added install/uninstall functions to the asset and wobject skeletons to
+   make custom assets easier to distribute.
+ - Added a mechanism for importing and exporting packages. This is useful for
+   trading styles and other content between sites.
+ - Added a database cache option as an alternative to memcached.
+ - Removed page caching system and added individual asset caches, because not
+   everything should cache in the same way.
+ - Converted WebGUI to use a new object oriented session system. More details
+   in migation.txt.
+ - Added a sort alphabetically option to the folder asset.
+ - Added a User form field type.
+ - Added a symbol next to items in the asset manager to indicate if they have
+   children or not.
+ - Added more templating options to the Paginator. (thanks to Jukka Raimovaara
+   / Axxion Oy)
+ - Added the currentPage.rank and currentPage.rankIsN variable to the nav
+   template. (thanks to Jukka Raimovaara / Axxion Oy)
+ - Added a screenshot feature to the matrix.
+ - Added an option to delete Matrix fields.
+ - Added a captcha challenge to the contact the maintainer form in the matrix.
+ - Added an API for retrieving email from POP3 servers.
+ - The rebuildLineage.pl script now finds and fixes orphans, and tries to
+   locate circular relationships as well.
+ - Added a lot more tests to the test suite.
+ - Added a new pluggable templating system. (Thanks to Misja Op de Coul /
+   E-Wise)
+ - Added "201" http status to various entity creation responses.
+ - Replaced the old search engine system with a brand new one, that is more
+   powerful, easier to use, and more flexible.
+ - Added output chunking as an option for asset www_ methods. The net effect
+   of this provides a fairly significant performance increase to what would
+   otherwise be slow or complex pages. More details in migration.txt. The
+   amount of the increase depends upon the complexity of the page, but now
+   complex pages should render almost as fast as simple pages.
+ - Removed the JavaScript, RawHeadTags, and StyleSheet macros in favor of
+   adding a Head Block parameter to templates. This was needed in order to
+   implement content chunking.
+ - The SMTP mail backend has been replaced with a new API that's capable of
+   sending attachments, HTML messages, and more. This will introduce many new
+   options for developers.
+ - Replaced the old Message Log system with a new Inbox system that's more
+   reliable, and scalable.
+ - Added a mail queue system.
+ - The group mail screen now allows sending of HTML messages.
+ - Added prequery statements to the SQLReport and configurable allowed statements
+   to the database link properties. (Martin Kamerbeek / Procolix)
+ - Converted config file format from PlainConfig to JSON. The new format is
+   more powerful and will use slightly less memory.
+ - Strengthened security of Captcha validation.
+ - Added Captcha form control type.
+ - All IPs used by WebGUI (Settings: debugIp and Group: ipFilter) now accept
+   IP addresses in CIDR format.  They also will accept multiple IP addresses
+   if they are separated by commas.  Whitespace is ignored.  The upgrade
+   script will migrate the data automatically, and hoverHelp documentation
+   has been updated to reflect the changes as well.
+ - The Rich Editor now has a master reset that allows disabling any individual
+   Rich Editor across the entire site without querying the user.
+ - Commit options have been removed from the Asset Manager "More" and Wobject
+   type icon context menus.
+ - The Navigation Asset now allows setting the MIME type of its output so that
+   you can generate non-HTML navigations or take advantate of the Google
+   SiteMap feature.
+ - Add tests that verify the integrity of the WebGUI Database.
+ - Added a karma ranking system to CS threads for conducting popularity
+   contests.
+ - The main page for the Help system is now a "Table of Contents" with a
+   tabbed view to make scanning for content easier.
+ - Help for forms now shows the fields that you should see with your UI level.
+   There is a link to show all fields.
+ - Added SQL Form and error feedback for asset addition (Martin Kamerbeek/Procolix)
+ - Added file upload ability to the rich text editor (Wouter van Oijen/ProcoliX)
+ - added [ 732011 ] http header cache setting
+ - added [ 810556 ] larger value field in userSessionScratch table
+ - added [ 881817 ] allowed characters in username
+ - added [ 1231386 ] Insert WebGUI Image
+ - added [ 1205807 ] ability to report file size in File template
+ - added [ 1201811 ] resizable textAreas
+ - added [ 1376374 ] WebGUI should return a Last-Modified http/1.x header
+ - added [ 1216059 ] Admin Bar Made Sticky
+ - fix [ 1471218 ] 6.8.8: Unable to change Default Home Page
+ - fix [ 1481787 ] autocomplete in user editing screens
+ - fix [ 1445002 ] Field(s) fail to delete
+ - fix [ 1344318 ] utf8 support for uri_escape/URL::Escape
+ - fix [ 1466255 ] 6.8.8 Typo in package WebGUI::Operation::FormHelpers
+ - fix [ 1463411 ] Denied content not getting expired or trashed
+ - fix [ 1461522 ] 6.8.7 Linking items in the page tree (PDF and other files)
+ - fix [ 1465280 ] BR Tag in Outlook
+ - fix [ 1178981 ] IE is in "quirks mode" - multi-column layout templates
+   break
+ - fix [ 999590 ] Rating
+ - fix [ 1410577 ] WebGUI::Session not included
+ - fix a bug where a link was provided to become or delete non-existant users.
+ - fix bugs with the in-memory session caching of user and group memberships
+ - fix [ 1465362 ] RichEditor doesn't work on Safari
+ - fix [ 1344665 ] Cache does not remember mimetype
+ - fix [ 1172613 ] Header Tag Not Accessibility Friendly
+ - fix [ 1340839 ] If can't use item in adminConsole don't display it
+ - fix [ 1473937 ] scratch->set not taking.
+ - fix [ 1471909 ] createAccountSave not called - no validate email (Martin
+   Kamerbeek / Procolix)
+ - fix [ 1479779 ] enable select box in dataform (Martin Kamerbeek / Procolix)
+ - fix [ 1478585 ] purgeRevision without warning or confirmation (Martin 
+   Kamerbeek / Procolix)
+ - fix [ 1480536 ] "Add Files" link in Folder template doesn't work (Martin
+   Kamerbeek / Procolix)
+ - fix [ 1443373 ] 6.8.7 Events Calendar Dates Incorrect (Wouter van Oijen /
+   ProcoliX)
+ - fix [ 1444918 ] 6.8.7 Events Calendar - Year old events show in list view
+   (Wouter van Oijen / ProcoliX)
+ - fix [ 1452552 ] Events Calendar starting from the wrong day with Now!
+   (Wouter van Oijen / ProcoliX)
+ - fix [ 1452719 ] Event calendar, wrong day of week for date (Wouter van Oijen
+   / ProcoliX)
+ - fix [ 1470410 ] Problems with Calendar (Wouter van Oijen / ProcoliX)
+ - fixed a caching bug for Events Calendar (Wouter van Oijen / ProcoliX)
+ - Added a graphing engine and tied it into the Poll asset (Martin Kamerbeek / Procolix)
+ - Added Slider form controls (IntSlider, HexSlider and SelectSlider) (Martin
+   Kamerbeek / Procolix)
+ - Fixed a number of bugs in DateTime.pm
+
+6.8.8
+ - fix [ 1452466 ] File size not set in File asset (Thanks to Eric S)
+ - fix [ 1460992 ] Field Loop in DataForm (Thanks to Beat Boesiger)
+ - fix [ 1423434 ] 6.8.5 - Versioning - users can see uncommitted data
+ - fix [ 1437186 ] 6.8.7 deploy DataForm package does not copy fields
+ - fix [ 1437563 ] Data picker intermittent for Admin
+ - fix broken link to top of CS Assets configured as FAQs
+ - fix [ 1437977 ] richeditor selectbox options not versioned, trashed appear
+ - fixed a bug in the rich editor where the page chooser didn't have scroll
+   bars
+ - fixed a delete bug on cs posts.
+ - fixed two security problems with www_process in DataForm.pm
+ - [ 1441488 ] Sort Order of Profile Fields in Form "Create New Account"
+ - fix [ 1439352 ] Deleting post is chain of posts ... descendants
+ - fix [ 1432491 ] 6.8.6 popup windows has not head & body tags
+ - fixed a bug in the File asset that caused file redirects to be cached
+   incorrectly for Visitor.  Thanks to Jukka Raimovaara / Axxion Oy.
+ - fix [ 1454694 ] Children of a folder not linking correctly
+ - fix [ 1454684 ] Folder listing every asset
+
+6.8.7
+ - fix [ 1431098 ] op=becomeUser can become non-existent userIds
+ - fix [ 1431944 ] 6.8.6 DataForm moving fields
+ - fix [ 1433195 ] 6.8.6 In/Out board labels missing
+ - fix : Registered users can deploy packages (Thanks to Lucas Bartholemy
+   for his work on finding this bug)
+ - fix : Package will deploy assets not defined as packages (Thanks to Lucas
+   Bartholemy for his work on finding this bug)
+ - fix : editBranchSave method does not check that user is a content
+   manager (Thanks to Lucas Bartholemy for his work on finding this bug)
+ - fix : editBranchSave does not check privileges of descendants (Thanks to
+   Lucas Bartholemy for his work on finding this bug)
+ - fix : setParent does not check that user is a content manager (Colin
+   Kuskie / Thanks to Lucas Bartholemy for his work on finding this bug)
+ - fix : setParent does not check permissions of target page (Colin Kuskie
+   / Thanks to Lucas Bartholemy for his work on finding this bug)
+
+6.8.6
+ - Added logic to deal with case sensitivity and whitespace problems in LDAP
+   Group matching.
+ - fix [ 1397890 ] Can't click directly to page 2+ of a thread
+ - fix [ 1328895 ] Page Redirect Asset Help File needs to be changed
+ - fix [ 1423815 ] snippet v6.8.5
+ - fix [ 1421056 ] LDAP Recursive Property Bug
+ - fix [ 1404350 ] no hoverHelp for InOutBoard
+ - fix [ 1410127 ] User profile fields do not display value \'0\'
+ - fix [ 1427600 ] Prevent Proxy caching on - URL issue
+ - fix [ 1413032 ] AdminBar text unreadable in some cases. w/ fix
+ - fix [ 1426790 ] Matrix isLoggedIn tmpl var not exposed to all view
+   methods
+ - fix [ 1426170 ] passthruUrls ignores single value
+ - fix [ 1428117 ] Uploading files with 0 size
+ - fix [ 1411884 ] DirectoryIndex doesn't work with passthruUrls in v6.8.5
+ - fix [ 1428396 ] IP Filter Broken
+ - fixed a bug where uploaded files and images did not get the right .wgaccess 
+   file (Martin Kamerbeek / Procolix)
+ - fix [ 1429349 ] Invalid HTML returned by func=manageAssets
+ - fix [ 1429348 ] Textboxes need to filter CR/LF
+ - fix [ 1428481 ] WebGUI::HTTP::setFilename not working correctly in 6.8.5
+ - fix [ 1423608 ] Bug in Data Form in v6.8.5
+ - fix [ 1423324 ] Delete locked asset
+ - fix [ 1415743 ] Collab reply count includes old versions
+ - fix [ 1429299 ] RTE Collateral Functions Break when Prev Proxy Cache On
+ - fixed a bug where uploaded files would give an Auth Required regardless of
+   the user being in the view group or not (Martin Kamerbeek / Procolix)
+ - fix [ 1411210 ] HttpProxy Error (Thanks to Eric Kennedy for the patch)
+ - fixed a serious security bug that would allow user account creation
+   using a well crafted url when anonymous registration is set to off.
+   (Thanks to Luke Bartholemy for the patch)
+
+6.8.5
+ - fix [ 1396957 ] Insufficient privileges check on the DataForm
+ - fix [ 1403466 ] CS Attachments - Broken Image Issue
+ - fix [ 1406633 ] Env and User macros broken (Thanks to Eric Kennedy for
+		   the patch)
+ - fix [ 1404485 ] userDefined1 to 5 onlineHelp
+ - fix [ 1403155 ] Poll shows no result
+ - fix [ 1373583 ] ITransact Module does not URL encode data within XML
+ - fix [ 1345363 ] Using RTE breaks links (Thanks to Gerald Young for
+		   assisting with this one.)
+ - fix [ 1376148 ] wrong pages are shown after visit of photo gallery (Gerald Young)
+ - fix [ 1403345 ] Rich Edit Not Working
+ 
+6.8.4
+ - fix [ 1395371 ] XSS Vulnerability in DataForm Entries
+ - When working with a redirect in admin mode, you're now presented with a
+   decision page regarding the redirect to help make working with redirects a
+   little easier.
+ - fix [ 1379384 ] image uploads to non-public pages (Len Kranendonk /
+   ilance.nl)
+ - fix [ 1379915 ] Survey can only be completed once per user
+ - Fixed broken UI Level examples in the config file.
+ - fixed a bug in SyncProfilesToLDAP
+ - fix [ 1387242 ] uploadsHandler fails
+ - fix [ 1389086 ] 6.8.3 RichEdit buttons disappear
+ - fix [ 1379915 ] Survey can only be completed once per user
+ - fix [ 1389371 ] Pictures & Avatars Don't Work
+ - The avatar user profile field is now visible and editable by default.
+ - fix [ 1392277 ] Stock Quote Template error
+ - fix [ 1387505 ] Hover help not working on Matrix
+ - fix [ 1393867 ] Data Form Not Emailing
+ - fix [ 1392643 ] 2006 Calendar dates are not correct?
+ - fix [ 1384794 ] editSave on an existing File or Image asset loses
+   storageId.
+ - Removed the If macro, since it was scheduled for removal in 6.8.0.
+ - fix [ 1396620 ] Package WebGUI::Form::DynamicField
+ - fix[ 1386505 ] time off by 6 hours
+ - fix [ 1397275 ] Rich Text Editor Settings Dissapear (6.8.3-gamma)
+
+
+6.8.3
+ - fixed a problem with enabling Avatars in the Collaboration System.
+ - Fixed a problem where profile data would be mixed between the current user
+   and the user your viewing the profile of.
+ - fix [ 1381551 ] epochToHuman for foreign languages
+ - fix [ 1381305 ] SQLReports report nothing!!!
+ - fix [ 1381873 ] Matrix missing toolbar
+ - fix [ 1381694 ] Unable to reset votes on poll
+ - fix [ 1381309 ] FormParam macro returns always undef
+ - fix [ 1379595 ] http proxy broken
+ - fix [ 1379060 ] Unable to view subscription codes
+ - fix [ 1379407 ] All collaboration systems show up as same username
+ - Fixed a syntax error in Post.pm
+ - fix [ 1382675 ] File Path Wrong - Uploads are difficult
+ - fix [ 1380368 ] Snippets should not contain debugging info
+ - fix [ 1377668 ] Unescaped double quote in Syndacate title cause problems
+
+
+6.8.2
+ - fix [ 1378871 ] become this user doesn't work
+ - fix [ 1378909 ] (SVN 300) Unable to add user
+ - fix [ 1378787 ] Unable to add new group to user
+ - Converted all the max((assetData.)revisionDate) calls to use mysql5/(4.1)
+   nested queries.
+ - Added some more skeletons (newWobject, newAsset, changelog(!))
+ - fix [ 1323184 ] CS Submissions Not Sorting on multiple sites
+ - fixed some major oversights in the new profile system.
+ - Added macro to return the MIME type to a file, FetchMimeType.
+ - fix [ 1378493 ] 6.7.8 collab post edits (images)
+ - fix [ 1363797 ] Calendar Javascript (Date/Time)
+ - Fixed bug where viewProfile did not show pretty printed values
+ - fix [ 1344146 ] deleting recurring events doesn't work
+ - fix [ 1378333 ] [WG 6.7.8] Mail Form template doesn't mark required fields
+ - fix [ 1377276 ] Calendar Pop up issue
+ - fix [ 1328728 ] Export exports root page n times
+ - fix [ 1338306 ] adminConsoleHelpIcon displayed at wrong position
+ - fix [ 1216810 ] anonymous registration errors persist (fixed for real!)
+ - fix [ 1237406 ] HTTP Proxy caches results
+ - fix [ 1365822 ] makePrintable does not work in Collaboration System
+ - fix [ 1376621 ] dateSubmitted not updated on posts
+ - fix [ 1344111 ] promote/demote swap with non-"published" assets
+ - fix [ 1372630 ] Syndicated encode "&" also if belong to a HTML entity
+ - removed server version tag appending.  Could re-add as an setting later.
+   (along with the Style.pm header tag version number insertion).
+ - fixed poll's editForm so an option only showed up at the proper time.
+ - Fixed bug/rfe where it was not obvious when hovering over the rank
+   column in the Asset Manager that you can drag rows up and down.
+   Added cursor:move to the td's style.
+ - Fixed a bug where in the Edit User profile tab that required fields were
+   not marked with an asterisk.
+  
+
+6.8.1
+ - fix [ 1364965 ] Assets in Trash give Permission Denied in stead of Not
+   Found
+ - fix [ 1372680 ] dashboard needs hide option
+ - Removed duplicate processing of metadata.
+ - fix [ 1373649 ] Username isn't populated in 6.8.0 Discussions
+ - fix [ 1373707 ] File Pile not uploading images
+ - fix [ 1353425 ] getUsersInGroup includes expired Group of group members (Ed
+   van Duinen)
+ - fix [ 1373041 ] context menus in Admin Mode don't position correctly in IE
+   ( Michele Dell'Aquila)
+ - Upgraded TinyMCE to 2.0.1, which allows the rich editor to work with
+   Firefox 1.5.
+ - Added test class for User.pm (Roy Johnson / Ocean View Web Creations)
+ - Fixed bugs in User.pm not updating _user{lastUpdated} (Roy Johnson /
+   Ocean View Web Creations)
+ - Fixed bugs in User.pm not updating _user{karma} when karma method called
+   (Roy Johnson / Ocean View Web Creations) 
+ - Now that we're requiring Perl 5.8, don't need to do the hackery for WS
+   Client to work any longer.
+ - Converted User Preference fields to user profile fields.
+ - Fixed a major versioning system bug where when purging the last revision of
+   an asset, if it had children, the children were not purged with it. This
+   may have caused problems in some people's databases. If it has all you
+   need to do to fix it is upgrade to this release and then run
+   sbin/rebuildLineage.pl
+ - fix [ 1356544 ] FAQ template in collaboration has wrong anchors
+ - The upgrade script now wipes out the file cache in case it would cause
+   any conflicts.
+ - fix [ 1373319 ] archive
+ - Fixed the In/Out Board so it doesn't produce fatal errors on add.
+ - fix [ 1373493 ] Upgrade script fails because parameters are not quoted
+ - Upgrade now uses --results-file parameter on mysqldump because some
+   operating system don't handle UTF-8 characters through their pipes.
+ - Added backend API for user profile schema to eliminate inconsistencies
+   and to allow the dashboard to use user profile fields as preferences rather
+   than having a seperate asset type for it. This mechanism is more efficient,
+   and thusly increases the performance of the dashboard.
+ - Removed some debug code that was spewing garbage into apache log file.
+
+6.8.0
+ - Switched Date::Manip to DateTime for better performance and more 
+   functionality. See gotchas for details. In our benchmarks DateTime runs 
+   about 13 times faster than Date::Manip. Depending upon how date intensive
+   your pages are, you will see a 2% to 100% performance increase from this
+   change.
+ - Added RandomThread macro thanks to Wouter Vijvers.
+ - Switched from Apache::Registry/CGI to a pure mod_perl2 interface, which
+   increased performance by over 70% to the entire system, and in some cases
+   as much as 100%. See gotcha.txt for details. This increase is not seen in
+   raw speed, but rather capacity. You can serve 70% more requests per second.
+ - Changed macro API which cuts macro memory consumption in half. See
+   migration.txt for details.
+ - Added automated code testing framework.
+ - Added code skeletons for the various plugins WebGUI supports.
+ - Added template to Collaboration RSS feeds.
+ - Added page.isContainer and page.isUtility template variables to Navigation
+   templates.
+ - Added Matrix asset.
+ - Added In/Out Board asset.
+ - Page not found page returns a 404 error code now.
+ - Added more error trapping in caching system.
+ - Fixed some layout and control bugs in the color picker form element.
+ - Added a simple Style Wizard.
+ - Removed $session{os}{slash} since it is no longer needed.
+ - Reworked the form system to use inheritance and added a new master form
+   class for lists called List.  See migration.txt for details
+ - Updated preload.perl to automatically preload all WebGUI related modules,
+   which increased shared memory usage by 30%.
+ - Added StockData asset.
+ - Added WeatherData asset.
+ - Added MultiSearch asset.  Will eventually be re-merged with the 
+   existing search wobject for the release of 6.9.0.
+ - Extended the Shortcut asset to allow fully extensible admin overrides,
+   which can be pulled from user preferences also attached to a Shortcut.
+ - Added Dashboard asset, which uses personalized Shortcuts to allow 
+   personalization of any asset on your site to create a "portal" or 
+   "dashboard".  You can create more than one dashboard per site.
+   See the help documention for how to use Shortcut overrides and the
+   new user preference fields.
+ - [ 1361669 ] editUserProfileField causes huge memory consumption, loop
+ - [ 1354464 ] Dynamic Field does not work correctly
+ - [ 1354467 ] WebGUI::Form::Group is implemented incorrectly
+ - [ 1372045 ] Required user profile field not show when create login
+ - [ 1371873 ] edit/manage buttons in Template form control disappeared
+ - Added an option for multiple IP addresses (space seperated) for debug
+   output
+
+
+6.7.8
+ - fix [ 1364895 ] Error in ITransact Commerce Module
+ - fix [ 1365033 ] Commerce Templates not saving to settings
+ - fix [ 1358317 ] Upgrade from 6.6.0 to 6.7.x does not work
+ - fix [ 1339611 ] Sm Calendar: date links broke, unusable for >1 event per
+   day
+ - Fixed a problem with Random Asset Proxy
+ - Fixed a caching bug in the user system.
+ - Fixed a problem in the user system for negating macros on profile fields.
+ - Added a missing use statement in Storage
+ - Renamed the "Page" asset to "Page Layout" for clarity.
+ - fix [1329023] Doc for EventsCalendar
+ - fix [1336414] All default profile fields not protected
+ - fix [ 1343269 ] add Content Profiling field yesNo type i18n
+ - fix [ 1342623 ] -noDate flag in WebGUI::Form::Date not working
+ - fix [ 1345261 ] addFileFromFormPost always returns 1 file uploaded
+ - fix [ 1347584 ] Wobject "Product" copy fails
+ - fix [ 1340614 ] page: "what next?" both choices take you to new page
+ - fix [ 1350687 ] 6.7.7 editProfile doesn't work...
+ - fix [ 1350770 ] generateContent.pl fails
+ - fix [ 1352362 ] can't add version tag in Content Versioning
+ - fix [ 1352647 ] WebGUI::HTTP::setCookie does not accept 0 as time to live
+ - fix [ 1358547 ] Syntax Error in Default Edit Profile Template
+ - fix [ 1304479 ] CS Content Approval Request Email Link Issue
+ - fix [ 1358264 ] syncprofiletoldap bug
+ - fix [ 1324000 ] SyncProfilesToLDAP does not work
+ - Fixed a documentation error related to SQL Report placeholder parameters.
+ - fix [ 1328951 ] someone screwed up RandomAssetProxy.pm
+ - fix [ 1333572 ] testEnvironment - broken loop
+ - fix [ 1341004 ] ArchiveOldPosts isn't fully versioned
+
+
+6.7.7
+ - added two new template variables to the EventsCalendar - 
+   pagination.previousPageUrl and pagination.nextPageUrl
+ - fix [ 1328298 ] 6.7.5 random Assets not random
+ - fix [ 1288653 ] Events calendar again - moving forth/back does not work
+ - fix [ 1324230 ] 6.7.6 - Template, Rich Text Editor options not showing
+ - fix [ 1276593 ] 6.7.2 Product Images don't upload
+ - fix [ 1324128 ] Help: List of Available Macros not working
+ - fix [ 1315408 ] Navigation sometimes fails to use correct startpoint
+ - fix [ 1305577 ] 6.7.5 Cannot insert a Link to a Page in the WebGUI page
+   tree
+ - fix [ 1307043 ] Can't Adjust Order of Nav Menu
+ - fix [ 1298896 ] 6.7.4 - reordering stops working after moving assets
+ - fix [ 1324170 ] assetId has no hoverhelp.
+ - fix [ 1298851 ] forum subscribers still get notif. after subscr. expired
+ - fix [ 1305368 ] Moderation in Collaboration not working ?
+ - fix [ 1306912 ] CMS Matrix - Unable to approve article's
+ - Removed the deprecated threaded view in the CS for a slight performance
+   gain and simplified templates.
+ - fix [ 1312107 ] Forum Issue in "Thread" View
+ - fix [ 1318963 ] 6.7.5 None of the profile fields can be updated
+ - fix [ 1306722 ] 6.7.5 Add an event only on TODAY
+ - fix [ 1323057 ] Anchors break XHTML 1.1
+ - fixed "Fail Safe" template (admin bar doesn't overlap content anymore)
+ - fix [ 1325296 ] sort by editform field in collaboration in random order
+ - fixed lots of XHTML bugs in templates and code
+ - fix [ 1301604 ] Survey in 6.7.5 gamma
+ - fix [ 1310360 ] WebGUI::FormProcessor::checkbox not working correctly
+ - Finally Internationalized some of the www_edit screens for wobjects, 
+   by adding a generic   www_edit generator in Wobject.pm.  
+ - Fixed a lot of the www_ methods in Survey.pm to return in styled pages
+   instead of raw <p> tags without <html><head>etc</head><body></body>
+ - fix [ 1293897 ] 6.7.4 - asset manager reorder by rank
+ - fix [ 1299131 ] paragraph tags added every time collaboration message change
+ - fix [ 1305132 ] 6.7.5 Assets are moved to trash by runHourly
+ - fix [ 1282473 ] RSS encoding (Thanks to Klaus Hertle)
+ - fix Removed last references to deprecated "lastUpdated"
+ - fix [ 1234051 ] Recursive loops in addGroupsToGroups
+ - Added handling for an exception in recurring payment processing where there
+   was missing data causing a fatal error.
+ - fix [ 1326687 ] Export on windows Apache server doesn't work (with quick
+   fix (Thanks to Sven Opitz)
+ - fix [ 1216810 ] anonymous registration errors persist
+ - fix [ 1327237 ] 6.7.5 Shortcuts
+ - fix [ 1328105 ] Pages should contain "no-cache" tags
+ - fix [ 1216810 ] anonymous registration errors persist
+ - fix [ 1323272 ] Site modifications using GET in stead of POST
+ - fix [ 1328763 ] 6.7.3 FileAsset file size has incorrect value when
+   displayed
+
+
+
+6.7.6
+ - Fixed invalid i18n keys that were causing missing labels.
+ - Fixed a bug in setToEpoch that caused dates to be improperly formatted.
+ - Fixed a problem with the slide panel where the links would sometimes take
+   the properties of the style.
+ - fix [ 1302878 ] testEnvironment.pl does not check versions (Wouter van Oijen / ProcoliX)
+ - fix [ 1238223 ] captcha image broken in WRE
+ - fix [ 1288783 ] Captcha picture only works with the latest ImageMagick.
+ - fix [ 1306915 ] Missing label on shortcut - Metadata
+ - Fixed a pagination bug in the subscription code pagination.
+ - Added a table of contents to the Help system.
+ - Documented the Product Macro and internationalized messages inside of it.
+ - Fixed a critical security bug. Upgrade to this version immediately if
+   you're using any other version 6.3 or above.
+
+6.7.5
+ - Fixed a syntax error in Syndicated Content.
+ - Fixed an infinite loop problem in Syndicated Content when no URLs were
+   specified.
+ - Corrected an error in the built in WebGUI config file documentation.
+ - Fixed Survey copy bug that prevented asset from appearing in clipboard.
+ - Fixed Survey copy bug that was preventing section data from being copied.
+ - Workedaround a bug for broken xml docs in Syndicated Content. 
+ - fix [ 1293947 ] 6.7.3 Cannot use a second AssetProxy with IE, Stack overflow (Wouter van Oijen / ProcoliX)
+ - Added a few more performance enhanceers which can cut the number of
+   database queries per page in half in some cases. And can reduce the number
+   of queries on Collaboration System related pages even further.
+ - fix [ 1292597 ] Trash not emptied
+ - fix [ 1292209 ] purgeTree called in runHourly.pl (6.7.4)
+ - fix [ 1290600 ] 6.6.5-6.7.0 upgrade script (fix) (Nicklous Roberts)
+ - fix [ 1288786 ] Names of copied style templates doesnt update.
+ - fix [ 1292538 ] Template::getList isn't versioned
+ - fix [ 1241451 ] Images not showing up in TinyMCE
+ - fix [ 1252786 ] rich edit ie image problem
+ - fix [ 1284248 ] runHourly.pl moving assets I don't want in trash to trash
+ - fix [ 1288699 ] 6.7.4 - username sometimes does not appear
+ - fix [ 1296468 ] Username doesn't show up in Edit User Account
+ - fix [ 1295921 ] Problem with Survey content.
+ - fix [ 1290460 ] Survey error when adding multiple choice answers
+ - fix [ 1288887 ] new user information mail dos'nt contains the username
+ - The export system now attempts to create the export path if it doesn't
+   already exist.
+ - fix [ 1287741 ] 6.7.3 Cannot insert a WebGUI collateral image in IE.
+ - fix [ 1293163 ] Error when using Syndication
+ - fix [ 1295718 ] Moderating submissions/posts is broken 
+ - fix [ 1288770 ] Couldn't call method www_view on asset
+ - fix [ 1278672 ] Timezones does not still not work properly in webgui
+ - fix [ 1281347 ] double slash in URL (in style template WebGUI 6)
+ - fix [ 1289336 ] Trash cannot be emptied 6.7.4 gamma (documentation fix)
+ - fix [ 1293180 ] packages help needs updating (documentation fix)
+ - fix [ 1276863 ] memcached caching broken
+ - fix [ 1286646 ] help things (documentation fix, content prototypes)
+
+6.7.4
+ - fix [ 1279861 ] POD errors in 6.7.3
+ - fix [ 1287994 ] POD errors in 6.7.4
+ - Fixed the default assets icon.
+ - Made further alterations to the page layout templates to make them work
+   better in IE.
+ - Added a date caching switch to the config file so people don't have to use
+   the new date caching system if they don't want to.
+ - Added an IP based limiter to the debug option, and for that reason
+   eliminated the unlikely, though potentially dangerous debug=1 URL option.
+ - Added a performance indicator debug option to the settings.
+ - The locked icon in the asset manager no longer shows up unless autocommit
+   is disabled.
+ - Added pagination to the versioning manager.
+ - Eliminated the possiblitity of rolling back the "auto commit" and "initial
+   import" tags.
+ - Any attempt to view "root" will redirect the user to the default page.
+ - fix [ 1285604 ] getVars undefined in Asset::File.pm
+ - fix [ 1284330 ] error in page export function
+ - Fixed a trash purging problem.
+ - fix [ 1281516 ] Undefined subroutine &WebGUI::Asset::File::quote runHourly
+ - fix [ 1281430 ] www_restoreList should be in AssetTrash.pm
+ - fix help links on the Asset add/edit forms
+ - Added cache to settings which increased performance by .02 seconds per
+   page.
+ - Added user cache which increased performance by more than .1 seconds per
+   page.
+ - Added some new indicies to make asset queries .01 to .1 seconds faster per query.
+ - fix [ 1274488 ] Visitors language not recognized 6.7.2
+ - fix [ 1266159 ] 6.7.1 - getEditForm fields are in funky order
+ - fix [ 1283629 ] Forum bug in 6.5.6
+ - fix [ 1279887 ] unable to copy Survey Wobject
+ - Fixed a bug where privileges were not being set correctly on cache files
+   and that was causing write errors.
+ - fix [ 1281437 ] hidden children appear when changing assetsToHide
+ - fix [ 1265771 ] assets that were formerly prototypes are... (mwilson)
+ - fix [ 1280018 ] add new sql report - all query fields visible (mwilson)
+ - fix [ 1283740 ] overridden in WebGUI/Mail.pm (mwilson)
+ - fix [ 1282511 ] WebGUI::Form::submit disabled (mwilson)
+ - fix [ 1281854 ] migration.txt - 5.6, 5.7 need some updating. (mwilson)
+ - fix [ 1281842 ] rand() needs srand() on win32 mod_perl (mwilson)
+ - fix [ 1281435 ] Asset::paste() or Asset::setParent() needs... (mwilson)
+ - fix [ 1280374 ] Events calendar with no end date set loops... (mwilson)
+ - fix [ 1230352 ] Navigation Template (mwilson)
+
+6.7.3
+ - User search now includes user alias.
+ - Fixed a bug in the user manager where userId, date created, date updated,
+   and karma were not showing up when editing users.
+ - fix [ 1274239 ] Can Not Save Edits to Assets
+ - fix [ 1274414 ] extraHeadTags entirely unused (mwilson)
+ - fix [ 1265709 ] 6.7.1 - most help topics appear twice
+ - fix [ 1276625 ] viewRSS not working (Andrew Khmelev)
+ - fix [ 1276695 ] Addition to 'viewRSS not working' (6.7.2) (Andrew Khmelev)
+ - Fixed a layout problem with the user search form.
+ - fix [ 1250418 ] unable to edit posts more than once
+ - fix [ 1245871 ] redirectAfterLogin url malformed
+ - fix [ 1274951 ] Unable to drag rank in asset manager
+ - fix [ 1276449 ] 6.7.1 content invisible after edit by content manager
+ - Fixed a few bugs in the new form system related to UI levels and hidden
+   fields.
+ - fix [ 1275024 ] Can not edit layout on 6.7.2
+ - fix [ 1262235 ] sql report form params
+ - fix [ 1277529 ] Extra radio buttons in Settings console
+ - Removed the last remnants of wobject ids.
+ - Fixed a GUID case sensitivity problem.
+ - Fixed several large security holes. See the security advisory on
+   getwebgui.com for details.
+ - fix [ 1279157 ] showInForms option not stored
+ - fix [ 1250290 ] ECommerce state field broken on Plainblack.com
+ - fix [ 1261985 ] (Fix?) sortby.lastreply.url (Andreas Graf)
+
+6.7.2
+ - fix [ 1163407 ] Ampersand XHTML 1.0 Non-Compliant
+ - fix [ 1243559 ] profile field security vulnerability (Len Kranendonk)
+ - fix [ 1271490 ] uncommitted version appears in Navigation (midellaq)
+ - fix [ 1268605 ] field type selection broken (midellaq)
+ - fix [ 1267548 ] can't add metadata field (midellaq) 
+ - fix [ 1265788 ] SyndicatedContent *not working* in 6.7.x
+ - fix [ 1266285 ] 6.7.1 - UserProfile Fields Time error (Len Kranendonk)
+ - fix [ 1245765 ] Missing 'page not found' crashes settings 
+ - fix [ 1263934 ] 6.6.5 Import Scripts Asset URLs
+ - fix [ 1260760 ] Default endDate in asset table too high for FreeBSD
+ - fix [ 1249486 ] default script language is not declared
+ - fix [ 1164205 ] TinyMCE files not found by Apache 
+ - fix [ 1038289 ] Performance problems with 6.2
+ - fix [ 1236961 ] Admin bar broken on IE under XHTML Transitional DTD
+ - fix [ 1225432 ] plainblack.com: print is broken
+ - fix [ 1249882 ] Make page printable in RWG broken
+ - fix [ 1255313 ] r_printable includes index.pl sometimes
+ - fix [ 1248006 ] Spell check create.sql
+ - fix [ 1248040 ] plainblack forum search not showing dates
+ - fix [ 1265771 ] assets that were formerly packages are still on packageList
+ - fix [ 1177447 ] deployPackage does not retain content pos. (mwilson)
+ - fix [ 1256718 ] Assets disappear after changing page layout (mwilson)
+ - fix [ 1267326 ] LastPost varibale not updating correctly in Msg Board
+ - fix [ 1262002 ] no "next Thread" or "previous Thread" links (mwilson)
+ - fix [ 1252626 ] navigation relative to current url broken (mwilson)
+ - fix [ 1261994 ] getLineageLength (mwilson)
+ - Updated references to Ruling WebGUI to be changed to WebGUI Done Right in
+   the default content.
+ - Changed the page templates to float better in IE.
+ - Fixed a bug that caused the page layout template not to change immediately
+   upon an edit.
+ - fix [ 1240899 ] File Upload Control strangeness in IE under XHTML
+ - fix [ 1208496 ] Link to a page in WebGUI broken on IE - Done button broken.
+ - fix [ 1264301 ] HTML Link in text editor broken
+ - Removed the positive options for Navigations with start points relative to
+   the current URL since they didn't make any sense.
+ - Fixed a bug where password field was not being displayed in the user manager.
+ - Fixed a bug in version management where you couldn't see the list of things
+   changed under a specific tag.
+ - Fixed a bug in versioning that would allow a user not using the same tag as
+   the original editor to edit a locked asset.
+ - Fixed a bug that would not allow an editor to commit an individual asset
+   revision.
+ - Fixed survey template.
+
+
+6.7.1
+ - fix [ 1251608 ] can't login
+ - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work
+ - Fixed a fatal error with Redirects
+ - Fixed a fatal error in the date field in the new pluggable forms system.
+ - Fixed a nasty logout bug.
+ - Fixed a formatting problem with the forum rich editor.
+ - Fixed a fatal error in www_viewStatistics (mwilson)
+ - Fixed some errors in FileCache.pm (mwilson)
+ - Disabled killing of own session since it sometimes displays weird things
+   and since the Logout link is on the same screen (viewActiveSessions) (mwilson)
+ - Added some more exception handling to getAssetAdderLinks (mwilson)
+ - fixed more arrayed Form parameters in www_editMetaDataField (mwilson)
+ - fixed a bunch more errors in the new date field - (mwilson)
+ - fixed a fatal error in whatNext.pm (mwilson)
+ - Fixed a bug in the new versioning system where new revisions would sometimes
+   not get their properties copied from the previous revision.
+ - Set the rich editor to use a bigger font by default if no style sheet
+   specifically setting it was called.
+ - fix [ 1256549 ] Users are allowed to set url to extras or uploads
+ - fix [ 1262505 ] Unable to edit group info
+ - Added the missing export toolbar icon.
+ - Fixed the context menus that were unclickable.
+ - Fixed a problem with the rich editor in Internet Explorer that caused it
+   not to save new content.
+ - fix [ 1261789 ] fixed(?) can't edit collaboration (Collaboration.pm) (andreasg)
+ - fix [ 1262239 ] Error when searching discussion
+ - fix [ 1253545 ] moving wobjects around in a Layout doesn't spawn revisions
+ - fix [ 1262991 ] runHourly fails on asset.assetData
+
+
+6.7.0
+ - Added Survey section feature
+- Added two new Survey answer types. HTMLArea and textarea.
+ - Upgraded the rich editor to 1.45.
+ - Rich edit now has three new buttons: paste from word, paste as plain text,
+   and fullscreen.
+ - Rich editor defaultly does not validate HTML tags and therefore will allow
+   the slop that it was stripping out before. While less strict, this is less
+   confusing to end users.
+ - The Rich Editor no longer second guesses the URL that a user enters.
+ - Being in the admins group automatically results in a UI level capable of
+   seeing everything.
+ - fix [ 1251390 ] Security tab doesn't appear for member of Admins
+ - HTTP Proxy URLs can now be up to 2048 characters long.
+ - The Edit Branch function now allows you to recursively set meta data.
+   (Thanks to Volvo for funding this feature.)
+ - Fixed a potential problem where editing a page under rare very rare 
+   conditions could destroy the not found page.
+ - Added the ability to override the UI Level of any field in the edit form of
+   any asset in the WebGUI config file. (Thanks to Volvo for funding this
+feature.)
+ - Translation providers can now add languageAbbreviation and locale
+   properties to their translation in order to activate the translations of
+   javascript helper components like the rich editor and the calendar
+   date picker.
+ - Added the ability to override the UI Level of an entire asset in the config
+   file. (Thanks to Volvo for funding this feature.)
+ - fix [ 1229042 ] crumbtrail should show full path...
+ - Added asset versioning. (Thanks to Volvo for contributing funding to this feature.)
+ - fix [ 1229188 ] typo in Help: Collaboration, Post List Template Variables
+ - fix [ 1221284 ] Operation\user.pm i18n {internationalize labels}
+ - All form field labels have been internationalized.
+ - Added hover help. (Special thanks to Colin Kuskie for all his help with
+   this.)
+ - Removed long since depricated support for the eopro editor.
+ - Class icon context menus are now left click enabled rather than right click
+   enabled because some users were confused by right clicking on a web page,
+   and mac users, having only one mouse button, couldn't do it.
+ - Rewrote the asset manager UI to have a little less whiz-bang and a bunch
+   more user friendliness due to user feedback.
+ - The File and Image assets are now considered utility assets and the default
+   way to upload files will be through the File Pile. Anyone wishing to make
+   the File and Image assets available as normal assets in the new content
+   menu are still able to do so, and existing sites will be left as they are.
+ - Added a file cache size limit option to the config file.
+ - Added "content type" to Snippets, allowing for CSS, XML, javascript and 
+   other file formats to be served directly from a snippet.
+ - Enhanced aggregation features of the SyndicatedContent wobject, including
+   keyword filtering, content republishing, XSLT stylesheet support and 
+   different "display modes".
+ - Wrote a whole new caching system for WebGUI that is up to 10 times more
+   efficient than the old caching system.
+ - fix [ 1216053 ] can't drag to asset manager crumbtrail
+ - Updated the calendar picker to version 1.0.
+ - Added a mechanism to wobject definitions so that they can dynamically
+   generate their getEditForm() method based upon settings in the definition
+   if they need no special processing rules. For people familiar with Jakarta
+   Struts or Ruby on Rails this will be very familiar. For all other
+   developers, just know that it will make writing wobjects that much easier.
+   For an example, take a look at the Article wobject's definition() method.
+ - Added an optional specification of the asset icon, ui level, and name in the
+   definition to have getName(), getUiLevel(), and getIcon() autogenerated for 
+   WebGUI::Asset subclasses.
+ - fix [ 1239601 ] Thread::getName is not Internationalized (and many other Assets, too)
+ - fix [ 1240316 ] Doc erro in Folder template thumbnail => thumbnail.url
+ - The Navigation template variable "unfolded_page_loop" was removed a long
+   time ago, but the documentation was never updated until now.
+ - Created a new pluggable form control backend. See migration.txt for
+   details.
+ - Changed warning generated when a languagepack misses the makeUrlCompliant
+   procedure to a fatal error, since this will lead to a false url in the asset
+   table. (mkamerbeek/Procolix)
+ - fix [ 1249114 ] unclosed <li> elements in auth modules (mkamerbeek/Procolix)
+ - fix [ 1249117 ] resetExpiredPassword not a callable method from authmodules. 
+   Includes an additional bugfix in resetExpiredPasswordSave method (mkamerbeek/Procolix)
+
+6.6.5
+ - fix [ 1243131 ] In 6.6.4 you cannot upload anything (ebruni/mwilson)
+ - fix [ 1243392 ] demo.plainblack.com: Cannot manage users in group (mwilson)
+ - fix [ 1240325 ] FilePile doesn't create thumbnail when upload images
+   (mwilson)
+ - fix [ 1240324 ] Folder.pm error evaluating $isImage (ebruni)
+ - fix [ 1240140 ] Database link username in 6.6.3 is wrong (mwilson)
+ - Fixed a bug where HTTP Proxy asset couldn't proxy images properly.
+
+
+6.6.4
+ - fix [ 1238539 ] REQUEST_URI broken in WRE
+ - fix [ 1227887 ] setScratch("redirectAfterLogin") doesn't save
+   $session{form}
+ - fix [ 1239475 ] post::processPropertiesFromFormPost doesn't check
+   attachment
+   (mwilson)
+ - fix [ 1239488 ] post::processPropertiesFromFormPost thumbnails non-images
+   (mwilson)
+ - fix [ 1206045 ] Max Image Size don't work (fixed for good this
+   time-mwilson)
+ - fix [ 1218993 ] Clicking of icon of active operation does nothing (mwilson)
+ - fix [ 1239576 ] New survey cached as blank (mwilson)
+ - fix [ 1224016 ] Survey.pm edit answer problems (mwilson)
+ - fix [ 1231377 ] When An Admin Logs Out Site Disappears (mwilson)
+ - fix [ 1230990 ] {_parent} is sometimes set to undef (mwilson)
+ - fix [ 1230985 ] $session{page}{empty} is not reset before each... (mwilson)
+ - fix [ 1226720 ] error msg when deleting last post from a coll.... (mwilson)
+ - fix [ 1226945 ] subscribe link doesn't update (mwilson)
+ - fix [ 1227208 ] Unable to override template on shortcut (mwilson)
+ - fix [ 1230505 ] IndexedSearch::getEditForm error msgs aren't......(mwilson)
+ - fix [ 1238001 ] HTMLForm->file rearrange problem, extras become subtext
+ - Fixed an upgrade script bug in 6.2.11-6.3.0.
+ - Fixed an upgrade script bug in 6.5.6-6.6.0.
+ - Fixed an error handler bug in the auth system.
+ - Fixed a typo in syndicated content that made templates not appear.
+ - Fixed several bugs in shortcut asset.
+ - fix [ 1224828 ] contra intuitive location when switching admin off
+ - fix [ 1230977 ] Products not shown when only in Admin group
+ - fix [ 1234214 ] Layout.pm (view) doesn't hide children (Emiliano Bruni)
+ - fix [ 1231070 ] undef $session{isInGroup}; should be delete
+   $session{isInGro (Matt Wilson)
+ - Updated the file system privileges mod_perl handler to work under multiple
+   versions of mod_perl.
+ - Fixed a sorting problem in the Collaboration System.
+ - fix [ 1237120 ] wG allows you to cut/paste USS sub & paste it on a page!
+   ERR
+ - fix [ 1236414 ] Collaboration System conflicts when two on a page
+ - fix [ 1231390 ] When Pasting Content More Than One Item is Pasted to Page
+ - fix [ 1231376 ] Secondary Admins Have No Access
+ - fix [ 1231388 ] Missing Break Tags All Over The Place (Matt Wilson)
+ - HTTP_X_FORWARDED_FOR automatically replaces REMOTE_ADDR when present so we
+   can capture accurate IP addresses for clients through proxies.
+ - fix [ 1221781 ] Metadata quicklink always visible in Asset Form
+ - fix [ 1229387 ] collaboration system file privs
+ - fix [ 1228342 ] edit branch doesn't set privs for filesystem
+ - fix [ 1221676 ] Duplicate postings in Collaboration System on IE
+ - Added an email override option to the config file for testing email
+   functions.
+
+
+6.6.3
+ - Fixed a recurring transaction commerce bug.
+ - fix [ 1218874 ] Unable to edit any Assets nested in a Layout
+ - Fixed a bad create.sql script from the last release.
+ - fix [ 1215281 ] Users randomly logged out
+
+
+6.6.2
+ - Changed the back to site link in the admin console to act intuitively rather than logically.
+ - fix [ 1220552 ] moderation of postings/threads
+ - fix [ 1218870 ] !! Bugs in Article.pm (old 'Discussion allowed' feature)
+ - Fixed help for LDAP connections.
+ - Internationalized all LDAP error messages
+ - Moved all LDAP help and labels into its own file (AuthLDAP)
+ - fix [ 1217865 ] typo in EditableToggle.pm
+ - RFE [ 1216056 ] Template names not specific enough
+ - fix [ 1210493 ] mistypo in query in thread.pm in table name
+ - Fixed a bug in the ITransact plugin that did not handle months with 31 days.
+ - fix [ 1200782 ] user.isModerator don't work
+ - fix [ 1209539 ] RSS online help URL points to casino site
+ - fix [ 1213524 ] Survey.pm: unable to edit answers
+ - fix [ 1213516 ] Survey.pm: question order=response driven doesn't work
+   (Thanks to misja1)
+ - fix [ 1212596 ] Field disableContentLock is missing in Shortcut table
+ - fix [ 1214399 ] Admin Bar Unusable
+ - fix [ 1196086 ] certain DOCTYPEs break the admin slidebar
+ - fix [ 1189186 ] 6.6 CVS Admin menu is invisible on failsafe templater
+ - fix [ 1215228 ] getToolbar uses get("url") instead of getUrl [mwilson]
+ - fix [ 1187040 ] getNextChildRank doesn't handle rank 999999
+ - fix [ 1179021 ] cannot set default value of 0 in several form elements
+ - fix [ 1172993 ] Product asset issues
+ - fix [ 1195523 ] Bug in Data Type Telephone Number
+ - fix [ 1216052 ] Can't copy polls
+ - Fixed a bug that was preventing population of the Poll template drop down
+   list.
+ - fix [ 1203834 ] accounts created by anon. reg. disobey def. userprofile
+   settings
+ - fix [ 1216062 ] http proxy not proxing images
+ - fix [ 1216066 ] url caching broken
+ - fix [ 1218475 ] cannot set "who to view" in style templates
+ - fix [ 1219745 ] setSize doesn't work with Images [mwilson]
+ - fix [ 1206045 ] Max Image Size don't work [mwilson]
+ - fix [ 1219805 ] storage.pm renameFile refers to getNode [mwilson]
+ - fix [ 1216061 ] 2 rich editors - 1 field [mwilson]
+ - fix [ 1220072 ] typo in Help: Template, Language
+ - fix [ 1220397 ] Cannot Copy Form
+ - fix [ 1220456 ] Image.pm add/edit image help goes nowhere.
+
+
+6.6.1
+ - Replaced defective confirm checkout commerce template.
+ - Fixed a typo in the Navigation table schema.
+ - fix [ 1160019 ] Notification content type [temp fix] <mwilson's fixes>
+ - fix [ 1173544 ] Rating increases view count
+ - fix [ 1177020 ] Preview, then Save a Post -subscribers get two notifications
+ - fix [ 1178367 ] Edit Shortcut doesn't work with wobjects without templateId
+ - fix [ 1180455 ] assetproxy of a nonexistent asset inserts the page_not_found
+ - fix [ 1182449 ] isMarkedRead not a template var in Post::getTemplateVars
+ - fix [ 1197781 ] Collaboration: sorting bug in sub_view FIXED! 
+   and [ 1182478 ] Coll::appendPostListTemplateVars does not sort by isSticky
+ - fix [ 1182630 ] thread::isMarkedRead should check thread's lastpost,not self
+ - fix [ 1197620 ] upgrade_6.2.11-6.3.0.pl : Missing posts - FIXED!
+ - fix [ 1200874 ] "reply with quote" in WebGUI Help
+ - fix [ 1190276 ] cannot use encrypt page recursively
+ - fix [ 1197360 ] "anscestor" flub in 6.6.0 upgrade file.
+ - fix [ 1191650 ] plainblack.com links that are copy/pasted append ..
+ - fix [ 1190814 ] The builtin help describes the removed Navigation macro
+ - fix [ 1199193 ] lastReply.url not complete
+ - fix [ 1201322 ] Form: fixChars don't work
+ - fix [ 1198799 ] Moving Threads or Posts in the Trash
+ - fix [ 1198000 ] Macro not listed in Rich Editor Assset helper
+ - fix [ 1196929 ] page table still being used
+ - fix [ 1195909 ] create.sql - left navigation doesn't show home
+ - fix [ 1193694 ] webgui::auth::webgui::createAccountSave $self->_logLogin bug
+ - fix [ 1186440 ] Asset/Post.pm content type only checked if editStamp set
+ - fix [ 1203331 ] i18n::Macro_Thumbnail.pm
+ - fix [ 1203413 ] Fix: Rating bug in Thread.pm
+ - fix [ 1203603 ] Error in admin console
+ - fix [ 1187037 ] LastModified.pm refers to LastEdited and pageId from wobject
+ - fix [ 1203693 ] Delete group fails with vital component
+ - fix [ 1198695 ] 6.6 ß - Can't call method error on ratings.
+ - fix [ 1204123 ] Bug: sortby.lastreply.url
+ - fix [ 1203779 ] "Remove" Button in FileUploadControl not internationalized
+ - fix [ 1201650 ] Server-wide Cache can be viewed/cleared by an admin
+ - fix [ 1205128 ] typo in \lib\WebGUI\AdminConsole.pm
+ - Fixed a bug with macro quotes and TinyMCE.
+ - fix [ 1197095 ] runHourly not finishing
+ - Fixed a bug with the rich editor locking up when switching between tabs.
+ - fix [ 1187256 ] WG v6.5.6 incompatible with mod_perl v2.0.0RC5? (Koen de
+   Jonge)
+ - fix [ 1206199 ] ^/; macro edited in save mode...
+ - fix [ 1206046 ] function tinyMCE_WebGUI_Cleanup don't work
+
+
+6.6.0
+ - Added a shopping cart system and salable products management system. This
+   completes the foundation of WebGUI's commerce system and will allow us to
+   add very rich commerce features in the 7.x series. (Thanks to ProcoliX and
+   Boomer Consulting for each contributing some funding toward the development
+   of these features.)
+ - Added a new admin panel for inline content editing.
+ - Tweaked the preloader so WebGUI uses a little less memory per process.
+ - upgrade.pl and testEnvironment.pl now use the same config file reader as
+   the rest of WebGUI
+ - fix [ 1173101 ] Template in ^LoginToggle();
+ - Added a page to the help docs which tells you what Assets are enabled for this site.
+ - Added a page to the help docs which tells you what Macros are enabled for this site and how
+   to call them.
+ - Added a new Error Handling / Logging mechanism.
+ - Whitespace in URLs will now be replaced with hyphens (-) instead of
+   underscores (_) because there is some evidence that hyphens get better
+   search index ranking than underscores.
+ - Turned off autocomplete on user manager.
+ - Switched session ID generator to use WebGUI::Id::generate() the same as
+   everything else.
+ - Fixed several bugs during the conversion of Help and International files to
+   namespaces.
+ - Fixed bugs in correctly setting default values in forms with anonymous arrays.
+ - Added class icons to all the content adders in the asset manager.
+ - Expsosed a page.rank template variable to the Navigation template.
+ - Added packages list to the content adder in the asset manager.
+ - Added edit icons to the list of prototypes and packages in the asset
+   manager.
+ - Added the ability in the DataForm to make the default view the List, rather than
+   the Form.
+ - Added a select all option to the clipboard selector in the asset manager.
+ - Added a color picker form field type.
+ - Fixed a bug where empty required field error messages from the data form
+   were not being displayed.
+ - Added a config file option to specify where the file cache is persisted.
+ - Added complete documentation of all WebGUI config file options to the
+   default config file.
+ - Added an end point to limit ancestors in navigation.
+ - Added missing international entries for Navigation.
+ - fix [1177858] lib/WebGUI/i18n/English/Macros.pm can not translated
+ - Added the notion of utility assets and moved the Template asset into it.
+ - Added a cache disabling config option for developers who are testing
+   performance.
+ - fix [ 1190834 ] Pagination of event calendar does not work for firefox
+ - Navigation depthIs template variables now allow for negative values.
+ - fix [ 1191744 ] [6.5.6] default templates wrong
+ - Renamed layout asset to page.
+ - CS Post reply URLs are now shortened to an incremented reply number.
+ - Added a Rich Editor Configuration asset.
+ - Fixed a bug where a blank page would be displayed if a user logged out on a
+   page that visitors could not access.
+ - Fixed a bug in the make printable macro that used the wrong default
+   template.
+ - Added a context menu to inline editing that is accessible by right-click
+   or by left-click-hold on the asset's class icon.
+ - The context menu in the asset manager is now accessible via left-click-hold
+   for more familiarity with mac users.
+ - Added "create shortcut" as a context menu option in the asset manager.
+ - Fixed generateContent.pl to work with the new asset tree.
+ - Updated TinyMCE to version 1.44.
+ - Added an option to the layout to hide child assets from being displayed.
+   This allows you to use non-layout child assets as stand alone pages.
+ - Internationalized a bunch of stuff that was previously uninternationalized.
+ - Fixed a bug in the survey that caused users to not be able to submit
+   survey's.
+ - Attached the karma system to the ratings system in the Collaboration
+   system.
+ - Added API for connecting to LDAP directories (Thanks to MABIS Healthcare
+   for funding this enhancement.)
+ - Added Admininstration Module for creating Multiple LDAP Connections on a 
+   WebGUI site (Thanks to MABIS Healthcare for funding this enhancement.)
+ - Modified LDAP Authentication Module to allow users to choose from the LDAP 
+   Connections created in the Admin Console (Thanks to MABIS Healthcare for
+   funding this enhancement.)
+ - Thumnail macro has been updated to work with the asset tree system.
+ - fix [ 1170169 ] Admin menu cut off in 800x600 resolution
+ - fix [ 1192714 ] New posts for CS doesn't use TinyMCE by default.
+ - fix [ 1190480 ] [6.5.6] Editor choice ignored in Forums
+ - fix [ 1175666 ] CVS code still using WebGUI::Collateral
+ - fix [ 1176172 ] Thumbnail Macro dosn't work
+ - fix [ 1180291 ] tinymce resets src of img incorrectly
+ - fix [ 1186395 ] survey: view statisics broken
+ - RFE 1035743, internationalize WebGUI macros.
+ - Redirects now process macros in the redirect URL.
+ - You can now tie LDAP groups to WebGUI groups.
+
+
+6.5.6
+ - Fixed a bunch of mostly cosmetic issues with the commerce system.
+ - Fixed a bug in the navigation system that would cause it not to work in
+   operations using the user style.
+ - fix [ 1171109 ] crumbtrail showing
+ - fix [ 1176383 ] Commerce for International customers
+ - fix [ 1175400 ] Shortcut.pm - refers to WebGUI::metadata
+ - fix [ 1172769 ] htmlform.pm template -> manage button
+ - fix [ 1173970 ] Redirects in trash still function
+ - fix [ 1173720 ] recursive encrypt content doesn't work
+ - fix [ 1176573 ] runHourly.pl - DeleteExpiredEvents
+ - fix [ 1175455 ] posts can be viewed by users who are not in groupIdView
+ - fix [ 1182381 ] Package deployed to self infinitely recurses
+ - fix [ 1177456 ] metadata fields do not show up in getEditForms for any
+   asset
+ - fix [ 1182302 ] getAssetAdderLinks gets prototypes that are deleted.
+ - fix [ 1182285 ] "bold" when highlighted - really messy
+ - fix [ 1177536 ] redundancy - thread.pm 6.5.5 line 559
+ - fix [ 1177336 ] DatabaseLink::whatIsUsing is out of date
+ - fix [ 1177450 ] Layout's view method does not exclude subclasses of Layouts
+ - fix [ 1176724 ] edit existing database link - wrong username/password
+ - fix [ 1176663 ] fixUrl needs to remove slashes from end of URLs
+ - fix [ 1173560 ] copyList doesn't copyList
+ - fix [ 1183014 ] deletion of post does not update lastPostId for CS
+ - fix [ 1185507 ] gotcha.txt SetPerlVar , uploadAccessHandler wrong
+ - fix [ 1185279 ] IE/SSL "Admin mode" prompts for download of port 80
+   material
+ - Fixed a bug in navigation where ancestors would become checked whenever
+   self was also checked.
+ - fix [ 1181266 ] Navigation - relative to root fails at third level
+ - fix [ 1173779 ] editSave metadata property doesn't save type
+
+
+6.5.5
+ - fix [ 1171569 ] add/edit sql report help link has wrong namespace
+ - Fixed a bug in the collaboration system that caused replies to fail.
+ - Fixed an inefficency in the asset system that caused a lot of extra work on
+   the server when pasting.
+ - Fixed a bug in the groups system where group expiration intervals weren't
+   saving properly.
+ - fix [ 1170879 ] "default extension" is added to asset's URL upon every Save
+ - fix [ 1170200 ] folder view template file_loop -> always current time
+ - fix [ 1170650 ] Group problem
+ - fix [ 1170245 ] paste returns deleted content
+ - Fixed a problem with the FormProcessor url sub that wouldn't allow URLs to
+   start with / or a macro.
+ - fix [ 1171447 ] Poll shows no result
+ - fix [ 1171060 ] delete file from cs
+ - fix [ 1170290 ] 6.2.x->6.5.4 doesn't add Page macro to config file
+ - fix [ 1171469 ] [edited] post insert wrong timezone
+ - Updated the macro picker in the rich editor.
+ - fix [ 1171505 ] Previewing a post appends signature every time.
+ - fix [ 1170095 ] Sort-by fields don't.
+ - fix [ 1165645 ] Search not working
+ - fix [ 1170264 ] can't copy file
+ - fix [ 1170242 ] cs email url
+ - fix [ 1171110 ] nav ancestor
+ - fix [ 1171574 ] purgeList doesn't purgeList
+ - fix [ 1170244 ] cs notification
+ - fix [ 1171616 ] default templateId for Folder is wrong
+ - fix [ 1170269 ] 6.2.11->6.3.0 fails if any product-related/accessories
+   exist
+ - fix [ 1170426 ] missing entries and wrong descriptions in webgui help
+
+
+6.5.4 
+ - fix [ 1160953 ] JavaScript Errors in admin console - IE
+ - Fixed a drag and drop problem.
+ - fix [ 1168195 ] Asset manager: Space between Size and unit
+ - Fixed a bug where sticky threads were not acting sticky in the CS.
+ - fix [ 1169116 ] AdminToggle macro doesn't display correct linktext
+ - fix [ 1168189 ] Asset Manager: Double Title entries
+ - fix [ 1168181 ] Edit in Asset manager -> wrong folder
+ - fix [ 1167971 ] attachment loop code for Asset::Post::getTemplateVariables
+ - fix [ 1168867 ] WebGUI Script XHTML 1.0 Non-Compliant
+ - Fixed a fatal crash bug caused by calling the old authentication urls.
+ - fix [ 1168318 ] Rating often not working
+ - fix [ 1167937 ] Asset Manager and No-Cache Imcompatible
+ - fix [ 1167917 ] Link to Page Tree and No-Cache Imcompatible
+ - fix [ 1168084 ] file uploads don't work.
+ - fix [ 1169239 ] Manage subscription codes -> Delete Selected -> Empty page
+ - fix [ 1169246 ] Manage subscription codes -> Cannot select single day
+ - fix [ 1169271 ] Last Post incorrect
+ - The items listed under new content are now in alphabetical order as they
+   should be.
+ - Fixed some template problems with the folder asset and the failsafe style.
+ - fix [ 1167720 ] Folder::view() subfolder_loop - missing.. [mwilson]
+ - fix [ 1169379 ] eventscalendar wobjects have wrong scope after upgrade
+ - fix [ 1168812 ] navigation sometimes fails to use correct... [mwilson]
+
+
+6.5.3
+ - Sorted templates into folders named after their respective namespaces
+   & re-enabled the manage button next to the template dropdown [mwilson]
+ - fix [ 1161457 ] Data fomr - list all entries: Logfile Error
+ - fix [ 1161461 ] Data form - Add field - wrong destination
+ - fix [ 1164382 ] User Profiling WebGUI::International::get(304,"WebGUI");
+ - fix [ 1164251 ] message preview
+ - fix [ 1164208 ] Unable to move freely between pages of a forum
+ - fix [ 1160034 ] 6.5.0 - newly added posts do not appear
+ - fix [ 1027992 ] pagination in forum doesn't take you to correct page
+ - fix [ 1149585 ] visitor as admin
+ - Fixed a bug where the wrong toolbar was displayed for AssetProxied
+   Navigation assets.
+ - fix [ 1165010 ] Navigation Display title gets reset
+ - fix [ 1159992 ] Integer value zero not returned in form fields
+ - fix [ 1165425 ] View Userprofile - Style is missing for non-public profiles
+ - fix [ 1165434 ] View Userprofile - Perm. denied page not parsed for macros
+ - fix [ 1138654 ] 6.3 CVS - raw form parameter not processed
+ - fix [ 1164202 ] Data Form field types are not sticky when re-edited
+ - fix [ 1149529 ] 6.3 CVS: Content positions don't save and  
+       [ 1149801 ] page position not maintained (Martin Kamerbeek)
+ - fix [ 1165373 ] sort templates into folders by namespace under ImportNode
+ - fix [ 1118789 ] 6.2.11 - L_loginBox display with empty 1st param [colink]
+ - fix [ 1165635 ] IndexedSearch - double toolbar in AdminMode [mwilson]
+ - fix [ 1165598 ] Auth module numeric comparisons against Ids
+ - fix [ 1165829 ] i18n/english/Eventscalendar.pm: double entrys [mwilson]
+ - fix [ 1165386 ] Templates page overlap [mwilson]
+ - Rebuilt all of the Collaboration System templates from scratch. They were
+   all pretty messed up from the merging of the forum, USS, Link List, and FAQ
+   wobjects.
+ - fix [ 1165759 ] PB.com contrib. templates dont show links
+ - fix [ 1165439 ] No way to upload on USS template in collaboration system
+ - fix [ 1165438 ] Issues with Job listing template of Collaboration system
+ - fix [ 1166071 ] Create New User allows blank username [mwilson]
+ - fix [ 1166133 ] DataForm www_edit and www_editField's "proceed" [mwilson] 
+ - fix [ 1164211 ] DataForm export tab deliniated always contains.. [mwilson]
+ - fix [ 1165616 ] calling a non-existent func= on a good url crashes Apache
+ - fix [ 1154384 ] 6.2.11 Admins with default UI level
+ - fix [ 1151879 ] Search button changes to "Please wait"
+ - fix [ 1165645 ] Search not working
+ - fix [ 1157233 ] search crashes
+ - fix [ 1146359 ] certain templates still hardcoded
+ - fix [ 1056470 ] Improper macro hangs calendar
+ - fix [ 1120959 ] 5.5.x forms - export tab delimited
+
+
+6.5.2
+ - Fixed a caching bug in the collaboration system that wouldn't allow you to
+   view other posts if you were in threaded mode.
+ - fix [ 1160969 ] 6.5.x plainblack.com - Second edit of Post fails
+ - fix [ 1161571 ] 6.5.0, pagination on view forum always returns page 1
+ - fix [ 1163780 ] Pagination not working for Thread in Nested view
+ - fix [ 1163761 ] session from 10.0.0.2 in create.sql
+ - fix [ 1160971 ] 6.5.x - Use Preview setting ignored in collaboration
+   systems
+ - fix [ 1159395 ] Rating causes Problem with request
+ - fix [ 1150169 ] archive posts
+ - fix [ 1149830 ] Collaboration System privileges not correct
+ - fix [ 1157197 ] content filters shows only word to be replaced
+ - fix [ 1088201 ] Deleted discussion thread negatively offsets reply count
+ - fix [ 1162056 ] No default template for Data Form with no tabs
+ - fix [ 1029170 ] Forum: Sorting thread by date
+ - Fixed a sort by last reply crash bug.
+ - fix [ 1160947 ] Make page printable does not work
+ - fix [ 1150140 ] Manage users in group only views first page
+ - fix [ 1163470 ] [6.5.1CVS] Dataform, wrong template, bad edit URL
+ - fix [ 1159992 ] Integer value zero not returned in form fields
+
+
+6.5.1
+ - Fixed a bug in the lineage tree that caused funky ranks to be created when
+   pasting assets.
+ - Fixed a bug in the collaboration system that caused posts to not post
+   unless rich edit was turned on.
+ - Improved pasting performance.
+ - fix [ 1157196 ] manage system clipboard wrong title
+ - fix [ 1154150 ] No time in forum overview
+ - fix [ 1152434 ] Last Reply column is blank in a forum [mwilson]
+ - fix [ 1158944 ] Validate email addresses?
+ - fix [ 1157311 ] Edit User Profile fails on Windows/Firefox
+ - fix [ 1160623 ] Redirect Incorrect- 6.2.11
+ - fix [ 1161455 ] New Content >> Data Form
+ - fixed a loop bug in the 6.3.0 upgrade that could cause pages to be upgraded
+   twice, which would kill the upgrade script
+ - fix [ 1158983 ] 6.4.0 demo Setting Asset rank crashes WebGUI 
+ - fix [ 1160229 ] Couldn't call method www_search
+ - fix [ 1153154 ] 6.3 beta Add function doesn't use WYSIWYG
+ - fix [ 1157205 ] default content (in create.sql) outdated
+ - fix [ 1028595 ] Denial of Service WebGUI (e.g. forum wobject)
+ - fix [ 1157229 ] Not Found Page
+ - fix [ 1157198 ] selecting content profiling sends you back to admin console
+
+
+6.5.0
+ - Added content prototypes.
+ - Updated TinyMCE to 1.43.
+ - Fixed a bug in the Collaboration post where the post end date was set to
+   the start date.
+ - fix [ 1157202 ] users can add themselves to Admins group
+ - fix [ 1157218 ] user cannot view it's own profile
+ - fix [ 1157195 ] Problem with request when saving profile
+ - fix [ 1158117 ] Help Index Unavailable from RWG
+ - fix [ 1157453 ] Error on Edit Template / Save and Cancel
+ - fix [ 1157434 ] [CVS 6.5]edit question controls have incorrect URL in Survey
+ - fix [ 1157418 ] "Display the title?" not shown in Layout tab
+ - fix [ 1157210 ] users added notification e-mail doesn't show correct url
+ - Fixed a bug that wouldn't allow the HTTP Proxy wobject to rewrite the URLs
+   of SSL enabled sites.
+ - Using the International Macro in Help to simplify management and translation.
+ - Fixed the rich edit bug on Collaboration System posts.
+ - Fixed a login bug that brought the user to the display account page rather
+   than the page they were trying to reach when they logged in.
+ - Fixed the Collaboration System search bug.
+
+
+6.4.0
+ - You can now see the groups of groups hierarchy in the group manager.
+ - Added an initial configuration wizard which prompts the site owner to
+   configure a custom admin username and password for better security.
+ - Added some indicies to increase performance.
+ - Added all sorts of caching to increase performance.
+ - Added asset type icons to the asset toolbar.
+ - Added isAdminOn(), switchOnAdmin(), and switchOffAdmin() to WebGUI::Session
+   to eliminate all of the previously cryptic means of doing those things.
+ - Added a temporary file storage mechanism to WebGUI::Storage.
+ - Image Magick is now required to run WebGUI.
+ - Added an image resizer to the image asset.
+ - Added Captcha verification option to WebGUI anonymous registration.
+ - Authentication templates are now selectable through the settings console.
+ - Added email validation option to WebGUI anonymous registration. Thanks to
+   Matt Wilson for inspiration.
+ - Thumbnails will now be generated a little sharper. Thanks to Nuba.
+ - SSL is now more strictly enforced.
+ - Deleted the long since deprecated authentication methods (logout, login,
+   displayAccount, displayLogin, recoverPassword). If you don't understand
+   this, don't worry about it, you'll still be able to log in to your site. =)
+ - Fixed resetting votes on Poll would crash it.
+ - Fixed not being able to set display title and other yes no questions to no.
+ - Fixed a bug where URLs would become unreachable when using SSL.
+ - Fixed a password timeout bug caused by the change in the interval method.
+ - Fixed a bug where subscription groups where showing up in user manager.
+ - Removed the depricated fileSize property from the File asset.
+ - Fixed a user profile editing bug.
+ - bugfix [ 1151462 ] missing slash in form URL
+ - bugfix [ 1155826 ] Forum After update has doble posts
+ - bugfix [ 1154990 ] lost "get" in code (Collaboration)
+ - bugfix [ 1154269 ] empty trash doesn't work
+ - bugfix [ 1154051 ] Unable to remove link below article
+ - bugfix [ 1152826 ] WebGUI.conf.original in source is not complit
+ - bugfix [ 1145984 ] <tmpl_var session.page.title> is still in Style
+   Templates
+ - bugfix [ 1152948 ] Edit Layout changes settings to defaults
+ - bugfix [ 1151400 ] editSave on Template erases namespace
+ - bugfix [ 1154211 ] Error: Can't instanciate template on Add Article
+ - bugfix [ 1153518 ] re-edit forum post error
+ - bugfix [ 1152819 ] Error when edit fild in Admin console -> user profiling
+ - bugfix [ 1152047 ] Unable to create new account
+ - bugfix [ 1150173 ] Error message when logging out
+ - bugfix [ 1154247 ] Title and menuTitle set to 'untitled' if url is changed
+ - bugfix [ 1150982 ] Subscribe to forum thread causes error
+ - bugfix [ 1151216 ] The Latest News is blank on demo.plainblack.com
+ - bugfix [ 1149458 ] CVS 6.3 -> ENV variables have changed for mod_perl 2.0
+ - bugfix [ 1150729 ] Submission approval URL not working from email
+ - bugfix [ 1150078 ] userProfile.url not set in Thread::view()
+ - bugfix [ 1153919 ] Asset::fixUrl doesn't limit URL length
+ - bugfix [ 1152834 ] can not to add IndexedSearch
+ - bugfix [ 1150200 ] Add New DataForm crashes
+
+
+6.3.0
+ - Migrated all wobjects to assets.
+ - Migrated pages to the layout and redirect assets.
+ - Converted the navigation system to navigation assets.
+ - Converted the template system to template assets.
+ - Converted site maps to navigation assets.
+ - Converted file managers to layout assets with file and image assets
+   attached.
+ - Added a new upgrade mechanism that will display a maintenence message
+   during upgrades. No need to set up anything special for this any longer.
+ - Added AssetProxy macro, which replaces the Navigation, I, Snippet, and File
+   macros.
+ - Added Folder asset type.
+ - Added the RandomAssetProxy macro, which replaces the RandomImage and
+   RandomSnippet macros.
+ - Renamed the i macro to FileUrl.
+ - Renamed the \ macro to PageUrl.
+ - Converted page templates to use CSS-based layouts instead of tables.
+ - Added a "Position" property to the DataForm Edit Field interface. This makes it easier to move a field to a certain position. (Len Kranendonk).
+ - Added the variables "record.edit.icon", "record.delete.url" and "record.delete.icon" to the DataForm DataList template. (Len Kranendonk).
+ - Converted all confirmation pages to client-side confirmation dialogs. Saves
+   a pageload. (Len Kranendonk).
+ - Added a new, more user-friendly administrative console complete with over
+   40 new icons developed specifically for WebGUI.
+ - SQL Report now supports multiple queries. (Thanks to Brunswick New
+   Technologies for funding this development.)
+ - Removed the old rich editors and replaced them with Tiny MCE.
+ - Integrated Tiny MCE with image chooser. (Thanks to the US Dept. of State
+   for funding portions of this development.)
+ - Added a new page link chooser to the rich editor. (Thanks to the US Dept.
+   of State for funding portions of this development.)
+ - Removed the admin style settings since their use has been replaced by the
+   admin console.
+ - bugfix [ 1045114 ] Columns randomly ordered in SQLReport (Len Kranendonk ,
+   tnx brother for reporting)
+ - Sped up Navigation.pm
+ - bugfix [1041937] List Roots broken
+ - Navigation template variable rename, added template variables for
+   currentPage.hasDaughter, page.inBranchRoot.
+ - Bugfix [ 1055396 ] Template switching issue (Len Kranendonk)
+ - WebGUI Operations are now dynamically loaded (Len Kranendonk) 
+ - Added <input type="button"> button to Form.pm / HTMLForm.pm (Len Kranendonk)
+ - Added a "Cancel" button to each tab form (Len Kranendonk)
+ - bugfix [ 1040341 ] Opera balks on HTMLArea TypeError
+ - bugfix [ 1037364 ] HTMLArea3 breaks ^i macro
+ - bugfix [ 889424 ] htmlArea td background image in expanded mode
+ - bugfix [ 991070 ] 5.5.4 Editor(s) replacing ^ symbol
+ - bugfix [ 1022287 ] WYSIWYG-Editor Add new web link
+ - bugfix [ 1055153 ] Turn Admin ON with SSL and IE.
+ - fix [ 1118753 ] GUID not displayed in 6.2.9 if it begins with "-".
+ - RFE [ 1034549 ] Docu für Encrypt Pag
+ - Added internationalized URL handling.
+ - Moved site icon and fav icon directly into style templates.
+ - Removed all the upgrades prior to 5.5.0. If you need to upgrade from an
+   older version, you'll need to upgrade to 5.5.x first, and then upgrade
+   to 6.x.
+ - Fixed a bug that caused begin/commit/rollback to fail when using the
+   internal WebGUI database. This exhibited no problems prior to this release
+   because no WebGUI functions actually used those methods before.
+ - bugfix [1073753]. bug in WebGUI::Search (Leendert Bottelberghs).
+ - Added an e-commerce system. Thanks to Atomic Learning for funding this
+   feature. 
+ - Added new asset type: File Pile. This allows you to do a mass upload of
+   files and images.
+ - Added a privilege access handler to the uploads file system.
+ - Added CDG Commerce iTransact payment plugin.
+ - Added an asset picker form control.
+ - Shortcuts can now proxy every type of asset, not just wobjects.
+ - Added a codearea form control.
+ - fix [ 1055362 ] Trash items show up in Search resultsA
+ - fix [ 1049367 ] /uploads/temp/templates/ shouldn't be public
+ - fix [ 1052801 ] wobjectproxy throws security error on editSubmission
+ - fix [ 1028921 ] Cannot drag n drop proxy wobjects
+ - fix [ 1003509 ] Admin mode breaks page layout with users not in Admin Group
+ - fix [ 1123666 ] Discussion - reply to thread not displaying in threaded
+   mode
+ - Removed the page stats tracking function as it was killing people's sites.
+   We recommend AWStats instead (www.awstats.org)
+ - Added the ability to switch the style for user functions like profiles,
+   authentication, etc.
+ - Merged the forum and USS into a new asset type called the Collaboration
+   System with all the best features of each system.
+ - Enhanced the user import script to allow you to update existing accounts,
+   group expirations, etc, in addition to just importing new accounts. (Nick
+   Roberts)
+ - fix [ 1118861 ] WebGUI::Group->find() broken! (fix)
+ - Removed the long deprecated SMB auth module. It will be added to the user
+   contribs area in case someone wishes to use/maintain it.
+ - fix [ 1122377 ] 6.2.9 - USS sequence ordering bugs
+
+
+
+6.2.11
+ - Fixed a navigation problem where home page was not showing up.
+ - fix [ 1111452 ] 6.2.10 showDebug=1 in create.sql 
+ - Removed fix 1079821 as it caused an ugly post bug defined as [ 1111591 ] Message Preview problems. (Duplicate message)
+ - fix [ 1111490 ] Calendar events in 6.2.10 (Matt Wilson)
+
+
+6.2.10
+ - A lot of help updates (Colin Kuskie)
+ - A bunch of GUID fixes (Eric Kennedy)
+ - fix [ 1102676 ] Re-visit 920583 Theme imports fail (Gerald Young)
+ - fix [ 1085795 ] Wrong parameter count to WebGUI/Group.pm (Dri)
+ - fix [ 1085485 ] parentId in page table not an int
+ - fix [ 1080299 ] Home page can be deleted
+ - fix [ 1071435 ] AdminBar macro incorrectly selects packages
+ - fix [ 1080326 ] DeleteExpiredTrash doesn't work
+ - Fixed the version compare bug in testEnvironment.pl and statistics due to
+   the missing status.
+ - fix [ 1072107 ] Calling ^SI(); by id doesn't work. (Dri)
+ - fix [ 1055088 ] SI macro will not do by ID look-up
+ - fix [ 1074036 ] Eventscalendar : very slow (Milo vd Zee)
+ - fix [ 1069991 ] Deleted msg - problems in nested, threaded views (mdj2000)
+ - fix [ 1108905 ] WebGUI::Mail charset inconsistency (fix) (Dri)
+ - fix [ 1108539 ] Profile issues
+ - fix [ 1096397 ] Data Form mail acknowledgement
+ - fix [ 1095532 ] Deploying package with sub-pages fails
+ - fix [ 1089383 ] message log URL missing operation name
+ - fix [ 1088470 ] missing '>' in template (create.sql) - minor. (Matt Wilson)
+ - fix [ 1080783 ] Profile field issue
+ - fix [ 1079821 ] Make printable macro ignores POST variables (rainer)
+ - fix [ 1078370 ] CPU Spike- UNKNOWN CAUSE
+ - fix [ 1078488 ] bad slashes in thumbnail
+ - fix [ 1077905 ] Post Preview template won't load. templateId 1 hardcoded!! (mdj2000)
+ - fix [ 1071941 ] Time Zone
+ - fix [ 1076678 ] Infinite loop with snippet
+ - fix [ 1075290 ] forum template subscription problem
+ - fix [ 1072838 ] FIX -- LDAP Auth: Sign up with existing WG username crashes
+   (Roy Johnson)
+ - fix [ 1066778 ] www.plainblack.com/news?wid=920&func=viewRSS (Dri)
+ - fix [ 1070169 ] 6.2.9 - Template create problem
+ - fix [ 1110644 ] Eventscalender month crossing bug (Milo van der Zee)
+ - fixed a template switching problem in the 6.0.0 upgrade script.
+ - fix [ 1071229 ] unauthorized user can view submissions!
+
+
+
+6.2.9
+ - bugfix [ 1058105 ] input tag has to be closed with /
+ - Changed a bunch of comparison operators that could potentially break with
+   GUIDs.
+ - bugfix [ 1058090 ] POST in Form.pm should be post
+ - bugfix [ 1066824 ] lib/WebGUI/Forum.pm problem, and the fix
+ - bugfix [ 1062108 ] Typo in WebGUI::Attachment
+ - bugfix [ 1059647 ] Forum search broken, and the fix
+ - bugfix [ 1059353 ] index.fpl broken (draj)
+ - bugfix [ 1066029 ] IDs with dashes break search
+ - bugfix [ 1066759 ] USER I.D. Multiple Issues (Matt Luebke)
+ - bugfix [ 1060002 ] Unable to delete empty DatabaseLink
+ - bugfix [ 1068344 ] 6.2.8 gamma - Users can't deactivate account
+ - bugfix [ 1068920 ] IpFilter non-functional in 6.2.7
+ - bugfix [ 1067171 ] DeleteCollateral doesn't delete all recurring in
+   EventsCalen
+ - bugfix [ 1069073 ] IDs with dashes break CoolMenus
+ - bugfix [ 1066778 ] www.plainblack.com/news?wid=920&func=viewRSS
+ - bugfix [ 1067740 ] pagination for manage users and groups
+ - bugfix [ 1062543 ] User profile fields don't hide correctly
+ - bugfix [ 1061115 ] 6.2.8 Encrypt login fails
+ - Fixed a bug in collateralImport.pl where imported items would not be
+   displayed if they were imported to the root.
+ - bugfix [ 1058167 ] admin mode: Menu --> undefined/forum
+ - bugfix [ 1057394 ] Bug in Notification email
+ - Fixed a meta refresh problem that resulted from a bug in Internet Explorer.
+ - Fixed the Slash_gatewayUrl macro.
+ - Fixed a redirect loop problem.
+ - Fixed a sequence ordering problem with the USS.
+ - Fixed a user profile vulnerability.
+ - Fixed typo in Wobjects/IndexedSearch.pm
+ - bugfix [ 1040570 ] default values for publicProfile and other preferences
+ - bugfix [ 1069732 ] redirect URL not working
+ - bugfix [ 1060003 ] pagination for Events Calendar not working as described
+
+
+6.2.8
+ - bugfix [ 1056335 ] Cool Menus navigation template seems broken
+ - bugfix [ 1041937 ] List Roots broken
+ - bugfix [ 1053187 ] eq/ne suggestions 6.2.7
+ - bugfix [ 1053003 ] theWg e-egg has a bug
+ - bugfix [ 1044316 ] 6.2.7 (and earlier?) Navigation change-suggestion
+ - bugfix [ 1052133 ] Databaselinks are not recognized (dapperdodo)
+ - bugfix [ 1046683 ] SQLReport doesn't query selected Data Source
+ - bugfix [ 1050133 ] broken link in 6.2.7 create.sql
+ - bugfix [ 1048421 ] TestEnvironment.pl - OS check
+ - bugfix [ 1044174 ] Site map wobject (Vadim Platonov)
+ - bugfix [ 1042680 ] collateralImport.pl --folderId
+ - bugfix [ 1050472 ] A CAUSE OF MANY BUGS (numeric comparisons against Ids)
+ - bugfix [ 1047947 ] collateralimport.pl
+ - bugfix [ 1040025 ] More HashId crashes (Paul Malabad)
+ - bugfix [ 1050282 ] no documentation for "wobject privileges" under add/edit
+   page
+ - bugfix [ 1055396 ] Template switching issue
+ - bugfix [ 1056122 ] 'bthis' is undefined
+ - bugfix [ 1044151 ] Adding new layout template causes JS error
+ - bugfix [ 1039765 ] Edit Page > Layout > Page Template
+ - bugfix [ 1053736 ] USS FAQ questions not updating
+ - bugfix [ 1043679 ] USS summary not updated on edit
+ - bugfix [ 1048484 ] USS ignores "URL Extension" content setting
+ - bugfix [ 1054364 ] Deleted event still visible
+ - bugfix [ 1052863 ] Empty Trash
+ - bugfix [ 1042682 ] op=emptyCollateralFolder
+ - bugfix [ 1056118 ] 2 File Managers on a page produces confusing results.
+ - Added missing POD in WebGUI::HTTP synopsis.
+ - The page URLs are back to being generated as relative (from the document
+   root) URLs once again. This means that you no longer have to specify all
+   your potential site URLs in your WebGUI config file.
+ - bugfix [ 1052613 ] sitename only first works
+ - bugfix [ 1041068 ] Wrong side menu after deleting a template
+ - bugfix [ 1043283 ] Prevent Proxy Caching breaks query string in URLs
+   (6.2.7)
+ - bugfix [ 1048167 ] grouping expiration notifications may not be working
+ - Fixed a bug in the search properties where pages that weren't roots were
+   showing up as roots to be searched.
+ - bugfix [ 1055589 ] "Default search" results show "Nameless root" in bread
+   crumb
+ - bugfix [ 1047157 ] Search wobject returns Profile content excerpts to
+   Visitor
+ - bugfix [ 1048166 ] privileged forums displayed in search
+ - bugfix [ 1040350 ] Calendar with Start and End Month = Current doesn't show
+   cal (Gerald Young)
+ - bugfix [ 1048955 ] all events in calendar moved ahead 1 day
+ - bugfix [ 1043234 ] EventCalendar Current Day Incorrect 6.2.7
+ - Added error handling to USS purge to deal with submissions without pages.
+ - bugfix [ 1037138 ] empty trash not working, Trash.pm
+ - bugfix [ 1053498 ] 6.2.7 gamma
+ - The forum post archive function is now 2700% faster.
+
+
+6.2.7
+ - Expanded upon the help for URL extensions.
+ - Added a workaround to a bug in Time::HiRes on windows.
+ - bugfix [ 1038289 ] Performance problems with 6.2 
+ - bugfix [ 1038837 ] Hashing issues (Paul Malabad)
+ - bugfix [ 1038678 ] 6.2.6- HTML Editor Image/ Collateral
+ - bugfix [ 1038129 ] Error importing with filemanagerimport.pl
+ - bugfix [ 1037605 ] Template changes not saved
+ - bugfix [ 1037531 ] 6.2.6 error (and further back) 
+ - Sped up WebGUI::DateTime::time() calls.
+
+
+6.2.6
+ - Fixed a GUID bug in the Site Map wobject.
+ - Removed debugging from the events calendar that should have been removed
+   before the last release.
+ - bugfix [ 1033670 ] JAVASCRIPT BUG
+ - bugfix [ 1034374 ] no pagination on groups
+ - bugfix [ 1035466 ] Pagination Broken - "Manage Users in Group"
+ - bugfix [ 1034900 ] unquoted themeID causing SQL error
+ - bugfix [ 1035510 ] USS search and user defined fields
+ - bugfix [ 1034373 ] No root path(s) specified
+ - bugfix [ 1035751 ] AdminBar.pm has message hardcoded, can't be translated.
+ - bugfix [ 1037161 ] Upgrade fail to change custom language to English
+ - bugfix [ 1036797 ] Bugs in Survey.pm (dapperedodo)
+ - bugfix [ 1036636 ] collateral folders missing
+ - bugfix [ 1036012 ] Themes broken
+ - Added a performance cache to the USS. Our testing indicates most USS' will see
+   more than 900% increase in performance.
+ - Added a performance cache to the Events Calendar. Our testing indicates
+   that most Events Calendars will see more than 3300% increase in
+   performance. 
+ - bugfix [ 1035901 ] Comparision logic based on int ids
+ - bugfix [ 1035891 ] DBMS reserved keyword in webgui wsclient table
+ - bugfix [ 1035055 ] Forum Karma
+ - bugfix [ 1034381 ] action2 not working
+
+
+6.2.5
+ - Added missing upgrade file. This caused no harm to those that upgraded
+   without it.
+ - WebGUI::HTTP::setRedirect now also adds a meta redirect in case the web
+   server does not support 302 redirects, or the content is being cached out
+   to static files.
+ - Added a warning to the Passive Profiling feature that it may be illegal to
+   use that feature in some countries.
+ - Fixed a problem where hidden form tags were not escaping macros properly.
+ - Fixed an XHTML problem with hidden form tags.
+ - Bugfix [ 1033561 ] HTMLArea 3 not working (Len Kranendonk)
+ - Fixed a paste page problem.
+ - Fixed a problem with the new export mechanism where it would just stop and
+   not report an error if it ran into a problem with creating folders and
+   files.
+ - bugfix [ 1033998 ] ^RootTitle does not work 
+ - bugfix [ 1031987 ] no upgrade script in 6.2.4
+ - bugfix [ 1030998 ] HTML Collateral Manager Issues (Harlan Barnes)
+ - Updated some of the template help. (Colin Kuskie)
+ - bugfix [ 1023800 ] USS - Read more
+ - bugfix [ 1033204 ] parentId empty when creating new root
+ - bugfix [ 998252 ] No Answers in Survey Causes Endless Loop
+
+
+6.2.4
+ - Changed text processor to convert HTML tags into text rather than
+   discarding them.
+ - Fixed some bugs in the WS Client that were checked in with the new Caching
+   code.
+ - Fixed a bug in the URL checker javascript that wouldn't allow for relative
+   paths.
+ - bugfix [ 991205 ] 6.0.3 Data Form data field sequence problem (Steven Chan)
+ - bugfix [ 1028498 ] Problem with page link in navigation
+ - bugfix [ 1031411 ] FileCache Problem since V6.2.x
+ - Fixed a problem with HTTP codes being spewed into the page content on codes
+   other than 200.
+ - bugfix [ 1029485 ] Forum interpreting text as HTML, double interpreting
+   HTML
+
+
+
+6.2.3
+ - Changed to new POD format.
+ - Fixed GUID related bugs in search indexer and passive profiling.
+ - Fixed a bug in page tree where indenting wasn't working.
+ - bugfix [ 1028746 ] All pages shown as Roots & PageTree not working
+ - bugfix [ 1028561 ] Manage Users - Next Page Link Broken
+ - bugfix [ 1028494 ] Folder not shown in Manage Collateral
+ - bugfix [ 1028446 ] Can't copy Navigation
+ - bugfix [ 1027705 ] %row in sub self_and_sisters should be case-insensitive
+   (Yary Hluchan).
+ - bugfix [ 1027834 ] Theme Importer fails due to getNextId
+ - bugfix [ 1027698 ] Attatchment::saveFromFilesystem fails when 1st arg is a
+   dir (Yary Hluchan)
+ - bugfix [ 1027684 ] cp silent failure in Attatchment.pm (Yary Hluchan)
+ - bugfix [ 1027681 ] Some warnings hard to track down (Yary Hluchan)
+ - bugfix [ 1027950 ] Collateral problem(s)
+ - bugfix [ 1028110 ] 6.2.2 PageTree doesn't format AND move buttons don't
+   work
+ - bugfix [ 1027687 ] Events List does not show events
+ - bugfix [ 1028054 ] 6.2.2 USS uploads do not show on list
+ - Fixed a problem with the dTree navigation template.
+ - bugfix [ 998249 ] Moving Survey Questions - Incorrect Redirection
+ - bugfix [ 1029170 ] Forum: Sorting thread by date
+
+
+6.2.2
+ - Made a dramatic performance enhancement to the page tree system by
+   restructuring an overused, and inefficent method.
+ - bugfix [1024275]. Drag and drop not working (Leendert Bottelberghs).
+ - bugfix [ 1025671 ] Crash on manage page tree. (Leendert Bottelberghs)
+ - bugfix [ 1025271 ] Cut page not working. (Leendert Bottelberghs)
+ - bugfix [ 1024643 ] Unknown column error. (Leendert Bottelberghs)
+ - bugfix [ 1025120 ] Pagination in forum thread doesn't work. New default thread template. (Leendert Bottelberghs)
+ - Fixed a bug where you couldn't delete templates.
+ - bugfix [ 1025755 ] UILevel can't be set to beginner (0)
+ - bugfix [ 1006981 ] Syndicated Content doesn't show channel description (Don
+   Ji).
+ - bugfix [ 996585 ] Fixed Package Add incompatibility w/new page tree in
+   6.1.1 (OpenTech)
+ - bugfix [ 1024073 ] Problem with Collateral Management (ID?)
+ - bugfix [ 1023688 ] upgrade.pl from 6.03 - 6.10 using 6.2.1 beta
+ - bugfix [ 1024079 ] "Software error" message
+ - bugfix [ 1027362 ] 6.2.1 Page Tree
+ - bugfix [ 1027333 ] 6.2.1 Page Tree
+ - bugfix [ 1027129 ] view message causes error
+ - bugfix [ 1024079 ] "Software error" message
+ - Fixed a bunch of POD errors.
+ - Fixed some errors in the search engine indexer related to the new GUID
+   system.
+ - Added extra debug to SQL errors on fatality.
+
+
+6.2.1
+ - Fixed a GUID quoting bug in WebGUI.pm setCollateral.
+ - Fixed all sorts of GUID related bugs in the Forums.
+ - Fixed a bug in the Message Board wobject that caused users not to be able
+   to do anything useful on the message board.
+ - Fixed a version check problem in Syndicated Content wobject.
+ - Fixed some GUID problems in the scheduler plug-ins.
+ - Fixed some epoch bugs in the scheduler plug-ins.
+ - Updated scheduler plug-ins to use the new page tree the way they're
+   supposed to.
+ - Fixed some POD errors.
+
+
+6.2.0
+ - Added generateContent.pl script to generate content offline. This script is
+   not backwards compatible with previous WebGUI versions. (Thanks to
+   DonorWare for funding this feature.)
+ - Extended the WobjectProxy to select content based upon alternate criteria.
+   (Thanks to DonorWare for funding this feature.)
+ - Added a criteria builder to the WobjectProxy. (Thanks to DonorWare for
+   funding this feature.)
+ - Added metadata functionality to wobjects. (Thanks to DonorWare for funding
+   this feature.)
+ - Added a new passive profiling mechanism. (Thanks to DonorWare for funding
+   this feature.)
+ - Added a passive profile summarizer. (Thanks to DonorWare for funding this
+   feature.)
+ - Added AOIRank and AOIHits macro's to retrieve user's Area's Of Interest
+   statistics. (Thanks to DonorWare for funding this feature.)
+ - Fixed a typo in Forum/UI.pm
+ - bugfix [ 996284 ] Compile error in macro.pm (Len Kranendonk)
+ - bugfix [ 997918 ] Default value in profile not working (Len Kranendonk)
+ - bugfix [ 997916 ] Bug and solution in File.pm
+ - Added the page.isMyAncestor condition to the Navigation system. (Thanks to
+   Len Kranendonk)
+ - Added automatic URL extensions.
+ - Added a new global unique id generator to replace the old incrementer system.
+ - Fixed a bug in userImport.pl, where it was using the old Auth system.
+ - Added a UI Level of 9 to the WS Client. 
+ - Added missing documentation to Page API and fixed pod errors in that package as well.
+ - Fixed a bug in the HTMLArea image picker where it would break if your gateway was not
+   in the root of your virtual host, or you had multiple gateways, but none was the
+   default page of your virtual host.
+ - passing form param disableWobjects=$call shortcircuits most of
+   WebGUI::Wobject::WSClient::www_view()
+ - Added write permission checks to WebGUI::Template. (Len Kranendonk)
+ - Added Export Page functionality. (Thanks to the US Federal Government for
+   funding this feature.)
+ - bugfix: Loginbox didn't support encrypt login. (Len Kranendonk)
+ - Bugfix: [ 1000205 ] Password Recovery Doesn't Work (Len Kranendonk)
+ - Bugfix: [ 1003594 ] Fixed Navigation Cacheing bug (OpenTech / Len Kranendonk)
+ - Bugfix: [ 1000299 ] laodAllConfigs should be loadAllConfigs? (Len
+   Kranendonk)
+ - Bugfix: [ 995088 ] Error in printable macro 6.1.1 (Len Kranendonk)
+ - Bugfix: [ 1003511 ] Users cannot be added to Registered Users if removed
+   (Len Kranendonk)
+ - Bugfix: [ 996592 ] Fixed Infinite loop in Page.pm makeUnique in 6.1.1
+   (OpenTech / Len Kranendonk)
+ - Converted all IDs to use global unique ids rather than incremented ids as
+   they were in the past.
+ - BugFix: [ 999799 ] Fixed Package deletion/copy bug in 6.1.1
+ - BugFix: [ 997885 ] Root move left bug. 
+ - Changed 'lft' and 'rgt' database field names to 'nestedSetLeft' and 'nestedSetRight'. (Martin Kamerbeek / Procolix)
+ - Added WebGUI::Session::getScratch().
+ - bugfix [ 996169 ] message log && uss not working
+ - bugfix [ 1000944 ] WebGUI::MessageLog::addInternationalizedEntry error
+ - bugfix [ 996170 ] mesage log logId not being passed
+ - Added template variables user.canPost and user.canView in forum_loop to MessageBoard / RFE[864134] (Leendert Bottelberghs)
+ - Made flat thread work like flat thread -> messages sorted by submission date / RFE[995982]. (Leendert Bottelberghs)
+ - Upgraded DBIx::Tree::NestedSet to the latest version (0.15) (Martin Kamerbeek /Procolix)
+ - Eliminated the use for the 'id' column in the page table (Martin Kamerbeek /Procolix)
+ - Implemented preview function for posting messages to a forum / RFE[991000] (Leendert Bottelberghs / United Knowledge)
+ - RFE [ 923878 ] htmlArea 3 (IE and Mozilla compliant) added to WebGUI (Len
+   Kranendonk)
+ - RFE [ 806332 ] Force SSL, a new page property "Encrypt page" is added. (Len
+   Kranendonk)
+ - RFE [ 1004098 ] Additional navigation Template Parameters added. (Martin Kamerbeek / Procolix, code thanks to Opentech)
+ - RFE [ 747859 ] RSS Encoding (Len Kranendonk) NB: Needs perl 5.8.0 or up.
+ - RFE [ 906852 ] Extended forum sorting (Leendert Bottelberghs).
+ - Bugfix [ 998588 ] (Leendert Bottelberghs).
+ - Changed page system to support multiple types of pages and to make URLs
+   resources in WebGUI rather than tied specifically to content pages.
+ - bugfix [ 1014236 ] Crash if only 1 wobject defined in webgui config (Leendert Bottelberghs).
+ - bugfix [ 1015267 ] Wobject drag & drop not working due to GUIDs (Leendert Bottelberghs).
+ - bugfix [ 1015319 ] Crash on non-existent URI request (Leendert Bottelberghs).
+ - Updated some out of date and missing help information. (Colin Kuskie)
+ - RFE [ 855761 ]. Move forum to another Message Board (Leendert Bottelberghs).
+ - RFE [ 1010055 ]. Added template variables for current user alias (Leendert Bottelberghs).
+ - Wobject Proxies (Shortcuts) now expose a template variable called
+   original.page.url that will allow you to link to the original content from
+   the shortcut.
+ - bugfix [ 1016271 ]. all posts go to last forum in MB (Leendert Bottelberghs).
+ - Added FastCGI support. (Kevin Wilson)
+ - Replaced Date::Calc with Date::Manip to allow for dates before 1970 and
+   after 2035. (Emiliano Bruni)
+ - Added Date::Manip to the WebGUI distribution.
+ - bugfix [ 1013370 ] tag </body> appears twice (Vladimir Kondratiev).
+ - bugfix [ 1016258 ] Empty Trash Typo (Tavis Parker).
+ - bugfix [ 1017727 ] Redirect URL (on edit page) not redirecting
+ - RFE [ 718739 ]. USS Submission Start/End Dates (Thanks to Roy Johnson).
+ - bugfix [ 1008039 ] When adding javascript to description, the script is
+   doubled
+ - bugfix [ 1007970 ] Fixed: DataForm duplicate doesn't copy tabs (Harry Waye)
+ - Added JavaScript RawHeadTags, and StyleSheet macros.
+ - Changed navigation, page, macro, and rich editor templates to load more
+   quickly.
+ - upgrade.pl now deletes temporary files and template cache.
+ - Fixed a bug in the HTMLArea image manager that would not allow users to
+   upload files if the gateway script was not at /index.pl
+ - bugfix [1008283]. Add new user not working for secondary admin (Leendert Bottelberghs).
+ - bugfix [ 1014337 ] WSClient->new error: templateId field missing in
+   database
+ - bugfix [ 991782 ] More Fault Tolerent upgrade_5.9.9-6.0.0.pl
+ - Minor performance enhancements to Navigation system.
+ - Fixes to online help content. (Colin Kuskie)
+
+
+6.1.1
+ - bugfix [ 991313 ] Manage Translations doesn't work
+ - bugfix [ 991677 ] Preload erro my $i earlier declaration
+ - bugfix [ 991200 ] scriptUrl option in webgui.conf ignored
+
+
+6.1.0
+ - Changed the output of upgrade.pl for better understanding.
+ - Added a --history option to upgrade.pl that displays the upgrade history
+   for each site.
+ - Fixed a typo in User.pm
+ - All plugins are now dynamically loaded. This provides a performance gain of
+   over 100% in CGI mode, 10% in mod_perl mode, and less memory usage in
+   mod_perl mode.
+ - Changed the privileges API significantly. See docs/migration.txt for details.
+ - Fixed a bug in articles where articles with no content would fail to
+   display their images.
+ - bugfix [966466] WebGUI::Session. System crash when user language setting missing.
+ - Eliminated the need for Data::Serializer which results in a small amount of
+   less memory usage.
+ - Rewrote the template API which resulted in a 30% performance increase. See
+   docs/migration.txt for details.
+ - Added five new caching mechanisms for templates. Each has their own
+   benefits and detriments. This allows you to increase scalability and
+   performance at a cost of either memory or disk space or both. The gains
+   here are primarily enjoyed by large heavy traffic sites that use lots of 
+   complex templates.
+ - Added convenience methods to Wobject superclass for internationalization,
+   wobject ID, and namespace.
+ - Added an object-oriented interface to the internationalization system. The
+   old procedural interface still works as well.
+ - Added on the wire compression to HTTP transport for WSClient wobject.  This
+   will have no effect on clients/servers that can't support compression.
+ - A small patch from Roy Johnson to deal with different types of WSDLs in the
+   WSClient.
+ - Adding form param WSClient_skipCache when posting to WSClient wobject
+   allows us to ignore even good soap return caches (mostly for testing use)
+ - Moved to a compiled internationalization and help system. At a cost of 400 
+   kilobytes of RAM, it provides a boost in performance of over 35%. More
+   importantly though, it cuts the number of database queries in half on an
+   average page, which leads to much greater scalability. See
+   docs/migration.txt for API changes.
+ - Added the ability to select session v. global caches to WSClient.
+ - Rmoved the httpHeader, httpRedirect, and setCookie subs from
+   WebGUI::Session and created a new class called WebGUI::HTTP for them. See
+   docs/migration.txt for details.
+ - The USS automatically adds an RSS feed link tag to the head of any page
+   it's on.
+ - Added a new API for dynamically adding javascript, css, xml, rss, and meta
+   information to the page. See WebGUI::Style for details.
+ - Fixed a long standing annoyance that javascripts used by the WebGUI::Form
+   would be loaded multiple times if there were multiple fields of the same
+   type in the same form.
+ - Sped up the page editing page by 50% by rearranging the javascript on the
+   page.
+ - Added prepared statement handlers to WebGUI::SQL.
+ - Added transaction handlers to WebGUI::SQL.
+ - Added additional debugging to WebGUI::SQL.
+ - Added a better user search mechanism, which works well even with 100,000
+   users.
+ - Made some minor changes to grouping lookups that resulted in an average of
+   18 less database queries per page when in admin mode which results in a 32%
+   performance gain while in admin mode.
+ - Changed the group and user management interfaces to work and scale better 
+   with thousands of users and groups.
+ - Changed the config loader to preload the WebGUI config files into memory at
+   a cost of ~70k (mem) per site for a 2000% performance gain. It is a huge
+   gain, but it was already really fast, so relatively users aren't likely to
+   notice the difference. However, this change helps in the overall
+   scalability of WebGUI under load.
+ - Added the ability to use replicated slave databases to lessen the load on
+   the master database. This will have no effect on single database users, but
+   can add a tremendous amount of scalability on large WebGUI sites that use
+   database replication.
+ - Templated the EditableToggle, a, GroupAdd, GroupDelete, H, LoginToggle, r, 
+   and AdminToggle macros. Thanks to Colin Kuskie.
+ - bugfix [ 933881 ] Forms not compliant (solution). Thanks to Nicklous
+   Roberts.
+ - bugfix [ 934410 ] non-compliant HTML (solution). Thanks to Nicklous
+   Roberts.
+ - bugfix [ 963316 ] Field without title in Content Settings
+ - Fixed a bug that affected Postgres when creating pages.
+ - RFE [ 978033 ] WebGUI::Form::fieldType - "float" type is missing
+ - Converted the page tree system from the ajacency list model to the nested
+   set model. Thanks to Martin Kamerbeek / Procolix and Dan Collis Puro for
+   providing the DBIx::Tree::NestedSet module.
+ - Dropped page tree caching and stepped onto Navigation caching. This helps
+   scalability a lot. Thanks to Martin Kamerbeek / Procolix
+ - bugfix [ 977201 ] ws client bug
+ - bugfix [ 969740 ] Messageboard: Deleting of postings
+ - Added an option to sort a select list by its values. Thanks to Roy Johnson.
+ - RFE [ 960747 ] Make the attachment box templated. Thanks to Flavio Curti.
+ - Snippets can now take up to 9 optional parameters as replacements similar
+   to the SQL macro. Thanks to Andreas Ljunggren.
+ - bugfix [ 990710 ] Users can't change own passwords
+ - Fixed a bug where the user was redirected to the clipboard after cutting a
+   page.
+
+
+6.0.3
+ - Fixed a recursive style change bug.
+ - Bugfix [ 953593 ] perl -MWebGUI -e "" fails
+ - Bugfix [ 955397 ] Make Page Printable Macro Fails
+ - Bugfix [ 959762 ] Mail Form Template problem (fix)
+ - Bugfix [ 952908 ] Manage database option is not available
+ - Bugfix [ 955501 ] Pagination link in SQL Report contains all
+   form-parameters
+ - Bugfix [ 956221 ] article template
+ - Bugfix [ 952906 ] Terminology in the Layout page
+ - Bugfix [ 952374 ] Images in Articel doesn't work anymore
+ - Bugfix [ 952137 ] error deleting default content after install
+ - Bugfix [ 947141 ] Bug in Forum - No Subject!!!
+ - Bugfix [ 949923 ] Collateral changes owner when editing
+ - Bugfix [ 949923 ] Collateral changes owner when editing
+ - Bugfix [ 948050 ] Correct email address not accepted (fix)
+ - Bugfix [ 938211 ] FIX: DeleteExpiredEvents.pm ignores offset
+ - Bugfix [ 951061 ] Login from AOL
+ - Bugfix [ 956219 ] can't delete survey question
+ - Fixed a bug whhere after posting to a USS you were redirected to the forum
+   for your new submission.
+ - Bugfix [ 952949 ] Survey Export Composite Fails
+ - Updated the Finnish translation thanks to Markus Hynna.
+ - Fixed a bug where visitors could potentially edit other visitor's USS
+   submissions.
+ - Added some missing international entries that caused problems accessing
+   some of the online help.
+ - Fixed a bug with Article override template.
+ - Fixed some POD errors.
+
+
+
+6.0.2
+ - Fixed a bug where visitor contributed items in the USS were editable by all
+   visitors.
+ - Bugfix [ 884375 ] Fix for multiple forum posts applied also to
+   www_viewForum to handle postings that start a new thread.
+ - Added German toolbar icons.
+ - Added missing SQL Report help.
+ - Changed the pagination template variables on SQL Report, Article, File
+   Manager and USS to the standard pagination variables.
+ - A very special thanks to Len Kranendonk for the following security
+   improvements.
+	- Disabled anonymous registration by default.
+ 	- Set session timeout to 1 hour by default.
+ 	- Sessions now auto end themselves if they are used after their
+ 	  expires timeout and before the scheduler has cleaned them up.
+	- Macros are now negated on user profile fields and authentication
+	  fields.
+	- Sessions are now validated against IP address to help prevent
+	  session theft.
+	- Took additional measures to prevent SQL injection.
+ - Bugfix [ 930425 ] Bug in EventsCalender, causing other wobjects to fail.
+ - Bugfix [ 925586 ] HttpProxy ignores javascript in <HEAD> (thanks to
+   Nicklous Roberts).
+ - Added cacheTTL param to WSClient to tweak expiration of SOAP returns.
+ - Bugfix [ 943298 ] Events Calendar recurrence error in WG6.0 (thanks to
+   Frank Dillon). 
+ - Bugfix [ 942865 ] urlizedTitle problem. (Thanks to tr0nd).
+ - Bugfix [ 940008 ] error deleting parts of a survey in 6.0.1 (Thanks to
+   Andreas Sexauer.)
+ - Bugfix [ 927855 ] Grading problems using a subset of the questions with
+   Survey
+ - Bugfix [ 914798 ] Calendar displays events from wrong year (Thanks to Frank
+   Dillon).
+ - Bugfix [ 927266 ] WG 6.0.1 Data Form Issue
+ - Fixed a problem where replacements weren't being applied to forum subjects.
+ - Fixed the edit controls on the USS.
+
+
+
+6.0.1
+
+ - Fixed a couple of formatting problems with the USS.
+ - Added Text::Balanced to the distro.
+ = Fixed bug [ 910145 ] htmlArea - insert image not working (Len Kranendonk /
+Andreas Graf).
+ - Bugfix 914825 / 912203: Bug in template system (LenK).
+ - Apache 2.0 is now the default web server for WebGUI. See gotcha.txt for
+   details.
+ - Bugfix [ 904313 ] Problem with page-template preview in 6.0.0
+ - Bugfix [ 912017 ] viewSubmission function error in 6.0.0
+ - Bugfix [ 912217 ] top level nav macro problems
+ - Bugfix [ 912401 ] level 0 nav
+ - Bugfix [ 912400 ] db link not working
+ - Bugfix [ 913114 ] Can't change passwords from display account screen.
+   (Thanks to Frank Dillon.)
+ - Bugfix [ 916538 ] Typo in lib/WebGUI/Auth.pm
+ - Bugfix [ 917783 ] 6.0.0 Date Changes
+ - Bugfix [ 914217 ] content managers cannot turn admin on
+ - Bugfix [ 920089 ] Problem with clipboard and object names containing a
+   quote.
+ - Bugfix [ 921750 ] Error in Horizontal Login Box template (Thanks to Tony
+   Mountifield.)
+ - Added Tony Mountifield to the credits list for all his debugging efforts as
+   of late.
+ - Bugfix [ 915498 ] htmlArea - insert image WebGUI 6.0
+ - Updated the dutch translation. (Thanks to Procolix)
+ - Added Style Help for Auth System
+
+
+6.0.0
+
+ - HTTP header conforming P3P Compact Privacy Policy. This fixes IE6 cookie
+   privacy problems. 
+ - Removed all the old styles. They now exist as themes in the user
+   contributions area of plainblack.com.
+ - Migrated styles to templates and removed the styles system.
+ - Updated page templates to be more powerful.
+ - Converted items to articles and removed the item wobject.
+ - Converted FAQ's to USS submissions and removed the FAQ wobject.
+ - Created format and processReplacements subs in the WebGUI::HTML package.
+ - Migrated extra columns to page templates and removed the Extra Column
+   wobject.
+ - Migrated Link Lists to USS submissions and removed the Link List wobject.
+ - Re-enabled the Date macro by default.
+ - Templatized the Login Box macro.
+ - Added the new WebGUI 6 design.
+ - Templatized the Admin Bar macro.
+ - Added CoolMenus to the distribution for easy making of DHTML driven menus.
+   (Thanks to Thomas Brattli.)
+ - Added JS Calendar to the distribution to replace the old calendar system.
+   (Thanks to Mihai Bazon.)
+ - Updated the Form subsystem to use the new calendar for date and time
+   fields.
+ - Bugfix 859816 : DataForm - security issues. Tnx Gabor for reporting.
+ - ^t; now starts in current root rather then in site root.
+ - Added new Authentication System.
+ - Added switches to prevent users from chaning usernames and passwords
+ - Added security switches that log when users update passwords or recover passwords via email
+ - Collateral macros now return undef instead of the macro tag when no
+   matching collateral is found.
+ - Added style personalization.
+ - Added admin style option.
+ - Added per page printable styles.
+ - Wobject privileges are available per page rather than site-wide.
+ - Templatized the Rich Editor support. Tnx to Len Kranendonk
+ - Fixed a problem in the forum that showed up under Postgres.
+ - Added some processing functions to programatically add meta tags,
+   javascript, and link tags to the head block of a page from anywhere within
+webgui.
+ - Templatized the Survey.
+ - Survey now allows for a configurable number of responses from a single user.
+ - Survey now allows for a configurable number of questions per page.
+ - Survey now shows progress indicator.
+ - Survey can now draw from a pool of questions, but does not have to use all
+   of them.
+ - Removed depricated functionality from Paginator (see docs/migration.txt).
+ - Added template variable mechanism to paginator.
+ - Added a limit option to the page list in the paginator.
+ - Fixed a bug in AdminBar's clipboard code where a standard hash was
+   used instead of a CPHash for database access.  (Thanks to Steve Simms.)
+ - Added caching of complex data structures to WebGUI::Cache (Martin Kamerbeek
+   / Procolix). Note that this now requires Data::Serialzier to be installed.
+ - Implemented an object oriented interface to the page tree and converted
+   WebGUI::Operation::Page to use it. (Martin Kamerbeek / Procolix)
+ - Added two new methods (isEditable and showInForms) to the groups API to
+   make it easier to automagically create and use groups programatically without 
+   disrupting the user experience.
+ - The everyone and registered users group are no longer magic in that there
+   are physical linkages between them and users. The magic was getting too
+   hard to maintain and users were confused by it.
+ - Added a "Turn Admin On" group to determine who can enable or disable admin
+   mode. 
+ - Added the Web Services Client wobject. (Thanks to Alan Ritari and DonorWare.)
+ - Optional second parameter to the File macro can be a boolean value to
+   turn off file icons.
+ - Added drag and drop content arranging.
+ - Added new toolbar icons. 
+ - Made the add content menu much more powerful.
+ - Added new navigation system. (Len Kranendonk).
+ - Made the date/time system more precise.
+ - The Events Calendar is now 100% template driven.
+ - The Events Calendar now allows for more than one drawn calendar per page.
+   Choose with your pagination options.
+ - Added options for developers for an empty style
+   $session{page}{useEmptyStyle} and added settings to the template table to
+   to allow templates to be hidden from forms and/or management.
+ - Added dTree menu to the navigation system 
+   (Thanks to Geir Landro, http://www.destroydrop.com)
+ - Added Cool Menus to the navigation system. (Thanks to Thomas Brattli,
+   http://www.dhtmlcentral.com)
+ - Added a config file option for per-site International message caching.
+ - Added an override in the user profile for toolbar icon set.
+ - Migrated the navigation items (Thanks to Leendert Bottelberghs, Len
+   Kranendonk).
+ - Removed all old navigation macros. See gotcha's for details.
+ - Added a variation on Len's Advanced Search wobject. Thanks to Len
+   Kranendonk for creating the original version for the WebGUI community
+   contest.
+ - Removed the old realtime search subsystem in favor of the new search
+   wobject.
+ - Removed the upgrades older than 4.x in order to help reduce the size of
+   the distribution. If you need those old upgrades you can still get them 
+   from previous distributions or th 5.5 branch in CVS.
+ - Added Job Listing templates to the USS.
+ - Added a view privileges setting to each forum.
+ - Bugfix [ 822805 ] Emptying trash can cause fatal error
+   (Thanks to Steve Simms.)
+ - Changed the upgrade system to stop after an error so the sys admin can fix
+   the problem before continuing.

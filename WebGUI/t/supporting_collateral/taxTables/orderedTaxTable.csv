@@ -1,0 +1,4 @@
+taxRate,country,state,city,code
+0.0,USA,,,
+5.0,USA,Wisconsin,,
+0.5,USA,Wisconsin,Madison,53701

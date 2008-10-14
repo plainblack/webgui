@@ -1,0 +1,10 @@
+select.macro {
+    width: 100%;
+}
+.panel_wrapper div.current {
+    height: 48px;
+}
+table.macro {
+    width: 100%;
+}
+

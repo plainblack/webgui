@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>Style Designer</title>
+<script type="text/javascript">
+function getWebguiProperty (propName) {
+var props = new Array();
+props["extrasURL"] = "/extras/";
+props["pageURL"] = "/home";
+return props[propName];
+}
+</script>
+    <script src="/extras/yui/build/yahoo/yahoo-min.js" type="text/javascript"></script>
+    <script src="/extras/yui/build/event/event-min.js" type="text/javascript"></script>
+    <script src="/extras/yui/build/dom/dom-min.js" type="text/javascript"></script>
+    <script src="/extras/yui/build/dragdrop/dragdrop-min.js" type="text/javascript"></script>
+    <script src="/extras/yui/build/animation/animation-min.js" type="text/javascript"></script>
+    <link href="/extras/colorpicker/colorpicker.css" rel="stylesheet" type="text/css" />
+    <script src="/extras/colorpicker/color.js" type="text/javascript"></script>
+    <script src="/extras/colorpicker/key.js" type="text/javascript"></script>
+    <script src="/extras/yui/build/slider/slider-min.js" type="text/javascript"></script>
+    <script src="/extras/colorpicker/colorpicker.js" type="text/javascript"></script>
+    <script src="/extras/styleDesigner/styleDesigner.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/extras/styleDesigner/styleDesigner.css" type="text/css" />
+</head>
+<body>
+
+<script type="text/javascript">
+document.write(WebguiStyleDesigner.draw('My Company','/extras/plainblack.gif'));
+</script>
+
+</body>
+</html>

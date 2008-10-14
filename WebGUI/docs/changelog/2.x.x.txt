@@ -1,0 +1,129 @@
+2.7.0 - Added Dutch translation (special thanks to Joeri de Bruin).
+ - Fixed a bug on Help icon for Edit Article.
+ - Moved international messages related to widgets into their appropriate namespaces.
+ - Fixed a bug where adding an Events Calendar would add an entry to the FAQ table.
+ - Added "copy" functionality to all Widgets.
+ - Added a more robust module loading mechanism.
+ - When a widget is purged from trash that had attachments, those attachments are now deleted as well.
+ - All the WebGUI icons got a facelift.
+ - Tweaked Edit, Copy, Cut, etc interface for better ease of use.
+ - Admins could always do any administrative function, but they now have all privileges assigned to any group in the system.
+ - Added a new Style Manager role that allows assigned users to edit styles without being an Admin.
+ - Added a new group expiry system.
+ - Changed the user>group linkage interface to make it easier to use and faster.
+ - Added the Package Management system for easy deployment of repetitive content management tasks.
+ - Added a new Package Manager role for the package management system.
+ - Massive code efficiency modifications for better performance, smaller code-base, and easier readability.
+ - Added several new designs to the distribution that may be used as a reference for people when building their own designs.
+ - Added a "Make Page Printable" design setting and page automatically brings up the print dialog box when visited.
+
+2.6.0 - Added new Item widget.
+ - Added new FlexMenu macro.
+ - Search engine results are now numbered.
+ - Fixed a serious problem introduced in 2.5.0 where templates would crash under mod_perl.
+ - Fixed a bug in the search engine where seperate results would be displayed for each keyword entered.
+ - The Plain Black and Yahoo! styles are now deletable.
+
+2.5.0 - Portuguese translation (Special thanks to Jose Caneira).
+ - Fixed bug in the date system which put the time 1 hour ahead of actual time.
+ - When a user would submit a submission to the user submission system without a title, "untitled" would be put in the title, but it was spelled incorrectly.
+ - Fixed an error in the macro that potentially could have come up in the future.
+ - Implemented the new page templating system.
+ - Alphabetized the "content" menu for easier use.
+ - Added the rich edit function to all widget descriptions.
+ - Fixed a bug where an SQL Report would crash if the content manager specified an invalid query.
+ - Added a limited real-time internal search engine due to popular demand.
+
+2.4.0 - Added the basic infrastructure and interface to the new content management workflow system, and removed the old "pending submissions" system.
+ - Fixed a bug in the LDAP interface where it would die if a user tried to create an LDAP account that didn't exist rather than just providing an error message.
+ - Fixed a few bugs where SQL queries weren't always been cleaned up properly.
+ - Added a new universal pagination system.
+ - Added a few new sub-system utilities.
+ - You can now specify who can approve User Sumissions rather than just all content managers.
+ - Added the new macro system. Note to current users: You'll need to upgrade all your macros to the new version by the time we get to 3.x.x or your macros will cease to function.
+ - Added much more functionality to the Site Map widget.
+ - Created a universal discussion system with an API that will allow any widget to make use of it. The message board has been migrated to this new system.
+
+2.3.4 - Fixed a bug in the update account method where it would save a new password even if the user didn't change it.
+ - Added a partial spanish tranlation (special thanks to Ricardo Markiewicz).
+ - Fixed a bug in the save attachment method where it could corrupt uploaded files on Windows systems.
+ - Fixed a bug in the save attachment method where it would save the original path of an attachment on some versions of IE.
+ - Added option to FAQ, Events Calendar, and Link List to go directly to add questions, events, and links after creating the instance of the widget.
+
+
+2.3.3 - Fixed an infinite loop bug in the International system.
+ - Fixed a crash bug in the Submissions approval system.
+ - Added an --install-modules option to testEnvironment.pl.
+ - Added a check for new version option to the admin.
+
+2.3.2 - Page names, page urls, widget titles, article link titles, event titles, link list titles, and user submission titles can now be 128 characters (instead of 30).
+ - Added WebGUI version to database in anticipation of the new automated install and upgrade system.
+ - Fixed a bug where adding a new link list would cause WebGUI to fault.
+ - Fixed a bug where the open link in new window didn't function.
+
+2.3.1 - Updated German translation (thanks to Mattias).
+ - Fixed a bug where an administrator could not add users through the admin interface.
+ - Fixed a bug where the user profile would display "First Name" even when it was displaying the whole name.
+ - Updated the "login box" macro to include a link to the registration page.
+
+2.3.0 - Added a WYSIWYG rich edit function. Unfortunately it only works for IE. Netscape must still use the old rich editor.
+ - If a user were to enter an invalid date in any "set date" field (like those on the Events Calendar) WebGUI would crash. This has been fixed.
+ - On a per-link basis you may choose whether a link should open in a new window in the Link List.
+ - Fixed a bug where the Any Menu macro displayed the level displayed the name that was specified.
+ - Renamed the Any Menu macro to the Specific Menu macro, which changed the code to ^S and ^s.
+ - Fixed a compatibility problem, in Account.pm, with Postgres where they changed the LCASE function to LOWER by simply removing the case sensitivity check.
+ - Added a namespace system to avoid overlap of help, internationalized messages, widgets, and database tables.
+ - You can now set indent, line spacing, and the bullet for a Link List.
+ - Fixed some problems where Events Calendar dates didn't span properly.
+ - Events Calendar events now group if they're in the same date span.
+ - Changed the "Add User" admin function to auto-select English as the default language.
+ - Added the profiles system.
+ - Added a link from group manager to edit users within the group.
+ - Updated the "view message" layout in the Message Board and User Submission System.
+ - Added a new style specifically for the trash and clipboard to make them easier to navigate.
+ - Added a "become user" feature for admins.
+ - Fixed a bug where the admin menu would misbehave if you were viewing the clipboard or the trash.
+ - The help system is now internationalized and just needs translation.
+
+2.2.0 - Fixed a bug where the "View statistics." link on the admin menu was broken.
+ - Added the German translation (special thanks to Mattias Kunkel).
+ - Fixed a bug where deleting an attachment or image from a user submission, would delete all others in the same widget.
+ - Added a "reset poll" function to the Poll widget.
+ - Separated the help for "Settings" into separate pages to map them to the individual settings pages.
+ - Added a new setting to bind LDAP usernames to WebGUI usernames.
+ - Fixed a bug where LDAP users were unable to update their account information.
+ - Fixed a bug where LDAP users could become unable to log in.
+ - Fixed a bug in "Edit File Settings" where it would crash on save.
+ - Added more style information to many of the menu widgets.
+ - Added a "copy" function to the style manager.
+ - Fixed a bug in the "Login Box" macro that would cause it to crash.
+ - Added "credits.txt" to the distribution.
+ - Added a check for Net::SMTP to testEnvironment.pl.
+ - Added a method of defaultly generating meta tags for your pages.
+
+2.1.1 - Fixed a few spots in the widgets where items were pointing to the wrong international text id.
+ - Updated all the help to match the latest version.
+ - Moved the "View Statistics" link from the settings page to the Admin menu.
+
+2.1.0 - Upped the maximum length of an Article from 65,000 characters to 16 million characters.
+ - Added internationalization features.
+ - Added a search function to the user manager.
+ - Added a statistics page to the admin interface.
+ - The admin may now modify the email message that gets sent to users using the "recover password" function.
+ - Split the "Edit Settings" page into many pages as it was getting difficult to manage with so many settings.
+ - Fixed a bug where dates were not being displayed properly in the User Submission System.
+ - Made all the vertical menu macros configurable. This process has depricated many macros.
+ - Added a new menu macro to allow the user to get the submenu of any page.
+ - Moved the "Search (MnoGo)" widget from the default distribution to the contributions page.
+ - Did a bunch of code cleanup.
+ - Made changes to the javascript wizards to ensure they will work regardless of the path specified for "extras".
+ - Added a check in the testEvironment.pl script for Tie::CPHash.
+ - Made some changes for compatibility with Microsoft Windows platforms.
+ - The online help is now drastically out of date, but that will be remedied in an upcoming version.
+
+2.0.0 - Released as "stable."
+ - Fixed a whole slew of bugs that were not allowing users to use the "recover password" function.
+ - Warning messages in the log, as they relate to accounts, are better defined.
+ - If the mail module fails to connect to the mail server indicated in settings, a warning message is now added to the WebGUI log.
+ - Added a limited "recurring events" function to the events calendar. It will be updated later in rev 2.x.x to include more functionality.
+ - Only users who authenticate via WebGUI can now use the "recover password" feature.

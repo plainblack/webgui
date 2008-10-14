@@ -1,0 +1,303 @@
+package WebGUI::Asset::NewAsset;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use Tie::IxHash;
+use base 'WebGUI::Asset';
+use WebGUI::Utility;
+
+
+
+=head1 NAME
+
+Package WebGUI::Asset::NewAsset
+
+=head1 DESCRIPTION
+
+Describe your New Asset's functionality and features here.
+
+=head1 SYNOPSIS
+
+use WebGUI::Asset::NewAsset;
+
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+
+
+#-------------------------------------------------------------------
+
+=head2 addRevision
+
+   This method exists for demonstration purposes only.  The superclass
+   handles revisions to NewAsset Assets.
+
+=cut
+
+sub addRevision {
+	my $self = shift;
+	my $newSelf = $self->SUPER::addRevision(@_);
+	return $newSelf;
+}
+
+#-------------------------------------------------------------------
+
+=head2 definition ( session, definition )
+
+defines asset properties for New Asset instances.  You absolutely need 
+this method in your new Assets. 
+
+=head3 session
+
+=head3 definition
+
+A hash reference passed in from a subclass definition.
+
+=cut
+
+sub definition {
+	my $class = shift;
+	my $session = shift;
+	my $definition = shift;
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	my $i18n = WebGUI::International->new($session, "Asset_NewAsset");
+	%properties = (
+		templateId => {
+			# Determines which tab this property appears in
+			tab=>"display",
+			#See the list of field/control types in /lib/WebGUI/Form/
+			fieldType=>"template",  
+			defaultValue=>'NewAssetTmpl0000000001',
+			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
+			noFormPost=>0,  
+			#This is an option specific to the template fieldType.
+			namespace=>"NewAsset", 
+			#This is what will appear when the user hovers the mouse over the label 
+			# of your form field.
+			hoverHelp=>$i18n->get('templateId label description'),
+			# This is the text that will appear to the left of your form field.
+			label=>$i18n->get('templateId label')
+			},
+		foo => {
+			tab=>"properties",
+			fieldType=>"text",
+			defaultValue=>undef,
+			label=>$i18n->get("foo label"),
+			hoverHelp=>$i18n->get("foo label help")
+			}
+	);
+	push(@{$definition}, {
+		assetName=>$i18n->get('assetName'),
+		icon=>'NewAsset.gif',
+		autoGenerateForms=>1,
+		tableName=>'NewAsset',
+		className=>'WebGUI::Asset::NewAsset',
+		properties=>\%properties
+	});
+	return $class->SUPER::definition($session, $definition);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 duplicate
+
+   This method exists for demonstration purposes only.  The superclass
+   handles duplicating NewAsset Assets.  This method will be called 
+   whenever a copy action is executed
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newAsset = $self->SUPER::duplicate(@_);
+	return $newAsset;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 indexContent ( )
+
+Making private. See WebGUI::Asset::indexContent() for additonal details. 
+
+=cut
+
+sub indexContent {
+	my $self = shift;
+	my $indexer = $self->SUPER::indexContent;
+	$indexer->setIsPublic(0);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+	$template->prepare;
+	$self->{_viewTemplate} = $template;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+Used to process properties from the form posted.  Do custom things with
+noFormPost fields here, or do whatever you want.  This method is called
+when /yourAssetUrl?func=editSave is requested/posted.
+
+=cut
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+This method is called when data is purged by the system.
+removes collateral data associated with a NewAsset when the system
+purges it's data.  This method is unnecessary, but if you have 
+auxiliary, ancillary, or "collateral" data or files related to your 
+asset instances, you will need to purge them here.
+
+=cut
+
+sub purge {
+	my $self = shift;
+	return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+This method is called when data is purged by the system.
+
+=cut
+
+sub purgeRevision {
+	my $self = shift;
+	return $self->SUPER::purgeRevision;
+}
+
+#-------------------------------------------------------------------
+=head2 view ( )
+
+method called by the container www_view method. 
+
+=cut
+
+sub view {
+	my $self = shift;
+	my $var = $self->get; # $var is a hash reference.
+	$var->{controls} = $self->getToolbar;
+	return $self->processTemplate($var,undef, $self->{_viewTemplate});
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Web facing method which is the default edit page.  Unless the method needs
+special handling or formatting, it does not need to be included in
+the module.
+
+=cut
+
+sub www_edit {
+   my $self = shift;
+   my $session = $self->session;
+   return $session->privilege->insufficient() unless $self->canEdit;
+   return $session->privilege->locked() unless $self->canEditIfLocked;
+   my $i18n = WebGUI::International->new($session, 'Asset_NewAsset');
+   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get('edit asset'));
+}
+
+#-------------------------------------------------------------------
+# Everything below here is to make it easier to install your custom
+# asset, but has nothing to do with assets in general
+#-------------------------------------------------------------------
+# cd /data/WebGUI/lib
+# perl -MWebGUI::Asset::NewAsset -e install www.example.com.conf [ /path/to/WebGUI ]
+# 	- or -
+# perl -MWebGUI::Asset::NewAsset -e uninstall www.example.com.conf [ /path/to/WebGUI ]
+#-------------------------------------------------------------------
+
+
+use base 'Exporter';
+our @EXPORT = qw(install uninstall);
+use WebGUI::Session;
+
+#-------------------------------------------------------------------
+sub install {
+	my $config = $ARGV[0];
+	my $home = $ARGV[1] || "/data/WebGUI";
+	die "usage: perl -MWebGUI::Asset::NewAsset -e install www.example.com.conf\n" unless ($home && $config);
+	print "Installing asset.\n";
+	my $session = WebGUI::Session->open($home, $config);
+	$session->config->addToArray("assets","WebGUI::Asset::NewAsset");
+	$session->db->write("create table NewAsset (
+		assetId varchar(22) binary not null,
+		revisionDate bigint not null,
+		primary key (assetId, revisionDate)
+		)");
+	$session->var->end;
+	$session->close;
+	print "Done. Please restart Apache.\n";
+}
+
+#-------------------------------------------------------------------
+sub uninstall {
+	my $config = $ARGV[0];
+	my $home = $ARGV[1] || "/data/WebGUI";
+	die "usage: perl -MWebGUI::Asset::NewAsset -e uninstall www.example.com.conf\n" unless ($home && $config);
+	print "Uninstalling asset.\n";
+	my $session = WebGUI::Session->open($home, $config);
+	$session->config->deleteFromArray("assets","WebGUI::Asset::NewAsset");
+	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::NewAsset'");
+	while (my ($id) = $rs->array) {
+		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::NewAsset");
+		$asset->purge if defined $asset;
+	}
+	$session->db->write("drop table NewAsset");
+	$session->var->end;
+	$session->close;
+	print "Done. Please restart Apache.\n";
+}
+
+
+1;
+
+#vim:ft=perl

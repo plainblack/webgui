@@ -1,0 +1,21 @@
+.colorPickerFormSwatch {
+    width: 18px;
+    height: 18px;
+    border: 1px solid black;
+    float: left;
+}
+.wg-picker-panel .ft {
+    text-align: right;
+}
+.wg-picker-panel .container-close {
+    height: 5px;
+}
+.wg-picker-panel {
+    z-index 100 !important;
+}
+.wg-picker-panel .yui-picker-controls .hd {
+    display: none;
+}
+.wg-picker-panel .yui-picker-controls .bd {
+    margin-top: 12px;
+}

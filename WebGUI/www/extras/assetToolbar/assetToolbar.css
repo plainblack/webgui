@@ -1,0 +1,23 @@
+.wg-toolbar {
+    display: inline;
+}
+
+.wg-toolbar-icon {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.wg-contextmenu {
+    position: absolute;
+    visibility: hidden;
+    font-family: helvetica, arial, sans-serif;
+}
+
+.wg-contextmenu .yuimenuitemlabel {
+    font-size: 10px
+}
+
+.wg-contextmenu.yuimenu .yuimenuitemlabel {
+    padding: 0 8px;
+}
+

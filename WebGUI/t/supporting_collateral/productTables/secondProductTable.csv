@@ -1,0 +1,7 @@
+mastersku,varSku,title,shortdescription,price,weight,quantity
+##alter existing with two collateral
+t-shirt,red-t-shirt,Colored T-Shirts,Red T-Shirt,5.00,1.33,500
+##alter existing with one collateral
+soda,soda-sweet,Sweet Soda-bottled in Oregon,Sweet Soda,1.00,0.85,500
+##add a new one
+classical-records-1,track-16,The Marriage of Figaro,Track 16,3.25,0.00,50

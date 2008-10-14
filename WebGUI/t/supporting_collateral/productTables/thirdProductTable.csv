@@ -1,0 +1,5 @@
+mastersku,varSku,title,shortdescription,price,weight,quantity
+##alter a title
+soda,soda-sweet,Sweet Soda-totally organic,Sweet Soda,1.00,0.85,500
+##add new collateral to an existing product
+classical-records-1,track-9,The Marriage of Figaro,Track 9,3.25,0.00,55

@@ -1,0 +1,22 @@
+<HTML>
+
+
+
+<HEAD><TITLE>ShowMe Viewer</TITLE>
+
+</HEAD>
+<BODY>
+
+<script language="JavaScript">
+var text = window.opener.getShowMeText();
+var re = /\n/g;
+text = text.replace(re,"<br>");
+document.write(text);
+</script>
+
+<form>
+<input type="button" onClick="window.close()" value="Close this window!">
+</form>
+</body>
+</html>
+

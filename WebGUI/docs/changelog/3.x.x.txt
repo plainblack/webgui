@@ -1,0 +1,293 @@
+3.10.1
+ - Updated all styles in the distribution to use ^Extras; macro.
+ - Attachment system inserts warning into the log file and returns no filename if a file could not be written due to permission or directory problem.
+ - Fixed a problem in the download manager where it would not attach the 2nd alternate version of a download.
+ - Disabled database connection pooling by default.
+ - Fixed the URL data type in the forms package so it doesn't auto-add the http:// if a macro is present in the URL.
+ - Fixed some errors in Swedish translation.
+ - Fixed a bug in the Inbox that could cause it to malfunction if you specified that you wanted to receive notifications by email, email to pager, or ICQ, but did not have the values for one of those specified in your preferences.
+ - Fixed a bug where 404 and 403 errors under mod perl would cause duplicate output.
+ - Fixed a problem where the anti-caching string was added to the URL prematurely.
+ - Fixed a bug where copying an FAQ would cause a fatal error.
+
+
+
+
+3.10.0
+ - Changed help to display english by default if there is no help in the user's native language.
+ - Added an option to alert someone when new users sign up.
+ - Gateway is now easier to modify.
+ - Fixed a bug where an invalid URL in Syndicated Content would cause the RSS parser to crash.
+ - Fixed bugs in sitemap where display synopsis would not save and duplication would be erroneous.
+ - Template help was pointing to style help. This was fixed.
+ - Changed template engine to default wobjects to template position 0 when the template that they were using is deleted.
+ - Fixed a bug where posting to a discussion would temporarily set your userId to the non privileged user "Visitor".
+ - Added an advanced search engine to USS, MB, DM, and main site search.
+ - Added flat reply tree view to Message Board.
+
+
+
+
+
+
+3.9.0
+ - Added an option to choose the default home page.
+ - Changed Page Not Found setting to allow for any page in the site.
+ - Added an option to filter javascript from user posts.
+ - Rebuilt runHourly.pl to be pluggable and to run all configurations at once.
+ - Rebuilt testEnvironment.pl to test all configurations.
+ - Added the Notifications system to the user inbox.
+ - Added the ^AdminToggle; macro.
+ - Added a switch for the edit stamp in user posts.
+ - Added "views" counter to all discussions and USS.
+ - Added the ^URLEncode(); macro.
+ - Added switches for TOC, [top], and Q/A to FAQ.
+ - Added thumbnail option to User Submission System (USS).
+ - All of a user's submitted items show up in main listing of USS (even pending and denied) when they are viewing the listing.
+ - Approvers can now edit/delete submissions in the USS.
+ - Fixed a bug where setting Display Title? to off in a Wobject would cause it to display a zero instead.
+ - Fixed a bug where editing a user's profile would instead display your (the current logged in admin) profile data.
+ - Added a macro loader for better performance processing macros.
+ - Added ^AdminBar; macro.
+ - Changed the template engine from a pluggable perl module system to a web editable interface.
+ - Changed the style editor from a header/footer editor to a full body editor.
+ - Added discussion to User Submission System.
+
+
+3.8.0
+ - Set up FAQ, Link List, Download Manager, and Events Calendar to allow inline editing of their data.
+ - All wobjects that have collateral data now have a "proceed" option to continue adding data. This makes data entry easier.
+ - Rebuilt page editor for easier use.
+ - Added ^Env(); macro.
+ - Added Sweedish translation.
+ - Changed urlizing mechanism to remove leading and trailing white space instead of converting to underscores.
+ - Added an HTML segment filter.
+ - Changed ^r; macro to allow for a configurable style.
+ - Added file sizes to download manager.
+ - ImageMagick is now optional. If you don't install it WebGUI will work, but you will not be able to use thumbnail features.
+ - Added anti-caching meta tags while in admin mode.
+ - Added support for the <a href="http://www.realobjects.de">Real Objects Edit-On Pro editor.
+ - Fixed bugs introduced in 3.7.0 where you could not get to the Authentication Settings page and where updating user accounts through the admin interface would screw up the user's password.
+ - Added the new Wobjects interface, rebuilt all the widgets as wobjects, and removed the widgets interface.
+ - Added a new magic "Everyone" group that everyone automatically belongs to.
+ - Fixed a search engine bug.
+ - Fixed a critical error when a user tried to access something they didn't have privileges to.
+ - Fixed a bug where some subsystems required the user to have a language specified in the profile. The system now defaults to English if none is specified.
+ - Added ThumbnailLinker macro.
+
+
+3.7.0
+ - Made Rich Edit window resizable.
+ - HTTP headers now return 404 and 403 response codes when applicable in addition to the typical 200 code (thanks to Peter Beardsley for the idea).
+ - Added RootTitle macro.
+ - Page URLs are now generated from Menu Title rather than Page Title.
+ - Added debug parameter (for developers, thanks to cmarcant).
+ - Added a page tree management view that allows content managers to get an overview of the entire site on one page, and manipulate the site from that page.
+ - Added a new user profile system that is completely extensible.
+ - Added a new user management module for WebGUI developers.
+ - Added a new typed form package to speed development for WebGUI developers.
+ - Completely rebuilt the user management system using the new profile, user, and form packages.
+ - Added user preferences for date format, time format, and time offset.
+ - Fixed a small problem with the DateTime system where it would display 12am as 0am.
+ - Fixed a bug where copying an Article could cause a fatal error.
+ - Fixed a bug where copying a Download Manager would definitely cause a fatal error.
+
+
+3.6.5
+ - Many Oracle compatibility fixes (thanks to Richard Caelius).
+ - Fixed a bug where editing a page would increment the URL.
+ - Fixed a bug where editing an article would delete its attachment.
+ - Changed the Include macro to report a file not found error if the file specified doesn't exist.
+
+3.6.4
+ - Fixed a bug that caused the copy function on Message Boards to fail.
+ - Fixed a bug that caused copied styles to be undeletable.
+ - Updated German translation (thanks to mkunkel).
+
+3.6.3
+ - Fixed a bug in the mod_perl preloader that caused problems with uploads.
+ - Changed user submission system images to center rather than right justify.
+ - Fixed a problem in style manager where it wouldn't let admins delete default example styles.
+ - Changed the login history to sort in descending order by date and the paginator to not display page numbers (because it can get VERY long very quickly.
+ - Changed the menu macro to FlexMenu in Package, Trash, and Clipboard styles.
+ - Changed page url creation so that it increments rather than just appending a "2" to the url to make it unique.
+
+3.6.2
+ - Changed add/edit page option so that page URLs can no longer end with a dot(.). This reportedly caused problems on some systems.
+ - Fixed an Oracle compatibility problem in the discussion system.
+ - Added ^FormParam(); macro documentation to the online help.
+ - Fixed a bug where form parameters were not being passed through the pagination system of SQL Reports.
+ - Fixed a bug where users could not create their own forms with textarea tags within WebGUI widgets.
+
+3.6.1
+ - Added an option to the message board so that visitors could post their own name if they are allowed to post.
+ - Fixed a bug introduced in 3.6.0 that caused the paste method on the clipboard to malfunction.
+ - Fixed an HTML syntax error on the Active Sessions page.
+ - Fixed a bug introduced in 3.6.0 that caused the kill session feature to display an error message even though there was none.
+
+3.6.0
+ - Added an option to show debugging info or friendly messages on critical errors.
+ - Added an option to remove HTML from user postings.
+ - Changed session signature to random useless information rather than smart encrypted data for better security.
+ - Removed a vulnerability that could allow widgets that belonged on one page to be shown on another.
+ - Removed a vulnerability that in rare circumstances could allow editing by users who were not content managers.
+ - Added the missing rich edit button to user submission editing.
+ - Fixed a problem where you could not edit whether or not to display a synopsis on a site map.
+ - Added user login log, and viewer.
+ - Added a current session viewer and session killer.
+
+
+3.5.2
+ - Fixed a bug introduced in 3.5.1 that created faulty HTML in the download manager causing old Netscape browsers to not see the DM.
+ - Fixed a syntax error in the build in search engine (thanks to cmarcant).
+
+3.5.1
+ - Added an updates table, which will be used for automatic database upgrades in the future.
+ - Changed the title on every page to display company name as well as page title.
+ - Fixed a bug that created problems when trying to copy attachments that didn't exist.
+ - Fixed a bug where only last item showed up in crumb trail.
+ - Fixed a bug where creating new Site Map bombed.
+ - Changed Download Manager to only display the search box if there are more downloads than will be shown on one page.
+
+3.5.0
+ - Added discussion capabilities to the Article widget which gives it Slashdot-like functionality.
+ - Added a special case of "linkonly" to the ^a; ^H; and ^r; macros to return the related URL only with no HTML.
+ - Added synopsis and menu title to page properties.
+ - Changed all navigation macros to use menu title instead of title.
+ - The SQL Report now allows for "show" and "describe" commands in addition to "select".
+ - Added an option to the Site Map to display page synopsis.
+ - Added a little more debugging info to the SQL Report.
+ - Fixed a problem with the Rich Text editor where it would add extra DIV tags when not necessary during editing. (Special thanks to fdillon.)
+ - Fixed a null error bug in SQL Report.
+ - Fixed a bug in SQL Report that didn't display first data row. (Special thanks to dcolling.)
+ - Fixed a syntax error in the attachment system.
+ - Fixed a bug that made attachment files overwrite image files in User Submission System. (Special thanks to cmarcant.)
+ - Fixed a line spacing problem in messages in Discussions.
+ - Fixed incompatibilities with Oracle and Postgres in the Events Calendar and User Submission Systems.
+ - Changed the Events Calendar to display the current month and date even if there are no entries in it at all.
+
+
+3.4.1
+ - Fixed a bug that caused all pages to become roots.
+ - Fixed a bug that would cause WebGUI to error if you deleted a root.
+
+3.4.0
+ - WebGUI widgets can be linked to within a page using their widget id as a target.
+ - Added a new root management system that will enable administrators to create new page roots (like home, trash, clipboard, etc).
+ - Updated German translation.
+ - Added ^FormParam(); macro for accessing url GET/POST parameters. This is mostly useful in SQL Reports.
+ - Added a new debugging mode to SQL Reports.
+ - Added a preprocessing option for macros on SQL Reports.
+ - Did much work to make SQL Reports completely bullet proof.
+ - Changed RSS gathering mechanism for the Syndicated Content widget. It no longer requires the RSS document to be well formed or well balanced XML. This will allow the mechanism to retreive many more documents successfully. As a result the XML::RSS module is no longer necessary.
+ - Fixed a bug introduced in 3.3.0 where selecting "View Statistics" caused a fault.
+ - Fixed a bug that allowed administrators to create usernames that are longer than allowed by the login mechanism.
+ - Fixed a bug introduced in 3.3.0 where an attachment uploaded to the Item widget would not work properly.
+ - Fixed a bug where errors were falsely reported when using the preload script.
+ - Fixed a bug the Events Calendar incorrectly paginated.
+
+3.3.0
+ - Completely rebuilt the attachment architecture for robustness and expandability.
+ - Started adding POD documentation to all WebGUI libraries.
+ - WebGUI now requires an additional Perl module called "Image::Magick".
+ - Images uploaded using the attachment system are now automatically thumbnailed.
+ - Completely rebuilt the pagination system for robustness and expandability.
+ - Added new attachment icons for exe, psd, sit, and gz files.
+ - Content Managers can now search the image archive based on name.
+ - Download Manager now has an option to display thumbnails.
+ - You can now specify a different config file in the gateway to run separate sites from one WebGUI installation.
+ - Added a new macro called ^Thumbnail(); so you can display a thumbnail on a page.
+ - The ^L; macro is now more configurable.
+ - Made some changes for better Oracle compatibility.
+ - Fixed a bug where WebGUI would crash if an admin tried to create a user with a ' in the username.
+
+
+3.2.4
+ - Fixed a bug where multi-day events on the Events Calendar (calendar view) would not display the last day of the event.
+ - Added a "prefer not to say" option to gender in the user profile.
+ - Fixed a bug in Events Calendar where pagination didn't work under list view.
+
+3.2.3
+ - Fixed a broken link when insufficient privileges message is displayed.
+ - Fixed a bug in the image mangager that won't let you update an image.
+ - Fixed a bug in the image manager that won't let admins edit/delete images from other users.
+ - Fixed a bug in the user administration where pagination wasn't working.
+
+3.2.2
+ - Fixed a bug in the Crumb Trail macro where the crumb trail was smashed together.
+ - Fixed a bug in the Download Manager widget that prevented a user from being able to download alternate versions.
+ - Fixed a bug in the Events Calendar calendar view that caused the calendar not to display unless there was at least 3 months of data.
+ - Fixed a pagination problem in the Events Calendar.
+ - Fixed a bug in the Events Calendar where links were generated for popups with more information even if there was no more information on that particular event.
+ - Fixed a bug in the Events Calendar where the starting page was not always the current month.
+ - Fixed a bug in the privilege system where a user was given a "permission denied" error message instead of a login prompt when they were not logged in on a page that required the user to be logged in.
+
+3.2.1
+ - We released a faulty upgrade script with 3.2.0. If you happened to be
+        one of the unlucky people who upgraded to 3.2.0, apply 3.2.1
+        immediately. If you didn't upgrade to 3.2.0 then all your
+        upgrades will appear normal. If you installed 3.2.0 from
+        scratch then <b>DO NOT EVER</b> apply the 3.2.1 upgrade!
+
+3.2.0
+ - Added an HTML validator option so content managers can troubleshoot display problems.
+ - Added a universal sorting mechanism that can be used by any other subsystem.
+
+ - Added the sorting mechanism and a search to the Download Manager.
+ - The "Previous / Next" buttons don't show up unless pagination is necessary.
+ - Updated help to fix spelling, gramatical, and consistency errors.
+ - Added an optional mechanism to prevent proxy server page caching.
+ - Added delimeter option to horizontal menu macros.
+ - Added limited moderation capabilities to the Message Board widget. More will be added later.
+ - Added calendar layout to Events Calendar.
+ - You now need to install Date::Calc and HTML::CalendarMonthSimple to use WebGUI.
+ - Fixed a bug in message board edit introduced in 3.1.0.
+ - Fixed a URL generation problem introduced in 3.1.0.
+
+3.1.0
+ - Added Download Manager widget.
+ - Added file typing system for attachments.
+ - Added an alignment option to images on Articles.
+ - Added a mod_perl preload script to lessen memory usage and add database connection pooling.
+ - Added pagination, unlimited number of returned fields, and automatic default template to SQL Report.
+ - Added a PageTitle macro that simply displays the title of the current page.
+ - Added an Include macro that includes the contents of a file on the local filesystem.
+ - Added an Execute macro that executes a local program and then returns the results.
+ - Added support for mod_rewrite (thanks to Peter Beardsley).
+ - The "company name" setting is now displayed in the title bar when on the home page.
+ - Added an image management system and relevant macros.
+ - Help links now open in their own window.
+ - Added missing labels to Events Calendar and SQL Report.
+ - Fixed a bug in copying User Submission systems where attachments would not be copied.
+ - Fixed a bug that caused the ^s(); macro to malfunction since 3.0.1.
+ - Fixed a potential security concern for attachments.
+
+3.0.3
+ - Fixed a bug in Site Map that would not save the line spacing when created.
+ - Fixed a bug in Poll that allowed a possible cheat of the poll.
+ - Fixed a bug in user management that would not allow admins to edit users.
+ - Version 3.0.2 was mistakenly released with an internal version number of 3.0.1, which would cause a version check to mistakenly identify itself.
+
+
+3.0.2
+ - Fixed a bug where the widget copy function would corrupt files under Win32 systems.
+ - Fixed a bug where some proprietery characters posted through Widget forms could cause WebGUI to crash.
+ - Changed some field names in the data dictionary for conformity.
+ - Added some missing primary keys.
+
+
+3.0.1
+ - Removed deprecated macro syntax.
+ - Fixed a problem with the widget table that made it incompatible with Postgres.
+ - Fixed a problem with the User Submission system (introduced in 2.7.0) that caused the property titles to not be displayed.
+ - Fixed a permissions problem where Style Managers could not actually edit styles.
+ - Added user ID and group ID listings to their respective managers.
+ - Fixed a problem where the duplicate method of some widgets would pull the data from the wrong original widget.
+
+3.0.0
+ - Minor fixes and tweaks to the built in styles.
+ - The WebGUI style is now the default style.
+ - Fixed a bug where duplicate usernames could be created by an administrator.
+ - Fixed a bug where duplicate page names could be created by the package management system.
+ - Fixed a bug where blank page names could be created.
+

@@ -1,0 +1,872 @@
+# config-file-type: JSON 1
+
+{
+
+# Add a comma separated list of the names this site can use.
+# The first site in the list will be used as the default
+# sitename for generating offline URLs and other functions.
+
+"sitename" : [ 
+    "www.example.com",
+    "example.com"
+    ],
+
+# Set to 1 if you want to use WebGUI's SSL functions, including encrypting user logins.
+
+"sslEnabled" : 0, 
+
+# Rename the WebGUI Session cookie if you like.
+
+"cookieName" : "wgSession",
+
+# Explicitly set the domain that the WebGUI session cookie
+# should be assigned to. Defaults to the domain that the user
+# is browsing the site under.
+
+# "cookieDomain" : ".example.com",
+
+# Explicitly set the time to live for the WebGUI session cookie
+# Defaults to +10Y.  cookieTTL must follow the described format:
+# Format should match /^\+?(\d+)([YMDhms]?)$/ 
+# $2 qualifies the number in $1 as representing "Y"ears, 
+# "M"onths, "D"ays, "h"ours, "m"inutes, or "s"econds (if the qualifier is omitted, 
+# the number is interpreted as representing seconds).
+# +1h = 1 hour
+# +2D = 2 Days
+# +3M = 3 Months
+# +10Y = 10 Years (default)
+
+# This may also be set to the word "session" to have cookies live
+# for the current browser session only.
+
+# "cookieTTL" : "+10Y",
+
+# The location where the WebGUI server will be handling
+# requests. This is normally just '/' or the root of the
+# server, but on some installations it might be /webgui or
+# /site1, /site2, etc. If this is set to anything other than
+# '/' then a matching <Location /somepath> block should 
+# contain the WebGUI handler instead in the Apache
+# VirtualHost configuration.
+
+"gateway" : "/",
+
+# Enable this flag if you run or back up files on a case sensitive
+# file system.  This will ensure uniqueness in the uploads folder
+
+#"caseInsensitiveOS" : "1",
+
+# The relative or fully qualified URL to the extras folder
+# that comes with WebGUI.
+
+"extrasURL" : "/extras",
+
+# The filesystem path to get to the extras folder that ships
+# with WebGUI.
+
+"extrasPath" : "/data/WebGUI/www/extras",
+
+# The relative for fully qualified URL to the uploads folder
+# for this site where all attachments will be stored.
+
+"uploadsURL" : "/uploads",
+
+# The filesystem path to get to the uploads folder where all
+# attachments for this site will be stored. This needs to be
+# writable by your web server.
+
+"uploadsPath" : "/data/WebGUI/www/uploads",
+
+# Set this value to 1 if you want rich editors to use the
+# WebGUI asset URLs for images rather than their real URLs
+# in the uploads folder. The advantage of this is that users 
+# see short clean WebGUI controlled URLs. However, this is 
+# slower than the default.
+
+"richEditorsUseAssetUrls" : 1,
+
+# If you are not running your web server on the standard
+# port (80) then use this setting to specify that.
+
+#"webServerPort" : 80,
+
+# What kind of cache do you wish to use? Available types are 
+# WebGUI::Cache::FileCache and WebGUI::Cache::Database.
+# We highly recommend the database cache if you are running
+# sites with more than a few hundred pages, or if you're
+# running in a multi-server environment. The file cache is better
+# for very small sites.
+
+"cacheType" : "WebGUI::Cache::FileCache",
+
+# Tell WebGUI where to store cached files. Defaults to the 
+# /tmp or c:\temp folder depending upon your operating system.
+
+# "fileCacheRoot" : "/path/to/cache",
+
+# Set this to 1 to disable WebGUI's caching subsystems. This is
+# mainly useful for developers.
+
+"disableCache" : 0,
+
+# The database connection string. It usually takes the form of
+# DBI:<driver>:<db>;host:<hostname>
+
+"dsn" : "DBI:mysql:www_example_com;host=localhost",
+
+# The username to authenticate to the above database.
+
+"dbuser" : "webgui",
+
+# The password to authenticate to the above database.
+
+"dbpass" : "password",
+
+# You can configure up to three read-only database slaves to 
+# increase WebGUI's read performance.
+
+# "dbslave1" : { 
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave1.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
+
+# "dbslave2" : { 
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave2.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
+
+# "dbslave3" : { 
+#    "dsn"  : "DBI:mysql:www_example_com;host=dbslave3.example.com",
+#    "user" : "webgui",
+#    "pass" : "password"
+#    },
+
+# You can configure a backup master database as a failover in case
+# your primary database goes down. WebGUI will use this database until
+# the original becomes available. However, this does nothing to change
+# the settings of your database. If it was set up as a slave until the
+# master went down, then some script will have to be written to convert
+# it from a slave to a master.
+
+# "failoverdb" : {
+#     "dsn" : "DBI:mysql:www_example_com;host=failover.example.com;port=3306",
+#     "user"     : "webgui",
+#     "password" : "password"
+#     },
+
+# Set this value if you wish to override all outbound emails to a specific
+# user for testing purposes.
+
+# "emailOverride" : "joe@example.com",
+
+# Set this value if you wish to bypass sending email to the mailserver alltogether.
+# This will instead pipe email messages to the log, removing them from the queue normally
+
+# "emailToLog" : "1",
+
+# By adding CIDR based subnets to the following array you can limit the
+# subnets by which users can turn admin mode on.
+
+"adminModeSubnets" : [ ],
+
+# List the authentication plug-ins you wish to be available on
+# this site.
+
+"authMethods" : [ "LDAP", "WebGUI" ],
+
+# List the merchant gateways you have installed and wish to be
+# available on this site.
+
+"paymentDrivers" : [
+    "WebGUI::Shop::PayDriver::Cash",
+    "WebGUI::Shop::PayDriver::ITransact"
+    ],
+
+# List the shipping drivers you have installed and wish to be
+# available for configuration on the site.
+
+"shippingDrivers" : [
+    "WebGUI::Shop::ShipDriver::FlatRate"
+    ],
+
+# Specify the list of template parsers available in the system.
+
+"templateParsers" : [
+    "WebGUI::Asset::Template::HTMLTemplate"
+    ],
+
+# Specify the default template parser.
+
+"defaultTemplateParser" : "WebGUI::Asset::Template::HTMLTemplate",
+
+# Specify external helper apps that will enable WebGUI's search
+# engine to index content in various uploaded file formats. The
+# helpers must take the path to the file as an argument and
+# return either text or html content.
+
+"searchIndexerPlugins" : {
+    "txt"    : "/bin/cat", 
+    "readme" : "/bin/cat", 
+    "html"   : "/bin/cat",
+    "htm"    : "/bin/cat"
+    },
+
+
+# define what appears in the admin console and who can view it
+
+"adminConsole" : {
+   "loginHistory" : {
+      "icon" : "loginHistory.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewLoginHistory);",
+      "title" : "^International(426,WebGUI);",
+      "groupSetting" : "groupIdAdminLoginHistory"
+   },
+   "clipboard" : {
+      "icon" : "clipboard.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageClipboard);",
+      "title" : "^International(948,WebGUI);"
+   },
+   "statistics" : {
+      "icon" : "statistics.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewStatistics);",
+      "title" : "^International(437,WebGUI);",
+      "groupSetting" : "groupIdAdminStatistics"
+   },
+   "users" : {
+      "icon" : "users.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listUsers);",
+      "title" : "^International(149,WebGUI);",
+      "groupSetting" : "groupIdAdminUser"
+   },
+   "activeSessions" : {
+      "icon" : "activeSessions.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=viewActiveSessions);",
+      "title" : "^International(425,WebGUI);",
+      "groupSetting" : "groupIdAdminActiveSessions"
+   },
+   "inbox" : {
+      "icon" : "inbox.gif",
+      "group" : "2",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewInbox);",
+      "title" : "^International(159,WebGUI);"
+   },
+   "versions" : {
+      "icon" : "versionTags.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",op=manageVersions);",
+      "title" : "^International(version tags,VersionTag);",
+      "groupSetting" : "groupIdAdminVersionTag"
+   },
+   "help" : {
+      "icon" : "help.gif",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=viewHelpIndex);",
+      "title" : "^International(help,WebGUI);",
+      "groupSetting" : "groupIdAdminHelp"
+   },
+   "groups" : {
+      "icon" : "groups.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGroups);",
+      "title" : "^International(89,WebGUI);",
+      "groupSetting" : "groupIdAdminGroup"
+   },
+   "userProfiling" : {
+      "icon" : "userProfiling.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editProfileSettings);",
+      "title" : "^International(user profiling,WebGUIProfile);",
+      "groupSetting" : "groupIdAdminProfileSettings"
+   },
+   "ldapconnections" : {
+      "icon" : "ldap.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listLDAPLinks);",
+      "title" : "^International(ldapconnections,AuthLDAP);",
+      "groupSetting" : "groupIdAdminLDAPLink"
+   },
+   "contentProfiling" : {
+      "icon" : "contentProfiling.gif",
+      "group" : "4",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageMetaData);",
+      "title" : "^International(content profiling,Asset);"
+   },
+   "databases" : {
+      "icon" : "databases.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=listDatabaseLinks);",
+      "title" : "^International(databases,WebGUI);",
+      "groupSetting" : "groupIdAdminDatabaseLink"
+   },
+   "adSpace" : {
+      "icon" : "advertising.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageAdSpaces);",
+      "title" : "^International(topicName,AdSpace);",
+      "groupSetting" : "groupIdAdminAdSpace"
+   },
+   "settings" : {
+      "icon" : "settings.gif",
+      "group" : "3",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=editSettings);",
+      "title" : "^International(settings,WebGUI);"
+   },
+   "workflow" : {
+      "icon" : "workflow.gif",
+      "uiLevel" : 7,
+      "url" : "^PageUrl(\"\",manageWorkflows);",
+      "title" : "^International(topicName,Workflow);",
+      "groupSetting" : "groupIdAdminWorkflow"
+   },
+   "assets" : {
+      "icon" : "assets.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=assetManager);",
+      "title" : "^International(assets,Asset);"
+   },
+   "graphics" : {
+      "icon" : "graphics.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=listGraphicsOptions);",
+      "title" : "^International(manage graphics,Graphics);",
+      "groupSetting" : "groupIdAdminGraphics"
+   },
+   "shop" : {
+      "icon" : "shop.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",shop=admin);",
+      "title" : "^International(shop,Shop);",
+      "groupSetting" : "groupIdAdminCommerce"
+   },
+   "trash" : {
+      "icon" : "trash.gif",
+      "group" : "12",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",func=manageTrash);",
+      "title" : "^International(trash,WebGUI);"
+   },
+   "cron" : {
+      "icon" : "cron.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=manageCron);",
+      "title" : "^International(topicName,Workflow_Cron);",
+      "groupSetting" : "groupIdAdminCron"
+   },
+   "spectre" : {
+      "icon" : "spectre.gif",
+      "uiLevel" : 9,
+      "url" : "^PageUrl(\"\",op=spectreStatus);",
+      "title" : "^International(spectre,Spectre);",
+      "groupSetting" : "groupIdAdminSpectre"
+   },
+   "contentFilters" : {
+      "icon" : "contentFilters.gif",
+      "uiLevel" : 3,
+      "url" : "^PageUrl(\"\",op=listReplacements);",
+      "title" : "^International(content filters,WebGUI);",
+      "groupSetting" : "groupIdAdminReplacements"
+   },
+   "cache" : {
+      "icon" : "cache.gif",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=manageCache);",
+      "title" : "^International(manage cache,WebGUI);",
+      "groupSetting" : "groupIdAdminCache"
+   }
+},
+
+# Enter the maximum number of assets that should be allowed to
+# be created on this site. Keep in mind that a base install of
+# WebGUI has around 300 assets. Enter zero (0) if you want to
+# allow an unlimited number.
+
+"maximumAssets" : 0,
+
+# Specify the list of categories to display in the "New Content"
+# menu. The category names should match those used in the "assets"
+# hash later in this config. Each category can have three properties:
+#
+#   title   - The human readable name of the category.
+#   uiLevel - The minimum UI level the user must have to see the category.
+#   group   - A group id the user must be in to see the category.
+
+"assetCategories" : {
+   "basic" : {
+      "uiLevel" : 1,
+      "title" : "^International(basic,Macro_AdminBar);"
+   },
+   "shop" : {
+      "uiLevel" : 5,
+      "title" : "^International(shop,Shop);"
+   },
+   "utilities" : {
+      "uiLevel" : 9,
+      "title" : "^International(utilities,Macro_AdminBar);"
+   },
+   "community" : {
+      "uiLevel" : 5,
+      "title" : "^International(community,Macro_AdminBar);"
+   },
+   "intranet" : {
+      "uiLevel" : 5,
+      "title" : "^International(intranet,Macro_AdminBar);"
+   }
+},
+
+# Specify a the list of assets you want to appear in your
+# "New Content" menu categories. See "assetCategories" for details
+# about categories. Each listing has a key of class name, and then
+# has several properties, which are:
+#
+#   category    - The category the asset should appear in.
+#   isContainer - Whether or not the assets main purpose to display the data from other assets.
+#   addGroup    - The group the user must be in to add this asset.
+#   uiLevel     - The minimum UI level the user must have to add the asset.
+#   fields      - Edit the properties of the asset.
+#   tabs        - Edit the tabs on which the fields are displayed when editing the asset.
+#
+# The "fields" property above may override any property of any field in this
+# asset class. Examples are label, tab, uiLevel. You must know what you're
+# doing with this, because you could break an asset if you set something wrong
+# with these properties. Here's an example of wha the fields poperty might look like:
+#
+#            "fields" : {
+#                "title" : {
+#                    "label" : "Name",
+#                    "tab" : "basic"
+#                },
+#                "synopsis" : {
+#                    "label" : "Abstract",
+#                    "uiLevel" : 3
+#                }
+#            }
+#
+# The "tabs" property allows you to to create new, hide, and update existing tabs in
+# the asset. Each tab has two properties:
+#
+#   uiLevel - The minimum UI level the user must have to view the tab.
+#   label   - The human readable label for the tab.
+#
+# Here's an example of what a tabls section might look like:
+#
+#            "tabs" : {
+#                "basic" : {
+#                    "label" : "Basic",
+#                    "uiLevel" : 1
+#                },
+#                "meta" : {
+#                    "uiLevel" : 99999
+#                },
+#                "security" : {
+#                    "label" : "Protection"
+#                }
+#            }
+
+"assets" : {
+   "WebGUI::Asset::Wobject::Shelf" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::Layout" : {
+      "isContainer" : 1,
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Gallery" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::DataForm" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Sku::Donation" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::UserList" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::EventManagementSystem" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Sku::Subscription" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::WikiMaster" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::WSClient" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::StockData" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::FilePile" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Collaboration" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::Survey" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::File::ZipArchive" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::RichEdit" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::SyndicatedContent" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::HttpProxy" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::MultiSearch" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::File::Image" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Sku::Product" : {
+      "isContainer" : 1,
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::WeatherData" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Redirect" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Article" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Search" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::MessageBoard" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::SQLReport" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::TimeTracking" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Calendar" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Poll" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::ProjectManager" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Folder" : {
+      "isContainer" : 1,
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::Navigation" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Matrix" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Sku::FlatDiscount" : {
+      "category" : "shop"
+   },
+   "WebGUI::Asset::Wobject::Thingy" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::File" : {
+      "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Collaboration::Newsletter" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Snippet" : {
+      "category" : "basic"
+   },
+   "WebGUI::Asset::Wobject::InOutBoard" : {
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Wobject::Dashboard" : {
+      "isContainer" : 1,
+      "category" : "intranet"
+   },
+   "WebGUI::Asset::Template" : {
+      "category" : "utilities"
+   }
+},
+   
+# Optionally add a "Save and Commit" button to assets so that you
+# don't have to hit "Commit My Changes" seperately.
+
+"enableSaveAndCommit" : 0,
+
+# Optionally override the default UI Level of any asset. This
+# determines whether the current user has the appropriate UI Level
+# to add assets of that type.
+
+# Configure the UI Levels of the asset toolbar links.
+
+"assetToolbarUiLevel" : {
+    "copy"       : 1,
+    "cut"        : 1,
+    "delete"     : 1,
+    "edit"       : 1,
+    "view"       : 1,
+    "demote"     : 3,
+    "promote"    : 3,
+    "lock"       : 5,
+    "manage"     : 5,
+    "revisions"  : 5,
+    "shortcut"   : 5,
+    "changeUrl"  : 9,
+    "editBranch" : 9,
+    "export"     : 9
+    },
+
+# If exportPath is defined, an "Export" toolbar icon will appear
+# which allows you to export assets to static HTML. This folder
+# needs to be writable by your web server.
+
+# "exportPath" : "/path/to/export",
+
+# Enable streaming Image and File assets thru mod_perl process instead of 
+# simple redirect. WARNING has impact on performance.
+
+"enableStreamingUploads" : "0",
+
+# Specify the list of macros you wish to be processed on each page.
+
+"macros" : {
+    "@"                : "At_username", 
+    "#"                : "Hash_userId", 
+    "/"                : "Slash_gatewayUrl", 
+    "a"                : "a_account", 
+    "AdminBar"         : "AdminBar", 
+    "AdminText"        : "AdminText", 
+    "AdminToggle"      : "AdminToggle", 
+    "AdSpace"          : "AdSpace",
+    "AOIHits"          : "AOIHits", 
+    "AOIRank"          : "AOIRank", 
+    "AssetProxy"       : "AssetProxy", 
+    "CanEditText"      : "CanEditText", 
+    "CartItemCount"    : "CartItemCount",
+    "c"                : "c_companyName", 
+    "D"                : "D_date", 
+    "EditableToggle"   : "EditableToggle", 
+    "e"                : "e_companyEmail", 
+    "Extras"           : "Extras", 
+    "FetchMimeType"    : "FetchMimeType", 
+    "FileUrl"          : "FileUrl", 
+    "GroupAdd"         : "GroupAdd", 
+    "GroupDelete"      : "GroupDelete", 
+    "GroupText"        : "GroupText", 
+    "H"                : "H_homeLink", 
+    "International"    : "International", 
+    "LastModified"     : "LastModified", 
+    "L"                : "L_loginBox", 
+    "LoginToggle"      : "LoginToggle", 
+    "MiniCart"         : "MiniCart",
+    "Page"             : "Page", 
+    "PageTitle"        : "PageTitle", 
+    "PageUrl"          : "PageUrl", 
+    "RandomAssetProxy" : "RandomAssetProxy", 
+    "RandomThread"     : "RandomThread", 
+    "RootTitle"        : "RootTitle", 
+    "r"                : "r_printable", 
+    "Spacer"           : "Spacer", 
+    "Thumbnail"        : "Thumbnail", 
+    "User"             : "User", 
+    "u"                : "u_companyUrl",
+    "ViewCart"         : "ViewCart"
+    },
+
+#Specify any LDAP aliases for synchronizing user profiles to LDAP    
+"ldapAlias" : {    
+    "firstName"   : "givenName",
+    "lastName"    : "sn",
+    "email"       : "mail",
+    "companyName" : "o"    
+    },
+    
+# Define the subnets that WebGUI should expect Spectre communication
+# to come from. All other subnets will be ignored. The subnet
+# should be listed in CIDR notation.
+
+"spectreSubnets" : [ "127.0.0.1/32" ],
+
+# Define the IP Address that should be used by WebGUI to connect
+# to Spectre. Depending upon your cluster configuration, this may
+# or may not be the same as the information in spectreSubnets.
+
+"spectreIp" : "127.0.0.1",
+
+# Define the port number WebGUI should use to connect to Spectre
+
+"spectrePort" : 32133,
+
+# Define the workflow activities that are available in the editing
+# process and what object types they support. 
+
+"workflowActivities" : {
+    "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldThreads",
+        "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
+        "WebGUI::Workflow::Activity::CleanDatabaseCache",
+        "WebGUI::Workflow::Activity::CleanFileCache",
+        "WebGUI::Workflow::Activity::CleanLoginHistory",
+        "WebGUI::Workflow::Activity::CleanTempStorage", 
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::DecayKarma",
+        "WebGUI::Workflow::Activity::DeleteExpiredSessions",
+        "WebGUI::Workflow::Activity::ExpireEmsCartItems",
+        "WebGUI::Workflow::Activity::ExpireGroupings",
+        "WebGUI::Workflow::Activity::ExpireSubscriptionCodes",
+        "WebGUI::Workflow::Activity::GetSyndicatedContent",
+        "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags",
+        "WebGUI::Workflow::Activity::ProcessRecurringPayments",
+        "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
+        "WebGUI::Workflow::Activity::PurgeOldTrash",
+        "WebGUI::Workflow::Activity::SendQueuedMailMessages",
+        "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
+        "WebGUI::Workflow::Activity::SyncProfilesToLdap",
+        "WebGUI::Workflow::Activity::TrashClipboard",
+        "WebGUI::Workflow::Activity::TrashExpiredEvents"
+    ],
+    "WebGUI::User" : [
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::NotifyAboutUser"
+    ],
+    "WebGUI::VersionTag" : [
+        "WebGUI::Workflow::Activity::CommitVersionTag",
+        "WebGUI::Workflow::Activity::CreateCronJob",
+        "WebGUI::Workflow::Activity::ExportVersionTagToHtml",
+        "WebGUI::Workflow::Activity::NotifyAboutVersionTag",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByCommitterGroup",
+        "WebGUI::Workflow::Activity::RequestApprovalForVersionTag::ByLineage",
+        "WebGUI::Workflow::Activity::RollbackVersionTag",
+        "WebGUI::Workflow::Activity::TrashVersionTag",
+        "WebGUI::Workflow::Activity::UnlockVersionTag",
+        "WebGUI::Workflow::Activity::WaitUntil"
+    ]
+    },
+
+# Enter the graphing plugins that you want to enable for your site.
+
+"graphingPlugins" : [
+    "WebGUI::Image::Graph::Pie",
+    "WebGUI::Image::Graph::XYGraph::Bar",
+    "WebGUI::Image::Graph::XYGraph::Line"
+    ],
+
+# Here you can define the dictionaries that are available through the tinyMCE spellchecker. You should set
+# id to the name the dictionary is known by ASpell (eg. en or en_US or nl), use the name parameter to set 
+# the name the dictionary is displayed with in tinyMCE. To set the default dictionary please set the 'default'
+# parameter.
+
+#"availableDictionaries" : [
+#    {
+#        "id"      : "en_US",
+#        "name"    : "English",
+#        "default" : "1"
+#    },
+#    {
+#        "id"      : "nl",
+#        "name"    : "Dutch"
+#    }
+#],
+
+# Optional script to run upon successful login.  The script can contain macros
+# ex: /data/WebGUI/sbin/doLogin.pl --configFile=dev.localhost.localdomain.conf --loginPage=^PageUrl();
+
+"runOnLogin" : "",
+
+# Optional script to run upon successful logout.  The script can contain macros
+# Example: /data/WebGUI/sbin/doLogout.pl --configFile=dev.localhost.localdomain.conf --logoutPage=^PageUrl();
+
+"runOnLogout" : "",
+
+# URL handlers are used to associate functionality with a URL via a regular expression.
+
+"urlHandlers" : [
+    { "^/extras" : "WebGUI::URL::PassThru" },
+#    { "^/icons" : "WebGUI::URL::PassThru" },
+#    { "^/documentation/pdf" : "WebGUI::URL::PassThru" },
+#    { "^/my-custom-application$" : "WebGUI::URL::PassThru" },
+#    { "^/server-status$" : "WebGUI::URL::PassThru" },
+#    { "^/perl-status$" : "WebGUI::URL::PassThru" },
+    { "^/uploads/dictionaries" : "WebGUI::URL::Unauthorized" },
+    { "^/uploads" : "WebGUI::URL::Uploads" },
+    { "^/\\*give-credit-where-credit-is-due\\*$" : "WebGUI::URL::Credits" },
+    { "^/abcdefghijklmnopqrstuvwxyz$" : "WebGUI::URL::Snoop" },
+    { ".*" : "WebGUI::URL::Content" }
+    ],
+
+# Content handlers are used to produce content from the content URL handler.
+# Note, these handlers are processed in the order listed.  Do not change
+# unless you know what you're doing.
+
+"contentHandlers" : [
+    "WebGUI::Content::Prefetch",
+    "WebGUI::Content::Maintenance",
+    "WebGUI::Content::Referral",
+    "WebGUI::Content::AssetManager",
+    "WebGUI::Content::Operation",
+    "WebGUI::Content::Setup",
+    "WebGUI::Content::Shop",
+    "WebGUI::Content::Asset",
+    "WebGUI::Content::NotFound"
+    ],
+
+
+# extensions that the export system should pass through as-is instead of using
+# index.html
+"exportBinaryExtensions" : [
+    ".html",
+    ".htm",
+    ".txt",
+    ".pdf",
+    ".jpg",
+    ".css",
+    ".gif",
+    ".png",
+    ".doc",
+    ".xls",
+    ".xml",
+    ".rss",
+    ".bmp",
+    ".mp3",
+    ".js",
+    ".fla",
+    ".flv",
+    ".swf",
+    ".pl",
+    ".php",
+    ".php3",
+    ".php4",
+    ".php5",
+    ".ppt",
+    ".docx",
+    ".zip",
+    ".tar",
+    ".rar",
+    ".gz",
+    ".bz2"
+]
+
+}
+
