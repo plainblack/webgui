@@ -658,12 +658,11 @@ $self->session->errorHandler->error("Can take survey");
             return $self->surveyEnd();
     }
 
+    return $self->surveyEnd() if($seslf->response->surveyEnd());
+
     my $questions = $self->response->nextQuestions();
 $self->session->errorHandler->error("Load Questions had ".@$questions." questions");
     
-    if(@$questions < 1){
-        return $self->surveyEnd();
-    }
 
     my $section = $self->response->nextSection();
 #$self->session->errorHandler->error(Dumper $section);
