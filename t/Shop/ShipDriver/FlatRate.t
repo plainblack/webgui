@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 13;
+my $tests = 14;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -286,13 +286,13 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
 );
 
 $options = {
-                label   => 'flat rate, ship weight',
-                enabled => 1,
-                flatFee => 1.00,
-                percentageOfPrice => 0,
-                pricePerWeight    => 100,
-                pricePerItem      => 10,
-              };
+    label   => 'flat rate, ship weight',
+    enabled => 1,
+    flatFee => 1.00,
+    percentageOfPrice => 0,
+    pricePerWeight    => 100,
+    pricePerItem      => 10,
+};
 
 $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
@@ -303,6 +303,17 @@ is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee w
 
 $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
 is($driver->calculate($cart), 4521, 'calculate by weight, perItem and flat fee work for two items');
+
+$options = {
+    label   => 'percentage of price',
+    enabled => 1,
+    flatFee => 0.00,
+    percentageOfPrice => 1/3*100,
+    pricePerWeight    => 0,
+    pricePerItem      => 0,
+};
+$driver->update($options);
+is($driver->calculate($cart), 30_200, 'calculate by percentage of price');
 
 }
 
