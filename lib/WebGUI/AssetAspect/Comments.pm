@@ -15,7 +15,7 @@ package WebGUI::AssetAspect::Comments;
 =cut
 
 use strict;
-use base 'Class::C3';
+use Class::C3;
 use JSON;
 use Tie::IxHash;
 use WebGUI::Exception;
