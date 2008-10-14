@@ -46,6 +46,8 @@
  - fixed #8807: _NewAsset.skeleton out of date
  - added: "Duplicate this template and edit" now updates the asset we came from, if any
  - fixed #8818: Visitor sends a welcome message
+ - added: "EditArea" code highlighter and editing tool for WebGUI::Form::Codearea, used
+    in Template, Snippet, SQLReport, and more
 
 7.6.0
  - added: users may now customize the post received page for the CS

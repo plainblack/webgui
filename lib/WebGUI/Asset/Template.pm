@@ -69,6 +69,7 @@ sub definition {
         properties  => {
             template => {
                 fieldType       => 'codearea',
+                syntax          => "html",
                 defaultValue    => undef,
             },
             isEditable => {
@@ -165,6 +166,7 @@ sub getEditForm {
 		-name=>"template",
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
+        -syntax => "html",
 		-value=>$self->getValue("template")
 		);
         $tabform->getTab("properties")->codearea(
