@@ -1,0 +1,6 @@
+<tmpl_loop name=answers>
+    <tmpl_var name='verts'>
+        <span class=answer id="<tmpl_var name='Survey_answerId'>container"></span>
+    <tmpl_var name='verte'>
+    <input type=hidden name=<tmpl_var name='Survey_answerId'> id=<tmpl_var name='Survey_answerId'>>
+</tmpl_loop>

@@ -1,0 +1,151 @@
+<div id="header">
+        <div id=headertitle><tmpl_var name='sectionName'></div>
+        <div id=headertext><tmpl_var name='sectionText'></div>
+</div>
+
+<div id='questions'>
+
+<form name='surveyForm'>
+
+<input type='hidden' name='section' value='<tmpl_var name='Survey_sectionId'>'>
+
+<tmpl_loop name='questions'>
+    <hr>
+    <div class='question'>Q<tmpl_var name='sequenceNumber'>: <tmpl_var name='questionText'></div>
+
+    <tmpl_if name='multipleChoice'>
+        <tmpl_if name='maxMoreOne'>
+            <div>selections left: <span id='<tmpl_var name='Survey_questionId'>max'><tmpl_var name='maxAnswers'></div>
+        </tmpl_if>
+    </tmpl_if>
+
+
+
+
+    
+    <tmpl_if name='fileLoader'>
+        <tmpl_loop name='answers'>
+            <tmpl_var name='verts'>
+            <span class=answer>
+                <input type='file' name='<tmpl_var name="Survey_answerId">' id='<tmpl_var name=Survey_answerId>' size='50' />
+            </span>
+            <tmpl_if name='verbatim'>
+                <span> <input type=text name= '<tmpl_var name='Survey_answerId'>verbatim' ></span>
+            </tmpl_if>  
+            <tmpl_var name='verte'>
+        </tmpl_loop>
+    </tmpl_if>
+
+    <tmpl_if name='text'>
+        <tmpl_loop name=answers>
+            <tmpl_var name='verts'>
+            <span class=answer>
+                <textarea name="<tmpl_var name="Survey_answerId">"></textarea>
+            </span>
+            <tmpl_if name='verbatim'>
+                <span><input type=text name='<tmpl_var name='Survey_answerId'>verbatim'></span>
+            </tmpl_if>  
+            <tmpl_var name='verte'>
+        </tmpl_loop>
+    </tmpl_if>
+
+    <tmpl_if name='multipleChoice'>
+        <tmpl_loop name=answers>
+            <tmpl_var name='verts'>
+                <span class=answer id="<tmpl_var name='Survey_answerId'>container"></span>
+                <tmpl_if name='verbatim'>
+                    <span><input type=text name='<tmpl_var name='Survey_answerId'>verbatim'></span>
+                </tmpl_if>  
+            <tmpl_var name='verte'>
+            <input type=hidden name=<tmpl_var name='Survey_answerId'> id=<tmpl_var name='Survey_answerId'>>
+        </tmpl_loop>
+    </tmpl_if>
+    
+    <tmpl_if name='dateType'>
+        <tmpl_loop name=answers>
+            <tmpl_var name='verts'>
+            <span class=dateanswer>
+                    <table><tr><td/><td><tmpl_var name='answerText'></td><td/></tr>
+                    <div id='<tmpl_var name='Survey_answerId'>container'></div>
+                    <input name='<tmpl_var name='Survey_answerId'>' id='<tmpl_var name='Survey_answerId'>' type=text></input>
+                <span id='<tmpl_var name='Survey_answerId'>button'></span>
+            <tmpl_if name='verbatim'>
+                <span><input type=text name='<tmpl_var name='Survey_answerId'>verbatim'></span>
+            </tmpl_if>  
+            <tmpl_var name='verte'>
+        </tmpl_loop>    
+    </tmpl_if>
+
+    <tmpl_if name='slider'>
+        <tmpl_if name='dualSlider'>
+
+            <tmpl_loop name='a1'>
+                <input type=hidden id='<tmpl_var name='Survey_answerId'>' name='<tmpl_var name='Survey_answerId'>' value=0>
+            </tmpl_loop>
+            <tmpl_loop name='a2'>
+                <input type=hidden id='<tmpl_var name='Survey_answerId'>' name='<tmpl_var name='Survey_answerId'>' value="<tmpl_var name='max'>">
+            </tmpl_loop>
+
+            <span class=answer>
+            <p><table><tr><td>
+            <tmpl_loop name='a1'>
+                <span id='<tmpl_var name='Survey_answerId'>show'>0</span>
+            </tmpl_loop>
+            </td><td></td><td>
+            <tmpl_loop name='a2'>
+                <span id='<tmpl_var name='Survey_answerId'>show'><tmpl_var name='max'></span>
+            </tmpl_loop>
+            </td></tr>
+            <tr><td>0&nbsp;&nbsp;</td><td>
+            <div id='<tmpl_var name='Survey_questionId'>slider-bg' tabindex='-1' title='Slider' class=slider-bg>
+            <tmpl_loop name='a1'>
+                <div id='<tmpl_var name='Survey_answerId'>slider-min-thumb' class=slider-min-thumb>
+            </tmpl_loop>
+            <img src='/extras/wobject/Survey/thumb-n.gif'></div>
+            <tmpl_loop name='a2'>
+                <div id='<tmpl_var name='Survey_answerId'>slider-max-thumb' class=slider-max-thumb>
+            </tmpl_loop>
+            <img src='/extras/wobject/Survey/thumb-n.gif'></div>
+            </div>
+            </div>
+            <tmpl_loop name='a2'>
+                <td><tmpl_var name='max'></td><td>
+            </tmpl_loop>
+            </table>
+
+            </span>
+
+        <tmpl_else>
+            <tmpl_loop name=answers>
+                <tmpl_var name='verts'>
+
+                      <span class=answer>
+                        <p><table><tr><td></td><td>
+                        <tmpl_var name='answerText'>&nbsp;
+                        <span id='<tmpl_var name='Survey_answerId'>show'>0</span>
+                        <input type=hidden id='<tmpl_var name='Survey_answerId'>' name='<tmpl_var name='Survey_answerId'>'>
+                        </td><td></td></tr>
+                        <tr><td>0&nbsp;&nbsp;</td><td>
+                        <div id='<tmpl_var name='Survey_answerId'>slider-bg' tabindex='-1' title='Slider' class=slider-bg>
+                        <div id='<tmpl_var name='Survey_answerId'>slider-thumb' class=slider-thumb>
+                                    <img src='/extras/wobject/Survey/thumb-n.gif'>
+                            </div>
+                                </div>
+                        <td><tmpl_var name='max'></td><td>
+                        </table>
+                        </span>
+
+                <tmpl_var name='verte'>
+            </tmpl_loop>    
+        </tmpl_if>
+    </tmpl_if>
+
+</tmpl_loop>
+<hr><input type=button id=submitbutton value=submitbutton></input>
+</form>
+
+</div>
+
+<div id="footer"></div>
+
+
