@@ -111,8 +111,8 @@ our $I18N = {
 	},
 
 	'default_stock_label_description' => {
-		message => q|Enter a list of default stocks (one per line) to display in cases where the user is not logged in or the user has not personalized the Stock List|,
-		lastUpdated => 1119066250
+		message => q|Enter a list of default stocks.  For multiple stocks, put one symbol per line.|,
+		lastUpdated => 1224043173
 	},
 
 	'stock_source_description' => {
