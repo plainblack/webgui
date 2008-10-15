@@ -240,7 +240,7 @@ $self->log("qAddy was $$qAddy[0]-$$qAddy[1]");
             last;
         }
         my %question = %{$self->survey->question([$$qAddy[0],$$qAddy[1]])};
-        $question->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
+        $question{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
         delete $question{answers};
         $question{id} = "$$qAddy[0]-$$qAddy[1]";
         $question{sid} = "$$qAddy[0]";
