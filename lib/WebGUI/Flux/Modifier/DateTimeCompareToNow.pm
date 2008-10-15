@@ -1,6 +1,5 @@
 package WebGUI::Flux::Modifier::DateTimeCompareToNow;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Modifier';
 

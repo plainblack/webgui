@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::Thingy;
 #-------------------------------------------------------------------
 
 use strict;
-use warnings;
 use version;
 use Tie::IxHash;
 use JSON;

@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand::TextValue;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Operand';
 

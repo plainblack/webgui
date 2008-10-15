@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand::UserProfileField;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Operand';
 

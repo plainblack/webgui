@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand::DateTime;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Operand';
 use WebGUI::DateTime;

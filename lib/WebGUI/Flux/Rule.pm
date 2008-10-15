@@ -1,7 +1,6 @@
 package WebGUI::Flux::Rule;
 
 use strict;
-use warnings;
 
 use Class::InsideOut qw{ :std };
 use WebGUI::Exception::Flux;

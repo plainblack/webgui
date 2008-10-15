@@ -3,7 +3,6 @@ package WebGUI::Asset::Wobject::UserList;
 #$VERSION = "2.0.0";
 
 use strict;
-use warnings;
 use HTML::Entities;
 use Tie::CPHash;
 use Tie::IxHash;

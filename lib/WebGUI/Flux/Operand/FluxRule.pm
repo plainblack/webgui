@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand::FluxRule;
 use strict;
-use warnings;
 use WebGUI::Flux::Rule;
 
 use base 'WebGUI::Flux::Operand';

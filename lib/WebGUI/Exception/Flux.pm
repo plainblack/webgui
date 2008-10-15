@@ -1,7 +1,6 @@
 package WebGUI::Exception::Flux;
 
 use strict;
-use warnings;
 use WebGUI::Exception;
 use Exception::Class (
     'WebGUI::Error::NotImplemented' => {

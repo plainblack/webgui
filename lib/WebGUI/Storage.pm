@@ -23,7 +23,6 @@ use File::Find;
 use File::Path;
 use Storable qw(nstore retrieve);
 use strict;
-use warnings;
 use WebGUI::Utility;
 
 =head1 NAME

@@ -1,6 +1,5 @@
 package WebGUI::Flux::Expression;
 use strict;
-use warnings;
 
 use Class::InsideOut qw{ :std };
 use Readonly;

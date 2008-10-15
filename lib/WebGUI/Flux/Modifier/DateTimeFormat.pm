@@ -1,6 +1,5 @@
 package WebGUI::Flux::Modifier::DateTimeFormat;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Modifier';
 

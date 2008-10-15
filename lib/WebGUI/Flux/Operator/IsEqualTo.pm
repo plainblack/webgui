@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operator::IsEqualTo;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Operator';
 use Scalar::Util qw(looks_like_number);

@@ -16,7 +16,6 @@ package WebGUI::Text;
 
 
 use strict;
-#use warnings;
 
 use Text::CSV_XS;
 use base 'Exporter';

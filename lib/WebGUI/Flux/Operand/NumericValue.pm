@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand::NumericValue;
 use strict;
-use warnings;
 
 use base 'WebGUI::Flux::Operand';
 

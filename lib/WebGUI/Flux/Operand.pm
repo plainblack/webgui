@@ -1,6 +1,5 @@
 package WebGUI::Flux::Operand;
 use strict;
-use warnings;
 
 use WebGUI::Pluggable;
 use English qw( -no_match_vars );

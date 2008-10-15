@@ -1,7 +1,6 @@
 package WebGUI::Flux;
 
 use strict;
-use warnings;
 
 use GraphViz;
 use JSON;
