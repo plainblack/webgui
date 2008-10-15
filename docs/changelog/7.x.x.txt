@@ -3,6 +3,7 @@
  - fixed: EMSBadge doesn't have a template field
  - fixed #4174: UserList template show links that should be hidden (Yung Han
    Khoe)
+ - fixed #8839: Documentation is wrong for Stock Ticker
 
 7.5.26
  - fixed: International characters in password prevents login
