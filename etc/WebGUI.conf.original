@@ -825,6 +825,7 @@
     "WebGUI::Content::Maintenance",
     "WebGUI::Content::Referral",
     "WebGUI::Content::AssetManager",
+    "WebGUI::Content::AssetDiscovery",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
