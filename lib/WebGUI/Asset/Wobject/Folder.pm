@@ -229,7 +229,7 @@ sub view {
 	my $children    = $self->getLineage( ["children"], \%rules);
 	foreach my $child ( @{ $children } ) {
         # TODO: Instead of this it should be using $child->getTemplateVars || $child->get
-		if ( ref $child eq "WebGUI::Asset::Wobject::Folder" ) {
+		if ( $child->isa("WebGUI::Asset::Wobject::Folder") ) {
 			push @{ $vars->{ "subfolder_loop" } }, {
 				id           => $child->getId,
 				url          => $child->getUrl,
@@ -257,14 +257,16 @@ sub view {
 				controls        => $child->getToolbar,
             };
             
-            if ( ref $child =~ /^WebGUI::Asset::File::Image/ ) {
-                $child->{ "isImage"         } = 1;
-                $child->{ "thumbnail.url"   } = $child->getThumbnailUrl;
+            if ( $child->isa('WebGUI::Asset::File::Image') ) {
+                $self->session->log->warn('is image');
+                $childVars->{ "isImage"         } = 1;
+                $childVars->{ "thumbnail.url"   } = $child->getThumbnailUrl;
             }
             
-            if ( ref $child =~ /^WebGUI::Asset::File/ ) {
-                $child->{ "isFile"          } = 1;
-                $child->{ "file.url"        } = $child->getFileUrl;
+            if ( $child->isa('WebGUI::Asset::File') ) {
+                $self->session->log->warn('is file');
+                $childVars->{ "isFile"          } = 1;
+                $childVars->{ "file.url"        } = $child->getFileUrl;
             }
 
 			push @{ $vars->{ "file_loop" } }, $childVars;

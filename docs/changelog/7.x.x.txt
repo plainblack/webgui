@@ -1,3 +1,57 @@
+7.6.1
+ - changed: the list of extensions for the export system to pass through
+   unmodified has been moved to the configuration file under the
+   "exportBinaryExtensions" field.
+ - fixed: some default assets have ids shorter than 22 characters
+ - fixed: failure when submitting a dataform that sends mail with an empty file field
+ - fixed: DataForm ignores height on textarea fields
+ - fixed: DataForm doesn't keep posted values properly when data fails validation
+ - fixed: Documentation for DataForm and Thingy updated for Possible Values field
+ - added a new permission denied page for version tag approval
+ - fixed: Thingy list type form elements do not support key/value pairs (SDH
+   Consulting Group)
+ - rfe: enable/disable pagination in asset manager  (#756)
+ - Added Comments asset aspect, which allows comments to be added to any asset
+   easily.
+ - Added comments aspect to wiki.
+ - Removed cart icon from ViewCart macro.
+ - Added a basic auth mechanism to WebGUI, which will allow WebGUI to handle
+   authenticated web service queries.
+ - Updated WebGUI::Shop::PayDriver::processTransaction() to accept a
+   transaction as a param.
+ - fixed: Select Slider borked in Thingy (SDH Consulting Group)
+ - fixed: Shortcuts includes HTML head data twice 
+ - fixed: DataForm entry table isn't properly indexed
+ - fixed: DataForm can't export fields containing newlines
+ - fixed: UserList templates use incorrect variable names
+ - fixed: International characters in password prevents login
+ - fixed: SelectSlider form control is broken
+ - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
+ - fixed: Combo box does not show possible values in Thingy (SDH Consulting
+   Group)
+ - Added some web services to the Gallery asset to support the use of remote
+   apps to post photos and create albums.
+ - fixed: Cross site scripting issue on operation pages
+ - fixed: Search asset shows blank page after searching
+ - rfe: Updated Thingy's edit instructions and search description fields to
+   HTMLAreas (SDH Consulting Group)
+ - rfe: Thingy Private Rows (SDH Consulting Group)
+ - fixed: Shop: Percentage of Weight Shipping Method doesn't work
+ - fixed #8776: duplicate does not duplicate keywords
+ - rfe: Thingy: export extra rows, meta data (SDH Consulting Group)
+ - rfe: Thingy: Max entries per user (SDH Consulting Group) 
+ - Added the Asset Discovery web service content handler.
+ - fixed: #4174: UserList template show links that should be hidden (Yung Han
+   Khoe)
+ - fixed #8802: isImage not functioning in Folders
+ - added RFE #480: Apply button for assets
+ - fixed #8807: _NewAsset.skeleton out of date
+ - added: "Duplicate this template and edit" now updates the asset we came from, if any
+ - fixed #8818: Visitor sends a welcome message
+ - added: "EditArea" code highlighter and editing tool for WebGUI::Form::Codearea, used
+    in Template, Snippet, SQLReport, and more
+ - fixed: email password recovery allows sending recovery mail to arbitrary address
+
 7.6.0
  - added: users may now customize the post received page for the CS
  - fixed: shortcuts don't notify browsers of updates to their shortcutted asset

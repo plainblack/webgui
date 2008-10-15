@@ -115,7 +115,7 @@ sub create {
 	if (defined $mail) {
         my $i18n = WebGUI::International->new($session, 'Inbox_Message');
         my $pref = $i18n->get("from user preface");
-        $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userid = ?",[$properties->{sentBy}]). ".";
+        $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userId = ?",[$properties->{sentBy}]). ".";
 	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
 		if ($msg =~ m/\<.*\>/) {
 			$mail->addHtml("<p>$pref</p><br />".$msg);

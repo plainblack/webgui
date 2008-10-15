@@ -50,16 +50,28 @@ Returns an array ref that contains tmpl_vars for the Alphabet Search.
 
 sub getAlphabetSearchLoop {
     my $self = shift;
-    my $fieldName = shift || 'lastName';
+    my $fieldName = shift;
     my $alphabet = shift;
     my (@alphabet, @alphabetLoop);
+    
+    return [] if $fieldName eq 'disableAlphabetSearch';
     $alphabet ||= "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
     @alphabet = split(/,/,$alphabet);
     foreach my $letter (@alphabet){
         my $htmlEncodedLetter = encode_entities($letter);
         my $searchURL = "?searchExact_".$fieldName."=".$letter."%25"; 
-        my $hasResults = $self->session->db->quickScalar("select if ("
-            ."(select count(*) from userProfileData where ".$fieldName."  like '".$letter."%')<>0, 1, 0)");
+        my $hasResults;
+        my $users = $self->session->db->read("select userId from userProfileData where lastName like '".$letter."%'"); 
+        while (my $user = $users->hashRef){
+            my $showGroupId = $self->get("showGroupId");
+            if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
+                unless ($self->get("hideGroupId") ne '0' && $self->isInGroup($self->get("hideGroupId"),$user->{userId})){
+                    $hasResults = 1;
+                    last;
+                }
+            }
+        }
+
         push @alphabetLoop, {
             alphabetSearch_loop_label       => $htmlEncodedLetter || $letter,
             alphabetSearch_loop_hasResults  => $hasResults,
@@ -162,12 +174,15 @@ sub definition {
         my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
         $profileFields{$field->{fieldName}} = $label;
     }
+    my %alphabetSearchFieldOptions;
+    tie %alphabetSearchFieldOptions, 'Tie::IxHash';
+    %alphabetSearchFieldOptions = ('disableAlphabetSearch'=>'Disable Alphabet Search',%profileFields);
 
     tie %properties, 'Tie::IxHash';
     %properties = (
        	templateId =>{
             fieldType=>"template",  
-            defaultValue=>'UserListTmpl0000001',
+            defaultValue=>'UserListTmpl0000000001',
 		    namespace=>'UserList',
     		tab=>"display",
             hoverHelp=>$i18n->get("template description"),
@@ -206,7 +221,7 @@ sub definition {
             fieldType=>"selectBox",
             defaultValue=>"lastName",
             tab=>"display",
-            options=>\%profileFields,
+            options=>\%alphabetSearchFieldOptions,
             label=>$i18n->get("alphabetSearchField label"),
             hoverHelp=>$i18n->get('alphabetSearchField description'),
         },

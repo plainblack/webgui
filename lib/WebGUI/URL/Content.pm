@@ -51,7 +51,10 @@ The Apache request handler for this package.
 sub handler {
     my ($request, $server, $config) = @_;
     $request->push_handlers(PerlResponseHandler => sub {
-        my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+        my $session = $request->pnotes('wgSession');
+        unless (defined $session) {
+            $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+        }
         WEBGUI_FATAL: foreach my $handler (@{$config->get("contentHandlers")}) {
             my $output = eval { WebGUI::Pluggable::run($handler, "handler", [ $session ] )};
             if ( my $e = WebGUI::Error->caught ) {

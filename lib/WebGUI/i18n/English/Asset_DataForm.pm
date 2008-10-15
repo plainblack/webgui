@@ -225,7 +225,7 @@ to validate any input that the user may supply.|,
         },
 
         '24 description' => {
-                message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line.|,
+                message => q{This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line. If you want a different label for a value, seperate them with a | (pipe) character: value|label },
                 lastUpdated => 1119156590,
         },
 

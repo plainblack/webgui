@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 5; # increment this value for each test you create
+use Test::More tests => 14; # increment this value for each test you create
 use WebGUI::Asset::Wobject::WikiMaster;
 use WebGUI::Asset::WikiPage;
 
@@ -45,6 +45,34 @@ is($article, undef, "Can't add an Article wobject as a child to a Wiki Page.");
 my $wikiPageCopy = $wikipage->duplicate();
 isa_ok($wikiPageCopy, 'WebGUI::Asset::WikiPage');
 my $thirdVersionTag = WebGUI::VersionTag->new($session,$wikiPageCopy->get("tagId"));
+
+
+##################
+# This section tests the Comments aspect
+##################
+
+is(ref $wikipage->get('comments'), "ARRAY", "Comments Aspect property returns an array ref");
+
+my $firstComment = 'what say you fuzzy britches';
+$wikipage->addComment($firstComment,5);
+my $secondComment = "i don't have her stuffed down my pants right now, sorry to say";
+$wikipage->addComment($secondComment, 1);
+
+my $comments = $wikipage->get('comments');
+is(scalar(@{$comments}), 2, "2 comments have been added");
+is($wikipage->get('averageCommentRating'), 3, 'average rating works');
+is($comments->[0]{comment}, $firstComment, "adding initial comment checks out");
+is($comments->[0]{rating}, 5, "adding initial comment rating checks out");
+is($comments->[1]{comment}, $secondComment, "adding additional comments checks out");
+is($comments->[1]{rating}, 1, "adding additional comment rating checks out");
+
+$wikipage->deleteComment($comments->[0]{id});
+$comments = $wikipage->get('comments');
+is($comments->[0]{comment}, $secondComment, "you can delete a comment");
+is($wikipage->get('averageCommentRating'), 1, 'average rating is adjusted after deleting a comment');
+
+
+##################
 
 TODO: {
     local $TODO = "Tests to make later";

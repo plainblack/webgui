@@ -59,6 +59,11 @@ Style attributes besides width and height which should be specified using the ab
 
 The following additional parameters have been added via this sub class.
 
+=head4 syntax
+
+The type of syntax highlighting to use by default. The types available are located at
+$WEBGUI_ROOT/www/extras/editarea/edit_area/reg_syntax
+
 =cut
 
 sub definition {
@@ -75,8 +80,11 @@ sub definition {
 		style=>{
 			defaultValue => undef,
 			},
-		});
-        return $class->SUPER::definition($session, $definition);
+        syntax => {
+            defaultValue    => "html",
+        },
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -125,10 +133,36 @@ Renders a code area field.
 =cut
 
 sub toHtml {
-	my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('TabFix.js'),{type=>"text/javascript"});
-	$self->set("extras", $self->get('extras').' onkeypress="return TabFix_keyPress(event)" onkeydown="return TabFix_keyDown(event)"');	
-	return $self->SUPER::toHtml;
+	my $self    = shift;
+	my $output  = "";
+    
+    # Do our superclass's job
+ 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
+	my $width = $self->get('width') || 400;
+	my $height = $self->get('height') || 150;
+	my ($style, $url) = $self->session->quick(qw(style url));
+	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
+    $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
+	$output = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>';
+
+    # Vars for JS below
+    my $id              = $self->get( "id" );
+    my $syntax          = $self->get( "syntax" );
+    my $editareaPath    = $self->session->url->extras( 'editarea' );
+
+	$self->session->style->setScript($editareaPath . '/edit_area/edit_area_full.js',{type=>"text/javascript"});
+    $output .= qq~
+        <script type="text/javascript">
+            editAreaLoader.init({
+                id              : "$id",
+                syntax          : "$syntax",
+                start_highlight : true,
+                toolbar         : "search, go_to_line, |, undo, redo, |, syntax_selection, highlight, reset_highlight, |, help"
+            });
+        </script>
+    ~;
+
+    return $output;
 }
 
 

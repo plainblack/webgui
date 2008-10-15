@@ -20,6 +20,7 @@ use strict;
 use CPAN;
 use Getopt::Long;
 use Pod::Usage;
+use Cwd ();
 
 
 my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
@@ -115,6 +116,7 @@ checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
 checkModule("Module::Find",                 "0.06"       );
+checkModule("Class::C3",                    "0.19"       );
 
 
 ###################################
@@ -335,7 +337,9 @@ sub getOs {
 sub installModule {
         my $module = shift;
         print "Attempting to install ".$module."...\n";
+        my $cwd = Cwd::cwd;
         CPAN::Shell->install($module);
+        chdir $cwd;
 }
 
 #----------------------------------------
@@ -384,7 +388,6 @@ sub prompt {
 __END__
 
 =head1 NAME
-
 testEnvironment - Test Perl environment for proper WebGUI support.
 
 =head1 SYNOPSIS

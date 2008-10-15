@@ -56,9 +56,10 @@ sub _createForm {
     my $data = shift;
     my $value = shift;
     # copy select entries
-    my %param = map { $_ => $data->{$_} } qw(name height width extras vertical defaultValue options);
+    my %param = map { $_ => $data->{$_} } qw(name width extras vertical defaultValue options);
     $param{value} = $value;
     $param{size} = $param{width};
+    $param{height} = $data->{rows};
 
     WebGUI::Macro::process($self->session, \( $param{defaultValue} ));
 
@@ -485,7 +486,9 @@ sub getAttachedFiles {
         my $form = $self->_createForm($field, $entryData->{$field->{name}});
         if ($form->can('getStorageLocation')) {
             my $storage = $form->getStorageLocation;
-            push @paths, $storage->getPath($storage->getFiles->[0]);
+            if ($storage) {
+                push @paths, $storage->getPath($storage->getFiles->[0]);
+            }
         }
     }
     return \@paths;
@@ -648,7 +651,7 @@ sub getRecordTemplateVars {
     for my $field (@fields) {
         # need a copy
         my $value;
-        if ($entry) {
+        if ($entryData) {
             $value = $entryData->{ $field->{name} };
         }
         elsif (!$ignoreForm && defined (my $formValue = $self->session->form->process($field->{name}))) {
@@ -1230,7 +1233,7 @@ sub www_exportTab {
                 if $field->{isMailField} && !$self->get('mailData');
             push @exportFields, $field->{name};
         }
-        my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n"});
+        my $tsv = Text::CSV_XS->new({sep_char => "\t", eol => "\n", binary => 1});
         $tsv->combine(
             'entryId',
             'ipAddress',

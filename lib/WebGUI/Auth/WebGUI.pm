@@ -21,6 +21,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Storage::Image;
 use WebGUI::User;
 use WebGUI::Utility;
+use Encode ();
 
 our @ISA = qw(WebGUI::Auth);
 
@@ -119,7 +120,7 @@ sub authenticate {
 	
 	$identifier = $_[1];
 	$userData = $self->getParams;
-	if ((Digest::MD5::md5_base64($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
+	if ((Digest::MD5::md5_base64(Encode::encode_utf8($identifier)) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
@@ -997,7 +998,7 @@ sub emailRecoverPasswordFinish {
     my $recoveryGuid = $session->id->generate();
     my $url = $session->url->getSiteURL;
     my $userId = $user->userId; #get the user guid
-    $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
+    $email = $user->profileField('email');
 
     my $authsettings = $self->getParams($userId);
     $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
@@ -1007,7 +1008,7 @@ sub emailRecoverPasswordFinish {
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
     $mail->send;
-    return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message1', 'AuthWebGUI'). $email . $i18n->get('email recover password finish message2', 'AuthWebGUI') . "</h3>";
+    return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message', 'AuthWebGUI') . "</h3>";
 }
 
 #-------------------------------------------------------------------

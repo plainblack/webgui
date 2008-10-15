@@ -896,8 +896,8 @@ our $I18N = {
     },
 
     'no more available' => {
-        message     => q|Error: No more items available for purcahse.|,
-        lastUpdated    => 0,
+        message     => q|Error: No more items available for purchase.|,
+        lastUpdated    => 1222876439,
     },
 
     'add to cart' => {

@@ -8,6 +8,12 @@ our $I18N = {
 		context => q|A button added to all asset properties pages when save and commit mode is enabled.|
 	},
 
+    'apply' => {
+        message     => q{Apply},
+        lastUpdated => 0,
+        context     => q{The label for the button to save and then return to the edit page.},
+    },
+
 	'keywords' => {
 		message => q|Keywords|,
 		lastUpdated => 0,
@@ -1125,7 +1131,31 @@ Couldn't open %-s because %-s <br />
         message     => q{Inherit parent's permissions},
         lastUpdated => 1221593874,
         context     => q{Error message in Asset.pm},
-    }
+    },
+
+    'need a userId parameter' => {
+        message     => q{need a userId parameter},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'is not a valid userId' => {
+        message     => q{is not a valid userId},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'need a depth' => {
+        message     => q{need a depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    '%s is not a valid depth' => {
+        message     => q{%s is not a valid depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
 
 };
 

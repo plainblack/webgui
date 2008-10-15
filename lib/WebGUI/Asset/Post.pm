@@ -1455,7 +1455,7 @@ sub www_showConfirmation {
 		$url = $self->getThread->getParent->getUrl;
 	}
     my $parent = $self->getThread;
-    my ($collabSystem, $templateId);
+    my $collabSystem;
     if($parent->isa('WebGUI::Asset::Wobject::Collaboration')) {
         $collabSystem = $parent;
     }

@@ -49,7 +49,7 @@ sub calculate {
 		my $sku = $item->getSku;
 		if ($sku->isShippingRequired) {
 			$cost += ($item->get("quantity") * $sku->getPrice * $self->get("percentageOfPrice") / 100)  # cost by price
-				+ ($item->get("quantity") * $sku->getWeight * $self->get("percentageOfWeight") / 100)	# cost by weight
+				+ ($item->get("quantity") * $sku->getWeight * $self->get("pricePerWeight") / 100)	# cost by weight
 				+ ($item->get("quantity") * $self->get("pricePerItem"));								# cost by item
 			$anyShippable = 1;
 		}

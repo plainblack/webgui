@@ -52,10 +52,12 @@ sub definition {
 				},
 			dbQuery1=>{
 				fieldType=>"codearea",
-				defaultValue=>undef
+                syntax  => "sql",
+				defaultValue=>undef,
 				},
 			prequeryStatements1=>{
 				fieldType=>"codearea",
+                syntax  => "sql",
 				defaultValue=>undef
 				},
 			preprocessMacros1=>{
@@ -72,10 +74,12 @@ sub definition {
                         },
 			dbQuery2=>{
                                 fieldType=>"codearea",
+                syntax  => "sql",
                                 defaultValue=>undef
                                 },
 			prequeryStatements2=>{
 				fieldType=>"codearea",
+                syntax  => "sql",
 				defaultValue=>undef
 				},
                         preprocessMacros2=>{
@@ -92,10 +96,12 @@ sub definition {
                         },
 			dbQuery3=>{
                                 fieldType=>"codearea",
+                syntax  => "sql",
                                 defaultValue=>undef
                                 },
 			prequeryStatements3=>{
 				fieldType=>"codearea",
+                syntax  => "sql",
 				defaultValue=>undef
 				},
                         preprocessMacros3=>{
@@ -112,10 +118,12 @@ sub definition {
                         },
 			dbQuery4=>{
                                 fieldType=>"codearea",
+                                syntax  => "sql",
                                 defaultValue=>undef
                                 },
 			prequeryStatements4=>{
 				fieldType=>"codearea",
+                                syntax  => "sql",
 				defaultValue=>undef
 				},
                         preprocessMacros4=>{
@@ -132,10 +140,12 @@ sub definition {
                         },
 			dbQuery5=>{
                                 fieldType=>"codearea",
+                                syntax  => "sql",
                                 defaultValue=>undef
                                 },
 			prequeryStatements5=>{
 				fieldType=>"codearea",
+                                syntax  => "sql",
 				defaultValue=>undef
 				},
                         preprocessMacros5=>{
@@ -166,7 +176,7 @@ sub definition {
 				},
 			downloadTemplateId=>{
 				fieldType=>"template",
-				defaultValue=>'SQLReportDownload0001',
+				defaultValue=>'SQLReportDownload00001',
 				},
 			downloadMimeType=>{
 				fieldType=>"text",
@@ -324,12 +334,14 @@ sub getEditForm {
 			-name	=> "prequeryStatements".$nr,
 			-label	=> $i18n->get('Prequery statements'),
 			-hoverHelp => $i18n->get('Prequery statements description'),
+            -syntax => "sql",
 			-value	=> $self->getValue("prequeryStatements".$nr),
 		);
 		$tabform->getTab("properties")->codearea(
 			-name=>"dbQuery".$nr,
 			-label=>$i18n->get(4),
 			-hoverHelp=>$i18n->get('4 description'),
+            -syntax => "sql",
 			-value=>$self->getValue("dbQuery".$nr)
 		);
 		$tabform->getTab("properties")->databaseLink(

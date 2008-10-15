@@ -788,7 +788,6 @@ sub www_editListingSave {
             $oldTag->setWorking
                 if defined $oldTag;
         }
-        my $forum = WebGUI::
     }
 	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;

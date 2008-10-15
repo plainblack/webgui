@@ -437,8 +437,8 @@ sub page {
     if ($useFullUrl) {
         $url = $self->getSiteURL();
     }
-	my $path = $self->session->asset ? $self->session->asset->get("url") : $self->getRequestedUrl;
-	$url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
+    my $path = $self->session->asset ? $self->session->asset->get("url") : $self->escape($self->getRequestedUrl);
+    $url .= $self->gateway($path, $pairs, $skipPreventProxyCache);
     return $url;
 }
 
