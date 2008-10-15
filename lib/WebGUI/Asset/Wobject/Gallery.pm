@@ -1124,6 +1124,7 @@ sub www_addAlbumService {
 
     $session->http->setMimeType('text/json');
     return JSON->new->pretty->encode($document);
+}
 
 #----------------------------------------------------------------------------
 
