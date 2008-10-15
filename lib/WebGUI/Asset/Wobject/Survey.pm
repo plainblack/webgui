@@ -1119,37 +1119,65 @@ sub www_editSectionSave {
 
 #-------------------------------------------------------------------
 sub www_exportAnswers {
-	my $self = shift;
+        my $self = shift;
         return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->session->http->setFilename($self->session->url->escape($self->get("title")."_answers.tab"),"text/tab");
-        return $self->session->db->quickTab("select * from Survey_answer where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        my $filename    = $self->session->url->escape($self->get("title")."_answers.tab");
+        my $content = $self->session->db->quickTab("select * from Survey_answer where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        return $self->export($filename,$content);
+}
+
+#-------------------------------------------------------------------
+sub export{ 
+        my $self = shift;
+        my $filename = shift;
+        $filename =~ s/[^\w\d\.]/_/g;
+        my $content = shift;
+        #Create a temporary directory to store files if it doesn't already exist
+        my $store       = WebGUI::Storage->createTemp( $self->session );
+        my $tmpDir      = $store->getPath();
+        my $filepath    = $store->getPath($filename);
+        unless (open TEMP, ">$filepath") {
+            return "Error - Could not open temporary file for writing.  Please use the back button and try again"; 
+        }
+        print TEMP $content;
+        close TEMP;
+        my $fileurl = $store->getUrl($filename);
+
+        $self->session->http->setRedirect($fileurl);
+
+        return undef;
 }
 
 #-------------------------------------------------------------------
 sub www_exportComposite {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->session->http->setFilename($self->session->url->escape($self->get("title")."_composite.tab"),"text/tab");
-	return $self->session->db->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
-		left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
-		left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
-		where a.Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by a.userId, a.ipAddress, b.sequenceNumber");
+        my $self = shift;
+        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
+        my $filename    = $self->session->url->escape($self->get("title")."_composite.tab");
+
+        my $content = $self->session->db->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
+                left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
+                left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
+                where a.Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by a.userId, a.ipAddress, b.sequenceNumber");
+
+        return $self->export($filename,$content);
 }
 
 #-------------------------------------------------------------------
 sub www_exportQuestions {
-	my $self = shift;
+        my $self = shift;
         return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->session->http->setFilename($self->session->url->escape($self->get("title")."_questions.tab"),"text/tab");
-        return $self->session->db->quickTab("select * from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        my $filename = $self->session->url->escape($self->get("title")."_questions.tab");
+        my $content = $self->session->db->quickTab("select * from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        return $self->export($filename,$content);
 }
 
 #-------------------------------------------------------------------
 sub www_exportResponses {
-	my $self = shift;
+        my $self = shift;
         return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->session->http->setFilename($self->session->url->escape($self->get("title")."_responses.tab"),"text/tab");
-        return $self->session->db->quickTab("select * from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        my $filename = $self->session->url->escape($self->get("title")."_responses.tab");
+        my $content = $self->session->db->quickTab("select * from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        return $self->export($filename,$content);
 }
 
 #-------------------------------------------------------------------
