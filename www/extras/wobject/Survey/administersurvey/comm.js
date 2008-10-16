@@ -12,18 +12,18 @@ Survey.Comm= new function(){
         if(form != undefined){
             if(hasFile){
                 YAHOO.util.Connect.setForm(form,true);
-                //console.log('set file was true');
+                //YAHOO.log('set file was true');
             }else{
-                //console.log('set file was false');
+                //YAHOO.log('set file was false');
                 YAHOO.util.Connect.setForm(form);
             }
-            //console.log('setForm was true');
+            //YAHOO.log('setForm was true');
         }
         if(callMade == 1){
             alert("Waiting on previous request");
         }else{
             callMade = 1;
-console.log(sUrl);
+YAHOO.log(sUrl);
             YAHOO.util.Connect.asyncRequest('POST', sUrl, callback, postData);
         }
     }
@@ -42,7 +42,7 @@ console.log(sUrl);
             if(response.type == 'displayquestions'){
                 Survey.Form.displayQuestions(response);
             }else if(response.type == 'forward'){
-//console.log("going to "+response.url);
+//YAHOO.log("going to "+response.url);
                 location.href=response.url;
             }else{
                 alert("bad response");
@@ -62,7 +62,7 @@ console.log(sUrl);
         var postData;
         if(form == undefined){
             postData = "data="+YAHOO.lang.JSON.stringify(data,data);
-            //console.log(postData);
+            //YAHOO.log(postData);
         }
         var sUrl = this.url + "?func="+functionName;
         request(sUrl,this.callback,postData,form,hasFile);
