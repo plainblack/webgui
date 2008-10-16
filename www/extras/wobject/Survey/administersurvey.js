@@ -211,7 +211,7 @@ Survey.Form = new function() {
             }
         }
         if(submit == 1){
-console.log("Submitting");
+YAHOO.log("Submitting");
             Survey.Comm.callServer('','submitQuestions','surveyForm',hasFile);
         }
     }
@@ -238,7 +238,7 @@ console.log("Submitting");
                 a1id+"slider-min-thumb", a2id+"slider-max-thumb", 
                 sliderWidth, 1*scale, [1,sliderWidth]);
             sliders[id] = s;
-//console.log(1);
+//YAHOO.log(1);
 
             s.minRange = 4; 
             var updateUI = function () { 

@@ -9,7 +9,7 @@ Survey.Data = new function(){
 
     this.dragDrop = function(did){
         var type;
-console.log('In drag drop');
+YAHOO.log('In drag drop');
         if(did.className.match("section")){type = 'section';}
         else if(did.className.match("question")){type = 'question';}
         else{ type = 'answer';}
@@ -32,7 +32,7 @@ console.log('In drag drop');
             else{ type = 'answer';}
             data = {id:before.id,type:type};
         }
-console.log(first.id+' '+data.id);
+YAHOO.log(first.id+' '+data.id);
         Survey.Comm.dragDrop(first,data);
     }
 
@@ -50,7 +50,7 @@ console.log(first.id+' '+data.id);
         
         //add event handlers for if a tag is clicked
         for(var x in d.ids){
-console.log('adding handler for '+ d.ids[x]);
+YAHOO.log('adding handler for '+ d.ids[x]);
             YAHOO.util.Event.addListener(d.ids[x], "click", this.clicked); 
             new Survey.DDList(d.ids[x],"sections");
         }
