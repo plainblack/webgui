@@ -1,5 +1,8 @@
 7.6.2
  - fixed #8839: Documentation is wrong for Stock Ticker
+ - Added Guid form control.
+ - Moved Asset ID and Class Name fields to the Meta tab of all assets.
+ - Made Classname from control a subclass of ReadOnly.
  - Fixed a limit bug in the asset discovery service.
 
 7.6.1

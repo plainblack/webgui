@@ -1,4 +1,4 @@
-package WebGUI::Form::ClassName;
+package WebGUI::Form::Guid;
 
 =head1 LEGAL
 
@@ -20,11 +20,11 @@ use WebGUI::International;
 
 =head1 NAME
 
-Package WebGUI::Form::ClassName
+Package WebGUI::Form::Guid
 
 =head1 DESCRIPTION
 
-Creates a field for typing in perl class names which is validated for taint safety.
+Creates a form control for feeding WebGUI IDs (which are called GUIDs or Global Unique IDs) through forms.
 
 =head1 SEE ALSO
 
@@ -39,6 +39,18 @@ The following methods are specifically available from this class. Check the supe
 
 #-------------------------------------------------------------------
 
+=head2  getDatabaseFieldType ( )
+
+Returns "char(22) binary"
+
+=cut
+
+sub getDatabaseFieldType {
+    return "char(22) binary";
+}
+
+#-------------------------------------------------------------------
+
 =head2 getName ( session )
 
 Returns the human readable name of this control.
@@ -47,7 +59,7 @@ Returns the human readable name of this control.
 
 sub getName {
     my ($self, $session) = @_;
-    return WebGUI::International->new($session, 'WebGUI')->get('class name');
+    return 'GUID';
 }
 
 #-------------------------------------------------------------------
@@ -61,9 +73,12 @@ Returns a class name which has been taint checked.
 sub getValue {
 	my $self = shift;
     my $value = $self->SUPER::getValue(@_);
-	$value =~ s/[^\w:]//g;
-	return $value;
+    if ($value =~ m/[A-Za-z0-9\-_]{1,22}/) {
+        return $value;
+    }
+    return undef;
 }
+
 
 1;
 

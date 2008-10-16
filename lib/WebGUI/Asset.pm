@@ -818,21 +818,19 @@ sub getEditForm {
 		name=>"func",
 		value=>"editSave"
 		});
+	my $assetId;
+	my $class;
 	if ($self->getId eq "new") {
-		$tabform->hidden({
-			name=>"assetId",
-			value=>"new"
-			});
-		$tabform->hidden({
-			name=>"class",
-			value=>$self->session->form->process("class","className")
-			});
+		$assetId = "new";
+		$class = $self->session->form->process("class","className");
 	}
 	else {
 		# revision history
+		$assetId = $self->getId;
+		$class = $self->get('className');
 		my $ac = $self->getAdminConsole;
 		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
-		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
+		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$assetId]);
 		while (my ($version) = $rs->array) {
 			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
@@ -875,11 +873,19 @@ sub getEditForm {
 	tie my %baseProperties, 'Tie::IxHash';
 	%baseProperties = (
 		assetId	=> {
-			fieldType	=> "readOnly",
+			fieldType	=> "guid",
 			label		=> $i18n->get("asset id"),
-			value		=> $self->get("assetId"),
+			value		=> $assetId,
 			hoverHelp	=> $i18n->get('asset id description'),
-			tab			=> "properties",
+			uiLevel		=> 9,
+			tab			=> "meta",
+		},
+		class	=> {
+			fieldType	=> "className",
+			label		=> $i18n->get("class name",'WebGUI'),
+			value		=> $class,
+			uiLevel		=> 9,
+			tab			=> "meta",
 		},
 		keywords => {
 			label       => $i18n->get('keywords'),
