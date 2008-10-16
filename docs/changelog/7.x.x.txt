@@ -5,6 +5,7 @@
    Khoe)
  - fixed #8839: Documentation is wrong for Stock Ticker
  - fixed #8880: YUI nav templates load menu too early
+ - fixed #4218: Date field in DataForm shows incorrect values
 
 7.5.26
  - fixed: International characters in password prevents login

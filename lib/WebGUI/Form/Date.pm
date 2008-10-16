@@ -142,13 +142,15 @@ sub getValue {
         if($value =~ /^\d+$/){
             return $value;
         }
-        return $self->session->datetime->setToEpoch($value);
+        my $ret = $self->session->datetime->setToEpoch($value);
+        return $ret;
+
 	} 
     else {
-		# MySQL format
-		# YY(YY)?-MM-DD
-		
-		# NOTE: Cannot fix time zone since we don't have a complete date/time
+        # MySQL format
+        # YY(YY)?-MM-DD
+
+        # NOTE: Cannot fix time zone since we don't have a complete date/time
 
         # MySQL format
         # YY(YY)?-MM-DD HH:MM:SS
@@ -159,9 +161,9 @@ sub getValue {
 
         # Verify format
         return undef
-			unless ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
+            unless ($value =~ m/((?:\d{2}|\d{4})\D\d{2}\D\d{2})/);
         return $value;
-	}
+    }
 }
 
 #-------------------------------------------------------------------
@@ -175,11 +177,8 @@ Return the date in a human readable format.
 sub getValueAsHtml {
 	my ($self) = @_;
     # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z");
+    if (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
+        return $self->session->datetime->epochToHuman($self->getOriginalValue,"%z");
 	} 
     else {
 		# MySQL format
@@ -209,25 +208,17 @@ Renders a date picker control.
 =cut
 
 sub toHtml {
-        my $self = shift;
-	my $value;
+    my $self = shift;
+	my $value = $self->getOriginalValue;
 	# This should probably be rewritten as a cascading ternary
     if ($self->get("_defaulted") && $self->get("noDate") ) {
 		# No default date
-		$value = $self->set("value",'');
+		$value = '';
 	}
-    elsif (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
+    elsif (!$self->getDefaultValue || $self->getDefaultValue =~ m/^\d+$/) {
 		# Epoch format
-		$value = $self->set("value",$self->session->datetime->epochToSet($self->getOriginalValue));
+		$value = $self->session->datetime->epochToSet($self->getOriginalValue);
 	} 
-    else {
-		# MySQL format
-		$value = $self->getOriginalValue;
-		# NOTE: Cannot fix time zone since we don't have a complete date/time
-	}
 
         $self->session->style->setLink($self->session->url->extras('yui/build/calendar/assets/skins/sam/calendar.css'), { rel=>"stylesheet", type=>"text/css", media=>"all" });
         $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
@@ -239,43 +230,13 @@ sub toHtml {
         $self->session->style->setScript($self->session->url->extras('yui-webgui/build/datepicker/datepicker.js'),{ type=>'text/javascript' });
 
         return WebGUI::Form::Text->new($self->session,
-                name=>$self->get("name"),
-                value=>$value,
-                size=>$self->get("size"),
-                extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this);"',
-                id=>$self->get('id'),
-                maxlength=>$self->get("maxlength")
-                )->toHtml;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtmlAsHidden ( )
-
-Renders the form field to HTML as a hidden field rather than whatever field type it was supposed to be.
-
-=cut
-
-sub toHtmlAsHidden {
-    my $self = shift;
-	my $value;
-	
-    # This should probably be rewritten as a cascading ternary
-	if (!$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/) {
-		$value = $self->session->datetime->epochToSet($self->getOriginalValue,"%z");
-	} else {
-		# MySQL format
-		$value = $self->getOriginalValue;
-		# NOTE: Cannot fix time zone since we don't have a complete date/time
-	}
-	
-        return WebGUI::Form::Hidden->new($self->session,
-                name	=> $self->get("name"),
-                value	=> $value,
-                )->toHtmlAsHidden;
+            name=>$self->get("name"),
+            value=>$value,
+            size=>$self->get("size"),
+            extras=>$self->get("extras") . ' onfocus="YAHOO.WebGUI.Form.DatePicker.display(this);"',
+            id=>$self->get('id'),
+            maxlength=>$self->get("maxlength")
+        )->toHtml;
 }
 
 1;
