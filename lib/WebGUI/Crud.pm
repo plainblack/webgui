@@ -22,6 +22,7 @@ use JSON;
 use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Exception;
+use WebGUI::Utility;
 
 
 private objectData => my %objectData;
@@ -198,6 +199,7 @@ sub crud_createTable {
 	my $db = $session->db;
 	my $dbh = $db->dbh;
 	my $tableName = $class->crud_getTableName($session);
+	$class->crud_dropTable($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
 		'.$dbh->quote_identifier($class->crud_getTableKey($session)).' varchar(22) binary not null primary key,
 		sequenceNumber int not null default 1,
@@ -207,7 +209,7 @@ sub crud_createTable {
 	$class->crud_updateTable($session);
 	my $sequenceKey = $class->crud_getSequenceKey($session);
 	if ($sequenceKey) {
-		$db->write('alter table '.dbh->quote_identifier($tableName).'
+		$db->write('alter table '.$dbh->quote_identifier($tableName).'
 			add index '.$dbh->quote_identifier($sequenceKey).' ('.$dbh->quote_identifier($sequenceKey).')');
 	}
 	return 1;
@@ -250,6 +252,11 @@ properties is a hash reference tied to IxHash so that it maintains its order. It
 		defaultValue	=> undef,
 		serialize		=> 0,
 	},
+	presidentUserId	=> {
+		fieldType		=> 'guid',
+		defaultValue	=> undef,
+		isQueryKey		=> 1,
+	}
  }
 
 The properties of each field can be any property associated with a WebGUI::Form::Control. There are two special properties as well. They are fieldType and serialize.
@@ -257,6 +264,8 @@ The properties of each field can be any property associated with a WebGUI::Form:
 fieldType is the WebGUI::Form::Control type that you wish to associate with this field. It is required for all fields. Examples are 'HTMLarea', 'text', 'url', 'email', and 'selectBox'.
 
 serialize tells WebGUI::Crud to automatically serialize this field in a JSON wrapper before storing it to the database, and to convert it back to it's native structure upon retrieving it from the database. This is useful if you wish to persist hash references or array references.
+
+isQueryKey tells WebGUI::Crud that the field should be marked as 'non null' in the table and then adds an index of the same name to the table to make searching on the field faster. B<WARNING:> Don't use this if the field is already a sequenceKey. If it's a sequence key then it will automatically be indexed.
 
 =cut
 
@@ -294,7 +303,7 @@ sub crud_dropTable {
     }
 	my $db = $session->db;
 	my $dbh = $db->dbh;
-	$db->write("drop table ".$dbh->quote_identifier($class->crud_getTableName($session)));
+	$db->write("drop table if exists ".$dbh->quote_identifier($class->crud_getTableName($session)));
 	return 1;
 }
 
@@ -385,8 +394,6 @@ sub crud_getTableKey {
 
 A management class method that tries to resolve the differences between the database table and the definition. Returns 1 on success.
 
-B<WARNING:> This works perfectly for adding new fields, but is not perfect at making changes to fields. For that reason we recommend you write your own upgrade scripts when making database changes rather than relying upon this API at this time.
-
 =head3 session
 
 A reference to a WebGUI::Session.
@@ -406,12 +413,14 @@ sub crud_updateTable {
 	my %tableFields = ();
 	my $sth = $db->read("DESCRIBE ".$tableName);
 	my $tableKey = $class->crud_getTableKey($session);
-	while (my ($col, $type) = $sth->array) {
-		next if ($col eq $tableKey);
-		next if ($col eq 'lastUpdated');
-		next if ($col eq 'dateCreated');
-		next if ($col eq 'sequenceNumber');
-		$tableFields{$col} = $type;
+	while (my ($col, $type, $null, $key, $default) = $sth->array) {
+		next if (isIn($col, $tableKey, 'lastUpdated', 'dateCreated','sequenceNumber'));
+		$tableFields{$col} = {
+			type	=> $type,
+			null	=> $null,
+			key		=> $key,
+			default	=> $default,
+			};
 	}
 
 	# update existing and create new fields
@@ -419,21 +428,46 @@ sub crud_updateTable {
 	foreach my $property (keys %{$properties}) {
 		my $control = WebGUI::Form::DynamicField->new( $session, %{ $properties->{ $property } });
 		my $fieldType = $control->getDatabaseFieldType;
+		my $isKey = $properties->{$property}{isQueryKey};
+		my $defaultValue =  $properties->{$property}{defaultValue};
+		my $notNullClause = ($isKey || $defaultValue ne "") ? "not null" : "";
+		my $defaultClause = "default ".$dbh->quote($defaultValue) if ($defaultValue ne "");
 		if (exists $tableFields{$property}) {
-			### have to figure out field type matching
-			#unless ($fieldType eq $tableFields{$property}) {
-			#	$db->write("alter table $tableName change column ".$dbh->quote_identifier($property)." ".$dbh->quote_identifier($property)." $fieldType");
-			#}
-			delete $tableFields{$property};
+			my $changed = 0;
+			
+			# parse database table field type
+			$tableFields{$property}{type} =~ m/^(\w+)(\([\d\s,]+\))?$/;
+			my ($tableFieldType, $tableFieldLength) = ($1, $2);
+			
+			# parse form field type
+			$fieldType =~ m/^(\w+)(\([\d\s,]+\))?\s*(binary)?$/;
+			my ($formFieldType, $formFieldLength) = ($1, $2);
+			
+			# compare table parts to definition
+			$changed = 1 if ($tableFieldType ne $formFieldType);
+			$changed = 1 if ($tableFieldLength ne $formFieldLength);
+			$changed = 1 if ($tableFields{$property}{null} eq "YES" && $isKey);
+			$changed = 1 if ($tableFields{$property}{default} ne $defaultValue);
+
+			# modify if necessary
+			if ($changed) {
+				$db->write("alter table $tableName change column ".$dbh->quote_identifier($property)." ".$dbh->quote_identifier($property)." $fieldType $notNullClause $defaultClause");
+			}
 		}
 		else {
-			$db->write("alter table $tableName add column ".$dbh->quote_identifier($property)." $fieldType");
-			delete $tableFields{$property};
+			$db->write("alter table $tableName add column ".$dbh->quote_identifier($property)." $fieldType $notNullClause $defaultClause");
 		}
+		if ($isKey) {
+			$db->write("alter table $tableName add index ".$dbh->quote_identifier($property)." (".$dbh->quote_identifier($property).")");
+		}
+		delete $tableFields{$property};
 	}
 
 	# delete fields that are no longer in the definition
 	foreach my $property (keys %tableFields) {
+		if ($tableFields{$property}{key}) {
+			$db->write("alter table $tableName drop index ".$dbh->quote_identifier($property));	
+		}
 		$db->write("alter table $tableName drop column ".$dbh->quote_identifier($property));	
 	}
 	return 1;

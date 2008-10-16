@@ -3,6 +3,9 @@
  - Added Guid form control.
  - Moved Asset ID and Class Name fields to the Meta tab of all assets.
  - Made Classname from control a subclass of ReadOnly.
+ - Added query keys to WebGUI::Crud.
+ - WebGUI::Crud can now automatically resolve differences between its
+   definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
 
 7.6.1
