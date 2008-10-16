@@ -1276,10 +1276,10 @@ sub www_listAlbumsService {
     my $count = 1;
 
     for my $assetId ( @{ $self->getAlbumIds } ) {
-        if ($count < $pageNumber * 100 - 99) { # skip low page numbers
+        if ($count < $pageNumber * 100 - 100) { # skip low page numbers
             next;
         }
-        if ($count > $pageNumber * 100) { # skip high page numbers
+        if ($count > $pageNumber * 100 - 1) { # skip high page numbers
             last;
         }        
         my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum' );

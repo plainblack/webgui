@@ -1,5 +1,6 @@
 7.6.2
  - fixed #8839: Documentation is wrong for Stock Ticker
+ - Fixed a limit bug in the asset discovery service.
 
 7.6.1
  - changed: the list of extensions for the export system to pass through
