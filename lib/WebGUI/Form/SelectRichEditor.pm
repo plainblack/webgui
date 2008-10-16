@@ -79,6 +79,18 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2  getDatabaseFieldType ( )
+
+Returns "CHAR(22) BINARY".
+
+=cut 
+
+sub getDatabaseFieldType {
+    return "CHAR(22) BINARY";
+}
+
+#-------------------------------------------------------------------
+
 =head2 getName ( session )
 
 Returns the human readable name of this control.

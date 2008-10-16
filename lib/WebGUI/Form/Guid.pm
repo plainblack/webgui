@@ -41,12 +41,12 @@ The following methods are specifically available from this class. Check the supe
 
 =head2  getDatabaseFieldType ( )
 
-Returns "char(22) binary"
+Returns "CHAR(22) BINARY"
 
 =cut
 
 sub getDatabaseFieldType {
-    return "char(22) binary";
+    return "CHAR(22) BINARY";
 }
 
 #-------------------------------------------------------------------
