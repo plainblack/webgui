@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (144 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (141 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -100,7 +100,6 @@ foreach my $gid ('new', '') {
 	is ($g->autoDelete(), 0, 'auto Delete is off by default');
 	is ($g->isEditable(), 1, 'isEditable is on by default');
 	is ($g->showInForms(), 1, 'show in forms is on by default');
-	is ($g->isAdHocMailGroup(), 0, 'is adHoc group is off by default');
 
 	$g->delete;
 }
@@ -139,9 +138,6 @@ is($g->showInForms(), 0, 'showInForms set and get correctly');
 
 $g->dbQuery('select userId from someOtherDatabase');
 is($g->dbQuery(), 'select userId from someOtherDatabase', 'dbQuery set and get correctly');
-
-$g->isAdHocMailGroup(1); 
-is($g->isAdHocMailGroup(),  1, 'isAdHocMailGroup set and get correctly');
 
 ################################################################
 #
