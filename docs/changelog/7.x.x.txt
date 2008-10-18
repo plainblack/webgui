@@ -7,6 +7,7 @@
  - WebGUI::Crud can now automatically resolve differences between its
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
+ - Fixed #8853: link to manageWorkflows is broken
 
 7.6.1
  - changed: the list of extensions for the export system to pass through

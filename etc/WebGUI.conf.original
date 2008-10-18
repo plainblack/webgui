@@ -325,7 +325,7 @@
    "workflow" : {
       "icon" : "workflow.gif",
       "uiLevel" : 7,
-      "url" : "^PageUrl(\"\",manageWorkflows);",
+      "url" : "^PageUrl(\"\",op=manageWorkflows);",
       "title" : "^International(topicName,Workflow);",
       "groupSetting" : "groupIdAdminWorkflow"
    },

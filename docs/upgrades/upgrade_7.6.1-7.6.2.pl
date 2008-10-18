@@ -29,7 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
+repairManageWorkflows($session); 
 finish($session); # this line required
 
 
@@ -41,6 +41,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub repairManageWorkflows {
+    my $session = shift;
+    print "\tCorrecting the Manage Workflow link in configuration file... " unless $quiet;
+    # and here's our code
+    my $ac = $session->config->get('adminConsole');
+    if (exists $ac->{'workflow'}) {
+        $ac->{'workflow'}->{'url'} = "^PageUrl(\"\",op=manageWorkflows);";
+        $session->config->set('adminConsole', $ac);
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
