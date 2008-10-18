@@ -258,13 +258,11 @@ sub view {
             };
             
             if ( $child->isa('WebGUI::Asset::File::Image') ) {
-                $self->session->log->warn('is image');
                 $childVars->{ "isImage"         } = 1;
                 $childVars->{ "thumbnail.url"   } = $child->getThumbnailUrl;
             }
             
             if ( $child->isa('WebGUI::Asset::File') ) {
-                $self->session->log->warn('is file');
                 $childVars->{ "isFile"          } = 1;
                 $childVars->{ "file.url"        } = $child->getFileUrl;
             }
