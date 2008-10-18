@@ -8,6 +8,7 @@
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
  - Fixed #8853: link to manageWorkflows is broken
+ - Fixed #8890: meta_loop in post form not working (United Knowledge)
 
 7.6.1
  - changed: the list of extensions for the export system to pass through

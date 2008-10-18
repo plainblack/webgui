@@ -12,6 +12,7 @@ package WebGUI::Asset::Post;
 
 use strict;
 use Tie::CPHash;
+use Tie::IxHash;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Asset::Post::Thread;
@@ -1346,19 +1347,31 @@ sub www_edit {
         my @meta_loop = ();
         foreach my $field (keys %{ $meta }) {
             my $fieldType = $meta->{$field}{fieldType} || "Text";
-            my $options;
+            my %options;
+            tie %options, 'Tie::IxHash';
+            if ($meta->{$field}{possibleValues}){
+                my $values = WebGUI::Operation::Shared::secureEval($self->session,$meta->{$field}{possibleValues});
+                if (ref $values eq 'HASH') {
+                    %options = %{$values};
+                }
+                else{
+                    foreach (split(/\n/x, $meta->{$field}{possibleValues})) {
+                    s/\s+$//x; # remove trailing spaces
+                    $options{$_} = $_;
+                    }
+                }
+            }
             # Add a "Select..." option on top of a select list to prevent from
             # saving the value on top of the list when no choice is made.
-            if($fieldType eq "selectList") {
-                $options = {"", $i18n->get("Select", "Asset")};
+            if($fieldType eq "selectBox") {
+                %options = ("" => $i18n->get("Select", "Asset"),%options);
             }
             my $form = WebGUI::Form::DynamicField->new($session,
                 name=>"metadata_".$meta->{$field}{fieldId},
                 uiLevel=>5,
                 value=>$meta->{$field}{value},
                 extras=>qq/title="$meta->{$field}{description}"/,
-                possibleValues=>$meta->{$field}{possibleValues},
-                options=>$options,
+                options=>\%options,
                 fieldType=>$fieldType,
             )->toHtml;
             push @meta_loop, {
