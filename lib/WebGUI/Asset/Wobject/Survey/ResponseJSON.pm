@@ -180,7 +180,7 @@ $self->log("There are questions to be submitted in this section");
                     $terminal = 1;
                     $terminalUrl = $answer->{terminalUrl};
                 }
-                elsif($answer->{goto} =~ /\S/){
+                elsif($answer->{goto} =~ /\w/){
                     $goto = $answer->{goto};     
                 }
             }
@@ -191,7 +191,7 @@ $self->log("There are questions to be submitted in this section");
     #if all responses completed, move the lastResponse index to the last question shown
     if($qAnswered){
         $self->lastResponse($self->lastResponse + @$questions);
-        $self->goto($goto);
+        $self->goto($goto) if(defined $goto);
     }else{
         $terminal = 0;
     }
@@ -200,7 +200,7 @@ $self->log("There are questions to be submitted in this section");
 sub goto{
     my $self = shift;
     my $goto = shift;
-$self->log("In goto for $goto");
+$self->log("In goto for '$goto'");
     for(my $i = 0; $i <= $#{$self->surveyOrder()}; $i++){
         my $section = $self->survey->section($self->surveyOrder()->[$i]);
         my $question = $self->survey->question($self->surveyOrder()->[$i]);
@@ -285,6 +285,7 @@ $self->log("Next Questions returning with ");
 sub surveyEnd{
     my $self = shift;
 $self->log("LR is ".$self->lastResponse." and order is ".$#{$self->surveyOrder});
+$self->log("ENDING THE SURVEY\n\n\n") if($self->lastResponse > $#{$self->surveyOrder});
     return 1 if($self->lastResponse >= $#{$self->surveyOrder});
     return 0;
 }
