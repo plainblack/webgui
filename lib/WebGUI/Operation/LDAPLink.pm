@@ -159,7 +159,6 @@ sub www_deleteLDAPLink {
 	my $session = shift;
 	return $session->privilege->insufficient unless canView($session);
 	$session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
-	$session->form->process("op") = "listLDAPLinks";
 	return www_listLDAPLinks($session);
 }
 

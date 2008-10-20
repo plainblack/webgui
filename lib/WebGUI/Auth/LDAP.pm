@@ -40,83 +40,82 @@ i.e., it does not validate their username or ensure their account is active.
 =cut
 
 sub _isValidLDAPUser {
-   my $self = shift;
-   my ($uri, $error, $ldap, $search, $auth, $connectDN, $username, $password);
-   my $i18n = WebGUI::International->new($self->session);
-   my $connection = $self->getLDAPConnection;
+    my $self = shift;
+    my ($error, $ldap, $search, $auth, $connectDN);
+    my $i18n = WebGUI::International->new($self->session);
    
-   $username = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
-   $password = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
-   
-   $uri = URI->new($connection->{ldapUrl}) or $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
-   
-   if($error ne ""){
-      $self->error($error);
-      return 0;
-   }
-   
-   # Create an LDAP object
-   if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
+    my $connection = $self->getLDAPConnection;
+    
+    #Check to see that the LDAP Link is valid
+    my $ldapLink = $self->getLDAPLink;
+    unless ($ldapLink) {
+        $self->error('<li>'.$i18n->get(2,'AuthLDAP').'</li>');
+        return 0;
+    }
 
-      # Bind as a proxy user to search for the user trying to login
-      if($connection->{connectDn}) {
-         $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
-      }
-      else {  # No proxy user specified, try to bind anonymously for the search
-         $auth = $ldap->bind;
-      }
-      
-      # If we were able to bind
-      if ($auth) {
-         
-         # Search for the user trying to login
-         $search = $ldap->search(base=>$uri->dn, filter=>$connection->{ldapIdentity}.'='.$username);
+    my $username   = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
+    my $password   = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
+  
+    # Create an LDAP object
+    if ($ldap = $ldapLink->connectToLDAP) {
+        my $uri  = $ldapLink->getURI;
+        # Bind as a proxy user to search for the user trying to login
+        if($connection->{connectDn}) {
+            $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
+        }
+        else {  # No proxy user specified, try to bind anonymously for the search
+            $auth = $ldap->bind;
+        }
+        
+        # If we were able to bind
+        if ($auth) {
+            # Search for the user trying to login
+            $search = $ldap->search(base=>$uri->dn, filter=>$connection->{ldapIdentity}.'='.$username);
 
-         # If we found a match
-         if (defined $search->entry(0)) {
+            # If we found a match
+            if (defined $search->entry(0)) {
+                # Determine the users distinguished name using dn
+                if ($connection->{ldapUserRDN} eq 'dn') {
+                    $connectDN = $search->entry(0)->dn;
+                }
+                else { # or... use a releative distinguished name instead
+                    $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
+                }
 
-            # Determine the users distinguished name using dn
-            if ($connection->{ldapUserRDN} eq 'dn') {
-               $connectDN = $search->entry(0)->dn;
-            }
-            else { # or... use a releative distinguished name instead
-               $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
-            }
-
-            # Remember the users DN so we can use it later.
-            $self->setConnectDN($connectDN);
-            $ldap->unbind;
+                # Remember the users DN so we can use it later.
+                $self->setConnectDN($connectDN);
+                $ldap->unbind;
             
-            # Create a new LDAP object
-            $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= $i18n->get(2,'AuthLDAP');
+                # Create a new LDAP object
+                $ldap = $ldapLink->connectToLDAP or $error .= $i18n->get(2,'AuthLDAP');
 
-            # Try to bind to the directory using the users dn and password
-            $auth = $ldap->bind(dn=>$connectDN, password=>$password);
+                #Try to bind to the directory using the users dn and password
+                $auth = $ldap->bind(dn=>$connectDN, password=>$password);
 
-            # Invalid login credentials, directory did not authenticate the user
-            if ($auth->code == 48 || $auth->code == 49) {
-               $error .= '<li>'.$i18n->get(68).'</li>';
-               $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process('authLDAP_ldapId'));
+                # Invalid login credentials, directory did not authenticate the user
+                if ($auth->code == 48 || $auth->code == 49) {
+                    $error .= '<li>'.$i18n->get(68).'</li>';
+                    $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process('authLDAP_ldapId'));
+                }
+                elsif ($auth->code > 0) {  # Some other LDAP error occured
+                    $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured. '.$i18n->get(69).'</li>';
+                    $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
+                }
+                $ldap->unbind;
             }
-            elsif ($auth->code > 0) {  # Some other LDAP error occured
-               $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured. '.$i18n->get(69).'</li>';
-               $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
+            else { # Could not find the user in the directory to build a DN
+                $error .= '<li>'.$i18n->get(68).'</li>';
+                $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("authLDAP_ldapId"));
             }
-            $ldap->unbind;
-         }
-         else { # Could not find the user in the directory to build a DN
-            $error .= '<li>'.$i18n->get(68).'</li>';
-            $self->session->errorHandler->warn("Invalid LDAP information for registration of LDAP ID: ".$self->session->form->process("authLDAP_ldapId"));
-         }
-      }
-      else { # Unable to bind with proxy user credentials or anonymously for our search
-         $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
-	 $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
-      }
+        }
+        else { # Unable to bind with proxy user credentials or anonymously for our search
+            $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
+            $self->session->errorHandler->error("Couldn't bind to LDAP server: ".$connection->{ldapUrl});
+        }
    }
    else { # Could not create our LDAP object
       $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
-      $self->session->errorHandler->error("Couldn't create LDAP object: ".$uri->host);
+      $self->session->errorHandler->error("Couldn't create LDAP object: ".$connection->{ldapUrl});
    }
   
    $self->error($error);
@@ -141,78 +140,79 @@ Returns 1 on success.
 =cut
 
 sub authenticate {
-   my $self = shift;
-   my ($uri, $ldap, $auth, $result, $error);
-   my $i18n = WebGUI::International->new($self->session);      
-   return 0 if !$self->SUPER::authenticate($_[0]);  #see that the username entered actually exists and is active in webgui
+    my $self = shift;
+    my ($uri, $ldap, $auth, $result, $error);
+    my $i18n = WebGUI::International->new($self->session);      
+    return 0 if !$self->SUPER::authenticate($_[0]);  #see that the username entered actually exists and is active in webgui
 
-   my $userId = $self->userId;
-   my $identifier = $_[1];
-   my $userData = $self->getParams;
+    my $userId = $self->userId;
+    my $identifier = $_[1];
+    my $userData = $self->getParams;
 		
-   $error .= '<li>'.$i18n->get(12,'AuthLDAP').'</li>' if ($userData->{ldapUrl} eq "");
-   $error .= '<li>'.$i18n->get(11,'AuthLDAP').'</li>' if ($userData->{connectDN} eq "");
-   $self->error($error);
+    $error .= '<li>'.$i18n->get(12,'AuthLDAP').'</li>' if ($userData->{ldapUrl} eq "");
+    $error .= '<li>'.$i18n->get(11,'AuthLDAP').'</li>' if ($userData->{connectDN} eq "");
+    $self->error($error);
 
-   if($error ne ""){
-      $self->user(WebGUI::User->new($self->session,1));
-         return 0 ;
-   }
+    if($error ne ""){
+        $self->user(WebGUI::User->new($self->session,1));
+        return 0 ;
+    }
 	
-   if($uri = URI->new($userData->{ldapUrl})) {
+    if($uri = URI->new($userData->{ldapUrl})) {
 
-      # Create an LDAP object
-      $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
+        # Create an LDAP object
+        $ldap = Net::LDAP->new($uri->host, (port=>$uri->port, scheme=>$uri->scheme)) or $error .= '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
 
-      if($error ne ""){
-         $self->user(WebGUI::User->new($self->session,1));
-         return 0 ;
-      }
+        if($error ne ""){
+            $self->user(WebGUI::User->new($self->session,1));
+            return 0 ;
+        }
 
-      # Try to bind using the users dn and password
-      $auth = $ldap->bind(dn=>$userData->{connectDN}, password=>$identifier);
-
-      # Authentication failed
-      if ($auth->code == 48 || $auth->code == 49){
-         $error .= '<li>'.$i18n->get(68).'</li>';
-      }
-      elsif ($auth->code > 0) { # Some other LDAP error happened
-         $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
-	 $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
-      }
+        # Try to bind using the users dn and password
+        $auth = $ldap->bind(dn=>$userData->{connectDN}, password=>$identifier);
+        
+        # Authentication failed
+        if ($auth->code == 48 || $auth->code == 49){
+            $error .= '<li>'.$i18n->get(68).'</li>';
+        }
+        elsif ($auth->code > 0) { # Some other LDAP error happened
+            $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
+            $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
+        }
 	   
-      $ldap->unbind;
-   }
-   else { 
-      $error .= '<li>'.$i18n->get(13,'AuthLDAP').'</li>';
-      $self->session->errorHandler->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
-   }
+        $ldap->unbind;
+    }
+    else { 
+        $error .= '<li>'.$i18n->get(13,'AuthLDAP').'</li>';
+        $self->session->errorHandler->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
+    }
 	
-   if($error ne ""){
-      $self->error($error);
-      $self->user(WebGUI::User->new($self->session,1));
-   }
+    if($error ne ""){
+        $self->error($error);
+        $self->user(WebGUI::User->new($self->session,1));
+    }
 
-   return $error eq "";	
+    return $error eq "";	
 }
 
 #-------------------------------------------------------------------
 sub connectToLDAP {
 
-   # This method needs to do some excpetion handling when we try to create an LDAPLink object
-   # Lot's to do though because then everything calling connectToLDAP must also handle exceptions on up
-   #
-   # Problem is that $connectionId may not have a value or the object creation may fail for other reasons.
-   # Quick fix for now is to ensure the ldapConnection setting is set in the settings table with the id of 
-   # the default ldap connection.
+    # This method needs to do some excpetion handling when we try to create an LDAPLink object
+    # Lot's to do though because then everything calling connectToLDAP must also handle exceptions on up
+    #
+    # Problem is that $connectionId may not have a value or the object creation may fail for other reasons.
+    # Quick fix for now is to ensure the ldapConnection setting is set in the settings table with the id of 
+    # the default ldap connection.
 
-   my $self = shift;
-   my $connectionId = $self->session->form->process("connection") || $self->session->setting->get("ldapConnection");
-   my $ldapLink = WebGUI::LDAPLink->new($self->session,$connectionId);
-   my $connection = $ldapLink->get;
+    my $self = shift;
+    my $connectionId = $self->session->form->process("connection") || $self->session->setting->get("ldapConnection");
+    my $ldapLink = WebGUI::LDAPLink->new($self->session,$connectionId);
+    my $connection = $ldapLink->get;
    
-   $self->{_connection} = $connection;   
-   return $connection;
+    $self->{'_ldapLink'  } = $ldapLink;
+    $self->{'_connection'} = $connection;   
+    return $connection;
 }
 
 #-------------------------------------------------------------------
@@ -274,46 +274,50 @@ sub createAccountSave {
       return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$self->error);
    }
    
-   my $connection = $self->getLDAPConnection;
-   #Get connectDN from settings   
-   my $uri = URI->new($connection->{ldapUrl});
-   my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
-   my $auth;
-   if($connection->{connectDn}) {
-      $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
-   }else{
-      $auth = $ldap->bind;
-   }
-   #$ldap->bind;
-   my $search = $ldap->search (base => $uri->dn, filter=>$connection->{ldapIdentity}."=".$username);
-   my $connectDN = "";
-   if (defined $search->entry(0)) {
-      if ($connection->{ldapUserRDN} eq 'dn') {
-	     $connectDN = $search->entry(0)->dn;
-	  } else { 
-		 $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
-	  }
-   }
-   $ldap->unbind;
-   
-   
-   #Check that username is valid and not a duplicate in the system.
-   $error .= $self->error if(!$self->validUsername($username));
-   #Validate profile data.
-   my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
-   $error .= $temp;
-   return $self->createAccount("<li>".$error."</li1>") unless ($error eq "");
-   #If Email address is not unique, a warning is displayed
-   if($warning ne "" && !$self->session->form->process("confirm")){
-      return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
-   }
-   
-   my $properties;
-   $properties->{connectDN} = $connectDN;
-   $properties->{ldapUrl} = $connection->{ldapUrl};
-   $properties->{ldapConnection} = $connection->{ldapLinkId};
+    my $connection = $self->getLDAPConnection;
+    my $ldapLink   = $self->getLDAPLink;
 
-   return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+    #Get connectDN from settings
+    my $ldap = $ldapLink->connectToLDAP;
+    my $uri  = $ldapLink->getURI;
+    my $auth;
+    if($connection->{connectDn}) {
+        $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
+    }
+    else{
+        $auth = $ldap->bind;
+    }
+    #$ldap->bind;
+    my $search = $ldap->search (base => $uri->dn, filter=>$connection->{ldapIdentity}."=".$username);
+    my $connectDN = "";
+    if (defined $search->entry(0)) {
+        if ($connection->{ldapUserRDN} eq 'dn') {
+            $connectDN = $search->entry(0)->dn;
+        }
+        else { 
+            $connectDN = $search->entry(0)->get_value($connection->{ldapUserRDN});
+        }
+    }
+    $ldap->unbind;
+   
+   
+    #Check that username is valid and not a duplicate in the system.
+    $error .= $self->error if(!$self->validUsername($username));
+    #Validate profile data.
+    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
+    $error .= $temp;
+    return $self->createAccount("<li>".$error."</li1>") unless ($error eq "");
+    #If Email address is not unique, a warning is displayed
+    if($warning ne "" && !$self->session->form->process("confirm")){
+        return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
+    }
+   
+    my $properties;
+    $properties->{connectDN} = $connectDN;
+    $properties->{ldapUrl} = $connection->{ldapUrl};
+    $properties->{ldapConnection} = $connection->{ldapLinkId};
+
+    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
 }
 
 #-------------------------------------------------------------------
@@ -487,6 +491,13 @@ sub getLDAPConnection {
    
    return $self->{_connection} if $self->{_connection};
    return $self->connectToLDAP;   
+}
+
+#-------------------------------------------------------------------
+sub getLDAPLink {
+   my $self = shift;
+   
+   return $self->{_ldapLink};
 }
 
 #-------------------------------------------------------------------
