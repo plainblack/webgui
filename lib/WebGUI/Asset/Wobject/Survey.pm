@@ -254,6 +254,11 @@ $self->session->errorHandler->error("Submit Edit Object");
 $self->session->errorHandler->error("Deleting ".join(',',@address));
         return $self->deleteObject(\@address);
     }
+    elsif($responses->{copy}){
+$self->session->errorHandler->error("Copying ".join(',',@address));
+        return $self->copyObject(\@address);
+    }
+
 $self->session->errorHandler->error("Updating ".join(',',@address));
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
     my $message = $self->survey->update(\@address,$responses);
@@ -263,6 +268,19 @@ $self->session->errorHandler->error("Updating ".join(',',@address));
     return $self->www_loadSurvey({address => \@address});
 }
 
+#-------------------------------------------------------------------
+sub copyObject{
+    my ($self,$address) = @_;
+
+    $self->loadSurveyJSON();
+
+    $address = $self->survey->copy($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+
+    $self->saveSurveyJSON();
+    #The parent address of the deleted object is returned.
+
+    return $self->www_loadSurvey({address => $address});
+}
 
 #-------------------------------------------------------------------
 sub deleteObject{
@@ -274,7 +292,12 @@ sub deleteObject{
 
     $self->saveSurveyJSON();
     #The parent address of the deleted object is returned.
-    pop(@{$address}) unless @$address == 1 and $$address[0] == 0;
+    if(@$address == 1){
+        $$address[0] = 0;
+    }else{
+        pop(@{$address});# unless @$address == 1 and $$address[0] == 0;
+    }
+$self->session->errorHandler->error("returning ".join(',',@$address));
 
     return $self->www_loadSurvey({address => $address, message=>$message});
 }
