@@ -69,7 +69,7 @@ my $testBlock = [
 my $formClass = 'WebGUI::Form::ClassName';
 my $formType = 'ClassName';
 
-my $numTests = 11 + scalar @{ $testBlock } + 3;
+my $numTests = 7 + scalar @{ $testBlock } + 3;
 
 
 plan tests => $numTests;
@@ -97,10 +97,8 @@ is(scalar @inputs, 1, 'The form has 1 input');
 
 my $input = $inputs[0];
 is($input->name, 'TestClass', 'Checking input name');
-is($input->type, 'text', 'Checking input type');
+is($input->type, 'hidden', 'Checking input type');
 is($input->value, 'WebGUI::Asset::File', 'Checking default value');
-is($input->{size}, 30, 'Default size');
-is($input->{maxlength}, 255, 'Default maxlength');
 
 ##Test Form Output parsing
 
@@ -109,8 +107,6 @@ my $html = join "\n",
 	$formClass->new($session, {
 		name => 'StorageClass',
 		value => 'WebGUI::Storage::Image',
-		size => 15,
-		maxlength => 20,
 	})->toHtml,
 	$footer;
 
@@ -119,8 +115,6 @@ my $html = join "\n",
 my $input = $inputs[0];
 is($input->name, 'StorageClass', 'Checking input name');
 is($input->value, 'WebGUI::Storage::Image', 'Checking default value');
-is($input->{size}, 15, 'set size');
-is($input->{maxlength}, 20, 'set maxlength');
 
 ##Test Form Output parsing
 
