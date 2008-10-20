@@ -587,10 +587,6 @@ $self->session->errorHandler->error(Dumper $responses);
 
     my @goodResponses = keys %$responses;#load everything.  
 
-    if(@goodResponses == 0){##nothing to load
-        return $self->www_loadQuestions();
-    }
-
     $self->loadBothJSON();
 
     my $termInfo = $self->response->recordResponses($responses);
@@ -660,8 +656,13 @@ $self->session->errorHandler->error("Can take survey");
 
     return $self->surveyEnd() if($self->response->surveyEnd());
 
-    my $questions = $self->response->nextQuestions();
-$self->session->errorHandler->error("Load Questions had ".@$questions." questions");
+    my $questions;
+eval{
+    $questions = $self->response->nextQuestions();
+};
+$self->session->errorHandler->error($@) if($@);
+
+$self->session->errorHandler->error("Load Questions had ".@$questions." questions") if(ref $questions eq 'ARRAY');
     
 
     my $section = $self->response->nextSection();
