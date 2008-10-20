@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 repairManageWorkflows($session); 
+addPreTextToThingyFields($session);
 finish($session); # this line required
 
 
@@ -52,6 +53,13 @@ sub repairManageWorkflows {
         $ac->{'workflow'}->{'url'} = "^PageUrl(\"\",op=manageWorkflows);";
         $session->config->set('adminConsole', $ac);
     }
+    print "DONE!\n" unless $quiet;
+}
+
+sub addPreTextToThingyFields {
+    my $session = shift;
+    print "\tAdding a pre-text property to Thingy fields... " unless $quiet;
+    $session->db->write('ALTER TABLE `Thingy_fields` ADD pretext varchar(255)');
     print "DONE!\n" unless $quiet;
 }
 

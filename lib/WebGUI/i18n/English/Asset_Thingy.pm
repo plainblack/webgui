@@ -464,15 +464,28 @@ this field using a hash, then the default value has to be a key in that hash, an
         lastUpdated => 1031514049
     },
 
-   'subtext description' => {
-        message => q|An extension of the label, this is additional information such as a description of what should go in the field or optional instructions for the field.|,
-        lastUpdated => 1133811301,
+    'subtext description' => {
+        message => q|An extension of the label, this is additional information such as a description of what should
+go in the field or optional instructions for the field. It will be displayed below/after the form element.|,
+        lastUpdated => 1224518799,
+    },
+
+    'pretext label' => {
+        message => q|Pre-text|,
+        lastUpdated => 1224518799,
+    },
+
+    'pretext description' => {
+        message => q|An extra extension of the label, this is additional information such as a description of what should
+go in the field or optional instructions for the field. It will be displayed above/before the form element.|,
+        lastUpdated => 1224518799,
     },
 
     'fieldstatus hidden label' => {
         message => q|Hidden|,
         lastUpdated => 1031514049
     },
+    
     'fieldstatus visible label' => {
         message => q|Visible|,
         lastUpdated => 1031514049
@@ -812,9 +825,16 @@ field.|,
         lastUpdated => 1104630516,
     },
 
+    'field_pretext' => {
+        message => q|An extra description of the field so that users know what to put in the field. To be
+displayed above/before the form element.|,
+        lastUpdated => 1224518799,
+    },
+
     'field_subtext' => {
-        message => q|A description of the field so that users know what to put in the field.|,
-        lastUpdated => 1104630516,
+        message => q|A description of the field so that users know what to put in the field. To be displayed
+below/after the form element.|,
+        lastUpdated => 1224518799,
     },
 
     'form_start' => {

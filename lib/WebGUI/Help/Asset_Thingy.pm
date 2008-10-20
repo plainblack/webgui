@@ -73,6 +73,7 @@ our $HELP = {
                     { 'name' => 'field_name' },
                     { 'name' => 'field_value' },
                     { 'name' => 'field_subtext' },
+                    { 'name' => 'field_pretext' },
                 ],
             },
             {   'name'      => 'listOfThings',
