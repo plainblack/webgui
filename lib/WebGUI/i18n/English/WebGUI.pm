@@ -2880,6 +2880,18 @@ or are under your current version tag.</p>
                 context => q|Field type name|
         },
 
+    'matrix fieldtype' => {
+        message => q|Matrix Field Type|,
+        lastUpdated =>0,
+                context => q|Field type name|
+        },
+
+    'matrix compare' => {
+        message => q|Matrix Compare|,
+        lastUpdated =>0,
+                context => q|Field type name|
+        },
+
 	'hidden list' => {
 		message => q|Hidden List|,
 		lastUpdated =>0,

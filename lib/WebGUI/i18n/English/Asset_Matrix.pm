@@ -4,30 +4,18 @@ use strict;
 our $I18N = {
 	'delete field confirm' => {
 		message => q|Are you certain you wish to delete this field and all the data linked to it?|,
-		lastUpdated => 0,
+		lastUpdated => 1230,
 		context => q|displayed in field manager before delete|
-		},
-
-	'screenshot' => {
-		message => q|Screenshot/Photo|,
-		lastUpdated => 0,
-		context => q|edit listing property|
-		},
-
-	'screenshot help' => {
-		message => q|Upload a picture of the product, or a screen shot if it's a software package.|,
-		lastUpdated => 0,
-		context => q|edit listing property help|
 		},
 
 	'visitor cache timeout' => {
 		message => q|Visitor Cache Timeout|,
-		lastUpdated => 0
+		lastUpdated => 1230
 		},
 
 	'visitor cache timeout help' => {
 		message => q|Since all visitors will see this asset the same way, we can cache it to increase performance. How long should we cache it?|,
-		lastUpdated => 0
+		lastUpdated => 1230
 		},
 
 	'isTooMany' => {
@@ -52,11 +40,6 @@ our $I18N = {
 
 	'name' => {
 		message => q|The name of the product.|,
-		lastUpdated => 1149783768,
-	},
-
-	'version' => {
-		message => q|The version number or model number of the product.|,
 		lastUpdated => 1149783768,
 	},
 
@@ -210,11 +193,6 @@ our $I18N = {
 		lastUpdated => 1149784175,
 	},
 
-	'manufacturerName' => {
-		message => q|The name of the company that manufactures the product or provides the service represented in this listing.|,
-		lastUpdated => 1167186054,
-	},
-
 	'manufacturerUrl' => {
 		message => q|The manufacturer's URL.|,
 		lastUpdated => 1149784175,
@@ -222,11 +200,6 @@ our $I18N = {
 
 	'manufacturerUrl.click' => {
 		message => q|The manufacturer URL to use if you want to register the click count for this listing.|,
-		lastUpdated => 1149784175,
-	},
-
-	'versionNumber' => {
-		message => q|The version number or model number of this product.|,
 		lastUpdated => 1149784175,
 	},
 
@@ -281,7 +254,7 @@ our $I18N = {
 	},
 
         'detail template help title' => {
-                lastUpdated => 0,
+                lastUpdated =>
                 message => q|Matrix Listing Detail Template Variables|
         },
 
@@ -501,7 +474,7 @@ our $I18N = {
         },
 
         'ratings detail template help title' => {
-                lastUpdated => 0,
+                lastUpdated => 1230,
                 message => q|Matrix Ratings Detail Template Variables|
         },
 
@@ -582,23 +555,68 @@ our $I18N = {
 
 	'categories description' => {
                 message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
-                lastUpdated => 1136503559,
-        },
+                lastUpdated => 0,
+     },
+
+    'categories default value' => {
+                message => q|Features\nBenefits|,
+                lastUpdated => 0,
+     },
+
+    'submission approval workflow description' => {
+        message => q|Select the  workflow that is used to approve submissions.|,
+        lastUpdated => 0,
+    },
+
+    'ratings duration description' => {
+        message => q|Select the interval after which old ratings are cleaned out.|,
+        lastUpdated => 0,
+    },
+
+    'default sort description' => {
+        message => q|Select the default sort order for the listings in the compare box.|,
+        lastUpdated => 0,
+    },
+
+    'compare color no description' => {
+        message => q|Select the color for compare result 'No'  in the compare display.|,
+        lastUpdated => 0,
+    },
+
+    'compare color limited description' => {
+        message => q|Select the color for compare result 'Limited'  in the compare display.|,
+        lastUpdated => 0,
+    },
+
+    'compare color costs extra description' => {
+        message => q|Select the color for compare result 'Costs Extra'  in the compare display.|,
+        lastUpdated => 0,
+    },
+
+    'compare color free add on description' => {
+        message => q|Select the color for compare result 'Free Add On'  in the compare display.|,
+        lastUpdated => 0,
+    },
+
+    'compare color yes description' => {
+        message => q|Select the color for compare result 'Yes'  in the compare display.|,
+        lastUpdated => 0,
+    },
 
 	'categories subtext' => {
                 message => q|<br />Enter one per line in the order you want them to appear. Be sure to watch leading and trailing whitespace.|,
                 lastUpdated => 1135271460,
         },
 
-        'max comparisons description' => {
-                message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
-                lastUpdated => 1135271460,
-        },
+    'max comparisons description' => {
+        message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
+        lastUpdated => 0,
+    },
 
-        'max comparisons privileged description' => {
-                message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
-                lastUpdated => 1135271460,
-        },
+    'max comparisons privileged description' => {
+        message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
+        lastUpdated => 0,
+    },
 
         'rating timeout description' => {
                 message => q|Set a timeout so that users are prevented from rating a given listing too often.|,
@@ -625,43 +643,103 @@ our $I18N = {
                 lastUpdated => 1135271460,
         },
 
-        'main template description' => {
+        'template description' => {
                 message => q|Select a template to be used to display the default view of the Matrix.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 0,
         },
 
         'detail template description' => {
                 message => q|Select a template to be used to display the detailed information about a listing.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 0,
         },
 
         'rating detail template description' => {
                 message => q|Select a template to be used to display the detailed ratings information.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 0,
         },
 
         'search template description' => {
                 message => q|Select a template to be used to display the search engine interface.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 0,
         },
 
         'compare template description' => {
                 message => q|Select a template to be used to show the listing comparison data.|,
-                lastUpdated => 1135271460,
+                lastUpdated => 0,
         },
-	'categories' => {
+	'categories label' => {
 		message => q|Categories|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'max comparisons' => {
+    'submission approval workflow label' => {
+        message => q|Submission Approval Workflow|,
+        lastUpdated => 0,
+    },
+
+    'ratings duration label' => {
+        message => q|Ratings Duration|,
+        lastUpdated => 0,
+    },
+
+    'default sort label' => {
+        message => q|Default Sort|,
+        lastUpdated => 0,
+    },
+
+    'sort by score label' => {
+        message => q|Score|,
+        lastUpdated => 0,
+    },
+
+    'sort alpha numeric label' => {
+        message => q|Alpha Numeric|,
+        lastUpdated => 0,
+    },
+
+    'sort by asset rank label' => {
+        message => q|Asset Rank|,
+        lastUpdated => 0,
+    },
+
+    'sort by last updated label' => {
+        message => q|Most Recent Update|,
+        lastUpdated => 0,
+    },
+
+	'compare color no label' => {
+        message => q|Compare Color: No|,
+        lastUpdated => 0,
+    },
+
+    'compare color limited label' => {
+        message => q|Compare Color: Limited|,
+        lastUpdated => 0,
+    },
+
+    'compare color costs extra label' => {
+        message => q|Compare Color: Costs Extra|,
+        lastUpdated => 0,
+    },
+
+    'compare color free add on label' => {
+        message => q|Compare Color: Free Add On|,
+        lastUpdated => 0,
+    },
+
+    'compare color yes label' => {
+        message => q|Compare Color: Yes|,
+        lastUpdated => 0,
+    },
+    
+    'max comparisons label' => {
 		message => q|Maximum Comparisons|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'max comparisons privileged' => {
+	'max comparisons privileged label' => {
 		message => q|Maximum Comparisons (For Privileged Users)|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
 	'rating timeout' => {
@@ -689,29 +767,29 @@ our $I18N = {
 		lastUpdated => 1133758944,
 	},
 
-	'main template' => {
-		message => q|Main Template|,
-		lastUpdated => 1133758944,
+	'template label' => {
+		message => q|Matrix Template|,
+		lastUpdated => 0,
 	},
 
-	'detail template' => {
+	'detail template label' => {
 		message => q|Detail Template|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'rating detail template' => {
+	'rating detail template label' => {
 		message => q|Rating Detail Template|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'search template' => {
+	'search template label' => {
 		message => q|Search Template|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'compare template' => {
+	'compare template label' => {
 		message => q|Compare Template|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
 	'product name' => {
@@ -719,59 +797,34 @@ our $I18N = {
 		lastUpdated => 1133758944,
 	},
 
-	'version number' => {
-		message => q|Version/Model Number|,
-		lastUpdated => 1133758944,
+	'attribute name label' => {
+		message => q|Name|,
+		lastUpdated => 0,
 	},
 
-	'product url' => {
-		message => q|Product URL|,
-		lastUpdated => 1135279964,
-	},
-
-	'manufacturer name' => {
-		message => q|Manufacturer Name|,
-		lastUpdated => 1133758944,
-	},
-
-	'manufacturer url' => {
-		message => q|Manufacturer URL|,
-		lastUpdated => 1133758944,
-	},
-
-	'description' => {
-		message => q|Description|,
-		lastUpdated => 1133758944,
-	},
-
-	'listing maintainer' => {
-		message => q|Listing Maintainer|,
-		lastUpdated => 1133758944,
-	},
-
-	'field name' => {
-		message => q|Field Name|,
-		lastUpdated => 1136499280,
-	},
-
-	'field label' => {
-		message => q|Field Label|,
-		lastUpdated => 1136499282,
-	},
-
-	'field type' => {
+#	'field label' => {
+#		message => q|Field Label|,
+#		lastUpdated => 1136499282,
+#	},
+	
+    'fieldType label' => {
 		message => q|Field Type|,
-		lastUpdated => 1136499283,
+		lastUpdated => 0,
 	},
 
-	'default value' => {
+	'attribute defaultValue label' => {
 		message => q|Default Value|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'category' => {
+    'attribute options label' => {
+        message => q|Options|,
+        lastUpdated => 0,
+    },
+
+	'category label' => {
 		message => q|Category|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
 	'your email' => {
@@ -829,9 +882,9 @@ our $I18N = {
                 message => q|<h1>Edit Listing</h1>|
         },
 
-        'edit field' => {
-                lastUpdated => 1135279558,
-                message => q|<h1>Edit Field</h1>|
+        'edit attribute title' => {
+                lastUpdated => 0,
+                message => q|Edit/Add Attribute|
         },
 
         'good bad' => {
@@ -869,12 +922,20 @@ our $I18N = {
 	<p><a href="%s">No, I made a mistake.</a></p>|,
         },
 
-        'list fields' => {
-                lastUpdated => 1135289632,
-                message => q|<h1>Field List</h1>
-		<a href="%s">Add new field.</a>
-		<p />|,
-        },
+    'list attributes title' => {
+        lastUpdated => 0,
+        message => q|Attribute List|,
+    },
+
+    'delete attribute confirm message' => {
+        message => q|Are you certain you wish to delete this attribute and all the data linked to it?|,
+        lastUpdated => 0,
+    },
+
+    'add attribute label' => {
+        lastUpdated => 0,
+        message => q|Add Attribute|,
+    },
 
         'yes' => {
                 lastUpdated => 1135279558,
@@ -906,38 +967,6 @@ our $I18N = {
                 message => q|Enter the name of the product.  If there are entries for the product with different revisions, it would be best to make sure the names are the same.|
         },
 
-        'version number description' => {
-                lastUpdated => 1135279558,
-                message => q|Enter the release or version number for the product.|
-        },
-
-        'product url description' => {
-                lastUpdated => 1135279558,
-                message => q|If the product has its own website, enter the complete URL for it here.|
-        },
-
-        'manufacturer name description' => {
-                lastUpdated => 1135279558,
-                message => q|Enter the manufacturer of the product.|
-        },
-
-        'manufacturer url description' => {
-                lastUpdated => 1135279558,
-                message => q|If the manufacturer has a website, enter the complete URL for it here.|
-        },
-
-        'description description' => {
-                lastUpdated => 1135279558,
-                message => q|Please give a general description of the product.  Specific details can be rated in the form fields below.|
-        },
-
-        'listing maintainer description' => {
-                lastUpdated => 1136488950,
-                message => q|If left blank, this will be the name of the user who created this product listing.  The
-		listing maintainer is allowed to edit this listing, even if they are not members of the group
-		to add or edit listings.|
-        },
-
         'matrix specific fields description' => {
                 lastUpdated => 1135279558,
                 message => q|Each matrix is configured to compare the features and performance of various products.  These features and performance criteria are displayed for you to rate on an item by item basis.|
@@ -948,55 +977,46 @@ our $I18N = {
                 message => q|Matrix Specific Fields|
         },
 
-        'field name description' => {
-                lastUpdated => 1135279558,
-                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
+        'attribute name description' => {
+                lastUpdated => 0,
+                message => q|The name of the attribute that you are creating.  It is case sensitive and must be unique.|
         },
 
-        'field label description' => {
-                lastUpdated => 1135279558,
-                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
+#        'field label description' => {
+#                lastUpdated => 1135279558,
+#                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
+#        },
+
+        'fieldType description' => {
+                lastUpdated => 0,
+                message => q|<p>The field type of attribute you are creating.  Please select the field type from the options in the drop-down list.</p>|
         },
 
-        'field type description' => {
-                lastUpdated => 1167185918,
-                message => q|<p>The type of field you are creating.  Please select the type from the following options in the drop-down list.</p>
-		<div>
-		<dl>
-		<dt>Good Bad</dt>
-		<dd>Defines availability of a feature, has it, doesn't have it, limited functionality, free add on, etc.</dd>
-		<dt>Text</dt>
-		<dd>A single line of text, like a short description or title.</dd>
-		<dt>TextArea</dt>
-		<dd>Multiple lines of text.</dd>
-		<dt>URL</dt>
-		<dd>A URL.</dd>
-		<dt>Combo</dt>
-		<dd>A combination Text box and drop down list.</dd>
-		</dl></div>|
+        'attribute description label' => {
+                lastUpdated => 0,
+                message => q|Description|
         },
 
-        'field description' => {
-                lastUpdated => 1135279558,
-                message => q|Field Description|
+        'attribute description description' => {
+                lastUpdated => 0,
+                message => q|Please give a general description of the attribute.|
         },
 
-        'field description description' => {
-                lastUpdated => 1135279558,
-                message => q|Please give a general description of the field.|
+        'attribute defaultValue description' => {
+                lastUpdated => 0,
+                message => q|<p>Enter in a default value for the attribute that will be used if the fieldType is
+selectBox.</p>|
         },
 
-        'default value description' => {
-                translatorsNote => q|Please do not translate the GoodBad field values, as described below|,
-                lastUpdated => 1135279558,
-                message => q|<p>Enter in a default value for the field that will be used if the user leaves the field blank.</p>
-		<p>For the GoodBad field, the possible values are "No", "Yes", "Free Add On", "Costs Extra", "Limited".  While the displayed labels are internationalized, these values are not.</p>
-		<p>For the Combo field, you may only enter in 1 value, but the user will be allowed to select any value entered in by other users.  In other words, the drop-down list will contain all values entered in by users who enter unique data into this field.</p>|
+        'attribute options description' => {
+                lastUpdated => 0,
+                message => q|<p>Enter in options (one per line) for the attribute that will be used if the fieldType is
+selectBox.</p>|
         },
 
         'category description' => {
-                lastUpdated => 1136503500,
-                message => q|Select the category which this field falls into.|
+                lastUpdated => 0,
+                message => q|Select the category which this attribute falls into.|
         },
 
 };
