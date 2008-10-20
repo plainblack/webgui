@@ -1222,9 +1222,9 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 triggerWorkflow ( workflowId,  )
+=head2 triggerWorkflow ( workflowId )
 
-Alters a column for a field if the field's fieldType has changed.
+Runs the specified workflow when this Thingy changes.
 
 =head3 workflowId
 

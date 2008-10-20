@@ -746,6 +746,9 @@
         "WebGUI::Workflow::Activity::TrashClipboard",
         "WebGUI::Workflow::Activity::TrashExpiredEvents"
     ],
+    "WebGUI::Asset::Wobject::Thingy" : [
+        "WebGUI::Workflow::Activity::NotifyAboutThing"
+    ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
         "WebGUI::Workflow::Activity::NotifyAboutUser"
