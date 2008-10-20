@@ -16,6 +16,7 @@ package WebGUI::Session;
 
 use strict;
 use WebGUI::Config;
+use WebGUI::Crypt;
 use WebGUI::SQL;
 use WebGUI::User;
 use WebGUI::Session::DateTime;
@@ -137,6 +138,38 @@ Returns a WebGUI::Config object.
 sub config {
 	my $self = shift;
 	return $self->{_config};
+}
+
+#-------------------------------------------------------------------
+
+=head2 crypt ( [ skipFatal ] ) 
+
+Returns the WebGUI::Crypt object
+
+=head3 skipFatal
+
+If set to true, we won't throw a fatal error, just return undef.
+
+=cut
+
+sub crypt {
+	my $self = shift;
+	my $skipFatal = shift;
+	unless (exists $self->{_crypt}) {
+		my $crypt = WebGUI::Crypt->new($self,$self->config->get("crypt"));
+		if (defined $crypt) {
+			$self->{_crypt} = $crypt;
+		}
+		else {
+			if ($skipFatal) {
+				return undef;
+			}
+			else { 	
+				$self->errorHandler->fatal("Couldn't connect to WebGUI Crypt provider, and can't continue without it.");
+			}
+		}
+	}
+	return $self->{_crypt};
 }
 
 
