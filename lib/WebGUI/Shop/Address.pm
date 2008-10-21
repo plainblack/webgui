@@ -111,13 +111,17 @@ Returns an HTML formatted address for display.
 
 sub getHtmlFormatted {
     my $self = shift;
-    my $address = $self->get("firstName"). " " .$self->get("lastName") . "<br />" . $self->get("address1") . "<br />";
+    my $address = $self->get("firstName"). " " .$self->get("lastName") . "<br />";
+    $address .= $self->get("organization") . "<br />" if ($self->get("organization") ne "");
+    $address .= $self->get("address1") . "<br />";
     $address .= $self->get("address2") . "<br />" if ($self->get("address2") ne "");
     $address .= $self->get("address3") . "<br />" if ($self->get("address3") ne "");
     $address .= $self->get("city") . ", ";
     $address .= $self->get("state") . " " if ($self->get("state") ne "");
     $address .= $self->get("code") if ($self->get("code") ne "");
     $address .= '<br />' . $self->get("country");
+    $address .= '<br />'.$self->get("phoneNumber") if ($self->get("phoneNumber") ne "");
+    $address .= '<br /><a href="mailto:'.$self->get("email").'">'.$self->get("email").'</a>' if ($self->get("email") ne "");
     return $address;
 }
 
@@ -228,6 +232,14 @@ The country that this address is in.
 
 A telephone number for this address. It is required by some shippers.
 
+=head4 email
+
+An email address for this user.
+
+=head4 organization
+
+The organization or company that this user is a part of.
+
 =head4 addressBookId
 
 The address book that this address belongs to.
@@ -237,7 +249,7 @@ The address book that this address belongs to.
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
+    foreach my $field (qw(email organization address1 address2 address3 state code city label firstName lastName country phoneNumber)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $properties{$id}{addressBookId} = $self->addressBook->getId;

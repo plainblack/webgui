@@ -31,17 +31,19 @@ my $session = start(); # this line required
 # upgrade functions go here
 repairManageWorkflows($session); 
 addPreTextToThingyFields($session);
+updateAddressBook($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub updateAddressBook {
+    my $session = shift;
+    print "\tAdd Organization and Email Address to address book." unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table address add column organization char(255)");
+    $db->write("alter table address add column email char(255)");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub repairManageWorkflows {

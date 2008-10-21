@@ -6,6 +6,7 @@
  - Moved Asset ID and Class Name fields to the Meta tab of all assets.
  - Made Classname from control a subclass of ReadOnly.
  - Added query keys to WebGUI::Crud.
+ - EMS Saved Address  (#8864)
  - WebGUI::Crud can now automatically resolve differences between its
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
@@ -15,6 +16,9 @@
  - rfe #740: Thingy Pre-Text (SDH Consulting Group)
  - rfe #746: use the menu title in asset manager
  - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
+
+
+
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the

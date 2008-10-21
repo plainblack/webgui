@@ -9,6 +9,18 @@ our $I18N = {
 		context		=> q|vendor label|,
 	},
 
+    'organization' => {
+        message     => q|Organization|,
+        lastUpdated    => 0,
+        context        => q|address book label|,
+    },
+
+    'email' => {
+        message     => q|Email|,
+        lastUpdated    => 0,
+        context        => q|address book label|,
+    },
+
 	'Payment Information' => {
 		message 	=> q|Payment Information|,
 		lastUpdated	=> 0,
