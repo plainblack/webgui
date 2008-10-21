@@ -13,6 +13,11 @@ our $I18N = {
 		lastUpdated => 0 
 	},
 
+	'leave this tag' => {
+		message => q|Leave This Tag|,
+		lastUpdated => 0 
+	},
+
 	'bad commit' => {
 		message => q|Something bad happened while trying to commit your content. Please contact your system
         administrator.|,

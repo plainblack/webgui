@@ -451,6 +451,13 @@ sub www_commitVersionTagConfirm {
 }
 
 #-------------------------------------------------------------------
+sub www_leaveVersionTag {
+    my $session = shift;
+    WebGUI::VersionTag->getWorking($session)->clearWorking;
+    return www_manageVersions($session);
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_manageCommittedVersions ( session )
 
@@ -543,37 +550,39 @@ sub www_manageVersions {
         return $session->privilege->insufficient() unless canView($session);
         my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
-	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
+    my ($icon, $url, $datetime, $user) = $session->quick(qw(icon url datetime user));
+	$ac->addSubmenuItem($url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
+	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
 	my $setTag = $i18n->get("set tag");
+    my $leave = ($workingTagId eq "") ? "" : '<a href="'.$url->page('op=leaveVersionTag').'">['.$i18n->get("leave this tag").']</a>';
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
-	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width="100%" class="content">
+	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>. '.$leave.'</p><table width="100%" class="content">
 	<tr><th></th><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("created on").'</th><th>'.$i18n->get("created by").'</th><th></th></tr> ';
 	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {	
-		next unless ($session->user->isInGroup($tag->get("groupToUse")));
+		next unless ($user->isInGroup($tag->get("groupToUse")));
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>';
         if (canView($session)) {
-				$output .= $session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
+				$output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
         }
-        $output .= $session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
+        $output .= $icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
-			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
-			<td>'.$session->datetime->epochToHuman($tag->get("creationDate")).'</td>
+			<td><a href="'.$url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
+			<td>'.$datetime->epochToHuman($tag->get("creationDate")).'</td>
 			<td>'.$u->username.'</td>
 			<td>';
 		unless ($workingTagId eq $tag->getId) {
-			$output .= '<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId).'">'.$setTag.'</a> | ';
+			$output .= '<a href="'.$url->page("op=setWorkingVersionTag;tagId=".$tag->getId).'">'.$setTag.'</a> | ';
 		}
 		$output .='
-			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$tag->getId).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
+			<a href="'.$url->page("op=commitVersionTag;tagId=".$tag->getId).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$output .= '</table>';
 	return $ac->render($output);

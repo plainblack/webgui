@@ -9,6 +9,7 @@
  - EMS Saved Address  (#8864)
  - rfe: Inclusion of UsersOnline macro into the core  (#766)
  - rfe: Search - Paginate results  (#713)
+ - rfe: Leave Version Tag
  - WebGUI::Crud can now automatically resolve differences between its
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.

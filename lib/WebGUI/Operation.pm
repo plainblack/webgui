@@ -213,6 +213,7 @@ sub getOperations {
 		'commitVersionTagConfirm' => 'VersionTag',
 		'editVersionTag' => 'VersionTag',
 		'editVersionTagSave' => 'VersionTag',
+		'leaveVersionTag' => 'VersionTag',
 		'manageCommittedVersions' => 'VersionTag',
 		'managePendingVersions' => 'VersionTag',
 		'manageRevisionsInTag' => 'VersionTag',
