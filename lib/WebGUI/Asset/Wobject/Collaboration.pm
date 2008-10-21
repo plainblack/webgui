@@ -1463,7 +1463,7 @@ sub www_search {
     $var->{'form.footer'} = WebGUI::Form::formFooter($self->session);
     $var->{'back.url'   } = $self->getUrl;
 	
-    $self->appendTemplateLabels(\%var);
+    $self->appendTemplateLabels($var);
     $var->{'doit'       } = $self->session->form->process("doit");
     if ($self->session->form->process("doit")) {
         my $search = WebGUI::Search->new($self->session);
