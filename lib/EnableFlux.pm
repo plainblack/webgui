@@ -10,9 +10,9 @@ my $verbose;
 
 #----------------------------------------------------------------------------
 sub apply {
-    my ($session, $v) = @_;
+    my ( $session, $v ) = @_;
     $verbose = $v;
-    
+
     # Ok, let's do it
     modify_db_schema_for_flux($session);
     modify_config_files_for_flux($session);
@@ -28,7 +28,7 @@ sub say {
 #----------------------------------------------------------------------------
 sub modify_db_schema_for_flux {
     my $session = shift;
-    
+
     # Each command comes in a pair, first reset change (if it has already been applied), second apply change fresh
 
     say("Modifying db schema..");
@@ -118,22 +118,33 @@ CREATE TABLE `fluxExpression` (
 sub modify_config_files_for_flux {
     my $session = shift;
     say("Modifying config files for flux..");
-    
+
     # Add Flux to the list of Content Handlers
-    my @content_handlers = @{$session->config->get('contentHandlers') };
+    my @content_handlers = @{ $session->config->get('contentHandlers') };
     if ( none { $_ eq 'WebGUI::Content::Flux' } @content_handlers ) {
         insert_after_string 'WebGUI::Content::Setup', 'WebGUI::Content::Flux', @content_handlers;
-        $session->config->set('contentHandlers', \@content_handlers);
+        $session->config->set( 'contentHandlers', \@content_handlers );
     }
 
     # Add WebGUI::Workflow::Activity::CheckFluxRules to the list of Activities
     # (keep the list sorted, because we're good citizens)
-    my @activities_none = @{$session->config->get('workflowActivities/None') };
+    my @activities_none = @{ $session->config->get('workflowActivities/None') };
     if ( none { $_ eq 'WebGUI::Workflow::Activity::CheckFluxRules' } @activities_none ) {
         push @activities_none, 'WebGUI::Workflow::Activity::CheckFluxRules';
         @activities_none = sort @activities_none;
-        $session->config->set('workflowActivities/None', \@activities_none);
+        $session->config->set( 'workflowActivities/None', \@activities_none );
     }
+
+    # Add Flux to AdminConsole
+    $session->config->set(
+        'adminConsole/flux',
+        {   icon         => "flux.gif",
+            uiLevel      => 5,
+            url          => "^PageUrl(\"\",flux=admin);",
+            title        => "Flux",
+            groupSetting => "groupIdAdminFlux"
+        }
+    );
 }
 
 #----------------------------------------------------------------------------

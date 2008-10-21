@@ -1,3 +1,4 @@
+#!/data/wre/prereqs/bin/perl
 # Enables Flux for a given site (see FLUX_README.txt for more information)
 
 our ($webguiRoot);
