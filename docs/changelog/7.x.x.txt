@@ -17,7 +17,7 @@
  - rfe #740: Thingy Pre-Text (SDH Consulting Group)
  - rfe #746: use the menu title in asset manager
  - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
-
+ - rfe #637: Alphabetize wiki items under a keyword?
 
 
 7.6.1
