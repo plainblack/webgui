@@ -13,7 +13,7 @@
  - Fixed #8890: meta_loop in post form not working (United Knowledge)
  - added: ldaps and ldapi are now supported when working with LDAP authentication
  - rfe #740: Thingy Pre-Text (SDH Consulting Group)
-
+ - rfe #746: use the menu title in asset manager
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the
