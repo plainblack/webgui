@@ -32,14 +32,23 @@ my $session = start(); # this line required
 repairManageWorkflows($session); 
 addPreTextToThingyFields($session);
 updateAddressBook($session);
+changeDefaultPaginationInSearch($session);
 addUsersOnlineMacro($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
+sub changeDefaultPaginationInSearch {
+    my $session = shift;
+    print "\tAllow content managers to change the default pagination in the search asset... " unless $quiet;
+    $session->db->write("ALTER TABLE `search` ADD COLUMN `paginateAfter` INTEGER  NOT NULL DEFAULT 25");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub addUsersOnlineMacro {
     my $session = shift;
-    print "\tMaking the UsersOnline macro available." unless $quiet;
+    print "\tMaking the UsersOnline macro available... " unless $quiet;
     $session->config->addToHash("macros","UsersOnline","UsersOnline");
     print "DONE!\n" unless $quiet;
 }
@@ -47,7 +56,7 @@ sub addUsersOnlineMacro {
 #----------------------------------------------------------------------------
 sub updateAddressBook {
     my $session = shift;
-    print "\tAdding organization and email to address book." unless $quiet;
+    print "\tAdding organization and email to address book... " unless $quiet;
     my $db = $session->db;
     $db->write("alter table address add column organization char(255)");
     $db->write("alter table address add column email char(255)");

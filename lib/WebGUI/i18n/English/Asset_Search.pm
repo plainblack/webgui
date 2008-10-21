@@ -3,6 +3,18 @@ use strict;
 
 our $I18N = { ##hashref of hashes
 
+	'paginate after' => {
+		message => q|Paginate After|,
+		lastUpdated => 0,
+		context => q|an asset property|
+	},
+
+	'paginate after help' => {
+		message => q|The number of items to be displayed before breaking further items into additional pages.|,
+		lastUpdated => 0,
+		context => q|an asset property help|
+	},
+
 	'useContainers' => {
 		message => q|Use container URLs in results?|,
 		lastUpdated => 0,
