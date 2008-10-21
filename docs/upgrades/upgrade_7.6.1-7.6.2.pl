@@ -32,13 +32,22 @@ my $session = start(); # this line required
 repairManageWorkflows($session); 
 addPreTextToThingyFields($session);
 updateAddressBook($session);
+addUsersOnlineMacro($session);
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
+sub addUsersOnlineMacro {
+    my $session = shift;
+    print "\tMaking the UsersOnline macro available." unless $quiet;
+    $session->config->addToHash("macros","UsersOnline","UsersOnline");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub updateAddressBook {
     my $session = shift;
-    print "\tAdd Organization and Email Address to address book." unless $quiet;
+    print "\tAdding organization and email to address book." unless $quiet;
     my $db = $session->db;
     $db->write("alter table address add column organization char(255)");
     $db->write("alter table address add column email char(255)");
@@ -58,6 +67,7 @@ sub repairManageWorkflows {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
 sub addPreTextToThingyFields {
     my $session = shift;
     print "\tAdding a pre-text property to Thingy fields... " unless $quiet;

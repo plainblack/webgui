@@ -691,6 +691,7 @@
     "SpectreCheck"     : "SpectreCheck",
     "Thumbnail"        : "Thumbnail", 
     "User"             : "User", 
+    "UsersOnline"      : "UsersOnline", 
     "u"                : "u_companyUrl",
     "ViewCart"         : "ViewCart"
     },
