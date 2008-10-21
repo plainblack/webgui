@@ -432,6 +432,7 @@ sub www_byKeyword {
             url     => $asset->getUrl,
             });
     }
+    @pages = sort { lc($a->{title}) cmp lc($b->{title}) } @pages;
     my $var = {
         keyword => $keyword,
         pagesLoop => \@pages,
