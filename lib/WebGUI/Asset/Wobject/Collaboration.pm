@@ -1444,33 +1444,38 @@ The web method to display and use the forum search interface.
 =cut
 
 sub www_search {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
-        my %var;
-	my $query = $self->session->form->process("query","text");
-        $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-         	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
-        	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
-        $var{'query.form'} = WebGUI::Form::text($self->session,{
-                name=>'query',
-                value=>$query
-                });
-        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170,'WebGUI')});
-        $var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-        $var{'back.url'} = $self->getUrl;
-	$self->appendTemplateLabels(\%var);
-        $var{doit} = $self->session->form->process("doit");
-        if ($self->session->form->process("doit")) {
-		my $search = WebGUI::Search->new($self->session);
+    my $self    = shift;
+    my $session = $self->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_Collaboration');
+    my $var     = {};
+	
+    my $query   = $self->session->form->process("query","text");
+    $var->{'form.header'} = WebGUI::Form::formHeader($self->session,{
+        action=>$self->getUrl("func=search;doit=1")
+    });
+    $var->{'query.form'}  = WebGUI::Form::text($self->session,{
+        name  => 'query',
+        value => $query
+    });
+    $var->{'form.search'} = WebGUI::Form::submit($self->session,{
+        value => $i18n->get(170,'WebGUI')
+    });
+    $var->{'form.footer'} = WebGUI::Form::formFooter($self->session);
+    $var->{'back.url'   } = $self->getUrl;
+	
+    $self->appendTemplateLabels(\%var);
+    $var->{'doit'       } = $self->session->form->process("doit");
+    if ($self->session->form->process("doit")) {
+        my $search = WebGUI::Search->new($self->session);
 		$search->search({
-				keywords=>$query,
-				lineage=>[$self->get("lineage")],
-				classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
-				});
-		my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->get("threadsPerPage"));
-		$self->appendPostListTemplateVars(\%var, $p);
-        }
-        return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));
+            keywords=>$query,
+            lineage=>[$self->get("lineage")],
+            classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
+        });
+        my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->get("threadsPerPage"));
+        $self->appendPostListTemplateVars($var, $p);
+    }
+    return  $self->processStyle($self->processTemplate($var, $self->get("searchTemplateId")));
 }
 
 #-------------------------------------------------------------------
