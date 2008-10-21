@@ -407,6 +407,9 @@ fails.
 
 sub requestCommit {
 	my $self = shift;
+    
+    return "Failure" if(WebGUI::Operation::Spectre::spectreTest($self->session) ne "success");    
+
 	$self->lock;
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),

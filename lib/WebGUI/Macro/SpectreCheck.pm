@@ -16,15 +16,14 @@ use WebGUI::International;
 
 =head1 NAME
 
-Package WebGUI::Macro::SessionId
+Package WebGUI::Macro:SpectreCheck:
 
 =head1 DESCRIPTION
 
-A macro to return the ID of the user's current session.
+A macro to return the status of Spectre.
 
 =head2 process( )
 
-Really just a wrapper around $session->getId;
 
 =cut
 
@@ -32,13 +31,15 @@ Really just a wrapper around $session->getId;
 #-------------------------------------------------------------------
 sub process {
 	my $session = shift;
-    my $remote = WebGUI::Operation::Spectre::getASpectre($session);
+    my $status = WebGUI::Operation::Spectre::spectreTest($session);
     my $i18n = WebGUI::International->new($session, "Macro_SpectreCheck");
-    if (defined $remote) {
-        return $i18n->get('spectre ok');
+    if (defined $status) {
+        return $i18n->get('success') if($status eq 'success');
+        return $i18n->get('subnet') if($status eq 'subnet');
+        return $i18n->get('spectre') if($status eq 'spectre');
     }
     else {
-        return $i18n->get('spectre is down');
+        return $i18n->get('spectre');
     }
 }
 

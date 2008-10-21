@@ -688,6 +688,7 @@
     "RootTitle"        : "RootTitle", 
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
+    "SpectreCheck"     : "SpectreCheck",
     "Thumbnail"        : "Thumbnail", 
     "User"             : "User", 
     "u"                : "u_companyUrl",

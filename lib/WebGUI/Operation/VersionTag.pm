@@ -307,6 +307,13 @@ sub www_commitVersionTag {
     my $session = shift;
     my $tagId = $session->form->param("tagId");
 
+    my $spectreTest = WebGUI::Operation::Spectre::spectreTest($session);
+    if($spectreTest ne "success"){
+        my $i18n = WebGUI::International->new($session, "Macro_SpectreCheck")->get($spectreTest); 
+        my $ac = WebGUI::AdminConsole->new($session,"versions");
+        return $ac->render( $i18n );
+    }
+
     if ( !$tagId ) { 
         return www_manageVersions( $session );
     }

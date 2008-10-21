@@ -172,7 +172,21 @@ sub www_spectreTest {
 	my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
+    return WebGUI::Operation::Spectre::spectreTest($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 spectreTest (  )
+
+Spectre executes this function to see if WebGUI connectivity is working.
+
+=cut
+
+sub spectreTest{
+	my $session = shift;
     my $subnets = $session->config->get("spectreSubnets");
+
     if (!defined $subnets) {
         $subnets = [];
     }

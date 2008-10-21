@@ -14,6 +14,7 @@
  - added: ldaps and ldapi are now supported when working with LDAP authentication
  - rfe #740: Thingy Pre-Text (SDH Consulting Group)
  - rfe #746: use the menu title in asset manager
+ - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the
