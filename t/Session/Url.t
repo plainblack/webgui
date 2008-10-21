@@ -226,22 +226,22 @@ my $sessionAsset = $session->asset;
 $session->asset(undef);
 
 $session->url->{_requestedUrl} = undef;  ##Manually clear cached value
-$pseudoRequest->uri('/path1/file1');
-is($session->url->page, '/path1%2Ffile1', 'page with no args returns getRequestedUrl through gateway, escaping the requested URL for safety');
+$pseudoRequest->uri('/path1/">file1');
+is($session->url->page, '/path1/%22%3Efile1', 'page with no args returns getRequestedUrl through gateway, escaping the requested URL for safety');
 
-is($session->url->page('op=viewHelpTOC;topic=Article'), '/path1%2Ffile1?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
+is($session->url->page('op=viewHelpTOC;topic=Article'), '/path1/%22%3Efile1?op=viewHelpTOC;topic=Article', 'page: pairs are appended');
 
-$url2 = 'http://'.$session->config->get('sitename')->[0].'/path1%2Ffile1';
+$url2 = 'http://'.$session->config->get('sitename')->[0].'/path1/%22%3Efile1';
 is($session->url->page('',1), $url2, 'page: withFullUrl includes method and sitename');
 
 $session->setting->set('preventProxyCache', 0);
 
-is($session->url->page('','',1), '/path1%2Ffile1', 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
+is($session->url->page('','',1), '/path1/%22%3Efile1', 'page: skipPreventProxyCache is a no-op with preventProxyCache off in settings');
 $session->setting->set('preventProxyCache', 1);
 my $cacheableUrl = $session->url->page('','',1);
-is($cacheableUrl, '/path1%2Ffile1', 'page: skipPreventProxyCache does not change url');
+is($cacheableUrl, '/path1/%22%3Efile1', 'page: skipPreventProxyCache does not change url');
 
-like($session->url->page('','',0), qr(^/path1%2Ffile1\?noCache=\d{0,4}:\d+$), 'page: noCache added');
+like($session->url->page('','',0), qr(^/path1/%22%3Efile1\?noCache=\d{0,4}:\d+$), 'page: noCache added');
 
 ##Restore original setting
 $session->setting->set('preventProxyCache', $preventProxyCache);
