@@ -408,8 +408,6 @@ fails.
 sub requestCommit {
 	my $self = shift;
     
-    return "Failure" if(WebGUI::Operation::Spectre::spectreTest($self->session) ne "success");    
-
 	$self->lock;
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),
@@ -420,7 +418,7 @@ sub requestCommit {
 	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-    $instance->start;
+    return $instance->start;
     return undef;
 }
 

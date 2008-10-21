@@ -20,8 +20,8 @@ use JSON;
 use WebGUI::Pluggable;
 use WebGUI::Workflow::Spectre;
 use WebGUI::Workflow;
-
-
+use WebGUI::International;
+use WebGUI::Operation::Spectre;
 =head1 NAME
 
 Package WebGUI::Workflow::Instance
@@ -527,6 +527,13 @@ sub start {
 	$log->info('Could not complete workflow instance '.$self->getId.' in realtime, handing off to Spectre.');
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+
+    my $spectreTest = WebGUI::Operation::Spectre::spectreTest($self->session);
+    if($spectreTest ne "success"){
+        return WebGUI::International->new($self->session, "Macro_SpectreCheck")->get($spectreTest);
+    }
+
+    return undef;
 }
 
 1;
