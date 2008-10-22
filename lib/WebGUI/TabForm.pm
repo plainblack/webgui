@@ -257,7 +257,7 @@ sub print {
 	}
 	$tabs .= '</ul>';
 	$form .= '</div>';
-	my $output = $self->{_form}.$self->{_hidden}.'<div>'.$self->{_submit}.$self->{_cancel}.'</div><div class="yui-skin-sam"><div id="webguiTabForm" class="yui-navset">'.$tabs.$form.'</div></div>';
+	my $output = $self->{_form}.$self->{_hidden}.'<div style="text-align: right;">'.$self->{_submit}.$self->{_cancel}.'</div><div class="yui-skin-sam"><div id="webguiTabForm" class="yui-navset">'.$tabs.$form.'</div></div>';
 	$output .= WebGUI::Form::formFooter($self->session);
 	$output .= q{<script type="text/javascript">
 		var tabView = new YAHOO.widget.TabView('webguiTabForm');
