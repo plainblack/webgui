@@ -13,6 +13,8 @@
  - rfe: Inclusion of UsersOnline macro into the core  (#766)
  - rfe: Search - Paginate results  (#713)
  - rfe: Leave Version Tag
+ - Migrated WebGUI::TabForm to use YUI tabs rather than the old fashioned
+   WebGUI tabs.
  - WebGUI::Crud can now automatically resolve differences between its
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
