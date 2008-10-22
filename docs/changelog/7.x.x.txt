@@ -28,6 +28,7 @@
  - Autocommit assets like CS posts or Calendar Events can now be added before the
     parent is committed.  They will go into the same version tag as their parent.
  - rfe #640: Refactored autocommit and autocomment
+ - added a perltidyrc to the docs folder. we'll be using this to clean up code.
 
 
 7.6.1
