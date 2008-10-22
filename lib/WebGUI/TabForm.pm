@@ -236,8 +236,6 @@ sub print {
     $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
-	my $output = $self->{_form};
-	$output .= $self->{_hidden};
 	my $i = 1;
 	my $tabs = '<ul class="yui-nav">';
 	my $form = '<div class="yui-content">';
@@ -259,7 +257,7 @@ sub print {
 	}
 	$tabs .= '</ul>';
 	$form .= '</div>';
-	$output .= '<div style="float: right;">'.$self->{_submit}.$self->{_cancel}.'</div><div class="yui-skin-sam"><div id="webguiTabForm" class="yui-navset">'.$tabs.$form.'</div></div>';
+	my $output = $self->{_form}.$self->{_hidden}.'<div>'.$self->{_submit}.$self->{_cancel}.'</div><div class="yui-skin-sam"><div id="webguiTabForm" class="yui-navset">'.$tabs.$form.'</div></div>';
 	$output .= WebGUI::Form::formFooter($self->session);
 	$output .= q{<script type="text/javascript">
 		var tabView = new YAHOO.widget.TabView('webguiTabForm');
