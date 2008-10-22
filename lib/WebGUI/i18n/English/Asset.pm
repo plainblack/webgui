@@ -9,7 +9,7 @@ our $I18N = {
 	},
 
     'apply' => {
-        message     => q{Apply},
+        message     => q{apply},
         lastUpdated => 0,
         context     => q{The label for the button to save and then return to the edit page.},
     },
