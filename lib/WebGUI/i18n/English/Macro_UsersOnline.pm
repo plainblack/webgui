@@ -158,9 +158,9 @@ our $I18N = {
 		lastUpdated => 1178783587
 	},
 
-	'members_loops' => {
+	'member_loop' => {
 		message => q|Loop containing all members that are online and have agreed publication.|,
-		lastUpdated => 1178783587
+		lastUpdated => 1224690890
 	},
 
 	'username' => {
@@ -213,9 +213,9 @@ our $I18N = {
 		lastUpdated => 1178783587
 	},
 
-	'visitors_loops' => {
+	'visitor_loop' => {
 		message => q|Loop containing all visitors that are online.|,
-		lastUpdated => 1178783587
+		lastUpdated => 1224690939
 	},
 
 };
