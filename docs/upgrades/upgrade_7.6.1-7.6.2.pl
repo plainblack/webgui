@@ -34,6 +34,7 @@ addPreTextToThingyFields($session);
 updateAddressBook($session);
 changeDefaultPaginationInSearch($session);
 addUsersOnlineMacro($session);
+addProfileExtrasField($session);
 finish($session); # this line required
 
 
@@ -81,6 +82,15 @@ sub addPreTextToThingyFields {
     my $session = shift;
     print "\tAdding a pre-text property to Thingy fields... " unless $quiet;
     $session->db->write('ALTER TABLE `Thingy_fields` ADD pretext varchar(255)');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addProfileExtrasField {
+    my $session = shift;
+    print "\tAdding the Extras field for profile fields... " unless $quiet;
+    my $db = $session->db;
+    $db->write('alter table userProfileField add extras text default NULL');
     print "DONE!\n" unless $quiet;
 }
 

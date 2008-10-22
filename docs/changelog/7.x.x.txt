@@ -1,4 +1,7 @@
 7.6.2
+ - added extras to user profile fields. these can be accessed using the
+   profile.form.element.extras template variable when editing a profile
+   and the profile.extras field when viewing a template.
  - Added the NotifyAboutThing workflow activity. Use this activity to create
    workflows for the add / edit / delete workflows for a thingy's things.
  - fixed #8839: Documentation is wrong for Stock Ticker

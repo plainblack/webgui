@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 139; # increment this value for each test you create
+use Test::More tests => 140; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -405,6 +405,12 @@ $copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
 $profileField->set(\%copiedFieldData);
 
 is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
+
+# now let's make sure it has an extras field, and that we can get/set it.
+$profileField->set( { extras => '<!-- hello world -->' } );
+is($profileField->getExtras, '<!-- hello world -->', 'extras field for profileField');
+$profileField->set( { extras => '' } );
+
 
 my $busterCopy = WebGUI::User->new($session, $buster->userId);
 is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy received updated user profile because there is no username set in his cached user object');

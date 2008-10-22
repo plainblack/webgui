@@ -44,15 +44,15 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 sub _reorderFields {
-	my $self = shift;
-	my $category = shift;
-        my ($sth, $i, $id);
-        $sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($category)." order by sequenceNumber");
-        while (($id) = $sth->array) {
-                $i++;
-                $self->session->db->write("update userProfileField set sequenceNumber='$i' where fieldName=".$self->session->db->quote($id));
-        }
-        $sth->finish;
+    my $self = shift;
+    my $category = shift;
+    my ($sth, $i, $id);
+    $sth = $self->session->db->read("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($category)." order by sequenceNumber");
+    while (($id) = $sth->array) {
+        $i++;
+        $self->session->db->write("update userProfileField set sequenceNumber='$i' where fieldName=".$self->session->db->quote($id));
+    }
+    $sth->finish;
 }
 
 #-------------------------------------------------------------------
@@ -64,9 +64,9 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 =cut
 
 sub isReservedFieldName {
-	my $class = shift;
-	my $fieldName = shift;
-	return isIn($fieldName, ('func', 'op'));
+    my $class = shift;
+    my $fieldName = shift;
+    return isIn($fieldName, ('func', 'op'));
 }
 
 #-------------------------------------------------------------------
@@ -167,25 +167,25 @@ a value) that are not known by the ProfileField.
 =cut
 
 sub formProperties {
-	my $self        = shift;
-	my $properties  = shift || {};
-    
+    my $self        = shift;
+    my $properties  = shift || {};
+
     # Make a copy of the properties so we don't clobber them
     my %properties     = %{$properties};
 
-	$properties{ label          } = $self->getLabel unless $properties->{label};
-	$properties{ fieldType      } = $self->get("fieldType");
-	$properties{ name           } = $self->getId;
-	my $values 
-        = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
-	unless (ref $values eq 'HASH') {
-		if ($self->get('possibleValues') =~ /\S/) {
-			$self->session->errorHandler->warn("Could not get a hash out of possible values for profile field ".$self->getId);
-		}
-		$values = {};
-	}
-	my $orderedValues = {};
-	tie %{$orderedValues}, 'Tie::IxHash';
+    $properties{ label          } = $self->getLabel unless $properties->{label};
+    $properties{ fieldType      } = $self->get("fieldType");
+    $properties{ name           } = $self->getId;
+    my $values 
+    = WebGUI::Operation::Shared::secureEval($self->session,$self->get("possibleValues"));
+    unless (ref $values eq 'HASH') {
+        if ($self->get('possibleValues') =~ /\S/) {
+            $self->session->errorHandler->warn("Could not get a hash out of possible values for profile field ".$self->getId);
+        }
+        $values = {};
+    }
+    my $orderedValues = {};
+    tie %{$orderedValues}, 'Tie::IxHash';
     for my $ov (sort keys %{$values}) {
         $orderedValues->{$ov} = $values->{$ov};
     }
@@ -229,37 +229,37 @@ form.
 =cut
 
 sub formField {
-	my $self = shift;
+    my $self = shift;
     my $properties = $self->formProperties(shift);
-	my $withWrapper = shift;
-	my $u = shift || $self->session->user;
-	my $skipDefault = shift;
-	my $assignedValue = shift;
-	if ($skipDefault) {
-	    $properties->{value} = undef;
-	}
-	elsif (defined $assignedValue) {
-	    $properties->{value} = $assignedValue;
-	}
-	else {
-	    # start with specified (or current) user's data.  previous data needed by some form types as well (file).
+    my $withWrapper = shift;
+    my $u = shift || $self->session->user;
+    my $skipDefault = shift;
+    my $assignedValue = shift;
+    if ($skipDefault) {
+        $properties->{value} = undef;
+    }
+    elsif (defined $assignedValue) {
+        $properties->{value} = $assignedValue;
+    }
+    else {
+        # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
         # use submitted data if it exists
         if (defined $self->session->form->process($properties->{name})) {
             $properties->{value} = $self->session->form->process($self->getId,$self->get("fieldType"), undef, $properties);
-	    }
-	    # fall back on default
-	    if(!defined $properties->{value}) {
-	        $properties->{value} = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
-	    }
-	}
-	if ($withWrapper == 1) {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtmlWithWrapper;
-	} elsif ($withWrapper == 2) {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->getValueAsHtml;
-	} else {
-		return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtml;
-	}
+        }
+        # fall back on default
+        if(!defined $properties->{value}) {
+            $properties->{value} = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
+        }
+    }
+    if ($withWrapper == 1) {
+        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtmlWithWrapper;
+    } elsif ($withWrapper == 2) {
+        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->getValueAsHtml;
+    } else {
+        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtml;
+    }
 }
 
 
@@ -272,20 +272,20 @@ Returns the value retrieved from a form post.
 =cut
 
 sub formProcess {
-	my $self = shift;
+    my $self = shift;
     my $u = shift || $self->session->user;
     my $properties = $self->formProperties({value => $u->profileField($self->getId)});
-	my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
-	if (ref $result eq "ARRAY") {
-		my @results = @$result;
-		for (my $count=0;$count<scalar(@results);$count++) {
-			$results[$count] = 	WebGUI::HTML::filter($results[$count], "javascript");
-		}
-		$result = \@results;
-	} else {
-		$result = WebGUI::HTML::filter($result, "javascript");
-	}
-	return $result;
+    my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
+    if (ref $result eq "ARRAY") {
+        my @results = @$result;
+        for (my $count=0;$count<scalar(@results);$count++) {
+            $results[$count] =  WebGUI::HTML::filter($results[$count], "javascript");
+        }
+        $result = \@results;
+    } else {
+        $result = WebGUI::HTML::filter($result, "javascript");
+    }
+    return $result;
 }
 
 #-------------------------------------------------------------------
@@ -318,8 +318,8 @@ Returns a WebGUI::ProfileCategory object for the category that this profile fiel
 =cut
 
 sub getCategory {
-	my $self = shift;
-	return WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
+    my $self = shift;
+    return WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
 }
 
 
@@ -340,6 +340,19 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getExtras ()
+
+Returns the value of the extras property for this field.
+
+=cut
+
+sub getExtras {
+    my $self = shift;
+    return $self->get('extras');
+}
+
+#-------------------------------------------------------------------
+
 =head2 getLabel ( )
 
 Returns the eval'd label for this field.
@@ -354,10 +367,10 @@ sub getLabel {
 #-------------------------------------------------------------------
 
 sub _listFieldsWhere {
-	my $class = shift;
-	my $session = shift;
-	my $whereClause = shift;
-	return [map{$class->new($session, $_)} $session->db->buildArray(<<"SQL")];
+    my $class = shift;
+    my $session = shift;
+    my $whereClause = shift;
+    return [map{$class->new($session, $_)} $session->db->buildArray(<<"SQL")];
   SELECT f.fieldName
     FROM userProfileField AS f
          LEFT JOIN userProfileCategory AS c ON f.profileCategoryId = c.profileCategoryId
@@ -375,9 +388,9 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "edit
 =cut
 
 sub getEditableFields {
-        my $class = shift;
-	my $session = shift;
-	return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1");
+    my $class = shift;
+    my $session = shift;
+    return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1");
 }
 
 #-------------------------------------------------------------------
@@ -389,9 +402,9 @@ Returns an array reference of WebGUI::ProfileField objects. This is a class meth
 =cut
 
 sub getFields {
-        my $class = shift;
-	my $session = shift;
-	return $class->_listFieldsWhere($session, "1");
+    my $class = shift;
+    my $session = shift;
+    return $class->_listFieldsWhere($session, "1");
 }
 
 #-------------------------------------------------------------------
@@ -416,9 +429,9 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "requ
 =cut
 
 sub getRequiredFields {
-	my $class = shift;
-	my $session = shift;
-	return $class->_listFieldsWhere($session, "f.required = 1");
+    my $class = shift;
+    my $session = shift;
+    return $class->_listFieldsWhere($session, "f.required = 1");
 }
 
 #-------------------------------------------------------------------
@@ -430,9 +443,9 @@ Returns an array reference of profile field objects to use during anonymous regi
 =cut
 
 sub getRegistrationFields {
-	my $class = shift;
-	my $session = shift;
-	return $class->_listFieldsWhere($session, "f.showAtRegistration = 1");
+    my $class = shift;
+    my $session = shift;
+    return $class->_listFieldsWhere($session, "f.showAtRegistration = 1");
 }
 
 =head2 getPasswordRecoveryFields ( session )
@@ -443,9 +456,9 @@ for password recovery.  Class method.
 =cut
 
 sub getPasswordRecoveryFields {
-	my $class = shift;
-	my $session = shift;
-	return $class->_listFieldsWhere($session, "f.requiredForPasswordRecovery = 1");
+    my $class = shift;
+    my $session = shift;
+    return $class->_listFieldsWhere($session, "f.requiredForPasswordRecovery = 1");
 }
 
 #-------------------------------------------------------------------
@@ -510,15 +523,15 @@ Moves this field down one position within it's category.
 =cut
 
 sub moveDown {
-	my $self = shift;
- 	my ($id, $thisSeq, $profileCategoryId);
-        ($thisSeq,$profileCategoryId) = $self->session->db->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".$self->session->db->quote($self->getId));
-        ($id) = $self->session->db->quickArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($profileCategoryId)." and sequenceNumber=$thisSeq+1");
-        if ($id ne "") {
-                $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($self->getId));
-                $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($id));
-                $self->_reorderFields($profileCategoryId);
-        }
+    my $self = shift;
+    my ($id, $thisSeq, $profileCategoryId);
+    ($thisSeq,$profileCategoryId) = $self->session->db->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".$self->session->db->quote($self->getId));
+    ($id) = $self->session->db->quickArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($profileCategoryId)." and sequenceNumber=$thisSeq+1");
+    if ($id ne "") {
+        $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($self->getId));
+        $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($id));
+        $self->_reorderFields($profileCategoryId);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -530,15 +543,15 @@ Moves this field up one position within it's category.
 =cut
 
 sub moveUp {
-	my $self = shift;
-	my ($id, $thisSeq, $profileCategoryId);
-        ($thisSeq,$profileCategoryId) = $self->session->db->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".$self->session->db->quote($self->getId));
-        ($id) = $self->session->db->quickArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($profileCategoryId)." and sequenceNumber=$thisSeq-1");
-        if ($id ne "") {
-                $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($self->getId));
-                $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($id));
-                $self->_reorderFields($profileCategoryId);
-        }
+    my $self = shift;
+    my ($id, $thisSeq, $profileCategoryId);
+    ($thisSeq,$profileCategoryId) = $self->session->db->quickArray("select sequenceNumber,profileCategoryId from userProfileField where fieldName=".$self->session->db->quote($self->getId));
+    ($id) = $self->session->db->quickArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($profileCategoryId)." and sequenceNumber=$thisSeq-1");
+    if ($id ne "") {
+        $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber-1 where fieldName=".$self->session->db->quote($self->getId));
+        $self->session->db->write("update userProfileField set sequenceNumber=sequenceNumber+1 where fieldName=".$self->session->db->quote($id));
+        $self->_reorderFields($profileCategoryId);
+    }
 }
 
 
@@ -583,21 +596,21 @@ The new name this field should take.
 =cut
 
 sub rename {
-	my $self        = shift;
-	my $newName     = shift;
+    my $self        = shift;
+    my $newName     = shift;
 
     my $session     = $self->session;
     my $db          = $session->db;
 
     ### Check data
     # Make sure the field doesn't exist
-	my $fieldNameExists
-        = $self->session->db->quickScalar(
-            "SELECT COUNT(*) FROM userProfileField WHERE fieldName=?",
-            [$newName]
-        );
-	return 0 if ($fieldNameExists);
-   
+    my $fieldNameExists
+    = $self->session->db->quickScalar(
+        "SELECT COUNT(*) FROM userProfileField WHERE fieldName=?",
+        [$newName]
+    );
+    return 0 if ($fieldNameExists);
+
     # Rename the userProfileData column
     my $fieldClass  = $self->getFormControlClass;
     eval "use $fieldClass;";
@@ -610,12 +623,12 @@ sub rename {
     );
 
     # Update the record
-	$self->session->db->write(
+    $self->session->db->write(
         "update userProfileField set fieldName=? where fieldName=?",
         [$newName, $self->getId]
     );
-	$self->{_properties}{fieldName} = $newName;
-	
+    $self->{_properties}{fieldName} = $newName;
+
     return 1;
 }
 
@@ -629,8 +642,8 @@ Returns a reference to the current session.
 =cut
 
 sub session {
-	my $self = shift;
-	return $self->{_session};
+    my $self = shift;
+    return $self->{_session};
 }
 
 #-------------------------------------------------------------------
@@ -678,51 +691,52 @@ A scalar containing an array reference or scalar declaration of defaultly select
 =cut
 
 sub set {
-	my $self        = shift;
-	my $properties  = shift;
+    my $self        = shift;
+    my $properties  = shift;
 
     my $session     = $self->session;
-	my $db          = $session->db;
+    my $db          = $session->db;
 
     # Set the defaults
     $properties->{visible} = 0 unless ($properties->{visible} == 1);
-	$properties->{editable} = 0 unless ($properties->{editable} == 1);
-	$properties->{protected} = 0 unless ($properties->{protected} == 1);
-	$properties->{required} = 0 unless ($properties->{required} == 1);
-	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
-	$properties->{fieldType} = 'text' unless ($properties->{fieldType});
-	if ($properties->{dataDefault} && $properties->{fieldType}=~/List$/) {
-                unless ($properties->{dataDefault} =~ /^\[/) {
-                        $properties->{dataDefault} = "[".$properties->{dataDefault};
-                }
-                unless ($properties->{dataDefault} =~ /\]$/) {
-                        $properties->{dataDefault} .= "]";
-                }
+    $properties->{editable} = 0 unless ($properties->{editable} == 1);
+    $properties->{protected} = 0 unless ($properties->{protected} == 1);
+    $properties->{required} = 0 unless ($properties->{required} == 1);
+    $properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
+    $properties->{fieldType} = 'text' unless ($properties->{fieldType});
+    $properties->{extras} = '' unless ($properties->{extras});
+    if ($properties->{dataDefault} && $properties->{fieldType}=~/List$/) {
+        unless ($properties->{dataDefault} =~ /^\[/) {
+            $properties->{dataDefault} = "[".$properties->{dataDefault};
         }
-	$properties->{fieldName} = $self->getId;
-    
+        unless ($properties->{dataDefault} =~ /\]$/) {
+            $properties->{dataDefault} .= "]";
+        }
+    }
+    $properties->{fieldName} = $self->getId;
+
     # If the fieldType has changed, modify the userProfileData column
     if ($properties->{fieldType} ne $self->get("fieldType")) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = "WebGUI::Form::".ucfirst($properties->{fieldType});
         eval "use $fieldClass;";
         my $dbDataType 
-            = $fieldClass->new($session, $self->formProperties($properties))->getDatabaseFieldType;
-        
+        = $fieldClass->new($session, $self->formProperties($properties))->getDatabaseFieldType;
+
         my $sql 
-            = "ALTER TABLE userProfileData MODIFY COLUMN " 
-            . $db->dbh->quote_identifier($self->getId) . q{ }
-            . $dbDataType
-            ;
-        
+        = "ALTER TABLE userProfileData MODIFY COLUMN " 
+        . $db->dbh->quote_identifier($self->getId) . q{ }
+        . $dbDataType
+        ;
+
         $db->write($sql);
     }
 
     # Update the record
-	$db->setRow("userProfileField","fieldName",$properties);
-	foreach my $key (keys %{$properties}) {
-		$self->{_properties}{$key} = $properties->{$key};
-	}
+    $db->setRow("userProfileField","fieldName",$properties);
+    foreach my $key (keys %{$properties}) {
+        $self->{_properties}{$key} = $properties->{$key};
+    }
 }
 
 #-------------------------------------------------------------------
@@ -738,19 +752,19 @@ The unique ID of a category to assign this field to.
 =cut
 
 sub setCategory {
-	my $self = shift;
-	my $categoryId = shift;
-	return undef unless ($categoryId);
-	my $currentCategoryId = $self->get("profileCategoryId");
+    my $self = shift;
+    my $categoryId = shift;
+    return undef unless ($categoryId);
+    my $currentCategoryId = $self->get("profileCategoryId");
 
-	return undef if ($categoryId eq $currentCategoryId);
+    return undef if ($categoryId eq $currentCategoryId);
 
-        my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=".$self->session->db->quote($categoryId));
-	$self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});
-	$self->{_property}{profileCategoryId} = $categoryId;
-	$self->{_property}{sequenceNumber} = $sequenceNumber+1;
-	$self->_reorderFields($currentCategoryId) if ($currentCategoryId);
-	$self->_reorderFields($categoryId);
+    my ($sequenceNumber) = $self->session->db->quickArray("select max(sequenceNumber) from userProfileField where profileCategoryId=".$self->session->db->quote($categoryId));
+    $self->session->db->setRow("userProfileField","fieldName",{fieldName=>$self->getId, profileCategoryId=>$categoryId, sequenceNumber=>$sequenceNumber+1});
+    $self->{_property}{profileCategoryId} = $categoryId;
+    $self->{_property}{sequenceNumber} = $sequenceNumber+1;
+    $self->_reorderFields($currentCategoryId) if ($currentCategoryId);
+    $self->_reorderFields($categoryId);
 }
 
 1;
