@@ -361,7 +361,12 @@ Returns the workflowId of the Gallery's approval workflow.
 
 sub getAutoCommitWorkflowId {
     my $self        = shift;
-    return $self->getParent->get("workflowIdCommit");
+    my $gallery = $self->getParent;
+    if ($gallery->hasBeenCommitted) {
+        return $gallery->get("workflowIdCommit")
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 #----------------------------------------------------------------------------
@@ -708,8 +713,6 @@ sub processPropertiesFromFormPost {
     return $errors  if @$errors;
 
     ### Passes all checks
-
-    $self->requestAutoCommit;
 }
 
 #----------------------------------------------------------------------------

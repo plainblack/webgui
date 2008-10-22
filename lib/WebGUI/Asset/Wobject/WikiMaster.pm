@@ -392,26 +392,6 @@ sub view {
 	return $self->processTemplate($var, undef, $template);
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_add ( )
-
-Returns an error message if the collaboration system has not yet been posted.
-
-=cut
-
-sub www_add {
-	my $self    = shift;
-    
-    #Check to see if the asset has been committed
-    unless ($self->hasBeenCommitted ) {
-        my $i18n = WebGUI::International->new($self->session,"Asset_WikiMaster");
-        return $self->processStyle($i18n->get("asset not committed"));
-    }
-	return $self->SUPER::www_add( @_ );
-}
-
-
 
 #-------------------------------------------------------------------
 sub www_byKeyword {

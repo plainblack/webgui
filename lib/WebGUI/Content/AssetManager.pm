@@ -371,21 +371,13 @@ sub www_manage {
         }
     }
 
-    # Handle Auto Request Commit setting
-    if ($session->setting->get("autoRequestCommit")) {
-        # Make sure version tag hasn't already been committed by another process
-        my $versionTag = WebGUI::VersionTag->getWorking($session, "nocreate");
-
-        if ($versionTag && $session->setting->get("skipCommitComments")) {
-            $versionTag->requestCommit;
-        }
-        elsif ($versionTag) {
-            $session->http->setRedirect(
-                $currentAsset->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($session)->getId)
-            );
-            return undef;
-        }
-    }
+    # Handle autocommit workflows
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        allowComments   => 1,
+        returnUrl       => $currentAsset->getUrl,
+    })) {
+        return undef;
+    };
 
     # Show the page
     # i18n we'll need later

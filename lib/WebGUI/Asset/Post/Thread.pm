@@ -582,6 +582,14 @@ sub postProcess {
 	$self->SUPER::postProcess;
 }
 
+sub processPropertiesFromFormPost {
+    my $self = shift;
+    if ($self->isNew && $self->getParent->getValue('useCaptcha')) {
+        my $captcha = $self->session->form->process("captcha","Captcha");
+        return [ 'invalid captcha' ];
+    }
+}
+
 
 #-------------------------------------------------------------------
 sub purge {

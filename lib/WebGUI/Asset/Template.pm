@@ -467,10 +467,7 @@ sub www_editDuplicate {
 
                         # Auto-commit our revision if necessary
                         # TODO: This needs to be handled automatically somehow...
-                        if ($session->setting->get("autoRequestCommit")) {
-                            my $tag = WebGUI::VersionTag->getWorking($session)->requestCommit;
-                        }
-                        
+                        WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
                         last DEF;
                     }
                 }

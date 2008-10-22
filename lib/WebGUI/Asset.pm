@@ -2550,35 +2550,17 @@ sub www_editSave {
     
     $object->updateHistory("edited");
 
-    # Handle Save & Commit button
-    if ($self->session->form->process("saveAndCommit") ne "") {
-        if ($self->session->setting->get("skipCommitComments")) {
-            $self->session->http->setRedirect(
-                $self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-        } 
-        else {
-            $self->session->http->setRedirect(
-                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-        }
-        return undef;
+    # we handle auto commit assets here in case they didn't handle it themselves
+    if ($object->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
+        $object->requestAutoCommit;
     }
-
-    # Handle Auto Request Commit setting
-    if ($self->session->setting->get("autoRequestCommit")) {
-        # Make sure version tag hasn't already been committed by another process
-        my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");
-
-        if ($versionTag && $self->session->setting->get("skipCommitComments")) {
-            $versionTag->requestCommit;
-        }
-        elsif ($versionTag) {
-            $self->session->http->setRedirect(  
-                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-            return undef;
-        }
+    # else, try to to auto commit
+    elsif(WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        override        => scalar $self->session->form->process('saveAndCommit'),
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    })) {
+        return undef;
     }
 
     # Handle "saveAndReturn" button
@@ -2600,12 +2582,11 @@ sub www_editSave {
         $self->session->asset($object);
         return $self->session->asset->$method();
     }
-            
+
     $self->session->asset($object->getContainer);
     return $self->session->asset->www_view;
 }
 
-                
 
 #-------------------------------------------------------------------
 

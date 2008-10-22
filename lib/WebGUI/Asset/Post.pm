@@ -332,8 +332,13 @@ sub getContentLastModified {
 
 #-------------------------------------------------------------------
 sub getAutoCommitWorkflowId {
-	my $self = shift;
-	return $self->getThread->getParent->get("approvalWorkflow");
+    my $self = shift;
+    my $cs = $self->getThread->getParent;
+    if ($cs->hasBeenCommitted) {
+        return $cs->get('approvalWorkflow')
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -879,7 +884,6 @@ sub postProcess {
 		$size += $storage->getFileSize($file);
 	}
 	$self->setSize($size);
-	$self->requestAutoCommit;
 }
 
 #-------------------------------------------------------------------

@@ -1388,55 +1388,6 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_add ( )
-
-Returns an error message if the collaboration system has not yet been posted.
-
-=cut
-
-sub www_add {
-	my $self    = shift;
-    
-    #Check to see if the asset has been committed
-    unless ( $self->hasBeenCommitted ) {
-        my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-        return $self->processStyle($i18n->get("asset not committed"));
-    }
-	return $self->SUPER::www_add( @_ );
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_editSave ( )
-
-We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
-
-=cut
-
-sub www_editSave {
-	my $self    = shift;
-    my $session = $self->session;
-    
-    my $className = $session->form->param("class");
-    
-    #my $assetId = $self->session->form->param("assetId");
-    if($className eq "WebGUI::Asset::Post::Thread") {
-        my $assetId = $session->form->param("assetId");
-      
-        if($assetId eq "new" && $self->getValue("useCaptcha")) {
-            my $captcha = $self->session->form->process("captcha","Captcha");
-            unless ($captcha) {
-                return $self->www_add;
-            }
-        }
-    }
-    
-    return $self->SUPER::www_editSave();
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_search ( )
 
 The web method to display and use the forum search interface.

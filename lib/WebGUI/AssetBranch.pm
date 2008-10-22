@@ -304,14 +304,12 @@ sub www_editBranchSave {
             }
         }
 	}
-	if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-            return undef;
-        }
-	}
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    })) {
+        return undef;
+    };
 	delete $self->{_parent};
 	$self->session->asset($self->getParent);
 	return $self->getParent->www_manageAssets;

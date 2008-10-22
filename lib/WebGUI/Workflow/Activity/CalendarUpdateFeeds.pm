@@ -25,7 +25,7 @@ use WebGUI::DateTime;
 use DateTime::TimeZone;
 
 use LWP::UserAgent;
-use JSON qw(encode_json decode_json);
+use JSON ();
 
 =head1 NAME
 
@@ -91,8 +91,8 @@ sub execute {
     my $eventList   = [];
     my $feedList;
     if ($instance->getScratch('events')) {
-        $eventList = decode_json($instance->getScratch('events'));
-        $feedList = decode_json($instance->getScratch('feeds'));
+        $eventList = JSON::from_json($instance->getScratch('events'));
+        $feedList = JSON::from_json($instance->getScratch('feeds'));
     }
     else {
         my $ua      = LWP::UserAgent->new(agent => "WebGUI");
@@ -353,11 +353,22 @@ sub execute {
             }
         }
     }
+    my $currentVersionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+    if ($currentVersionTag) {
+        $currentVersionTag->clearWorking;
+    }
     my $ttl = $self->getTTL;
     while (@$eventList) {
         if ($startTime + $ttl < time()) {
-            $instance->setScratch('events', encode_json($eventList));
-            $instance->setScratch('feeds', encode_json($feedList));
+            $instance->setScratch('events', JSON::to_json($eventList));
+            $instance->setScratch('feeds', JSON::to_json($feedList));
+            my $newVersionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+            if ($newVersionTag) {
+                $newVersionTag->requestCommit;
+            }
+            if ($currentVersionTag) {
+                $currentVersionTag->setWorking;
+            }
             return $self->WAITING;
         }
         my $eventData = shift @$eventList;
@@ -376,7 +387,6 @@ sub execute {
             
             if ($event) {
                 $event->update($properties);
-                $event->requestAutoCommit;
                 $feed->{updated}++;
             }
         }
@@ -384,10 +394,16 @@ sub execute {
             my $calendar = WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
             if (!defined $calendar) {
                 $self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate.  Did you commit the calendar wobject?");
+                my $newVersionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+                if ($newVersionTag) {
+                    $newVersionTag->requestCommit;
+                }
+                if ($currentVersionTag) {
+                    $currentVersionTag->setWorking;
+                }
                 return $self->ERROR;
             }
-            my $event   = $calendar->addChild($properties);
-            $event->requestAutoCommit;
+            my $event   = $calendar->addChild($properties, { skipAutoCommitWorkflows => 1});
             $feed->{added}++;
             if ($recur) {
                 $event->setRecurrence($recur);
@@ -397,6 +413,13 @@ sub execute {
         
         # TODO: Only update if last-updated field is 
         # greater than the event's lastUpdated property
+    }
+    my $newVersionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+    if ($newVersionTag) {
+        $newVersionTag->requestCommit;
+    }
+    if ($currentVersionTag) {
+        $currentVersionTag->setWorking;
     }
     for my $feedId (keys %$feedList) {
         my $feed = $feedList->{$feedId};

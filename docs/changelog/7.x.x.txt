@@ -25,6 +25,9 @@
  - rfe #746: use the menu title in asset manager
  - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
  - rfe #637: Alphabetize wiki items under a keyword?
+ - Autocommit assets like CS posts or Calendar Events can now be added before the
+    parent is committed.  They will go into the same version tag as their parent.
+ - rfe #640: Refactored autocommit and autocomment
 
 
 7.6.1

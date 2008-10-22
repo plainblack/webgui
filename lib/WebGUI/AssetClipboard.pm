@@ -219,16 +219,12 @@ sub www_copy {
     my $i18n = WebGUI::International->new($self->session, 'Asset');
     $newAsset->update({ title=>sprintf("%s (%s)",$self->getTitle,$i18n->get('copy'))});
     $newAsset->cut;
-    if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-            $self->session->http->setRedirect($self->getUrl(
-                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
-            ));
-            return undef;
-        }
-    }
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    })) {
+        return undef;
+    };
     return $self->session->asset($self->getContainer)->www_view;
 }
 
@@ -287,17 +283,14 @@ sub www_createShortcut {
     if (! $isOnDashboard) {
         $child->cut;
     }
-    if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-            $self->session->http->setRedirect($self->getUrl(
-                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
-            ));
-            return 1;
-        }
-    }
-	if ($isOnDashboard) {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    })) {
+        return undef;
+    };
+
+    if ($isOnDashboard) {
 		return $self->getParent->www_view;
 	} else {
 		$self->session->asset($self->getContainer);
