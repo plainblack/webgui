@@ -142,10 +142,8 @@ sub toHtml {
 	if ($self->get("resizable")) {
         $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
         $style->setLink($url->extras("resize-skin.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/dragdrop/dragdrop.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/element/element-beta.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/resize/resize-beta.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/resize/resize.js"), {type=>"text/javascript"});
         $out = qq|
             <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 6) . qq|px; height: | . ($height + 6) . qq|px; overflow: hidden">
             $out

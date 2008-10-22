@@ -150,6 +150,28 @@ WebGUI.AssetManager.formatRank
         + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
 };
 
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.DefaultSortedBy ( )
+*/
+WebGUI.AssetManager.DefaultSortedBy = { 
+    "key"       : "lineage",
+    "dir"       : YAHOO.widget.DataTable.CLASS_ASC
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.BuildQueryString ( )
+*/
+WebGUI.AssetManager.BuildQueryString
+= function ( state, dt ) {
+    var query = "recordOffset=" + state.pagination.recordOffset 
+            + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
+            + ';rowsPerPage=' + state.pagination.rowsPerPage
+            + ';orderByColumn=' + state.sorting.key
+            ;
+        return query;
+    };
+
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.formatRevisionDate ( )
     Format the asset class name
@@ -222,6 +244,34 @@ WebGUI.AssetManager.initManager
         // Send the request
         dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
     };
+ 
+   // initialize the data source
+   WebGUI.AssetManager.DataSource
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
+    WebGUI.AssetManager.DataSource.responseType
+        = YAHOO.util.DataSource.TYPE_JSON;
+    WebGUI.AssetManager.DataSource.responseSchema
+        = {
+            resultsList: 'assets',
+            fields: [
+                { key: 'assetId' },
+                { key: 'lineage' },
+                { key: 'actions' },
+                { key: 'title' },
+                { key: 'className' },
+                { key: 'revisionDate' },
+                { key: 'assetSize' },
+                { key: 'lockedBy' },
+                { key: 'icon' },
+                { key: 'url' },
+                { key: 'childCount' }
+            ],
+            metaFields: {
+                totalRecords: "totalAssets" // Access to value in the server response
+            }
+        };
+
+
 
     // Initialize the data table
     WebGUI.AssetManager.DataTable 
@@ -229,13 +279,20 @@ WebGUI.AssetManager.initManager
             WebGUI.AssetManager.ColumnDefs, 
             WebGUI.AssetManager.DataSource, 
             {
-                initialRequest          : ';recordOffset=0',
+                initialRequest          : 'recordOffset=0',
                 generateRequest         : WebGUI.AssetManager.BuildQueryString,
-                paginationEventHandler  : handlePagination,
+                dynamicData             : true,
                 paginator               : assetPaginator,
                 sortedBy                : WebGUI.AssetManager.DefaultSortedBy
             }
         );
+     WebGUI.AssetManager.DataTable.onPaginatorChangeRequest  = handlePagination;
+
+        
+    WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        return oPayload;
+    }
 
     // Override function for custom server-side sorting
     WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {

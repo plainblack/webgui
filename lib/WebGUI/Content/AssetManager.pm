@@ -387,14 +387,14 @@ sub www_manage {
     );
 
     # Add script and stylesheets
+    $session->style->setLink( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/element/element-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/utilities/utilities.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/paginator/paginator-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
@@ -511,44 +511,6 @@ ENDHTML
                     ;
 
     $output         .= <<"ENDJS";
-    // Start the data source
-    WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage',{connTimeout:30000} );
-    WebGUI.AssetManager.DataSource.responseType
-        = YAHOO.util.DataSource.TYPE_JSON;
-    WebGUI.AssetManager.DataSource.responseSchema
-        = {
-            resultsList: 'assets',
-            totalRecords: 'totalAssets',
-            fields: [
-                { key: 'assetId' },
-                { key: 'lineage' },
-                { key: 'actions' },
-                { key: 'title' },
-                { key: 'className' },
-                { key: 'revisionDate' },
-                { key: 'assetSize' },
-                { key: 'lockedBy' },
-                { key: 'icon' },
-                { key: 'url' },
-                { key: 'childCount' }
-            ]
-        };
-
-    WebGUI.AssetManager.DefaultSortedBy = { 
-        "key"       : "lineage",
-        "dir"       : YAHOO.widget.DataTable.CLASS_ASC
-    };
-    
-    WebGUI.AssetManager.BuildQueryString
-    = function ( state, dt ) {
-        var query = ";recordOffset=" + state.pagination.recordOffset 
-                + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
-                + ';rowsPerPage=' + state.pagination.rowsPerPage
-                + ';orderByColumn=' + state.sorting.key
-                ;
-            return query;
-        };
 
     var selectAllButton = "<input type=\\"checkbox\\" title=\\"$i18n{"select all"}\\" onclick=\\"WebGUI.Form.toggleAllCheckboxesInForm( document.forms[0], 'assetId' );\\" />";
 ENDJS

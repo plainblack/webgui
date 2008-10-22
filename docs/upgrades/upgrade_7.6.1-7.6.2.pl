@@ -33,10 +33,23 @@ repairManageWorkflows($session);
 addPreTextToThingyFields($session);
 updateAddressBook($session);
 changeDefaultPaginationInSearch($session);
+upgradeToYui26($session);
 addUsersOnlineMacro($session);
 addProfileExtrasField($session);
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub upgradeToYui26 {
+    my $session = shift;
+    print "\tUpgrading to YUI 2.6... " unless $quiet;
+    $session->db->write("update template set template=replace(template, 'resize-beta.js', 'resize-min.js'), headBlock=replace(headBlock, 'resize-beta.js', 'resize-min.js')");
+    $session->db->write("update template set template=replace(template, 'resize-beta-min.js', 'resize-min.js'), headBlock=replace(headBlock, 'resize-beta-min.js', 'resize-min.js')");
+    $session->db->write("update template set template=replace(template, 'datasource-beta.js', 'datasource-min.js'), headBlock=replace(headBlock, 'datasource-beta.js', 'datasource-min.js')");
+    $session->db->write("update template set template=replace(template, 'datasource-beta-min.js', 'datasource-min.js'), headBlock=replace(headBlock, 'datasource-beta-min.js', 'datasource-min.js')");
+    $session->db->write("update template set template=replace(template, 'datatable-beta.js', 'datatable-min.js'), headBlock=replace(headBlock, 'datatable-beta.js', 'datatable-min.js')");
+    $session->db->write("update template set template=replace(template, 'datatable-beta-min.js', 'datatable-min.js'), headBlock=replace(headBlock, 'datatable-beta-min.js', 'datatable-min.js')");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub changeDefaultPaginationInSearch {

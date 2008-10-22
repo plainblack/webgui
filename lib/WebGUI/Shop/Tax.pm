@@ -477,7 +477,6 @@ sub www_getTaxesAsJson {
     $results{'totalRecords'} = $db->quickScalar('select found_rows()')+0; ##Convert to numeric
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
-#    $results{'dir'}          = "desc";
     $results{'dir'}          = $sortDir;
     $session->http->setMimeType('text/json');
     return JSON::to_json(\%results);
@@ -542,11 +541,13 @@ sub www_manage {
     my ($style, $url) = $session->quick(qw(style url));
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
+    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type => 'text/CSS'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/json/json-min.js'), {type => 'text/javascript'});
-    $style->setScript($url->extras('yui/build/datasource/datasource-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
     ##YUI Datatable
-    $style->setScript($url->extras('yui/build/datatable/datatable-beta-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
     ##Default CSS
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search, #export form { display: inline; } </style>');
     my $i18n=WebGUI::International->new($session, 'Tax');
@@ -596,172 +597,87 @@ $status_message
 </div>
 EOSM
     }
-    $output .=sprintf <<EODIV, $i18n->get(364, 'WebGUI'), $addForm->print, $exportForm, $importForm;
-<div class="yui-skin-sam">
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="%s" /></form></div>
-    <div id="paging"></div>
-    <div id="dt"></div>
-    <div id="adding">%s</div>
-    <div id="importExport">%s%s</div>
-</div>
+    
+    $output .= q|
+    
+    
+  <div class="yui-skin-sam">  
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364, 'WebGUI').q|" /></form></div>
+    <div id="dynamicdata"></div>
+    <div id="adding">|.$addForm->print.q|</div>
+    <div id="importExport">|.$exportForm.$importForm.q|</div>
+  </div>
 
 <script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function () {
-    var DataSource = YAHOO.util.DataSource,
-        Dom        = YAHOO.util.Dom,
-        DataTable  = YAHOO.widget.DataTable,
-        Paginator  = YAHOO.widget.Paginator;
-EODIV
-
-    ##Build datasource with URL.
-    $output .= sprintf <<'EODSURL', $url->page('shop=tax;method=getTaxesAsJson');
-    var mySource = new DataSource('%s');
-    mySource.responseType   = DataSource.TYPE_JSON;
-    mySource.responseSchema = {
-        resultsList : 'records',
-        totalRecords: 'totalRecords',
-        fields      : [
-            {key:"country", parser:YAHOO.util.DataSource.parseString},
-            {key:"state",   parser:YAHOO.util.DataSource.parseString},
-            {key:"city",    parser:YAHOO.util.DataSource.parseString},
-            {key:"code",    parser:YAHOO.util.DataSource.parseString},
-            {key:"taxRate", parser:YAHOO.util.DataSource.parseNumber},
-            {key:"taxId",   parser:YAHOO.util.DataSource.parseString}
-        ],
-        metaFields  : [
-            'startIndex', 'sort', 'dir', 'recordsReturned'
-        ]
+var taxtable = function() {
+    // Column definitions
+    formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
+        elCell.innerHTML = '<a href="|.$url->page(q{shop=tax;method=deleteTax}).q|;taxId='+oRecord.getData('taxId')+'">|.$i18n->get('delete').q|</a>';
     };
-EODSURL
-    $output .= <<STOP;
-    //Tell YUI how to get back to the site
-    var buildQueryString = function (state,dt) {
-        return ";startIndex=" + state.pagination.recordOffset +
-               ";keywords="   + Dom.get('keywordsField').value +
-               ";sortKey="    + state.sorting.key +
-               ";sortDir="    + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC || state.sorting.dir == 'desc') ? "desc" : "asc") +
-               ";results="    + state.pagination.rowsPerPage;
-    };
-
-    //Build and configure a paginator
-//    var myPaginator = new Paginator({
-//        containers         : ['paging'],
-//        pageLinks          : 5,
-//        rowsPerPage        : 25,
-//        rowsPerPageOptions : [10,25,50,100],
-//        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-//    });
-
-    // Custom function to handle pagination requests
-    var handlePagination = function (state,dt) {
-
-        var sortedBy = dt.get('sortedBy');
-	if(sortedBy == null){
-		sortedBy = {'key': "country",'dir':"desc"};
-	}
-        // Define the new state
-    if(sortedBy.dir == "desc" || sortedBy.dir == "asc"){
-	    sortedBy.dir = sortedBy.dir == "desc" ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC;
-    }
-        var newState = {
-            startIndex: state.recordOffset,
-            sorting: {
-                key: sortedBy.key,
-                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
-            },
-            pagination : { // Pagination values
-                recordOffset: state.recordOffset, // Default to first page when sorting
-                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-        // Create callback object for the request
-        var oCallback = {
-            success: dt.onDataReturnSetRows,
-            failure: dt.onDataReturnSetRows,
-            scope: dt,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-
-        // Send the request
-        dt.getDataSource().sendRequest(buildQueryString(newState), oCallback);
-    };
-
-    //Configure the table to use the paginator.
-    var myTableConfig = {
-        initialRequest         : ';startIndex=0;results=25',
-        generateRequest        : buildQueryString,
-        paginationEventHandler : handlePagination,
-        sortedBy               : {key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC},
-        //paginator            : myPaginator
-        paginator              : new YAHOO.widget.Paginator({rowsPerPage:25})
-    };
-STOP
-
-    $output .= sprintf <<'STOP', $url->page(q{shop=tax;method=deleteTax}), $i18n->get('delete');
-    YAHOO.widget.DataTable.formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
-        elCell.innerHTML = '<a href="%s;taxId='+oRecord.getData('taxId')+'">%s</a>';
-    };
-STOP
-    $output .= sprintf <<'EOCHJS', $i18n->get('country'), $i18n->get('state'), $i18n->get('city'), $i18n->get('code'), $i18n->get('tax rate');
-    //Build column headers.
-    var taxColumnDefs = [
-        {key:"country", label:"%s", sortable: true},
-        {key:"state",   label:"%s", sortable: true},
-        {key:"city",    label:"%s", sortable: true},
-        {key:"code",    label:"%s", sortable: true},
-        {key:"taxRate", label:"%s"},
-        {key:"taxId",   label:"", formatter:YAHOO.widget.DataTable.formatDeleteTaxId}
+    var myColumnDefs = [ // sortable:true enables sorting
+        {key:"country", label:"|.$i18n->get('country').q|", sortable: true},
+        {key:"state",   label:"|.$i18n->get('state').q|", sortable: true},
+        {key:"city",    label:"|.$i18n->get('city').q|", sortable: true},
+        {key:"code",    label:"|.$i18n->get('code').q|", sortable: true},
+        {key:"taxRate", label:"|.$i18n->get('tax rate').q|"},
+        {key:"taxId",   label:"", formatter:formatDeleteTaxId}
     ];
-EOCHJS
-    $output .= <<STOP;
-    //Now, finally, the table
-    var myTable = new DataTable('dt', taxColumnDefs, mySource, myTableConfig);
-
-    // Override function for custom server-side sorting 
-    myTable.sortColumn = function(oColumn) { 
-        // Default ascending 
-        var sDir = "asc"; 
-        // If already sorted, sort in opposite direction 
-        if(oColumn.key === this.get("sortedBy").key) { 
-            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ? 
-                    "desc" : "asc"; 
-        } 
-     
-        // Define the new state 
-        var newState = { 
-            startIndex: 0, 
-            sorting: { // Sort values 
-                key: oColumn.key, 
-                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC 
-            }, 
-            pagination : { // Pagination values 
-                recordOffset: 0, // Default to first page when sorting 
-                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting 
-            } 
-        }; 
-     
-        // Create callback object for the request 
-        var oCallback = { 
-            success: this.onDataReturnSetRows, 
-            failure: this.onDataReturnSetRows, 
-            scope: this, 
-            argument: newState // Pass in new state as data payload for callback function to use 
-        }; 
-         
-        // Send the request 
-        this.getDataSource().sendRequest(buildQueryString(newState), oCallback); 
-    }; 
+    
+    // DataSource instance
+    var myDataSource = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=getTaxesAsJson;').q|");
+    myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+    myDataSource.responseSchema = {
+        resultsList: "records",
+        fields: [
+            {key:"country", parser:"string"},
+            {key:"state",   parser:"string"},
+            {key:"city",    parser:"string"},
+            {key:"code",    parser:"string"},
+            {key:"taxRate", parser:"number"},
+            {key:"taxId",   parser:"string"}
+        ],
+        metaFields: {
+            totalRecords: "totalRecords" // Access to value in the server response
+        }
+    };
+    
+    // DataTable configuration
+    var myConfigs = {
+        initialRequest: 'startIndex=0;results=25', // Initial request for first page of data
+        dynamicData: true, // Enables dynamic server-driven data
+        sortedBy : {key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+        paginator: new YAHOO.widget.Paginator({ rowsPerPage:25 }) // Enables pagination 
+    };
+    
+    // DataTable instance
+    var myDataTable = new YAHOO.widget.DataTable("dynamicdata", myColumnDefs, myDataSource, myConfigs);
+    // Update totalRecords on the fly with value from server to allow pagination
+    myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        return oPayload;
+    }
 
     //Setup the form to submit an AJAX request back to the site.
-    Dom.get('keywordSearchForm').onsubmit = function () {
-        mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
-            myTable.onDataReturnInitializeTable, myTable);
+    YAHOO.util.Dom.get('keywordSearchForm').onsubmit = function () {
+        var state = myDataTable.getState();
+        state.pagination.recordOffset = 0;
+        myDataSource.sendRequest('keywords=' + YAHOO.util.Dom.get('keywordsField').value + ';startIndex=0;results=25', {success: myDataTable.onDataReturnInitializeTable, scope:myDataTable, argument:state});  
         return false;
+    };        
+    
+    return {
+        ds: myDataSource,
+        dt: myDataTable
     };
 
-});
+
+}();
+
+
 </script>
-STOP
+
+|;
+    
     return $admin->getAdminConsole->render($output, $i18n->get('taxes', 'Shop'));
 }
 
