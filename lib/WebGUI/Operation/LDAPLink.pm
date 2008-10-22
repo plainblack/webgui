@@ -118,7 +118,7 @@ sub validateForm {
 	}
 	
 	# Check format of ldapUrl
-	push(@{$errors}, $i18n->get("ldap url malformed")) unless ($formFields->{ldapUrl} =~ m!^ldap://.*!);
+	push(@{$errors}, $i18n->get("ldap url malformed")) unless ($formFields->{ldapUrl} =~ m!^ldaps?://.*!);
 	
 	# Other checks here
 	
