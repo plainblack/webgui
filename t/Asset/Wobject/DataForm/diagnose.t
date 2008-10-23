@@ -13,8 +13,7 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 
 ##The goal of this test is to diagnose problems in DataForms.
-##	Orphaned DataForms with no Asset table entries
-##	
+##  Orphaned DataForms with no Asset table entries
 
 use WebGUI::Test;
 use WebGUI::Session;
