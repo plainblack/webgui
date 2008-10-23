@@ -11,7 +11,8 @@ use WebGUI::Flux;
 use WebGUI::Flux::Rule;
 use WebGUI::Flux::Expression;
 use Exception::Class;
-WebGUI::Error->Trace(1); 
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 =head1 NAME
 
@@ -146,14 +147,8 @@ A reference to the current session.
 =cut
 
 sub new {
-    my ( $class, $session ) = @_;
-    unless ( defined $session && $session->isa("WebGUI::Session") ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => "WebGUI::Session",
-            got      => ( ref $session ),
-            error    => "Need a session."
-        );
-    }
+    my $class = shift;
+    my ($session ) = validate_pos(@_, {isa => 'WebGUI::Session' });
     my $self = register $class;
     my $id   = id $self;
     $session{$id} = $session;

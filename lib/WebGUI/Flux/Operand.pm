@@ -5,6 +5,8 @@ use WebGUI::Pluggable;
 use English qw( -no_match_vars );
 use WebGUI::Exception::Flux;
 use Class::InsideOut qw{ :std };
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub {WebGUI::Error::InvalidParam->throw( error => shift)} );
 
 =head1 NAME
 
@@ -63,36 +65,8 @@ The args being passed to this Operand (required)
 =cut
 
 sub new {
-    my ( $class, $arg_ref ) = @_;
-
-    # Check arguments..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.',
-        );
-    }
-    foreach my $field qw(rule args) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
-    }
-    if ( ref $arg_ref->{rule} ne 'WebGUI::Flux::Rule' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{rule},
-            error    => 'need a rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => ref $arg_ref->{rule},
-        );
-    }
-    if ( ref $arg_ref->{args} ne 'HASH' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{args},
-            error    => 'need an args hash ref.',
-            expected => 'HASH',
-            got      => ref $arg_ref->{args},
-        );
-    }
+    my $class = shift;
+    my %props = validate(@_, { rule => { isa => 'WebGUI::Flux::Rule'}, args => {type => HASHREF}});
 
     # Register Class::InsideOut object..
     my $self = register $class;
@@ -100,13 +74,13 @@ sub new {
     # Initialise object properties that will be available to Operands
     # via the $self object..
     my $id = id $self;
-    my $rule = $arg_ref->{rule};
+    my $rule = $props{rule};
     $rule{$id}    = $rule;
-    $args{$id}    = $arg_ref->{args};
+    $args{$id}    = $props{args};
     $user{$id}    = $rule->evaluatingForUser();
     $session{$id} = $rule->session();
-    if ( exists $arg_ref->{assetId} ) {
-        $assetId{$id} = $arg_ref->{assetId};
+    if ( exists $props{assetId} ) {
+        $assetId{$id} = $props{assetId};
     }
     
     $self->_checkDefinition();
@@ -140,44 +114,16 @@ The args being passed to this Operand (required)
 =cut
 
 sub evaluateUsing {
-    my ( $class, $operand, $arg_ref ) = @_;
-
-    # Check arguments..
-    if ( @_ != 3 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 3,
-            error    => 'invalid param count.',
-        );
-    }
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
-        );
-    }
-    foreach my $field qw(rule args) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
-    }
-    if ( ref $arg_ref->{rule} ne 'WebGUI::Flux::Rule' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{rule},
-            error    => 'need a rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => ref $arg_ref->{rule},
-        );
-    }
-    if ( ref $arg_ref->{args} ne 'HASH' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{args},
-            error    => 'need an args hash ref.',
-            expected => 'HASH',
-            got      => ref $arg_ref->{args},
-        );
-    }
+    my $class = shift;
+    my ($operand, $arg_ref ) = validate_pos(@_, 1, { type => HASHREF });
     
+    # Validate $arg_ref
+    my @args = (%{$arg_ref});
+    validate(@args, {
+         rule => {isa => 'WebGUI::Flux::Rule'},
+         args => {type => HASHREF },
+    });
+
     # The Operand module we are going to dynamically instantiate and evaluate
     my $operandModule = "WebGUI::Flux::Operand::$operand";
 
@@ -261,7 +207,7 @@ sub _checkDefinition {
         if ( !exists $args_ref->{$field} ) {
             WebGUI::Error::InvalidParam->throw(
                 param => $field,
-                error => 'Missing required Operand arg.',
+                error => "Missing required Operand arg: $field",
             );
         }
     }

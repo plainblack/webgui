@@ -31,7 +31,7 @@ use Exception::Class (
     'WebGUI::Error::Flux::CircularRuleLoopDetected' => {
         isa         => 'WebGUI::Error',
         description => 'Circular Rule loop detected (infinite loops not allowed).',
-        fields      => [ 'sourceFluxRuleId', 'targetFluxRuleId', 'depth' ],
+        fields      => [ 'sourceFluxRuleId', 'targetFluxRuleId' ],
     },
     'WebGUI::Error::Flux::Operand::DefinitionError' => {
         isa         => 'WebGUI::Error',

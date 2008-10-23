@@ -16,6 +16,7 @@ use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
+use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 
 use Data::Dumper;
 
@@ -254,6 +255,11 @@ $self->session->errorHandler->error("Submit Edit Object");
 $self->session->errorHandler->error("Deleting ".join(',',@address));
         return $self->deleteObject(\@address);
     }
+    elsif($responses->{copy}){
+$self->session->errorHandler->error("Copying ".join(',',@address));
+        return $self->copyObject(\@address);
+    }
+
 $self->session->errorHandler->error("Updating ".join(',',@address));
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
     my $message = $self->survey->update(\@address,$responses);
@@ -263,6 +269,19 @@ $self->session->errorHandler->error("Updating ".join(',',@address));
     return $self->www_loadSurvey({address => \@address});
 }
 
+#-------------------------------------------------------------------
+sub copyObject{
+    my ($self,$address) = @_;
+
+    $self->loadSurveyJSON();
+
+    $address = $self->survey->copy($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+
+    $self->saveSurveyJSON();
+    #The parent address of the deleted object is returned.
+
+    return $self->www_loadSurvey({address => $address});
+}
 
 #-------------------------------------------------------------------
 sub deleteObject{
@@ -274,7 +293,12 @@ sub deleteObject{
 
     $self->saveSurveyJSON();
     #The parent address of the deleted object is returned.
-    pop(@{$address}) unless @$address == 1 and $$address[0] == 0;
+    if(@$address == 1){
+        $$address[0] = 0;
+    }else{
+        pop(@{$address});# unless @$address == 1 and $$address[0] == 0;
+    }
+$self->session->errorHandler->error("returning ".join(',',@$address));
 
     return $self->www_loadSurvey({address => $address, message=>$message});
 }
@@ -480,7 +504,7 @@ sub prepareView {
 sub purge {
         my $self = shift;
         $self->session->db->write("delete from Survey_response where assetId = ?",[$self->getId()]);
-        $self->session->db->write("delete from Survey_questionResponse where assetId = ?",[$self->getId()]);
+        $self->session->db->write("delete from Survey where assetId = ?",[$self->getId()]);
         return $self->SUPER::purge;
 }
 
@@ -587,10 +611,6 @@ $self->session->errorHandler->error(Dumper $responses);
 
     my @goodResponses = keys %$responses;#load everything.  
 
-    if(@goodResponses == 0){##nothing to load
-        return $self->www_loadQuestions();
-    }
-
     $self->loadBothJSON();
 
     my $termInfo = $self->response->recordResponses($responses);
@@ -660,8 +680,13 @@ $self->session->errorHandler->error("Can take survey");
 
     return $self->surveyEnd() if($self->response->surveyEnd());
 
-    my $questions = $self->response->nextQuestions();
-$self->session->errorHandler->error("Load Questions had ".@$questions." questions");
+    my $questions;
+eval{
+    $questions = $self->response->nextQuestions();
+};
+$self->session->errorHandler->error($@) if($@);
+
+$self->session->errorHandler->error("Load Questions had ".@$questions." questions") if(ref $questions eq 'ARRAY');
     
 
     my $section = $self->response->nextSection();

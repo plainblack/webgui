@@ -178,6 +178,8 @@ sub update{
         $object->{$key} = $ref->{$key} if(defined $$ref{$key});
     }
 }
+
+
 #determine what to add and add it.
 # ref should contain all the information for the new
 sub insertObject{
@@ -193,6 +195,25 @@ $self->log("Inserting ".join(',',@$address));
 $self->log("Finished inserting ");
 
 }
+
+sub copy{
+    my ($self,$address) = @_;
+    if(@$address == 1){
+            my %newSection = %{$self->section($address)};
+            push(@{$self->sections}, \%newSection);
+            return [$#{$self->sections}];
+$self->log("copying here $$address[0] :".$#{$self->sections});
+    }elsif(@$address == 2){
+$self->log("copying question $$address[0] $$address[1]");
+            my %newQuestion = %{$self->question($address)};
+            push( @{$self->questions($address)}, \%newQuestion);
+            $$address[1] = $#{$self->questions($address)};
+$self->log("to $$address[0] $$address[1]");
+            return $address;
+    }
+}
+
+
 sub remove{
     my ($self,$address,$movingOverride) = @_;
     if(@$address == 1){

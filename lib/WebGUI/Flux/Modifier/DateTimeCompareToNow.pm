@@ -17,6 +17,12 @@ See WebGUI::Flux::Modifier base class for more information.
 
 #-------------------------------------------------------------------
 
+=head2 evaluate
+
+See WebGUI::Flux::Modifier base class for more information.
+
+=cut
+
 sub evaluate {
     my ($self) = @_;
 
@@ -39,6 +45,12 @@ sub evaluate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+See WebGUI::Flux::Modifier base class for more information.
+
+=cut
 
 sub definition {
     return { args => { units => 1, time_zone => 1 } };

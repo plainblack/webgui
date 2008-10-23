@@ -18,6 +18,7 @@ use WebGUI::Asset::Wobject::Survey;
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+#WebGUI::Error->Trace(1);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -27,39 +28,32 @@ plan tests => 4;
 # put your tests here
 
 use_ok('WebGUI::Flux::Operand::SurveyCompleted');
-my $user        = WebGUI::User->new( $session, 'new' );
+my $user = WebGUI::User->new( $session, 'new' );
 my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
-# N.B. This is all a bit pointless until Survey 2.0 comes out because Survey don't provide 
-# an API to perform these operations (thus our Operand really just tests against the manual
-# sql writes we make here. Still..
-my $survey_id   = $session->id->generate();
-my $survey      = $import_node->addChild(
-    {   className => 'WebGUI::Asset::Wobject::Survey',
-        Survey_id => $survey_id,
-    }
-);
-my $assetId = $survey->getId();
-my $qid     = $survey->setCollateral(
-    "Survey_question",
-    "Survey_questionId",
-    {   Survey_id         => $survey_id,
-        Survey_questionId => 'new',
-        question          => 'dummy question',
-        allowComment      => 0,
-        gotoQuestion      => 1,
-        answerFieldType   => 'text',
-        randomizeAnswers  => 0,
-        Survey_sectionId  => 1,
-    },
-    1, 0,
-    "Survey_id"
-);
+my $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+my $survey_id = $survey->getId();
 
-# Add boolean answers
-$survey->addAnswer( 31, $qid );
-my $aid = $survey->addAnswer( 32, $qid );
+my $responses = {
+    commentCols  => 10,
+    commentRows  => 5,
+    copy         => 0,
+    delete       => 0,
+    id           => 'undefined-0',
+    maxAnswers   => 1,
+    questionType => 'Yes/No',
+    randomWords  => undef,
+    text         => 'test',
+    value        => 1,
+    variable     => undef,
+};
+
+my @address = split /-/, $responses->{id};
+
+$survey->loadSurveyJSON();
+$survey->survey->update( \@address, $responses );
+$survey->saveSurveyJSON();
 
 {
     my $rule = WebGUI::Flux::Rule->create($session);
@@ -72,46 +66,23 @@ my $aid = $survey->addAnswer( 32, $qid );
         }
     );
     ok( !$rule->evaluateFor( { user => $user } ), q{Mr User hasn't even started Survey yet} );
-
-    # Simulate Survey start..
-    my $response_id = $session->db->setRow(
-        "Survey_response",
-        "Survey_responseId",
-        {   'Survey_responseId' => "new",
-            userId              => $user->userId(),
-            username            => $user->username(),
-            startDate           => $session->datetime->time(),
-            'Survey_id'         => $survey_id
-        }
-    );
-
-    $session->db->write(
-        <<END_SQL
-insert into Survey_questionResponse (
-    Survey_answerId,
-    Survey_questionId,
-    Survey_responseId,
-    Survey_id,
-    comment,
-    response,
-    dateOfResponse
-) values (?,?,?,?,?,?,?)
-END_SQL
-        , [ $aid, $qid, $response_id, $survey_id, 1, 1, $session->datetime->time() ]
-    );
     
-    ok( !$rule->evaluateFor( { user => $user, } ), q{Not finished yet..} );
+    # Simulate user starting survey
+    my $response_id = $session->db->setRow("Survey_response","Survey_responseId",{
+                Survey_responseId=>"new",
+                userId=>$user->userId,
+                startDate=>WebGUI::DateTime->now->toDatabase,
+                endDate=>WebGUI::DateTime->now->toDatabase,
+                assetId=>$survey->getId()
+            });
+    ok( !$rule->evaluateFor( { user => $user } ), q{Mr User hasn't finished Survey yet} );
 
-    # Simulate Survey completion..
-    $session->db->setRow(
-        "Survey_response",
-        "Survey_responseId",
-        {   isComplete        => 1,
-            endDate           => $session->datetime->time(),
-            Survey_responseId => $response_id,
-        }
-    );
-
+    # Simulate Survey completion
+    $session->db->setRow("Survey_response","Survey_responseId",{
+                Survey_responseId=>$response_id,
+                endDate=>WebGUI::DateTime->now->toDatabase,
+                isComplete=>1
+            });
     ok( $rule->evaluateFor( { user => $user, } ), q{Now he's done it!} );
 }
 

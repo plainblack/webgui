@@ -17,6 +17,12 @@ See WebGUI::Flux::Operator base class for more information.
 
 #-------------------------------------------------------------------
 
+=head2 evaluate
+
+See WebGUI::Flux::Operator base class for more information.
+
+=cut
+
 sub evaluate {
     my ( $self) = @_;
     

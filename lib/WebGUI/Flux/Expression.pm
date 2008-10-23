@@ -9,6 +9,8 @@ use WebGUI::Exception::Flux;
 use WebGUI::Flux::Operand;
 use WebGUI::Flux::Operator;
 use WebGUI::Flux::Modifier;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub {WebGUI::Error::InvalidParam->throw( error => shift)} );
 
 =head1 NAME
 
@@ -106,28 +108,19 @@ The operator of the Expression
 =cut
 
 sub create {
-    my ( $class, $rule, $properties_ref ) = @_;
+    my $class = shift;
+    my ( $rule, $properties_ref ) = validate_pos(@_, { isa => 'WebGUI::Flux::Rule' }, { type => HASHREF });
 
-    # Check arguments..
-    if ( !defined $rule || !$rule->isa('WebGUI::Flux::Rule') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Flux::Rule',
-            got      => ( ref $rule ),
-            error    => 'Need a Flux Rule.',
-            param    => $rule
-        );
-    }
-    if ( defined $properties_ref && ref $properties_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $properties_ref,
-            error => 'invalid properties hash ref.'
-        );
-    }
-    foreach my $field qw(operand1 operand2 operator) {
-        if ( !exists $properties_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing: ' . $field );
-        }
-    }
+    # Validate $properties_ref
+    my @args = (%{$properties_ref});
+    my %validation_spec = map { $_ => 0 } @MUTABLE_FIELDS;
+    validate(@args, {
+         %validation_spec,
+         operand1 => 1,
+         operand2 => 1,
+         operator => 1,
+         fluxExpressionId => 0,
+    });
 
     # Work out the next highest sequence number
     my $sequenceNumber
@@ -143,8 +136,11 @@ sub create {
             fluxExpressionId => 'new',
             fluxRuleId       => $rule->getId(),
             sequenceNumber   => $sequenceNumber
-        }
+        },
+        $properties_ref->{fluxExpressionId},    # specified fluxExpressionId will be used if provided
     );
+    
+    delete $properties_ref->{fluxExpressionId};    # doesn't need to be passed to update (below)
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $expression = $class->new( $rule, $id );
@@ -185,7 +181,8 @@ Any field − returns the value of a field rather than the hash reference.
 =cut
 
 sub get {
-    my ( $self, $name ) = @_;
+    my $self = shift;
+    my ( $name ) = validate_pos(@_, 0);
     if ( defined $name ) {
         return $property{ id $self}{$name};
     }
@@ -249,20 +246,8 @@ The unique id of the expression to instantiate.
 =cut
 
 sub new {
-    my ( $class, $rule, $fluxExpressionId ) = @_;
-
-    # Check arguments..
-    if ( !defined $rule || !$rule->isa('WebGUI::Flux::Rule') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Flux::Rule',
-            got      => ( ref $rule ),
-            error    => 'Need a Flux Rule.',
-            param    => $rule
-        );
-    }
-    if ( !defined $fluxExpressionId ) {
-        WebGUI::Error::InvalidParam->throw( error => 'Need a fluxExpressionId.', param => $fluxExpressionId );
-    }
+    my $class = shift;
+    my ( $rule, $fluxExpressionId ) = validate_pos(@_, { isa => 'WebGUI::Flux::Rule' }, 1);
 
     # Retreive row from db..
     my $expression = $rule->session->db->quickHashRef( 'select * from fluxExpression where fluxExpressionId=?',
@@ -357,15 +342,9 @@ The Expression's sequence number (defines its 'e' number)
 =cut
 
 sub update {
-    my ( $self, $newProp_ref ) = @_;
-
-    # Check arguments..
-    if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $newProp_ref,
-            error => 'invalid properties hash ref.'
-        );
-    }
+    my $self            = shift;
+    my %validation_spec = map { $_ => 0 } @MUTABLE_FIELDS;
+    my %args            = validate( @_, \%validation_spec );  # only allows MUTABLE_FIELDS as optional named params
 
     # Reset the Rule's combined expression
     $self->rule->resetCombinedExpression();
@@ -373,7 +352,7 @@ sub update {
     my $id = id $self;
     foreach my $field (@MUTABLE_FIELDS) {
         $property{$id}{$field}
-            = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
+            = ( exists $args{$field} ) ? $args{$field} : $property{$id}{$field};
     }
     $property{$id}{fluxRuleId} = $self->rule->getId();
 
@@ -389,16 +368,7 @@ Evaluates this Flux Expression
 =cut
 
 sub evaluate {
-    my ($self) = @_;
-
-    # Check arguments..
-    if ( @_ != 1 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 1,
-            error    => 'invalid param count',
-        );
-    }
+    my $self = shift;
 
     # Assemble all the ingredients..
     my $id               = id $self;

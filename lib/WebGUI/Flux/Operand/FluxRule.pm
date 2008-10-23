@@ -1,11 +1,9 @@
 package WebGUI::Flux::Operand::FluxRule;
 use strict;
 use WebGUI::Flux::Rule;
+use Readonly;
 
 use base 'WebGUI::Flux::Operand';
-
-my $MAX_DEPTH      = 1000;
-my $_depth_counter = 0;
 
 =head1 NAME
 
@@ -21,67 +19,58 @@ See WebGUI::Flux::Operand base class for more information.
 
 #-------------------------------------------------------------------
 
+=head2 evaluate
+
+See WebGUI::Flux::Operand base class for more information.
+
+=cut
+
 sub evaluate {
     my ($self) = @_;
 
     # Assemble the ingredients..
     my $thisRule            = $self->rule();
     my $requestedFluxRuleId = $self->args()->{fluxRuleId};
-
+        
     # Immediately return the known result if the requested Rule has already been resolved
-    my $resolvedRuleCache_ref = $thisRule->resolvedRuleCache();
-    if ( exists $resolvedRuleCache_ref->{$requestedFluxRuleId} ) {
-        return $resolvedRuleCache_ref->{$requestedFluxRuleId};
+    if ($thisRule->hasResolvedRuleCached($requestedFluxRuleId)) {
+        return $thisRule->getResolvedRuleResult($requestedFluxRuleId);
     }
 
     # If the requested Rule is already in the unresolved cache we have an infinite loop
-    my $unresolvedRuleCache_ref = $thisRule->unresolvedRuleCache();
-    if ( exists $unresolvedRuleCache_ref->{$requestedFluxRuleId} ) {
+    if ( $thisRule->hasUnresolvedRuleCached($requestedFluxRuleId) ) {
         WebGUI::Error::Flux::CircularRuleLoopDetected->throw(
             error            => 'Circular Rule loop detected.',
             sourceFluxRuleId => $thisRule->getId(),
             targetFluxRuleId => $requestedFluxRuleId,
-            depth            => $_depth_counter,
-        );
-    }
-
-    # Just in case..
-    if ( $_depth_counter > $MAX_DEPTH ) {
-        WebGUI::Error::Flux::CircularRuleLoopDetected->throw(
-            error            => 'MAX_DEPTH exceeded. Do you have a circular Rule loop?',
-            sourceFluxRuleId => $thisRule->getId(),
-            targetFluxRuleId => $requestedFluxRuleId,
-            depth            => $_depth_counter,
         );
     }
 
     # No infinite loops detected, ok to proceed..
 
     # Add the requested Rule to the unresolved cache..
-    $unresolvedRuleCache_ref->{$requestedFluxRuleId} = $requestedFluxRuleId;
+    $thisRule->cacheRuleAsUnresolved($requestedFluxRuleId);
 
-    # Instantiate the requested Rule and share our resolved/unresolved caches with it
+    # Instantiate the requested Rule and init its resolved and unresolved rule caches from thisRule
     my $requestedRule = WebGUI::Flux::Rule->new( $thisRule->session(), $requestedFluxRuleId );
-    $requestedRule->resolvedRuleCache($resolvedRuleCache_ref);
-    $requestedRule->unresolvedRuleCache($unresolvedRuleCache_ref);
+    $requestedRule->initCachesFrom($thisRule);
 
-    $_depth_counter++;
     my $was_successful = $requestedRule->evaluateFor(
         { user => $thisRule->evaluatingForUser(), access => 0, recursive => 1, assetId => $thisRule->evaluatingForAssetId() } );
 
     # Requested Rule is now resolved..
-    delete $unresolvedRuleCache_ref->{$requestedFluxRuleId};    # so remove it from unresolved cache
-    $resolvedRuleCache_ref->{$requestedFluxRuleId} = $was_successful;    # .. and add to resolved cache
+    $thisRule->cacheRuleAsResolved($requestedFluxRuleId, $was_successful);
 
     return $was_successful;
 }
 
 #-------------------------------------------------------------------
-sub resetDepthCounter {
-    $_depth_counter = 0;
-}
 
-#-------------------------------------------------------------------
+=head2 definition
+
+See WebGUI::Flux::Operand base class for more information.
+
+=cut
 
 sub definition {
     return { args => { fluxRuleId => 1 } };

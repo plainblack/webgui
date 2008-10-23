@@ -6,6 +6,8 @@
 # Profiling:
 # FASTPROF_CONFIG='filename=/tmp/fluxprof' HARNESS_PERL_SWITCHES='-d:FastProf' prove -r t/Flux
 # fprofpp -f/tmp/fluxprof -t5
+#
+# HARNESS_PERL_SWITCHES='-d:NYTProf' prove -r t/Flux
 
 use strict;
 use warnings;
@@ -13,6 +15,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use Data::Dumper;
 use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
@@ -25,12 +28,15 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 18;
+plan tests => 24;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 use_ok('WebGUI::Flux');
+$session->user( { userId => 3 } );
+my $user   = $session->user();
+my $userId = $user->userId();
 
 # Start with a clean slate
 $session->db->write('delete from fluxRule');
@@ -44,18 +50,8 @@ $session->db->write('delete from fluxExpression');
 #######################################################################
 # Errors
 {
-    eval { my $rule = WebGUI::Flux->getRules(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a session object' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a session.',
-            expected => 'WebGUI::Session',
-            got      => '',
-        ),
-        'takes exception to not giving it a session object',
-    );
+    throws_ok { WebGUI::Flux->getRules() } 'WebGUI::Error::InvalidParam',
+        'takes exception to not giving it a session object';
 }
 
 # Single Rule
@@ -88,46 +84,15 @@ $session->db->write('delete from fluxExpression');
 #######################################################################
 # Errors
 {
-    eval { my $rule = WebGUI::Flux->getRule(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a session object' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a session.',
-            expected => 'WebGUI::Session',
-            got      => '',
-        ),
-        'takes exception to not giving it a session object',
-    );
-}
-{
-    eval { my $rule = WebGUI::Flux->getRule($session); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'takes exception to not giving it a fluxRuleId' );
-    cmp_deeply(
-        $e,
-        methods(
-            error => 'Need a fluxRuleId.',
-            param => undef,
-        ),
-        'takes exception to not giving it a fluxRuleId object',
-    );
-}
-{
-    eval { my $rule = WebGUI::Flux->getRule( $session, 'neverAGUID' ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::ObjectNotFound', 'takes exception to not giving it an existing fluxRuleId' );
-    cmp_deeply(
-        $e,
-        methods(
-            error => 'No such Flux Rule.',
-            id    => 'neverAGUID',
-        ),
-        'takes exception to not giving it a rule Id',
-    );
+    throws_ok { WebGUI::Flux->getRule() } 'WebGUI::Error::InvalidParam',
+        'takes exception to not giving it a session object';
+    throws_ok { WebGUI::Flux->getRule($session) } 'WebGUI::Error::InvalidParam',
+        'takes exception to not giving it a fluxRuleId';
+    throws_ok { WebGUI::Flux->getRule( $session, 'neverAGUID' ) } 'WebGUI::Error::ObjectNotFound',
+        'takes exception to not giving it an existing fluxRuleId';
 }
 
+# getRule
 {
     my $rule1            = WebGUI::Flux::Rule->create($session);
     my $rule1Id          = $rule1->getId();
@@ -213,13 +178,13 @@ $session->db->write('delete from fluxExpression');
         }
     );
     $rule3->update( { name => 'Yet Another Rule' } );
-    
-    my $rule4 = WebGUI::Flux::Rule->create($session);
+
+    my $rule4    = WebGUI::Flux::Rule->create($session);
     my $rule4_id = $rule4->getId();
     $rule4->update( { name => 'My empty Rule' } );
 
     my $rule5 = WebGUI::Flux::Rule->create($session);
-    $rule5->addExpression( # This time put the FluxRule into operand2
+    $rule5->addExpression(    # This time put the FluxRule into operand2
         {   operand1     => 'TruthValue',
             operand1Args => '{"value":  "1"}',
             operator     => 'IsEqualTo',
@@ -231,6 +196,56 @@ $session->db->write('delete from fluxExpression');
     $rule5->update( { name => 'Another Rule' } );
 
     WebGUI::Flux->generateGraph($session);
+}
+
+#######################################################################
+#
+# evaluateFor()
+#
+#######################################################################
+# Errors
+{
+    throws_ok { WebGUI::Flux->evaluateFor() } 'WebGUI::Error::InvalidParam', 'takes exception to zero arguments';
+    throws_ok {
+        WebGUI::Flux->evaluateFor( { user => 1, fluxRuleId => 1 } );
+    }
+    'WebGUI::Error::InvalidParam', 'takes exception to invalid user';
+    is(WebGUI::Flux->evaluateFor( { user => $user, fluxRuleId => "notAFluxRuleId" } ), 0, 'Invalid fluxRuleId returns false');
+}
+{
+    my $rule    = WebGUI::Flux::Rule->create($session);
+    ok(WebGUI::Flux->evaluateFor( { user => $user, fluxRuleId => $rule->getId } ), 'Empty rule evaluates to true');
+}
+
+#######################################################################
+#
+# getStickies
+#
+#######################################################################
+# Errors
+{
+    throws_ok { WebGUI::Flux->getStickies() } 'WebGUI::Error::InvalidParam',
+        'takes exception to not giving it any named params';
+    throws_ok { WebGUI::Flux->getStickies( { user => 1, fluxRuleIds => [] } ) } 'WebGUI::Error::InvalidParam',
+        'takes exception to not giving it an invalid user object';
+}
+{
+    my @stickies = WebGUI::Flux->getStickies( { user => $user, fluxRuleIds => [] } );
+    cmp_deeply( \@stickies, [], 'nothing returned for empty array of fluxRuleIds' );
+
+    my $rule1 = WebGUI::Flux::Rule->create( $session, { sticky => 1 } );
+    my $rule2 = WebGUI::Flux::Rule->create( $session, { sticky => 1 } );
+    my $ids = [ $rule1->getId, $rule2->getId ];
+    @stickies = WebGUI::Flux->getStickies( { user => $user, fluxRuleIds => $ids } );
+    cmp_deeply( \@stickies, [], 'no sticky hits for user yet' );
+
+    $rule1->evaluateFor( { user => $user } );
+    @stickies = WebGUI::Flux->getStickies( { user => $user, fluxRuleIds => $ids } );
+    cmp_deeply( \@stickies, [ $rule1->getId ], 'one sticky hit for user' );
+
+    $rule2->evaluateFor( { user => $user } );
+    @stickies = WebGUI::Flux->getStickies( { user => $user, fluxRuleIds => $ids } );
+    cmp_deeply( \@stickies, [ $rule1->getId, $rule2->getId ], '2 sticky hits for user' );
 }
 
 #----------------------------------------------------------------------------

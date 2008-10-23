@@ -15,10 +15,12 @@ use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Flux::Rule;
+use Test::Exception;
 
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+WebGUI::Error->Trace(1);
 
 # Start with a clean slate
 $session->db->write('delete from fluxRule');
@@ -28,7 +30,7 @@ $session->db->write('delete from fluxRuleUserData');
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 30;
+plan tests => 26;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -43,49 +45,18 @@ use_ok('WebGUI::Flux::Expression');
 
 # N.B. Just test for failures here - we test successful retrieval
 # later after we've successfully create()'ed em
-
 {
-    eval { my $expression = WebGUI::Flux::Expression->new(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a Rule' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a Flux Rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => q{},
-        ),
-        'new takes exception to not giving it a Rule',
-    );
+    throws_ok { my $expression = WebGUI::Flux::Expression->new() } 'WebGUI::Error::InvalidParam',
+        'new takes exception to not giving it a Rule';
 }
 
 # Errors with a valid Rule
 {
     my $rule = WebGUI::Flux::Rule->create($session);
-    eval { my $expression = WebGUI::Flux::Expression->new($rule); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a fluxExpressionId' );
-    cmp_deeply(
-        $e,
-        methods( error => 'Need a fluxExpressionId.', ),
-        'new takes exception to not giving it a expression Id',
-    );
-
-    eval { my $expression = WebGUI::Flux::Expression->new( $rule, 'neverAGUID' ); };
-    $e = Exception::Class->caught();
-    isa_ok(
-        $e,
-        'WebGUI::Error::ObjectNotFound',
-        'new takes exception to not giving it an existing fluxExpressionId'
-    );
-    cmp_deeply(
-        $e,
-        methods(
-            error => 'No such Flux Expression.',
-            id    => 'neverAGUID',
-        ),
-        'new takes exception to not giving it a expression Id',
-    );
+    throws_ok { WebGUI::Flux::Expression->new($rule) } 'WebGUI::Error::InvalidParam',
+        'new takes exception to not giving it a fluxExpressionId';
+    throws_ok { WebGUI::Flux::Expression->new( $rule, 'neverAGUID' ) }  'WebGUI::Error::ObjectNotFound',
+        'new takes exception to not giving it an existing fluxExpressionId';
 }
 
 #######################################################################
@@ -97,35 +68,20 @@ use_ok('WebGUI::Flux::Expression');
 $session->db->write('delete from fluxExpression');
 
 {
-    eval { my $expression = WebGUI::Flux::Expression->create(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a Rule' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a Flux Rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => q{},
-        ),
-        'create takes exception to not giving it a Rule',
-    );
+    throws_ok { WebGUI::Flux::Expression->create() } 'WebGUI::Error::InvalidParam',
+        'create takes exception to not giving it a Rule';
 }
 {
     my $rule = WebGUI::Flux::Rule->create($session);
-    eval { my $expression = WebGUI::Flux::Expression->create( $rule, 'not a hash ref' ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'create takes exception to an invalid hash ref' );
-    cmp_deeply(
-        $e,
-        methods( param => 'not a hash ref', ),
-        'create takes exception to an invalid hash ref',
-    );
+    throws_ok { WebGUI::Flux::Expression->create( $rule, 'not a hash ref' ) } 'WebGUI::Error::InvalidParam',
+        'create takes exception to an invalid hash ref';
+    $rule->delete();
 }
 {
     my $rule = WebGUI::Flux::Rule->create($session);
-    eval { my $expression = WebGUI::Flux::Expression->create( $rule, { requiredFields => 'missing' } ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::NamedParamMissing', 'create takes exception to missing required fields in hash ref' );
+    throws_ok { WebGUI::Flux::Expression->create( $rule, { requiredFields => 'missing' } ) }
+    'WebGUI::Error::InvalidParam', 'create takes exception to missing required fields in hash ref';
+    $rule->delete();
 }
 {
 
@@ -151,9 +107,9 @@ $session->db->write('delete from fluxExpression');
     is( $expression->get('operator'), 'DUMMY_OPERATOR',           'operator has the value we set' );
 
     # Check Expression defaults
-    is( $expression->get('name'), 'Undefined', 'default value for name is "Undefined"' );
+    is( $expression->get('name'),           'Undefined', 'default value for name is "Undefined"' );
     is( $expression->get('sequenceNumber'), 1,           'sequenceNumber starts at 1' );
-    
+
     # Add a second Expression (to test sequenceNumber)
     my $expression2 = $rule->addExpression(
         {   operand1 => 'DUMMY_OPERAND_1',
@@ -161,7 +117,17 @@ $session->db->write('delete from fluxExpression');
             operand2 => 'DUMMY_OPERAND_2',
         }
     );
-    is( $expression2->get('sequenceNumber'), 2,           'second sequenceNumber is 2' );
+    is( $expression2->get('sequenceNumber'), 2, 'second sequenceNumber is 2' );
+
+    # Add a third Expression to test that we can use our own fluxExpressionId
+    my $expression3 = $rule->addExpression(
+        {   operand1         => 'DUMMY_OPERAND_1',
+            operator         => 'DUMMY_OPERATOR',
+            operand2         => 'DUMMY_OPERAND_2',
+            fluxExpressionId => 'grandmamoses',
+        }
+    );
+    is( $expression3->getId, 'grandmamoses', 'correct fluxExpressionId' );
 }
 
 #######################################################################
@@ -195,27 +161,27 @@ $session->db->write('delete from fluxExpression');
             operator => 'DUMMY_OPERATOR',
         }
     );
-    
-    Readonly my %newValues => (
+
+    my %newValues = (
         name     => 'New Name',
         operand1 => 'DUNNY_OPERAND_1',
         operand2 => 'DUNNY_OPERAND_2',
         operator => 'DUNNY_OPERATOR',
     );
-
     $expression->update( \%newValues );
 
     cmp_deeply( $expression->get(), superhashof( \%newValues ), 'update updates the object properties cache' );
 
     my $clonedExpression = WebGUI::Flux::Expression->new( $rule, $expression->getId() );
     cmp_deeply( $clonedExpression, $expression, 'update persists to the db, too' );
+
     # N.B. update() also gets tested indirectly by create() (above)
-    
+
     # Check that Rule's combined expression gets reset as a side-effect of updating an expression
-    $rule->update({combinedExpression => 'E1'});
-    is($rule->get('combinedExpression'), 'e1', 'Set combined expression (automatically converted to lc)');
+    $rule->update( { combinedExpression => 'E1' } );
+    is( $rule->get('combinedExpression'), 'e1', 'Set combined expression (automatically converted to lc)' );
     $expression->update( \%newValues );
-    is($rule->get('combinedExpression'), undef, 'Combined expression correctly reset by update');
+    is( $rule->get('combinedExpression'), undef, 'Combined expression correctly reset by update' );
 }
 
 #######################################################################

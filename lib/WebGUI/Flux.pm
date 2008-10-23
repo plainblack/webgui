@@ -1,10 +1,11 @@
 package WebGUI::Flux;
 
 use strict;
-
 use GraphViz;
 use JSON;
 use Readonly;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 =head1 NAME
 
@@ -53,22 +54,8 @@ An existing Rule's unique id.
 =cut
 
 sub getRule {
-    my ( $class, $session, $fluxRuleId ) = @_;
-
-    # Check arguments..
-    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Session',
-            got      => ( ref $session ),
-            error    => 'Need a session.'
-        );
-    }
-    if ( !defined $fluxRuleId ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $fluxRuleId,
-            error => 'Need a fluxRuleId.'
-        );
-    }
+    my $class = shift;
+    my ( $session, $fluxRuleId ) = validate_pos( @_, { isa => 'WebGUI::Session' }, 1 );
 
     # Retreive Rule from cache or db..
     if ( !exists $ruleCache{$fluxRuleId} ) {
@@ -87,16 +74,8 @@ Returns an array reference of Rules
 =cut
 
 sub getRules {
-    my ( $class, $session ) = @_;
-
-    # Check arguments..
-    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Session',
-            got      => ( ref $session ),
-            error    => 'Need a session.'
-        );
-    }
+    my $class = shift;
+    my ($session) = validate_pos( @_, { isa => 'WebGUI::Session' } );
 
     # Collect an array of Rules
     my @ruleObjects = ();
@@ -110,7 +89,7 @@ sub getRules {
 
 #-------------------------------------------------------------------
 
-=head2 getGraph ( )
+=head2 generateGraph ( )
 
 Generates the Flux Graph using GraphViz. This is currently just a proof-of-concept.
 The image is stored at /uploads/FluxGraph.png and overwritten every time this method is called.
@@ -123,7 +102,8 @@ GraphViz must be installed for this to work.
 =cut
 
 sub generateGraph {
-    my ( $class, $session ) = @_;
+    my $class = shift;
+    my ($session) = validate_pos( @_, { isa => 'WebGUI::Session' } );
 
     # Check arguments..
     if ( !defined $session || !$session->isa('WebGUI::Session') ) {
@@ -207,7 +187,7 @@ sub generateGraph {
         );
 
     }
-    
+
     # Now add the vertices..
     foreach my $edge (@edges) {
         $g->add_edge( @{$edge} );
@@ -224,7 +204,7 @@ sub generateGraph {
 =head2 evaluateFor ( arg_ref )
 
 Convenience method. Instantiates a Flux Rule and evaluates it against a given user and assetId.
-Currently, if anything goes wrong we return 1 (permit access). This will likely change later.
+Currently, if anything goes wrong we return 0 (deny access).
 
 =head3 arg_ref
 
@@ -240,73 +220,129 @@ The fluxRuleId of the Flux Rule
 
 =head4 assetId
 
-The assetId of the asset/wobject being evaluated against 
+The assetId of the asset/wobject being evaluated against (optional) 
 
 =cut
 
-#TODO: Add in some tests for this convenience method.
-
 sub evaluateFor {
-    my ($class, $arg_ref) = @_;
-    
-    # Check arguments..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
-        );
-    }
-    foreach my $field qw(user fluxRuleId assetId) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
-    }
-    if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{user},
-            error    => 'need a user.',
-            expected => 'WebGUI::User',
-            got      => ref $arg_ref->{user},
-        );
-    }
-    
-    my $session = $arg_ref->{user}->session();
-    
-#    # Debugging.. (remove later)
-#    {
-#        my $asset = WebGUI::Asset->new($session, $arg_ref->{assetId});
-#        $session->log->info("Getting Flux Result for: " . $asset->getUrl());
-#    }
-    
+    my $class = shift;
+    my %args = validate( @_, { user => { isa => 'WebGUI::User' }, fluxRuleId => 1, assetId => 0 } );
+
+    my $session = $args{user}->session();
+
+    #    # Debugging.. (remove later)
+    #    {
+    #        my $asset = WebGUI::Asset->new($session, $args{assetId});
+    #        $session->log->debug("Getting Flux Result for: " . $asset->getUrl());
+    #    }
+
     # Instantiate the Flux Rule..
-    my $fluxRuleId = $arg_ref->{fluxRuleId};                
-    if (!$fluxRuleId) {
-        $session->log->info('Invalid fluxRuleId, returning 1');
-        return 1;
+    my $fluxRule = eval { WebGUI::Flux->getRule( $session, $args{fluxRuleId} ) };
+    if ( my $e = Exception::Class->caught() ) {
+        $session->log->warn( $e->error );
+        return 0;
     }
-    my $fluxRule = eval {WebGUI::Flux->getRule($session, $fluxRuleId)};
-    if (my $e = Exception::Class->caught()) {
-        $session->log->warn($e->error);
-        return 1;
+    if ( !$fluxRule ) {
+        $session->log->warn('Unable to instantiate Flux Rule');
+        return 0;
     }
-    if (!$fluxRule) {
-        $session->log->info('Unable to instantiate Flux Rule, returning 1');
-        return 1;
-    }
-    $session->log->info('->Flux using Rule: ' . $fluxRule->get('name'));
-    
+    $session->log->debug( '->Flux using Rule: ' . $fluxRule->get('name') );
+
+    delete $args{fluxRuleId};    # don't need to pass this on with the rest of the args to $fluxRule->evaluateFo
+
     # Evaluate the Flux Rule..
-    my $result = eval {
-        $fluxRule->evaluateFor( $arg_ref )
-    };
-    if (my $e = Exception::Class->caught()) {
-        $session->log->warn('Flux caught an exception, returning 1 - ' . $e->error);
-        return 1;
+    my $result = eval { $fluxRule->evaluateFor( \%args ) };
+    if ( my $e = Exception::Class->caught() ) {
+        $session->log->warn( 'Flux caught an exception, returning 0 - ' . $e->error );
+        return 0;
     }
-    
+
     # Return the result..
-    $session->log->info('->Result: ' . $result);
+    $session->log->debug( '->Result: ' . $result );
     return $result;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStickies ( arg_ref )
+
+Returns a list of fluxRuleIds that have been true for the given user at least 
+once (e.g. dateRuleFirstTrue is not null).
+If users progress linearly through a sequence of rules (think sticky), then 
+this method can be used to determine in a single sql query how far they have
+progressed along the linear sequence. See also getHighestSticky.
+
+=cut
+
+sub getStickies {
+    my $class = shift;
+
+    my %args = validate( @_, { fluxRuleIds => { type => ARRAYREF }, user => { isa => 'WebGUI::User' } } );
+
+    my $user        = $args{user};
+    my @fluxRuleIds = @{ $args{fluxRuleIds} };
+
+    return unless @fluxRuleIds;
+
+    my $session = $user->session;
+
+    my $ruleList = join( q{,}, map { $session->db->quote($_) } @fluxRuleIds );
+    my $sql = <<"END_SQL";
+select fluxRuleId 
+from fluxRuleUserData natural join fluxRule 
+where sticky 
+    and fluxRuleId in ( $ruleList ) 
+    and userId = ? 
+    and dateRuleFirstTrue is not null
+END_SQL
+
+    return $session->db->buildArray( $sql, [ $user->userId ] );
+}
+
+#-------------------------------------------------------------------
+
+=head2 getHighestSticky ( arg_ref )
+
+Returns the last fluxRuleIds in a linear sequence.
+First uses getStickies to determine all known results in a single sql query.
+Then tries to execute the remaining rules in case the user now passes. Stops trying 
+rules as soon as one fails, so at most you'll have one wasteful rule eval. 
+
+=cut
+
+sub getHighestSticky {
+    my $class = shift;
+
+    my %args = validate( @_, { fluxRuleIds => { type => ARRAYREF }, user => { isa => 'WebGUI::User' } } );
+
+    my %stickies = map { $_ => 1 } $class->getStickies( \%args );
+
+    my $user    = $args{user};
+    my $session = $user->session;
+
+    my $highest;
+
+    # Find the last fluxRuleId that evaluates to true
+    foreach my $fluxRuleId ( @{ $args{fluxRuleIds} } ) {
+
+        if ( $stickies{$fluxRuleId} ) {
+            $session->log->debug("$fluxRuleId is a known sticky, no need to eval");
+            $highest = $fluxRuleId;
+            next;
+        }
+
+        $session->log->debug("Evaluating $fluxRuleId due to getHighestSticky search");
+
+        if ( $class->evaluateFor( { user => $user, fluxRuleId => $fluxRuleId } ) ) {
+            $session->log->debug("$fluxRuleId evaluated true, continuing search..");
+            $highest = $fluxRuleId;
+            next;
+        }
+
+        $session->log->debug("$fluxRuleId evaluated false, search ends with $highest");
+        last;
+    }
+    return $highest;
 }
 
 1;

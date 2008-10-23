@@ -16,15 +16,17 @@ use WebGUI::Text;
 use WebGUI::Flux::Expression;
 use WebGUI::Workflow;
 use WebGUI::Group;
+use Test::Exception;
 
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+WebGUI::Error->Trace(1);
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 80;
+plan tests => 76;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -49,37 +51,12 @@ $session->db->write('delete from fluxRuleUserData');
 # later after we've successfully create()'ed a Rule
 
 {
-    eval { my $rule = WebGUI::Flux::Rule->new(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a session object' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a session.',
-            expected => 'WebGUI::Session',
-            got      => q{},
-        ),
-        'new takes exception to not giving it a session object',
-    );
-}
-{
-    eval { my $rule = WebGUI::Flux::Rule->new($session); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'new takes exception to not giving it a fluxRuleId' );
-    cmp_deeply( $e, methods( error => 'Need a fluxRuleId.', ), 'new takes exception to not giving it a rule Id', );
-}
-{
-    eval { my $rule = WebGUI::Flux::Rule->new( $session, 'neverAGUID' ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::ObjectNotFound', 'new takes exception to not giving it an existing fluxRuleId' );
-    cmp_deeply(
-        $e,
-        methods(
-            error => 'No such Flux Rule.',
-            id    => 'neverAGUID',
-        ),
-        'new takes exception to not giving it a rule Id',
-    );
+    throws_ok { WebGUI::Flux::Rule->new() } 'WebGUI::Error::InvalidParam',
+        'new takes exception to not giving it a session object';
+    throws_ok { WebGUI::Flux::Rule->new($session) } 'WebGUI::Error::InvalidParam',
+        'new takes exception to not giving it a fluxRuleId';
+    throws_ok { WebGUI::Flux::Rule->new( $session, 'neverAGUID' ) } 'WebGUI::Error::ObjectNotFound',
+        'new takes exception to not giving it an existing fluxRuleId';
 }
 
 #######################################################################
@@ -88,24 +65,10 @@ $session->db->write('delete from fluxRuleUserData');
 #
 #######################################################################
 {
-    eval { my $rule = WebGUI::Flux::Rule->create(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a session object' );
-    cmp_deeply(
-        $e,
-        methods(
-            error    => 'Need a session.',
-            expected => 'WebGUI::Session',
-            got      => '',
-        ),
-        'create takes exception to not giving it a session object',
-    );
-}
-{
-    eval { my $rule = WebGUI::Flux::Rule->create( $session, 'not a hash ref' ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidNamedParamHashRef', 'create takes exception to an invalid hash ref' );
-    cmp_deeply( $e, methods( param => 'not a hash ref', ), 'create takes exception to an invalid hash ref', );
+    throws_ok { WebGUI::Flux::Rule->create() } 'WebGUI::Error::InvalidParam',
+        'create takes exception to not giving it a session object';
+    throws_ok { WebGUI::Flux::Rule->create( $session, 'not a hash ref' ) } 'WebGUI::Error::InvalidParam',
+        'create takes exception to an invalid hash ref';
 }
 {
 
@@ -123,6 +86,15 @@ $session->db->write('delete from fluxRuleUserData');
     # Check Rule defaults
     is( $rule->get('name'),   'Undefined', 'default value for name is "Undefined"' );
     is( $rule->get('sticky'), 0,           'default value for sticky is 0' );
+}
+{
+
+    # Create Rule with custom fluxRuleId
+    my $rule = WebGUI::Flux::Rule->create( $session, { fluxRuleId => 'myChosenFluxRuleId' } );
+    isa_ok( $rule, 'WebGUI::Flux::Rule', 'create returns the right kind of object' );
+    is( $rule->getId, 'myChosenFluxRuleId', 'with our chosen fluxRuleId' );
+    is( WebGUI::Flux->getRule( $session, 'myChosenFluxRuleId' )->getId,
+        $rule->getId, 'and we can retreive it via id' );
 }
 
 #######################################################################
@@ -347,9 +319,9 @@ $session->db->write('delete from fluxRuleUserData');
 
     # Try out some Combined Expressions
     $rule->update( { combinedExpression => 'E1' } );
-    ok( $rule->evaluateFor( { user => $user, } ), q{same with explicit combined expression 'E1'} );
+    ok( $rule->evaluateFor( { user => $user } ), q{same with explicit combined expression 'E1'} );
     $rule->update( { combinedExpression => 'not E1' } );
-    ok( !$rule->evaluateFor( { user => $user, } ), q{false with explicit combined expression 'not E1'} );
+    ok( !$rule->evaluateFor( { user => $user } ), q{false with explicit combined expression 'not E1'} );
 
     # add a second expression to the Rule with a Modifier
 
@@ -406,33 +378,17 @@ $session->db->write('delete from fluxRuleUserData');
 
     # try some invalid combinedExpressions
     $rule->update( { combinedExpression => '(' } );
-    {
-        eval { $rule->evaluateFor( { user => $user, } ) };
-        my $e = Exception::Class->caught();
-        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE '('} );
-    }
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE '('};
+    
     $rule->update( { combinedExpression => 'E1 E2' } );
-    {
-        eval { $rule->evaluateFor( { user => $user, } ) };
-        my $e = Exception::Class->caught();
-        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 E2'} );
-    }
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 E2'};
+    
     $rule->update( { combinedExpression => 'AND' } );
-    {
-        eval { $rule->evaluateFor( { user => $user, } ) };
-        my $e = Exception::Class->caught();
-        isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'AND'} );
-    }
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'AND'};
+    
     $rule->update( { combinedExpression => 'E1 AND E2 )' } );
-    {
-        eval { $rule->evaluateFor( { user => $user, } ) };
-        my $e = Exception::Class->caught();
-        isa_ok(
-            $e,
-            'WebGUI::Error::Flux::InvalidCombinedExpression',
-            q{evaluate takes exception to cE 'E1 AND E2 )'}
-        );
-    }
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 AND E2 )'};
+    
 }
 
 # Workflows
@@ -447,7 +403,7 @@ my $test_workflow = WebGUI::Workflow->create(
 use WebGUI::Workflow::Activity::AddUserToGroup;
 {
 
-    # Use the AddUserToGroup Workflow as a Guinea pig to test onRuleFirstTrueWorkflowId..   
+    # Use the AddUserToGroup Workflow as a Guinea pig to test onRuleFirstTrueWorkflowId..
     my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
     $activity->set( 'groupId', $test_group->getId() );
     ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
@@ -460,15 +416,16 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 
     # Workflow should have completed in real-time and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
-    
+
     # Clean up
     $activity->delete();
 }
 {
+
     # Try again with onAccessTrueWorkflowId..
     $test_group->delete();
     $test_group = WebGUI::Group->new( $session, 'new' );
-    
+
     my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
     $activity->set( 'groupId', $test_group->getId() );
     ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
@@ -481,15 +438,16 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 
     # Workflow should have completed in real-time and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
-    
+
     # Clean up
     $activity->delete();
 }
 {
+
     # Try again with onAccessFirstFalseWorkflowId..
     $test_group->delete();
     $test_group = WebGUI::Group->new( $session, 'new' );
-    
+
     my $activity = WebGUI::Workflow::Activity::AddUserToGroup->create( $session, $test_workflow->getId() );
     $activity->set( 'groupId', $test_group->getId() );
     ok( !$user->isInGroup( $test_group->getId() ), 'User not yet added to group by Workflow' );
@@ -497,7 +455,7 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 
     # Create a rule that will run AddUserToGroup on execution
     my $rule = WebGUI::Flux::Rule->create($session);
-    $rule->addExpression( # Add an expression that will fail, kaaboom!
+    $rule->addExpression(    # Add an expression that will fail, kaaboom!
         {   operand1     => 'TextValue',
             operand1Args => '{"value":  "apples"}',
             operator     => 'IsEqualTo',
@@ -510,7 +468,7 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 
     # Workflow should have completed in real-time and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
-    
+
     # Clean up
     $activity->delete();
 }
@@ -520,31 +478,18 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 # checkCombinedExpression
 #
 #######################################################################
+# Errors
 {
-    eval { WebGUI::Flux::Rule::checkCombinedExpression(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'takes exception to invalid param count' );
-    cmp_deeply( $e, methods( expected => 2, got => 0 ), 'takes exception to invalid param count', );
-}
-{
-    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'E0', 0 ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E0' is invalid} );
-}
-{
-    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'E1', 0 ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E1' with 0 expressions is invalid} );
-}
-{
-    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'blah', 0 ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'blah' is invalid} );
-}
-{
-    eval { WebGUI::Flux::Rule::checkCombinedExpression( 'ANDNOTOR', 0 ); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Flux::InvalidCombinedExpression', q{'ANDNOTOR' is invalid} );
+    throws_ok { WebGUI::Flux::Rule::checkCombinedExpression() } 'WebGUI::Error::InvalidParam',
+        'takes exception to invalid param count';
+    throws_ok { WebGUI::Flux::Rule::checkCombinedExpression( 'E0', 0 ) }
+    'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E0' is invalid};
+    throws_ok { WebGUI::Flux::Rule::checkCombinedExpression( 'E1', 0 ) }
+    'WebGUI::Error::Flux::InvalidCombinedExpression', q{'E1' with 0 expressions is invalid};
+    throws_ok { WebGUI::Flux::Rule::checkCombinedExpression( 'blah', 0 ) }
+    'WebGUI::Error::Flux::InvalidCombinedExpression', q{'blah' is invalid};
+    throws_ok { WebGUI::Flux::Rule::checkCombinedExpression( 'ANDNOTOR', 0 ) }
+    'WebGUI::Error::Flux::InvalidCombinedExpression', q{'ANDNOTOR' is invalid};
 }
 {
     ok( WebGUI::Flux::Rule::checkCombinedExpression( q{},         0 ), q{empty expression is valid} );
@@ -565,12 +510,8 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 #
 #######################################################################
 {
-    eval { WebGUI::Flux::Rule::_parseCombinedExpression(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'takes exception to invalid param count' );
-    cmp_deeply( $e, methods( expected => 1, got => 0 ), 'takes exception to invalid param count', );
-}
-{
+    throws_ok { WebGUI::Flux::Rule::_parseCombinedExpression() } 'WebGUI::Error::InvalidParam', 'takes exception to invalid param count';
+
     is( WebGUI::Flux::Rule::_parseCombinedExpression('e1 and e2'),
         '$expressions[1]->evaluate() and $expressions[2]->evaluate()',
         'combined expression parsed correctly into internal form'
@@ -587,6 +528,6 @@ END {
     $session->db->write('delete from fluxRule');
     $session->db->write('delete from fluxExpression');
     $session->db->write('delete from fluxRuleUserData');
-    $test_group->delete();
-    $test_workflow->delete();
+    $test_group->delete()    if $test_group;
+    $test_workflow->delete() if $test_workflow;
 }

@@ -13,10 +13,13 @@ use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Flux::Rule;
+use Test::Exception;
 
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
+
+#WebGUI::Error->Trace(1);
 
 #----------------------------------------------------------------------------
 # Tests
@@ -55,11 +58,11 @@ my $user = $session->user();
         }
     );
 
-    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Dependent rule true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, } ), q{Dependent rule true} );
     $simple_rule->update( { combinedExpression => 'not E1' } );
-    ok( !$dependent_rule->evaluateFor( { user => $user, }), q{Dependent rule false when simple rule toggled} );
+    ok( !$dependent_rule->evaluateFor( { user => $user, } ), q{Dependent rule false when simple rule toggled} );
     $dependent_rule->update( { combinedExpression => 'not E1' } );
-    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Double-negative is true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, } ), q{Double-negative is true} );
 
     # make $simple_rule circular by pointing it back at dependent_rule
     $simple_rule->addExpression(
@@ -70,15 +73,8 @@ my $user = $session->user();
             operand2Args => '{"value":  "1"}',
         }
     );
-    {
-        eval { $dependent_rule->evaluateFor( { user => $user, }) };
-        my $e = Exception::Class->caught();
-        isa_ok(
-            $e,
-            'WebGUI::Error::Flux::CircularRuleLoopDetected',
-            q{evaluateFor takes exception to circular rule}
-        );
-    }
+    throws_ok { $dependent_rule->evaluateFor( { user => $user, } ) }
+    'WebGUI::Error::Flux::CircularRuleLoopDetected', q{evaluateFor takes exception to circular rule};
 
     # Create a rule that depends on itself
     my $self_circular_rule    = WebGUI::Flux::Rule->create($session);
@@ -91,15 +87,9 @@ my $user = $session->user();
             operand2Args => '{"value":  "1"}',
         }
     );
-    {
-        eval { $self_circular_rule->evaluateFor( { user => $user, }) };
-        my $e = Exception::Class->caught();
-        isa_ok(
-            $e,
-            'WebGUI::Error::Flux::CircularRuleLoopDetected',
-            q{evaluateFor takes exception to self circular rule}
-        );
-    }
+    throws_ok { $self_circular_rule->evaluateFor( { user => $user, } ) }
+    'WebGUI::Error::Flux::CircularRuleLoopDetected',
+        q{evaluateFor takes exception to self circular rule};
 }
 
 # Exercise the resolvedRuleCache
@@ -137,9 +127,9 @@ my $user = $session->user();
         }
     );
 
-    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Twice-dependent rule true} );
+    ok( $dependent_rule->evaluateFor( { user => $user, } ), q{Twice-dependent rule true} );
     $dependent_rule->update( { combinedExpression => 'not(not E1 or not E2)' } );
-    ok( $dependent_rule->evaluateFor( { user => $user, }), q{Twice-dependent rule works with a cE too} );
+    ok( $dependent_rule->evaluateFor( { user => $user, } ), q{Twice-dependent rule works with a cE too} );
 
     # TODO: improve the above test to check that the resolvedRuleCache was actually used
 }

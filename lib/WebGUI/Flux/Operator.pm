@@ -5,6 +5,8 @@ use WebGUI::Pluggable;
 use English qw( -no_match_vars );
 use WebGUI::Exception::Flux;
 use Class::InsideOut qw{ :std };
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub {WebGUI::Error::InvalidParam->throw( error => shift)} );
 
 =head1 NAME
 
@@ -78,28 +80,9 @@ The second operand1 being passed to this Operator (required)
 =cut
 
 sub new {
-    my ( $class, $arg_ref ) = @_;
-
-    # Check arguments..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.',
-        );
-    }
-    foreach my $field qw(rule operand1 operand2) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
-    }
-    if ( ref $arg_ref->{rule} ne 'WebGUI::Flux::Rule' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{rule},
-            error    => 'need a rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => ref $arg_ref->{rule},
-        );
-    }
+    my $class = shift;
+    my %args = validate(@_, { rule => { isa => 'WebGUI::Flux::Rule'},
+        operand1 => 1, operand2 => 1 });
 
     # Register Class::InsideOut object..
     my $self = register $class;
@@ -107,14 +90,14 @@ sub new {
     # Initialise object properties that will be available to Operators
     # via the $self object..
     my $id = id $self;
-    my $rule = $arg_ref->{rule};
+    my $rule = $args{rule};
     $rule{$id}    = $rule;
-    $operand1{$id}    = $arg_ref->{operand1};
-    $operand2{$id}    = $arg_ref->{operand2};
+    $operand1{$id}    = $args{operand1};
+    $operand2{$id}    = $args{operand2};
     $user{$id}    = $rule->evaluatingForUser();
     $session{$id} = $rule->session();
-    if ( exists $arg_ref->{assetId} ) {
-        $assetId{$id} = $arg_ref->{assetId};
+    if ( exists $args{assetId} ) {
+        $assetId{$id} = $args{assetId};
     }
     
     $self->_checkDefinition();
@@ -148,35 +131,16 @@ Second operand
 =cut
 
 sub evaluateUsing {
-    my ( $class, $operator, $arg_ref ) = @_;
-
-    # Check arguments..
-    if ( @_ != 3 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 3,
-            error => 'invalid param count',
-        );
-    }
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
-        );
-    }
-    foreach my $field qw(operand1 operand2 rule) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
-        }
-    }
-    if ( ref $arg_ref->{rule} ne 'WebGUI::Flux::Rule' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{rule},
-            error    => 'need a rule.',
-            expected => 'WebGUI::Flux::Rule',
-            got      => ref $arg_ref->{rule},
-        );
-    }
+    my $class = shift;
+    my ($operator, $arg_ref ) = validate_pos(@_,1,{type => HASHREF});
+    
+    # Validate $arg_ref
+    my @args = (%{$arg_ref});
+    validate(@args, {
+         operand1 => 1,
+         operand2 => 1,
+         rule => {isa => 'WebGUI::Flux::Rule'},
+    });
     
     # Do a little bit of pre-processing on the operands
     foreach my $operand qw(operand1 operand2) {
@@ -189,7 +153,6 @@ sub evaluateUsing {
         # Trim whitespace
         $arg_ref->{$operand} =~ s/^\s+|\s+$//g;
     }
-    
 
      # The Operator module we are going to dynamically instantiate and evaluate
     my $operatorModule = "WebGUI::Flux::Operator::$operator";

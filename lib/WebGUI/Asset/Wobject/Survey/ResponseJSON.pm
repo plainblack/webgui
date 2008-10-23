@@ -15,7 +15,6 @@ sub new{
     $self->{log} = $log;
     $self->{responseId} = $rId;
     my $temp = decode_json($json) if defined $json;
-    $self->{goto} = defined $temp->{goto} ? $temp->{goto} : [];
     $self->{surveyOrder} = defined $temp->{surveyOrder} ? $temp->{surveyOrder} : [];#an array of question addresses, with the third member being an array of answers
     $self->{responses} = defined $temp->{responses} ? $temp->{responses} : {};
     $self->{lastResponse} = defined $temp->{lastResponse} ? $temp->{lastResponse} : -1;
@@ -118,7 +117,10 @@ sub nextSection{
     my $self = shift;
     return $self->survey->section([$self->surveyOrder->[$self->lastResponse + 1]->[0]]);
 }
-
+sub currentSection{
+    my $self = shift;
+    return $self->survey->section([$self->surveyOrder->[$self->lastResponse]->[0]]);
+}
 
 sub recordResponses{
     my $self = shift;
@@ -133,18 +135,27 @@ sub recordResponses{
     my %fileTypes = ('File Upload',1);
     my %dateTypes = ('Date','Date Range',1);
     my %hiddenTypes = ('Hidden',1);
-
     #These were just submitted from the user, so we need to see what and how they were (un)answered.
     my $questions = $self->nextQuestions();
     my $qAnswered = 1;
     my $terminal = 0;
     my $terminalUrl;
     my $goto;
-    my $section = $self->survey->section([$questions->[0]->{sid}]);
+    #my $section = $self->survey->section([$questions->[0]->{sid}]);
+    my $section = $self->currentSection();
     if($section->{terminal}){
         $terminal = 1;
         $terminalUrl = $section->{terminalUrl};
     }
+    
+    #There were no questions in the section just displayed, so increment the lastResponse by one
+    if(ref $questions ne 'ARRAY'){
+        $self->lastResponse($self->lastResponse + 1);
+        $self->log("Incrementing last response by one");
+        return [$terminal,$terminalUrl];
+    }
+$self->log("There are questions to be submitted in this section");
+
     for my $question(@$questions){
         my $aAnswered = 0;
         if($question->{terminal}){
@@ -169,7 +180,7 @@ sub recordResponses{
                     $terminal = 1;
                     $terminalUrl = $answer->{terminalUrl};
                 }
-                elsif($answer->{goto} =~ /\S/){
+                elsif($answer->{goto} =~ /\w/){
                     $goto = $answer->{goto};     
                 }
             }
@@ -180,7 +191,7 @@ sub recordResponses{
     #if all responses completed, move the lastResponse index to the last question shown
     if($qAnswered){
         $self->lastResponse($self->lastResponse + @$questions);
-        $self->goto($goto);
+        $self->goto($goto) if(defined $goto);
     }else{
         $terminal = 0;
     }
@@ -189,8 +200,21 @@ sub recordResponses{
 sub goto{
     my $self = shift;
     my $goto = shift;
-
-
+$self->log("In goto for '$goto'");
+    for(my $i = 0; $i <= $#{$self->surveyOrder()}; $i++){
+        my $section = $self->survey->section($self->surveyOrder()->[$i]);
+        my $question = $self->survey->question($self->surveyOrder()->[$i]);
+        if(ref $section eq 'HASH' and $section->{variable} eq $goto){
+$self->log("setting lastResponse to section ".($i-1));
+            $self->lastResponse($i - 1);
+            last;
+        }
+        if(ref $question eq 'HASH' and $question->{variable} eq $goto){
+$self->log("setting lastResponse to question ".($i-1));
+            $self->lastResponse($i - 1);
+            last;
+        }
+    } 
 }
 sub getPreviousAnswer{
     my $self = shift;
@@ -232,13 +256,15 @@ $self->log("qperpage $qPerPage");
 
     my $questions;
     for(my $i = 1; $i <= $qPerPage; $i++){
-        my $qAddy= $self->surveyOrder->[$self->lastResponse + $i];
-
+        my $qAddy = $self->surveyOrder->[$self->lastResponse + $i];
 $self->log("qAddy was $$qAddy[0]-$$qAddy[1]");
+        next if(! exists $$qAddy[1]);#skip this if it doesn't have a question (for sections with no questions)
 
         if($$qAddy[0] != $nextSectionId){
+$self->log("Next question section did not match current section");
             last;
         }
+$self->log("wtf");
         my %question = %{$self->survey->question([$$qAddy[0],$$qAddy[1]])};
         $question{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
         delete $question{answers};
@@ -252,11 +278,15 @@ $self->log("qAddy was $$qAddy[0]-$$qAddy[1]");
         }
         push(@$questions,\%question);
     }
+$self->log("Next Questions returning with ");
     return $questions
 }
+
 sub surveyEnd{
     my $self = shift;
-    return 1 if($self->lastResponse > $#{$self->surveyOrder});
+$self->log("LR is ".$self->lastResponse." and order is ".$#{$self->surveyOrder});
+$self->log("ENDING THE SURVEY\n\n\n") if($self->lastResponse > $#{$self->surveyOrder});
+    return 1 if($self->lastResponse >= $#{$self->surveyOrder});
     return 0;
 }
 

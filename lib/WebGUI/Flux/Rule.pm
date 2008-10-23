@@ -1,7 +1,6 @@
 package WebGUI::Flux::Rule;
 
 use strict;
-
 use Class::InsideOut qw{ :std };
 use WebGUI::Exception::Flux;
 use WebGUI::Flux::Expression;
@@ -9,6 +8,11 @@ use Readonly;
 use WebGUI::DateTime;
 use English qw( -no_match_vars );
 use WebGUI::Workflow::Instance;
+use List::MoreUtils qw(all);
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
+
+my $recursiveDepthCounter = 0; # Used as an extra (hopefully never needed) guard against infinite loops
 
 =head1 NAME
 
@@ -70,8 +74,8 @@ private expressionCache       => my %expressionCache;         # (hash) cache of 
 readonly evaluatingForUser    => my %evaluatingForUser;       # Set to a WebGUI::User when Rule is being evaluated
 readonly evaluatingForAssetId => my %evaluatingForAssetId;    # Set to an assetId when Rule is being evaluated
 readonly evaluationInfo       => my %evaluationInfo;          # Evaluation info
-public resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
-public unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
+readonly resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
+readonly unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
 
 # Default values used in create() method
 Readonly my %FIELD_DEFAULTS => (
@@ -117,13 +121,12 @@ A hash reference containing properties that you would pass to C<WebGUI::Flux::Ex
 =cut
 
 sub addExpression {
-    my ( $self, $properties_ref ) = @_;
-    return WebGUI::Flux::Expression->create( $self, $properties_ref );
+    return WebGUI::Flux::Expression->create(@_);
 }
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, rule )
+=head2 create ( session, $properties_ref )
 
 Constructor. Creates a new Flux Rule and returns it.
 Refer to C<new()> if instead you want To instantiate an existing rule.
@@ -132,40 +135,29 @@ Refer to C<new()> if instead you want To instantiate an existing rule.
 
 A reference to the current session.
 
-=head3 rule
+=head3 $properties_ref
 
 A hash reference containing the properties to set on the Rule.
 
 =cut
 
 sub create {
-    my ( $class, $session, $properties_ref ) = @_;
-
-    # Check arguments..
-    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Session',
-            got      => ( ref $session ),
-            error    => 'Need a session.'
-        );
-    }
-    if ( defined $properties_ref && ref $properties_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $properties_ref,
-            error => 'invalid properties hash ref.'
-        );
-    }
-
-    # Ok for $properties_ref to be missing
-    $properties_ref = defined $properties_ref ? $properties_ref : {};
+    my $class = shift;
+    my ( $session, $properties_ref )
+        = validate_pos( @_, { isa => 'WebGUI::Session' }, { type => HASHREF, default => {} } );
 
     # Work out the next highest sequence number
     my $sequenceNumber = $session->db->quickScalar('select max(sequenceNumber) from fluxRule');
     $sequenceNumber = $sequenceNumber ? $sequenceNumber + 1 : 1;
 
     # Create a bare-minimum entry in the db..
-    my $id = $session->db->setRow( 'fluxRule', 'fluxRuleId',
-        { %FIELD_DEFAULTS, fluxRuleId => 'new', sequenceNumber => $sequenceNumber } );
+    my $id = $session->db->setRow(
+        'fluxRule', 'fluxRuleId',
+        { %FIELD_DEFAULTS, fluxRuleId => 'new', sequenceNumber => $sequenceNumber },
+        $properties_ref->{fluxRuleId},    # specified fluxRuleID will be used if provided
+    );
+
+    delete $properties_ref->{fluxRuleId};    # doesn't need to be passed to update (below)
 
     # (re-)retrieve entry and apply user-supplied properties..
     my $rule = $class->new( $session, $id );
@@ -185,7 +177,7 @@ make it handle expression changes intelligently.
 =cut
 
 sub resetCombinedExpression {
-    my ($self) = @_;
+    my $self = shift;
     $self->update( { combinedExpression => undef } );
     return;
 }
@@ -199,7 +191,7 @@ Deletes this Flux Rule and all expressions contained in it.
 =cut
 
 sub delete {
-    my ($self) = @_;
+    my $self = shift;
     foreach my $expression ( @{ $self->getExpressions } ) {
         $expression->delete;
     }
@@ -223,7 +215,8 @@ L<update> method.
 =cut
 
 sub get {
-    my ( $self, $name ) = @_;
+    my $self = shift;
+    my ($name) = validate_pos( @_, 0 );
     if ( defined $name ) {
         return $property{ id $self}{$name};
     }
@@ -242,7 +235,6 @@ Returns the list of mutable fields
 sub getMutableFields {
     return @MUTABLE_FIELDS;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -269,14 +261,14 @@ An expression object's unique id.
 =cut
 
 sub getExpression {
-    my ( $self, $expressionId ) = @_;
+    my $self = shift;
+    my ($expressionId) = validate_pos( @_, 1 );
     my $id = id $self;
 
     if ( !exists $expressionCache{$id}{$expressionId} ) {
         $expressionCache{$id}{$expressionId} = WebGUI::Flux::Expression->new( $self, $expressionId );
     }
 
-    #    return WebGUI::Flux::Expression->new( $self, $expressionId );
     return $expressionCache{$id}{$expressionId};
 }
 
@@ -289,7 +281,7 @@ Returns the number of Expressions in this Rule.
 =cut
 
 sub getExpressionCount {
-    my ($self) = @_;
+    my $self              = shift;
     my @expressionObjects = ();
     my $count = $self->session->db->quickScalar( 'select count(*) from fluxExpression where fluxRuleId=?',
         [ $self->getId ] );
@@ -305,7 +297,7 @@ Returns an array reference of expression objects that are in this Rule.
 =cut
 
 sub getExpressions {
-    my ($self) = @_;
+    my $self              = shift;
     my @expressionObjects = ();
     my $expressions
         = $self->session->db->read(
@@ -326,7 +318,7 @@ Returns the unique id for this Rule.
 =cut
 
 sub getId {
-    my ($self) = @_;
+    my $self = shift;
     return $self->get('fluxRuleId');
 }
 
@@ -348,19 +340,8 @@ The unique id of a Flux Rule to instantiate.
 =cut
 
 sub new {
-    my ( $class, $session, $ruleId ) = @_;
-
-    # Check arguments..
-    if ( !defined $session || !$session->isa('WebGUI::Session') ) {
-        WebGUI::Error::InvalidObject->throw(
-            expected => 'WebGUI::Session',
-            got      => ( ref $session ),
-            error    => 'Need a session.'
-        );
-    }
-    if ( !defined $ruleId ) {
-        WebGUI::Error::InvalidParam->throw( error => 'Need a fluxRuleId.' );
-    }
+    my $class = shift;
+    my ( $session, $ruleId ) = validate_pos( @_, { isa => 'WebGUI::Session' }, 1 );
 
     # Retreive row from db..
     my $rule = $session->db->quickHashRef( 'select * from fluxRule where fluxRuleId=?', [$ruleId] );
@@ -435,27 +416,23 @@ The combined expression
 =cut
 
 sub update {
-    my ( $self, $newProp_ref ) = @_;
-
-    # Check arguments..
-    if ( !defined $newProp_ref || ref $newProp_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidParam->throw( param => $newProp_ref, error => 'Invalid hash reference.' );
-    }
+    my $self            = shift;
+    my %validation_spec = map { $_ => 0 } @MUTABLE_FIELDS;
+    my %args            = validate( @_, \%validation_spec );  # only allows MUTABLE_FIELDS as optional named params
 
     # Special filtering for combinedExpression..
-    if ( defined $newProp_ref->{combinedExpression} ) {
+    if ( defined $args{combinedExpression} ) {
 
         # Check for validity (throws an exception if not)
-        checkCombinedExpression( $newProp_ref->{combinedExpression}, $self->getExpressionCount() );
+        checkCombinedExpression( $args{combinedExpression}, $self->getExpressionCount() );
 
         # Convert to lower-case
-        $newProp_ref->{combinedExpression} = lc $newProp_ref->{combinedExpression};
+        $args{combinedExpression} = lc $args{combinedExpression};
     }
 
     my $id = id $self;
     foreach my $field (@MUTABLE_FIELDS) {
-        $property{$id}{$field}
-            = ( exists $newProp_ref->{$field} ) ? $newProp_ref->{$field} : $property{$id}{$field};
+        $property{$id}{$field} = ( exists $args{$field} ) ? $args{$field} : $property{$id}{$field};
     }
     return $self->session->db->setRow( 'fluxRule', 'fluxRuleId', $property{$id} );
 }
@@ -474,9 +451,9 @@ A hash ref of options.
 
 A WebGUI::User object corresponding to the user who the Rule is being evaluated against (required)
 
-=head4 assetId
+=head4 assetId (optional)
 
-The assetId of the asset/wobject for which the Rule is being evaluated for (optional) 
+The assetId of the asset/wobject for which the Rule is being evaluated for 
 
 =head4 access (optional)
 
@@ -497,54 +474,42 @@ Defaults to false.
 =cut
 
 sub evaluateFor {
-    my ( $self, $arg_ref ) = @_;
-
-    # Check args..
-    if ( !defined $arg_ref || ref $arg_ref ne 'HASH' ) {
-        WebGUI::Error::InvalidNamedParamHashRef->throw(
-            param => $arg_ref,
-            error => 'invalid named param hash ref.'
-        );
-    }
-
-    # check compulsory fields..
-    foreach my $field qw(user) {
-        if ( !exists $arg_ref->{$field} ) {
-            WebGUI::Error::NamedParamMissing->throw( param => $field, error => 'named param missing.' );
+    my $self = shift;
+    my %args = validate(
+        @_,
+        {   user    => { isa => 'WebGUI::User' },
+            assetId => 0,
+            access    => { default => 1 },
+            recursive => { default => 0 }
         }
-    }
-    if ( ref $arg_ref->{user} ne 'WebGUI::User' ) {
-        WebGUI::Error::InvalidObject->throw(
-            param    => $arg_ref->{user},
-            error    => 'need a user.',
-            expected => 'WebGUI::User',
-            got      => ref $arg_ref->{user},
-        );
-    }
+    );
 
     # Cache $id for speed
     my $id = id $self;
+    
+    if ($args{recursive}) {
+        # Should not be possible for $recursiveDepthCounter to exceed 1, but check anyway
+        # as a double-guard against infinite loops..
+        if ( $recursiveDepthCounter++ > 1 ) {
+            WebGUI::Error::Flux::CircularRuleLoopDetected->throw(
+                error            => 'MAX_DEPTH exceeded. Do you have a circular Rule loop?',
+                sourceFluxRuleId => $self->getId(),
+            );
+        }
+    }
 
     # Take note of which user we're evaluating the Rule for..
-    my $user = $arg_ref->{user};
+    my $user = $args{user};
     $evaluatingForUser{$id} = $user;
 
     # Take note of which asset we're evaluating the Rule for (if set)..
-    if ( exists $arg_ref->{assetId} ) {
-        $evaluatingForAssetId{$id} = $arg_ref->{assetId};
-    }
+    $evaluatingForAssetId{$id} = $args{assetId};
 
     # Take note of whether this is a recursive call or not..
-    $evaluationInfo{$id}{is_recursive}
-        = ( exists $arg_ref->{recursive} )
-        ? $arg_ref->{recursive}
-        : 0;    # defaults to false
+    $evaluationInfo{$id}{is_recursive} = $args{recursive};
 
     # Take note of whether this is wobject access or not..
-    $evaluationInfo{$id}{is_access}
-        = ( exists $arg_ref->{access} )
-        ? $arg_ref->{access}
-        : 1;    # defaults to true
+    $evaluationInfo{$id}{is_access} = $args{access};
 
     # Rule with no expressions defaults to true
     if ( $self->getExpressionCount() == 0 ) {
@@ -559,8 +524,6 @@ sub evaluateFor {
             [ $self->getId(), $user->userId() ] );
 
         if ($dateRuleFirstTrue) {
-            WebGUI::Error::NotImplemented->throw( error => 'STICKY OPTIMISATION NOT TESTED YET.' );
-
             return $self->_finishEvaluating( 1, $id );
         }
     }
@@ -575,9 +538,10 @@ sub evaluateFor {
 =for Workaround
 The most elegant way to do it would be:
  $was_successful = all { $_->evaluate() } @{ $self->getExpressions() };
-However in some weird cases (covered by test suite) it's seg faulting.
-You can still use it if you turn off the XS version of List::MoreUtils
-by setting the environment variable: LIST_MOREUTILS_PP
+However in some weird cases (covered by test suite) we get an exception
+thrown: "Not a subroutine reference". No idea why.. works if you turn off 
+the XS version of List::MoreUtils by setting the environment 
+variable: LIST_MOREUTILS_PP
 
 =cut 
 
@@ -639,16 +603,8 @@ value of "id $self" (optimisation)
 =cut
 
 sub _finishEvaluating {
-    my ( $self, $result, $id ) = @_;
-
-    # Check arguments..
-    if ( @_ != 3 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 3,
-            error    => 'invalid param count',
-        );
-    }
+    my $self = shift;
+    my ($result, $id ) = validate_pos(@_, 1, 1);
 
     # Update the fluxRuleUserData table
     $self->_updateDataAndTriggerWorkflows( $result, $id );
@@ -659,8 +615,20 @@ sub _finishEvaluating {
     return $result;
 }
 
+#-------------------------------------------------------------------
+
+=head2 resetEvaluationInfo ( id )
+
+Clean up
+
+head3 id
+
+value of "id $self" (optimisation)
+ 
+=cut
 sub resetEvaluationInfo {
-    my ( $self, $id ) = @_;
+    my $self = shift;
+    my ($id) = validate_pos(@_, 1);
 
     delete $evaluatingForUser{$id};
     delete $evaluatingForAssetId{$id};
@@ -678,10 +646,7 @@ sub resetEvaluationInfo {
         my $rule_id = $self->getId();
         $resolvedRuleCache{$id} = {};
         $unresolvedRuleCache{$id} = { $rule_id => $rule_id };
-
-        # And reset the depth counter..
-        use WebGUI::Flux::Operand::FluxRule;
-        WebGUI::Flux::Operand::FluxRule->resetDepthCounter();
+        $recursiveDepthCounter = 0;
     }
     $evaluationInfo{$id} = {};
 }
@@ -698,16 +663,7 @@ just catch any errors from eval.
 =cut
 
 sub checkCombinedExpression {
-    my ( $combined_expression, $expression_count ) = @_;
-
-    # Check arguments..
-    if ( @_ != 2 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 2,
-            error    => 'invalid param count',
-        );
-    }
+    my ( $combined_expression, $expression_count ) = validate_pos(@_, 1,1);
 
     # Undefined combined expression is valid
     return 1 if !defined $combined_expression;
@@ -753,22 +709,13 @@ so that we can test it.
 =cut
 
 sub _parseCombinedExpression {
-    my ($combined_expression) = @_;
-
-    # Check arguments..
-    if ( @_ != 1 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 1,
-            error    => 'invalid param count',
-        );
-    }
+    my ($combined_expression) = validate_pos(@_, 1);
 
     # Apply the magic regex
     $combined_expression =~ s/e(\d+)/\$expressions[$1]->evaluate()/gx;
+    
     return $combined_expression;
 }
-1;
 
 #-------------------------------------------------------------------
 
@@ -793,16 +740,8 @@ value of "id $self" (optimisation)
 =cut
 
 sub _updateDataAndTriggerWorkflows {
-    my ( $self, $result, $id ) = @_;
-
-    # Check arguments..
-    if ( @_ != 3 ) {
-        WebGUI::Error::InvalidParamCount->throw(
-            got      => scalar(@_),
-            expected => 3,
-            error    => 'invalid param count',
-        );
-    }
+    my $self = shift;
+    my ($result, $id ) = validate_pos(@_, 1,1);
 
     my $is_access = $evaluationInfo{$id}{is_access};
 
@@ -817,9 +756,9 @@ sub _updateDataAndTriggerWorkflows {
     my $dt = WebGUI::DateTime->new(time)->toDatabase();
 
     # Along the way, keep track of..
-    my $db_write_required = 0;                 # whether we need to write to the db
-    my %field_updates;                         # what fields need to be updated
-    my %trigger_workflow;                      # what workflows need to be triggered
+    my $db_write_required = 0;    # whether we need to write to the db
+    my %field_updates;            # what fields need to be updated
+    my %trigger_workflow;         # what workflows need to be triggered
 
     # Has rule ever been checked for this user?
     if ( !exists $userData{fluxRuleUserDataId} ) {
@@ -897,3 +836,99 @@ sub _updateDataAndTriggerWorkflows {
         }
     }
 }
+
+#-------------------------------------------------------------------
+
+=head2 hasResolvedRuleCached ( $fluxRuleId )
+
+Returns true/false depending on whether this Rule has
+the given fluxRuleId stored in its resolved rule cache
+ 
+=cut
+
+sub hasResolvedRuleCached {
+    my $self = shift;
+    my ($fluxRuleId) = validate_pos(@_,1);
+    return exists $resolvedRuleCache{id $self}{$fluxRuleId};   
+}
+
+#-------------------------------------------------------------------
+
+=head2 hasUnresolvedRuleCached ( $fluxRuleId )
+
+Returns true/false depending on whether this Rule has
+the given fluxRuleId stored in its unresolved rule cache
+ 
+=cut
+
+sub hasUnresolvedRuleCached {
+    my $self = shift;
+    my ($fluxRuleId) = validate_pos(@_,1);
+    return exists $unresolvedRuleCache{id $self}{$fluxRuleId};   
+}
+
+#-------------------------------------------------------------------
+
+=head2 getResolvedRuleResult ( $fluxRuleId )
+
+Returns the cached rule result for $fluxRuleId stored in this
+Rule's resolved rule cache
+ 
+=cut
+
+sub getResolvedRuleResult {
+    my $self = shift;
+    my ($fluxRuleId) = validate_pos(@_,1);
+    return $resolvedRuleCache{id $self}{$fluxRuleId};   
+}
+
+#-------------------------------------------------------------------
+
+=head2 cacheRuleAsResolved ( $fluxRuleId, $result )
+
+Stores the given rule and result in this Rule's resolved rule cache
+ 
+=cut
+
+sub cacheRuleAsResolved {
+    my $self = shift;
+    my ($fluxRuleId, $result) = validate_pos(@_, 1, 1);
+    delete $unresolvedRuleCache{id $self}{$fluxRuleId};
+    $resolvedRuleCache{id $self}{$fluxRuleId} = $result;
+}
+
+#-------------------------------------------------------------------
+
+=head2 cacheRuleAsUnresolved ( $fluxRuleId )
+
+Stores the given rule in this Rule's unresolved rule cache
+ 
+=cut
+
+sub cacheRuleAsUnresolved {
+    my $self = shift;
+    my ($fluxRuleId) = validate_pos(@_, 1);
+    delete $resolvedRuleCache{id $self}{$fluxRuleId}; # generally won't exist anyway
+    $unresolvedRuleCache{id $self}{$fluxRuleId} = $fluxRuleId;
+}
+
+#-------------------------------------------------------------------
+
+=head2 initCachesFrom ( $fluxRule )
+
+Sets this Rule's resolved and unresolved rule caches to a shallow copy taken from
+the provided rule. 
+ 
+=cut
+
+sub initCachesFrom {
+    my $self = shift;
+    my ($that) = validate_pos(@_, {isa => 'WebGUI::Flux::Rule'});
+ 
+    my %rrc_copy = %{$that->resolvedRuleCache()};
+    my %urc_copy = %{$that->unresolvedRuleCache()};
+    $resolvedRuleCache{id $self} = \%rrc_copy;
+    $unresolvedRuleCache{id $self} = \%urc_copy;
+}
+
+1;

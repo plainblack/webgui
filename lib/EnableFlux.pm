@@ -6,23 +6,23 @@ use WebGUI::Session;
 use Carp;
 use Tie::IxHash;
 use List::MoreUtils qw(none insert_after_string);
-my $verbose;
+use File::Slurp;
 
 #----------------------------------------------------------------------------
 sub apply {
-    my ( $session, $v ) = @_;
-    $verbose = $v;
+    my ( $class, $session, $demo ) = @_;
 
-    # Ok, let's do it
+    say("# Running EnableFlux..");
+
     modify_db_schema_for_flux($session);
     modify_config_files_for_flux($session);
-    create_demo_data($session);
-    say("Finished. Don't forget to restart modperl");
+    create_demo_data($session) if $demo;
+    enable_survey2($session);
 }
 
 sub say {
     local $\ = "\n";
-    print @_ if $verbose;
+    print @_ if $ENV{VERBOSE};
 }
 
 #----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ CREATE TABLE `fluxExpression` (
 #----------------------------------------------------------------------------
 sub modify_config_files_for_flux {
     my $session = shift;
-    say("Modifying config files for flux..");
+    say("# Examining wg config file..");
 
     # Add Flux to the list of Content Handlers
     my @content_handlers = @{ $session->config->get('contentHandlers') };
@@ -150,7 +150,7 @@ sub modify_config_files_for_flux {
 #----------------------------------------------------------------------------
 sub create_demo_data {
     my $session = shift;
-    say("Creating demo data..");
+    say("Creating flux demo data..");
     $session->db->write(
         q~
 INSERT INTO `fluxRule` (`fluxRuleId`, `name`, `sequenceNumber`, `sticky`, `onRuleFirstTrueWorkflowId`, `onRuleFirstFalseWorkflowId`, `onAccessFirstTrueWorkflowId`, `onAccessFirstFalseWorkflowId`, `onAccessTrueWorkflowId`, `onAccessFalseWorkflowId`, `combinedExpression`) VALUES ('2wKj6EkpLrmU1f6ZVfxzOA','Dependent Rule',2,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('M8EjDc89Q8iqBYb4UTRalA','Simple Rule',1,0,NULL,NULL,NULL,NULL,NULL,NULL,'not e1 or e2'),('Yztbug94AbqQkOKhyOT4NQ','Yet Another Rule',3,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('NgRW4dh2sDSNEwJPGCtWBg','My empty Rule',4,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('VVGkA5gBRlNYd6DrFV5anQ','Another Rule',5,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL)
@@ -170,6 +170,59 @@ sub drop_col {
     if (@cols) {
         $session->db->write("ALTER TABLE $table DROP COLUMN $col");
     }
+}
+
+sub enable_survey2 {
+    my $session = shift;
+    say("# As a bonus, also enabling Survey2..");
+    say('Updating db schema..');
+    $session->db->write("drop table if exists Survey");
+    $session->db->write("drop table if exists Survey_answer");
+    $session->db->write("drop table if exists Survey_question");
+    $session->db->write("drop table if exists Survey_questionResponse");
+    $session->db->write("drop table if exists Survey_response");
+    $session->db->write("drop table if exists Survey_section");
+    my $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey.sql');
+    $session->db->write($sql);
+    $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey_response.sql');
+    $session->db->write($sql);
+    say('Importing Survey2 templates..');
+    my $versionTag = WebGUI::VersionTag->getWorking($session);
+    $versionTag->set({name=>"Adding Survey2 Packages"});
+    addPackage($session, '/data/WebGUI/survey_templates.wgpkg');
+    $versionTag->commit;
+}
+
+# Add a package to the import node
+sub addPackage {
+    my $session     = shift;
+    my $file        = shift;
+
+    # Make a storage location for the package
+    my $storage     = WebGUI::Storage->createTemp( $session );
+    $storage->addFileFromFilesystem( $file );
+
+    # Import the package into the import node
+    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+
+    # Make the package not a package anymore
+    $package->update({ isPackage => 0 });
+    
+    # Set the default flag for templates added
+    my $assetIds
+        = $package->getLineage( ['self','descendants'], {
+            includeOnlyClasses  => [ 'WebGUI::Asset::Template' ],
+        } );
+    for my $assetId ( @{ $assetIds } ) {
+        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( !$asset ) {
+            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
+            next;
+        }
+        $asset->update( { isDefault => 1 } );
+    }
+
+    return;
 }
 
 1;

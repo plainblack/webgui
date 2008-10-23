@@ -13,6 +13,7 @@ use Readonly;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Flux::Rule;
+use Test::Exception;
 
 #----------------------------------------------------------------------------
 # Init
@@ -20,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 7;
+plan tests => 6;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -28,38 +29,34 @@ plan tests => 7;
 use_ok('WebGUI::Flux::Operator');
 my $rule = WebGUI::Flux::Rule->create($session);
 
+# Errors
 {
-    eval { WebGUI::Flux::Operator->evaluateUsing(); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::InvalidParamCount', 'evaluateUsing takes exception to wrong number of args' );
-    cmp_deeply(
-        $e,
-        methods(
-            expected    => 3,
-            got         => 1,
-        ),
-        'evaluateUsing takes exception to wrong number of args',
-    );
+    throws_ok { WebGUI::Flux::Operator->evaluateUsing() } 'WebGUI::Error::InvalidParam',
+        'evaluateUsing takes exception to wrong number of args';
+    throws_ok {
+        WebGUI::Flux::Operator->evaluateUsing( 'IsQuantumSuperpositionOf',
+            { rule => $rule, operand1 => 'a', operand2 => 'b' } );
+    }
+    'WebGUI::Error::Pluggable::LoadFailed', 'evaluateUsing takes exception to invalid Operator';
+    throws_ok {
+        WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo',
+            { rule => 'j00rule!', operand1 => 'a', operand2 => 'b' } );
+    }
+    'WebGUI::Error::InvalidParam', 'evaluateUsing takes exception to invalid rule';
 }
-{
-    eval { WebGUI::Flux::Operator->evaluateUsing('IsQuantumSuperpositionOf', {rule => $rule, operand1 => 'a', operand2 => 'b'}); };
-    my $e = Exception::Class->caught();
-    isa_ok( $e, 'WebGUI::Error::Pluggable::LoadFailed', 'evaluateUsing takes exception to invalid Operator' );
-    cmp_deeply(
-        $e,
-        methods(
-            error => re(qr/^Could not load WebGUI::Flux::Operator::IsQuantumSuperpositionOf/),
-            module => 'WebGUI::Flux::Operator::IsQuantumSuperpositionOf',
-        ),
-        'evaluateUsing takes exception to invalid Operator',
-    );
-}
-
 {
 
     # Try out evaluateUsing(), using IsEqualTo as our guinea pig
-    ok( WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 'cat', operand2 => 'cat'} ), 'identical operands' );
-    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsEqualTo', {rule => $rule, operand1 => 'cat', operand2 => 'dog'}), 'different operands' );
+    ok( WebGUI::Flux::Operator->evaluateUsing(
+            'IsEqualTo', { rule => $rule, operand1 => 'cat', operand2 => 'cat' }
+        ),
+        'identical operands'
+    );
+    ok( !WebGUI::Flux::Operator->evaluateUsing(
+            'IsEqualTo', { rule => $rule, operand1 => 'cat', operand2 => 'dog' }
+        ),
+        'different operands'
+    );
 }
 
 #----------------------------------------------------------------------------

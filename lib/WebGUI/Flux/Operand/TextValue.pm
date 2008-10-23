@@ -17,6 +17,12 @@ See WebGUI::Flux::Operand base class for more information.
 
 #-------------------------------------------------------------------
 
+=head2 evaluate
+
+See WebGUI::Flux::Operand base class for more information.
+
+=cut
+
 sub evaluate {
     my ($self) = @_;
 
@@ -24,6 +30,12 @@ sub evaluate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition
+
+See WebGUI::Flux::Operand base class for more information.
+
+=cut
 
 sub definition {
     return { args => { value => 1 } };
