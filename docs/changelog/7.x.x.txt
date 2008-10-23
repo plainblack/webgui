@@ -29,6 +29,7 @@
     parent is committed.  They will go into the same version tag as their parent.
  - rfe #640: Refactored autocommit and autocomment
  - added a perltidyrc to the docs folder. we'll be using this to clean up code.
+ - fixed: Site Nav navigation template can now be used more than once per page
 
 
 7.6.1
