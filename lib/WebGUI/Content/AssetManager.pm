@@ -375,7 +375,7 @@ sub www_manage {
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $currentAsset->getUrl,
-    })) {
+    }) eq 'redirect' ) {
         return undef;
     };
 

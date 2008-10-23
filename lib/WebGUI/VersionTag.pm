@@ -42,7 +42,8 @@ These methods are available from this class:
 =head2 autoCommitWorkingIfEnabled ( $session, $options )
 
 A class method that automatically commits the working version tag if auto commit is
-enabled.  Returns true if the version tag was committed.
+enabled.  Returns 'commit' if the tag was committed, 'redirect' if a redirect for
+comments was set (only possible with allowComments), or false if no action was taken.
 
 =head3 $options
 
@@ -70,7 +71,7 @@ sub autoCommitWorkingIfEnabled {
     my $options = shift || {};
     # need a version tag to do any auto commit
     my $versionTag = $class->getWorking($session, "nocreate");
-    return
+    return undef
         unless $versionTag;
     # auto commit assets
     # save and commit button and site wide auto commit work the same
@@ -80,13 +81,13 @@ sub autoCommitWorkingIfEnabled {
     ) {
         if ($session->setting->get("skipCommitComments") || !$options->{allowComments}) {
             $versionTag->requestCommit;
-            return 1;
+            return 'commit';
         }
         else {
             my $url = $options->{returnUrl} || $session->url->page;
             $url = $session->url->append($url, "op=commitVersionTag;tagId=" . $versionTag->getId);
             $session->http->setRedirect($url);
-            return 1;
+            return 'redirect';
         }
     }
 }

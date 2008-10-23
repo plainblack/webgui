@@ -339,7 +339,7 @@ sub www_importPackage {
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
+    }) eq 'redirect') {
         return undef;
     };
 

@@ -199,7 +199,7 @@ sub editSave {
         override        => scalar $self->session->form->process("saveAndCommit"),
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
+    }) eq 'redirect') {
         return undef;
     };
 

@@ -307,7 +307,7 @@ sub www_editBranchSave {
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
+    }) eq 'redirect') {
         return undef;
     };
 	delete $self->{_parent};

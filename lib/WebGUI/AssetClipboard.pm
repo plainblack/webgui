@@ -222,7 +222,7 @@ sub www_copy {
     if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
+    }) eq 'redirect') {
         return undef;
     };
     return $self->session->asset($self->getContainer)->www_view;

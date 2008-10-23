@@ -388,7 +388,7 @@ sub www_importProducts {
             if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
                 allowComments   => 1,
                 returnUrl       => $self->getUrl,
-            })) {
+            }) eq 'redirect') {
                 return undef;
             };
 		}
