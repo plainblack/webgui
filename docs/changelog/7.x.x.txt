@@ -1,5 +1,6 @@
 7.5.28
  - Fixed #8890: meta_loop in post form not working (United Knowledge)
+ - Fixed: Site Nav navigation template can now be used more than once per page
 
 7.5.27
  - fixed #8802: isImage not functioning in Folders
