@@ -402,7 +402,10 @@ sub www_manage {
 
     my $extras      = $session->url->extras;
     $session->style->setRawHeadTags( <<ENDHTML );
-    <script type="text/javascript">
+    <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.6.0/build/logger/assets/skins/sam/logger.css">
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/logger/logger-min.js"></script> 
+
+<script type="text/javascript">
         WebGUI.AssetManager.extrasUrl   = '$extras';
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
