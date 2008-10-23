@@ -41,10 +41,11 @@ foreach my $library (@modules) {
 for my $script (@scripts) {
     my $cmd = "$^X -wcI'$wgLib' $script 2>&1";
     my $output = `$cmd`;
-    is($?, 0, "$script compiles successfully");
+    my $shortName = File::Spec->abs2rel($script, WebGUI::Test->root);
+    is($?, 0, "$shortName compiles successfully");
     chomp $output;
     $output =~ s/^\Q$script\E (?:had compilation errors\.|syntax OK)$//m;
-    is($output, '', "$script compiles without warnings");
+    is($output, '', "$shortName compiles without warnings");
 }
 
 #----------------------------------------
