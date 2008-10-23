@@ -4,14 +4,15 @@
 -ole=unix   # Output Line Ending
 -ci=4       # Continuation Indentation
 -sil=0      # Force starting indent level to 0
--nolq       # No Outdent Long Quotes
--nolc       # No Outdent Comments
--nola       # No Outdent LAbels
--pt=0       # Paren Tightness (PBP style)
--sbt=0      # Square Brace Tightness (PBP style)
--bt=0       # Brace Tightness (PBP style)
+-noll       # No Outdent Long Lines
+-pt=1       # Paren Tightness (PBP style)
+-sbt=1      # Square Brace Tightness (PBP style)
+-bt=1       # Brace Tightness (PBP style)
+-bbt=1      # Code block brace tightness
+-vt=2       # Vertical tightness (PBP style)
 -nsfs       # No Space For Semicolon
--bar        # Opening Brace Always on Right
 -otr        # Opening token right
 -sot        # Stack Opening Tokens ( { [
 -bbao       # Break before all operators
+-csc        # Add closing side comments
+-csci=16    # Add closing side comments after 16 lines
