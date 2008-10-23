@@ -1,3 +1,5 @@
+7.5.28
+
 7.5.27
  - fixed #8802: isImage not functioning in Folders
  - fixed: EMSBadge doesn't have a template field
