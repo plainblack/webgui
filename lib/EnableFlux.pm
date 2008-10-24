@@ -172,26 +172,26 @@ sub drop_col {
     }
 }
 
-sub enable_survey2 {
-    my $session = shift;
-    say("# As a bonus, also enabling Survey2..");
-    say('Updating db schema..');
-    $session->db->write("drop table if exists Survey");
-    $session->db->write("drop table if exists Survey_answer");
-    $session->db->write("drop table if exists Survey_question");
-    $session->db->write("drop table if exists Survey_questionResponse");
-    $session->db->write("drop table if exists Survey_response");
-    $session->db->write("drop table if exists Survey_section");
-    my $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey.sql');
-    $session->db->write($sql);
-    $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey_response.sql');
-    $session->db->write($sql);
-    say('Importing Survey2 templates..');
-    my $versionTag = WebGUI::VersionTag->getWorking($session);
-    $versionTag->set({name=>"Adding Survey2 Packages"});
-    addPackage($session, '/data/WebGUI/survey_templates.wgpkg');
-    $versionTag->commit;
-}
+#sub enable_survey2 {
+#    my $session = shift;
+#    say("# As a bonus, also enabling Survey2..");
+#    say('Updating db schema..');
+#    $session->db->write("drop table if exists Survey");
+#    $session->db->write("drop table if exists Survey_answer");
+#    $session->db->write("drop table if exists Survey_question");
+#    $session->db->write("drop table if exists Survey_questionResponse");
+#    $session->db->write("drop table if exists Survey_response");
+#    $session->db->write("drop table if exists Survey_section");
+#    my $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey.sql');
+#    $session->db->write($sql);
+#    $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey_response.sql');
+#    $session->db->write($sql);
+#    say('Importing Survey2 templates..');
+#    my $versionTag = WebGUI::VersionTag->getWorking($session);
+#    $versionTag->set({name=>"Adding Survey2 Packages"});
+#    addPackage($session, '/data/WebGUI/survey_templates.wgpkg');
+#    $versionTag->commit;
+#}
 
 # Add a package to the import node
 sub addPackage {
