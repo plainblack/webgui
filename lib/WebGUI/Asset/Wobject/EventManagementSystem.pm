@@ -822,7 +822,7 @@ sub www_getBadgesAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -904,7 +904,9 @@ sub www_getRegistrantAsJson {
 		my $sku = $item->getSku;
 		# it's a ticket
 		if ($sku->isa('WebGUI::Asset::Sku::EMSTicket')) {
-            my $startTime = WebGUI::DateTime->new($sku->get('startDate'))->set_time_zone($self->get('timezone'));
+            my $startTime = WebGUI::DateTime->new($sku->get('startDate'))
+                ->set_time_zone($self->get('timezone'))
+                ->strftime('%Y-%m-%d %H:%M:%S');
 			push(@tickets, {
 				title			=> $sku->getTitle,
 				eventNumber		=> $sku->get('eventNumber'),
@@ -954,7 +956,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{ribbons} = \@ribbons;
 	
 	# build json datasource
-    return JSON->new->utf8->encode($badgeInfo);
+    return JSON->new->encode($badgeInfo);
 }
 
 #-------------------------------------------------------------------
@@ -1018,7 +1020,7 @@ sub www_getRegistrantsAsJson {
 	
 	# build json datasource
     $session->http->setMimeType('text/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1053,7 +1055,7 @@ sub www_getRibbonsAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1164,7 +1166,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         my $description = $ticket->get('description');
         my $data = $ticket->get('eventMetaData');
         $data = '{}' if ($data eq "");
-        my $meta = JSON->new->utf8->decode($data);
+        my $meta = JSON->new->decode($data);
         foreach my $field (keys %{$meta}) {
             $description .= '<p><b>'.$field.'</b>: '.$meta->{$field}.'</p>' unless ($meta->{$field} eq "");
         }
@@ -1205,7 +1207,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1240,7 +1242,7 @@ sub www_getTokensAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('text/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
