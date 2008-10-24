@@ -121,7 +121,7 @@ sub definition {
                 label => "Answer Edit Tempalte",
                 defaultValue    => 'AjhlNO3wZvN5k4i4qioWcg',
                 namespace  => 'Survey/Edit',
-                }
+                },
         );
 
     push(@{$definition}, {
@@ -133,6 +133,36 @@ sub definition {
         properties=>\%properties
         });
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData ( )
+
+Override exportAssetData so that surveyJSON is included in package exports etc..
+
+=cut
+
+sub exportAssetData {
+	my $self = shift;
+	my $hash = $self->SUPER::exportAssetData();
+	$self->loadSurveyJSON();
+	$hash->{properties}{surveyJSON} = $self->survey->freeze;
+	return $hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importAssetData ( hashRef )
+
+Override importAssetCollateralData so that surveyJSON gets imported from packages
+
+=cut
+
+sub importAssetCollateralData {
+    my ($self, $data) = @_;
+    my $surveyJSON = $data->{properties}{surveyJSON};
+    $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$surveyJSON,$self->getId]);
 }
 
 #-------------------------------------------------------------------
