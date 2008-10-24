@@ -476,6 +476,7 @@ eval{
 #$self->session->errorHandler->error($@);
 
 $self->session->errorHandler->error("Returning from loadSurvey");
+    $session->http->setMimeType('application/json');
     return encode_json($return);
 }
 
@@ -721,6 +722,7 @@ $self->session->errorHandler->error("-------SurveyEnd $url");
         }
     }
 $self->session->errorHandler->error("-------SurveyEnd $url");
+    $session->http->setMimeType('application/json');
     return encode_json({"type","forward","url",$url});
 }
 
@@ -770,6 +772,7 @@ $self->session->errorHandler->error("Question Text is: ".$q->{text});
 #$self->session->errorHandler->error(Dumper $section);
     my $out = $self->processTemplate($section,$self->get("surveyQuestionsId"));
 
+    $session->http->setMimeType('application/json');
     return encode_json({"type","displayquestions","section",$section,"questions",$questions,"html",$out});
 }
 
