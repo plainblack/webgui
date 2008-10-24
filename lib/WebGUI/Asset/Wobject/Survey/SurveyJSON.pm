@@ -150,12 +150,14 @@ sub update{
     my $object;
     my $newQuestion = 0;
     if(@$address == 1){
+$self->log("A section");
         $object = $self->section($address);
         if(! defined $object){
             $object = $self->newSection();
             push(@{$self->sections},$object);
         }
     }elsif(@$address == 2){
+$self->log("A question");
         $object = $self->question($address);
         if(! defined $object){
             my $newQuestion = 1;
@@ -163,6 +165,7 @@ sub update{
             push(@{$self->questions($address)},$object);
         }
     }elsif(@$address == 3){
+$self->log("A answer");
         $object = $self->answer($address);
         if(! defined $object){
             $object = $self->newAnswer();
@@ -175,6 +178,7 @@ sub update{
         }
     }
     for my $key(keys %$object){
+$self->log("$key $$object{$key}");
         $object->{$key} = $ref->{$key} if(defined $$ref{$key});
     }
 }
@@ -263,8 +267,8 @@ sub newQuestion{
                 'maxAnswers',1,
                 'value',1,
                 'textInButton',0,
-                'terminal',0,
-                'terminalUrl','',
+#                'terminal',0,
+#                'terminalUrl','',
                 'type','question'
             );
     $members{answers} = [];

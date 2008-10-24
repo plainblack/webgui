@@ -38,6 +38,11 @@ sub definition {
                 hoverHelp=>"A Survey System",
                 label=>"Template ID"
                 },
+            groupToEditSurvey => {
+                fieldType   => 'group',
+                defaultValue    => 4,
+                label => "Group to edit survey",
+                },
             groupToTakeSurvey => {
                 fieldType   => 'group',
                 defaultValue    => 2,
@@ -552,6 +557,7 @@ sub prepareView {
 sub purge {
         my $self = shift;
         $self->session->db->write("delete from Survey_response where assetId = ?",[$self->getId()]);
+        $self->session->db->write("delete from Survey_tempReport where assetId = ?",[$self->getId()]);
         $self->session->db->write("delete from Survey where assetId = ?",[$self->getId()]);
         return $self->SUPER::purge;
 }
@@ -589,12 +595,13 @@ returns the output.
 sub view {
     my $self = shift;
     my %var;
+
     $var{'edit_survey_url'} = $self->getUrl('func=editSurvey');
     $var{'take_survey_url'} = $self->getUrl('func=takeSurvey');
+    $var{'view_reports_url'} = $self->getUrl('func=viewReports');
     $var{'user_canTakeSurvey'} = $self->session->user->isInGroup($self->get("groupToTakeSurvey"));
-
-    $var{'user_canTakeSurvey'} = 1;
-
+    $var{'user_canViewReports'} = $self->session->user->isInGroup($self->get("groupToViewReports"));
+    $var{'user_canEditSurvey'} = $self->session->user->isInGroup($self->get("groupToEditSurvey"));
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 
     return $out;
@@ -842,14 +849,18 @@ sub loadBothJSON{
 #-------------------------------------------------------------------
 sub loadResponseJSON{
     my $self = shift;
+$self->log("1");
     my $jsonHash = shift;
     my $rId = shift;
+    $rId = defined $rId ? $rId : $self->{responseId};
+    if(defined $self->response and ! defined $rId){return;}
 
-    if(defined $self->response){return;}
+$self->log("loading $rId");
 
-    $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]) if(! defined $jsonHash);
-
-    $self->{response} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new($jsonHash,$self->session->errorHandler, $rId, $self->survey);
+    $jsonHash = $self->session->db->quickScalar("select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
+        [$self->getId,$rId]) if(! defined $jsonHash);
+$self->log("jsonhash was ".(length $jsonHash));
+    $self->{response} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new($jsonHash,$self->session->errorHandler, $self->survey);
 }
 
 #-------------------------------------------------------------------
@@ -984,7 +995,67 @@ $self->session->errorHandler->error("Can take was NOT already defined");
 
 }
 
+#-------------------------------------------------------------------
+sub www_viewReports {
+        my $self = shift;
+        $self->loadTempReportTable();
+        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
+        my $filename    = $self->session->url->escape($self->get("title")."_results.tab");
+        my $content = $self->session->db->quickTab("select * from Survey_tempReport t where t.assetId=? order by t.Survey_responseId, t.order",[$self->getId()]);
+        return $self->export($filename,$content);
+}
+
+#-------------------------------------------------------------------
+sub export{
+        my $self = shift;
+        my $filename = shift;
+        $filename =~ s/[^\w\d\.]/_/g;
+        my $content = shift;
+        #Create a temporary directory to store files if it doesn't already exist
+        my $store       = WebGUI::Storage->createTemp( $self->session );
+        my $tmpDir      = $store->getPath();
+        my $filepath    = $store->getPath($filename);
+        unless (open TEMP, ">$filepath") {
+            return "Error - Could not open temporary file for writing.  Please use the back button and try again";
+        }
+        print TEMP $content;
+        close TEMP;
+        my $fileurl = $store->getUrl($filename);
+
+        $self->session->http->setRedirect($fileurl);
+
+        return undef;
+}
 
 
+sub loadTempReportTable{
+    my $self = shift;
+
+    $self->loadSurveyJSON();
+    my $refs = $self->session->db->buildArrayRefOfHashRefs("select * from Survey_response where assetId = ?",[$self->getId()]);
+    $self->session->db->write("delete from Survey_tempReport where assetId = ?",[$self->getId()]);
+    for my $ref(@$refs){
+        $self->loadResponseJSON(undef,$ref->{Survey_responseId});
+        my $count = 1;
+        for my $q(@{$self->response->returnResponseForReporting()}){
+            if(@{$q->{answers}} == 0 and $q->{comment} =~ /\w/){
+                $self->session->db->write("insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [$self->getId(),$ref->{Survey_responseId}, $count++, $q->{section},$q->{sectionName},$q->{question},$q->{questionName},
+                    $q->{questionComment},undef,undef,undef,undef,undef,undef,undef]);
+                next;
+            }
+            for my $a(@{$q->{answers}}){
+                $self->session->db->write("insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [$self->getId(),$ref->{Survey_responseId}, $count++, $q->{section},$q->{sectionName},$q->{question},$q->{questionName},
+                    $q->{questionComment},$a->{id},$a->{value},$a->{comment},$a->{time},$a->{isCorrect},$a->{value},undef]);
+            }
+        }
+    }
+    return 1;
+}
+sub log{
+    my $self = shift;
+    $self->session->errorHandler->error(shift);
+}
 
 1;
