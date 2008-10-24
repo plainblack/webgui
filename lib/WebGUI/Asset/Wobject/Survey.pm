@@ -166,6 +166,23 @@ sub importAssetCollateralData {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Override duplicate so that surveyJSON gets duplicated too
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+    my $options = shift;
+	my $newAsset = $self->SUPER::duplicate($options);
+	$self->loadSurveyJSON();
+	$self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$self->survey->freeze,$newAsset->getId]);
+    return $newAsset;
+}
+
+#-------------------------------------------------------------------
 =head2 getEditForm
 
 getEditForm is called when creating/editing the asset.  
