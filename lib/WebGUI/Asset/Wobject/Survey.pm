@@ -16,6 +16,7 @@ use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
+use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 
 use Data::Dumper;
 
@@ -120,7 +121,7 @@ sub definition {
                 label => "Answer Edit Tempalte",
                 defaultValue    => 'AjhlNO3wZvN5k4i4qioWcg',
                 namespace  => 'Survey/Edit',
-                }
+                },
         );
 
     push(@{$definition}, {
@@ -132,6 +133,36 @@ sub definition {
         properties=>\%properties
         });
         return $class->SUPER::definition($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 exportAssetData ( )
+
+Override exportAssetData so that surveyJSON is included in package exports etc..
+
+=cut
+
+sub exportAssetData {
+	my $self = shift;
+	my $hash = $self->SUPER::exportAssetData();
+	$self->loadSurveyJSON();
+	$hash->{properties}{surveyJSON} = $self->survey->freeze;
+	return $hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importAssetData ( hashRef )
+
+Override importAssetCollateralData so that surveyJSON gets imported from packages
+
+=cut
+
+sub importAssetCollateralData {
+    my ($self, $data) = @_;
+    my $surveyJSON = $data->{properties}{surveyJSON};
+    $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$surveyJSON,$self->getId]);
 }
 
 #-------------------------------------------------------------------
@@ -504,7 +535,7 @@ sub prepareView {
 sub purge {
         my $self = shift;
         $self->session->db->write("delete from Survey_response where assetId = ?",[$self->getId()]);
-        $self->session->db->write("delete from Survey_questionResponse where assetId = ?",[$self->getId()]);
+        $self->session->db->write("delete from Survey where assetId = ?",[$self->getId()]);
         return $self->SUPER::purge;
 }
 
