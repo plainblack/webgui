@@ -104,7 +104,7 @@ sub getSectionEditVars{
     $var{displayed_id} = $address->[0]+1;
     delete $var{questions};
     delete $var{questionsPerPage};
-    for(1 .. 10){
+    for(1 .. 20){
 #        if($_ == $self->section($address)->{questionsPerPage}){
         if($_ == $object->{questionsPerPage}){
             push(@{$var{questionsPerPage}},{'index',$_,'selected',1});

@@ -32,7 +32,7 @@ Survey.SectionTemplate = new function(){
             html = html + "\
                 <p>Question per Page:\
                      <select name='questionsPerPage'>";
-            for(var i=1;i<=10;i++){  
+            for(var i=1;i<=20;i++){  
                 if(i == params.questionsPerPage){
                     html = html + "<option value='"+i+"' selected>"+i+"</option>";
                 }else{
