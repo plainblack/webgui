@@ -105,6 +105,22 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate
+
+Subclass the duplicate method so that the isDefault flag is set to 0 on any
+copy.
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newTemplate = $self->SUPER::duplicate;
+    $newTemplate->update({isDefault => 0});
+    return $newTemplate;
+}
+
+#-------------------------------------------------------------------
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
