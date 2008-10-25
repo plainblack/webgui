@@ -32,6 +32,7 @@
  - added a perltidyrc to the docs folder. we'll be using this to clean up code.
  - fixed: Site Nav navigation template can now be used more than once per page
  - added: TextArea now supports "maxlength" attribute
+ - added: DataForm can now run a workflow when an entry is added
 
 
 7.6.1

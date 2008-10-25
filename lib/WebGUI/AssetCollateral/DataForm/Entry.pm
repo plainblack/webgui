@@ -1,6 +1,5 @@
 package WebGUI::AssetCollateral::DataForm::Entry;
 use strict;
-use warnings;
 
 our $VERSION = '0.0.1';
 
@@ -60,6 +59,41 @@ sub fields {
     return { %{ $entryData } };
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getHash ( )
+
+Gets a hash reference of data for this entry, which looks like this:
+ 
+ {
+     DataForm_entryId    => "entryId",
+     userId              => "userId",
+     username            => "username",
+     ipAddress           => "0.0.0.0",
+     assetId             => "assetId",
+     submissionDate      => "2008-00-00 00:00:00", # in UTC
+     entryData           => { name => value, name => value, ... },
+ }
+
+=cut
+
+sub getHash {
+    my $self    = shift;
+    my $id      = id $self;
+
+    my $var = {
+        DataForm_entryId    => $entryId{$id},
+        userId              => $userId{$id},
+        username            => $username{$id},
+        ipAddress           => $ipAddress{$id},
+        assetId             => $assetId{$id},
+        submissionDate      => $submissionDate{$id}->toDatabase,
+        entryData           => $entryData{$id},
+    };
+
+    return $var;
+}
+
 #-------------------------------------------------------------------
 sub getCount {
     my $class = shift;
@@ -102,6 +136,16 @@ sub iterateAll {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new ( asset [, entryId ] )
+
+=head2 new ( session, entryId )
+
+Instantiate an object. If C<entryId> is defined, will pull the correct entry
+from the database. If C<entryId> is not defined, will create a new entry.
+
+=cut
+
 sub new {
     my ($class, $asset, $entryId) = @_;
     my $self = register($class);
@@ -124,7 +168,6 @@ sub new {
         if (! defined $properties->{'DataForm_entryId'}) {
             WebGUI::Error::ObjectNotFound->throw(error => 'no such DataForm_entryId', id => $entryId);
         }
-        $session = $session{$id} = $asset->session;
         if (! $assetId{$id}) {
             $assetId{$id} = $properties->{assetId};
             $asset{$id} = WebGUI::Asset::Wobject::DataForm->new($session, $properties->{assetId});
@@ -137,6 +180,38 @@ sub new {
         $self->submissionDate(WebGUI::DateTime->new($session, time));
         $entryData{id $self} = {};
     }
+    return $self;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 newFromHash ( asset, properties )
+
+=head2 newFromHash ( session, assetId, properties )
+
+Create a new DataForm entry from the given properties.
+
+=cut
+
+sub newFromHash {
+    my $class   = shift;
+    my $asset   = shift;
+    my $self;
+
+    if ( defined $asset && ref $asset && $asset->isa( 'WebGUI::Asset::Wobject::DataForm' ) ) {
+        my $properties  = shift;
+        $self           = $class->new( $asset );
+        $self->setFromHash( $properties );
+    } 
+    elsif ( defined $asset && ref $asset && $asset->isa( 'WebGUI::Session' ) ) {
+        my $session     = $asset;
+        my $assetId     = shift;
+        my $properties  = shift;
+        $asset          = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        $self           = $class->new( $asset );
+        $self->setFromHash( $properties );
+    }
+
     return $self;
 }
 

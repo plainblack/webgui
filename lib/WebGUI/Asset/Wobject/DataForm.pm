@@ -314,6 +314,15 @@ sub definition {
             label           => $i18n->get('editForm useCaptcha label'),
             hoverHelp       => $i18n->get('editForm useCaptcha description'),
         },
+        workflowIdAddEntry  => {
+            tab             => "properties",
+            fieldType       => "workflow",
+            defaultValue    => undef,
+            type            => "WebGUI::AssetCollateral::DataForm::Entry",
+            none            => 1,
+            label           => $i18n->get('editForm workflowIdAddEntry label'),
+            hoverHelp       => $i18n->get('editForm workflowIdAddEntry description'),
+        },
         fieldConfiguration => {
             fieldType       => 'hidden',
         },
@@ -1164,12 +1173,16 @@ sub www_editFieldSave {
     my $fieldName = $form->process('fieldName');
     my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
     $newName =~ tr{-/}{};
+
+    # Make sure we don't rename special fields
     if ($fieldName) {
         my $field = $self->getFieldConfig($fieldName);
         if ($field->{isMailField}) {
             $newName = $fieldName;
         }
     }
+
+    # Make sure our field name is unique
     if (!$fieldName || $fieldName ne $newName) {
         my $i = '';
         while ($self->getFieldConfig($newName . $i)) {
@@ -1178,6 +1191,7 @@ sub www_editFieldSave {
         }
         $newName .= $i;
     }
+
     my %field = (
         width           => $form->process("width", 'integer'),
         label           => $form->process("label"),
@@ -1191,6 +1205,7 @@ sub www_editFieldSave {
         vertical        => $form->process("vertical", 'yesNo'),
         extras          => $form->process("extras"),
     );
+
     my $newSelf = $self->addRevision;
     if ($fieldName) {
         if ($fieldName ne $newName) {
@@ -1231,6 +1246,8 @@ sub setField {
     my $self = shift;
     my $fieldName = shift;
     my $field = shift;
+    
+    $field->{ name } = $fieldName;
 
     my $fieldConfig = $self->getFieldConfig;
     if (!$fieldConfig->{$fieldName}) {
@@ -1528,18 +1545,47 @@ sub www_process {
         };
     }
 
-    $var->{error_loop} = \@errors;
+    # Prepare template variables
     $var = $self->getRecordTemplateVars($var, $entry);
+
+    # If errors, show error page
     if (@errors) {
-        $self->prepareFormView;
+        $var->{error_loop} = \@errors;
+        $self->prepareViewForm;
         return $self->processStyle($self->viewForm($var, $entry));
     }
+
+    # Send email
     if ($self->get("mailData") && !$entryId) {
         $self->sendEmail($var, $entry);
     }
+
+    # Save entry to database
     if ($self->get('storeData')) {
         $entry->save;
     }
+    
+    # Run the workflow
+    if ( $self->get("workflowIdAddEntry") ) {
+        my $instanceVar = {
+            workflowId  => $self->get( "workflowIdAddEntry" ),
+            className   => "WebGUI::AssetCollateral::DataForm::Entry",
+        };
+
+        # If we've saved the entry, we only need the ID
+        if ( $self->get( 'storeData' ) ) {
+            $instanceVar->{ methodName     } = "new";
+            $instanceVar->{ parameters     } = $entry->getId;
+        }
+        # We haven't saved the entry, we need the whole thing
+        else {
+            $instanceVar->{ methodName     } = "newFromHash";
+            $instanceVar->{ parameters     } = [ $self->getId, $entry->getHash ];
+        }
+
+        WebGUI::Workflow::Instance->create( $self->session, $instanceVar )->start;
+    }
+
     return $self->processStyle($self->processTemplate($var,$self->get("acknowlegementTemplateId")))
         if $self->defaultViewForm;
     return '';

@@ -36,6 +36,7 @@ changeDefaultPaginationInSearch($session);
 upgradeToYui26($session);
 addUsersOnlineMacro($session);
 addProfileExtrasField($session);
+addWorkflowToDataform( $session );
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -107,6 +108,23 @@ sub addProfileExtrasField {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Add the workflow property to DataForm
+sub addWorkflowToDataform {
+    my $session     = shift;
+    print "\tAdding Workflow to DataForm... " unless $quiet;
+
+    my $sth = $session->db->read('DESCRIBE `DataForm`');
+    while (my ($col) = $sth->array) {
+        if ( $col eq 'workflowIdAddEntry' ) {
+            print "Already done, skipping.\n" unless $quiet;
+            return;
+        }
+    }
+     
+    $session->db->write( "ALTER TABLE DataForm ADD COLUMN workflowIdAddEntry CHAR(22) BINARY" );
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
