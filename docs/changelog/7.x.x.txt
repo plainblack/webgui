@@ -4,6 +4,7 @@
    and the profile.extras field when viewing a profile.
  - Added the NotifyAboutThing workflow activity. Use this activity to create
    workflows for the add / edit / delete workflows for a thingy's things.
+ - Fixed basic auth to work on WRE demo servers.
  - fixed #8839: Documentation is wrong for Stock Ticker
  - Added Guid form control.
  - Moved Asset ID and Class Name fields to the Meta tab of all assets.
