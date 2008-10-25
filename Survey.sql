@@ -23,6 +23,7 @@ DROP TABLE IF EXISTS `Survey`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `Survey` (
+  `groupToEditSurvey` varchar(22) character set utf8 collate utf8_bin NOT NULL default '3',
   `groupToTakeSurvey` varchar(22) character set utf8 collate utf8_bin NOT NULL default '2',
   `groupToViewReports` varchar(22) character set utf8 collate utf8_bin NOT NULL default '3',
   `responseTemplateId` varchar(22) character set utf8 collate utf8_bin NOT NULL default '',
