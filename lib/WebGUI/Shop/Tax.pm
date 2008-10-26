@@ -479,7 +479,7 @@ sub www_getTaxesAsJson {
     $results{'sort'}         = undef;
 #    $results{'dir'}          = "desc";
     $results{'dir'}          = $sortDir;
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON::to_json(\%results);
 }
 
