@@ -988,7 +988,7 @@ sub www_addFileService {
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
         
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->pretty->encode($document);
 }
 

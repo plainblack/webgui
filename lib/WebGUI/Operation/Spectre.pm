@@ -52,7 +52,7 @@ Checks to ensure the requestor is who we think it is, and then returns a JSON st
 
 sub www_spectreGetSiteData {
     my $session = shift;
-	$session->http->setMimeType("text/json");
+	$session->http->setMimeType("application/json");
 	$session->http->setCacheControl("none");
 	my %siteData = ();
     my $subnets = $session->config->get("spectreSubnets");

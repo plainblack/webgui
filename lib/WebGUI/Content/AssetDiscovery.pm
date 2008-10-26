@@ -138,7 +138,7 @@ sub handler {
             $session->http->setMimeType('text/xml');
             return XML::Simple::XMLout($document, NoAttr => 1);
         }
-        $session->http->setMimeType('text/json');
+        $session->http->setMimeType('application/json');
         return JSON->new->encode($document);
     }
     return undef;

@@ -1122,7 +1122,7 @@ sub www_addAlbumService {
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
 
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1315,7 +1315,7 @@ sub www_listAlbumsService {
         $session->http->setMimeType('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->pretty->encode($document);
 }
 
