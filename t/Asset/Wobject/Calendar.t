@@ -16,7 +16,8 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 4; # increment this value for each test you create
+use Test::More tests => 5; # increment this value for each test you create
+use Test::Deep;
 use WebGUI::Asset::Wobject::Calendar;
 use WebGUI::Asset::Event;
 
@@ -44,7 +45,35 @@ my $secondVersionTag = WebGUI::VersionTag->new($session, $event->get("tagId"));
 my $article = $cal->addChild({className=>"WebGUI::Asset::Wobject::Article"});
 isnt(ref $article, 'WebGUI::Asset::Wobject::Article', "Can't add an article as a child to the calendar.");
 
+my $dt = WebGUI::DateTime->new($session, mysql => '2001-08-16 8:00:00', time_zone => 'America/Chicago');
 
+my $vars = {};
+$cal->appendTemplateVarsDateTime($vars, $dt, "start");
+cmp_deeply(
+    $vars,
+    {
+        startMinute     => '00',
+        startDayOfMonth => 16,
+        startMonthName  => 'August',
+        startMonthAbbr  => 'Aug',
+        startEpoch      => 997966800,
+        startHms        => '08:00:00',
+        startM          => 'AM',
+        startMeridiem   => 'AM',
+        startDayName    => 'Thursday',
+        startMdy        => '08-16-2001',
+        startYmd        => '2001-08-16',
+        startDmy        => '16-08-2001',
+        startDayAbbr    => 'Thu',
+        startDayOfWeek  => 4,
+        startHour       => 8,
+        startHour24     => 8,
+        startMonth      => 8,
+        startSecond     => '00',
+        startYear       => 2001,
+    },
+    'Variables returned by appendTemplateVarsDateTime'
+);
 
 TODO: {
         local $TODO = "Tests to make later";
