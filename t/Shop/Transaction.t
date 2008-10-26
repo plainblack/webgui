@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 65;        # Increment this number for each test you create
+plan tests => 66;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -186,6 +186,7 @@ is(scalar @{$transaction->getItems}, 0, "can delete items");
 $session->user({userId=>3});
 my $json = WebGUI::Shop::Transaction->www_getTransactionsAsJson($session);
 ok($json, 'www_getTransactionsAsJson returned something');
+is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
 my $jsonTransactions = JSON::from_json($json);
 cmp_deeply(
     $jsonTransactions,

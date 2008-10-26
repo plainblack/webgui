@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 79 + 2*scalar(@{$addExceptions});
+my $tests = 80 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -609,6 +609,7 @@ SKIP: {
     $session->user({userId=>3});
     my $json = $taxer->www_getTaxesAsJson();
     ok($json, 'www_getTaxesAsJson returned something');
+    is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
     my $jsonTax = JSON::from_json($json);
     cmp_deeply(
         $jsonTax,
