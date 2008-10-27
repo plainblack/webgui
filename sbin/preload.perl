@@ -33,28 +33,18 @@ DBI->install_driver("mysql"); # Change to match your database driver.
 #----------------------------------------
 require WebGUI;
 require WebGUI::Config;
-
-require Module::Find;
+require WebGUI::Pluggable;
 
 # these modules should always be skipped
 my @excludes = qw(WebGUI::i18n::English::Automated_Information WebGUI::PerformanceProfiler);
 push @excludes, readLines($webguiRoot."/sbin/preload.exclude");
 
-my @webguiLibs = Module::Find::findallmod('WebGUI');
-
-for my $module ( @webguiLibs ) {
-    # filter out excludes
-    next
-        if grep { $_ eq $module } @excludes;
-    # filter any files found starting with a period
-    next
-        if $module =~ /::\./;
-
-    (my $moduleFile = $module . ".pm") =~ s{::|'}{/}g;
-    if (!eval { require $moduleFile; 1 }) {
-        warn "Error loading $module! - $@\n";
+WebGUI::Pluggable::findAndLoad( "WebGUI", 
+    { 
+        exclude     => \@excludes, 
+        onLoadFail  => sub { warn 'Error loading %s: %s', @_ },
     }
-}
+);
 
 require APR::Request::Apache2;
 require Apache2::Cookie;
