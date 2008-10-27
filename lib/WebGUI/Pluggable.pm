@@ -70,6 +70,7 @@ Return an array of all the modules in the given namespace. Will search all
  onelevel       => If true, only find sub modules (children), no deeper
                 find( "CGI", { onelevel => 1 } ) would match "CGI::Session" but 
                 not "CGI::Session::File"
+ return         => "name" - Return just the last part of the package, so CGI::Session would return "Session"
 
 =cut
 
@@ -109,6 +110,12 @@ sub find {
         @modulesHash{ @modules } = ( 1 ) x @modules;
         delete @modulesHash{ @{ $options->{exclude} } };
         @modules    = keys %modulesHash;
+    }
+
+    ### Return valu
+    # If "name", just grab the last part
+    if ( $options->{ return } eq "name" ) {
+        @modules = map { /::([^:]+)$/; $1 } @modules;
     }
 
     return @modules;

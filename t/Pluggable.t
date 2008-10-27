@@ -41,7 +41,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 7;        # Increment this number for each test you create
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -100,7 +100,12 @@ is($dumper->Dump, q|$VAR1 = {
         bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' } @testFiles ),
         "find() with exclude",
     );
-
+    
+    cmp_deeply( 
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1, return => "name" } ) ],
+        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+        "find() with return => name",
+    );
 };
 
 #----------------------------------------------------------------------------
