@@ -1522,12 +1522,15 @@ sub isValidRssItem { 1 }
 
 =head2 loadModule ( $session, $className ) 
 
-Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.
+Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.  Will only load classes in the WebGUI::Asset namespace.
 
 =cut
 
 sub loadModule {
     my ($class, $session, $className) = @_;
+    if ($className !~ /^WebGUI::Asset(?:$|::)/ ) {
+        return undef;
+    }
     (my $module = $className . '.pm') =~ s{::|'}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
