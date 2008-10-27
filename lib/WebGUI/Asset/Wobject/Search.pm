@@ -95,7 +95,8 @@ sub definition {
 				tab             => "properties",
 				hoverHelp       => $i18n->get("class limiter description"),
 				label           => $i18n->get("class limiter"),
-				options         => $session->db->buildHashRef("select distinct(className) from asset")
+				options         => $session->db->buildHashRef("select distinct(className) from asset"),
+                showSelectAll   => 1,
 				},
             useContainers => {
                 tab             => "properties",
