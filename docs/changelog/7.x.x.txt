@@ -1,6 +1,7 @@
 7.5.30
  - fixed: can't add EMS tickets to badges
  - fixed 8962: Wrong mime-type used for json data
+ - fixed: default site has no content
 
 7.5.29
  - fixed: Site Nav is broken
