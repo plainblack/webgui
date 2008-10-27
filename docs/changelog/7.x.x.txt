@@ -2,6 +2,7 @@
  - fixed: can't add EMS tickets to badges
  - fixed 8962: Wrong mime-type used for json data
  - fixed: default site has no content
+ - fixed: possible to execute arbitrary perl code as any user that can upload files
 
 7.5.29
  - fixed: Site Nav is broken

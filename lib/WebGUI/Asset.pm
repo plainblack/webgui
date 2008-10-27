@@ -1559,6 +1559,10 @@ Loads an asset module if it's not already in memory. This is a class method. Ret
 
 sub loadModule {
     my ($class, $session, $className) = @_;
+    # refuse to load non-assets
+    if ($className !~ /^WebGUI::Asset(?:$|::)/) {
+        return;
+    }
     (my $module = $className . '.pm') =~ s{::|'}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
