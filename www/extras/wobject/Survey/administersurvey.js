@@ -77,7 +77,11 @@ Survey.Form = new function() {
             Survey.Form.addWidgets(qs);             
         }
     }
-        //Display questions
+
+
+
+
+    //Display questions
     this.addWidgets = function(qs){ 
         hasFile = false;
         for(var i = 0; i < qs.length; i++){
