@@ -1,6 +1,14 @@
 package WebGUI::Asset::Wobject::UserList;
 
-#$VERSION = "2.0.0";
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
 use strict;
 use warnings;
@@ -15,13 +23,6 @@ use WebGUI::Pluggable;
 use WebGUI::Form::Image;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
-
-=head1 LEGAL
-
-Copyright 2004-2008 United Knowledge
-
-http://www.unitedknowledge.nl
-developmentinfo@unitedknowledge.nl
 
 =head1 NAME
 
