@@ -21,21 +21,6 @@
    definition and the table schema.
  - Fixed a limit bug in the asset discovery service.
  - Fixed #8853: link to manageWorkflows is broken
- - Fixed #8890: meta_loop in post form not working (United Knowledge)
- - added: ldaps and ldapi are now supported when working with LDAP authentication
- - rfe #740: Thingy Pre-Text (SDH Consulting Group)
- - rfe #746: use the menu title in asset manager
- - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
- - rfe #637: Alphabetize wiki items under a keyword?
- - Autocommit assets like CS posts or Calendar Events can now be added before the
-    parent is committed.  They will go into the same version tag as their parent.
- - rfe #640: Refactored autocommit and autocomment
- - added a perltidyrc to the docs folder. we'll be using this to clean up code.
- - fixed: Site Nav navigation template can now be used more than once per page
- - added: TextArea now supports "maxlength" attribute
- - added: DataForm can now run a workflow when an entry is added
- - Fixed #8921: Duplicating templates through conventional methods maintains default template flag
- - Fixed #8962: Wrong mime-type used for json data
  - Added: WebGUI::Pluggable find() and findAndLoad() for easier module loading
  - Added RFE #327: Select All button to class list in Search asset
  - Fixed #8984: Weather Asset missing hoverhelp
@@ -161,6 +146,39 @@
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
+
+7.5.31
+ - fixed: debian licensing problem with user list
+ - fixed: Wrong password behaviour  (#8905)
+ - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
+   in about 3 years. 
+ - Fixed #8984: Weather Asset missing hoverhelp
+
+7.5.30
+ - fixed: can't add EMS tickets to badges
+ - fixed 8962: Wrong mime-type used for json data
+ - fixed: default site has no content
+ - fixed: possible to execute arbitrary perl code as any user that can upload files
+
+7.5.29
+ - fixed: Site Nav is broken
+
+7.5.28
+ - Fixed #8890: meta_loop in post form not working (United Knowledge)
+ - added: ldaps and ldapi are now supported when working with LDAP authentication
+ - rfe #740: Thingy Pre-Text (SDH Consulting Group)
+ - rfe #746: use the menu title in asset manager
+ - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
+ - rfe #637: Alphabetize wiki items under a keyword?
+ - Autocommit assets like CS posts or Calendar Events can now be added before the
+    parent is committed.  They will go into the same version tag as their parent.
+ - rfe #640: Refactored autocommit and autocomment
+ - added a perltidyrc to the docs folder. we'll be using this to clean up code.
+ - fixed: Site Nav navigation template can now be used more than once per page
+ - added: TextArea now supports "maxlength" attribute
+ - added: DataForm can now run a workflow when an entry is added
+ - Fixed #8921: Duplicating templates through conventional methods maintains default template flag
+ - Fixed #8962: Wrong mime-type used for json data
 
 7.5.24
  - fixed: Spelling mistake on site starter

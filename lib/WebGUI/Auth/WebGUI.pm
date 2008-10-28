@@ -120,7 +120,7 @@ sub authenticate {
 	
 	$identifier = $_[1];
 	$userData = $self->getParams;
-	if ((Digest::MD5::md5_base64(Encode::encode_utf8($identifier)) eq $$userData{identifier}) && ($identifier ne "")) {
+	if (($self->hashPassword($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
@@ -246,7 +246,7 @@ sub createAccountSave {
     my $properties;
     $properties->{ changeUsername       } = $setting->get("webguiChangeUsername");
     $properties->{ changePassword       } = $setting->get("webguiChangePassword");   
-    $properties->{ identifier           } = Digest::MD5::md5_base64($password);
+    $properties->{ identifier           } = $self->hashPassword($password);
     $properties->{ passwordLastUpdated  } = $session->datetime->time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
@@ -409,7 +409,7 @@ sub editUserFormSave {
    my $userData = $self->getParams($userId);
    my $identifier = $self->session->form->process('authWebGUI.identifier');
    unless (!$identifier || $identifier eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
+      $properties->{identifier} = $self->hashPassword($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
       }
@@ -670,6 +670,13 @@ sub getUserIdByPasswordRecoveryToken {
        my $token = shift;
        return $session->db->quickScalar("select userId from authentication where fieldName = 'emailRecoverPasswordVerificationNumber' and fieldData = ?", [$token]); 
 }
+
+#-------------------------------------------------------------------
+sub hashPassword {
+    my ($self, $password) = @_;
+    return Digest::MD5::md5_base64(Encode::encode_utf8($password));
+}
+
 
 #-------------------------------------------------------------------
 sub login {
@@ -954,7 +961,7 @@ sub profileRecoverPasswordFinish {
 	if ($self->_isValidPassword($password, $passwordConfirm)) {
 		$self->user( $user );
 		$self->saveParams($userId, $self->authMethod,
-				  { identifier => Digest::MD5::md5_base64($password),
+				  { identifier => $self->hashPassword($password),
 				    passwordLastUpdated => $self->session->datetime->time });
 		$self->_logSecurityMessage;
 		return $self->SUPER::login;
@@ -1103,7 +1110,7 @@ sub emailResetPasswordFinish {
        if ($self->_isValidPassword($password, $passwordConfirm)) {
                $self->user(WebGUI::User->new($self->session, $userId));
                $self->saveParams($userId, $self->authMethod,
-                                 { identifier => Digest::MD5::md5_base64($password),
+                                 { identifier => $self->hashPassword($password),
                                    passwordLastUpdated => $self->session->datetime->time });
                $self->_logSecurityMessage;
 
@@ -1157,7 +1164,7 @@ sub resetExpiredPasswordSave {
    
    return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1><ul>".$error.'</ul>') if ($error);
    
-   $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
+   $properties->{identifier} = $self->hashPassword($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
@@ -1229,7 +1236,7 @@ sub updateAccount {
 	  if($password){
 	     my $userData = $self->getParams;
          unless ($password eq "password") {
-            $properties->{identifier} = Digest::MD5::md5_base64($password);
+            $properties->{identifier} = $self->hashPassword($password);
 			$self->_logSecurityMessage();
 	        if($userData->{identifier} ne $properties->{identifier}){
 	           $properties->{passwordLastUpdated} =$self->session->datetime->time();
