@@ -498,7 +498,7 @@ Returns a boolean indicating whether this field may be viewed by a user.
 
 sub isViewable {
         my $self = shift;
-        return $self->get("viewable");
+        return $self->get("visible");
 }
 
 #-------------------------------------------------------------------

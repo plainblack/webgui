@@ -13,6 +13,7 @@
  - Fixed #8899: Calendar feeds somehow cause edit screen to fail 
  - Fixed #8891: Calendar still pulls feeds when in trash
  - Fixed #8818: Visitor sends a welcome message
+ - Fixed #8924: useProfile: s/viewable/visible/ig
 
 7.5.30
  - fixed: can't add EMS tickets to badges
