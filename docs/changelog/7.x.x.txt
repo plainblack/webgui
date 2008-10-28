@@ -39,6 +39,7 @@
  - Added: WebGUI::Pluggable find() and findAndLoad() for easier module loading
  - Added RFE #327: Select All button to class list in Search asset
  - Fixed #8984: Weather Asset missing hoverhelp
+ - Fixed #8983: Missing Help in Group Edit screen
 
 7.6.1
  - changed: the list of extensions for the export system to pass through

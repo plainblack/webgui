@@ -447,20 +447,20 @@ sub www_editGroup {
 	$f->text(
 	       -name=>"ldapGroup",
 		   -label=>$i18n->get("LDAPLink_ldapGroup","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroup","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroup description","AuthLDAP"),
 	       -value=>$g->ldapGroup
 		);
     $f->text(
 	       -name=>"ldapGroupProperty",
 		   -label=>$i18n->get("LDAPLink_ldapGroupProperty","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroupProperty","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroupProperty description","AuthLDAP"),
 		   -value=>$g->ldapGroupProperty,
 		   -defaultValue=>"member"
 	    );
     $f->text(
 	       -name=>"ldapRecursiveProperty",
 		   -label=>$i18n->get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveProperty description","AuthLDAP"),
 		   -value=>$g->ldapRecursiveProperty
 	    );
 	$f->textarea(
