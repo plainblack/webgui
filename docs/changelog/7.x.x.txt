@@ -12,6 +12,7 @@
  - fixed #4177: You can send your people on your friends list a friends request  
  - Fixed #8899: Calendar feeds somehow cause edit screen to fail 
  - Fixed #8891: Calendar still pulls feeds when in trash
+ - fixed #4103: Gallery performance increases 300%
  - Fixed #8818: Visitor sends a welcome message
  - Fixed #8924: useProfile: s/viewable/visible/ig
 
