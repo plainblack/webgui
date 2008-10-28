@@ -635,7 +635,8 @@ ENDHTML
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
     for my $feedId (keys %$feeds) {
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".encode_json($feeds->{$feedId}).");\n");
+        my %row = %{ $feeds->{ $feedId } };
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
     }
     $tab->raw('</script>');
     
