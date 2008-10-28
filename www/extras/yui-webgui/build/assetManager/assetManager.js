@@ -15,6 +15,18 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
 WebGUI.AssetManager.extrasUrl   = '/extras/';
 // Keep track of the open more menus
 WebGUI.AssetManager.MoreMenusDisplayed = {};
+// Append something to a url:
+WebGUI.AssetManager.appendToUrl = function ( url, params ) {
+    var components = [ url ];
+    if (url.match(/\?/)) {
+        components.push(";");
+    }
+    else {
+        components.push("?");
+    }
+    components.push(params);
+    return components.join(''); 
+}
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.addHighlightToRow ( child )
@@ -51,7 +63,7 @@ WebGUI.AssetManager.findRow
 WebGUI.AssetManager.formatActions 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML 
-        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit;proceed=manageAssets">Edit</a>'
+        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
         + ' | '
         ;
     var more    = document.createElement( 'a' );
@@ -70,7 +82,7 @@ WebGUI.AssetManager.formatActions
     var menuItems   = [];
     for ( var i = 0; i < rawItems.length; i++ ) {
         var itemUrl     = rawItems[i].url.match( /<url>/ )
-                        ? rawItems[i].url.replace( "<url>", oRecord.getData( 'url' ) )
+                        ? rawItems[i].url.replace( /<url>(?:\?(.*))?/, WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), "$1") )
                         : oRecord.getData( 'url' ) + rawItems[i].url
                         ;
         menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
@@ -127,11 +139,11 @@ WebGUI.AssetManager.formatLockedBy
     var extras  = WebGUI.AssetManager.extrasUrl;
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
-        ? '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+        ? '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
             + '<img src="' + extras + '/assetManager/locked.gif" alt="locked by ' + oRecord.getData( 'lockedBy' ) + '" '
             + 'title="locked by ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
-        : '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+        : '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
             + '<img src="' + extras + '/assetManager/unlocked.gif" alt="unlocked" '
             + 'title="unlocked" border="0" />'
             + '</a>'
@@ -174,7 +186,7 @@ WebGUI.AssetManager.formatTitle
 = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<span class="hasChildren">' 
         + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <a href="' + oRecord.getData( 'url' ) + '?op=assetManager;method=manage">'
+        + '</span> <a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'op=assetManager;method=manage') + '">'
         + oRecord.getData( 'title' )
         + '</a>'
         ;
