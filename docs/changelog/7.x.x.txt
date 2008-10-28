@@ -7,6 +7,7 @@
  - Fixed #8984: Weather Asset missing hoverhelp
  - Fixed #8983: Missing Help in Group Edit screen
  - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
+ - fixed #4177: You can send your people on your friends list a friends request  
 
 7.5.30
  - fixed: can't add EMS tickets to badges
