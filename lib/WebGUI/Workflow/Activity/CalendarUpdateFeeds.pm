@@ -100,6 +100,16 @@ sub execute {
         my $sth     = $self->session->db->read("select * from Calendar_feeds");
 
         FEED: while (my $feed = $sth->hashRef) {
+            my $calendar = WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
+            if (!defined $calendar) {
+                $self->session->errorHandler->error("Calendar object failed to instanciate.  Did you commit the calendar wobject?");
+                next FEED;
+            }
+            elsif ( $calendar->get( "state" ) ne "published" ) {
+                $self->session->errorHandler->info( "Calendar is not state='published', skipping..." );
+                next FEED;
+            }
+            
             #!!! KLUDGE - If the feed is on the same server, set a scratch value
             # I do not know how dangerous this is, so THIS MUST CHANGE!
             # Preferably: Spectre would add a userSession to the database, 
@@ -158,6 +168,7 @@ sub execute {
                     my $uid = lc $current_event{uid}[1];
                     delete $current_event{uid};
                     $events{$uid} = {%current_event};
+                    $self->session->log->info( "Found event $uid from feed " . $feed->{feedId} );
                     %current_event  = ();
                 }
                 elsif ($line =~ /^ /) {
@@ -357,6 +368,7 @@ sub execute {
     my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
     my $versionTag = WebGUI::VersionTag->create($session, {'name' => 'Calendar Feed Update', 'workflowId' => 'pbworkflow000000000003'});
     $versionTag->setWorking;
+    $self->session->log->info( "Have to add " . scalar( @$eventList ) . " events..." );
     while (@$eventList) {
         if ($startTime + 55 < time()) {
             $instance->setScratch('events', encode_json($eventList));
@@ -370,11 +382,11 @@ sub execute {
         my $feed = $feedList->{$properties->{feedId}};
 
         # Update event
-        my ($assetId)   = $self->session->db->quickArray("select assetId from Event where feedUid=?",[$id]);
+        my $assetId   = $self->session->db->quickScalar("select assetId from Event where feedUid=?",[$id]);
         
         # If this event already exists, update
         if ($assetId) {
-            #warn "Updating $assetId\n";
+            $self->session->log->info( "Updating existing asset $assetId" );
             my $event   = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
             
             if ($event) {
@@ -383,14 +395,8 @@ sub execute {
             }
         }
         else {
+            $self->session->log->info( "Creating new event!" );
             my $calendar = WebGUI::Asset->newByDynamicClass($self->session,$feed->{assetId});
-            if (!defined $calendar) {
-                $self->session->errorHandler->error("CalendarUpdateFeeds Activity: Calendar object failed to instanciate.  Did you commit the calendar wobject?");
-                $versionTag->requestCommit;
-                $oldVersionTag->setWorking
-                    if $oldVersionTag;
-                return $self->ERROR;
-            }
             my $event   = $calendar->addChild($properties, undef, undef, {skipAutoCommitWorkflows => 1});
             $feed->{added}++;
             if ($recur) {
@@ -401,6 +407,7 @@ sub execute {
         
         # TODO: Only update if last-updated field is 
         # greater than the event's lastUpdated property
+        $self->session->log->info( scalar @$eventList . " events left to load" );
     }
     $versionTag->requestCommit;
     $oldVersionTag->setWorking
