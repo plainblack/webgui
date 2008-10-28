@@ -300,7 +300,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
         $f->yesNo(name=>"aboutUs",label=>$i18n->get("About Us"));
         $f->HTMLArea(name=>"aboutUsContent", richEditId=>"PBrichedit000000000002", 
             value=>$i18n->get("Put your about us content here."));
-        if (isIn("WebGUI::Asset::Wobject::Collaboration", @{$session->config->get("assets")})) {
+        if (exists $session->config->get('assets')->{"WebGUI::Asset::Wobject::Collaboration"}) {
             $f->yesNo(name=>"news",label=>$i18n->get(357));
             $f->yesNo(name=>"forums",label=>$i18n->get("Forums"));
             $f->textarea(name=>"forumNames",subtext=>$i18n->get("One forum name per line"), 
