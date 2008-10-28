@@ -150,6 +150,7 @@
 7.5.31
  - fixed: debian licensing problem with user list
  - fixed: Wrong password behaviour  (#8905)
+ - fixed: Duplicate Root URLs Allowed  (#8900)
  - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
    in about 3 years. 
  - Fixed #8984: Weather Asset missing hoverhelp
