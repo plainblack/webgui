@@ -1,5 +1,7 @@
 7.5.31
  - fixed: debian licensing problem with user list
+ - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
+   in about 3 years. 
 
 7.5.30
  - fixed: can't add EMS tickets to badges
