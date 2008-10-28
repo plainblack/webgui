@@ -1,3 +1,5 @@
+7.5.31
+
 7.5.30
  - fixed: can't add EMS tickets to badges
  - fixed 8962: Wrong mime-type used for json data

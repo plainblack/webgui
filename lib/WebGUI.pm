@@ -1,7 +1,7 @@
 package WebGUI;
 
 
-our $VERSION = '7.5.30';
+our $VERSION = '7.5.31';
 our $STATUS = "stable";
 
 
