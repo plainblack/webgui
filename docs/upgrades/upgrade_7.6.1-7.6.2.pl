@@ -37,7 +37,53 @@ upgradeToYui26($session);
 addUsersOnlineMacro($session);
 addProfileExtrasField($session);
 addWorkflowToDataform( $session );
+installDataTableAsset( $session );
+installAjaxI18N( $session );
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+# installDataTableAsset
+# Install the asset by creating the DB table and adding it to the config file
+sub installDataTableAsset {
+    my $session     = shift;
+    print "\tInstalling the DataTable asset... " unless $quiet;
+
+    $session->db->write( <<'ENDSQL' );
+        CREATE TABLE DataTable ( 
+            assetId VARCHAR(22) BINARY NOT NULL, 
+            revisionDate BIGINT NOT NULL, 
+            data LONGTEXT, 
+            templateId VARCHAR(22) BINARY,
+            PRIMARY KEY ( assetId, revisionDate ) 
+        )
+ENDSQL
+
+    my $assets  = $session->config->get( "assets" );
+    $assets->{ "WebGUI::Asset::Wobject::DataTable" } = { category => "basic" };
+    $session->config->set( "assets", $assets );
+
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# installDataTableAsset
+# Install the content handler by adding it to the config file
+sub installAjaxI18N {
+    my $session     = shift;
+    print "\tInstalling the AjaxI18N content handler... " unless $quiet;
+
+    my $oldHandlers = $session->config->get( "contentHandlers" );
+    my @newHandlers;
+    for my $handler ( @{ $oldHandlers } ) {
+        if ( $handler eq "WebGUI::Content::Operation" ) {
+            push @newHandlers, "WebGUI::Content::AjaxI18N";
+        }
+        push @newHandlers, $handler;
+    }
+    $session->config->set( "contentHandlers", \@newHandlers );
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub upgradeToYui26 {
@@ -195,6 +241,7 @@ sub updateTemplates {
     my @files = readdir(DIR);
     closedir(DIR);
     my $newFolder = undef;
+    $session->db->write( "UPDATE asset SET parentId='infinityandbeyond' WHERE assetId='pbversion0000000000001'" );
     foreach my $file (@files) {
         next unless ($file =~ /\.wgpkg$/);
         # Fix the filename to include a path
