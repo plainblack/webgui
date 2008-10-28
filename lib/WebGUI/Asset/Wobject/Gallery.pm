@@ -648,6 +648,8 @@ sub getAssetClassForFile {
     my $self        = shift;
     my $filepath    = shift;
 
+    $self->session->log->info( "Checking asset class for file '$filepath'" );
+
     # Checks for Photo assets
     if ( $filepath =~ /\.(jpe?g|gif|png)$/i ) {
         return "WebGUI::Asset::File::GalleryFile::Photo";

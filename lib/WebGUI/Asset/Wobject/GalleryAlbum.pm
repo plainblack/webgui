@@ -118,7 +118,9 @@ sub addArchive {
 
     for my $filePath (@files) {
         my ($volume, $directory, $filename) = File::Spec->splitpath( $filePath );
+        next unless $filename;
         next if $filename =~ m{^[.]};
+        next if $filename =~ m{^thumb-};
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
@@ -194,8 +196,10 @@ sub appendTemplateVarsFileLoop {
     my $session     = $self->session;
 
     for my $assetId (@$assetIds) {
-        push @{$var->{file_loop}}, 
-            WebGUI::Asset->newByDynamicClass($session, $assetId)->getTemplateVars;
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        # Set the parent
+        $asset->{_parent} = $self;
+        push @{$var->{file_loop}}, $asset->getTemplateVars;
     }
 
     return $var;
@@ -332,6 +336,21 @@ sub canView {
 
 #----------------------------------------------------------------------------
 
+=head2 DESTROY
+
+Destroy the cached assets
+
+=cut
+
+sub DESTROY {
+    my $self        = shift;
+    for my $asset ( delete $self->{ qw/ _nextAlbum _prevAlbum / } ) {
+        $asset->DESTROY;
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 i18n ( session )
 
 Get a WebGUI::International object for this class. 
@@ -415,23 +434,31 @@ Gets an array reference of asset IDs for all the files in this album.
 
 sub getFileIds {
     my $self        = shift;
-    my $gallery     = $self->getParent;
 
-    # Deal with "pending" files.
-    my %pendingRules;
-    if ( $self->canEdit ) {
-        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    if ( !$self->session->stow->get( 'fileIds-' . $self->getId ) ) {
+        my $gallery     = $self->getParent;
+        
+        # Deal with "pending" files.
+        my %pendingRules;
+        if ( $self->canEdit ) {
+            $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        }
+        else {
+            $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+            $pendingRules{ whereClause } = q{
+                ( 
+                    status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+                )
+            };
+        }
+        
+        $self->session->stow->set( 
+            "fileIds-" . $self->getId, 
+            $self->getLineage( ['descendants'], { (%pendingRules) } ),
+        );
     }
-    else {
-        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
-        $pendingRules{ whereClause } = q{
-            ( 
-                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
-            )
-        };
-    }
-    
-    return $self->getLineage( ['descendants'], { (%pendingRules) } );
+
+    return $self->session->stow->get( "fileIds-" . $self->getId );
 }
 
 #----------------------------------------------------------------------------
@@ -465,9 +492,11 @@ or undef if there is no next album.
 
 sub getNextAlbum {
     my $self        = shift;
+    return $self->{_nextAlbum} if $self->{_nextAlbum};
     my $nextId      = $self->getParent->getNextAlbumId( $self->getId );
     return undef unless $nextId;
-    return WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    $self->{_nextAlbum } = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    return $self->{_nextAlbum};
 }
 
 #----------------------------------------------------------------------------
@@ -481,9 +510,11 @@ or undef if there is no previous album.
 
 sub getPreviousAlbum {
     my $self        = shift;
+    return $self->{_previousAlbum} if $self->{_previousAlbum};
     my $previousId  = $self->getParent->getPreviousAlbumId( $self->getId );
     return undef unless $previousId;
-    return WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    $self->{_previousAlbum} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    return $self->{_previousAlbum};
 }
 
 #----------------------------------------------------------------------------
@@ -713,6 +744,30 @@ sub processPropertiesFromFormPost {
     return $errors  if @$errors;
 
     ### Passes all checks
+}
+
+#----------------------------------------------------------------------------
+
+=head2 sendChunkedContent ( callback )
+
+Send chunked content to the user. Will send the head of the style template, 
+run the C<callback> to get the body content, then send the footer of the style
+template.
+
+=cut
+
+sub sendChunkedContent {
+    my $self        = shift;
+    my $callback    = shift;
+
+	$self->session->http->setLastModified($self->getContentLastModified);
+	$self->session->http->sendHeader;
+	my $style = $self->processStyle("~~~");
+	my ($head, $foot) = split("~~~",$style);
+	$self->session->output->print($head, 1);
+	$self->session->output->print( $callback->() );
+	$self->session->output->print($foot, 1);
+	return "chunked";
 }
 
 #----------------------------------------------------------------------------
@@ -1264,9 +1319,9 @@ a javascript application in the template.
 sub www_slideshow {
     my $self        = shift;
 
-    return $self->session->privilege->insufficient unless $self->canView;
-
-    return $self->processStyle( $self->view_slideshow );
+	my $check = $self->checkView;
+	return $check if (defined $check);
+    return $self->sendChunkedContent( sub { $self->view_slideshow } );
 }
 
 #----------------------------------------------------------------------------
@@ -1278,11 +1333,10 @@ Show the thumbnails for the album.
 =cut
 
 sub www_thumbnails {
-    my $self        = shift;
-    
-    return $self->session->privilege->insufficient unless $self->canView;
-
-    return $self->processStyle( $self->view_thumbnails );
+	my $self = shift;
+	my $check = $self->checkView;
+	return $check if (defined $check);
+    return $self->sendChunkedContent( sub { $self->view_thumbnails } );
 }
 
 #----------------------------------------------------------------------------

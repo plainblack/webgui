@@ -472,35 +472,16 @@ sub getTemplateVars {
         }
     }
     
-    # Add some things from Gallery
-    my $galleryVar  = $self->getGallery->getTemplateVars;
-    for my $key ( qw{ url_listFilesForCurrentUser url_search } ) {
-        $var->{ $key } = $galleryVar->{ $key };
-    }
-
-    # More things from Gallery, but with different names
-    for my $key ( qw{ title menuTitle url } ) {
-        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
-    }
-
-    # Add some things from Album
-    my $album       = $self->getParent;
-    my $albumVar    = $album->getTemplateVars;
-    for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
-        $var->{ "album_" . $key } = $albumVar->{ $key };
-    }
-
-    # Add the search form
-    $self->getGallery->appendTemplateVarsSearchForm( $var );
-
     # Add a text-only synopsis
     $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->get('synopsis'), "all" );
 
     # Figure out on what page of the album the gallery file belongs.
+    my $album           = $self->getParent;
     my $fileIdsInAlbum  = $album->getFileIds;
+    my $id              = $self->getId;
     my $pageNumber      = 
         int (
-            ( first_index { $_ eq $self->getId } @{ $fileIdsInAlbum } )     # Get index of file in album
+            ( first_index { $_ eq $id } @{ $fileIdsInAlbum } )     # Get index of file in album
             / $album->getParent->get( 'defaultFilesPerPage' )               # Divide by the number of files per page
         ) + 1;                                                              # Round upwards
 
@@ -772,6 +753,27 @@ sub view {
     my $var     = $self->getTemplateVars;
     
     $self->appendTemplateVarsCommentForm( $var ); 
+
+    # Add the search form
+    $self->getGallery->appendTemplateVarsSearchForm( $var );
+
+    # Add some things from Gallery
+    my $galleryVar  = $self->getGallery->getTemplateVars;
+    for my $key ( qw{ url_listFilesForCurrentUser url_search } ) {
+        $var->{ $key } = $galleryVar->{ $key };
+    }
+
+    # More things from Gallery, but with different names
+    for my $key ( qw{ title menuTitle url } ) {
+        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
+    }
+
+    # Add some things from Album
+    my $album       = $self->getParent;
+    my $albumVar    = $album->getTemplateVars;
+    for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
+        $var->{ "album_" . $key } = $albumVar->{ $key };
+    }
 
     # Keywords
     my $k           = WebGUI::Keyword->new( $session );
