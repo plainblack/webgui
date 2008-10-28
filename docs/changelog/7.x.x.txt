@@ -38,6 +38,7 @@
  - Fixed #8962: Wrong mime-type used for json data
  - Added: WebGUI::Pluggable find() and findAndLoad() for easier module loading
  - Added RFE #327: Select All button to class list in Search asset
+ - Fixed #8984: Weather Asset missing hoverhelp
 
 7.6.1
  - changed: the list of extensions for the export system to pass through
