@@ -29,6 +29,7 @@
  - Fixed #8983: Missing Help in Group Edit screen
  - Fixed #8899: Calendar feeds somehow cause edit screen to fail
  - Fixed #8891: Calendar still pulls feeds when in trash
+ - Fixed #8981: style template help -- Macro being replaced
 
 7.6.1
  - changed: the list of extensions for the export system to pass through
