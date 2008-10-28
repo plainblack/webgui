@@ -157,6 +157,7 @@
  - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
    in about 3 years. 
  - Fixed #8984: Weather Asset missing hoverhelp
+ - fixed #4177: You can send your people on your friends list a friends request  
 
 7.5.30
  - fixed: can't add EMS tickets to badges

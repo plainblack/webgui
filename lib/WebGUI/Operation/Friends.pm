@@ -40,8 +40,24 @@ sub www_addFriend {
 	return $session->privilege->insufficient() unless ($session->user->isRegistered);
     my $friendId = $session->form->get('userId');
     my $protoFriend = WebGUI::User->new($session, $friendId);
-
+    
     my $i18n = WebGUI::International->new($session, 'Friends');
+    
+    my $friends = WebGUI::Friends->new($session);
+    if($friends->isFriend($friendId)) {
+        my $returnToProfile = sprintf($i18n->get('add to friends profile'),$protoFriend->getFirstName);
+        my $backUrl         = $session->url->append($session->url->getRequestedUrl, 'op=viewProfile;uid='.$friendId);
+        return $session->style->userStyle(
+            sprintf($i18n->get("error user is already friend"),$backUrl,$returnToProfile)
+        );
+    }
+    elsif($friends->isInvited($friendId)) {
+        my $returnToProfile = sprintf($i18n->get('add to friends profile'),$protoFriend->getFirstName);
+        my $backUrl         = $session->url->append($session->url->getRequestedUrl, 'op=viewProfile;uid='.$friendId);
+        return $session->style->userStyle(
+            sprintf($i18n->get("error user is already invited"),$backUrl,$returnToProfile)
+        );
+    }
 
     # Check for non-existant user id.
     if ((!$protoFriend->username) || (!$protoFriend->profileField('ableToBeFriend'))) {

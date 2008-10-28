@@ -169,6 +169,37 @@ sub isFriend {
 
 #-------------------------------------------------------------------
 
+=head2 isInvited ( userId )
+
+Returns a booelean indicating whether the user has already been invited to the friends network.
+
+=head3 userId
+
+The userId to check against this user.
+
+=cut
+
+sub isInvited {
+    my $self    = shift;
+    my $session = $self->session;
+    my $userId  = shift;
+    
+    my ($isInvited) = $session->db->quickArray(q{
+        select
+            count(*)
+        from
+            friendInvitations
+        where
+            inviterId = ?
+            and friendId = ?
+    },
+    [$session->user->userId,$userId]);
+
+    return $isInvited;    
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, user )
 
 Constructor.
