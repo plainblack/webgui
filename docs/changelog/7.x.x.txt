@@ -8,6 +8,9 @@
  - Fixed #8983: Missing Help in Group Edit screen
  - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
  - fixed #4177: You can send your people on your friends list a friends request  
+ - Fixed #8899: Calendar feeds somehow cause edit screen to fail 
+ - Fixed #8891: Calendar still pulls feeds when in trash
+
 
 7.5.30
  - fixed: can't add EMS tickets to badges
