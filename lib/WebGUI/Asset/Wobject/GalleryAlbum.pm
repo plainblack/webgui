@@ -848,9 +848,12 @@ sub view_thumbnails {
     if (!$asset) {
         $asset  = $self->getFirstChild;
     }
-    my %assetVars   = %{ $asset->getTemplateVars };
-    for my $key ( keys %assetVars ) {
-        $var->{ 'file_' . $key } = $assetVars{ $key };
+    
+    if ( $asset ) {
+        my %assetVars   = %{ $asset->getTemplateVars };
+        for my $key ( keys %assetVars ) {
+            $var->{ 'file_' . $key } = $assetVars{ $key };
+        }
     }
 
     return $self->processTemplate($var, $self->getParent->get("templateIdViewThumbnails"));
