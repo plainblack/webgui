@@ -6,6 +6,7 @@
    in about 3 years. 
  - Fixed #8984: Weather Asset missing hoverhelp
  - Fixed #8983: Missing Help in Group Edit screen
+ - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
 
 7.5.30
  - fixed: can't add EMS tickets to badges
