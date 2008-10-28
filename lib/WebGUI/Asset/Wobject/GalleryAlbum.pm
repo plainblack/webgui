@@ -945,6 +945,10 @@ The title of the album you wish to create.
 
 A brief description of the album you wish to create.
 
+=head3 file
+
+A file attached to the multi-part post.
+
 =cut
 
 sub www_addFileService {
@@ -958,7 +962,8 @@ sub www_addFileService {
     my $file = $self->addChild({
         className       => "WebGUI::Asset::File::GalleryFile::Photo",
         title           => $form->get('title','text'),
-        synopsis        => $form->get('description','textarea'),
+        description     => $form->get('synopsis','textarea'),
+        synopsis        => $form->get('synopsis','textarea'),
     });
 
     my $storage = $file->getStorageLocation;
