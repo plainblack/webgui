@@ -955,10 +955,10 @@ to add or remove users from their groups.
 <br />
 <br />We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
 <br />
-<br />^PageTitle(); - ^c();
+<br />&#94;PageTitle(); - &#94;c();
 <br />
 <br />That particular example will help you get good ranking on search engines.|,
-		lastUpdated => 1183420610,
+		lastUpdated => 1225222473,
 	},
 
 	'860' => {
