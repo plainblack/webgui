@@ -162,6 +162,7 @@
    in about 3 years. 
  - Fixed #8984: Weather Asset missing hoverhelp
  - fixed #4177: You can send your people on your friends list a friends request  
+ - Fixed #8924: useProfile: s/viewable/visible/ig
 
 7.5.30
  - fixed: can't add EMS tickets to badges
