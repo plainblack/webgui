@@ -105,15 +105,18 @@ sub create {
 	if (defined $mail) {
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
-        if ($fromUser) {
+        if ($fromUser->userId ne 1 && $fromUser->userId ne 3) {
             my $i18n = WebGUI::International->new($session, 'Inbox_Message');
             $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
         }
+        my $message = $self->{_properties}{message};
         if ($self->{_properties}{message} =~ m/\<.*\>/) {
-            $mail->addHtml('<p>' . $preface . '</p><br />' . $self->{_properties}{message});
+            $message = '<p>' . $preface . '</p><br />'.$message if($preface ne "");
+            $mail->addHtml($message);
         }
         else {
-            $mail->addText($preface . "\n\n" . $self->{_properties}{message});
+            $message = $preface. "\n\n" .$message  if($preface ne "");
+            $mail->addText($message);
         }
 		$mail->addFooter;
 		$mail->queue;

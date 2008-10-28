@@ -12,7 +12,7 @@
  - fixed #4177: You can send your people on your friends list a friends request  
  - Fixed #8899: Calendar feeds somehow cause edit screen to fail 
  - Fixed #8891: Calendar still pulls feeds when in trash
-
+ - Fixed #8818: Visitor sends a welcome message
 
 7.5.30
  - fixed: can't add EMS tickets to badges
