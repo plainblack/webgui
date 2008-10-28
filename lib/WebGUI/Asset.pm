@@ -643,6 +643,11 @@ sub fixUrl {
 		$url .= ".".$self->session->setting->get("urlExtension");
 	}
 
+    # make sure the url isn't empty after all that filtering
+    if ($url eq "") {
+        $url = $self->getId;
+    }
+
 	# check to see if the url already exists or not, and increment it if it does
     if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
         my @parts = split(/\./,$url);
