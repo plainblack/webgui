@@ -344,7 +344,8 @@ Destroy the cached assets
 
 sub DESTROY {
     my $self        = shift;
-    for my $asset ( delete $self->{ qw/ _nextAlbum _prevAlbum / } ) {
+    for my $key ( qw/ _nextAlbum _prevAlbum / ) {
+        my $asset       = delete $self->{ $key };
         $asset->DESTROY;
     }
 }
