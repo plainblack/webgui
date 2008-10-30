@@ -653,7 +653,7 @@ Either an integer representing the number of records to return, or an array refe
 
 =head4 orderBy
 
-A scalar containing an order by clause. Defaults to 'sequenceNumber'.
+A scalar containing a field name to order by. Defaults to 'sequenceNumber'.
 
 =head4 sequenceKeyValue
 
@@ -793,7 +793,7 @@ sub new {
 	# deserialize data
 	my $properties = $class->crud_getProperties($session);
 	foreach my $name (keys %{$properties}) {
-		if ($properties->{$name}{serialize}) {
+		if ($properties->{$name}{serialize} && $data->{$name} ne "") {
 			$data->{$name} = JSON->new->canonical->decode($data->{$name});
 		}
 	}
@@ -921,7 +921,7 @@ sub update {
 		$data->{$property} ||= $properties->{$property}{defaultValue};
 
 		# serialize if needed
-		if ($properties->{$property}{serialize}) {
+		if ($properties->{$property}{serialize} && $data->{property} ne "") {
 			$data->{property} = JSON->new->canonical->encode($data->{property});
 		}
 	}
