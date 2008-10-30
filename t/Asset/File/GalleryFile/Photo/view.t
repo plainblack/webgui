@@ -88,26 +88,12 @@ my $testTemplateVars    = {
     exifLoop            => ignore(), # Tested elsewhere
     isPending           => ( $photo->get("status") eq "pending" ),
 
-    # Gallery stuff
-    url_search          => $gallery->getUrl('func=search'),
-    url_listFilesForCurrentUser    => $gallery->getUrl('func=listFilesForUser'),
-    gallery_title       => $gallery->get('title'),
-    gallery_menuTitle   => $gallery->get('menuTitle'),
-    gallery_url         => $gallery->getUrl,
-
-    # Album stuff
-    album_title         => $album->get('title'),
-    album_menuTitle     => $album->get('menuTitle'),
-    album_url           => $album->getUrl,
-    album_thumbnailUrl  => $album->getThumbnailUrl,
 };
 
 # Ignore all EXIF tags, they're tested in exif.t
 for my $tag ( keys %{ $photo->getExifData } ) {
     $testTemplateVars->{ 'exif_' . $tag } = ignore();
 }
-# Add search vars
-$gallery->appendTemplateVarsSearchForm( $testTemplateVars );
 
 # Add resolution vars
 for my $resolution ( @{ $photo->getResolutions } ) {
@@ -120,19 +106,6 @@ for my $resolution ( @{ $photo->getResolutions } ) {
     };
     $testTemplateVars->{ "resolution_" . $resolution } = $downloadUrl;
 }
-
-# Fix vars that are time-sensitive
-$testTemplateVars->{ searchForm_creationDate_before }
-    = all(
-        re( qr/<input/ ),
-        re( qr/name="creationDate_before"/ ),
-    );
-
-$testTemplateVars->{ searchForm_creationDate_after }
-    = all(
-        re( qr/<input/ ),
-        re( qr/name="creationDate_after"/ ),
-    );
 
 cmp_deeply(
     $photo->getTemplateVars,
