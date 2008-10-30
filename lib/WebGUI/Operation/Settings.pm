@@ -80,6 +80,9 @@ sub definition {
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help'),
 		});
+
+        #AMH: Todo add versionTagMode
+
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"yesNo",
