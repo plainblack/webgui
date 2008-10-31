@@ -42,7 +42,7 @@ push @excludes, readLines($webguiRoot."/sbin/preload.exclude");
 WebGUI::Pluggable::findAndLoad( "WebGUI", 
     { 
         exclude     => \@excludes, 
-        onLoadFail  => sub { warn 'Error loading %s: %s', @_ },
+        onLoadFail  => sub { warn sprintf 'Error loading %s: %s', @_ },
     }
 );
 
