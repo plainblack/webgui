@@ -4141,6 +4141,30 @@ LongTruncOk=1</p>
         context     => q{Column heading for the total logged in time for the user},
     },
 
+
+        #AMH: Support for versionTagMode.
+        'version tag mode' => {
+            message => q{Version tag mode},
+        },
+        'version tag mode help' => {
+            message => q{Version tag mode help...TODO},
+        },
+        'versionTagMode multiPerUser' => {
+            message => q{Multi version tags per user},
+        },
+        'versionTagMode singlePerUser' => {
+            message => q{Single version tag per user},
+        },
+        'versionTagMode siteWide' => {
+            message => q{One site wide version tag},
+        },
+        'versionTagMode autoCommit' => {
+            message => q{Commit automatically},
+        },
+        'versionTagMode inherited' => {
+            message => q{Inherit from site settings},
+        },
+
 };
 
 1;
