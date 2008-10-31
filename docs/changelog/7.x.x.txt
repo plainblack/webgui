@@ -1,3 +1,5 @@
+7.5.32
+
 7.5.31
  - fixed: debian licensing problem with user list
  - fixed: Wrong password behaviour  (#8905)
