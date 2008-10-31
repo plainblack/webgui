@@ -380,6 +380,12 @@ sub getVersionTagMode {
     my $mode = q{};
 
     #AMH: to do get user settings
+    $mode = $session->user()->profileField(q{versionTagMode});
+
+    #verify mode.
+    if (!(defined $mode && WebGUI::Utility::isIn($mode, qw{autoCommit siteWide singlePerUser multiPerUser}))) {
+        $mode = q{};
+    }
 
     #Get mode from settings
     if ($mode eq q{}) {
