@@ -938,5 +938,25 @@ sub update {
 	return 1;
 }
 
+#-------------------------------------------------------------------
+
+=head2 updateFromFormPost ( )
+
+Calls update() on any properties that are available from $session->form. Returns 1 on success.
+
+=cut
+
+sub updateFromFormPost {
+	my $self = shift;
+	my $session = $self->session;
+	my $form = $session->form;
+	my %data;
+	my $properties = $self->crud_getProperties($session);
+	foreach my $property ($form->param) {
+		$data{$property} = $form->get($property, $properties->{$property}{fieldType}, $properties->{$property}{defaultValue});
+	}
+	return $self->update(\%data);
+}
+
 
 1;
