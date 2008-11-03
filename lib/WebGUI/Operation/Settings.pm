@@ -15,6 +15,7 @@ use Tie::IxHash;
 use WebGUI::AdminConsole;
 use WebGUI::TabForm;
 use WebGUI::International;
+use WebGUI::Macro;
 use WebGUI::SQL;
 
 =head1 NAME
@@ -603,6 +604,7 @@ sub www_editSettings {
         ui          => { label => $i18n->get("ui") },
         messaging   => { label => $i18n->get("messaging") },
         misc        => { label => $i18n->get("misc") },
+        account     => { label => $i18n->get("account settings tab")},
         user        => { label => $i18n->get("user") },
         auth        => { label => $i18n->get("authentication") },
         perms       => { label => $i18n->get("permissions") },
@@ -626,6 +628,35 @@ sub www_editSettings {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
 		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
 		$tabform->getTab("auth")->fieldSetEnd;
+	}
+
+    # Get fieldsets for avaiable account methods
+    my $accountConfigs = $session->config->get("account");
+	foreach my $accountKey (keys %{$accountConfigs}) {
+        my $account = $accountConfigs->{$accountKey};
+
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+
+        if ( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        
+        #Get the content of the settings form from the instance
+        my $settingsForm = $instance->editUserSettingsForm;
+        #If editUserSettingsForm is empty, skip it
+        next if $settingsForm eq "";
+
+        #Set the title of the fieldset
+        my $title = $account->{title};
+        WebGUI::Macro::process($title);
+
+        #Print the settings form for this account pluggin
+		$tabform->getTab("account")->fieldSetStart($title);
+		$tabform->getTab("account")->raw($settingsForm);
+		$tabform->getTab("account")->fieldSetEnd;
 	}
 
 	$tabform->submit();

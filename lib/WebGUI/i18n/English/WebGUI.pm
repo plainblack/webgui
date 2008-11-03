@@ -3229,6 +3229,12 @@ a user.|,
 		lastUpdated => 1118941685,
 	},
 
+    'account settings tab' => {
+		message => q|Account|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the account settings in WebGUI Settings.|
+	},
+
 	'account' => {
 		message => q|Account|,
 		lastUpdated => 1098327046,
