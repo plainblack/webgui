@@ -383,7 +383,7 @@ sub canEdit {
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
     my $form    = $self->session->form;
-    
+
     # Account for new events
     return 1 if (
         $self->canAddEvent( $userId ) 
@@ -430,9 +430,10 @@ sub canAddEvent {
         $self->get("status") ne "approved"
         && $self->getTagCount <= 1
     );
-            
-    return 1 if (        
-        $user->isInGroup( $self->get("groupIdEventEdit") ) 
+
+    return 1 if (
+        $user->isInGroup( $self->get("groupIdEventEdit") )
+        || $self->SUPER::canEdit( $userId )
     );
 }
 

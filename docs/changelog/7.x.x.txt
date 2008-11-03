@@ -1,4 +1,5 @@
 7.5.32
+ - fixed: not allowed to add calendar events if in can edit group but not can add event group
 
 7.5.31
  - fixed: debian licensing problem with user list
