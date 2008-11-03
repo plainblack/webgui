@@ -71,29 +71,19 @@ displaying the table with getValueAsHtml().
 =cut
 
 sub definition {
-    my $class       = shift;
-    my $session     = shift;
-    my $definition  = shift || [];
+    my $class      = shift;
+    my $session    = shift;
+    my $definition = shift || [];
 
     push @{$definition}, {
-        showEdit     => {
-            defaultValue        => 0,
-        },
-        ajaxDataUrl     => {
-            defaultValue        => undef,
-        },
-        ajaxSaveUrl     => {
-            defaultValue        => undef,
-        },
-        ajaxSaveFunc    => {
-            defaultValue        => "view",
-        },
-        ajaxSaveExtras => {
-            defaultValue        => undef,
-        },
-    };
- 
-    return $class->SUPER::definition($session, $definition);
+        showEdit       => { defaultValue => 0, },
+        ajaxDataUrl    => { defaultValue => undef, },
+        ajaxSaveUrl    => { defaultValue => undef, },
+        ajaxSaveFunc   => { defaultValue => "view", },
+        ajaxSaveExtras => { defaultValue => undef, },
+        };
+
+    return $class->SUPER::definition( $session, $definition );
 }
 
 #-------------------------------------------------------------------
@@ -105,77 +95,78 @@ Render the DataTable
 =cut
 
 sub getDataTableHtml {
-    my $self        = shift;
+    my $self = shift;
 
     $self->prepare unless $self->{_prepared};
 
-    my $data        = JSON->new->decode( $self->getOriginalValue );
-    my $id          = $self->get( 'id' );
+    my $data = JSON->new->decode( $self->getOriginalValue );
+    my $id   = $self->get('id');
 
     # Get the HTML for the table
-    my $html        = $self->getTableHtml( $data );
-    
+    my $html = $self->getTableHtml($data);
+
     ### Prepare the columns data
-    my %parsers     = (
-        date        => "YAHOO.util.DataSource.parseDate",
-        number      => "YAHOO.util.DataSource.parseNumber",
+    my %parsers = (
+        date   => "YAHOO.util.DataSource.parseDate",
+        number => "YAHOO.util.DataSource.parseNumber",
     );
 
-    my %editors     = ( 
-        date        => "date",
-        textbox     => "textbox",
+    my %editors = (
+        date    => "date",
+        textbox => "textbox",
     );
-    
+
     my @columnsJson = ();
-    for my $column ( @{ $data->{ columns } } ) {
+    for my $column ( @{ $data->{columns} } ) {
+
         # Not using a datastructure and JSON.pm because of function references for "parser"
-        my $columnDef   = '{'
-                        . qq{"key" : "$column->{ key }", }
-                        . qq{"abbr" : "$column->{ key }", }
-                        . qq{"formatter" : "$column->{ formatter }", }
-                        . qq{"resizable" : 1, }
-                        . qq{"sortable" : 1}
-                        ;
+        my $columnDef
+            = '{'
+            . qq["key" : "$column->{ key }", ]
+            . qq["abbr" : "$column->{ key }", ]
+            . qq["formatter" : "$column->{ formatter }", ]
+            . qq["resizable" : 1, ]
+            . qq["sortable" : 1];
 
         # Automatically determine the parser to use
-        if ( $parsers{ $column->{ formatter } } ) {
-            $columnDef  .= qq{, "parser" : $parsers{ $column->{ formatter } }};
-        };
+        if ( $parsers{ $column->{formatter} } ) {
+            $columnDef .= qq{, "parser" : $parsers{ $column->{ formatter } }};
+        }
 
         # If we can edit
-        if ( $self->get( 'showEdit' ) ) {
+        if ( $self->get('showEdit') ) {
+
             # Set the editor
-            my $editor  = $editors{ $column->{ formatter } }
-                        || $editors{ "textbox" }
-                        ;
-            $columnDef  .= qq{, "editor" : "$editor"};
+            my $editor = $editors{ $column->{formatter} }
+                || $editors{"textbox"};
+            $columnDef .= qq{, "editor" : "$editor"};
         }
-        $columnDef  .=  '}';
+        $columnDef .= '}';
 
         push @columnsJson, $columnDef;
-    }
+    } ## end for my $column ( @{ $data...
     my $columnsJson = "[" . join( ",", @columnsJson ) . "]";
-    
+
     ### Prepare any options
-    my $options     = {
-        "showEdit"      => $self->get( 'showEdit' ),
-        "inputName"     => $self->get( 'name' ),
-        "ajaxDataUrl"   => $self->get( 'ajaxDataUrl' ),
-        "ajaxDataFunc"  => $self->get( 'ajaxDataFunc' ),
-        "ajaxSaveUrl"   => $self->get( 'ajaxSaveUrl' ),
-        "ajaxSaveFunc"  => $self->get( 'ajaxSaveFunc' ),
+    my $options = {
+        "showEdit"     => $self->get('showEdit'),
+        "inputName"    => $self->get('name'),
+        "ajaxDataUrl"  => $self->get('ajaxDataUrl'),
+        "ajaxDataFunc" => $self->get('ajaxDataFunc'),
+        "ajaxSaveUrl"  => $self->get('ajaxSaveUrl'),
+        "ajaxSaveFunc" => $self->get('ajaxSaveFunc'),
     };
-    my $optionsJson = JSON->new->encode( $options );
+    my $optionsJson = JSON->new->encode($options);
 
     # Progressively enhance the bejesus out of it
-    $html       .= <<"ENDJS";
+    $html .= <<"ENDJS";
         <script type="text/javascript">
             var myDataTable = WebGUI.Form.DataTable( "$id-container", $columnsJson, $optionsJson );
         </script>
 ENDJS
 
     return $html;
-}
+} ## end sub getDataTableHtml
 
 #-------------------------------------------------------------------
 
@@ -187,29 +178,23 @@ data structure.
 =cut
 
 sub getDefaultValue {
-    my $self        = shift;
-    my $value       = $self->SUPER::getDefaultValue( @_ );
+    my $self  = shift;
+    my $value = $self->SUPER::getDefaultValue(@_);
 
     if ( !$value ) {
-        $value = JSON->new->encode( 
-            {
-                columns     => [ 
-                    {
-                        key         => "New Column",
-                        formatter   => "text",
+        $value = JSON->new->encode( {
+                columns => [ {
+                        key       => "New Column",
+                        formatter => "text",
                     },
                 ],
-                rows        => [
-                    {
-                        "New Column" => "Value",        
-                    },
-                ],
+                rows => [ { "New Column" => "Value", }, ],
             }
         );
     }
 
     return $value;
-}
+} ## end sub getDefaultValue
 
 #-------------------------------------------------------------------
 
@@ -220,8 +205,8 @@ Returns the name of the form control.
 =cut
 
 sub getName {
-    my ($class, $session) = @_;
-    return WebGUI::International->new($session, "Form_DataTable")->get("topicName");
+    my ( $class, $session ) = @_;
+    return WebGUI::International->new( $session, "Form_DataTable" )->get("topicName");
 }
 
 #-------------------------------------------------------------------
@@ -233,11 +218,11 @@ Get the original value, or the default value.
 =cut
 
 sub getOriginalValue {
-    my $self        = shift;
-    my $value       = $self->SUPER::getOriginalValue( @_ );
+    my $self  = shift;
+    my $value = $self->SUPER::getOriginalValue(@_);
 
     if ( !$value ) {
-        $value      = $self->getDefaultValue;
+        $value = $self->getDefaultValue;
     }
 
     return $value;
@@ -275,14 +260,14 @@ structure.
 =cut
 
 sub getValue {
-    my $self    = shift;
-    my $value   = $self->SUPER::getValue(@_);
-    
+    my $self  = shift;
+    my $value = $self->SUPER::getValue(@_);
+
     # If passing in a data structure, encode to JSON
     if ( ref $value eq "HASH" ) {
-        $value  = JSON->new->encode( $value );
+        $value = JSON->new->encode($value);
     }
-    
+
     return $value;
 }
 
@@ -295,7 +280,7 @@ Get the value as HTML. Render the datatable in a non-editable form.
 =cut
 
 sub getValueAsHtml {
-    my $self        = shift;
+    my $self = shift;
     return $self->getDataTableHtml;
 }
 
@@ -309,44 +294,44 @@ columns and rows to render.
 =cut
 
 sub getTableHtml {
-    my $self        = shift;
-    my $data        = shift;
+    my $self = shift;
+    my $data = shift;
 
-    my $html        = '<div id="' . $self->get('id') . '-container" class="yui-skin-sam">';
+    my $html = '<div id="' . $self->get('id') . '-container" class="yui-skin-sam">';
 
     # Only insert the table if we're not getting AJAX Data
-    if ( !$self->get( "ajaxDataUrl" ) ) {
-        $html       .= '<table id="' . $self->get('id') . '-container-table"><thead><tr>';
+    if ( !$self->get("ajaxDataUrl") ) {
+        $html .= '<table id="' . $self->get('id') . '-container-table"><thead><tr>';
 
-        for my $column ( @{ $data->{ columns } } ) {
-            $html       .= '<th>' . $column->{ key } . '</th>';
+        for my $column ( @{ $data->{columns} } ) {
+            $html .= '<th>' . $column->{key} . '</th>';
         }
-        
+
         # TODO: Add table footer
-        $html           .= '</tr></thead><tbody>';
+        $html .= '</tr></thead><tbody>';
 
-        for my $row ( @{ $data->{ rows } } ) {
-            $html   .= '<tr>';
+        for my $row ( @{ $data->{rows} } ) {
+            $html .= '<tr>';
 
-            for my $column ( @{ $data->{ columns } } ) {
-                $html   .= '<td>' . $row->{ $column->{ key } } . '</td>';
+            for my $column ( @{ $data->{columns} } ) {
+                $html .= '<td>' . $row->{ $column->{key} } . '</td>';
             }
 
-            $html   .= '</tr>';
+            $html .= '</tr>';
         }
-        
-        $html           .= '</tbody></table>';
-    }
-    
-    $html       .= '</div>';
-    
+
+        $html .= '</tbody></table>';
+    } ## end if ( !$self->get("ajaxDataUrl"...
+
+    $html .= '</div>';
+
     # Add hidden form element to hold JSON
-    if ( $self->get( 'showEdit' ) ) {
-        $html       .= '<input type="hidden" name="' . $self->get( 'name' ) . '" />';
+    if ( $self->get('showEdit') ) {
+        $html .= '<input type="hidden" name="' . $self->get('name') . '" />';
     }
 
     return $html;
-}
+} ## end sub getTableHtml
 
 #-------------------------------------------------------------------
 
@@ -358,36 +343,45 @@ Otherwise, is called automatically.
 =cut
 
 sub prepare {
-    my $self    = shift;
+    my $self = shift;
 
     # Source in the scripts
-    my $style       = $self->session->style;
-    my $url         = $self->session->url;
-    $style->setLink( $url->extras( 'yui/build/datatable/assets/skins/sam/datatable.css' ), { rel => "stylesheet", type => "text/css" } );
-    $style->setScript( $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
-    $style->setScript( $url->extras( 'yui/build/element/element-beta.js' ) );
-    $style->setScript( $url->extras( 'yui/build/dragdrop/dragdrop-min.js' ) );
-    $style->setScript( $url->extras( 'yui/build/connection/connection-min.js' ) );
-    $style->setScript( $url->extras( 'yui/build/json/json-min.js' ) );
+    my $style = $self->session->style;
+    my $url   = $self->session->url;
+    $style->setLink( $url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        { rel => "stylesheet", type => "text/css" } );
+    $style->setScript( $url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js') );
+    $style->setScript( $url->extras('yui/build/element/element-beta.js') );
+    $style->setScript( $url->extras('yui/build/dragdrop/dragdrop-min.js') );
+    $style->setScript( $url->extras('yui/build/connection/connection-min.js') );
+    $style->setScript( $url->extras('yui/build/json/json-min.js') );
 
     # Prepare the editors
-    if ( $self->get( 'showEdit' ) ) {
-        $style->setLink( $url->extras( 'yui/build/button/assets/skins/sam/button.css', { rel => "stylesheet", type => "text/css" } ) );
-        $style->setLink( $url->extras( 'yui/build/calendar/assets/skins/sam/calendar.css', { rel => "stylesheet", type => "text/css" } ) );
-        $style->setLink( $url->extras( 'yui/build/container/assets/skins/sam/container.css' ), { rel => "stylesheet", type => "text/css" } );
-        $style->setScript( $url->extras( 'yui/build/container/container-min.js' ) );
-        $style->setScript( $url->extras( 'yui/build/button/button-min.js' ) );
-        $style->setScript( $url->extras( 'yui/build/calendar/calendar-min.js' ) );
-    }
+    if ( $self->get('showEdit') ) {
+        $style->setLink(
+            $url->extras( 'yui/build/button/assets/skins/sam/button.css', { rel => "stylesheet", type => "text/css" } )
+        );
+        $style->setLink(
+            $url->extras(
+                'yui/build/calendar/assets/skins/sam/calendar.css',
+                { rel => "stylesheet", type => "text/css" }
+            )
+        );
+        $style->setLink( $url->extras('yui/build/container/assets/skins/sam/container.css'),
+            { rel => "stylesheet", type => "text/css" } );
+        $style->setScript( $url->extras('yui/build/container/container-min.js') );
+        $style->setScript( $url->extras('yui/build/button/button-min.js') );
+        $style->setScript( $url->extras('yui/build/calendar/calendar-min.js') );
+    } ## end if ( $self->get('showEdit'...
 
-    $style->setScript( $url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
-    $style->setScript( $url->extras( 'yui/build/datasource/datasource.js' ) );
-    $style->setScript( $url->extras( 'yui/build/datatable/datatable.js' ) );
-    $style->setScript( $url->extras( 'yui-webgui/build/form/datatable.js' ) );
+    $style->setScript( $url->extras('yui-webgui/build/i18n/i18n.js') );
+    $style->setScript( $url->extras('yui/build/datasource/datasource.js') );
+    $style->setScript( $url->extras('yui/build/datatable/datatable.js') );
+    $style->setScript( $url->extras('yui-webgui/build/form/datatable.js') );
 
     $self->{_prepared} = 1;
     return;
-}
+} ## end sub prepare
 
 #-------------------------------------------------------------------
 
@@ -398,7 +392,7 @@ Render the DataTable in an editable format.
 =cut
 
 sub toHtml {
-    my $self    = shift;
+    my $self = shift;
     $self->set( 'showEdit', 1 );
     return $self->getDataTableHtml;
 }
