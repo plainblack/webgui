@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
 
 
 my $toVersion = '7.6.2';
@@ -39,7 +40,57 @@ addProfileExtrasField($session);
 addWorkflowToDataform( $session );
 installDataTableAsset( $session );
 installAjaxI18N( $session );
+upgradeAccount( $session );
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub upgradeAccount {
+    my $session = shift;
+    my $config  = $session->config;
+    my $setting = $session->setting;
+
+    print "\tUpgrading WebGUI Account System... " unless $quiet;
+    #Add account properties to config file
+    $session->config->delete("account"); #Delete account if it exists
+    $session->config->set("account",{
+        profile => {
+			title     => "^International(title,Account_Profile);",
+			className => "WebGUI::Account::Profile",
+		},
+        friends => {
+			title     => "^International(title,Account_Friends);",
+			className => "WebGUI::Account::Friends",
+		},
+        user => {
+        	title     => "^International(title,Account_User);",
+			className => "WebGUI::Account::User",
+        },
+        inbox => {
+        	title     => "^International(title,Account_Inbox);",
+			className => "WebGUI::Account::Inbox",
+        }
+    });
+
+    #Add the content handler to the config file if it's not there
+    my $oldHandlers = $session->config->get( "contentHandlers" );
+    unless (isIn("WebGUI::Content::Account",@{$oldHandlers})) {
+        my @newHandlers;
+        for my $handler ( @{ $oldHandlers } ) {
+            if ( $handler eq "WebGUI::Content::Operation" ) {
+                push @newHandlers, "WebGUI::Content::Account";
+            }
+            push @newHandlers, $handler;
+        }
+        $session->config->set( "contentHandlers", \@newHandlers );
+    }
+    
+    #Add the settings
+    $setting->add("profileStyleTemplateId",""); #Use the userStyle by default
+    $session->setting->add("profileLayoutTempalteId","FJbUTvZ2nUTn65LpW6gjsA");
+    $session->setting->add("profileViewTemplateId","75CmQgpcCSkdsL-oawdn3Q");
+
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # installDataTableAsset
