@@ -26,38 +26,38 @@ use base 'WebGUI::Asset::Wobject';
 =cut
 
 sub definition {
-	my $class       = shift;
-	my $session     = shift;
-	my $definition  = shift;
-	my $i18n        = WebGUI::International->new($session, 'Asset_DataTable');
-	
+    my $class      = shift;
+    my $session    = shift;
+    my $definition = shift;
+    my $i18n       = WebGUI::International->new( $session, 'Asset_DataTable' );
+
     tie my %properties, 'Tie::IxHash', (
-        data    => {
-            fieldType       => 'DataTable',
-            defaultValue    => undef,
-            autoGenerate    => 0,
+        data => {
+            fieldType    => 'DataTable',
+            defaultValue => undef,
+            autoGenerate => 0,
         },
         templateId => {
-            tab             => "display",
-            fieldType       => "template",
-            namespace       => "DataTable",
-            defaultValue    => "3rjnBVJRO6ZSkxlFkYh_ug",
-            label           => $i18n->get( "editForm templateId label" ),
-            hoverHelp       => $i18n->get( "editForm templateId description" ),
+            tab          => "display",
+            fieldType    => "template",
+            namespace    => "DataTable",
+            defaultValue => "3rjnBVJRO6ZSkxlFkYh_ug",
+            label        => $i18n->get("editForm templateId label"),
+            hoverHelp    => $i18n->get("editForm templateId description"),
         },
-	);
+        );
 
-	push @{$definition}, {
-		assetName           => $i18n->get('assetName'),
-		icon                => 'Asset.gif',
-		autoGenerateForms   => 1,
-		tableName           => 'DataTable',
-		className           => 'WebGUI::Asset::Wobject::DataTable',
-		properties          => \%properties,
-    };
+    push @{$definition}, {
+        assetName         => $i18n->get('assetName'),
+        icon              => 'Asset.gif',
+        autoGenerateForms => 1,
+        tableName         => 'DataTable',
+        className         => 'WebGUI::Asset::Wobject::DataTable',
+        properties        => \%properties,
+        };
 
-    return $class->SUPER::definition($session, $definition);
-}
+    return $class->SUPER::definition( $session, $definition );
+} ## end sub definition
 
 #----------------------------------------------------------------------------
 
@@ -85,9 +85,9 @@ Get the data as a JSON object with the following structure:
 =cut
 
 sub getDataJson {
-    my $self        = shift;
+    my $self = shift;
 
-    return $self->get( "data" );
+    return $self->get("data");
 }
 
 #----------------------------------------------------------------------------
@@ -101,13 +101,13 @@ Get the YUI DataTable markup and script for this DataTable.
 # TODO Have this method get from a WebGUI::DataSource object
 
 sub getDataTable {
-    my $self        = shift;
+    my $self = shift;
 
-    if ( !$self->{ _datatable } ) {
+    if ( !$self->{_datatable} ) {
         $self->prepareView;
     }
 
-    return $self->{ _datatable }->getValueAsHtml;
+    return $self->{_datatable}->getValueAsHtml;
 }
 
 #----------------------------------------------------------------------------
@@ -122,25 +122,23 @@ Get the template variables for the raw data. Returns a hash reference with
 # TODO Have this method get from a WebGUI::DataSource object
 
 sub getDataTemplateVars {
-    my $self        = shift;
+    my $self = shift;
 
-    my $json        = $self->getDataJson;
-    my $dt          = JSON->new->decode( $json );
+    my $json = $self->getDataJson;
+    my $dt   = JSON->new->decode($json);
 
     # Make row data more friendly to templates
-    my %cols        = map { $_->{ key } => $_ } @{ $dt->{ columns } };
-    for my $row ( @{ $dt->{ rows } } ) {
+    my %cols = map { $_->{key} => $_ } @{ $dt->{columns} };
+    for my $row ( @{ $dt->{rows} } ) {
+
         # Create the column loop for the row
-        for my $col ( @{ $dt->{ columns } } ) {
-            push @{ $row->{ row_columns } }, {
-                %{ $col },
-                value       => $row->{ $col->{ key } },
-            };
+        for my $col ( @{ $dt->{columns} } ) {
+            push @{ $row->{row_columns} }, { %{$col}, value => $row->{ $col->{key} }, };
         }
     }
 
     return $dt;
-}
+} ## end sub getDataTemplateVars
 
 #----------------------------------------------------------------------------
 
@@ -152,20 +150,22 @@ Add the data table to the edit form.
 
 # TODO Get the DataSource's edit form
 sub getEditForm {
-    my $self        = shift;
-    my $tabform     = $self->SUPER::getEditForm( @_ );
-    
-    $tabform->getTab( "data" )->raw(
-        WebGUI::Form::DataTable->new( $self->session, {
-            name            => "data",
-            value           => $self->get( "data" ),
-            defaultValue    => undef,
-            showEdit        => 1,
-        } )->toHtml
+    my $self    = shift;
+    my $tabform = $self->SUPER::getEditForm(@_);
+
+    $tabform->getTab("data")->raw(
+        WebGUI::Form::DataTable->new(
+            $self->session, {
+                name         => "data",
+                value        => $self->get("data"),
+                defaultValue => undef,
+                showEdit     => 1,
+            }
+            )->toHtml
     );
 
     return $tabform;
- }
+} ## end sub getEditForm
 
 #----------------------------------------------------------------------------
 
@@ -176,13 +176,10 @@ Add a tab for the data table.
 =cut
 
 sub getEditTabs {
-    my $self    = shift;
-    my $i18n    = WebGUI::International->new( $self->session, "Asset_DataTable" );
+    my $self = shift;
+    my $i18n = WebGUI::International->new( $self->session, "Asset_DataTable" );
 
-    return ( 
-        $self->SUPER::getEditTabs,
-        [ "data"    => $i18n->get( "tab label data" ) ],
-    );
+    return ( $self->SUPER::getEditTabs, [ "data" => $i18n->get("tab label data") ], );
 }
 
 #----------------------------------------------------------------------------
@@ -194,17 +191,14 @@ Get the template vars for this asset.
 =cut
 
 sub getTemplateVars {
-    my $self        = shift;
-    my $var         = $self->get;
+    my $self = shift;
+    my $var  = $self->get;
 
-    $var->{ url         } = $self->getUrl;
-    $var->{ dataTable   } = $self->getDataTable;
-    $var->{ dataJson    } = $self->getDataJson;
-    
-    %{ $var }   = ( 
-        %{ $var },
-        %{ $self->getDataTemplateVars },
-    );
+    $var->{url}       = $self->getUrl;
+    $var->{dataTable} = $self->getDataTable;
+    $var->{dataJson}  = $self->getDataJson;
+
+    %{$var} = ( %{$var}, %{ $self->getDataTemplateVars }, );
 
     return $var;
 }
@@ -218,27 +212,29 @@ Prepare the view. Add stuff to HEAD.
 =cut
 
 sub prepareView {
-    my $self    = shift;
-    $self->SUPER::prepareView( @_ );
+    my $self = shift;
+    $self->SUPER::prepareView(@_);
     my $session = $self->session;
-    
-    # For now, prepare the form control. 
+
+    # For now, prepare the form control.
     # TODO Use a WebGUI::DataSource
-    my $dt      = WebGUI::Form::DataTable->new( $session, {
-        name            => "data",
-        value           => $self->get( 'data' ),
-        defaultValue    => undef,
-    } );
+    my $dt = WebGUI::Form::DataTable->new(
+        $session, {
+            name         => "data",
+            value        => $self->get('data'),
+            defaultValue => undef,
+        }
+    );
     $dt->prepare;
-    $self->{ _datatable } = $dt;
+    $self->{_datatable} = $dt;
 
     # Prepare the template
-    my $template    = WebGUI::Asset::Template->new( $session, $self->get( "templateId" ) );
+    my $template = WebGUI::Asset::Template->new( $session, $self->get("templateId") );
     $template->prepare;
-    $self->{ _template } = $template;
+    $self->{_template} = $template;
 
     return;
-}
+} ## end sub prepareView
 
 #----------------------------------------------------------------------------
 
@@ -250,13 +246,13 @@ to be displayed within the page style.
 =cut
 
 sub view {
-	my $self        = shift;
-	my $session     = $self->session;	
-	my $var         = $self->getTemplateVars;
-    my $dt          = $self->{ _datatable };	
-    my $template    = $self->{ _template }; 
+    my $self     = shift;
+    my $session  = $self->session;
+    my $var      = $self->getTemplateVars;
+    my $dt       = $self->{_datatable};
+    my $template = $self->{_template};
 
-	return $self->processTemplate( $var, undef, $template );
+    return $self->processTemplate( $var, undef, $template );
 }
 
 #----------------------------------------------------------------------------
@@ -268,9 +264,9 @@ Get the data asynchronously.
 =cut
 
 sub www_ajaxGetData {
-    my $self        = shift;
+    my $self = shift;
 
-    $self->session->http->setMimeType( "application/json" );
+    $self->session->http->setMimeType("application/json");
     return $self->getDataJson;
 }
 
@@ -283,16 +279,16 @@ Update the data table asynchronously.
 =cut
 
 sub www_ajaxUpdateData {
-    my $self        = shift;
-    my $data        = $self->session->form->get( "data" );
+    my $self = shift;
+    my $data = $self->session->form->get("data");
 
     if ( $data && $self->canEdit ) {
         $self->update( { data => $data } );
     }
-    
-    $data   ||= $self->get( "data" );
-    
-    $self->session->http->setMimeType( "application/json" );
+
+    $data ||= $self->get("data");
+
+    $self->session->http->setMimeType("application/json");
     return $data;
 }
 
