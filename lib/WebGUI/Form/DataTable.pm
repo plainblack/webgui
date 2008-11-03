@@ -50,10 +50,6 @@ The following additional parameters have been added via this sub class.
 
 This is the URL to get the data from, AJAX-style.
 
-=head4 ajaxDataFunc
-
-This is the ?func= to get the data from.
-
 =head4 ajaxSaveUrl
 
 This is the URL to send AJAX requests to. If this exists, will send 
@@ -62,6 +58,10 @@ updates to the table asyncronously.
 =head4 ajaxSaveFunc
 
 This is the ?func= to send AJAX requests to.
+
+=head4 ajaxSaveExtras
+
+Any extra name=value pairs needed to save the data successfully
 
 =head4 showEdit
 
@@ -82,14 +82,14 @@ sub definition {
         ajaxDataUrl     => {
             defaultValue        => undef,
         },
-        ajaxDataFunc    => {
-            defaultValue        => "view",
-        },
         ajaxSaveUrl     => {
             defaultValue        => undef,
         },
         ajaxSaveFunc    => {
             defaultValue        => "view",
+        },
+        ajaxSaveExtras => {
+            defaultValue        => undef,
         },
     };
  
@@ -282,7 +282,7 @@ sub getValue {
     if ( ref $value eq "HASH" ) {
         $value  = JSON->new->encode( $value );
     }
-
+    
     return $value;
 }
 
@@ -301,10 +301,10 @@ sub getValueAsHtml {
 
 #-------------------------------------------------------------------
 
-=head2 getTableHtml ( [data] )
+=head2 getTableHtml ( data )
 
 Get the HTML to render the table. C<data> is the data structure with
-columns and rows to render. Defaults to C<getValue>.
+columns and rows to render. 
 
 =cut
 
