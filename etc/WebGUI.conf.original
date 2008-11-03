@@ -604,6 +604,9 @@
       "isContainer" : 1,
       "category" : "intranet"
    },
+   "WebGUI::Asset::Wobject::DataForm" : {
+       "category" : "basic"
+   },
    "WebGUI::Asset::Template" : {
       "category" : "utilities"
    }
