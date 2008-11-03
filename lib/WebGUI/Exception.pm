@@ -41,7 +41,7 @@ use Exception::Class (
         },
     'WebGUI::Error::ObjectNotFound' => {
         isa             => 'WebGUI::Error',
-        description     => "The object you were try to retrieve does not exist.",
+        description     => "The object you were trying to retrieve does not exist.",
         fields          => ["id"],
         },
     'WebGUI::Error::InvalidFile' => {
