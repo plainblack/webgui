@@ -16,6 +16,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::Form::DataTable;
 use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
@@ -102,7 +103,10 @@ Get the YUI DataTable markup and script for this DataTable.
 sub getDataTable {
     my $self        = shift;
 
-    # This method assumes the form control has been prepared
+    if ( !$self->{ _datatable } ) {
+        $self->prepareView;
+    }
+
     return $self->{ _datatable }->getValueAsHtml;
 }
 
@@ -120,8 +124,7 @@ Get the template variables for the raw data. Returns a hash reference with
 sub getDataTemplateVars {
     my $self        = shift;
 
-    # This method assumes the form control has been prepared
-    my $json        = $self->{ _datatable }->getValue;
+    my $json        = $self->getDataJson;
     my $dt          = JSON->new->decode( $json );
 
     # Make row data more friendly to templates
