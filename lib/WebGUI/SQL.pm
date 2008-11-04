@@ -972,7 +972,8 @@ sub unconditionalRead {
 
 =head2 write ( sql, params )
 
-A method specifically designed for writing to the database in an efficient manner. 
+A method specifically designed for writing to the database in an efficient manner. Returns
+the number of rows effected.
 
 =head3 sql
 

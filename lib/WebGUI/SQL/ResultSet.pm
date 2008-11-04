@@ -118,9 +118,11 @@ sub errorMessage {
 
 =head2 execute ( [ placeholders ] )
 
-Executes a prepared SQL statement.
+Executes a prepared SQL statement.  For SELECT queries, returns a true value on success.  For
+other queries, returns the number of rows effected.  Return value will always evaluate as true
+even if zero rows were effected.
 
-=head3 placeholders 
+=head3 placeholders
 
 An array reference containing a list of values to be used in the placeholders defined in the SQL statement.
 
