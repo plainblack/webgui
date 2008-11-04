@@ -427,6 +427,7 @@ sub canAddEvent {
 
     return 1 if (
         $user->isInGroup( $self->get("groupIdEventEdit") ) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 

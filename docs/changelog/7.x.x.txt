@@ -1,4 +1,5 @@
 7.6.2
+ - fixed: not allowed to add calendar events if in can edit group but not can add event group
  - sped up lineage changes significantly
  - fixed: site starter fails after site style page
  - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
