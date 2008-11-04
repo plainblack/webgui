@@ -32,7 +32,7 @@ my $dt;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 1;        # Increment this number for each test you create
+plan tests => 6;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Datatable creation
