@@ -910,6 +910,8 @@ Updates an object's properties. While doing so also validates default data and s
 
 A hash reference of properties to be set. See crud_definition() for a list of the properties available.
 
+B<WARNING:> As part of it's validation mechanisms, update() will delete any elements from the properties list that are not specified in the crud_definition().
+
 =cut
 
 sub update {
