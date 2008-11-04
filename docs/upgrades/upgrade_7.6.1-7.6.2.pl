@@ -73,11 +73,14 @@ sub installAjaxI18N {
     my $session     = shift;
     print "\tInstalling the AjaxI18N content handler... " unless $quiet;
 
-    my $oldHandlers = $session->config->get( "contentHandlers" );
     my @newHandlers;
+    my $oldHandlers = $session->config->get( "contentHandlers" );
     for my $handler ( @{ $oldHandlers } ) {
         if ( $handler eq "WebGUI::Content::Operation" ) {
             push @newHandlers, "WebGUI::Content::AjaxI18N";
+        }
+        elsif ( $handler eq "WebGUI::Content::AjaxI18N" ) {
+            next;
         }
         push @newHandlers, $handler;
     }
