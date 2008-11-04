@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 54;        # Increment this number for each test you create
+plan tests => 55;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 
@@ -57,6 +57,11 @@ like($record1->get('lastUpdated'), qr/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, "la
 like($record1->get('sequenceNumber'), qr/\d+/, "sequenceNumber looks like a number");
 is($record1->get('sequenceNumber'), 1, "record 1 sequenceNumber is 1");
 like($record1->get('id'), qr/[A-Za-z0-9_-]{22}/, "id looks like a guid");
+
+# custom id
+my $record2 = WebGUI::Crud->create($session,{},{id=>'theshawshankredemption'});
+is($record2->get('id'),'theshawshankredemption',"custom id works");
+$record2->delete;
 
 # instanciation
 my $record2 = WebGUI::Crud->create($session);
