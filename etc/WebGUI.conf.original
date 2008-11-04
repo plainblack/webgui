@@ -834,9 +834,11 @@
     "WebGUI::Content::Referral",
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::AssetDiscovery",
+    "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
+    "WebGUI::Content::SiteIndex",
     "WebGUI::Content::Asset",
     "WebGUI::Content::NotFound"
     ],
