@@ -39,6 +39,7 @@ addProfileExtrasField($session);
 addWorkflowToDataform( $session );
 installDataTableAsset( $session );
 installAjaxI18N( $session );
+installSiteIndex( $session );
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -84,6 +85,27 @@ sub installAjaxI18N {
 
     print "DONE!\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+# installSiteIndex
+# Install the content handler by adding it to the config file
+sub installSiteIndex {
+    my $session     = shift;
+    print "\tInstalling the SiteIndex content handler... " unless $quiet;
+
+    my $oldHandlers = $session->config->get( "contentHandlers" );
+    my @newHandlers;
+    for my $handler ( @{ $oldHandlers } ) {
+        if ( $handler eq "WebGUI::Content::Asset" ) {
+            push @newHandlers, "WebGUI::Content::SiteIndex";
+        }
+        push @newHandlers, $handler;
+    }
+    $session->config->set( "contentHandlers", \@newHandlers );
+
+    print "DONE!\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 sub upgradeToYui26 {
