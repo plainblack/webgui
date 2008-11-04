@@ -16,7 +16,7 @@ package WebGUI::Cache::Database;
 
 use strict;
 use base "WebGUI::Cache";
-use Storable qw(freeze thaw);
+use Storable ();
 
 =head1 NAME
 
@@ -104,7 +104,7 @@ sub get {
 	return undef unless ($content);
 	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
     eval {
-        $content = thaw($content);
+        $content = Storable::thaw($content);
     };
     return undef unless $content && ref $content;
     return $$content;
@@ -175,7 +175,7 @@ The time to live for this content. This is the amount of time (in seconds) that 
 sub set {
 	my $self = shift;
 	# Storable doesn't like non-reference arguments, so we wrap it in a scalar ref.
-	my $content = freeze(\(scalar shift));
+	my $content = Storable::nfreeze(\(scalar shift));
 	my $ttl = shift || 60;
 	my $size = length($content);
 	# getting better performance using native dbi than webgui sql

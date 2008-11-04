@@ -122,7 +122,7 @@ sub cascadeLineage {
         $cache->flush;
     }
     else {
-        my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage]);
+        my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);
         while (my ($assetId, $lineage) = $descendants->array) {
             $cache->deleteChunk(["asset",$assetId]);
         }
