@@ -119,7 +119,7 @@ These methods are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 create ( session, [ properties ])
+=head2 create ( session, [ properties ], [ options ])
 
 Constructor. Creates a new instance of this object. Returns a reference to the object.
 
@@ -131,10 +131,18 @@ A reference to a WebGUI::Session or an object that has a session method. If it's
 
 The properties that you wish to create this object with. Note that if this object has a sequenceKey then that sequence key must be specified in these properties or it will throw an execption. See crud_definition() for a list of all the properties.
 
+=head3 options
+
+A hash reference of creation options.
+
+=head4 id
+
+A guid. Use this to force the row's table key to a specific ID.
+
 =cut
 
 sub create {
-	my ($class, $someObject, $data) = @_;
+	my ($class, $someObject, $data, $options) = @_;
 
 	# dynamic recognition of object or session
 	my $session = $someObject;
@@ -176,7 +184,7 @@ sub create {
 	$sequenceNumber++;
 
 	# create object
-	my $id = $db->setRow($tableName, $tableKey, {$tableKey=>'new', dateCreated=>$now, sequenceNumber=>$sequenceNumber});
+	my $id = $db->setRow($tableName, $tableKey, {$tableKey=>'new', dateCreated=>$now, sequenceNumber=>$sequenceNumber}, $options->{id});
 	my $self = $class->new($someObject, $id);
 	$self->update($data);
 	return $self;
