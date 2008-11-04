@@ -113,16 +113,21 @@ sub cascadeLineage {
     my $self = shift;
     my $newLineage = shift;
     my $oldLineage = shift || $self->get("lineage");
-    my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
-	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ?",[$oldLineage.'%']);
-	my $cache = WebGUI::Cache->new($self->session);
-	while (my ($assetId, $lineage) = $descendants->array) {
-		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
-		$prepared->execute([$fixedLineage,$assetId]);
-        # we do the purge directly cuz it's a lot faster than instantiating all these assets
-        $cache->deleteChunk(["asset",$assetId]);
-	}
-	$descendants->finish;
+    my $records = $self->session->db->write(
+        "UPDATE asset SET lineage=CONCAT(?,SUBSTRING(lineage,?)) WHERE lineage LIKE ?",
+        [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
+    );
+    my $cache = WebGUI::Cache->new($self->session);
+    if ($records > 20) {
+        $cache->flush;
+    }
+    else {
+        my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage]);
+        while (my ($assetId, $lineage) = $descendants->array) {
+            $cache->deleteChunk(["asset",$assetId]);
+        }
+        $descendants->finish;
+    }
 }
 
 #-------------------------------------------------------------------

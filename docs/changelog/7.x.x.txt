@@ -1,4 +1,5 @@
 7.6.2
+ - sped up lineage changes significantly
  - fixed: site starter fails after site style page
  - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
  - fixed #8980: possible to execute arbitrary perl code as any user that can upload files
