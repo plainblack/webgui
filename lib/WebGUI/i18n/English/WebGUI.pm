@@ -4141,6 +4141,12 @@ LongTruncOk=1</p>
         context     => q{Column heading for the total logged in time for the user},
     },
 
+    'Show when online?' => {
+        message     => q{Show when online?},
+        lastUpdated => 0,
+        context     => q{Label for the user profile field used by the UsersOnline macro},
+    },
+
 };
 
 1;
