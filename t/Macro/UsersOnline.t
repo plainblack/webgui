@@ -30,7 +30,7 @@ my @users = setupUsers($session);
 my $i18n = WebGUI::International->new($session,'Macro_UsersOnline');
 
 my $numTests = 1;   # Module loading test
-$numTests += 31;    # Static tests
+$numTests += 30;    # Static tests
 
 plan tests => $numTests;
 
@@ -44,12 +44,12 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
     # Basic testing -----------------------------------------------------------
 
     # Check for default template
-    my $defTemplate = WebGUI::Asset->new($session, 'pUwYHCjfQUMcRXRmKOlaRQ');
-    is(defined $defTemplate, 1, 'default template is present');
+    my $defTemplate = WebGUI::Asset->new($session, 'h_T2xtOxGRQ9QJOR6ebLpQ');
+    ok(defined $defTemplate, 'default template is present');
 
     # Call with default values
  	my $html = WebGUI::Macro::UsersOnline::process($session);
-    is((length $html) > 0, 1, 'call with default template and values returns some output');
+    cmp_ok((length $html), '>', 0, 'call with default template and values returns some output');
 
 
     # Test labels -------------------------------------------------------------
@@ -74,13 +74,15 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
 
     # Test logic --------------------------------------------------------------
 
-	is($vars->{'visitors'} =~ /[0-9]+/, 1, 'visitors is numeric');
-    is($vars->{'visitors'} > 0, 1, 'visitors > 0 when calling as visitor');
-	is($vars->{'members'} =~ /[0-9]+/, 1, 'members is numeric');
-    is($vars->{'visitors'} > 0, 1, 'members > 0 since we have created one visible active member');
+	like($vars->{'visitors'},  qr/[0-9]+/, 'visitors is numeric');
+# Does not work in testing environments that run on the loopback interface,
+# since these queries are filtered out by the macro.
+#    is($vars->{'visitors'} > 0, 1, 'visitors > 0 when calling as visitor');
+	like($vars->{'members'}, qr/[0-9]+/, 'members is numeric');
+    cmp_ok($vars->{'members'}, '>', 0, 'members > 0 since we have created one visible active member');
 	is($vars->{'total'}, $vars->{'visitors'} + $vars->{'members'}, 'total == visitors + members');
-	is($vars->{'isVisitor'}, 1, 'isVisitor is defined when calling as visitor');
-	is(defined $vars->{'hasMembers'}, 1, 'hasMembers is defined since we have created one visible active member');
+	ok($vars->{'isVisitor'}, 'isVisitor is true when calling as visitor');
+	ok(defined $vars->{'hasMembers'}, 'hasMembers is defined since we have created one visible active member');
 
 
     # Check member loop -------------------------------------------------------
@@ -116,9 +118,9 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
         $allFieldsSet &&= $_->{'lastActivity'} =~ /.*/;
     }
     # Check booleans indicating errors
-	is($allFieldsSet, 1, 'fields in the member loop have been set correctly');
-	is($firstUserPresent, 1, 'the first user is present in the member loop');
-	is($secondUserAbsent, 1, 'the second user is absent from the member loop');
+	ok($allFieldsSet,     'fields in the member loop have been set correctly');
+	ok($firstUserPresent, 'the first user is present in the member loop');
+	ok($secondUserAbsent, 'the second user is absent from the member loop');
 
 
     # Check visitor loop ------------------------------------------------------
@@ -132,7 +134,7 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
     }
 
     # Check booleans indicating errors
-	is($allFieldsSet, 1, 'fields in the visitor loop have been set correctly');
+	ok($allFieldsSet, 'fields in the visitor loop have been set correctly');
 
 
     # Test macro parameters ---------------------------------------------------
@@ -140,15 +142,15 @@ skip "Unable to load $macro", $numTests-1 unless $loaded;
     # Call with zero max limits
  	$json = WebGUI::Macro::UsersOnline::process($session, $template->getId, undef, 0, 0);
 	$vars = JSON::from_json($json);
-	is(defined $vars->{'hasMembers'}, '', 'hasMembers undefined when display limit is set to zero');
-    is(@{$vars->{'member_loop'}} == 0, 1, 'empty member loop when display limit is set to zero');
+	ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when display limit is set to zero');
+    is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when display limit is set to zero');
     is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when display limit is set to zero');
     
     # Call with zero max inactivity time
     $json = WebGUI::Macro::UsersOnline::process($session, $template->getId, 0, undef, undef);
     $vars = JSON::from_json($json);
-    is(defined $vars->{'hasMembers'}, '', 'hasMembers undefined when max inactivity time is set to zero');
-    is(@{$vars->{'member_loop'}} == 0, 1, 'empty member loop when max inactivity time is set to zero');
+    ok(!defined $vars->{'hasMembers'},     'hasMembers undefined when max inactivity time is set to zero');
+    is(@{$vars->{'member_loop'}}  == 0, 1, 'empty member loop when max inactivity time is set to zero');
     is(@{$vars->{'visitor_loop'}} == 0, 1, 'empty visitor loop when max inactivity time is set to zero');
 }
 
@@ -157,6 +159,13 @@ sub setupUsers {
     my ($session) = @_;
     my @users;
     my $user;
+
+    # Delete any users from previous tests. This is necessary if the test has
+    # failed before.
+    $user = WebGUI::User->newByUsername($session, 'tester1');
+    $user->delete if defined $user;
+    $user = WebGUI::User->newByUsername($session, 'tester2');
+    $user->delete if defined $user;
 
     # Create first user
     $user = WebGUI::User->new($session, 'new');
@@ -180,10 +189,9 @@ sub setupUsers {
 
     # Create sessions such that users are added to the userSession table
     foreach (@users) {
-        $session->user({user => $_});
-        WebGUI::Session::Var->new($session);
+        my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+        $newSession->user({user => $_});
     }
-
     return @users;
 }
 
@@ -236,7 +244,7 @@ sub setupJSONtemplate {
     ]	
     }
 EOTMPL
-    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', namespace => 'Shop/MiniCart', template=>$templateBody});
+    my $template = WebGUI::Asset->getImportNode($session)->addChild({className=>'WebGUI::Asset::Template', namespace => 'Macro/UsersOnline', template=>$templateBody});
     return $template;
 }
 

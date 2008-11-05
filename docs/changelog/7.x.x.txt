@@ -1,5 +1,6 @@
 7.6.3
  - fixed #8989: Missing profile field "showOnline" for the UsersOnline macro.
+ - fixed #9025: Testing function of UsersOnline macro fails.
 
 7.6.2
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
