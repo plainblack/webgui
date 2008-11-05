@@ -26,7 +26,7 @@ WebGUI::Error->Trace(1);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 76;
+plan tests => 82;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -378,17 +378,64 @@ $session->db->write('delete from fluxRuleUserData');
 
     # try some invalid combinedExpressions
     $rule->update( { combinedExpression => '(' } );
-    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE '('};
-    
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression',
+        q{evaluate takes exception to cE '('};
+
     $rule->update( { combinedExpression => 'E1 E2' } );
-    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 E2'};
-    
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression',
+        q{evaluate takes exception to cE 'E1 E2'};
+
     $rule->update( { combinedExpression => 'AND' } );
-    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'AND'};
-    
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression',
+        q{evaluate takes exception to cE 'AND'};
+
     $rule->update( { combinedExpression => 'E1 AND E2 )' } );
-    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression', q{evaluate takes exception to cE 'E1 AND E2 )'};
-    
+    throws_ok { $rule->evaluateFor( { user => $user, } ) } 'WebGUI::Error::Flux::InvalidCombinedExpression',
+        q{evaluate takes exception to cE 'E1 AND E2 )'};
+
+}
+
+# Explicitly test for a bug I found during early development: 
+# Rule that was initiallly false wouldn't update dateRuleFirstTrue when it became true
+{
+    my $rule   = WebGUI::Flux::Rule->create($session);
+    my $ruleId = $rule->getId();
+    $rule->addExpression(
+        {   operand1     => 'NumericValue',
+            operand1Args => '{"value":  0}',
+            operator     => 'IsEqualTo',
+            operand2     => 'NumericValue',
+            operand2Args => '{"value":  42}',
+        }
+    );
+    ok( !$rule->evaluateFor( { user => $user, } ), q{initially false} );
+    ok( $session->db->quickScalar(
+            'select dateRuleFirstFalse from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ]
+        ),
+        'dateRuleFirstFalse set'
+    );
+    is( $session->db->quickScalar(
+            'select dateRuleFirstTrue from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ]
+        ),
+        undef,
+        'dateRuleFirstTrue not set yet'
+    );
+    $rule->update( { combinedExpression => 'not E1' } );
+    ok( $rule->evaluateFor( { user => $user, } ), q{now true} );
+    ok( $session->db->quickScalar(
+            'select dateRuleFirstFalse from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ]
+        ),
+        'dateRuleFirstFalse still set'
+    );
+    ok( $session->db->quickScalar(
+            'select dateRuleFirstTrue from fluxRuleUserData where fluxRuleId=? and userId=?',
+            [ $ruleId, $userId ]
+        ),
+        'dateRuleFirstTrue now set'
+    );
 }
 
 # Workflows
@@ -510,7 +557,8 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 #
 #######################################################################
 {
-    throws_ok { WebGUI::Flux::Rule::_parseCombinedExpression() } 'WebGUI::Error::InvalidParam', 'takes exception to invalid param count';
+    throws_ok { WebGUI::Flux::Rule::_parseCombinedExpression() } 'WebGUI::Error::InvalidParam',
+        'takes exception to invalid param count';
 
     is( WebGUI::Flux::Rule::_parseCombinedExpression('e1 and e2'),
         '$expressions[1]->evaluate() and $expressions[2]->evaluate()',

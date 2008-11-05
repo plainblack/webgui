@@ -12,7 +12,7 @@ use List::MoreUtils qw(all);
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-my $recursiveDepthCounter = 0; # Used as an extra (hopefully never needed) guard against infinite loops
+my $recursiveDepthCounter = 0;    # Used as an extra (hopefully never needed) guard against infinite loops
 
 =head1 NAME
 
@@ -74,8 +74,8 @@ private expressionCache       => my %expressionCache;         # (hash) cache of 
 readonly evaluatingForUser    => my %evaluatingForUser;       # Set to a WebGUI::User when Rule is being evaluated
 readonly evaluatingForAssetId => my %evaluatingForAssetId;    # Set to an assetId when Rule is being evaluated
 readonly evaluationInfo       => my %evaluationInfo;          # Evaluation info
-readonly resolvedRuleCache      => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
-readonly unresolvedRuleCache    => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
+readonly resolvedRuleCache    => my %resolvedRuleCache;       # (hash) cache of resolved WebGUI::Rules
+readonly unresolvedRuleCache  => my %unresolvedRuleCache;     # (hash) cache of currently unresolved WebGUI::Rules
 
 # Default values used in create() method
 Readonly my %FIELD_DEFAULTS => (
@@ -477,8 +477,8 @@ sub evaluateFor {
     my $self = shift;
     my %args = validate(
         @_,
-        {   user    => { isa => 'WebGUI::User' },
-            assetId => 0,
+        {   user      => { isa     => 'WebGUI::User' },
+            assetId   => 0,
             access    => { default => 1 },
             recursive => { default => 0 }
         }
@@ -486,8 +486,9 @@ sub evaluateFor {
 
     # Cache $id for speed
     my $id = id $self;
-    
-    if ($args{recursive}) {
+
+    if ( $args{recursive} ) {
+
         # Should not be possible for $recursiveDepthCounter to exceed 1, but check anyway
         # as a double-guard against infinite loops..
         if ( $recursiveDepthCounter++ > 1 ) {
@@ -513,7 +514,7 @@ sub evaluateFor {
 
     # Rule with no expressions defaults to true
     if ( $self->getExpressionCount() == 0 ) {
-        return $self->_finishEvaluating( 1, $id );
+        return $self->_finishEvaluating(1);
     }
 
     # Check if we can apply the sticky optimisation..
@@ -524,7 +525,7 @@ sub evaluateFor {
             [ $self->getId(), $user->userId() ] );
 
         if ($dateRuleFirstTrue) {
-            return $self->_finishEvaluating( 1, $id );
+            return $self->_finishEvaluating(1);
         }
     }
 
@@ -569,7 +570,7 @@ variable: LIST_MOREUTILS_PP
             $was_successful = eval("($parsed_combined_expression)");
         }
         if ( my $e = Exception::Class->caught() ) {
-            $self->resetEvaluationInfo($id);
+            $self->resetEvaluationInfo();
             $e->rethrow() if ref $e;            # Re-throw Exception::Class errors for other code to catch
         }
         if ($EVAL_ERROR) {
@@ -582,12 +583,12 @@ variable: LIST_MOREUTILS_PP
     }
 
     # We've finished evaluating now
-    return $self->_finishEvaluating( $was_successful, $id );
+    return $self->_finishEvaluating($was_successful);
 }
 
 #-------------------------------------------------------------------
 
-=head2 _finishEvaluating ( result id )
+=head2 _finishEvaluating ( result )
 
 Clean up after evaluating (update fluxRuleUserData table and
 reset caches).
@@ -595,40 +596,33 @@ reset caches).
 =head3 result
 
 The boolean status of the Rule evaluation
-
-head3 id
-
-value of "id $self" (optimisation)
  
 =cut
 
 sub _finishEvaluating {
     my $self = shift;
-    my ($result, $id ) = validate_pos(@_, 1, 1);
+    my ($result) = validate_pos( @_, 1 );
 
     # Update the fluxRuleUserData table
-    $self->_updateDataAndTriggerWorkflows( $result, $id );
+    $self->_updateDataAndTriggerWorkflows($result);
 
     # Clear evaluation-data
-    $self->resetEvaluationInfo($id);
+    $self->resetEvaluationInfo();
 
     return $result;
 }
 
 #-------------------------------------------------------------------
 
-=head2 resetEvaluationInfo ( id )
+=head2 resetEvaluationInfo ( )
 
 Clean up
-
-head3 id
-
-value of "id $self" (optimisation)
  
 =cut
+
 sub resetEvaluationInfo {
     my $self = shift;
-    my ($id) = validate_pos(@_, 1);
+    my $id   = id $self;
 
     delete $evaluatingForUser{$id};
     delete $evaluatingForAssetId{$id};
@@ -644,9 +638,9 @@ sub resetEvaluationInfo {
 
         # Reset the resolved/unresolved Rule Caches too..
         my $rule_id = $self->getId();
-        $resolvedRuleCache{$id} = {};
+        $resolvedRuleCache{$id}   = {};
         $unresolvedRuleCache{$id} = { $rule_id => $rule_id };
-        $recursiveDepthCounter = 0;
+        $recursiveDepthCounter    = 0;
     }
     $evaluationInfo{$id} = {};
 }
@@ -663,7 +657,7 @@ just catch any errors from eval.
 =cut
 
 sub checkCombinedExpression {
-    my ( $combined_expression, $expression_count ) = validate_pos(@_, 1,1);
+    my ( $combined_expression, $expression_count ) = validate_pos( @_, 1, 1 );
 
     # Undefined combined expression is valid
     return 1 if !defined $combined_expression;
@@ -709,39 +703,35 @@ so that we can test it.
 =cut
 
 sub _parseCombinedExpression {
-    my ($combined_expression) = validate_pos(@_, 1);
+    my ($combined_expression) = validate_pos( @_, 1 );
 
     # Apply the magic regex
     $combined_expression =~ s/e(\d+)/\$expressions[$1]->evaluate()/gx;
-    
+
     return $combined_expression;
 }
 
 #-------------------------------------------------------------------
 
-=head2 _updateDataAndTriggerWorkflows ( result, id )
+=head2 _updateDataAndTriggerWorkflows ( $success )
 
 Updates the rule/user row in the fluxRuleUserData table after a Rule is
-evaluated. Uses the boolean outcome of the Rule (was_successful) and a
-flag indicating whether the Rule was directly/indirectly evaluated to
+evaluated. Uses the boolean outcome of the Rule ($success) to
 determine which fields need to be updated (dateRuleFirstTrue, 
 dateAccessFirstTrue, etc..).
 
 Also triggers any related Workflows.
 
-=head3 result
+=head3 $success
 
 The boolean status of the Rule evaluation
-
-=head3 id
-
-value of "id $self" (optimisation)
 
 =cut
 
 sub _updateDataAndTriggerWorkflows {
     my $self = shift;
-    my ($result, $id ) = validate_pos(@_, 1,1);
+    my ($success) = validate_pos( @_, 1 );
+    my $id = id $self;
 
     my $is_access = $evaluationInfo{$id}{is_access};
 
@@ -756,60 +746,69 @@ sub _updateDataAndTriggerWorkflows {
     my $dt = WebGUI::DateTime->new(time)->toDatabase();
 
     # Along the way, keep track of..
-    my $db_write_required = 0;    # whether we need to write to the db
-    my %field_updates;            # what fields need to be updated
-    my %trigger_workflow;         # what workflows need to be triggered
+    my $db_write_required;    # whether we need to write to the db
+    my %trigger_workflow;     # what workflows need to be triggered
+
+    my %field_updates = (
+        fluxRuleUserDataId => $userData{fluxRuleUserDataId},    # may not exist
+        fluxRuleId         => $self->getId(),
+        userId             => $user->userId(),
+    );
+    
+    $self->session->log->debug('_updateDataAndTriggerWorkflows for Rule: ' . $self->getId);
 
     # Has rule ever been checked for this user?
     if ( !exists $userData{fluxRuleUserDataId} ) {
-        $db_write_required = 1;
-
-        # Create the basis of our new fluxRuleUserData row..
+        $db_write_required                   = 1;
         $field_updates{fluxRuleUserDataId}   = 'new';
-        $field_updates{fluxRuleId}           = $self->getId();
-        $field_updates{userId}               = $user->userId();
         $field_updates{dateRuleFirstChecked} = $dt;
     }
 
-    # First time Rule true or false?
-    if ( !exists $userData{dateRuleFirstTrue} && $result ) {
+    # True for the first time?
+    if ( $success && !$userData{dateRuleFirstTrue} ) {
+        $self->session->log->debug('RuleFirstTrue');
         $db_write_required                = 1;
         $field_updates{dateRuleFirstTrue} = $dt;
         $trigger_workflow{RuleFirstTrue}  = 1;
     }
-    if ( !exists $userData{dateRuleFirstFalse} && !$result ) {
+
+    # False for the first time?
+    if ( !$success && !$userData{dateRuleFirstFalse} ) {
+        $self->session->log->debug('RuleFirstFalse');
         $db_write_required                 = 1;
         $field_updates{dateRuleFirstFalse} = $dt;
         $trigger_workflow{RuleFirstFalse}  = 1;
     }
 
-    # Direct access attempt?
-    if ( $is_access && $result ) {
-        $db_write_required                         = 1;
-        $field_updates{dateAccessMostRecentlyTrue} = $dt;
-        $trigger_workflow{AccessTrue}              = 1;
-    }
-    if ( $is_access && !$result ) {
-        $db_write_required                          = 1;
-        $field_updates{dateAccessMostRecentlyFalse} = $dt;
-        $trigger_workflow{AccessFalse}              = 1;
-    }
-
-    # First direct access attempt?
-    if ( !exists $userData{dateAccessFirstAttempted} && $is_access ) {
-        $db_write_required = 1;
-        $field_updates{dateAccessFirstAttempted} = $dt;
-    }
-
-    # First time direct access true/false?
+    # Direct access?
     if ($is_access) {
-        if ( !exists $userData{dateAccessFirstTrue} && $result ) {
-            $db_write_required                  = 1;
+        $db_write_required = 1;
+        
+        if ($success) {
+            $self->session->log->debug('AccessMostRecentlyTrue');
+            $field_updates{dateAccessMostRecentlyTrue} = $dt;
+            $trigger_workflow{AccessTrue}              = 1;
+        }
+        else {
+            $self->session->log->debug('AccessFalse');
+            $field_updates{dateAccessMostRecentlyFalse} = $dt;
+            $trigger_workflow{AccessFalse}              = 1;
+        }
+
+        # First direct access attempt?
+        if ( !$userData{dateAccessFirstAttempted} ) {
+            $self->session->log->debug('AccessFirstAttempted');
+            $field_updates{dateAccessFirstAttempted} = $dt;
+        }
+
+        # True for the first time?
+        if ( $success && !$userData{dateAccessFirstTrue} ) {
+            $self->session->log->debug('AccessFirstTrue');
             $field_updates{dateAccessFirstTrue} = $dt;
             $trigger_workflow{AccessFirstTrue}  = 1;
         }
-        if ( !exists $userData{dateAccessFirstFalse} && !$result ) {
-            $db_write_required                   = 1;
+        if ( !$success && !exists $userData{dateAccessFirstFalse}) {
+            $self->session->log->debug('AccessFirstFalse');
             $field_updates{dateAccessFirstFalse} = $dt;
             $trigger_workflow{AccessFirstFalse}  = 1;
         }
@@ -848,8 +847,8 @@ the given fluxRuleId stored in its resolved rule cache
 
 sub hasResolvedRuleCached {
     my $self = shift;
-    my ($fluxRuleId) = validate_pos(@_,1);
-    return exists $resolvedRuleCache{id $self}{$fluxRuleId};   
+    my ($fluxRuleId) = validate_pos( @_, 1 );
+    return exists $resolvedRuleCache{ id $self}{$fluxRuleId};
 }
 
 #-------------------------------------------------------------------
@@ -863,8 +862,8 @@ the given fluxRuleId stored in its unresolved rule cache
 
 sub hasUnresolvedRuleCached {
     my $self = shift;
-    my ($fluxRuleId) = validate_pos(@_,1);
-    return exists $unresolvedRuleCache{id $self}{$fluxRuleId};   
+    my ($fluxRuleId) = validate_pos( @_, 1 );
+    return exists $unresolvedRuleCache{ id $self}{$fluxRuleId};
 }
 
 #-------------------------------------------------------------------
@@ -878,8 +877,8 @@ Rule's resolved rule cache
 
 sub getResolvedRuleResult {
     my $self = shift;
-    my ($fluxRuleId) = validate_pos(@_,1);
-    return $resolvedRuleCache{id $self}{$fluxRuleId};   
+    my ($fluxRuleId) = validate_pos( @_, 1 );
+    return $resolvedRuleCache{ id $self}{$fluxRuleId};
 }
 
 #-------------------------------------------------------------------
@@ -892,9 +891,9 @@ Stores the given rule and result in this Rule's resolved rule cache
 
 sub cacheRuleAsResolved {
     my $self = shift;
-    my ($fluxRuleId, $result) = validate_pos(@_, 1, 1);
-    delete $unresolvedRuleCache{id $self}{$fluxRuleId};
-    $resolvedRuleCache{id $self}{$fluxRuleId} = $result;
+    my ( $fluxRuleId, $result ) = validate_pos( @_, 1, 1 );
+    delete $unresolvedRuleCache{ id $self}{$fluxRuleId};
+    $resolvedRuleCache{ id $self}{$fluxRuleId} = $result;
 }
 
 #-------------------------------------------------------------------
@@ -907,9 +906,9 @@ Stores the given rule in this Rule's unresolved rule cache
 
 sub cacheRuleAsUnresolved {
     my $self = shift;
-    my ($fluxRuleId) = validate_pos(@_, 1);
-    delete $resolvedRuleCache{id $self}{$fluxRuleId}; # generally won't exist anyway
-    $unresolvedRuleCache{id $self}{$fluxRuleId} = $fluxRuleId;
+    my ($fluxRuleId) = validate_pos( @_, 1 );
+    delete $resolvedRuleCache{ id $self}{$fluxRuleId};    # generally won't exist anyway
+    $unresolvedRuleCache{ id $self}{$fluxRuleId} = $fluxRuleId;
 }
 
 #-------------------------------------------------------------------
@@ -923,12 +922,12 @@ the provided rule.
 
 sub initCachesFrom {
     my $self = shift;
-    my ($that) = validate_pos(@_, {isa => 'WebGUI::Flux::Rule'});
- 
-    my %rrc_copy = %{$that->resolvedRuleCache()};
-    my %urc_copy = %{$that->unresolvedRuleCache()};
-    $resolvedRuleCache{id $self} = \%rrc_copy;
-    $unresolvedRuleCache{id $self} = \%urc_copy;
+    my ($that) = validate_pos( @_, { isa => 'WebGUI::Flux::Rule' } );
+
+    my %rrc_copy = %{ $that->resolvedRuleCache() };
+    my %urc_copy = %{ $that->unresolvedRuleCache() };
+    $resolvedRuleCache{ id $self}   = \%rrc_copy;
+    $unresolvedRuleCache{ id $self} = \%urc_copy;
 }
 
 1;
