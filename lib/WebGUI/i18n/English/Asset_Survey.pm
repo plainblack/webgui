@@ -15,8 +15,8 @@ our $I18N = {
 		message => q|Take Survey|,
 		lastUpdated => 1224686319
 	},
-	'view results' => {
-		message => q|View Reports|,
+	'view reports' => {
+		message => q|View Results|,
 		lastUpdated => 1224686319
 	},
 	'continue button' => {
@@ -127,7 +127,7 @@ our $I18N = {
 		message => q|Question type:|,
 		lastUpdated => 1224686319
 	},
-	'randomzied words' => {
+	'randomized words' => {
 		message => q|Randomized words:|,
 		lastUpdated => 1224686319
 	},
@@ -155,7 +155,7 @@ our $I18N = {
 		message => q|Maximum number of answers:|,
 		lastUpdated => 1224686319
 	},
-	'qrequired' => {
+	'required' => {
 		message => q|Required|,
 		lastUpdated => 1224686319
 	},

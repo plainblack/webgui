@@ -8,12 +8,10 @@ sub new{
     my $class = shift;
     my $json = shift;
     my $log = shift;
-    my $rId = shift;
     my $survey = shift;
     my $self = {};
     $self->{survey} = $survey;
     $self->{log} = $log;
-    $self->{responseId} = $rId;
     my $temp = decode_json($json) if defined $json;
     $self->{surveyOrder} = defined $temp->{surveyOrder} ? $temp->{surveyOrder} : [];#an array of question addresses, with the third member being an array of answers
     $self->{responses} = defined $temp->{responses} ? $temp->{responses} : {};
@@ -34,10 +32,9 @@ Forks are passed in to show where to branch the new order.
 
 sub createSurveyOrder{
     my $self = shift;
-#    my $fork = shift || [];
     my $order;
     my $qstarting = 0;
-eval{
+    
     for(my $s = 0; $s <= $#{$self->survey->sections()}; $s++){
         #create question order for section
         my @qorder;
@@ -61,17 +58,8 @@ eval{
                 @aorder = (($qstarting .. $#{$self->survey->question([$s,$_])->{answers}}));
             }
             push(@$order,[$s,$_,\@aorder]);
-#            if(@$fork == 2){
-#                if($$fork[0][0] == $s and $$fork[0][1] == $_){
-#                    $s = $$fork[1][0]-1;
-#                    $qstarting = $$fork[1][1];
-#                    last;
-#                }
-#            }
         }
     }
-};
-$self->log($@) if($@);
     $self->{surveyOrder} = $order;
 }
 sub shuffle {
@@ -90,6 +78,7 @@ sub freeze{
     delete $temp{survey};
     return encode_json(\%temp);
 }
+
 #the index of the last surveyOrder entry shown
 sub lastResponse{
     my $self = shift;
@@ -162,6 +151,7 @@ $self->log("There are questions to be submitted in this section");
             $terminal = 1;
             $terminalUrl = $question->{terminalUrl};
         }
+        $self->responses->{$question->{id}}->{comment} = $responses->{$question->{id}."comment"};
         for my $answer(@{$question->{answers}}){
 
             if(defined($responses->{$answer->{id}}) and $responses->{$answer->{id}} =~ /\S/){
@@ -169,11 +159,13 @@ $self->log("There are questions to be submitted in this section");
                 $aAnswered = 1;
                 if($mcTypes{$question->{questionType}}){
                     $self->responses->{$answer->{id}}->{value} = $answer->{recordedAnswer};
+$self->log("Recorded Answer ".$answer->{recordedAnswer});
                 }
                 else{
+$self->log("Returned Answer ".$responses->{$answer->{id}});
                     $self->responses->{$answer->{id}}->{value} = $responses->{$answer->{id}};
                 }
-
+                $self->responses->{$answer->{id}}->{'time'} = time();
                 $self->responses->{$answer->{id}}->{comment} = $responses->{$answer->{id}."comment"};
 
                 if($answer->{terminal}){
@@ -250,7 +242,6 @@ $self->log("next sectionid is $nextSectionId");
     my $section = $self->nextSection(); 
 $self->log("Section text is ".$section->{text});
     $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
-#    $section->{'text'} =~ s/(\[\[\%.*?\]\])/$self->getRandomText($responseId,$1)/eg;
 
 $self->log("qperpage $qPerPage");
 
@@ -290,6 +281,41 @@ $self->log("ENDING THE SURVEY\n\n\n") if($self->lastResponse > $#{$self->surveyO
     return 0;
 }
 
+sub returnResponseForReporting{
+    my $self = shift;
+    my @responses = ();
+    for my $entry(@{$self->surveyOrder}){
+        if(@$entry == 1){
+            next;
+        }
+        my @answers;
+        for (@{$$entry[2]}){
+            if(defined $self->responses->{"$$entry[0]-$$entry[1]-$_"}){
+                $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{id} = $_;
+                if($self->survey->answer([$$entry[0],$$entry[1],$_])->{isCorrect}){
+                    my $value;                
+                    if($self->survey->answer([$$entry[0],$$entry[1],$_])->{value} =~ /\w/){
+                        $value = $self->survey->answer([$$entry[0],$$entry[1],$_])->{value};
+                    }else{
+                        $value = $self->survey->question([$$entry[0],$$entry[1]])->{value};
+                    }
+                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{value} = $value;
+                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{isCorrect} = 1;
+                }else{
+                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{isCorrect} = 0;
+                }
+                push(@answers,($self->responses->{"$$entry[0]-$$entry[1]-$_"}));
+            }
+        }
+        push(@responses,({'section',$$entry[0],'question',$$entry[1],
+            'sectionName',$self->survey->section([$$entry[0]])->{variable},
+            'questionName',$self->survey->question([$$entry[0],$$entry[1]])->{variable},
+            'questionComment',$self->responses->{"$$entry[0]-$$entry[1]"}->{comment},
+            'answers',\@answers}));
+    }
+$self->log(Dumper @responses);
+    return \@responses;
+}
 
 #the actual responses to the survey.  A response is for a question and is accessed by the exact same address as a survey member.
 #Questions only contain the comment and an array of answer Responses. 
