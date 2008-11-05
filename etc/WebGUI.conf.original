@@ -485,6 +485,9 @@
    "WebGUI::Asset::Wobject::Gallery" : {
       "category" : "community"
    },
+   "WebGUI::Asset::Wobject::DataTable" : {
+      "category" : "basic"
+   },
    "WebGUI::Asset::Wobject::DataForm" : {
       "category" : "basic"
    },
