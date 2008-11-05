@@ -17,7 +17,7 @@ sub apply {
     modify_db_schema_for_flux($session);
     modify_config_files_for_flux($session);
     create_demo_data($session) if $demo;
-    enable_survey2($session);
+#    enable_survey2($session);
 }
 
 sub say {
