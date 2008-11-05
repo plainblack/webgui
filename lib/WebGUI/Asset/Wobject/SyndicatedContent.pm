@@ -647,10 +647,19 @@ sub view {
 	}
 
 	if(@$rss_feeds == 1){
-	    #One feed. Put in the info from the feed.
-	    $var{'channel.title'} = $rss_feeds->[0]->{channel}->{title} || $title;
-	    $var{'channel.link'} = $rss_feeds->[0]->{channel}->{link};
-	    $var{'channel.description'} = $rss_feeds->[0]->{channel}->{description};
+        if(@$rss_feeds == 1){
+            #One feed. Put in the info from the feed.
+            # Make sure we have a channel to avoid runtime errors
+            my $channel = $rss_feeds->[0]->{channel};
+            if ( $channel && ref $channel eq "HASH" ) {
+                $var{'channel.title'} = $channel->{title} || $title;
+                $var{'channel.link'} = $channel->{link};
+                $var{'channel.description'} = $channel->{description};
+            }
+            else {
+                $var{'channel.title'} = $title;
+            }
+        }
 	}
 
 	$self->_createRSSURLs(\%var);
