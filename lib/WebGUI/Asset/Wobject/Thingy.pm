@@ -633,7 +633,13 @@ sub getEditFieldForm {
             });
     $f->raw($self->getHtmlWithModuleWrapper($dialogPrefix."_defaultValue_module",$defaultValueForm,
         $i18n->get('default value label'),$i18n->get('default value description')));
-    
+   
+    $f->text(
+        -name=>"pretext",
+        -value=>$field->{pretext},
+        -label=>$i18n->get('pretext label'),
+        -hoverHelp=>$i18n->get('pretext description'),
+        );
     $f->text(
         -name=>"subtext",
         -value=>$field->{subtext},
@@ -1215,9 +1221,9 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 triggerWorkflow ( workflowId,  )
+=head2 triggerWorkflow ( workflowId )
 
-Alters a column for a field if the field's fieldType has changed.
+Runs the specified workflow when this Thingy changes.
 
 =head3 workflowId
 
@@ -1601,6 +1607,9 @@ sub www_editThing {
         }
         else{
             $formElement = $self->getFormElement($field);     
+        }
+        if ($field->{pretext}){
+            $formElement = '<span class="formPretext">'.$field->{pretext}.'</span><br />'.$formElement;
         }
         if ($field->{subtext}){
             $formElement .= '<br /><span class="formSubtext">'.$field->{subtext}.'</span>';
@@ -1996,6 +2005,7 @@ sub www_editFieldSave {
         fieldType=>$fieldType,
         defaultValue=>$defaultValue,
         possibleValues=>$self->session->form->process("possibleValues"),
+        pretext=>$self->session->form->process("pretext"),
         subtext=>$self->session->form->process("subtext"),
         status=>$self->session->form->process("status"),
         size=>$self->session->form->process("size"),
@@ -2028,6 +2038,9 @@ sub www_editFieldSave {
     }
     else{
         $formElement = $self->getFormElement(\%properties);
+    }
+    if ($properties{pretext}){
+        $formElement = '<span class="formSubtext">'.$properties{pretext}.'</span><br />'.$formElement;
     }
     if ($properties{subtext}){
         $formElement .= '<br /><span class="formSubtext">'.$properties{subtext}.'</span>';
@@ -2242,6 +2255,7 @@ sub editThingData {
             "isHidden" => $hidden,
             "isVisible" => ($field{status} eq "visible" && !$hidden),
             "isRequired" => ($field{status} eq "required" && !$hidden),
+            "pretext" => $field{pretext},
             "subtext" => $field{subtext},
         );
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });

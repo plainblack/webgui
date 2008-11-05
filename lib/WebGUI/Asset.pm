@@ -685,6 +685,11 @@ sub fixUrl {
 		$url .= ".".$self->session->setting->get("urlExtension");
 	}
 
+    # make sure the url isn't empty after all that filtering
+    if ($url eq "") {
+        $url = $self->getId;
+    }
+
 	# check to see if the url already exists or not, and increment it if it does
     if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
         my @parts = split(/\./,$url);
@@ -860,21 +865,19 @@ sub getEditForm {
 		name=>"func",
 		value=>"editSave"
 		});
+	my $assetId;
+	my $class;
 	if ($self->getId eq "new") {
-		$tabform->hidden({
-			name=>"assetId",
-			value=>"new"
-			});
-		$tabform->hidden({
-			name=>"class",
-			value=>$self->session->form->process("class","className")
-			});
+		$assetId = "new";
+		$class = $self->session->form->process("class","className");
 	}
 	else {
 		# revision history
+		$assetId = $self->getId;
+		$class = $self->get('className');
 		my $ac = $self->getAdminConsole;
 		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
-		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$self->getId]);
+		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$assetId]);
 		while (my ($version) = $rs->array) {
 			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
@@ -917,11 +920,19 @@ sub getEditForm {
 	tie my %baseProperties, 'Tie::IxHash';
 	%baseProperties = (
 		assetId	=> {
-			fieldType	=> "readOnly",
+			fieldType	=> "guid",
 			label		=> $i18n->get("asset id"),
-			value		=> $self->get("assetId"),
+			value		=> $assetId,
 			hoverHelp	=> $i18n->get('asset id description'),
-			tab			=> "properties",
+			uiLevel		=> 9,
+			tab			=> "meta",
+		},
+		class	=> {
+			fieldType	=> "className",
+			label		=> $i18n->get("class name",'WebGUI'),
+			value		=> $class,
+			uiLevel		=> 9,
+			tab			=> "meta",
 		},
 		keywords => {
 			label       => $i18n->get('keywords'),
@@ -1558,12 +1569,15 @@ sub isValidRssItem { 1 }
 
 =head2 loadModule ( $session, $className ) 
 
-Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.
+Loads an asset module if it's not already in memory. This is a class method. Returns undef on failure to load, otherwise returns the classname.  Will only load classes in the WebGUI::Asset namespace.
 
 =cut
 
 sub loadModule {
     my ($class, $session, $className) = @_;
+    if ($className !~ /^WebGUI::Asset(?:$|::)/ ) {
+        return undef;
+    }
     (my $module = $className . '.pm') =~ s{::|'}{/}g;
     if (eval { require $module; 1 }) {
         return $className;
@@ -2589,35 +2603,17 @@ sub www_editSave {
     
     $object->updateHistory("edited");
 
-    # Handle Save & Commit button
-    if ($self->session->form->process("saveAndCommit") ne "") {
-        if ($self->session->setting->get("skipCommitComments")) {
-            $self->session->http->setRedirect(
-                $self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-        } 
-        else {
-            $self->session->http->setRedirect(
-                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-        }
-        return undef;
+    # we handle auto commit assets here in case they didn't handle it themselves
+    if ($object->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
+        $object->requestAutoCommit;
     }
-
-    # Handle Auto Request Commit setting
-    if ($self->session->setting->get("autoRequestCommit")) {
-        # Make sure version tag hasn't already been committed by another process
-        my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");
-
-        if ($versionTag && $self->session->setting->get("skipCommitComments")) {
-            $versionTag->requestCommit;
-        }
-        elsif ($versionTag) {
-            $self->session->http->setRedirect(  
-                $self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-            );
-            return undef;
-        }
+    # else, try to to auto commit
+    elsif(WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        override        => scalar $self->session->form->process('saveAndCommit'),
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
     }
 
     # Handle "saveAndReturn" button
@@ -2639,12 +2635,11 @@ sub www_editSave {
         $self->session->asset($object);
         return $self->session->asset->$method();
     }
-            
+
     $self->session->asset($object->getContainer);
     return $self->session->asset->www_view;
 }
 
-                
 
 #-------------------------------------------------------------------
 

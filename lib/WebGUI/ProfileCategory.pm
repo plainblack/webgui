@@ -235,7 +235,7 @@ Returns a boolean indicating whether the category's fields may be viewed by a us
 
 sub isViewable {
 	my $self = shift;
-	return $self->get("viewable");
+	return $self->get("visible");
 }
 
 

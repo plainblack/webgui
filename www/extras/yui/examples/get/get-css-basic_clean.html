@@ -18,10 +18,8 @@ body {
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
-<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
+<script type="text/javascript" src="../../build/utilities/utilities.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
-<script type="text/javascript" src="../../build/get/get-min.js"></script>
 
 
 <!--begin custom header content for this example-->
@@ -68,6 +66,7 @@ body {
 
 <body class=" yui-skin-sam">
 
+
 <h1>Getting CSS Style Sheets</h1>
 
 <div class="exampleIntro">
@@ -109,7 +108,7 @@ example.) </p>
             <div id="searchControls">
                 <!--Use a real form that works without JavaScript:-->
                 <form method="GET" action="http://search.yahooapis.com/NewsSearchService/V1/newsSearch" id="newsSearch">            
-                    <label for="p">Search Yahoo! News:</label> <input type="text" name="p" id="p" value="San Francisco" size="40">                
+                    <label for="searchString">Search Yahoo! News:</label> <input type="text" name="p" id="searchString" value="San Francisco" size="40">                
                     <input type="submit" id="getNewsData" value="Search Yahoo! News">                
                 </form>            
             </div>

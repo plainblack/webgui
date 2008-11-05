@@ -315,9 +315,7 @@ sub www_upload {
     $asset->getStorageLocation->addFileFromFilesystem($storage->getPath($filename));
     $asset->applyConstraints;
     push(@assetIds, $asset->getId);
-    if ($session->setting->get("autoRequestCommit")) {
-        WebGUI::VersionTag->getWorking($session)->requestCommit;
-    }
+    WebGUI::VersionTag->autoCommitWorkingIfEnabled($session);
     $storage->delete;
     return www_show($session, \@assetIds);
 }

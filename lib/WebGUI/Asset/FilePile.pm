@@ -195,25 +195,13 @@ sub editSave {
 	}
 	$tempStorage->delete;
 
-    # deal with special commit rules
-	if ($self->session->form->process("saveAndCommit") ne "") {
-        if ($self->session->setting->get("skipCommitComments")) {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-        } 
-        else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-        }
-		return undef;
-	}
-	if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } 
-        else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-            return undef;
-        }
-	}
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        override        => scalar $self->session->form->process("saveAndCommit"),
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
 
 	return $self->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 	return $self->getParent->www_view;

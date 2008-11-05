@@ -48,10 +48,13 @@
             };
             //Give the DT a custom Height
             var dtH = (h - 27 - YAHOO.example.app.inboxToolbarHeight);
+
             //Create the DT, setting scrollable to true and setting the height
             YAHOO.widget.DataTable.MSG_EMPTY = 'This folder contains no messages';
+
             dataTable = new YAHOO.widget.DataTable("standard",
-                    myColumnDefs, myDataSource, { scrollable: true, height: dtH + 'px' });
+                    myColumnDefs, myDataSource, { scrollable: true, height: dtH + 'px', width: w + 'px' });
+            
             
             // Subscribe to events for row selection
             dataTable.subscribe("rowMouseoverEvent", dataTable.onEventHighlightRow);
@@ -114,7 +117,7 @@
                 YAHOO.log('Remove the loading class (icon) from the tabview..', 'info', 'inbox.js');
                 YAHOO.util.Dom.removeClass(YAHOO.example.app.tabView._tabParent, 'loading');
                 YAHOO.example.app.inboxLoading = false;
-            }, 0);
+            }, 1000);
         };
 
         YAHOO.log('Using loader to fetch datatable and editor (for the toolbar)', 'info', 'inbox.js');
@@ -148,7 +151,6 @@
                         dataTable.set('width', (this.getSizes().top.w) + 'px');
                         dataTable.setColumnWidth(dataTable.getColumn('Subject'), (this.getSizes().top.w - magicNum));
                         dataTable._syncColWidths();
-                        dataTable._syncScrollPadding();
                     }
                 }, layout2, true);
                 layout2.on('render', function() {

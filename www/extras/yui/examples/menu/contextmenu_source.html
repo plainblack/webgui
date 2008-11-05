@@ -188,42 +188,6 @@
                     oUL.removeChild(p_oLI);
                 
                 }
-    
-    
-                /*
-                     Returns the <li> instance that is the parent node of the  
-                     target of a "contextmenu" event.
-                */
-    
-                function getListItemFromEventTarget(p_oNode) {
-    
-                    if (p_oNode.tagName.toUpperCase() == "LI") {
-                    
-                        return p_oNode;
-    
-                    }
-                    else {
-    
-
-                        /*
-                             If the target of the event was a child of an <li>, 
-                             get the parent <li> element.
-                        */
-    
-                        do {
-        
-                            if (p_oNode.tagName.toUpperCase() == "LI") {
-    
-                                return p_oNode;                            
-                            
-                            }
-        
-                        }
-                        while ((p_oNode = p_oNode.parentNode));
-                    
-                    }
-                
-                }
                 
     
                 // "click" event handler for each item in the ewe context menu
@@ -238,13 +202,15 @@
                     */
 
                     var oItem = p_aArgs[1], // The MenuItem that was clicked
+                    	oTarget = this.contextEventTarget,
                         oLI;
 
 
                     if (oItem) {
 
-                        oLI = getListItemFromEventTarget(this.contextEventTarget);
-        
+						oLI = oTarget.nodeName.toUpperCase() == "LI" ? 
+								oTarget : YAHOO.util.Dom.getAncestorByTagName(oTarget, "LI");
+
 
                         switch (oItem.index) {
                         

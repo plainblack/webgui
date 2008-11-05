@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
-use Test::More tests => 11; # increment this value for each test you create
+use Test::More tests => 13; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -52,5 +52,11 @@ ok(exists $newList->{$template->getId}, 'Uncommitted template exists returned fr
 my $newList2 = WebGUI::Asset::Template->getList($session, 'WebGUI Test Template', "assetData.status='approved'");
 ok(!exists $newList2->{$template->getId}, 'extra clause to getList prevents uncommitted template from being displayed');
 
+$template->update({isDefault=>1});
+is($template->get('isDefault'), 1, 'isDefault set to 1');
+my $templateCopy = $template->duplicate();
+is($templateCopy->get('isDefault'), 0, 'isDefault set to 0 on copy');
+
 $template->purge;
+$templateCopy->purge;
 

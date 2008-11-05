@@ -117,12 +117,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "TEXT".
+Returns "CHAR(22) BINARY".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "TEXT";
+    return "CHAR(22) BINARY";
 }
 
 #-------------------------------------------------------------------

@@ -106,12 +106,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(22) BINARY".
+Returns "CHAR(22) BINARY".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(22) BINARY";
+    return "CHAR(22) BINARY";
 }
 
 #-------------------------------------------------------------------

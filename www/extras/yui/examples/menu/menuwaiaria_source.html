@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Using ARIA Roles and States with YUI Menu</title>
+		<title>Menu: Using The Menu ARIA Plugin</title>
 
         <!-- Standard reset and fonts -->
 
@@ -14,6 +14,50 @@
 
         <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css"> 
 		
+		<style type="text/css">
+		
+
+            /*
+                Setting the "zoom" property to "1" triggers the "hasLayout" 
+                property in IE.  This is necessary to fix a bug IE where 
+                mousing mousing off a the text node of MenuItem instance's 
+                text label, or help text without the mouse actually exiting the
+                boundaries of the MenuItem instance will result in the losing  
+                the background color applied when it is selected.
+            */
+            
+            #filemenu.visible .yuimenuitemlabel,
+            #editmenu.visible .yuimenuitemlabel {
+
+                *zoom: 1;
+
+            }
+
+
+			/*
+				Remove "hasLayout" from the submenu of the file menu.			
+			*/
+
+            #filemenu.visible .yuimenu .yuimenuitemlabel {
+
+                *zoom: normal;
+
+            }
+
+			/*
+				The Menu ARIA Plugin removes the "href" attribute from the <A> element of each 
+				MenuItem if the value of the "href" is set to "#", resulting in the focus outline 
+				no longer be rendered in Gecko-based browsers when the <A> element is focused.  
+				For this reason, it is necessary to restore the focus outline for the <A>. 
+			*/
+			a[role=menuitem]:focus {
+
+				outline: dotted 1px #000;
+
+			}
+		
+		</style>
+
 
         <!-- Dependency source files -->
 
@@ -21,211 +65,162 @@
         <script type="text/javascript" src="../../build/container/container_core.js"></script>
 
         <!-- Menu source file -->
-
         <script type="text/javascript" src="../../build/menu/menu.js"></script>
 
+		<script type="text/javascript" src="../container/assets/containerariaplugin.js"></script>
+		<script type="text/javascript" src="../menu/assets/menuariaplugin.js"></script>
 		<script type="text/javascript">
 
-			/*
-				 Initialize and render the MenuBar when the page's DOM is ready 
-				 to be scripted.
-			*/
-
-			YAHOO.util.Event.onDOMReady(function () {
-
-				/*
-					 Define an array of object literals, each containing 
-					 the data necessary to create the items for a MenuBar.
-				*/
+			(function () {
 			
-				var aItemData = [
-			
-					{ text: "File", submenu: {  id: "filemenu", itemdata: [
-			
-							{ text: "New File", helptext: "Ctrl + N" },
-							"New Folder",
-							{ text: "Open", helptext: "Ctrl + O" },
-							{ text: "Open With...", submenu: { id: "applications", itemdata: [
-									"Application 1", 
-									"Application 2", 
-									"Application 3", 
-									"Application 4"
-								] } 
-							},
-							{ text: "Print", helptext: "Ctrl + P" }
-			
-						] }
-					
-					},
-					
-					{ text: "Edit", submenu: { id: "editmenu", itemdata: [
-			
-							[ 
-								{ text: "Undo", helptext: "Ctrl + Z" },
-								{ text: "Redo", helptext: "Ctrl + Y" }
-							],
-							
-							[
-								{ text: "Cut", helptext: "Ctrl + X" },
-								{ text: "Copy", helptext: "Ctrl + C" },
-								{ text: "Paste", helptext: "Ctrl + V" },
-								{ text: "Delete", helptext: "Del" }
-							],
-							
-							[ { text: "Select All", helptext: "Ctrl + A" } ],
-			
-							[
-								{ text: "Find", helptext: "Ctrl + F" },
-								{ text: "Find Again", helptext: "Ctrl + G" }
-							]
-					
-						] }
-			
-					}
-			
-				];
-			
-			
-				/*
-					 Instantiate a MenuBar:  The first argument passed to the constructor is the id 
-					 of the HTML to be created that will represent the MenuBar; the second is an 
-					 object literal of configuration properties.
-				*/
-			
-                var oMenuBar = new YAHOO.widget.MenuBar("mymenubar", { 
-																		lazyload: true, 
-																		itemdata: aItemData 
-																		});
-
-
-				/*
-					Add a "show" event listener that keeps the left-most
-					submenu against the left edge of the browser viewport.
-				*/
-				
-				function onSubmenuShow() {
-				
-					if (this.id == "yahoo") {
-				
-						this.cfg.setProperty("x", 0);
-					
-					}
-				
-				}
-				
-
-				// Subscribe to the "show" event for each submenu
-				
-				oMenuBar.subscribe("show", onSubmenuShow);
-
-
-				/*
-					Add the WAI-ARIA Roles and States to the MenuBar's DOM elements once it 
-					is rendered.
-				*/
-
-				oMenuBar.subscribe("render", function () {
-
-					/*
-						 Apply the "role" attribute of "menu" or "menubar" depending on the type of 
-						 the Menu control being rendered.
-					*/
-
-					this.element.setAttribute("role", 
-									(this instanceof YAHOO.widget.MenuBar ? "menubar" : "menu"));
+				var Event = YAHOO.util.Event,
+					Dom = YAHOO.util.Dom,
+					UA = YAHOO.env.ua,
 
 
 					/*
-						 Apply the appropriate "role" and "aria-[state]" attributes to the label of
-						 each MenuItem instance.
+						 Define an array of object literals, each containing 
+						 the data necessary to create the items for a MenuBar.
 					*/
+				
+					aItemData = [
+				
+						{ text: "File", submenu: {  id: "filemenu", itemdata: [
+				
+								{ text: "New File", helptext: "Ctrl + N" },
+								"New Folder",
+								{ text: "Open", helptext: "Ctrl + O" },
+								{ text: "Open With...", submenu: { id: "applications", itemdata: [
+										"Application 1", 
+										"Application 2", 
+										"Application 3", 
+										"Application 4"
+									] } 
+								},
+								{ text: "Print", helptext: "Ctrl + P" }
+				
+							] }
+						
+						},
+						
+						{ text: "Edit", submenu: { id: "editmenu", itemdata: [
+				
+								[ 
+									{ text: "Undo", helptext: "Ctrl + Z" },
+									{ text: "Redo", helptext: "Ctrl + Y" }
+								],
+								
+								[
+									{ text: "Cut", helptext: "Ctrl + X" },
+									{ text: "Copy", helptext: "Ctrl + C" },
+									{ text: "Paste", helptext: "Ctrl + V" },
+									{ text: "Delete", helptext: "Del" }
+								],
+								
+								[ { text: "Select All", helptext: "Ctrl + A" } ],
+				
+								[
+									{ text: "Find", helptext: "Ctrl + F" },
+									{ text: "Find Again", helptext: "Ctrl + G" }
+								]
+						
+							] }
+				
+						}
+				
+					];
 
-					var aMenuItems = this.getItems(),
-						i = aMenuItems.length - 1,
-						oMenuItem,
-						oMenuItemLabel;
+
+				/*
+					 Initialize and render the MenuBar when the page's DOM is ready 
+					 to be scripted.
+				*/
+	
+				Event.onDOMReady(function () {
+	
+					/*
+						 Instantiate a MenuBar:  The first argument passed to the constructor is 
+						 the id of the HTML to be created that will represent the MenuBar; the 
+						 second is an object literal of configuration properties.
+					*/
+				
+					var oMenuBar = new YAHOO.widget.MenuBar("mymenubar", { lazyload: true, itemdata: aItemData });
+	
+	
+					/*
+						Add a "show" event listener that keeps the left-most
+						submenu against the left edge of the browser viewport.
+					*/
 					
-
-					do {
-
-						oMenuItem = aMenuItems[i];
-
-
-						/*
-							Retrieve a reference to the anchor element that serves as the label for 
-							each MenuItem.
-						*/
-
-						oMenuItemLabel = oMenuItem.element.firstChild;
-
-
-						// Set the "role" attribute of the label to "menuitem"
-
-						oMenuItemLabel.setAttribute("role", "menuitem");
-
-
-						// Remove the label from the browser's default tab order
-
-						oMenuItemLabel.setAttribute("tabindex", -1);
-
-
-						/*
-							Optional: JAWS announces the value of each anchor element's "href"
-							attribute when it recieves focus.  If the MenuItem instance's "url" 
-							attribute is set to the default, remove the attribute so that JAWS 
-							does announce its value.
-						*/
-
-						if (oMenuItem.cfg.getProperty("url") == "#") {
-
-							oMenuItemLabel.removeAttribute("href");
+					function onSubmenuShow() {
+					
+						var oIFrame;
+	
+	
+						if (this.id == "filemenu") {
+							
+							Dom.setX(this.element, 0);
+	
+							oIFrame = this.iframe;            
+				
+	
+							if (oIFrame) {
+					
+								Dom.setX(oIFrame, 0);
+					
+							}
+							
+							this.cfg.setProperty("x", 0, true);
 						
 						}
 
 
 						/*
-							If the MenuItem has a submenu, set the "aria-haspopup" attribute to 
-							true so that the screen reader can announce 
+							Need to set the width for submenus of submenus in IE to prevent the mouseout 
+							event from firing prematurely when the user mouses off of a MenuItem's 
+							text node.
 						*/
-
-						if (oMenuItem.cfg.getProperty("submenu")) {
-						
-							oMenuItemLabel.setAttribute("aria-haspopup", true);
+	
+						if ((this.id == "filemenu" || this.id == "editmenu") && YAHOO.env.ua.ie) {
+	
+							oElement = this.element;
+							nOffsetWidth = oElement.offsetWidth;
+					
+							/*
+								Measuring the difference of the offsetWidth before and after
+								setting the "width" style attribute allows us to compute the 
+								about of padding and borders applied to the element, which in 
+								turn allows us to set the "width" property correctly.
+							*/
+							
+							oElement.style.width = nOffsetWidth + "px";
+							oElement.style.width = (nOffsetWidth - (oElement.offsetWidth - nOffsetWidth)) + "px";
 						
 						}
-
-					}
-					while (i--);
-					
-
-					/*
-						 Set the "tabindex" of the first MenuItem's label to 0 so the user can 
-						 easily tab into and out of the control.
-					*/
-
-					if (this.getRoot() == this) {
-					
-						this.getItem(0).element.firstChild.setAttribute("tabindex", 0);
 					
 					}
+					
+	
+					// Subscribe to the "show" event for each submenu
+					
+					oMenuBar.subscribe("show", onSubmenuShow);
+					
 				
+					/*
+						 Since this MenuBar instance is built completely from 
+						 script, call the "render" method passing in a node 
+						 reference for the DOM element that its should be 
+						 appended to.
+					*/
+					
+					oMenuBar.render(document.body);
+					
 				});
 			
-			
-				/*
-					 Since this MenuBar instance is built completely from 
-					 script, call the "render" method passing in a node 
-					 reference for the DOM element that its should be 
-					 appended to.
-				*/
-				
-				oMenuBar.render(document.body);
-				
-			});
+			}());
 		
 		</script>
 
 	</head>
-	<body class="yui-skin-sam">
-	</body>
+	<body class="yui-skin-sam"></body>
 </html>

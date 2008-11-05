@@ -369,6 +369,10 @@ sub www_editAddress {
                 {name=>"code", defaultValue=>($form->get("code") || ((defined $address) ? $address->get('code') : undef))}),
         phoneNumberField    => WebGUI::Form::phone($session, 
                 {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $address) ? $address->get('phoneNumber') : undef))}),
+        emailField          => WebGUI::Form::email($session, 
+                {name=>"email", defaultValue=>($form->get("email") || ((defined $address) ? $address->get('email') : undef))}),
+        organizationField    => WebGUI::Form::text($session, 
+                {name=>"organization", defaultValue=>($form->get("organization") || ((defined $address) ? $address->get('organization') : undef))}),
     );
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressTemplateId"));
     $template->prepare;
@@ -425,6 +429,8 @@ sub www_editAddressSave {
         code            => $form->get("code","zipcode"),
         country         => $form->get("country","country"),
         phoneNumber     => $form->get("phoneNumber","phone"),
+        email           => $form->get("email","email"),
+        organization    => $form->get("organization"),
         );
     if ($form->get('addressId') eq '') {
         $self->addAddress(\%addressData);

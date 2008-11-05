@@ -15,7 +15,7 @@ package WebGUI::Form::ClassName;
 =cut
 
 use strict;
-use base 'WebGUI::Form::Text';
+use base 'WebGUI::Form::ReadOnly';
 use WebGUI::International;
 
 =head1 NAME
@@ -28,7 +28,7 @@ Creates a field for typing in perl class names which is validated for taint safe
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Text.
+This is a subclass of WebGUI::Form::ReadOnly.
 
 =head1 METHODS 
 
@@ -63,33 +63,6 @@ sub getValue {
     my $value = $self->SUPER::getValue(@_);
 	$value =~ s/[^\w:]//g;
 	return $value;
-}
-
-#-------------------------------------------------------------------
-
-=head2 isDynamicCompatible ( )
-
-Returns 0.
-
-=cut
-
-sub isDynamicCompatible {
-    return 0;
-}
-
-#-------------------------------------------------------------------
-
-=head2 toHtml ( )
-
-Renders a class name field.
-
-=cut
-
-sub toHtml {
-	my $self = shift;
-	$self->session->style->setScript($self->session->url->extras('inputCheck.js'),{ type=>'text/javascript' });
-	$self->set("extras", $self->get('extras') . ' onkeyup="doInputCheck(document.getElementById(\''.$self->get("id").'\'),\'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:_\')" ');
-	return $self->SUPER::toHtml;
 }
 
 1;

@@ -221,7 +221,8 @@ sub www_editProfile {
 			push(@temp, {
 				'profile.form.element' => $field->formField,
 				'profile.form.element.label' => $field->getLabel,
-				'profile.form.element.subtext' => $field->isRequired ? "*" : undef
+				'profile.form.element.subtext' => $field->isRequired ? "*" : undef,
+                'profile.form.element.extras' => $field->getExtras,
 				});
 		}
 		push(@array, {
@@ -306,8 +307,9 @@ sub www_viewProfile {
             next unless ($field->get("visible"));
             next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
             push @array, {
-                'profile.label' => $field->getLabel,
-                'profile.value' => $field->formField(undef,2,$u),
+                'profile.label'     => $field->getLabel,
+                'profile.value'     => $field->formField(undef,2,$u),
+                'profile.extras'    => $field->getExtras,
             };
         }
     }

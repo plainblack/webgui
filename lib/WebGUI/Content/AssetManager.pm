@@ -283,7 +283,7 @@ sub www_ajaxGetManagerPage {
             assetId         => $asset->getId,
             url             => $asset->getUrl,
             lineage         => $asset->get( "lineage" ),
-            title           => $asset->get( "title" ),
+            title           => $asset->get( "menuTitle" ),
             revisionDate    => $asset->get( "revisionDate" ),
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
@@ -371,21 +371,13 @@ sub www_manage {
         }
     }
 
-    # Handle Auto Request Commit setting
-    if ($session->setting->get("autoRequestCommit")) {
-        # Make sure version tag hasn't already been committed by another process
-        my $versionTag = WebGUI::VersionTag->getWorking($session, "nocreate");
-
-        if ($versionTag && $session->setting->get("skipCommitComments")) {
-            $versionTag->requestCommit;
-        }
-        elsif ($versionTag) {
-            $session->http->setRedirect(
-                $currentAsset->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($session)->getId)
-            );
-            return undef;
-        }
-    }
+    # Handle autocommit workflows
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        allowComments   => 1,
+        returnUrl       => $currentAsset->getUrl,
+    }) eq 'redirect' ) {
+        return undef;
+    };
 
     # Show the page
     # i18n we'll need later
@@ -395,14 +387,14 @@ sub www_manage {
     );
 
     # Add script and stylesheets
+    $session->style->setLink( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/element/element-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/utilities/utilities.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/paginator/paginator-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
@@ -410,7 +402,10 @@ sub www_manage {
 
     my $extras      = $session->url->extras;
     $session->style->setRawHeadTags( <<ENDHTML );
-    <script type="text/javascript">
+    <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.6.0/build/logger/assets/skins/sam/logger.css">
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/logger/logger-min.js"></script> 
+
+<script type="text/javascript">
         WebGUI.AssetManager.extrasUrl   = '$extras';
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
@@ -519,44 +514,6 @@ ENDHTML
                     ;
 
     $output         .= <<"ENDJS";
-    // Start the data source
-    WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage',{connTimeout:30000} );
-    WebGUI.AssetManager.DataSource.responseType
-        = YAHOO.util.DataSource.TYPE_JSON;
-    WebGUI.AssetManager.DataSource.responseSchema
-        = {
-            resultsList: 'assets',
-            totalRecords: 'totalAssets',
-            fields: [
-                { key: 'assetId' },
-                { key: 'lineage' },
-                { key: 'actions' },
-                { key: 'title' },
-                { key: 'className' },
-                { key: 'revisionDate' },
-                { key: 'assetSize' },
-                { key: 'lockedBy' },
-                { key: 'icon' },
-                { key: 'url' },
-                { key: 'childCount' }
-            ]
-        };
-
-    WebGUI.AssetManager.DefaultSortedBy = { 
-        "key"       : "lineage",
-        "dir"       : YAHOO.widget.DataTable.CLASS_ASC
-    };
-    
-    WebGUI.AssetManager.BuildQueryString
-    = function ( state, dt ) {
-        var query = ";recordOffset=" + state.pagination.recordOffset 
-                + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
-                + ';rowsPerPage=' + state.pagination.rowsPerPage
-                + ';orderByColumn=' + state.sorting.key
-                ;
-            return query;
-        };
 
     var selectAllButton = "<input type=\\"checkbox\\" title=\\"$i18n{"select all"}\\" onclick=\\"WebGUI.Form.toggleAllCheckboxesInForm( document.forms[0], 'assetId' );\\" />";
 ENDJS
@@ -720,7 +677,7 @@ sub www_search {
                     alt             => ( $count % 2 == 0 ? 'class="alt"' : '' ),
                     assetId         => $asset->getId,
                     url             => $asset->getUrl,
-                    title           => $asset->get( "title" ),
+                    title           => $asset->get( "menuTitle" ),
                     revisionDate    => $session->datetime->epochToHuman( $asset->get( "revisionDate" ) ),
                     hasChildren     => ( $asset->hasChildren ? "+&nbsp;" : "&nbsp;&nbsp;" ),
                     rank            => $asset->getRank,

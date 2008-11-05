@@ -821,7 +821,7 @@ sub www_getBadgesAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -838,7 +838,7 @@ sub www_getRegistrantAsJson {
 	my $session = $self->session;
 	my $db = $session->db;
     return $session->privilege->insufficient() unless $self->canView;
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
 	my @tickets = ();
 	my @tokens = ();
 	my @ribbons = ();
@@ -1017,7 +1017,7 @@ sub www_getRegistrantsAsJson {
     $results{'dir'}          = "asc";
 	
 	# build json datasource
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1052,7 +1052,7 @@ sub www_getRibbonsAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1204,7 +1204,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'startIndex'}   	= $startIndex;
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1239,7 +1239,7 @@ sub www_getTokensAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 

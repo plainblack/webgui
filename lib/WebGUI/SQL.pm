@@ -925,19 +925,20 @@ sub setRow {
 	my ($self, $table, $keyColumn, $data, $id) = @_;
 	if ($data->{$keyColumn} eq "new" || $id) {
 		$data->{$keyColumn} = $id || $self->session->id->generate();
-		$self->write("replace into $table ($keyColumn) values (?)",[$data->{$keyColumn}]);
+		$self->write("replace into $table (" . $self->dbh->quote_identifier($keyColumn) . ") values (?)",[$data->{$keyColumn}]);
 	}
 	my @fields = ();
 	my @data = ();
 	foreach my $key (keys %{$data}) {
 		unless ($key eq $keyColumn) {
-			push(@fields, $key.'=?');
+			push(@fields, $self->dbh->quote_identifier($key).'=?');
 			push(@data,$data->{$key});
 		}
 	}
 	if ($fields[0] ne "") {
 		push(@data,$data->{$keyColumn});
-		$self->write("update $table set ".join(", ", @fields)." where ".$keyColumn."=?",\@data);
+		$self->write("update $table set " . join(", ", @fields)
+            . " where " . $self->dbh->quote_identifier($keyColumn) . "=?", \@data);
 	}
 	return $data->{$keyColumn};
 }
@@ -971,7 +972,8 @@ sub unconditionalRead {
 
 =head2 write ( sql, params )
 
-A method specifically designed for writing to the database in an efficient manner. 
+A method specifically designed for writing to the database in an efficient manner. Returns
+the number of rows effected.
 
 =head3 sql
 

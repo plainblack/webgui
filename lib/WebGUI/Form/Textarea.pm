@@ -62,27 +62,34 @@ Style attributes besides width and height which should be specified using the ab
 
 A boolean indicating whether the text area can be reized by users. Defaults to 1.
 
+=head4 maxlength
+
+The maximum number of characters to allow in this field. If not defined, will not do any limiting.
+
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift || [];
-	push(@{$definition}, {
+	my $class       = shift;
+	my $session     = shift;
+	my $definition  = shift || [];
+	push @{$definition}, {
 		height=>{
 			defaultValue=> 150
-			},
+        },
 		width=>{
 			defaultValue=> 400
-			},
+        },
 		style=>{
 			defaultValue => undef,
-			},
+        },
 		resizable => {
 			defaultValue => 1,
-			},
-		});
-        return $class->SUPER::definition($session, $definition);
+        },
+        maxlength => {
+            defaultValue    => ''
+        },
+    };
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -138,14 +145,31 @@ sub toHtml {
 	my ($style, $url) = $self->session->quick(qw(style url));
 	my $styleAttribute = "width: ".$width."px; height: ".$height."px; ".$self->get("style");
     $style->setRawHeadTags(qq|<style type="text/css">\ntextarea#|.$self->get('id').qq|{ $styleAttribute }\n</style>|);
-	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '.$self->get("extras").' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>';
+	my $out = '<textarea id="'.$self->get('id').'" name="'.$self->get("name").'" '
+            . ( $self->get("maxlength") ? 'maxlength="' . $self->get( "maxlength" ) . '" ' : '' )
+            . $self->get("extras") . ' rows="#" cols="#" style="width: '.$width.'px; height: '.$height.'px;">'.$value.'</textarea>'
+            ;
+
+    # Add the maxlength script
+    $style->setScript( 
+        $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ), 
+        { text => 'text/javascript' },
+    );
+    $style->setScript( 
+        $url->extras( 'yui-webgui/build/form/textarea.js' ), 
+        { type => 'text/javascript' }, 
+    );
+    $style->setRawHeadTags( q|
+        <script type="text/javascript">
+            YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
+        </script>
+    | );
+
 	if ($self->get("resizable")) {
         $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
         $style->setLink($url->extras("resize-skin.css"), {type=>"text/css", rel=>"stylesheet"});
-        $style->setScript($url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/dragdrop/dragdrop.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/element/element-beta.js"), {type=>"text/javascript"});
-        $style->setScript($url->extras("yui/build/resize/resize-beta.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/utilities/utilities.js"), {type=>"text/javascript"});
+        $style->setScript($url->extras("yui/build/resize/resize.js"), {type=>"text/javascript"});
         $out = qq|
             <div id="resize_| . $self->get('id'). qq|" style="width: | . ($width + 6) . qq|px; height: | . ($height + 6) . qq|px; overflow: hidden">
             $out

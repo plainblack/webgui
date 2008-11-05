@@ -39,6 +39,61 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 autoCommitWorkingIfEnabled ( $session, $options )
+
+A class method that automatically commits the working version tag if auto commit is
+enabled.  Returns 'commit' if the tag was committed, 'redirect' if a redirect for
+comments was set (only possible with allowComments), or false if no action was taken.
+
+=head3 $options
+
+Hashref with options for how to do auto commit
+
+=head4 override
+
+Do autocommit even if not enabled for the site
+
+=head4 allowComments
+
+Whether to allow comments to be added.  If enabled, instead of
+committing directly, will set a redirect for the user to enter
+a comment.
+
+=head4 returnUrl
+
+If allowComments is enabled, the URL to return to after committing
+
+=cut
+
+sub autoCommitWorkingIfEnabled {
+    my $class = shift;
+    my $session = shift;
+    my $options = shift || {};
+    # need a version tag to do any auto commit
+    my $versionTag = $class->getWorking($session, "nocreate");
+    return undef
+        unless $versionTag;
+    # auto commit assets
+    # save and commit button and site wide auto commit work the same
+    if (
+        $options->{override}
+        || $session->setting->get("autoRequestCommit")
+    ) {
+        if ($session->setting->get("skipCommitComments") || !$options->{allowComments}) {
+            $versionTag->requestCommit;
+            return 'commit';
+        }
+        else {
+            my $url = $options->{returnUrl} || $session->url->page;
+            $url = $session->url->append($url, "op=commitVersionTag;tagId=" . $versionTag->getId);
+            $session->http->setRedirect($url);
+            return 'redirect';
+        }
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 clearWorking ( )
 
 Makes it so this tag is no longer the working tag for any user.
@@ -407,6 +462,7 @@ fails.
 
 sub requestCommit {
 	my $self = shift;
+    
 	$self->lock;
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),
@@ -417,7 +473,7 @@ sub requestCommit {
 	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-    $instance->start;
+    return $instance->start;
     return undef;
 }
 

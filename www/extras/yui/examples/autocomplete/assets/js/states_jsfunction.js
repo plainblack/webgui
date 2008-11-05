@@ -1,4 +1,4 @@
-function getStates(sQuery) {
+var getStates = function(sQuery) {
     aResults = [];
     if(sQuery && sQuery.length > 0) {
         var charKey = sQuery.substring(0,1).toLowerCase();
@@ -22,7 +22,7 @@ function getStates(sQuery) {
     else {
         for(var letter in dataset) {
             var oResponse = dataset[letter];
-            for(var i = oResponse.length-1; i >= 0; i--) {
+            for(var i = 0; i < oResponse.length; i++) {
                 aResults.push([oResponse[i].STATE, oResponse[i].ABBR]);
             }
         }

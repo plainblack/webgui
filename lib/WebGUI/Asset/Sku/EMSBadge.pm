@@ -396,7 +396,7 @@ sub view {
                         });
     $vars{organization} = WebGUI::Form::text($session, {
                             name         => 'organization',
-                            defaultValue => $form->get("organization"),
+                            defaultValue => (defined $address) ? $address->get("organization") : $form->get('organization'),
                         });
     $vars{address1} = WebGUI::Form::text($session, {
                             name         => 'address1',
@@ -432,7 +432,7 @@ sub view {
                         });
     $vars{email}  = WebGUI::Form::text($session, {
                             name         => 'email',
-                            defaultValue => $form->get('email','email'),
+                            defaultValue => (defined $address) ? $address->get('email') : $form->get('email','email'),
                         });
     if($self->getQuantityAvailable() > 0){ 
         $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});

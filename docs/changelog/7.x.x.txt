@@ -1,3 +1,40 @@
+7.6.2
+ - fixed: not allowed to add calendar events if in can edit group but not can add event group
+ - sped up lineage changes significantly
+ - fixed: site starter fails after site style page
+ - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
+ - fixed #8980: possible to execute arbitrary perl code as any user that can upload files
+ - added extras to user profile fields. these can be accessed using the
+   profile.form.element.extras template variable when editing a profile
+   and the profile.extras field when viewing a profile.
+ - Added the NotifyAboutThing workflow activity. Use this activity to create
+   workflows for the add / edit / delete workflows for a thingy's things.
+ - Fixed basic auth to work on WRE demo servers.
+ - fixed #8839: Documentation is wrong for Stock Ticker
+ - Added Guid form control.
+ - Moved Asset ID and Class Name fields to the Meta tab of all assets.
+ - Made Classname from control a subclass of ReadOnly.
+ - Added query keys to WebGUI::Crud.
+ - EMS Saved Address  (#8864)
+ - rfe: Inclusion of UsersOnline macro into the core  (#766)
+ - rfe: Search - Paginate results  (#713)
+ - rfe: Leave Version Tag
+ - Migrated WebGUI::TabForm to use YUI tabs rather than the old fashioned
+   WebGUI tabs.
+ - WebGUI::Crud can now automatically resolve differences between its
+   definition and the table schema.
+ - Fixed a limit bug in the asset discovery service.
+ - Fixed #8853: link to manageWorkflows is broken
+ - Added: WebGUI::Pluggable find() and findAndLoad() for easier module loading
+ - Added RFE #327: Select All button to class list in Search asset
+ - Fixed #8984: Weather Asset missing hoverhelp
+ - Fixed #8983: Missing Help in Group Edit screen
+ - Fixed #8899: Calendar feeds somehow cause edit screen to fail
+ - Fixed #8891: Calendar still pulls feeds when in trash
+ - Fixed #8981: style template help -- Macro being replaced
+ - Fixed #8818: Visitor sends a welcome message
+ - Added: Google siteindex
+
 7.6.1
  - changed: the list of extensions for the export system to pass through
    unmodified has been moved to the configuration file under the
@@ -51,6 +88,7 @@
  - added: "EditArea" code highlighter and editing tool for WebGUI::Form::Codearea, used
     in Template, Snippet, SQLReport, and more
  - fixed: email password recovery allows sending recovery mail to arbitrary address
+ - added: WebGUI::AssetCollateral::DataForm::Entry object for managing DataForm entries
 
 7.6.0
  - added: users may now customize the post received page for the CS
@@ -117,6 +155,43 @@
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
+
+7.5.31
+ - fixed: debian licensing problem with user list
+ - fixed: Wrong password behaviour  (#8905)
+ - fixed: Duplicate Root URLs Allowed  (#8900)
+ - fixed: Edit branch not working with noCache  (#4154)
+ - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
+   in about 3 years. 
+ - Fixed #8984: Weather Asset missing hoverhelp
+ - fixed #4177: You can send your people on your friends list a friends request  
+ - Fixed #8924: useProfile: s/viewable/visible/ig
+
+7.5.30
+ - fixed: can't add EMS tickets to badges
+ - fixed 8962: Wrong mime-type used for json data
+ - fixed: default site has no content
+ - fixed: possible to execute arbitrary perl code as any user that can upload files
+
+7.5.29
+ - fixed: Site Nav is broken
+
+7.5.28
+ - Fixed #8890: meta_loop in post form not working (United Knowledge)
+ - added: ldaps and ldapi are now supported when working with LDAP authentication
+ - rfe #740: Thingy Pre-Text (SDH Consulting Group)
+ - rfe #746: use the menu title in asset manager
+ - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
+ - rfe #637: Alphabetize wiki items under a keyword?
+ - Autocommit assets like CS posts or Calendar Events can now be added before the
+    parent is committed.  They will go into the same version tag as their parent.
+ - rfe #640: Refactored autocommit and autocomment
+ - added a perltidyrc to the docs folder. we'll be using this to clean up code.
+ - fixed: Site Nav navigation template can now be used more than once per page
+ - added: TextArea now supports "maxlength" attribute
+ - added: DataForm can now run a workflow when an entry is added
+ - Fixed #8921: Duplicating templates through conventional methods maintains default template flag
+ - Fixed #8962: Wrong mime-type used for json data
 
 7.5.24
  - fixed: Spelling mistake on site starter

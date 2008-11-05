@@ -1,4 +1,4 @@
-Restaurant|Location|Town|Telephone|Stars|Website
+Restaurant|Location|Town|Telephone|Stars|Url
 Domino's Pizza|615 Caliente Dr|Sunnyvale|(408) 732-3030|4|http://local.yahoo.com/details?id=21335892&amp;stx=pizza&amp;csz=Sunnyvale+CA&amp;ed=17rS8q160Sy5Htog0TF1m1atNv01Iz7ySeGEMtCL4dJsf1ku0nhziD2qN5XcnHlJtDS4IydIbA--
 Pizza Depot|919 E Duane Ave|Sunnyvale|(408) 245-7760|3.5|http://local.yahoo.com/details?id=21332021&amp;stx=pizza&amp;csz=Sunnyvale+CA&amp;ed=6tiAL6160Sx1XVIEu1zIWPu6fD8rJDV4.offJLNUTb1Ri2Q.R5oLTYvDCz8YmzivI7Bz0gfrpw--
 Pizza Hut|464 N Mathilda Ave|Sunnyvale|(408) 735-1900|2.5|http://local.yahoo.com/details?id=21340811&amp;stx=pizza&amp;csz=Sunnyvale+CA&amp;ed=syVWvq160Szz0Q60Q8N7uetWGoUIbThLIdulmQLubJ29CuU7wpxDvDxrLF4md791a4jW7kNRr9eSVQ--

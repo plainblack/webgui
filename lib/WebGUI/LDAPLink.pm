@@ -56,14 +56,14 @@ cannot be established
 
 sub bind {
 	my $self = shift;
-	my ($uri, $ldap, $auth, $result, $error);
+	my ($uri, $auth, $result, $error);
 	
 	if (defined $self->{_connection}) {
 		return $self->{_connection};
 	}
 	
-	my $ldapUrl = $self->{_ldapLink}->{ldapUrl};
-	my $connectDn = $self->{_ldapLink}->{connectDn};
+	my $ldapUrl    = $self->{_ldapLink}->{ldapUrl};
+	my $connectDn  = $self->{_ldapLink}->{connectDn};
 	my $identifier = $self->{_ldapLink}->{identifier};
 		
 	if ($ldapUrl eq "") {
@@ -71,25 +71,52 @@ sub bind {
 		return 0;
 	} 
 	
-	if ($uri = URI->new($ldapUrl)) {
-		unless ($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))) {
-			$self->{_error} = 103;
-			return 0;
-		}
+	my $ldap = $self->connectToLDAP($ldapUrl);
+
+	return 0 unless ($ldap);
 	
-		$auth = $ldap->bind(dn=>$connectDn, password=>$identifier);
-		if ($auth->code == 48 || $auth->code == 49) {
-			$self->{_error} = 104;
-		} elsif($auth->code > 0) {
-			$self->{_error} = $auth->code;
-		}
-        $self->{_uri       } = $uri;
-		$self->{_connection} = $ldap;
-	} else {
-		$self->{_error} = 105;
-		return 0;
-	}
-	return $self->{_connection};
+	$auth = $ldap->bind(dn=>$connectDn, password=>$identifier);
+	if ($auth->code == 48 || $auth->code == 49) {
+		$self->{_error} = 104;
+    } elsif($auth->code > 0) {
+		$self->{_error} = $auth->code;
+    }
+    
+    return $ldap;
+}
+
+#-------------------------------------------------------------------
+
+=head2 connectToLDAP ( )
+
+Attempts to bind to an LDAP server returning the Net::LDAP object if successful
+
+=cut
+
+sub connectToLDAP {
+	my $self    = shift;
+    my $ldapUrl = shift || $self->getValue("ldapUrl");
+    my $uri     = URI->new($ldapUrl);
+    
+    unless ($uri) {
+        $self->{_error} = 105;
+        return undef;
+    }
+    
+    $self->{_uri} = $uri;
+    my $ldap = Net::LDAP->new($uri->host,
+        port   => $uri->port,   #Port will default to 389 or 636
+        scheme => $uri->scheme
+    );
+    
+    unless($ldap) {
+        $self->{_error} = 103;
+        return undef;
+    }
+
+    $self->{_connection} = $ldap;
+    
+    return $ldap;
 }
 
 #-------------------------------------------------------------------

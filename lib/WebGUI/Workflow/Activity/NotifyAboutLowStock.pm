@@ -71,9 +71,9 @@ sub definition {
 				},
 			subject => {
 				fieldType=>"text",
-				label=>$i18n->get("subject", 'Asset_DataForm'),
+				label=>$i18n->get("229", 'WebGUI'),
 				defaultValue=>'',
-				hoverHelp=>$i18n->get("subject help", 'Asset_DataForm'),
+				hoverHelp=>$i18n->get("229 description", 'WebGUI'),
 				},
 			}
 		});

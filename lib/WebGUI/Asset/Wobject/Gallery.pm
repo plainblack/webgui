@@ -648,6 +648,8 @@ sub getAssetClassForFile {
     my $self        = shift;
     my $filepath    = shift;
 
+    $self->session->log->info( "Checking asset class for file '$filepath'" );
+
     # Checks for Photo assets
     if ( $filepath =~ /\.(jpe?g|gif|png)$/i ) {
         return "WebGUI::Asset::File::GalleryFile::Photo";
@@ -1122,7 +1124,7 @@ sub www_addAlbumService {
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
 
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->pretty->encode($document);
 }
 
@@ -1276,10 +1278,10 @@ sub www_listAlbumsService {
     my $count = 1;
 
     for my $assetId ( @{ $self->getAlbumIds } ) {
-        if ($count < $pageNumber * 100 - 99) { # skip low page numbers
+        if ($count < $pageNumber * 100 - 100) { # skip low page numbers
             next;
         }
-        if ($count > $pageNumber * 100) { # skip high page numbers
+        if ($count > $pageNumber * 100 - 1) { # skip high page numbers
             last;
         }        
         my $asset       = WebGUI::Asset->new( $session, $assetId, 'WebGUI::Asset::Wobject::GalleryAlbum' );
@@ -1315,7 +1317,7 @@ sub www_listAlbumsService {
         $session->http->setMimeType('text/xml');
         return XML::Simple::XMLout($document, NoAttr => 1);
     }
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->pretty->encode($document);
 }
 

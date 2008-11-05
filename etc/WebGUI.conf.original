@@ -325,7 +325,7 @@
    "workflow" : {
       "icon" : "workflow.gif",
       "uiLevel" : 7,
-      "url" : "^PageUrl(\"\",manageWorkflows);",
+      "url" : "^PageUrl(\"\",op=manageWorkflows);",
       "title" : "^International(topicName,Workflow);",
       "groupSetting" : "groupIdAdminWorkflow"
    },
@@ -604,6 +604,9 @@
       "isContainer" : 1,
       "category" : "intranet"
    },
+   "WebGUI::Asset::Wobject::DataForm" : {
+       "category" : "basic"
+   },
    "WebGUI::Asset::Template" : {
       "category" : "utilities"
    }
@@ -688,8 +691,10 @@
     "RootTitle"        : "RootTitle", 
     "r"                : "r_printable", 
     "Spacer"           : "Spacer", 
+    "SpectreCheck"     : "SpectreCheck",
     "Thumbnail"        : "Thumbnail", 
     "User"             : "User", 
+    "UsersOnline"      : "UsersOnline", 
     "u"                : "u_companyUrl",
     "ViewCart"         : "ViewCart"
     },
@@ -745,6 +750,9 @@
         "WebGUI::Workflow::Activity::SyncProfilesToLdap",
         "WebGUI::Workflow::Activity::TrashClipboard",
         "WebGUI::Workflow::Activity::TrashExpiredEvents"
+    ],
+    "WebGUI::Asset::Wobject::Thingy" : [
+        "WebGUI::Workflow::Activity::NotifyAboutThing"
     ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
@@ -825,9 +833,12 @@
     "WebGUI::Content::Maintenance",
     "WebGUI::Content::Referral",
     "WebGUI::Content::AssetManager",
+    "WebGUI::Content::AssetDiscovery",
+    "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
+    "WebGUI::Content::SiteIndex",
     "WebGUI::Content::Asset",
     "WebGUI::Content::NotFound"
     ],
@@ -836,36 +847,36 @@
 # extensions that the export system should pass through as-is instead of using
 # index.html
 "exportBinaryExtensions" : [
-    ".html",
-    ".htm",
-    ".txt",
-    ".pdf",
-    ".jpg",
-    ".css",
-    ".gif",
-    ".png",
-    ".doc",
-    ".xls",
-    ".xml",
-    ".rss",
-    ".bmp",
-    ".mp3",
-    ".js",
-    ".fla",
-    ".flv",
-    ".swf",
-    ".pl",
-    ".php",
-    ".php3",
-    ".php4",
-    ".php5",
-    ".ppt",
-    ".docx",
-    ".zip",
-    ".tar",
-    ".rar",
-    ".gz",
-    ".bz2"
+    "html",
+    "htm",
+    "txt",
+    "pdf",
+    "jpg",
+    "css",
+    "gif",
+    "png",
+    "doc",
+    "xls",
+    "xml",
+    "rss",
+    "bmp",
+    "mp3",
+    "js",
+    "fla",
+    "flv",
+    "swf",
+    "pl",
+    "php",
+    "php3",
+    "php4",
+    "php5",
+    "ppt",
+    "docx",
+    "zip",
+    "tar",
+    "rar",
+    "gz",
+    "bz2"
 ]
 
 }

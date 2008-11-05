@@ -9,7 +9,7 @@ our $I18N = {
 	},
 
     'apply' => {
-        message     => q{Apply},
+        message     => q{apply},
         lastUpdated => 0,
         context     => q{The label for the button to save and then return to the edit page.},
     },
@@ -567,8 +567,19 @@ as mouseover text in the asset properties tab.</p>|,
     },
 
     'Possible Values description' => {
-        message => q|<p>This field is used only for the Radio List and Select List data types. Enter
-the values you wish to appear, one per line.  Each line should be less than 255 characters long.</p>|,
+        message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values
+you wish to appear, one per line.<br />
+<br />If you want a different label for a value, the possible values list has to be
+formatted as follows:
+<pre>
+&#123;
+   "key1"=>"value1",
+   "key2"=>"value2",
+   "key3"=>"value3"
+   ...
+&#125;
+</pre>
+Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs|,
         lastUpdated => 1213247476,
     },
 

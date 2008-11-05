@@ -425,8 +425,9 @@ sub canAddEvent {
                 : $self->session->user
                 ;
 
-    return 1 if (        
+    return 1 if (
         $user->isInGroup( $self->get("groupIdEventEdit") ) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 
@@ -635,7 +636,8 @@ ENDHTML
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
     for my $feedId (keys %$feeds) {
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".encode_json($feeds->{$feedId}).");\n");
+        my %row = %{ $feeds->{ $feedId } };
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
     }
     $tab->raw('</script>');
     
@@ -1754,26 +1756,6 @@ sub wrapIcal {
     my @text    = ($text =~ m/.{0,75}/g);
     return join "\r\n ",@text;
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_add ( )
-
-Returns an error message if the collaboration system has not yet been posted.
-
-=cut
-
-sub www_add {
-	my $self    = shift;
-    
-    #Check to see if the asset has been committed
-    unless ($self->hasBeenCommitted ) {
-        my $i18n = WebGUI::International->new($self->session,"Asset_Calendar");
-        return $self->processStyle($i18n->get("asset not committed"));
-    }
-	return $self->SUPER::www_add( @_ );
-}
-
 
 #----------------------------------------------------------------------------
 

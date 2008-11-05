@@ -95,7 +95,8 @@ sub definition {
 				tab             => "properties",
 				hoverHelp       => $i18n->get("class limiter description"),
 				label           => $i18n->get("class limiter"),
-				options         => $session->db->buildHashRef("select distinct(className) from asset")
+				options         => $session->db->buildHashRef("select distinct(className) from asset"),
+                showSelectAll   => 1,
 				},
             useContainers => {
                 tab             => "properties",
@@ -104,7 +105,15 @@ sub definition {
                 fieldType       => "yesNo",
                 defaultValue    => 0,
                 },
-		);
+			paginateAfter => {
+				hoverHelp       => $i18n->get("paginate after help"),
+				label           => $i18n->get("paginate after"),
+				tab             => "display",
+				fieldType       => "integer",
+				defaultValue    => 25,
+				},
+ 		);
+
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'search.gif',
@@ -152,9 +161,9 @@ sub view {
 	my %var;
 	
     $var{'form_header'  } = WebGUI::Form::formHeader($session, {
-        action=>$self->getUrl("doit=1")
-    });
-    #.WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
+        action=>$self->getUrl
+		})
+    .WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
 	$var{'form_footer'  } = WebGUI::Form::formFooter($session);
 	$var{'form_submit'  } = WebGUI::Form::submit($session, {
         value=>$i18n->get("search")
@@ -187,7 +196,8 @@ sub view {
 
         #Set up the paginator
         my $p         = $search->getPaginatorResultSet (
-            $self->getUrl('doit=1;keywords='.$session->url->escape($keywords))            
+            $self->getUrl('doit=1;keywords='.$session->url->escape($keywords)),
+			$self->get("paginateAfter"),
         );
 
         my @results   = ();

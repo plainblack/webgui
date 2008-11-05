@@ -700,7 +700,7 @@ sub www_getTransactionsAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -722,10 +722,12 @@ sub www_manage {
     # set up all the files that we need
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/paginator/paginator-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-min.js'), {type=>'text/javascript'});
 
     # draw the html markup that's needed
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
@@ -746,43 +748,29 @@ YAHOO.util.Event.onDOMReady(function () {
     |;
     
     # the datasource deals with the stuff returned from www_getTransactionsAsJson
-    $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson')."');";
+    $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson;')."');";
     $output .= <<STOP;
     mySource.responseType   = DataSource.TYPE_JSON;
     mySource.responseSchema = {
         resultsList : 'records',
-        totalRecords: 'totalRecords',
         fields      : [ 'transactionCode', 'orderNumber', 'paymentDriverLabel',
-            'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage']
+            'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage'],
+        metaFields: {
+            totalRecords: "totalRecords" // Access to value in the server response
+        }
     };
 STOP
 
-    # paginator does the cool ajaxy pagination and makes the requests as needed
-    $output .= <<STOP;
-    var buildQueryString = function (state,dt) {
-        return ";startIndex=" + state.pagination.recordOffset +
-               ";keywords=" + Dom.get('keywordsField').value +
-               ";results=" + state.pagination.rowsPerPage;
-    };
-
-    var myPaginator = new Paginator({
-        containers         : ['paging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [10,25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-STOP
 
     # create the data table, and a special formatter for the view transaction urls
     $output .= <<STOP;
     var myTableConfig = {
-        initialRequest         : ';startIndex=0',
-        generateRequest        : buildQueryString,
-        paginationEventHandler : DataTable.handleDataSourcePagination,
-        paginator              : myPaginator
+        initialRequest         : 'startIndex=0',
+        dynamicData: true, // Enables dynamic server-driven data
+        sortedBy : {key:"orderNumber", dir:YAHOO.widget.DataTable.CLASS_DESC}, // Sets UI initial sort arrow
+        paginator              : new YAHOO.widget.Paginator({ rowsPerPage:25 })
     };
-    YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
+    formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
 STOP
 	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=view})
         .q{;transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
@@ -790,7 +778,7 @@ STOP
         }; 
         var myColumnDefs = [
     ';
-    $output .= '{key:"orderNumber", label:"'.$i18n->get('order number').'", formatter:YAHOO.widget.DataTable.formatViewTransaction},';
+    $output .= '{key:"orderNumber", label:"'.$i18n->get('order number').'", formatter:formatViewTransaction},';
     $output .= '{key:"dateOfPurchase", label:"'.$i18n->get('date').'",formatter:YAHOO.widget.DataTable.formatDate},';
     $output .= '{key:"username", label:"'.$i18n->get('username').'"},';
     $output .= '{key:"amount", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
@@ -800,15 +788,23 @@ STOP
     $output .= <<STOP;
     ];
     var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+    myTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        return oPayload;
+    }
 STOP
 
     # add the necessary event handler to the search button that sends the search request via ajax
     $output .= <<STOP;
     Dom.get('keywordSearchForm').onsubmit = function () {
-         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
-            myTable.onDataReturnInitializeTable, myTable);
+        var state = myTable.getState();
+        state.pagination.recordOffset = 0;
+        mySource.sendRequest('keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+            {success: myTable.onDataReturnInitializeTable, scope:myTable, argument:state});
         return false;
     };
+    
+     
 
 });
 </script>

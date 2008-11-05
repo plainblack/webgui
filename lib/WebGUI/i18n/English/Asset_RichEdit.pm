@@ -120,9 +120,9 @@ our $I18N = {
 		message => q|Cut|,
         	lastUpdated => 1115150778,
 	},
-	'copy' => {
+	'Copy' => {
 		message => q|Copy|,
-        	lastUpdated => 1115150778,
+        	lastUpdated => 1224381734,
 	},
 	'paste' => {
 		message => q|Paste|,

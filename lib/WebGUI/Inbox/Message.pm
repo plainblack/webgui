@@ -113,14 +113,20 @@ sub create {
 		subject=>$subject,
 		});
 	if (defined $mail) {
-        my $i18n = WebGUI::International->new($session, 'Inbox_Message');
-        my $pref = $i18n->get("from user preface");
-        $pref .= $session->db->quickScalar("SELECT username FROM users WHERE userId = ?",[$properties->{sentBy}]). ".";
-	    my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
+        my $preface = "";
+        my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
+        #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
+        unless ($fromUser->isVisitor || $fromUser->userId eq 3) {  #Can't use isAdmin because it will not send prefaces from normal users who in the admin group
+            my $i18n = WebGUI::International->new($session, 'Inbox_Message');
+            $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
+        }
+        my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
 		if ($msg =~ m/\<.*\>/) {
-			$mail->addHtml("<p>$pref</p><br />".$msg);
+            $msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
+			$mail->addHtml($msg);
 		} else {
-			$mail->addText($pref."\n\n".$msg);
+            $msg = $preface."\n\n".$msg if($preface ne "");
+			$mail->addText($msg);
 		}
 		$mail->addFooter;
 		$mail->queue;

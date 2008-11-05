@@ -9,6 +9,18 @@ our $I18N = {
 		context		=> q|vendor label|,
 	},
 
+    'organization' => {
+        message     => q|Organization|,
+        lastUpdated    => 0,
+        context        => q|address book label|,
+    },
+
+    'email' => {
+        message     => q|Email|,
+        lastUpdated    => 0,
+        context        => q|address book label|,
+    },
+
 	'Payment Information' => {
 		message 	=> q|Payment Information|,
 		lastUpdated	=> 0,
@@ -856,9 +868,9 @@ our $I18N = {
 	},
 
 	'choose shipping button' => { 
-		message => q|Choose Shipping Address|,
-		lastUpdated => 0,
-		context => q|a button the user clicks on to choose shipping information|
+		message => q|Choose Address|,
+		lastUpdated => 1224818677,
+		context => q|a button the user clicks on to choose shipping information and tax calculation|
 	},
 
 	'update cart button' => { 

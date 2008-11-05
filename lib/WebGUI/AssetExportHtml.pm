@@ -543,7 +543,7 @@ sub exportGetUrlAsPath {
         return Path::Class::File->new($exportPath, @pathComponents, $filename, $index);
     }
     else { # got a dot
-        my $extension = (fileparse($filename, qr/\.[^.]*/))[2]; # get just the extension
+        my $extension = (fileparse($filename, qr/[^.]*$/))[2]; # get just the extension
         
         # check if the file type is recognised by apache. if it is, return it
         # as-is. if not, slap on the directory separator, $index, and return

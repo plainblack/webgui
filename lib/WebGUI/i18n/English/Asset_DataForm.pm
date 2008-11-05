@@ -1001,6 +1001,18 @@ be useful, others may not.|,
             lastUpdated => 0,
             context     => q{Description of template variable},
         },
+
+    'editForm workflowIdAddEntry label' => {
+        message     => q{Add Entry Workflow},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'editForm workflowIdAddEntry description' => {
+        message     => q{Workflow to be run when an entry is added to the DataForm},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
 };
 
 1;

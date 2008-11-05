@@ -199,26 +199,42 @@
                 oMenuBar.render(document.body);
 
 
-                /*
-                    Add a "show" event listener that keeps the left-most
-                    submenu against the left edge of the browser viewport.
-                */
+                // Add a "show" event listener for each submenu.
                 
                 function onSubmenuShow() {
 
-                    if (this.id == "yahoo") {
-                
-                        YAHOO.util.Dom.setX(this.element, 0);
-                    
-                    }
-
-
-                    var oElement,
+					var oIFrame,
+						oElement,
                         nOffsetWidth;
-                    
 
-                    if ((this.id == "filemenu" || this.id == "editmenu") && 
-                        YAHOO.env.ua.ie) {
+
+					// Keep the left-most submenu against the left edge of the browser viewport
+
+					if (this.id == "yahoo") {
+						
+						YAHOO.util.Dom.setX(this.element, 0);
+
+						oIFrame = this.iframe;            
+			
+
+						if (oIFrame) {
+				
+							YAHOO.util.Dom.setX(oIFrame, 0);
+				
+						}
+						
+						this.cfg.setProperty("x", 0, true);
+					
+					}
+
+
+					/*
+						Need to set the width for submenus of submenus in IE to prevent the mouseout 
+						event from firing prematurely when the user mouses off of a MenuItem's 
+						text node.
+					*/
+
+                    if ((this.id == "filemenu" || this.id == "editmenu") && YAHOO.env.ua.ie) {
 
                         oElement = this.element;
                         nOffsetWidth = oElement.offsetWidth;

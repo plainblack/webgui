@@ -141,7 +141,7 @@
                         
 
                             /*
-                                There is a bug in gecko-based browsers where 
+                                There is a bug in gecko-based browsers and Opera where 
                                 an element whose "position" property is set to 
                                 "absolute" and "overflow" property is set to 
                                 "hidden" will not render at the correct width when
@@ -151,7 +151,7 @@
                                 property in addition to overflow.
                             */
 
-                            if (ua.gecko) {
+                            if (ua.gecko || ua.opera) {
                             
                                 oBody.style.width = oBody.clientWidth + "px";
                             
@@ -245,7 +245,7 @@
 
                         // Clear widths set by the "beforeshow" event handler
 
-                        if (ua.gecko) {
+                        if (ua.gecko || ua.opera) {
                         
                             oBody.style.width = "";
                         

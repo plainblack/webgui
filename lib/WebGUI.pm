@@ -1,7 +1,7 @@
 package WebGUI;
 
 
-our $VERSION = '7.6.1';
+our $VERSION = '7.6.2';
 our $STATUS = "beta";
 
 
@@ -53,7 +53,7 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
-=head2 authen ( requestObject, [ user, pass ])
+=head2 authen ( requestObject, [ user, pass, config ])
 
 HTTP Basic auth for WebGUI.
 
@@ -69,11 +69,15 @@ The username to authenticate with. Will pull from the request object if not spec
 
 The password to authenticate with. Will pull from the request object if not specified.
 
+=head3 config
+
+A reference to a WebGUI::Config object. One will be created if it isn't specified.
+
 =cut
 
 
 sub authen {
-    my ($request, $username, $password) = @_;
+    my ($request, $username, $password, $config) = @_;
     $request = Apache2::Request->new($request);
     my $server = Apache2::ServerUtil->server;
 	my $status = Apache2::Const::OK;
@@ -89,12 +93,12 @@ sub authen {
 		}
 	}
 
-	my $config = WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
+	$config ||= WebGUI::Config->new($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'));
 	my $cookies = APR::Request::Apache2->handle($request)->jar();
    
 	# determine session id
 	my $sessionId = $cookies->{$config->getCookieName};
-	my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'),$request->dir_config('WebguiConfig'), $request, $server, $sessionId);
+	my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'),$config->getFilename, $request, $server, $sessionId);
 	my $log = $session->log;
 	$request->pnotes(wgSession => $session);
 
@@ -167,10 +171,10 @@ sub handler {
 	my $auth = $request->headers_in->{'Authorization'};
     if ($auth =~ m/^Basic/) { # machine oriented
 		$auth =~ s/Basic //;
-		authen($request, split(":",MIME::Base64::decode_base64($auth)));
+		authen($request, split(":",MIME::Base64::decode_base64($auth)), $config);
     }
 	else { # realm oriented
-		$request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request)});
+		$request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
 	}
 	
 	# url handlers

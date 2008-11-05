@@ -218,116 +218,122 @@ Add or edit a profile field specified in form variable C<fid>.  Calls www_editPr
 
 #-------------------------------------------------------------------
 sub www_editProfileField {
-	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
-	my $i18n = WebGUI::International->new($session,"WebGUIProfile");
-        my $f = WebGUI::HTMLForm->new($session);
-	$f->submit;
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
+    my $i18n = WebGUI::International->new($session,"WebGUIProfile");
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->submit;
+    $f->hidden(
+        -name => "op",
+        -value => "editProfileFieldSave",
+    );
+    my $data = {};
+    if ($session->form->process("fid") ne 'new') {
         $f->hidden(
-		-name => "op",
-		-value => "editProfileFieldSave",
+            -name => "fid",
+            -value => $session->form->process("fid"),
         );
-	my $data = {};
-	if ($session->form->process("fid") ne 'new') {
-              	$f->hidden(
-			-name => "fid",
-			-value => $session->form->process("fid"),
-              	);
-		$f->readOnly(
-			-value => $session->form->process("fid"),
-			-label => $i18n->get(475),
-			-hoverHelp => $i18n->get('475 description'),
-		);
-		$data = WebGUI::ProfileField->new($session,$session->form->process("fid"))->get;
-	} else {
-               	$f->hidden(
-			-name => "new",
-			-value => 1,
-               	);
-               	$f->text(
-			-name => "fid",
-			-label => $i18n->get(475),
-			-hoverHelp => $i18n->get('475 description'),
-               	);
-	}
-	$f->text(
-		-name => "label",
-		-label => $i18n->get(472),
-		-hoverHelp => $i18n->get('472 description'),
-		-value => $data->{label},
-	);
-	$f->yesNo(
-		-name=>"visible",
-		-label=>$i18n->get('473a'),
-		-hoverHelp=>$i18n->get('473a description'),
-		-value=>$data->{visible}
-		);
-	$f->yesNo(
-                -name=>"editable",
-                -value=>$data->{editable},
-                -label=>$i18n->get('897a'),
-                -hoverHelp=>$i18n->get('897a description'),
-                );
-	$f->yesNo(
-		-name=>"required",
-		-label=>$i18n->get(474),
-		-hoverHelp=>$i18n->get('474 description'),
-		-value=>$data->{required}
-		);
-	$f->yesNo(
-		  -name => 'showAtRegistration',
-		  -label => $i18n->get('showAtRegistration label'),
-		  -hoverHelp => $i18n->get('showAtRegistration hoverHelp'),
-		  -value => $data->{showAtRegistration}
-		 );
-	$f->yesNo(
-		  -name => 'requiredForPasswordRecovery',
-		  -label => $i18n->get('requiredForPasswordRecovery label'),
-		  -hoverHelp => $i18n->get('requiredForPasswordRecovery hoverHelp'),
-		  -value => $data->{requiredForPasswordRecovery}
-		 );
-	if ($data->{fieldType} eq "Image") {
-		$f->yesNo(
-			-name=>"forceImageOnly",
-			-label=>$i18n->get('forceImageOnly label'),
-			-hoverHelp=>$i18n->get('forceImageOnly hoverHelp'),
-			-value=>$data->{forceImageOnly},
-			-defaultValue=>1,
-		);
-	}	
-	my $fieldType = WebGUI::Form::FieldType->new($session,
-		-name=>"fieldType",
-		-label=>$i18n->get(486),
-		-hoverHelp=>$i18n->get('486 description'),
-		-value=>ucfirst $data->{fieldType},
-		-defaultValue=>"Text",
-	);
-	$f->raw($fieldType->toHtmlWithWrapper());
-	$f->textarea(
-		-name => "possibleValues",
-		-label => $i18n->get(487),
-		-hoverHelp => $i18n->get('487 description'),
-		-value => $data->{possibleValues},
-	);
-	$f->textarea(
-		-name => "dataDefault",
-		-label => $i18n->get(488),
-		-hoverHelp => $i18n->get('488 description'),
-		-value => $data->{dataDefault},
-	);
-	my %hash;
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		$hash{$category->getId} = $category->getLabel;
-	}
-	$f->selectBox(
-		-name=>"profileCategoryId",
-		-options=>\%hash,
-		-label=>$i18n->get(489),
-		-hoverHelp=>$i18n->get('489 description'),
-		-value=>$data->{profileCategoryId}
-		);
-        $f->submit;
-	return _submenu($session,$f->print,'471',"WebGUIProfile");
+        $f->readOnly(
+            -value => $session->form->process("fid"),
+            -label => $i18n->get(475),
+            -hoverHelp => $i18n->get('475 description'),
+        );
+        $data = WebGUI::ProfileField->new($session,$session->form->process("fid"))->get;
+    } else {
+        $f->hidden(
+            -name => "new",
+            -value => 1,
+        );
+        $f->text(
+            -name => "fid",
+            -label => $i18n->get(475),
+            -hoverHelp => $i18n->get('475 description'),
+        );
+    }
+    $f->text(
+        -name => "label",
+        -label => $i18n->get(472),
+        -hoverHelp => $i18n->get('472 description'),
+        -value => $data->{label},
+    );
+    $f->yesNo(
+        -name=>"visible",
+        -label=>$i18n->get('473a'),
+        -hoverHelp=>$i18n->get('473a description'),
+        -value=>$data->{visible}
+    );
+    $f->yesNo(
+        -name=>"editable",
+        -value=>$data->{editable},
+        -label=>$i18n->get('897a'),
+        -hoverHelp=>$i18n->get('897a description'),
+    );
+    $f->yesNo(
+        -name=>"required",
+        -label=>$i18n->get(474),
+        -hoverHelp=>$i18n->get('474 description'),
+        -value=>$data->{required}
+    );
+    $f->yesNo(
+        -name => 'showAtRegistration',
+        -label => $i18n->get('showAtRegistration label'),
+        -hoverHelp => $i18n->get('showAtRegistration hoverHelp'),
+        -value => $data->{showAtRegistration}
+    );
+    $f->yesNo(
+        -name => 'requiredForPasswordRecovery',
+        -label => $i18n->get('requiredForPasswordRecovery label'),
+        -hoverHelp => $i18n->get('requiredForPasswordRecovery hoverHelp'),
+        -value => $data->{requiredForPasswordRecovery}
+    );
+    if ($data->{fieldType} eq "Image") {
+        $f->yesNo(
+            -name=>"forceImageOnly",
+            -label=>$i18n->get('forceImageOnly label'),
+            -hoverHelp=>$i18n->get('forceImageOnly hoverHelp'),
+            -value=>$data->{forceImageOnly},
+            -defaultValue=>1,
+        );
+    }	
+    my $fieldType = WebGUI::Form::FieldType->new($session,
+        -name=>"fieldType",
+        -label=>$i18n->get(486),
+        -hoverHelp=>$i18n->get('486 description'),
+        -value=>ucfirst $data->{fieldType},
+        -defaultValue=>"Text",
+    );
+    $f->raw($fieldType->toHtmlWithWrapper());
+    $f->textarea(
+        -name => "possibleValues",
+        -label => $i18n->get(487),
+        -hoverHelp => $i18n->get('487 description'),
+        -value => $data->{possibleValues},
+    );
+    $f->textarea(
+        -name => "dataDefault",
+        -label => $i18n->get(488),
+        -hoverHelp => $i18n->get('488 description'),
+        -value => $data->{dataDefault},
+    );
+    $f->textarea(
+        -name => "extras",
+        -label => $i18n->get('profile field extras label'),
+        -hoverHelp => $i18n->get('profile field extras hoverHelp'),
+        -value => $data->{extras},
+    );
+    my %hash;
+    foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
+        $hash{$category->getId} = $category->getLabel;
+    }
+    $f->selectBox(
+        -name=>"profileCategoryId",
+        -options=>\%hash,
+        -label=>$i18n->get(489),
+        -hoverHelp=>$i18n->get('489 description'),
+        -value=>$data->{profileCategoryId}
+    );
+    $f->submit;
+    return _submenu($session,$f->print,'471',"WebGUIProfile");
 }
 
 =head2 www_editProfileFieldSave ( $session )
@@ -363,6 +369,7 @@ sub www_editProfileFieldSave {
 		dataDefault=>$session->form->textarea("dataDefault"),
 		fieldType=>$session->form->fieldType("fieldType"),
 		forceImageOnly=>$session->form->yesNo("forceImageOnly"),
+        extras=>$session->form->text('extras'),
 		);
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {

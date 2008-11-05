@@ -15,6 +15,18 @@ if ( typeof WebGUI.AssetManager == "undefined" ) {
 WebGUI.AssetManager.extrasUrl   = '/extras/';
 // Keep track of the open more menus
 WebGUI.AssetManager.MoreMenusDisplayed = {};
+// Append something to a url:
+WebGUI.AssetManager.appendToUrl = function ( url, params ) {
+    var components = [ url ];
+    if (url.match(/\?/)) {
+        components.push(";");
+    }
+    else {
+        components.push("?");
+    }
+    components.push(params);
+    return components.join(''); 
+}
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.addHighlightToRow ( child )
@@ -48,10 +60,9 @@ WebGUI.AssetManager.findRow
     WebGUI.AssetManager.formatActions ( )
     Format the Edit and More links for the row
 */
-WebGUI.AssetManager.formatActions 
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML 
-        = '<a href="' + oRecord.getData( 'url' ) + '?func=edit;proceed=manageAssets">Edit</a>'
+        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
         + ' | '
         ;
     var more    = document.createElement( 'a' );
@@ -70,7 +81,7 @@ WebGUI.AssetManager.formatActions
     var menuItems   = [];
     for ( var i = 0; i < rawItems.length; i++ ) {
         var itemUrl     = rawItems[i].url.match( /<url>/ )
-                        ? rawItems[i].url.replace( "<url>", oRecord.getData( 'url' ) )
+                        ? rawItems[i].url.replace( /<url>(?:\?(.*))?/, WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), "$1") )
                         : oRecord.getData( 'url' ) + rawItems[i].url
                         ;
         menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
@@ -93,8 +104,7 @@ WebGUI.AssetManager.formatActions
     WebGUI.AssetManager.formatAssetIdCheckbox ( )
     Format the checkbox for the asset ID.
 */
-WebGUI.AssetManager.formatAssetIdCheckbox 
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatAssetIdCheckbox = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<input type="checkbox" name="assetId" value="' + oRecord.getData("assetId") + '"'
         + 'onchange="WebGUI.AssetManager.toggleHighlightForRow( this )" />';
 };
@@ -103,8 +113,7 @@ WebGUI.AssetManager.formatAssetIdCheckbox
     WebGUI.AssetManager.formatAssetSize ( )
     Format the asset class name
 */
-WebGUI.AssetManager.formatAssetSize
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatAssetSize = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = oRecord.getData( "assetSize" );
 };
 
@@ -112,8 +121,7 @@ WebGUI.AssetManager.formatAssetSize
     WebGUI.AssetManager.formatClassName ( )
     Format the asset class name
 */
-WebGUI.AssetManager.formatClassName
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatClassName = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<img src="' + oRecord.getData( 'icon' ) + '" /> '
         + oRecord.getData( "className" );
 };
@@ -122,16 +130,15 @@ WebGUI.AssetManager.formatClassName
     WebGUI.AssetManager.formatLockedBy ( )
     Format the asset class name
 */
-WebGUI.AssetManager.formatLockedBy
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatLockedBy = function ( elCell, oRecord, oColumn, orderNumber ) {
     var extras  = WebGUI.AssetManager.extrasUrl;
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
-        ? '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+        ? '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
             + '<img src="' + extras + '/assetManager/locked.gif" alt="locked by ' + oRecord.getData( 'lockedBy' ) + '" '
             + 'title="locked by ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
-        : '<a href="' + oRecord.getData( 'url' ) + '?func=manageRevisions">'
+        : '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
             + '<img src="' + extras + '/assetManager/unlocked.gif" alt="unlocked" '
             + 'title="unlocked" border="0" />'
             + '</a>'
@@ -142,20 +149,39 @@ WebGUI.AssetManager.formatLockedBy
     WebGUI.AssetManager.formatRank ( )
     Format the input for the rank box
 */
-WebGUI.AssetManager.formatRank
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatRank = function ( elCell, oRecord, oColumn, orderNumber ) {
     var rank    = oRecord.getData("lineage").match(/[1-9][0-9]{0,5}$/); 
     elCell.innerHTML = '<input type="text" name="' + oRecord.getData("assetId") + '_rank" '
         + 'value="' + rank + '" size="3" '
         + 'onchange="WebGUI.AssetManager.selectRow( this )" />';
 };
 
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.DefaultSortedBy ( )
+*/
+WebGUI.AssetManager.DefaultSortedBy = { 
+    "key"       : "lineage",
+    "dir"       : YAHOO.widget.DataTable.CLASS_ASC
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.BuildQueryString ( )
+*/
+WebGUI.AssetManager.BuildQueryString = function ( state, dt ) {
+    var query = "recordOffset=" + state.pagination.recordOffset 
+            + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
+            + ';rowsPerPage=' + state.pagination.rowsPerPage
+            + ';orderByColumn=' + state.sorting.key
+            ;
+        return query;
+    };
+
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.formatRevisionDate ( )
     Format the asset class name
 */
-WebGUI.AssetManager.formatRevisionDate
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatRevisionDate = function ( elCell, oRecord, oColumn, orderNumber ) {
     var revisionDate    = new Date( oRecord.getData( "revisionDate" ) * 1000 );
     var minutes = revisionDate.getMinutes();
     if (minutes < 10)
@@ -170,11 +196,10 @@ WebGUI.AssetManager.formatRevisionDate
     WebGUI.AssetManager.formatTitle ( )
     Format the link for the title
 */
-WebGUI.AssetManager.formatTitle
-= function ( elCell, oRecord, oColumn, orderNumber ) {
+WebGUI.AssetManager.formatTitle = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML = '<span class="hasChildren">' 
         + ( oRecord.getData( 'childCount' ) > 0 ? "+" : "&nbsp;" )
-        + '</span> <a href="' + oRecord.getData( 'url' ) + '?op=assetManager;method=manage">'
+        + '</span> <a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'op=assetManager;method=manage') + '">'
         + oRecord.getData( 'title' )
         + '</a>'
         ;
@@ -184,8 +209,7 @@ WebGUI.AssetManager.formatTitle
     WebGUI.AssetManager.initManager ( )
     Initialize the www_manage page
 */
-WebGUI.AssetManager.initManager
-= function (o) {
+WebGUI.AssetManager.initManager = function (o) {
     var assetPaginator = new YAHOO.widget.Paginator({
         containers         : ['pagination'],
         pageLinks          : 7,
@@ -222,6 +246,34 @@ WebGUI.AssetManager.initManager
         // Send the request
         dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
     };
+ 
+   // initialize the data source
+   WebGUI.AssetManager.DataSource
+        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
+    WebGUI.AssetManager.DataSource.responseType
+        = YAHOO.util.DataSource.TYPE_JSON;
+    WebGUI.AssetManager.DataSource.responseSchema
+        = {
+            resultsList: 'assets',
+            fields: [
+                { key: 'assetId' },
+                { key: 'lineage' },
+                { key: 'actions' },
+                { key: 'title' },
+                { key: 'className' },
+                { key: 'revisionDate' },
+                { key: 'assetSize' },
+                { key: 'lockedBy' },
+                { key: 'icon' },
+                { key: 'url' },
+                { key: 'childCount' }
+            ],
+            metaFields: {
+                totalRecords: "totalAssets" // Access to value in the server response
+            }
+        };
+
+
 
     // Initialize the data table
     WebGUI.AssetManager.DataTable 
@@ -229,13 +281,19 @@ WebGUI.AssetManager.initManager
             WebGUI.AssetManager.ColumnDefs, 
             WebGUI.AssetManager.DataSource, 
             {
-                initialRequest          : ';recordOffset=0',
-                generateRequest         : WebGUI.AssetManager.BuildQueryString,
-                paginationEventHandler  : handlePagination,
+                initialRequest          : 'recordOffset=0',
+                dynamicData             : true,
                 paginator               : assetPaginator,
                 sortedBy                : WebGUI.AssetManager.DefaultSortedBy
             }
         );
+     WebGUI.AssetManager.DataTable.onPaginatorChangeRequest  = handlePagination;
+
+        
+    WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        return oPayload;
+    }
 
     // Override function for custom server-side sorting
     WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
@@ -279,8 +337,7 @@ WebGUI.AssetManager.initManager
     WebGUI.AssetManager.removeHighlightFromRow ( child )
     Remove the highlight from a row by removing the "highlight" class.
 */
-WebGUI.AssetManager.removeHighlightFromRow
-= function ( child ) {
+WebGUI.AssetManager.removeHighlightFromRow = function ( child ) {
     var row     = WebGUI.AssetManager.findRow( child );
     if ( YAHOO.util.Dom.hasClass( row, "highlight" ) ) {
         YAHOO.util.Dom.removeClass( row, "highlight" );
@@ -292,8 +349,7 @@ WebGUI.AssetManager.removeHighlightFromRow
     Check the assetId checkbox in the row that contains the given child. 
     Used when something in the row changes.
 */
-WebGUI.AssetManager.selectRow 
-= function ( child ) {
+WebGUI.AssetManager.selectRow = function ( child ) {
     // First find the row
     var node    = WebGUI.AssetManager.findRow( child );
     WebGUI.AssetManager.addHighlightToRow( child );
@@ -312,8 +368,7 @@ WebGUI.AssetManager.selectRow
     WebGUI.AssetManager.toggleHighlightForRow ( checkbox )
     Toggle the highlight for the row based on the state of the checkbox
 */
-WebGUI.AssetManager.toggleHighlightForRow
-= function ( checkbox ) {
+WebGUI.AssetManager.toggleHighlightForRow = function ( checkbox ) {
     if ( checkbox.checked ) {
         WebGUI.AssetManager.addHighlightToRow( checkbox );
     }
@@ -327,8 +382,7 @@ WebGUI.AssetManager.toggleHighlightForRow
     Toggles the entire row by finding the checkbox and doing what needs to be
     done.
 */
-WebGUI.AssetManager.toggleRow 
-= function ( child ) {
+WebGUI.AssetManager.toggleRow = function ( child ) {
     var row     = WebGUI.AssetManager.findRow( child );
     
     // Find the checkbox

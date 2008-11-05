@@ -26,6 +26,9 @@ our $HELP = {
                     {
                         name        => 'profile.value',
                     },
+                    {
+                        name        => 'profile.extras',
+                    },
                     
                 ],
             },
@@ -90,6 +93,9 @@ our $HELP = {
                             {
                                 name        => 'profile.form.element',
                                 required    => 1,
+                            },
+                            {
+                                name        => 'profile.form.extras',
                             },
                             {
                                 name        => 'profile.form.element.label',

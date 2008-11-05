@@ -109,10 +109,10 @@ sub handler {
         my $class = $form->get('className');
         if ($class ne '') {
             my $start = WebGUI::Asset->newByUrl($session);
-            my $limit = ($pageNumber * 100 - 99).','.($pageNumber * 100);
+            my $limit = ($pageNumber * 100 - 100).','.($pageNumber * 100 - 1);
             my $siteUrl = $session->url->getSiteURL;
             my $date = $session->datetime;
-            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className like ? limit ".$limit, [$start->get('lineage').'%', $class.'%']);
+            my $matchingAssets = $session->db->read("select assetId from asset where lineage like ? and className=? limit ".$limit, [$start->get('lineage').'%', $class]);
             while (my ($id) = $matchingAssets->array) {
                 my $asset = WebGUI::Asset->new($session, $id, $class);
                 if (defined $asset) {
@@ -138,7 +138,7 @@ sub handler {
             $session->http->setMimeType('text/xml');
             return XML::Simple::XMLout($document, NoAttr => 1);
         }
-        $session->http->setMimeType('text/json');
+        $session->http->setMimeType('application/json');
         return JSON->new->encode($document);
     }
     return undef;

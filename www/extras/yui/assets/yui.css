@@ -23,6 +23,15 @@ ul li {
 	list-style: disc outside;
 }
 
+/*
+AutoComplete Control CSS:
+Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 2.6.0
+*/
+.yui-skin-sam .yui-ac{position:relative;font-family:arial;font-size:100%;}.yui-skin-sam .yui-ac-input{position:absolute;width:100%;}.yui-skin-sam .yui-ac-container{position:absolute;top:1.6em;width:100%;}.yui-skin-sam .yui-ac-content{position:absolute;width:100%;border:1px solid #808080;background:#fff;overflow:hidden;z-index:9050;}.yui-skin-sam .yui-ac-shadow{position:absolute;margin:.3em;width:100%;background:#000;-moz-opacity:0.10;opacity:.10;filter:alpha(opacity=10);z-index:9049;}.yui-skin-sam .yui-ac iframe{opacity:0;filter:alpha(opacity=0);padding-right:.3em;padding-bottom:.3em;}.yui-skin-sam .yui-ac-content ul{margin:0;padding:0;width:100%;}.yui-skin-sam .yui-ac-content li{margin:0;padding:2px 5px;cursor:default;white-space:nowrap;list-style:none;zoom:1;}.yui-skin-sam .yui-ac-content li.yui-ac-prehighlight{background:#B3D4FF;}.yui-skin-sam .yui-ac-content li.yui-ac-highlight{background:#426FD9;color:#FFF;}
+
 /*begin YDN/YUI styles*/
 #bd {padding-top:1em;}
 .yui-gb:after{clear:none;}
@@ -101,7 +110,7 @@ h3.methods { border-top:none; margin-top:0; margin-bottom:.2em; font-size: 100%;
 #ft p { padding-bottom:2em; margin:0; text-align:center; font-size:80%; line-height:1.4em}
 #ft p.first { padding:1em 0 0 0; margin:0; }
 
-#pagetitle {background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border: 1px solid #93B2CC; position:relative;}
+#pagetitle {background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border: 1px solid #93B2CC; }
 #pagetitle h1 {text-indent:15px; padding:4px 0 2px 0; background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/title_h_bg.gif) 0 0 no-repeat;  margin:0; color:#000; font-size:120%; font-weight:bold; position:relative; left:-1px; top:-1px; margin-right:-2px;}
 #pagetitle h1 em {color:#FF9933; font-size:60%; font-weight:bold; font-style:normal; position:relative; top:-6px}
 
@@ -118,7 +127,7 @@ html>body #ygunav {overflow:hidden;}
 #ygunav .ygbt {background:#dcdcdc;font:110% verdana;position:relative;top:1px;}
 * html #ygunav .ygbt {top:4px;}
 * html>body #ygunav .ygbt {line-height:0;top:-4px;}
-#ygunav label {color:#666;font-family:tahoma;position:relative;top:1px;}
+#ygunav label {color:#666;font-family:tahoma;top:1px;}
 
 #bd ol.getstarted { margin:0; padding:0; }
 #bd ol.getstarted li { font-weight:bold; color:#668AA8; margin-bottom:1em; padding-left:20px; list-style-type:none;}
@@ -128,7 +137,7 @@ html>body #ygunav {overflow:hidden;}
 #bd p {margin-bottom:8px;}
 */
 
-#promo {zoom:1;border: 1px solid #B6CDE1; padding:1em; position:relative;  background-color:#FFF5DF;}
+#promo {zoom:1;border: 1px solid #B6CDE1; padding:1em; /*position:relative;*/  background-color:#FFF5DF;}
 /*#promo ul {margin-bottom:0;}*/
 #promo h1 {margin-top:0; padding-top:0}
 #promo h2 {line-height:1.2em; color:#668AA8; margin-top:0; padding-top:0; border:none; font-size:100%}
@@ -194,7 +203,10 @@ img.rssbadge {display:inline;border:none !important;}
 .example .promo h1 {font-size:159%; padding-top:0; margin-top:0;}
 .exampleIntro, .exampleIntro p, .exampleIntro a, .exampleIntro a code {color:#fff;}
 .example .promo p {margin-top:.7em;}
-.firstContent {margin-top:0; padding-top:0;}
+
+.example cite.byline {display:block; padding:0.5em; background-color:#eee; border:1px solid #000;margin-bottom:5px}
+
+firstContent {margin-top:0; padding-top:0;}
 #logger {margin-top:1em;}
 .example-container {background-color:#F1F6F7;}
 
@@ -219,7 +231,7 @@ img.rssbadge {display:inline;border:none !important;}
 #loggerDiv.yui-log .yui-log-bd code p {margin:1px 0;}
 #loggerDiv.yui-log .yui-log-ft .yui-log-categoryfilters {margin-top:.5em;clear:right;}
 #loggerDiv.yui-log .yui-log-ft .yui-log-sourcefilters {margin-top:.5em;border:none; clear:both;}
-#loggerDiv.yui-log .yui-log-btns {margin-top:.2em;padding:.2em;background: url(bg_hd.gif) 0 0 repeat-x #CECCCC; text-align:right; float:none;}
+#loggerDiv.yui-log .yui-log-btns {margin-top:.2em;padding:.2em;background: url(bg_hd.gif) 0 0 repeat-x #CECCCC; text-align:right; float:none; position:static;}
 #loggerDiv.yui-log .yui-log-filtergrp {margin-right:.3em; float:left; display:block}
 #loggerDiv.yui-log .yui-log-ft {margin-top:.3em;margin-bottom:.3em; font-family:verdana; zoom:1;}
 /*bug in Safari when this is applied to .yui-log-ft:*/
@@ -291,5 +303,20 @@ p.loggerButton {text-align:center;}
 #questions li a:hover {background-color:#F6F6F6;}
 
 /*for notes on file includes*/
-.include-notice {border:1px solid #6F7EA1; background:#eee; font:77% verdana; padding:.7em;}
+#configuratorBadge {display:block; float:left; margin:0 .5em .5em 0;}
+.include-notice {clear:left; border:1px solid #6F7EA1; background:#eee; font:77% verdana; padding:.7em;}
+.include-notice p.firstP {margin-top:0;}
+.include-notice p.lastP {margin-bottom:0;}
 .include-notice strong {color:#990000;}
+.configurator-notice p {font-size:85%;}
+
+/*for site search suggest via autocomplete*/
+#ygunav {overflow:visible !important;}
+#sitesearch {float:right; width:40em; position:relative; text-align:right;}
+#searchinput {width:15em; font-size:11px; font-weight:bold; position:relative; top:2px;}
+#searchcontainer {text-align:left; width:40em; overflow:hidden; line-height:normal; position:absolute;}
+#searchcontainer .yui-ac-bd {font-size:10px; color:#666; background-color:#EAEFF2; text-align:left;}
+#searchcontainer li {overflow:hidden; text-overflow:ellipsis; -o-text-overflow:ellipsis; cursor:pointer; padding-top:2px; }
+#searchcontainer em {font-style:normal; font-weight:bold; color:#000033;}
+.yui-ac-ft {padding:3px; font-size:10px; text-align:right;}
+#searchcontainer .yui-ac-highlight {background-color:#87A4D6;}

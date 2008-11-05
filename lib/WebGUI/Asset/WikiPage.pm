@@ -117,7 +117,12 @@ sub definition {
 #-------------------------------------------------------------------
 sub getAutoCommitWorkflowId {
 	my $self = shift;
-	return $self->getWiki->get("approvalWorkflow");
+    my $wiki = $self->getWiki;
+    if ($wiki->hasBeenCommitted) {
+        return $wiki->get('approvalWorkflow')
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 
@@ -266,9 +271,7 @@ sub processPropertiesFromFormPost {
         }
     }
 
-    # wiki pages are auto committed
-	$self->requestAutoCommit;
-}	
+}
 
 #-------------------------------------------------------------------
 

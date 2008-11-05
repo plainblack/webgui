@@ -10,14 +10,23 @@
             var r = YAHOO.example.app.layout.getUnitByPosition('right'),
             w = r.getSizes().body.w,
             h = r.getSizes().body.h;
+
             var logger = new YAHOO.widget.LogReader(r.body, {
                 logReaderEnabled: true,
                 draggable: false,
-                footerEnabled: false,
                 newestOnTop: true,
                 height: h + 'px',
                 width: w + 'px'
             });
+
+            
+            r.on('collapse', function() {
+                logger.pause();
+            });
+            r.on('expand', function() {
+                logger.resume();
+            });
+
             YAHOO.example.app.layout.on('resize', function() {
                 var r = YAHOO.example.app.layout.getUnitByPosition('right'),
                 w = r.getSizes().body.w,
