@@ -15,8 +15,9 @@ use WebGUI::Session;
 use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
-use File::Spec;
-use Cwd;
+
+# Include helper
+require "$FindBin::Bin/crypt.pl";
 
 #----------------------------------------------------------------------------
 # Init
@@ -25,13 +26,11 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 9;
+plan tests => 8;
 
 #----------------------------------------------------------------------------
 # put your tests here
-
 use_ok('WebGUI::Crypt');
-require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 
 #######################################################################
 #
