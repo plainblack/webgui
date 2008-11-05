@@ -50,7 +50,7 @@ sub handler {
     my $session = shift;
     
     my $p = $session->url->page();
-    unless ($p =~ m/siteindex\.xml$/i) {
+    unless ($p =~ m/sitemap\.xml$/i) {
         return undef;
     }
     
