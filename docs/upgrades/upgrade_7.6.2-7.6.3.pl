@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Template;
 
 
 my $toVersion = "7.6.3"; # make this match what version you're going to
@@ -28,20 +29,47 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 # upgrade functions go here
+
 createFieldShowOnline($session);
+upgradeSyndicatedContentTemplates($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub upgradeSyndicatedContentTemplates {
+    my $session = shift;
+    print "\tUpgrading syndicated content assets... " unless $quiet;
+    my $db = $session->db;
+    my $templates = $db->read("select distinct assetId from template where namespace='SyndicatedContent'");
+    while (my ($id) = $templates->array) {
+        my $asset = WebGUI::Asset::Template->new($session, $id);
+        if (defined $asset) {
+            if ($asset->getId eq "DPUROtmpl0000000000001") { # this one no longer applies
+                $asset->trash;
+                next;
+            }
+            my $template = $asset->get('template');
+            $template =~ s{channel.title}{channel_title}xmsi;
+            $template =~ s{channel.description}{channel_description}xmsi;
+            $template =~ s{channel.link}{channel_link}xmsi;
+            $template =~ s{site_link}{channel_link}xmsi;
+            $template =~ s{site_title}{channel_title}xmsi;
+            $template =~ s{descriptionFull}{description}xmsi;
+            $template =~ s{rss.url.0.9}{rss_url}xmsi;
+            $template =~ s{rss.url}{rss_url}xmsi;
+            $template =~ s{rss.url.0.91}{rss_url}xmsi;
+            $template =~ s{rss.url.1.0}{rdf_url}xmsi;
+            $template =~ s{rss.url.2.0}{rss_url}xmsi;
+            $asset->addRevision({template=>$template});
+        }
+    }
+    $db->write("update SyndicatedContent set templateId='PBtmpl0000000000000065' where templateId='DPUROtmpl0000000000001'");
+    $db->write("alter table SyndicatedContent drop column displayMode");
+    print "DONE!\n" unless $quiet;
+}
 
+#----------------------------------------------------------------------------
 sub createFieldShowOnline {
     my $session = shift;
     print "\tCreating an additional profile field 'showOnline' for the UsersOnline macro... " unless $quiet;
