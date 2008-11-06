@@ -49,18 +49,18 @@ sub getDragDropList{
     my $self = shift;
     my $address = shift;
     my @data;
-$self->log("dd'ing sections".$#{$self->sections});
+#$self->log("dd'ing sections".$#{$self->sections});
 eval{
     for(my $i = 0; $i <= $#{$self->sections}; $i++){
         push(@data,{text=>$self->section([$i])->{title}, type=>'section'});
         if($address->[0] == $i){
 
             for(my $x = 0; $x <= $#{$self->questions($address)}; $x++){
-#$self->log("dd'ing questions".$#{$self->questions});
+##$self->log("dd'ing questions".$#{$self->questions});
                 push(@data,{text=>$self->question([$i,$x])->{text}, type=>'question'});
                 if($address->[1] == $x){
                     for(my $y = 0; $y <= $#{$self->answers($address)}; $y++){
-#$self->log("dd'ing answers".$#{$self->answers});
+##$self->log("dd'ing answers".$#{$self->answers});
                         push(@data,{text=>$self->answer([$i,$x,$y])->{text}, type=>'answer'});
                     }
                 }
@@ -68,8 +68,8 @@ eval{
         }
     }
 };
-$self->log($@);
-#$self->log('finished dding');
+#$self->log($@);
+##$self->log('finished dding');
     return \@data;
 }
 
@@ -150,14 +150,14 @@ sub update{
     my $object;
     my $newQuestion = 0;
     if(@$address == 1){
-$self->log("A section");
+#$self->log("A section");
         $object = $self->section($address);
         if(! defined $object){
             $object = $self->newSection();
             push(@{$self->sections},$object);
         }
     }elsif(@$address == 2){
-$self->log("A question");
+#$self->log("A question");
         $object = $self->question($address);
         if(! defined $object){
             my $newQuestion = 1;
@@ -165,7 +165,7 @@ $self->log("A question");
             push(@{$self->questions($address)},$object);
         }
     }elsif(@$address == 3){
-$self->log("A answer");
+#$self->log("A answer");
         $object = $self->answer($address);
         if(! defined $object){
             $object = $self->newAnswer();
@@ -178,7 +178,7 @@ $self->log("A answer");
         }
     }
     for my $key(keys %$object){
-$self->log("$key $$object{$key}");
+#$self->log("$key $$object{$key}");
         $object->{$key} = $ref->{$key} if(defined $$ref{$key});
     }
 }
@@ -188,7 +188,7 @@ $self->log("$key $$object{$key}");
 # ref should contain all the information for the new
 sub insertObject{
     my ($self,$object,$address) = @_;
-$self->log("Inserting ".join(',',@$address));
+#$self->log("Inserting ".join(',',@$address));
     if(@$address == 1){
         splice(@{$self->sections($address)},$$address[0] + 1, 0, $object);
     }elsif(@$address == 2){ 
@@ -196,7 +196,7 @@ $self->log("Inserting ".join(',',@$address));
     }elsif(@$address == 3){ 
         splice(@{$self->answers($address)},$$address[2] + 1, 0, $object);
     }
-$self->log("Finished inserting ");
+#$self->log("Finished inserting ");
 
 }
 
@@ -206,13 +206,13 @@ sub copy{
             my %newSection = %{$self->section($address)};
             push(@{$self->sections}, \%newSection);
             return [$#{$self->sections}];
-$self->log("copying here $$address[0] :".$#{$self->sections});
+#$self->log("copying here $$address[0] :".$#{$self->sections});
     }elsif(@$address == 2){
-$self->log("copying question $$address[0] $$address[1]");
+#$self->log("copying question $$address[0] $$address[1]");
             my %newQuestion = %{$self->question($address)};
             push( @{$self->questions($address)}, \%newQuestion);
             $$address[1] = $#{$self->questions($address)};
-$self->log("to $$address[0] $$address[1]");
+#$self->log("to $$address[0] $$address[1]");
             return $address;
     }
 }
@@ -221,14 +221,14 @@ $self->log("to $$address[0] $$address[1]");
 sub remove{
     my ($self,$address,$movingOverride) = @_;
     if(@$address == 1){
-$self->log("removing here $$address[0] :".$#{$self->sections}) if($$address[0] != 0 or defined $movingOverride);;
+#$self->log("removing here $$address[0] :".$#{$self->sections}) if($$address[0] != 0 or defined $movingOverride);;
             splice(@{$self->{sections}},$$address[0],1) if($$address[0] != 0 or defined $movingOverride);#can't delete the first section
-$self->log("removing here $$address[0] :".$#{$self->sections});
+#$self->log("removing here $$address[0] :".$#{$self->sections});
     }elsif(@$address == 2){
-$self->log("removing here $$address[0] $$address[1]");
+#$self->log("removing here $$address[0] $$address[1]");
             splice(@{$self->questions($address)},$$address[1],1);
     }elsif(@$address == 3){
-$self->log("removing here $$address[0] $$address[1] $$address[2]");
+#$self->log("removing here $$address[0] $$address[1] $$address[2]");
             splice(@{$self->answers($address)},$$address[2],1);
     }
 }
@@ -299,7 +299,7 @@ sub updateQuestionAnswers{
     my $address = shift;
     my $type = shift;
 
-$self->log("In updateQuestion");
+#$self->log("In updateQuestion");
 
     my @addy = @{$address};
     my $question = $self->question($address);
@@ -391,11 +391,11 @@ sub addAnswersToQuestion{
     my $addy = shift;
     my $ans = shift;
     my $verbs = shift;
-$self->log(Dumper $verbs);
+#$self->log(Dumper $verbs);
     for(0 .. $#$ans){
         push(@{$self->question($addy)->{answers}},$self->newAnswer()); 
         $$addy[2] = $_;
-$self->log("$_:".defined $$verbs{$_}." ".$$verbs{$_});
+#$self->log("$_:".defined $$verbs{$_}." ".$$verbs{$_});
         if(defined $$verbs{$_} and $_ == $$verbs{$_}){
             $self->update($addy,{'text',$$ans[$_],'recordedAnswer',$_+1,'verbatim',1});
         }else{
