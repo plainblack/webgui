@@ -200,6 +200,10 @@ sub generateFeed {
 	
 	# limit the feed to the maxium number of headlines
 	$feed->limit_item($self->get('maxHeadlines'));
+	
+	# mark this asset as updated
+	$self->update({lastModified=>time});
+	
 	return $feed;
 }
 
@@ -327,68 +331,6 @@ sub view {
 		$cache->set($out,$self->get("cacheTimeout"));
 	}
 	return $out;
-	
-	
-	
-	my $rssFlavor = shift;
-	if ($rssFlavor eq "" && !$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
-		return $out if $out;
-	}
-        my $maxHeadlines = $self->_getMaxHeadlines;
-	my @validatedUrls = $self->_getValidatedUrls;
-	return $self->processTemplate({},$self->get('templateId')) unless (scalar(@validatedUrls));
-	my $title=$self->get('title');
-
-	#We came into this subroutine as
-	my $rssObject=($rssFlavor) ? XML::RSS::Creator->new(version=>$rssFlavor) : undef;
-
-        my %var;
-	
-	my($item_loop,$rss_feeds)=$self->_get_items(\@validatedUrls, $maxHeadlines);
-
-	if (scalar(@$rss_feeds) < 1) {
-		return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	}
-
-	if(@$rss_feeds == 1){
-        if(@$rss_feeds == 1){
-            #One feed. Put in the info from the feed.
-            # Make sure we have a channel to avoid runtime errors
-            my $channel = $rss_feeds->[0]->{channel};
-            if ( $channel && ref $channel eq "HASH" ) {
-                $var{'channel.title'} = $channel->{title} || $title;
-                $var{'channel.link'} = $channel->{link};
-                $var{'channel.description'} = $channel->{description};
-            }
-            else {
-                $var{'channel.title'} = $title;
-            }
-        }
-	}
-
-	$self->_createRSSURLs(\%var);
-    $var{item_loop} = $item_loop;
-
-	if ($rssObject) {
-	    $self->_constructRSS($rssObject,\%var);
-	    my $rss=$rssObject->as_string;
-	    $self->session->http->setMimeType('text/xml');
-
-	    #Looks like a kludge, but what this does is put in the proper
-	    #XSLT stylesheet so the RSS doesn't look like total ass.
-	    my $siteURL=$self->session->url->getSiteURL().$self->session->url->gateway();
-	    $rss=~s|<\?xml version="1\.0" encoding="UTF\-8"\?>|<\?xml version="1\.0" encoding="UTF\-8"\?>\n<?xml\-stylesheet type="text/xsl" href="${siteURL}xslt/rss$rssFlavor.xsl"\?>\n|;
-	    return $rss;
-
-	} else {
-       		my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-		if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
-			WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
-		}
-       		return $out;
-	}
-
 }
 
 #-------------------------------------------------------------------

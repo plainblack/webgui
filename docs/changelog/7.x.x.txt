@@ -1,6 +1,8 @@
 7.6.3
  - fixed #8989: Missing profile field "showOnline" for the UsersOnline macro.
  - Added DataTable to WebGUI.conf.original
+ - Added a better mechanism for calculating when content was last modified for
+   cache headers.
  - The Syndicated Content asset was rewritten, and now uses 35% less memory
    and is 400% faster.
  - fixed #9025: Testing function of UsersOnline macro fails.

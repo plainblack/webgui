@@ -29,12 +29,21 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 # upgrade functions go here
-
+createLastUpdatedField($session);
 createFieldShowOnline($session);
 upgradeSyndicatedContentTemplates($session);
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub createLastUpdatedField {
+    my $session = shift;
+    print "\tAdding last updated field to all assets... " unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table assetData add column lastModified bigint");
+    $db->write("update assetData set lastModified=revisionDate");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub upgradeSyndicatedContentTemplates {

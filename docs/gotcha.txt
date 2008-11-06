@@ -16,6 +16,8 @@ save you many hours of grief.
 	there will be problems that the migration cannot handle. Check your
 	Syndicated Content assets after upgrade to ensure they are still
 	working as expected.
+	
+  * You must upgrade to 7.6.2 before you can upgrade to 7.6.3.
 
 
 7.6.1
