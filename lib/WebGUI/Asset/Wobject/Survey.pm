@@ -242,13 +242,9 @@ sub loadSurveyJSON{
 
     $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]) if(! defined $jsonHash);
     
-$self->session->errorHandler->error("LOADING JSON");
 eval{    
     $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($jsonHash,$self->session->errorHandler);
 };
-$self->session->errorHandler->error("Loaded JSON".$@);
-
-#$self->session->errorHandler->error("Loaded JSON\n\n".Dumper $self->survey->freeze);
 }
 
 #-------------------------------------------------------------------
@@ -267,8 +263,6 @@ sub saveSurveyJSON{
     my $self = shift;
     
     my $data = $self->survey->freeze();
-    
-$self->session->errorHandler->error("Saving THIS DATA");#\n\n".$data);
     
     $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
@@ -295,7 +289,6 @@ sub www_editSurvey {
 #-------------------------------------------------------------------
 sub www_submitObjectEdit{
     my $self = shift;
-$self->session->errorHandler->error("Submit Edit Object");
     
 #    my $ref = @{decode_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
@@ -304,15 +297,12 @@ $self->session->errorHandler->error("Submit Edit Object");
     
     $self->loadSurveyJSON();
     if($responses->{delete}){
-$self->session->errorHandler->error("Deleting ".join(',',@address));
         return $self->deleteObject(\@address);
     }
     elsif($responses->{copy}){
-$self->session->errorHandler->error("Copying ".join(',',@address));
         return $self->copyObject(\@address);
     }
 
-$self->session->errorHandler->error("Updating ".join(',',@address));
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
     my $message = $self->survey->update(\@address,$responses);
 
@@ -350,7 +340,6 @@ sub deleteObject{
     }else{
         pop(@{$address});# unless @$address == 1 and $$address[0] == 0;
     }
-$self->session->errorHandler->error("returning ".join(',',@$address));
 
     return $self->www_loadSurvey({address => $address, message=>$message});
 }
@@ -361,18 +350,15 @@ sub www_newObject{
     my $self = shift;
     my $ref;
     
-$self->session->errorHandler->error("Entering newObject");
     my $ids = $self->session->form->process("data");
 
     my @inAddress = split/-/,$ids;
-$self->session->errorHandler->error("Address is:".join(',', @inAddress));
     
     $self->loadSurveyJSON();
 
     #Don't save after this as the new object should not stay in the survey
     my $address = $self->survey->newObject(\@inAddress);
 
-$self->session->errorHandler->error("New objects address is:".join(',', @$address));
    
     #The new temp object has an address of NEW, which means it is not a real final address. 
 
@@ -386,7 +372,6 @@ sub www_dragDrop{
     my $self = shift;
     my $p = decode_json($self->session->form->process("data"));
 
-$self->session->errorHandler->error("In Drag Drop ".Dumper $p);
 
     my @tid = split/-/,$p->{target}->{id};
     my @bid = split/-/,$p->{before}->{id};
@@ -430,7 +415,6 @@ $self->session->errorHandler->error("In Drag Drop ".Dumper $p);
     }
     
     $self->saveSurveyJSON();
-$self->session->errorHandler->error("Finsihed Drag Drop ".Dumper $self->survey->freeze());
             
     return $self->www_loadSurvey({address => $address});
 }
@@ -440,7 +424,6 @@ $self->session->errorHandler->error("Finsihed Drag Drop ".Dumper $self->survey->
 sub www_loadSurvey{
     my ($self,$options) = @_;
     
-$self->session->errorHandler->error("Entering loadSurvey");
     $self->loadSurveyJSON();
 
     my $address = defined $options->{address} ? $options->{address} : undef;
@@ -452,13 +435,9 @@ $self->session->errorHandler->error("Entering loadSurvey");
         }
     }
     my $message = defined $options->{message} ? $options->{message} : '';
-#$self->session->errorHandler->error("Getting edit vars:".join(',',@$address));
     my $var = defined $options->{var} ? $options->{var} : $self->survey->getEditVars($address);
 
-#$self->session->errorHandler->error("Got edit vars".Dumper $self->survey->freeze);
-#$self->session->errorHandler->error("Loaded beginning params ".join(',',@$address));
     my $editHtml;
-#$self->session->errorHandler->error("The edit vars:".Dumper $var);
     if($var->{type} eq 'section'){
         $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
     }elsif($var->{type} eq 'question'){
@@ -466,7 +445,6 @@ $self->session->errorHandler->error("Entering loadSurvey");
     }elsif($var->{type} eq 'answer'){
         $editHtml = $self->processTemplate($var,$self->get("answerEditTemplateId"));
     }
-#$self->session->errorHandler->error("The HTML :$editHtml");
 
     my %buttons;
     $buttons{question} = $$address[0]; 
@@ -475,7 +453,6 @@ $self->session->errorHandler->error("Entering loadSurvey");
     }
         
     my $data = $self->survey->getDragDropList($address);
-#$self->session->errorHandler->error("The DD data :".Dumper $data);
     my $html;
     my ($scount,$qcount,$acount) = (-1,-1,-1);
     my $lastType;
@@ -512,7 +489,6 @@ $self->session->errorHandler->error("Entering loadSurvey");
             $lastType = 'answer';
         }
     }
-#$self->session->errorHandler->error($html);
 
     #address is the address of the focused object
     #buttons are the data to create the Add buttons
@@ -521,13 +497,6 @@ $self->session->errorHandler->error("Entering loadSurvey");
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {"address",$address,"buttons",\%buttons,"edithtml",$editHtml,"ddhtml",$html,"ids",\@ids,"type",$var->{type}};
-#$self->session->errorHandler->error(Dumper $return);
-eval{
-#    $self->session->errorHandler->error(encode_json($return));
-};
-#$self->session->errorHandler->error($@);
-
-$self->session->errorHandler->error("Returning from loadSurvey");
     $self->session->http->setMimeType('application/json');
     return encode_json($return);
 }
@@ -632,12 +601,10 @@ sub www_takeSurvey{
     eval{
         my $responseId = $self->getResponseId();
         if(!$responseId){
-$self->session->errorHandler->error("\n\nIn takeSurvey with no reponseId $responseId");
             return $self->surveyEnd();
         }
     };
 
-    $self->session->errorHandler->error($@) if defined $@;
     return $out;
 }
 
@@ -658,10 +625,8 @@ sub www_submitQuestions{
     my $responseId = $self->getResponseId();
     if(!$responseId){return $self->surveyEnd();}
     
-    $self->session->errorHandler->error("\n\nIn submitQuestions with reponseId $responseId");
 
     my $responses = $self->session->form->paramsHashRef();
-$self->session->errorHandler->error(Dumper $responses);
     delete $$responses{'func'};
 
     my @goodResponses = keys %$responses;#load everything.  
@@ -720,13 +685,11 @@ $self->session->errorHandler->error(Dumper $responses);
 sub www_loadQuestions{
     my $self=shift;
     
-    $self->session->errorHandler->error("\n\n\n\n\t\t\t\t\t\t\t\t\t---In loadQuestions");
     
     if(!$self->canTakeSurvey()){
         return $self->surveyEnd();
     }
 
-$self->session->errorHandler->error("Can take survey");
 
     my $responseId = $self->getResponseId();#also loads the survey and response 
     if(!$responseId){
@@ -739,18 +702,14 @@ $self->session->errorHandler->error("Can take survey");
 eval{
     $questions = $self->response->nextQuestions();
 };
-$self->session->errorHandler->error($@) if($@);
 
-$self->session->errorHandler->error("Load Questions had ".@$questions." questions") if(ref $questions eq 'ARRAY');
     
 
     my $section = $self->response->nextSection();
-#$self->session->errorHandler->error(Dumper $section);
      
     #return $self->prepareShowSurveyTemplate($section,$questions);
     $section->{id} = $self->response->nextSectionId();
     my $text = $self->prepareShowSurveyTemplate($section,$questions);
-$self->session->errorHandler->error("Load Questions returning");
     return $text;
 }
 
@@ -759,7 +718,6 @@ $self->session->errorHandler->error("Load Questions returning");
 sub surveyEnd{
     my $self = shift;
     my $url = shift;
-$self->session->errorHandler->error("-------SurveyEnd $url");
     my $responseId = $self->getResponseId();#also loads the survey and response 
 #    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
     $self->session->db->setRow("Survey_response","Survey_responseId",{
@@ -775,7 +733,6 @@ $self->session->errorHandler->error("-------SurveyEnd $url");
             $url = "/";
         }
     }
-$self->session->errorHandler->error("-------SurveyEnd $url");
     $self->session->http->setMimeType('application/json');
     return encode_json({"type","forward","url",$url});
 }
@@ -795,9 +752,7 @@ sub prepareShowSurveyTemplate{
     my %fileUpload = ('File Upload',1);
     my %hidden = ('Hidden',1);
 
-$self->session->errorHandler->error("Preparing to insert question for $#$questions questions");
     foreach my $q(@$questions){
-$self->session->errorHandler->error("Question Text is: ".$q->{text});
         if($fileUpload{$$q{'questionType'}}){ $q->{'fileLoader'} = 1; } 
         elsif($text{$$q{'questionType'}}){ $q->{'textType'} = 1; }
         elsif($hidden{$$q{'questionType'}}){ $q->{'hidden'} = 1; }
@@ -823,7 +778,6 @@ $self->session->errorHandler->error("Question Text is: ".$q->{text});
     }
     $section->{'questions'} = $questions;
     
-#$self->session->errorHandler->error(Dumper $section);
     my $out = $self->processTemplate($section,$self->get("surveyQuestionsId"));
 
     $self->session->http->setMimeType('application/json');
@@ -849,18 +803,14 @@ sub loadBothJSON{
 #-------------------------------------------------------------------
 sub loadResponseJSON{
     my $self = shift;
-$self->log("1");
     my $jsonHash = shift;
     my $rId = shift;
     $rId = defined $rId ? $rId : $self->{responseId};
     if(defined $self->response and ! defined $rId){return;}
 
-$self->log("loading $rId");
 
     $jsonHash = $self->session->db->quickScalar("select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
         [$self->getId,$rId]) if(! defined $jsonHash);
-$self->log("jsonhash was ".(length $jsonHash));
-    $self->{response} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new($jsonHash,$self->session->errorHandler, $self->survey);
 }
 
 #-------------------------------------------------------------------
@@ -869,7 +819,6 @@ sub saveResponseJSON{
 
     my $data = $self->response->freeze();
     
-$self->session->errorHandler->error("Saving RESPONSE to ".$self->{responseId}." for $data");
     
     $self->session->db->write("update Survey_response set responseJSON = ? where Survey_responseId = ?",[$data,$self->{responseId}]);
 }
@@ -939,18 +888,15 @@ sub getResponseId{
                 assetId=>$self->getId(),
                 anonId=>$anonId
             });
-$self->session->errorHandler->error("Creating a new response and survey order");
             $self->loadBothJSON($responseId);
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->saveResponseJSON();
         }else{
-$self->session->errorHandler->error("No responses left max=$allowedTakes used up=$haveTaken");
         }
     }
     $self->{responseId} = $responseId;
     $self->loadBothJSON($responseId);
-    $self->session->errorHandler->error("Survey Response was ".$responseId);
     return $responseId;
 }
 
@@ -962,7 +908,6 @@ sub canTakeSurvey{
   
     return $self->{canTake} if(defined $self->{canTake});
 
-$self->session->errorHandler->error("Can take was NOT already defined");
  
     if(!$self->session->user->isInGroup($self->get("groupToTakeSurvey"))){
         return 0;
@@ -982,15 +927,12 @@ $self->session->errorHandler->error("Can take was NOT already defined");
         $takenCount = $self->session->db->quickScalar("select count(*) from Survey_response where userId = ? and assetId = ? and isComplete = ?",[$id,$self->getId(),1]);
     }
 
-    $self->session->errorHandler->error("userid is ".$id."\t and ip is ".$ip);
-    $self->session->errorHandler->error("max ".$maxTakes." taken ".$takenCount);
 
     if($takenCount >= $maxTakes){
         $self->{canTake} = 0;
     }else{
         $self->{canTake} = 1;
     }
-    $self->session->errorHandler->error("Can take survey returning ".$self->{canTake});
     return $self->{canTake};
 
 }
