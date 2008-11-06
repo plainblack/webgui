@@ -9,6 +9,7 @@
  - Brand new Survey system.  Make sure to export your old results as they will
    not be imported, only the surveys themselves.
  - fixed #9028: Thingy fails when setting values containing single quotes
+ - fixed #9047: Unable to reorder DataForm tabs
 
 7.6.2
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
