@@ -49,7 +49,7 @@ sub definition {
 
     push @{$definition}, {
         assetName         => $i18n->get('assetName'),
-        icon              => 'Asset.gif',
+        icon              => 'DataTable.gif',
         autoGenerateForms => 1,
         tableName         => 'DataTable',
         className         => 'WebGUI::Asset::Wobject::DataTable',
