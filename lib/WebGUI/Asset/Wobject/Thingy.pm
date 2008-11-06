@@ -3009,7 +3009,8 @@ sequenceNumber');
                 "searchFields_is".$fieldType => 1,
             });
             my $searchValue = $session->form->process("field_".$field->{fieldId});
-            push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
+            push @constraints, $dbh->quote_identifier("field_".$field->{fieldId}) . " LIKE "
+                . $dbh->quote('%'.$searchValue.'%') if ($searchValue);
         }
         if($field->{displayInSearch}){
             my $orderByUrl = $self->session->url->append($currentUrl,"orderBy=".$field->{fieldId});
