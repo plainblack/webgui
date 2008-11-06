@@ -17,7 +17,6 @@ sub apply {
     modify_db_schema_for_flux($session);
     modify_config_files_for_flux($session);
     create_demo_data($session) if $demo;
-#    enable_survey2($session);
 }
 
 sub say {
@@ -170,59 +169,6 @@ sub drop_col {
     if (@cols) {
         $session->db->write("ALTER TABLE $table DROP COLUMN $col");
     }
-}
-
-#sub enable_survey2 {
-#    my $session = shift;
-#    say("# As a bonus, also enabling Survey2..");
-#    say('Updating db schema..');
-#    $session->db->write("drop table if exists Survey");
-#    $session->db->write("drop table if exists Survey_answer");
-#    $session->db->write("drop table if exists Survey_question");
-#    $session->db->write("drop table if exists Survey_questionResponse");
-#    $session->db->write("drop table if exists Survey_response");
-#    $session->db->write("drop table if exists Survey_section");
-#    my $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey.sql');
-#    $session->db->write($sql);
-#    $sql = read_file('/data/WebGUI/lib/WebGUI/Asset/Wobject/Survey/Survey_response.sql');
-#    $session->db->write($sql);
-#    say('Importing Survey2 templates..');
-#    my $versionTag = WebGUI::VersionTag->getWorking($session);
-#    $versionTag->set({name=>"Adding Survey2 Packages"});
-#    addPackage($session, '/data/WebGUI/survey_templates.wgpkg');
-#    $versionTag->commit;
-#}
-
-# Add a package to the import node
-sub addPackage {
-    my $session     = shift;
-    my $file        = shift;
-
-    # Make a storage location for the package
-    my $storage     = WebGUI::Storage->createTemp( $session );
-    $storage->addFileFromFilesystem( $file );
-
-    # Import the package into the import node
-    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
-
-    # Make the package not a package anymore
-    $package->update({ isPackage => 0 });
-    
-    # Set the default flag for templates added
-    my $assetIds
-        = $package->getLineage( ['self','descendants'], {
-            includeOnlyClasses  => [ 'WebGUI::Asset::Template' ],
-        } );
-    for my $assetId ( @{ $assetIds } ) {
-        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        if ( !$asset ) {
-            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
-            next;
-        }
-        $asset->update( { isDefault => 1 } );
-    }
-
-    return;
 }
 
 1;
