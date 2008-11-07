@@ -17,6 +17,7 @@ use WebGUI::International;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
+use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
 use Data::Dumper;
 
@@ -691,12 +692,11 @@ sub www_loadQuestions{
         return $self->surveyEnd();
     }
 
-
     my $responseId = $self->getResponseId();#also loads the survey and response 
     if(!$responseId){
             return $self->surveyEnd();
     }
-
+    
     return $self->surveyEnd() if($self->response->surveyEnd());
 
     my $questions;
@@ -812,6 +812,8 @@ sub loadResponseJSON{
 
     $jsonHash = $self->session->db->quickScalar("select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
         [$self->getId,$rId]) if(! defined $jsonHash);
+
+    $self->{response} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new($jsonHash,$self->session->errorHandler, $self->survey); 
 }
 
 #-------------------------------------------------------------------
@@ -846,6 +848,7 @@ sub getResponseId{
     my $anonId = $self->session->form->process("userid") || $self->session->http->getCookies->{"Survey2AnonId"} || undef;
     $self->session->http->setCookie("Survey2AnonId",$anonId) if($anonId);
 
+$self->log("here"); 
     my $responseId;
 
     my  $string;
@@ -866,7 +869,7 @@ sub getResponseId{
     }
 
     if(! $responseId){
-    
+$self->log("no response id"); 
         my $allowedTakes = $self->session->db->quickScalar("select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1",[$self->getId()]);
         my $haveTaken;
 
@@ -879,6 +882,7 @@ sub getResponseId{
         }
 
         if($haveTaken < $allowedTakes){
+$self->log("creating new response"); 
             $responseId = $self->session->db->setRow("Survey_response","Survey_responseId",{
                 Survey_responseId=>"new",
                 userId=>$id,
@@ -889,10 +893,15 @@ sub getResponseId{
                 assetId=>$self->getId(),
                 anonId=>$anonId
             });
+$self->log("1");
             $self->loadBothJSON($responseId);
+$self->log("2");
             $self->response->createSurveyOrder();
+$self->log("3");
             $self->{responseId} = $responseId;
+$self->log("4");
             $self->saveResponseJSON();
+$self->log("loaded nad saved survey and response"); 
         }else{
         }
     }
