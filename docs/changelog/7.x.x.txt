@@ -2,6 +2,7 @@
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
  - fixed: Syndicated Content asset throws runtime error on certain feeds
  - fixed #9047: Unable to reorder DataForm tabs
+ - fixed #9028: Thingy fails when setting values containing single quotes
 
 7.5.31
  - fixed: debian licensing problem with user list
