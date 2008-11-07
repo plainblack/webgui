@@ -393,8 +393,13 @@ sub www_selectPaymentGateway {
     }
 
     # All the output stuff below is just a placeholder until it's templated.
+    my $payOptions  = $self->getOptions( $cart );
+
+    # TODO: If only one payOption exists, just send us there
+    # In order to do this, the PayDriver must give us a direct URL to go to
+
     my $output .= $i18n->get('choose payment gateway message');
-    foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
+    foreach my $payOption ( values %{$payOptions} ) {
         $output .= $payOption->{button} . '<br />';
     }
    
