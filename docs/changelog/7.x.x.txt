@@ -1,4 +1,5 @@
 7.5.33
+ - fixed #9002: add a variant in admin product view misses i18n link
 
 7.5.32
  - fixed: not allowed to add calendar events if in can edit group but not can add event group

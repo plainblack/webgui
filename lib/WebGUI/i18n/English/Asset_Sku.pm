@@ -93,6 +93,18 @@ our $I18N = {
 		context => q|help for tax rate override field|
 	},
 
+	'Add a Variant' => {
+		message => q|Add a Variant|,
+		lastUpdated => 0,
+		context => q|i18n label for the view template|
+	},
+
+	'Set Product price and SKU' => {
+		message => q|Set Product price and SKU|,
+		lastUpdated => 0,
+		context => q|i18n label for the view template|
+	},
+
 	'assetName' => {
 		message => q|Sku|,
 		lastUpdated => 0,
