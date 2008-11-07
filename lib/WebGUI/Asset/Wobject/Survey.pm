@@ -188,6 +188,7 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getEditForm
 
 getEditForm is called when creating/editing the asset.  
