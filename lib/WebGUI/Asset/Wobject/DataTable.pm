@@ -220,7 +220,7 @@ sub prepareView {
     # TODO Use a WebGUI::DataSource
     my $dt = WebGUI::Form::DataTable->new(
         $session, {
-            name         => "data",
+            name         => $self->getId,
             value        => $self->get('data'),
             defaultValue => undef,
         }

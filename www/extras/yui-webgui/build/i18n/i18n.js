@@ -43,7 +43,10 @@ YAHOO.lang.augmentProto( WebGUI.i18n, YAHOO.util.EventProvider );
 WebGUI.i18n.prototype.get
 = function ( ns, key ) {
     if ( typeof this.namespaces[ ns ][ key ] == "undefined" ) {
-        this.load( ns, [ key ] );
+        var obj = {};
+        obj[ns] = [ key ];
+        this.load( obj );
+        // TODO: Return placeholder that will get auto-updated
     }
     return this.namespaces[ ns ][ key ];
 };

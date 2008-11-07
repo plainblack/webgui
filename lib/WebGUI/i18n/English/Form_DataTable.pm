@@ -68,6 +68,12 @@ our $I18N = {
         context     => q{Format for a column with numbers},
     },
 
+    "format date" => {
+        message     => q{Date},
+        lastUpdated => 0,
+        context     => q{Format for a column with a date},
+    },
+
     "add column" => {
         message     => q{Add Column},
         lastUpdated => 0,
@@ -126,6 +132,12 @@ our $I18N = {
         message     => q{Drag and drop columns to reorder them.},
         lastUpdated => 0,
         context     => q{How to reorder columns. Shown in the help pop-up},
+    },
+
+    "delete column" => {
+        message     => q{Delete},
+        lastUpdated => 0,
+        context     => q{Button to delete a column, shown in the Edit Schema dialog},
     },
 };
 
