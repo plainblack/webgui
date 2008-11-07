@@ -74,13 +74,11 @@ sub autoCommitWorkingIfEnabled {
     return undef
         unless $versionTag;
 
-    #AMH: auto commit is no longer determined from autoRequestCommit
+    #Auto commit is no longer determined from autoRequestCommit
 
     # auto commit assets
     # save and commit button and site wide auto commit work the same
     if (
-#        $options->{override}
-#        || $session->setting->get("autoRequestCommit")
         $options->{override}
         || $class->getVersionTagMode($session) eq q{autoCommit}
     ) {
@@ -365,8 +363,6 @@ sub getRevisionCount {
 
 #-------------------------------------------------------------------
 
-#AMH: Support for versionTagMode.
-
 =head2 getVersionTagMode ( session )
 
 Return version tag mode for current session
@@ -379,7 +375,6 @@ sub getVersionTagMode {
 
     my $mode = q{};
 
-    #AMH: to do get user settings
     $mode = $session->user()->profileField(q{versionTagMode});
 
     #verify mode.
@@ -425,7 +420,6 @@ A boolean that if set to true, will prevent this method from creating an autotag
 =cut
 
 sub getWorking {
-    #AMH: Support for versionTagMode.
     my $class    = shift;
     my $session  = shift;
     my $noCreate = shift;
@@ -664,7 +658,7 @@ sub set {
     my $startTime  = WebGUI::DateTime->new($self->session,$now)->toDatabase;
     my $endTime    = WebGUI::DateTime->new($self->session,'2036-01-01 00:00:00')->toDatabase;
 
-    #AMH: In case of site wide version tag, mark it as Site wide autotag instead
+    #In case of site wide version tag, mark it as Site wide autotag instead
     my $isSiteWide = $properties->{isSiteWide} || $self->{_data}{isSiteWide} || 0;
 
     $self->{_data}{'name'      } = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman().($isSiteWide ? q{ (Site wide autotag)} : q{ (Autotag)});
@@ -680,7 +674,7 @@ sub set {
         $self->{_data}{'endTime'   } = $properties->{endTime} || $self->{_data}{endTime} || $endTime;
     }
 
-    #AMH: new field isSiteWide is added. Check if field exists. This is needed to let upgrades work
+    #New field isSiteWide is added. Check if field exists. This is needed to let upgrades work
     if (grep { $_ =~ /^isSiteWide/ } keys %{$assetVersionTagDesc}) {
 
         $self->{_data}{'isSiteWide'} = $isSiteWide;

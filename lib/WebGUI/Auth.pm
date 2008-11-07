@@ -760,7 +760,7 @@ sub isVisitor {
 Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
 Authentication should always happen in the subclass routine.
 
-AMH: open version tag is reclaimed if user is in site wide or singlePerUser mode.
+Open version tag is reclaimed if user is in site wide or singlePerUser mode.
 
 =cut
 
@@ -806,7 +806,7 @@ sub login {
 	  	$self->session->scratch->delete("redirectAfterLogin");
 	}
 
-        #AMH: get open version tag. This is needed if we want
+        # Get open version tag. This is needed if we want
         # to reclaim a version right after login (singlePerUser and siteWide mode)
         # and to have the correct version displayed.
         WebGUI::VersionTag->getWorking($self->session(), q{noCreate});

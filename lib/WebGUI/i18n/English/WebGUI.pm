@@ -4142,7 +4142,7 @@ LongTruncOk=1</p>
     },
 
 
-        #AMH: Support for versionTagMode.
+        #Support for versionTagMode.
         'version tag mode' => {
             message => q{Version tag mode},
         },

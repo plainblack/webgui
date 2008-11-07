@@ -81,7 +81,7 @@ sub definition {
 		hoverHelp=>$i18n->get('default version tag workflow help'),
 		});
 
-        #AMH: Support for versionTagMode. We'll have:
+        # Support for versionTagMode. We'll have:
         # - multi version tag per user
         # - one version tag per user (SwiftySite mode)
         # - one site wide version tag
@@ -102,16 +102,6 @@ sub definition {
                 hoverHelp    => $i18n->get(q{version tag mode help}),
             },
         );
-
-#AMH: autoRequestCommit no long needed
-#	push(@fields, {
-#		tab=>"content",
-#		fieldType=>"yesNo",
-#        name=>"autoRequestCommit",
-#        label=>$i18n->get("auto request commit"),
-#        hoverHelp=>$i18n->get("auto request commit help"),
-#        defaultValue=>$setting->get("autoRequestCommit")
-#		});
 
 	push(@fields, {
 		tab=>"content",
