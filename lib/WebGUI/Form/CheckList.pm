@@ -52,7 +52,7 @@ The following additional parameters have been added via this sub class.
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
 
-=head4 showSelectAllButton
+=head4 showSelectAll
 
 Flag that toggles a "Select All" toggle button on or off.
 
