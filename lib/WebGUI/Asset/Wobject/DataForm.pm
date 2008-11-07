@@ -1324,7 +1324,7 @@ sub www_moveTabRight {
     my $newPos = $currentPos + 1;
     if ($newPos < @$tabOrder) {
         splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
-        $self->_saveFieldConfig;
+        $self->_saveTabConfig;
     }
     return "";
 }
@@ -1343,7 +1343,7 @@ sub www_moveTabLeft {
     my $newPos = $currentPos - 1;
     if ($newPos >= 0) {
         splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
-        $self->_saveFieldConfig;
+        $self->_saveTabConfig;
     }
     return "";
 }
