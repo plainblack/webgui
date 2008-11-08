@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use Carp qw( croak confess );
 use Scalar::Util qw( blessed );
+use Clone qw(clone);
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -2242,7 +2243,8 @@ to set the keywords for this asset.
 
 sub update {
 	my $self = shift;
-	my $properties = shift;
+	my $requestedProperties = shift;
+    my $properties = clone($requestedProperties);
 	$properties->{lastModified} = time();
 	
     # if keywords were specified, then let's set them the right way
