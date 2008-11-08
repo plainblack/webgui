@@ -57,8 +57,8 @@ sub definition {
 			groupToNotify => {
 				fieldType=>"group",
 				defaultValue=>["4"],
-				label=>$i18n->get("who to notify"),
-				hoverHelp=>$i18n->get("who to notify help")
+				label=>$i18n->get("group to notify"),
+				hoverHelp=>$i18n->get("group to notify help")
 				},
 			message => {
 				fieldType=>"textarea",
