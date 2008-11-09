@@ -374,11 +374,161 @@ to be displayed within the page style.
 =cut
 
 sub view {
-	my $self = shift;
+	my $self    = shift;
 	my $session = $self->session;	
+    my $db      = $session->db; 
 
 	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
+    $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
+    $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
+
+    # Get the MatrixListing with the most views as an object using getLineage.
+    my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "views desc",
+            limit               => 1,
+            returnObjects       => 1,
+        }) };
+    $var->{bestViews_url}   = $bestViews_listing->getUrl;
+    $var->{bestViews_count} = $bestViews_listing->get('views');
+    $var->{bestViews_name}  = $bestViews_listing->get('title');
+
+    # Get the MatrixListing with the most compares as an object using getLineage.
+
+    my ($bestCompares_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "compares desc",
+            limit               => 1,   
+            returnObjects       => 1,   
+        }) };   
+    $var->{bestCompares_url}   = $bestCompares_listing->getUrl;
+    $var->{bestCompares_count} = $bestCompares_listing->get('views');
+    $var->{bestCompares_name}  = $bestCompares_listing->get('title');
+
+    # Get the MatrixListing with the most clicks as an object using getLineage.
+    my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "clicks desc",
+            limit               => 1,   
+            returnObjects       => 1,   
+        }) };   
+    $var->{bestClicks_url}   = $bestClicks_listing->getUrl;
+    $var->{bestClicks_count} = $bestClicks_listing->get('views');
+    $var->{bestClicks_name}  = $bestClicks_listing->get('title');
+
+    # Get the MatrixListing that was last updated as an object using getLineage.
+
+    my ($bestUpdated_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            orderByClause       => "revisionDate desc",
+            limit               => 1,
+            returnObjects       => 1,
+        }) };
+    $var->{bestUpdated_url}     = $bestUpdated_listing->getUrl;
+    $var->{bestUpdated_date}    = $session->datetime->epochToHuman( $bestUpdated_listing->get('revisionDate') );
+    $var->{bestUpdated_name}    = $bestUpdated_listing->get('title');
+
+    # Get the 5 MatrixListings that were last updated as objects using getLineage.
+
+    my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            orderByClause       => "revisionDate desc",
+            limit               => 5,
+            returnObjects       => 1,
+        }) };
+    foreach my $lastUpdatedListing (@lastUpdatedListings){
+        push (@{ $var->{last_updated_loop} }, {
+                        url         => $lastUpdatedListing->getUrl,
+                        name        => $lastUpdatedListing->get('title'),
+                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('revisionDate'),"%z")
+                    });
+    }
+
+    # Get all the MatrixListings that are still pending.
+
+    my @pendingListings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            orderByClause       => "revisionDate asc",
+            returnObjects       => 1,
+            statusToInclude     => ['pending'],
+        }) };
+    foreach my $pendingListing (@pendingListings){
+        push (@{ $var->{pending_loop} }, {
+                        url     => $pendingListing->getUrl,
+                        name    => $pendingListing->get('title'),
+                    });
+    }   
+ 
+    # For each category, get the MatrixListings with the best ratings.
+
+    foreach my $category (keys %{$self->getCategories}) {
+        my $data;
+        my $sql = "
+        select
+            assetData.title as productName,
+            assetData.url,
+            listing.assetId,
+            rating.meanValue,
+            rating.medianValue,
+            rating.countValue
+        from MatrixListing as listing
+            left join asset on listing.assetId = asset.assetId
+            left join MatrixListing_ratingSummary as rating on rating.listingId = listing.assetId
+            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
+assetData.revisionDate
+        where
+            asset.parentId=?
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate)
+                from
+                    assetData
+                where
+                    assetData.assetId=asset.assetId
+                    and (status='approved' or status='archived')
+            )
+            and status='approved'
+            and rating.category=?
+        group by
+            assetData.assetId
+        order by rating.meanValue ";
+        
+        $data = $db->quickHashRef($sql." desc limit 1",[$self->getId,$category]);
+        push(@{ $var->{best_rating_loop} },{
+            url=>'/'.$data->{url},
+            category=>$category,
+            name=>$data->{productName},
+            mean=>$data->{meanValue},
+            median=>$data->{medianValue},
+            count=>$data->{countValue}
+            });
+        $data = $db->quickHashRef($sql." asc limit 1",[$self->getId,$category]);
+        push(@{ $var->{worst_rating_loop} },{
+            url=>'/'.$data->{url},
+            category=>$category,
+            name=>$data->{productName},
+            mean=>$data->{meanValue},
+            median=>$data->{medianValue},
+            count=>$data->{countValue}
+            });
+    }
+
+    $var->{listingCount} = scalar $db->buildArray("
+        select  * 
+        from    asset, assetData
+        where   asset.assetId=assetData.assetId
+                and asset.parentId=?
+                and asset.state='published'
+                and asset.className='WebGUI::Asset::MatrixListing'
+                and assetData.status='approved'
+        group by asset.assetId",
+        [$self->getId]);
 	
 	#This is an example of debugging code to help you diagnose problems.
 	#WebGUI::ErrorHandler::warn($self->get("templateId")); 

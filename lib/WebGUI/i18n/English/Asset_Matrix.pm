@@ -63,6 +63,12 @@ our $I18N = {
 		lastUpdated => 1149783768,
 	},
 
+    'categoryLabel' => {
+        message => q|The label of a category.|,
+        lastUpdated => 1149783768,
+    },
+
+
 	'tmplVar category' => {
 		message => q|The name of the current category.|,
 		lastUpdated => 1149783768,
@@ -158,64 +164,59 @@ our $I18N = {
 		lastUpdated => 1167186037,
 	},
 
-	'lastUpdated.epoch' => {
+	'lastUpdated_epoch' => {
 		message => q|The epoch date of when this listing was last updated.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
-	'lastUpdated.date' => {
+	'lastUpdated_date' => {
 		message => q|A human readable date of when this listing was last updated.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
-	'id' => {
-		message => q|The unique identifier of this listing.|,
-		lastUpdated => 1149784175,
-	},
-
-	'listing description' => {
+	'description' => {
 		message => q|The description of this listing.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'productName' => {
-		message => q|The name of this listing.|,
-		lastUpdated => 1149784175,
+		message => q|The name of this listing. This is the same as this matrix listing's asset title.|,
+		lastUpdated => 0,
 	},
 
 	'productUrl' => {
 		message => q|The manufacturer's URL for this listing.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
-	'productUrl.click' => {
+	'productUrl_click' => {
 		message => q|The product URL to use if you want to register the click count for this listing.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'manufacturerUrl' => {
 		message => q|The manufacturer's URL.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
-	'manufacturerUrl.click' => {
+	'manufacturerUrl_click' => {
 		message => q|The manufacturer URL to use if you want to register the click count for this listing.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'views' => {
 		message => q|The total number of views this listing has received.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'compares' => {
 		message => q|The total number of compares this listing has received.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'clicks' => {
 		message => q|The total number of clicks this listing has received.|,
-		lastUpdated => 1149784175,
+		lastUpdated => 0,
 	},
 
 	'ratings' => {
@@ -224,9 +225,14 @@ our $I18N = {
 	},
 
 	'CATEGORY_NAME_loop' => {
-		message => q|A loop is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
-		lastUpdated => 1167186070,
+		message => q|A loop containting attributes and values for those attributes is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
+		lastUpdated => 0,
 	},
+
+    'attribute_loop' => {
+        message => q|A loop containing attributes and values for those attributes.|,
+        lastUpdated => 0,
+    },
 
 	'tmplVar name' => {
 		message => q|The name of this field.|,
@@ -273,124 +279,124 @@ our $I18N = {
 		lastUpdated => 1149795214,
 	},
 
-	'listing.add.url' => {
+	'addMatrixListing_url' => {
 		message => q|The URL to the page where a user can add a new listing to the matrix.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.views.url' => {
+	'bestViews_url' => {
 		message => q|The URL to the listing that has the most views.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.views.count' => {
+	'bestViews_count' => {
 		message => q|The total number of views of the listing that has the most views.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.views.name' => {
+	'bestViews_name' => {
 		message => q|The name of the listing that has the most views.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.compares.url' => {
+	'bestCompares_url' => {
 		message => q|The URL to the listing that has the most compares.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.compares.count' => {
+	'bestCompares_count' => {
 		message => q|The number of compares of the listing that has the most compares.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.compares.name' => {
+	'bestCompares_name' => {
 		message => q|The name of the listing that has the most compares.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.clicks.url' => {
+	'bestClicks_url' => {
 		message => q|The URL of the listing that has the most clicks.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.clicks.count' => {
+	'bestClicks_count' => {
 		message => q|The number of clicks of the listing that has the most clicks.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.clicks.name' => {
+	'bestClicks_name' => {
 		message => q|The name of the listing that has the most clicks.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'best_rating_loop' => {
 		message => q|A loop containing all of the categories for this matrix and their best ratings.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar best.url' => {
 		message => q|The URL of the listing that has the best rating for this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar best.category' => {
 		message => q|The name of this category.|,
-		lastUpdated => 1167186103,
+		lastUpdated => 0,
 	},
 
 	'tmplVar best.name' => {
 		message => q|The name of the listing that has the best rating for this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'mean' => {
 		message => q|The mean (or average) rating of the best listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'median' => {
 		message => q|The median (or middle) rating of the best listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'count' => {
 		message => q|The sum of all the votes of the best listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'worst_rating_loop' => {
 		message => q|A loop containing all of the categories for this matrix and their worst ratings.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.url' => {
 		message => q|The URL of the listing that has the worst rating for this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.category' => {
 		message => q|The name of this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.name' => {
 		message => q|The name of the listing that has the worst rating for this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.mean' => {
 		message => q|The mean (or average) rating of the worst listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.median' => {
 		message => q|The median (or middle) rating of the worst listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar worst.count' => {
 		message => q|The sum of all the votes of the worst listing in this category.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'ratings.details.url' => {
@@ -403,19 +409,19 @@ our $I18N = {
 		lastUpdated => 1149795214,
 	},
 
-	'best.updated.url' => {
+	'bestUpdated_url' => {
 		message => q|The URL to the listing that was updated most recently.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.updated.date' => {
+	'bestUpdated_date' => {
 		message => q|The date of the most recently updated listing.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'best.updated.name' => {
+	'bestUpdated_name' => {
 		message => q|The name of the listing that was most recently updated.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'last_update_loop' => {
@@ -448,25 +454,35 @@ our $I18N = {
 		lastUpdated => 1149795214,
 	},
 
-	'listing.count' => {
+	'listingCount' => {
 		message => q|The number of listings in this matrix.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'pending_list' => {
+	'pending_loop' => {
 		message => q|A loop containing the list of pending listing.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
 	'tmplVar pending.url' => {
 		message => q|The URL to the pending listing.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'tmplVar pending.productName' => {
+	'tmplVar pending.name' => {
 		message => q|The product title of the pending listing.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
+
+    'narrow the matrix label' => {
+        message => q|Narrow The Matrix|,
+        lastUpdated => 0,
+    },
+
+    'expand the matrix label' => {
+        message => q|Expand The Matrix|,
+        lastUpdated => 0,
+    },
 
         'matrix template help title' => {
                 message => q|Matrix Main Template Variables|,
@@ -827,35 +843,46 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
-	'your email' => {
+	'your email label' => {
 		message => q|Your Email Address|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'report error' => {
+	'report error label' => {
 		message => q|Report an error.|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'general comment' => {
+	'general comment label' => {
 		message => q|General comment.|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'request type' => {
+	'request type label' => {
 		message => q|Type of Request|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
 
-	'comment' => {
+	'comment label' => {
 		message => q|Comment|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
+
+    'send button label' => {
+        message => q|Send...|,
+        lastUpdated => 0,
+    },
+
 
 	'show ratings' => {
 		message => q|Show Ratings|,
-		lastUpdated => 1133758944,
+		lastUpdated => 0,
 	},
+
+    'rate submit label' => {
+        message => q|Rate|,
+        lastUpdated => 0,
+    },
 
 	'no copy' => {
 		message => q|This asset may not be copied.|,

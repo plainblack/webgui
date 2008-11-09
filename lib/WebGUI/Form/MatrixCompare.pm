@@ -115,6 +115,27 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsHtml ()
+
+Shows either Yes or No.
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session,'Form_MatrixCompare');
+    my %options = (
+        0 => $i18n->get('no'),
+        1 => $i18n->get('limited'),
+        2 => $i18n->get('costs extra'),
+        3 => $i18n->get('free add on'),
+        4 => $i18n->get('yes'),
+    );
+    return $options{$self->getOriginalValue};
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 Returns 0.
@@ -135,7 +156,7 @@ Renders a fieldType selector.
 
 sub toHtml {
 	my $self = shift;
-    my $i18n = WebGUI::International->new($session,'Form_MatrixCompare'); 
+    my $i18n = WebGUI::International->new($self->session,'Form_MatrixCompare'); 
 	my %options;
 	tie %options, "Tie::IxHash";
     %options = (

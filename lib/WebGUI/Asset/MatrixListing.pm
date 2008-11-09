@@ -79,19 +79,20 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, "Asset_MatrixListing");
 	%properties = (
-		templateId => {
-			tab             =>"display",
-			fieldType       =>"template",  
-			defaultValue    =>'MatrixListingTmpl00001',
-			noFormPost      =>0,  
-			namespace       =>"MatrixListing", 
-			hoverHelp       =>$i18n->get('template description'),
-			label           =>$i18n->get('template label')
-			},
+#		templateId => {
+#			tab             =>"display",
+#			fieldType       =>"template",  
+#			defaultValue    =>'MatrixListingTmpl00001',
+#			noFormPost      =>0,  
+#			namespace       =>"MatrixListing", 
+#			hoverHelp       =>$i18n->get('template description'),
+#			label           =>$i18n->get('template label')
+#			},
         screenshots => {
             tab             =>"properties",
             fieldType       =>"image",
             defaultValue    =>undef,
+            maxAttachments  =>20,
             label           =>$i18n->get("screenshots label"),
             hoverHelp       =>$i18n->get("screenshots description")
             },
@@ -217,6 +218,119 @@ sub getAutoCommitWorkflowId {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm ( )
+
+Returns the TabForm object that will be used in generating the edit page for this asset.
+
+=cut
+
+sub getEditForm {
+    my $self        = shift;
+    my $session     = $self->session;
+    my $db          = $session->db;
+    my $matrixId    = $self->getParent->getId;
+    my $tabform     = $self->SUPER::getEditForm();
+    my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
+
+    #$self->session->style->setScript($self->session->url->extras('FileUploadControl.js'), {type =>'text/javascript'});
+
+    foreach my $category (keys %{$self->getParent->getCategories}) {
+        $tabform->getTab('properties')->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
+        my $attributes;
+        if ($session->form->process('func') eq 'add'){
+            $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
+                [$category,$matrixId]);
+        }
+        else{
+            $attributes = $db->read("select * from Matrix_attribute as a 
+                left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?) 
+                where category =? and a.assetId = ?",
+                [$self->getId,$category,$matrixId]);
+        }
+        while (my $attribute = $attributes->hashRef) {
+            $attribute->{label}     = $attribute->{name};
+            $attribute->{subtext}   = $attribute->{description};
+            $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
+            $tabform->getTab("properties")->dynamicField(%{$attribute});           
+        }
+    }
+    return $tabform;
+=cut
+    $tabform->hidden({
+        name=>"returnUrl",
+        value=>$self->session->form->get("returnUrl")
+        });
+    if ($self->getValue("namespace") eq "") {
+        my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by
+namespace");
+        $tabform->getTab("properties")->combo(
+            -name=>"namespace",
+            -options=>$namespaces,
+            -label=>$i18n->get('namespace'),
+            -hoverHelp=>$i18n->get('namespace description'),
+            -value=>[$self->session->form->get("namespace")]
+            );
+    }
+=cut
+}
+
+#-------------------------------------------------------------------
+
+=head2 hasRated ( )
+
+Returns whether the user has already rated this listing or not.
+
+=cut
+
+sub hasRated {
+    my $self    = shift;
+    my $session = $self->session;
+
+=cut
+    return 1 unless ($self->session->user->isInGroup($self->get("groupToRate")));
+
+    my $ratingTimeout = $self->session->user->isInGroup($self->get("privilegedGroup")) ?
+$self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
+=cut
+
+    my $hasRated = $self->session->db->quickScalar("select count(*) from MatrixListing_rating where
+        ((userId=? and userId<>'1') or (userId='1' and ipAddress=?)) and listingId=?",
+        [$session->user->userId,$session->env->get("HTTP_X_FORWARDED_FOR"),$self->getId]);
+    return $hasRated;
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 incrementCounter ( counter )
+
+Increments one of the Matrix Listing's counters.
+
+=head3 counter
+
+The name of the counter to increment this should be 'views', 'clicks' or 'compares').
+
+=cut
+
+sub incrementCounter {
+    my $self    = shift;
+    my $db      = $self->session->db;
+    my $counter = shift;
+    
+    my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
+    print "current ip: ".$currentIp."<br>";
+    
+    print "dsfsdf lastIp : ".$self->get($counter."LastIp")."<br>";
+    unless ($self->get($counter."LastIp") eq $currentIp) {
+        $self->update({ 
+            $counter."LastIp"   => $currentIp,
+            $counter            => $self->get($counter)+1,
+        });
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 indexContent ( )
 
 Making private. See WebGUI::Asset::indexContent() for additonal details. 
@@ -241,8 +355,8 @@ See WebGUI::Asset::prepareView() for details.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
+	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get('detailTemplateId'));
+    $template->prepare;
 	$self->{_viewTemplate} = $template;
 }
 
@@ -251,15 +365,26 @@ sub prepareView {
 
 =head2 processPropertiesFromFormPost ( )
 
-Used to process properties from the form posted.  Do custom things with
-noFormPost fields here, or do whatever you want.  This method is called
-when /yourAssetUrl?func=editSave is requested/posted.
+Used to process properties from the form posted.  
 
 =cut
 
 sub processPropertiesFromFormPost {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
+
 	$self->SUPER::processPropertiesFromFormPost;
+
+    my $attributes = $session->db->read("select * from Matrix_attribute where assetId = ?",[$self->getParent->getId]);
+    while (my $attribute = $attributes->hashRef) {
+        my $name = 'attribute_'.$attribute->{attributeId};
+        #my $value = $session->form->process($name);
+        my $value = $session->form->process($name,$attribute->{fieldType},$attribute->{defaultValue},$attribute);
+        $session->db->write("replace into MatrixListing_attribute (matrixId, matrixListingId, attributeId, value) 
+            values (?, ?, ?, ?)",
+            [$self->getParent->getId,$self->getId,$attribute->{attributeId},$value]);
+    }
+
     $self->requestAutoCommit;
 }
 
@@ -275,7 +400,13 @@ purges it's data.
 =cut
 
 sub purge {
-	my $self = shift;
+	my $self    = shift;
+    my $db      = $self->session->db;
+
+    $db->write("delete from MatrixListing_attribute     where matrixListingId=?",[$self->getId]);    
+    $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
+    $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
+
 	return $self->SUPER::purge;
 }
 
@@ -293,21 +424,248 @@ sub purgeRevision {
 }
 
 #-------------------------------------------------------------------
-=head2 view ( )
+
+=head2 setRatings ( ratings  )
+
+Sets the ratings for a matrix listing
+
+=head3 ratings
+
+A hashref containing the ratings to set for this listing.
+
+=cut
+
+sub setRatings {
+    my $self        = shift;
+    my $ratings     = shift;
+    my $session     = $self->session;
+    my $db          = $session->db;
+    my $matrixId    = $self->getParent->getId;
+    
+    foreach my $category (keys %{$self->getParent->getCategories}) {
+        if ($ratings->{$category}) {
+            $db->write("insert into MatrixListing_rating 
+                (userId, category, rating, timeStamp, listingId, ipAddress, matrixId) values (?,?,?,?,?,?,?)",
+                [$session->user->userId,$category,$ratings->{$category},$session->datetime->time(),$self->getId,
+                $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
+        }
+        my $sql     = "from MatrixListing_rating where listingId=? and category=?";
+        my $sum     = $db->quickScalar("select sum(rating) $sql", [$self->getId,$category]);
+        my $count   = $db->quickScalar("select count(*) $sql", [$self->getId,$category]);
+        
+        my $half    = round($count/2);
+        my $mean    = $sum / ($count || 1);
+        my $median  = $db->quickScalar("select rating $sql limit $half,$half",[$self->getId,$category]);
+        
+        $db->write("replace into MatrixListing_ratingSummary 
+            (listingId, category, meanValue, medianValue, countValue, matrixId) 
+            values (?,?,?,?,?,?)",[$self->getId,$category,$mean,$median,$count,$matrixId]);
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 view ( hasRated )
 
 method called by the container www_view method. 
+
+=head3 hasRated
+
+A boolean indicating if the user has rated this listing.
+
+=head3 hasRated
+
+A boolean indicating if an email to the listing maintianer was sent.
 
 =cut
 
 sub view {
-	my $self = shift;
-	my $var = $self->get; # $var is a hash reference.
-	$var->{controls} = $self->getToolbar;
-	$var->{fileUrl} = $self->getFileUrl;
-	$var->{fileIcon} = $self->getFileIconUrl;
+	my $self        = shift;
+    my $hasRated    = shift || $self->hasRated;
+    my $emailSent   = shift;
+    my $db          = $self->session->db;
+    my $i18n        = WebGUI::International->new($self->session, "Asset_Matrix");
+    my @categories  = keys %{$self->getParent->getCategories};
+   
+    # Increment views before getting template var hash so that the views tmpl_var has the incremented value. 
+    $self->incrementCounter("views");
+
+	my $var = $self->get;
+    if ($emailSent){
+    	$var->{emailSent}       = 1;
+    }
+    $var->{controls}            = $self->getToolbar;
+    $var->{productName}         = $var->{title};
+    $var->{lastUpdated_epoch}   = $self->get('lastUpdated');
+    $var->{lastUpdated_date}    = $self->session->datetime->epochToHuman($self->get('lastUpdated'),"%z");
+
+    $var->{manufacturerUrl_click}  = $self->getUrl("func=click;manufacturer=1");
+    $var->{productUrl_click}       = $self->getUrl("func=click");
+
+    # Attributes
+
+    foreach my $category (@categories) {
+        my $attributes;
+        my @attribute_loop;
+        my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+        $attributes = $db->read("select * from Matrix_attribute as a
+            left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
+            where category =? and a.assetId = ?",
+            [$self->getId,$category,$self->getParent->getId]);
+        while (my $attribute = $attributes->hashRef) {
+            $attribute->{label} = $attribute->{name};
+            if ($attribute->{fieldType} eq 'MatrixCompare'){
+                $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
+            }
+            #$attribute->{value} = $attribute->{description};
+            #$tabform->getTab("properties")->dynamicField(%{$attribute});
+            #my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+            push(@attribute_loop,$attribute);
+        }
+        $var->{$categoryLoopName} = \@attribute_loop;
+        push(@{$var->{category_loop}},{
+            categoryLabel   => $category,
+            attribute_loop  => \@attribute_loop,
+        });
+    }
+
+    # Screenshots
+
+    if ($var->{screenshots}) {
+        my $file = WebGUI::Form::File->new($self->session,{ value=>$var->{screenshots} });
+        my $storage = $file->getStorageLocation;
+        my @files = @{ $storage->getFiles } if (defined $storage);
+        if (scalar(@files)) {
+            $var->{screenshots} = $file->getFilePreview($storage);
+        }
+    }
+
+    # Rating form
+
+    my %rating;
+    tie %rating, 'Tie::IxHash';
+    %rating = (
+        1=>"1 - Worst",
+                2=>2,
+                3=>3,
+                4=>4,
+                5=>"5 - Respectable",
+                6=>6,
+                7=>7,
+                8=>8,
+                9=>9,
+                10=>"10 - Best"
+        );
+    my $ratingsTable = "<table class='ratingForm'><tbody>\n
+        <tr><th></th><th>Mean</th><th>Median</th><th>Count</th></tr>\n";
+
+    my $ratingForm = WebGUI::HTMLForm->new($self->session,
+        -extras     =>'class="content"',
+        -tableExtras=>'class="content"'
+        );
+    $ratingForm = WebGUI::HTMLForm->new($self->session,
+        -extras     =>'class="ratingForm"',
+        -tableExtras=>'class="ratingForm"'
+        );
+    $ratingForm->hidden(
+        -name       =>"listingId",
+        -value      =>$self->getId
+        );
+    $ratingForm->hidden(
+        -name       =>"func",
+        -value      =>"rate"
+        );
+    foreach my $category (@categories) {
+        my ($mean,$median,$count) = $db->quickArray("select meanValue, medianValue, countValue 
+            from MatrixListing_ratingSummary
+            where listingId=? and category=?",[$self->getId,$category]);
+        $ratingsTable .= '<tr><th>'.$category.'</th><td>'.$mean.'</td><td>'.$median.'</td><td>'.$count.'</td></tr>';
+        $ratingForm->selectBox(
+            -name   =>$category,
+            -label  =>$category,
+            -value  =>[5],
+            -extras =>'class="ratingForm"',
+            -options=>\%rating
+            );
+    }
+    $ratingsTable .= '</tbody></table>';
+    $ratingForm->submit(
+        -extras =>'class="ratingForm"',
+        -value  =>$i18n->get('rate submit label'),
+        -label  =>'<a href="'.$self->getUrl("func=rate").'">'.$i18n->get('show ratings').'</a>'
+        );
+    if ($hasRated) {
+        $var->{ratings} = $ratingsTable;
+    } else {
+        $var->{ratings} = $ratingForm->print;
+    }
+
+    # Mail form
+
+    my $mailForm = WebGUI::HTMLForm->new($self->session,
+        -extras     =>'class="content"',
+        -tableExtras=>'class="content"'
+        );
+    $mailForm->hidden(
+        -name       =>"func",
+        -value      =>"sendEmail"
+        );
+    $mailForm->captcha(
+        -name       =>"verify"
+        );
+    $mailForm->email(
+        -extras     =>'class="content"',
+        -name       =>"from",
+        -value      =>$self->session->user->profileField("email"),
+        -label      =>$i18n->get('your email label'),
+        );
+    $mailForm->selectBox(
+        -name       =>"subject",
+        -extras     =>'class="content"',
+        -options    =>{
+            $i18n->get('report error label')      =>$i18n->get('report error label'),
+            $i18n->get('general comment label')   =>$i18n->get('general comment label'),
+            },
+        -label      =>$i18n->get('request type label'),
+        );
+    $mailForm->textarea(
+        -rows       =>4,
+        -extras     =>'class="content"',
+        -columns    =>35,
+        -name       =>"body",
+        -label      =>$i18n->get('comment label'),
+        );
+    $mailForm->submit(
+        -extras     =>'class="content"',
+        -value      =>$i18n->get('send button label'),
+        );
+    $var->{emailForm} = $mailForm->print;
+
 	return $self->processTemplate($var,undef, $self->{_viewTemplate});
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_click ( )
+
+Redirects to the manufacturerUrl or productUrl and increments clicks.
+
+=cut
+
+sub www_click {
+    my $self    = shift;
+    my $session = $self->session;
+
+    $self->incrementCounter('clicks');
+    if ($session->form->process("manufacturer")) {
+        $session->http->setRedirect( $self->get('manufacturerUrl') );
+    }
+    else {
+        $session->http->setRedirect( $self->get('productUrl') );
+    }
+    return undef;
+}
 
 #-------------------------------------------------------------------
 
@@ -330,6 +688,75 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+=head2 www_rate ( )
+
+Saves a rating of a matrix listing and returns the listing view.
+
+=cut
+
+sub www_rate {
+    my $self = shift;
+    my $form = $self->session->form;
+    
+    my $hasRated    = $self->hasRated;
+    my $sameRating  = 1;
+    my $first       = 1;
+    my $lastRating;
+    
+    foreach my $category (keys %{$self->getParent->getCategories}) {
+        if ($first) {
+            $first=0;
+        } else {
+            if ($lastRating != $form->process($category)) {
+                $sameRating = 0;
+            }
+        }
+        $lastRating = $form->process($category);
+    }
+    
+    # Throw out ratings that are all the same number, or if the user rates twice.
+    unless ($hasRated || $sameRating) {
+        $self->setRatings($self->session->form->paramsHashRef);
+    }
+
+    $self->prepareView;
+    return $self->view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_sendEmail ( )
+
+Sends an email to the maintainer of this matrix listing and returns www_view
+
+=cut
+
+sub www_sendEmail {
+    my $self = shift;
+    my $form = $self->session->form;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+    
+    if ($form->process("verify","captcha")) {
+        if ($form->process("body") ne "") {
+            my $user = WebGUI::User->new($self->session, $self->get('maintainerId'));
+            my $mail = WebGUI::Mail::Send->create($self->session,{
+                        to      =>$user->profileField("email"),
+                        subject =>$self->get('productName')." - ".$form->process("subject"),
+                        from=>$form->process("from")
+                });
+            $mail->addText($form->process("body"));
+            $mail->addFooter;
+            $mail->queue;
+        }
+    }
+
+    $self->prepareView;
+    return $self->view(0,1);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view ( )
 
 Web facing method which is the default view page.  This method does a 
@@ -340,11 +767,8 @@ Web facing method which is the default view page.  This method does a
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	if ($self->session->var->isAdminOn) {
-		return $self->getContainer->www_view;
-	}
-	$self->session->http->setRedirect($self->getFileUrl($self->getValue("showPage")));
-	return undef;
+    $self->prepareView;
+	return $self->view;
 }
 
 #-------------------------------------------------------------------
@@ -390,6 +814,13 @@ sub install {
         productURL          varchar(255),
 		primary key (assetId, revisionDate)
 		)");
+    $session->db->write("create table MatrixListing_attribute (
+        matrixId char(22) not null, 
+        matrixListingId char(22) not null, 
+        attributeId char(22) not null, 
+        value char(255),
+        primary key (matrixId, matrixListingId, attributeId)
+        )");
 	$session->var->end;
 	$session->close;
 	print "Done. Please restart Apache.\n";
