@@ -73,7 +73,6 @@ sub addFileFromCaptcha {
 	my $self = shift;
     my $error = "";
 	my $challenge;
-    srand;
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".$self->session->id->generate().".gif";
 	my $image = $graphicsPackage->new();

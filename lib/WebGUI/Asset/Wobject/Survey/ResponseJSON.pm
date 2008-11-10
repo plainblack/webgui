@@ -34,7 +34,7 @@ sub createSurveyOrder{
     my $self = shift;
     my $order;
     my $qstarting = 0;
-    
+$self->log('wtf am I faling for'); 
     for(my $s = 0; $s <= $#{$self->survey->sections()}; $s++){
         #create question order for section
         my @qorder;

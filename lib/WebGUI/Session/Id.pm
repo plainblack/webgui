@@ -101,7 +101,6 @@ A reference to the current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	srand;
 	bless {_session=>$session}, $class;
 }
 

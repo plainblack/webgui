@@ -13,7 +13,7 @@
  - added: Delete columns from DataTable
  - fixed: Now more than one DataTable can be put on a page
  - fixed #9002: add a variant in admin product view misses i18n link
-
+ - fixed #9034: Removed all instances of srand.  This is called implicitily by rand and be dangerous if called mulitple times by the same process.
 7.6.2
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
  - sped up lineage changes significantly
