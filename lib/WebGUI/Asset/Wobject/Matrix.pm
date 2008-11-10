@@ -115,9 +115,9 @@ sub definition {
             tab             =>"display",
             options         =>{ 
                                 score           => $i18n->get('sort by score label'),
-                                alphaNumeric    => $i18n->get('sort alpha numeric label'),
-                                assetRank       => $i18n->get('sort by asset rank label'),
-                                lastUpdated     => $i18n->get('sort by last updated label'),
+                                title           => $i18n->get('sort alpha numeric label'),
+                                lineage         => $i18n->get('sort by asset rank label'),
+                                revisionDate    => $i18n->get('sort by last updated label'),
                               },
             defaultValue    =>"score",
             hoverHelp       =>$i18n->get('default sort description'),
@@ -309,6 +309,77 @@ sub getCategories {
 
 }
 
+#-------------------------------------------------------------------
+
+=head2 getCompareForm  (  )
+
+Returns the compare form.
+
+=head3 selectedListingIds
+
+An array of listingIds that should be selected in the compare form.
+
+=cut
+
+sub getCompareForm {
+    my $self = shift;
+    my @selectedListingIds = @_;
+    
+    my (%options, @listings);
+    tie %options, 'Tie::IxHash';
+
+    if ($self->get('defaultSort') eq 'score'){
+        my @unorderedListings = @{ $self->getLineage(['descendants'], {
+                includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+                returnObjects       => 1,
+            }) };
+        foreach my $listing (@unorderedListings) {
+        }
+        # sort an array of hashrefs:
+        # @listings = sort { $$a{'ques'} <=> $$b{'ques'} } @listings;        
+    }
+    else{
+        my $sortDirection = " asc";
+        if ($self->get('defaultSort') eq "revisionDate"){   
+            $sortDirection = " desc";
+        }
+        @listings = @{ $self->getLineage(['descendants'], {
+                includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+                orderByClause       => $self->get('defaultSort').$sortDirection,
+                returnObjects       => 1,
+            }) };
+    }
+    # Create an options hash based on the orderd array of listings.
+    foreach my $listing (@listings){
+        $options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
+    }
+
+
+    my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+        .WebGUI::Form::submit($self->session, {
+            value=>"compare"
+            })
+        ."<br />"
+        ."<br />"
+        .WebGUI::Form::hidden($self->session, {
+            name=>"func",
+            value=>"compare"
+            })
+        .WebGUI::Form::checkList($self->session, {
+            name=>"listingId",
+            vertical=>1,
+            value=>\@selectedListingIds,
+            options=>\%options,
+        })
+        ."<br />"
+        .WebGUI::Form::submit($self->session,{
+            value=>"compare"
+            })
+        .WebGUI::Form::formFooter($self->session);
+    return $form;
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -382,6 +453,7 @@ sub view {
 	my $var = $self->get;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
+    $var->{compareForm}             = $self->getCompareForm;
 
     # Get the MatrixListing with the most views as an object using getLineage.
     my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
