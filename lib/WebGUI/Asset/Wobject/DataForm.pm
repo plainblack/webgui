@@ -1272,7 +1272,7 @@ sub www_editTab {
 
     my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
-        -name => "tabIdd",
+        -name => "tabId",
         -value => $tabId,
     );
     $f->hidden(
