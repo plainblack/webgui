@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 82; # increment this value for each test you create
+my $numTests = 75; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -68,7 +68,7 @@ is( $storage1->getLastError, undef, "No errors during path creation");
 #
 ####################################################
 
-is( $storage1->getPathFrag, 'fo/ob/foobar', 'pathFrag returns correct value');
+is( $storage1->getPathFrag, '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
 
 ####################################################
 #
@@ -76,15 +76,15 @@ is( $storage1->getPathFrag, 'fo/ob/foobar', 'pathFrag returns correct value');
 #
 ####################################################
 
-my $storageDir1 = join '/', $uploadDir, 'fo', 'ob', 'foobar';
-is ($storageDir1, $storage1->getPath, 'getPath: path calculated correctly for directory');
+my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6a';
+is ($storage1->getPath, $storageDir1, 'getPath: path calculated correctly for directory');
 my $storageFile1 = join '/', $storageDir1, 'baz';
-is ($storageFile1, $storage1->getPath('baz'), 'getPath: path calculated correctly for file');
+is ($storage1->getPath('baz'), $storageFile1, 'getPath: path calculated correctly for file');
 
-my $storageUrl1 = join '/', $uploadUrl, 'fo', 'ob', 'foobar';
-is ($storageUrl1, $storage1->getUrl, 'getUrl: url calculated correctly for directory');
+my $storageUrl1 = join '/', $uploadUrl, '7e', '8a', '7e8a1b6a';
+is ($storage1->getUrl, $storageUrl1, 'getUrl: url calculated correctly for directory');
 my $storageUrl2 = join '/', $storageUrl1, 'bar';
-is ($storageUrl2, $storage1->getUrl('bar'), 'getUrl: url calculated correctly for file');
+is ($storage1->getUrl('bar'), $storageUrl2, 'getUrl: url calculated correctly for file');
 
 ok( (-e $storageDir1 and -d $storageDir1), "Storage location created and is a directory");
 
@@ -290,7 +290,7 @@ ok(-e $hackedStore->getPath('fileToHack'), 'deleteFile did not delete the file i
 my $tempStor = WebGUI::Storage->createTemp($session);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
-is ($tempStor->{_part1}, 'temp', 'createTemp puts stuff in the temp directory');
+is (substr($tempStor->getPathFrag, 0, 5), 'temp/', 'createTemp puts stuff in the temp directory');
 use Data::Dumper;
 diag Dumper $tempStor->getErrors();
 ok (-e $tempStor->getPath(), 'createTemp: directory was created');
@@ -303,7 +303,7 @@ ok (-e $tempStor->getPath(), 'createTemp: directory was created');
 
 my $tarStorage = $copiedStorage->tar('tar.tar');
 isa_ok( $tarStorage, "WebGUI::Storage", "tar: returns a WebGUI::Storage object");
-is ($tarStorage->{_part1}, 'temp', 'tar: puts stuff in the temp directory');
+is (substr($tarStorage->getPathFrag, 0, 5), 'temp/', 'tar: puts stuff in the temp directory');
 cmp_bag($tarStorage->getFiles(), [ 'tar.tar' ], 'tar: storage contains only the tar file');
 isnt($tarStorage->getPath, $copiedStorage->getPath, 'tar did not reuse the same path as the source storage object');
 
@@ -315,7 +315,7 @@ isnt($tarStorage->getPath, $copiedStorage->getPath, 'tar did not reuse the same 
 
 my $untarStorage = $tarStorage->untar('tar.tar');
 isa_ok( $untarStorage, "WebGUI::Storage", "untar: returns a WebGUI::Storage object");
-is ($untarStorage->{_part1}, 'temp', 'untar: puts stuff in the temp directory');
+is (substr($untarStorage->getPathFrag, 0, 5), 'temp/', 'untar: puts stuff in the temp directory');
 ##Note, getFiles will NOT recurse, so do not use a deep directory structure here
 cmp_bag($untarStorage->getFiles, $copiedStorage->getFiles, 'tar and untar loop preserve all files');
 isnt($untarStorage->getPath, $tarStorage->getPath, 'untar did not reuse the same path as the tar storage object');
@@ -345,27 +345,6 @@ cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile'], 'getFiles(1) returns a
 $fileStore->addFileFromScalar('dot.file', 'dot.file');
 cmp_bag($fileStore->getFiles(),  ['dot.file'],            'getFiles() returns normal files');
 cmp_bag($fileStore->getFiles(1), ['.', '..', '.dotfile', 'dot.file'], 'getFiles(1) returns all files, including dot files');
-
-####################################################
-#
-# Hexadecimal File Ids
-#
-####################################################
-
-$session->config->set('caseInsensitiveOS', 1);
-
-my $hexStorage = WebGUI::Storage->create($session);
-ok($session->id->valid($hexStorage->getId), 'create returns valid sessionIds in hex mode');
-isnt($hexStorage->getId, $hexStorage->getFileId, 'getId != getFileId when caseInsentiveOS=1');
-is($session->id->toHex($hexStorage->getId), $hexStorage->getFileId, 'Hex value of GUID calculated correctly');
-my ($hexValue) = $session->db->quickArray('select hexValue,guidValue from storageTranslation where guidValue=?',[$hexStorage->getId]);
-is($hexStorage->getFileId, $hexValue, 'hexValue cached in the storageTranslation table');
-my ($part1, $part2) = unpack "A2A2A*", $hexStorage->getFileId;  #fancy m/(..)(..)/;
-is ($hexStorage->{_part1}, $part1, 'Storage part1 uses hexId');
-is ($hexStorage->{_part2}, $part2, 'Storage part2 uses hexId, too');
-like ($hexStorage->getPath, qr/$hexValue/, 'Storage path uses hexId');
-
-$session->config->set('caseInsensitiveOS', 0);
 
 ####################################################
 #

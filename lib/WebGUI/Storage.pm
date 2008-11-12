@@ -14,17 +14,17 @@ package WebGUI::Storage;
 
 =cut
 
+use strict;
+use warnings;
 use Archive::Tar;
 use Carp qw( croak );
 use Cwd ();
-use File::Copy qw(cp);
-use FileHandle;
-use File::Find;
-use File::Path;
-use Storable qw(nstore retrieve);
-use strict;
-use warnings;
-use WebGUI::Utility;
+use File::Copy ();
+use File::Find ();
+use File::Path ();
+use File::Spec;
+use Storable ();
+use WebGUI::Utility qw(isIn);
 
 =head1 NAME
 
@@ -112,7 +112,7 @@ NOTE: This is a private method and should never be called except internally to t
 sub _makePath {
 	my $self = shift;
 	my $node = $self->session->config->get("uploadsPath");
-	foreach my $folder ($self->{_part1}, $self->{_part2}, $self->getFileId) {
+	foreach my $folder (@{ $self->{_pathParts} }) {
 		$node .= '/'.$folder;
 		unless (-e $node) { # check to see if it already exists
 			if (mkdir($node)) { # check to see if there was an error during creation
@@ -158,46 +158,43 @@ Provide the local path to this file.
 =cut
 
 sub addFileFromFilesystem {
-	my $self = shift;
-	my $pathToFile = shift;
-	my $filename;
-        if (defined $pathToFile) {
-                if ($pathToFile =~ /([^\/\\]+)$/) {
-                        $filename = $1;
-                } else {
-                        $pathToFile = $filename;
-                }
-                if (isIn($self->getFileExtension, qw(pl perl sh cgi php asp))) {
-                        $filename =~ s/\./\_/g;
-                        $filename .= ".txt";
-                }
-                $filename = $self->session->url->makeCompliant($filename);
-                if (-d $pathToFile) {
-                        $self->session->errorHandler->error($pathToFile." is a directory, not a file.");
-                } else {
-                        my $source = FileHandle->new($pathToFile,"r");
-                        if (defined $source) {
-                                binmode($source);
-                                my $dest = FileHandle->new(">".$self->getPath($filename));
-                                if (defined $dest) {
-                                        binmode($dest);
-                                        cp($source,$dest) or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
-                                        $dest->close;
-                                        $self->_changeOwner($self->getPath($filename));
-                                } else {
-                                        $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
-                                        $filename = undef;
-                                }
-                                $source->close;
-                        } else {
-                                $self->_addError("Couldn't open file ".$pathToFile." for reading due to error: ".$!);
-                                $filename = undef;
-                        }
-                }
-        } else {
-                $filename = undef;
-        }
-        return $filename;
+    my $self = shift;
+    my $pathToFile = shift;
+    if (! defined $pathToFile) {
+        return undef;
+    }
+    $pathToFile = Cwd::realpath($pathToFile); # trace any symbolic links
+    if (-d $pathToFile) {
+        $self->session->log->error($pathToFile." is a directory, not a file.");
+        return undef;
+    }
+    # checks the same file
+    elsif (!-f _) {
+        $self->session->log->error($pathToFile." is not a regular file.");
+        return undef;
+    }
+    my $filename = (File::Spec->splitpath( $pathToFile ))[2];
+    if (isIn($self->getFileExtension($filename), qw(pl perl sh cgi php asp))) {
+        $filename =~ s/\./\_/g;
+        $filename .= ".txt";
+    }
+    $filename = $self->session->url->makeCompliant($filename);
+    my $source;
+    my $dest;
+    unless ( open $source, '<:raw', $pathToFile ) {
+        $self->_addError("Couldn't open file ".$pathToFile." for reading due to error: ".$!);
+        return undef;
+    }
+    unless ( open $dest, '>:raw', $self->getPath($filename) ) {
+        $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
+        close $source;
+        return undef;
+    }
+    File::Copy::copy($source,$dest)
+        or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
+    close $dest;
+    close $source;
+    return $filename;
 }
 
 
@@ -221,45 +218,43 @@ sub addFileFromFormPost {
 	my $self = shift;
 	my $formVariableName = shift;
 	my $attachmentLimit = shift || 99999;
-	return "" if ($self->session->http->getStatus() =~ /^413/);
-	require Apache2::Request;
+    my $session = $self->session;
+    return ""
+        if ($self->session->http->getStatus eq '413');
+    require Apache2::Request;
     require Apache2::Upload;
-	my $filename;
-	my $attachmentCount = 1;
-	foreach my $upload ($self->session->request->upload($formVariableName)) {
-            $self->session->errorHandler->info("Trying to get " . $upload->filename);
-		return $filename if $attachmentCount > $attachmentLimit;
-		my $tempFilename = $upload->filename();
-		next unless $tempFilename;
-		next unless $upload->size > 0;
-		next if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));
-		if ($tempFilename =~ /([^\/\\]+)$/) { $tempFilename = $1; }
-		my $type = $self->getFileExtension($tempFilename);
-		if (isIn($type, qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
-			$tempFilename =~ s/\./\_/g;
-			$tempFilename .= ".txt";
-		}
-		$filename = $self->session->url->makeCompliant($tempFilename);
-		my $bytesread;
-		my $file = FileHandle->new(">".$self->getPath($filename));
-		$attachmentCount++;
-		if (defined $file) {
-			my $buffer;
-			my $sourcefh = $upload->fh;
-			binmode $file;
-			while ($bytesread=read($sourcefh,$buffer,1024)) {
-				print $file $buffer;
-			}
-			close($file);
-            $self->_changeOwner($self->getPath($filename));
-                        $self->session->errorHandler->info("Got ".$upload->filename);
-		} else {
-			$self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
-			return undef;
-		}
-	}
-	return $filename if $filename;
-	return undef;
+    my $filename;
+    my $attachmentCount = 1;
+    foreach my $upload ($session->request->upload($formVariableName)) {
+        $session->errorHandler->info("Trying to get " . $upload->filename);
+        return $filename
+            if $attachmentCount > $attachmentLimit;
+        my $clientFilename = $upload->filename;
+        next
+            unless $clientFilename;
+        next
+            unless $upload->size > 0;
+        next
+            if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));
+        $clientFilename =~ s/.*[\/\\]//;
+        my $type = $self->getFileExtension($clientFilename);
+        if (isIn($type, qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
+            $clientFilename =~ s/\./\_/g;
+            $clientFilename .= ".txt";
+        }
+        $filename = $session->url->makeCompliant($clientFilename);
+        my $filePath = $self->getPath($filename);
+        $attachmentCount++;
+        if ($upload->link($filePath)) {
+            $self->_changeOwner($filePath);
+            $self->session->errorHandler->info("Got ".$upload->filename);
+        }
+        else {
+            $self->_addError("Couldn't open file ".$self->getPath($filename)." for writing due to error: ".$!);
+            return undef;
+        }
+    }
+    return $filename;
 }
 
 
@@ -283,7 +278,8 @@ sub addFileFromHashref {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
 	my $hashref = shift;
-    nstore $hashref, $self->getPath($filename) or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
+    Storable::nstore($hashref, $self->getPath($filename))
+        or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
     $self->_changeOwner($self->getPath($filename));
 	return $filename;
 }
@@ -308,12 +304,13 @@ sub addFileFromScalar {
 	my $self = shift;
 	my $filename = $self->session->url->makeCompliant(shift);
 	my $content = shift;
-	if (open(my $FILE,">",$self->getPath($filename))) {
+	if (open(my $FILE, ">", $self->getPath($filename))) {
 		print $FILE $content;
 		close($FILE);
         $self->_changeOwner($self->getPath($filename));
-	} else {
-        	$self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
+	}
+    else {
+        $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
 	}
 	return $filename;
 }
@@ -329,8 +326,8 @@ Clears a storage locations of all files except the .wgaccess file
 sub clear {
 	my $self = shift;
 	my $filelist = $self->getFiles(1);
-	foreach my $file (@{$filelist}) {	
-       $self->deleteFile($file);    
+	foreach my $file (@{$filelist}) {
+       $self->deleteFile($file);
     }
 }
 
@@ -356,11 +353,9 @@ sub copy {
     my $newStorage = shift || WebGUI::Storage->create($self->session);
     my $filelist = shift || $self->getFiles(1);
     foreach my $file (@{$filelist}) {
-        open my $source, '<', $self->getPath($file) or next;
-        open my $dest, '>', $newStorage->getPath($file) or next;
-        binmode $source;
-        binmode $dest;
-        cp($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
+        open my $source, '<:raw', $self->getPath($file) or next;
+        open my $dest, '>:raw', $newStorage->getPath($file) or next;
+        File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
         close $dest;
         close $source;
         $newStorage->_changeOwner($newStorage->getPath($file));
@@ -387,7 +382,7 @@ sub copyFile {
     croak "Second argument must be a filename"
         unless $newFilename;
 
-    cp( $self->getPath($filename), $self->getPath($newFilename) )
+    File::Copy::copy( $self->getPath($filename), $self->getPath($newFilename) )
         || croak "Couldn't copy '$filename' to '$newFilename': $!";
     $self->_changeOwner($self->getPath($filename));
 
@@ -409,19 +404,8 @@ A reference to the current session;
 sub create {
     my $class   = shift;
     my $session = shift;
-    my $id      = $session->id->generate();
-	
-    #Determine whether or not to use case insensitive files
-    my $config          = $session->config;
-    my $db              = $session->db;
-    my $caseInsensitive = $config->get("caseInsensitiveOS");
-    
-    #For case insensitive operating systems, convert guid to hex
-    if ($caseInsensitive) {
-        my $hexId = $session->id->toHex($id);
-        $db->write("insert into storageTranslation (guidValue,hexValue) values (?,?)",[$id,$hexId]);
-    }
-    
+    my $id      = $session->id->generate;
+
     my $self = $class->get($session,$id);
     $self->_makePath;
 
@@ -445,23 +429,11 @@ A reference to the current session.
 sub createTemp {
 	my $class   = shift;
 	my $session = shift;
-	my $id      = $session->id->generate();
-	my $guid    = $id;
+	my $id      = $session->id->generate;
+	my $path    = $session->id->toHex($id);
 
-    #Determine whether or not to use case insensitive files
-    my $config          = $session->config;
-    my $db              = $session->db;
-    my $caseInsensitive = $config->get("caseInsensitiveOS");
-                    
-    #For case insensitive operating systems, convert guid to hex
-    if($caseInsensitive) {
-        my $hexId = $session->id->toHex($id);
-        $db->write("insert into storageTranslation (guidValue,hexValue) values (?,?)",[$id,$hexId]);
-        $id = $hexId;
-    }
-    
-	$id =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $guid, _part1 => 'temp', _part2 => $1, _errors => []};
+	$path =~ m/^(.{2})/;
+	my $self = {_session=>$session, _id => $id, _pathParts => ['temp', $1, $path], _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
@@ -477,30 +449,18 @@ Deletes this storage location and its contents (if any) from the filesystem.
 
 sub delete {
 	my $self = shift;
-	my $db   = $self->session->db;
-	
-	my $path = $self->getPath;
-	if ($path) {
-		rmtree($path) if (-d $path);
-		foreach my $subDir ($self->{_part1}.'/'.$self->{_part2}, $self->{_part1}) {
-			my $uDir = $self->session->config->get('uploadsPath') . '/' . $subDir;
-			if (opendir my $DH, $uDir) {
-				my @dirs = grep { !/^\.+$/ } readdir($DH);
-				if (scalar @dirs == 0) {
-					rmtree($uDir);
-				}
-				close $DH;
-			} else {
-				$self->session->errorHandler->warn("Unable to open $uDir for directory reading");
-			}
-		}
-		#Delete the item from the storageTranslation table
-		if($self->session->config->get("caseInsensitiveOS")){
-		    $db->write("delete from storageTranslation where guidValue=?",[$self->getId]);
-	    }
-	}
-        $self->session->errorHandler->info("Deleted storage ".$self->getId);
-	return undef;
+
+    my $path = $self->getPath || return undef;
+    File::Path::rmtree($path)
+        if (-d $path);
+    foreach my $subDir (join('/', @{$self->{_pathParts}}[0,1]), $self->{_pathParts}[0]) {
+        my $fullPath = $self->session->config->get('uploadsPath') . '/' . $subDir;
+
+        # can only remove empty directories, will fail silently otherwise
+        rmdir $fullPath;
+    }
+    $self->session->errorHandler->info("Deleted storage ".$self->getId);
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -519,7 +479,8 @@ it doesn't.
 sub deleteFile {
     my $self = shift;
     my $filename = shift;
-    return undef if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
+    return undef
+        if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
     unlink($self->getPath($filename));
 }
 
@@ -541,39 +502,29 @@ The unique identifier for this file system storage location.
 =cut
 
 sub get {
-	my $class   = shift;
-	my $session = shift;
-	my $id      = shift;
-	return undef unless $id;
-	my $guid    = $id;
-	my $self;
-    
-    my $db      = $session->db;
-    
-	#Determine whether or not to use case insensitive files
-    my $config          = $session->config;
-    my $caseInsensitive = $config->get("caseInsensitiveOS");
+    my $class   = shift;
+    $class = ref($class) || $class;
+    my $session = shift;
+    my $id      = shift;
+    return undef
+        unless $id;
+    my $self = bless {_session=>$session, _id => $id, _errors => []}, $class;
 
-    #For case insensitive operating systems, convert guid to hex
-    if($caseInsensitive) {
-       #Determine if the item is in the database
-       my ($hexId) = $db->quickArray("select hexValue from storageTranslation where guidValue=?",[$id]);
-       
-       #Set the value of the guid to the hex value if found.
-       $id = $hexId if($hexId);
+    my $uploadsRoot = $session->config->get('uploadsPath');
+    my @parts = ($id =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+    unless (@parts) {
+        $self->_addError("Illegal ID: $id");
+        return $self;
     }
-                                
-    $self = {_session=>$session, _id => $guid, _errors => []};
-	bless $self, ref($class)||$class;
-	if (my ($part1, $part2) = $id =~ m/^(.{2})(.{2})/) {
-		$self->{_part1} = $part1;
-		$self->{_part2} = $part2;
-		$self->_makePath unless (-e $self->getPath); # create the folder in case it got deleted somehow
-	}
-	else {
-		$self->_addError("Illegal ID: $id");
-	}
-	return $self;
+    if (!-e join('/', $uploadsRoot, @parts)) {
+        my $hexId = $session->id->toHex($id);
+        @parts = ($hexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+    }
+    $self->{_pathParts} = \@parts;
+    # create the folder in case it got deleted somehow
+    $self->_makePath
+        unless (-e $self->getPath);
+    return $self;
 }
 
 #-------------------------------------------------------------------
@@ -620,7 +571,7 @@ The file to retrieve the data from.
 sub getFileContentsAsHashref {
 	my $self = shift;
 	my $filename = shift;
-        return retrieve($self->getPath($filename));
+    return Storable::retrieve($self->getPath($filename));
 }
 
 
@@ -639,11 +590,10 @@ The name of the file to read from.
 sub getFileContentsAsScalar {
 	my $self = shift;
 	my $filename = shift;
-	my $content;
-	open (my $FILE,"<",$self->getPath($filename));
+    open my $FILE, '<', $self->getPath($filename) or return undef;
     local $/;
-    $content = <$FILE>;
-	close($FILE);
+    my $content = <$FILE>;
+    close $FILE;
 	return $content;
 }
 
@@ -665,8 +615,8 @@ sub getFileExtension {
 	my $self = shift;
 	my $filename = shift;
 	$filename = lc $filename;
-        my ($extension) = $filename =~ /\.([^.]*)$/;
-        return $extension;
+    my ($extension) = $filename =~ /\.([^.]*)$/;
+    return $extension;
 }
 
 
@@ -707,8 +657,7 @@ Returns the size of this file.
 sub getFileSize {
 	my $self = shift;
 	my $filename = shift;
-        my (@attributes) = stat($self->getPath($filename));
-        return $attributes[7];
+    return (stat($self->getPath($filename)))[7];
 }
 
 
@@ -749,24 +698,7 @@ Returns the file id for this storage location.
 
 sub getFileId {
 	my $self    = shift;
-	my $session = $self->session;
-	my $config  = $session->config;
-	my $db      = $session->db;
-	
-	my $id      = $self->getId;
-	
-	my $caseInsensitive = $config->get("caseInsensitiveOS");
-
-    #For case insensitive operating systems, convert guid to hex
-    if($caseInsensitive) {
-       #Determine if the item is in the database
-       my ($hexId) = $db->quickArray("select hexValue from storageTranslation where guidValue=?",[$id]);
-       
-       #Set the value of the guid to the hex value if found.
-       return $hexId if($hexId);
-    }
-	
-	return $id;
+	return $self->getId;
 }
 
 #-------------------------------------------------------------------
@@ -812,19 +744,16 @@ NOTE: Does not check if the file exists. This is a feature.
 =cut
 
 sub getPath {
-	my $self = shift;	
+	my $self = shift;
 	my $file = shift;
-	my $id   = $self->getFileId;
-	
-	unless ($self->session->config->get("uploadsPath") && $self->{_part1} && $self->{_part2} && $id) {
+
+    unless ($self->session->config->get("uploadsPath") && $self->{_pathParts} && @{ $self->{_pathParts} }) {
 		$self->_addError("storage object malformed");
 		return undef;
-	}
-    my $path = $self->session->config->get("uploadsPath")
-             . '/'
-             . $self->getPathFrag();
+    }
+    my $path = join('/', $self->session->config->get("uploadsPath"), @{ $self->{_pathParts} });
     if (defined $file) {
-            $path .= '/'.$file;
+        return join('/', $path, $file);
     }
     return $path;
 }
@@ -839,8 +768,8 @@ Returns the internal, upload dir specific part of the path.
 =cut
 
 sub getPathFrag {
-    my $self = shift;	
-    return join '/', $self->{_part1}, $self->{_part2}, $self->getFileId;
+    my $self = shift;
+    return join '/', @{ $self->{_pathParts} };
 }
 
 
@@ -872,7 +801,7 @@ sub getUrl {
 
 =head2 renameFile ( filename, newFilename )
 
-Renames an file's filename.  Returns true if the rename succeeded and false
+Renames a file's filename.  Returns true if the rename succeeded and false
 if it didn't.
 
 =head3 filename
@@ -889,7 +818,7 @@ sub renameFile {
 	my $self = shift;
 	my $filename = shift;
 	my $newFilename = shift;
-        rename $self->getPath($filename), $self->getPath($newFilename);
+    rename $self->getPath($filename), $self->getPath($newFilename);
 }
 
 
@@ -964,9 +893,10 @@ sub tar {
     my $filename = shift;
     my $temp = shift || WebGUI::Storage->createTemp($self->session);
     my $originalDir = Cwd::cwd();
-    chdir $self->getPath or croak 'Unable to chdir to ' . $self->getPath . ": $!";
-    my @files = ();
-    find(sub { push(@files, $File::Find::name)}, ".");
+    chdir $self->getPath
+        or croak 'Unable to chdir to ' . $self->getPath . ": $!";
+    my @files;
+    File::Find::find(sub { push(@files, $File::Find::name)}, ".");
     Archive::Tar->create_archive($temp->getPath($filename),1,@files);
     chdir $originalDir;
     return $temp;
@@ -998,9 +928,10 @@ sub untar {
     local $Archive::Tar::CHOWN = 0;
     local $Archive::Tar::CHMOD = 0;
     Archive::Tar->extract_archive($self->getPath($filename),1);
-    $self->_addError(Archive::Tar->error) if (Archive::Tar->error);
+    $self->_addError(Archive::Tar->error)
+        if (Archive::Tar->error);
     my @files;
-    find(sub {
+    File::Find::find(sub {
         push(@files, $File::Find::name);
     }, ".");
     $self->_changeOwner(@files);
@@ -1009,5 +940,5 @@ sub untar {
     return $temp;
 }
 
-
 1;
+

@@ -32,11 +32,21 @@ my $session = start(); # this line required
 createLastUpdatedField($session);
 createFieldShowOnline($session);
 upgradeSyndicatedContentTemplates($session);
+removeCaseInsensitiveConfig($session);
 migrateSurvey($session);
 
 finish($session); # this line required
 
 
+#----------------------------------------------------------------------------
+# removes the caseInsensitiveOS flag from the config file, as it isn't used anymore
+sub removeCaseInsensitiveConfig {
+    my $session = shift;
+    print "\tRemoving caseInsensitiveOS flag from config..." unless $quiet;
+    $session->config->delete('caseInsensitiveOS');
+    $session->db->write('DROP TABLE storageTranslation');
+    print " Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # This method migrates the the old survey system and existing surveys to the new survey system
@@ -87,7 +97,7 @@ sub migrateSurvey{
         }
 
         #move over questions
-        my %qMap = ('radioList','Multiple Choice','text','Text','HTMLArea','Text','textArea','Text');
+        #my %qMap = ('radioList','Multiple Choice','text','Text','HTMLArea','Text','textArea','Text');
         $sql = "select * from Survey_question_old where Survey_id = '$$survey{Survey_id}' order by sequenceNumber";
         my $questions = $session->db->buildArrayRefOfHashRefs($sql);
         my $qId = 0;

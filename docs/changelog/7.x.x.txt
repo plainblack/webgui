@@ -1,4 +1,6 @@
 7.6.3
+ - improved performance of file uploads
+ - changed format of created uploads locations, avoiding case sensitivity problems
  - fixed #8989: Missing profile field "showOnline" for the UsersOnline macro.
  - Added DataTable to WebGUI.conf.original
  - Added a better mechanism for calculating when content was last modified for

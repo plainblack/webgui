@@ -177,6 +177,12 @@ sub size {
 	return $self->{size};
 }
 
+sub link {
+    my $self = shift;
+    my $dest = shift;
+    return File::Copy::copy($self->filename, $dest);
+}
+
 package WebGUI::PseudoRequest;
 
 #----------------------------------------------------------------------------
