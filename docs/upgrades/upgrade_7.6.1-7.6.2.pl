@@ -21,6 +21,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Utility;
+use Tie::IxHash;
 
 
 my $toVersion = '7.6.2';
@@ -40,8 +41,19 @@ addProfileExtrasField($session);
 addWorkflowToDataform( $session );
 installDataTableAsset( $session );
 installAjaxI18N( $session );
+fixFriendsGroups( $session );
 upgradeAccount( $session );
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub fixFriendsGroups {
+    my $session = shift;
+    my $users = $session->db->buildArrayRef("select userId from users where friendsGroup is not null && friendsGroup != ''");
+    foreach my $userId (@{$users}) {
+        #purge the admin group
+        WebGUI::User->new($session,$userId)->friends->deleteGroups([3]);
+    }
+}
 
 #----------------------------------------------------------------------------
 sub upgradeAccount {
@@ -52,25 +64,29 @@ sub upgradeAccount {
     print "\tUpgrading WebGUI Account System... " unless $quiet;
     #Add account properties to config file
     $session->config->delete("account"); #Delete account if it exists
-    $session->config->set("account",{
-        profile => {
-			title     => "^International(title,Account_Profile);",
-			className => "WebGUI::Account::Profile",
-		},
-        friends => {
-			title     => "^International(title,Account_Friends);",
-			className => "WebGUI::Account::Friends",
-		},
-        user => {
-        	title     => "^International(title,Account_User);",
-			className => "WebGUI::Account::User",
+    $session->config->set("account",[
+        {
+            identifier    => "profile",
+            title         => "^International(title,Account_Profile);",
+            className     => "WebGUI::Account::Profile"
         },
-        inbox => {
-        	title     => "^International(title,Account_Inbox);",
-			className => "WebGUI::Account::Inbox",
-        }
-    });
-
+        {
+            identifier    => "inbox",
+            title         => "^International(title,Account_Inbox);",
+			className     => "WebGUI::Account::Inbox"
+        },
+        {
+            identifier    => "friends",
+            title         => "^International(title,Account_Friends);",
+			className     => "WebGUI::Account::Friends"
+        },
+        {
+            identifier    => "user",
+            title         => "^International(title,Account_User);",
+			className     => "WebGUI::Account::User"
+        },
+    ]);
+    $session->config->set("profileModuleIdentifier","profile");
     #Add the content handler to the config file if it's not there
     my $oldHandlers = $session->config->get( "contentHandlers" );
     unless (isIn("WebGUI::Content::Account",@{$oldHandlers})) {
@@ -84,10 +100,84 @@ sub upgradeAccount {
         $session->config->set( "contentHandlers", \@newHandlers );
     }
     
-    #Add the settings
+    #Add the settings for the profile
     $setting->add("profileStyleTemplateId",""); #Use the userStyle by default
-    $session->setting->add("profileLayoutTempalteId","FJbUTvZ2nUTn65LpW6gjsA");
-    $session->setting->add("profileViewTemplateId","75CmQgpcCSkdsL-oawdn3Q");
+    $setting->add("profileLayoutTemplateId","N716tpSna0iIQTKxS4gTWA");
+    $setting->add("profileEditLayoutTemplateId","FJbUTvZ2nUTn65LpW6gjsA"); 
+    $setting->add("profileEditTemplateId","75CmQgpcCSkdsL-oawdn3Q");
+    $setting->add("profileViewTempalteId","2CS-BErrjMmESOtGT90qOg");
+
+    #Add the settings for the inbox
+    $setting->add("inboxStyleTemplateId",""); #Use the userStyle by default
+    $setting->add("inboxLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
+    $setting->add("inboxViewTemplateId","c8xrwVuu5QE0XtF9DiVzLw");
+    $setting->add("inboxViewMessageTemplateId","0n4HtbXaWa_XJHkFjetnLQ");
+    $setting->add("inboxSendMessageTemplateId","6uQEULvXFgCYlRWnYzZsuA");
+    $setting->add("inboxErrorTemplateId","ErEzulFiEKDkaCDVmxUavw");
+    $setting->add("inboxInvitationErrorTemplateId","5A8Hd9zXvByTDy4x-H28qw");
+    $setting->add("inboxMessageConfirmationTemplateId","DUoxlTBXhVS-Zl3CFDpt9g");
+    $setting->add("inboxManageInvitationsTemplateId","1Q4Je3hKCJzeo0ZBB5YB8g");
+
+    #Add inbox changes
+    $session->db->write(q{
+        create table inbox_messageState (
+            messageId char(22) binary not null,
+            userId char(22) binary not null,
+            isRead tinyint(4) not null default 0,
+            repliedTo tinyint(4) not null default 0,
+            deleted tinyint(4) not null default 0,
+            primary key (messageId, userId)
+        )
+    });
+
+    #Update the inbox
+    my $sth = $session->db->read("select messageId, groupId, userId, status from inbox");
+    while(my ($messageId,$groupId,$userId,$status) = $sth->array) {
+        my $repliedTo = $status eq "replied";
+        my $isRead    = ($status ne "unread" && $status ne "pending")?1:0;
+        my $deleted   = 0;
+
+        if($status eq "deleted") {
+            #Purge deleted messages
+            $session->db->write("delete from inbox where messageId=?",[$messageId]);
+            next;
+        }
+
+        if($groupId) {
+            my $g     = WebGUI::Group->new($session,$groupId);
+            my $users = $g->getAllUsers;
+            foreach my $userId (@{$users}) {
+                $session->db->write(
+                    q{ REPLACE INTO inbox_messageState (messageId,userId,isRead,repliedTo,deleted) VALUES (?,?,?,?,?) },
+                    [$messageId,$userId,$isRead,$repliedTo,$deleted]
+                );
+            }
+        }
+
+        if($userId) {
+            $session->db->write(
+                q{ REPLACE INTO inbox_messageState (messageId,userId,isRead,repliedTo,deleted) VALUES (?,?,?,?,?) },
+                [$messageId,$userId,$isRead,$repliedTo,$deleted]
+            );
+        }
+
+        if($status ne "completed" && $status ne "pending") {
+            $session->db->write(
+                q{ UPDATE inbox SET status='active' WHERE messageId=? },
+                [$messageId]
+            );
+        }
+    }
+
+    #Add the profile field changes
+    $session->db->write(q{alter table userProfileCategory add column shortLabel char(255) default NULL after label});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("misc info short","WebGUI");' where profileCategoryId='1'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("contact info short","WebGUI");' where profileCategoryId='2'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("personal info short","WebGUI");' where profileCategoryId='3'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("preferences short","WebGUI");' where profileCategoryId='4'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("home info short","WebGUI");' where profileCategoryId='5'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("work info short","WebGUI");' where profileCategoryId='6'});
+    $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("demographic info short","WebGUI");' where profileCategoryId='7'});
 
     print "DONE!\n" unless $quiet;
 }

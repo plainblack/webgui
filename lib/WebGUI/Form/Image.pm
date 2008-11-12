@@ -181,11 +181,12 @@ Displays the image using an img tag.
 =cut
 
 sub getValueAsHtml {
-	my ($self) = @_;
-    my $value = $self->getOriginalValue;
+	my ($self)   = @_;
+    my $value    = $self->getOriginalValue;
 	return '' unless $value;
 	my $location = WebGUI::Storage::Image->get($self->session, $value);
 	my $file = shift @{ $location->getFiles };
+    return '' unless $file;
 	my $fileValue = sprintf qq|<img src="%s" />&nbsp;%s|, $location->getUrl($file), $file; 
 	return $fileValue;
 }

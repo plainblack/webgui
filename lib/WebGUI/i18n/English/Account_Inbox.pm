@@ -9,7 +9,276 @@ our $I18N = {
         context     => q{Tab label for Inbox Account pluggin},
     },
 
+    'inbox style template label' => {
+        message     => q|Style Template|,
+        lastUpdated => 1119068809
+	},
+
+    'inbox style template hoverHelp' => {
+        message     => q|Select a style template from the list to enclose the inbox in.|,
+        lastUpdated => 1119068809
+	},
+
+    'inbox layout template label' => {
+        message     => q|Edit Layout Template|,
+        lastUpdated => 1119068809
+	},
     
+    'inbox layout template hoverHelp' => {
+        message     => q{Choose a layout from the list to display the various account pluggins that are editable by the current user as well as the contents of the one currently chosen},
+        lastUpdated => 1119068809
+    },
+
+    'inbox view template label' => {
+        message     => q|View Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox view template hoverHelp' => {
+        message     => q|Choose the main template for viewing the inbox|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox view message template label' => {
+        message     => q|View Message Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox view message template hoverHelp' => {
+        message     => q|Choose the template for viewing a message in the inbox|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox message confirm template label' => {
+        message     => q|Inbox Message Confirm Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox message confirm template hoverHelp' => {
+        message     => q|Choose the template for displaying confirmation that a message has been sent|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox error message template label' => {
+        message     => q|Inbox Error Message Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox error message template hoverHelp' => {
+        message     => q|Choose the template for viewing inbox errors|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox manage invitations template label' => {
+        message     => q|Manage Invitations Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox manage invitations template hoverHelp' => {
+        message     => q|Choose the template to user for managing invitations|,
+        lastUpdated => 1119068809
+    },
+
+    'invitation error message template label' => {
+        message     => q|Inbox Error Message Template|,
+        lastUpdated => 1119068809
+    },
+
+    'invitation error message template hoverHelp' => {
+        message     => q|Choose the template for viewing inbox errors|,
+        lastUpdated => 1119068809
+    },
+
+    'subject label' => {
+        message     => q|Subject|,
+        lastUpdated => 1119068809
+    },
+    
+    'status label' => {
+        message     => q{Status},
+        lastUpdated => 1119068809
+    },
+
+    'date label' => {
+        message     => q{Date},
+        lastUpdated => 1119068809
+    },
+
+    'received label' => {
+        message     => q{Received},
+        lastUpdated => 1119068809
+    },
+
+    'recipients label' => {
+        message     => q{Add Recipients},
+        lastUpdated => 1119068809
+    },
+    
+    'from label' => {
+        message     => q{From},
+        lastUpdated => 1119068809
+    },
+
+    'to label' => {
+        message     => q{To},
+        lastUpdated => 1119068809
+    },
+    
+    'member since' => {
+        message     => q{Member Since },
+        lastUpdated => 1119068809
+    },
+
+    'delete label' => {
+        message     => q{Delete},
+        lastUpdated => 1119068809
+    },
+    
+    'view my profile' => {
+        message     => q{view my profile as others see it},
+        lastUpdated => 1119068809
+    },
+
+    'messages label' => {
+        message     => q{Messages},
+        lastUpdated => 1119068809
+    },
+
+    'invitations label' => {
+        message     => q{Invitations},
+        lastUpdated => 1119068809
+    },
+
+    'previous label' => {
+        message     => q{Previous},
+        lastUpdated => 1119068809
+    },
+
+    'next label' => {
+        message     => q{Next},
+        lastUpdated => 1119068809
+    },
+
+    'reply label' => {
+        message     => q{Reply},
+        lastUpdated => 1119068809
+    },
+
+    'delete label' => {
+        message     => q{Delete},
+        lastUpdated => 1119068809
+    },
+
+    'cancel label' => {
+        message     => q{Cancel},
+        lastUpdated => 1119068809
+    },
+
+    'back label' => {
+        message     => q{Back to Inbox},
+        lastUpdated => 1119068809
+    },
+
+    'new message label' => {
+        message     => q{New Message},
+        lastUpdated => 1119068809
+    },
+
+    'send label' => {
+		message => q{Send},
+		lastUpdated => 1181019679,
+	},
+
+    'no access' => {
+        message     => q{You do not have permission to view this message.},
+        lastUpdated => 1119068809
+    },
+
+    'no reply error' => {
+        message     => q{You do not have permission to reply to this message.},
+        lastUpdated => 1119068809
+    },
+
+    'system message error' => {
+        message     => q{This message was sent by the system and cannot be replied to},
+        lastUpdated => 1119068809
+    },
+
+    'message does not exist' => {
+        message     => q{The message you are trying to view has been deleted.},
+        lastUpdated => 1119068809
+    },
+
+    'message count' => {
+        message     => q{messages},
+        lastUpdated => 1119068809
+    },
+
+    'compose message label' => {
+        message     => q{Compose new message},
+        lastUpdated => 1119068809
+    },
+
+    'reply message label' => {
+        message     => q{Reply to message},
+        lastUpdated => 1119068809
+    },
+
+    'no self error' => {
+		message => q|You may not send messages to yourself.|,
+		lastUpdated => 1181019679,
+	},
+
+    'no friends error' => {
+        message => q{You do not have any active friends in the system.  If you wish to send a new private message to a user without having to locate their profile, you must first add them as a friend.},
+        lastUpdated => 1181019679,
+    },
+
+    'no friends hover' => {
+        message => q{You must have active friends in the system if you wish to send new private messages without having to first locate their profile},
+        lastUpdated => 1181019679,
+    },
+
+    'no subject error' => {
+        message => q{You have not entered a subject for this message},
+        lastUpdated => 1181019679,
+    },
+
+    'no message error' => {
+        message => q{You have not entered a message},
+        lastUpdated => 1181019679,
+    },
+
+    'no user error' => {
+        message => q{You have not selected anyone to send this message to},
+        lastUpdated => 1181019679,
+    },
+
+    'blocked error' => {
+        message => q|This user does not wish to receive private messages.|,
+		lastUpdated => 1181019679,
+    },
+
+    'remove text' => {
+        message => q{remove},
+		lastUpdated => 1181019679,
+    },
+
+    'update label' => {
+        message => q{Update},
+		lastUpdated => 1181019679,
+    },
+
+    'message sent label' => {
+        message => q{Message Sent},
+		lastUpdated => 1181019679,
+    },
+
+    'message sent text' => {
+        message => q{Your message has been sent successfully},
+		lastUpdated => 1181019679,
+    },
+
 };
 
 1;

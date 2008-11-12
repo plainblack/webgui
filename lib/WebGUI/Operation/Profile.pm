@@ -46,7 +46,7 @@ These methods are available from this package:
 Returns an array of hashes for required profile fields.  This array is ready
 to be used as template variables in the WebGUI template system.
 
-This method is deprecated, and should not be used in new code.  Use
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
 the getRequiredFields method from WebGUI::ProfileField and specify the
 translation to template variables directly instead.
 
@@ -80,6 +80,9 @@ duplicated in the system.  Returns true of false.  Will return false
 if the email address passed in is same as the email address of the
 current user.
 
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the isDuplicate method from WebGUI::ProfileField instead
+
 =head3 email
 
 email address to check for duplication
@@ -103,6 +106,9 @@ sub isDuplicateEmail {
 
 Saves profile data to a user's profile.  Does not validate any of the data.
 
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the saveProfileFields method from WebGUI::Account::Profile instead
+
 =head3 session
 
 WebGUI session object
@@ -122,9 +128,7 @@ sub saveProfileFields {
 	my $u = shift;
 	my $profile = shift;
 
-	foreach my $fieldName (keys %{$profile}) {
-		$u->profileField($fieldName,${$profile}{$fieldName});
-	}
+	WebGUI::Account::Profile->saveProfileFields($session,$u,$profile);
 }
 
 #-------------------------------------------------------------------
@@ -133,6 +137,9 @@ sub saveProfileFields {
 
 Validates profile data from the session form variables.  Returns processed data, warnings
 and errors.
+
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the validateProfileData method from WebGUI::Account::Profile instead
 
 There are two levels of validation:
 
@@ -190,6 +197,8 @@ Provide a form where user profile data can be entered or edited.  The subroutine
 makes a large set of template variables which are passed to a template for presentation
 and styling.  The default template is PBtmpl0000000000000051 and is not user
 selectable.
+
+DEPRECATED - Use WebGUI::Account::Profile::www_edit
 
 Calls www_editProfileSave on submission.
 
@@ -253,6 +262,9 @@ object.
 
 Returns the user to WebGUI::Operation::Auth::www_auth when done.
 
+
+DEPRECATED:  Use WebGUI::Account::Profile::www_editSave
+
 =head3 session
 
 A reference to the current session.
@@ -280,6 +292,8 @@ View the profile data for a user by the userId specified by the form variable C<
 Validates that the user requesting the profile data is allowed to see it.
 Similarly to www_editProfile, this method is templated.  The default template
 is PBtmpl0000000000000052.  The template is not user selectable.
+
+DEPRECATED:  Use WebGUI::Account::Profile::www_view
 
 =head3 session
 

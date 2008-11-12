@@ -174,6 +174,11 @@ deleting the file if it was specified.
 sub getValue {
 	my $self = shift;
 	my $value = $self->get("value");
+    my $log = $self->session->log;
+    $log->warn("file is: ".$self->session->form->get($self->get("name")."_file"));
+    $log->warn("value is: ".$value);
+    $log->warn("action is: ".$self->session->form->param($self->privateName('action')));
+
 	my $storage = WebGUI::Storage->get($self->session,$value);
 	if (defined $storage) {
 		foreach my $file (@{$storage->getFiles}) {
@@ -195,6 +200,8 @@ sub getValue {
 		}
 		$storage->addFileFromFormPost($self->get("name")."_file",1000);
 		my @files = @{ $storage->getFiles };
+        $log->warn("storageId: ".$storage->getId);
+        $log->warn("number of files: ".scalar(@files));
 		if (scalar(@files) < 1) {
 			$storage->delete;
 			return undef;
@@ -205,6 +212,7 @@ sub getValue {
 			return $id;
 		}
 	}
+    $log->warn("returning: ".$value);
 	return $value;
 }
 

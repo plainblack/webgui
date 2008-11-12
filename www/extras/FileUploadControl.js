@@ -85,7 +85,7 @@ function FileUploadControl_swapImage(firedobj) {
 	var img = row.childNodes[0].childNodes[0];
 	img.src = imgPath;
 	img.style.visibility="visible";
-    img.alt = alternate;
+    img.alt = alternative;
 }
 
 //removes a row from the control

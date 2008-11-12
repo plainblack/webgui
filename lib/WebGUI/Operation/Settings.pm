@@ -632,8 +632,8 @@ sub www_editSettings {
 
     # Get fieldsets for avaiable account methods
     my $accountConfigs = $session->config->get("account");
-	foreach my $accountKey (keys %{$accountConfigs}) {
-        my $account = $accountConfigs->{$accountKey};
+    
+	foreach my $account (@{$accountConfigs}) {
 
         #Create the instance
         my $className = $account->{className};
@@ -645,7 +645,7 @@ sub www_editSettings {
         }
         
         #Get the content of the settings form from the instance
-        my $settingsForm = $instance->editUserSettingsForm;
+        my $settingsForm = $instance->editSettingsForm;
         #If editUserSettingsForm is empty, skip it
         next if $settingsForm eq "";
 
@@ -697,6 +697,22 @@ sub www_saveSettings {
             push @errors, @{ $authErrors };
         }
     }
+
+    # Save account pluggin settings
+    my $accountConfigs = $session->config->get("account");
+	foreach my $account (@{$accountConfigs}) {
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+
+        if ( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        #Save the settings
+        $instance->editSettingsFormSave;
+	}
+
 
     ### Handle special settings
     # Reset login message seen numbers

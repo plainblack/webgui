@@ -37,6 +37,9 @@ Operations for viewing message logs and individual messages.
 
 appends the form variables for the private message form
 
+DEPRECATED: Do not use this method in new code.  It is here for API
+compatibility only
+
 =cut
 
 sub _appendPrivateMessageForm {
@@ -55,10 +58,6 @@ sub _appendPrivateMessageForm {
     
     $vars->{ message_to_label   }  = $i18n->get("private message to label"); 
     $vars->{ message_to         }  = $userTo->username;
-    $vars->{ message_to         } .= WebGUI::Form::hidden($session, {
-        name=>"uid",
-        value=>$userTo->userId
-    });
     
     my $subject = $form->get("subject") || "";
     if($subject eq "" && defined $message) {
@@ -81,14 +80,10 @@ sub _appendPrivateMessageForm {
         value=>$form->get("message") || "",
     });
     
-    $vars->{ form_header       }  = WebGUI::Form::formHeader($session);
-    $vars->{ form_header       } .= WebGUI::Form::hidden($session, {
-        name => "op", 
-        value => "sendPrivateMessageSave"
-    });
-    $vars->{ form_header       } .= WebGUI::Form::hidden($session, {
-        name => "messageId", 
-        value => $form->get("messageId") || "",
+    my $messageId                = $form->get("messageId") || $message->getId;
+    $vars->{'form_header'      }  = WebGUI::Form::formHeader($session,{
+        action => $session->url->page->("op=account;module=inbox;do=sendMessageSave;messageId=$messageId;userId=$userTo->userId"),
+        extras => q{name="messageForm"}
     });
     
     $vars->{ submit_button     }  = WebGUI::Form::submit($session,{});
@@ -104,23 +99,28 @@ sub _appendPrivateMessageForm {
 
 returns a hashref with internationalized values for message status.
 
+DEPRECATED: Use WebGUI::Inbox::Message->statusCodes
+
 =cut
 
 sub _status {
 	my $session = shift;
-	my $i18n = WebGUI::International->new($session);
-	return {
-        "pending"   =>$i18n->get(552),
-        "completed" =>$i18n->get(350),
-        "unread"    =>$i18n->get("private message status unread"),
-        "read"      =>$i18n->get("private message status read"),
-        "replied"   =>$i18n->get("private message status replied"),
-    };
+	return WebGUI::Inbox::Message->statusCodes($session);
+    #my $i18n = WebGUI::International->new($session);
+	#return {
+    #    "pending"   =>$i18n->get(552),
+    #    "completed" =>$i18n->get(350),
+    #    "unread"    =>$i18n->get("private message status unread"),
+    #    "read"      =>$i18n->get("private message status read"),
+    #    "replied"   =>$i18n->get("private message status replied"),
+    #};
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_sendPrivateMessage ( )
+
+DEPRECATED: Use WebGUI::Account::Inbox
 
 Form for sending private messages
 
@@ -168,6 +168,8 @@ sub www_sendPrivateMessage {
 #-------------------------------------------------------------------
 
 =head2 www_sendPrivateMessageSave ( )
+
+DEPRECATED: Use WebGUI::Account::Inbox
 
 Post process the form, check for required fields, handle inviting users who are already
 members (determined by email address) and send the email.
@@ -243,6 +245,8 @@ sub www_sendPrivateMessageSave {
 #-------------------------------------------------------------------
 
 =head2 www_viewInbox ( )
+
+DEPRECATED: Use WebGUI::Account::Inbox
 
 Templated display all messages for the current user.
 
@@ -335,6 +339,8 @@ sub www_viewInbox {
 
 =head2 www_deletePrivateMessage ( )
 
+DEPRECATED:  Use WebGUI::Account::Inbox
+
 Mark a private message in the inbox as deleted.
 
 =cut
@@ -355,6 +361,8 @@ sub www_deletePrivateMessage {
 #-------------------------------------------------------------------
 
 =head2 www_viewInboxMessage ( )
+
+DEPRECATED:  Use WebGUI::Account::Inbox
 
 Templated display of a single message for the user.
 

@@ -226,10 +226,13 @@ sub addFileFromFormPost {
     require Apache2::Upload;
 	my $filename;
 	my $attachmentCount = 1;
+    $self->session->log->warn("trying to uplaod: ".$formVariableName);
 	foreach my $upload ($self->session->request->upload($formVariableName)) {
-            $self->session->errorHandler->info("Trying to get " . $upload->filename);
+            $self->session->errorHandler->warn("Trying to get " . $upload->filename);
 		return $filename if $attachmentCount > $attachmentLimit;
 		my $tempFilename = $upload->filename();
+                $self->session->log->warn("templFile is: ".$tempFilename);
+
 		next unless $tempFilename;
 		next unless $upload->size > 0;
 		next if ($upload->size > 1024 * $self->session->setting->get("maxAttachmentSize"));

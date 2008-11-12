@@ -188,6 +188,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'home info short' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
+
 	'118' => {
 		message => q|Anonymous Registration|,
 		lastUpdated => 1031514049
@@ -617,6 +622,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'demographic info short' => {
+		message => q|Demographic|,
+		lastUpdated => 1031514049
+	},
+
 	'39' => {
 		message => q|You do not have sufficient privileges to access this page.|,
 		lastUpdated => 1031514049
@@ -831,6 +841,11 @@ to add or remove users from their groups.
 	},
 
 	'445' => {
+		message => q|Preferences|,
+		lastUpdated => 1031514049
+	},
+
+    'preferences short' => {
 		message => q|Preferences|,
 		lastUpdated => 1031514049
 	},
@@ -1247,6 +1262,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 		message => q|Miscellaneous Information|,
 		lastUpdated => 1031514049
 	},
+    
+    'misc info short' => {
+		message => q|Miscellaneous|,
+		lastUpdated => 1031514049
+	},
 
 	'967' => {
 		message => q|Empty everyone's trash.|,
@@ -1513,6 +1533,11 @@ sent in HTML format. No attachments can be included.|,
 
 	'442' => {
 		message => q|Work Information|,
+		lastUpdated => 1031514049
+	},
+
+    'work info short' => {
+		message => q|Work|,
 		lastUpdated => 1031514049
 	},
 
@@ -1906,6 +1931,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1031514049
 	},
 
+    'contact info short' => {
+		message => q|Contact Info|,
+		lastUpdated => 1031514049
+	},
+
 	'230' => {
 		message => q|Message|,
 		lastUpdated => 1031514049
@@ -2244,6 +2274,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 
 	'439' => {
 		message => q|Personal Information|,
+		lastUpdated => 1031514049
+	},
+
+    'personal info short' => {
+		message => q|Personal|,
 		lastUpdated => 1031514049
 	},
 
@@ -3538,6 +3573,11 @@ LongTruncOk=1</p>
     'private message status read' => {
         message => q|Read|,
 		lastUpdated => 1181019679,
+    },
+    
+    'inbox message status active' => {
+        message => q|Active|,
+		lastUpdated => 1181019679,    
     },
 
     'private message prev label' => {

@@ -114,6 +114,9 @@ sub acceptsPrivateMessages {
     my $self      = shift;
     my $userId    = shift;
 
+    return 0 if ($self->isVisitor);  #Visitor can't get private messages
+    return 0 if ($self->userId eq $userId);  #Can't send private messages to yourself
+
     my $pmSetting = $self->profileField('allowPrivateMessages');
 
     return 0 if ($pmSetting eq "none");
@@ -127,6 +130,33 @@ sub acceptsPrivateMessages {
     }
 
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 acceptsFriendsRequests ( user )
+
+Returns whether or this user will accept friends requests from the user passed in
+
+=head3 user
+
+WebGUI::User object to check to see if user will accept requests from.
+
+=cut
+
+sub acceptsFriendsRequests {
+    my $self   = shift;
+    my $user   = shift;
+
+    return 0 unless ($user && ref $user eq "WebGUI::User"); #Sanity checks
+    return 0 if($self->isVisitor);  #Visitors can't have friends
+    return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
+
+    my $friends = WebGUI::Friends->new($self->session,$self);
+    return 0 if ($friends->isFriend($user->userId));  #Already a friend
+    return 0 if ($friends->isInvited($user->userId)); #Invitation already sent
+
+    return $self->profileField('ableToBeFriend'); #Return profile setting
 }
 
 #-------------------------------------------------------------------
@@ -288,13 +318,12 @@ Returns the WebGUI::Group for this user's Friend's Group.
 sub friends {
     my $self = shift;
     if ($self->{_user}{"friendsGroup"} eq "") {
-        my $myFriends = WebGUI::Group->new($self->session, "new");
+        my $myFriends = WebGUI::Group->new($self->session, "new",0,1);
         $myFriends->name($self->username." Friends");
         $myFriends->description("Friends of user ".$self->userId);
         $myFriends->expireOffset(60*60*24*365*60);
         $myFriends->showInForms(0);
         $myFriends->isEditable(0);
-        $myFriends->deleteUsers(['3']);
         $self->uncache;
         $self->{_user}{"friendsGroup"} = $myFriends->getId;
         $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
@@ -389,6 +418,31 @@ sub getGroupIdsRecursive {
 
 #-------------------------------------------------------------------
 
+=head2 getProfileUrl ( [page] )
+
+Returns a link to the user's profile
+
+=head3 page
+
+If page is passed in, the profile ops will be appended to the page, otherwise
+the method will return the ops appended to the current page.
+
+=cut
+
+sub getProfileUrl {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $page      = shift || $session->url->page;
+
+    my $identifier = $session->config->get("profileModuleIdentifier");
+
+    return qq{$page?op=account;module=$identifier;do=view;uid=}.$self->userId;
+
+}   
+
+
+#-------------------------------------------------------------------
+
 =head2 getWholeName ( )
 
 Attempts to build the user's whole name from profile fields, and ultimately their alias and username if all else
@@ -402,6 +456,21 @@ sub getWholeName {
         return join ' ', $self->profileField('firstName'), $self->profileField('lastName');
     }
     return $self->profileField("alias") || $self->username;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 hasFriends ( )
+
+Returns whether or not the user has any friends on the site.
+
+=cut
+
+sub hasFriends {
+    my $self         = shift;
+    my $users = $self->friends->getUsers(1);
+    return scalar(@{$users}) > 0;
 }
 
 #-------------------------------------------------------------------

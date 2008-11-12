@@ -35,7 +35,7 @@ These subroutines are available from this package:
 
 =cut
 
-sub editUserSettingsForm {
+sub editSettingsForm {
     my $self    = shift;
     my $session = $self->session;
     my $setting = $session->setting;
@@ -61,7 +61,7 @@ sub editUserSettingsForm {
 
 =cut
 
-sub editUserSettingsFormSave {
+sub editSettingsFormSave {
 }
 
 #-------------------------------------------------------------------

@@ -18,7 +18,9 @@ This is the class which is used to display a users's profile information
 
 =head1 SYNOPSIS
 
- use WebGUI::Account::Profile;
+    use base 'WebGUI::Account';
+
+    currentState("edit");
 
 =head1 METHODS
 
@@ -27,6 +29,20 @@ These subroutines are available from this package:
 =cut
 
 readonly session => my %session;
+public store    => my %store;  #This is an all purpose hash to store stuff in: $store{id $self}->{something} = "something"
+
+#-------------------------------------------------------------------
+
+=head2 canView ( )
+
+    Override this method to create permission levels for your Account Pluggin
+
+=cut
+
+sub canView {
+    my $self = shift;
+    return 1;
+}
 
 #-------------------------------------------------------------------
 
@@ -36,7 +52,7 @@ readonly session => my %session;
 
 =cut
 
-sub editUserSettingsForm {
+sub editSettingsForm {
     my $self = shift;
     return "";
 }
@@ -49,11 +65,10 @@ sub editUserSettingsForm {
 
 =cut
 
-sub editUserSettingsFormSave {
+sub editSettingsFormSave {
     my $self = shift;
     return "";
 }
-
 
 #-------------------------------------------------------------------
 
@@ -65,7 +80,7 @@ sub editUserSettingsFormSave {
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return "FJbUTvZ2nUTn65LpW6gjsA";
+    return "N716tpSna0iIQTKxS4gTWA";
 }
 
 #-------------------------------------------------------------------
@@ -79,6 +94,49 @@ sub getLayoutTemplateId {
 sub getStyleTemplateId {
     my $self = shift;
     return $self->session->setting->get("userFunctionStyleId");
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getUrl ( [pairs,appendUID] )
+
+    Builds the url for the current page.
+
+=head3 pairs
+
+    name value pairs to append to the page url.  If pairs is not passed in
+    the current module and do values will be used.
+
+=head3 appendUID
+
+    If this flag is set and uid is passed along the url, the uid passed in will be
+    appended to the end of it to the end of the url
+
+=cut
+
+sub getUrl {
+    my $self      = shift;
+    my $pairs     = shift;
+    my $appendUID = shift;
+
+    my $session   = $self->session;
+    my $form      = $session->form;
+    
+    if($pairs) {
+        #Append op=account to the url if it doesn't already exist
+        unless ($pairs =~ m/op=account/){
+            $pairs = "op=account;".$pairs;
+        }
+    }
+    else {
+        $pairs = q{op=account;module=}.$form->get("module").q{;do=}.$form->get("do");
+    }
+
+    my $uid = $form->get("uid");
+    $pairs .= ";uid=".$uid if($appendUID && $uid);
+
+    return $session->url->page($pairs);
 }
 
 #-------------------------------------------------------------------
@@ -105,9 +163,10 @@ sub new {
         );
     }
 
-    my $self          = register $class;
-    my $id            = id $self;
-    $session { $id }  = $session;
+    my $self              = register $class;
+    my $id                = id $self;
+    $session { $id      } = $session;
+    $store   { $id      } = {};
     return $self;
 }
 
@@ -144,7 +203,7 @@ sub processTemplate {
     # Sanity checks
     if (ref $var ne "HASH") {
         $session->log->error("First argument to processTemplate() should be a hash reference.");
-        my $i18n = WebGUI::International->new($self->session, 'Account');
+        my $i18n = WebGUI::International->new($session, 'Account');
         return sprintf($i18n->get('Error: Cannot instantiate template'),$templateId,$className);
     }
 
@@ -152,11 +211,48 @@ sub processTemplate {
 
     unless (defined $template) {
         $session->log->error("Can't instantiate template $templateId for class ".$className);
-        my $i18n = WebGUI::International->new($self->session, 'Account');
+        my $i18n = WebGUI::International->new($session, 'Account');
         return sprintf($i18n->get('Error: Cannot instantiate template'),$templateId,$className);
     }
 
     return $template->process($var);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 showError ( vars )
+
+    Returns a general error screen with the message passed in.
+
+=head3 vars
+
+Variable hash ref to append errors to
+
+=head3 error
+
+Error message to display
+
+=head3 url
+
+URL to display to the user to go back to a safe place
+
+=head3 templateId
+
+temlateId to use to display error
+
+=cut
+
+sub showError {
+    my $self  = shift;
+
+    my $var                 = shift || {};
+    $var->{'error_message'} = shift;
+    $var->{'back_url'     } = shift;
+    
+    my $templateId          = shift;
+    
+    return $self->processTemplate($var,$templateId)
 }
 
 
