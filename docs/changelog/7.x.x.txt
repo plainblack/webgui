@@ -1,7 +1,7 @@
 7.6.4
  - Brand new Survey system.  Make sure to export your old results as they will
    not be imported, only the surveys themselves.
-
+ - fixed #8837: When you move an asset to a new version, only the current version is moved, instead of all of them.
 7.6.3
  - improved performance of file uploads
  - changed format of created uploads locations, avoiding case sensitivity problems

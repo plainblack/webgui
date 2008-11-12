@@ -449,7 +449,7 @@ A new version tag id.
 sub setVersionTag {
 	my $self = shift;
     my $tagId = shift;
-	$self->session->db->write("update assetData set tagId=? where assetId=?", [$tagId, $self->getId]);
+    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->get('tagId')]);
 	$self->updateHistory("changed version tag to $tagId");
 	$self->purgeCache;
 }
