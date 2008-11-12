@@ -3,6 +3,9 @@
  - fixed #9034: Removed all instances of srand.  This is called implicitily by rand and be dangerous if called mulitple times by the same process.
  - fixed #9064: SQLReport now replaces field name spaces with hyphens for the direct access template params.
  - fixed #8837: When you move an asset to a new version, only the current version is moved, instead of all of them.
+ - fixed: ProfileField->formField now uses the correct method to check if a form
+          field value was sent with the current request
+
 7.5.32
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
  - fixed: Syndicated Content asset throws runtime error on certain feeds
