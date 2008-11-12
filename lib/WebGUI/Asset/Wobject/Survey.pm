@@ -11,554 +11,497 @@ package WebGUI::Asset::Wobject::Survey;
 #-------------------------------------------------------------------
 
 use strict;
-use List::Util;
-use Tie::CPHash;
-use WebGUI::HTMLForm;
+use Tie::IxHash;
+use JSON;
 use WebGUI::International;
-use WebGUI::SQL;
-use WebGUI::Utility;
-use WebGUI::Asset::Wobject;
-use Digest::MD5 qw(md5_hex);
+use WebGUI::Form::File;
+use base 'WebGUI::Asset::Wobject';
+use WebGUI::Asset::Wobject::Survey::SurveyJSON;
+use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
-our @ISA = qw(WebGUI::Asset::Wobject);
+use Data::Dumper;
 
-#-------------------------------------------------------------------
-sub addAnswer {
-	my $self = shift;
-	my $answer = shift;
-	my $qid = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	$self->setCollateral("Survey_answer","Survey_answerId",{
-		Survey_id=>$self->get("Survey_id"),
-		Survey_questionId=>$qid,
-		Survey_answerId=>"new",
-		answer=>$i18n->get($answer)
-		},1,0,"Survey_id");
-}
-
-#-------------------------------------------------------------------
-sub addSection {
-	my $self = shift;
-	my $sectionName = shift;
-	my $sectionId = $self->setCollateral("Survey_section","Survey_sectionId",{
-		Survey_id=>$self->get("Survey_id"),
-		Survey_sectionId=>"new",
-		sectionName=>$sectionName
-		},1,0,"Survey_id");
-	
-	return $sectionId;
-}
-
-#-------------------------------------------------------------------
-sub completeResponse {
-	my $self = shift;
-	my $responseId = shift;
-	$self->session->db->setRow("Survey_response","Survey_responseId",{
-		'Survey_responseId'=>$responseId,
-		isComplete=>1
-		});
-	$self->session->scratch->delete($self->getResponseIdString);
-}
-
+#<tmpl if admin <tmpl_if canEditSurvey><a href="<tmpl_var editSUrvey_url>"><tmpl_var editSurvey_label></a></tmpl_if>
 #-------------------------------------------------------------------
 sub definition {
-        my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,'Asset_Survey');
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-		icon=>'survey.gif',
-		tableName	=> 'Survey',
-		className	=> 'WebGUI::Asset::Wobject::Survey',
-                properties	=> {
-			templateId => {
-				fieldType	=> 'template',
-				defaultValue	=> 'PBtmpl0000000000000061'
-				},
-			Survey_id => {
-				fieldType	=> 'text',
-				defaultValue	=> undef
-				}, 
-			questionOrder => {
-				fieldType	=> 'text',
-				defaultValue	=> 'sequential'
-				}, 
-			groupToTakeSurvey => {
-				fieldType	=> 'group',
-				defaultValue	=> 2
-				}, 
-			groupToViewReports => {
-				fieldType	=> 'group',
-				defaultValue	=> 4
-				},
-			mode => {
-				fieldType 	=> 'text',
-				defaultValue	=> 'survey'
-				},
-			anonymous=>{
-				fieldType	=> 'yesNo',
-				defaultValue	=> 0
-				},
-			maxResponsesPerUser=>{
-				fieldType	=> 'integer',
-				defaultValue	=> 1
-				},
-			questionsPerResponse=>{
-				fieldType	=> 'integer',
-				defaultValue	=>99999
-				},
-			questionsPerPage=>{
-				fieldType	=> 'integer',
-				defaultValue	=> 1
-				},
-			overviewTemplateId=>{
-				fieldType	=> 'template',
-				defaultValue	=> 'PBtmpl0000000000000063'
-				},
-			gradebookTemplateId => {
-				fieldType	=> 'template',
-				defaultValue	=> 'PBtmpl0000000000000062'
-				},
-			responseTemplateId => {
-				fieldType	=> 'template',
-				defaultValue	=> 'PBtmpl0000000000000064'
-				},
-			defaultSectionId => {
-				fieldType	=> 'text',
-				defaultValue	=> 'undef'
-				},
-			}
-		});
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,'Asset_Survey');
+    my %properties;
+    tie %properties, 'Tie::IxHash';
+    %properties = (
+            templateId =>{
+                fieldType=>"template",
+                defaultValue=>'PBtmpl0000000000000061', 
+                tab=>"display",
+                namespace=>"Survey",
+                hoverHelp=>"A Survey System",
+                label=>"Template ID"
+                },
+            groupToEditSurvey => {
+                fieldType   => 'group',
+                defaultValue    => 4,
+                label => "Group to edit survey",
+                },
+            groupToTakeSurvey => {
+                fieldType   => 'group',
+                defaultValue    => 2,
+                label => "Group to take survey",
+                },
+            groupToViewReports => {
+                fieldType   => 'group',
+                defaultValue    => 4,
+                label => "Group to view reports",
+                },
+            exitURL => {
+                fieldType   => 'text',
+                defaultValue    => undef,
+                label   => "Set the URL that the survey will exit to",
+                hoverHelp=>"When the user finishes the survey, they will be sent to this URL.  Leave blank if no forwarding required.",
+                },
+            maxResponsesPerUser=>{
+                fieldType   => 'integer',
+                defaultValue    => 1,
+                label => "Max user reponses",
+                },
+            overviewTemplateId=>{
+                tab         => 'display',
+                fieldType   => 'template',
+                defaultValue    => 'PBtmpl0000000000000063',
+                label => "Overview template id",
+                namespace  => 'Survey/Overview',
+                },
+            gradebookTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Grabebook template id",
+                defaultValue    => 'PBtmpl0000000000000062',
+                namespace  => 'Survey/Gradebook',
+                },
+            responseTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Response template id",
+                defaultValue    => 'PBtmpl0000000000000064',
+                namespace  => 'Survey/Response',
+                },
+            surveyEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Survey edit template id",
+                defaultValue    => 'GRUNFctldUgop-qRLuo_DA',
+                namespace  => 'Survey/Edit',
+                },
+            surveyTakeTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Take survey template id",
+                defaultValue    => 'd8jMMMRddSQ7twP4l1ZSIw',
+                namespace  => 'Survey/Take',
+                },
+            surveyQuestionsId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Questions template id",
+                defaultValue    => 'CxMpE_UPauZA3p8jdrOABw',
+                namespace  => 'Survey/Take',
+                },
+            sectionEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Section Edit Tempalte",
+                defaultValue    => '1oBRscNIcFOI-pETrCOspA',
+                namespace  => 'Survey/Edit',
+                },
+            questionEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Question Edit Tempalte",
+                defaultValue    => 'wAc4azJViVTpo-2NYOXWvg',
+                namespace  => 'Survey/Edit',
+                },
+            answerEditTemplateId => {
+                tab         => 'display',
+                fieldType   => 'template',
+                label => "Answer Edit Tempalte",
+                defaultValue    => 'AjhlNO3wZvN5k4i4qioWcg',
+                namespace  => 'Survey/Edit',
+                },
+        );
+
+    push(@{$definition}, {
+        assetName=>$i18n->get('assetName'),
+        icon=>'survey.gif',
+        autoGenerateForms=>1,
+        tableName=>'Survey',
+        className=>'WebGUI::Asset::Wobject::Survey',
+        properties=>\%properties
+        });
         return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
+
+=head2 exportAssetData ( )
+
+Override exportAssetData so that surveyJSON is included in package exports etc..
+
+=cut
+
+sub exportAssetData {
+	my $self = shift;
+	my $hash = $self->SUPER::exportAssetData();
+	$self->loadSurveyJSON();
+	$hash->{properties}{surveyJSON} = $self->survey->freeze;
+	return $hash;
+}
+
+#-------------------------------------------------------------------
+
+=head2 importAssetData ( hashRef )
+
+Override importAssetCollateralData so that surveyJSON gets imported from packages
+
+=cut
+
+sub importAssetCollateralData {
+    my ($self, $data) = @_;
+    my $surveyJSON = $data->{properties}{surveyJSON};
+    $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$surveyJSON,$self->getId]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Override duplicate so that surveyJSON gets duplicated too
+
+=cut
+
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	my $newSurveyId = $self->session->id->generate();
-	$newAsset->update({
-		Survey_id=>$newSurveyId
-		});
-		
-	my $sections = $self->session->db->read("select * from Survey_section where Survey_id=? order by sequenceNumber",[$self->get("Survey_id")]);
-	while (my $sdata = $sections->hashRef) {
-		my $oldSectionId = $sdata->{Survey_sectionId};
-		$sdata->{Survey_sectionId} = "new";
-		$sdata->{Survey_id} = $newSurveyId;
-		$sdata->{Survey_sectionId} = $newAsset->setCollateral("Survey_section", "Survey_sectionId",$sdata,1,0, "Survey_id");
-	
-		my $questions = $self->session->db->read("select * from Survey_question where Survey_id=? and Survey_sectionId=?",[$self->get("Survey_id"), $oldSectionId]);
-		while (my $qdata = $questions->hashRef) {
-			my $oldQuestionId = $qdata->{Survey_questionId};
-			$qdata->{Survey_questionId} = "new";
-			$qdata->{Survey_id} = $newSurveyId;
-			$qdata->{Survey_sectionId} = $sdata->{Survey_sectionId};
-			$qdata->{Survey_questionId} = $newAsset->setCollateral("Survey_question","Survey_questionId",$qdata,1,0,"Survey_id");
-			my $answers = $self->session->db->read("select * from Survey_answer where Survey_questionId=? order by sequenceNumber",[$oldQuestionId]);
-			while (my $adata = $answers->hashRef) {
-				my $oldAnswerId = $adata->{Survey_answerId};
-				$adata->{Survey_answerId} = "new";
-				$adata->{Survey_questionId} = $qdata->{Survey_questionId};
-				$adata->{Survey_id} = $newSurveyId;
-				$adata->{Survey_answerId} = $newAsset->setCollateral("Survey_answer", "Survey_answerId", $adata, 1, 0, "Survey_Id");
-				my $responses = $self->session->db->read("select * from Survey_questionResponse where Survey_answerId=?",[$oldAnswerId]);
-				while (my $rdata = $responses->hashRef) {
-					$rdata->{Survey_responseId} = "new";
-					$rdata->{Survey_answerId} = $adata->{Survey_answerId};
-					$rdata->{Survey_id} = $newSurveyId;
-					$rdata->{Survey_questionId} = $qdata->{Survey_questionId};
-					$newAsset->setCollateral("Survey_questionResponse","Survey_responseId",$rdata,0,0);
-				}
-			}
-		}
-	}
-
-	return $newAsset;
+    my $options = shift;
+	my $newAsset = $self->SUPER::duplicate($options);
+	$self->loadSurveyJSON();
+	$self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$self->survey->freeze,$newAsset->getId]);
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------
-sub generateResponseId {
-	my $self = shift;
-	my $varname = $self->getResponseIdString;
-	if ($self->session->scratch->get($varname)) {
-		$self->completeResponse;
-	}
-	my $ipAddress = $self->getIp; 
-	my $userId = $self->getUserId; 
-	my $responseId = $self->session->db->setRow("Survey_response","Survey_responseId",{
-		'Survey_responseId'=>"new",
-		userId=>$userId,
-		ipAddress=>$ipAddress,
-		username=>$self->session->user->username,
-		startDate=>$self->session->datetime->time(),
-		'Survey_id'=>$self->get("Survey_id")
-		});
-	$self->session->scratch->set($varname,$responseId);
-	return $responseId;
-}
 
-#-------------------------------------------------------------------
-sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm;
+=head2 getEditForm
 
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
-	$tabform->getTab('properties')->hidden(
-		-name => "Survey_id",
-		-value => ($self->get("Survey_id") || $self->session->id->generate())
-	);
-	$tabform->getTab('display')->template(
-		-name		=> 'templateId',
-		-label		=> $i18n->get('view template'),
-		-hoverHelp	=> $i18n->get('view template description'),
-		-value		=> $self->getValue('templateId'),
-		-namespace	=> 'Survey',
-		-afterEdit	=> 'func=edit'
-		);
-	$tabform->getTab('display')->template(
-		-name		=> 'responseTemplateId',
-		-label		=> $i18n->get('response template'),
-		-hoverHelp	=> $i18n->get('response template description'),
-		-value		=> $self->getValue('responseTemplateId'),
-		-namespace	=> 'Survey/Response',
-		-afterEdit	=> 'func=edit'
-		);
-	$tabform->getTab('display')->template(
-		-name		=> 'gradebookTemplateId',
-		-label		=> $i18n->get('gradebook template'),
-		-hoverHelp	=> $i18n->get('gradebook template description'),
-		-value		=> $self->getValue('gradebookTemplateId'),
-		-namespace	=> 'Survey/Gradebook',
-		-afterEdit	=> 'func=edit'
-		);
-	$tabform->getTab('display')->template(
-		-name		=> 'overviewTemplateId',
-		-label		=> $i18n->get('overview template'),
-		-hoverHelp	=> $i18n->get('overview template description'),
-		-value		=> $self->getValue('overviewTemplateId'),
-		-namespace	=> 'Survey/Overview',
-		-afterEdit	=> 'func=edit'
-		);
+getEditForm is called when creating/editing the asset.  
+This overloads the normal call to the super, to call the super call like normal and then add to the tab form.
 
-	$tabform->getTab('display')->selectBox(
-		-name		=> "questionOrder",
-		-options	=> {
-			sequential => $i18n->get(5),
-                	random => $i18n->get(6),
-                	response => $i18n->get(7),
-                	section => $i18n->get(106)
-			},
-		-label		=> $i18n->get(8),
-		-hoverHelp	=> $i18n->get('8 description'),
-		-value		=> [$self->getValue("questionOrder")]
-		);
-	$tabform->getTab('display')->integer(
-		-name		=> "questionsPerPage",
-		-value		=> $self->getValue("questionsPerPage"),
-		-label		=> $i18n->get(83),
-		-hoverHelp	=> $i18n->get('83 description')
-		);
-        $tabform->getTab('properties')->selectBox(
-                -name	=> "mode",
-                -options	=> {
-			survey => $i18n->get(9),
-                	quiz => $i18n->get(10)
-			},
-                -label		=> $i18n->get(11),
-                -hoverHelp	=> $i18n->get('11 description'),
-                -value		=> [$self->getValue("mode")]
-                );
-	$tabform->getTab('properties')->yesNo(
-		-name		=> "anonymous",
-               	-value		=> $self->getValue("anonymous"),
-               	-label		=> $i18n->get(81),
-               	-hoverHelp	=> $i18n->get('81 description')
-               	);
-	$tabform->getTab('properties')->integer(
-		-name		=> "maxResponsesPerUser",
-		-value		=> $self->getValue("maxResponsesPerUser"),
-		-label		=> $i18n->get(84),
-		-hoverHelp	=> $i18n->get('84 description')
-		);
-	$tabform->getTab('properties')->integer(
-		-name		=> "questionsPerResponse",
-		-value		=> $self->getValue("questionsPerResponse"),
-		-label		=> $i18n->get(85),
-		-hoverHelp	=> $i18n->get('85 description')
-		);	
-	$tabform->getTab('security')->group(
-		-name		=> "groupToTakeSurvey",
-		-value		=> [$self->getValue("groupToTakeSurvey")],
-		-label		=> $i18n->get(12),
-		-hoverHelp	=> $i18n->get('12 description')
-		);
-        $tabform->getTab('security')->group(
-                -name		=> "groupToViewReports",
-                -label		=> $i18n->get(13),
-                -hoverHelp	=> $i18n->get('13 description'),
-                -value		=> [$self->getValue("groupToViewReports")]
-                );
-	if ($self->get("assetId") eq "new") {
-		$tabform->getTab('properties')->whatNext(
-			-options=>{
-				editQuestion=>$i18n->get(28),
-				viewParent=>$i18n->get(745)
-				},
-			-value=>"editQuestion",
-                        -hoverHelp	=> $i18n->get('what next description'),
-			);
-	}
+=cut
 
-	return $tabform;
-}
+#sub getEditForm { 
+#    my $self = shift; 
 
-#-------------------------------------------------------------------
-sub getIp {
-	my $self = shift;
-	my $ip = ($self->get("anonymous")) ? substr(md5_hex($self->session->env->getIp),0,8) : $self->session->env->getIp;
-	return $ip;
-}
+#    my $tabform = $self->SUPER::getEditForm(@_); 
 
-#-------------------------------------------------------------------
-sub getMenuVars {
-	my $self = shift;
-	my %var;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	$var{'user.canViewReports'} = ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$var{'delete.all.responses.url'} = $self->getUrl('func=deleteAllResponses');
-	$var{'delete.all.responses.label'} = $i18n->get(73);
-	$var{'export.answers.url'} = $self->getUrl('func=exportAnswers');
-	$var{'export.answers.label'} = $i18n->get(62);
-	$var{'export.questions.url'} = $self->getUrl('func=exportQuestions');
-	$var{'export.questions.label'} = $i18n->get(63);
-	$var{'export.responses.url'} = $self->getUrl('func=exportResponses');
-	$var{'export.responses.label'} = $i18n->get(64);
-	$var{'export.composite.url'} = $self->getUrl('func=exportComposite');
-	$var{'export.composite.label'} = $i18n->get(65);
-	$var{'report.gradebook.url'} = $self->getUrl('func=viewGradebook');
-	$var{'report.gradebook.label'} = $i18n->get(61);
-	$var{'report.overview.url'} = $self->getUrl('func=viewStatisticalOverview');
-	$var{'report.overview.label'} = $i18n->get(59);
-        $var{'survey.url'} = $self->getUrl;
-	$var{'survey.label'} = $i18n->get(60);
-	return \%var;
-}
+#    $tabform->getTab("properties")->hidden( 
+#        -value => "editSurvey", 
+#        -name => 'proceed' 
+#    );
 
-#-------------------------------------------------------------------
-sub getQuestionCount {
-	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-	return ($count < $self->getValue("questionsPerResponse")) ? $count : $self->getValue("questionsPerResponse");
-}
-
-#-------------------------------------------------------------------
-sub getQuestionsLoop {
-	my $self = shift;
-	my $responseId = shift;
-	my @ids;
-	if ($self->get("questionOrder") eq "sequential") {
-		@ids = $self->getSequentialQuestionIds($responseId);
-	} elsif ($self->get("questionOrder") eq "response") {
-		@ids = $self->getResponseDrivenQuestionIds($responseId);
-	} elsif ($self->get("questionOrder") eq "section") {
-		@ids = $self->getSectionDrivenQuestionIds($responseId);
-	} else {
-		@ids = $self->getRandomQuestionIds($responseId);
-	}
-	my $length = scalar(@ids);
-	my $i = 1;
-	my @loop;
-	
-	#Ignore questions per page when using sections, return all questions for current section
-	if ($self->get("questionOrder") eq "section") {
-	  while ($i <= $length) {
-	  	push(@loop,$self->getQuestionVars($ids[($i-1)]));
-	  	$i++;
-	  }
-	  return \@loop;
-	}
-	
-	my $questionResponseCount = $self->getQuestionResponseCount($responseId);
-	while ($i <= $length && $i<= $self->get("questionsPerPage") && ($questionResponseCount + $i) <= $self->getValue("questionsPerResponse")) {
-		push(@loop,$self->getQuestionVars($ids[($i-1)]));
-		$i++;
-	}
-	return \@loop;
-}
-
-
-#-------------------------------------------------------------------
-sub getQuestionResponseCount {
-	my $self = shift;
-	my $responseId = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($responseId));
-	return $count;
-}
-
-#-------------------------------------------------------------------
-sub getQuestionVars {
-	my $self = shift;
-	my $questionId = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	my %var;
-	my $question = $self->session->db->getRow("Survey_question","Survey_questionId",$questionId);
-	$var{'question.question'} = $question->{question};
-	$var{'question.allowComment'} = $question->{allowComment};
-	$var{'question.id'} = $question->{Survey_questionId};
-	$var{'question.comment.field'} = WebGUI::Form::textarea($self->session,{
-		name=>'comment_'.$questionId
-		});
-	$var{'question.comment.label'} = $i18n->get(51);
-
-	my $answer;
-	($answer) = $self->session->db->quickArray("select Survey_answerId from Survey_answer where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId}));
-	$var{'question.answer.field'} = WebGUI::Form::hidden($self->session,{
-			name=>'answerId_'.$questionId,
-			value=>$answer
-			});
-	if ($question->{answerFieldType} eq "text") {
-		$var{'question.answer.field'} .= WebGUI::Form::text($self->session,{
-			name=>'textResponse_'.$questionId
-			});
-	} elsif ($question->{answerFieldType} eq "HTMLArea") {
-		$var{'question.answer.field'} .= WebGUI::Form::HTMLArea($self->session,{
-			name=>'textResponse_'.$questionId
-			});
-	} elsif ($question->{answerFieldType} eq "textArea") {
-		$var{'question.answer.field'} .= WebGUI::Form::textarea($self->session,{
-			name=>'textResponse_'.$questionId
-			});
-	} else {
-		my $answer = $self->session->db->buildHashRef("select Survey_answerId,answer from Survey_answer where Survey_questionId=? order by sequenceNumber", [$question->{Survey_questionId}]);
-		if ($question->{randomizeAnswers}) {
-			$answer = randomizeHash($answer);
-		}
-		$var{'question.answer.field'} = WebGUI::Form::radioList($self->session,{
-			options=>$answer,
-			name=>"answerId_".$questionId,
-			vertical=>1
-			});
-	}
-	return \%var;
-}
-
-#-------------------------------------------------------------------
-sub getRandomQuestionIds {
-	my $self = shift;
-	my $responseId = shift;
-	my @usedQuestionIds = $self->session->db->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($responseId));
-	my $where = " where Survey_id=".$self->session->db->quote($self->get("Survey_id"));
-	if ($#usedQuestionIds+1 > 0) {
-		$where .= " and Survey_questionId not in (".$self->session->db->quoteAndJoin(\@usedQuestionIds).")";
-	}
-	my @questions = $self->session->db->buildArray("select Survey_questionId from Survey_question".$where);
-	@questions = List::Util::shuffle(@questions);
-	return @questions;
-}
-
-#-------------------------------------------------------------------
-sub getResponseCount {
-	my $self = shift;
-	my $ipAddress = $self->getIp;
-	my $userId = $self->getUserId;
-	my ($count) = $self->session->db->quickArray("select count(*) from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." and 
-		((userId<>'1' and userId=".$self->session->db->quote($userId).") or ( userId='1' and ipAddress=".$self->session->db->quote($ipAddress)."))");
-	return $count;
-}
-
-
-#-------------------------------------------------------------------
-sub getResponseDrivenQuestionIds {
-	my $self = shift;
-	my $responseId = shift;
-        my $previousResponse = $self->session->db->quickHashRef("select Survey_questionId, Survey_answerId from Survey_questionResponse 
-		where Survey_responseId=".$self->session->db->quote($responseId)." order by dateOfResponse desc");
-	my $questionId;
-	my @questions;
-	if ($previousResponse->{Survey_answerId}) {
-	        ($questionId) = $self->session->db->quickArray("select gotoQuestion from Survey_answer where 
-			Survey_answerId=".$self->session->db->quote($previousResponse->{Survey_answerId}));
-	        unless ($questionId) { 
-			($questionId) = $self->session->db->quickArray("select gotoQuestion from Survey_question where 
-				Survey_questionId=".$self->session->db->quote($previousResponse->{Survey_questionId}));
-		}
-		if (!$questionId || $questionId eq '-1') { # terminate survey
-			$self->completeResponse($responseId);
-			return ();
-		}
-	} else {
-		($questionId) = $self->session->db->quickArray("select Survey_questionId from Survey_question where Survey_id=".$self->session->db->quote($self->getValue("Survey_id"))."
-			order by sequenceNumber");
-	}
-	push(@questions,$questionId);
-	return @questions;
-}
-
-#-------------------------------------------------------------------
-sub getSectionDrivenQuestionIds {
-	my $self = shift;
-	my $responseId = shift;
-	my @usedQuestionIds = $self->session->db->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($responseId));
-	my @questions;
-	my $where = " where Survey_question.Survey_id=".$self->session->db->quote($self->get("Survey_id"));
-	$where .= " and Survey_question.Survey_sectionId=Survey_section.Survey_sectionId";	
-	
-	if ($#usedQuestionIds+1 > 0) {
-		$where .= " and Survey_questionId not in (".$self->session->db->quoteAndJoin(\@usedQuestionIds).")";
-	}
-		
-	my $sth = $self->session->db->read("select Survey_questionId, Survey_question.Survey_sectionId from Survey_question,
-			Survey_section $where order by Survey_section.sequenceNumber, Survey_question.sequenceNumber");
-
-	my $loopCount=0;
-	my $currentSection;
-	while (my $hashRef = $sth->hashRef) {
-	  if ($loopCount == 0){ $currentSection = $hashRef->{Survey_sectionId}; }
-	  if ($currentSection eq $hashRef->{Survey_sectionId}) {
-	    push (@questions, $hashRef->{Survey_questionId});
-	  }
-	  $loopCount++;
-	}
-	$sth->finish;
-	return @questions;
-}
+#    return $tabform; 
+#    return $self->www_editSurvey(@_);
+#}
 
 
 
 #-------------------------------------------------------------------
-sub getResponseId {
-	my $self = shift;
-	return $self->session->scratch->get($self->getResponseIdString);
+#sub processPropertiesFromFormPost {
+#    my $self = shift;
+#    $self->SUPER::processPropertiesFromFormPost;
+
+#    $self->loadSurveyJSON();
+#    if($#{$self->{_data}->{sections}} < 0){
+#$self->session->errorHandler->error("In Processing from Post\n");
+#        my $section = $self->{_data}->newSection();
+#        $self->{_data}->addSection($section);
+
+#$self->session->errorHandler->error("Processing from creation\n".Dumper $self->{_data});
+#    }
+#    $self->saveSurveyJSON();
+#}
+
+#-------------------------------------------------------------------
+
+=head2 loadSurveyJSON ( )
+
+Loads the survey collateral into memory so that the survey objects can be created
+
+=cut
+
+sub loadSurveyJSON{
+    my $self = shift;
+    my $jsonHash = shift;
+    if(defined $self->survey){return;}#already loaded
+
+    $jsonHash = $self->session->db->quickScalar("select surveyJSON from Survey where assetId = ?",[$self->getId]) if(! defined $jsonHash);
+    
+eval{    
+    $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($jsonHash,$self->session->errorHandler);
+};
 }
 
 #-------------------------------------------------------------------
-sub getResponseIdString {
-	my $self = shift;
-	return "Survey-".$self->get("Survey_id")."-ResponseId";
+
+=head2 saveSurveyJSON ( )
+
+Saves the survey collateral to the DB
+
+=cut
+
+sub survey{ return shift->{survey}; }
+sub littleBuddy{ return shift->{survey}; }
+sub allyourbases{ return shift->{survey}; }
+sub helpmehelpme{ return shift->{survey}; }
+
+sub saveSurveyJSON{
+    my $self = shift;
+    
+    my $data = $self->survey->freeze();
+    
+    $self->session->db->write("update Survey set surveyJSON = ? where assetId = ?",[$data,$self->getId]);
 }
 
 
 #-------------------------------------------------------------------
-sub getSequentialQuestionIds {
-	my $self = shift;
-	my $responseId = shift;
-	my @usedQuestionIds = $self->session->db->buildArray("select Survey_questionId from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($responseId));
-	my $where = " where Survey_id=".$self->session->db->quote($self->get("Survey_id"));
-	if ($#usedQuestionIds+1 > 0) {
-		$where .= " and Survey_questionId not in (".$self->session->db->quoteAndJoin(\@usedQuestionIds).")";
-	}
-	my @questions = $self->session->db->buildArray("select Survey_questionId from Survey_question $where order by sequenceNumber");
-	return @questions;
+
+=head2 www_editSurvey ( )
+
+Loads the initial edit survey page.  All other edit actions are JSON calls from this page.
+
+=cut
+
+sub www_editSurvey {
+    my $self = shift;
+
+    my %var;
+    my $out = $self->processTemplate(\%var,$self->get("surveyEditTemplateId"));
+
+    return $out;
+}
+
+
+#-------------------------------------------------------------------
+sub www_submitObjectEdit{
+    my $self = shift;
+    
+#    my $ref = @{decode_json($self->session->form->process("data"))};
+    my $responses = $self->session->form->paramsHashRef();
+
+    my @address = split/-/,$responses->{id};
+    
+    $self->loadSurveyJSON();
+    if($responses->{delete}){
+        return $self->deleteObject(\@address);
+    }
+    elsif($responses->{copy}){
+        return $self->copyObject(\@address);
+    }
+
+    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->survey->update(\@address,$responses);
+
+    $self->saveSurveyJSON();
+
+    return $self->www_loadSurvey({address => \@address});
 }
 
 #-------------------------------------------------------------------
-sub getUserId {
-	my $self = shift;
-	my $userId = ($self->get("anonymous") && $self->session->user->userId != 1) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
-	return $userId;
+sub copyObject{
+    my ($self,$address) = @_;
+
+    $self->loadSurveyJSON();
+
+    $address = $self->survey->copy($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+
+    $self->saveSurveyJSON();
+    #The parent address of the deleted object is returned.
+
+    return $self->www_loadSurvey({address => $address});
+}
+
+#-------------------------------------------------------------------
+sub deleteObject{
+    my ($self,$address) = @_;
+
+    $self->loadSurveyJSON();
+
+    my $message = $self->survey->remove($address);#each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+
+    $self->saveSurveyJSON();
+    #The parent address of the deleted object is returned.
+    if(@$address == 1){
+        $$address[0] = 0;
+    }else{
+        pop(@{$address});# unless @$address == 1 and $$address[0] == 0;
+    }
+
+    return $self->www_loadSurvey({address => $address, message=>$message});
+}
+
+
+#-------------------------------------------------------------------
+sub www_newObject{
+    my $self = shift;
+    my $ref;
+    
+    my $ids = $self->session->form->process("data");
+
+    my @inAddress = split/-/,$ids;
+    
+    $self->loadSurveyJSON();
+
+    #Don't save after this as the new object should not stay in the survey
+    my $address = $self->survey->newObject(\@inAddress);
+
+   
+    #The new temp object has an address of NEW, which means it is not a real final address. 
+
+    return $self->www_loadSurvey({address => $address, message => undef});
+
+}
+
+
+#-------------------------------------------------------------------
+sub www_dragDrop{
+    my $self = shift;
+    my $p = decode_json($self->session->form->process("data"));
+
+
+    my @tid = split/-/,$p->{target}->{id};
+    my @bid = split/-/,$p->{before}->{id};
+
+    $self->loadSurveyJSON();
+    my $target = $self->survey->getObject(\@tid);
+    $self->survey->remove(\@tid,1);
+    my $address = [0];
+    if(@tid == 1){
+        $#bid = 0;#sections can only be inserted after another section so chop off the question and answer portion of 
+        $bid[0] = -1 if(! defined $bid[0]);
+        $self->survey->insertObject($target, [$bid[0]]);
+    }elsif(@tid == 2){#questions can be moved to any section, but a pushed to the end of a new section.  
+        if($bid[0] !~ /\d/){
+            $bid[0] = $tid[0]; 
+            $bid[1] = $tid[1];
+        }elsif(@bid == 1){#moved to a new section or head of current section
+            if($bid[0] !~ /\d/){
+                $bid[0] = $tid[0]; 
+                $bid[1] = $tid[1];
+            }
+            if($bid[0] == $tid[0]){
+                #moved to top of current section
+                $bid[1] = -1;
+            }else{
+                #else move to the end of the selected section
+                $bid[1] = $#{$self->survey->questions([$bid[0]])};
+            }
+        }
+        $self->survey->insertObject($target, [$bid[0],$bid[1]]);
+    }elsif(@tid == 3){#answers can only be rearranged in the same question
+        if(@bid == 2 and $bid[1] == $tid[1]){
+            $bid[2] = -1;
+            $self->survey->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
+        }elsif(@bid == 3){
+            $self->survey->insertObject($target, [$bid[0],$bid[1],$bid[2]]);
+        }else{
+            #else put it back where it was
+            $self->survey->insertObject($target, \@tid);
+        }
+    }
+    
+    $self->saveSurveyJSON();
+            
+    return $self->www_loadSurvey({address => $address});
+}
+   
+ 
+#-------------------------------------------------------------------
+sub www_loadSurvey{
+    my ($self,$options) = @_;
+    
+    $self->loadSurveyJSON();
+
+    my $address = defined $options->{address} ? $options->{address} : undef;
+    if(! defined $address){
+        if(my $inAddress = $self->session->form->process("data")){
+            $address = [split/-/,$inAddress];
+        }else{
+            $address = [0];
+        }
+    }
+    my $message = defined $options->{message} ? $options->{message} : '';
+    my $var = defined $options->{var} ? $options->{var} : $self->survey->getEditVars($address);
+
+    my $editHtml;
+    if($var->{type} eq 'section'){
+        $editHtml = $self->processTemplate($var,$self->get("sectionEditTemplateId"));
+    }elsif($var->{type} eq 'question'){
+        $editHtml = $self->processTemplate($var,$self->get("questionEditTemplateId"));
+    }elsif($var->{type} eq 'answer'){
+        $editHtml = $self->processTemplate($var,$self->get("answerEditTemplateId"));
+    }
+
+    my %buttons;
+    $buttons{question} = $$address[0]; 
+    if(@$address == 2 or @$address == 3){
+        $buttons{answer} = "$$address[0]-$$address[1]";
+    }
+        
+    my $data = $self->survey->getDragDropList($address);
+    my $html;
+    my ($scount,$qcount,$acount) = (-1,-1,-1);
+    my $lastType;
+    my %lastId;
+    my @ids;
+    my ($s,$q,$a) = (0,0,0);#bools on if a button has already been created
+
+    foreach (@$data){
+        if($_->{type} eq 'section'){
+            $lastId{section} = ++$scount;
+            if($lastType eq 'answer'){
+                $a = 1;
+            }
+            elsif($lastType eq 'question'){
+                $q = 1;
+            }
+            $html .= "<li id='$scount' class='section'>S". ($scount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,$scount);
+        }
+        elsif($_->{type} eq 'question'){
+            $lastId{question} = ++$qcount;
+            if($lastType eq 'answer'){
+                $a = 1;
+            }
+            $html .= "<li id='$scount-$qcount' class='question'>Q". ($qcount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,"$scount-$qcount");
+            $lastType = 'question';
+            $acount = -1;
+        }
+        elsif($_->{type} eq 'answer'){
+            $lastId{answer} = ++$acount;
+            $html .= "<li id='$scount-$qcount-$acount' class='answer'>A". ($acount + 1). ": $_->{text}<\/li><br>\n";
+            push(@ids,"$scount-$qcount-$acount");
+            $lastType = 'answer';
+        }
+    }
+
+    #address is the address of the focused object
+    #buttons are the data to create the Add buttons
+    #edithtml is the html edit the object
+    #ddhtml is the html to create the draggable html divs
+    #ids is a list of all ids passed in which are draggable (for adding events)
+    #type is the object type
+    my $return = {"address",$address,"buttons",\%buttons,"edithtml",$editHtml,"ddhtml",$html,"ids",\@ids,"type",$var->{type}};
+    $self->session->http->setMimeType('application/json');
+    return encode_json($return);
 }
 
 #-------------------------------------------------------------------
@@ -570,564 +513,453 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $templateId = $self->get("templateId");
+        if ($self->session->form->process("overrideTemplateId") ne "") {
+                $templateId = $self->session->form->process("overrideTemplateId");
+        }
+    my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare;
+    $self->{_viewTemplate} = $template;
 }
 
+#-------------------------------------------------------------------
 
-#-------------------------------------------------------------------
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Survey");
-	if ($self->session->form->process("assetId") eq "new") {
-	  my $defaultSectionId = $self->addSection($i18n->get(107));
-	  $self->update({'defaultSectionId' => $defaultSectionId});
-	  $self->session->errorHandler->warn($defaultSectionId);
-	}
-	
-}
-#-------------------------------------------------------------------
 sub purge {
-	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from Survey where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-	if ($count < 2) { ### Check for other wobjects using this survey.
-        	$self->session->db->write("delete from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-        	$self->session->db->write("delete from Survey_answer where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-        	$self->session->db->write("delete from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-        	$self->session->db->write("delete from Survey_section where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-	}
-        $self->SUPER::purge();
-}
-
-
-#-------------------------------------------------------------------
-sub responseIsComplete {
-	my $self = shift;
-	my $responseId = shift;
-	my $response = $self->session->db->getRow("Survey_response","Survey_responseId",$responseId);
-	return $response->{isComplete};
-}
-
-
-#-------------------------------------------------------------------
-sub setAnswerType {
-	my $self = shift;
-	my $answerFieldType = shift;
-	my $qid = shift;
-	$self->setCollateral("Survey_question","Survey_questionId",{
-		Survey_questionId=>$qid,
-		Survey_id=>$self->get("Survey_id"),
-		answerFieldType=>$answerFieldType
-		},1,0,"Survey_id");
-}
-
-#-------------------------------------------------------------------
-sub view {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
-	my $var = $self->getMenuVars;
-	$var->{'question.add.url'} = $self->getUrl('func=editQuestion;qid=new');
-	$var->{'question.add.label'} = $i18n->get(30);
-	$var->{'section.add.url'} = $self->getUrl('func=editSection;sid=new');
-	$var->{'section.add.label'} = $i18n->get(104);
-	my @sectionEdit;
-	
-	# Get Sections
-	my $sth = $self->session->db->read("select Survey_sectionId,sectionName from Survey_section where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-	while (my %sectionData = $sth->hash) {
-		my @edit;
-		
-		# Get Questions for this section
-		my $sth2 = $self->session->db->read("select Survey_questionId,question from Survey_question 
-		   where Survey_id=".$self->session->db->quote($self->get("Survey_id"))."
-		   and Survey_sectionId=".$self->session->db->quote($sectionData{Survey_sectionId})." order by sequenceNumber");
-		while (my %data = $sth2->hash) {
-		  push(@edit,{
-			'question.edit.controls'=>
-				$self->session->icon->delete('func=deleteQuestionConfirm;qid='.$data{Survey_questionId}, $self->get("url"), $i18n->get(44)).
-				$self->session->icon->edit('func=editQuestion;qid='.$data{Survey_questionId}, $self->get("url")).
-				$self->session->icon->moveUp('func=moveQuestionUp;qid='.$data{Survey_questionId}, $self->get("url")).
-				$self->session->icon->moveDown('func=moveQuestionDown;qid='.$data{Survey_questionId}, $self->get("url")),
-			'question.edit.question'=>$data{question},
-			'question.edit.id'=>$data{Survey_questionId}
-		  });
-		}
-		$sth2->finish;
-	
-		push(@sectionEdit,{
-			'section.edit.controls'=>
-				$self->session->icon->delete('func=deleteSectionConfirm;sid='.$sectionData{Survey_sectionId}, $self->get("url"), $i18n->get(105)).
-				$self->session->icon->edit('func=editSection;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				$self->session->icon->moveUp('func=moveSectionUp;sid='.$sectionData{Survey_sectionId}, $self->get("url")).
-				$self->session->icon->moveDown('func=moveSectionDown;sid='.$sectionData{Survey_sectionId}, $self->get("url")),
-			'section.edit.sectionName'=>$sectionData{sectionName},
-			'section.edit.id'=>$sectionData{Survey_sectionId},
-			'section.questions_loop'=>\@edit
-			});
-		$var->{'section.edit_loop'} = \@sectionEdit;
-		
-	}
-	$sth->finish;
-		
-	$var->{'user.canTakeSurvey'} = $self->session->user->isInGroup($self->get("groupToTakeSurvey"));
-	if ($var->{'user.canTakeSurvey'}) {
-		$var->{'response.Id'} = $self->getResponseId;
-		$var->{'response.Count'} = $self->getResponseCount;
-		$var->{'user.isFirstResponse'} = ($var->{'response.Count'} == 0 && !(exists $var->{'response.id'}));
-		$var->{'user.canRespondAgain'} = ($var->{'response.Count'} < $self->get("maxResponsesPerUser"));
-        if ($self->session->form->process("startNew") && $var->{'user.canRespondAgain'}) {
-            $var->{'response.Id'} = "new";
-        }
-        elsif ($var->{'user.isFirstResponse'}) {
-            $var->{'response.Id'} ||= "new";
-        }
-		if ($var->{'response.Id'}) {
-			$var->{'questions.soFar.count'} = $self->getQuestionResponseCount($var->{'response.Id'});
-			($var->{'questions.correct.count'}) = $self->session->db->quickArray("select count(*) from Survey_questionResponse a, Survey_answer b where a.Survey_responseId="
-				.$self->session->db->quote($var->{'response.Id'})." and a.Survey_answerId=b.Survey_answerId and b.isCorrect=1");
-			if ($var->{'questions.soFar.count'} > 0) {
-				$var->{'questions.correct.percent'} = round(($var->{'questions.correct.count'}/$var->{'questions.soFar.count'})*100)
-			}
-			$var->{question_loop} = $self->getQuestionsLoop($var->{'response.Id'});
-            $var->{'response.isComplete'} = $self->responseIsComplete($var->{'response.Id'});
-		}
-	}
-	$var->{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::hidden($self->session,{
-			name=>'func',
-			value=>'respond'
-			});
-    if ($var->{'response.Id'}) {
-        $var->{'form.header'} .= WebGUI::Form::hidden($self->session,{name=>'responseId',value=>$var->{'response.Id'}});
-    }
-	$var->{'form.footer'} = WebGUI::Form::formFooter($self->session,);
-	$var->{'form.submit'} = WebGUI::Form::submit($self->session,{
-			value=>$i18n->get(50)
-			});
-	$var->{'questions.sofar.label'} = $i18n->get(86);
-	$var->{'start.newResponse.label'} = $i18n->get(87);
-	$var->{'start.newResponse.url'} = $self->getUrl("func=view;startNew=1"); 
-	$var->{'thanks.survey.label'} = $i18n->get(46);
-	$var->{'thanks.quiz.label'} = $i18n->get(47);
-	$var->{'questions.total'} = $self->getQuestionCount;
-	$var->{'questions.correct.count.label'} = $i18n->get(52);
-	$var->{'questions.correct.percent.label'} = $i18n->get(54);
-	$var->{'mode.isSurvey'} = ($self->get("mode") eq "survey");
-	$var->{'survey.noprivs.label'} = $i18n->get(48);
-	$var->{'quiz.noprivs.label'} = $i18n->get(49);
-	return $self->processTemplate($var, undef, $self->{_viewTemplate});
-}
-
-#-------------------------------------------------------------------
-sub www_deleteAnswerConfirm {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        my ($answerCount) = $self->session->db->quickArray("select count(*) from Survey_answer where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
-	return $self->i18n("cannot delete the last answer") unless($answerCount);
-        $self->session->db->write("delete from Survey_questionResponse where Survey_answerId=".$self->session->db->quote($self->session->form->process("aid")));
-        $self->deleteCollateral("Survey_answer","Survey_answerId",$self->session->form->process("aid"));
-        $self->reorderCollateral("Survey_answer","Survey_answerId","Survey_id");
-        return $self->www_editQuestion;
-}
-
-#-------------------------------------------------------------------
-sub www_deleteQuestionConfirm {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$self->session->db->write("delete from Survey_answer where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
-	$self->session->db->write("delete from Survey_questionResponse where Survey_questionId=".$self->session->db->quote($self->session->form->process("qid")));
-        $self->deleteCollateral("Survey_question","Survey_questionId",$self->session->form->process("qid"));
-        $self->reorderCollateral("Survey_question","Survey_questionId","Survey_id");
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_deleteSectionConfirm {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-        my $section_id = $self->session->form->get("sid");
-        if ($section_id eq $self->get("defaultSectionId")) {
-	  return $self->session->privilege->vitalComponent();
-	}
-        
-	$self->session->db->write("delete from Survey_section where Survey_sectionId=?",[$section_id]);
-        $self->deleteCollateral("Survey_section","Survey_sectionId",$section_id);
-        $self->reorderCollateral("Survey_section","Survey_sectionId","Survey_id");
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_deleteResponse {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
-        return $self->session->style->process($self->confirm($i18n->get(72),
-                $self->getUrl('func=deleteResponseConfirm;responseId='.$self->session->form->process("responseId"))),$self->getValue("styleTemplateId"));
-}
-
-#-------------------------------------------------------------------
-sub www_deleteResponseConfirm {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        $self->session->db->write("delete from Survey_response where Survey_responseId=".$self->session->db->quote($self->session->form->process("responseId")));
-        $self->session->db->write("delete from Survey_questionResponse where Survey_responseId=".$self->session->db->quote($self->session->form->process("responseId")));
-        return $self->www_viewGradebook;
-}
-
-#-------------------------------------------------------------------
-sub www_deleteAllResponses {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	return $self->session->style->process($self->confirm($i18n->get(74),$self->getUrl('func=deleteAllResponsesConfirm')),$self->getValue("styleTemplateId"));
-}
-
-#-------------------------------------------------------------------
-sub www_deleteAllResponsesConfirm {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        $self->session->db->write("delete from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id"))); 
-        $self->session->db->write("delete from Survey_questionResponse where Survey_id=".$self->session->db->quote($self->get("Survey_id"))); 
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_editAnswer {
-	my $self = shift;
-        my ($question, $f, $answer);	
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-	my $aid = shift || $self->session->form->process('aid');
-	my $qid = shift || $self->session->form->process('qid');
-	
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	$answer = $self->getCollateral("Survey_answer","Survey_answerId",$aid);
-        $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-		-name => "assetId",
-		-value => $self->session->form->process("assetId")
-	);
-        $f->hidden(
-		-name => "func",
-		-value => "editAnswerSave"
-	);
-        $f->hidden(
-		-name => "qid",
-		-value => $qid
-	);
-        $f->hidden(
-		-name => "aid",
-		-value => $answer->{Survey_answerId}
-	);
-        $f->text(
-                -name=>"answer",
-                -value=>$answer->{answer},
-                -label=>$i18n->get(19),
-                -hoverHelp=>$i18n->get('19 description')
-                );
-	if ($self->get("mode") eq "quiz") {
-        	$f->yesNo(
-                	-name=>"isCorrect",
-                	-value=>$answer->{isCorrect},
-                	-label=>$i18n->get(20),
-                	-hoverHelp=>$i18n->get('20 description')
-                	);
-	} else {
-		$f->hidden(
-			-name => "isCorrect",
-			-value => 0
-		);
-	}
-	if ($self->get("questionOrder") eq "response") {
-		$question = $self->session->db->buildHashRef("select Survey_questionId,question 
-			from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-		$question = { ('-1' => $i18n->get(82),%$question) };
-		$f->selectBox(
-			-name=>"gotoQuestion",
-			-options=>$question,
-			-value=>[$answer->{gotoQuestion}],
-			-label=>$i18n->get(21),
-			-hoverHelp=>$i18n->get('21 description')
-			);
-	}
-	if ($answer->{Survey_answerId} eq "new") {
-                my %options;
-                tie %options, 'Tie::IxHash';
-                %options = (
-                        "addAnswer"=>$i18n->get(24),
-                        "addQuestion"=>$i18n->get(28),
-                        "editQuestion"=>$i18n->get(75),
-                        "backToPage"=>$i18n->get(745)
-                        );
-                $f->whatNext(
-                        -options=>\%options,
-                        -value=>"addAnswer",
-			-hoverHelp=>$i18n->get('what next answer description')
-                        );
-        }
-        $f->submit;
-
-	return $self->getAdminConsole->render($f->print, $i18n->get(18));
-
-}
-
-#-------------------------------------------------------------------
-sub www_editAnswerSave {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-	my $qid = $self->session->form->process("qid");
-        $self->setCollateral("Survey_answer", "Survey_answerId", {
-                Survey_answerId => $self->session->form->process("aid"),
-                Survey_questionId => $qid,
-                answer => $self->session->form->process("answer"),
-                isCorrect => $self->session->form->process("isCorrect"),
-		Survey_id=>$self->get("Survey_id"),
-                gotoQuestion => $self->session->form->process("gotoQuestion")
-                },1,0,"Survey_questionId", $qid);
-	if ($self->session->form->process("proceed") eq "addQuestion") {
-		return $self->www_editQuestion('new');
-	} elsif ($self->session->form->process("proceed") eq "addAnswer") {
-		return $self->www_editAnswer('new');
-	} elsif ($self->session->form->process("proceed") eq "backToPage") {
-		return "";
-        }
-        return $self->www_editQuestion();
-}
-
-#-------------------------------------------------------------------
-sub www_editQuestion {
-	my $self = shift;
-	my ($f, $question, $answerFieldType, $sth, %data);
-	my $qid = shift || $self->session->form->process('qid');
-
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	tie %data, 'Tie::CPHash';
-	$question = $self->getCollateral("Survey_question","Survey_questionId", $qid);
-	$answerFieldType = $question->{answerFieldType} || "radioList";
-
-	$f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(
-		-name => "assetId",
-		-value => $self->get("assetId")
-	);
-	$f->hidden(
-		-name => "func",
-		-value => "editQuestionSave"
-	);
-	$f->hidden(
-		-name => "qid",
-		-value => $question->{Survey_questionId}
-	);
-	$f->hidden(
-		-name => "answerFieldType",
-		-value => $answerFieldType
-	);
-	$f->HTMLArea(
-		-name	=> "question",
-		-value	=> $question->{question},
-		-label	=> $i18n->get(14),
-		-hoverHelp	=> $i18n->get('14 description')
-		);
-	$f->yesNo(
-		-name	=> "allowComment",
-		-value	=> $question->{allowComment},
-		-label	=> $i18n->get(15),
-		-hoverHelp	=> $i18n->get('15 description')
-		);
-	$f->yesNo(
-		-name	=> "randomizeAnswers",
-		-value	=> $question->{randomizeAnswers},
-		-label	=> $i18n->get(16),
-		-hoverHelp	=> $i18n->get('16 description')
-		);
-	
-	my $sectionList = $self->session->db->buildHashRef("select Survey_sectionId,sectionName
-			  from Survey_section where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-
-	$f->selectBox(
-			-name	=> "section",
-			-options=> $sectionList,
-			-value	=> [$question->{Survey_sectionId}],
-			-label	=> $i18n->get(106),
-			-hoverHelp	=> $i18n->get('106 description'),
-		      );
-
-	if ($self->get("questionOrder") eq "response") {
-		my $ql = $self->session->db->buildHashRef("select Survey_questionId,question 
-			from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-		$ql = { ('-1' => $i18n->get(82),%$ql) };
-		$f->selectBox(
-			-name	=> "gotoQuestion",
-			-options=> $ql,
-			-value	=> [$question->{gotoQuestion}],
-			-label	=> $i18n->get(21),
-			-hoverHelp	=> $i18n->get('21 description')
-			);
-	}
-
-	if ($question->{Survey_questionId} eq "new") {
-		my %options;
-		tie %options, 'Tie::IxHash';
-		%options = (
-			"addMultipleChoiceAnswer"	=> $i18n->get(24),
-                        "addTextAnswer"			=> $i18n->get(29),
-                        "addBooleanAnswer"		=> $i18n->get(25),
-                        "addFrequencyAnswer"		=> $i18n->get(26),
-                        "addOpinionAnswer"		=> $i18n->get(27),
-                        "addHTMLAreaAnswer"		=> $i18n->get(100),
-                        "addTextAreaAnswer"		=> $i18n->get(101),
-			#"addQuestion"			=> $i18n->get(28),
-                        "backToPage"			=> $i18n->get(745)
-			);
-        	$f->whatNext(
-                	-options=> \%options,
-                	-value	=> "addMultipleChoiceAnswer",
-			-hoverHelp	=> $i18n->get('what next question description')
-                	);
-	}
-	$f->submit;
-	my $output = $f->print;
-	if ($question->{Survey_questionId} ne "new" 
-	   && $question->{answerFieldType} ne "text" 
-	   && $question->{answerFieldType} ne "HTMLArea"
-	   && $question->{answerFieldType} ne "textArea"
-	) {
-		$output .= '<a href="'.$self->getUrl('func=editAnswer;aid=new;qid='
-			.$question->{Survey_questionId}).'">'.$i18n->get(23).'</a><p />';
-		$sth = $self->session->db->read("select Survey_answerId,answer from Survey_answer 
-			where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId})." order by sequenceNumber");
-		while (%data = $sth->hash) {
-			$output .= 
-				$self->session->icon->delete('func=deleteAnswerConfirm;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, 
-					$self->get("url"),$i18n->get(45)).
-                                $self->session->icon->edit('func=editAnswer;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                $self->session->icon->moveUp('func=moveAnswerUp'.';qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                $self->session->icon->moveDown('func=moveAnswerDown;qid='.$question->{Survey_questionId}.';aid='.$data{Survey_answerId}, $self->get("url")).
-                                ' '.$data{answer}.'<br />';
-		}
-		$sth->finish;
-	}
-	return $self->getAdminConsole->render($output, $i18n->get(17));
-}
-
-#-------------------------------------------------------------------
-sub www_editQuestionSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-
-	my $qid = $self->setCollateral("Survey_question", "Survey_questionId", {
-		# XXX: In some cases not all form fields are present and then the SQL query failes
-		# because the array is not complete
-		# There has to be a better way to fix this problem, but adding "|| 1" works for now
-                question=>$self->session->form->process("question", 'HTMLArea') || 1,
-        	Survey_questionId=>$self->session->form->process("qid") || 1,
-		Survey_id=>$self->get("Survey_id") || 1,
-                allowComment=>$self->session->form->process("allowComment", 'yesNo'),
-		gotoQuestion=>$self->session->form->process("gotoQuestion", 'selectBox') || 1,
-		answerFieldType=>$self->session->form->process("answerFieldType") || 1,
-                randomizeAnswers=>$self->session->form->process("randomizeAnswers", 'yesNo'),
-                Survey_sectionId=>$self->session->form->process("section") || 1
-                },1,0,"Survey_id");
-
-        if ($self->session->form->process("proceed") eq "addMultipleChoiceAnswer") {
-                return $self->www_editAnswer('new',$qid);
-	} elsif ($self->session->form->process("proceed") eq "addTextAnswer") {
-                $self->setAnswerType("text",$qid);
-        	$self->addAnswer(0,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addBooleanAnswer") {
-        	$self->addAnswer(31,$qid);
-        	$self->addAnswer(32,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addOpinionAnswer") {
-                $self->addAnswer(33,$qid);
-                $self->addAnswer(34,$qid);
-                $self->addAnswer(35,$qid);
-                $self->addAnswer(36,$qid);
-                $self->addAnswer(37,$qid);
-                $self->addAnswer(38,$qid);
-                $self->addAnswer(39,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addFrequencyAnswer") {
-                $self->addAnswer(40,$qid);
-                $self->addAnswer(41,$qid);
-                $self->addAnswer(42,$qid);
-                $self->addAnswer(43,$qid);
-                $self->addAnswer(39,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addHTMLAreaAnswer") {
-		$self->setAnswerType("HTMLArea",$qid);
-		$self->addAnswer(0,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addTextAreaAnswer") {
-		$self->setAnswerType("textArea",$qid);
-		$self->addAnswer(0,$qid);
-	} elsif ($self->session->form->process("proceed") eq "addQuestion") {
-                return $self->www_editQuestion('new');
-	}
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_editSection {
-	my $self = shift;
-	my ($f, $section, $sectionName);
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Survey');
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$section = $self->getCollateral("Survey_section","Survey_sectionId",$self->session->form->process("sid"));
-	
-	if ($section->{Survey_sectionId} eq $self->get("defaultSectionId") && $section->{Survey_sectionId} ne "") {
-		return $self->session->privilege->vitalComponent;
-	}
-	
-	$f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-	$f->hidden(
-		-name => "assetId",
-		-value => $self->get("assetId")
-	);
-	$f->hidden(
-		-name => "func",
-		-value => "editSectionSave"
-	);
-	$f->hidden(
-		-name => "sid",
-		-value => $section->{Survey_sectionId}
-	);
-
-	$f->text(
-		-name	=> "sectionName",
-		-value	=> $section->{sectionName},
-		-label	=> $i18n->get(102)
-	);
-	$f->submit;
-	my $output = $f->print;
-	return $self->getAdminConsole->render($output, $i18n->get(103));
-}
-
-#-------------------------------------------------------------------
-sub www_editSectionSave {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->canEdit);
-	$self->setCollateral("Survey_section", "Survey_sectionId", {
-                sectionName => $self->session->form->process("sectionName"),
-        	Survey_sectionId=>$self->session->form->process("sid"),
-		Survey_id=>$self->get("Survey_id"),
-                },1,0,"Survey_id");
-	return "";
-}
-
-#-------------------------------------------------------------------
-sub www_exportAnswers {
         my $self = shift;
+        $self->session->db->write("delete from Survey_response where assetId = ?",[$self->getId()]);
+        $self->session->db->write("delete from Survey_tempReport where assetId = ?",[$self->getId()]);
+        $self->session->db->write("delete from Survey where assetId = ?",[$self->getId()]);
+        return $self->SUPER::purge;
+}
+
+#-------------------------------------------------------------------
+
+=head2 purgeCache ( )
+
+See WebGUI::Asset::purgeCache() for details.
+
+=cut
+
+sub purgeCache {
+    my $self = shift;
+    WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
+    $self->SUPER::purgeCache;
+}
+
+#-------------------------------------------------------------------
+
+sub purgeRevision {
+        my $self = shift;
+        return $self->SUPER::purgeRevision;
+}
+
+#-------------------------------------------------------------------
+
+=head2 view ( )
+
+view defines all template variables, processes the template and
+returns the output.
+
+=cut
+
+sub view {
+    my $self = shift;
+    my %var;
+
+    $var{'edit_survey_url'} = $self->getUrl('func=editSurvey');
+    $var{'take_survey_url'} = $self->getUrl('func=takeSurvey');
+    $var{'view_reports_url'} = $self->getUrl('func=viewReports');
+    $var{'user_canTakeSurvey'} = $self->session->user->isInGroup($self->get("groupToTakeSurvey"));
+    $var{'user_canViewReports'} = $self->session->user->isInGroup($self->get("groupToViewReports"));
+    $var{'user_canEditSurvey'} = $self->session->user->isInGroup($self->get("groupToEditSurvey"));
+    my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+
+    return $out;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+See WebGUI::Asset::Wobject::www_view() for details.
+
+=cut
+
+sub www_view {
+    my $self = shift;
+    $self->SUPER::www_view(@_);
+}
+
+
+#-------------------------------------------------------------------
+sub www_takeSurvey{
+    my $self = shift;
+    my %var;
+    
+    my $out = $self->processTemplate(\%var,$self->get("surveyTakeTemplateId"));
+
+    eval{
+        my $responseId = $self->getResponseId();
+        if(!$responseId){
+            return $self->surveyEnd();
+        }
+    };
+
+    return $out;
+}
+
+
+
+
+
+#handles questions that were submitted
+#-------------------------------------------------------------------
+sub www_submitQuestions{
+    my $self=shift;
+    #can user take survey    
+    if(!$self->canTakeSurvey()){
+       # return encode_json({"type","FAIL LOGIN"});
+        return $self->surveyEnd();
+    }
+    
+    my $responseId = $self->getResponseId();
+    if(!$responseId){return $self->surveyEnd();}
+    
+
+    my $responses = $self->session->form->paramsHashRef();
+    delete $$responses{'func'};
+
+    my @goodResponses = keys %$responses;#load everything.  
+
+    $self->loadBothJSON();
+
+    my $termInfo = $self->response->recordResponses($responses);
+
+    $self->saveResponseJSON();
+
+    if($termInfo->[0]){
+        return $self->surveyEnd($termInfo->[1]);
+    }
+
+    return $self->www_loadQuestions();
+
+    my $files = 0;
+ 
+#    for my $id(@$orderOf){
+        #if a file upload, write to disk 
+#        my $path;
+#        if($id->{'questionType'} eq 'File Upload'){
+#            $files = 1;
+#            my $storage = WebGUI::Storage->create($self->session);
+#            my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
+#            $path = $storage->getPath($filename);
+#        }
+#$self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
+#        $self->session->db->write("insert into Survey_questionResponse 
+#            select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
+#            [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
+#    }
+    if($files){
+        ##special case, need to check for more questions in section, if not, more current up one
+        my $lastA = $self->getLastAnswerInfo($responseId);
+        my $questionId = $self->getNextQuestionId($lastA->{'Survey_questionId'});
+        if(!$questionId){
+            my $currentSection = $self->getCurrentSection($responseId);
+            $currentSection = $self->getNextSection($currentSection);
+            if($currentSection){
+                $self->setCurrentSection($responseId,$currentSection);
+            }
+        }
+        return;
+    }
+    return $self->www_loadQuestions($responseId);
+}
+
+
+
+
+
+
+#finds the questions to display next and builds the data structre to hold them
+#-------------------------------------------------------------------
+sub www_loadQuestions{
+    my $self=shift;
+    
+    
+    if(!$self->canTakeSurvey()){
+        return $self->surveyEnd();
+    }
+
+    my $responseId = $self->getResponseId();#also loads the survey and response 
+    if(!$responseId){
+            return $self->surveyEnd();
+    }
+    
+    return $self->surveyEnd() if($self->response->surveyEnd());
+
+    my $questions;
+eval{
+    $questions = $self->response->nextQuestions();
+};
+
+    
+
+    my $section = $self->response->nextSection();
+     
+    #return $self->prepareShowSurveyTemplate($section,$questions);
+    $section->{id} = $self->response->nextSectionId();
+    my $text = $self->prepareShowSurveyTemplate($section,$questions);
+    return $text;
+}
+
+#-------------------------------------------------------------------
+#called when the survey is over.
+sub surveyEnd{
+    my $self = shift;
+    my $url = shift;
+    my $responseId = $self->getResponseId();#also loads the survey and response 
+#    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
+    $self->session->db->setRow("Survey_response","Survey_responseId",{
+                Survey_responseId=>$responseId,
+                endDate=>WebGUI::DateTime->now->toDatabase,
+                isComplete=>1
+            });
+    if($url !~ /\w/){ $url = 0; }
+    if($url eq "undefined"){ $url = 0; }
+    if(!$url){
+        $url = $self->session->db->quickScalar("select exitURL from Survey where assetId = ? order by revisionDate desc limit 1",[$self->getId()]);
+        if(!$url){
+            $url = "/";
+        }
+    }
+    $self->session->http->setMimeType('application/json');
+    return encode_json({"type","forward","url",$url});
+}
+
+
+
+#-------------------------------------------------------------------
+#sends the processed template and questions structure to the client
+sub prepareShowSurveyTemplate{
+    my ($self,$section,$questions) = @_;
+    my %multipleChoice = ('Multiple Choice',1,'Gender',1,'Yes/No',1,'True/False',1,'Ideology',1, 'Race',1,'Party',1,'Education',1
+        ,'Scale',1,'Agree/Disagree',1,'Oppose/Support',1,'Importance',1, 'Likelihood',1,'Certainty',1,'Satisfaction',1,'Confidence',1,
+        'Effectiveness',1,'Concern',1,'Risk',1,'Threat',1,'Security',1);
+    my %text = ('Text',1, 'Email',1, 'Phone Number',1, 'Text Date',1, 'Currency',1);
+    my %slider = ('Slider',1, 'Dual Slider - Range',1, 'Multi Slider - Allocate',1);
+    my %dateType = ('Date',1,'Date Range',1);
+    my %fileUpload = ('File Upload',1);
+    my %hidden = ('Hidden',1);
+
+    foreach my $q(@$questions){
+        if($fileUpload{$$q{'questionType'}}){ $q->{'fileLoader'} = 1; } 
+        elsif($text{$$q{'questionType'}}){ $q->{'textType'} = 1; }
+        elsif($hidden{$$q{'questionType'}}){ $q->{'hidden'} = 1; }
+        elsif($multipleChoice{$$q{'questionType'}}){ 
+            $q->{'multipleChoice'} = 1; 
+            if($$q{'maxAnswers'} > 1){
+                $q->{'maxMoreOne'} = 1; 
+            }
+        }
+        elsif($dateType{$$q{'questionType'}}){ 
+            $q->{'dateType'} = 1; 
+        }
+        elsif($slider{$$q{'questionType'}}){ 
+            $q->{'slider'} = 1;
+            if($$q{'questionType'} eq 'Dual Slider - Range'){
+                $q->{'dualSlider'} = 1;
+                $q->{'a1'} = [$q->{'answers'}->[0]];
+                $q->{'a2'} = [$q->{'answers'}->[1]];
+            }
+        }
+ 
+        if($$q{'verticalDisplay'}){ $$q{'verts'} = "<p>"; $$q{'verte'} = "</p>"; }
+    }
+    $section->{'questions'} = $questions;
+    
+    my $out = $self->processTemplate($section,$self->get("surveyQuestionsId"));
+
+    $self->session->http->setMimeType('application/json');
+    return encode_json({"type","displayquestions","section",$section,"questions",$questions,"html",$out});
+}
+
+
+#-------------------------------------------------------------------
+
+sub loadBothJSON{
+    my $self = shift;
+    my $rId = shift;
+    if(defined $self->survey and defined $self->response){return;}
+    my $ref = $self->session->db->buildArrayRefOfHashRefs("
+        select s.surveyJSON,r.responseJSON 
+        from Survey s, Survey_response r 
+        where s.assetId = ? and r.Survey_responseId = ?",
+        [$self->getId,$rId]);
+    $self->loadSurveyJSON($ref->[0]->{surveyJSON});
+    $self->loadResponseJSON($ref->[0]->{responseJSON}, $rId);
+}
+
+#-------------------------------------------------------------------
+sub loadResponseJSON{
+    my $self = shift;
+    my $jsonHash = shift;
+    my $rId = shift;
+    $rId = defined $rId ? $rId : $self->{responseId};
+    if(defined $self->response and ! defined $rId){return;}
+
+
+    $jsonHash = $self->session->db->quickScalar("select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
+        [$self->getId,$rId]) if(! defined $jsonHash);
+
+    $self->{response} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new($jsonHash,$self->session->errorHandler, $self->survey); 
+}
+
+#-------------------------------------------------------------------
+sub saveResponseJSON{
+    my $self = shift;
+
+    my $data = $self->response->freeze();
+    
+    
+    $self->session->db->write("update Survey_response set responseJSON = ? where Survey_responseId = ?",[$data,$self->{responseId}]);
+}
+
+
+
+
+#-------------------------------------------------------------------
+sub response{
+    my $self = shift;
+    return $self->{response};
+}
+
+
+#-------------------------------------------------------------------
+
+sub getResponseId{
+    my $self = shift;
+
+    return $self->{responseId} if(defined $self->{responseId});
+
+    my $ip = $self->session->env->getIp;
+    my $id = $self->session->user->userId();
+    my $anonId = $self->session->form->process("userid") || $self->session->http->getCookies->{"Survey2AnonId"} || undef;
+    $self->session->http->setCookie("Survey2AnonId",$anonId) if($anonId);
+
+$self->log("here"); 
+    my $responseId;
+
+    my  $string;
+   
+    #if there is an anonid or id is for a WG user
+    if($anonId or $id != 1){
+        $string = 'userId';
+        if($anonId){
+            $string = 'anonId';
+            $id = $anonId;
+        }
+        $responseId = $self->session->db->quickScalar("select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
+            [$id,$self->getId()]);
+
+    }elsif($id == 1){
+        $responseId = $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0",
+            [$id,$ip,$self->getId()]);
+    }
+
+    if(! $responseId){
+$self->log("no response id"); 
+        my $allowedTakes = $self->session->db->quickScalar("select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1",[$self->getId()]);
+        my $haveTaken;
+
+        if($id == 1 ){
+            $haveTaken = $self->session->db->quickScalar("select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?",
+            [$id,$ip,$self->getId()]);
+        }else{
+            $haveTaken = $self->session->db->quickScalar("select count(*) from Survey_response where $string = ? and assetId = ?",
+                [$id,$self->getId()]);
+        }
+
+        if($haveTaken < $allowedTakes){
+$self->log("creating new response"); 
+            $responseId = $self->session->db->setRow("Survey_response","Survey_responseId",{
+                Survey_responseId=>"new",
+                userId=>$id,
+                ipAddress=>$ip,
+                username=>$self->session->user->username,
+                startDate=>WebGUI::DateTime->now->toDatabase,
+                endDate=>WebGUI::DateTime->now->toDatabase,
+                assetId=>$self->getId(),
+                anonId=>$anonId
+            });
+$self->log("1");
+            $self->loadBothJSON($responseId);
+$self->log("2");
+            $self->response->createSurveyOrder();
+$self->log("3");
+            $self->{responseId} = $responseId;
+$self->log("4");
+            $self->saveResponseJSON();
+$self->log("loaded nad saved survey and response"); 
+        }else{
+        }
+    }
+    $self->{responseId} = $responseId;
+    $self->loadBothJSON($responseId);
+    return $responseId;
+}
+
+
+#-------------------------------------------------------------------
+
+sub canTakeSurvey{
+    my $self = shift;
+  
+    return $self->{canTake} if(defined $self->{canTake});
+
+ 
+    if(!$self->session->user->isInGroup($self->get("groupToTakeSurvey"))){
+        return 0;
+    }
+
+    #Does user have too many finished survey responses
+    my $maxTakes = $self->getValue("maxResponsesPerUser");
+    my $ip = $self->session->env->getIp;
+    my $id = $self->session->user->userId();
+    my $takenCount = 0; 
+
+
+    if($id == 1){
+        $takenCount = $self->session->db->quickScalar("select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? 
+                and isComplete = ?",[$id,$ip,$self->getId(),1]);
+    }else{
+        $takenCount = $self->session->db->quickScalar("select count(*) from Survey_response where userId = ? and assetId = ? and isComplete = ?",[$id,$self->getId(),1]);
+    }
+
+
+    if($takenCount >= $maxTakes){
+        $self->{canTake} = 0;
+    }else{
+        $self->{canTake} = 1;
+    }
+    return $self->{canTake};
+
+}
+
+#-------------------------------------------------------------------
+sub www_viewReports {
+        my $self = shift;
+        $self->loadTempReportTable();
         return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        my $filename    = $self->session->url->escape($self->get("title")."_answers.tab");
-        my $content = $self->session->db->quickTab("select * from Survey_answer where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
+        my $filename    = $self->session->url->escape($self->get("title")."_results.tab");
+        my $content = $self->session->db->quickTab("select * from Survey_tempReport t where t.assetId=? order by t.Survey_responseId, t.order",[$self->getId()]);
         return $self->export($filename,$content);
 }
 
 #-------------------------------------------------------------------
-sub export{ 
+sub export{
         my $self = shift;
         my $filename = shift;
         $filename =~ s/[^\w\d\.]/_/g;
@@ -1137,7 +969,7 @@ sub export{
         my $tmpDir      = $store->getPath();
         my $filepath    = $store->getPath($filename);
         unless (open TEMP, ">$filepath") {
-            return "Error - Could not open temporary file for writing.  Please use the back button and try again"; 
+            return "Error - Could not open temporary file for writing.  Please use the back button and try again";
         }
         print TEMP $content;
         close TEMP;
@@ -1148,303 +980,35 @@ sub export{
         return undef;
 }
 
-#-------------------------------------------------------------------
-sub www_exportComposite {
-        my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        my $filename    = $self->session->url->escape($self->get("title")."_composite.tab");
 
-        my $content = $self->session->db->quickTab("select b.question, c.response, a.userId, a.username, a.ipAddress, c.comment, c.dateOfResponse from Survey_response a 
-                left join Survey_questionResponse c on a.Survey_responseId=c.Survey_responseId 
-                left join Survey_question b on c.Survey_questionId=b.Survey_questionId 
-                where a.Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by a.userId, a.ipAddress, b.sequenceNumber");
+sub loadTempReportTable{
+    my $self = shift;
 
-        return $self->export($filename,$content);
-}
-
-#-------------------------------------------------------------------
-sub www_exportQuestions {
-        my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        my $filename = $self->session->url->escape($self->get("title")."_questions.tab");
-        my $content = $self->session->db->quickTab("select * from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-        return $self->export($filename,$content);
-}
-
-#-------------------------------------------------------------------
-sub www_exportResponses {
-        my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-        my $filename = $self->session->url->escape($self->get("title")."_responses.tab");
-        my $content = $self->session->db->quickTab("select * from Survey_response where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-        return $self->export($filename,$content);
-}
-
-#-------------------------------------------------------------------
-sub www_moveAnswerDown {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralDown("Survey_answer","Survey_answerId",$self->session->form->process("aid"),"Survey_id");
-        return $self->www_editQuestion;
-}
-
-#-------------------------------------------------------------------
-sub www_moveAnswerUp {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralUp("Survey_answer","Survey_answerId",$self->session->form->process("aid"),"Survey_id");
-        return $self->www_editQuestion;
-}
-
-#-------------------------------------------------------------------
-sub www_moveQuestionDown {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralDown("Survey_question","Survey_questionId",$self->session->form->process("qid"),"Survey_id");
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_moveQuestionUp {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralUp("Survey_question","Survey_questionId",$self->session->form->process("qid"),"Survey_id");
-        return ""; 
-}
-
-#-------------------------------------------------------------------
-sub www_moveSectionDown {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralDown("Survey_section","Survey_sectionId",$self->session->form->process("sid"),"Survey_id");
-        return "";
-}
-
-#-------------------------------------------------------------------
-sub www_moveSectionUp {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless ($self->canEdit);
-        $self->moveCollateralUp("Survey_section","Survey_sectionId",$self->session->form->process("sid"),"Survey_id");
-        return ""; 
-}
-
-#-------------------------------------------------------------------
-sub www_respond {
-	my $self = shift;
-	return "" unless ($self->session->user->isInGroup($self->get("groupToTakeSurvey")));
-    #If user has not responded before, create the responseId binding the survey to this session: fdillon 7-11-07
-    my $responseCount   = $self->getResponseCount;
-    my $responseId      = $self->getResponseId;
-    my $canRespond      = ($responseCount < $self->get("maxResponsesPerUser"));
-    if ($canRespond && (!defined $responseId || $self->session->form->param('responseId') eq 'new')) {
-        $self->generateResponseId;
+    $self->loadSurveyJSON();
+    my $refs = $self->session->db->buildArrayRefOfHashRefs("select * from Survey_response where assetId = ?",[$self->getId()]);
+    $self->session->db->write("delete from Survey_tempReport where assetId = ?",[$self->getId()]);
+    for my $ref(@$refs){
+        $self->loadResponseJSON(undef,$ref->{Survey_responseId});
+        my $count = 1;
+        for my $q(@{$self->response->returnResponseForReporting()}){
+            if(@{$q->{answers}} == 0 and $q->{comment} =~ /\w/){
+                $self->session->db->write("insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [$self->getId(),$ref->{Survey_responseId}, $count++, $q->{section},$q->{sectionName},$q->{question},$q->{questionName},
+                    $q->{questionComment},undef,undef,undef,undef,undef,undef,undef]);
+                next;
+            }
+            for my $a(@{$q->{answers}}){
+                $self->session->db->write("insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [$self->getId(),$ref->{Survey_responseId}, $count++, $q->{section},$q->{sectionName},$q->{question},$q->{questionName},
+                    $q->{questionComment},$a->{id},$a->{value},$a->{comment},$a->{time},$a->{isCorrect},$a->{value},undef]);
+            }
+        }
     }
-
-    my $varname = $self->getResponseIdString;
-	return "" unless ($self->session->scratch->get($varname));
-	my $userId = ($self->get("anonymous")) ? substr(md5_hex($self->session->user->userId),0,8) : $self->session->user->userId;
-	my $terminate = 0;
-	foreach my $key ($self->session->form->param) {
-		if ($key =~ /^answerId_(.+)$/) {
-			my $id = $1;
-			my ($previousResponse) = $self->session->db->quickArray("select count(*) from Survey_questionResponse
-				where Survey_answerId=".$self->session->db->quote($self->session->form->process("answerId_".$id))." and Survey_responseId=".$self->session->db->quote($self->session->scratch->get($varname)));
-			next if ($previousResponse);
-			my $answer = $self->getCollateral("Survey_answer","Survey_answerId",$self->session->form->process("answerId_".$id));
-			if ($self->get("questionOrder") eq "response" && $answer->{gotoQuestion} eq "") {
-				$terminate = 1;
-			}
-			my $response = $self->session->form->process("textResponse_".$id) || $answer->{answer};
-			$self->session->db->write("insert into Survey_questionResponse (Survey_answerId,Survey_questionId,Survey_responseId,Survey_id,comment,response,dateOfResponse) values (
-				".$self->session->db->quote($answer->{Survey_answerId}).", ".$self->session->db->quote($answer->{Survey_questionId}).", ".$self->session->db->quote($self->session->scratch->get($varname)).", ".$self->session->db->quote($answer->{Survey_id}).",
-				".$self->session->db->quote($self->session->form->process("comment_".$id)).", ".$self->session->db->quote($response).", ".$self->session->datetime->time().")");
-		}
-	}
-	
-    $responseCount = $self->getQuestionResponseCount($self->session->scratch->get($varname)); 
-	if ($terminate || $responseCount >= $self->getValue("questionsPerResponse") || $responseCount >= $self->getQuestionCount) {
-		$self->session->db->setRow("Survey_response","Survey_responseId",{
-			isComplete=>1,
-			endDate=>$self->session->datetime->time(),
-			Survey_responseId=>$self->session->scratch->get($varname)
-			});
-	}
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
-	return "";
+    return 1;
 }
-
-
-#-------------------------------------------------------------------
-sub www_viewGradebook {
-	my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	my $var = $self->getMenuVars;
-	$var->{title} = $i18n->get(71);
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewGradebook'));
-	$p->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate from Survey_response 
-		where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by username,ipAddress,startDate");
-	my $users = $p->getPageData;
-	($var->{'question.count'}) = $self->session->db->quickArray("select count(*) from Survey_question where Survey_id=".$self->session->db->quote($self->get("Survey_id")));
-	if ($var->{'question.count'} > $self->get("questionsPerResponse")) {
-		$var->{'question.count'} = $self->get("questionsPerResponse");
-	}
-	$var->{'response.user.label'} = $i18n->get(67);
-	$var->{'response.count.label'} = $i18n->get(52);
-	$var->{'response.percent.label'} = $i18n->get(54);
-	my @responseloop;
-	foreach my $user (@$users) {
-		my ($correctCount) = $self->session->db->quickArray("select count(*) from Survey_questionResponse a left join
-                	Survey_answer b on a.Survey_answerId=b.Survey_answerId where a.Survey_responseId=".$self->session->db->quote($user->{Survey_responseId})
-			." and b.isCorrect=1");
-		push(@responseloop, {
-			'response.url'=>$self->getUrl('func=viewIndividualSurvey;responseId='.$user->{Survey_responseId}),
-			'response.user.name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
-			'response.count.correct' => $correctCount,
-			'response.percent' => round(($correctCount/$var->{'question.count'})*100)
-			});
-	}
-	$var->{response_loop} = \@responseloop;
-	$p->appendTemplateVars($var);
-	return $self->session->style->process($self->processTemplate($var,$self->getValue("gradebookTemplateId")),$self->getValue("styleTemplateId"));
-#	return $self->processTemplate($self->getValue("gradebookTemplateId"),$var,"Survey/Gradebook");
-}
-
-
-#-------------------------------------------------------------------
-sub www_viewIndividualSurvey {
-	my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	my $var = $self->getMenuVars;
-	$var->{'title'} = $i18n->get(70);
-	$var->{'delete.url'} = $self->getUrl('func=deleteResponse;responseId='.$self->session->form->process("responseId"));
-	$var->{'delete.label'} = $i18n->get(69);
-	my $response = $self->session->db->getRow("Survey_response","Survey_responseId",$self->session->form->process("responseId"));
-	$var->{'start.date.label'} = $i18n->get(76);
-	$var->{'start.date.epoch'} = $response->{startDate};
-	$var->{'start.date.human'} =$self->session->datetime->epochToHuman($response->{startDate},"%z");
-	$var->{'start.time.human'} =$self->session->datetime->epochToHuman($response->{startDate},"%Z");
-	$var->{'end.date.label'} = $i18n->get(77);
-	$var->{'end.date.epoch'} = $response->{endDate};
-	$var->{'end.date.human'} =$self->session->datetime->epochToHuman($response->{endDate},"%z");
-	$var->{'end.time.human'} =$self->session->datetime->epochToHuman($response->{endDate},"%Z");
-	$var->{'duration.label'} = $i18n->get(78);
-	$var->{'duration.minutes'} = int(($response->{end} - $response->{start})/60);
-	$var->{'duration.minutes.label'} = $i18n->get(79);
-	$var->{'duration.seconds'} = (($response->{endDate} - $response->{start})%60);
-	$var->{'duration.seconds.label'} = $i18n->get(80);
-	$var->{'answer.label'} = $i18n->get(19) if ($self->get("mode") eq "quiz");
-	$var->{'response.label'} = $i18n->get(66);
-	$var->{'comment.label'} = $i18n->get(57);
-	my $questions = $self->session->db->read("select Survey_questionId,question,answerFieldType from Survey_question 
-		where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-	my @questionloop;
-	while (my $qdata = $questions->hashRef) {
-		my @aid;
-		my @answer;
-		if ($qdata->{answerFieldType} eq "radioList") {
-			my $sth = $self->session->db->read("select Survey_answerId,answer from Survey_answer 
-				where Survey_questionId=".$self->session->db->quote($qdata->{Survey_questionId})." and isCorrect=1 order by sequenceNumber");
-			while (my $adata = $sth->hashRef) {
-				push(@aid,$adata->{Survey_answerId});
-				push(@answer,$adata->{answer});
-			}
-			$sth->finish;
-		}
-		my $rdata = $self->session->db->quickHashRef("select Survey_answerId,response,comment from Survey_questionResponse 
-			where Survey_questionId=".$self->session->db->quote($qdata->{Survey_questionId})." and Survey_responseId=".$self->session->db->quote($self->session->form->process("responseId")));
-		push(@questionloop,{
-			question => $qdata->{question},
-			'question.id'=>$qdata->{Survey_questionId},
-			'question.isRadioList' => ($qdata->{answerFieldType} eq "radioList"),
-			'question.response' => $rdata->{response},
-			'question.comment' => $rdata->{comment},
-			'question.isCorrect' => isIn($rdata->{Survey_answerId}, @aid),
-			'question.answer' => join(", ",@answer),
-			});
-	}
-	$questions->finish;
-	$var->{question_loop} = \@questionloop;
-	return $self->session->style->process($self->processTemplate($var, $self->getValue("responseTemplateId")),$self->getValue("styleTemplateId"));
-#	return $self->processTemplate($self->getValue("responseTemplateId"),$var,"Survey/Response");
-}
-
-#-------------------------------------------------------------------
-sub www_viewStatisticalOverview {
-	my $self = shift;
-        return "" unless ($self->session->user->isInGroup($self->get("groupToViewReports")));
-	$self->logView() if ($self->session->setting->get("passiveProfilingEnabled"));
-	my $var = $self->getMenuVars;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Survey');
-	$var->{title} = $i18n->get(58);
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewStatisticalOverview'));
-	$p->setDataByQuery("select Survey_questionId,question,answerFieldType,allowComment from Survey_question 
-		where Survey_id=".$self->session->db->quote($self->get("Survey_id"))." order by sequenceNumber");
-	my $questions = $p->getPageData;
-	my @questionloop;
-	$var->{'answer.label'} = $i18n->get(19);
-	$var->{'response.count.label'} = $i18n->get(53);
-	$var->{'response.percent.label'} = $i18n->get(54);
-	$var->{'show.responses.label'} = $i18n->get(55);
-	$var->{'show.comments.label'} = $i18n->get(56);
-	foreach my $question (@$questions) {
-		my @answerloop;
-		my ($totalResponses) = $self->session->db->quickArray("select count(*) from Survey_questionResponse where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId}));
-		if ($question->{answerFieldType} eq "radioList") {
-			my $sth = $self->session->db->read("select Survey_answerId,answer,isCorrect from Survey_answer where
-				Survey_questionId=".$self->session->db->quote($question->{Survey_questionId})." order by sequenceNumber");
-			while (my $answer = $sth->hashRef) {
-				my ($numResponses) = $self->session->db->quickArray("select count(*) from Survey_questionResponse where Survey_answerId=".$self->session->db->quote($answer->{Survey_answerId}));
-				my $responsePercent;
-				if ($totalResponses) {
-					$responsePercent = round(($numResponses/$totalResponses)*100);
-				} else {
-					$responsePercent = 0;
-				}
-				my @commentloop;
-				my $sth2 = $self->session->db->read("select comment from Survey_questionResponse where Survey_answerId=".$self->session->db->quote($answer->{Survey_answerId}));
-				while (my ($comment) = $sth2->array) {
-					push(@commentloop,{
-						'answer.comment'=>$comment
-						});
-				}
-				$sth2->finish;
-				push(@answerloop,{
-					'answer.isCorrect'=>$answer->{isCorrect},
-					'answer' => $answer->{answer},
-					'answer.response.count' =>$numResponses,
-					'answer.response.percent' =>$responsePercent,
-					'comment_loop'=>\@commentloop
-					});
-			}
-			$sth->finish;
-		} else {
-			my $sth = $self->session->db->read("select response,comment from Survey_questionResponse where Survey_questionId=".$self->session->db->quote($question->{Survey_questionId}));
-			while (my $response = $sth->hashRef) {
-				push(@answerloop,{
-					'answer.response'=>$response->{response},
-					'answer.comment'=>$response->{comment}
-					});
-			}
-			$sth->finish;
-		}
-		push(@questionloop,{
-			question=>$question->{question},
-			'question.id'=>$question->{Survey_questionId},
-			'question.isRadioList' => ($question->{answerFieldType} eq "radioList"),
-			'question.response.total' => $totalResponses,
-			'answer_loop'=>\@answerloop,
-			'question.allowComment'=>$question->{allowComment}
-			});
-	}
-	$var->{question_loop} = \@questionloop;
-	$p->appendTemplateVars($var);
-
-	return $self->session->style->process($self->processTemplate($var, $self->getValue("overviewTemplateId")),$self->getValue("styleTemplateId"));
+sub log{
+    my $self = shift;
+    $self->session->errorHandler->error(shift);
 }
 
 1;
-

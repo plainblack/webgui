@@ -1,4 +1,6 @@
 7.6.4
+ - Brand new Survey system.  Make sure to export your old results as they will
+   not be imported, only the surveys themselves.
 
 7.6.3
  - improved performance of file uploads
