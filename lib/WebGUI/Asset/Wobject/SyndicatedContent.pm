@@ -407,9 +407,9 @@ Deprecated. Use www_viewRss() instead.
 
 =cut
 
-sub www_viewRSS10 {
+sub www_viewRSS090 {
 	my $self = shift;
-	return $self->www_viewRdf;
+	return $self->www_viewRss;
 }
 
 #-------------------------------------------------------------------
@@ -420,9 +420,9 @@ Deprecated. Use www_viewRss() instead.
 
 =cut
 
-sub www_viewRSS10 {
+sub www_viewRSS091 {
 	my $self = shift;
-	return $self->www_viewRdf;
+	return $self->www_viewRss;
 }
 
 #-------------------------------------------------------------------
@@ -446,14 +446,10 @@ Deprecated. Use www_viewRss() instead.
 
 =cut
 
-sub www_viewRSS10 {
+sub www_viewRSS20 {
 	my $self = shift;
-	return $self->www_viewRdf;
+	return $self->www_viewRss;
 }
-
-
-
-
 
 1;
 
