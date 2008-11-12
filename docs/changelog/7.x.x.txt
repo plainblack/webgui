@@ -8,8 +8,6 @@
  - The Syndicated Content asset was rewritten, and now uses 35% less memory
    and is 400% faster.
  - fixed #9025: Testing function of UsersOnline macro fails.
- - Brand new Survey system.  Make sure to export your old results as they will
-   not be imported, only the surveys themselves.
  - fixed #9028: Thingy fails when setting values containing single quotes
  - fixed #9047: Unable to reorder DataForm tabs
  - added: Delete columns from DataTable

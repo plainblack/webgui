@@ -78,7 +78,7 @@ sub execute {
                 my $archiveDate = $epoch - $cs->get("archiveAfter");
                 my $sql = "select asset.assetId, assetData.revisionDate from Post left join asset on asset.assetId=Post.assetId 
                         left join assetData on Post.assetId=assetData.assetId and Post.revisionDate=assetData.revisionDate
-                        where Post.revisionDate > ? and assetData.status='archived' and asset.state='published'
+                        where Post.revisionDate<? and assetData.status='approved' and asset.state='published'
 			and Post.threadId=Post.assetId and asset.lineage like ?";
                 my $b = $self->session->db->read($sql,[$archiveDate, $cs->get("lineage").'%']);
                 while (my ($id, $version) = $b->array) {
@@ -87,7 +87,7 @@ sub execute {
 			foreach my $post (@{$thread->getPosts}) {
                         	$archiveIt = 0 if (defined $post && $post->get("revisionDate") > $archiveDate);
 			}
-			$thread->unarchive if ($archiveIt);
+			$thread->archive if ($archiveIt);
                 }
                 $b->finish;
         }
