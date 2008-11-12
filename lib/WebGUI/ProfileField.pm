@@ -245,7 +245,8 @@ sub formField {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
         # use submitted data if it exists
-        if (defined $self->session->form->process($properties->{name})) {
+        # FIXME Is $properties->{name} or $self->getId the correct way to get the form name?
+        if (defined $self->session->form->process($properties->{name}, $self->get("fieldType"))) {
             $properties->{value} = $self->session->form->process($self->getId,$self->get("fieldType"), undef, $properties);
         }
         # fall back on default
