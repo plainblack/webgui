@@ -80,11 +80,18 @@ sub execute {
     # start time to check for timeouts
     my $time = time();
     my $ttl  = $self->getTTL;
+    
+    # get asset list
+    my $scratch = $instance->getScratch("syndicatedassets");
+    my $assets = [];
+    if ($scratch) {
+        $assets = JSON->new->decode($scratch);
+    }
+    else {
+        $assets = $self->session->db->buildArrayRef("select assetId from asset where className like 'WebGUI::Asset::Wobject::SyndicatedContent'");
+    }
 
-    my $assets = JSON->new->decode($instance->getScratch("syndicatedassets") || '[]');
-	if (scalar @$assets < 1) {
-		$assets = $self->session->db->buildArrayRef("select assetId from asset where className like 'WebGUI::Asset::Wobject::SyndicatedContent'");
-	}
+    # process each syndicated content asset
     while (my $id = shift(@{$assets})) {
         # Get RSS data, which will be stored in the cache
         $log->info("GetSyndicatedContent: Caching for $id");
@@ -107,6 +114,8 @@ sub execute {
         $instance->setScratch("syndicatedassets", JSON->new->encode($assets));
         return $self->WAITING;
     }
+    
+    # if we've completed the list, clean up
     $instance->deleteScratch("syndicatedassets");
     return $self->COMPLETE;
 }
