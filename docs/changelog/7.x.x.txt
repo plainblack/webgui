@@ -1,3 +1,5 @@
+7.6.4
+
 7.6.3
  - improved performance of file uploads
  - changed format of created uploads locations, avoiding case sensitivity problems
