@@ -123,9 +123,10 @@ sub process {
             "Too many levels of macro recursion. Stopping.";
         }
         else {
-            my $d = $1;
+            my $initialText = $1;
             my $replaceText = _processMacro($session, $2, $3);
-            defined $replaceText ? $replaceText : $d;       # processMacro returns undef on failure, use original text
+            # _processMacro returns undef on failure, use original text
+            defined $replaceText ? $replaceText : $initialText;
         }
     }ge;
 }
