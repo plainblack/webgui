@@ -206,7 +206,7 @@ sub getTemplateVariables {
 	foreach my $object (@items) {
 		my %item;
         $item{title} = WebGUI::HTML::filter($object->title, 'javascript');
-        $item{date} = WebGUI::HTML::filter($object->pubDate, 'javascript');
+        $item{date} = WebGUI::HTML::filter($object->get_pubDate_epoch, 'javascript');
         $item{category} = WebGUI::HTML::filter($object->category, 'javascript');
         $item{author} = WebGUI::HTML::filter($object->author, 'javascript');
         $item{guid} = WebGUI::HTML::filter($object->guid, 'javascript');
