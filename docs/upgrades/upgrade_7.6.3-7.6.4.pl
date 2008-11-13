@@ -20,7 +20,9 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Asset::Wobject::Survey;
+use WebGUI::Asset::Wobject::Survey::SurveyJSON;
+use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
 my $toVersion = '7.6.4';
 my $quiet; # this line required
@@ -98,7 +100,6 @@ sub migrateSurvey{
         );
 
         my $sjson = WebGUI::Asset::Wobject::Survey::SurveyJSON->new();
-
         #move over sections
         my $sql = "select * from Survey_section_old where Survey_id = '$$survey{Survey_id}' order by sequenceNumber";
         my $sections = $session->db->buildArrayRefOfHashRefs($sql);
@@ -114,32 +115,39 @@ sub migrateSurvey{
                 }
             );
         }
-
+        
         #move over questions
-        #my %qMap = ('radioList','Multiple Choice','text','Text','HTMLArea','Text','textArea','Text');
         $sql = "select * from Survey_question_old where Survey_id = '$$survey{Survey_id}' order by sequenceNumber";
         my $questions = $session->db->buildArrayRefOfHashRefs($sql);
         my $qId = 0;
-        my %qMap;
+        my %qMap = ('radioList','Multiple Choice','text','Text','HTMLArea','Text','textArea','Text');
         my %qS;
+        my $lastSection = $$questions[0]->{Survey_sectionid};
         for my $question(@$questions){
+            if($lastSection ne $$question{Survey_sectionId}){
+                $qId = 0;
+            }
             $qMap{$$question{Survey_questionId}} = $qId;
             $qS{$$question{Survey_questionId}} = $$question{Survey_sectionId};
             $sjson->update([$sMap{$$question{Survey_sectionId}},$qId++],
                 {
                     'text',$$question{question},'variable',$$question{Survey_questionId},'allowComment',$$question{allowComment},
-                    'randomizeAnswers',$$question{randomizeAnswers},'questionType',$qMap{$$question{answerField}}
+                    'randomizeAnswers',$$question{randomizeAnswers},'questionType',$qMap{$$question{answerFieldType}}
                 }
             );
+            $lastSection = $$question{Survey_sectionId};
         }
-
 
         #move over answers
         $sql = "select * from Survey_answer_old where Survey_id = '$$survey{Survey_id}' order by sequenceNumber";
         my $answers = $session->db->buildArrayRefOfHashRefs($sql);
         my $aId = 0;
         my %aMap;
+        my $lastQuestion = $$answers[0]->{Survey_questionId};
         for my $answer(@$answers){
+            if($lastQuestion ne $$answer{Survey_questionId}){
+                $aId = 0;
+            }
             $aMap{$$survey{Survey_answerId}} = $aId;
             $sjson->update([$sMap{$qS{$$answer{Survey_questionId}}},$qMap{$$answer{Survey_questionId}},$aId++],
                 {
@@ -147,10 +155,11 @@ sub migrateSurvey{
                     'isCorrect',$$answer{isCorrect},'NEED TO MAP QUESTION TYPES'
                 }
             );
+            $lastQuestion = $$answer{Survey_questionId};
         }
+
         my $date = $session->db->quickScalar('select max(revisionDate) from Survey where assetId = ?',[$$survey{assetId}]);
         $session->db->write('update Survey set surveyJSON = ? where assetId = ? and revisionDate = ?',[$sjson->freeze,$$survey{assetId},$date]);
-
 
         my $rjson = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(undef,undef,$sjson);
         $rjson->createSurveyOrder();
