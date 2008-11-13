@@ -1114,7 +1114,7 @@ Couldn't open %-s because %-s <br />
         context     => q{Message when no assets match search criteria},
     },
 
-    'menu label' => {
+    'More' => {
         message     => q{More},
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},

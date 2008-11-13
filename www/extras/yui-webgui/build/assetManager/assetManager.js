@@ -62,12 +62,12 @@ WebGUI.AssetManager.findRow
 */
 WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
     elCell.innerHTML 
-        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
+        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">' + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
         + ' | '
         ;
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
-    more.appendChild( document.createTextNode( 'More' ) );
+    more.appendChild( document.createTextNode( WebGUI.AssetManager.i18n.get('Asset','More' ) ) );
     more.href   = '#';
 
     // Delete the old menu
@@ -207,9 +207,28 @@ WebGUI.AssetManager.formatTitle = function ( elCell, oRecord, oColumn, orderNumb
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.initManager ( )
-    Initialize the www_manage page
+    Initialize the i18n interface
 */
 WebGUI.AssetManager.initManager = function (o) {
+    WebGUI.AssetManager.i18n
+    = new WebGUI.i18n( { 
+            namespaces  : {
+                'Asset' : [
+                    "edit",
+                    "More",
+                ]
+            },
+            onpreload   : {
+                fn       : WebGUI.AssetManager.initDataTable
+            }
+        } );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.initDataTable ( )
+    Initialize the www_manage page
+*/
+WebGUI.AssetManager.initDataTable = function (o) {
     var assetPaginator = new YAHOO.widget.Paginator({
         containers         : ['pagination'],
         pageLinks          : 7,
@@ -330,7 +349,6 @@ WebGUI.AssetManager.initManager = function (o) {
         // Send the request
         this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, this), oCallback);
     };
-
 };
 
 /*---------------------------------------------------------------------------

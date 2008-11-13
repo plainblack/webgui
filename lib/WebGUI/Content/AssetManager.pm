@@ -390,13 +390,16 @@ sub www_manage {
     $session->style->setLink( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
-    $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+    $session->style->setLink( $session->url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+
     $session->style->setScript( $session->url->extras( 'yui/build/utilities/utilities.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/paginator/paginator-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/json/json-min.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
