@@ -80,14 +80,29 @@ sub definition {
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help'),
 		});
-	push(@fields, {
-		tab=>"content",
-		fieldType=>"yesNo",
-        name=>"autoRequestCommit",
-        label=>$i18n->get("auto request commit"),
-        hoverHelp=>$i18n->get("auto request commit help"),
-        defaultValue=>$setting->get("autoRequestCommit")
-		});
+
+        # Support for versionTagMode. We'll have:
+        # - multi version tag per user
+        # - one version tag per user (SwiftySite mode)
+        # - one site wide version tag
+        # - auto commit
+        push (
+            @fields,
+            {   tab          => q{content},
+		fieldType    => q{selectBox},
+                name         => q{versionTagMode},
+                defaultValue => [ $setting->get(q{versionTagMode}) ],
+                options      => {
+                    multiPerUser  => $i18n->get(q{versionTagMode multiPerUser}),
+                    singlePerUser => $i18n->get(q{versionTagMode singlePerUser}),
+                    siteWide      => $i18n->get(q{versionTagMode siteWide}),
+                    autoCommit    => $i18n->get(q{versionTagMode autoCommit}),
+                },
+                label        => $i18n->get(q{version tag mode}),
+                hoverHelp    => $i18n->get(q{version tag mode help}),
+            },
+        );
+
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"yesNo",
