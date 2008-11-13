@@ -1085,7 +1085,7 @@ sub loadTempReportTable {
 
 sub log {
     my $self = shift;
-    $self->session->errorHandler->error(shift);
+    $self->session->log->debug(shift);
 }
 
 1;
