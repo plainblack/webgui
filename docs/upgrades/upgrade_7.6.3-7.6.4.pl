@@ -29,9 +29,42 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 migrateSurvey($session);
+addVersionTagMode($session);
 
 finish($session); # this line required
 
+
+
+#----------------------------------------------------------------------------
+# This method add support for versionTagMode
+#
+sub addVersionTagMode {
+    my $session = shift;
+
+    print q{Adding support for versionTagMode...} if !$quiet;
+
+    my $db      = $session->db();
+    my $setting = $session->setting();
+
+
+    $db->write(q{ALTER TABLE `assetVersionTag` ADD `isSiteWide` BOOL NOT NULL DEFAULT '0'});
+    $db->write(q|INSERT INTO `userProfileField` (`fieldName`, `label`, `visible`, `required`, `fieldType`, `possibleValues`, `dataDefault`, `sequenceNumber`, `profileCategoryId`, `protected`, `editable`, `forceImageOnly`, `showAtRegistration`, `requiredForPasswordRecovery`) VALUES ('versionTagMode', 'WebGUI::International::get("version tag mode","WebGUI");', 1, 1, 'selectBox', '{\r\n    inherited     => WebGUI::International::get("versionTagMode inherited"),\r\n    multiPerUser  => WebGUI::International::get("versionTagMode multiPerUser"),\r\n    singlePerUser => WebGUI::International::get("versionTagMode singlePerUser"),\r\n    siteWide      => WebGUI::International::get("versionTagMode siteWide"),\r\n    autoCommit    => WebGUI::International::get("versionTagMode autoCommit"),\r\n}', 'inherited', 12, 0x34, 0, 1, 1, 0, 0)|);
+
+    $db->write(q{INSERT INTO `settings` ( `name` , `value` ) VALUES ('versionTagMode', '')});
+
+    # Keep autoRequestCommit if enabled
+    my $versionTagMode    = q{multiPerUser};
+    if ($setting->get('autoRequestCommit')) {
+        $versionTagMode = q{autoCommit};
+    }
+    $setting->set('versionTagMode', $versionTagMode);
+
+    $db->write(q{DELETE FROM `settings` WHERE `name` = 'autoRequestCommit'});
+
+    print qq{Finished\n} if !$quiet;
+
+    return;
+} #addVersionTagMode
 
 
 #----------------------------------------------------------------------------
