@@ -4199,6 +4199,18 @@ Users may override this setting in their profile.
             context     => q{Entry for version tag settings},
         },
 
+        '< prev' => {
+            message => q{< prev},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
+        'next >' => {
+            message => q{next >},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
 };
 
 1;

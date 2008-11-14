@@ -6,6 +6,7 @@
  - Added version tag modes: multiple tags per user, single tag per user, site wide version tag and auto commit (thanks to Long Term Results B.V.)
  - fixed #9076: Thingy broken in latest beta, Save and Close buttons missing
    from Add/Edit Field dialogs (SDH Consulting Group).
+ - fixed #4214: Missing i18n in asset manager
 
 7.6.3
  - improved performance of file uploads

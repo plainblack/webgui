@@ -215,7 +215,11 @@ WebGUI.AssetManager.initManager = function (o) {
             namespaces  : {
                 'Asset' : [
                     "edit",
-                    "More",
+                    "More"
+                ],
+                'WebGUI' : [
+                    "< prev",
+                    "next >"
                 ]
             },
             onpreload   : {
@@ -230,10 +234,14 @@ WebGUI.AssetManager.initManager = function (o) {
 */
 WebGUI.AssetManager.initDataTable = function (o) {
     var assetPaginator = new YAHOO.widget.Paginator({
-        containers         : ['pagination'],
-        pageLinks          : 7,
-        rowsPerPage        : 100,
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
+        containers            : ['pagination'],
+        pageLinks             : 7,
+        rowsPerPage           : 100,
+        previousPageLinkLabel : WebGUI.AssetManager.i18n.get('WebGUI', '< prev'),
+        nextPageLinkLabel     : WebGUI.AssetManager.i18n.get('WebGUI', 'next >'),
+//        previousPageLinkLabel : 'fred',
+//        nextPageLinkLabel     : 'barney',
+        template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
     });
 
 

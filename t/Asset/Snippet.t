@@ -37,8 +37,6 @@ my $properties = {
 };
 $snippet->update($properties);
 
-use Data::Dumper;
-Dumper($properties);
 foreach my $property (keys %{$properties}) {
 	is ($snippet->get($property), $properties->{$property}, "updated $property is ".$properties->{$property});
 }
