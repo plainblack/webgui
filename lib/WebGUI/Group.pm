@@ -1079,7 +1079,7 @@ sub new {
 	$self->{_groupId}   = shift;
 	my $override        = shift;
 
-    my $cached = $self->{_session}->stow->get("groupObj");
+    my $cached = $self->{_session}->stow->get("groupObj", { noclone => 1});
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 
 	bless $self, $class;

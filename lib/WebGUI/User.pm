@@ -486,7 +486,7 @@ sub isInGroup {
    return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
    return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
    ### Get data for auxillary checks.
-   my $isInGroup = $self->session->stow->get("isInGroup");
+   my $isInGroup = $self->session->stow->get("isInGroup", { noclone => 1 });
    ### Look to see if we've already looked up this group. 
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
