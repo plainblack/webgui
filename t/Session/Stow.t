@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 33; # increment this value for each test you create
+use Test::More tests => 35; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
  
@@ -87,6 +87,17 @@ is($stow->delete('noSuchKey'), undef, 'deleting non-existant variable returns un
 
 $stow->set('countedKey', 5);
 is($stow->delete('countedKey'), 5, 'delete method returns what was deleted');
+
+#----------------------------------------------------------------------------
+# Test get( ... { noclone => 1 } )
+my $arr = [ 'get busy living', 'get busy dying' ];
+$session->stow->set( 'possibilities', $arr );
+isnt( $session->stow->get( 'possibilities' ), $arr,
+    "Without noclone does not return same reference",
+);
+is( $session->stow->get( 'possibilities', { noclone => 1 } ), $arr,
+    "With noclone returns same reference"
+);
 
 END {
 	$session->config->set('disableCache',$disableCache);

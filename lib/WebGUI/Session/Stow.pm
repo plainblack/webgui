@@ -95,33 +95,49 @@ sub DESTROY {
 
 =head2 get( varName ) 
 
-Retrieves the current value of a stow variable.  Note that if you use references, you're
-getting back a reference and modifying the contents of the reference will change the
-contents of the stow variable.
+Retrieves the current value of a stow variable. By default, will try
+to create a safe copy.
+
+WARNING: Not all structures can be made completely safe. Objects will
+not be cloned.
 
 =head3 varName
 
 The name of the variable.
 
+=head3 options
+
+A hashref of options with the following keys:
+
+ noclone        - If true, will not create a safe copy. This can be much much
+                    faster than creating a safe copy. Defaults to false.
+
 =cut
 
 sub get {
-	my $self = shift;
-	my $var = shift;
+	my $self    = shift;
+	my $var     = shift;
+    my $opt     = shift || {};
 	return undef if $self->session->config->get("disableCache");
-    my $ref = $self->{_data}{$var};
-    if (ref $ref eq 'ARRAY') {
-        my @safeArray = @{ $ref };
+    my $value   = $self->{_data}{$var};
+    return unless $value;
+    my $ref     = ref $value;
+    return $value if ( !$ref || $opt->{noclone} );
+
+    # Try to clone
+    # NOTE: Clone and Storable::dclone do not currently work here, but
+    # would be safer if they did
+    if ($ref eq 'ARRAY') {
+        my @safeArray = @{ $value };
         return \@safeArray;
     }
-    elsif (ref $ref eq 'HASH') {
-        my %safeHash = %{ $ref };
+    elsif ($ref eq 'HASH') {
+        my %safeHash = %{ $value };
         return \%safeHash;
     }
-    else {
-        return $ref
-    }
-	return $self->{_data}{$var};
+    
+    # Can't figure out how to clone
+    return $value;
 }
 
 
