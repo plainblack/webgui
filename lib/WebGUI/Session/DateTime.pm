@@ -826,34 +826,35 @@ The number of seconds in the interval.
 sub secondsToInterval {
 	my $self = shift;
 	my $seconds = shift;
+    my $i18n = WebGUI::International->new($self->session, 'WebGUI');
 	my ($interval, $units);
 	if ($seconds >= 31536000) {
 		$interval = round($seconds/31536000);
-		$units = "years";
+		$units = $i18n->get("years");
 	}
     elsif ($seconds >= 2592000) {
         $interval = round($seconds/2592000);
-        $units = "months";
+        $units = $i18n->get("months");
 	}
     elsif ($seconds >= 604800) {
         $interval = round($seconds/604800);
-        $units = "weeks";
+        $units = $i18n->get("weeks");
 	}
     elsif ($seconds >= 86400) {
         $interval = round($seconds/86400);
-        $units = "days";
+        $units = $i18n->get("days");
     }
     elsif ($seconds >= 3600) {
         $interval = round($seconds/3600);
-        $units = "hours";
+        $units = $i18n->get("hours");
     }
     elsif ($seconds >= 60) {
         $interval = round($seconds/60);
-        $units = "minutes";
+        $units = $i18n->get("minutes");
     }
     else {
         $interval = $seconds;
-        $units = "seconds";
+        $units = $i18n->get("seconds");
 	}
 	return ($interval, $units);
 }
