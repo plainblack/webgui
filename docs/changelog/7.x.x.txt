@@ -3,7 +3,7 @@
    not be imported, only the surveys themselves.
  - Made syndicated content asset use cache.
  - fixed #8837: When you move an asset to a new version, only the current version is moved, instead of all of them.
-
+ - Added version tag modes: multiple tags per user, single tag per user, site wide version tag and auto commit (thanks to Long Term Results B.V.)
 
 7.6.3
  - improved performance of file uploads

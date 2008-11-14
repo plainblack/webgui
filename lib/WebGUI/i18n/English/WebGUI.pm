@@ -4152,16 +4152,25 @@ LongTruncOk=1</p>
             message => q{Version tag mode},
         },
         'version tag mode help' => {
-            message => q{Version tag mode help...TODO},
+            message => q{Determine version tag behaviour.
+<ul>
+<li>Multiple version tags per user: each user can have multiple open version tags.</li>
+<li>Single version tag per user: each user only has one open version tag. Existing open version tag is reclaimed automatically.</li>
+<li>One site-wide version tag: users work on one site-wide version tag.</li>
+<li>Commit automatically: version tags are committed automatically.</li>
+</ul>
+
+Users may override this setting in their profile.
+},
         },
         'versionTagMode multiPerUser' => {
-            message => q{Multi version tags per user},
+            message => q{Multiple version tags per user},
         },
         'versionTagMode singlePerUser' => {
             message => q{Single version tag per user},
         },
         'versionTagMode siteWide' => {
-            message => q{One site wide version tag},
+            message => q{One site-wide version tag},
         },
         'versionTagMode autoCommit' => {
             message => q{Commit automatically},
