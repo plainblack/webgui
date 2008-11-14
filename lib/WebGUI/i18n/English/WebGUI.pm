@@ -4150,7 +4150,10 @@ LongTruncOk=1</p>
         #Support for versionTagMode.
         'version tag mode' => {
             message => q{Version tag mode},
+            lastUpdated => 0,
+            context     => q{Label for the settings screen},
         },
+
         'version tag mode help' => {
             message => q{Determine version tag behaviour.
 <ul>
@@ -4162,21 +4165,38 @@ LongTruncOk=1</p>
 
 Users may override this setting in their profile.
 },
+            lastUpdated => 0,
+            context     => q{Hover help for the settings screen},
         },
+
         'versionTagMode multiPerUser' => {
             message => q{Multiple version tags per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
         },
+
         'versionTagMode singlePerUser' => {
             message => q{Single version tag per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
         },
+
         'versionTagMode siteWide' => {
             message => q{One site-wide version tag},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
         },
+
         'versionTagMode autoCommit' => {
             message => q{Commit automatically},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
         },
+
         'versionTagMode inherited' => {
             message => q{Inherit from site settings},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
         },
 
 };
