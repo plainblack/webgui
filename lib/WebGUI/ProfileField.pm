@@ -228,6 +228,10 @@ form.
 
 =cut
 
+# FIXME This would be better if it returned an OBJECT not the HTML
+# TODO add a toHtml sub to take the place of this sub and a getFormControl
+# And refactor to not require all these arguments HERE but rather in the 
+# constructor or something...
 sub formField {
     my $self = shift;
     my $properties = $self->formProperties(shift);
@@ -245,9 +249,8 @@ sub formField {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
         # use submitted data if it exists
-        # FIXME Is $properties->{name} or $self->getId the correct way to get the form name?
-        if (defined $self->session->form->process($properties->{name}, $self->get("fieldType"))) {
-            $properties->{value} = $self->session->form->process($self->getId,$self->get("fieldType"), undef, $properties);
+        if ($self->formProcess($u) != $self->get('dataDefault')) {
+            $properties->{value} = $self->formProcess($u);
         }
         # fall back on default
         if(!defined $properties->{value}) {
@@ -767,6 +770,7 @@ sub setCategory {
     $self->_reorderFields($currentCategoryId) if ($currentCategoryId);
     $self->_reorderFields($categoryId);
 }
+
 
 1;
 
