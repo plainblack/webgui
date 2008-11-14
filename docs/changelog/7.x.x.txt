@@ -1,4 +1,5 @@
 7.5.34
+ - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
 
 7.5.33
  - fixed #9002: add a variant in admin product view misses i18n link

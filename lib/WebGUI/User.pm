@@ -18,6 +18,7 @@ use strict;
 use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
+use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
 
@@ -61,6 +62,9 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+# TODO This stays like this until we can break API, just in case somebody
+# doesn't realize that _ means private.
+# After API unfreeze, put this in the WebGUI::User->create routine
 sub _create {
     my $session = shift;
     my $userId = shift || $session->id->generate();
@@ -153,6 +157,31 @@ sub authMethod {
 			lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 create ( session, [userId] )
+
+Create a new user. C<userId> is an option user ID to give the new user.
+Returns the newly created WebGUI::User object.
+
+=cut
+
+sub create {
+    my $class   = shift;
+    my $session = shift;
+    my $userId  = shift;
+
+    if ( !ref $session || !$session->isa( 'WebGUI::Session' ) ) {
+        WebGUI::Error::InvalidObject->throw(
+            expected => "WebGUI::Session",
+            got      => (ref $session),
+            error    => q{Must provide a session variable},
+        );
+    }
+
+    return WebGUI::User->new( $session, "new", $userId );
 }
 
 #-------------------------------------------------------------------
