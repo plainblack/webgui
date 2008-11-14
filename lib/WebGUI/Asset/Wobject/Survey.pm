@@ -59,7 +59,7 @@ sub definition {
             defaultValue => undef,
             label        => "Set the URL that the survey will exit to",
             hoverHelp =>
-"When the user finishes the survey, they will be sent to this URL.  Leave blank if no forwarding required.",
+                "When the user finishes the survey, they will be sent to this URL.  Leave blank if no forwarding required.",
         },
         maxResponsesPerUser => {
             fieldType    => 'integer',
@@ -132,8 +132,7 @@ sub definition {
     );
 
     push(
-        @{$definition},
-        {
+        @{$definition}, {
             assetName         => $i18n->get('assetName'),
             icon              => 'survey.gif',
             autoGenerateForms => 1,
@@ -143,7 +142,7 @@ sub definition {
         }
     );
     return $class->SUPER::definition( $session, $definition );
-}
+} ## end sub definition
 
 #-------------------------------------------------------------------
 
@@ -172,9 +171,7 @@ Override importAssetCollateralData so that surveyJSON gets imported from package
 sub importAssetCollateralData {
     my ( $self, $data ) = @_;
     my $surveyJSON = $data->{properties}{surveyJSON};
-    $self->session->db->write(
-        "update Survey set surveyJSON = ? where assetId = ?",
-        [ $surveyJSON, $self->getId ] );
+    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $surveyJSON, $self->getId ] );
 }
 
 #-------------------------------------------------------------------
@@ -190,10 +187,8 @@ sub duplicate {
     my $options  = shift;
     my $newAsset = $self->SUPER::duplicate($options);
     $self->loadSurveyJSON();
-    $self->session->db->write(
-        "update Survey set surveyJSON = ? where assetId = ?",
-        [ $self->survey->freeze, $newAsset->getId ]
-    );
+    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?",
+        [ $self->survey->freeze, $newAsset->getId ] );
     return $newAsset;
 }
 
@@ -210,14 +205,10 @@ sub loadSurveyJSON {
     my $jsonHash = shift;
     if ( defined $self->survey ) { return; }    #already loaded
 
-    $jsonHash = $self->session->db->quickScalar(
-        "select surveyJSON from Survey where assetId = ?",
-        [ $self->getId ] )
-      if ( !defined $jsonHash );
+    $jsonHash = $self->session->db->quickScalar( "select surveyJSON from Survey where assetId = ?", [ $self->getId ] )
+        if ( !defined $jsonHash );
 
-    $self->{survey} =
-      WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $jsonHash,
-        $self->session->errorHandler );
+    $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $jsonHash, $self->session->errorHandler );
 }
 
 #-------------------------------------------------------------------
@@ -238,9 +229,7 @@ sub saveSurveyJSON {
 
     my $data = $self->survey->freeze();
 
-    $self->session->db->write(
-        "update Survey set surveyJSON = ? where assetId = ?",
-        [ $data, $self->getId ] );
+    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $data, $self->getId ] );
 }
 
 #-------------------------------------------------------------------
@@ -255,8 +244,7 @@ sub www_editSurvey {
     my $self = shift;
 
     my %var;
-    my $out =
-      $self->processTemplate( \%var, $self->get("surveyEditTemplateId") );
+    my $out = $self->processTemplate( \%var, $self->get("surveyEditTemplateId") );
 
     return $out;
 }
@@ -284,7 +272,7 @@ sub www_submitObjectEdit {
     $self->saveSurveyJSON();
 
     return $self->www_loadSurvey( { address => \@address } );
-}
+} ## end sub www_submitObjectEdit
 
 #-------------------------------------------------------------------
 sub copyObject {
@@ -293,7 +281,7 @@ sub copyObject {
     $self->loadSurveyJSON();
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    $address = $self->survey->copy($address); 
+    $address = $self->survey->copy($address);
 
     $self->saveSurveyJSON();
 
@@ -309,7 +297,7 @@ sub deleteObject {
     $self->loadSurveyJSON();
 
     my $message = $self->survey->remove($address)
-      ; #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+        ; #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
 
     $self->saveSurveyJSON();
 
@@ -321,9 +309,8 @@ sub deleteObject {
         pop( @{$address} );    # unless @$address == 1 and $$address[0] == 0;
     }
 
-    return $self->www_loadSurvey(
-        { address => $address, message => $message } );
-}
+    return $self->www_loadSurvey( { address => $address, message => $message } );
+} ## end sub deleteObject
 
 #-------------------------------------------------------------------
 sub www_newObject {
@@ -343,7 +330,7 @@ sub www_newObject {
 
     return $self->www_loadSurvey( { address => $address, message => undef } );
 
-}
+} ## end sub www_newObject
 
 #-------------------------------------------------------------------
 sub www_dragDrop {
@@ -358,18 +345,18 @@ sub www_dragDrop {
     $self->survey->remove( \@tid, 1 );
     my $address = [0];
     if ( @tid == 1 ) {
+
         #sections can only be inserted after another section so chop off the question and answer portion of
-        $#bid = 0; 
+        $#bid = 0;
         $bid[0] = -1 if ( !defined $bid[0] );
         $self->survey->insertObject( $target, [ $bid[0] ] );
     }
-    elsif ( @tid == 2 )
-    { #questions can be moved to any section, but a pushed to the end of a new section.
+    elsif ( @tid == 2 ) {    #questions can be moved to any section, but a pushed to the end of a new section.
         if ( $bid[0] !~ /\d/ ) {
             $bid[0] = $tid[0];
             $bid[1] = $tid[1];
         }
-        elsif ( @bid == 1 ) { #moved to a new section or head of current section
+        elsif ( @bid == 1 ) {    #moved to a new section or head of current section
             if ( $bid[0] !~ /\d/ ) {
                 $bid[0] = $tid[0];
                 $bid[1] = $tid[1];
@@ -384,18 +371,16 @@ sub www_dragDrop {
                 #else move to the end of the selected section
                 $bid[1] = $#{ $self->survey->questions( [ $bid[0] ] ) };
             }
-        }
+        } ## end elsif ( @bid == 1 )
         $self->survey->insertObject( $target, [ $bid[0], $bid[1] ] );
-    }
-    elsif ( @tid == 3 ) {   #answers can only be rearranged in the same question
+    } ## end elsif ( @tid == 2 )
+    elsif ( @tid == 3 ) {    #answers can only be rearranged in the same question
         if ( @bid == 2 and $bid[1] == $tid[1] ) {
             $bid[2] = -1;
-            $self->survey->insertObject( $target,
-                [ $bid[0], $bid[1], $bid[2] ] );
+            $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         elsif ( @bid == 3 ) {
-            $self->survey->insertObject( $target,
-                [ $bid[0], $bid[1], $bid[2] ] );
+            $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
 
@@ -407,7 +392,7 @@ sub www_dragDrop {
     $self->saveSurveyJSON();
 
     return $self->www_loadSurvey( { address => $address } );
-}
+} ## end sub www_dragDrop
 
 #-------------------------------------------------------------------
 sub www_loadSurvey {
@@ -425,23 +410,20 @@ sub www_loadSurvey {
         }
     }
     my $message = defined $options->{message} ? $options->{message} : '';
-    my $var =
-      defined $options->{var}
-      ? $options->{var}
-      : $self->survey->getEditVars($address);
+    my $var
+        = defined $options->{var}
+        ? $options->{var}
+        : $self->survey->getEditVars($address);
 
     my $editHtml;
     if ( $var->{type} eq 'section' ) {
-        $editHtml =
-          $self->processTemplate( $var, $self->get("sectionEditTemplateId") );
+        $editHtml = $self->processTemplate( $var, $self->get("sectionEditTemplateId") );
     }
     elsif ( $var->{type} eq 'question' ) {
-        $editHtml =
-          $self->processTemplate( $var, $self->get("questionEditTemplateId") );
+        $editHtml = $self->processTemplate( $var, $self->get("questionEditTemplateId") );
     }
     elsif ( $var->{type} eq 'answer' ) {
-        $editHtml =
-          $self->processTemplate( $var, $self->get("answerEditTemplateId") );
+        $editHtml = $self->processTemplate( $var, $self->get("answerEditTemplateId") );
     }
 
     my %buttons;
@@ -456,8 +438,7 @@ sub www_loadSurvey {
     my $lastType;
     my %lastId;
     my @ids;
-    my ( $s, $q, $a ) =
-      ( 0, 0, 0 );    #bools on if a button has already been created
+    my ( $s, $q, $a ) = ( 0, 0, 0 );    #bools on if a button has already been created
 
     foreach (@$data) {
         if ( $_->{type} eq 'section' ) {
@@ -468,10 +449,7 @@ sub www_loadSurvey {
             elsif ( $lastType eq 'question' ) {
                 $q = 1;
             }
-            $html .=
-                "<li id='$scount' class='section'>S"
-              . ( $scount + 1 )
-              . ": $_->{text}<\/li><br>\n";
+            $html .= "<li id='$scount' class='section'>S" . ( $scount + 1 ) . ": $_->{text}<\/li><br>\n";
             push( @ids, $scount );
         }
         elsif ( $_->{type} eq 'question' ) {
@@ -479,24 +457,18 @@ sub www_loadSurvey {
             if ( $lastType eq 'answer' ) {
                 $a = 1;
             }
-            $html .=
-                "<li id='$scount-$qcount' class='question'>Q"
-              . ( $qcount + 1 )
-              . ": $_->{text}<\/li><br>\n";
+            $html .= "<li id='$scount-$qcount' class='question'>Q" . ( $qcount + 1 ) . ": $_->{text}<\/li><br>\n";
             push( @ids, "$scount-$qcount" );
             $lastType = 'question';
             $acount   = -1;
         }
         elsif ( $_->{type} eq 'answer' ) {
             $lastId{answer} = ++$acount;
-            $html .=
-                "<li id='$scount-$qcount-$acount' class='answer'>A"
-              . ( $acount + 1 )
-              . ": $_->{text}<\/li><br>\n";
+            $html .= "<li id='$scount-$qcount-$acount' class='answer'>A" . ( $acount + 1 ) . ": $_->{text}<\/li><br>\n";
             push( @ids, "$scount-$qcount-$acount" );
             $lastType = 'answer';
         }
-    }
+    } ## end foreach (@$data)
 
     #address is the address of the focused object
     #buttons are the data to create the Add buttons
@@ -505,13 +477,12 @@ sub www_loadSurvey {
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {
-        "address",  $address,  "buttons", \%buttons,
-        "edithtml", $editHtml, "ddhtml",  $html,
-        "ids",      \@ids,     "type",    $var->{type}
+        "address", $address, "buttons", \%buttons, "edithtml", $editHtml,
+        "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
     };
     $self->session->http->setMimeType('application/json');
     return encode_json($return);
-}
+} ## end sub www_loadSurvey
 
 #-------------------------------------------------------------------
 
@@ -537,13 +508,9 @@ sub prepareView {
 
 sub purge {
     my $self = shift;
-    $self->session->db->write( "delete from Survey_response where assetId = ?",
-        [ $self->getId() ] );
-    $self->session->db->write(
-        "delete from Survey_tempReport where assetId = ?",
-        [ $self->getId() ] );
-    $self->session->db->write( "delete from Survey where assetId = ?",
-        [ $self->getId() ] );
+    $self->session->db->write( "delete from Survey_response where assetId = ?",   [ $self->getId() ] );
+    $self->session->db->write( "delete from Survey_tempReport where assetId = ?", [ $self->getId() ] );
+    $self->session->db->write( "delete from Survey where assetId = ?",            [ $self->getId() ] );
     return $self->SUPER::purge;
 }
 
@@ -581,15 +548,12 @@ sub view {
     my $self = shift;
     my %var;
 
-    $var{'edit_survey_url'}  = $self->getUrl('func=editSurvey');
-    $var{'take_survey_url'}  = $self->getUrl('func=takeSurvey');
-    $var{'view_reports_url'} = $self->getUrl('func=viewReports');
-    $var{'user_canTakeSurvey'} =
-      $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
-    $var{'user_canViewReports'} =
-      $self->session->user->isInGroup( $self->get("groupToViewReports") );
-    $var{'user_canEditSurvey'} =
-      $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
+    $var{'edit_survey_url'}     = $self->getUrl('func=editSurvey');
+    $var{'take_survey_url'}     = $self->getUrl('func=takeSurvey');
+    $var{'view_reports_url'}    = $self->getUrl('func=viewReports');
+    $var{'user_canTakeSurvey'}  = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
+    $var{'user_canViewReports'} = $self->session->user->isInGroup( $self->get("groupToViewReports") );
+    $var{'user_canEditSurvey'}  = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
     my $out = $self->processTemplate( \%var, undef, $self->{_viewTemplate} );
 
     return $out;
@@ -613,8 +577,7 @@ sub www_takeSurvey {
     my $self = shift;
     my %var;
 
-    my $out =
-      $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
+    my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
 
     eval {
         my $responseId = $self->getResponseId();
@@ -660,25 +623,24 @@ sub www_submitQuestions {
 
     my $files = 0;
 
-#    for my $id(@$orderOf){
-#if a file upload, write to disk
-#        my $path;
-#        if($id->{'questionType'} eq 'File Upload'){
-#            $files = 1;
-#            my $storage = WebGUI::Storage->create($self->session);
-#            my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
-#            $path = $storage->getPath($filename);
-#        }
-#$self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
-#        $self->session->db->write("insert into Survey_questionResponse
-#            select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
-#            [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
-#    }
+    #    for my $id(@$orderOf){
+    #if a file upload, write to disk
+    #        my $path;
+    #        if($id->{'questionType'} eq 'File Upload'){
+    #            $files = 1;
+    #            my $storage = WebGUI::Storage->create($self->session);
+    #            my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
+    #            $path = $storage->getPath($filename);
+    #        }
+    #$self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
+    #        $self->session->db->write("insert into Survey_questionResponse
+    #            select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
+    #            [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
+    #    }
     if ($files) {
         ##special case, need to check for more questions in section, if not, more current up one
-        my $lastA = $self->getLastAnswerInfo($responseId);
-        my $questionId =
-          $self->getNextQuestionId( $lastA->{'Survey_questionId'} );
+        my $lastA      = $self->getLastAnswerInfo($responseId);
+        my $questionId = $self->getNextQuestionId( $lastA->{'Survey_questionId'} );
         if ( !$questionId ) {
             my $currentSection = $self->getCurrentSection($responseId);
             $currentSection = $self->getNextSection($currentSection);
@@ -689,7 +651,7 @@ sub www_submitQuestions {
         return;
     }
     return $self->www_loadQuestions($responseId);
-}
+} ## end sub www_submitQuestions
 
 #finds the questions to display next and builds the data structre to hold them
 #-------------------------------------------------------------------
@@ -700,7 +662,7 @@ sub www_loadQuestions {
         return $self->surveyEnd();
     }
 
-    my $responseId = $self->getResponseId(); #also loads the survey and response
+    my $responseId = $self->getResponseId();    #also loads the survey and response
     if ( !$responseId ) {
         return $self->surveyEnd();
     }
@@ -716,20 +678,19 @@ sub www_loadQuestions {
     $section->{id} = $self->response->nextSectionId();
     my $text = $self->prepareShowSurveyTemplate( $section, $questions );
     return $text;
-}
+} ## end sub www_loadQuestions
 
 #-------------------------------------------------------------------
 #called when the survey is over.
 sub surveyEnd {
     my $self       = shift;
     my $url        = shift;
-    my $responseId = $self->getResponseId(); #also loads the survey and response
+    my $responseId = $self->getResponseId();    #also loads the survey and response
 
-#    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
+    #    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
     $self->session->db->setRow(
         "Survey_response",
-        "Survey_responseId",
-        {
+        "Survey_responseId", {
             Survey_responseId => $responseId,
             endDate           => WebGUI::DateTime->now->toDatabase,
             isComplete        => 1
@@ -738,37 +699,31 @@ sub surveyEnd {
     if ( $url !~ /\w/ ) { $url = 0; }
     if ( $url eq "undefined" ) { $url = 0; }
     if ( !$url ) {
-        $url = $self->session->db->quickScalar(
-"select exitURL from Survey where assetId = ? order by revisionDate desc limit 1",
-            [ $self->getId() ]
-        );
+        $url
+            = $self->session->db->quickScalar(
+            "select exitURL from Survey where assetId = ? order by revisionDate desc limit 1",
+            [ $self->getId() ] );
         if ( !$url ) {
             $url = "/";
         }
     }
     $self->session->http->setMimeType('application/json');
     return encode_json( { "type", "forward", "url", $url } );
-}
+} ## end sub surveyEnd
 
 #-------------------------------------------------------------------
 #sends the processed template and questions structure to the client
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
     my %multipleChoice = (
-        'Multiple Choice', 1, 'Gender',         1, 'Yes/No',       1,
-        'True/False',      1, 'Ideology',       1, 'Race',         1,
-        'Party',           1, 'Education',      1, 'Scale',        1,
-        'Agree/Disagree',  1, 'Oppose/Support', 1, 'Importance',   1,
-        'Likelihood',      1, 'Certainty',      1, 'Satisfaction', 1,
-        'Confidence',      1, 'Effectiveness',  1, 'Concern',      1,
-        'Risk',            1, 'Threat',         1, 'Security',     1
+        'Multiple Choice', 1, 'Gender',        1, 'Yes/No',     1, 'True/False', 1, 'Ideology',       1,
+        'Race',            1, 'Party',         1, 'Education',  1, 'Scale',      1, 'Agree/Disagree', 1,
+        'Oppose/Support',  1, 'Importance',    1, 'Likelihood', 1, 'Certainty',  1, 'Satisfaction',   1,
+        'Confidence',      1, 'Effectiveness', 1, 'Concern',    1, 'Risk',       1, 'Threat',         1,
+        'Security',        1
     );
-    my %text = (
-        'Text',      1, 'Email',    1, 'Phone Number', 1,
-        'Text Date', 1, 'Currency', 1
-    );
-    my %slider =
-      ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
+    my %text = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
+    my %slider = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
     my %dateType   = ( 'Date',        1, 'Date Range', 1 );
     my %fileUpload = ( 'File Upload', 1 );
     my %hidden     = ( 'Hidden',      1 );
@@ -799,20 +754,14 @@ sub prepareShowSurveyTemplate {
             $$q{'verts'} = "<p>";
             $$q{'verte'} = "</p>";
         }
-    }
+    } ## end foreach my $q (@$questions)
     $section->{'questions'} = $questions;
 
-    my $out =
-      $self->processTemplate( $section, $self->get("surveyQuestionsId") );
+    my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
     $self->session->http->setMimeType('application/json');
-    return encode_json(
-        {
-            "type",      "displayquestions", "section", $section,
-            "questions", $questions,         "html",    $out
-        }
-    );
-}
+    return encode_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
+} ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------
 
@@ -837,16 +786,15 @@ sub loadResponseJSON {
     $rId = defined $rId ? $rId : $self->{responseId};
     if ( defined $self->response and !defined $rId ) { return; }
 
-    $jsonHash = $self->session->db->quickScalar(
-"select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
-        [ $self->getId, $rId ]
-    ) if ( !defined $jsonHash );
+    $jsonHash
+        = $self->session->db->quickScalar(
+        "select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
+        [ $self->getId, $rId ] )
+        if ( !defined $jsonHash );
 
-    $self->{response} =
-      WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $jsonHash,
-        $self->session->errorHandler,
-        $self->survey );
-}
+    $self->{response}
+        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $jsonHash, $self->session->errorHandler, $self->survey );
+} ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
 sub saveResponseJSON {
@@ -854,10 +802,8 @@ sub saveResponseJSON {
 
     my $data = $self->response->freeze();
 
-    $self->session->db->write(
-"update Survey_response set responseJSON = ? where Survey_responseId = ?",
-        [ $data, $self->{responseId} ]
-    );
+    $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?",
+        [ $data, $self->{responseId} ] );
 }
 
 #-------------------------------------------------------------------
@@ -875,10 +821,10 @@ sub getResponseId {
 
     my $ip = $self->session->env->getIp;
     my $id = $self->session->user->userId();
-    my $anonId =
-         $self->session->form->process("userid")
-      || $self->session->http->getCookies->{"Survey2AnonId"}
-      || undef;
+    my $anonId 
+        = $self->session->form->process("userid")
+        || $self->session->http->getCookies->{"Survey2AnonId"}
+        || undef;
     $self->session->http->setCookie( "Survey2AnonId", $anonId ) if ($anonId);
 
     my $responseId;
@@ -892,44 +838,43 @@ sub getResponseId {
             $string = 'anonId';
             $id     = $anonId;
         }
-        $responseId = $self->session->db->quickScalar(
-"select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-            [ $id, $self->getId() ]
-        );
+        $responseId
+            = $self->session->db->quickScalar(
+            "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
+            [ $id, $self->getId() ] );
 
     }
     elsif ( $id == 1 ) {
         $responseId = $self->session->db->quickScalar(
-"select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0",
+            "select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0",
             [ $id, $ip, $self->getId() ]
         );
     }
 
     if ( !$responseId ) {
-        my $allowedTakes = $self->session->db->quickScalar(
-"select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1",
-            [ $self->getId() ]
-        );
+        my $allowedTakes
+            = $self->session->db->quickScalar(
+            "select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1",
+            [ $self->getId() ] );
         my $haveTaken;
 
         if ( $id == 1 ) {
-            $haveTaken = $self->session->db->quickScalar(
-"select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?",
-                [ $id, $ip, $self->getId() ]
-            );
+            $haveTaken
+                = $self->session->db->quickScalar(
+                "select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?",
+                [ $id, $ip, $self->getId() ] );
         }
         else {
-            $haveTaken = $self->session->db->quickScalar(
-"select count(*) from Survey_response where $string = ? and assetId = ?",
-                [ $id, $self->getId() ]
-            );
+            $haveTaken
+                = $self->session->db->quickScalar(
+                "select count(*) from Survey_response where $string = ? and assetId = ?",
+                [ $id, $self->getId() ] );
         }
 
         if ( $haveTaken < $allowedTakes ) {
             $responseId = $self->session->db->setRow(
                 "Survey_response",
-                "Survey_responseId",
-                {
+                "Survey_responseId", {
                     Survey_responseId => "new",
                     userId            => $id,
                     ipAddress         => $ip,
@@ -944,14 +889,14 @@ sub getResponseId {
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->saveResponseJSON();
-        }
+        } ## end if ( $haveTaken < $allowedTakes)
         else {
         }
-    }
+    } ## end if ( !$responseId )
     $self->{responseId} = $responseId;
     $self->loadBothJSON($responseId);
     return $responseId;
-}
+} ## end sub getResponseId
 
 #-------------------------------------------------------------------
 
@@ -972,15 +917,15 @@ sub canTakeSurvey {
 
     if ( $id == 1 ) {
         $takenCount = $self->session->db->quickScalar(
-"select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? 
+            "select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? 
                 and isComplete = ?", [ $id, $ip, $self->getId(), 1 ]
         );
     }
     else {
-        $takenCount = $self->session->db->quickScalar(
-"select count(*) from Survey_response where userId = ? and assetId = ? and isComplete = ?",
-            [ $id, $self->getId(), 1 ]
-        );
+        $takenCount
+            = $self->session->db->quickScalar(
+            "select count(*) from Survey_response where userId = ? and assetId = ? and isComplete = ?",
+            [ $id, $self->getId(), 1 ] );
     }
 
     if ( $takenCount >= $maxTakes ) {
@@ -991,21 +936,19 @@ sub canTakeSurvey {
     }
     return $self->{canTake};
 
-}
+} ## end sub canTakeSurvey
 
 #-------------------------------------------------------------------
 sub www_viewReports {
     my $self = shift;
     $self->loadTempReportTable();
     return ""
-      unless (
-        $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
-    my $filename =
-      $self->session->url->escape( $self->get("title") . "_results.tab" );
-    my $content = $self->session->db->quickTab(
-"select * from Survey_tempReport t where t.assetId=? order by t.Survey_responseId, t.order",
-        [ $self->getId() ]
-    );
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+    my $filename = $self->session->url->escape( $self->get("title") . "_results.tab" );
+    my $content
+        = $self->session->db->quickTab(
+        "select * from Survey_tempReport t where t.assetId=? order by t.Survey_responseId, t.order",
+        [ $self->getId() ] );
     return $self->export( $filename, $content );
 }
 
@@ -1021,8 +964,7 @@ sub export {
     my $tmpDir   = $store->getPath();
     my $filepath = $store->getPath($filename);
     unless ( open TEMP, ">$filepath" ) {
-        return
-"Error - Could not open temporary file for writing.  Please use the back button and try again";
+        return "Error - Could not open temporary file for writing.  Please use the back button and try again";
     }
     print TEMP $content;
     close TEMP;
@@ -1031,57 +973,44 @@ sub export {
     $self->session->http->setRedirect($fileurl);
 
     return undef;
-}
+} ## end sub export
 
 sub loadTempReportTable {
     my $self = shift;
 
     $self->loadSurveyJSON();
-    my $refs = $self->session->db->buildArrayRefOfHashRefs(
-        "select * from Survey_response where assetId = ?",
+    my $refs = $self->session->db->buildArrayRefOfHashRefs( "select * from Survey_response where assetId = ?",
         [ $self->getId() ] );
-    $self->session->db->write(
-        "delete from Survey_tempReport where assetId = ?",
-        [ $self->getId() ] );
+    $self->session->db->write( "delete from Survey_tempReport where assetId = ?", [ $self->getId() ] );
     for my $ref (@$refs) {
         $self->loadResponseJSON( undef, $ref->{Survey_responseId} );
         my $count = 1;
         for my $q ( @{ $self->response->returnResponseForReporting() } ) {
             if ( @{ $q->{answers} } == 0 and $q->{comment} =~ /\w/ ) {
                 $self->session->db->write(
-"insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                    [
-                        $self->getId(),     $ref->{Survey_responseId},
-                        $count++,           $q->{section},
-                        $q->{sectionName},  $q->{question},
-                        $q->{questionName}, $q->{questionComment},
-                        undef,              undef,
-                        undef,              undef,
-                        undef,              undef,
-                        undef
+                    "insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
+                        $self->getId(),    $ref->{Survey_responseId}, $count++,           $q->{section},
+                        $q->{sectionName}, $q->{question},            $q->{questionName}, $q->{questionComment},
+                        undef,             undef,                     undef,              undef,
+                        undef,             undef,                     undef
                     ]
                 );
                 next;
             }
             for my $a ( @{ $q->{answers} } ) {
                 $self->session->db->write(
-"insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                    [
-                        $self->getId(),     $ref->{Survey_responseId},
-                        $count++,           $q->{section},
-                        $q->{sectionName},  $q->{question},
-                        $q->{questionName}, $q->{questionComment},
-                        $a->{id},           $a->{value},
-                        $a->{comment},      $a->{time},
-                        $a->{isCorrect},    $a->{value},
-                        undef
+                    "insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
+                        $self->getId(),    $ref->{Survey_responseId}, $count++,           $q->{section},
+                        $q->{sectionName}, $q->{question},            $q->{questionName}, $q->{questionComment},
+                        $a->{id},          $a->{value},               $a->{comment},      $a->{time},
+                        $a->{isCorrect},   $a->{value},               undef
                     ]
                 );
             }
-        }
-    }
+        } ## end for my $q ( @{ $self->response...
+    } ## end for my $ref (@$refs)
     return 1;
-}
+} ## end sub loadTempReportTable
 
 sub log {
     my $self = shift;
