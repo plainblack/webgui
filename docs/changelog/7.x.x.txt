@@ -2,6 +2,7 @@
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
  - fixed #8849: More missing i18n
  - fixed: Performance issue with Stow. Added a way to bypass safety for speed.
+ - fixed #4182: Edit links show in asset manager for locked assets
 
 7.5.33
  - fixed #9002: add a variant in admin product view misses i18n link

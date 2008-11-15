@@ -62,10 +62,15 @@ WebGUI.AssetManager.findRow
 */
 WebGUI.AssetManager.formatActions 
 = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML 
-        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
-        + ' | '
-        ;
+    if ( oRecord.getData( 'actions' ) ) {
+        elCell.innerHTML 
+            = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
+            + ' | '
+            ;
+    }
+    else {
+        elCell.innerHTML = "";
+    }
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
     more.appendChild( document.createTextNode( 'More' ) );
