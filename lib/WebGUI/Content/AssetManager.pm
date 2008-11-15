@@ -288,7 +288,7 @@ sub www_ajaxGetManagerPage {
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
             lockedBy        => $asset->get( 'isLockedBy' ),
-            canEditIfLocked => $asset->canEditIfLocked,
+            actions         => $asset->canEdit && $asset->canEditIfLocked,
         );
 
         $fields{ className } = {};

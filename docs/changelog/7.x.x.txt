@@ -10,6 +10,7 @@
    from Add/Edit Field dialogs (SDH Consulting Group).
  - fixed #4214: Missing i18n in asset manager
  - fixed #8849: More missing i18n
+ - fixed #4182: Edit links show in asset manager for locked assets
 
 7.6.3
  - improved performance of file uploads

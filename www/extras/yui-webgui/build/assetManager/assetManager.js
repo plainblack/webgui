@@ -61,10 +61,16 @@ WebGUI.AssetManager.findRow
     Format the Edit and More links for the row
 */
 WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML 
-        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">' + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
-        + ' | '
-        ;
+    if ( oRecord.getData( 'actions' ) ) {
+        elCell.innerHTML 
+            = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
+            + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
+            + ' | '
+            ;
+    }
+    else {
+        elCell.innerHTML = "";
+    }
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
     more.appendChild( document.createTextNode( WebGUI.AssetManager.i18n.get('Asset','More' ) ) );
@@ -239,8 +245,6 @@ WebGUI.AssetManager.initDataTable = function (o) {
         rowsPerPage           : 100,
         previousPageLinkLabel : WebGUI.AssetManager.i18n.get('WebGUI', '< prev'),
         nextPageLinkLabel     : WebGUI.AssetManager.i18n.get('WebGUI', 'next >'),
-//        previousPageLinkLabel : 'fred',
-//        nextPageLinkLabel     : 'barney',
         template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
     });
 
