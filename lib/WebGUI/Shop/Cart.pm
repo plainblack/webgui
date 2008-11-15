@@ -813,7 +813,7 @@ sub www_view {
     }
     
     # if there is no shipping address we can't check out
-    if (WebGUI::Error->caught || not defined $address) {
+    if (WebGUI::Error->caught) {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
     }
     

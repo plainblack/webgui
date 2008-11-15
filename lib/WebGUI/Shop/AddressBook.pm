@@ -197,7 +197,7 @@ sub getDefaultAddress {
             return $address;
         }
     }
-    return undef;
+    WebGUI::Error::ObjectNotFound->throw(error=>"No default address.");
 }
 
 #-------------------------------------------------------------------
