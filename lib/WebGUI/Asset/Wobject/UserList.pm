@@ -390,6 +390,7 @@ sub view {
 		    		"sequenceNumber"=>$profileField->{sequenceNumber},
                     "visible"=>$profileField->{visible},
                     "fieldType"=>$profileField->{fieldType},
+                    "dataDefault"=>$profileField->{dataDefault},
 			    	});
         if($profileField->{visible}){
             push (@profileField_loop, {
@@ -432,13 +433,14 @@ sub view {
         });
 	}
     
+    # Query user profile data. Exclude the visitor account and users that have been deactivated.
 	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile, userProfileData.publicEmail ";
-	
+	# Include remaining profile fields in the query
 	foreach my $profileField (@profileFields){
     	$sql .= ", userProfileData.$profileField->{fieldName}";
 	}
-	$sql .= "	from users";
-	$sql .= " left join userProfileData using(userId) where users.userId != '1'";
+	$sql .= " from users";
+	$sql .= " left join userProfileData using(userId) where users.userId != '1' and users.status = 'active'";
 	
 	my $constraint;
     my @profileSearchFields = ();
@@ -547,11 +549,17 @@ sub view {
 				    	"profile_emailNotPublic"=>1,
     				});
 				}
-                else{
+                else {
+                    # Assign field name
                     my $profileFieldName = $profileField->{fieldName};
                     $profileFieldName =~ s/ /_/g;
                     $profileFieldName =~ s/\./_/g;
+                    # Assign value
                     my $value = $user->{$profileField->{fieldName}};
+                    # Assign default value if not available
+                    $value = $profileField->{dataDefault} if $value eq '';
+                    # Handle special case of alias, which does not have a default value but is set to the username by default
+                    $value = $user->{userName} if ($profileFieldName eq 'alias' && $value eq '');
                     my %profileFieldValues;
                     if (WebGUI::Utility::isIn(ucfirst $profileField->{fieldType},qw(File Image)) && $value ne ''){
                         my $file = WebGUI::Form::DynamicField->new($self->session,
