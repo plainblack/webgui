@@ -46,17 +46,18 @@ These subroutines are available from this package:
 
 sub appendCommonVars {
     my $self    = shift;
-    my $var     = shift;
-    my $inbox   = shift;
     my $session = $self->session;
+    my $var     = shift;
+    my $inbox   = shift || WebGUI::Inbox->new($session);
     my $user    = $session->user;
 
-    $var->{'user_full_name'      } = $user->getWholeName;
-    $var->{'user_member_since'   } = $user->dateCreated;
-    $var->{'view_profile_url'    } = $user->getProfileUrl;
+    $self->SUPER::appendCommonVars($var);
+
     $var->{'view_inbox_url'      } = $self->getUrl("module=inbox;do=view");
     $var->{'view_invitations_url'} = $self->getUrl("module=inbox;do=manageInvitations");
     $var->{'unread_message_count'} = $inbox->getUnreadMessageCount;
+    $var->{'invitation_count'    } = $self->getInvitationCount;
+    $var->{'invitations_enabled' } = $session->user->profileField('ableToBeFriend');
     
 }
 
@@ -70,7 +71,7 @@ sub appendCommonVars {
 
 sub canView {
     my $self    = shift;
-    return ($self->session->form->get("uid") eq ""); 
+    return ($self->uid eq ""); 
 }
 
 #-------------------------------------------------------------------
@@ -145,11 +146,18 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("inbox manage invitations template hoverHelp")
 	);
     $f->template(
-        name      => "inboxInvitationErrorTemplateId",
-        value     => $self->getInvitationErrorTemplateId,
-        namespace => "Account/Inbox/Error",
-        label     => $i18n->get("invitation error message template label"),
-        hoverHelp => $i18n->get("invitation error message template hoverHelp")
+        name      => "inboxViewInvitationTemplateId",
+        value     => $self->getViewInvitationTemplateId,
+        namespace => "Account/Inbox/ViewInvitation",
+        label     => $i18n->get("inbox view invitation template label"),
+        hoverHelp => $i18n->get("inbox view invitation template hoverHelp")
+	);
+    $f->template(
+        name      => "inboxInvitationConfirmTemplateId",
+        value     => $self->getInvitationConfirmTemplateId,
+        namespace => "Account/Inbox/Confirm",
+        label     => $i18n->get("invitation confirm message template label"),
+        hoverHelp => $i18n->get("invitation confirm message template hoverHelp")
 	); 
 
     return $f->printRowsOnly;
@@ -179,7 +187,8 @@ sub editSettingsFormSave {
     $session->set("inboxErrorTemplateId",$form->process("inboxErrorTemplateId","template"));
     #Invitations Settings
     $session->set("inboxManageInvitationsTemplateId",$form->process("inboxManageInvitationsTemplateId","template"));
-    $session->set("inboxInvitationErrorTemplateId",$form->process("inboxInvitationErrorTemplateId","template"));
+    $session->set("inboxViewInvitationTemplateId",$form->process("inboxViewInvitationTemplateId","template"));
+    $session->set("inboxInvitationConfirmTemplateId",$form->process("inboxInvitationConfirmTemplateId","template"));
 }
 
 #-------------------------------------------------------------------
@@ -195,19 +204,36 @@ sub getInboxErrorTemplateId {
     return $self->session->setting->get("inboxErrorTemplateId") || "ErEzulFiEKDkaCDVmxUavw";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getInvitationCount ( )
+
+This method returns the total number of invitations in the invitation box.
+
+=cut
+
+sub getInvitationCount {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->db->quickScalar(
+        q{select count(*) from friendInvitations where friendId=?},
+        [$session->user->userId]
+    );
+}
 
 #-------------------------------------------------------------------
 
-=head2 getInvitationErrorTemplateId ( )
+=head2 getInvitationConfirmTemplateId ( )
 
 This method returns the template ID for invitation errors.
 
 =cut
 
-sub getInvitationErrorTemplateId {
+sub getInvitationConfirmTemplateId {
     my $self = shift;
-    return $self->session->setting->get("inboxInvitationErrorTemplateId") || "5A8Hd9zXvByTDy4x-H28qw";
+    return $self->session->setting->get("inboxInvitationConfirmTemplateId") || "5A8Hd9zXvByTDy4x-H28qw";
 }
+
 
 #-------------------------------------------------------------------
 
@@ -221,6 +247,7 @@ sub getLayoutTemplateId {
     my $self = shift;
     return $self->session->setting->get("inboxLayoutTempalteId") || $self->SUPER::getLayoutTemplateId;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -297,6 +324,40 @@ sub getUserProfileUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getViewInvitationTemplateId ( )
+
+This method returns the id for the view message template.
+
+=cut
+
+sub getViewInvitationTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("inboxViewInvitationTemplateId") || "VBkY05f-E3WJS50WpdKd1Q";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getViewInvitationUrl ( session )
+
+Class method which returns the base url for viewing invitations
+
+=head3 session
+
+session object
+
+=cut
+
+sub getViewInvitationUrl {
+    my $class   = shift;
+    my $session = shift;
+    my $url     = $session->url;
+
+    return $url->append($url->getSiteURL,"op=account;module=inbox;do=viewInvitation");
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getViewMessageTemplateId ( )
 
 This method returns the id for the view message template.
@@ -319,6 +380,54 @@ This method returns the template ID for the main view.
 sub getViewTemplateId {
     my $self = shift;
     return $self->session->setting->get("inboxViewTemplateId") || "c8xrwVuu5QE0XtF9DiVzLw";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_approveDenyInvitations ( )
+
+Approves or denies invitations passed in.
+
+=cut
+
+sub www_approveDenyInvitations {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+
+    my @messages = $form->process("inviteId","checkList");
+    my $approve  = $form->get("accept");
+    my $deny     = $form->get("deny");
+
+    my $friends = WebGUI::Friends->new($session);
+
+    my @users   = ();
+
+    foreach my $inviteId (@messages) {
+        my $invite  = $friends->getAddRequest($inviteId);
+        my $inviter = WebGUI::User->new($session, $invite->{inviterId});
+        next unless ($invite->{inviterId}); #Not sure how this could ever happen, but check for it
+        next unless ($session->user->userId eq $invite->{friendId});  #Protect against malicious stuff
+        if($deny) {
+            $friends->rejectAddRequest($inviteId);
+        }
+        elsif($approve) {
+            $friends->approveAddRequest($inviteId);
+        }
+        push (@users, {
+            'friend_name'  => $inviter->getWholeName,
+            'is_denied'    => ($deny ne ""),
+            'is_approved'  => ($approve ne ""),
+        });
+    }
+    my $var = {};
+    $var->{'friends_loop'} = \@users;
+
+    #Append common vars
+    $self->appendCommonVars($var,WebGUI::Inbox->new($session));
+
+    #Return a confirm message
+    return $self->processTemplate($var,$self->getInvitationConfirmTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -389,15 +498,84 @@ The page on which users can manage their friends requests
 =cut
 
 sub www_manageInvitations {
-    my $self      = shift;
-    my $session   = $self->session;
-    my $user      = $session->user;
+    my $self    = shift;
+    my $session = $self->session;
+    my $user    = $session->user;
+    my $var     = {};
+    my $i18n    = WebGUI::International->new($session,'Account_Inbox');
+    
+    #Deal with rows per page
+    my $rpp          = $session->form->get("rpp") || 25;
+    my $rpp_url      = ";rpp=$rpp";
+    
+    #Cache the base url
+    my $inboxUrl     =  $self->getUrl("op=account;module=inbox;do=manageInvitations");
 
-    my $var       = {};
+    #Create the paginator
+    my $sql    = q{ select * from friendInvitations where friendId=? order by dateSent desc };
+    my $p      = WebGUI::Paginator->new(
+        $session,
+        $inboxUrl.$rpp_url,
+        $rpp
+    );
+    $p->setDataByQuery($sql,undef,undef,[$user->userId]);
+    
+    #Export page to template
+    my @msg    = ();
+    foreach my $row ( @{$p->getPageData} ) {
+        my $inviter   = WebGUI::User->new($session,$row->{inviterId});
+        next if($inviter->isVisitor); # Inviter account got deleted
+        
+        my $epoch = WebGUI::DateTime->new(mysql => $row->{dateSent} )->epoch;
+        
+        my $hash                       = {};
+        $hash->{'invite_id'          } = $row->{inviteId};
+        $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewInvitation;inviteId=".$row->{inviteId});
+        $hash->{'from_id'            } = $row->{inviterId};
+        $hash->{'from_url'           } = $inviter->getProfileUrl;  #Get the profile url of this user which may be cached.
+        $hash->{'from'               } = $inviter->getWholeName;
+        $hash->{'dateStamp'          } = $epoch;
+	  	$hash->{'dateStamp_formatted'} = $session->datetime->epochToHuman($epoch);
+        $hash->{'form_checkbox'      } = WebGUI::Form::checkbox($session,{
+            name  => "inviteId",
+            value => $row->{inviteId}
+        });
+	  	push(@msg,$hash);
+   	}
+    my $msgCount  = $p->getRowCount;
+         
+   	$var->{'message_loop'  } = \@msg;
+    $var->{'has_messages'  } = $msgCount > 0;
+    $var->{'message_total' } = $msgCount;
 
-    #Add common template variable for displaying the inbox
-    my $inbox     = WebGUI::Inbox->new($session); 
-    $self->appendCommonVars($var,$inbox);
+    $var->{'form_start'   } = WebGUI::Form::formHeader($session,{
+        action => $self->getUrl("module=inbox;do=approveDenyInvitations")
+    });
+    $var->{'form_end'   } = WebGUI::Form::formFooter($session);
+
+    $var->{'form_accept'   } = WebGUI::Form::submit($session,{
+        name  =>"accept",
+        value =>$i18n->get("accept button label")
+    });
+
+    $var->{'form_deny'     } = WebGUI::Form::submit($session,{
+        name  =>"deny",
+        value =>$i18n->get("deny button label")
+    });
+
+    tie my %rpps, "Tie::IxHash";
+    %rpps = (25 => "25", 50 => "50", 100=>"100");
+    $var->{'message_rpp'  } = WebGUI::Form::selectBox($session,{
+        name    =>"rpp",
+        options => \%rpps,
+        value   => $session->form->get("rpp") || 25,
+        extras  => q{onchange="location.href='}.$inboxUrl.q{;rpp='+this.options[this.selectedIndex].value"}
+    });
+
+    #Append common vars
+    $self->appendCommonVars($var,WebGUI::Inbox->new($session));
+    #Append pagination vars
+    $p->appendTemplateVars($var);
 
     return $self->processTemplate($var,$self->getManageInvitationsTemplateId);
 }
@@ -453,6 +631,7 @@ sub www_sendMessage {
             $errorMsg = $i18n->get("system message error");
         }
         if($errorMsg) {
+            $var->{'isInbox'} = "true";
             return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
         }
 
@@ -478,6 +657,7 @@ sub www_sendMessage {
             $errorMsg = $i18n->get("no self error");
         }
         if($errorMsg) {
+            $var->{'isInbox'} = "true";
             return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
         }
         
@@ -530,6 +710,7 @@ sub www_sendMessage {
         unless($activeFriendCount) {
             my $i18n  = WebGUI::International->new($session,'Account_Inbox');
             $errorMsg = $i18n->get("no friends error");
+            $var->{'isInbox'} = "true";
             return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
         }
 
@@ -553,8 +734,10 @@ sub www_sendMessage {
     $var->{'message_body'     } = $form->get('message');
     
     $var->{'form_message_text'}  = WebGUI::Form::textarea($session, {
-        name  =>"message",
-        value =>$var->{'message_body'} || "",
+        name   =>"message",
+        value  =>$var->{'message_body'} || "",
+        width  =>600,
+        height =>200
     });
 
     $var->{'form_message_rich'}  = WebGUI::Form::HTMLArea($session, {
@@ -771,6 +954,99 @@ sub www_view {
 
 #-------------------------------------------------------------------
 
+=head2 www_viewInvitation ( )
+
+The page on which users view their messages
+
+=cut
+
+sub www_viewInvitation {
+    my $self       = shift;
+    my $session    = $self->session;
+    my $user       = $session->user;
+
+    my $var        = {};
+    my $inviteId   = shift || $session->form->get("inviteId");
+    my $errorMsg   = shift;
+    my $i18n       = WebGUI::International->new($session,'Account_Inbox');
+
+
+    my $friends    = WebGUI::Friends->new($session);
+    my $invitation = $friends->getAddRequest($inviteId);
+    my $inviter    = WebGUI::User->new($session,$invitation->{inviterId});
+
+    #Add common template variable for displaying the inbox
+    $self->appendCommonVars($var,WebGUI::Inbox->new($session));
+
+    #Handle Errors
+    if (!($invitation->{inviteId})) { #Invitation is invalid
+        $errorMsg = $i18n->get("invitation does not exist");        
+    }
+    elsif ($inviter->isVisitor) { #Inviter user account was deleted
+        $errorMsg = $i18n->get("inviter no longer exists");
+    }
+    elsif ($session->user->userId ne $invitation->{friendId}) { #User trying to view someone else's invitation
+        $errorMsg = $i18n->get("no access to invitation");
+    }
+
+    if($errorMsg) {
+        my $backUrl = $var->{'view_invitations_url'};
+        $var->{'isInvitation'} = "true";
+        return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
+    }
+        
+    my $epoch = WebGUI::DateTime->new(mysql => $invitation->{dateSent} )->epoch;
+        
+    $var->{'invite_id'              } = $inviteId;
+    $var->{'message_from_id'        } = $inviter->userId; 
+    $var->{'message_from'           } = $inviter->getWholeName;
+    $var->{'message_from_url'       } = $inviter->getProfileUrl;
+    $var->{'message_dateStamp'      } = $epoch;
+    $var->{'message_dateStamp_human'} = $session->datetime->epochToHuman($epoch);
+    $var->{'message_body'           } = $invitation->{comments};
+
+    unless ($var->{'message_body'} =~ /\<a/ig) {
+        $var->{'message_body'} =~ s/(http\S*)/\<a href=\"$1\"\>$1\<\/a\>/g;
+    }
+    unless ($var->{'message_body'} =~ /\<div/ig
+                || $var->{'message_body'} =~ /\<br/ig
+                || $var->{'message_body'} =~ /\<p/ig) {
+        $var->{'message_body'} =~ s/\n/\<br \/\>\n/g;
+    }
+    
+    #Build the action URLs
+    my $nextInvitation = $friends->getPreviousInvitation($invitation);  #Messages sorted descending so next is actually previous
+    if( $nextInvitation->{inviteId} ) {
+        $var->{'hasNext'         } = "true";
+        $var->{'next_message_url'} = $self->getUrl("module=inbox;do=viewInvitation;inviteId=".$nextInvitation->{inviteId});
+    }
+
+    my $prevInvitation = $friends->getNextInvitation($invitation);  #Messages sorted descending so previous is actually next
+    if( $prevInvitation->{inviteId} ) {
+        $var->{'hasPrevious'     } = "true";
+        $var->{'prev_message_url'} = $self->getUrl("module=inbox;do=viewInvitation;inviteId=".$prevInvitation->{inviteId});
+    }
+
+    $var->{'form_header'  } = WebGUI::Form::formHeader($session,{
+        action => $self->getUrl("module=inbox;do=approveDenyInvitations;inviteId=".$inviteId)
+    });
+    $var->{'form_footer'  } = WebGUI::Form::formFooter($session);
+
+    $var->{'form_accept'  } = WebGUI::Form::submit($session,{
+        name  =>"accept",
+        value =>$i18n->get("accept button label")
+    });
+
+    $var->{'form_deny'   } = WebGUI::Form::submit($session,{
+        name  =>"deny",
+        value =>$i18n->get("deny button label")
+    });
+
+    return $self->processTemplate($var,$self->getViewInvitationTemplateId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_viewMessage ( )
 
 The page on which users view their messages
@@ -804,6 +1080,7 @@ sub www_viewMessage {
 
     if($errorMsg) {
         my $backUrl = $var->{'view_inbox_url'};
+        $var->{'isInvitation'} = "true";
         return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
     }
     
@@ -812,7 +1089,7 @@ sub www_viewMessage {
     $var->{'message_id'             } = $messageId;
     $var->{'message_subject'        } = $message->get("subject");
     $var->{'message_dateStamp'      } = $message->get("dateStamp");
-    $var->{'message_dateStemp_human'} = $session->datetime->epochToHuman($var->{'message_dateStamp'});
+    $var->{'message_dateStamp_human'} = $session->datetime->epochToHuman($var->{'message_dateStamp'});
     $var->{'message_status'         } = $message->getStatus;
     $var->{'message_body'           } = $message->get("message");
 
@@ -848,13 +1125,13 @@ sub www_viewMessage {
         $var->{'reply_url'} = $self->getUrl("module=inbox;do=sendMessage;messageId=".$messageId);
     }
 
-    my $nextMessage = $inbox->getNextMessage($message);
+    my $nextMessage = $inbox->getPreviousMessage($message);  #Message are displayed in descending order so next is actually previous
     if( defined $nextMessage ) {
         $var->{'hasNext'         } = "true";
         $var->{'next_message_url'} = $self->getUrl("module=inbox;do=viewMessage;messageId=".$nextMessage->getId);
     }
 
-    my $prevMessage = $inbox->getPreviousMessage($message);
+    my $prevMessage = $inbox->getNextMessage($message);  #Messages are displayed in descending order so previous is actually next
     if(defined $prevMessage) {
         $var->{'hasPrevious'     } = "true";
         $var->{'prev_message_url'} = $self->getUrl("module=inbox;do=viewMessage;messageId=".$prevMessage->getId);

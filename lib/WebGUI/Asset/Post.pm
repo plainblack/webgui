@@ -424,7 +424,7 @@ Formats the url to view a users profile.
 
 sub getPosterProfileUrl {
 	my $self = shift;
-	return $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
+	return WebGUI::User->new($self->session,$self->get("ownerUserId"))->getProfileUrl;
 }
 
 #-------------------------------------------------------------------
@@ -534,7 +534,7 @@ sub getTemplateVars {
 	$var{"userId"} = $self->get("ownerUserId");
 	$var{"user.isPoster"} = $self->isPoster;
 	$var{"avatar.url"} = $self->getAvatarUrl;
-	$var{"userProfile.url"} = $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
+	$var{"userProfile.url"} = $self->getPosterProfileUrl;
 	$var{"dateSubmitted.human"} =$self->session->datetime->epochToHuman($self->get("creationDate"));
 	$var{"dateUpdated.human"} =$self->session->datetime->epochToHuman($self->get("revisionDate"));
 	$var{'title.short'} = $self->chopTitle;

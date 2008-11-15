@@ -378,9 +378,12 @@ The id of the user that completed this task. Defaults to the current user.
 sub setCompleted {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
-	$self->{_properties}{status} = "completed";
+	$self->{_properties}{status}      = "completed";
 	$self->{_properties}{completedBy} = $userId;
 	$self->{_properties}{completedOn} = time();
+    $self->{_inbox}{status}           = "completed";
+    $self->{_inbox}{completedBy}      = $userId;
+    $self->{_inbox}{completedOn}      = time();
 	$self->session->db->setRow("inbox","messageId",$self->{_inbox});
     #Completed messages should also be marked read
     $self->setRead($userId);
@@ -498,7 +501,12 @@ sub setStatus {
         $self->setReplied($userId);
     }
     
-    $self->{_properties}{status} = ( $status ne "pending") ? "active" : "pending";
+    #Only let completed stuff go back to pending
+    if ( $status eq "pending" && $self->{_properties}{status} eq "completed") {
+        $self->{_properties}{status} = "pending";
+        $self->{_inbox}{status} = "pending"
+    }
+    
 	$self->session->db->setRow("inbox","messageId",$self->{_inbox});
     return undef;
 }

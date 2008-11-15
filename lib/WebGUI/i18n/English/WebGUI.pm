@@ -254,6 +254,16 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'required error' => {
+		message => q{%s is required.},
+		lastUpdated => 1031514049
+	},
+
+    'language not available error' => {
+		message => q|%s is not available.  Please select another language|,
+		lastUpdated => 1031514049
+	},
+
 	'454' => {
 		message => q|Last Updated|,
 		lastUpdated => 1031514049
@@ -330,7 +340,7 @@ our $I18N = {
 	},
 
 	'861' => {
-		message => q|Make profile public?|,
+		message => q|Profile Privacy Setting|,
 		lastUpdated => 1043879954
 	},
 

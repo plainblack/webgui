@@ -484,15 +484,13 @@ value to check for duplicates against
 =cut
 
 sub isDuplicate {
-    my $self    = shift;
-    my $session = $self->session;
+    my $self      = shift;
+    my $session   = $self->session;
+    my $fieldId   = $self->getId;
+    my $value     = shift;
 
-    my $fieldId = $self->getId;
-    my $value   = shift;
-
-    my $sql         = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
-    my ($duplicate) = $session->db->quickArray($sql,[$value, $session->user->userId]);
-
+    my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
+    my $duplicate = $session->db->quickScalar($sql,[$value, $session->user->userId]);
     return ($duplicate > 0);
 }
 

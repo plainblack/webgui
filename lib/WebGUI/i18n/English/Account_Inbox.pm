@@ -79,13 +79,23 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
-    'invitation error message template label' => {
-        message     => q|Inbox Error Message Template|,
+    'invitation confirm message template label' => {
+        message     => q|Invitation Confirmation Message Template|,
         lastUpdated => 1119068809
     },
 
-    'invitation error message template hoverHelp' => {
-        message     => q|Choose the template for viewing inbox errors|,
+    'invitation confirm message template hoverHelp' => {
+        message     => q|Choose the template for viewing invitation confirmations|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox view invitation template label' => {
+        message     => q|View Invitation Template|,
+        lastUpdated => 1119068809
+    },
+
+    'inbox view invitation template hoverHelp' => {
+        message     => q|Choose the template for viewing an invitation|,
         lastUpdated => 1119068809
     },
 
@@ -278,6 +288,72 @@ our $I18N = {
         message => q{Your message has been sent successfully},
 		lastUpdated => 1181019679,
     },
+
+    'error label' => {
+        message     => q{Error},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation label' => {
+        message     => q{Invitation},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation count' => {
+        message     => q{invitations},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation message' => {
+        message     => q{%s has invited you to join their friends newtork},
+        lastUpdated => 1225724810,
+    },
+
+    'no invitations' => {
+        message     => q{You have no outstanding friends invitations},
+        lastUpdated => 1225724810,
+    },
+
+    'accept button label' => {
+        message     => q{Accept},
+        lastUpdated => 1225724810,
+    },
+
+    'deny button label' => {
+        message     => q{Deny},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation confirm label' => {
+        message     => q{Invitation Notices Sent},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation confirm message' => {
+        message     => q{The following users were notified:},
+        lastUpdated => 1225724810,
+    },
+
+    'invitations back label' => {
+        message     => q{back to invitations},
+        lastUpdated => 1225724810,
+    },
+
+    'invitation does not exist' => {
+        message     => q{The invitation you are trying to view has already been approved or denied.},
+        lastUpdated => 1119068809
+    },
+
+    'no access to invitation' => {
+        message     => q{You do not have permission to view this invitation.},
+        lastUpdated => 1119068809
+    },
+
+    'inviter no longer exists' => {
+        message     => q{The user who sent this invitation is no longer a member of the site.},
+        lastUpdated => 1119068809
+    },
+    
 
 };
 

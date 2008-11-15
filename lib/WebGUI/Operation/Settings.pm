@@ -226,34 +226,7 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
-	# messaging settings
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxTemplateId",
-		label=>$i18n->get('view inbox template'),
-		hoverHelp=>$i18n->get('view inbox template description'),
-		namespace=>"Inbox",
-		defaultValue=>$setting->get("viewInboxTemplateId"),
-		});
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxMessageTemplateId",
-		label=>$i18n->get('view inbox message template'),
-		hoverHelp=>$i18n->get('view inbox message template description'),
-		namespace=>"Inbox/Message",
-		defaultValue=>$setting->get("viewInboxMessageTemplateId"),
-		});    
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"sendPrivateMessageTemplateId",
-		label=>$i18n->get('send private message template'),
-		hoverHelp=>$i18n->get('send private message template description'),
-		namespace=>"Inbox/SendPrivateMessage",
-		defaultValue=>$setting->get("sendPrivateMessageTemplateId"),
-		});    
+	# messaging settings  
 	push(@fields, {
 		tab=>"messaging",
 		fieldType=>"text",
@@ -444,15 +417,6 @@ sub definition {
 		namespace=>"userInvite/Email",
 		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
 		});    
-    push(@fields, {
-        tab             => "user",
-        fieldType       => "template",
-        defaultValue    => "managefriends_________",
-        namespace       => "friends/manage",
-        name            => "manageFriendsTemplateId",
-        label           => $i18n->get("manage friends template", "Friends"),
-        hoverHelp       => $i18n->get("manage friends template help", "Friends"),
-        });
     push @fields, {
         tab             => "user",
         name            => "showMessageOnLogin",
@@ -485,24 +449,7 @@ sub definition {
         hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
         defaultValue    => $setting->get('showMessageOnLoginBody'),
     };
-    push @fields, {
-        tab             => "user",
-        name            => 'viewUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/View',
-        label           => $i18n->get( 'user profile view template' ),
-        hoverHelp       => $i18n->get( 'user profile view template description' ),
-        defaultValue    => $setting->get('viewUserProfileTemplate'),
-    };
-    push @fields, {
-        tab             => "user",
-        name            => 'editUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/Edit',
-        label           => $i18n->get( 'user profile edit template' ),
-        hoverHelp       => $i18n->get( 'user profile edit template description' ),
-        defaultValue    => $setting->get('editUserProfileTemplate'),
-    };
+   
 	# auth settings 
    	my $options;
    	foreach (@{$session->config->get("authMethods")}) {
@@ -638,14 +585,18 @@ sub www_editSettings {
         #Create the instance
         my $className = $account->{className};
 		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
-
-        if ( my $e = WebGUI::Error->caught ) {
+        if ( $@ ) {
             $session->log->warn("Could not instantiate account pluggin $className...skipping");
             next;
         }
         
         #Get the content of the settings form from the instance
-        my $settingsForm = $instance->editSettingsForm;
+        my $settingsForm = eval { $instance->editSettingsForm };
+        if( $@ ) {
+            $session->log->warn("Error calling editSettingsForm in $className...skipping : ".$@);
+            next;
+        }
+
         #If editUserSettingsForm is empty, skip it
         next if $settingsForm eq "";
 
@@ -710,7 +661,12 @@ sub www_saveSettings {
             next;
         }
         #Save the settings
-        $instance->editSettingsFormSave;
+        eval { $instance->editSettingsFormSave };
+        
+        if( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Error calling editSettingsFormSave in $className...skipping : ".$e->error);
+            next;
+        }
 	}
 
 

@@ -154,7 +154,7 @@ sub getMessage {
 
 =head2 getNextMessage ( message [, userId] ) 
 
-Returns the next message for the user
+Returns the message that was send after the message passed in for the user
 
 =head3 message
 
@@ -167,15 +167,15 @@ The WebGUI::User object of the user to retrieve the message for.  Defaults to th
 =cut
 
 sub getNextMessage {
-	my $self      = shift;
+    my $self      = shift;
     my $session   = $self->session;
     my $message   = shift;
     my $user      = shift || $session->user;
-
-    my $sql = $self->getMessageSql($user,{
-        whereClause => "ibox.dateStamp < ".$message->get("dateStamp"),
+    
+	my $sql = $self->getMessageSql($user,{
+        whereClause => "ibox.dateStamp > ".$message->get("dateStamp"),
         sortBy      => "ibox.dateStamp",
-        sortDir     => "desc",
+        sortDir     => "asc",
         limit       => 1
     });
     
@@ -188,7 +188,7 @@ sub getNextMessage {
 
 =head2 getPreviousMessage ( message [, userId] ) 
 
-Returns the previous message for the user
+Returns the message that was sent before the message passed in for the user
 
 =head3 message
 
@@ -205,11 +205,11 @@ sub getPreviousMessage {
     my $session   = $self->session;
     my $message   = shift;
     my $user      = shift || $session->user;
-    
-	my $sql = $self->getMessageSql($user,{
-        whereClause => "ibox.dateStamp > ".$message->get("dateStamp"),
+
+    my $sql = $self->getMessageSql($user,{
+        whereClause => "ibox.dateStamp < ".$message->get("dateStamp"),
         sortBy      => "ibox.dateStamp",
-        sortDir     => "asc",
+        sortDir     => "desc",
         limit       => 1
     });
     

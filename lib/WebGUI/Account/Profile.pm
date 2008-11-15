@@ -32,7 +32,7 @@ These subroutines are available from this package:
 
 =head2 appendCommonVars ( var )
 
-    Appends common template variables that all inbox templates use
+    Appends common template variables that all profile templates use
     
 =head3 var
 
@@ -47,11 +47,12 @@ sub appendCommonVars {
     my $user    = $session->user;
     my $pageUrl = $session->url->page;
 
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
-    $var->{'view_profile_url'  } = $user->getProfileUrl($pageUrl);
-    $var->{'edit_profile_url'  } = $self->getUrl("module=profile;do=edit");
-    $var->{'back_url'          } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'}
+    $var->{'user_full_name'      } = $user->getWholeName;
+    $var->{'user_member_since'   } = $user->dateCreated;
+    $var->{'view_profile_url'    } = $user->getProfileUrl($pageUrl);
+    $var->{'edit_profile_url'    } = $self->getUrl("module=profile;do=edit");
+    $var->{'back_url'            } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'};
+    $var->{'invitations_enabled' } = $session->user->profileField('ableToBeFriend');
 }
 
 #-------------------------------------------------------------------
@@ -104,6 +105,14 @@ sub editSettingsForm {
         label     => $i18n->get("profile view template label"),
         hoverHelp => $i18n->get("profile view template hoverHelp")
 	);
+    $f->template(
+        name      => "profileErrorTemplateId",
+        value     => $self->getErrorTemplateId,
+        namespace => "Account/Profile/Error",
+        label     => $i18n->get("profile error template label"),
+        hoverHelp => $i18n->get("profile error template hoverHelp")
+	);
+
 
     return $f->printRowsOnly;
 }
@@ -128,6 +137,7 @@ sub editSettingsFormSave {
     $setting->set("profileDisplayLayoutTemplateId", $form->process("profileDisplayLayoutTemplateId","template"));
     $setting->set("profileEditTemplateId", $form->process("profileEditTemplateId","template"));
     $setting->set("profileViewTempalteId", $form->process("profileViewTemplateId","template"));
+    $setting->set("profileErrorTemplateId",$form->process("profileErrorTemplateId","template"));
 
 }
 
@@ -196,6 +206,20 @@ sub getEditTemplateId {
 
 #-------------------------------------------------------------------
 
+=head2 getErrorTemplateId ( )
+
+This method returns the template ID used to display the error page.
+
+=cut
+
+sub getErrorTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("profileErrorTemplateId") || "MBmWlA_YEA2I6D29OMGtRg";
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getLayoutTemplateId ( )
 
 This method returns the template ID for the account layout.
@@ -205,9 +229,9 @@ This method returns the template ID for the account layout.
 sub getLayoutTemplateId {
     my $self    = shift;
     my $session = $self->session;
-    my $method  = $session->form->get("do");
-    my $uid     = $session->form->get("uid");
-
+    my $method  = $self->method;
+    my $uid     = $self->uid;
+    
     return $self->getEditLayoutTemplateId if($method eq "edit" || $uid eq "");
     return $session->setting->get("profileLayoutTemplateId") || $self->SUPER::getLayoutTemplateId;
 }
@@ -240,114 +264,6 @@ sub getViewTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 saveProfileFields ( session, user, profile )
-
-Saves profile data to a user's profile.  Does not validate any of the data.
-
-=head3 session
-
-WebGUI session object
-
-=head3 user
-
-User object.  Profile data will be placed in this user's profile.
-
-=head3 profile
-
-Hash ref of profile data to save.
-
-=cut
-
-sub saveProfileFields {
-    my $class   = shift;
-	my $session = shift;
-	my $u       = shift;
-	my $profile = shift;
-
-	foreach my $fieldName (keys %{$profile}) {
-		$u->profileField($fieldName,${$profile}{$fieldName});
-	}
-}
-
-#-------------------------------------------------------------------
-
-=head2 validateProfileFields ( session, fields )
-
-Class method which validates profile data from the session form variables.  Returns an data structure which contains the following
-
-{
-    profile        => Hash reference containing all of the profile fields and their values
-    errors         => Array reference of error messages to be displayed
-    errorCategory  => Category in which the first error was thrown
-    warnings       => Array reference of warnings to be displayed
-    errorFields    => Array reference of the fieldIds that threw an error
-    warningFields  => Array reference of the fieldIds that threw a warning
-}
-
-=head3 session
-
-WebGUI session object
-
-=head3 fields
-
-An array reference of profile fields to validate.
-
-=cut
-
-sub validateProfileFields {
-    my $class       = shift;
-	my $session     = shift;
-	my $fields      = shift;
-
-    my $i18n        = WebGUI::International->new($session, 'Account_Profile');
-
-    my $data        = {};
-    my $errors      = [];
-    my $warnings    = [];
-    my $errorCat    = undef;
-    my $errorFields = [];
-    my $warnFields  = [];
-    
-	foreach my $field (@{$fields}) {
-        my $fieldId       = $field->getId;
-        my $fieldLabel    = $field->getLabel;
-    	my $fieldValue    = $field->formProcess;
-        my $isValid       = $field->isValid($fieldValue);
-
-        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
-
-        if(!$isValid) {
-            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
-            push (@{$errors}, sprintf($i18n->get("required error"),$fieldLabel));
-            push(@{$errorFields},$fieldId);
-        }
-        #The language field is special and must be always be valid or WebGUI will croak
-        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$data->{$fieldId}})) {
-            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
-            $session->log->warn("language $fieldValue does not exist");
-            push (@{$errors}, sprintf($i18n->get("language not installed error"),$data->{$fieldId}));
-            push(@{$errorFields},$fieldId);
-        }
-        #Duplicate emails throw warnings
-        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue)) {
-            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
-            push (@{$warnings},$i18n->get("email already in use error"));
-            push(@{$warnFields},$fieldId);
-        }
-    }
-
-	return {
-        profile       => $data,
-        errors        => $errors,
-        warnings      => $warnings,
-        errorCategory => $errorCat,
-        errorFields   => $errorFields,
-        warningFields => $warnFields,
-    };
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_edit ( )
 
 The edit page for the user's profile.
@@ -368,6 +284,10 @@ sub www_edit {
 
     my @errorFields = ();
     @errorFields = (@{$errors->{errorFields}},@{$errors->{warningFields}}) if($hasErrors);
+
+    $var->{'profile_errors'       } = [];    
+    map{ push(@{$var->{'profile_errors'}},{ error_message => $_ }) } @{$errors->{errors}} if($hasErrors);
+    $var->{'hasErrors'            } = scalar(@{$var->{'profile_errors'}}) > 0;
 
     my @categories = ();
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
@@ -415,6 +335,7 @@ sub www_edit {
             'profile_category_shortLabel'      => $shortCategoryLabel,
             'profile_category_index'           => $categoryIndex,
             'profile_fields_loop'              => \@fields,
+            'profile_errors'                   => $var->{'profile_errors'},
         });
         #This value will determine whether or not a valid category is active or not
         $active ||= $isActive;
@@ -431,11 +352,8 @@ sub www_edit {
     });
 	$var->{'profile_form_footer'  }  = WebGUI::Form::formFooter($session);
 
-    $var->{'profile_errors'       } = [];    
-    map{ push(@{$var->{'profile_errors'}},{ error_message => $_ }) } @{$errors->{errors}} if($hasErrors);
-
     $self->appendCommonVars($var);
-	
+
     return $self->processTemplate($var,$self->getEditTemplateId);
 }
 
@@ -453,7 +371,7 @@ sub www_editSave {
     my $session    = $self->session;
 
     my $fields     = WebGUI::ProfileField->getEditableFields($session);
-    my $retHash    = $self->validateProfileFields($session,$fields);
+    my $retHash    = $session->user->validateProfileDataFromForm($fields);
 	push (@{$retHash->{errors}},@{$retHash->{warnings}});
 
     unless(scalar(@{$retHash->{errors}})) {
@@ -476,9 +394,8 @@ The display page of the .
 sub www_view {
     my $self     = shift;
     my $session  = $self->session;
-    my $i18n     = WebGUI::International->new($session, 'Account_Profile');
     my $var      = {};
-    my $uid      = $session->form->get("uid");
+    my $uid      = $self->uid;
     my $selected = $session->form->get("selected"); #Allow users to template tabs or other category dividers
 
     my $active      = 0; #Whether or not a category is selected
@@ -487,15 +404,23 @@ sub www_view {
     #Ensure uid is passed in if they want to view a profile.  This controls the tab state.
     return $self->www_edit unless ($uid);
 
-    my $user     = WebGUI::User->new($session,$uid);    
+    my $user     = WebGUI::User->new($session,$uid);
+
+    $self->appendCommonVars($var);
+
+    #Overwrite these
+    $var->{'user_full_name'    } = $user->getWholeName;
+    $var->{'user_member_since' } = $user->dateCreated;
 
     #Check user privileges
-    #return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isAdmin));
-    #return $session->privilege->insufficient() if(!$session->user->isRegistered);
-
-    if($user->isVisitor) {
-        $var->{'restricted'   } = "true";
-        $var->{'error_message'} = $i18n->get("visitor profile restricted");
+    unless ($user->profileIsViewable($session->user)) {
+        my $i18n = WebGUI::International->new($session,'Account_Profile');
+        return $self->showError(
+            $var,
+            $i18n->get("profile not public error"),
+            $var->{'back_url'},
+            $self->getErrorTemplateId
+        );
     }
 
     my @categories = ();
@@ -549,18 +474,14 @@ sub www_view {
 
     #If not category is selected, set the first category as the active one
     $categories[0]->{profile_category_isActive} = 1 unless($active);
+    my $privacySetting                          = $user->profileField("publicProfile") || "none";
+    $var->{'profile_privacy_'.$privacySetting } = "true";
 
     $var->{'profile_category_loop' } = \@categories;
     $var->{'profile_user_id'       } = $user->userId;
     $var->{'can_edit_profile'      } = $uid eq $session->user->userId;
     $var->{'acceptsPrivateMessages'} = $user->acceptsPrivateMessages($session->user->userId);
     $var->{'acceptsFriendsRequests'} = $user->acceptsFriendsRequests($session->user);
-
-    $self->appendCommonVars($var);
-
-    #Overwrite these
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
 
     return $self->processTemplate($var,$self->getViewTemplateId);
 }

@@ -59,20 +59,16 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
-	'required error' => {
-		message => q|%s is required.|,
-		lastUpdated => 1031514049
-	},
+    'profile error template label' => {
+        message     => q|Error Template|,
+        lastUpdated => 1119068809
+    },
 
-    'language not installed error' => {
-		message => q|%s is not installed.  Please select another language|,
-		lastUpdated => 1031514049
-	},
+    'profile error template hoverHelp' => {
+        message     => q|Choose the template to use for displaying profile errors to the user|,
+        lastUpdated => 1119068809
+    },
 
-    'email already in use error' => {
-		message => q|The email address is already in use. Please use a different email address.|,
-		lastUpdated => 1068703399
-	},
 
     'visitor profile restricted' => {
         message => q|The visitor profile is restricted|,
@@ -110,9 +106,56 @@ our $I18N = {
     },
 
     'back label' => {
-        message     => q{go back},
+        message     => q{back to site},
         lastUpdated => 1119068809
-    }
+    },
+
+    'profile not public error' => {
+		message => q|This user's profile is not public.|,
+		lastUpdated => 1043881275
+	},
+
+    'friends only' => {
+		message => q|Your profile is viewable to Friends|,
+		lastUpdated => 1043881275
+	},
+
+    'private profile' => {
+		message => q|Your profile is Private|,
+		lastUpdated => 1043881275
+	},
+
+    'public profile' => {
+		message => q|Your profile is Public|,
+		lastUpdated => 1043881275
+	},
+
+    'private label' => {
+    	message => q|Private|,
+		lastUpdated => 1043881275
+    },
+    
+    'public label' => {
+    	message => q|Public|,
+		lastUpdated => 1043881275
+    },
+
+    'friends only label' => {
+    	message => q|Friends Only|,
+		lastUpdated => 1043881275
+    },
+
+    'error label' => {
+        message     => q{Error},
+        lastUpdated => 1225724810,
+    },
+    
+    'back to profile label' => {
+        message     => q{back to profile},
+        lastUpdated => 1225724810,
+    },
+
+
 };
 
 1;

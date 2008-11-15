@@ -129,7 +129,7 @@ sub acceptsPrivateMessages {
         return $sentBy->isInGroup($friendsGroup->getId);
     }
 
-    return 1;
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -145,16 +145,19 @@ WebGUI::User object to check to see if user will accept requests from.
 =cut
 
 sub acceptsFriendsRequests {
-    my $self   = shift;
-    my $user   = shift;
+    my $self    = shift;
+    my $session = $self->session;
+    my $user    = shift;
 
     return 0 unless ($user && ref $user eq "WebGUI::User"); #Sanity checks
     return 0 if($self->isVisitor);  #Visitors can't have friends
     return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
 
-    my $friends = WebGUI::Friends->new($self->session,$self);
-    return 0 if ($friends->isFriend($user->userId));  #Already a friend
-    return 0 if ($friends->isInvited($user->userId)); #Invitation already sent
+    my $me     = WebGUI::Friends->new($session,$self);
+    my $friend = WebGUI::Friends->new($session,$user);
+
+    return 0 if ($me->isFriend($user->userId));  #Already a friend
+    return 0 if ($me->isInvited($user->userId) || $friend->isInvited($self->userId)); #Invitation sent by one or the other
 
     return $self->profileField('ableToBeFriend'); #Return profile setting
 }
@@ -804,6 +807,37 @@ sub profileField {
 
 #-------------------------------------------------------------------
 
+=head2 profileIsViewable ( user  )
+
+Returns whether or not the user's profile is viewable by the user passed in
+
+=head3 user
+
+The user to test to see if the profile is viewable for.  If no user is passed in,
+the current user in session will be tested
+
+=cut
+
+sub profileIsViewable {
+    my $self     = shift;
+    my $user     = shift || $self->session->user;
+    my $userId   = $user->userId;
+
+    return 0 if ($self->isVisitor);  #Can't view visitor's profile
+    return 1 if ($self->userId eq $userId);  #Users can always view their own profile
+
+    my $profileSetting = $self->profileField('publicProfile');
+    
+    return 0 if ($profileSetting eq "none");
+    return 1 if ($profileSetting eq "all");
+
+    my $friendsGroup = $self->friends;
+    return $user->isInGroup($friendsGroup->getId);
+}
+ 
+
+#-------------------------------------------------------------------
+
 =head2 referringAffiliate ( [ value ] )
 
 Returns the unique identifier of the affiliate that referred this user to the site. 
@@ -890,6 +924,28 @@ sub uncache {
 	$cache->delete;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 updateProfileFields ( profile )
+
+Saves profile data to a user's profile.  Does not validate any of the data.
+
+=head3 profile
+
+Hash ref of key/value pairs of data in the users's profile to update.
+
+=cut
+
+sub updateProfileFields {
+    my $self    = shift;
+    my $profile = shift;
+
+	foreach my $fieldName (keys %{$profile}) {
+		$self->profileField($fieldName,$profile->{$fieldName});
+	}
+}
+
 #-------------------------------------------------------------------
 
 =head2 username ( [ value ] )
@@ -925,6 +981,78 @@ Returns the userId for this user.
 
 sub userId {
         return $_[0]->{_userId};
+}
+
+#-------------------------------------------------------------------
+
+=head2 validateProfileDataFromForm ( fields )
+
+Validates profile data from the session form variables.  Returns an data structure which contains the following
+
+{
+    profile        => Hash reference containing all of the profile fields and their values
+    errors         => Array reference of error messages to be displayed
+    errorCategory  => Category in which the first error was thrown
+    warnings       => Array reference of warnings to be displayed
+    errorFields    => Array reference of the fieldIds that threw an error
+    warningFields  => Array reference of the fieldIds that threw a warning
+}
+
+=head3 fields
+
+An array reference of profile field Ids to validate.
+
+=cut
+
+sub validateProfileDataFromForm {
+	my $self        = shift;
+    my $session     = $self->session;
+	my $fields      = shift;
+
+    my $i18n        = my $i18n = WebGUI::International->new($session);
+
+    my $data        = {};
+    my $errors      = [];
+    my $warnings    = [];
+    my $errorCat    = undef;
+    my $errorFields = [];
+    my $warnFields  = [];
+    
+	foreach my $field (@{$fields}) {
+        my $fieldId       = $field->getId;
+        my $fieldLabel    = $field->getLabel;
+    	my $fieldValue    = $field->formProcess;
+        my $isValid       = $field->isValid($fieldValue);
+
+        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
+
+        if(!$isValid) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$errors}, sprintf($i18n->get("required error"),$fieldLabel));
+            push(@{$errorFields},$fieldId);
+        }
+        #The language field is special and must be always be valid or WebGUI will croak
+        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$data->{$fieldId}})) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$errors}, sprintf($i18n->get("language not available error"),$data->{$fieldId}));
+            push(@{$errorFields},$fieldId);
+        }
+        #Duplicate emails throw warnings
+        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue)) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$warnings},$i18n->get(1072));
+            push(@{$warnFields},$fieldId);
+        }
+    }
+
+	return {
+        profile       => $data,
+        errors        => $errors,
+        warnings      => $warnings,
+        errorCategory => $errorCat,
+        errorFields   => $errorFields,
+        warningFields => $warnFields,
+    };
 }
 
 #-------------------------------------------------------------------

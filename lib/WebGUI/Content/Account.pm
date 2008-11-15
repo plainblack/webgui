@@ -16,7 +16,7 @@ package WebGUI::Content::Account;
 
 use strict;
 use WebGUI::Session;
-use WebGUI::Exception::Account;
+use WebGUI::Exception;
 use Carp qw(croak);
 
 =head1 NAME
@@ -55,6 +55,65 @@ account : {
 These subroutines are available from this package:
 
 =cut
+
+
+#-------------------------------------------------------------------
+
+=head2 createInstance ( session, module ) 
+
+Creates an instance of an account pluggin
+
+=session
+
+WebGUI::Session object
+
+=module
+
+Module the method is in.  Defaults to the profileModuleIdentifier in the config file
+
+=cut
+
+sub createInstance {
+    my $class   = shift;
+    my $session = shift;
+    my $module  = shift || $session->config->get("profileModuleIdentifier");
+
+    #Get the account config to work with
+    my $configs = $session->config->get("account");
+    my $config  = __PACKAGE__->getAccountConfig($session,$module,$configs);
+
+    #Throw an error if the config file isn't found
+    unless (defined $config) {
+        WebGUI::Error->throw( error => qq{Could not locate module $module in the account system});
+        return undef;
+    }
+
+    #Visitor cannot access the acccount system
+    return $session->privilege->insufficient if($session->user->isVisitor);
+
+    #Create Pluggin Object
+    #Don't eval this as pluggable will croak and we want the calling module to handle the exception 
+    my $pluggin = WebGUI::Pluggable::instanciate(
+            $config->{className},
+            "new",
+            [  $session, $module ]
+    );
+        
+    #Check to make sure pluggin is a subclass of WebGUI::Account
+    unless($pluggin->isa('WebGUI::Account')) {
+        my $plugginType = ref $pluggin;
+        WebGUI::Error::InvalidObject->throw(
+            expected => 'WebGUI::Account',
+            got      => $plugginType,
+            error    => '$plugginType is not a subclass of WebGUI::Accout'
+        );
+        return undef;
+    }
+
+    return $pluggin;
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -99,97 +158,21 @@ sub handler {
     my $form    = $session->form;
     my $setting = $session->setting;
 
-    my $op      = $form->get("op");
-    return undef unless ($op eq "account");
+    #Pass through if it's not the account op
+    return undef unless ($form->get("op") eq "account");
 
-    my $output  = undef;
+    my $module   = $form->get("module");
+    my $method   = $form->get("do");
+    my $uid      = $form->get("uid");
 
-    my $module  = $form->get("module") || $session->config->get("profileModuleIdentifier");
+    my $instance = __PACKAGE__->createInstance($session,$module);
     
-    my $configs = $session->config->get("account");
-    my $config  = __PACKAGE__->getAccountConfig($session,$module,$configs);
-
-    if (defined $config) {
-        #Visitor cannot do anything to the profile.
-        return $session->privilege->insufficient if($session->user->isVisitor);
-
-        #Create Pluggin Object
-        #Don't eval this as pluggable will croak and we want WebGUI::URL::Content to handle the exception 
-        my $pluggin = WebGUI::Pluggable::instanciate($config->{className}, "new", [ $session ] );
-        
-        #Check to make sure pluggin is a subclass of WebGUI::Account
-        unless($pluggin->isa('WebGUI::Account')) {
-            my $plugginType = ref $pluggin;
-            WebGUI::Error::InvalidObject->throw(
-                expected => 'WebGUI::Account',
-                got      => $plugginType,
-                error    => '$plugginType is not a subclass of WebGUI::Accout'
-            );
-        }
-        
-        #Check to see if the user has permission to see what they are calling
-        return $session->privilege->insufficient unless ($pluggin->canView);
-        
-        #Process the method call
-        my $method = $form->get("do") || "view";
-        $method = "www_".$method;
-        
-        if($pluggin->can($method)) {
-            $output = $pluggin->$method;
-        }
-        else {
-            WebGUI::Error::MethodNotFound->throw(
-                error  => "Couldn't call non-existant method $method",
-                method => $method
-            );
-        }
-
-        #Wrap content returned from method call into the layout
-        my $var         = {};
-        $var->{content} = $output;
-
-        # Get fieldsets for avaiable account methods in the order they exist in the config file
-        my @pluggins    = ();
-        foreach my $account (@{$configs}) {
-            #Instantiate the pluggin
-            #Use the currently instantiated pluggin if we are checking this pluggin
-            my $instance = undef;
-            if($account->{identifier} eq $module) {
-                $instance = $pluggin;
-            }
-            else {
-                $instance = eval { WebGUI::Pluggable::instanciate($account->{className}, "new", [ $session ] ) };
-                if (my $e = WebGUI::Error->caught) {
-                    $session->log->warn("Couldn't instantiate Account Pluggin ".$account->{className}." ... skipping");
-                    next;
-                }
-                elsif(!$pluggin->isa('WebGUI::Account')) {
-                    $session->log->warn((ref $instance)." is not a subclass of WebGUI::Account ... skipping");
-                    next;
-                }
-            }
-            #Skip this module if the user can't view this
-            next unless ($instance->canView);
-            
-            #Push the tab variables onto the template
-            my %hash = %{$account};
-            my $identifier = $account->{identifier};
-            $hash{'is_'.$identifier} = "true";
-            $hash{'url'            } = $instance->getUrl("module=$identifier",1);
-            $hash{'isActive'       } = "true" if($identifier eq $module);
-            WebGUI::Macro::process(\$hash{'title'});
-            push(@pluggins,\%hash);
-        }
-        $var->{'account_loop'} = \@pluggins;
-
-        my $layoutId    = $pluggin->getLayoutTemplateId;
-        #Process the layout template
-        $output         = $pluggin->processTemplate($var,$layoutId);
-        #Wrap the layout in the user style
-        $output         = $session->style->userStyle($output);
-    }
-
-    return $output;
+    #Let the content handler handle trapping errors
+    my $output   = $instance->callMethod($method,[],$uid);
+    return undef unless (defined $output);
+    
+    return $instance->displayContent($output);
+    
 }
 
 

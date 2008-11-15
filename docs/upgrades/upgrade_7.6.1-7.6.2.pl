@@ -81,6 +81,11 @@ sub upgradeAccount {
 			className     => "WebGUI::Account::Friends"
         },
         {
+            identifier    => "shop",
+            title         => "^International(title,Account_Shop);",
+			className     => "WebGUI::Account::Shop"
+        },
+        {
             identifier    => "user",
             title         => "^International(title,Account_User);",
 			className     => "WebGUI::Account::User"
@@ -100,23 +105,44 @@ sub upgradeAccount {
         $session->config->set( "contentHandlers", \@newHandlers );
     }
     
-    #Add the settings for the profile
+    #Add the settings for the profile module
     $setting->add("profileStyleTemplateId",""); #Use the userStyle by default
     $setting->add("profileLayoutTemplateId","N716tpSna0iIQTKxS4gTWA");
     $setting->add("profileEditLayoutTemplateId","FJbUTvZ2nUTn65LpW6gjsA"); 
     $setting->add("profileEditTemplateId","75CmQgpcCSkdsL-oawdn3Q");
     $setting->add("profileViewTempalteId","2CS-BErrjMmESOtGT90qOg");
+    $setting->add("profileErrorTempalteId","MBmWlA_YEA2I6D29OMGtRg");
 
-    #Add the settings for the inbox
+    #Add the settings for the inbox module
     $setting->add("inboxStyleTemplateId",""); #Use the userStyle by default
     $setting->add("inboxLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
     $setting->add("inboxViewTemplateId","c8xrwVuu5QE0XtF9DiVzLw");
     $setting->add("inboxViewMessageTemplateId","0n4HtbXaWa_XJHkFjetnLQ");
     $setting->add("inboxSendMessageTemplateId","6uQEULvXFgCYlRWnYzZsuA");
     $setting->add("inboxErrorTemplateId","ErEzulFiEKDkaCDVmxUavw");
-    $setting->add("inboxInvitationErrorTemplateId","5A8Hd9zXvByTDy4x-H28qw");
     $setting->add("inboxMessageConfirmationTemplateId","DUoxlTBXhVS-Zl3CFDpt9g");
+    #Invitations
     $setting->add("inboxManageInvitationsTemplateId","1Q4Je3hKCJzeo0ZBB5YB8g");
+    $setting->add("inboxViewInvitationTemplateId","VBkY05f-E3WJS50WpdKd1Q");
+    $setting->add("inboxInvitationConfirmTemplateId","5A8Hd9zXvByTDy4x-H28qw");
+
+    #Add the settings for the friends module
+    $setting->add("friendsStyleTemplateId",""); #Use the userStyle by default
+    $setting->add("friendsLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
+    $setting->add("friendsViewTemplateId","1Yn_zE_dSiNuaBGNLPbxtw");
+    $setting->add("friendsEditTemplateId","AZFU33p0jpPJ-E6qLSWZng");
+    $setting->add("friendsSendRequestTemplateId","AGJBGviWGAwjnwziiPjvDg");
+    $setting->add("friendsErrorTemplateId","7Ijdd8SW32lVgg2H8R-Aqw");
+    $setting->add("friendsConfirmTemplateId","K8F0j_cq_jgo8dvWY_26Ag");
+    $setting->add("friendsRemoveConfirmTemplateId","G5V6neXIDiFXN05oL-U3AQ");
+
+    #Add the settings for the user module
+    $setting->add("userAccountStyleTemplateId",""); #Use the userStyle by default
+    $setting->add("userAccountLayoutTemplateId","9ThW278DWLV0-Svf68ljFQ");
+
+    #Add the settings for the shop module
+    $setting->add("shopStyleTemplateId",""); #Use the userStyle by default
+    $setting->add("shopLayoutTemplateId","aUDsJ-vB9RgP-AYvPOy8FQ");
 
     #Add inbox changes
     $session->db->write(q{
@@ -179,6 +205,33 @@ sub upgradeAccount {
     $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("work info short","WebGUI");' where profileCategoryId='6'});
     $session->db->write(q{update userProfileCategory set shortLabel='WebGUI::International::get("demographic info short","WebGUI");' where profileCategoryId='7'});
 
+    $session->db->write(q{alter table userProfileData modify publicProfile char(10) default 'none'});
+    $session->db->write(q{update userProfileData set publicProfile='none' where publicProfile='0' || publicProfile is NULL || publicProfile=''});
+    $session->db->write(q{update userProfileData set publicProfile='all' where publicProfile='1'});
+    $session->db->write(q{REPLACE INTO `userProfileField` VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'RadioList','{ all=>WebGUI::International::get(\'public label\',\'Account_Profile\'), friends=>WebGUI::International::get(\'friends only label\',\'Account_Profile\'), none=>WebGUI::International::get(\'private label\',\'Account_Profile\')}','[\"none\"]',8,'4',1,1,0,0,0,'')})
+    
+
+    #Clean up old templates and settings
+    my $oldtemplates = {
+        editUserProfileTemplate      => 'Operation/Profile/Edit',
+        viewUserProfileTemplate      => 'Operation/Profile/View',
+        manageFriendsTemplateId      => 'friends/manage',
+        sendPrivateMessageTemplateId => 'Inbox/SendPrivateMessage',
+        viewInboxTemplateId          => 'Inbox',
+        viewInboxMessageTemplateId   => 'Inbox/Message',
+    };
+
+    foreach my $setting (keys %{$oldtemplates}) {
+        #Remove the setting
+        $session->db->write("delete from settings where name=?",[$setting]);
+        #Remove all the templates with the related namespace
+        my $assets = $session->db->buildArrayRef("select distinct assetId from template where namespace=?",[$oldtemplates->{$setting}]);
+        #Purge the template
+        foreach my $assetId (@{$assets}) {
+            WebGUI::Asset->newByDynamicClass($session,$assetId)->purge;
+        }
+    }
+    
     print "DONE!\n" unless $quiet;
 }
 

@@ -52,6 +52,10 @@ the asset and simply return the url of the first file it finds
 If id is passed in and the isStorageId flag is set, you may pass in filename
 to specify the name of the file you'd like returned.
 
+head3 isImage
+
+If id is passed in and the isImage flag is set, the first image will be returned
+
 =cut
 
 sub process {
@@ -60,11 +64,18 @@ sub process {
     my $id          = shift;
     my $isStorageId = shift;
     my $filename    = shift;
+    my $isImage     = shift;
     my $i18n        = WebGUI::International->new($session, 'Macro_FileUrl');
     
     #Handle storageId case
     if($isStorageId && $id) {
-        my $store = WebGUI::Storage->get($session,$id);
+        my $store = undef;
+        if($isImage) {
+            $store = WebGUI::Storage::Image->get($session,$id);
+        }
+        else {
+            $store = WebGUI::Storage->get($session,$id);
+        }
         $filename = $store->getFiles->[0] unless ($filename);
         return "" unless ($filename);
         return $store->getUrl($filename);
