@@ -15,6 +15,7 @@ use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::TransactionItem;
 use WebGUI::Shop::Pay;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -154,8 +155,14 @@ sub create {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $transactionId = $session->id->generate;
-    $session->db->write('insert into transaction (transactionId, userId, username, dateOfPurchase) values (?,?,?,now())',
-        [$transactionId, $session->user->userId, $session->user->username]);
+    my $cashier = $session->user;
+    my $posUser = $cashier;
+    my $cart = $properties->{cart};
+    if (defined $cart) {
+        $posUser = $cart->getPosUser;
+    }
+    $session->db->write('insert into transaction (transactionId, userId, username, cashierUserId, dateOfPurchase) values (?,?,?,?,now())',
+        [$transactionId, $posUser->userId, $posUser->username, $cashier->userId]);
     my $self = $class->new($session, $transactionId);
     $self->update($properties);
     return $self;
@@ -917,6 +924,7 @@ sub www_view {
         }
         $output .= q{</div>};
     }
+    my $cashier = WebGUI::User->new($session, $transaction->get('cashierUserId'));
     $output .= q{   
         <table class="transactionDetail">
             <tr>
@@ -930,6 +938,9 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("username") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$transaction->get('userId')).q{">}. $transaction->get('username') .q{</a></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("cashier") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$cashier->userId).q{">}. $cashier->username .q{</a></td>
             </tr>
             <tr>
                 <th>}. $i18n->get("amount") .q{</th><td><b>}. sprintf("%.2f", $transaction->get('amount')) .q{</b></td>
@@ -1121,7 +1132,7 @@ sub www_viewMy {
     unless (defined $transaction) {
         $transaction = $class->new($session, $session->form->get('transactionId'));
     }
-    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
+    return $session->privilege->insufficient unless ($transaction->get('userId') eq $session->user->userId || WebGUI::Shop::Admin->new($session)->isCashier);
     my $i18n = WebGUI::International->new($session, 'Shop');
     my ($style, $url) = $session->quick(qw(style url));
     my %var = (

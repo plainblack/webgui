@@ -9,6 +9,36 @@ our $I18N = {
 		context		=> q|vendor label|,
 	},
 
+    'cashier' => {
+        message     => q|Cashier|,
+        lastUpdated    => 0,
+        context        => q|transaction label|,
+    },
+
+    'order for' => {
+        message     => q|Order For|,
+        lastUpdated    => 0,
+        context        => q|cart label, as in "This is an order for John Smith"|,
+    },
+
+    'search for email' => {
+        message     => q|Search for Email Address|,
+        lastUpdated    => 0,
+        context        => q|cart button label|,
+    },
+
+    'who is a cashier' => {
+        message     => q|Who is a cashier?|,
+        lastUpdated    => 0,
+        context        => q|shop admin setting|,
+    },
+
+    'who is a cashier help' => {
+        message     => q|Cashiers are able to make purchases on behalf of another user by typing the email address of the user into the cart.|,
+        lastUpdated    => 0,
+        context        => q|help for shop admin setting|,
+    },
+
     'organization' => {
         message     => q|Organization|,
         lastUpdated    => 0,
@@ -305,6 +335,12 @@ our $I18N = {
 
 	'editButton help' => {
 		message 	=> q|A button that will allow the user to edit an existing address.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
+	'defaultButton help' => {
+		message 	=> q|A button that will allow the user to set an address as a default.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -761,6 +797,12 @@ our $I18N = {
 
 	'delete' => { 
 		message => q|Delete|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
+	'default' => { 
+		message => q|Set Default|,
 		lastUpdated => 0,
 		context => q|a button in the address book|
 	},

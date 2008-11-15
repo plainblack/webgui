@@ -174,6 +174,34 @@ sub getAddresses {
 
 #-------------------------------------------------------------------
 
+=head2 getDefaultAddress ()
+
+Returns the default address for this address book if there is one. Otherwise throws a WebGUI::Error::ObjectNotFound exception.
+
+=cut
+
+sub getDefaultAddress {
+    my ($self) = @_;
+    my $id = $self->get('defaultAddressId');
+    if ($id ne '') {
+        my $address = eval { $self->getAddress($id) };
+        my $e;
+        if ($e = WebGUI::Error->caught('WebGUI::Error::ObjectNotFound')) {
+            $self->update({defaultAddressId=>''});
+            $e->rethrow;
+        }
+        elsif ($e = WebGUI::Error->caught) {
+            $e->rethrow;
+        }
+        else {
+            return $address;
+        }
+    }
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ()
 
 Returns the unique id for this cart.
@@ -288,12 +316,16 @@ Assign the user that owns this address book.
 
 Assign the session, by id, that owns this address book. Will automatically be set to "" if a user owns it.
 
+=head4 defaultAddressId
+
+The id of the address to be made the default for this address book.
+
 =cut
 
 sub update {
     my ($self, $newProperties) = @_;
     my $id = id $self;
-    foreach my $field (qw(userId sessionId)) {
+    foreach my $field (qw(userId sessionId defaultAddressId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     ##Having both a userId and sessionId will confuse create.
@@ -314,6 +346,20 @@ Deletes an address from the book.
 sub www_deleteAddress {
     my $self = shift;
     $self->getAddress($self->session->form->get("addressId"))->delete;
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_defaultAddress ( )
+
+Makes an address be the default.
+
+=cut
+
+sub www_defaultAddress {
+    my $self = shift;
+    $self->update({defaultAddressId=>$self->session->form->get("addressId")});
     return $self->www_view;
 }
 
@@ -467,6 +513,7 @@ sub www_view {
         push(@addresses, {
             %{$address->get},
             address         => $address->getHtmlFormatted,
+            isDefault       => ($self->get('defaultAddressId') eq $address->getId),
             deleteButton    => WebGUI::Form::formHeader($session)
                                 .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
                                 .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteAddress"})
@@ -480,6 +527,13 @@ sub www_view {
                                 .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
                                 .$self->formatCallbackForm($form->get('callback'))
                                 .WebGUI::Form::submit($session, {value=>$i18n->get("edit")})
+                                .WebGUI::Form::formFooter($session),
+            defaultButton      => WebGUI::Form::formHeader($session)
+                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
+                                .WebGUI::Form::hidden($session, {name=>"method", value=>"defaultAddress"})
+                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
+                                .$self->formatCallbackForm($form->get('callback'))
+                                .WebGUI::Form::submit($session, {value=>$i18n->get("default")})
                                 .WebGUI::Form::formFooter($session),
             useButton       => WebGUI::Form::formHeader($session,{action=>$callback->{url}})
                                 .$callbackForm

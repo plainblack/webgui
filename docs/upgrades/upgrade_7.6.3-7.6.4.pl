@@ -32,10 +32,29 @@ my $session = start(); # this line required
 
 migrateSurvey($session);
 addVersionTagMode($session);
+addPosMode($session);
 
 finish($session); # this line required
 
 
+#----------------------------------------------------------------------------
+sub addPosMode {
+    my $session = shift;
+
+    print qq{\tAdding Point of Sale mode to the Shop...} if !$quiet;
+
+    my $db      = $session->db();
+    my $setting = $session->setting();
+
+    $setting->add("groupIdCashier","3");
+    $db->write(q{ALTER TABLE cart drop column couponId});
+    $db->write(q{ALTER TABLE cart add column posUserId char(22) binary});
+    $db->write(q{ALTER TABLE transaction add column cashierUserId char(22) binary});
+    $db->write(q{update transaction set cashierUserId=userId});
+    $db->write(q{ALTER TABLE addressBook add column defaultAddressId char(22) binary});
+
+    print qq{Finished\n} if !$quiet;
+} 
 
 #----------------------------------------------------------------------------
 # This method add support for versionTagMode
@@ -43,7 +62,7 @@ finish($session); # this line required
 sub addVersionTagMode {
     my $session = shift;
 
-    print q{Adding support for versionTagMode...} if !$quiet;
+    print qq{\tAdding support for versionTagMode...} if !$quiet;
 
     my $db      = $session->db();
     my $setting = $session->setting();
@@ -75,12 +94,11 @@ sub addVersionTagMode {
 #
 sub migrateSurvey{
     my $session = shift;
-    print "Migrating surveys to new survey system..." unless $quiet;
+    print "\tMigrating surveys to new survey system..." unless $quiet;
 
     _moveOldSurveyTables($session);
     _addSurveyTables($session);
 
-    print "\n";
 
     my $surveys = $session->db->buildArrayRefOfHashRefs(
         "SELECT * FROM Survey_old s
