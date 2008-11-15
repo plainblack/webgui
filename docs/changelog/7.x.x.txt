@@ -11,6 +11,8 @@
  - fixed #4214: Missing i18n in asset manager
  - fixed #8849: More missing i18n
  - fixed #4182: Edit links show in asset manager for locked assets
+ - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
+ - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
 
 7.6.3
  - improved performance of file uploads
