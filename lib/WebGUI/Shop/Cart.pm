@@ -805,14 +805,15 @@ sub www_view {
         );
 
     # get the shipping address    
-    my $address = eval { $self->getShippingAddress };
-    if (WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+    my $address          = eval { $self->getShippingAddress };
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
         # choose another address cuz we've got a problem
         $self->update({shippingAddressId=>''});
+        
     }
     
     # if there is no shipping address we can't check out
-    if (WebGUI::Error->caught) {
+    if (WebGUI::Error->caught || not defined $address) {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
     }
     
