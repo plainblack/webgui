@@ -266,20 +266,31 @@ sub formField {
     }
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 formProcess ( )
+=head2 formProcess ( [ user ] )
 
 Returns the value retrieved from a form post.
+
+=head3 user
+
+optional user object to process properteis for.  If no use is passed
+in the current user will be used
 
 =cut
 
 sub formProcess {
-    my $self = shift;
-    my $u = shift || $self->session->user;
+    my $self       = shift;
+    my $u          = shift || $self->session->user;
+    my $userId     = $u->userId;
+
     my $properties = $self->formProperties({value => $u->profileField($self->getId)});
-    my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
+    my $result      = $self->session->form->process(
+        $self->getId,
+        $self->get("fieldType"),
+        WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")),
+        $properties
+    );
     if (ref $result eq "ARRAY") {
         my @results = @$result;
         for (my $count=0;$count<scalar(@results);$count++) {
@@ -289,6 +300,7 @@ sub formProcess {
     } else {
         $result = WebGUI::HTML::filter($result, "javascript");
     }
+    
     return $result;
 }
 
@@ -394,7 +406,7 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "edit
 sub getEditableFields {
     my $class = shift;
     my $session = shift;
-    return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1");
+    return $class->_listFieldsWhere($session, "c.editable=1 AND (f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1)");
 }
 
 #-------------------------------------------------------------------
@@ -467,6 +479,29 @@ sub getPasswordRecoveryFields {
 
 #-------------------------------------------------------------------
 
+=head2 isDuplicate( fieldValue )
+
+Checks the value of the field to see if it is duplicated in the system.  Returns true of false.
+
+=head3 fieldValue
+
+value to check for duplicates against
+
+=cut
+
+sub isDuplicate {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $fieldId   = $self->getId;
+    my $value     = shift;
+
+    my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
+    my $duplicate = $session->db->quickScalar($sql,[$value, $session->user->userId]);
+    return ($duplicate > 0);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isEditable ( )
 
 Returns a boolean indicating whether this field may be editable by a user.
@@ -503,6 +538,30 @@ Returns a boolean indicating whether this field is required when a user creates 
 sub isRequired {
         my $self = shift;
         return $self->get("required");
+}
+
+#-------------------------------------------------------------------
+
+=head2 isValid ( [fieldValue] )
+
+Validates the profile field returning true (1) if valid or false(1) if false
+
+=head3 fieldValue
+
+value to validate the field against
+
+=cut
+
+sub isValid {
+	my $self       = shift;
+    my $fieldValue = shift;
+
+    #If the field value is an array ref, set the value to the first element
+    if(ref $fieldValue eq "ARRAY") {
+        $fieldValue = $fieldValue->[0];
+    }
+        
+	return !$self->isRequired || ($self->isRequired && $fieldValue ne "");
 }
 
 #-------------------------------------------------------------------

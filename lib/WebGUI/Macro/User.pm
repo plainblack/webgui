@@ -18,22 +18,39 @@ Package WebGUI::Macro::User
 
 =head1 DESCRIPTION
 
-Macro for displaying information from the current User's profile.
+Macro for displaying information from the a User's profile.
 
-=head2 process( field )
+=head2 process( field [, userId] )
 
-process takes a single parameter, the name of a field in the current user's User Profile from
-the data stored in $session .  If the field does not exist, undef is returned.
+This macro tries to return the profile field passed in for the user
+passed in.  If not user is passed in, the current user in session
+will be used.  
+
+=head3 field
+
+field to return
+
+=head3 userId
+
+optional userId of the user to return the field for.  If this field is
+empty, the profile field for the default user will be returned
 
 =cut
 
 #-------------------------------------------------------------------
 sub process {
-	my $session = shift;
-	return  $session->user->profileField(shift);
+	my $session    = shift;
+    my $field      = shift;
+    my $userId     = shift;
+
+    return undef unless ($field);
+    
+    my $user       = ($userId)
+                   ? WebGUI::User->new($session,$userId)
+                   : $session->user
+                   ;
+
+	return  $user->profileField($field);
 }
 
-
 1;
-
-

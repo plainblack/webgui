@@ -151,6 +151,61 @@ sub getAllPendingAddRequests {
 
 #-------------------------------------------------------------------
 
+=head2 getNextInvitation ( invitation ) 
+
+Returns the invitation that was sent to the user just after the invitation passed in.
+
+=cut
+
+sub getNextInvitation {
+    my $self       = shift;
+    my $invitation = shift;
+
+    my $sql = q{
+        select
+            *
+        from
+            friendInvitations
+        where
+            friendId = ?
+            and dateSent > ?
+        order by dateSent asc
+        limit 1
+    };
+    my $bindvars = [$self->user->userId,$invitation->{dateSent}];
+    return $self->session->db->quickHashRef($sql,$bindvars);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getPreviousInvitation ( invitation ) 
+
+Returns the invitation that was sent to the user just before the invitation passed in.
+
+=cut
+
+sub getPreviousInvitation {
+    my $self       = shift;
+    my $invitation = shift;
+
+    my $sql = q{
+        select
+            *
+        from
+            friendInvitations
+        where
+            friendId = ?
+            and dateSent < ?
+        order by dateSent desc
+        limit 1
+    };
+    my $bindvars = [$self->user->userId,$invitation->{dateSent}];
+    return $self->session->db->quickHashRef($sql,$bindvars);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isFriend ( userId )
 
 Returns a booelean indicating whether the userId is already a friend of this user.
@@ -193,7 +248,7 @@ sub isInvited {
             inviterId = ?
             and friendId = ?
     },
-    [$session->user->userId,$userId]);
+    [$self->user->userId,$userId]);
 
     return $isInvited;    
 }
@@ -268,12 +323,19 @@ The user to invite to be a friend.
 
 The message to lure them to accept.
 
+=head inviteUrl
+
+The url to view the friend request
+
 =cut
 
 sub sendAddRequest {
-    my $self = shift;
-    my $userId = shift;
-    my $comments = shift;
+    my $self       = shift;
+    my $userId     = shift;
+    my $comments   = shift;
+    my $url        = $self->session->url;
+    my $inviteUrl  = shift || $url->append($url->getSiteURL,'op=account');
+
     my $i18n = WebGUI::International->new($self->session, "Friends");
 
     # No sneaky attack paths...
@@ -281,7 +343,9 @@ sub sendAddRequest {
 
     # Create the invitation url.
     my $inviteId = $self->session->id->generate();
-    my $inviteUrl = $self->session->url->append($self->session->url->getSiteURL, 'op=friendRequest;inviteId='.$inviteId);
+    
+    $inviteUrl = $url->append($inviteUrl,'inviteId='.$inviteId);
+
     # Build the message
     my $messageText = sprintf $i18n->get("invitation approval email"), $self->user->getWholeName, $self->session->url->getSiteURL, $comments, $inviteUrl;
 

@@ -17,6 +17,7 @@ package WebGUI::VersionTag;
 use strict;
 use WebGUI::Asset;
 use WebGUI::Workflow::Instance;
+use WebGUI::DateTime;
 
 =head1 NAME
 

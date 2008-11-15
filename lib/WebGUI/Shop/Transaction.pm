@@ -526,7 +526,11 @@ Displays the default thank you page.
 sub thankYou {
     my ($self) = @_;
     my $i18n = WebGUI::International->new($self->session,'Shop');
-    return $self->www_viewMy($self->session, $self, $i18n->get('thank you message'));
+
+    #Otherwise wrap the template into the account layout
+    my $args     = [$self,$i18n->get('thank you message')];
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"shop");
+    return $instance->displayContent($instance->callMethod("viewTransaction",$args));
 }
 
 

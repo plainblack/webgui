@@ -179,6 +179,20 @@ sub getLabel {
 
 #-------------------------------------------------------------------
 
+=head2 getShortLabel ( )
+
+Returns the eval'd label for this category.
+
+=cut
+
+sub getShortLabel {
+    my $self = shift;
+    return WebGUI::Operation::Shared::secureEval($self->session,$self->get("shortLabel"));
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 hasProtected ( )
 
 Returns a boolean indicating whether any of the category's fields are protected.
@@ -332,6 +346,10 @@ A hash reference containing the properties to be updated.
 
 A perl structure that will return a scalar. Defaults to 'Undefined'.
 
+=head4 shortLabel
+
+A perl structure that will return a scalar.  Defaults to 'Undefined'.
+
 =head4 visible
 
 A boolean indicating whether the fields in this category should be visible when a user views a user's profile.
@@ -353,6 +371,7 @@ sub set {
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
 	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
+    $properties->{shortLabel} = 'Undefined' if ($properties->{shortLabel} =~ /^[\"\']*$/);
 	$properties->{profileCategoryId} = $self->getId;
 	$self->session->db->setRow("userProfileCategory","profileCategoryId",$properties);
 }

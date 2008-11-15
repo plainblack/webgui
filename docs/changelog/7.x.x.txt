@@ -1,5 +1,10 @@
 7.6.4
  - Brand new Survey system.  Make sure to export your old results as they will
+ - New pluggable framework added for cutsomizing WebGUI's Account system
+ - New Profile Account module added providing a better interface for users to view and update their profile
+ - New Inbox Account module added providing a better interface into WebGUI's various messaging systems
+ - New Friends Account module added providing a better interface into WebGUI's friends system
+ - The Display Account and My Purchases interfaces have been added to the new Account system
    not be imported, only the surveys themselves.
  - Made syndicated content asset use cache.
  - Added Cashier/Point of Sale mode for the Shop.

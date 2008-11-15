@@ -241,33 +241,6 @@ sub definition {
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
 	# messaging settings
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxTemplateId",
-		label=>$i18n->get('view inbox template'),
-		hoverHelp=>$i18n->get('view inbox template description'),
-		namespace=>"Inbox",
-		defaultValue=>$setting->get("viewInboxTemplateId"),
-		});
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxMessageTemplateId",
-		label=>$i18n->get('view inbox message template'),
-		hoverHelp=>$i18n->get('view inbox message template description'),
-		namespace=>"Inbox/Message",
-		defaultValue=>$setting->get("viewInboxMessageTemplateId"),
-		});    
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"sendPrivateMessageTemplateId",
-		label=>$i18n->get('send private message template'),
-		hoverHelp=>$i18n->get('send private message template description'),
-		namespace=>"Inbox/SendPrivateMessage",
-		defaultValue=>$setting->get("sendPrivateMessageTemplateId"),
-		});    
 	push(@fields, {
 		tab=>"messaging",
 		fieldType=>"text",
@@ -458,15 +431,6 @@ sub definition {
 		namespace=>"userInvite/Email",
 		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
 		});    
-    push(@fields, {
-        tab             => "user",
-        fieldType       => "template",
-        defaultValue    => "managefriends_________",
-        namespace       => "friends/manage",
-        name            => "manageFriendsTemplateId",
-        label           => $i18n->get("manage friends template", "Friends"),
-        hoverHelp       => $i18n->get("manage friends template help", "Friends"),
-        });
     push @fields, {
         tab             => "user",
         name            => "showMessageOnLogin",
@@ -498,24 +462,6 @@ sub definition {
         label           => $i18n->get( 'showMessageOnLoginBody label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
         defaultValue    => $setting->get('showMessageOnLoginBody'),
-    };
-    push @fields, {
-        tab             => "user",
-        name            => 'viewUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/View',
-        label           => $i18n->get( 'user profile view template' ),
-        hoverHelp       => $i18n->get( 'user profile view template description' ),
-        defaultValue    => $setting->get('viewUserProfileTemplate'),
-    };
-    push @fields, {
-        tab             => "user",
-        name            => 'editUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/Edit',
-        label           => $i18n->get( 'user profile edit template' ),
-        hoverHelp       => $i18n->get( 'user profile edit template description' ),
-        defaultValue    => $setting->get('editUserProfileTemplate'),
     };
 	# auth settings 
    	my $options;
@@ -618,6 +564,7 @@ sub www_editSettings {
         ui          => { label => $i18n->get("ui") },
         messaging   => { label => $i18n->get("messaging") },
         misc        => { label => $i18n->get("misc") },
+        account     => { label => $i18n->get("account settings tab")},
         user        => { label => $i18n->get("user") },
         auth        => { label => $i18n->get("authentication") },
         perms       => { label => $i18n->get("permissions") },
@@ -641,6 +588,38 @@ sub www_editSettings {
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,1);
 		$tabform->getTab("auth")->raw($authInstance->editUserSettingsForm);
 		$tabform->getTab("auth")->fieldSetEnd;
+	}
+
+     # Get fieldsets for avaiable account methods
+    my $accountConfigs = $session->config->get("account");
+
+	foreach my $account (@{$accountConfigs}) {
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+        if ( $@ ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        
+        #Get the content of the settings form from the instance
+        my $settingsForm = eval { $instance->editSettingsForm };
+        if( $@ ) {
+            $session->log->warn("Error calling editSettingsForm in $className...skipping : ".$@);
+            next;
+        }
+
+        #If editUserSettingsForm is empty, skip it
+        next if $settingsForm eq "";
+
+        #Set the title of the fieldset
+        my $title = $account->{title};
+        WebGUI::Macro::process($title);
+
+        #Print the settings form for this account pluggin
+		$tabform->getTab("account")->fieldSetStart($title);
+		$tabform->getTab("account")->raw($settingsForm);
+		$tabform->getTab("account")->fieldSetEnd;
 	}
 
 	$tabform->submit();
@@ -681,6 +660,26 @@ sub www_saveSettings {
             push @errors, @{ $authErrors };
         }
     }
+
+    # Save account pluggin settings
+    my $accountConfigs = $session->config->get("account");
+	foreach my $account (@{$accountConfigs}) {
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+
+        if ( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        #Save the settings
+        eval { $instance->editSettingsFormSave };
+        
+        if( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Error calling editSettingsFormSave in $className...skipping : ".$e->error);
+            next;
+        }
+	}
 
     ### Handle special settings
     # Reset login message seen numbers

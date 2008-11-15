@@ -270,7 +270,7 @@ Password entered by the user.  This is only used in for sending the user a notif
 
 =head3 profile
 
-Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData($self->session)
+Hashref of profile values returned by the function WebGUI::User::validateProfileDataFromForm($fields);
 
 =cut
 
@@ -290,8 +290,8 @@ sub createAccountSave {
 	$u->username($username);
 	$u->authMethod($self->authMethod);
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	WebGUI::Operation::Profile::saveProfileFields($self->session,$u,$profile) if($profile);
-	$self->saveParams($userId,$self->authMethod,$properties);
+	$u->updateProfileFields($profile) if ($profile);
+    $self->saveParams($userId,$self->authMethod,$properties);
 
 	if ($self->getSetting("sendWelcomeMessage")){
 		my $authInfo = "\n\n".$i18n->get(50).": ".$username;
@@ -460,10 +460,10 @@ Array ref of template vars from subclass
 =cut
 
 sub displayAccount {
-	my $self = shift;
-	my $method = $_[0];
-	my $vars = $_[1];
-
+	my $self   = shift;
+	my $method = shift;
+	my $vars   = shift;
+    
 	my $i18n = WebGUI::International->new($self->session);
 	$vars->{title} = $i18n->get(61);
 
@@ -477,8 +477,21 @@ sub displayAccount {
 	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
 	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
 
-	$vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
-	return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    #Appends 'account.options' loop along with some new links
+    WebGUI::Account->appendAccountLinks($self->session,$vars);
+    
+    ########### ACCOUNT SHUNT
+    #The following is a shunt which allows the displayAccount page to be displayed in the
+    #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
+    my $output = WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    #If the account system is calling this method, just return the template
+    my $op = $self->session->form->get("op");
+    if($op eq "account") {
+        return $output;
+    }
+    #Otherwise wrap the template into the account layout
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"user");
+    return $instance->displayContent($output,1);
 }
 
 #-------------------------------------------------------------------

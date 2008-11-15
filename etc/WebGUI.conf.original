@@ -609,7 +609,64 @@
       "category" : "utilities"
    }
 },
-   
+
+# 
+# Specify the list of account pluggins available on your site.
+# Account pluggins are returned on the site in the order they are list in the config file
+# Each pluggin has serveral properties
+#
+#   identifier  - This string will act as the identifying agent for this account pluggin.  It is passed along
+                  the url and cannot contain spaces.
+#   title       - The title of the module which is displayed on the website.
+#   className   - The class which drives this module
+
+#
+# IMPORTANT NOTE - PLEASE READ:
+# 
+# DO NOT DELETE THE WebGUI::Account::User pluggin from this list.  This module
+# is Deprecated on release and is mandatory for every site.  You may move it's position
+# but if you remove it you will break WebGUI's Authentication System.  This module will
+# be replaced in WebGUI 8 once the APIs can be broken and the Account portion of Auth
+# can be moved into the Account system
+#
+# A profile module is required as well.  You may replace the default profile
+# module with a custom version, but many systems in WebGUI rely on being
+# able to display a user's profile.
+#
+
+"account" : [
+    {
+        identifier : "profile",
+        title      : "^International(title,Account_Profile);",
+        className  : "WebGUI::Account::Profile"
+    },
+    {
+        identifier : "inbox",
+        title      : "^International(title,Account_Inbox);",
+        className  : "WebGUI::Account::Inbox"
+    },
+    {
+        identifier : "friends",
+        title      : "^International(title,Account_Friends);",
+		className  : "WebGUI::Account::Friends"
+    },
+    {
+        identifier : "shop",
+        title      : "^International(title,Account_Shop);",
+		className  : "WebGUI::Account::Shop"
+    },
+    {
+        identifier : "user",
+        title      : "^International(title,Account_User);",
+		className  : "WebGUI::Account::User"
+    },
+],
+
+# Specify which of the modules in the above list is used
+# to display the user's profile.  This is a mandatory configuration
+
+"profileModuleIdentifier" : "profile",
+
 # Optionally add a "Save and Commit" button to assets so that you
 # don't have to hit "Commit My Changes" seperately.
 

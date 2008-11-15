@@ -188,6 +188,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'home info short' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
+
 	'118' => {
 		message => q|Anonymous Registration|,
 		lastUpdated => 1031514049
@@ -242,6 +247,16 @@ our $I18N = {
 		message => q|Statistics|,
 		lastUpdated => 1031514049,
                 context => q|Title of the statistics viewer for the admin console.|
+	},
+
+    'required error' => {
+		message => q{%s is required.},
+		lastUpdated => 1031514049
+	},
+
+    'language not available error' => {
+		message => q|%s is not available.  Please select another language|,
+		lastUpdated => 1031514049
 	},
 
 	'451' => {
@@ -325,7 +340,7 @@ our $I18N = {
 	},
 
 	'861' => {
-		message => q|Make profile public?|,
+		message => q|Profile Privacy Setting|,
 		lastUpdated => 1043879954
 	},
 
@@ -604,6 +619,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'demographic info short' => {
+		message => q|Demographic|,
+        lastUpdated => 1031514049
+	},
+
 	'77' => {
 		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
 %sToo<br />
@@ -834,6 +854,11 @@ to add or remove users from their groups.
 		message => q|Preferences|,
 		lastUpdated => 1031514049
 	},
+
+    'preferences short' => {
+ 		message => q|Preferences|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'1026' => {
 		message => q|Allow rich edit?|,
@@ -1248,6 +1273,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 		lastUpdated => 1031514049
 	},
 
+    'misc info short' => {
+		message => q|Miscellaneous|,
+		lastUpdated => 1031514049
+	},
+
 	'967' => {
 		message => q|Empty everyone's trash.|,
 		lastUpdated => 1208022779
@@ -1515,6 +1545,11 @@ sent in HTML format. No attachments can be included.|,
 		message => q|Work Information|,
 		lastUpdated => 1031514049
 	},
+
+    'work info short' => {
+		message => q|Work|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'429' => {
 		message => q|Login Time|,
@@ -1906,6 +1941,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1031514049
 	},
 
+    'contact info short' => {
+		message => q|Contact Info|,
+		lastUpdated => 1031514049
+	},
+
 	'230' => {
 		message => q|Message|,
 		lastUpdated => 1031514049
@@ -2246,6 +2286,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		message => q|Personal Information|,
 		lastUpdated => 1031514049
 	},
+
+    'personal info short' => {
+		message => q|Personal|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'317' => {
 		message => q|<a href="http://www.icq.com">ICQ</a> UIN|,
@@ -3229,6 +3274,12 @@ a user.|,
 		lastUpdated => 1118941685,
 	},
 
+    'account settings tab' => {
+		message => q|Account|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the account settings in WebGUI Settings.|
+	},
+
 	'account' => {
 		message => q|Account|,
 		lastUpdated => 1098327046,
@@ -3532,6 +3583,11 @@ LongTruncOk=1</p>
     'private message status read' => {
         message => q|Read|,
 		lastUpdated => 1181019679,
+    },
+
+    'inbox message status active' => {
+        message => q|Active|,
+		lastUpdated => 1181019679,    
     },
 
     'private message prev label' => {

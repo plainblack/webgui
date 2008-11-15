@@ -847,7 +847,7 @@ sub www_saveUserPrefs {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
-		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($self->session,$data{$field->getId})) {
+        if ($field->getId eq 'email' && $field->isDuplicate($data{$field->getId})) {
 			return '<li>'.$i18n->get(1072).'</li>';
 		}
 		if ($field->isRequired && !$data{$field->getId}) {

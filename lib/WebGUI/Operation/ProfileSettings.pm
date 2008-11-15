@@ -169,6 +169,12 @@ sub www_editProfileCategory {
 		-hoverHelp => $i18n->get('470 description'),
 		-value => $data->{label},
 	);
+    $f->text(
+		-name      => "shortLabel",
+		-label     => $i18n->get('category short name'),
+		-hoverHelp => $i18n->get('category short name description'),
+		-value     => $data->{shortLabel},
+	);
 	$f->yesNo(
                 -name=>"visible",
                 -label=>$i18n->get(473),
@@ -198,10 +204,11 @@ sub www_editProfileCategorySave {
 	my $session = shift;
         return $session->privilege->adminOnly() unless canView($session);
 	my %data = (
-		label=>$session->form->text("label"),
-		visible=>$session->form->yesNo("visible"),
-		editable=>$session->form->yesNo("editable"),
-		);
+		label      => $session->form->text("label"),
+        shortLabel => $session->form->text("shortLabel"),
+		visible    => $session->form->yesNo("visible"),
+		editable   => $session->form->yesNo("editable"),
+	);
 	if ($session->form->process("cid") eq "new") {
 		my $category = WebGUI::ProfileCategory->create($session,\%data);
 	} else {

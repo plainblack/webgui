@@ -77,10 +77,11 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $self = shift;
-	my $override = shift;
+	my $self          = shift;
+	my $override      = shift;
+    my $noAdmin       = shift;
 	$self->{_groupId} = $self->session->db->setRow("groups","groupId", $self->_defaults, $override);
-	$self->addGroups([3]);
+	$self->addGroups([3]) unless ($noAdmin);
 }
 
 
@@ -850,7 +851,30 @@ u.expires > $time AND
 	( $scratchClause )
 EOQ
 	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
-}	
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUserList ( [ withoutExpired ] )
+
+Returns a hash reference with key of userId and value of username for users in the group
+
+=head3 withoutExpired
+
+A boolean that if set to true will return only the groups that the user is in where
+their membership hasn't expired.
+
+=cut
+
+sub getUserList {
+	my $self = shift;
+	my $withoutExpired = shift;
+	my $expireTime = 0;
+	if ($withoutExpired) {
+		$expireTime = $self->session->datetime->time();
+	}
+	return $self->session->db->buildHashRef("select users.userId, users.username from users join groupings using(userId) where expireDate > ? and groupId = ? order by username asc", [$expireTime, $self->getId]);
+}
 
 #-------------------------------------------------------------------
 
@@ -1050,10 +1074,9 @@ sub name {
         return $self->get("groupName");
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 new ( session, groupId [, overrideId ] )
+=head2 new ( session, groupId [, overrideId, noAdmin ] )
 
 Constructor.
 
@@ -1069,6 +1092,10 @@ The groupId of the group you're creating an object reference for. If specified a
 
 If you specified "new" for groupId, you can use this property to specify an id you wish to create, rather than having the system generate one for you.
 
+=head3 noAdmin
+
+If you specified "new" for groupId, you can use this property to specify that you do not wish the admin user or group to be added to the group
+
 =cut
 
 sub new {
@@ -1078,13 +1105,14 @@ sub new {
     $self->{_session}   = shift;
 	$self->{_groupId}   = shift;
 	my $override        = shift;
+    my $noAdmin         = shift;
 
     my $cached = $self->{_session}->stow->get("groupObj", { noclone => 1});
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 
 	bless $self, $class;
         if ($self->{_groupId} eq "new") {
-		$self->_create($override);
+		$self->_create($override,$noAdmin);
 	}
 	elsif ($self->{_groupId} eq "") {
 		$self->{_group} = $self->_defaults();
@@ -1105,6 +1133,7 @@ sub new {
 	$self->{_session}->stow->set("groupObj", $cached);
 	return $self;
 }
+
 
 #-------------------------------------------------------------------
 

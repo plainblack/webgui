@@ -17,6 +17,16 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'category short name' => {
+        message => q|Category Short Name|,
+        lastUpdated => 1031514049
+	},
+
+    'category short name description' => {
+        message => q|The short name of the this category.|,
+        lastUpdated => 1122315199,
+    },
+
 	'475' => {
 		message => q|Field Name|,
 		lastUpdated => 1031514049

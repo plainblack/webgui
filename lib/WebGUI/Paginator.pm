@@ -483,9 +483,10 @@ sub getPageLinks {
 		if ($i+1 == $pn) {
 			push @pages, $i+1;
 			push @pages_loop, { 
-                "pagination.url"    => '', 
-                "pagination.text"   => $i+1,
-                'pagination.range'  => ($first+1) . "-" . ($last+1),
+                "pagination.url"        => '', 
+                "pagination.text"       => $i+1,
+                'pagination.range'      => ($first+1) . "-" . ($last+1),
+                'pagination.activePage' => "true",
             };
 		} else {
 			push @pages, '<span><a href="'.$self->session->url->append($self->{_url},($self->{_formVar}.'='.($i+1))).'"'.$altTag.'>'.($i+1).'</a></span>';

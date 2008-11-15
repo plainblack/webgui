@@ -229,7 +229,17 @@ sub createAccountSave {
         }
     }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
-    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session, {regOnly => 1});
+
+    my $fields    = WebGUI::ProfileField->getRegistrationFields($session);
+    my $retHash   = $self->user->validateProfileDataFromForm($fields);
+    my $profile   = $retHash->{profile};
+    my $temp      = "";
+    my $warning   = "";
+
+    my $format    = "<li>%s</li>";
+    map { $warning .= sprintf($format,$_)  } @{$retHash->{warnings}};
+    map { $temp    .= sprintf($format,$_)  } @{$retHash->{errors}};
+
     $error .= $temp;
      
     unless ($error eq "") {
