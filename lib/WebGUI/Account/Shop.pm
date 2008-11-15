@@ -224,7 +224,6 @@ sub www_viewTransaction {
     return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
 
     my $i18n          = WebGUI::International->new($session, 'Shop');
-    my $i18n          = WebGUI::International->new($session, 'Shop');
     my ($style, $url) = $session->quick(qw(style url));
     
     my %var = (

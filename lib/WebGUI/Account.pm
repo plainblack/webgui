@@ -77,9 +77,6 @@ sub appendAccountLinks {
         });
 	}
 
-    #Pluggin - delete eventually	
-    push(@array, {'options.display' => '<a href="'.$session->url->page('shop=transaction;method=manageMy').'">'.$i18n->get('my purchases', 'Shop').'</a>'});
-	
     #Pluggin - delete eventually
     if ($session->setting->get('userInvitationsEnabled')) {
         push @array, {
