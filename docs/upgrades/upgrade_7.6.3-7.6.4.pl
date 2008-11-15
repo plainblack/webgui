@@ -23,6 +23,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::Wobject::Survey;
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use WebGUI::ProfileField;
 
 my $toVersion = '7.6.4';
 my $quiet; # this line required
@@ -69,9 +70,34 @@ sub addVersionTagMode {
 
 
     $db->write(q{ALTER TABLE `assetVersionTag` ADD `isSiteWide` BOOL NOT NULL DEFAULT '0'});
-    $db->write(q|INSERT INTO `userProfileField` (`fieldName`, `label`, `visible`, `required`, `fieldType`, `possibleValues`, `dataDefault`, `sequenceNumber`, `profileCategoryId`, `protected`, `editable`, `forceImageOnly`, `showAtRegistration`, `requiredForPasswordRecovery`) VALUES ('versionTagMode', 'WebGUI::International::get("version tag mode","WebGUI");', 1, 1, 'selectBox', '{\r\n    inherited     => WebGUI::International::get("versionTagMode inherited"),\r\n    multiPerUser  => WebGUI::International::get("versionTagMode multiPerUser"),\r\n    singlePerUser => WebGUI::International::get("versionTagMode singlePerUser"),\r\n    siteWide      => WebGUI::International::get("versionTagMode siteWide"),\r\n    autoCommit    => WebGUI::International::get("versionTagMode autoCommit"),\r\n}', 'inherited', 12, 0x34, 0, 1, 1, 0, 0)|);
 
-    $db->write(q{INSERT INTO `settings` ( `name` , `value` ) VALUES ('versionTagMode', '')});
+    ##Use the API...
+    my $newField = WebGUI::ProfileField->create(
+        $session,
+        'versionTagMode',
+        {
+            label    => 'WebGUI::International::get("version tag mode","WebGUI");',
+            visible  => 1,
+            required => 0,
+            protected => 1,
+            editable  => 1,
+            forceImageOnly => 0,
+            requiredForPasswordRecovery => 0,
+            fieldType => 'selectBox',
+            possibleValues => q|
+{
+    inherited     => WebGUI::International::get("versionTagMode inherited"),
+    multiPerUser  => WebGUI::International::get("versionTagMode multiPerUser"),
+    singlePerUser => WebGUI::International::get("versionTagMode singlePerUser"),
+    siteWide      => WebGUI::International::get("versionTagMode siteWide"),
+    autoCommit    => WebGUI::International::get("versionTagMode autoCommit"),
+}
+|,
+            dataDefault => 'inherited',
+        }
+    );
+    $newField->setCategory(4);
+    $setting->add('versionTagMode', '');
 
     # Keep autoRequestCommit if enabled
     my $versionTagMode    = q{multiPerUser};
@@ -80,7 +106,7 @@ sub addVersionTagMode {
     }
     $setting->set('versionTagMode', $versionTagMode);
 
-    $db->write(q{DELETE FROM `settings` WHERE `name` = 'autoRequestCommit'});
+    $setting->remove('autoRequestCommit');
 
     print qq{Finished\n} if !$quiet;
 
