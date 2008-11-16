@@ -233,12 +233,14 @@ form.
 # And refactor to not require all these arguments HERE but rather in the 
 # constructor or something...
 sub formField {
-    my $self = shift;
-    my $properties = $self->formProperties(shift);
-    my $withWrapper = shift;
-    my $u = shift || $self->session->user;
-    my $skipDefault = shift;
+    my $self          = shift;
+    my $session       = $self->session;
+    my $properties    = $self->formProperties(shift);
+    my $withWrapper   = shift;
+    my $u             = shift || $session->user;
+    my $skipDefault   = shift;
     my $assignedValue = shift;
+    
     if ($skipDefault) {
         $properties->{value} = undef;
     }
@@ -248,21 +250,21 @@ sub formField {
     else {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
-        # use submitted data if it exists
-        if ($self->formProcess($u) != $self->get('dataDefault')) {
+        #If the fieldId is actually found in the request, try to process the form
+        if ($session->form->param($self->getId)) {
             $properties->{value} = $self->formProcess($u);
         }
-        # fall back on default
+        #If no value is set, go with the default value
         if(!defined $properties->{value}) {
-            $properties->{value} = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
+            $properties->{value} = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
         }
     }
     if ($withWrapper == 1) {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtmlWithWrapper;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtmlWithWrapper;
     } elsif ($withWrapper == 2) {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->getValueAsHtml;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->getValueAsHtml;
     } else {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtml;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtml;
     }
 }
 
@@ -283,8 +285,8 @@ sub formProcess {
     my $self       = shift;
     my $u          = shift || $self->session->user;
     my $userId     = $u->userId;
-
-    my $properties = $self->formProperties({value => $u->profileField($self->getId)});
+    
+    my $properties  = $self->formProperties({value => $u->profileField($self->getId)});
     my $result      = $self->session->form->process(
         $self->getId,
         $self->get("fieldType"),
