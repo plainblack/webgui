@@ -693,7 +693,6 @@ sub getRecordTemplateVars {
             "form"          => $form->toHtml,
             "name"          => $field->{name},
             "tid"           => $field->{tabId},
-            "inTab".$field->{tabId} => 1,
             "value"         => $form->getValueAsHtml,
             "label"         => $field->{label},
             "isMailField"   => $field->{isMailField},
@@ -703,6 +702,7 @@ sub getRecordTemplateVars {
             "subtext"       => $field->{subtext},
             "type"          => $field->{type},
             "controls"      => $self->_fieldAdminIcons($field->{name}),
+            "inTab"         => ($field->{tabId} ? 1 : 0),
         );
         my %fieldLoopEntry;
         my %tabLoopEntry;
