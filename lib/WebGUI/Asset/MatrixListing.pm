@@ -16,7 +16,9 @@ package WebGUI::Asset::MatrixListing;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::Asset';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
+#use base 'WebGUI::Asset';
 use WebGUI::Utility;
 
 
@@ -53,7 +55,7 @@ These methods are available from this class:
 
 sub addRevision {
 	my $self = shift;
-	my $newSelf = $self->SUPER::addRevision(@_);
+	my $newSelf = $self->next::method(@_);
 	return $newSelf;
 }
 
@@ -109,6 +111,11 @@ sub definition {
             defaultValue    =>undef,
             label           =>$i18n->get("version label"),
             hoverHelp       =>$i18n->get("version description")
+            },
+        score => {
+            defaultValue    =>0,
+            autoGenerate    =>0,
+            noFormPost      =>1,
             },
         views => {
             defaultValue    =>0,
@@ -182,7 +189,7 @@ sub definition {
 		className=>'WebGUI::Asset::MatrixListing',
 		properties=>\%properties
 	});
-	return $class->SUPER::definition($session, $definition);
+	return $class->next::method($session, $definition);
 }
 
 
@@ -198,7 +205,7 @@ sub definition {
 
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = $self->next::method(@_);
 	return $newAsset;
 }
 
@@ -229,7 +236,7 @@ sub getEditForm {
     my $session     = $self->session;
     my $db          = $session->db;
     my $matrixId    = $self->getParent->getId;
-    my $tabform     = $self->SUPER::getEditForm();
+    my $tabform     = $self->next::method();#SUPER::getEditForm();
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
 
     #$self->session->style->setScript($self->session->url->extras('FileUploadControl.js'), {type =>'text/javascript'});
@@ -339,7 +346,7 @@ Making private. See WebGUI::Asset::indexContent() for additonal details.
 
 sub indexContent {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->next::method;
 	$indexer->setIsPublic(0);
 }
 
@@ -354,7 +361,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	$self->next::method();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get('detailTemplateId'));
     $template->prepare;
 	$self->{_viewTemplate} = $template;
@@ -372,18 +379,26 @@ Used to process properties from the form posted.
 sub processPropertiesFromFormPost {
 	my $self    = shift;
     my $session = $self->session;
+    my $score   = 0;
 
-	$self->SUPER::processPropertiesFromFormPost;
+	$self->next::method(@_);#SUPER::processPropertiesFromFormPost;
 
     my $attributes = $session->db->read("select * from Matrix_attribute where assetId = ?",[$self->getParent->getId]);
     while (my $attribute = $attributes->hashRef) {
         my $name = 'attribute_'.$attribute->{attributeId};
-        #my $value = $session->form->process($name);
-        my $value = $session->form->process($name,$attribute->{fieldType},$attribute->{defaultValue},$attribute);
+        my $value;
+        if ($attribute->{fieldType} eq 'MatrixCompare'){
+            $value = $session->form->process($name);
+            $score = $score + $value;
+        }
+        else{
+            $value = $session->form->process($name,$attribute->{fieldType},$attribute->{defaultValue},$attribute);
+        }
         $session->db->write("replace into MatrixListing_attribute (matrixId, matrixListingId, attributeId, value) 
             values (?, ?, ?, ?)",
             [$self->getParent->getId,$self->getId,$attribute->{attributeId},$value]);
     }
+    $self->update({score => $score});    
 
     $self->requestAutoCommit;
 }
@@ -407,7 +422,7 @@ sub purge {
     $db->write("delete from MatrixListing_rating        where listingId=?"      ,[$self->getId]);
     $db->write("delete from MatrixListing_ratingSummary where listingId=?"      ,[$self->getId]);
 
-	return $self->SUPER::purge;
+	return $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -420,7 +435,7 @@ This method is called when data is purged by the system.
 
 sub purgeRevision {
 	my $self = shift;
-	return $self->SUPER::purgeRevision;
+	return $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -495,6 +510,7 @@ sub view {
     	$var->{emailSent}       = 1;
     }
     $var->{controls}            = $self->getToolbar;
+    $var->{comments}            = $self->getFormattedComments(),
     $var->{productName}         = $var->{title};
     $var->{lastUpdated_epoch}   = $self->get('lastUpdated');
     $var->{lastUpdated_date}    = $self->session->datetime->epochToHuman($self->get('lastUpdated'),"%z");
@@ -536,8 +552,57 @@ sub view {
         my $storage = $file->getStorageLocation;
         my @files = @{ $storage->getFiles } if (defined $storage);
         if (scalar(@files)) {
-            $var->{screenshots} = $file->getFilePreview($storage);
+            #$var->{screenshots} = $file->getFilePreview($storage);
         }
+        $var->{screenshots} = qq|
+<script language="javascript">AC_FL_RunContent = 0;</script>
+<script src="/extras/ukplayer/AC_RunActiveContent.js" language="javascript"></script>
+<script language="javascript">
+    if (AC_FL_RunContent == 0) {
+        alert("This page requires AC_RunActiveContent.js.");
+    } else {
+        AC_FL_RunContent(
+            'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0',
+            'width', '400',
+            'height', '300',
+            'src', 'swc/assets',
+            'quality', 'high',
+            'pluginspage', 'http://www.macromedia.com/go/getflashplayer',
+            'align', 'middle',
+            'play', 'true',
+            'loop', 'true',
+            'scale', 'showall',
+            'wmode', 'window',
+            'devicefont', 'false',
+            'id', 'slideShow',
+            'bgcolor', '#ffffff',
+            'name', 'coverflow',
+            'menu', 'true',
+            // note: the width & height in the flashVars below MUST match the width & height set above
+            'flashVars',
+'config=?func=getScreenshotsConfig&width=400&height=300&backgroundColor=0xCCCCCC&fontColor=&textBorderColor=&textBackgroundColor=&controlsColor=&controlsBorderColor=&controlsBackgroundColor=',
+            'allowFullScreen', 'false',
+            'allowScriptAccess','sameDomain',
+            'movie', '/extras/ukplayer/slideShow',
+            'salign', ''
+            ); //end AC code
+    }
+</script>
+<noscript>
+    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="400"
+height="300" id="swc/assets" align="middle">
+    <param name="allowScriptAccess" value="sameDomain" />
+    <param name="allowFullScreen" value="false" />
+    <param name="flashVars" value="config=?func=getScreenshotsConfig" />
+    <param name="movie" value="/extras/ukplayer/slideShow.swf" /><param name="quality" value="high" /><param
+name="bgcolor" value="#ffffff" />   <embed src="/extras/ukplayer/slideShow.swf" quality="high" bgcolor="#ffffff"
+width="400" height="300" name="swc/assets" align="middle" allowScriptAccess="sameDomain" allowFullScreen="false"
+flashvars="config=?func=getScreenshotsConfig" type="application/x-shockwave-flash"
+pluginspage="http://www.macromedia.com/go/getflashplayer" />
+    </object>
+</noscript>
+|;
     }
 
     # Rating form
@@ -641,7 +706,7 @@ sub view {
         );
     $var->{emailForm} = $mailForm->print;
 
-	return $self->processTemplate($var,undef, $self->{_viewTemplate});
+	return $self->getParent->processStyle($self->processTemplate($var,undef, $self->{_viewTemplate}));
 }
 
 
@@ -655,6 +720,9 @@ Redirects to the manufacturerUrl or productUrl and increments clicks.
 
 sub www_click {
     my $self    = shift;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+
     my $session = $self->session;
 
     $self->incrementCounter('clicks');
@@ -684,6 +752,118 @@ sub www_edit {
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit matrix listing title'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getScreenshots ( )
+
+Returns the screenshots as xml.
+
+=cut
+
+sub www_getScreenshots {
+    my $self = shift;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+
+    $self->session->http->setMimeType('text/xml');
+
+    my $xml = qq |<?xml version="1.0" encoding="UTF-8"?>
+<content>
+    <slides>
+|;
+
+    if ( $self->get('screenshots') ) {
+        my $fileObject = WebGUI::Form::File->new($self->session,{ value=>$self->get('screenshots') });
+        my $storage = $fileObject->getStorageLocation;
+        my $path = $storage->getPath;
+        my @files = @{ $storage->getFiles } if (defined $storage);
+        foreach my $file (@files) {
+        unless ($file =~ m/^thumb-/){
+            my $thumb = 'thumb-'.$file;
+            $xml .= "
+        <slide>
+            <width>400</width>
+            <height>300</height>
+            <title><![CDATA[<b>Slide</b> One]]></title>
+            <description><![CDATA[ Screenshots ]]></description>
+            <image_source>".$storage->getUrl($file)."</image_source>
+            <duration>5</duration>
+            <thumb_source>".$storage->getUrl($thumb)."</thumb_source>
+        </slide>            
+            ";
+            }
+        }
+    }
+
+    $xml .= qq |
+    </slides>
+</content>
+|;
+
+    return $xml;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getScreenshotsConfig ( )
+
+Returns the xml config file for the ukplayer that displays the screenshots.
+
+=cut
+
+sub www_getScreenshotsConfig {
+    my $self = shift;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+
+    $self->session->http->setMimeType('text/xml');
+
+    my $xml = qq|<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+    <content_url>?func=getScreenshots</content_url>
+    
+    <width>400</width><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
+useful for offline testing) -->
+    <height>300</height><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
+useful for offline testing) -->
+    <background_color>0xDDDDEE</background_color>
+    <default_duration>20</default_duration>
+    <default_slidewidth>100</default_slidewidth>
+    <default_slideheight>100</default_slideheight>
+    
+    <font>Verdana</font>
+    <font_size>12</font_size>
+    <font_color>0xCCCCCC</font_color>
+    <text_border_color>0xCCCCCC</text_border_color>
+    <text_bg_color>0x000000</text_bg_color>
+    <text_autohide>true</text_autohide>
+    
+    <controls_color>0xCCCCCC</controls_color>
+    <controls_border_color>0xCCCCCC</controls_border_color>
+    <controls_bg_color>0x000000</controls_bg_color>
+    <controls_autohide>false</controls_autohide>
+    
+    <thumbnail_width>48</thumbnail_width>
+    <thumbnail_height>36</thumbnail_height>
+    <thumbnail_border_color>0x000000</thumbnail_border_color>
+    <menu_autohide>true</menu_autohide>
+    <menu_dead_zone_width>100</menu_dead_zone_width>
+    <menu_gaps>5</menu_gaps>
+    
+    <mute_at_start>false</mute_at_start>
+    <autostart>true</autostart>
+    <autopause>false</autopause>
+    <loop>false</loop>
+    <error_message_content><![CDATA[XML not found: ]]></error_message_content>
+    <error_message_image><![CDATA[Image not found]]></error_message_image>
+    
+</config>
+|;
+
+    return $xml;
 }
 
 #-------------------------------------------------------------------

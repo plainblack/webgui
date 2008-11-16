@@ -15,8 +15,10 @@ $VERSION = "2.0.0";
 use strict;
 use warnings;
 use Tie::IxHash;
+use JSON;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::Asset::MatrixListing;
 use base 'WebGUI::Asset::Wobject';
 
 #----------------------------------------------------------------------------
@@ -94,14 +96,14 @@ sub definition {
             hoverHelp       =>$i18n->get('detail template description'),
             label           =>$i18n->get('detail template label'),
         },
-        ratingDetailTemplateId=>{
-            defaultValue    =>"matrixtmpl000000000004",
-            fieldType       =>"template",
-            tab             =>"display",
-            namespace       =>"Matrix/RatingDetail",
-            hoverHelp       =>$i18n->get('rating detail template description'),
-            label           =>$i18n->get('rating detail template label'),
-        },
+#        ratingDetailTemplateId=>{
+#            defaultValue    =>"matrixtmpl000000000004",
+#            fieldType       =>"template",
+#            tab             =>"display",
+#            namespace       =>"Matrix/RatingDetail",
+#            hoverHelp       =>$i18n->get('rating detail template description'),
+#            label           =>$i18n->get('rating detail template label'),
+#        },
         compareTemplateId=>{
             defaultValue    =>"matrixtmpl000000000002",
             fieldType       =>"template",
@@ -328,27 +330,16 @@ sub getCompareForm {
     my (%options, @listings);
     tie %options, 'Tie::IxHash';
 
-    if ($self->get('defaultSort') eq 'score'){
-        my @unorderedListings = @{ $self->getLineage(['descendants'], {
-                includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-                returnObjects       => 1,
-            }) };
-        foreach my $listing (@unorderedListings) {
-        }
-        # sort an array of hashrefs:
-        # @listings = sort { $$a{'ques'} <=> $$b{'ques'} } @listings;        
+    my $sortDirection = " asc";
+    if ( WebGUI::Utility::isIn($self->get('defaultSort'),qw(revisionDate score)) ){   
+        $sortDirection = " desc";
     }
-    else{
-        my $sortDirection = " asc";
-        if ($self->get('defaultSort') eq "revisionDate"){   
-            $sortDirection = " desc";
-        }
-        @listings = @{ $self->getLineage(['descendants'], {
-                includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-                orderByClause       => $self->get('defaultSort').$sortDirection,
-                returnObjects       => 1,
-            }) };
-    }
+    @listings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => $self->get('defaultSort').$sortDirection,
+            returnObjects       => 1,
+    }) };
     # Create an options hash based on the orderd array of listings.
     foreach my $listing (@listings){
         $options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
@@ -365,17 +356,19 @@ sub getCompareForm {
             name=>"func",
             value=>"compare"
             })
-        .WebGUI::Form::checkList($self->session, {
-            name=>"listingId",
-            vertical=>1,
-            value=>\@selectedListingIds,
-            options=>\%options,
-        })
+        .'<div id="compareForm"></div> '
+#        .WebGUI::Form::checkList($self->session, {
+#            name=>"listingId",
+#            vertical=>1,
+#            value=>\@selectedListingIds,
+#            options=>\%options,
+#        })
         ."<br />"
         .WebGUI::Form::submit($self->session,{
             value=>"compare"
             })
         .WebGUI::Form::formFooter($self->session);
+        #.'<div id="compareForm"></div> ';
     return $form;
 }
 
@@ -448,6 +441,24 @@ sub view {
 	my $self    = shift;
 	my $session = $self->session;	
     my $db      = $session->db; 
+
+    # javascript and css files for compare form datatable
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
+        {type =>'text/css', rel=>'stylesheet'});
 
 	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
@@ -606,6 +617,66 @@ assetData.revisionDate
 	#WebGUI::ErrorHandler::warn($self->get("templateId")); 
 	
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_compare ( )
+
+Returns the compare screen
+
+=cut
+
+sub www_compare {
+
+    my $self = shift;
+    my $var = $self->get;
+    my @listingIds = @_;
+    my @columnKeys = ['name'];
+    #my @listingIds = ['AwioUvaZXmAEaFw20t-x3Q', 'CWNjAHcmh0pEF6WJooomJA'];
+    unless (scalar(@listingIds)) {
+        @listingIds = $self->session->form->checkList("listingId");
+    }
+
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),
+        {type => 'text/javascript'});    
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), 
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-beta-min.js'),
+    {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-beta-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+
+    foreach my $listingId (@listingIds){
+        my $listingId_safe = $listingId;
+        $listingId_safe =~ s/-//g;
+        push(@columnKeys, $listingId_safe);
+    }
+
+    $var->{javascript} = "<script type='text/javascript'>\n".
+        'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).');'.
+        'var columnKeys = new Array("name", '.join(", ",map {'"'.$_.'"'} @columnKeys).');'.
+        "</script>";
+
+    return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));;
 }
 
 #-------------------------------------------------------------------
@@ -803,6 +874,161 @@ sub www_editAttributeSave {
     return $self->www_listAttributes;
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_getCompareFormData  (  )
+
+Returns the compare form data as JSON.
+
+=cut
+
+sub www_getCompareFormData {
+
+    my $self = shift;
+    my @results;
+    my $sortDirection = ' asc';
+    
+    $self->session->http->setMimeType("application/json");
+=cut
+    my @listings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => $self->get('defaultSort').$sortDirection,
+            returnObjects       => 1,
+    }) };
+=cut
+    my $sql = "
+        select
+            assetData.title,
+            assetData.url,
+            listing.assetId,
+            listing.views,
+            listing.compares,
+            listing.clicks,
+            listing.lastUpdated
+        from MatrixListing as listing
+            left join asset on listing.assetId = asset.assetId
+            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
+assetData.revisionDate
+        where
+            asset.parentId=?
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate)
+                from
+                    assetData
+                where
+                    assetData.assetId=asset.assetId
+                    and (status='approved' or status='archived')
+            )
+            and status='approved'
+        group by
+            assetData.assetId
+        order by ".$self->get('defaultSort').$sortDirection;
+
+    my $results = $self->session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
+=cut        
+push(@results,{
+            Title=>$data->{title},
+            Views=>$data->{views},
+            Compares=>$data->{compares},
+            Clicks=>$data->{clicks}
+            });
+=cut
+    # Create an options hash based on the orderd array of listings.
+=cut    
+    foreach my $listing (@listings){
+        push(@results,{Title=>$listing->get('title'),Phone=>'123'})
+        #$options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
+    }
+=cut    
+    my $jsonOutput;
+    $jsonOutput->{ResultSet} = {Result=>$results};
+
+    return JSON->new->utf8->encode($jsonOutput);
+=cut
+    return JSON->new->utf8->encode({
+    ResultSet=>{
+        totalResultsAvailable=>1,
+        totalResultsReturned=>1,
+        firstResultPosition=>1,
+        Result=>[{
+            Title=>"Pizza Depot",
+            Phone=>"(408) 245-7760",
+            City=>"Sunnyvale",
+            ClickUrl=>"http:\/\/local.yahoo.com\/details?id=21332021&stx=pizza&csz=Sunnyvale+CA"
+        }]
+    }
+    });
+=cut
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getCompareListData  (  )
+
+Returns the compare list data as JSON.
+
+=cut
+
+sub www_getCompareListData {
+
+    my $self = shift;
+    my @listingIds = @_;
+    unless (scalar(@listingIds)) {
+        @listingIds = $self->session->form->checkList("listingId");
+    }
+
+    my $session = $self->session;
+    my (@results,$results,@columnDefs);
+    my $sortDirection = ' asc';
+
+    foreach my $listingId (@listingIds){
+        my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
+        my $listingId_safe = $listingId;
+        $listingId_safe =~ s/-//g;
+        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title')});
+    }
+
+    my $jsonOutput;
+    $jsonOutput->{ColumnDefs} = \@columnDefs;
+
+    foreach my $category (keys %{$self->getCategories}) {
+        my $fields = " a.name, a.fieldType ";
+        my $from = "from Matrix_attribute a";
+        my $tableCount = "b";
+        foreach my $listingId (@listingIds) {
+            my $listingId_safe = $listingId;
+            $listingId_safe =~ s/-//g;
+            $fields .= ", ".$tableCount.".value as `$listingId_safe`";
+            $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId="
+                .$tableCount.".attributeId and ".$tableCount.".matrixListingId=? ";
+            $tableCount++;
+        }
+        push(@results, @{ $self->session->db->buildArrayRefOfHashRefs(
+            "select $fields $from where a.category=? and a.assetId=? order by a.name",
+            [@listingIds,$category,$self->getId]
+        ) });
+    }
+    foreach my $result (@results){
+        foreach my $listingId (@listingIds) {
+            my $listingId_safe = $listingId;
+            $listingId_safe =~ s/-//g;
+            if ($result->{fieldType} eq 'MatrixCompare'){
+                $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
+                    { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
+            }
+        }
+    }
+
+    $jsonOutput->{ResultSet} = {Result=>\@results};
+
+    $session->http->setMimeType("application/json");
+
+    return JSON->new->utf8->encode($jsonOutput);
+}
 #-------------------------------------------------------------------
 
 =head2 www_listAttributes ( )
