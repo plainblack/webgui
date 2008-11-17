@@ -22,6 +22,7 @@
  - fixed #8845: Workflows refusing to show edit screen
  - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
  - fixed #4161: asset manager: switching title to descending order reverts to ascending on next page
+ - fixed #8914: epoch for calendar/List View for Calendar
 
 7.6.3
  - improved performance of file uploads

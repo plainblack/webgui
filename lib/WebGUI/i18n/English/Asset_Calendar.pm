@@ -795,13 +795,13 @@ our $I18N = {
         },
 
         'helpvar dateTime start' => {
-            message         => 'A set of date/time variables with the prefix "start". See "Calendar Date/Time Variables" for more information.',
-            lastUpdated     => 0,
+            message         => 'A set of date/time variables with the prefix "start" that all deal with the starting date of the displayed interval for the List view of the Calendar. See "Calendar Date/Time Variables" for more information.',
+            lastUpdated     => 1226959335,
             context         => 'Description of template variable.',
         },
 
         'helpvar dateTime end' => {
-            message         => 'A set of date/time variables with the prefix "end". See "Calendar Date/Time Variables" for more information.',
+            message         => 'A set of date/time variables with the prefix "end" that all deal with the ending date of the displayed window for the List view of the Calendar. See "Calendar Date/Time Variables" for more information.',
             lastUpdated     => 1204303480,
             context         => 'Description of template variable',
         },
