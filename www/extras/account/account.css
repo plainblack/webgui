@@ -337,7 +337,7 @@
 /* TABS - outer */
 
 .bottombutton {
-    border: none;
+    #border: none;
     float:right;
     padding-right:2px;
     padding-top: 2px;
@@ -351,7 +351,7 @@
 	border: solid #ffa700 6px;
 }
 .topbutton {
-    border: none;
+    #border: none;
     float:right;
     clear:both;
     padding-right:2px;
@@ -434,6 +434,7 @@ ul.topTabs a.selected b {
     line-height:normal;
     padding-right:8px;
     padding-top:3px;
+    text-decoration: none;
 }
 
 .profile_displaySubContent { 

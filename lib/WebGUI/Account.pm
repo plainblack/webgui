@@ -129,11 +129,11 @@ sub appendCommonVars {
     my $session = $self->session;
     my $user    = $session->user;
 
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
-    $var->{'view_profile_url'  } = $user->getProfileUrl;
-    $var->{'gateway_url'       } = $session->url->page("op=account");
-    $var->{'back_url'          } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'}
+    $var->{'user_full_name'   } = $user->getWholeName;
+    $var->{'user_member_since'} = $user->dateCreated;
+    $var->{'view_profile_url' } = $user->getProfileUrl;
+    $var->{'root_url'         } = $session->url->page("op=account");
+    #$var->{'back_url'          } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'}
 }
 
 

@@ -155,6 +155,11 @@ our $I18N = {
         lastUpdated => 1225724810,
     },
 
+    'save changes' => {
+        message     => q{save changes},
+        lastUpdated => 1225724810,
+    },
+
 
 };
 

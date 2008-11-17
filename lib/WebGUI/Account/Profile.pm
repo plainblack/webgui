@@ -30,6 +30,69 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 appendCategoryVars ( var, category [,fields, errors] )
+
+    Appends cateogry variables to the hash ref passed in
+    
+=head3 var
+
+    The hash reference to append template variables to
+
+=head3 category
+
+    WebGUI::ProfileCategory object to append variables for
+
+=head3 fields
+
+    Optional array ref of fields in this category
+
+=head3 errors
+
+    Optional array ref of errors to attach to the category loop
+
+=cut
+
+sub appendCategoryVars {
+    my $self     = shift;
+    my $var      = shift || {};
+    my $category = shift;
+    my $fields   = shift;
+    my $errors   = shift;
+    my $selected = $self->store->{selected} || $self->session->form->get("selected");
+    
+    my $categoryId         = $category->getId;
+    my $categoryLabel      = $category->getLabel;
+    my $shortCategoryLabel = $category->getShortLabel;
+    my $isActive           = $categoryId eq $selected;
+
+    my $index  = scalar(@{$var->{'profile_category_loop'}}) + 1;
+
+    push(@{ $var->{'profile_category_loop'} }, {
+        'profile_category_id'              => $categoryId,
+        'profile_category_isActive'        => $isActive,
+        'profile_category_is_'.$categoryId => "true",  #Test so users can tell what category they are at in the loop
+        'profile_category_label'           => $categoryLabel,
+        'profile_category_shortLabel'      => $shortCategoryLabel,
+        'profile_category_index'           => $index,
+        'profile_fields_loop'              => $fields,
+        'profile_errors'                   => $errors,
+    });
+
+    $var->{'profile_category_'.$categoryId."_isActive"  } = $isActive; 
+    $var->{'profile_category_'.$categoryId."_label"     } = $categoryLabel;
+    $var->{'profile_category_'.$categoryId."_shortLabel"} = $shortCategoryLabel;
+    $var->{'profile_category_'.$categoryId."_index"     } = $index;
+    $var->{'profile_category_'.$categoryId."_fields"    } = $fields;
+    
+
+    #Update the isActive flag to determine the default active tab
+    $self->store->{hasActiveTab} = ($self->store->{hasActiveTab} || $isActive);
+
+    #return $index;
+}
+
+#-------------------------------------------------------------------
+
 =head2 appendCommonVars ( var )
 
     Appends common template variables that all profile templates use
@@ -41,18 +104,33 @@ These subroutines are available from this package:
 =cut
 
 sub appendCommonVars {
-    my $self    = shift;
-    my $var     = shift;
-    my $session = $self->session;
-    my $user    = $session->user;
-    my $pageUrl = $session->url->page;
+    my $self          = shift;
+    my $var           = shift;
+    my $session       = $self->session;
+    my $user          = $session->user;
+    my $pageUrl       = $session->url->page;
 
-    $var->{'user_full_name'      } = $user->getWholeName;
-    $var->{'user_member_since'   } = $user->dateCreated;
-    $var->{'view_profile_url'    } = $user->getProfileUrl($pageUrl);
-    $var->{'edit_profile_url'    } = $self->getUrl("module=profile;do=edit");
-    $var->{'back_url'            } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'};
-    $var->{'invitations_enabled' } = $session->user->profileField('ableToBeFriend');
+    $self->SUPER::appendCommonVars($var);
+
+    $var->{'edit_profile_url'     } = $self->getUrl("module=profile;do=edit");
+    $var->{'invitations_enabled'  } = $session->user->profileField('ableToBeFriend');
+    $var->{'profile_category_loop'} = [];
+
+    #Append the categories
+    my $categories = WebGUI::ProfileCategory->getCategories($session, { editable=>1 } );
+    map { $self->appendCategoryVars($var,$_) } @ { $categories };
+    unless ($self->store->{hasActiveTab}) {
+        $var->{'profile_category_loop'}->[0]->{'profile_category_isActive'} = 1;
+    }    
+
+    #Append the form submit if it's in edit mode
+    if($self->method eq "edit" || $self->uid eq "") {
+        $var->{'is_edit'      } = "true";
+        $var->{'form_header'  } = WebGUI::Form::formHeader($session,{
+            action => $self->getUrl("module=profile;do=editSave")
+        });
+        $var->{'form_footer'  } = WebGUI::Form::formFooter($session);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -83,13 +161,6 @@ sub editSettingsForm {
 		namespace => "Account/Layout",
 		label     => $i18n->get("profile layout template label"),
         hoverHelp => $i18n->get("profile layout template hoverHelp")
-	);
-    $f->template(
-		name      => "profileEditLayoutTemplateId",
-		value     => $self->getEditLayoutTemplateId,
-		namespace => "Account/Layout",
-		label     => $i18n->get("profile edit layout template label"),
-        hoverHelp => $i18n->get("profile edit layout template hoverHelp")
 	);
 	$f->template(
         name      => "profileEditTemplateId",
@@ -177,20 +248,6 @@ sub getExtrasStyle {
     return $requiredStyleOff;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getDisplayLayoutTemplateId ( )
-
-This method returns the template ID for the account layout.
-
-=cut
-
-sub getEditLayoutTemplateId {
-    my $self    = shift;
-    return $self->session->setting->get("profileEditLayoutTemplateId") || "FJbUTvZ2nUTn65LpW6gjsA";
-}
-
 #-------------------------------------------------------------------
 
 =head2 getEditTemplateId ( )
@@ -231,9 +288,7 @@ sub getLayoutTemplateId {
     my $session = $self->session;
     my $method  = $self->method;
     my $uid     = $self->uid;
-    
-    return $self->getEditLayoutTemplateId if($method eq "edit" || $uid eq "");
-    return $session->setting->get("profileLayoutTemplateId") || $self->SUPER::getLayoutTemplateId;
+    return $session->setting->get("profileLayoutTemplateId") || "FJbUTvZ2nUTn65LpW6gjsA";
 }
 
 #-------------------------------------------------------------------
@@ -275,26 +330,35 @@ sub www_edit {
     my $errors      = shift || {};
     my $session     = $self->session;
     my $user        = $session->user;
-    my $selected    = $errors->{errorCategory} || $session->form->get("selected"); #Allow users to template tabs or other category dividers
     my $var         = {};
+
+    #Handle errors
+    my @errorFields          = ();
+    $var->{'profile_errors'} = [];
+
+    if( scalar(keys %{$errors}) ) {
+        #Warnings and errors are the same here - set the fields so we can tell which fields errored
+        @errorFields = (@{$errors->{errorFields}},@{$errors->{warningFields}});
+        #Build the error message loop
+        map {
+            push( @{$var->{'profile_errors'}},{ error_message => $_ })
+        }  @{$errors->{errors}};
+    }
+
+    my $count = 0;
+
+    #Set the active flag to the default.  We'll know more later 
+    $self->store->{hasActiveTab} = 0;    
     
-    my $active      = 0; #Whether or not a category is selected
-    my $counter     = 1; #Count the number of categories being displayed
-    my $hasErrors   = scalar(keys %{$errors});
+    #Initialize the category template loop which gets filled inside the loop
+    $var->{'profile_category_loop'}  = [];
 
-    my @errorFields = ();
-    @errorFields = (@{$errors->{errorFields}},@{$errors->{warningFields}}) if($hasErrors);
-
-    $var->{'profile_errors'       } = [];    
-    map{ push(@{$var->{'profile_errors'}},{ error_message => $_ }) } @{$errors->{errors}} if($hasErrors);
-    $var->{'hasErrors'            } = scalar(@{$var->{'profile_errors'}}) > 0;
-
-    my @categories = ();
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-        next unless $category->isEditable;
+    #Get the editable categories
+    my $categories = WebGUI::ProfileCategory->getCategories($session, { editable => 1 } );
+	foreach my $category (@{ $categories } ) {
         my @fields = ();
-        foreach my $field (@{$category->getFields}) {
-            next unless ($field->isEditable); 
+        use Data::Dumper;
+        foreach my $field (@{ $category->getFields( { editable => 1 } ) }) {
             next if $field->getId =~ m/contentPositions/; #This protects the contentPosition fields
             my $fieldId      = $field->getId;
             my $fieldLabel   = $field->getLabel;
@@ -315,44 +379,18 @@ sub www_edit {
                 'profile_field_extras'  => $field->getExtras,
 			});
         }
-        my $categoryId         = $category->getId;
-        my $categoryLabel      = $category->getLabel;
-        my $shortCategoryLabel = $category->getShortLabel;
-        my $isActive           = $categoryId eq $selected;
-        my $categoryIndex      = $counter++;
 
-        $var->{'profile_category_'.$categoryId."_isActive"  } = $isActive; 
-        $var->{'profile_category_'.$categoryId."_label"     } = $categoryLabel;
-        $var->{'profile_category_'.$categoryId."_shortLabel"} = $shortCategoryLabel;
-        $var->{'profile_category_'.$categoryId."_fields"    } = \@fields;
-        $var->{'profile_category_'.$categoryId."_index"     } = $categoryIndex;
-
-        push(@categories, {
-            'profile_category_id'              => $categoryId,
-            'profile_category_isActive'        => $isActive,
-            'profile_category_is_'.$categoryId => "true",  #Test so users can tell what category they are at in the loop
-            'profile_category_label'           => $categoryLabel,
-            'profile_category_shortLabel'      => $shortCategoryLabel,
-            'profile_category_index'           => $categoryIndex,
-            'profile_fields_loop'              => \@fields,
-            'profile_errors'                   => $var->{'profile_errors'},
-        });
-        #This value will determine whether or not a valid category is active or not
-        $active ||= $isActive;
+        #Append the category variables
+        $self->appendCategoryVars($var,$category,\@fields,$var->{'profile_errors'});
     }
-    
+ 
     #If not category is selected, set the first category as the active one
-    $categories[0]->{profile_category_isActive} = 1 unless($active);
-        
-    $var->{'profile_category_loop'}  = \@categories;
+    unless ($self->store->{hasActiveTab}) {
+        $var->{'profile_category_loop'}->[0]->{'profile_category_isActive'} = 1;
+    }
 
-    $var->{'profile_form_submit'  }  = WebGUI::Form::submit($session,{});
-    $var->{'profile_form_header'  }  = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=profile;do=editSave")
-    });
-	$var->{'profile_form_footer'  }  = WebGUI::Form::formFooter($session);
-
-    $self->appendCommonVars($var);
+    #Call the superclass common vars method cause we don't need to build the categories again
+    $self->SUPER::appendCommonVars($var);
 
     return $self->processTemplate($var,$self->getEditTemplateId);
 }
@@ -375,10 +413,11 @@ sub www_editSave {
 	push (@{$retHash->{errors}},@{$retHash->{warnings}});
 
     unless(scalar(@{$retHash->{errors}})) {
-        foreach my $fieldName (keys %{$retHash->{profile}}) {
-            $session->user->profileField($fieldName,$retHash->{profile}->{$fieldName});
-        }
+        $session->user->updateProfileFields( $retHash->{profile} );
     }
+    
+    #Store the category the error occurred in the object for reference
+    $self->store->{selected} = $retHash->{errorCategory};
 
     return $self->www_edit($retHash);
 }
@@ -423,7 +462,7 @@ sub www_view {
         );
     }
 
-    my @categories = ();
+    $var->{'profile_category_loop' } = [];
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
         next unless $category->isViewable;
         my @fields = ();
@@ -447,37 +486,19 @@ sub www_view {
                 'profile_field_raw'          => $fieldRaw
 			});
         }
-        my $categoryId         = $category->getId;
-        my $categoryLabel      = $category->getLabel;
-        my $shortCategoryLabel = $category->getShortLabel;
-        my $isActive           = $categoryId eq $selected;
-        my $categoryIndex      = $counter++;
-        
-        $var->{'profile_category_'.$categoryId."_isActive"  } = $isActive;
-        $var->{'profile_category_'.$categoryId."_label"     } = $categoryLabel;
-        $var->{'profile_category_'.$categoryId."_shortLabel"} = $shortCategoryLabel;
-        $var->{'profile_category_'.$categoryId."_fields"    } = \@fields;
-        $var->{'profile_category_'.$categoryId."_index"     } = $categoryIndex;
 
-        push(@categories, {
-            'profile_category_id'              => $categoryId,
-            'profile_category_isActive'        => $isActive,
-            'profile_category_is_'.$categoryId => "true",
-            'profile_category_label'           => $categoryLabel,
-            'profile_category_shortLabel'      => $shortCategoryLabel,
-            'profile_category_index'           => $categoryIndex,
-            'profile_fields_loop'              => \@fields,
-        });
-        #This value will determine whether or not a valid category is active or not
-        $active ||= $isActive;
+        #Append the category variables
+        $self->appendCategoryVars($var,$category,\@fields);
     }
 
     #If not category is selected, set the first category as the active one
-    $categories[0]->{profile_category_isActive} = 1 unless($active);
+    unless ($self->store->{hasActiveTab}) {
+        $var->{'profile_category_loop'}->[0]->{'profile_category_isActive'} = 1;
+    }
+
     my $privacySetting                          = $user->profileField("publicProfile") || "none";
     $var->{'profile_privacy_'.$privacySetting } = "true";
 
-    $var->{'profile_category_loop' } = \@categories;
     $var->{'profile_user_id'       } = $user->userId;
     $var->{'can_edit_profile'      } = $uid eq $session->user->userId;
     $var->{'acceptsPrivateMessages'} = $user->acceptsPrivateMessages($session->user->userId);
@@ -485,7 +506,5 @@ sub www_view {
 
     return $self->processTemplate($var,$self->getViewTemplateId);
 }
-
-
 
 1;

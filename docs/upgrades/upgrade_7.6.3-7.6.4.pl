@@ -368,8 +368,7 @@ sub upgradeAccount {
     
     #Add the settings for the profile module
     $setting->add("profileStyleTemplateId",""); #Use the userStyle by default
-    $setting->add("profileLayoutTemplateId","N716tpSna0iIQTKxS4gTWA");
-    $setting->add("profileEditLayoutTemplateId","FJbUTvZ2nUTn65LpW6gjsA"); 
+    $setting->add("profileLayoutTemplateId","FJbUTvZ2nUTn65LpW6gjsA");
     $setting->add("profileEditTemplateId","75CmQgpcCSkdsL-oawdn3Q");
     $setting->add("profileViewTempalteId","2CS-BErrjMmESOtGT90qOg");
     $setting->add("profileErrorTempalteId","MBmWlA_YEA2I6D29OMGtRg");
