@@ -167,11 +167,11 @@ sub editSettingsFormSave {
     $setting->set("friendsStyleTemplateId", $form->process("friendsStyleTemplateId","template"));
     $setting->set("friendsLayoutTempalteId", $form->process("friendsLayoutTempalteId","template"));
     $setting->set("friendsViewTemplateId", $form->process("friendsViewTemplateId","template"));
-    $session->set("friendsEditTemplateId",$form->process("friendsEditTemplateId","template"));
-    $session->set("friendsSendRequestTemplateId",$form->process("friendsSendRequestTemplateId","template"));
-    $session->set("friendsErrorTemplateId",$form->process("friendsErrorTemplateId","template"));
-    $session->set("friendsConfirmTemplateId",$form->process("friendsConfirmTemplateId","template"));
-    $session->set("friendsRemoveConfirmTemplateId",$form->process("friendsRemoveConfirmTemplateId","template"));
+    $setting->set("friendsEditTemplateId",$form->process("friendsEditTemplateId","template"));
+    $setting->set("friendsSendRequestTemplateId",$form->process("friendsSendRequestTemplateId","template"));
+    $setting->set("friendsErrorTemplateId",$form->process("friendsErrorTemplateId","template"));
+    $setting->set("friendsConfirmTemplateId",$form->process("friendsConfirmTemplateId","template"));
+    $setting->set("friendsRemoveConfirmTemplateId",$form->process("friendsRemoveConfirmTemplateId","template"));
 
 }
 
