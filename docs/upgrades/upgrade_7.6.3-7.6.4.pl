@@ -36,6 +36,7 @@ addVersionTagMode($session);
 addPosMode($session);
 fixFriendsGroups( $session );
 upgradeAccount( $session );
+removeProcessRecurringPaymentsFromConfig( $session );
 finish($session); # this line required
 
 
@@ -56,6 +57,23 @@ sub addPosMode {
     $db->write(q{ALTER TABLE addressBook add column defaultAddressId char(22) binary});
 
     print qq{Finished\n} if !$quiet;
+} 
+
+#----------------------------------------------------------------------------
+sub removeProcessRecurringPaymentsFromConfig {
+    my $session = shift;
+
+    print qq{\tRemoving old ProcessRecurringPayments workflow activity from config...} if !$quiet;
+
+    my $config = $session->config();
+    my $workflowActivities = $config->get('workflowActivities');
+    my @noObjects = ();
+    foreach my $activity (@{ $workflowActivities->{'None'}}) {
+        push @noObjects, $activity unless
+            $activity eq 'WebGUI::Workflow::Activity::ProcessRecurringPayments';
+    }
+    $workflowActivities->{'None'} = [ @noObjects ];
+    $config->set('workflowActivities', $workflowActivities);
 } 
 
 #----------------------------------------------------------------------------

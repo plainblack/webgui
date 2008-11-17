@@ -19,6 +19,7 @@
  - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
  - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
  - fixed #9068: field.inTab
+ - fixed #8845: Workflows refusing to show edit screen
 
 7.6.3
  - improved performance of file uploads
