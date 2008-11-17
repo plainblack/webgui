@@ -259,12 +259,12 @@ sub displayContent {
         $hash{'url'                } = $instance->getUrl("module=$identifier",1);
         $hash{'isActive'           } = "true" if($identifier eq $self->module);
         WebGUI::Macro::process(\$hash{'title'});
-        push(@pluggins,\%hash);
-
-        #Append common display variables to the main template
-        $instance->appendCommonVars($var);        
+        push(@pluggins,\%hash);       
     }
     $var->{'account_loop'} = \@pluggins;
+
+    #Append common display variables to the layout template
+    $self->appendCommonVars($var); 
 
     #Process the layout template
     my $output      = $self->processTemplate($var,$self->getLayoutTemplateId);
