@@ -463,11 +463,9 @@ sub www_view {
     }
 
     $var->{'profile_category_loop' } = [];
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-        next unless $category->isViewable;
+	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session,{ visible => 1})}) {
         my @fields = ();
-        foreach my $field (@{$category->getFields}) {
-            next unless ($field->isViewable); 
+        foreach my $field (@{$category->getFields({ visible => 1 })}) {
             next if $field->getId =~ m/contentPositions/; #This protects the contentPosition fields
             my $fieldId      = $field->getId;
             my $fieldLabel   = $field->getLabel;
