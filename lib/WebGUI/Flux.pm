@@ -313,9 +313,10 @@ rules as soon as one fails, so at most you'll have one wasteful rule eval.
 sub getHighestSticky {
     my $class = shift;
 
-    my %args = validate( @_, { fluxRuleIds => { type => ARRAYREF }, user => { isa => 'WebGUI::User' } } );
+    my %args = validate( @_, { fluxRuleIds => { type => ARRAYREF }, user => { isa => 'WebGUI::User' }, skippableFluxRuleIds => { type => ARRAYREF, optional => 1 }, } );
 
-    my %stickies = map { $_ => 1 } $class->getStickies( \%args );
+    my %stickies = map { $_ => 1 } $class->getStickies( fluxRuleIds => $args{fluxRuleIds}, user => $args{user} );
+    my %skippable = map { $_ => 1 } (@{$args{skippableFluxRuleIds}});
 
     my $user    = $args{user};
     my $session = $user->session;
@@ -336,6 +337,11 @@ sub getHighestSticky {
         if ( $class->evaluateFor( { user => $user, fluxRuleId => $fluxRuleId } ) ) {
             $session->log->debug("$fluxRuleId evaluated true, continuing search..");
             $highest = $fluxRuleId;
+            next;
+        }
+        
+        if ($skippable{$fluxRuleId}) {
+            $session->log->debug("$fluxRuleId evaluated false, but in skippable so continuing search..");
             next;
         }
 
