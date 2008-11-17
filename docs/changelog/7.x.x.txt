@@ -9,6 +9,7 @@
  - fixed #8845: Workflows refusing to show edit screen
  - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
  - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
+ - fixed #8914: epoch for calendar/List View for Calendar
 
 7.5.33
  - fixed #9002: add a variant in admin product view misses i18n link
