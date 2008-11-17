@@ -365,6 +365,12 @@ sub execute {
             }
         }
     }
+    unless (scalar @{ $eventList }) {
+        ##nothing to do.  Get out of here.  Do not pass go, do not create unnecessary version tags
+        $instance->deleteScratch('events');
+        $instance->deleteScratch('feeds');
+        return $self->COMPLETE;
+    }
     my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
     my $versionTag = WebGUI::VersionTag->create($session, {'name' => 'Calendar Feed Update', 'workflowId' => 'pbworkflow000000000003'});
     $versionTag->setWorking;
