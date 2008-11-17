@@ -324,7 +324,7 @@ sub newByPropertyHashRef {
     return undef unless defined $properties;
     return undef unless exists $properties->{className};
     my $className = $properties->{className};
-    eval { WebGUI::Pluggable::load($class) };
+    eval { WebGUI::Pluggable::load($className) };
     if ($@) {
         $session->errorHandler->error($@);
         return undef;

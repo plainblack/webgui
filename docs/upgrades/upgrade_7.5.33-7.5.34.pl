@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+removeProcessRecurringPaymentsFromConfig( $session );
 
 finish($session); # this line required
 
@@ -41,6 +42,24 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub removeProcessRecurringPaymentsFromConfig {
+    my $session = shift;
+
+    print qq{\tRemoving old ProcessRecurringPayments workflow activity from config...} if !$quiet;
+
+    my $config = $session->config();
+    my $workflowActivities = $config->get('workflowActivities');
+    my @noObjects = ();
+    foreach my $activity (@{ $workflowActivities->{'None'}}) {
+        push @noObjects, $activity unless
+            $activity eq 'WebGUI::Workflow::Activity::ProcessRecurringPayments';
+    }
+    $workflowActivities->{'None'} = [ @noObjects ];
+    $config->set('workflowActivities', $workflowActivities);
+} 
+
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
