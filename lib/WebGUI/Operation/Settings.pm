@@ -406,31 +406,6 @@ sub definition {
                 defaultValue=>$setting->get("passiveProfilingEnabled"),
                 extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
 		});
-    push(@fields, {
-        tab=>"user",
-        fieldType=>"yesNo",
-        name=>"userInvitationsEnabled",
-        label=>$i18n->get("Enable user invitations"),
-        hoverHelp=>$i18n->get("Enable user invitations description"),
-        defaultValue=>$setting->get("userInvitationsEnabled"),
-    });
-    push(@fields, {
-        tab=>"user",
-        fieldType=>"textarea",
-        name=>"userInvitationsEmailExists",
-        label=>$i18n->get("user invitations email exists"),
-        hoverHelp=>$i18n->get("user invitations email exists description"),
-        defaultValue=>$setting->get("userInvitationsEmailExists"),
-    });
-    push(@fields, {
-		tab=>"user",
-		fieldType=>"template",
-		name=>"userInvitationsEmailTemplateId",
-		label=>$i18n->get('user email template'),
-		hoverHelp=>$i18n->get('user email template description'),
-		namespace=>"userInvite/Email",
-		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
-		});    
     push @fields, {
         tab             => "user",
         name            => "showMessageOnLogin",
@@ -675,8 +650,8 @@ sub www_saveSettings {
         #Save the settings
         eval { $instance->editSettingsFormSave };
         
-        if( my $e = WebGUI::Error->caught ) {
-            $session->log->warn("Error calling editSettingsFormSave in $className...skipping : ".$e->error);
+        if( $@ ) {
+            $session->log->warn("Error calling editSettingsFormSave in $className...skipping : ".$@);
             next;
         }
 	}
