@@ -58,14 +58,14 @@ sub editSettingsForm {
 
     $f->template(
 		name      => "userAccountStyleTemplateId",
-		value     => $self->session->setting->get("userAccountStyleTemplateId"),
+		value     => $self->getStyleTemplateId,
 		namespace => "style",
 		label     => $i18n->get("user style template label"),
         hoverHelp => $i18n->get("user style template hoverHelp")
     );
     $f->template(
 		name      => "userAccountLayoutTemplateId",
-		value     => $self->session->setting->get("userAccountLayoutTemplateId"),
+		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("layout template label"),
         hoverHelp => $i18n->get("layout template hoverHelp")
