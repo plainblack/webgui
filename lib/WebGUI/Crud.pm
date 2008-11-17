@@ -928,7 +928,9 @@ sub update {
 		}
 
 		# set a default value if it's empty or undef
-		$data->{$property} ||= $properties->{$property}{defaultValue};
+        if ($data->{$property} eq "") {
+            $data->{$property} = $properties->{$property}{defaultValue};
+        }
 
 		# serialize if needed
 		if ($properties->{$property}{serialize} && $data->{property} ne "") {
