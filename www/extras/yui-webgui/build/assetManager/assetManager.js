@@ -176,9 +176,9 @@ WebGUI.AssetManager.DefaultSortedBy = {
 */
 WebGUI.AssetManager.BuildQueryString = function ( state, dt ) {
     var query = "recordOffset=" + state.pagination.recordOffset 
-            + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
+            + ';orderByDirection=' + ((state.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
             + ';rowsPerPage=' + state.pagination.rowsPerPage
-            + ';orderByColumn=' + state.sorting.key
+            + ';orderByColumn=' + state.sortedBy.key
             ;
         return query;
     };
@@ -249,35 +249,6 @@ WebGUI.AssetManager.initDataTable = function (o) {
     });
 
 
-    // Custom function to handle pagination requests
-    var handlePagination = function (state,dt) {
-        var sortedBy  = dt.get('sortedBy');
-
-        // Define the new state
-        var newState = {
-            startIndex: state.recordOffset, 
-            sorting: {
-                key: sortedBy.key,
-                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
-            },
-            pagination : { // Pagination values
-                recordOffset: state.recordOffset, // Default to first page when sorting
-                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: dt.onDataReturnSetRows,
-            failure: dt.onDataReturnSetRows,
-            scope: dt,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
-    };
- 
    // initialize the data source
    WebGUI.AssetManager.DataSource
         = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
@@ -315,52 +286,16 @@ WebGUI.AssetManager.initDataTable = function (o) {
                 initialRequest          : 'recordOffset=0',
                 dynamicData             : true,
                 paginator               : assetPaginator,
-                sortedBy                : WebGUI.AssetManager.DefaultSortedBy
+                sortedBy                : WebGUI.AssetManager.DefaultSortedBy,
+                generateRequest         : WebGUI.AssetManager.BuildQueryString
             }
         );
-     WebGUI.AssetManager.DataTable.onPaginatorChangeRequest  = handlePagination;
 
-        
     WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
         oPayload.totalRecords = oResponse.meta.totalRecords;
         return oPayload;
     }
 
-    // Override function for custom server-side sorting
-    WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
-        // Default ascending
-        var sDir = "asc";
-        
-        // If already sorted, sort in opposite direction
-        if(oColumn.key === this.get("sortedBy").key) {
-            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ?
-                    "desc" : "asc";
-        }
-
-        // Define the new state
-        var newState = {
-            startIndex: 0,
-            sorting: { // Sort values
-                key: oColumn.key,
-                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC
-            },
-            pagination : { // Pagination values
-                recordOffset: 0, // Default to first page when sorting
-                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: this.onDataReturnSetRows,
-            failure: this.onDataReturnSetRows,
-            scope: this,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, this), oCallback);
-    };
 };
 
 /*---------------------------------------------------------------------------

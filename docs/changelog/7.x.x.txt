@@ -21,6 +21,7 @@
  - fixed #9068: field.inTab
  - fixed #8845: Workflows refusing to show edit screen
  - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
+ - fixed #4161: asset manager: switching title to descending order reverts to ascending on next page
 
 7.6.3
  - improved performance of file uploads
