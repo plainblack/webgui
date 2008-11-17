@@ -16,6 +16,7 @@ package WebGUI::Asset;
 
 use Carp qw( croak confess );
 use Scalar::Util qw( blessed );
+use Clone qw(clone);
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -516,6 +517,11 @@ sub definition {
 					    noFormPost=>1,
 					    fieldType=>'hidden',
 					    defaultValue=>'pending'
+					},
+				    lastModified=>{
+					    noFormPost=>1,
+					    fieldType=>'hidden',
+					    defaultValue=>time(),
 					},
 				    assetSize=>{
 					    noFormPost=>1,
@@ -1492,14 +1498,14 @@ sub getUrl {
 
 Returns the overall modification time of the object and its content in Unix
 epoch format, for the purpose of the Last-Modified HTTP header.  Override this
-for subclasses that contain content that is not solely dependent on the
-revisionDate of the asset.
+for subclasses that contain content that is not solely lastModified property,
+which gets updated every time update() is called.
 
 =cut
 
 sub getContentLastModified {
 	my $self = shift;
-	return $self->get("revisionDate");
+	return $self->get("lastModified");
 }
 
 
@@ -2279,7 +2285,9 @@ to set the keywords for this asset.
 
 sub update {
 	my $self = shift;
-	my $properties = shift;
+	my $requestedProperties = shift;
+    my $properties = clone($requestedProperties);
+	$properties->{lastModified} = time();
 	
     # if keywords were specified, then let's set them the right way
     if (exists $properties->{keywords}) {

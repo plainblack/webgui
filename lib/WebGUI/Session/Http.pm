@@ -162,8 +162,7 @@ sub getRedirectLocation {
 =head2 getStatus ( ) {
 
 Returns the current HTTP status code.  If no code has been set,
-the code returned will be 200.  If no description has been set,
-the internal description will be set to "OK" and "OK" will be returned.
+the code returned will be 200.
 
 =cut
 

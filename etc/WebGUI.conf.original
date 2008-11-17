@@ -51,11 +51,6 @@
 
 "gateway" : "/",
 
-# Enable this flag if you run or back up files on a case sensitive
-# file system.  This will ensure uniqueness in the uploads folder
-
-#"caseInsensitiveOS" : "1",
-
 # The relative or fully qualified URL to the extras folder
 # that comes with WebGUI.
 
@@ -484,6 +479,9 @@
    },
    "WebGUI::Asset::Wobject::Gallery" : {
       "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::DataTable" : {
+      "category" : "basic"
    },
    "WebGUI::Asset::Wobject::DataForm" : {
       "category" : "basic"

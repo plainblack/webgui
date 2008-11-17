@@ -161,7 +161,7 @@ sub getDataTableHtml {
     # Progressively enhance the bejesus out of it
     $html .= <<"ENDJS";
         <script type="text/javascript">
-            var myDataTable = WebGUI.Form.DataTable( "$id-container", $columnsJson, $optionsJson );
+            new WebGUI.Form.DataTable( "$id-container", $columnsJson, $optionsJson );
         </script>
 ENDJS
 

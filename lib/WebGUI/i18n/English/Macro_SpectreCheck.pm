@@ -3,9 +3,9 @@ package WebGUI::i18n::English::Macro_SpectreCheck;
 use strict;
 
 our $I18N = {
-	'spectre' => {
+	'success' => {
 		message => q|Spectre is OK|,
-		lastUpdated => 1202771219,
+		lastUpdated => 1226175390,
 		context => q|Message saying that Spectre is doing okay.|
 	},
 

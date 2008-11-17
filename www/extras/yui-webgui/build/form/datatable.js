@@ -322,10 +322,12 @@ WebGUI.Form.DataTable
                     "help",
                     "edit schema",
                     "delete confirm",
+                    "delete column",
                     "format text",
                     "format email",
                     "format link",
                     "format number",
+                    "format date",
                     "add column",
                     "cancel",
                     "ok",
@@ -346,7 +348,7 @@ WebGUI.Form.DataTable
         } );
     };
     // Run this automatically
-    YAHOO.util.Event.onDOMReady( this.initI18N, undefined, this );
+    YAHOO.util.Event.onContentReady( this.containerId, this.initI18N, undefined, this );
 
     /************************************************************************
      * showHelp ( event )
@@ -382,58 +384,144 @@ WebGUI.Form.DataTable
      */
     this.showSchemaDialog
     = function ( e ) {
+        
+        // Function to remove a column
+        var removeColumn = function ( e, colId ) {
+            var form    = this.element.getElementsByTagName( "form" )[0];
+            // Add to deleteCols
+            var deleteCols  = YAHOO.lang.JSON.parse( form.elements[ "deleteCols" ].value );
+            deleteCols.push( form.elements[ "oldKey_" + colId ].value );
+            form.elements[ "deleteCols" ].value 
+                = YAHOO.lang.JSON.stringify( deleteCols );
+            // Remove column from dialog
+            var div = document.getElementById( "col_" + colId );
+            div.parentNode.removeChild( div );
+        };
+
+        // Function to add a column
+        var addColumn   = function ( e ) {
+            // this is the dialog
+            var form    = this.element.getElementsByTagName( "form" )[0];
+
+            // Find the last indexed column
+            var newIdx  = 0;
+            while ( form.elements[ "oldKey_" + newIdx ] ) { newIdx++; }
+            
+            var div     = document.createElement( "div" );
+            div.id      = "col_" + newIdx;
+            
+            var button  = form.elements[ "removeColumn_" + (newIdx - 1) ].cloneNode(true);
+            button.id   = "removeColumn_" + newIdx;
+            var del     = new YAHOO.widget.Button( "removeColumn_" + newIdx, {
+                    type        : "push",
+                    container   : div,
+                    onclick     : {
+                        fn          : function () { removeColumn( i ) },
+                        scope       : this
+                    }
+            } );
+
+            var oldKey  = form.elements[ "oldKey_" + (newIdx - 1) ].cloneNode(true); 
+            oldKey.name     = "oldKey_" + newIdx;
+            oldKey.value    = "";
+            div.appendChild( oldKey );
+
+            var newKey  = form.elements[ "newKey_" + (newIdx - 1) ].cloneNode(true); 
+            newKey.name     = "newKey_" + newIdx;
+            newKey.value    = "New Column " + newIdx;
+            div.appendChild( newKey );
+
+            var format  = form.elements[ "format_" + (newIdx - 1) ].cloneNode(true); 
+            format.name             = "format_" + newIdx;
+            format.selectedIndex    = 0;
+            div.appendChild( format );
+
+            form.appendChild( div );
+        };
+        
         var dg  = new YAHOO.widget.Dialog( "editSchemaDialog", {
             modal           : true,
             fixedcenter     : true
         });
         dg.setHeader( this.i18n.get( "Form_DataTable", "edit schema" ) );
 
-        var body    = '<form>';
+        var body    = document.createElement( 'form' );
         var cols    = this.dataTable.getColumnSet().keys;
         for ( var i = 0; i < cols.length; i++ ) {
-            body = body
-                + '<input name="oldKey_' + i + '" type="hidden" value="' + cols[ i ].key + '" />'
-                + '<input name="newKey_' + i + '" value="' + cols[ i ].key + '"/>'
-                + '<select name="format_' + i + '">'
-                + '<option value="text"' + ( cols[ i ].formatter == "text" ? ' selected="selected"' : '' ) + '>' 
-                + this.i18n.get( "Form_DataTable", "format text" ) + '</option>'
-                + '<option value="number"' + ( cols[ i ].formatter == "number" ? ' selected="selected"' : '' ) + '>'
-                + this.i18n.get( "Form_DataTable", "format number" ) + '</option>'
-                + '<option value="link"' + ( cols[ i ].formatter == "link" ? ' selected="selected"' : '' ) + '>' 
-                + this.i18n.get( "Form_DataTable", "format link" ) + '</option>'
-                + '<option value="email"' + ( cols[ i ].formatter == "email" ? ' selected="selected"' : '' ) + '>' 
-                + this.i18n.get( "Form_DataTable", "format email" ) + '</option>'
-                + '</select><br/>'
+            //TODO: Refactor this to be a function, like addColumn above
+            var div = document.createElement( 'div' );
+            div.className   = "yui-skin-sam";
+            div.id          = "col_" + i;
+
+            var del     = new YAHOO.widget.Button( {
+                    type        : "push",
+                    label       : this.i18n.get( "Form_DataTable", "delete column" ),
+                    container   : div,
+                    onclick     : {
+                        fn          : removeColumn,
+                        obj         : i,
+                        scope       : dg
+                    }
+            } );
+
+            var oldKey  = document.createElement( "input" );
+            oldKey.type     = "hidden";
+            oldKey.name     = "oldKey_" + i;
+            oldKey.value    = cols[i].key;
+            div.appendChild( oldKey );
+
+            var newKey  = document.createElement( "input" );
+            newKey.type     = "text";
+            newKey.name     = "newKey_" + i;
+            newKey.value    = cols[i].key;
+            div.appendChild( newKey );
+
+            var format  = document.createElement('select');
+            format.name             = "format_" + i;
+            var availableFormats    = [
+                { 
+                    "value" : "text",
+                    "label" : this.i18n.get( "Form_DataTable", "format text" ) 
+                },
+                {
+                    "value" : "number",
+                    "label" : this.i18n.get( "Form_DataTable", "format number" ) 
+                },
+                {
+                    "value" : "email",
+                    "label" : this.i18n.get( "Form_DataTable", "format email" ) 
+                },
+                {
+                    "value" : "link", 
+                    "label" : this.i18n.get( "Form_DataTable", "format link" ) 
+                },
+                {
+                    "value" : "date", 
+                    "label" : this.i18n.get( "Form_DataTable", "format date" ) 
+                }
+            ];
+            for ( var x = 0; x < availableFormats.length; x++ ) {
+                var opt = new Option(
+                    availableFormats[x].label, 
+                    availableFormats[x].value,
+                    cols[i].formatter == availableFormats[x].value
+                );
+                format.appendChild( opt );
+            }
+            div.appendChild( format );
+
+            body.appendChild( div );
         }
-        body        += '</form>';
+
+        // Columns to delete
+        var deleteCols = document.createElement( "input" );
+        deleteCols.type = "hidden";
+        deleteCols.name = "deleteCols";
+        deleteCols.value = "[]";
+        body.appendChild( deleteCols );
+
         dg.setBody( body );
         
-        // Function to add a column
-        var addColumn   = function ( e ) {
-            // this is the dialog
-            var form    = this.element.getElementsByTagName( "form" )[0];
-
-            var newIdx  = 0;
-            while ( form.elements[ "oldKey_" + newIdx ] ) { newIdx++; }
-
-            var oldKey  = form.elements[ "oldKey_" + (newIdx - 1) ].cloneNode(true); 
-            oldKey.name     = "oldKey_" + newIdx;
-            oldKey.value    = "";
-            form.appendChild( oldKey );
-
-            var newKey  = form.elements[ "newKey_" + (newIdx - 1) ].cloneNode(true); 
-            newKey.name     = "newKey_" + newIdx;
-            newKey.value    = "New Column " + newIdx;
-            form.appendChild( newKey );
-
-            var format  = form.elements[ "format_" + (newIdx - 1) ].cloneNode(true); 
-            format.name             = "format_" + newIdx;
-            format.selectedIndex    = 0;
-            form.appendChild( format );
-
-            form.appendChild( document.createElement( "br" ) );
-        };
-
         dg.cfg.queueProperty( "buttons", [ 
             { text: this.i18n.get( "Form_DataTable", "add column" ), handler: addColumn },
             { text: this.i18n.get( "Form_DataTable", "cancel" ), handler: { fn: this.hideSchemaDialog, scope: this } },
@@ -520,8 +608,17 @@ WebGUI.Form.DataTable
      */
     this.updateSchema
     = function () {
-        var i       = 0;
-        var data    = this.schemaDialog.getData();
+        var data        = this.schemaDialog.getData();
+        
+        // First delete columns
+        var deleteCols  = YAHOO.lang.JSON.parse( data[ "deleteCols" ] );
+        for ( var x = 0; x < deleteCols.length; x++ ) {
+            var col = this.dataTable.getColumn( deleteCols[x] ); 
+            this.dataTable.removeColumn( col );
+        }
+
+        // Update columns
+        var i           = 0;
         while ( data[ "newKey_" + i ] ) {
             var oldKey  = data[ "oldKey_" + i ];
             var newKey  = data[ "newKey_" + i ];

@@ -1494,7 +1494,6 @@ sub processPropertiesFromFormPost {
 
     # Since we may be adding more events, set out version tag to be active if needed
     # Leave the original version tag available, we will need to reactivate it before returning
-        warn "trying to activate version tag\n";
     my $activeVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
     # if our version tag is active, we don't need a new one, and don't need to reactivate anything later
     if ($activeVersionTag && $activeVersionTag->getId eq $self->get('tagId')) {

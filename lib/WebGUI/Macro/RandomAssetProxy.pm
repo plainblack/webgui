@@ -41,7 +41,6 @@ sub process {
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);
 		#randomize;
-		srand;
 		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
 		if (defined $randomAsset) {

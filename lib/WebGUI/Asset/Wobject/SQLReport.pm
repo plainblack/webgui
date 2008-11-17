@@ -680,7 +680,9 @@ sub _processQuery {
                                                         'field.value'=>$data->{$name}
                                                         });
                                                 $colnum++;
-                                                $row{$prefix.'row.field.'.$name.'.value'} = $data->{$name};
+                                                my $tmpl_name = $name;
+                                                $tmpl_name =~ s/\ /-/g;
+                                                $row{$prefix.'row.field.'.$tmpl_name.'.value'} = $data->{$name};
                                         }
 					# Process nested query
                                         if($nest && $self->{_query}{$nr + 1}{dbQuery}) {

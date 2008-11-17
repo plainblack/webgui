@@ -1,3 +1,22 @@
+7.6.3
+ - improved performance of file uploads
+ - changed format of created uploads locations, avoiding case sensitivity problems
+ - fixed #8989: Missing profile field "showOnline" for the UsersOnline macro.
+ - Added DataTable to WebGUI.conf.original
+ - Added a better mechanism for calculating when content was last modified for
+   cache headers.
+ - The Syndicated Content asset was rewritten, and now uses 35% less memory
+   and is 400% faster.
+ - fixed #9025: Testing function of UsersOnline macro fails.
+ - fixed #9028: Thingy fails when setting values containing single quotes
+ - fixed #9047: Unable to reorder DataForm tabs
+ - added: Delete columns from DataTable
+ - fixed: Now more than one DataTable can be put on a page
+ - fixed #9002: add a variant in admin product view misses i18n link
+ - fixed #9034: Removed all instances of srand.  This is called implicitily by rand and be dangerous if called mulitple times by the same process.
+ - fixed: DataForm now allows you to edit existing tabs
+ - fixed #9064: SQLReport now replaces field name spaces with hyphens for the direct access template params.
+
 7.6.2
  - fixed: not allowed to add calendar events if in can edit group but not can add event group
  - sped up lineage changes significantly

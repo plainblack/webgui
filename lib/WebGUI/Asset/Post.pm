@@ -325,12 +325,6 @@ sub formatContent {
 }
 
 #-------------------------------------------------------------------
-# Too slow to try to find out children, just always assume new data
-sub getContentLastModified {
-    return time();
-}
-
-#-------------------------------------------------------------------
 sub getAutoCommitWorkflowId {
     my $self = shift;
     my $cs = $self->getThread->getParent;

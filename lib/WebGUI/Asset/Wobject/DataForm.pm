@@ -1272,7 +1272,7 @@ sub www_editTab {
 
     my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
     $f->hidden(
-        -name => "tabIdd",
+        -name => "tabId",
         -value => $tabId,
     );
     $f->hidden(
@@ -1383,7 +1383,7 @@ sub www_moveFieldDown {
         unless $self->canEdit;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
-    $self->moveFieldDown($fieldName);
+    $newSelf->moveFieldDown($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return $newSelf->www_view;
 }
@@ -1417,7 +1417,7 @@ sub www_moveFieldUp {
         unless $self->canEdit;
     my $newSelf = $self->addRevision;
     my $fieldName = $self->session->form->process('fieldName');
-    $self->moveFieldUp($fieldName);
+    $newSelf->moveFieldUp($fieldName);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return $newSelf->www_view;
 }
@@ -1452,7 +1452,7 @@ sub www_moveTabRight {
         unless $self->canEdit;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
-    $self->moveTabRight($tabId);
+    $newSelf->moveTabRight($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return $newSelf->www_view;
 }
@@ -1470,7 +1470,7 @@ sub moveTabRight {
     my $newPos = $currentPos + 1;
     if ($newPos < @$tabOrder) {
         splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
-        $self->_saveFieldConfig;
+        $self->_saveTabConfig;
     }
     return 1;
 }
@@ -1482,7 +1482,7 @@ sub www_moveTabLeft {
         unless $self->canEdit;
     my $newSelf = $self->addRevision;
     my $tabId = $self->session->form->process('tabId');
-    $self->moveTabLeft($tabId);
+    $newSelf->moveTabLeft($tabId);
     WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
     return $newSelf->www_view;
 }
@@ -1500,7 +1500,8 @@ sub moveTabLeft {
     my $newPos = $currentPos - 1;
     if ($newPos >= 0) {
         splice @$tabOrder, $newPos, 0, splice(@$tabOrder, $currentPos, 1);
-        $self->_saveFieldConfig;
+
+        $self->_saveTabConfig;
     }
     return 1;
 }

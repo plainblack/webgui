@@ -233,7 +233,7 @@ SKIP: {
 
     $storage = $taxer->exportTaxData();
     isa_ok($storage, 'WebGUI::Storage', 'exportTaxData returns a WebGUI::Storage object');
-    is($storage->{_part1}, 'temp', 'The storage object is in the temporary area');
+    is(substr($storage->getPathFrag, 0, 5), 'temp/', 'The storage object is in the temporary area');
     ok(-e $storage->getPath('siteTaxData.csv'), 'siteTaxData.csv file exists in the storage object');
     cmp_ok($storage->getFileSize('siteTaxData.csv'), '!=', 0, 'CSV file is not empty');
     my @fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');

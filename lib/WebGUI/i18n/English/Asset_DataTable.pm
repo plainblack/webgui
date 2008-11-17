@@ -14,6 +14,18 @@ our $I18N = {
         context     => q{Label for the tab with the editable data table},
     },
 
+    'editForm templateId label' => {
+        message     => q{DataTable Template},
+        lastUpdated => 1226174617,
+        context     => q{Label for asset edit screen},
+    },
+
+    'editForm templateId description' => {
+        message     => q{Select a template to display your data table.},
+        lastUpdated => 1226174619,
+        context     => q{Hover help for asset edit screen},
+    },
+
 };
 
 1;

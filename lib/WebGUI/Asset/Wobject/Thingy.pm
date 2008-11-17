@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::Thingy;
 #-------------------------------------------------------------------
 
 use strict;
-use version;
 use Tie::IxHash;
 use JSON;
 use WebGUI::International;
@@ -1283,19 +1282,20 @@ sub _updateFieldType {
         my $thingId = shift;
         my $assetId = shift;
         my $dbDataType = shift;
+        my $db = $session->db;
 
         my ($fieldType) = $self->session->db->quickArray("select fieldType from Thingy_fields where fieldId = "
-        .$self->session->db->quote($fieldId)." and  assetId = ".$self->session->db->quote($assetId)
-        ." and thingId = ".$self->session->db->quote($thingId));
+        .$db->quote($fieldId)." and  assetId = ".$db->quote($assetId)
+        ." and thingId = ".$db->quote($thingId));
 
         if($newFieldType ne $fieldType){
             my $thingyTableName = "Thingy_".$thingId;
             my $columnName = "field_".$fieldId;
             $error->info("changing column: $columnName, table: $thingyTableName");
             $self->session->db->write(
-                "ALTER TABLE ".$session->db->dbh->quote_identifier($thingyTableName).
-                " CHANGE ".$self->session->db->dbh->quote_identifier($columnName)." "
-                .$session->db->dbh->quote_identifier($columnName)." ".$dbDataType
+                "ALTER TABLE ".$db->dbh->quote_identifier($thingyTableName).
+                " CHANGE ".$db->dbh->quote_identifier($columnName)." "
+                .$db->dbh->quote_identifier($columnName)." ".$dbDataType
             );
         }
     return undef;
@@ -3008,7 +3008,8 @@ sequenceNumber');
                 "searchFields_is".$fieldType => 1,
             });
             my $searchValue = $session->form->process("field_".$field->{fieldId});
-            push(@constraints,$dbh->quote_identifier("field_".$field->{fieldId})." like '%".$searchValue."%'") if ($searchValue);
+            push @constraints, $dbh->quote_identifier("field_".$field->{fieldId}) . " LIKE "
+                . $dbh->quote('%'.$searchValue.'%') if ($searchValue);
         }
         if($field->{displayInSearch}){
             my $orderByUrl = $self->session->url->append($currentUrl,"orderBy=".$field->{fieldId});

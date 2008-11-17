@@ -811,12 +811,6 @@ sub duplicate {
 }
 
 #-------------------------------------------------------------------
-# Too slow to try to find out children, just always assume new data
-sub getContentLastModified {
-    return time();
-}
-
-#-------------------------------------------------------------------
 
 =head2 getEditTabs
 
