@@ -270,7 +270,7 @@ Returns a list of fluxRuleIds that have been true for the given user at least
 once (e.g. dateRuleFirstTrue is not null).
 If users progress linearly through a sequence of rules (think sticky), then 
 this method can be used to determine in a single sql query how far they have
-progressed along the linear sequence. See also getHighestSticky.
+progressed along the linear sequence. See also getLinearProgression.
 
 =cut
 
@@ -301,54 +301,77 @@ END_SQL
 
 #-------------------------------------------------------------------
 
-=head2 getHighestSticky ( arg_ref )
+=head2 getLinearProgression ( arg_ref )
 
-Returns the last fluxRuleIds in a linear sequence.
-First uses getStickies to determine all known results in a single sql query.
-Then tries to execute the remaining rules in case the user now passes. Stops trying 
-rules as soon as one fails, so at most you'll have one wasteful rule eval. 
+Walk through fluxRuleIds in a linear sequence. Stop as soon as a rule is false, unless
+the rule has been flagged as skippable.
+
+Excluding situations where you allow multipel rules to be skipped, this sub will only
+wastefully evaluate one Rule (the first rule that fails). If most of your rules are sticky
+then this sub doesn't need to do much work at all.
+
+Returns an array of result hashes, with the result undefined for rules that we didn't reach.
 
 =cut
 
-sub getHighestSticky {
+sub getLinearProgression {
     my $class = shift;
 
-    my %args = validate( @_, { fluxRuleIds => { type => ARRAYREF }, user => { isa => 'WebGUI::User' }, skippableFluxRuleIds => { type => ARRAYREF, optional => 1 }, } );
+    my %args = validate(
+        @_,
+        {   fluxRuleIds          => { type => ARRAYREF },
+            user                 => { isa  => 'WebGUI::User' },
+            skippableFluxRuleIds => { type => ARRAYREF, optional => 1 },
+            adminAlwaysTrue => 0,
+        }
+    );
 
+    # Build a hash of rules that Flux already knows are true
     my %stickies = map { $_ => 1 } $class->getStickies( fluxRuleIds => $args{fluxRuleIds}, user => $args{user} );
-    my %skippable = map { $_ => 1 } (@{$args{skippableFluxRuleIds}});
+    my %skippable = map { $_ => 1 } ( @{ $args{skippableFluxRuleIds} } );
 
     my $user    = $args{user};
     my $session = $user->session;
+    
+    my $force_true = $args{adminAlwaysTrue} && $user->isInGroup(3);
 
-    my $highest;
+    my @results;
 
     # Find the last fluxRuleId that evaluates to true
     foreach my $fluxRuleId ( @{ $args{fluxRuleIds} } ) {
 
+        if ( $force_true ) {
+            $session->log->debug("Admin user, so $fluxRuleId forced to be true");
+            push @results, { id => $fluxRuleId, success => 1 };
+            next;
+        }
+
         if ( $stickies{$fluxRuleId} ) {
             $session->log->debug("$fluxRuleId is a known sticky, no need to eval");
-            $highest = $fluxRuleId;
+            push @results, { id => $fluxRuleId, success => 1 };
             next;
         }
 
-        $session->log->debug("Evaluating $fluxRuleId due to getHighestSticky search");
+        $session->log->debug("Evaluating $fluxRuleId due to getLinearProgression search");
 
-        if ( $class->evaluateFor( { user => $user, fluxRuleId => $fluxRuleId } ) ) {
+        my $result = $class->evaluateFor( { user => $user, fluxRuleId => $fluxRuleId } );
+        push @results, { id => $fluxRuleId, success => $result };
+
+        if ($result) {
             $session->log->debug("$fluxRuleId evaluated true, continuing search..");
-            $highest = $fluxRuleId;
             next;
         }
-        
-        if ($skippable{$fluxRuleId}) {
+
+        if ( $skippable{$fluxRuleId} ) {
             $session->log->debug("$fluxRuleId evaluated false, but in skippable so continuing search..");
             next;
         }
 
-        $session->log->debug("$fluxRuleId evaluated false, search ends with $highest");
+        $session->log->debug("$fluxRuleId evaluated false, search ends here");
         last;
     }
-    return $highest;
+
+    return @results;
 }
 
 1;
