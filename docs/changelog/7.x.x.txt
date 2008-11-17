@@ -20,6 +20,7 @@
  - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
  - fixed #9068: field.inTab
  - fixed #8845: Workflows refusing to show edit screen
+ - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
 
 7.6.3
  - improved performance of file uploads
