@@ -58,11 +58,17 @@ sub getNext {
     if (defined $firstChild) {
         return $firstChild;
     }
-    my $siblingLineage = $startingAsset->getParent->get('lineage').$startingAsset->formatRank($startingAsset->getRank()+1);
-    my $firstSib = WebGUI::Asset->newByLineage($session, $siblingLineage);
-    if (defined $firstSib) {
-        return $firstSib;
+    ##No children, try the first sibling after me
+    my $firstAsset = $startingAsset;
+    while ($firstAsset->getId ne $topPage->getId) {
+        my $siblingLineage = $firstAsset->getParent->get('lineage').$firstAsset->formatRank($firstAsset->getRank()+1);
+        my $firstSib = WebGUI::Asset->newByLineage($session, $siblingLineage);
+        if (defined $firstSib) {
+            return $firstSib;
+        }
+        $firstAsset = $firstAsset->getParent;
     }
+    ##No valid siblings after me, try my parent's siblings.
     return undef;
 }
 
