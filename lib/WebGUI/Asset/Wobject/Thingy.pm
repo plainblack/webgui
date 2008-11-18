@@ -327,6 +327,35 @@ sub deleteField {
 
 #-------------------------------------------------------------------
 
+=head2 copyThingData ( )
+
+Copies data in a Thing.
+
+=head3 thingId
+
+The id of the Thing that should be copied.
+
+=head3 thingDataId
+
+The id of row of data that should be copied.
+
+=cut
+
+sub copyThingData {
+    my $self = shift;
+    my $thingId = shift;
+    my $thingDataId = shift;
+    my $db = $self->session->db;
+    return undef unless $self->canEditThingData($thingId, $thingDataId);;
+
+    $self->copyCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+
+    return undef;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 deleteThingData ( )
 
 Deletes data in a Thing.
@@ -1368,6 +1397,27 @@ sub www_deleteFieldConfirm {
 }
 #-------------------------------------------------------------------
 
+=head2 www_copyThingData( )
+
+Copies data in a Thing.
+
+=cut
+
+sub www_copyThingData{
+
+    my $self        = shift;
+    my $thingId     = $self->session->form->process("thingId");
+    my $thingDataId = $self->session->form->process('thingDataId');
+
+    return $self->session->privilege->insufficient() unless $self->canEditThingData($thingId, $thingDataId);
+    
+    $self->copyThingData($thingId,$thingDataId);
+    
+    return $self->www_search;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteThingConfirm ( )
 
 Deletes a Thing, including field definitions and instances of this Thing and drops the table that holds the
@@ -2203,11 +2253,18 @@ sub editThingData {
 
     if($canEditThingData){
         if ($thingDataId ne "new"){
+            $var->{"copy_url"} = $session->url->append($url, 'func=copyThingData;thingId='.$thingId.';thingDataId='.$thingDataId);
+        }
+    }
+
+    if($canEditThingData){
+        if ($thingDataId ne "new"){
             $var->{"delete_url"} = $session->url->append($url, 'func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId);
         }
         $var->{"delete_confirm"} = "onclick=\"return confirm('".$i18n->get("delete thing data warning")."')\"";
     }
+
     if($self->hasPrivileges($thingProperties->{groupIdAdd}) && !$self->hasEnteredMaxPerUser($thingId)){    
         $var->{"add_url"} = $session->url->append($url,'func=editThingData;thingId='.$thingId.';thingDataId=new');
     }
@@ -3082,6 +3139,8 @@ sequenceNumber');
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
+            .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_copy_icon} = $session->icon->copy('func=copyThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
         }
         push(@searchResult_loop,\%templateVars);

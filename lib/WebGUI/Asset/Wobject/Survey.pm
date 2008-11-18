@@ -947,7 +947,7 @@ sub www_viewGradeBook{
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
     my @peoples = $self->session->db->quickArray("SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",[$self->getId()]);
     for my $people(@peoples){
-
+        #my $
 
     }
         
