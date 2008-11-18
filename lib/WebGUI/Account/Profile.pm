@@ -359,17 +359,23 @@ sub www_edit {
         my @fields = ();
         use Data::Dumper;
         foreach my $field (@{ $category->getFields( { editable => 1 } ) }) {
-            next if $field->getId =~ m/contentPositions/; #This protects the contentPosition fields
             my $fieldId      = $field->getId;
             my $fieldLabel   = $field->getLabel;
             my $fieldForm    = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->profileField($fieldId)) });
             my $fieldSubtext = $field->isRequired ? "*" : undef;
             my $fieldExtras  = $field->getExtras;
+            my $fieldPrivacy = WebGUI::Form::radoList($session,{
+                name    => "privacy_$fieldId",
+                options => $field->getPrivacyOptions($session),
+                value   => $user->getProfileFieldPrivacySetting($fieldId)
+            });
+
             #Create a seperate template var for each field
             $var->{'profile_field_'.$fieldId.'_form'   } = $fieldForm;
             $var->{'profile_field_'.$fieldId.'_label'  } = $fieldLabel;
             $var->{'profile_field_'.$fieldId.'_subtext'} = $fieldSubtext;
             $var->{'profile_field_'.$fieldId.'_extras' } = $fieldExtras;
+            $var->{'profile_field_'.$fieldId.'_privacy'} = $fieldPrivacy;
             
             push(@fields, {
                 'profile_field_id'      => $fieldId,
@@ -377,6 +383,7 @@ sub www_edit {
 				'profile_field_label'   => $fieldLabel,
 				'profile_field_subtext' => $field->isRequired ? "*" : undef,
                 'profile_field_extras'  => $field->getExtras,
+                'profile_field_privacy' => $fieldPrivacy,
 			});
         }
 
@@ -466,7 +473,6 @@ sub www_view {
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session,{ visible => 1})}) {
         my @fields = ();
         foreach my $field (@{$category->getFields({ visible => 1 })}) {
-            next if $field->getId =~ m/contentPositions/; #This protects the contentPosition fields
             my $fieldId      = $field->getId;
             my $fieldLabel   = $field->getLabel;
             my $fieldValue   = $field->formField(undef,2,$user);
