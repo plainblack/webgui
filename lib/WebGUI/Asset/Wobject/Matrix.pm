@@ -478,6 +478,8 @@ sub view {
     my $db      = $session->db; 
 
     # javascript and css files for compare form datatable
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
+        {type =>'text/css', rel=>'stylesheet'});
     $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>
@@ -490,12 +492,11 @@ sub view {
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-beta-min.js'), {type =>
     'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
+    'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
     'text/javascript'});
-    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
-        {type =>'text/css', rel=>'stylesheet'});
 
-	#This automatically creates template variables for all of your wobject's properties.
 	my $var = $self->get;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
@@ -509,9 +510,10 @@ sub view {
             limit               => 1,
             returnObjects       => 1,
         }) };
-    $var->{bestViews_url}   = $bestViews_listing->getUrl;
-    $var->{bestViews_count} = $bestViews_listing->get('views');
-    $var->{bestViews_name}  = $bestViews_listing->get('title');
+    $var->{bestViews_url}           = $bestViews_listing->getUrl;
+    $var->{bestViews_count}         = $bestViews_listing->get('views');
+    $var->{bestViews_name}          = $bestViews_listing->get('title');
+    $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
 
     # Get the MatrixListing with the most compares as an object using getLineage.
 
@@ -522,9 +524,10 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestCompares_url}   = $bestCompares_listing->getUrl;
-    $var->{bestCompares_count} = $bestCompares_listing->get('views');
-    $var->{bestCompares_name}  = $bestCompares_listing->get('title');
+    $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
+    $var->{bestCompares_count}      = $bestCompares_listing->get('views');
+    $var->{bestCompares_name}       = $bestCompares_listing->get('title');
+    $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
 
     # Get the MatrixListing with the most clicks as an object using getLineage.
     my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
@@ -534,10 +537,12 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestClicks_url}   = $bestClicks_listing->getUrl;
-    $var->{bestClicks_count} = $bestClicks_listing->get('views');
-    $var->{bestClicks_name}  = $bestClicks_listing->get('title');
+    $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
+    $var->{bestClicks_count}        = $bestClicks_listing->get('views');
+    $var->{bestClicks_name}         = $bestClicks_listing->get('title');
+    $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
 
+=cut
     # Get the MatrixListing that was last updated as an object using getLineage.
 
     my ($bestUpdated_listing) = @{ $self->getLineage(['descendants'], {
@@ -546,9 +551,11 @@ sub view {
             limit               => 1,
             returnObjects       => 1,
         }) };
-    $var->{bestUpdated_url}     = $bestUpdated_listing->getUrl;
-    $var->{bestUpdated_date}    = $session->datetime->epochToHuman( $bestUpdated_listing->get('revisionDate') );
-    $var->{bestUpdated_name}    = $bestUpdated_listing->get('title');
+    $var->{bestUpdated_url}         = $bestUpdated_listing->getUrl;
+    $var->{bestUpdated_date}        = $session->datetime->epochToHuman( $bestUpdated_listing->get('revisionDate') );
+    $var->{bestUpdated_name}        = $bestUpdated_listing->get('title');
+    $var->{bestUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+=cut
 
     # Get the 5 MatrixListings that were last updated as objects using getLineage.
 
@@ -565,6 +572,8 @@ sub view {
                         lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('revisionDate'),"%z")
                     });
     }
+    $var->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+
 
     # Get all the MatrixListings that are still pending.
 
@@ -702,7 +711,7 @@ sub www_compare {
 
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;
-        $listingId_safe =~ s/-/_/g;
+        $listingId_safe =~ s/-/_____/g;
         push(@columnKeys, $listingId_safe);
         push(@columnKeys, $listingId_safe."_compareColor");
     }
@@ -978,28 +987,42 @@ assetData.revisionDate
                     if($param =~ m/^search_/){
                         my $attributeId = $param;
                         $attributeId =~ s/^search_//;
-                        $attributeId =~ s/_/-/;
-                        my $listingValue = $session->db->quickScalar("
-                            select value from MatrixListing_attribute
-                            where attributeId = ? and matrixListingId = ?
+                        $attributeId =~ s/_____/-/;
+                        my ($listingValue,$fieldType) = $session->db->quickArray("
+                            select value, fieldType from MatrixListing_attribute as listing
+                            left join Matrix_attribute using(attributeId)
+                            where listing.attributeId = ? and listing.matrixListingId = ?
                         ",[$attributeId,$result->{assetId}]);
-                        $self->session->errorHandler->warn("attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
-                        if($form->process($param) eq $listingValue){
-                            $self->session->errorHandler->warn("--Checked--");
-                            $result->{checked} = 'checked';
+                        $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
+                        if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
+                            undef $result->{checked};
+                            last;
+                        }
+                        elsif(($fieldType ne 'MatrixCompare') && ($form->process($param) ne $listingValue)){
+                            undef $result->{checked};
+                            last;
                         }
                         else{
-                            undef $result->{checked};
+                            $self->session->errorHandler->warn("--Checked--");
+                            $result->{checked} = 'checked';
                         }
                     }    
                 }
             }
             else{
+                $result->{assetId}  =~ s/-/_____/g;
                 if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
                     $result->{checked} = 'checked';
                 }
             }
-            $result->{assetId} =~ s/-/_/g;
+            $result->{assetId}  =~ s/-/_____/g;
+            $result->{url}      = "/".$result->{url};
+            $result->{checkBox} = "<input type='checkbox' name='listingId' value='".$result->{assetId}
+                                    ."' id='".$result->{assetId}."_checkBox' ";
+            if($result->{checked}){
+                $result->{checkBox} .= " checked='checked'";
+            }
+            $result->{checkBox} .= " onChange='javascript:compareFormButton()' class='compareCheckBox'>";
     }
 =cut        
 push(@results,{
@@ -1043,10 +1066,11 @@ sub www_getCompareListData {
     my $sortDirection = ' asc';
 
     foreach my $listingId (@listingIds){
-        $listingId =~ s/_/-/g;
+        $listingId =~ s/_____/-/g;
         my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
+        $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
-        $listingId_safe =~ s/-/_/g;
+        $listingId_safe =~ s/-/_____/g;
         push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors"});
     }
 
@@ -1059,7 +1083,7 @@ sub www_getCompareListData {
         my $tableCount = "b";
         foreach my $listingId (@listingIds) {
             my $listingId_safe = $listingId;
-            $listingId_safe =~ s/-/_/g;
+            $listingId_safe =~ s/-/_____/g;
             $fields .= ", ".$tableCount.".value as `$listingId_safe`";
             $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId="
                 .$tableCount.".attributeId and ".$tableCount.".matrixListingId=? ";
@@ -1072,9 +1096,9 @@ sub www_getCompareListData {
     }
     foreach my $result (@results){
         foreach my $listingId (@listingIds) {
-            $result->{attributId} =~ s/-/_/g;
+            $result->{attributId} =~ s/-/_____/g;
             my $listingId_safe = $listingId;
-            $listingId_safe =~ s/-/_/g;
+            $listingId_safe =~ s/-/_____/g;
             if ($result->{fieldType} eq 'MatrixCompare'){
                 my $originalValue = $result->{$listingId_safe};
                 $result->{$listingId_safe.'_compareColor'} = $self->getCompareColor($result->{$listingId_safe});
@@ -1132,7 +1156,7 @@ sub www_search {
     my $self    = shift;
     my $var     = $self->get;
     
-    #$var->{compareForm}     = $self->getCompareForm;
+    $var->{compareForm}     = $self->getCompareForm;
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
         {type => 'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
@@ -1169,7 +1193,7 @@ sub www_search {
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label} = $attribute->{name};
             $attribute->{id} = $attribute->{attributeId};
-            $attribute->{id} =~ s/-/_/g;
+            $attribute->{id} =~ s/-/_____/g;
             $attribute->{extras} = " class='attributeSelect'";
             if($attribute->{fieldType} eq 'Combo'){    
                 $attribute->{fieldType} = 'SelectBox';

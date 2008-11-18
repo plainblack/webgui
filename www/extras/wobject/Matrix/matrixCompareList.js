@@ -93,7 +93,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             scope : myDataTable
         };
 
-	var btnCompare = new YAHOO.widget.Button("compare");
+	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
         btnCompare.on("click", function(e) {
 		var uri = "func=getCompareListData";
 		for (var i = 0; i < columnKeys.length; i++) {
@@ -107,6 +107,25 @@ YAHOO.util.Event.addListener(window, "load", function() {
             	this.myDataSource.sendRequest(uri,callback2); 
         },this,true);
 
+	//btnCompare.set("disabled",true);
+	alert(btnCompare.get("disabled"));
+	
+
+	window.compareFormButton = function() {
+		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		var checked = 0;
+		for (var i = compareCheckBoxes.length; i--; ) {
+			if(compareCheckBoxes[i].checked){	
+				checked++;
+			}
+    		}
+		if (checked > 1){
+			btnCompare.set("disabled",false);
+		}else{
+			btnCompare.set("disabled",true);
+		}
+	}
+
 	var btnStickied = new YAHOO.widget.Button("stickied");
         btnStickied.on("click", function(e) {
 		var elements = myDataTable.getRecordSet().getRecords();
@@ -117,9 +136,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				var checkBox = Dom.get(attributeId+"_stickied");
 				if (checkBox.checked == false){
 					elRow = myDataTable.getTrEl(elements[i]);
-					//var styleNow = Dom.getStyle(elRow, "display");
-					//alert(styleNow);
-                			Dom.setStyle(elRow, "display", "none");
+					Dom.setStyle(elRow, "display", "none");
 				}
 			}
 			hideStickies = 1;

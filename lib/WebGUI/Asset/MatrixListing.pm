@@ -325,9 +325,9 @@ sub incrementCounter {
     my $counter = shift;
     
     my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
-    print "current ip: ".$currentIp."<br>";
+    #print "current ip: ".$currentIp."<br>";
     
-    print "dsfsdf lastIp : ".$self->get($counter."LastIp")."<br>";
+    #print "dsfsdf lastIp : ".$self->get($counter."LastIp")."<br>";
     unless ($self->get($counter."LastIp") eq $currentIp) {
         $self->update({ 
             $counter."LastIp"   => $currentIp,
