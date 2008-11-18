@@ -23,7 +23,7 @@ Package WebGUI::Macro::DeactivateAccount
 Macro for displaying a url to the user for deactivating their account, if
 the setting is turned on.
 
-=head2 process ( [deactivateText, template ] )
+=head2 process ( deactivateText )
 
 process takes two optional parameters for customizing the content and layout
 of the self deactivation link.
@@ -32,7 +32,7 @@ of the self deactivation link.
 
 The text displayed to the user for this link.  If this is blank an internationalized default is used.
 
-=head3 template
+=head3 linkonly
 
 The url for a template from the Macro/DeactivateAccount namespace to use for formatting the link.
 
@@ -41,20 +41,19 @@ The url for a template from the Macro/DeactivateAccount namespace to use for for
 #-------------------------------------------------------------------
 sub process {
     my $session = shift;
-    my ($deactivateText, $templateName) = @_;
+    my ($deactivateText, $linkonly) = @_;
 
     return "" unless ($session->setting->get("selfDeactivation") && !$session->user->isAdmin);
 
-    my $i18n = WebGUI::International->new($session);
-    my $var  = {};    
-        
-    $var->{'self_deactivation_url' } = $session->url->page('op=auth;method=deactivateAccount');
-    $var->{'self_deactivation_text'} = $deactivateText || $i18n->get(65);    
+    my $deactivateUrl = $session->url->page('op=auth;method=deactivateAccount');
 
-    my $template = $templateName    ? WebGUI::Asset::Template->newByUrl($session, $templateName)
-                                    : WebGUI::Asset::Template->new($session, "CocyDcs-NqmKtPy0Bs_vUA")
-                                    ;
-    return $template->process($var);
+    return $deactivateUrl if($linkonly);
+
+    my $i18n           = WebGUI::International->new($session);
+    my $format         = q{<a href="%s">%s</a>};
+    $deactivateText    = $i18n->get(65) unless ($deactivateText);
+    
+    return sprintf($format,$deactivateUrl,$deactivateText);
 }
 
 1;

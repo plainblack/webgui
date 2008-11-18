@@ -31,8 +31,8 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-migrateSurvey($session);
 addVersionTagMode($session);
+migrateSurvey($session);
 addPosMode($session);
 fixFriendsGroups( $session );
 upgradeAccount( $session );
@@ -386,7 +386,7 @@ sub upgradeAccount {
 
     #Add new macros to the config file
     $session->config->addToHash("macros","BackToSite","BackToSite");
-    $session->config->addToHash("macros","HasValueText","HasValueText");
+    $session->config->addToHash("macros","If","If");
     $session->config->addToHash("macros","DeactivateAccount","DeactivateAccount");
 
     

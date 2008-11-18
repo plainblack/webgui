@@ -1,4 +1,4 @@
-package WebGUI::Macro::HasValueText;
+package WebGUI::Macro::If;
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
@@ -14,7 +14,7 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::Macro::HasValueText
+Package WebGUI::Macro::If
 
 =head1 DESCRIPTION
 
