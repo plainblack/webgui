@@ -421,7 +421,7 @@ sub upgradeAccount {
     
     #Add the settings for the friends module
     $setting->add("friendsStyleTemplateId",""); #Use the userStyle by default
-    $setting->add("friendsLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
+    $setting->add("friendsLayoutTempalteId","zrNpGbT3odfIkg6nFSUy8Q");
     $setting->add("friendsViewTemplateId","1Yn_zE_dSiNuaBGNLPbxtw");
     $setting->add("friendsEditTemplateId","AZFU33p0jpPJ-E6qLSWZng");
     $setting->add("friendsSendRequestTemplateId","AGJBGviWGAwjnwziiPjvDg");

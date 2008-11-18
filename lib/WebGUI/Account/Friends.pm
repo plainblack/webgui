@@ -45,11 +45,12 @@ sub appendCommonVars {
     my $user    = $session->user;
     my $pageUrl = $session->url->page;
 
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
-    $var->{'view_profile_url'  } = $user->getProfileUrl($pageUrl);
-    $var->{'edit_profile_url'  } = $session->url->page("op=account");
-    $var->{'back_url'          } = $session->env->get("HTTP_REFERER") || $var->{'view_profile_url'}
+    $self->SUPER::appendCommonVars($var);
+
+    $var->{'is_edit'         } = $self->uid eq "";
+    $var->{'can_edit_friends'} = ($self->uid eq "" || $self->uid eq $session->user->userId);
+    $var->{'edit_friends_url'} = $self->getUrl("module=friends;do=view");
+    $var->{'view_friends_url'} = $self->getUrl("module=friends;do=view;uid=".$session->user->userId);
 }
 
 #-------------------------------------------------------------------
@@ -225,7 +226,7 @@ This method returns the template ID for the account layout.
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return $self->session->setting->get("friendsLayoutTempalteId") || $self->SUPER::getLayoutTemplateId;
+    return $self->session->setting->get("friendsLayoutTempalteId") || "zrNpGbT3odfIkg6nFSUy8Q";
 }
 
 
@@ -488,7 +489,6 @@ sub www_view {
     $self->appendCommonVars($var);
     
     my $displayView           = $uid ne "";
-    $var->{'can_edit'       } = $session->user->userId eq $user->userId;
     $var->{'display_message'} = $msg;
 
     #Override these

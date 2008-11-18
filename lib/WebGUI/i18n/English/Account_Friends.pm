@@ -94,13 +94,13 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
-    'edit my profile' => {
-        message => q|edit my profile|,
+    'edit my friends' => {
+        message => q|edit my friends|,
 		lastUpdated => 1068703399    
     },
 
-    'profile as others label' => {
-        message     => q{view my profile as others see it},
+    'friends as others label' => {
+        message     => q{view my friends as others see them},
         lastUpdated => 1119068809
     },
 
@@ -166,11 +166,6 @@ Thanks,
     'does not want to be a friend' => {
         message     => q{This user prefers not to be added as a friend.},
         lastUpdated => 1186264488,
-    },
-    
-    '' => {
-        message     => q{},
-        lastUpdated => 1225724810,
     },
 
     'back to user profile' => {
