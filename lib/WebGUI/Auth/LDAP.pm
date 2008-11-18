@@ -355,8 +355,7 @@ sub displayAccount {
         $vars->{'account.form.karma'} = $self->session->user->profileField("karma");
         $vars->{'account.form.karma.label'} = $i18n->get(537);
     }
-    WebGUI::Account->appendAccountLinks($self->session,$vars);
-    
+
     ########### ACCOUNT SHUNT
     #The following is a shunt which allows the displayAccount page to be displayed in the
     #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken

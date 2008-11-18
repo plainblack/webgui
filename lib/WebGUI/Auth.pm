@@ -482,9 +482,6 @@ sub displayAccount {
 	}
 	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
 	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
-
-    #Appends 'account.options' loop along with some new links
-    WebGUI::Account->appendAccountLinks($self->session,$vars);
     
     ########### ACCOUNT SHUNT
     #The following is a shunt which allows the displayAccount page to be displayed in the

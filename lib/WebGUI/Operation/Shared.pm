@@ -27,18 +27,14 @@ Shared routines for WebGUI Operations.
 
 TODO: DOCUMENT ME
 
-DEPRECATED - USE WebGUI::Account->appendAccountOptions
+DEPRECATED - USE Macros to display account options
 
 =cut
 
 #-------------------------------------------------------------------
  sub accountOptions {
 	my $session = shift;
-	
-    my $vars = {};
-    WebGUI::Account->appendAccountLinks($session,$vars);
-
-    return $vars->{'account.options'};
+    return "";
 }
 
 =head2 secureEval ( $session, $code )

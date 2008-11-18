@@ -33,76 +33,7 @@ readonly session => my %session;
 readonly module  => my %module;
 public   method  => my %method;
 public   uid     => my %uid;
-public   store   => my %store;  #This is an all purpose hash to store stuff in: $store{id $self}->{something} = "something"
-
-#-------------------------------------------------------------------
-
-=head2 appendAccountLinks ( session , var)
-
-    Class method which appends common links to preform various account tasks
-
-=head3 session
-
-    WebGUI::Session object
-
-=head3 var
-
-    hash ref to append template variables to
-
-=cut
-
-sub appendAccountLinks {
-    my $class   = shift;
-    my $session = shift;
-    my $var     = shift;
-
-    return unless $var;
-
-	my $i18n    = WebGUI::International->new($session);
-    my $format  = q{<a href="%s">%s</a>};
-	my @array   = ();
-        
-    #Turn Admin On
-	if ($session->user->isInGroup(12)) {
-        if ($session->var->isAdminOn) {
-            $var->{'admin_mode_url' }  = $session->url->page('op=switchOffAdmin');
-            $var->{'admin_mode_text'} = $i18n->get(12);
-		}
-        else {
-            $var->{'admin_mode_url' }  = $session->url->page('op=switchOnAdmin');
-            $var->{'admin_mode_text'} = $i18n->get(63);
-		}
-	    push(@array,{
-            'options.display' => sprintf($format,$var->{'admin_mode_url'},$var->{'admin_mode_text'})
-        });
-	}
-
-    #Logout
-    $var->{'logout_url' } = $session->url->page('op=auth;method=logout');
-    $var->{'logout_text'} = $i18n->get(64);
-    push(@array,{
-        'options.display' => sprintf($format,$var->{'logout_url'},$var->{'logout_text'})
-    });
-
-    #Deactivate Account
-	if ($session->setting->get("selfDeactivation") && !$session->user->isAdmin){
-        $var->{'self_deactivation_url' } = $session->url->page('op=auth;method=deactivateAccount');
-        $var->{'self_deactivation_text'} = $i18n->get(65);
-        push(@array,{
-            'options.display' => sprintf($format,$var->{'self_deactivation_url' },$var->{'self_deactivation_text'})
-        });
-	}
-
-    #Return to site
-    $var->{'return_to_site_url' } = $session->url->getBackToSiteURL;
-    $var->{'return_to_site_link'} = $i18n->get(493);
-    push(@array,{
-        'options.display' => sprintf($format,$var->{'return_to_site_url'},$var->{'return_to_site_link'})
-    });
-
-    $var->{'account.options'} = \@array;
-}
-
+public   store   => my %store;  #This is an all purpose hash to store stuff in: $self->store->{something} = "something"
 
 #-------------------------------------------------------------------
 

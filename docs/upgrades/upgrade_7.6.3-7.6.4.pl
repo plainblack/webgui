@@ -383,6 +383,12 @@ sub upgradeAccount {
         }
         $session->config->set( "contentHandlers", \@newHandlers );
     }
+
+    #Add new macros to the config file
+    $session->config->addToHash("macros","BackToSite","BackToSite");
+    $session->config->addToHash("macros","HasValueText","HasValueText");
+    $session->config->addToHash("macros","DeactivateAccount","DeactivateAccount");
+
     
     #Add the settings for the profile module
     $setting->add("profileStyleTemplateId",""); #Use the userStyle by default

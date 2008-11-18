@@ -16,7 +16,11 @@ save you many hours of grief.
      custom templates prior to upgrading as you will need to modify them for
      the new system.
 
-  * The Survey system has been completely updated.  Please make sure you
+   * The Auth display account template no longer has the account.options loop
+     available.  This loop has been replaced entirely by macros to provide more
+     flexibility.  Any custom templates will need to be updated accordingly.
+
+   * The Survey system has been completely updated.  Please make sure you
      create full backups of your survey results and export them as needed.
      Results will not be imported into the new Survey system.  Your old surveys
      will be imported into the new survey system.

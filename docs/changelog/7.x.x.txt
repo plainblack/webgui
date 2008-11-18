@@ -5,6 +5,9 @@
  - New Inbox Account module added providing a better interface into WebGUI's various messaging systems
  - New Friends Account module added providing a better interface into WebGUI's friends system
  - The Display Account and My Purchases interfaces have been added to the new Account system
+ - Added a new macro which returns the self deactivation link if the setting is enabled.
+ - Added a new macro which returns the back to site link
+ - Added a new macro which allows users to test to see if a value is not empty and set the display text accordingly.
    not be imported, only the surveys themselves.
  - Made syndicated content asset use cache.
  - Added Cashier/Point of Sale mode for the Shop.
