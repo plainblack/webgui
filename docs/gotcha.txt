@@ -9,11 +9,12 @@ save you many hours of grief.
 
 7.6.4
 --------------------------------------------------------------------
-   * The user facing portions of WebGUI's profile, inbox, and friends systems
-     have been completely updated.  No data will be lost but all templates
-     including custom templates that are related to these systems will be deleted
-     on upgrade.  Please make sure you export your custom templates prior to
-     upgrading as you will need to modify them for the new system.
+   * The user facing portions of WebGUI's profile, inbox, friends, and "invite
+     a friend" systems have been completely updated.  No data will be lost
+     but all templates including custom templates that are related to these
+     systems will be deleted on upgrade.  Please make sure you export your
+     custom templates prior to upgrading as you will need to modify them for
+     the new system.
 
   * The Survey system has been completely updated.  Please make sure you
      create full backups of your survey results and export them as needed.

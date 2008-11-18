@@ -27,13 +27,27 @@
             height: 300px;
             border: solid #BECEF8 1px;
             margin-left: 50px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             overflow:-moz-scrollbars-vertical;
             overflow-x:hidden;
             overflow-y:scroll;
             background-color: white;
             text-align: left;
         }
+
+        .userInvite_subject {
+            width: 500px;
+            height: 25px;
+            border: solid #BECEF8 1px;
+            /*margin-left: 50px;*/
+            /*margin-bottom: 20px;*/
+            /*overflow:-moz-scrollbars-vertical;
+            overflow-x:hidden;
+            overflow-y:scroll;*/
+            background-color: white;
+            text-align: left;
+        }
+    
 		.profileMember {
 			text-align:right;
 			margin-right:20px;
@@ -215,7 +229,7 @@
 	.editBox {
 		font-size:9px;
 		font-weight:bold;
-		background:white url(images/edit_box_bg.jpg) no-repeat bottom left;
+		/*background:white url(images/edit_box_bg.jpg) no-repeat bottom left;*/
 		border:solid #8DABF1 2px;
 		padding:5px;
 		width:590px;

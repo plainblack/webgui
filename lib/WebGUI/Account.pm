@@ -77,13 +77,6 @@ sub appendAccountLinks {
         });
 	}
 
-    #Pluggin - delete eventually
-    if ($session->setting->get('userInvitationsEnabled')) {
-        push @array, {
-            'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=inviteUser'), $i18n->get('invite a friend')),
-        };
-    }
-
     #Logout
     $var->{'logout_url' } = $session->url->page('op=auth;method=logout');
     $var->{'logout_text'} = $i18n->get(64);

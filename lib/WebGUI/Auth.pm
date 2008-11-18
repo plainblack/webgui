@@ -30,6 +30,7 @@ use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;
+use WebGUI::Friends;
 
 # Profile field name for the number of times the showMessageOnLogin has been
 # seen.
@@ -194,7 +195,7 @@ sub createAccount {
         ;
     
     # User Defined Options
-    my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
+    my $userInvitation = $self->session->setting->get('inboxInviteUserEnabled');
     $vars->{'create.form.profile'} = [];
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
         my $id         = $field->getId;
@@ -321,15 +322,20 @@ sub createAccountSave {
     ##Finalize the record in the user invitation table.
     my $inviteId = $self->session->form->get('uniqueUserInvitationCode');
     if ($inviteId) {
-        $self->session->db->setRow(
-            'userInvitations',
-            'inviteId',
-            {
-                inviteId    => $inviteId,
-                newUserId   => $u->userId,
-                dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
-            },
-        );
+        $self->session->db->setRow('userInvitations','inviteId',{
+            inviteId    => $inviteId,
+            newUserId   => $u->userId,
+            dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
+        });
+        #Get the invite record
+        my $inviteRecord = $self->session->db->getRow('userInvitations','inviteId',$inviteId);
+        #Get the user
+        my $inviteUser   = WebGUI::User->new($self->session,$inviteRecord->{userId});
+        #Automatically add the friend that invited the user and vice versa if the friend has friends enabled
+        if($inviteUser->acceptsFriendsRequests($u)) {
+            my $friends  = WebGUI::Friends->new($self->session,$u);
+            $friends->add([$inviteUser->userId]);
+        }
     }
 
     # If we have something to do after login, do it

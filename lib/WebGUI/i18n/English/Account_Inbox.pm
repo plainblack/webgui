@@ -99,6 +99,87 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
+    'invite user enabled template label' => {
+        message     => q|Enable user invitations?|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user enabled template hoverHelp' => {
+        message     => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user restrict subject template label' => {
+        message     => q|Restrict Invitation Subject?|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user restrict subject template hoverHelp' => {
+        message     => q|If this setting is 'yes', users will not be able to modify the default subject of the invitation|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user subject template label' => {
+        message     => q|Default Invitation Subject|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user subject template hoverHelp' => {
+        message     => q|Enter the default text for the subject of user invitations.  Macros will be processed on this field (macros will not be processed on the actual subject sent)|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user restrict message template label' => {
+        message     => q|Restrict Invitation Message?|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user restrict message template hoverHelp' => {
+        message     => q|If this setting is 'yes', users will not be able to modify the default message of the invitation|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user message label' => {
+        message     => q|Default Invitation Message|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user message hoverHelp' => {
+        message     => q|Enter the default text for the message of user invitations.  Macros will be processed on this field (macros will not be processed on the actual message sent)|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user message template label' => {
+        message     => q|Invitation Email Template|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user message template hoverHelp' => {
+        message     => q|Choose the template for the email that will be sent as the user invitation.  This will include the text of the message as well as the registration link and any headers or footers you choose to add to the message.|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user template label' => {
+        message     => q|Invite User Send Tempalte|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user template hoverHelp' => {
+        message     => q|Choose the template for viewing the main user invitation screen|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user confirm template label' => {
+        message     => q|Invite User Confirmation Template|,
+        lastUpdated => 1119068809
+    },
+
+    'invite user confirm template hoverHelp' => {
+        message     => q|Choose the template for viewing user invitation confirmations|,
+        lastUpdated => 1119068809
+    },
+
+
     'subject label' => {
         message     => q|Subject|,
         lastUpdated => 1119068809
@@ -353,7 +434,56 @@ our $I18N = {
         message     => q{The user who sent this invitation is no longer a member of the site.},
         lastUpdated => 1119068809
     },
-    
+
+    'invite a friend' => {
+        message     => q{invite a friend to join this website},
+        lastUpdated => 1119068809
+    },
+
+    'invite subject' => {
+        message     => q{An invitation to join %s},
+        lastUpdated => 1119068809
+    },
+
+    'invite message' => {
+        message     => q{I'm a member of a site that I thought you would find very useful, so I'm sending this invitation hoping you'll join me here. Click on the link below to register.},
+        lastUpdated => 1119068809,
+    },
+
+    'missing email' => {
+		message => q|The invitation cannot be sent because you did not enter an email address.|,
+		lastUpdated => 1181409056,
+	},
+
+	'missing message' => {
+		message     => q|Your invitiation must have a message.|,
+		lastUpdated => 1181409432,
+	},
+
+	'missing subject' => {
+		message     => q|Your invitation must have a subject.|,
+		lastUpdated => 1181409433,
+	},
+
+    'already a member' => {
+		message     => q|The email address you entered is already regiestered to <a href="%s">%s</a> on this site.|,
+		lastUpdated => 1181410226,
+	},
+
+    'no email' => {
+        message     => q{The invitation cannot be sent because you do not have an email address set in your profile.},
+        lastUpdated => 1119068809,
+    },
+
+    'invitation sent label' => {
+		message => q|Invitation Sent|,
+		lastUpdated => 1181410226,
+	},
+
+    'invitation sent text' => {
+		message => q|Your invitation has been sent successfully.|,
+		lastUpdated => 1181410226,
+	},
 
 };
 

@@ -50,15 +50,21 @@ sub appendCommonVars {
     my $var     = shift;
     my $inbox   = shift || WebGUI::Inbox->new($session);
     my $user    = $session->user;
+    my $method  = $self->method;
 
     $self->SUPER::appendCommonVars($var);
 
-    $var->{'view_inbox_url'      } = $self->getUrl("module=inbox;do=view");
-    $var->{'view_invitations_url'} = $self->getUrl("module=inbox;do=manageInvitations");
-    $var->{'unread_message_count'} = $inbox->getUnreadMessageCount;
-    $var->{'invitation_count'    } = $self->getInvitationCount;
-    $var->{'invitations_enabled' } = $session->user->profileField('ableToBeFriend');
-    
+    $var->{'view_inbox_url'          } = $self->getUrl("module=inbox;do=view");
+    $var->{'view_invitations_url'    } = $self->getUrl("module=inbox;do=manageInvitations");
+    $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount;
+    $var->{'invitation_count'        } = $self->getInvitationCount;
+    $var->{'invitations_enabled'     } = $session->user->profileField('ableToBeFriend');
+    $var->{'user_invitations_enabled'} = $session->setting->get("inboxInviteUserEnabled");
+    $var->{'invite_friend_url'       } = $self->getUrl("module=inbox;do=inviteUser");
+
+    my $tab = $self->store->{tab};
+    $var->{'is_tab_'.$tab} = "true";
+
 }
 
 #-------------------------------------------------------------------
@@ -158,8 +164,60 @@ sub editSettingsForm {
         namespace => "Account/Inbox/Confirm",
         label     => $i18n->get("invitation confirm message template label"),
         hoverHelp => $i18n->get("invitation confirm message template hoverHelp")
-	); 
-
+	);
+    $f->yesNo(
+		name      => "inboxInviteUserEnabled",
+		value     => $setting->get("inboxInviteUserEnabled"),
+		label     => $i18n->get("invite user enabled template label"),
+        hoverHelp => $i18n->get("invite user enabled template hoverHelp")
+	);
+    $f->yesNo(
+		name      => "inboxInviteUserRestrictSubject",
+		value     => $setting->get("inboxInviteUserRestrictSubject"),
+		label     => $i18n->get("invite user restrict subject template label"),
+        hoverHelp => $i18n->get("invite user restrict subject template hoverHelp")
+	);
+    $f->text(
+		name      => "inboxInviteUserSubject",
+		value     => $setting->get("inboxInviteUserSubject"),
+		label     => $i18n->get("invite user subject template label"),
+        hoverHelp => $i18n->get("invite user subject template hoverHelp")
+	);
+    $f->yesNo(
+		name      => "inboxInviteUserRestrictMessage",
+		value     => $setting->get("inboxInviteUserRestrictMessage"),
+		label     => $i18n->get("invite user restrict message template label"),
+        hoverHelp => $i18n->get("invite user restrict message template hoverHelp")
+	);
+    $f->textarea(
+		name      => "inboxInviteUserMessage",
+		value     => $setting->get("inboxInviteUserMessage"),
+        height    => 300,
+		label     => $i18n->get("invite user message label"),
+        hoverHelp => $i18n->get("invite user message hoverHelp")
+	);
+    $f->template(
+		name      => "inboxInviteUserMessageTemplateId",
+		value     => $self->getInviteUserMessageTempalteId,
+        namespace => "Account/Inbox/InviteUserMessage",
+		label     => $i18n->get("invite user message template label"),
+        hoverHelp => $i18n->get("invite user message template hoverHelp")
+	);
+    $f->template(
+		name      => "inboxInviteUserTemplateId",
+		value     => $self->getInviteUserTemplateId,
+		namespace => "Account/Inbox/InviteUser",
+		label     => $i18n->get("invite user template label"),
+        hoverHelp => $i18n->get("invite user template hoverHelp")
+	);
+    $f->template(
+		name      => "inboxInviteUserConfirmTemplateId",
+		value     => $self->getInviteUserConfirmTemplateId,
+		namespace => "Account/Inbox/InviteUserConfirm",
+		label     => $i18n->get("invite user confirm template label"),
+        hoverHelp => $i18n->get("invite user confirm template hoverHelp")
+	);
+    
     return $f->printRowsOnly;
 }
 
@@ -181,15 +239,26 @@ sub editSettingsFormSave {
     $setting->set("inboxStyleTemplateId", $form->process("inboxStyleTemplateId","template"));
     $setting->set("inboxLayoutTempalteId", $form->process("inboxLayoutTempalteId","template"));
     $setting->set("inboxViewTemplateId", $form->process("inboxViewTemplateId","template"));
-    $session->set("inboxViewMessageTemplateId",$form->process("inboxViewMessageTemplateId","template"));
-    $session->set("inboxSendMessageTemplateId",$form->process("inboxSendMessageTemplateId","template"));
-    $session->set("inboxMessageConfirmationTemplateId",$form->process("inboxMessageConfirmationTemplateId","template"));
-    $session->set("inboxErrorTemplateId",$form->process("inboxErrorTemplateId","template"));
-    #Invitations Settings
-    $session->set("inboxManageInvitationsTemplateId",$form->process("inboxManageInvitationsTemplateId","template"));
-    $session->set("inboxViewInvitationTemplateId",$form->process("inboxViewInvitationTemplateId","template"));
-    $session->set("inboxInvitationConfirmTemplateId",$form->process("inboxInvitationConfirmTemplateId","template"));
+    $setting->set("inboxViewMessageTemplateId",$form->process("inboxViewMessageTemplateId","template"));
+    $setting->set("inboxSendMessageTemplateId",$form->process("inboxSendMessageTemplateId","template"));
+    $setting->set("inboxMessageConfirmationTemplateId",$form->process("inboxMessageConfirmationTemplateId","template"));
+    $setting->set("inboxErrorTemplateId",$form->process("inboxErrorTemplateId","template"));
+    #Friends Invitations Settings
+    $setting->set("inboxManageInvitationsTemplateId",$form->process("inboxManageInvitationsTemplateId","template"));
+    $setting->set("inboxViewInvitationTemplateId",$form->process("inboxViewInvitationTemplateId","template"));
+    $setting->set("inboxInvitationConfirmTemplateId",$form->process("inboxInvitationConfirmTemplateId","template"));
+    #User Invitation Settings
+    $setting->set("inboxInviteUserEnabled",$form->process("inboxInviteUserEnabled","yesNo"));
+    $setting->set("inboxInviteUserRestrictSubject",$form->process("inboxInviteUserRestrictSubject","yesNo"));
+    $setting->set("inboxInviteUserSubject",$form->process("inboxInviteUserSubject","text"));
+    $setting->set("inboxInviteUserRestrictMessage",$form->process("inboxInviteUserRestrictMessage","yesNo"));
+    $setting->set("inboxInviteUserMessage",$form->process("inboxInviteUserMessage","HTMLArea"));    
+    $setting->set("inboxInviteUserMessageTemplateId",$form->process("inboxInviteUserMessageTemplateId","template"));
+    $setting->set("inboxInviteUserTemplateId",$form->process("inboxInviteUserTemplateId","template"));
+    $setting->set("inboxInviteUserConfirmTemplateId",$form->process("inboxInviteUserConfirmTemplateId","template"));
+
 }
+
 
 #-------------------------------------------------------------------
 
@@ -234,6 +303,44 @@ sub getInvitationConfirmTemplateId {
     return $self->session->setting->get("inboxInvitationConfirmTemplateId") || "5A8Hd9zXvByTDy4x-H28qw";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getInviteUserMessageTempalteId ( )
+
+This method returns the template ID for the user email message
+
+=cut
+
+sub getInviteUserMessageTempalteId {
+    my $self = shift;
+    return $self->session->setting->get("inboxInviteUserMessageTemplateId") || "XgcsoDrbC0duVla7N7JAdw";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInviteUserTemplateId ( )
+
+This method returns the template ID for the main invite user screen.
+
+=cut
+
+sub getInviteUserTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("inboxInviteUserTemplateId") || "cR0UFm7I1qUI2Wbpj--08Q";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInviteUserConfirmTemplateId ( )
+
+This method returns the template ID for invitation errors.
+
+=cut
+
+sub getInviteUserConfirmTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("inboxInviteUserConfirmTemplateId") || "SVIhz68689hwUGgcDM-gWw";
+}
 
 #-------------------------------------------------------------------
 
@@ -245,7 +352,7 @@ This method returns the template ID for the account layout.
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return $self->session->setting->get("inboxLayoutTempalteId") || $self->SUPER::getLayoutTemplateId;
+    return $self->session->setting->get("inboxLayoutTempalteId") || "gfZOwaTWYjbSoVaQtHBBEw";
 }
 
 
@@ -399,6 +506,8 @@ sub www_approveDenyInvitations {
     my $approve  = $form->get("accept");
     my $deny     = $form->get("deny");
 
+    $self->store->{tab} = "invitations";
+
     my $friends = WebGUI::Friends->new($session);
 
     my @users   = ();
@@ -445,6 +554,8 @@ sub www_deleteMessage {
     my $messageId = $session->form->get("messageId");
     my $inbox     = WebGUI::Inbox->new($session);
     my $message   = $inbox->getMessage($messageId);
+
+    $self->store->{tab} = "inbox";
     
     if (!(defined $message) || !$inbox->canRead($message)) {
         #View will handle displaying these errors
@@ -479,6 +590,8 @@ sub www_deleteMessages {
     my $self    = shift;
     my $session = $self->session;
 
+    $self->store->{tab} = "inbox";
+
     my @messages = $session->form->process("message","checkList");
 
     foreach my $messageId (@messages) {
@@ -487,6 +600,182 @@ sub www_deleteMessages {
     }
 
     return $self->www_view();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_inviteUser ( )
+
+Form for inviting a user to join the site.
+
+=cut
+
+sub www_inviteUser {
+    my $self         = shift;
+    my $session      = $self->session;
+    my $form         = $session->form;
+    my $setting      = $session->setting;
+    my $user         = $session->user;
+    
+    my $displayError = shift;
+    my $var          = {};
+
+    #Let the tab display that they are currently on
+    $self->store->{tab} = "invitations";
+
+    #Add any error passed in to be displayed if the form reloads
+    $var->{'message_display_error'}  = $displayError;
+   
+    #Message From
+    $var->{'message_from'     }  = $user->getWholeName;
+    $var->{'message_from_id'  }  = $user->userId;
+    
+    #Message To
+    $var->{'form_to'          } = WebGUI::Form::email($session, {
+        name  => "to",
+        value => $session->form->get('to'),
+    });
+
+    #Message Subject
+    my $defaultSubject        = $setting->get("inboxInviteUserSubject");
+    WebGUI::Macro::process($session,\$defaultSubject);
+    my $subject               = $form->get('subject') || $defaultSubject;
+    $var->{'subject_allowed'} = !($setting->get("inboxInviteUserRestrictSubject"));
+    if($var->{'subject_allowed'}) {
+        $var->{'form_subject' }  = WebGUI::Form::text($session, {
+            name   => "subject",
+            value  => $subject,
+            extras => q{ class="invite_subject" }
+        });
+    }
+    else {
+        $var->{'form_subject' } = $subject;
+    }   
+
+    #Message Body
+    my $defaultMessage          = $setting->get("inboxInviteUserMessage");
+    WebGUI::Macro::process($session,\$defaultMessage);
+    my $message                 = $form->get('message') || $defaultMessage;
+    $var->{'message_allowed'  } = !($setting->get("inboxInviteUserRestrictMessage"));
+    if($var->{'message_allowed'}) {
+        $var->{'form_message_text'}  = WebGUI::Form::textarea($session, {
+            name   =>"message",
+            value  =>$message,
+            width  =>600,
+            height =>200
+        });
+        $var->{'form_message_rich'}  = WebGUI::Form::HTMLArea($session, {
+            name  => "message",
+            value => $message,
+            width => "600",
+        });
+    }
+    else {
+        $var->{'form_message_text'} = $message;
+        $var->{'form_message_rich'} = $message;
+    }
+
+    $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{
+        action => $self->getUrl("module=inbox;do=inviteUserSave"),
+        extras => q{name="inviteForm"}
+    });
+    
+    $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
+    $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
+    $var->{'back_url'         }  = $session->env->get("HTTP_REFERER") || $var->{'view_inbox_url'};
+
+    #Add common template variable for displaying the inbox
+    $self->appendCommonVars($var);
+
+    return $self->processTemplate($var,$self->getInviteUserTemplateId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_inviteUserSave ( )
+
+Post process the form, check for required fields, handle inviting users who are already
+members (determined by email address) and send the email.
+
+=cut
+
+sub www_inviteUserSave {
+    my $self         = shift;
+    my $session      = $self->session;
+    my $form         = $session->form;
+    my $setting      = $session->setting;
+    my $user         = $session->user;
+    my $i18n         = WebGUI::International->new($session,"Account_Inbox");
+
+    #Must have a person to send email to
+    my $to = $form->get('to');
+    return $self->www_inviteUser($i18n->get('missing email')) unless $to;
+    
+    #Must have a subject
+    my $defaultSubject = $setting->get("inboxInviteUserSubject");
+    WebGUI::Macro::process($session,\$defaultSubject);
+    my $subject        = ($setting->get("inboxInviteUserRestrictSubject"))
+                       ? $defaultSubject
+                       : $form->get('subject')
+                       ;
+    return $self->www_inviteUser($i18n->get('missing subject')) unless $subject;
+
+    #Must have a message
+    my $defaultMessage = $setting->get("inboxInviteUserMessage");
+    WebGUI::Macro::process($session,\$defaultMessage);
+    my $message        = ($setting->get("inboxInviteUserRestrictMessage"))
+                       ? $defaultMessage
+                       : $form->get("message")
+                       ;    
+    return $self->www_inviteUser($i18n->get('missing message')) unless $message;
+
+
+    #User existance check.
+    my $existingUser = WebGUI::User->newByEmail($session,$to);
+    if (defined $existingUser) {
+        my $existingProfile = $existingUser->getProfileUrl;
+        my $existingUser    = $existingUser->username;
+        my $errorMsg = sprintf($i18n->get('already a member'),$existingProfile,$existingUser);
+        return $self->www_inviteUser($errorMsg);
+    }
+
+    #Profile Email address check
+    my $email = $session->user->profileField('email');
+    unless ($email) {
+        return $self->www_inviteUser($i18n->get('no email'));
+    }
+
+    my $var = {};
+    ##No sneaky attack paths...
+    $var->{'message'} = WebGUI::HTML::html2text(WebGUI::HTML::filter($message));
+
+    ##Create the invitation url.
+    my $inviteId  = $session->id->generate();
+    $var->{'url'} = $session->url->append(
+        $session->url->getSiteURL,'op=auth;method=createAccount;code='.$inviteId
+    );
+
+    my $emailBody  = $self->processTemplate($var,$self->getInviteUserMessageTempalteId);
+
+    ##Create the invitation record.
+    my $hash = {
+        userId   => $user->userId,
+        dateSent => WebGUI::DateTime->new($session, time)->toMysqlDate,
+        email    => $to,
+    };
+    $session->db->setRow('userInvitations','inviteId',$hash,$inviteId);
+
+    my $invitation = WebGUI::Mail::Send->create($session, {
+        to      => $to,
+        from    => $email,
+        subject => $subject,
+    });
+    $invitation->addText($emailBody);
+    $invitation->send;
+
+    $var = {};
+    $self->appendCommonVars($var);
+    return $self->processTemplate($var,$self->getInviteUserConfirmTemplateId);
 }
 
 #-------------------------------------------------------------------
@@ -503,6 +792,8 @@ sub www_manageInvitations {
     my $user    = $session->user;
     my $var     = {};
     my $i18n    = WebGUI::International->new($session,'Account_Inbox');
+
+    $self->store->{tab} = "invitations";
     
     #Deal with rows per page
     my $rpp          = $session->form->get("rpp") || 25;
@@ -548,10 +839,10 @@ sub www_manageInvitations {
     $var->{'has_messages'  } = $msgCount > 0;
     $var->{'message_total' } = $msgCount;
 
-    $var->{'form_start'   } = WebGUI::Form::formHeader($session,{
+    $var->{'form_header'   } = WebGUI::Form::formHeader($session,{
         action => $self->getUrl("module=inbox;do=approveDenyInvitations")
     });
-    $var->{'form_end'   } = WebGUI::Form::formFooter($session);
+    $var->{'form_footer'   } = WebGUI::Form::formFooter($session);
 
     $var->{'form_accept'   } = WebGUI::Form::submit($session,{
         name  =>"accept",
@@ -596,6 +887,8 @@ sub www_sendMessage {
     my $displayError = shift;
     my $toUser       = undef;
     my $var          = {};
+
+    $self->store->{tab} = "inbox";
 
     #Add any error passed in to be displayed if the form reloads
     $var->{'message_display_error'}  = $displayError;
@@ -775,6 +1068,8 @@ sub www_sendMessageSave {
     my $errorMsg  = "";
     my @toUsers   = ();
 
+    $self->store->{tab} = "inbox";
+
     #Add common template variable for displaying the inbox
     my $inbox     = WebGUI::Inbox->new($session); 
     
@@ -864,6 +1159,8 @@ sub www_view {
     my $session = $self->session;
     my $user    = $session->user;
     my $var     = {};
+
+    $self->store->{tab} = "inbox";
    
     #Deal with sort order
     my $sortBy       = $session->form->get("sortBy") || undef;
@@ -931,11 +1228,6 @@ sub www_view {
     $var->{'new_message_url'     } = $self->getUrl("module=inbox;do=sendMessage");
     $var->{'canSendMessages'     } = $user->hasFriends;
 
-    $var->{'inbox_form_start'    } = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=inbox;do=deleteMessages")
-    });
-    $var->{'inbox_form_end'      } = WebGUI::Form::formFooter($session);
-
     tie my %rpps, "Tie::IxHash";
     %rpps = (25 => "25", 50 => "50", 100=>"100");
     $var->{'message_rpp'  } = WebGUI::Form::selectBox($session,{
@@ -945,7 +1237,12 @@ sub www_view {
         extras  => q{onchange="location.href='}.$var->{'rpp_url'}.q{;rpp='+this.options[this.selectedIndex].value"}
     });
 
-    #Append common vars
+    $var->{'form_header'} = WebGUI::Form::formHeader($session,{
+        action => $self->getUrl("module=inbox;do=deleteMessages")
+    });
+    $var->{'form_footer'} = WebGUI::Form::formFooter($session);
+
+    #Append common vars - form headers set in here 
     $self->appendCommonVars($var,$inbox);
     #Append pagination vars
     $p->appendTemplateVars($var);
@@ -970,6 +1267,7 @@ sub www_viewInvitation {
     my $errorMsg   = shift;
     my $i18n       = WebGUI::International->new($session,'Account_Inbox');
 
+    $self->store->{tab} = "invitations";
 
     my $friends    = WebGUI::Friends->new($session);
     my $invitation = $friends->getAddRequest($inviteId);
@@ -1061,6 +1359,8 @@ sub www_viewMessage {
     my $var       = {};
     my $messageId = shift || $session->form->get("messageId");
     my $errorMsg  = shift;
+
+    $self->store->{tab} = "inbox";
 
     my $inbox     = WebGUI::Inbox->new($session);    
     my $message   = $inbox->getMessage($messageId);

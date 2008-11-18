@@ -393,7 +393,7 @@ sub upgradeAccount {
 
     #Add the settings for the inbox module
     $setting->add("inboxStyleTemplateId",""); #Use the userStyle by default
-    $setting->add("inboxLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
+    $setting->add("inboxLayoutTempalteId","gfZOwaTWYjbSoVaQtHBBEw");
     $setting->add("inboxViewTemplateId","c8xrwVuu5QE0XtF9DiVzLw");
     $setting->add("inboxViewMessageTemplateId","0n4HtbXaWa_XJHkFjetnLQ");
     $setting->add("inboxSendMessageTemplateId","6uQEULvXFgCYlRWnYzZsuA");
@@ -403,7 +403,16 @@ sub upgradeAccount {
     $setting->add("inboxManageInvitationsTemplateId","1Q4Je3hKCJzeo0ZBB5YB8g");
     $setting->add("inboxViewInvitationTemplateId","VBkY05f-E3WJS50WpdKd1Q");
     $setting->add("inboxInvitationConfirmTemplateId","5A8Hd9zXvByTDy4x-H28qw");
-
+    #Inbox Invitations
+    $setting->add("inboxInviteUserEnabled",$session->setting->get("userInvitationsEnabled"));
+    $setting->add("inboxInviteUserRestrictSubject","0");
+    $setting->add("inboxInviteUserSubject","^International(invite subject,Account_Inbox,^u;);");
+    $setting->add("inboxInviteUserRestrictMessage","0");
+    $setting->add("inboxInviteUserMessage","^International(invite message,Account_Inbox);");    
+    $setting->add("inboxInviteUserMessageTemplateId","XgcsoDrbC0duVla7N7JAdw");
+    $setting->add("inboxInviteUserTemplateId","cR0UFm7I1qUI2Wbpj--08Q");
+    $setting->add("inboxInviteUserConfirmTemplateId","SVIhz68689hwUGgcDM-gWw");
+    
     #Add the settings for the friends module
     $setting->add("friendsStyleTemplateId",""); #Use the userStyle by default
     $setting->add("friendsLayoutTempalteId","N716tpSna0iIQTKxS4gTWA");
@@ -421,6 +430,7 @@ sub upgradeAccount {
     #Add the settings for the shop module
     $setting->add("shopStyleTemplateId",""); #Use the userStyle by default
     $setting->add("shopLayoutTemplateId","aUDsJ-vB9RgP-AYvPOy8FQ");
+
 
     #Add inbox changes
     $session->db->write(q{
@@ -489,20 +499,25 @@ sub upgradeAccount {
     $session->db->write(q{REPLACE INTO `userProfileField` VALUES ('publicProfile','WebGUI::International::get(861)',1,0,'RadioList','{ all=>WebGUI::International::get(\'public label\',\'Account_Profile\'), friends=>WebGUI::International::get(\'friends only label\',\'Account_Profile\'), none=>WebGUI::International::get(\'private label\',\'Account_Profile\')}','[\"none\"]',8,'4',1,1,0,0,0,'')});
     
     #Clean up old templates and settings
-    my $oldtemplates = {
-        editUserProfileTemplate      => 'Operation/Profile/Edit',
-        viewUserProfileTemplate      => 'Operation/Profile/View',
-        manageFriendsTemplateId      => 'friends/manage',
-        sendPrivateMessageTemplateId => 'Inbox/SendPrivateMessage',
-        viewInboxTemplateId          => 'Inbox',
-        viewInboxMessageTemplateId   => 'Inbox/Message',
+    my $oldsettings = {
+        editUserProfileTemplate        => 'Operation/Profile/Edit',
+        viewUserProfileTemplate        => 'Operation/Profile/View',
+        manageFriendsTemplateId        => 'friends/manage',
+        sendPrivateMessageTemplateId   => 'Inbox/SendPrivateMessage',
+        viewInboxTemplateId            => 'Inbox',
+        viewInboxMessageTemplateId     => 'Inbox/Message',
+        userInvitationsEmailTemplateId => 'userInvite/Email',
+        userInvitationsEnabled         => 'userInvite',
+        userInvitationsEmailExists     => '',
     };
 
-    foreach my $setting (keys %{$oldtemplates}) {
+    foreach my $setting (keys %{$oldsettings}) {
         #Remove the setting
-        $session->db->write("delete from settings where name=?",[$setting]);
+        $session->setting->remove($setting);
+        #$session->db->write("delete from settings where name=?",[$setting]);
         #Remove all the templates with the related namespace
-        my $assets = $session->db->buildArrayRef("select distinct assetId from template where namespace=?",[$oldtemplates->{$setting}]);
+        next if ($oldsettings->{$setting} eq "");
+        my $assets = $session->db->buildArrayRef("select distinct assetId from template where namespace=?",[$oldsettings->{$setting}]);
         #Purge the template
         foreach my $assetId (@{$assets}) {
             WebGUI::Asset->newByDynamicClass($session,$assetId)->purge;

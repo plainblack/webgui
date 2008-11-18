@@ -3232,10 +3232,6 @@ and tracked by WebGUI.|,
                 lastUpdated => 1163457062,
         },
 
-        'Enable user invitations description' => {
-                message => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
-                lastUpdated => 1181017746,
-        },
 
         '164 description' => {
                 message => q|<p>Set the default authentication method for new accounts.  The two available options by default are WebGUI and LDAP. WebGUI authentication means that the users will authenticate against the username and password stored in the WebGUI database. LDAP authentication means that users will authenticate against an external LDAP server.  Other methods can be provided by writing a custom authentication plug-in.</p>
@@ -3258,11 +3254,6 @@ and tracked by WebGUI.|,
 a user.|,
         lastUpdated => 1167189802,
     },
-
-	'Enable user invitations' => {
-		message => q|Enable user invitations?|,
-		lastUpdated => 1181017730
-	},
 
 	'Illegal Warning' => {
 		message => q|Enabling this feature is illegal in some countries, like Australia. In addition, some countries require you to add a warning to your site if you use this feature. Consult your local authorities for local laws. Plain Black Corporation is not responsible for your illegal activities, regardless of ignorance or malice.|,

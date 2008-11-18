@@ -224,7 +224,7 @@ sub createAccount {
     if ($self->session->user->isRegistered) {
        return $self->displayAccount;
     }
-    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
+    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('inboxInviteUserEnabled')) {
  	   return $self->displayLogin;
     } 
 	

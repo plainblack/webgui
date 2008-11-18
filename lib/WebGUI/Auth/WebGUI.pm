@@ -144,7 +144,7 @@ sub createAccount {
     if ($self->session->user->isRegistered) {
         return $self->displayAccount;
     }
-    elsif (!$setting->get("anonymousRegistration") && !$setting->get('userInvitationsEnabled')) {
+    elsif (!$setting->get("anonymousRegistration") && !$setting->get('inboxInviteUserEnabled')) {
         return $self->displayLogin;
     } 
     
@@ -212,7 +212,7 @@ sub createAccountSave {
     return $self->displayAccount if ($session->user->isRegistered);
 
     # Make sure anonymous registration is enabled 
-    if (!$setting->get("anonymousRegistration") && !$setting->get("userInvitationsEnabled")) {    
+    if (!$setting->get("anonymousRegistration") && !$setting->get("inboxInviteUserEnabled")) {    
         $session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
         return $self->displayLogin;
     }

@@ -137,7 +137,6 @@ sub getOperations {
         'sendPrivateMessage' => 'Inbox',
 
 		'inviteUser'       => 'Invite',
-		'inviteUserSave'   => 'Invite',
 		'acceptInvite'     => 'Invite',
 
 		'addFriend'      => 'Friends',
