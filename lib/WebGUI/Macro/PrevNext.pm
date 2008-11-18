@@ -40,9 +40,29 @@ sub process {
     if (! defined $topPage) {
         $topPage = WebGUI::Asset->getDefault($session);
     }
+    my $nextPage = getNext($session->asset, $topPage);
 	my $output = ""; # do some stuff
 	return $output;
 }
+
+=head2 getNext ($startingAsset, $topPage)
+
+Find the next asset using a 1-level, depth first approach.  This means it
+prefers children over siblings.  If no next asset exists, it returns undef.
+If it does exist, it returns an WebGUI::Asset object of the appropriate type.
+
+=head3 $startingAsset
+
+The next asset will be the next logical asset after $startingAsset.
+
+=head3 $topPage
+
+When no valid next sibling is found, the subroutine will attempt to
+see if the parent has valid siblings with children.  It uses $topPage
+to make sure it doesn't recurse out of a particular area, such as
+all the way back to the WebGUI root node.
+
+=cut
 
 sub getNext {
     my ($startingAsset, $topPage) = @_;
@@ -61,8 +81,16 @@ sub getNext {
     ##No children, try the first sibling after me
     my $firstAsset = $startingAsset;
     while ($firstAsset->getId ne $topPage->getId) {
-        my $siblingLineage = $firstAsset->getParent->get('lineage').$firstAsset->formatRank($firstAsset->getRank()+1);
-        my $firstSib = WebGUI::Asset->newByLineage($session, $siblingLineage);
+        my $siblingIterator = $firstAsset->getLineageIterator(
+            ['siblings'],
+            {
+                includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
+                returnObjects      => 1,
+                whereClause        => 'asset.lineage > '.$session->db->quote($firstAsset->get('lineage')),
+            }
+        );
+
+        my $firstSib = $siblingIterator->();
         if (defined $firstSib) {
             return $firstSib;
         }
@@ -70,6 +98,49 @@ sub getNext {
     }
     ##No valid siblings after me, try my parent's siblings.
     return undef;
+}
+
+=head2 getPrevious
+
+Find the next asset using a 1-level, depth first approach.  This means
+it prefers children over siblings.  If no previous asset exists, it
+returns undef.  If it does exist, it returns an WebGUI::Asset object of
+the appropriate type.
+
+=head3 $startingAsset
+
+The next asset will be the next logical asset after $startingAsset.
+
+=head3 $topPage
+
+When no valid next sibling is found, the subroutine will attempt to
+see if the parent has valid siblings with children.  It uses $topPage
+to make sure it doesn't recurse out of a particular area, such as
+all the way back to the WebGUI root node.
+
+=cut
+
+sub getPrevious {
+    my ($startingAsset, $topPage) = @_;
+    if ($startingAsset->getId eq $topPage->getId) {
+        return $topPage;
+    }
+    my $session = $startingAsset->session;
+    my $siblingIterator = $startingAsset->getLineageIterator(
+        ['siblings'],
+        {
+            includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
+            whereClause        => 'asset.lineage < '.$session->db->quote($startingAsset->get('lineage')),
+            returnObjects      => 1,
+            invertTree         => 1,
+        }
+    );
+
+    my $firstSib = $siblingIterator->();
+    if (defined $firstSib) {
+        return $firstSib;
+    }
+    return $startingAsset->getParent();
 }
 
 1;

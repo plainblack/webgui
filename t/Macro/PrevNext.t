@@ -12,7 +12,7 @@ use Test::More; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 
-my $numTests = 6;
+my $numTests = 10;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -66,25 +66,37 @@ my $subPage2_2 = $topPage2->addChild({
     title     => 'Sub Page 1, Top Page 2',
 });
 
-my ($goodChild, $goodSibling, $nextParent, $lastPage);
+my ($goodChild, $goodSibling, $nextParent, $lastPage, $previousParent);
 
 $goodChild = WebGUI::Macro::PrevNext::getNext($topPage1, $testStart);
-is ($goodChild->getTitle, $subPage1_1->getTitle, 'Getting first child of first page');
+is ($goodChild->getTitle, $subPage1_1->getTitle, 'next: Getting first child of first page');
 
 $goodSibling = WebGUI::Macro::PrevNext::getNext($subPage1_1, $testStart);
-is ($goodSibling->getTitle, $subPage1_2->getTitle, 'Getting first sibling of first subpage');
+is ($goodSibling->getTitle, $subPage1_2->getTitle, 'next: Getting first sibling of first subpage');
 
 $goodSibling = WebGUI::Macro::PrevNext::getNext($subPage1_2, $testStart);
-is ($goodSibling->getTitle, $subPage1_Last->getTitle, 'Getting first sibling of second subpage');
+is ($goodSibling->getTitle, $subPage1_Last->getTitle, 'next: Getting first sibling of second subpage');
 
 $nextParent = WebGUI::Macro::PrevNext::getNext($subPage1_Last, $testStart);
-is ($nextParent->getTitle, $topPage2->getTitle, "Last sibling in a set returns the parent's first sibling");
+is ($nextParent->getTitle, $topPage2->getTitle, "next: Last sibling in a set returns the parent's first sibling");
 
 $lastPage = WebGUI::Macro::PrevNext::getNext($topPageLast, $testStart);
-is ($lastPage, undef, "Last page returns undef");
+is ($lastPage, undef, "next: Last page returns undef");
 
 $nextParent = WebGUI::Macro::PrevNext::getNext($subPage2_1, $testStart);
-is ($nextParent->getTitle, $topPage3->getTitle, "With no valid siblings, return next parent");
+is ($nextParent->getTitle, $topPage3->getTitle, "next: With no valid siblings, return next parent");
+
+$goodSibling = WebGUI::Macro::PrevNext::getPrevious($subPage1_2, $testStart);
+is ($goodSibling->getTitle, $subPage1_1->getTitle, "previous: Getting first sibling");
+
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($subPage1_1, $testStart);
+is ($previousParent->getTitle, $topPage1->getTitle, "previous: Getting parent when start asset is the first child");
+
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($topPage1, $testStart);
+is ($previousParent->getTitle, $testStart->getTitle, "previous: Getting parent when start asset is the first child and parent is the top asset");
+
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($testStart, $testStart);
+is ($previousParent->getTitle, $testStart->getTitle, "previous: Getting parent when start asset is the top asset");
 
 }
 
