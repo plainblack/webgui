@@ -29,6 +29,7 @@
  - fixed #4161: asset manager: switching title to descending order reverts to ascending on next page
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed: Get CS Mail workflow doesn't commit version tags created
+ - rfe: Thingy can now copy thingy entries
 
 7.6.3
  - improved performance of file uploads
