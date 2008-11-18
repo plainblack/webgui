@@ -88,9 +88,6 @@ sub createInstance {
         return undef;
     }
 
-    #Visitor cannot access the acccount system
-    return $session->privilege->insufficient if($session->user->isVisitor);
-
     #Create Pluggin Object
     #Don't eval this as pluggable will croak and we want the calling module to handle the exception 
     my $pluggin = WebGUI::Pluggable::instanciate(
@@ -160,6 +157,9 @@ sub handler {
 
     #Pass through if it's not the account op
     return undef unless ($form->get("op") eq "account");
+
+    #Visitor cannot access the acccount system
+    return $session->privilege->insufficient if($session->user->isVisitor);
 
     my $module   = $form->get("module");
     my $method   = $form->get("do");
