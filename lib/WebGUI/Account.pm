@@ -258,7 +258,7 @@ sub displayContent {
         $hash{'is_method_'.$self->method } = "true";
         $hash{'url'                } = $instance->getUrl("module=$identifier",1);
         $hash{'isActive'           } = "true" if($identifier eq $self->module);
-        WebGUI::Macro::process(\$hash{'title'});
+        WebGUI::Macro::process($session,\$hash{'title'});
         push(@pluggins,\%hash);       
     }
     $var->{'account_loop'} = \@pluggins;
