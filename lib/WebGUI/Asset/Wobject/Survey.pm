@@ -383,7 +383,6 @@ sub www_dragDrop {
             $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
-
             #else put it back where it was
             $self->survey->insertObject( $target, \@tid );
         }
@@ -550,7 +549,10 @@ sub view {
 
     $var{'edit_survey_url'}     = $self->getUrl('func=editSurvey');
     $var{'take_survey_url'}     = $self->getUrl('func=takeSurvey');
-    $var{'view_reports_url'}    = $self->getUrl('func=viewReports');
+    $var{'view_simple_results_url'}    = $self->getUrl('func=exportSimpleResults');
+    $var{'view_transposed_results_url'}    = $self->getUrl('func=exportTransposedResults');
+    $var{'view_statistical_overview_url'}    = $self->getUrl('func=viewStatisticalOverview');
+    $var{'view_grade_book_url'}         = $self->getUrl('func=viewGradeBook');
     $var{'user_canTakeSurvey'}  = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
     $var{'user_canViewReports'} = $self->session->user->isInGroup( $self->get("groupToViewReports") );
     $var{'user_canEditSurvey'}  = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
@@ -586,7 +588,7 @@ sub www_takeSurvey {
         }
     };
 
-    return $out;
+    return $self->session->style->process($out,$self->getValue("styleTemplateId"));
 }
 
 #handles questions that were submitted
@@ -937,9 +939,22 @@ sub canTakeSurvey {
     return $self->{canTake};
 
 } ## end sub canTakeSurvey
-
 #-------------------------------------------------------------------
-sub www_viewReports {
+sub www_viewGradeBook{
+    my $self = shift;
+    $self->loadTempReportTable();
+    return ""
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+    my @peoples = $self->session->db->quickArray("SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",[$self->getId()]);
+    for my $people(@peoples){
+
+
+    }
+        
+
+}
+#-------------------------------------------------------------------
+sub www_exportSimpleResults{
     my $self = shift;
     $self->loadTempReportTable();
     return ""
