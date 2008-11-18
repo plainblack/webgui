@@ -67,36 +67,18 @@ all the way back to the WebGUI root node.
 sub getNext {
     my ($startingAsset, $topPage) = @_;
     my $session = $startingAsset->session;
-    my $childrenIterator = $startingAsset->getLineageIterator(
-        ['children'],
+    my $childrenIterator = $topPage->getLineageIterator(
+        ['descendants', 'siblings'],
         {
             includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
             returnObjects      => 1,
+            whereClause        => 'asset.lineage > '.$session->db->quote($startingAsset->get('lineage')),
         }
     );
     my $firstChild = $childrenIterator->();
     if (defined $firstChild) {
         return $firstChild;
     }
-    ##No children, try the first sibling after me
-    my $firstAsset = $startingAsset;
-    while ($firstAsset->getId ne $topPage->getId) {
-        my $siblingIterator = $firstAsset->getLineageIterator(
-            ['siblings'],
-            {
-                includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
-                returnObjects      => 1,
-                whereClause        => 'asset.lineage > '.$session->db->quote($firstAsset->get('lineage')),
-            }
-        );
-
-        my $firstSib = $siblingIterator->();
-        if (defined $firstSib) {
-            return $firstSib;
-        }
-        $firstAsset = $firstAsset->getParent;
-    }
-    ##No valid siblings after me, try my parent's siblings.
     return undef;
 }
 
@@ -138,6 +120,17 @@ sub getPrevious {
 
     my $firstSib = $siblingIterator->();
     if (defined $firstSib) {
+        my $childIterator = $firstSib->getLineageIterator(
+            ['children'],
+            {
+                includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
+                whereClause        => 'asset.lineage < '.$session->db->quote($startingAsset->get('lineage')),
+                returnObjects      => 1,
+                invertTree         => 1,
+            }
+        );
+        my $child = $childIterator->();
+
         return $firstSib;
     }
     return $startingAsset->getParent();
