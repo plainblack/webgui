@@ -14,6 +14,7 @@ use strict;
 use Tie::CPHash;
 use WebGUI::AdminConsole;
 use WebGUI::DatabaseLink;
+use WebGUI::Exception;
 use WebGUI::International;
 
 =head1 NAME
@@ -281,7 +282,8 @@ sub www_editDatabaseLinkSave {
     }
 	if ($session->form->process("dlid") eq "new") {
 		WebGUI::DatabaseLink->create($session,$params);
-	} else {
+	}
+    else {
 		WebGUI::DatabaseLink->new($session,$session->form->process("dlid"))->set($params);
 	}
     return www_listDatabaseLinks($session);
@@ -300,11 +302,10 @@ sub www_listDatabaseLinks {
 	my $session = shift;
     return $session->privilege->adminOnly() unless canView($session);
 	my $links = WebGUI::DatabaseLink->getList($session);
-        my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
+    my $output = '<table border="1" cellpadding="3" cellspacing="0" align="center">';
 	my $i18n = WebGUI::International->new($session);
 	foreach my $id (keys %{$links}) {
-#		$output .= '<tr><td valign="top" class="tableData"></td><td valign="top" class="tableData">'.$i18n->get(1076).'</td></tr>';
-                $output .= '<tr><td valign="top" class="tableData">';
+        $output .= '<tr><td valign="top" class="tableData">';
 		if ($id ne '0') {
 			$output .= $session->icon->delete('op=deleteDatabaseLinkConfirm;dlid='.$id,'',$i18n->get(988))
 				.$session->icon->edit('op=editDatabaseLink;dlid='.$id)
@@ -314,10 +315,23 @@ sub www_listDatabaseLinks {
             $output .= $session->icon->edit('op=editDatabaseLink;dlid='.$id);
         }
 		$output	.= '</td>';
-                $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td></tr>';
+        $output .= '<td valign="top" class="tableData">'.$links->{$id}.'</td><td valign="top" class="tableData">';
+        my $connection = eval {WebGUI::DatabaseLink->new($session,$id)->db};
+        my $e;
+        if (($e = WebGUI::Error->caught) || $@ || not defined $connection) {
+            $output .= $i18n->get('70');
+            if (defined $e) {
+                $output .= ': '.$e->error;
+            }
         }
-        $output .= '</table>';
-        return _submenu($session,$output);
+        else {
+            $output .= $i18n->get('ok');
+            $connection->disconnect;
+        }
+        $output .='</td></tr>';
+    }
+    $output .= '</table>';
+    return _submenu($session,$output);
 }
 
 

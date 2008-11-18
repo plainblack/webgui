@@ -181,8 +181,8 @@ sub drawLocationField {
 	my $options = $self->session->db->buildHashRef("select distinct(location) from EMSTicket left join asset using (assetId)
 		where parentId=? order by location",[$self->get('parentId')]);
 	return WebGUI::Form::combo($self->session, {
-		name	=> $params->{name},
-		value	=> $self->get($params->{name}),
+		name	=> 'location',
+		value	=> $self->get('location'),
 		options	=> $options,
 		});
 }
@@ -268,10 +268,10 @@ sub getEditForm {
 	}
     $form->getTab("properties")->DateTime(
             name            => "startDate", 
-            defaultValue    => $date->toDatabase,
             label           => $i18n->get("add/edit event start date"),
             hoverHelp       => $i18n->get("add/edit event start date help"),
             timeZone        => $self->getParent->get("timezone"),
+            defaultValue    => $date->toDatabase,
             value           => $self->get("startDate"),
     );
 	return $form;

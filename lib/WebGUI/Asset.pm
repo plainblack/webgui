@@ -986,6 +986,7 @@ sub getEditForm {
             my $drawMethod = $properties->{$fieldName}{customDrawMethod};
             if ($drawMethod) {
                 $params{value} = $self->$drawMethod(\%params);
+                delete $params{name}; # don't want readOnly to generate a hidden field
                 $params{fieldType} = "readOnly";
             }
 
