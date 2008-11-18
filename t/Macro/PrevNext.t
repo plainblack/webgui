@@ -66,7 +66,7 @@ my $subPage2_2 = $topPage2->addChild({
     title     => 'Sub Page 1, Top Page 2',
 });
 
-my ($goodChild, $goodSibling, $nextParent, $lastPage, $previousParent);
+my ($goodChild, $goodSibling, $nextParent, $lastPage, $previousParent, $previousChild);
 
 $goodChild = WebGUI::Macro::PrevNext::getNext($topPage1, $testStart);
 is ($goodChild->getTitle, $subPage1_1->getTitle, 'next: Getting first child of first page');
@@ -92,11 +92,11 @@ is ($goodSibling->getTitle, $subPage1_1->getTitle, "previous: Getting first sibl
 $previousParent = WebGUI::Macro::PrevNext::getPrevious($subPage1_1, $testStart);
 is ($previousParent->getTitle, $topPage1->getTitle, "previous: Getting parent when start asset is the first child");
 
-$previousParent = WebGUI::Macro::PrevNext::getPrevious($topPage1, $testStart);
-is ($previousParent->getTitle, $testStart->getTitle, "previous: Getting parent when start asset is the first child and parent is the top asset");
+$previousChild = WebGUI::Macro::PrevNext::getPrevious($topPage2, $testStart);
+is ($previousChild->getTitle, $subPage1_Last->getTitle, "previous: Getting child of previous parent");
 
-$previousParent = WebGUI::Macro::PrevNext::getPrevious($testStart, $testStart);
-is ($previousParent->getTitle, $testStart->getTitle, "previous: Getting parent when start asset is the top asset");
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($topPage1, $testStart);
+is ($previousParent, undef, "previous: Getting parent when start asset is the first child and parent is the top asset");
 
 }
 

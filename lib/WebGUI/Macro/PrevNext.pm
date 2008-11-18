@@ -41,6 +41,7 @@ sub process {
         $topPage = WebGUI::Asset->getDefault($session);
     }
     my $nextPage = getNext($session->asset, $topPage);
+    my $prevPage = getPrevious($session->asset, $topPage);
 	my $output = ""; # do some stuff
 	return $output;
 }
@@ -84,18 +85,18 @@ sub getNext {
 
 =head2 getPrevious
 
-Find the next asset using a 1-level, depth first approach.  This means
+Find the previous asset using a 1-level, depth first approach.  This means
 it prefers children over siblings.  If no previous asset exists, it
 returns undef.  If it does exist, it returns an WebGUI::Asset object of
 the appropriate type.
 
 =head3 $startingAsset
 
-The next asset will be the next logical asset after $startingAsset.
+The next asset will be the next logical asset before $startingAsset.
 
 =head3 $topPage
 
-When no valid next sibling is found, the subroutine will attempt to
+When no valid previous sibling is found, the subroutine will attempt to
 see if the parent has valid siblings with children.  It uses $topPage
 to make sure it doesn't recurse out of a particular area, such as
 all the way back to the WebGUI root node.
@@ -104,12 +105,10 @@ all the way back to the WebGUI root node.
 
 sub getPrevious {
     my ($startingAsset, $topPage) = @_;
-    if ($startingAsset->getId eq $topPage->getId) {
-        return $topPage;
-    }
     my $session = $startingAsset->session;
-    my $siblingIterator = $startingAsset->getLineageIterator(
-        ['siblings'],
+
+    my $childIterator = $topPage->getLineageIterator(
+        ['self', 'descendants', 'siblings'],
         {
             includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
             whereClause        => 'asset.lineage < '.$session->db->quote($startingAsset->get('lineage')),
@@ -117,23 +116,11 @@ sub getPrevious {
             invertTree         => 1,
         }
     );
-
-    my $firstSib = $siblingIterator->();
-    if (defined $firstSib) {
-        my $childIterator = $firstSib->getLineageIterator(
-            ['children'],
-            {
-                includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
-                whereClause        => 'asset.lineage < '.$session->db->quote($startingAsset->get('lineage')),
-                returnObjects      => 1,
-                invertTree         => 1,
-            }
-        );
-        my $child = $childIterator->();
-
-        return $firstSib;
+    my $firstChild = $childIterator->();
+    if (defined $firstChild and $firstChild->getId ne $topPage->getId) {
+        return $firstChild;
     }
-    return $startingAsset->getParent();
+    return undef;
 }
 
 1;
