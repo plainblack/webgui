@@ -119,6 +119,7 @@ sub addPost {
 			$storage->addFileFromScalar($filename, $file->{content});
 		}
 	}
+    $post->requestAutoCommit;
 	$post->postProcess;
 	$post->getThread->unarchive if ($post->getThread->get("status") eq "archived");
 	return $post;
