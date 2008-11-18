@@ -155,6 +155,7 @@ sub acceptsFriendsRequests {
 
     return 0 unless ($user && ref $user eq "WebGUI::User"); #Sanity checks
     return 0 if($self->isVisitor);  #Visitors can't have friends
+    return 0 if($user->isVisitor);  #Visitor can't be your friend either
     return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
 
     my $me     = WebGUI::Friends->new($session,$self);
