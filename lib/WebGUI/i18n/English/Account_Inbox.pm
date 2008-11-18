@@ -105,7 +105,7 @@ our $I18N = {
     },
 
     'invite user enabled template hoverHelp' => {
-        message     => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
+        message     => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.  Please note:  In order for this feature to work you must also enable anonymous registration|,
         lastUpdated => 1119068809
     },
 
