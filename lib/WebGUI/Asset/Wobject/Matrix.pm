@@ -313,6 +313,41 @@ sub getCategories {
 
 #-------------------------------------------------------------------
 
+=head2 getCompareColor  (  )
+
+Returns the compare form.
+
+=head3 value
+
+The value of a MatrixCompare form field.
+
+=cut
+
+sub getCompareColor {
+
+    my $self    = shift;
+    my $value   = shift;
+
+    if($value == 0){
+        return $self->get('compareColorNo');
+    }
+    elsif($value == 1){
+        return $self->get('compareColorLimited');
+    }
+    elsif($value == 2){
+        return $self->get('compareColorCostsExtra');
+    }
+    elsif($value == 3){
+        return $self->get('compareColorFreeAddOn');
+    }
+    elsif($value == 3){
+        return $self->get('compareColorYes');
+    }
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCompareForm  (  )
 
 Returns the compare form.
@@ -340,7 +375,7 @@ sub getCompareForm {
             orderByClause       => $self->get('defaultSort').$sortDirection,
             returnObjects       => 1,
     }) };
-    # Create an options hash based on the orderd array of listings.
+    # Create an options hash based on the ordered array of listings.
     foreach my $listing (@listings){
         $options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
     }
@@ -632,7 +667,7 @@ sub www_compare {
     my $self = shift;
     my $var = $self->get;
     my @listingIds = @_;
-    my @columnKeys = ['name'];
+    my @columnKeys;
     #my @listingIds = ['AwioUvaZXmAEaFw20t-x3Q', 'CWNjAHcmh0pEF6WJooomJA'];
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
@@ -667,16 +702,17 @@ sub www_compare {
 
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;
-        $listingId_safe =~ s/-//g;
+        $listingId_safe =~ s/-/_/g;
         push(@columnKeys, $listingId_safe);
+        push(@columnKeys, $listingId_safe."_compareColor");
     }
 
     $var->{javascript} = "<script type='text/javascript'>\n".
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).');'.
-        'var columnKeys = new Array("name", '.join(", ",map {'"'.$_.'"'} @columnKeys).');'.
+        'var columnKeys = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @columnKeys).');'.
         "</script>";
 
-    return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));;
+    return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -884,9 +920,13 @@ Returns the compare form data as JSON.
 
 sub www_getCompareFormData {
 
-    my $self = shift;
+    my $self            = shift;
+    my $session         = $self->session;
+    my $form            = $session->form;
+    my $sortDirection   = ' asc';
+
     my @results;
-    my $sortDirection = ' asc';
+    my @listingIds = $self->session->form->checkList("listingId");
     
     $self->session->http->setMimeType("application/json");
 =cut
@@ -928,7 +968,39 @@ assetData.revisionDate
             assetData.assetId
         order by ".$self->get('defaultSort').$sortDirection;
 
-    my $results = $self->session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
+    @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
+    foreach my $result (@results){
+            #$result->{checked} = '';
+            if($form->process("search")){
+                #my $listing = WebGUI::Asset::MatrixListing->new($session,$result->{assetId});
+                $self->session->errorHandler->warn("checking listing: ".$result->{title});
+                foreach my $param ($form->param) {
+                    if($param =~ m/^search_/){
+                        my $attributeId = $param;
+                        $attributeId =~ s/^search_//;
+                        $attributeId =~ s/_/-/;
+                        my $listingValue = $session->db->quickScalar("
+                            select value from MatrixListing_attribute
+                            where attributeId = ? and matrixListingId = ?
+                        ",[$attributeId,$result->{assetId}]);
+                        $self->session->errorHandler->warn("attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
+                        if($form->process($param) eq $listingValue){
+                            $self->session->errorHandler->warn("--Checked--");
+                            $result->{checked} = 'checked';
+                        }
+                        else{
+                            undef $result->{checked};
+                        }
+                    }    
+                }
+            }
+            else{
+                if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
+                    $result->{checked} = 'checked';
+                }
+            }
+            $result->{assetId} =~ s/-/_/g;
+    }
 =cut        
 push(@results,{
             Title=>$data->{title},
@@ -945,24 +1017,9 @@ push(@results,{
     }
 =cut    
     my $jsonOutput;
-    $jsonOutput->{ResultSet} = {Result=>$results};
+    $jsonOutput->{ResultSet} = {Result=>\@results};
 
     return JSON->new->utf8->encode($jsonOutput);
-=cut
-    return JSON->new->utf8->encode({
-    ResultSet=>{
-        totalResultsAvailable=>1,
-        totalResultsReturned=>1,
-        firstResultPosition=>1,
-        Result=>[{
-            Title=>"Pizza Depot",
-            Phone=>"(408) 245-7760",
-            City=>"Sunnyvale",
-            ClickUrl=>"http:\/\/local.yahoo.com\/details?id=21332021&stx=pizza&csz=Sunnyvale+CA"
-        }]
-    }
-    });
-=cut
 }
 
 #-------------------------------------------------------------------
@@ -986,22 +1043,23 @@ sub www_getCompareListData {
     my $sortDirection = ' asc';
 
     foreach my $listingId (@listingIds){
+        $listingId =~ s/_/-/g;
         my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
         my $listingId_safe = $listingId;
-        $listingId_safe =~ s/-//g;
-        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title')});
+        $listingId_safe =~ s/-/_/g;
+        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors"});
     }
 
     my $jsonOutput;
     $jsonOutput->{ColumnDefs} = \@columnDefs;
 
     foreach my $category (keys %{$self->getCategories}) {
-        my $fields = " a.name, a.fieldType ";
+        my $fields = " a.name, a.fieldType, a.attributeId ";
         my $from = "from Matrix_attribute a";
         my $tableCount = "b";
         foreach my $listingId (@listingIds) {
             my $listingId_safe = $listingId;
-            $listingId_safe =~ s/-//g;
+            $listingId_safe =~ s/-/_/g;
             $fields .= ", ".$tableCount.".value as `$listingId_safe`";
             $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId="
                 .$tableCount.".attributeId and ".$tableCount.".matrixListingId=? ";
@@ -1014,9 +1072,12 @@ sub www_getCompareListData {
     }
     foreach my $result (@results){
         foreach my $listingId (@listingIds) {
+            $result->{attributId} =~ s/-/_/g;
             my $listingId_safe = $listingId;
-            $listingId_safe =~ s/-//g;
+            $listingId_safe =~ s/-/_/g;
             if ($result->{fieldType} eq 'MatrixCompare'){
+                my $originalValue = $result->{$listingId_safe};
+                $result->{$listingId_safe.'_compareColor'} = $self->getCompareColor($result->{$listingId_safe});
                 $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
                     { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
             }
@@ -1056,6 +1117,74 @@ sub www_listAttributes {
             .' '.$attribute->{name}."<br />\n";
     }
     return $self->getAdminConsole->render($output, $i18n->get('list attributes title'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_search  (  )
+
+Returns the search screen.
+
+=cut
+
+sub www_search {
+
+    my $self    = shift;
+    my $var     = $self->get;
+    
+    #$var->{compareForm}     = $self->getCompareForm;
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-beta-min.js'),
+    {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-beta-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
+    {type =>'text/javascript'});
+#    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
+#    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixSearch.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+
+    foreach my $category (keys %{$self->getCategories}) {
+        my $attributes;
+        my @attribute_loop;
+        my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+        $attributes = $self->session->db->read("select * from Matrix_attribute where category =? and assetId = ?",
+            [$category,$self->getId]);
+        while (my $attribute = $attributes->hashRef) {
+            $attribute->{label} = $attribute->{name};
+            $attribute->{id} = $attribute->{attributeId};
+            $attribute->{id} =~ s/-/_/g;
+            $attribute->{extras} = " class='attributeSelect'";
+            if($attribute->{fieldType} eq 'Combo'){    
+                $attribute->{fieldType} = 'SelectBox';
+            }
+            $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
+            push(@attribute_loop,$attribute);
+        }
+        $var->{$categoryLoopName} = \@attribute_loop;
+        push(@{$var->{category_loop}},{
+            categoryLabel   => $category,
+            attribute_loop  => \@attribute_loop,
+        });
+    }
+
+    return $self->processStyle($self->processTemplate($var,$self->get("searchTemplateId")));
 }
 
 #-------------------------------------------------------------------

@@ -7,7 +7,12 @@ YAHOO.util.Event.addListener(window, "load", function() {
         };
 
 	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) {
-            elCell.innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "'>";
+		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
+		if(typeof(oRecord.getData("checked")) != 'undefined'){
+			innerHTML = innerHTML + " checked='checked'";
+		}
+		innerHTML = innerHTML + ">";
+            	elCell.innerHTML = innerHTML;
         };
 
         var myColumnDefs = [
@@ -18,16 +23,23 @@ YAHOO.util.Event.addListener(window, "load", function() {
             {key:"compares", sortable:true}
         ];
 
+	var uri = "func=getCompareFormData";
+	if(typeof(listingIds) != 'undefined'){
+	for (var i = 0; i < listingIds.length; i++) {
+		uri = uri+';listingId='+listingIds[i];
+	}
+	}
+
         this.myDataSource = new YAHOO.util.DataSource("?");
         this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","assetId"]
+            fields: ["title","views","clicks","compares","assetId","checked"]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
-                this.myDataSource, {initialRequest:"func=getCompareFormData"});
+                this.myDataSource, {initialRequest:uri});
 
 	var oColumn = this.myDataTable.getColumn(3);
 	this.myDataTable.hideColumn(oColumn); 

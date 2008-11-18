@@ -2,9 +2,27 @@
 
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
+	var Dom = YAHOO.util.Dom;
+	var hideStickies = 0;
+
+	this.formatStickied = function(elCell, oRecord, oColumn, sData) {
+            	elCell.innerHTML = "<input type='checkBox' class='stickieCheckbox' id='" + oRecord.getData("attributeId") + "_stickied'>";
+        };
+
+	this.formatColors = function(elCell, oRecord, oColumn, sData) {
+		var colorField = oColumn.key + "_compareColor";
+		var color = oRecord.getData(colorField);
+		if(color){
+			Dom.setStyle(elCell.parentNode, "background-color", color);
+		}
+            	elCell.innerHTML = sData;
+        };
+
+	YAHOO.widget.DataTable.Formatter.formatColors = this.formatColors; 
 
         var myColumnDefs = [
-            {key:"name"}
+            	{key:"stickied",formatter:this.formatStickied},
+		{key:"name"}
         ];
 
         this.myDataSource = new YAHOO.util.DataSource("?");
@@ -38,8 +56,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		myDataTable.getRecordSet().reset();
 		var existingColumns = myDataTable.getColumnSet().keys;
 		for (var i = 0; i < existingColumns.length; i++) {
-		if(i > 0){
-			myDataTable.removeColumn(existingColumns[1]);
+		if(i > 1){
+			// after deleting a column the next column will
+			// allways be no. 2 (the third in the array)
+			myDataTable.removeColumn(existingColumns[2]);
 		}
 		}
 	    if (oFullResponse.ColumnDefs) {
@@ -59,11 +79,11 @@ YAHOO.util.Event.addListener(window, "load", function() {
         };
 
         var myCallback2 = function() {
-	this.getRecordSet().reset();
-	//this.render();		
-            this.set("sortedBy", null);
-            this.onDataReturnAppendRows.apply(this,arguments);
-		this.getRecordSet().reset();
+		//this.getRecordSet().reset();
+        	this.set("sortedBy", null);
+            	this.onDataReturnAppendRows.apply(this,arguments);
+	
+		//this.getRecordSet().reset();
         };
 	
 
@@ -72,15 +92,68 @@ YAHOO.util.Event.addListener(window, "load", function() {
             failure : myCallback,
             scope : myDataTable
         };
-        this.myDataSource.sendRequest("func=getCompareListData;listingId=CWNjAHcmh0pEF6WJooomJA",
-                callback2);
-	
+
+	var btnCompare = new YAHOO.widget.Button("compare");
+        btnCompare.on("click", function(e) {
+		var uri = "func=getCompareListData";
+		for (var i = 0; i < columnKeys.length; i++) {
+			if(columnKeys[i] != 'name'){
+				var checkBox = new Dom.get(columnKeys[i] + '_checkBox');	
+				if(checkBox.checked == true){
+					uri = uri+';listingId='+columnKeys[i];
+				}
+			}
+		}
+            	this.myDataSource.sendRequest(uri,callback2); 
+        },this,true);
+
+	var btnStickied = new YAHOO.widget.Button("stickied");
+        btnStickied.on("click", function(e) {
+		var elements = myDataTable.getRecordSet().getRecords();
+		if(hideStickies == 0){
+			// hide non-selected attributes
+			for(i=0; i<elements.length; i++){
+				var attributeId = elements[i].getData('attributeId');
+				var checkBox = Dom.get(attributeId+"_stickied");
+				if (checkBox.checked == false){
+					elRow = myDataTable.getTrEl(elements[i]);
+					//var styleNow = Dom.getStyle(elRow, "display");
+					//alert(styleNow);
+                			Dom.setStyle(elRow, "display", "none");
+				}
+			}
+			hideStickies = 1;
+		}else{
+			// show all attributes
+			for(i=0; i<elements.length; i++){
+				var attributeId = elements[i].getData('attributeId');
+				var checkBox = Dom.get(attributeId+"_stickied");
+				if (checkBox.checked == false){
+					elRow = myDataTable.getTrEl(elements[i]);
+					Dom.setStyle(elRow, "display", "table-row");
+				}
+			}
+			hideStickies = 0;
+		}
+		
+//		var elements = Dom.getElementsByClassName('yui-dt-even yui-dt-first', 'tr');
+//		for(i=0; i<elements.length; i++){
+//			alert(elements[i].id);
+//			Dom.setStyle(elements[i], "display", "none");
+//			Dom.addClass(elements[i],'hidden')
+//			alert(elements[i].className);
+//			var show = true;
+                	
+			
+//		}
+	},this,true);
+
+	//var hideEl = new Dom.get('yui-dt0-bdrow0');
+	//alert(hideEl.id);
+	//Dom.addClass(hideEl,'hidden');
+
     };
 });
 
-//function sort() {
-//	myCompareTable.sortColumn()
-//	var oColumn = myCompareTable.getColumn(3);
-//	myCompareTable.hideColumn(oColumn); 
-//}
+
 
