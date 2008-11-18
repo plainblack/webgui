@@ -176,7 +176,6 @@ sub displayContent {
             
         #Push the tab variables onto the template
         my %hash                     = %{$account};
-        my $identifier               = $account->{identifier};
        
         $hash{'is_'.$identifier    } = "true";
         $hash{'is_method_'.$self->method } = "true";
