@@ -616,7 +616,7 @@
 # Each pluggin has serveral properties
 #
 #   identifier  - This string will act as the identifying agent for this account pluggin.  It is passed along
-                  the url and cannot contain spaces.
+#                  the url and cannot contain spaces.
 #   title       - The title of the module which is displayed on the website.
 #   className   - The class which drives this module
 
@@ -636,29 +636,29 @@
 
 "account" : [
     {
-        identifier : "profile",
-        title      : "^International(title,Account_Profile);",
-        className  : "WebGUI::Account::Profile"
+        "identifier" : "profile",
+        "title"      : "^International(title,Account_Profile);",
+        "className"  : "WebGUI::Account::Profile"
     },
     {
-        identifier : "inbox",
-        title      : "^International(title,Account_Inbox);",
-        className  : "WebGUI::Account::Inbox"
+        "identifier" : "inbox",
+        "title"      : "^International(title,Account_Inbox);",
+        "className"  : "WebGUI::Account::Inbox"
     },
     {
-        identifier : "friends",
-        title      : "^International(title,Account_Friends);",
-		className  : "WebGUI::Account::Friends"
+        "identifier" : "friends",
+        "title"      : "^International(title,Account_Friends);",
+        "className"  : "WebGUI::Account::Friends"
     },
     {
-        identifier : "shop",
-        title      : "^International(title,Account_Shop);",
-		className  : "WebGUI::Account::Shop"
+        "identifier" : "shop",
+        "title"      : "^International(title,Account_Shop);",
+        "className"  : "WebGUI::Account::Shop"
     },
     {
-        identifier : "user",
-        title      : "^International(title,Account_User);",
-		className  : "WebGUI::Account::User"
+        "identifier" : "user",
+        "title"      : "^International(title,Account_User);",
+        "className"  : "WebGUI::Account::User"
     },
 ],
 
