@@ -38,6 +38,7 @@
  - rfe: Thingy can now copy thingy entries
  - Added a switch to subscriptions so that they can be also non-recurring to
    facilitate eg. limited time meberships (Martin Kamerbeek / Oqapi)
+ - Replaced Matrix with newer version
 
 7.6.3
  - improved performance of file uploads

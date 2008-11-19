@@ -41,7 +41,133 @@ removeProcessRecurringPaymentsFromConfig( $session );
 addExtendedProfilePrivileges( $session );
 addStorageUrlMacro( $session );
 addRecurringSubscriptionSwitch( $session );
+upgradeMatrix( $session );
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub upgradeMatrix {
+    my $session = shift;
+    print "\tUpgrading matrix assets... \n" unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table Matrix drop column groupToRate, drop column groupToAdd, drop column privilegedGroup,
+        drop column ratingTimeout, drop column ratingTimeoutPrivileged, drop column ratingDetailTemplateId,
+        drop column visitorCacheTimeout");
+    $db->write("alter table Matrix add column defaultSort char(22) not null default 'score',
+        add column compareColorNo char(22) default '#ffaaaa', 
+        add column compareColorLimited char(22) not null default '#ffffaa', 
+        add column compareColorCostsExtra char(22) not null default '#ffffaa', 
+        add column compareColorFreeAddOn char(22) not null default '#ffffaa', 
+        add column compareColorYes char(22) not null default '#aaffaa',
+        add column submissionApprovalWorkflowId char(22) not null,
+        add column ratingsDuration int(11) not null default 7776000");
+    $db->write("create table MatrixListing (
+        assetId         char(22) binary not null,
+        revisionDate    bigint not null,
+        screenshots     char(22),
+        description     text,
+        version         char(255),
+        views           int(11),
+        compares        int(11),
+        clicks          int(11),
+        viewsLastIp     char(255),
+        comparesLastIp  char(255),
+        clicksLastIp    char(255),
+        lastUpdated     int(11),
+        maintainer      char(22),
+        manufacturerName    char(255),
+        manufacturerURL     char(255),
+        productURL          char(255),
+        score           int(11),
+        primary key (assetId, revisionDate)
+    )");
+    $db->write("create table MatrixListing_attribute (
+        matrixId char(22) not null, 
+        matrixListingId char(22) not null, 
+        attributeId char(22) not null, 
+        value char(255),
+        primary key (matrixId, matrixListingId, attributeId)
+    )");
+    $db->write("alter table Matrix_rating rename MatrixListing_rating");
+    $db->write("alter table Matrix_ratingSummary rename MatrixListing_ratingSummary");
+    $db->write("alter table Matrix_field rename Matrix_attribute");
+    $db->write("alter table Matrix_attribute drop column label");
+    $db->write("alter table Matrix_attribute add column options text");
+    $db->write("alter table Matrix_attribute change fieldType fieldType char(255) not null default 'MatrixCompare'");
+    $db->write("alter table Matrix_attribute change fieldId attributeId char(22) not null");
+    $db->write("update Matrix_attribute set fieldType = 'MatrixCompare' where fieldType = 'GoodBad'");	
+    $db->write("update Matrix_attribute set fieldType = 'Combo' where fieldType != 'MatrixCompare'");
+	$db->write("update Matrix_listingData set value = 0 where value = 'No'");
+	$db->write("update Matrix_listingData set value = 1 where value = 'Limited'");
+	$db->write("update Matrix_listingData set value = 2 where value = 'Costs Extra'");
+	$db->write("update Matrix_listingData set value = 3 where value = 'Free Add On'");
+	$db->write("update Matrix_listingData set value = 4 where value = 'Yes'");
+
+    # get existing Matrix wobjects
+    my $matrices   = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
+        {
+            statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+            statusToInclude     => ['pending','approved','deleted','archived'],
+            includeOnlyClasses  => ['WebGUI::Asset::Wobject::Matrix'],
+            returnObjects       => 1,
+        });
+
+    for my $matrix (@{$matrices})
+    {
+        next unless defined $matrix;
+        # If the asset is in the trash, ignore the migration, we're just going
+        # to purge it.
+        if ($matrix->get("state") =~ m/trash/) {
+            $matrix->purge;
+            next;
+        }
+    
+        # get listings for each Matrix
+        my @listings = @{ $db->buildArrayRefOfHashRefs("select * from Matrix_listing where assetId =?",[$matrix->getId]) };
+        foreach my $listing (@listings){
+            # add MatrixListing asset for each listing
+            print "Migrating listing: ".$listing->{productName}."\n" unless $quiet;;
+            $listing->{className} = 'WebGUI::Asset::MatrixListing';
+            $listing->{assetId} = 'new';
+            $listing->{title}   = $listing->{productName};
+            $listing->{version} = $listing->{versionNumber};
+            $listing->{screenshots} = $listing->{storageId};
+		$listing->{productURL} = $listing->{productUrl};		
+		$listing->{manufacturerURL} = $listing->{manufacturerUrl};
+            my $newMatrixListing = $matrix->addChild($listing,undef,undef,{skipAutoCommitWorkflows=>1});
+            # get listingData for each listing
+            my $listingData = $db->buildArrayRefOfHashRefs("select * from Matrix_listingData where listingId =?",[$listing->{listingId}]);
+            # add listing attribute for each listing field
+            foreach my $attribute (@{$listingData}){
+                $db->write("insert into MatrixListing_attribute (matrixId, matrixListingId, attributeId, value) values 
+                (?,?,?,?)",[$matrix->getId,$newMatrixListing->getId,$attribute->{fieldId},$attribute->{value}]);
+            }
+            # update listingIds to MatrixListingIds in MatrixListing_rating/Summary tables
+            $db->write("update MatrixListing_rating set listingId = ? where listingId =?",
+                [$newMatrixListing->getId,$listing->{listingId}]);
+            $db->write("update MatrixListing_ratingSummary set listingId = ? where listingId =?",
+                [$newMatrixListing->getId,$listing->{listingId}]);
+            # migrate comments
+            if($listing->{forumId}){
+                my $forum = WebGUI::Asset::Wobject::Collaboration->new($session, $listing->{forumId});
+                my @comments = @{ $forum->getLineage(['descendants'], {
+                    includeOnlyClasses  => ["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"],
+                    returnObjects       => 1,
+                    }) };
+                foreach my $comment (@comments){
+                # add comment
+                my $content = $comment->get('content');
+		$content =~ s/^<p>//;
+		$content =~ s/<\/p>//;
+                my $ownerUser = WebGUI::User->new($session,$comment->get('ownerUserId'));
+                $newMatrixListing->addComment($content,0,$ownerUser);
+                }
+            }
+        }
+    }
+    $db->write("drop table Matrix_listing");
+    $db->write("drop table Matrix_listingData");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addExtendedProfilePrivileges {
