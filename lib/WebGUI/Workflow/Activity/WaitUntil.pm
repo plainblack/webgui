@@ -82,7 +82,6 @@ sub execute {
 	my $versionTag = shift;
     my $session    = $self->session;
 	my $urlOfSingleAsset = "";
-$session->log->warn('a');
 
     #By default, we'll make it so that things happen now.
     my $time = $session->datetime->time();
@@ -94,24 +93,18 @@ $session->log->warn('a');
     elsif ($self->get("type") eq "endTime") {
         $time = $versionTag->get("endTime");
     }
-$session->log->warn('b');
     
     #Turn start or end time into an epoch value
     my $dt = WebGUI::DateTime->new($session,$time);
-$session->log->warn('c');
     
     #Get the current UTC time
     my $now = WebGUI::DateTime->new($session,$session->datetime->time());
-$session->log->warn('d');
     
     #Workflow is complete if the time has passed.
     if($now->epoch >= $dt->epoch) {
         return $self->COMPLETE;
     }
-    
-$session->log->warn('e');
-    $session->log->warn($dt->epoch - $now->epoch);
-    
+        
     return $self->WAITING($dt->epoch - $now->epoch);
 }
 
