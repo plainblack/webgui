@@ -662,6 +662,9 @@ sub checkCombinedExpression {
     # Undefined combined expression is valid
     return 1 if !defined $combined_expression;
 
+    # Trim whitespace
+    $combined_expression =~ s/^\s+|\s+$//g;
+    
     # Split combined expression up at whitespace and check tokens
     foreach my $token ( split /\s+/, $combined_expression ) {
 

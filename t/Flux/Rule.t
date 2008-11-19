@@ -26,7 +26,7 @@ WebGUI::Error->Trace(1);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 82;
+plan tests => 83;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -322,6 +322,8 @@ $session->db->write('delete from fluxRuleUserData');
     ok( $rule->evaluateFor( { user => $user } ), q{same with explicit combined expression 'E1'} );
     $rule->update( { combinedExpression => 'not E1' } );
     ok( !$rule->evaluateFor( { user => $user } ), q{false with explicit combined expression 'not E1'} );
+    $rule->update( { combinedExpression => ' E1 ' } );
+    ok( $rule->evaluateFor( { user => $user } ), q{whitespace ok'} );
 
     # add a second expression to the Rule with a Modifier
 
