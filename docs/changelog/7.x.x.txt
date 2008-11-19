@@ -36,6 +36,8 @@
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed: Get CS Mail workflow doesn't commit version tags created
  - rfe: Thingy can now copy thingy entries
+ - Added a switch to subscriptions so that they can be also non-recurring to
+   facilitate eg. limited time meberships (Martin Kamerbeek / Oqapi)
 
 7.6.3
  - improved performance of file uploads

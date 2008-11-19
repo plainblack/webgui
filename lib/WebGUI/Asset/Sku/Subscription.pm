@@ -119,6 +119,12 @@ sub definition {
             hoverHelp	    => $i18n->get('subscription group description'),
             defaultvalue	=> [ 2 ]
         },
+        recurringSubscription => {
+            fieldType       => 'yesNo',
+            label           => $i18n->get('recurring subscription'),
+            hoverHelp       => $i18n->get('recurring subscription description'),
+            defaultValue    => 1,
+        },
         duration        => { 
             fieldType       => 'selectBox',
             label	        => $i18n->get('subscription duration'),
@@ -415,7 +421,9 @@ Tells the commerce system this Sku is recurring.
 =cut
 
 sub isRecurring {
-    return 1;
+    my $self = shift;
+
+    return $self->getValue('recurringSubscription');
 }
 
 #-------------------------------------------------------------------

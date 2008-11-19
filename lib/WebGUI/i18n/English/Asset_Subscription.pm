@@ -503,6 +503,20 @@ The form in which the user can enter his subscription code.<br />|,
 		context => q|template variable|
 	},
 
+	'recurring subscription' => {
+		message => q|Is subscription recurring?|,
+		lastUpdated => 0,
+		context => q|Label for swith to set subscription to be recurring or not.|
+	},
+	
+    'recurring subscription description' => {
+		message => q|If set to yes, the customer will be charged after each term for a new one and the subscription
+will be renewed for an extra term. If set to no, the customer will be charged for the first term only, and after one
+term the subscription expires for the customer.|,
+		lastUpdated => 0,
+		context => q|Label for swith to set subscription to be recurring or not.|
+	},
+
 };
 
 1;

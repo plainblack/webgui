@@ -40,6 +40,7 @@ upgradeAccount( $session );
 removeProcessRecurringPaymentsFromConfig( $session );
 addExtendedProfilePrivileges( $session );
 addStorageUrlMacro( $session );
+addRecurringSubscriptionSwitch( $session );
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -382,6 +383,17 @@ sub fixFriendsGroups {
         #purge the admin group
         WebGUI::User->new($session,$userId)->friends->deleteGroups([3]);
     }
+}
+
+#----------------------------------------------------------------------------
+sub addRecurringSubscriptionSwitch {
+    my $session = shift;
+
+    print "\tAdding a recurring/nonrecurring switch to subscriptions... " unless $quiet;
+
+    $session->db->write('alter table Subscription add column recurringSubscription tinyint(1) not null default 1');
+
+    print "Done!\n";
 }
 
 #----------------------------------------------------------------------------
