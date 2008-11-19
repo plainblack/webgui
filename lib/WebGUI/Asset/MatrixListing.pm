@@ -975,23 +975,23 @@ sub install {
 	my $session = WebGUI::Session->open($home, $config);
 	$session->config->addToArray("assets","WebGUI::Asset::MatrixListing");
 	$session->db->write("create table MatrixListing (
-		assetId         varchar(22) binary not null,
+		assetId         char(22) binary not null,
 		revisionDate    bigint not null,
-        title           varchar(255),
-        screenshots     varchar(22),
+        screenshots     char(22),
         description     text,
-        version         varchar(255),
+        version         char(255),
         views           int(11),
         compares        int(11),
         clicks          int(11),
-        viewsLastIp     varchar(255),
-        comparesLastIp  varchar(255),
-        clicksLastIp    varchar(255),
+        viewsLastIp     char(255),
+        comparesLastIp  char(255),
+        clicksLastIp    char(255),
         lastUpdated     int(11),
-        maintainer      varchar(22),
-        manufacturerName    varchar(255),
-        manufacturerURL     varchar(255),
-        productURL          varchar(255),
+        maintainer      char(22),
+        manufacturerName    char(255),
+        manufacturerURL     char(255),
+        productURL          char(255),
+        score           int(11),
 		primary key (assetId, revisionDate)
 		)");
     $session->db->write("create table MatrixListing_attribute (

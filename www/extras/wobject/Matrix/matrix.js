@@ -82,19 +82,40 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	//	compareCheckBoxes[i].onchange = compareFormButton;
     	//}
 	
-    };
-});
-	function compareFormButton () {
+	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
+        btnCompare.on("click", function(e) {
+		alert('bla');
+		window.document.forms['doCompare'].submit();
+        },this,true);
+
+	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
-		//alert(compareCheckBoxes.length);
 		var checked = 0;
 		for (var i = compareCheckBoxes.length; i--; ) {
 			if(compareCheckBoxes[i].checked){	
 				checked++;
 			}
     		}
-		//alert(checked);
+		if (checked > 1 && checked < maxComparisons){
+			btnCompare.set("disabled",false);
+		}else{
+			btnCompare.set("disabled",true);
+		}
 	}
+    };
+});
+
+//	function compareFormButton () {
+//		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		//alert(compareCheckBoxes.length);
+//		var checked = 0;
+//		for (var i = compareCheckBoxes.length; i--; ) {
+//			if(compareCheckBoxes[i].checked){	
+//				checked++;
+//			}
+//  		}
+		//alert(checked);
+//	}
 
 //function sort() {
 //	myCompareTable.sortColumn()

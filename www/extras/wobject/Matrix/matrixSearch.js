@@ -62,6 +62,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		myDataTable.getRecordSet().reset();
             this.set("sortedBy", null);
             this.onDataReturnAppendRows.apply(this,arguments);
+		compareFormButton();
         };
 
 	var callback2 = {
@@ -77,19 +78,43 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
         	}
 		var elements = myDataTable.getRecordSet().getRecords();
-		alert(elements.length);
 		for(i=0; i<elements.length; i++){
 			elRow = myDataTable.getTrEl(elements[i]);
 			Dom.setStyle(elRow, "display", "none");
 		}
+		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		for (var i = compareCheckBoxes.length; i--; ) {
+			compareCheckBoxes[i].checked = false;
+    		}
 		myDataTable.getRecordSet().deleteRecord(0,elements.length);
 		myDataSource.sendRequest(newUri,callback2);
+		
     	}
 	var attributeSelects = YAHOO.util.Dom.getElementsByClassName('attributeSelect','select');
 	for (var i = attributeSelects.length; i--; ) {
 		attributeSelects[i].onchange = reloadCompareForm;
     	}
 	
+	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
+        btnCompare.on("click", function(e) {
+		window.document.forms['doCompare'].submit();
+        },this,true);
+
+	window.compareFormButton = function() {
+		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		var checked = 0;
+		for (var i = compareCheckBoxes.length; i--; ) {
+			if(compareCheckBoxes[i].checked){	
+				checked++;
+			}
+    		}
+		alert(checked);
+		if (checked > 1 && checked < maxComparisons){
+			btnCompare.set("disabled",false);
+		}else{
+			btnCompare.set("disabled",true);
+		}
+	}
 
 	
     };

@@ -108,9 +108,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         },this,true);
 
 	//btnCompare.set("disabled",true);
-	alert(btnCompare.get("disabled"));
-	
-
+	//alert(btnCompare.get("disabled"));
 	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
@@ -119,7 +117,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				checked++;
 			}
     		}
-		if (checked > 1){
+		//alert(maxComparisons);
+		if (checked > 1 && checked < maxComparisons){
 			btnCompare.set("disabled",false);
 		}else{
 			btnCompare.set("disabled",true);

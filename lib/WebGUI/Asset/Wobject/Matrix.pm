@@ -360,6 +360,8 @@ An array of listingIds that should be selected in the compare form.
 
 sub getCompareForm {
     my $self = shift;
+
+=cut
     my @selectedListingIds = @_;
     
     my (%options, @listings);
@@ -380,12 +382,19 @@ sub getCompareForm {
         $options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
     }
 
-
-    my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-        .WebGUI::Form::submit($self->session, {
-            value=>"compare"
-            })
-        ."<br />"
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }
+=cut
+    my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,extras=>'name="doCompare"'})
+#        .WebGUI::Form::submit($self->session, {
+#            value=>"compare"
+#            })
+#        ."<br />"
         ."<br />"
         .WebGUI::Form::hidden($self->session, {
             name=>"func",
@@ -399,11 +408,21 @@ sub getCompareForm {
 #            options=>\%options,
 #        })
         ."<br />"
-        .WebGUI::Form::submit($self->session,{
-            value=>"compare"
-            })
+#        .WebGUI::Form::submit($self->session,{
+#            value=>"compare"
+#            })
         .WebGUI::Form::formFooter($self->session);
-        #.'<div id="compareForm"></div> ';
+
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }        
+    $form .=  "\n<script type='text/javascript'>\n".
+        'var maxComparisons = '.$maxComparisons.';'.
+        "\n</script>\n";
     return $form;
 }
 
@@ -501,6 +520,8 @@ sub view {
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
     $var->{compareForm}             = $self->getCompareForm;
+    $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
+    $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
 
     # Get the MatrixListing with the most views as an object using getLineage.
     my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
@@ -709,16 +730,25 @@ sub www_compare {
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
 
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }
+
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;
         push(@columnKeys, $listingId_safe);
         push(@columnKeys, $listingId_safe."_compareColor");
     }
-
+    
     $var->{javascript} = "<script type='text/javascript'>\n".
-        'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).');'.
-        'var columnKeys = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @columnKeys).');'.
+        'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
+        'var columnKeys = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @columnKeys).");\n".
+        "var maxComparisons = ".$maxComparisons.";\n".
         "</script>";
 
     return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
@@ -917,6 +947,31 @@ sub www_editAttributeSave {
     $self->editAttributeSave($attributeProperties);
 
     return $self->www_listAttributes;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportAttributes ( )
+
+Exports search attributes as csv.
+
+=cut
+
+sub www_exportAttributes {
+    my $self = shift;
+    my $session = $self->session;
+    my $output = WebGUI::Text::joinCSV("name","description","category");
+
+    my $attributes = $session->db->read("select name, description, category 
+            from Matrix_attribute where assetId = ? order by category, name",[$self->getId]);
+
+    while (my $attribute = $attributes->hashRef) {
+        $output .= "\n".WebGUI::Text::joinCSV($attribute->{name},$attribute->{description},$attribute->{category});
+    }
+    my $fileName = "export_matrix_attributes.csv";
+    $self->session->http->setFilename($fileName,"application/octet-stream");
+    $self->session->http->sendHeader;
+    return $output;
 }
 
 #-------------------------------------------------------------------
@@ -1255,14 +1310,14 @@ sub install {
         primary key (assetId, revisionDate)
 		)");
     $session->db->write("create table Matrix_attribute (
-        assetId             varchar(22)     binary not null,
-        attributeId         varchar(22)     binary not null,
-        name                varchar(255)    not null,
+        assetId             char(22)     binary not null,
+        attributeId         char(22)     binary not null,
+        name                char(255)    not null,
         description         text,
-        fieldType           varchar(255)    not null default 'MatrixField',
-        category            varchar(22)     not null,
+        fieldType           char(255)    not null default 'MatrixCompare',
+        category            char(22)     not null,
         options             text,
-        defaultValue        varchar(255),
+        defaultValue        char(255),
         primary key (attributeId)
     )");
 	$session->var->end;
