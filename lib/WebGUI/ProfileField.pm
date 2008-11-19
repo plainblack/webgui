@@ -66,7 +66,7 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 sub isReservedFieldName {
     my $class = shift;
     my $fieldName = shift;
-    return isIn($fieldName, ('func', 'op'));
+    return isIn($fieldName, ('func', 'op', 'wg_privacySettings'));
 }
 
 #-------------------------------------------------------------------
@@ -337,7 +337,10 @@ Returns a WebGUI::ProfileCategory object for the category that this profile fiel
 
 sub getCategory {
     my $self = shift;
-    return WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
+    unless ($self->{_category}) {
+        $self->{_category} = WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
+    }
+    return $self->{_category};
 }
 
 
@@ -440,6 +443,27 @@ sub getFormControlClass {
 
 #-------------------------------------------------------------------
 
+=head2 getPrivacyOptions ( session )
+
+Class method which returns a hash reference containing the privacy options available.
+
+=cut
+
+sub getPrivacyOptions {
+    my $class   = shift;
+    my $session = shift;
+    my $i18n    = WebGUI::International->new($session);
+    tie my %hash, "Tie::IxHash";
+    %hash = (
+        all     => $i18n->get('user profile field private message allow label'),
+        friends => $i18n->get('user profile field private message friends only label'),
+        none    => $i18n->get('user profile field private message allow none label'),
+    );
+    return \%hash;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRequiredFields ( session )
 
 Returns an array reference of WebGUI::ProfileField objects that are marked "required". This is a class method.
@@ -512,7 +536,7 @@ Returns a boolean indicating whether this field may be editable by a user.
 
 sub isEditable {
         my $self = shift;
-        return $self->get("editable") || $self->isRequired;
+        return $self->getCategory->isEditable && ($self->get("editable") || $self->isRequired);
 }
 
 
@@ -575,8 +599,8 @@ Returns a boolean indicating whether this field may be viewed by a user.
 =cut
 
 sub isViewable {
-        my $self = shift;
-        return $self->get("visible");
+    my $self = shift;
+    return $self->getCategory->isViewable && $self->get("visible");
 }
 
 #-------------------------------------------------------------------

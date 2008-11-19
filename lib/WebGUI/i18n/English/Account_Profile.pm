@@ -160,7 +160,15 @@ our $I18N = {
         lastUpdated => 1225724810,
     },
 
+    'set by admin' => {
+        message     => q{site administrator has set this field to not be visible },
+        lastUpdated => 1225724810,
+    },
 
+    'required field' => {
+        message     => q{required },
+        lastUpdated => 1225724810,
+    },
 };
 
 1;

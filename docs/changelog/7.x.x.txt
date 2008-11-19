@@ -10,6 +10,7 @@
  - New Friends Account module added providing a better interface into WebGUI's friends system
  - rfe: Event hover detail exclusions  (#8761)
  - rfe: Database Link test  (#513)
+ - rfe: User Profile Privacy Settings (#507) - users now have granular control of whether or not their profile fields are viewable - admin settings still apply
  - The Display Account and My Purchases interfaces have been added to the new Account system
  - Added a new macro which returns the self deactivation link if the setting is enabled.
  - Added a new macro which returns the back to site link

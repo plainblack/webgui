@@ -21,6 +21,7 @@ use WebGUI::DatabaseLink;
 use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use JSON;
 
 =head1 NAME
 
@@ -258,6 +259,42 @@ sub canUseAdminMode {
 
 #-------------------------------------------------------------------
 
+=head2 canViewField ( field, user)
+
+Returns whether or not the user passed in can view the field value for the user.
+This will only check the user level privileges.
+
+=head3 field
+
+Field to check privileges on
+
+=head3 user
+
+User to check field privileges for
+
+=cut
+
+sub canViewField {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $field     = shift;
+    my $user      = shift;
+
+    return 0 unless ($field && $user);
+    #Always true for yourself
+    return 1 if ($self->userId eq $user->userId);
+    
+    my $privacySetting = $self->getProfileFieldPrivacySetting($field);
+    return 0 unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+    return 1 if ($privacySetting eq "all");
+    return 0 if ($privacySetting eq "none");
+
+    #It's friends so return whether or not user is a friend
+    return WebGUI::Friends->new($session,$self)->isFriend($user->userId); 
+}   
+
+#-------------------------------------------------------------------
+
 =head2 dateCreated ( )
 
 Returns the epoch for when this user was created.
@@ -448,6 +485,42 @@ sub getGroupIdsRecursive {
 
     return [ keys %groupIds ];
 }
+
+#-------------------------------------------------------------------
+
+=head2 getProfileFieldPrivacySetting ( [field ])
+
+Returns the privacy setting for the field passed in.  If no field is passed in the entire hash is returned
+
+=head3 field
+
+Field to get privacy setting for.
+
+=cut
+
+sub getProfileFieldPrivacySetting {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $field     = shift;
+
+    unless ($self->{_privacySettings}) {
+        #Look it up manually because we want to cache this separately.
+        my $privacySettings        = $session->db->quickScalar(
+            q{select wg_privacySettings from userProfileData where userId=?},
+            [$self->userId]
+        );
+        $privacySettings          = "{}" unless $privacySettings;
+        $self->{_privacySettings} = JSON->new->decode($privacySettings);
+    }
+    
+    return $self->{_privacySettings} unless ($field);
+
+    #No privacy settings returned the privacy setting field
+    return "none" if($field eq "wg_privacySettings");
+
+    return $self->{_privacySettings}->{$field};
+}   
+
 
 #-------------------------------------------------------------------
 
@@ -806,6 +879,7 @@ sub profileField {
     my $fieldName   = shift;
     my $value       = shift;
     my $db          = $self->session->db;
+    return "" if ($fieldName eq "wg_privacySettings");  # this is a special internal field, don't try to process it.
     if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
         $self->session->errorHandler->warn("No such profile field: $fieldName");
         return undef;
@@ -899,6 +973,43 @@ Returns a reference to the current session.
 sub session {
 	my $self = shift;
 	return $self->{_session};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setProfileFieldPrivacySetting ( settings ) 
+
+Sets the profile field privacy settings
+
+=head3 settings
+
+hash ref containing the field and it's corresponding privacy setting
+
+=cut
+
+sub setProfileFieldPrivacySetting {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $settings = shift;
+    
+    return undef unless scalar(keys %{$settings});
+
+    #Get the current settings
+    my $currentSettings = $self->getProfileFieldPrivacySetting;
+    
+    foreach my $fieldId (keys %{$settings}) {
+        my $privacySetting = $settings->{$fieldId};
+        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        $currentSettings->{$fieldId} = $settings->{$fieldId};
+    }
+    
+    #Store the data in the database
+    my $json = JSON->new->encode($currentSettings);
+    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$self->userId]);
+
+    #Recache the current settings
+    $self->{_privacySettings} = $currentSettings;
 }
 
 

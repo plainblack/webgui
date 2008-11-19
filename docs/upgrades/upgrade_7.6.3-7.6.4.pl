@@ -24,6 +24,7 @@ use WebGUI::Asset::Wobject::Survey;
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use WebGUI::ProfileField;
+use JSON;
 
 my $toVersion = '7.6.4';
 my $quiet; # this line required
@@ -37,8 +38,47 @@ addPosMode($session);
 fixFriendsGroups( $session );
 upgradeAccount( $session );
 removeProcessRecurringPaymentsFromConfig( $session );
+addExtendedProfilePrivileges( $session );
 addStorageUrlMacro( $session );
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addExtendedProfilePrivileges {
+    my $session = shift;
+
+    print qq{\tExtending User Profile Privileges..} if !$quiet;
+    
+    my $userProfDesc = $session->db->buildHashRef('describe userProfileData');
+    if(grep { $_ =~ /^wg_privacySettings/ } keys %{$userProfDesc}) {
+        $session->db->write("alter table userProfileData drop column wg_privacySettings");
+    }
+    $session->db->write("alter table userProfileData add wg_privacySettings longtext");
+
+    my $fields = WebGUI::ProfileField->getFields($session);
+    
+    my $users = $session->db->buildArrayRef("select userId from users");
+    foreach my $userId (@{$users}) {
+        my $hash = {};
+        foreach my $field (@{$fields}) {
+            if($field->getId eq "publicEmail") {
+                my $u = WebGUI::User->new($session,$userId);
+                $hash->{$field->getId} = $u->profileField("publicEmail") ? "all" : "none";
+                next;
+            }
+            $hash->{$field->getId} = $field->isViewable ? "all" : "none";
+        }
+        my $json = JSON->new->encode($hash);
+        $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$userId]);
+    }
+
+    #Delete the public email field
+    my $publicEmail = WebGUI::ProfileField->new($session,"publicEmail");
+    if(defined $publicEmail) {
+        $publicEmail->delete;
+    }
+
+    print qq{Finished\n} if !$quiet;
+} 
 
 
 #----------------------------------------------------------------------------
@@ -446,7 +486,6 @@ sub upgradeAccount {
     #Add the settings for the shop module
     $setting->add("shopStyleTemplateId",""); #Use the userStyle by default
     $setting->add("shopLayoutTemplateId","aUDsJ-vB9RgP-AYvPOy8FQ");
-
 
     #Add inbox changes
     $session->db->write(q{

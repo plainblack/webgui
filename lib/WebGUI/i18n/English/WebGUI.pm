@@ -3603,17 +3603,17 @@ LongTruncOk=1</p>
     },
 
     'user profile field private message allow label' => {
-        message => q|Allow All|,
+        message => q|Public|,
 		lastUpdated => 1181019679,
     },
 
     'user profile field private message friends only label' => {
-        message => q|Allow From My Friends Only|,
+        message => q|Friends Only|,
 		lastUpdated => 1181019679,
     },
 
     'user profile field private message allow none label' => {
-        message => q|Allow None|,
+        message => q|Private|,
 		lastUpdated => 1181019679,
     },
 
@@ -4302,6 +4302,12 @@ Users may override this setting in their profile.
 
         'seconds' => {
             message => q{seconds},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'profile privacy settings' =>  {
+            message     => q{Privacy Settings},
             lastUpdated => 1226706547,
             context     => q{i18n label for time duration in WebGUI::DateTime},
         },

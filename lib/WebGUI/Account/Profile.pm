@@ -353,37 +353,50 @@ sub www_edit {
     #Initialize the category template loop which gets filled inside the loop
     $var->{'profile_category_loop'}  = [];
 
+    #Cache the privacy settings
+    my $privacySettingsHash = WebGUI::ProfileField->getPrivacyOptions($session);
     #Get the editable categories
     my $categories = WebGUI::ProfileCategory->getCategories($session, { editable => 1 } );
 	foreach my $category (@{ $categories } ) {
         my @fields = ();
-        use Data::Dumper;
         foreach my $field (@{ $category->getFields( { editable => 1 } ) }) {
-            my $fieldId      = $field->getId;
-            my $fieldLabel   = $field->getLabel;
-            my $fieldForm    = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->profileField($fieldId)) });
-            my $fieldSubtext = $field->isRequired ? "*" : undef;
-            my $fieldExtras  = $field->getExtras;
-            my $fieldPrivacy = WebGUI::Form::radoList($session,{
+            my $fieldId             = $field->getId;
+            my $fieldLabel          = $field->getLabel;
+            my $fieldForm           = $field->formField({ extras=>$self->getExtrasStyle($field,\@errorFields,$user->profileField($fieldId)) });
+            my $fieldRequired       = $field->isRequired;
+            my $fieldExtras         = $field->getExtras;
+            my $fieldViewable       = $field->isViewable;
+            my $rawPrivacySetting   = $user->getProfileFieldPrivacySetting($fieldId);
+            my $fieldPrivacySetting = $privacySettingsHash->{$rawPrivacySetting};
+            
+            my $fieldPrivacy = WebGUI::Form::selectBox($session,{
                 name    => "privacy_$fieldId",
-                options => $field->getPrivacyOptions($session),
-                value   => $user->getProfileFieldPrivacySetting($fieldId)
+                options => $privacySettingsHash,
+                value   => $rawPrivacySetting,
+                extras  => (!$fieldViewable) ? " disabled" : ""
             });
 
             #Create a seperate template var for each field
-            $var->{'profile_field_'.$fieldId.'_form'   } = $fieldForm;
-            $var->{'profile_field_'.$fieldId.'_label'  } = $fieldLabel;
-            $var->{'profile_field_'.$fieldId.'_subtext'} = $fieldSubtext;
-            $var->{'profile_field_'.$fieldId.'_extras' } = $fieldExtras;
-            $var->{'profile_field_'.$fieldId.'_privacy'} = $fieldPrivacy;
+            my $fieldBase = 'profile_field_'.$fieldId;
+            $var->{$fieldBase.'_form'                           } = $fieldForm;
+            $var->{$fieldBase.'_label'                          } = $fieldLabel;
+            $var->{$fieldBase.'_required'                       } = $fieldRequired;
+            $var->{$fieldBase.'_extras'                         } = $fieldExtras;
+            $var->{$fieldBase.'_privacy_form'                   } = $fieldPrivacy;
+            $var->{$fieldBase.'_field_viewable'                 } = $fieldViewable;
+            $var->{$fieldBase.'_privacy_setting'                } = $fieldPrivacySetting;
+            $var->{$fieldBase.'_privacy_is_'.$rawPrivacySetting } = $rawPrivacySetting;
             
             push(@fields, {
-                'profile_field_id'      => $fieldId,
-				'profile_field_form'    => $fieldForm,
-				'profile_field_label'   => $fieldLabel,
-				'profile_field_subtext' => $field->isRequired ? "*" : undef,
-                'profile_field_extras'  => $field->getExtras,
-                'profile_field_privacy' => $fieldPrivacy,
+                'profile_field_id'                             => $fieldId,
+				'profile_field_form'                           => $fieldForm,
+				'profile_field_label'                          => $fieldLabel,
+				'profile_field_required'                       => $fieldRequired,
+                'profile_field_extras'                         => $fieldExtras,
+                'profile_field_viewable'                       => $fieldViewable,
+                'profile_field_privacy_form'                   => $fieldPrivacy,
+                'profile_field_privacy_setting'                => $fieldPrivacySetting,
+                'profile_field_privacy_is_'.$rawPrivacySetting => $rawPrivacySetting,
 			});
         }
 
@@ -420,7 +433,15 @@ sub www_editSave {
 	push (@{$retHash->{errors}},@{$retHash->{warnings}});
 
     unless(scalar(@{$retHash->{errors}})) {
-        $session->user->updateProfileFields( $retHash->{profile} );
+        my $profile  = $retHash->{profile};
+        my $privacy  = {};
+        foreach my $fieldName (keys %{$profile}) {
+            $session->user->profileField($fieldName,$profile->{$fieldName});
+            my $privacySetting     = $session->form->get("privacy_".$fieldName);
+            next unless $privacySetting;
+            $privacy->{$fieldName} = $privacySetting;
+        }
+        $session->user->setProfileFieldPrivacySetting($privacy);
     }
     
     #Store the category the error occurred in the object for reference
@@ -457,6 +478,8 @@ sub www_view {
     #Overwrite these
     $var->{'user_full_name'    } = $user->getWholeName;
     $var->{'user_member_since' } = $user->dateCreated;
+    $var->{'profile_user_id'   } = $user->userId;
+    $var->{'can_edit_profile'  } = $uid eq $session->user->userId;
 
     #Check user privileges
     unless ($user->profileIsViewable($session->user)) {
@@ -469,28 +492,38 @@ sub www_view {
         );
     }
 
+    #Cache the privacy settings
+    my $privacySettingsHash = WebGUI::ProfileField->getPrivacyOptions($session);
     $var->{'profile_category_loop' } = [];
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session,{ visible => 1})}) {
         my @fields = ();
         foreach my $field (@{$category->getFields({ visible => 1 })}) {
-            my $fieldId      = $field->getId;
-            my $fieldLabel   = $field->getLabel;
-            my $fieldValue   = $field->formField(undef,2,$user);
-            my $fieldRaw     = $user->profileField($fieldId);;
+            next unless ($user->canViewField($field->getId,$session->user));
+            my $rawPrivacySetting  = $user->getProfileFieldPrivacySetting($field->getId);
+            my $privacySetting     = $privacySettingsHash->{$rawPrivacySetting};
+            my $fieldId            = $field->getId;
+            my $fieldLabel         = $field->getLabel;
+            my $fieldValue         = $field->formField(undef,2,$user);
+            my $fieldRaw           = $user->profileField($fieldId);;
             #Create a seperate template var for each field
-            $var->{'profile_field_'.$fieldId.'_label' } = $fieldLabel;
-            $var->{'profile_field_'.$fieldId.'_value' } = $fieldValue;
-            $var->{'profile_field_'.$fieldId.'_raw'   } = $fieldRaw;
-            
+            my $fieldBase = 'profile_field_'.$fieldId;
+            $var->{$fieldBase.'_label'                          } = $fieldLabel;
+            $var->{$fieldBase.'_value'                          } = $fieldValue;
+            $var->{$fieldBase.'_raw'                            } = $fieldRaw;
+            $var->{$fieldBase.'_privacySetting'                 } = $privacySetting;
+            $var->{$fieldBase.'_privacy_is_'.$rawPrivacySetting } = "true";
             push(@fields, {
-                'profile_field_id'           => $fieldId,
-                'profile_field_is_'.$fieldId => "true",
-				'profile_field_label'        => $fieldLabel,
-                'profile_field_value'        => $fieldValue,
-                'profile_field_raw'          => $fieldRaw
+                'profile_field_id'                             => $fieldId,
+                'profile_field_is_'.$fieldId                   => "true",
+				'profile_field_label'                          => $fieldLabel,
+                'profile_field_value'                          => $fieldValue,
+                'profile_field_raw'                            => $fieldRaw,
+                'profile_field_privacySetting'                 => $privacySetting,
+                'profile_field_privacy_is_'.$rawPrivacySetting => "true",
 			});
         }
-
+        #Don't bother displaying the category if there's nothing in it.
+        next unless (scalar(@fields));
         #Append the category variables
         $self->appendCategoryVars($var,$category,\@fields);
     }
@@ -503,8 +536,6 @@ sub www_view {
     my $privacySetting                          = $user->profileField("publicProfile") || "none";
     $var->{'profile_privacy_'.$privacySetting } = "true";
 
-    $var->{'profile_user_id'       } = $user->userId;
-    $var->{'can_edit_profile'      } = $uid eq $session->user->userId;
     $var->{'acceptsPrivateMessages'} = $user->acceptsPrivateMessages($session->user->userId);
     $var->{'acceptsFriendsRequests'} = $user->acceptsFriendsRequests($session->user);
 
