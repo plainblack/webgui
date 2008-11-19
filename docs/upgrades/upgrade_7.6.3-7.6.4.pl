@@ -410,6 +410,11 @@ sub upgradeAccount {
 			className     => "WebGUI::Account::Friends"
         },
         {
+            identifier    => "contributions",
+            title         => "^International(title,Account_Contributions);",
+			className     => "WebGUI::Account::Contributions"
+        },
+        {
             identifier    => "shop",
             title         => "^International(title,Account_Shop);",
 			className     => "WebGUI::Account::Shop"
@@ -486,6 +491,12 @@ sub upgradeAccount {
     #Add the settings for the shop module
     $setting->add("shopStyleTemplateId",""); #Use the userStyle by default
     $setting->add("shopLayoutTemplateId","aUDsJ-vB9RgP-AYvPOy8FQ");
+
+    #Add the settings for the contributions module
+    $setting->add("contribStyleTemplateId",""); #Use the userStyle by default
+    $setting->add("contribLayoutTemplateId","b4n3VyUIsAHyIvT-W-jziA");
+    $setting->add("contribViewTemplateId","1IzRpX0tgW7iuCfaU2Kk0A");
+
 
     #Add inbox changes
     $session->db->write(q{

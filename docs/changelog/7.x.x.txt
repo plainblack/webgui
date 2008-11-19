@@ -8,6 +8,7 @@
  - New Profile Account module added providing a better interface for users to view and update their profile
  - New Inbox Account module added providing a better interface into WebGUI's various messaging systems
  - New Friends Account module added providing a better interface into WebGUI's friends system
+ - New Contributions Account module added which displays public assets a user has contributed to the website
  - rfe: Event hover detail exclusions  (#8761)
  - rfe: Database Link test  (#513)
  - rfe: User Profile Privacy Settings (#507) - users now have granular control of whether or not their profile fields are viewable - admin settings still apply
