@@ -184,7 +184,7 @@ sub execute {
 			$link->unbind if defined $link;
 			$instance->setScratch('ldapSelectIndex', $index);
 			$sth->finish;
-			return $self->WAITING;
+			return $self->WAITING(1);
 		}
 	}
 	

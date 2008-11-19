@@ -91,7 +91,7 @@ sub execute {
         }
         if (time() - $start > $ttl) {
             $pending->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         }
     }
 	return $self->COMPLETE;

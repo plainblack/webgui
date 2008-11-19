@@ -112,7 +112,7 @@ sub execute {
     # if there are urls left, we need to process again
     if (scalar(@$assets) > 0) {
         $instance->setScratch("syndicatedassets", JSON->new->encode($assets));
-        return $self->WAITING;
+        return $self->WAITING(1);
     }
     
     # if we've completed the list, clean up

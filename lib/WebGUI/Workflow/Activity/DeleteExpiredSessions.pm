@@ -94,7 +94,7 @@ sub execute {
 		}
 		if ((time() - $time) > $ttl) {
             $sth->finish;
-			return $self->WAITING;
+			return $self->WAITING(1);
 		}
     }
 	

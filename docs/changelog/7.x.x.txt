@@ -1,5 +1,9 @@
 7.6.4
  - Brand new Survey system.  Make sure to export your old results as they will
+ - Added a wait timeout parameter to the WAITING method, so that Spectre
+   doesn't have to check something that the workflow activity knows it will
+   have to wait on for a while.
+ - Added --stop and --start aliases to spectre.pl.
  - New pluggable framework added for cutsomizing WebGUI's Account system
  - New Profile Account module added providing a better interface for users to view and update their profile
  - New Inbox Account module added providing a better interface into WebGUI's various messaging systems

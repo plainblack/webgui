@@ -115,7 +115,7 @@ sub execute {
             $log->info("Ran out of time, will pick up with revision $version when we start again."); 
             $instance->setScratch("purgeOldAssetsLastRevisionDate", $version);
             $sth->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         } 
     }
 	return $self->COMPLETE;
