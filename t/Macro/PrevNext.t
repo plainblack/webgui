@@ -13,8 +13,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-
-my $numTests = 29;
+my $numTests = 38;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -97,13 +96,37 @@ my $templateBody = <<EOTMPL;
 "hasPrevious":<tmpl_var hasPrevious>,
 "hasNext":<tmpl_var hasNext>,
 "nextUrl":"<tmpl_var nextUrl>",
-"previousUrl":"<tmpl_var previousUrl>"
+"previousUrl":"<tmpl_var previousUrl>",
+"startingPageTitle":"<tmpl_var startingPageTitle>"
 }
 EOTMPL
 
 my $jsonTemplate = $testStart->addChild({className=>'WebGUI::Asset::Template', namespace => 'Macro/PrevNext', template=>$templateBody});
 
 my ($goodChild, $goodSibling, $nextParent, $lastPage, $previousParent, $previousChild);
+
+############################################
+#
+# getStartPage
+#
+############################################
+
+my $startPage;
+
+$startPage = WebGUI::Macro::PrevNext::getStartPage($testStart, $topPage1, 0);
+is($startPage->getTitle, $testStart->getTitle, 'getStartPage: with depth=0, startPage = testStart');
+
+$startPage = WebGUI::Macro::PrevNext::getStartPage($testStart, $topPage2, 0);
+is($startPage->getTitle, $testStart->getTitle, 'getStartPage: with depth=0, startPage = topPage2');
+
+$startPage = WebGUI::Macro::PrevNext::getStartPage($testStart, $subPage1_1, 0);
+is($startPage->getTitle, $testStart->getTitle, 'getStartPage: with depth=0, startPage = subPage1_1');
+
+$startPage = WebGUI::Macro::PrevNext::getStartPage($testStart, $topPage1, 1);
+is($startPage->getTitle, $topPage1->getTitle, 'getStartPage: with depth=1, startPage = topPage1');
+
+$startPage = WebGUI::Macro::PrevNext::getStartPage($testStart, $subPage2_2, 1);
+is($startPage->getTitle, $topPage2->getTitle, 'getStartPage: with depth=1, startPage = topPage2');
 
 ############################################
 #
@@ -115,7 +138,7 @@ $goodChild = WebGUI::Macro::PrevNext::getNext($testStart, $testStart);
 is($goodChild->getTitle, $topPage1->getTitle, 'next: Getting first child of test start');
 
 $goodChild = WebGUI::Macro::PrevNext::getNext($topPage1, $testStart);
-is ($goodChild->getTitle, $subPage1_1->getTitle, 'next: Getting first child of first page');
+is ($goodChild->getTitle, $subPage1_1->getTitle, 'next: page with children returns first child');
 
 $goodSibling = WebGUI::Macro::PrevNext::getNext($subPage1_1, $testStart);
 is ($goodSibling->getTitle, $subPage1_2->getTitle, 'next: Getting first sibling of first subpage');
@@ -128,9 +151,6 @@ is ($nextParent->getTitle, $topPage2->getTitle, "next: Last sibling in a set ret
 
 $lastPage = WebGUI::Macro::PrevNext::getNext($topPageLast, $testStart);
 is ($lastPage, undef, "next: Last page returns undef");
-
-$lastPage = WebGUI::Macro::PrevNext::getNext($subPage1_Last, $topPage1);
-is ($lastPage, undef, "next: Last child of topPage returns undef even when topPage has siblings");
 
 $nextParent = WebGUI::Macro::PrevNext::getNext($subPage2_1, $testStart);
 is ($nextParent->getTitle, $topPage3->getTitle, "next: With no valid siblings, return next parent");
@@ -146,6 +166,12 @@ $session->user({userId => 3});
 $goodChild = WebGUI::Macro::PrevNext::getNext($topPage4, $testStart);
 is ($goodChild->getTitle, $subPage4_1->getTitle, "next: Obeys viewing rules from parent as Admin");
 
+$goodChild = WebGUI::Macro::PrevNext::getNext($testStart, $topPage1);
+is ($goodChild, undef, "next: No next link when the current page is above the top page");
+
+$goodChild = WebGUI::Macro::PrevNext::getNext($subPage1_Last, $topPage1);
+is ($goodChild, undef, "next: works 1 level down");
+
 ############################################
 #
 # getPrevious
@@ -157,17 +183,23 @@ $session->user({userId => 7});
 $previousParent = WebGUI::Macro::PrevNext::getPrevious($testStart, $testStart);
 is($previousParent, undef, 'previous: Test start has no previous page');
 
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($testStart, $topPage1);
+is($previousParent, undef, 'previous: Page above start page has no previous page');
+
 $goodSibling = WebGUI::Macro::PrevNext::getPrevious($subPage1_2, $testStart);
 is ($goodSibling->getTitle, $subPage1_1->getTitle, "previous: Getting first sibling");
 
-$previousParent = WebGUI::Macro::PrevNext::getPrevious($subPage1_1, $testStart);
+$previousParent = WebGUI::Macro::PrevNext::getPrevious($subPage1_1, $topPage1);
 is ($previousParent->getTitle, $topPage1->getTitle, "previous: Getting parent when start asset is the first child");
 
 $previousChild = WebGUI::Macro::PrevNext::getPrevious($topPage2, $testStart);
 is ($previousChild->getTitle, $subPage1_Last->getTitle, "previous: Getting child of previous parent");
 
 $previousParent = WebGUI::Macro::PrevNext::getPrevious($topPage1, $testStart);
-is ($previousParent, undef, "previous: Getting parent when start asset is the first child and parent is the top asset");
+is ($previousParent->getTitle, $testStart->getTitle, "previous: Getting parent when start asset is the first child and parent is the top asset");
+
+$goodChild = WebGUI::Macro::PrevNext::getPrevious($subPage1_1, $topPage1);
+is ($goodChild->getTitle, $topPage1->getTitle, "previous: first child returns parent");
 
 $previousChild = WebGUI::Macro::PrevNext::getPrevious($topPage3, $testStart);
 is ($previousChild->getTitle, $subPage2_1->getTitle, "previous: Only gets Layouts");
@@ -187,8 +219,9 @@ is ($previousChild->getTitle, $subPage4_2->getTitle, "previous: Obeys viewing ru
 ############################################
 
 my ($jsonOutput, $jsonData, $macroOutput);
+
 $session->asset($topPage2);
-$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, $jsonTemplate->getId);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 0, $jsonTemplate->getId);
 $jsonData = JSON::from_json($jsonOutput);
 cmp_deeply(
     $jsonData,
@@ -197,6 +230,7 @@ cmp_deeply(
         hasNext     => 1,
         previousUrl => $subPage1_Last->getUrl,
         nextUrl     => $subPage2_1->getUrl, 
+        startingPageTitle => ignore(),
     },
     'Previous and Next both exist, variables'
 );
@@ -206,7 +240,7 @@ like($macroOutput, qr/wgx-prev-btn/, 'previous button link exists');
 like($macroOutput, qr/wgx-next-btn/, 'previous button link exists');
 
 $session->asset($topPage1);
-$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, $jsonTemplate->getId);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 0, $jsonTemplate->getId);
 $jsonData = JSON::from_json($jsonOutput);
 cmp_deeply(
     $jsonData,
@@ -215,6 +249,7 @@ cmp_deeply(
         hasNext     => 1,
         previousUrl => '',
         nextUrl     => $subPage1_1->getUrl, 
+        startingPageTitle => ignore(),
     },
     'Testing next only, variables'
 );
@@ -224,7 +259,7 @@ unlike($macroOutput, qr/wgx-prev-btn/, 'previous button link does not exist');
 like($macroOutput, qr/wgx-next-btn/, 'previous button link exists');
 
 $session->asset($topPageLast);
-$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, $jsonTemplate->getId);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 0, $jsonTemplate->getId);
 $jsonData = JSON::from_json($jsonOutput);
 cmp_deeply(
     $jsonData,
@@ -233,6 +268,7 @@ cmp_deeply(
         hasNext     => 0,
         previousUrl => $subPage4_3->getUrl,
         nextUrl     => '', 
+        startingPageTitle => ignore(),
     },
     'Testing previous only, variables'
 );
@@ -241,7 +277,54 @@ $macroOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl);
 like($macroOutput, qr/wgx-prev-btn/, 'previous button link exists');
 unlike($macroOutput, qr/wgx-next-btn/, 'previous button link does not exist');
 
+$session->asset($topPage1);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 1, $jsonTemplate->getId);
+$jsonData = JSON::from_json($jsonOutput);
+cmp_deeply(
+    $jsonData,
+    {
+        hasPrevious => 0,
+        hasNext     => 1,
+        previousUrl => '',
+        nextUrl     => $subPage1_1->getUrl, 
+        startingPageTitle => $topPage1->getTitle,
+    },
+    'depth=1, no previous'
+);
+
+$session->asset($subPage1_1);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 1, $jsonTemplate->getId);
+$jsonData = JSON::from_json($jsonOutput);
+diag $jsonData->{startingPageTitle};
+cmp_deeply(
+    $jsonData,
+    {
+        hasPrevious => 1,
+        hasNext     => 1,
+        previousUrl => $topPage1->getUrl,
+        nextUrl     => $subPage1_2->getUrl, 
+        startingPageTitle => $topPage1->getTitle,
+    },
+    'Previous and Next both exist, variables'
+);
+
+$session->asset($subPage1_Last);
+$jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 1, $jsonTemplate->getId);
+$jsonData = JSON::from_json($jsonOutput);
+cmp_deeply(
+    $jsonData,
+    {
+        hasPrevious => 1,
+        hasNext     => 0,
+        previousUrl => $subPage1_2->getUrl,
+        nextUrl     => '', 
+        startingPageTitle => $topPage1->getTitle,
+    },
+    'depth=1, last child has only previous'
+);
+
 }
+
 
 END { ##Clean-up after yourself, always
 	$versionTag->rollback;

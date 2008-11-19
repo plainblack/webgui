@@ -11,7 +11,7 @@ Package WebGUI::Macro::PrevNext
 Provide a JS based previous and next button for each page, doing a depth-first
 search one level deep.
 
-=head2 process( $session, $topPage )
+=head2 process( $session, $topPage, $depth, $templateId )
 
 The main macro class, Macro.pm, will call this subroutine and pass it options.
 
@@ -25,6 +25,30 @@ A session variable
 
 The assetId of the top page.  The Macro will not look above this page.
 
+=item $depth
+
+From the $topPage, how many levels of hierarchy down to "block".  For example, if
+there is a page structure that looks like:
+    
+    topPage
+        page1
+            subPage1_1
+            subPage2_1
+        page2
+            subPage1_2
+            subPage2_2
+
+and $depth is 0, then navigation links would show up on page1 and its subpages, and page2
+and its subpages.  The links would allow you to start at page1 and go from page to page, down
+into its subpages, up to page2, then down into its subpages.
+
+If $depth is 1, then page1 would only have a next link, down into its subpages.  Its last
+subpage, subPage2_1, would only have a previous link.
+
+=item $templateId
+
+The assetId of a template to use to make the macro's output.
+
 =back
 
 =cut
@@ -32,8 +56,10 @@ The assetId of the top page.  The Macro will not look above this page.
 
 #-------------------------------------------------------------------
 sub process {
-	my ($session, $topPageUrl, $templateId) = @_;
+	my ($session, $topPageUrl, $depth, $templateId) = @_;
     $templateId = defined $templateId ? $templateId : 'PrevNextMacro_YUILink0';
+
+    ##Determine the top page
     my $topPage;
     if ($topPageUrl) {
         $topPage = WebGUI::Asset->newByUrl($session, $topPageUrl);
@@ -41,9 +67,15 @@ sub process {
     if (! defined $topPage) {
         $topPage = WebGUI::Asset->getDefault($session);
     }
-    my $nextPage = getNext($session->asset, $topPage);
-    my $prevPage = getPrevious($session->asset, $topPage);
+
+    ##Use the depth to alter the top page
+    my $thisPage = $session->asset;
+    my $startingPage = getStartPage($topPage, $thisPage, $depth);
+
+    my $nextPage = getNext(    $thisPage, $startingPage);
+    my $prevPage = getPrevious($thisPage, $startingPage);
     my $vars;
+    $vars->{startingPageTitle} = $startingPage->getTitle;
     if (defined $nextPage) {
         $vars->{hasNext} = 1;
         $vars->{nextUrl} = $nextPage->getUrl;
@@ -87,9 +119,13 @@ all the way back to the WebGUI root node.
 
 sub getNext {
     my ($startingAsset, $topPage) = @_;
+    ##Special case for page above starting page
+    if ($startingAsset->get('lineage') lt $topPage->get('lineage') ) {
+        return undef;
+    }
     my $session = $startingAsset->session;
     my $childrenIterator = $topPage->getLineageIterator(
-        ['descendants', 'siblings'],
+        ['descendants'],
         {
             includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
             returnObjects      => 1,
@@ -132,7 +168,7 @@ sub getPrevious {
     ##Asset on the very first asset.  If you do not include self, then it will find
     ##the first asset whose lineage is above the topPage.
     my $childrenIterator = $topPage->getLineageIterator(
-        ['self', 'descendants', 'siblings'],
+        ['self', 'descendants'],
         {
             includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
             whereClause        => 'asset.lineage < '.$session->db->quote($startingAsset->get('lineage')),
@@ -144,15 +180,49 @@ sub getPrevious {
     CHILD: while ($firstChild = $childrenIterator->()) {
        last CHILD if $firstChild->canView(); 
     }
-    return undef
-        unless $firstChild;
-        
-    if ($firstChild->getId ne $topPage->getId) {
-        return $firstChild;
+    return $firstChild;
+}
+
+=head2 getStartPage ($topPage, $thisPage, $depth)
+
+Find the previous asset using a 1-level, depth first approach.  This means
+it prefers children over siblings.  If no previous asset exists, it
+returns undef.  If it does exist, it returns an WebGUI::Asset object of
+the appropriate type.
+
+=head3 $topPage
+
+The asset requested to be the top asset by the user.
+
+=head3 $thisPage
+
+The current page, from the session variable.
+
+=head3 $depth
+
+The number of levels, from the topPage, to ignore.
+
+=cut
+
+sub getStartPage {
+    my ($topPage, $thisPage, $depth) = @_;
+    if ($depth == 0) {
+        return $topPage;
     }
-    else {
-        return undef;
+    my $topLineage  = $topPage->get('lineage');
+    my $thisLineage = $thisPage->get('lineage');
+    #print '# topLineage: '.  $topLineage . "\n";
+    #print '# thisLineage: '.  $thisLineage . "\n";
+    my $topLineageLength = length($topLineage);
+    #print '# topLineageLength: '.  $topLineageLength . "\n";
+    my $startPageLineage = $topLineage . substr($thisLineage, $topLineageLength, 6 * $depth);
+    #print '# depth: '.  $depth . "\n";
+    #print '# startPageLineage: '.  $startPageLineage . "\n";
+    my $startPage = WebGUI::Asset->newByLineage($topPage->session, $startPageLineage);
+    if (!defined $startPage) {
+        $startPage = $topPage;
     }
+    return $startPage;
 }
 
 1;
