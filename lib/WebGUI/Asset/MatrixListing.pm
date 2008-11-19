@@ -18,7 +18,6 @@ use strict;
 use Tie::IxHash;
 use Class::C3;
 use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
-#use base 'WebGUI::Asset';
 use WebGUI::Utility;
 
 
@@ -81,15 +80,6 @@ sub definition {
 	tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, "Asset_MatrixListing");
 	%properties = (
-#		templateId => {
-#			tab             =>"display",
-#			fieldType       =>"template",  
-#			defaultValue    =>'MatrixListingTmpl00001',
-#			noFormPost      =>0,  
-#			namespace       =>"MatrixListing", 
-#			hoverHelp       =>$i18n->get('template description'),
-#			label           =>$i18n->get('template label')
-#			},
         screenshots => {
             tab             =>"properties",
             fieldType       =>"image",
@@ -236,10 +226,8 @@ sub getEditForm {
     my $session     = $self->session;
     my $db          = $session->db;
     my $matrixId    = $self->getParent->getId;
-    my $tabform     = $self->next::method();#SUPER::getEditForm();
+    my $tabform     = $self->next::method();
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
-
-    #$self->session->style->setScript($self->session->url->extras('FileUploadControl.js'), {type =>'text/javascript'});
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
         $tabform->getTab('properties')->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
@@ -262,23 +250,6 @@ sub getEditForm {
         }
     }
     return $tabform;
-=cut
-    $tabform->hidden({
-        name=>"returnUrl",
-        value=>$self->session->form->get("returnUrl")
-        });
-    if ($self->getValue("namespace") eq "") {
-        my $namespaces = $self->session->dbSlave->buildHashRef("select distinct(namespace) from template order by
-namespace");
-        $tabform->getTab("properties")->combo(
-            -name=>"namespace",
-            -options=>$namespaces,
-            -label=>$i18n->get('namespace'),
-            -hoverHelp=>$i18n->get('namespace description'),
-            -value=>[$self->session->form->get("namespace")]
-            );
-    }
-=cut
 }
 
 #-------------------------------------------------------------------
@@ -292,13 +263,6 @@ Returns whether the user has already rated this listing or not.
 sub hasRated {
     my $self    = shift;
     my $session = $self->session;
-
-=cut
-    return 1 unless ($self->session->user->isInGroup($self->get("groupToRate")));
-
-    my $ratingTimeout = $self->session->user->isInGroup($self->get("privilegedGroup")) ?
-$self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
-=cut
 
     my $hasRated = $self->session->db->quickScalar("select count(*) from MatrixListing_rating where
         ((userId=? and userId<>'1') or (userId='1' and ipAddress=?)) and listingId=?",
@@ -325,9 +289,7 @@ sub incrementCounter {
     my $counter = shift;
     
     my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
-    #print "current ip: ".$currentIp."<br>";
     
-    #print "dsfsdf lastIp : ".$self->get($counter."LastIp")."<br>";
     unless ($self->get($counter."LastIp") eq $currentIp) {
         $self->update({ 
             $counter."LastIp"   => $currentIp,
@@ -381,7 +343,7 @@ sub processPropertiesFromFormPost {
     my $session = $self->session;
     my $score   = 0;
 
-	$self->next::method(@_);#SUPER::processPropertiesFromFormPost;
+	$self->next::method(@_);
 
     my $attributes = $session->db->read("select * from Matrix_attribute where assetId = ?",[$self->getParent->getId]);
     while (my $attribute = $attributes->hashRef) {
@@ -533,9 +495,6 @@ sub view {
             if ($attribute->{fieldType} eq 'MatrixCompare'){
                 $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
             }
-            #$attribute->{value} = $attribute->{description};
-            #$tabform->getTab("properties")->dynamicField(%{$attribute});
-            #my $categoryLoopName = $self->session->url->urlize($category)."_loop";
             push(@attribute_loop,$attribute);
         }
         $var->{$categoryLoopName} = \@attribute_loop;
@@ -551,9 +510,7 @@ sub view {
         my $file = WebGUI::Form::File->new($self->session,{ value=>$var->{screenshots} });
         my $storage = $file->getStorageLocation;
         my @files = @{ $storage->getFiles } if (defined $storage);
-        if (scalar(@files)) {
-            #$var->{screenshots} = $file->getFilePreview($storage);
-        }
+        
         $var->{screenshots} = qq|
 <script language="javascript">AC_FL_RunContent = 0;</script>
 <script src="/extras/ukplayer/AC_RunActiveContent.js" language="javascript"></script>
@@ -949,80 +906,6 @@ sub www_view {
 	return $self->session->privilege->noAccess() unless $self->canView;
     $self->prepareView;
 	return $self->view;
-}
-
-#-------------------------------------------------------------------
-# Everything below here is to make it easier to install your custom
-# asset, but has nothing to do with assets in general
-#-------------------------------------------------------------------
-# cd /data/WebGUI/lib
-# perl -MWebGUI::Asset::MatrixListing -e install www.example.com.conf [ /path/to/WebGUI ]
-# 	- or -
-# perl -MWebGUI::Asset::MatrixListing -e uninstall www.example.com.conf [ /path/to/WebGUI ]
-#-------------------------------------------------------------------
-
-
-use base 'Exporter';
-our @EXPORT = qw(install uninstall);
-use WebGUI::Session;
-
-#-------------------------------------------------------------------
-sub install {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::MatrixListing -e install www.example.com.conf\n" unless ($home && $config);
-	print "Installing asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->addToArray("assets","WebGUI::Asset::MatrixListing");
-	$session->db->write("create table MatrixListing (
-		assetId         char(22) binary not null,
-		revisionDate    bigint not null,
-        screenshots     char(22),
-        description     text,
-        version         char(255),
-        views           int(11),
-        compares        int(11),
-        clicks          int(11),
-        viewsLastIp     char(255),
-        comparesLastIp  char(255),
-        clicksLastIp    char(255),
-        lastUpdated     int(11),
-        maintainer      char(22),
-        manufacturerName    char(255),
-        manufacturerURL     char(255),
-        productURL          char(255),
-        score           int(11),
-		primary key (assetId, revisionDate)
-		)");
-    $session->db->write("create table MatrixListing_attribute (
-        matrixId char(22) not null, 
-        matrixListingId char(22) not null, 
-        attributeId char(22) not null, 
-        value char(255),
-        primary key (matrixId, matrixListingId, attributeId)
-        )");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
-#-------------------------------------------------------------------
-sub uninstall {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::MatrixListing -e uninstall www.example.com.conf\n" unless ($home && $config);
-	print "Uninstalling asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->deleteFromArray("assets","WebGUI::Asset::MatrixListing");
-	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::MatrixListing'");
-	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::MatrixListing");
-		$asset->purge if defined $asset;
-	}
-	$session->db->write("drop table MatrixListing");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
 }
 
 

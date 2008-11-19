@@ -1,22 +1,11 @@
-var myCompareTable;
-
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
             elCell.innerHTML = "<a href='" + oRecord.getData("url") + "' target='_blank'>" + sData + "</a>";
         };
 
-	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) {
-		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
-		if(typeof(oRecord.getData("checked")) != 'undefined'){
-			innerHTML = innerHTML + " checked='checked'";
-		}
-		innerHTML = innerHTML + ">";
-            	elCell.innerHTML = innerHTML;
-        };
-
         var myColumnDefs = [
-	    {key:"checkBox",label:"",sortable:false},//,formatter:this.formatCheckBox
+	    {key:"checkBox",label:"",sortable:false},
             {key:"title", label:"Name", sortable:true, formatter:this.formatUrl},
             {key:"views", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
             {key:"clicks", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
@@ -42,13 +31,11 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
 
-	//var oColumn = this.myDataTable.getColumn(3);
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(2)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(3)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(4)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(5)); 
 	
-
 	var btnSortByViews = new YAHOO.widget.Button("sortByViews");
         btnSortByViews.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(2)); 
@@ -73,18 +60,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
             this.set("sortedBy", null);
             this.onDataReturnAppendRows.apply(this,arguments);
         };
-
-
-
-	//var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox');
-	//for (var i = compareCheckBoxes.length; i--; ) {
-	//	alert('bla');
-	//	compareCheckBoxes[i].onchange = compareFormButton;
-    	//}
 	
 	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
         btnCompare.on("click", function(e) {
-		alert('bla');
 		window.document.forms['doCompare'].submit();
         },this,true);
 
@@ -105,38 +83,3 @@ YAHOO.util.Event.addListener(window, "load", function() {
     };
 });
 
-//	function compareFormButton () {
-//		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
-		//alert(compareCheckBoxes.length);
-//		var checked = 0;
-//		for (var i = compareCheckBoxes.length; i--; ) {
-//			if(compareCheckBoxes[i].checked){	
-//				checked++;
-//			}
-//  		}
-		//alert(checked);
-//	}
-
-//function sort() {
-//	myCompareTable.sortColumn()
-//	var oColumn = myCompareTable.getColumn(3);
-//	myCompareTable.hideColumn(oColumn); 
-//}
-
-function bla() {
-        var callback1 = {
-            success : myCallback,
-            failure : myCallback,
-            scope : this.myDataTable
-        };
-        this.myDataSource.sendRequest("func=getCompareFormData",
-                callback1);
-
-        var callback2 = {
-            success : myCallback,
-            failure : myCallback,
-            scope : this.myDataTable
-        };
-        this.myDataSource.sendRequest("func=getCompareFormData",
-                callback2);
-}

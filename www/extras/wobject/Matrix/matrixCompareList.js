@@ -1,5 +1,3 @@
-//var myCompareTable;
-
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
 	var Dom = YAHOO.util.Dom;
@@ -30,7 +28,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: columnKeys //["name","AwioUvaZXmAEaFw20tx3Q","CWNjAHcmh0pEF6WJooomJA"]
+            fields: columnKeys 
         };
 
 	var uri = "func=getCompareListData";
@@ -41,16 +39,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myDataTable = new YAHOO.widget.DataTable("compareList", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
 
-	//var oColumn = this.myDataTable.getColumn(3);
-	//this.myDataTable.hideColumn(oColumn); 
-
-
-	//var btnAddRows = new YAHOO.widget.Button("hidecolumn");
-        //btnAddRows.on("click", function(e) {
-
-            //var oColumn = this.myDataTable.getColumn(3);
-	//    this.myDataTable.sortColumn(oColumn); 
-        //},this,true);
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {
 		myDataTable.getRecordSet().reset();
@@ -79,11 +67,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
         };
 
         var myCallback2 = function() {
-		//this.getRecordSet().reset();
-        	this.set("sortedBy", null);
+		this.set("sortedBy", null);
             	this.onDataReturnAppendRows.apply(this,arguments);
-	
-		//this.getRecordSet().reset();
         };
 	
 
@@ -107,8 +92,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
             	this.myDataSource.sendRequest(uri,callback2); 
         },this,true);
 
-	//btnCompare.set("disabled",true);
-	//alert(btnCompare.get("disabled"));
 	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
@@ -117,7 +100,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				checked++;
 			}
     		}
-		//alert(maxComparisons);
 		if (checked > 1 && checked < maxComparisons){
 			btnCompare.set("disabled",false);
 		}else{
@@ -151,22 +133,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			}
 			hideStickies = 0;
 		}
-		
-//		var elements = Dom.getElementsByClassName('yui-dt-even yui-dt-first', 'tr');
-//		for(i=0; i<elements.length; i++){
-//			alert(elements[i].id);
-//			Dom.setStyle(elements[i], "display", "none");
-//			Dom.addClass(elements[i],'hidden')
-//			alert(elements[i].className);
-//			var show = true;
-                	
-			
-//		}
 	},this,true);
-
-	//var hideEl = new Dom.get('yui-dt0-bdrow0');
-	//alert(hideEl.id);
-	//Dom.addClass(hideEl,'hidden');
 
     };
 });

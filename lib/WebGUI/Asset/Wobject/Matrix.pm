@@ -69,17 +69,15 @@ sub definition {
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-		templateId =>{
-			fieldType       =>"template",  
-			defaultValue    =>'matrixtmpl000000000001',
-			tab             =>"display",
-			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
-			noFormPost      =>0,  
-			#This is an option specific to the template fieldType.
-			namespace       =>"Matrix", 
-			hoverHelp       =>$i18n->get('template description'),
-			label           =>$i18n->get('template label'),
-		},
+	templateId =>{
+		fieldType       =>"template",  
+		defaultValue    =>'matrixtmpl000000000001',
+		tab             =>"display",
+		noFormPost      =>0,  
+		namespace       =>"Matrix", 
+		hoverHelp       =>$i18n->get('template description'),
+		label           =>$i18n->get('template label'),
+	},
         searchTemplateId=>{
             defaultValue    =>"matrixtmpl000000000005",
             fieldType       =>"template",
@@ -96,14 +94,6 @@ sub definition {
             hoverHelp       =>$i18n->get('detail template description'),
             label           =>$i18n->get('detail template label'),
         },
-#        ratingDetailTemplateId=>{
-#            defaultValue    =>"matrixtmpl000000000004",
-#            fieldType       =>"template",
-#            tab             =>"display",
-#            namespace       =>"Matrix/RatingDetail",
-#            hoverHelp       =>$i18n->get('rating detail template description'),
-#            label           =>$i18n->get('rating detail template label'),
-#        },
         compareTemplateId=>{
             defaultValue    =>"matrixtmpl000000000002",
             fieldType       =>"template",
@@ -361,56 +351,14 @@ An array of listingIds that should be selected in the compare form.
 sub getCompareForm {
     my $self = shift;
 
-=cut
-    my @selectedListingIds = @_;
-    
-    my (%options, @listings);
-    tie %options, 'Tie::IxHash';
-
-    my $sortDirection = " asc";
-    if ( WebGUI::Utility::isIn($self->get('defaultSort'),qw(revisionDate score)) ){   
-        $sortDirection = " desc";
-    }
-    @listings = @{ $self->getLineage(['descendants'], {
-            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            joinClass           => "WebGUI::Asset::MatrixListing",
-            orderByClause       => $self->get('defaultSort').$sortDirection,
-            returnObjects       => 1,
-    }) };
-    # Create an options hash based on the ordered array of listings.
-    foreach my $listing (@listings){
-        $options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
-    }
-
-    my $maxComparisons;
-    if($self->session->user->isVisitor){
-        $maxComparisons = $self->get('maxComparisons');
-    }
-    else{
-        $maxComparisons = $self->get('maxComparisonsPrivileged');
-    }
-=cut
     my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,extras=>'name="doCompare"'})
-#        .WebGUI::Form::submit($self->session, {
-#            value=>"compare"
-#            })
-#        ."<br />"
         ."<br />"
         .WebGUI::Form::hidden($self->session, {
             name=>"func",
             value=>"compare"
             })
         .'<div id="compareForm"></div> '
-#        .WebGUI::Form::checkList($self->session, {
-#            name=>"listingId",
-#            vertical=>1,
-#            value=>\@selectedListingIds,
-#            options=>\%options,
-#        })
         ."<br />"
-#        .WebGUI::Form::submit($self->session,{
-#            value=>"compare"
-#            })
         .WebGUI::Form::formFooter($self->session);
 
     my $maxComparisons;
@@ -439,13 +387,6 @@ returns the tabform object that will be used in generating the edit page for Mat
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
-=cut
-	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
-		-label=>WebGUI::International::get("template_label","Asset_Matrix"),
-		-namespace=>"Matrix"
-	);
-=cut	
 	return $tabform;
 }
 
@@ -563,21 +504,6 @@ sub view {
     $var->{bestClicks_name}         = $bestClicks_listing->get('title');
     $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
 
-=cut
-    # Get the MatrixListing that was last updated as an object using getLineage.
-
-    my ($bestUpdated_listing) = @{ $self->getLineage(['descendants'], {
-            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            orderByClause       => "revisionDate desc",
-            limit               => 1,
-            returnObjects       => 1,
-        }) };
-    $var->{bestUpdated_url}         = $bestUpdated_listing->getUrl;
-    $var->{bestUpdated_date}        = $session->datetime->epochToHuman( $bestUpdated_listing->get('revisionDate') );
-    $var->{bestUpdated_name}        = $bestUpdated_listing->get('title');
-    $var->{bestUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
-=cut
-
     # Get the 5 MatrixListings that were last updated as objects using getLineage.
 
     my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
@@ -678,9 +604,6 @@ assetData.revisionDate
         group by asset.assetId",
         [$self->getId]);
 	
-	#This is an example of debugging code to help you diagnose problems.
-	#WebGUI::ErrorHandler::warn($self->get("templateId")); 
-	
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
@@ -698,7 +621,7 @@ sub www_compare {
     my $var = $self->get;
     my @listingIds = @_;
     my @columnKeys;
-    #my @listingIds = ['AwioUvaZXmAEaFw20t-x3Q', 'CWNjAHcmh0pEF6WJooomJA'];
+
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
     }
@@ -771,24 +694,6 @@ sub www_deleteAttribute {
 
     return $self->www_listAttributes;
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  This method is entirely
-optional.  Take it out unless you specifically want to set a submenu in your
-adminConsole views.
-
-=cut
-
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   return $self->session->privilege->locked() unless $self->canEditIfLocked;
-#   my $i18n = WebGUI::International->new($self->session, "Asset_Matrix");
-#   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
-#}
 
 #-------------------------------------------------------------------
 
@@ -893,20 +798,7 @@ sub www_editAttribute {
                 ."</script>\n";
 
     $form->raw($html);
-=cut
-    $form->text(
-        -name       =>"defaultValue",
-        -value      =>$attribute->{defaultValue},
-        -label      =>$i18n->get('attribute defaultValue label'),
-        -hoverHelp  =>$i18n->get('attribute defaultValue description'),
-        );
-    $form->textarea(
-        -name       =>"options",
-        -value      =>$attribute->{options},
-        -label      =>$i18n->get('attribute options label'),
-        -hoverHelp  =>$i18n->get('attribute options description'),
-        );    
-=cut
+
     $form->selectBox(
         -name       =>"category",
         -value      =>[$attribute->{category}],
@@ -993,14 +885,7 @@ sub www_getCompareFormData {
     my @listingIds = $self->session->form->checkList("listingId");
     
     $self->session->http->setMimeType("application/json");
-=cut
-    my @listings = @{ $self->getLineage(['descendants'], {
-            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            joinClass           => "WebGUI::Asset::MatrixListing",
-            orderByClause       => $self->get('defaultSort').$sortDirection,
-            returnObjects       => 1,
-    }) };
-=cut
+
     my $sql = "
         select
             assetData.title,
@@ -1034,9 +919,7 @@ assetData.revisionDate
 
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
     foreach my $result (@results){
-            #$result->{checked} = '';
             if($form->process("search")){
-                #my $listing = WebGUI::Asset::MatrixListing->new($session,$result->{assetId});
                 $self->session->errorHandler->warn("checking listing: ".$result->{title});
                 foreach my $param ($form->param) {
                     if($param =~ m/^search_/){
@@ -1061,7 +944,7 @@ assetData.revisionDate
                             $self->session->errorHandler->warn("--Checked--");
                             $result->{checked} = 'checked';
                         }
-                    }    
+                    }
                 }
             }
             else{
@@ -1079,21 +962,7 @@ assetData.revisionDate
             }
             $result->{checkBox} .= " onChange='javascript:compareFormButton()' class='compareCheckBox'>";
     }
-=cut        
-push(@results,{
-            Title=>$data->{title},
-            Views=>$data->{views},
-            Compares=>$data->{compares},
-            Clicks=>$data->{clicks}
-            });
-=cut
-    # Create an options hash based on the orderd array of listings.
-=cut    
-    foreach my $listing (@listings){
-        push(@results,{Title=>$listing->get('title'),Phone=>'123'})
-        #$options{$listing->getId} = '<a href="'.$listing->getUrl.'">'.$listing->get('title').'</a>';
-    }
-=cut    
+
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
@@ -1232,8 +1101,6 @@ sub www_search {
     {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
     {type =>'text/javascript'});
-#    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
-#    'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixSearch.js'), {type =>
     'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
@@ -1266,83 +1133,6 @@ sub www_search {
     return $self->processStyle($self->processTemplate($var,$self->get("searchTemplateId")));
 }
 
-#-------------------------------------------------------------------
-# Everything below here is to make it easier to install your custom
-# wobject, but has nothing to do with wobjects in general
-#-------------------------------------------------------------------
-# cd /data/WebGUI/lib
-# perl -MWebGUI::Asset::Wobject::Matrix -e install www.example.com.conf [ /path/to/WebGUI ]
-# 	- or -
-# perl -MWebGUI::Asset::Wobject::Matrix -e uninstall www.example.com.conf [ /path/to/WebGUI ]
-#-------------------------------------------------------------------
-
-
-use base 'Exporter';
-our @EXPORT = qw(install uninstall);
-use WebGUI::Session;
-
-#-------------------------------------------------------------------
-sub install {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::Matrix -e install www.example.com.conf\n" unless ($home && $config);
-	print "Installing asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->addToArray("assets","WebGUI::Asset::Wobject::Matrix");
-	$session->db->write("create table Matrix (
-		assetId                     varchar(22) binary not null,
-		revisionDate                bigint      not null,
-        templateId                  varchar(22) not null,
-        searchTemplateId            varchar(22) not null,
-        compareTemplateId           varchar(22) not null,
-        detailTemplateId            varchar(22) not null,
-        maxComparisons              int(11)     not null default 10,
-        maxComparisonsPrivileged    int(11)     not null default 25,
-        defaultSort                 varchar(22) not null default 'score',
-        categories                  text,
-        compareColorNo                  varchar(22) not null default '#ffaaaa',
-        compareColorLimited             varchar(22) not null default '#ffffaa',
-        compareColorCostsExtra          varchar(22) not null default '#ffffaa',
-        compareColorFreeAddOn           varchar(22) not null default '#ffffaa',
-        compareColorYes                 varchar(22) not null default '#aaffaa',
-        submissionApprovalWorkflowId    varchar(22) not null,
-        ratingsDuration                 int(11)     not null default 7776000,
-        primary key (assetId, revisionDate)
-		)");
-    $session->db->write("create table Matrix_attribute (
-        assetId             char(22)     binary not null,
-        attributeId         char(22)     binary not null,
-        name                char(255)    not null,
-        description         text,
-        fieldType           char(255)    not null default 'MatrixCompare',
-        category            char(22)     not null,
-        options             text,
-        defaultValue        char(255),
-        primary key (attributeId)
-    )");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
-#-------------------------------------------------------------------
-sub uninstall {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::Matrix -e uninstall www.example.com.conf\n" unless ($home && $config);
-	print "Uninstalling asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::Matrix");
-	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Matrix'");
-	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::Matrix");
-		$asset->purge if defined $asset;
-	}
-	$session->db->write("drop table Matrix");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
 
 
 1;
