@@ -32,18 +32,34 @@ The assetId of the top page.  The Macro will not look above this page.
 
 #-------------------------------------------------------------------
 sub process {
-	my ($session, $topPageId) = @_;
+	my ($session, $topPageUrl, $templateId) = @_;
+    $templateId = defined $templateId ? $templateId : 'PrevNextMacro_YUILink0';
     my $topPage;
-    if ($topPageId) {
-        $topPage = WebGUI::Asset->newByDynamicClass($session, $topPageId);
+    if ($topPageUrl) {
+        $topPage = WebGUI::Asset->newByUrl($session, $topPageUrl);
     }
     if (! defined $topPage) {
         $topPage = WebGUI::Asset->getDefault($session);
     }
     my $nextPage = getNext($session->asset, $topPage);
     my $prevPage = getPrevious($session->asset, $topPage);
-	my $output = ""; # do some stuff
-	return $output;
+    my $vars;
+    if (defined $nextPage) {
+        $vars->{hasNext} = 1;
+        $vars->{nextUrl} = $nextPage->getUrl;
+    }
+    else {
+        $vars->{hasNext} = 0;
+    }
+    if (defined $prevPage) {
+        $vars->{hasPrevious} = 1;
+        $vars->{previousUrl} = $prevPage->getUrl;
+    }
+    else {
+        $vars->{hasPrevious} = 0;
+    }
+    my $template = WebGUI::Asset->newByDynamicClass($session, $templateId);
+	return $template->process($vars);
 }
 
 =head2 getNext ($startingAsset, $topPage)
@@ -76,11 +92,12 @@ sub getNext {
             whereClause        => 'asset.lineage > '.$session->db->quote($startingAsset->get('lineage')),
         }
     );
-    my $firstChild = $childrenIterator->();
-    if (defined $firstChild) {
-        return $firstChild;
+    my $firstChild;
+    CHILD: while ($firstChild = $childrenIterator->()) {
+       last CHILD if $firstChild->canView(); 
     }
-    return undef;
+    ##Fall through condition for undef
+    return $firstChild;
 }
 
 =head2 getPrevious
@@ -107,7 +124,10 @@ sub getPrevious {
     my ($startingAsset, $topPage) = @_;
     my $session = $startingAsset->session;
 
-    my $childIterator = $topPage->getLineageIterator(
+    ##This includes self, for a corner condition when you look for a the previous
+    ##Asset on the very first asset.  If you do not include self, then it will find
+    ##the first asset whose lineage is above the topPage.
+    my $childrenIterator = $topPage->getLineageIterator(
         ['self', 'descendants', 'siblings'],
         {
             includeOnlyClasses => ['WebGUI::Asset::Wobject::Layout'],
@@ -116,11 +136,16 @@ sub getPrevious {
             invertTree         => 1,
         }
     );
-    my $firstChild = $childIterator->();
-    if (defined $firstChild and $firstChild->getId ne $topPage->getId) {
+    my $firstChild;
+    CHILD: while ($firstChild = $childrenIterator->()) {
+       last CHILD if $firstChild->canView(); 
+    }
+    if ($firstChild->getId ne $topPage->getId) {
         return $firstChild;
     }
-    return undef;
+    else {
+        return undef;
+    }
 }
 
 1;
