@@ -37,6 +37,7 @@ addPosMode($session);
 fixFriendsGroups( $session );
 upgradeAccount( $session );
 removeProcessRecurringPaymentsFromConfig( $session );
+addStorageUrlMacro( $session );
 finish($session); # this line required
 
 
@@ -60,6 +61,14 @@ sub addPosMode {
 } 
 
 #----------------------------------------------------------------------------
+sub addStorageUrlMacro {
+    my $session = shift;
+    print qq{\tAdding StorageUrl Macro... } if !$quiet;
+    $session->config->addToHash( "macros", "StorageUrl" => "StorageUrl" );
+    print qq{Done!\n} if !$quiet;
+}
+
+#----------------------------------------------------------------------------
 sub removeProcessRecurringPaymentsFromConfig {
     my $session = shift;
 
@@ -74,6 +83,7 @@ sub removeProcessRecurringPaymentsFromConfig {
     }
     $workflowActivities->{'None'} = [ @noObjects ];
     $config->set('workflowActivities', $workflowActivities);
+    print qq{Done!\n} if !$quiet;
 } 
 
 #----------------------------------------------------------------------------

@@ -751,7 +751,8 @@
     "User"             : "User", 
     "UsersOnline"      : "UsersOnline", 
     "u"                : "u_companyUrl",
-    "ViewCart"         : "ViewCart"
+    "ViewCart"         : "ViewCart",
+    "StorageUrl"       : "StorageUrl"
     },
 
 #Specify any LDAP aliases for synchronizing user profiles to LDAP    

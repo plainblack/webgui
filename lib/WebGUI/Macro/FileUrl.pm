@@ -26,7 +26,7 @@ identified by it's asset URL.
 
 #-------------------------------------------------------------------
 
-=head2 process ( url, id, isStorageId, filename )
+=head2 process ( url )
 
 returns the file system URL if url is the URL for an Asset in the
 system that has storageId and filename properties.  If no Asset
@@ -37,54 +37,13 @@ be returned.
 
 The URL to the Asset.
 
-head3 id
-
-If id is passed in, the macro will attempt to retrive the storageId using the
-Id of the Asset instead of by the url
-
-=head3 isStorageId
-
-If id is passed in and the isStorageId flag is set, the macro will forgo
-the asset and simply return the url of the first file it finds
-
-=head3 filename
-
-If id is passed in and the isStorageId flag is set, you may pass in filename
-to specify the name of the file you'd like returned.
-
-head3 isImage
-
-If id is passed in and the isImage flag is set, the first image will be returned
-
 =cut
 
 sub process {
-	my $session     = shift;
-    my $url         = shift;
-    my $id          = shift;
-    my $isStorageId = shift;
-    my $filename    = shift;
-    my $isImage     = shift;
-    my $i18n        = WebGUI::International->new($session, 'Macro_FileUrl');
-    
-    #Handle storageId case
-    if($isStorageId && $id) {
-        my $store = undef;
-        if($isImage) {
-            $store = WebGUI::Storage::Image->get($session,$id);
-        }
-        else {
-            $store = WebGUI::Storage->get($session,$id);
-        }
-        $filename = $store->getFiles->[0] unless ($filename);
-        return "" unless ($filename);
-        return $store->getUrl($filename);
-    }
-    
-	my $asset = ($id)
-              ? WebGUI::Asset->newByDynamicClass($session,$id)
-              : WebGUI::Asset->newByUrl($session,$url);
-
+	my $session = shift;
+        my $url = shift;
+	my $asset = WebGUI::Asset->newByUrl($session,$url);
+	my $i18n = WebGUI::International->new($session, 'Macro_FileUrl');
 	if (not defined $asset) {
 		return $i18n->get('invalid url');
 	}
