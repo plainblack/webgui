@@ -8,9 +8,9 @@ our $I18N = {
         lastUpdated => 1227057110,
     },
 
-    'admin toggle title' => {
+    'prev next title' => {
         message => q|Previous/Next Macro Template Variables|,
-        lastUpdated => 1227057168,
+        lastUpdated => 1227072246,
     },
 
 	'hasNext' => {
@@ -23,6 +23,16 @@ our $I18N = {
 		lastUpdated => 1227057172,
 	},
 
+	'nextMenuTitle' => {
+		message => q|The menu title to the next page, by lineage, if it exists.|,
+		lastUpdated => 1227057172,
+	},
+
+	'nextTitle' => {
+		message => q|The title to the next page, by lineage, if it exists.|,
+		lastUpdated => 1227057172,
+	},
+
 	'hasPrevious' => {
 		message => q|A boolean which indicates whether or not the current page has a previous page link.|,
 		lastUpdated => 1227057146,
@@ -30,6 +40,16 @@ our $I18N = {
 
 	'previousUrl' => {
 		message => q|The URL to the previous page, by lineage, if it exists.|,
+		lastUpdated => 1227057172,
+	},
+
+	'previousMenuTitle' => {
+		message => q|The menu title to the previous page, by lineage, if it exists.|,
+		lastUpdated => 1227057172,
+	},
+
+	'previousTitle' => {
+		message => q|The title to the previous page, by lineage, if it exists.|,
 		lastUpdated => 1227057172,
 	},
 

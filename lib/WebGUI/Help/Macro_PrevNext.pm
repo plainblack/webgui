@@ -8,9 +8,13 @@ our $HELP = {
         body      => '',
         variables => [
             { 'name' => 'hasNext' },
-            { 'name' => 'hasPrevious' },
             { 'name' => 'nextUrl' },
-            { 'name' => 'previousUrl' }
+            { 'name' => 'nextMenuTitle' },
+            { 'name' => 'nextTitle' },
+            { 'name' => 'hasPrevious' },
+            { 'name' => 'previousUrl' },
+            { 'name' => 'previousMenuTitle' },
+            { 'name' => 'previousTitle' },
         ],
         fields    => [],
         related   => [],
