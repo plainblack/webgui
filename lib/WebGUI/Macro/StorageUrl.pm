@@ -59,7 +59,7 @@ sub process {
 	my $output = ""; 
 
     # Use WebGUI::Storage::Image because we might be getting an image
-    my $storage = WebGUI::Storage::Image->new( $session, $storageId );
+    my $storage = WebGUI::Storage::Image->get( $session, $storageId );
     return "" if !$storage;
 
     if ( !$filename ) {
