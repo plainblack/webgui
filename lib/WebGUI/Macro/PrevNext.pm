@@ -47,6 +47,8 @@ sub process {
     if (defined $nextPage) {
         $vars->{hasNext} = 1;
         $vars->{nextUrl} = $nextPage->getUrl;
+        $vars->{nextMenuTitle} = $nextPage->getMenuTitle;
+        $vars->{nextTitle} = $nextPage->getTitle;
     }
     else {
         $vars->{hasNext} = 0;
@@ -54,6 +56,8 @@ sub process {
     if (defined $prevPage) {
         $vars->{hasPrevious} = 1;
         $vars->{previousUrl} = $prevPage->getUrl;
+        $vars->{previousMenuTitle} = $prevPage->getMenuTitle;
+        $vars->{previousTitle} = $prevPage->getTitle;
     }
     else {
         $vars->{hasPrevious} = 0;
@@ -140,6 +144,9 @@ sub getPrevious {
     CHILD: while ($firstChild = $childrenIterator->()) {
        last CHILD if $firstChild->canView(); 
     }
+    return undef
+        unless $firstChild;
+        
     if ($firstChild->getId ne $topPage->getId) {
         return $firstChild;
     }
