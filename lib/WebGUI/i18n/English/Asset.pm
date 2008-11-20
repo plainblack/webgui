@@ -763,7 +763,7 @@ case of the check box list, then enter one per line.  The total amount of data i
         message => q|Export site root URL|,
     },
 
-    'Export site root URL' => {
+    'Export site root URL description' => {
         lastUpdated => 1227213703,
         message => q|A URL to pass on to Macro Widgets.|,
     },
