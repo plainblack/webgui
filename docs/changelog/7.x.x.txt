@@ -10,6 +10,7 @@
  - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
  - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
  - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed #8822: Password Recovery Tempalte not working
 
 7.5.33
  - fixed #9002: add a variant in admin product view misses i18n link
