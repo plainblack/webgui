@@ -331,7 +331,7 @@ sub canStartThread {
 sub canView {
 	my $self = shift;
         my $userId  = shift     || $self->session->user->userId;
-	return $self->SUPER::canView( $userId ) || $self->canPost( $userId );
+	return $self->SUPER::canView( $userId );# || $self->canPost( $userId );
 }
 
 #-------------------------------------------------------------------
