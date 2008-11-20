@@ -900,6 +900,11 @@ to add or remove users from their groups.
 		lastUpdated => 1044138691
 	},
 
+	'868 help' => {
+		message => q|Should the user be sent an email when their account is created?|,
+		lastUpdated => 1227209376
+	},
+
 	'990' => {
 		message => q|Edit Database Link|,
 		lastUpdated => 1056151382
@@ -1094,7 +1099,12 @@ to add or remove users from their groups.
 
 	'869' => {
 		message => q|Welcome Message|,
-		lastUpdated => 1044138730
+		lastUpdated => 1044138730,
+	},
+
+	'869 help' => {
+		message => q|This message will be part of the email sent to a user when they create an account on this WebGUI site.|,
+		lastUpdated => 1227209607,
 	},
 
 	'533' => {
@@ -3014,11 +3024,11 @@ or are under your current version tag.</p>
                 context => q|Field type name|
         },
 
-	'submit' => {
-		message => q|Submit|,
-		lastUpdated =>1140589512,
-                context => q|Field type name and button label|
-        },
+    'submit' => {
+        message => q|Submit|,
+        lastUpdated =>1140589512,
+        context => q|Field type name and button label|
+    },
 
 	'button' => {
 		message => q|Button|,
