@@ -28,20 +28,19 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-# upgrade functions go here
 removeProcessRecurringPaymentsFromConfig( $session );
+increaseDataFormSizeLimits($session);
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub increaseDataFormSizeLimits {
+    my $session = shift;
+    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
+    $session->db->write("ALTER TABLE DataForm_entry MODIFY COLUMN entryData mediumtext");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub removeProcessRecurringPaymentsFromConfig {
