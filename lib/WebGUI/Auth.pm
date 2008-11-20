@@ -626,7 +626,7 @@ sub getAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ( )
+=head2 getCreateAccountTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the create account screen.
 
