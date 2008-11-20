@@ -827,7 +827,7 @@ sub www_export {
     $f->text(
         -label          => $i18n->get("Export site root URL"),
         -name           => 'exportUrl',
-        -value          => $session->asset->getUrl,
+        -value          => '',
         -hoverHelp      => $i18n->get("Export site root URL description"),
     );
 
