@@ -711,7 +711,7 @@ sub new {
 =head2 recoverPassword ( args )
 
 Initiates the password recovery process.  Checks for recovery type, 
-and then runs the appropriate method. arguments to this sub are
+and then runs the appropriate method. Arguments to this sub are
 passed directly to the approprate method.
 
 =cut
@@ -732,55 +732,61 @@ sub recoverPassword {
 }
  
 #-------------------------------------------------------------------
- 
+
+=head2 emailRecoverPassword ( $error )
+
+Templated email recovery form.
+
+=head3 $error
+
+$error is any error from the system which needs to be reported to the user.
+
+=cut
+
 sub emailRecoverPassword {
     my $self    = shift;
-    my $error   = shift;
-    my $i18n    = WebGUI::International->new($self->session);
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session);
 
-    my $output 
-        = "<h1>" . $i18n->get('recover password banner', 'AuthWebGUI') . " </h1> "
-        . "<h3>" . $i18n->get('email recover password start message', 'AuthWebGUI') ."</h3>"
-        ;
+    my $vars = {};
+    $vars->{title}    = $i18n->get('recover password banner', 'AuthWebGUI');
+    $vars->{subtitle} = $i18n->get('email recover password start message', 'AuthWebGUI');
+
+	$vars->{'recoverFormHeader'} = "\n\n".WebGUI::Form::formHeader($session,{});
+	$vars->{'recoverFormHidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"auth"});
+	$vars->{'recoverFormHidden'} .= WebGUI::Form::hidden($session,{"name"=>"method","value"=>"recoverPasswordFinish"});
+
+	$vars->{'recoverFormSubmit'} = WebGUI::Form::submit($session,{});
+	$vars->{'recoverFormFooter'} = WebGUI::Form::formFooter($session,);
+	$vars->{'loginUrl'} = $session->url->page('op=auth;method=init');
+	$vars->{'loginLabel'} = $i18n->get(58);
+
+	$vars->{'anonymousRegistrationIsAllowed'} = ($session->setting->get("anonymousRegistration"));
+	$vars->{'createAccountUrl'} = $session->url->page('op=auth;method=createAccount');
+	$vars->{'createAccountLabel'} = $i18n->get(67);
+	$vars->{'recoverMessage'} = $_[0] if ($_[0]);
+
+    $vars->{'recoverFormProfile'} = [];
     
-    if ( $error ) {
-        $output .= '<p class="error">' . $error . '</p>';
-    }
+    ##just one element
+    my $emailForm = WebGUI::Form::email($session, {name        => "email",});
+    my $label     = $i18n->get('password recovery email label', 'AuthWebGUI');
+    push @{$vars->{'recoverFormProfile'}},
+        {
+            'id'          => 'email',
+            'formElement' => $emailForm,
+            'label'       => $label,
+        };
 
-    my $f = WebGUI::HTMLForm->new($self->session);
+    $vars->{'recoverFormProfileFieldEmailFormElement'} = $emailForm;
+    $vars->{'recoverFormProfileFieldEmailLabel'}       = $label;
 
-    $f->hidden(
-        name        => 'op',
-        value       => 'auth',
-    );
+    ##Username is handled by this form
+    $vars->{'recoverFormUsername'}      = WebGUI::Form::text($session, {name => 'username'});
+    $vars->{'recoverFormUsernameLabel'} = $i18n->get(50);
 
-    $f->hidden(
-        name        => "method",
-        value       => "recoverPasswordFinish",
-    );
-
-    $f->text(
-        name        => "username",
-        label       => $i18n->get('password recovery login label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery login hoverHelp', 'AuthWebGUI'),
-        uiLevel     => 0,
-    );
-
-    $f->email(
-        name        => "email",
-        label       => $i18n->get('password recovery email label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery email hoverHelp', 'AuthWebGUI'),
-        uiLevel     => 0,
-    );
-    
-    $f->submit(
-        uiLevel     => 0,
-    );
-
-    $output .= $f->print;
-$self->session->log->error($output);
-    return  $output;
- }
+	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
+}
  
 #-------------------------------------------------------------------
  

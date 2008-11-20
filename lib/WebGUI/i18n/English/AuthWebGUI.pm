@@ -172,6 +172,11 @@ our $I18N = {
 		lastUpdated => 1164335682,
 	},
 
+	'subtitle' => {
+		message => q|Special instructions for the form.  May not be defined in all types of password recovery templates.|,
+		lastUpdated => 1227216717,
+	},
+
 	'login.message' => {
 		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
 		lastUpdated => 1149220294,
