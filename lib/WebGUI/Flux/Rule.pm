@@ -514,6 +514,7 @@ sub evaluateFor {
 
     # Rule with no expressions defaults to true
     if ( $self->getExpressionCount() == 0 ) {
+        $self->session->log->info('Rule has no expressions, defaulting to true');
         return $self->_finishEvaluating(1);
     }
 
@@ -525,6 +526,7 @@ sub evaluateFor {
             [ $self->getId(), $user->userId() ] );
 
         if ($dateRuleFirstTrue) {
+            $self->session->log->debug('Sticky and previously true, no need to evaluate');
             return $self->_finishEvaluating(1);
         }
     }
@@ -757,30 +759,29 @@ sub _updateDataAndTriggerWorkflows {
         fluxRuleId         => $self->getId(),
         userId             => $user->userId(),
     );
-    
-    $self->session->log->debug('_updateDataAndTriggerWorkflows for Rule: ' . $self->getId);
 
     # Has rule ever been checked for this user?
     if ( !exists $userData{fluxRuleUserDataId} ) {
         $db_write_required                   = 1;
         $field_updates{fluxRuleUserDataId}   = 'new';
         $field_updates{dateRuleFirstChecked} = $dt;
+        $self->session->log->debug('Updating dateRuleFirstChecked');
     }
 
     # True for the first time?
     if ( $success && !$userData{dateRuleFirstTrue} ) {
-        $self->session->log->debug('RuleFirstTrue');
         $db_write_required                = 1;
         $field_updates{dateRuleFirstTrue} = $dt;
         $trigger_workflow{RuleFirstTrue}  = 1;
+        $self->session->log->debug('Updating dateRuleFirstTrue');
     }
 
     # False for the first time?
     if ( !$success && !$userData{dateRuleFirstFalse} ) {
-        $self->session->log->debug('RuleFirstFalse');
         $db_write_required                 = 1;
         $field_updates{dateRuleFirstFalse} = $dt;
         $trigger_workflow{RuleFirstFalse}  = 1;
+        $self->session->log->debug('Updating dateRuleFirstFalse');
     }
 
     # Direct access?
@@ -788,32 +789,32 @@ sub _updateDataAndTriggerWorkflows {
         $db_write_required = 1;
         
         if ($success) {
-            $self->session->log->debug('AccessMostRecentlyTrue');
             $field_updates{dateAccessMostRecentlyTrue} = $dt;
             $trigger_workflow{AccessTrue}              = 1;
+            $self->session->log->debug('Updating dateAccessMostRecentlyTrue');
         }
         else {
-            $self->session->log->debug('AccessFalse');
             $field_updates{dateAccessMostRecentlyFalse} = $dt;
             $trigger_workflow{AccessFalse}              = 1;
+            $self->session->log->debug('Updating dateAccessMostRecentlyFalse');
         }
 
         # First direct access attempt?
         if ( !$userData{dateAccessFirstAttempted} ) {
-            $self->session->log->debug('AccessFirstAttempted');
             $field_updates{dateAccessFirstAttempted} = $dt;
+            $self->session->log->debug('Updating dateAccessFirstAttempted');
         }
 
         # True for the first time?
         if ( $success && !$userData{dateAccessFirstTrue} ) {
-            $self->session->log->debug('AccessFirstTrue');
             $field_updates{dateAccessFirstTrue} = $dt;
             $trigger_workflow{AccessFirstTrue}  = 1;
+            $self->session->log->debug('Updating dateAccessFirstTrue');
         }
         if ( !$success && !exists $userData{dateAccessFirstFalse}) {
-            $self->session->log->debug('AccessFirstFalse');
             $field_updates{dateAccessFirstFalse} = $dt;
             $trigger_workflow{AccessFirstFalse}  = 1;
+            $self->session->log->debug('Updating dateAccessFirstFalse');
         }
     }
 
@@ -826,6 +827,7 @@ sub _updateDataAndTriggerWorkflows {
     foreach my $w ( keys %trigger_workflow ) {
         my $full_workflow_name = 'on' . $w . 'WorkflowId';
         if ( my $workflowId = $self->get($full_workflow_name) ) {
+            $self->session->log->debug('Flux triggering $full_workflow_name');
             my $workflow = WebGUI::Workflow::Instance->create(
                 $self->session,
                 {   workflowId => $workflowId,

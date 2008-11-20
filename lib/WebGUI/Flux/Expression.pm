@@ -380,10 +380,12 @@ sub evaluate {
     my $operand2Args     = from_json( $property{$id}{operand2Args} );    # deserialise JSON-encoded args
     my $operand2Modifier = $property{$id}{operand2Modifier};
     my $operator         = $property{$id}{operator};
+    
+    $rule->session->log->debug( 'Flux evaluating Rule: ' . $rule->get('name') . ' (' . $rule->getId . ')');
 
     # Evaluate operand1..
     my $operand1_val = WebGUI::Flux::Operand->evaluateUsing( $operand1, { rule => $rule, args => $operand1Args } );
-    $rule->session->log->debug("Flux evaluated Operand1: $operand1_val");
+    $rule->session->log->debug("Operand1: $operand1_val");
     
     if ($operand1Modifier) {
 
@@ -392,12 +394,14 @@ sub evaluate {
             = from_json( $property{$id}{operand1ModifierArgs} );         # deserialise JSON-encoded args
         $operand1_val = WebGUI::Flux::Modifier->evaluateUsing( $operand1Modifier,
             { rule => $rule, operand => $operand1_val, args => $operand1ModifierArgs } );
-        $rule->session->log->debug("Flux evaluated Operand1Modifier: $operand1_val");
+        $rule->session->log->debug("Operand1Modifier: $operand1_val");
     }
+    
+    $rule->session->log->debug("Operator: $operator");
 
     # Evaluate operand2..
     my $operand2_val = WebGUI::Flux::Operand->evaluateUsing( $operand2, { rule => $rule, args => $operand2Args } );
-    $rule->session->log->debug("Flux evaluated Operand2: $operand2_val");
+    $rule->session->log->debug("Operand2: $operand2_val");
     if ($operand2Modifier) {
 
         # Modifier is optional so only try it if it's defined..
@@ -405,11 +409,15 @@ sub evaluate {
             = from_json( $property{$id}{operand2ModifierArgs} );         # deserialise JSON-encoded args
         $operand2_val = WebGUI::Flux::Modifier->evaluateUsing( $operand2Modifier,
             { rule => $rule, operand => $operand2_val, args => $operand2ModifierArgs } );
-        $rule->session->log->debug("Flux evaluated Operand2Modifier: $operand2_val");
+        $rule->session->log->debug("Operand2Modifier: $operand2_val");
     }
 
     # Evaluate operator, passing in the two operands
-    return WebGUI::Flux::Operator->evaluateUsing( $operator,
+    my $result = WebGUI::Flux::Operator->evaluateUsing( $operator,
         { rule => $rule, operand1 => $operand1_val, operand2 => $operand2_val } );
+    
+    $rule->session->log->debug("Result: " . ($result ? 'Truthy' : 'Falsy') );
+    
+    return $result;
 }
 1;

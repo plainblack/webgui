@@ -228,13 +228,9 @@ sub evaluateFor {
     my $class = shift;
     my %args = validate( @_, { user => { isa => 'WebGUI::User' }, fluxRuleId => 1, assetId => 0 } );
 
-    my $session = $args{user}->session();
-
-    #    # Debugging.. (remove later)
-    #    {
-    #        my $asset = WebGUI::Asset->new($session, $args{assetId});
-    #        $session->log->debug("Getting Flux Result for: " . $asset->getUrl());
-    #    }
+    my $user = $args{user};
+    my $assetId = $args{assetId};
+    my $session = $user->session();
 
     # Instantiate the Flux Rule..
     my $fluxRule = eval { WebGUI::Flux->getRule( $session, $args{fluxRuleId} ) };
@@ -246,19 +242,14 @@ sub evaluateFor {
         $session->log->warn('Unable to instantiate Flux Rule');
         return 0;
     }
-    $session->log->debug( '->Flux using Rule: ' . $fluxRule->get('name') );
-
-    delete $args{fluxRuleId};    # don't need to pass this on with the rest of the args to $fluxRule->evaluateFo
 
     # Evaluate the Flux Rule..
-    my $result = eval { $fluxRule->evaluateFor( \%args ) };
+    my $result = eval { $fluxRule->evaluateFor( { user => $user, assetId => $assetId } ) };
     if ( my $e = Exception::Class->caught() ) {
         $session->log->warn( 'Flux caught an exception, returning 0 - ' . $e->error );
         return 0;
     }
 
-    # Return the result..
-    $session->log->debug( '->Result: ' . $result );
     return $result;
 }
 

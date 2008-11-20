@@ -244,6 +244,7 @@ sub canEdit {
     
     # See if we should delegate to Flux..
     if ($self->get('fluxEnabled')) {
+        $self->session->log->debug('Delegating to Flux for canEdit on asset: ' . $self->getUrl . ' (' . $self->getId . ')');
         return WebGUI::Flux->evaluateFor({
             user => $user, 
             assetId => $self->getId(), 
@@ -287,6 +288,7 @@ sub canView {
     
     # See if we should delegate to Flux..
     if ($self->get('fluxEnabled') && $self->session->setting->get('fluxEnabled')) {
+        $self->session->log->debug('Delegating to Flux for canView on asset: ' . $self->getTitle . ' (' . $self->getId . ')');
         return WebGUI::Flux->evaluateFor({
             user => $user, 
             assetId => $self->getId(), 
