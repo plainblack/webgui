@@ -768,7 +768,17 @@ case of the check box list, then enter one per line.  The total amount of data i
 	'directory index' => {
 		 lastUpdated => 1118896675,
 		 message => q|Directory Index|,
-	       },
+    },
+
+    'Export site root URL' => {
+        lastUpdated => 1227213703,
+        message => q|Export site root URL|,
+    },
+
+    'Export site root URL description' => {
+        lastUpdated => 1227213703,
+        message => q|A URL to pass on to Macro Widgets.|,
+    },
 
         'Depth description' => {
                 message => q|<p>Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,

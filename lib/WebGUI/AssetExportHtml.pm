@@ -823,10 +823,12 @@ sub www_export {
         -name           => "index",
         -value          => "index.html"
     );
+
     $f->text(
         -label          => $i18n->get("Export site root URL"),
         -name           => 'exportUrl',
-        -value          => '',
+        -value          => $session->asset->getUrl,
+        -hoverHelp      => $i18n->get("Export site root URL description"),
     );
 
     # TODO: maybe add copy options to these boxes alongside symlink
