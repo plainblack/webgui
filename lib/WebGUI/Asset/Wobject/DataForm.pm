@@ -1224,7 +1224,9 @@ sub www_editTabSave {
 #-------------------------------------------------------------------
 sub www_exportTab {
         my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canEdit;
+        my $session = $self->session;
+        return $session->privilege->insufficient
+            unless $self->canEdit;
         my @exportRows;
         my $entries = $self->session->db->read("select * from DataForm_entry where assetId=?", [$self->getId]);
         my @exportFields;
@@ -1242,6 +1244,10 @@ sub www_exportTab {
             'submissionDate',
             @exportFields,
         );
+        $session->http->setFilename($self->get("url").".tab","text/plain");
+        $session->http->sendHeader;
+        $session->output->print($tsv->string, 1);
+
         my $outText = $tsv->string;
 
         while (my $entryData = $entries->hashRef) {
@@ -1251,14 +1257,13 @@ sub www_exportTab {
                 $entryData->{ipAddress},
                 $entryData->{username},
                 $entryData->{userId},
-                WebGUI::DateTime->new($self->session, $entryData->{submissionDate})->webguiDate,
+                WebGUI::DateTime->new($session, $entryData->{submissionDate})->webguiDate,
                 @{ $entryFields }{@exportFields},
             );
-            $outText .= $tsv->string;
+            $session->output->print($tsv->string, 1);
         }
         $entries->finish;
-        $self->session->http->setFilename($self->get("url").".tab","text/plain");
-        return $outText;
+        return 'chunked';
 }
 
 #-------------------------------------------------------------------
