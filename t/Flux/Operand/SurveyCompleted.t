@@ -1,4 +1,4 @@
-# Tests WebGUI::Flux::Operand::FluxRule
+# Tests WebGUI::Flux::Operand::SurveyCompleted
 #
 #
 
