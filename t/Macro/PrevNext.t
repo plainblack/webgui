@@ -13,7 +13,7 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $numTests = 38;
+my $numTests = 39;
 $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
@@ -236,10 +236,10 @@ cmp_deeply(
 );
 
 $macroOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl);
-like($macroOutput, qr/wgx-prev-btn/, 'previous button link exists');
-like($macroOutput, qr/wgx-next-btn/, 'previous button link exists');
+like($macroOutput, qr/wgx-prev-btn/, 'previous and next, default template, previous button link exists');
+like($macroOutput, qr/wgx-next-btn/, 'previous and next, default template, next button link exists');
 
-$session->asset($topPage1);
+$session->asset($testStart);
 $jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 0, $jsonTemplate->getId);
 $jsonData = JSON::from_json($jsonOutput);
 cmp_deeply(
@@ -248,7 +248,7 @@ cmp_deeply(
         hasPrevious => 0,
         hasNext     => 1,
         previousUrl => '',
-        nextUrl     => $subPage1_1->getUrl, 
+        nextUrl     => $topPage1->getUrl, 
         startingPageTitle => ignore(),
     },
     'Testing next only, variables'
@@ -295,7 +295,6 @@ cmp_deeply(
 $session->asset($subPage1_1);
 $jsonOutput = WebGUI::Macro::PrevNext::process($session, $testStart->getUrl, 1, $jsonTemplate->getId);
 $jsonData = JSON::from_json($jsonOutput);
-diag $jsonData->{startingPageTitle};
 cmp_deeply(
     $jsonData,
     {
