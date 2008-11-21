@@ -1956,12 +1956,6 @@ sub prepareView {
             content => join(',', @keywords),
             }); 
     }
-    if ($self->get('synopsis')) {
-        $style->setMeta({
-                name    => 'Description',
-                content => $self->get('synopsis'),
-        });
-    }
 	$style->setRawHeadTags($self->getExtraHeadTags);
 }
 
@@ -2648,7 +2642,13 @@ sub www_view {
 	return $check if (defined $check);
 
     # if all else fails 
-	$self->prepareView;
+    if ($self->get('synopsis')) {
+        $self->session->style->setMeta({
+                name    => 'Description',
+                content => $self->get('synopsis'),
+        });
+    }
+    $self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;
 }

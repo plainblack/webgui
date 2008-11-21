@@ -540,6 +540,13 @@ sub www_view {
 	return $check if (defined $check);
 	$self->session->http->setLastModified($self->getContentLastModified);
 	$self->session->http->sendHeader;
+    ##Have to dupe this code here because Wobject does not call SUPER.
+    if ($self->get('synopsis')) {
+        $self->session->style->setMeta({
+                name    => 'Description',
+                content => $self->get('synopsis'),
+        });
+    }
 	$self->prepareView;
 	my $style = $self->processStyle("~~~");
 	my ($head, $foot) = split("~~~",$style);
