@@ -387,13 +387,31 @@ Returns the WebGUI::Group for this user's Friend's Group.
 
 sub friends {
     my $self = shift;
-    if ($self->{_user}{"friendsGroup"} eq "") {
-        my $myFriends = WebGUI::Group->new($self->session, "new",0,1);
+    my $myFriends;
+
+    # If the user already has a friend group fetch it.
+    if ( $self->{_user}{"friendsGroup"} ne "" ) {
+        if ( ! exists $self->{_friendsGroup} ) {
+            # Friends group is not in cache, so instantiate and cache it.
+            $myFriends = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
+            $self->{_friendsGroup} = $myFriends;
+        }
+        else {
+            # Friends group is cached, so fetch it from cache.
+            $myFriends = $self->{_friendsGroup};
+        }
+    }
+
+    # If there's no instantiated friends group, either the user has none yet or the group has been deleted. 
+    # Whatever the reason may be, we need to create a new friends group for this user.
+    unless ( $myFriends ) {
+        $myFriends = WebGUI::Group->new($self->session, "new");
         $myFriends->name($self->username." Friends");
         $myFriends->description("Friends of user ".$self->userId);
         $myFriends->expireOffset(60*60*24*365*60);
         $myFriends->showInForms(0);
         $myFriends->isEditable(0);
+        $myFriends->deleteUsers(['3']);
         $self->uncache;
         $self->{_user}{"friendsGroup"} = $myFriends->getId;
         $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
@@ -401,10 +419,8 @@ sub friends {
             [$myFriends->getId, $self->session->datetime->time(), $self->userId]);
         $self->{_friendsGroup} = $myFriends;
     }
-    elsif (! exists $self->{_friendsGroup}) {
-        $self->{_friendsGroup} = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
-    }
-    return $self->{_friendsGroup};
+
+    return $myFriends;
 }
 
 #-------------------------------------------------------------------
