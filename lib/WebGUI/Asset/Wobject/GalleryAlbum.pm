@@ -763,8 +763,8 @@ sub sendChunkedContent {
 
 	$self->session->http->setLastModified($self->getContentLastModified);
 	$self->session->http->sendHeader;
-	my $style = $self->processStyle("~~~");
-	my ($head, $foot) = split("~~~",$style);
+	my $style = $self->processStyle($self->getSeparator);
+	my ($head, $foot) = split($self->getSeparator,$style);
 	$self->session->output->print($head, 1);
 	$self->session->output->print( $callback->() );
 	$self->session->output->print($foot, 1);

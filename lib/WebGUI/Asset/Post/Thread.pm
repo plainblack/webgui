@@ -1175,8 +1175,8 @@ sub www_view {
 	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
         $self->session->http->sendHeader;    
         $self->prepareView;
-        my $style = $self->getParent->processStyle("~~~");
-        my ($head, $foot) = split("~~~",$style);
+        my $style = $self->getParent->processStyle($self->getSeparator);
+        my ($head, $foot) = split($self->getSeparator,$style);
         $self->session->output->print($head,1);
         $self->session->output->print($self->view($currentPost));
         $self->session->output->print($foot,1);

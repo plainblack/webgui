@@ -973,8 +973,8 @@ sub www_view {
         if ($shortcut->isa('WebGUI::Asset::Wobject')) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
-                my $style = $shortcut->processStyle("~~~");
-                my ($head, $foot) = split("~~~",$style);
+                my $style = $shortcut->processStyle($self->getSeparator);
+                my ($head, $foot) = split($self->getSeparator,$style);
                 $self->session->output->print($head, 1);
                 $self->session->output->print($self->view);
                 $self->session->output->print($foot, 1);

@@ -46,6 +46,7 @@
  - fixed #9132: usage error in Hover Help
  - fixed #4181: hoover help for 'encrypt login' is wrong
  - fixed #4186: search results (macro not expanded in the synopsis field)
+ - fixed #4191: Using 3 consecutive tildes in a Post title makes a bad URL/Pos
 
 7.6.3
  - improved performance of file uploads

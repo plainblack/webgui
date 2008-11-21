@@ -148,7 +148,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 100 
+plan tests => 103 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -677,6 +677,15 @@ $session->setting->set('notFoundPage', $origNotFoundPage);
 #
 ################################################################
 is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
+
+################################################################
+#
+# getSeparator
+#
+################################################################
+is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', 'getSeparator, known assetId');
+is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', 'getSeparator, given pad character');
+isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, 'getSeparator: unique string');
 
 ################################################################
 #

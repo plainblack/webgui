@@ -1246,6 +1246,23 @@ sub getRoot {
 
 #-------------------------------------------------------------------
 
+=head2 getSeparator
+
+Returns a very unique string that can be used for splitting head and body apart
+from the style template.  Made into a method in case it ever has to be changed
+again.
+
+=cut
+
+sub getSeparator {
+	my $self = shift;
+    my $padCharacter = shift || '~';
+    my $pad = $padCharacter x 3;
+	return $pad.$self->getId.$pad
+}
+
+#-------------------------------------------------------------------
+
 =head2 getTempspace ( session )
 
 Constructor. Returns the tempspace folder.
