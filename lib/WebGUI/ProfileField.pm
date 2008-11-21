@@ -276,8 +276,8 @@ Returns the value retrieved from a form post.
 
 =head3 user
 
-optional user object to process properteis for.  If no use is passed
-in the current user will be used
+Optional user object to process properties for.  If no user object is passed
+in the current user will be used.
 
 =cut
 
