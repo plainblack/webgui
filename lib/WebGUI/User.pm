@@ -405,13 +405,12 @@ sub friends {
     # If there's no instantiated friends group, either the user has none yet or the group has been deleted. 
     # Whatever the reason may be, we need to create a new friends group for this user.
     unless ( $myFriends ) {
-        $myFriends = WebGUI::Group->new($self->session, "new");
+        $myFriends = WebGUI::Group->new($self->session, "new",0,1);
         $myFriends->name($self->username." Friends");
         $myFriends->description("Friends of user ".$self->userId);
         $myFriends->expireOffset(60*60*24*365*60);
         $myFriends->showInForms(0);
         $myFriends->isEditable(0);
-        $myFriends->deleteUsers(['3']);
         $self->uncache;
         $self->{_user}{"friendsGroup"} = $myFriends->getId;
         $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
