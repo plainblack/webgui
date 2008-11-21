@@ -37,7 +37,7 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub increaseDataFormSizeLimits {
     my $session = shift;
-    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
+    print "\tIncreasing size of DataForm entry data field... " unless $quiet;
     $session->db->write("ALTER TABLE DataForm_entry MODIFY COLUMN entryData mediumtext");
     print "Done.\n" unless $quiet;
 }
@@ -57,6 +57,7 @@ sub removeProcessRecurringPaymentsFromConfig {
     }
     $workflowActivities->{'None'} = [ @noObjects ];
     $config->set('workflowActivities', $workflowActivities);
+    print "Done.\n" unless $quiet;
 } 
 
 
