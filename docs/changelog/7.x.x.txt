@@ -44,6 +44,7 @@
    (Martin Kamerbeek / Oqapi)
  - fixed #9039: Synopsis not output as a meta field
  - fixed #9132: usage error in Hover Help
+ - fixed #4181: hoover help for 'encrypt login' is wrong
 
 7.6.3
  - improved performance of file uploads
