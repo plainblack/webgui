@@ -162,8 +162,7 @@ sub validateProfileData {
     my $errors    = $retHash->{errors};
 
     my $format    = "<li>%s</li>";
-    my $warning   = "";
-    my $error     = "";
+
     map { $warning .= sprintf($format,$_) }@{$warnings};
     map { $error   .= sprintf($format,$_) }@{$errors};
     
