@@ -3273,8 +3273,8 @@ and tracked by WebGUI.|,
         },
 
         '1006 description' => {
-                message => q|Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will encrypt not only the login form, but all pages after that as well.|,
-                lastUpdated => 1163457062,
+                message => q|Should the system use the HTTPS protocol for the login form?|,
+                lastUpdated => 1227291454,
         },
 
         'Enable user invitations description' => {
