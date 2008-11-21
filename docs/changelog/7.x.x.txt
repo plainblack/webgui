@@ -1,5 +1,7 @@
 7.5.35
  - fixed #8879: SEO Flaw in New Shop System
+ - fixed: WebGUI::User now actually checks whether the friends group exists
+   (Martin Kamerbeek / Oqapi)
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
