@@ -196,14 +196,14 @@ sub prepareView {
                             push(@{$vars{"position1_loop"}},{
                                 id=>$child->getId,
                                 isUncommitted=> $child->get('status') eq 'pending',
-                                content=>"~~~".$child->getId."~~~~~"
+                                content=>$self->getSeparator.$child->getId.$self->getSeparator('!'),
                             });
                         } else {
                             $placeHolder{$child->getId} = $child;
                             push(@{$vars{"position".$i."_loop"}},{
                                 id=>$child->getId,
                                 isUncommitted=>$child->get('status') eq 'pending',
-                                content=>"~~~".$child->getId."~~~~~"
+                                content=>$self->getSeparator.$child->getId.$self->getSeparator('!'),
                             });
                         }
                     }
@@ -226,13 +226,13 @@ sub prepareView {
 				if($self->getValue("assetOrder") eq "asc"){
                 	push(@{$vars{"position1_loop"}},{
                     	id=>$child->getId,
-                    	content=>"~~~".$child->getId."~~~~~"
+                    	content=>$self->getSeparator.$child->getId.$self->getSeparator('!'),
                     });
 				} 
 				else {
 					unshift(@{$vars{"position1_loop"}},{
                     	id=>$child->getId,
-                   	    content=>"~~~".$child->getId."~~~~~"
+                   	    content=>$self->getSeparator.$child->getId.$self->getSeparator('!'),
                     });
 				} 
             }
@@ -272,10 +272,10 @@ sub view {
     }
     my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
     my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
-    my @parts = split("~~~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
+    my @parts = split($self->getSeparator('!'),$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
     my $output = "";
     foreach my $part (@parts) {
-        my ($outputPart, $assetId) = split("~~~",$part,2);
+        my ($outputPart, $assetId) = split($self->getSeparator,$part,2);
         if ($self->{_viewPrintOverride}) {
             $self->session->output->print($outputPart);
         } else {
