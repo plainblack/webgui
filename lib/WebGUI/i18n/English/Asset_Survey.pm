@@ -15,8 +15,20 @@ our $I18N = {
 		message => q|Take Survey|,
 		lastUpdated => 1224686319
 	},
-	'view reports' => {
-		message => q|View Results|,
+	'view simple results' => {
+		message => q|View Simple Results|,
+		lastUpdated => 1224686319
+	},
+	'view transposed results' => {
+		message => q|View Transposed Results|,
+		lastUpdated => 1224686319
+	},
+	'view statistical overview' => {
+		message => q|View Statistical Overview|,
+		lastUpdated => 1224686319
+	},
+	'view grade book' => {
+		message => q|View Grade Book|,
 		lastUpdated => 1224686319
 	},
 	'continue button' => {
