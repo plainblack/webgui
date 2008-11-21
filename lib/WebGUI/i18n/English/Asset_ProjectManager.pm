@@ -213,8 +213,8 @@ our $I18N = {
 		},
 
 	 'project delete warning' => {
-		message => q|Are you sure you wish to delete this project and all of it's associated tasks?|,
-		lastUpdated => 0
+		message => q|Are you sure you wish to delete this project and all of its associated tasks?|,
+		lastUpdated => 1227289374
 		},
 
 	 'project start task label' => {
@@ -381,8 +381,8 @@ our $I18N = {
 		},
 
 	 'task samePredecessor error' => {
-		message => q|Task cannot be it's own predecessor|,
-		lastUpdated => 0
+		message => q|Task cannot be its own predecessor|,
+		lastUpdated => 1227289406
 		},
 
 	 'task noPredecessor error' => {
