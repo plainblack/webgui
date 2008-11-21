@@ -480,6 +480,31 @@ sub view {
     $var->{manufacturerUrl_click}  = $self->getUrl("func=click;manufacturer=1");
     $var->{productUrl_click}       = $self->getUrl("func=click");
 
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),
+    {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixListing.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+
     # Attributes
 
     foreach my $category (@categories) {
@@ -709,6 +734,54 @@ sub www_edit {
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
     return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit matrix listing title'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getAttributes ( )
+
+Gets a listings attributes grouped by category as json.
+
+=cut
+
+sub www_getAttributes {
+    
+    my $self    = shift;
+    my $session = $self->session;
+    my $db      = $session->db;
+
+    return $session->privilege->noAccess() unless $self->canView;
+
+    $session->http->setMimeType("application/json");
+
+    my @results;
+    my @categories  = keys %{$self->getParent->getCategories};
+    foreach my $category (@categories) {
+        my $attributes;
+        my @attribute_loop;
+        #my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+        $attributes = $db->read("select * from Matrix_attribute as a
+            left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
+            where category =? and a.assetId = ?",
+            [$self->getId,$category,$self->getParent->getId]);
+        while (my $attribute = $attributes->hashRef) {
+            $attribute->{label} = $attribute->{name};
+            $attribute->{attributeId} =~ s/-/_____/g;
+            if ($attribute->{fieldType} eq 'MatrixCompare'){
+                $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
+            }
+            push(@results,$attribute);
+        }
+        #$var->{$categoryLoopName} = \@attribute_loop;
+        #push(@{$var->{category_loop}},{
+        #    categoryLabel   => $category,
+        #    attribute_loop  => \@attribute_loop,
+        #});
+    }
+    my $jsonOutput;
+    $jsonOutput->{ResultSet} = {Result=>\@results};
+
+    return JSON->new->utf8->encode($jsonOutput);
 }
 
 #-------------------------------------------------------------------

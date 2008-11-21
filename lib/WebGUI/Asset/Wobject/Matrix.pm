@@ -620,7 +620,7 @@ sub www_compare {
     my $self = shift;
     my $var = $self->get;
     my @listingIds = @_;
-    my @columnKeys;
+    my @responseFields;
 
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
@@ -664,13 +664,12 @@ sub www_compare {
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;
-        push(@columnKeys, $listingId_safe);
-        push(@columnKeys, $listingId_safe."_compareColor");
+        push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
     }
     
     $var->{javascript} = "<script type='text/javascript'>\n".
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
-        'var columnKeys = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @columnKeys).");\n".
+        'var responseFields = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
         "</script>";
 

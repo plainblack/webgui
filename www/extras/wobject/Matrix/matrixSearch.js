@@ -57,16 +57,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
     		for (var i = attributeSelects.length; i--; ) {
 			newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
         	}
-		var elements = myDataTable.getRecordSet().getRecords();
-		for(i=0; i<elements.length; i++){
-			elRow = myDataTable.getTrEl(elements[i]);
-			Dom.setStyle(elRow, "display", "none");
-		}
-		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
-		for (var i = compareCheckBoxes.length; i--; ) {
-			compareCheckBoxes[i].checked = false;
-    		}
-		myDataTable.getRecordSet().deleteRecord(0,elements.length);
+		myDataTable.getRecordSet().reset();
+		myDataTable.refreshView();
+		
 		myDataSource.sendRequest(newUri,callback2);
 		
     	}
