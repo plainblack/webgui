@@ -5,9 +5,17 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
             elCell.innerHTML = "<a href='" + oRecord.getData("url") + "' target='_blank'>" + sData + "</a>";
         };
+	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
+		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
+		if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
+			innerHTML = innerHTML + " checked='checked'";
+		}
+		innerHTML = innerHTML + " onchange='javascript:compareFormButton()' class='compareCheckBox'>";
+		elCell.innerHTML = innerHTML;
+	};
 
         var myColumnDefs = [
-	    {key:"checkBox",label:""},
+	    {key:"assetId",label:"",sortable:false, formatter:this.formatCheckBox},
             {key:"title", label:"Name", sortable:true, formatter:this.formatUrl},
             {key:"views", sortable:true},
             {key:"clicks", sortable:true},
@@ -26,7 +34,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","checkBox","checked","url"]
+            fields: ["title","views","clicks","compares","checked","url","assetId"]
         };
 
         var myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
@@ -55,7 +63,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		var attributeSelects = YAHOO.util.Dom.getElementsByClassName('attributeSelect','select');
 		var newUri = "func=getCompareFormData;search=1";
     		for (var i = attributeSelects.length; i--; ) {
-			newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
+			if(attributeSelects[i].value != 'blank'){
+				newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
+			}
         	}
 		myDataTable.getRecordSet().reset();
 		myDataTable.refreshView();

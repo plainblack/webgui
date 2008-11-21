@@ -3,9 +3,17 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
             elCell.innerHTML = "<a href='" + oRecord.getData("url") + "' target='_blank'>" + sData + "</a>";
         };
+	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
+		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
+		if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
+			innerHTML = innerHTML + " checked='checked'";
+		}
+		innerHTML = innerHTML + " onchange='javascript:compareFormButton()' class='compareCheckBox'>";
+		elCell.innerHTML = innerHTML;
+	};
 
         var myColumnDefs = [
-	    {key:"checkBox",label:"",sortable:false},
+	    {key:"assetId",label:"",sortable:false, formatter:this.formatCheckBox},
             {key:"title", label:"Name", sortable:true, formatter:this.formatUrl},
             {key:"views", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
             {key:"clicks", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
@@ -25,7 +33,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","checkBox","checked","lastUpdated","url"]
+            fields: ["title","views","clicks","compares","checked","lastUpdated","url","assetId"]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
@@ -66,18 +74,31 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		window.document.forms['doCompare'].submit();
         },this,true);
 
+	window.compareDataTable = this.myDataTable;
+
 	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
+		var checkedCompareBoxes = new Object();
 		for (var i = compareCheckBoxes.length; i--; ) {
 			if(compareCheckBoxes[i].checked){	
 				checked++;
+				checkedCompareBoxes[compareCheckBoxes[i].value] = true;
 			}
     		}
 		if (checked > 1 && checked < maxComparisons){
 			btnCompare.set("disabled",false);
 		}else{
 			btnCompare.set("disabled",true);
+		}
+		var elements = window.compareDataTable.getRecordSet().getRecords();
+		for(j=0; j<elements.length; j++){
+			var assetId = elements[j].getData('assetId');
+			if(assetId in checkedCompareBoxes){
+				elements[j].setData('checked','checked');
+			}else{
+				elements[j].setData('checked',null);
+			}
 		}
 	}
     };

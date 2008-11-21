@@ -932,11 +932,13 @@ assetData.revisionDate
                         ",[$attributeId,$result->{assetId}]);
                         $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
                         if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
-                            undef $result->{checked};
+                            #undef $result->{checked};
+                            $result->{checked} = '';
                             last;
                         }
                         elsif(($fieldType ne 'MatrixCompare') && ($form->process($param) ne $listingValue)){
-                            undef $result->{checked};
+                            #undef $result->{checked};
+                            $result->{checked} = '';
                             last;
                         }
                         else{
@@ -954,12 +956,12 @@ assetData.revisionDate
             }
             $result->{assetId}  =~ s/-/_____/g;
             $result->{url}      = "/".$result->{url};
-            $result->{checkBox} = "<input type='checkbox' name='listingId' value='".$result->{assetId}
-                                    ."' id='".$result->{assetId}."_checkBox' ";
-            if($result->{checked}){
-                $result->{checkBox} .= " checked='checked'";
-            }
-            $result->{checkBox} .= " onChange='javascript:compareFormButton()' class='compareCheckBox'>";
+            #$result->{checkBox} = "<input type='checkbox' name='listingId' value='".$result->{assetId}
+            #                        ."' id='".$result->{assetId}."_checkBox' ";
+            #if($result->{checked}){
+            #    $result->{checkBox} .= " checked='checked'";
+            #}
+            #$result->{checkBox} .= " onChange='javascript:compareFormButton()' class='compareCheckBox'>";
     }
 
     my $jsonOutput;
@@ -1118,6 +1120,7 @@ sub www_search {
             $attribute->{extras} = " class='attributeSelect'";
             if($attribute->{fieldType} eq 'Combo'){    
                 $attribute->{fieldType} = 'SelectBox';
+                $attribute->{options} = "blank\n".$attribute->{options};
             }
             $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
             push(@attribute_loop,$attribute);
