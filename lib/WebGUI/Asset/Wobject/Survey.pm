@@ -588,7 +588,7 @@ sub www_takeSurvey {
         }
     };
 
-    return $self->session->style->process($out,$self->getValue("styleTemplateId"));
+    return $self->session->style->process($out,$self->get("styleTemplateId"));
 }
 
 #handles questions that were submitted

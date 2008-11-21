@@ -52,7 +52,7 @@ Survey.Form = new function() {
                 span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                 span.style.display = 'block';
             
-                document.getElementById('header').appendChild(span);
+                document.getElementById('survey-header').appendChild(span);
                 YAHOO.util.Event.addListener("showQuestionsButton", "click", 
                     function(){ 
                         document.getElementById('showQuestionsButton').style.display = 'none';

@@ -442,6 +442,7 @@ sub _addSurveyTables{
     $session->db->write("
 CREATE TABLE `Survey` (
   `groupToTakeSurvey` char(22) character set utf8 collate utf8_bin NOT NULL default '2',
+  `groupToEditSurvey` char(22) character set utf8 collate utf8_bin NOT NULL default '3',
   `groupToViewReports` char(22) character set utf8 collate utf8_bin NOT NULL default '3',
   `responseTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL,
   `overviewTemplateId` char(22) character set utf8 collate utf8_bin NOT NULL,
