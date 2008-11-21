@@ -42,6 +42,7 @@
  - fixed #8822: Password Recovery Tempalte not working
  - fixed: WebGUI::User now actually checks whether the friends group exists
    (Martin Kamerbeek / Oqapi)
+ - fixed #9039: Synopsis not output as a meta field
 
 7.6.3
  - improved performance of file uploads

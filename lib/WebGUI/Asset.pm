@@ -1956,6 +1956,12 @@ sub prepareView {
             content => join(',', @keywords),
             }); 
     }
+    if ($self->get('synopsis')) {
+        $style->setMeta({
+                name    => 'Description',
+                content => $self->get('synopsis'),
+        });
+    }
 	$style->setRawHeadTags($self->getExtraHeadTags);
 }
 
