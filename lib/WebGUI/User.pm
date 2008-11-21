@@ -1161,7 +1161,7 @@ sub validateProfileDataFromForm {
     my $session     = $self->session;
 	my $fields      = shift;
 
-    my $i18n        = my $i18n = WebGUI::International->new($session);
+    my $i18n        = WebGUI::International->new($session);
 
     my $data        = {};
     my $errors      = [];
