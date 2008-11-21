@@ -16,6 +16,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Search;
+use WebGUI::Macro;
 
 =head1 NAME
 
@@ -173,7 +174,7 @@ sub view {
 			push(@results, {
 				url         => $url,
 				title       => $data->{title},
-				synopsis    => $data->{synopsis},
+				synopsis    => WebGUI::Macro::process($self->session, \$data->{synopsis}),
 				assetId     => $data->{assetId},
 				});
              $var{results_found} = 1;
