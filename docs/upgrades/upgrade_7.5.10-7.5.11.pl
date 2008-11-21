@@ -1198,7 +1198,7 @@ sub mergeProductsWithCommerce {
         my $sku = $productFolder->addChild({
             className   => 'WebGUI::Asset::Sku::Product',
             title       => $productData->{title},
-            url         => $productData->{title},
+            url         => $productData->{title} || $productData->{description},
             sku         => $productData->{sku},
             description => $productData->{description},
         }, $productData->{productId});

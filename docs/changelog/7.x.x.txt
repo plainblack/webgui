@@ -1,4 +1,5 @@
 7.5.35
+ - fixed #8879: SEO Flaw in New Shop System
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
