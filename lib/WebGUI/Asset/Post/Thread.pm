@@ -249,6 +249,12 @@ sub getArchiveUrl {
 }
 
 #-------------------------------------------------------------------
+sub getAutoCommitWorkflowId {
+	my $self = shift;
+	return $self->getThread->getParent->get("threadApprovalWorkflow");
+}
+
+#-------------------------------------------------------------------
 sub getLastPost {
 	my $self = shift;
 	my $lastPostId = $self->get("lastPostId");
