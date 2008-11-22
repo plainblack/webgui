@@ -251,6 +251,15 @@ sub definition {
 		namespace=>"Inbox/SendPrivateMessage",
 		defaultValue=>$setting->get("sendPrivateMessageTemplateId"),
 		});    
+    push(@fields, {
+		tab=>"messaging",
+		fieldType=>"template",
+		name=>"sendUserInviteTemplateId",
+		label=>$i18n->get('send user invite template'),
+		hoverHelp=>$i18n->get('send user invite template description'),
+		namespace=>"userInvite",
+		defaultValue=>$setting->get("sendUserInviteTemplateId"),
+		});    
 	push(@fields, {
 		tab=>"messaging",
 		fieldType=>"text",

@@ -3709,6 +3709,16 @@ LongTruncOk=1</p>
 		lastUpdated => 1181019679,
 	},
 
+    'send user invite template' => {
+		message => q|Send User Invite Template|,
+		lastUpdated => 1227336127,
+	},
+
+    'send user invite template description' => {
+		message => q|Choose a template for sending invitations to users to visit and/or join the site.|,
+		lastUpdated => 1227336125,
+	},
+
     'editSettings error occurred' => {
         message     => q{The following errors occurred while trying to save settings.},
         lastUpdated => 0,

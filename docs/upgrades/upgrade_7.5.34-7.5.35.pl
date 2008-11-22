@@ -29,9 +29,20 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addUserInviteTemplateSetting($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addUserInviteTemplateSetting {
+    my $session = shift;
+    print "\tAdd a new setting for customized User Invite templates... " unless $quiet;
+    $session->setting->add('sendUserInviteTemplateId','PBtmpl00000userInvite1');
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
