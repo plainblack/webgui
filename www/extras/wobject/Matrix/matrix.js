@@ -43,25 +43,29 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(3)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(4)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(5)); 
-	
+
 	var btnSortByViews = new YAHOO.widget.Button("sortByViews");
         btnSortByViews.on("click", function(e) {
-	    this.myDataTable.sortColumn(this.myDataTable.getColumn(2)); 
+		this.myDataTable.sortColumn(this.myDataTable.getColumn(2)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=views");
         },this,true);
 
 	var btnSortByClicks = new YAHOO.widget.Button("sortByClicks");
         btnSortByClicks.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(3)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=clicks");
         },this,true);
 
 	var btnSortByCompares = new YAHOO.widget.Button("sortByCompares");
         btnSortByCompares.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(4)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=compares");
         },this,true);
 
 	var btnSortByUpdated = new YAHOO.widget.Button("sortByUpdated");
         btnSortByUpdated.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(5)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=lastUpdated");
         },this,true);
 
         var myCallback = function() {

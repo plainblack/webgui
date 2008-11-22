@@ -4,23 +4,39 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	var hideStickies = 0;
 
 	this.formatStickied = function(elCell, oRecord, oColumn, sData) {
-            	elCell.innerHTML = "<input type='checkBox' class='stickieCheckbox' id='" + oRecord.getData("attributeId") + "_stickied'>";
+		if(oRecord.getData("fieldType") != 'category'){
+            		var innerHTML = "<input type='checkBox' class='stickieCheckbox' id='" + oRecord.getData("attributeId") + "_stickied' name='" + oRecord.getData("attributeId") + "' onChange='setStickied(this)'";
+			if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
+				innerHTML = innerHTML + " checked='checked'";
+			}
+			innerHTML = innerHTML + ">";
+			elCell.innerHTML = innerHTML;
+		}
         };
 
 	this.formatColors = function(elCell, oRecord, oColumn, sData) {
-		var colorField = oColumn.key + "_compareColor";
-		var color = oRecord.getData(colorField);
-		if(color){
-			Dom.setStyle(elCell.parentNode, "background-color", color);
+		if(oRecord.getData("fieldType") != 'category'){
+			var colorField = oColumn.key + "_compareColor";
+			var color = oRecord.getData(colorField);
+			if(color){
+				Dom.setStyle(elCell.parentNode, "background-color", color);
+			}
+			elCell.innerHTML = sData;
 		}
-            	elCell.innerHTML = sData;
+        };
+	this.formatLabel = function(elCell, oRecord, oColumn, sData) {
+		if(oRecord.getData("fieldType") == 'category'){
+            		elCell.innerHTML = "<b>" +sData + "</b>";
+		}else{
+			elCell.innerHTML = sData;
+		}
         };
 
 	YAHOO.widget.DataTable.Formatter.formatColors = this.formatColors; 
 
         var myColumnDefs = [
-            	{key:"stickied",formatter:this.formatStickied},
-		{key:"name"}
+            	{key:"stickied",formatter:this.formatStickied,label:""},
+		{key:"name",formatter:this.formatLabel,label:""}
         ];
 
         this.myDataSource = new YAHOO.util.DataSource("?");
@@ -106,22 +122,26 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(hideStickies == 0){
 			// hide non-selected attributes
 			for(i=0; i<elements.length; i++){
-				var attributeId = elements[i].getData('attributeId');
-				var checkBox = Dom.get(attributeId+"_stickied");
-				if (checkBox.checked == false){
-					elRow = myDataTable.getTrEl(elements[i]);
-					Dom.setStyle(elRow, "display", "none");
+				if(elements[i].getData('fieldType') != 'category'){
+					var attributeId = elements[i].getData('attributeId');
+					var checkBox = Dom.get(attributeId+"_stickied");
+					if (checkBox.checked == false){
+						elRow = myDataTable.getTrEl(elements[i]);
+						Dom.setStyle(elRow, "display", "none");
+					}
 				}
 			}
 			hideStickies = 1;
 		}else{
 			// show all attributes
 			for(i=0; i<elements.length; i++){
-				var attributeId = elements[i].getData('attributeId');
-				var checkBox = Dom.get(attributeId+"_stickied");
-				if (checkBox.checked == false){
-					elRow = myDataTable.getTrEl(elements[i]);
-					Dom.setStyle(elRow, "display", "table-row");
+				if(elements[i].getData('fieldType') != 'category'){
+					var attributeId = elements[i].getData('attributeId');
+					var checkBox = Dom.get(attributeId+"_stickied");
+					if (checkBox.checked == false){
+						elRow = myDataTable.getTrEl(elements[i]);
+						Dom.setStyle(elRow, "display", "table-row");
+					}
 				}
 			}
 			hideStickies = 0;
@@ -130,6 +150,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
     };
 });
+
+function setStickied (checkbox) {
+	if(checkbox.checked == true){
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setStickied;attributeId="+checkbox.name);
+	}else{
+		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=deleteStickied;attributeId="+checkbox.name);
+	}
+	
+}
 
 
 

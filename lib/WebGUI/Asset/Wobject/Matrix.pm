@@ -669,7 +669,7 @@ sub www_compare {
     
     $var->{javascript} = "<script type='text/javascript'>\n".
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
-        'var responseFields = new Array("attributeId", "name", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
+        'var responseFields = new Array("attributeId", "name", "fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
         "</script>";
 
@@ -692,6 +692,24 @@ sub www_deleteAttribute {
     $self->deleteAttribute($attributeId);
 
     return $self->www_listAttributes;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteStickied  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_deleteStickied {
+
+    my $self = shift;
+
+    if(my $attributeId = $self->session->form->process("attributeId")){
+        $self->session->scratch->delete('stickied_'.$attributeId);
+    }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -878,7 +896,12 @@ sub www_getCompareFormData {
     my $self            = shift;
     my $session         = $self->session;
     my $form            = $session->form;
+    my $sort            = $session->scratch->get('sort') || $self->get('defaultSort');
     my $sortDirection   = ' asc';
+
+    if ( WebGUI::Utility::isIn($sort),qw(revisionDate score)) {
+        $sortDirection = " desc";
+    }
 
     my @results;
     my @listingIds = $self->session->form->checkList("listingId");
@@ -914,7 +937,7 @@ assetData.revisionDate
             and status='approved'
         group by
             assetData.assetId
-        order by ".$self->get('defaultSort').$sortDirection;
+        order by ".$sort.$sortDirection;
 
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
     foreach my $result (@results){
@@ -988,7 +1011,7 @@ sub www_getCompareListData {
 
     my $session = $self->session;
     my (@results,$results,@columnDefs);
-    my $sortDirection = ' asc';
+    #my $sortDirection = ' asc';
 
     foreach my $listingId (@listingIds){
         $listingId =~ s/_____/-/g;
@@ -1003,6 +1026,7 @@ sub www_getCompareListData {
     $jsonOutput->{ColumnDefs} = \@columnDefs;
 
     foreach my $category (keys %{$self->getCategories}) {
+        push(@results,{name=>$category,fieldType=>'category'});
         my $fields = " a.name, a.fieldType, a.attributeId ";
         my $from = "from Matrix_attribute a";
         my $tableCount = "b";
@@ -1020,8 +1044,9 @@ sub www_getCompareListData {
         ) });
     }
     foreach my $result (@results){
+        unless($result->{fieldType} eq 'category'){
         foreach my $listingId (@listingIds) {
-            $result->{attributId} =~ s/-/_____/g;
+            $result->{attributeId} =~ s/-/_____/g;
             my $listingId_safe = $listingId;
             $listingId_safe =~ s/-/_____/g;
             if ($result->{fieldType} eq 'MatrixCompare'){
@@ -1030,6 +1055,14 @@ sub www_getCompareListData {
                 $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
                     { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
             }
+            if($session->scratch->get('stickied_'.$result->{attributeId})){
+                $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
+                $result->{checked} = 'checked';
+            }
+            else{
+                $result->{checked} = '';
+            }
+        }
         }
     }
 
@@ -1135,6 +1168,40 @@ sub www_search {
     return $self->processStyle($self->processTemplate($var,$self->get("searchTemplateId")));
 }
 
+#-------------------------------------------------------------------
 
+=head2 www_setSort  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_setSort {
+
+    my $self = shift;
+
+    if(my $sort = $self->session->form->process("sort")){
+        $self->session->scratch->set('sort',$sort);
+    }        
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_setStickied  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_setStickied {
+
+    my $self = shift;
+
+    if(my $attributeId = $self->session->form->process("attributeId")){
+        $self->session->scratch->set('stickied_'.$attributeId,1);
+    }     
+    return undef;
+}
 
 1;

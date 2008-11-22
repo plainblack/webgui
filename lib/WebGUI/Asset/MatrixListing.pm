@@ -719,6 +719,21 @@ sub www_click {
 
 #-------------------------------------------------------------------
 
+=head2 www_deleteStickied  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_deleteStickied {
+
+    my $self = shift;
+    $self->getParent->www_deleteStickied();
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_edit ( )
 
 Web facing method which is the default edit page
@@ -757,9 +772,9 @@ sub www_getAttributes {
     my @results;
     my @categories  = keys %{$self->getParent->getCategories};
     foreach my $category (@categories) {
+        push(@results,{label=>$category,fieldType=>'category'});
         my $attributes;
         my @attribute_loop;
-        #my $categoryLoopName = $self->session->url->urlize($category)."_loop";
         $attributes = $db->read("select * from Matrix_attribute as a
             left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
             where category =? and a.assetId = ?",
@@ -770,13 +785,14 @@ sub www_getAttributes {
             if ($attribute->{fieldType} eq 'MatrixCompare'){
                 $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
             }
+            if($session->scratch->get('stickied_'.$attribute->{attributeId})){
+                $attribute->{checked} = 'checked';
+            }
+            else{
+                $attribute->{checked} = '';
+            }
             push(@results,$attribute);
         }
-        #$var->{$categoryLoopName} = \@attribute_loop;
-        #push(@{$var->{category_loop}},{
-        #    categoryLabel   => $category,
-        #    attribute_loop  => \@attribute_loop,
-        #});
     }
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
@@ -964,7 +980,20 @@ sub www_sendEmail {
     $self->prepareView;
     return $self->view(0,1);
 }
+#-------------------------------------------------------------------
 
+=head2 www_setStickied  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_setStickied {
+
+    my $self = shift;
+    $self->getParent->www_setStickied();
+    return undef;
+}
 #-------------------------------------------------------------------
 
 =head2 www_view ( )
