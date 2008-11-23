@@ -592,19 +592,21 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
     my %rating;
     tie %rating, 'Tie::IxHash';
     %rating = (
-        1=>"1 - Worst",
+        1=>"1 - ".$i18n->get('worst label'),
                 2=>2,
                 3=>3,
                 4=>4,
-                5=>"5 - Respectable",
+                5=>"5 - ".$i18n->get('respectable label'),
                 6=>6,
                 7=>7,
                 8=>8,
                 9=>9,
-                10=>"10 - Best"
+                10=>"10 - ".$i18n->get('best label')
         );
     my $ratingsTable = "<table class='ratingForm'><tbody>\n
-        <tr><th></th><th>Mean</th><th>Median</th><th>Count</th></tr>\n";
+        <tr><th></th><th>".$i18n->get('mean label')."</th>
+        <th>".$i18n->get('median label')."</th>
+        <th>".$i18n->get('count label')."</th></tr>\n";
 
     my $ratingForm = WebGUI::HTMLForm->new($self->session,
         -extras     =>'class="content"',
