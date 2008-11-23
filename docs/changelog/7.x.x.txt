@@ -11,6 +11,7 @@
  - fixed #8927: Collaboration System: Thread approval workflow setting ignore
  - fixed #8827: Slider JS bug for non-numeric values (Patrick Donelan, SDH Consulting)
  - fixed #8801: invite a friend
+ - fixed #8925: Collaboration System: Label missing
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
