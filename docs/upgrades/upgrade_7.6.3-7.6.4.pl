@@ -331,11 +331,11 @@ sub migrateSurvey{
 
         #move over survey
         $session->db->write("insert into Survey
-            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [
                 $$survey{groupToTakeSurvey},$$survey{groupToViewReports},'PBtmpl0000000000000064','PBtmpl0000000000000063',$$survey{maxResponsesPerUser},
                 $$survey{gradebookTemplateId},$$survey{assetId},'PBtmpl0000000000000061',$$survey{revisionDate},'GRUNFctldUgop-qRLuo_DA','AjhlNO3wZvN5k4i4qioWcg',
-                'wAc4azJViVTpo-2NYOXWvg', '1oBRscNIcFOI-pETrCOspA','d8jMMMRddSQ7twP4l1ZSIw','CxMpE_UPauZA3p8jdrOABw','','{}'
+                'wAc4azJViVTpo-2NYOXWvg', '1oBRscNIcFOI-pETrCOspA','d8jMMMRddSQ7twP4l1ZSIw','CxMpE_UPauZA3p8jdrOABw','','{}',0
             ]
         );
 
@@ -459,6 +459,7 @@ CREATE TABLE `Survey` (
   `surveyQuestionsId` char(22) default NULL,
   `exitURL` varchar(512) default NULL,
   `surveyJSON` longblob,
+  `timeLimit` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 "); 

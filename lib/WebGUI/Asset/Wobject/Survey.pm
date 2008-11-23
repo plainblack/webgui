@@ -39,6 +39,12 @@ sub definition {
             hoverHelp    => "A Survey System",
             label        => "Template ID"
         },
+        timeLimit => { fieldType => 'integer',
+            defaultValue => 0,
+            tab => 'properties',
+            hoverHelp => $i18n->get('timelimit hoverHelp'),
+            label => $i18n->get('timelimit') 
+        },
         groupToEditSurvey => {
             fieldType    => 'group',
             defaultValue => 4,
