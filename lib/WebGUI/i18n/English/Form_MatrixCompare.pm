@@ -2,6 +2,11 @@ package WebGUI::i18n::English::Form_MatrixCompare;
 use strict;
 
 our $I18N = { 
+    'topicName' => {
+        message     => q|Matrix Compare|,
+        lastUpdated => 0,
+    },
+
 	'no' => {
 		message     => q|No|,
 		lastUpdated => 0,

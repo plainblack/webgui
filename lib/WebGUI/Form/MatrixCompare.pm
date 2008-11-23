@@ -79,7 +79,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		label=>{
-			defaultValue=>$i18n->get("matrix compare","WebGUI")
+			defaultValue=>$i18n->get("matrix compare","Form_MatrixCompare")
 			},
         });
 	return $class->SUPER::definition($session, $definition);
@@ -95,7 +95,7 @@ Returns the human readable name of this control.
 
 sub getName {
     my ($self, $session) = @_;
-    return WebGUI::International->new($session, 'WebGUI')->get('matrix compare');
+    return WebGUI::International->new($session, 'Form_MatrixCompare')->get('topicName');
 }
 
 #-------------------------------------------------------------------

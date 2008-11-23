@@ -7,10 +7,6 @@ our $HELP = {
         title     => 'search template help title',
         body      => '',
         variables => [
-            { 'name' => 'compare.form', },
-            { 'name' => 'form.header' },
-            { 'name' => 'form.footer' },
-            { 'name' => 'form.submit' },
             {   'name'      => 'CATEGORY_NAME_loop',
                 'variables' => [
                     {   'name'        => 'name',
@@ -31,9 +27,6 @@ our $HELP = {
             {   tag       => 'compare template',
                 namespace => 'Asset_Matrix'
             },
-            {   tag       => 'ratings detail template',
-                namespace => 'Asset_Matrix'
-            },
             {   tag       => 'main template',
                 namespace => 'Asset_Matrix'
             },
@@ -49,16 +42,6 @@ our $HELP = {
         variables => [
             { 'name' => 'isTooMany' },
             { 'name' => 'isTooFew' },
-            { 'name' => 'compare.form' },
-            {   'name'      => 'product_loop',
-                'variables' => [
-                    { 'name' => 'name' },
-                    { 'name' => 'version' },
-                    {   'name'        => 'url',
-                        'description' => 'details url'
-                    }
-                ]
-            },
             {   'name'      => 'lastupdated_loop',
                 'variables' => [ { 'name' => 'lastUpdated' } ]
             },
@@ -67,73 +50,11 @@ our $HELP = {
                     {   'name'        => 'category',
                         'description' => 'tmplVar category'
                     },
-                    { 'name' => 'columnCount' },
-                    {   'name'      => 'row_loop',
-                        'variables' => [
-                            {   'name'      => 'column_loop',
-                                'variables' => [
-                                    { 'name' => 'value' },
-                                    { 'name' => 'class' },
-                                    {   'name'        => 'description',
-                                        'description' => 'tmplVar field.description'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
                 ]
             }
         ],
         related => [
             {   tag       => 'search template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'ratings detail template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'main template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'listing detail template',
-                namespace => 'Asset_Matrix'
-            },
-        ],
-    },
-
-    'ratings detail template' => {
-        title     => 'ratings detail template help title',
-        body      => '',
-        variables => [
-            {   'name'      => 'rating_loop',
-                'variables' => [
-                    { 'name' => 'category', },
-                    {   'name'      => 'detail_loop',
-                        'variables' => [
-                            {   'name'        => 'url',
-                                'description' => 'tmplVar detail url'
-                            },
-                            {   'name'        => 'mean',
-                                'description' => 'detail mean'
-                            },
-                            {   'name'        => 'median',
-                                'description' => 'detail median'
-                            },
-                            {   'name'        => 'count',
-                                'description' => 'detail count'
-                            },
-                            {   'name'        => 'name',
-                                'description' => 'listing name'
-                            }
-                        ]
-                    }
-                ]
-            }
-        ],
-        related => [
-            {   tag       => 'search template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'compare template',
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'main template',
@@ -201,11 +122,6 @@ our $HELP = {
                     }
                 ]
             },
-            { 'name' => 'ratings.details.url' },
-            { 'name' => 'best.posts.url' },
-            { 'name' => 'bestUpdated_url' },
-            { 'name' => 'bestUpdated_date' },
-            { 'name' => 'bestUpdated_name' },
             {   'name'      => 'last_update_loop',
                 'variables' => [
                     {   'name'        => 'url',
@@ -219,16 +135,14 @@ our $HELP = {
                     }
                 ]
             },
-            { 'name' => 'user.count' },
-            { 'name' => 'current.user.count' },
             { 'name' => 'listingCount' },
-            {   'name'      => 'pending_list',
+            {   'name'      => 'pending_loop',
                 'variables' => [
                     {   'name'        => 'url',
                         'description' => 'tmplVar pending.url'
                     },
-                    {   'name'        => 'productName',
-                        'description' => 'tmplVar pending.productName'
+                    {   'name'        => 'name',
+                        'description' => 'tmplVar pending.name'
                     }
                 ]
             }
@@ -238,9 +152,6 @@ our $HELP = {
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'compare template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'ratings detail template',
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'listing detail template',
@@ -258,13 +169,8 @@ our $HELP = {
                 'description' => 'tmplVar screenshot'
             },
             { 'name' => 'thumbnail' },
-            { 'name' => 'email.form' },
-            { 'name' => 'email.wasSent' },
-            { 'name' => 'edit.url' },
-            { 'name' => 'user.canEdit' },
-            { 'name' => 'user.canApprove' },
-            { 'name' => 'approve.url' },
-            { 'name' => 'delete.url' },
+            { 'name' => 'emailForm' },
+            { 'name' => 'emailSent' },
             { 'name' => 'isPending' },
             { 'name' => 'lastUpdated_epoch' },
             { 'name' => 'lastUpdated_date' },
@@ -274,10 +180,10 @@ our $HELP = {
             },
             { 'name' => 'productName' },
             { 'name' => 'productUrl' },
-            { 'name' => 'productUrl.click' },
+            { 'name' => 'productUrl_click' },
             { 'name' => 'manufacturerName' },
             { 'name' => 'manufacturerUrl' },
-            { 'name' => 'manufacturerUrl.click' },
+            { 'name' => 'manufacturerUrl_click' },
             { 'name' => 'versionNumber' },
             { 'name' => 'views' },
             { 'name' => 'compares' },
@@ -307,9 +213,6 @@ our $HELP = {
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'compare template',
-                namespace => 'Asset_Matrix'
-            },
-            {   tag       => 'ratings detail template',
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'main template',
