@@ -86,6 +86,14 @@ sub freeze {
     return encode_json( \%temp );
 }
 
+#Hash the survey timed out?
+
+sub hasTimedOut{
+    my $self=shift;
+    return 1 if($self->{startTime} + ($self->{timeLimit} * 60) < time());
+    return 0;
+}
+
 #the index of the last surveyOrder entry shown
 sub lastResponse {
     my $self = shift;

@@ -674,6 +674,9 @@ sub www_loadQuestions {
     if ( !$responseId ) {
         return $self->surveyEnd();
     }
+    if($self->response->hasTimedOut()){
+        return $self->surveyEnd();
+    }
 
     return $self->surveyEnd() if ( $self->response->surveyEnd() );
 
@@ -700,7 +703,7 @@ sub surveyEnd {
         "Survey_response",
         "Survey_responseId", {
             Survey_responseId => $responseId,
-            endDate           => WebGUI::DateTime->now->toDatabase,
+            endDate           => time(),#WebGUI::DateTime->now->toDatabase,
             isComplete        => 1
         }
     );
@@ -880,6 +883,7 @@ sub getResponseId {
         }
 
         if ( $haveTaken < $allowedTakes ) {
+            my $time = time();
             $responseId = $self->session->db->setRow(
                 "Survey_response",
                 "Survey_responseId", {
@@ -887,8 +891,8 @@ sub getResponseId {
                     userId            => $id,
                     ipAddress         => $ip,
                     username          => $self->session->user->username,
-                    startDate         => WebGUI::DateTime->now->toDatabase,
-                    endDate           => WebGUI::DateTime->now->toDatabase,
+                    startDate         => $time,#WebGUI::DateTime->now->toDatabase,
+                    endDate           => 0,#WebGUI::DateTime->now->toDatabase,
                     assetId           => $self->getId(),
                     anonId            => $anonId
                 }
@@ -896,7 +900,10 @@ sub getResponseId {
             $self->loadBothJSON($responseId);
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
+            $self->response->{startTime} = $time;
+            $self->response->{timeLimit} = $self->get("timeLimit");
             $self->saveResponseJSON();
+            
         } ## end if ( $haveTaken < $allowedTakes)
         else {
         }
@@ -1035,7 +1042,7 @@ sub loadTempReportTable {
 
 sub log {
     my $self = shift;
-    $self->session->log->debug(shift);
+    $self->session->log->error(shift);
 }
 
 1;
