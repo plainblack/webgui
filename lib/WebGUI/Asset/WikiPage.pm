@@ -346,6 +346,7 @@ sub view {
 		editContent         => $self->getEditForm,
         allowsAttachments   => $self->getWiki->get("allowAttachments"),
 		comments			=> $self->getFormattedComments(),
+        canEdit             => $self->canEdit,
 		content             => $self->getWiki->autolinkHtml(
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
