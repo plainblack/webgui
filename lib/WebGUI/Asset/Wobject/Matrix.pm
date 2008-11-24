@@ -1,6 +1,7 @@
 package WebGUI::Asset::Wobject::Matrix;
 
-$VERSION = "2.0.0";
+use strict;
+our $VERSION = "2.0.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
@@ -12,7 +13,6 @@ $VERSION = "2.0.0";
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use strict;
 use Tie::IxHash;
 use JSON;
 use WebGUI::International;
@@ -485,7 +485,7 @@ sub view {
             returnObjects       => 1,   
         }) };   
     $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
-    $var->{bestCompares_count}      = $bestCompares_listing->get('views');
+    $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
     $var->{bestCompares_name}       = $bestCompares_listing->get('title');
     $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
 
@@ -498,7 +498,7 @@ sub view {
             returnObjects       => 1,   
         }) };   
     $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
-    $var->{bestClicks_count}        = $bestClicks_listing->get('views');
+    $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
     $var->{bestClicks_name}         = $bestClicks_listing->get('title');
     $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
 

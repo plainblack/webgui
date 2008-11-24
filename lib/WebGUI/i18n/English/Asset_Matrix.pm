@@ -183,6 +183,83 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'listing statistics label' => {
+        message => q|Listing Statistics|,
+        lastUpdated => 0,
+    },
+
+    'most clicks label' => {
+        message => q|Most clicks|,
+        lastUpdated => 0,
+    },
+
+    'most views label' => {
+        message => q|Most views|,
+        lastUpdated => 0,
+    },
+
+    'most compares label' => {
+        message => q|Most compares|,
+        lastUpdated => 0,
+    },
+
+    'most recently updated label' => {
+        message => q|Most recently updated|,
+        lastUpdated => 0,
+    },
+
+    'best rated label' => {
+        message => q|Best Rated By Users|,
+        lastUpdated => 0,
+    },
+
+    'worst rated label' => {
+        message => q|Worst Rated by Users|,
+        lastUpdated => 0,
+    },
+
+    'site statistics label' => {
+        message => q|Site Statistics|,
+        lastUpdated => 0,
+    },
+
+    'listing count label' => {
+        message => q|Listing Count|,
+        lastUpdated => 0,
+    },
+
+    'pending listings label' => {
+        message => q|Pending Listings|,
+        lastUpdated => 0,
+    },
+
+    'add new listing label' => {
+        message => q|Click here to add a new listing.|,
+        lastUpdated => 0,
+    },
+
+    'add new listing text' => {
+        message => q|Please note that you will be the official maintainer of the listing, and will be responsible
+for keeping it up to date.|,
+        lastUpdated => 0,
+    },
+
+    'create account part1 text' => {
+        message => q|If you are the maker of a product, or are an expert user and are willing to maintain the
+listing,|,
+        lastUpdated => 0,
+    },
+
+    'create account label' => {
+        message => q|create an account|,
+        lastUpdated => 0,
+    },
+
+    'create account part2 text' => {
+        message => q|so you can register your listing.|,
+        lastUpdated => 0,
+    },
+
 	'isLoggedIn' => {
 		message => q|A condition indicating whether the current user is logged in to the site.|,
 		lastUpdated => 0,

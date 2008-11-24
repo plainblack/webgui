@@ -534,7 +534,8 @@ sub view {
     if ($var->{screenshots}) {
         my $file = WebGUI::Form::File->new($self->session,{ value=>$var->{screenshots} });
         my $storage = $file->getStorageLocation;
-        my @files = @{ $storage->getFiles } if (defined $storage);
+        my @files;
+        @files = @{ $storage->getFiles } if (defined $storage);
         
         $var->{screenshots} = qq|
 <script language="javascript">AC_FL_RunContent = 0;</script>
@@ -711,10 +712,10 @@ sub www_click {
 
     $self->incrementCounter('clicks');
     if ($session->form->process("manufacturer")) {
-        $session->http->setRedirect( $self->get('manufacturerUrl') );
+        $session->http->setRedirect( $self->get('manufacturerURL') );
     }
     else {
-        $session->http->setRedirect( $self->get('productUrl') );
+        $session->http->setRedirect( $self->get('productURL') );
     }
     return undef;
 }
@@ -826,7 +827,8 @@ sub www_getScreenshots {
         my $fileObject = WebGUI::Form::File->new($self->session,{ value=>$self->get('screenshots') });
         my $storage = $fileObject->getStorageLocation;
         my $path = $storage->getPath;
-        my @files = @{ $storage->getFiles } if (defined $storage);
+        my @files;
+        @files = @{ $storage->getFiles } if (defined $storage);
         foreach my $file (@files) {
         unless ($file =~ m/^thumb-/){
             my $thumb = 'thumb-'.$file;
