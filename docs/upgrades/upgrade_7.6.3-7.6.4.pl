@@ -529,7 +529,7 @@ sub addRecurringSubscriptionSwitch {
 
     $session->db->write('alter table Subscription add column recurringSubscription tinyint(1) not null default 1');
 
-    print "Done!\n";
+    print "Done!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
