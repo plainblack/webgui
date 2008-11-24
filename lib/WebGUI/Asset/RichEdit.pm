@@ -481,6 +481,7 @@ sub getRichEditor {
 		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
 		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
 		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
+        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
 		remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
 		nowrap => $self->getValue("nowrap") ? JSON::true() : JSON::false(),
 		directionality => $self->getValue("directionality"),
