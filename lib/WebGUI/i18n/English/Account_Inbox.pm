@@ -160,8 +160,8 @@ our $I18N = {
     },
 
     'invite user template label' => {
-        message     => q|Invite User Send Tempalte|,
-        lastUpdated => 1119068809
+        message     => q|Invite User Send Template|,
+        lastUpdated => 1227564609
     },
 
     'invite user template hoverHelp' => {
