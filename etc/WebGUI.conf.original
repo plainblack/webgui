@@ -725,6 +725,7 @@
     "CartItemCount"    : "CartItemCount",
     "c"                : "c_companyName", 
     "D"                : "D_date", 
+    "DeactivateAccount": "DeactivateAccount",
     "EditableToggle"   : "EditableToggle", 
     "e"                : "e_companyEmail", 
     "Extras"           : "Extras", 
