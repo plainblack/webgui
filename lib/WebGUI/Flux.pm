@@ -228,7 +228,7 @@ sub evaluateFor {
     my $class = shift;
     my %args = validate( @_, { user => { isa => 'WebGUI::User' }, fluxRuleId => 1, assetId => 0 } );
 
-    my $user = $args{user};
+    my $user    = $args{user};
     my $assetId = $args{assetId};
     my $session = $user->session();
 
@@ -314,6 +314,7 @@ sub getLinearProgression {
             user                 => { isa  => 'WebGUI::User' },
             skippableFluxRuleIds => { type => ARRAYREF, optional => 1 },
             adminAlwaysTrue => 0,
+            minimal         => 0,
         }
     );
 
@@ -323,15 +324,14 @@ sub getLinearProgression {
 
     my $user    = $args{user};
     my $session = $user->session;
-    
+
     my $force_true = $args{adminAlwaysTrue} && $user->isInGroup(3);
 
     my @results;
 
     # Find the last fluxRuleId that evaluates to true
     foreach my $fluxRuleId ( @{ $args{fluxRuleIds} } ) {
-
-        if ( $force_true ) {
+        if ($force_true) {
             $session->log->debug("Admin user, so $fluxRuleId forced to be true");
             push @results, { id => $fluxRuleId, success => 1 };
             next;
@@ -341,6 +341,11 @@ sub getLinearProgression {
             $session->log->debug("$fluxRuleId is a known sticky, no need to eval");
             push @results, { id => $fluxRuleId, success => 1 };
             next;
+        }
+
+        if ( $args{minimal} ) {
+            $session->log->debug("getLinearProgression wanted to eval $fluxRuleId but 'minimal' flag detected");
+            last;
         }
 
         $session->log->debug("Evaluating $fluxRuleId due to getLinearProgression search");

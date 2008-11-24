@@ -666,7 +666,7 @@ sub checkCombinedExpression {
 
     # Trim whitespace
     $combined_expression =~ s/^\s+|\s+$//g;
-    
+
     # Split combined expression up at whitespace and check tokens
     foreach my $token ( split /\s+/, $combined_expression ) {
 
@@ -787,7 +787,7 @@ sub _updateDataAndTriggerWorkflows {
     # Direct access?
     if ($is_access) {
         $db_write_required = 1;
-        
+
         if ($success) {
             $field_updates{dateAccessMostRecentlyTrue} = $dt;
             $trigger_workflow{AccessTrue}              = 1;
@@ -811,7 +811,7 @@ sub _updateDataAndTriggerWorkflows {
             $trigger_workflow{AccessFirstTrue}  = 1;
             $self->session->log->debug('Updating dateAccessFirstTrue');
         }
-        if ( !$success && !exists $userData{dateAccessFirstFalse}) {
+        if ( !$success && !exists $userData{dateAccessFirstFalse} ) {
             $field_updates{dateAccessFirstFalse} = $dt;
             $trigger_workflow{AccessFirstFalse}  = 1;
             $self->session->log->debug('Updating dateAccessFirstFalse');
@@ -827,16 +827,16 @@ sub _updateDataAndTriggerWorkflows {
     foreach my $w ( keys %trigger_workflow ) {
         my $full_workflow_name = 'on' . $w . 'WorkflowId';
         if ( my $workflowId = $self->get($full_workflow_name) ) {
-            $self->session->log->debug('Flux triggering $full_workflow_name');
-            my $workflow = WebGUI::Workflow::Instance->create(
+            $self->session->log->debug("Triggering $full_workflow_name ($workflowId)");
+            my $user_id = $evaluatingForUser{$id}->userId();
+            WebGUI::Workflow::Instance->create(
                 $self->session,
                 {   workflowId => $workflowId,
-                    className  => "WebGUI::User",
                     methodName => "new",
-                    parameters => $evaluatingForUser{$id}->userId(),
+                    className  => "WebGUI::User",
+                    parameters => $user_id,
                 }
-            );
-            $workflow->start();
+            )->start;
         }
     }
 }
