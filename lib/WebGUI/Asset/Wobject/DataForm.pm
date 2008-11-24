@@ -15,10 +15,8 @@ http://www.plainblack.com                     info@plainblack.com
 =cut
 
 use strict;
-use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::Form;
-use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Mail::Send;
@@ -26,13 +24,12 @@ use WebGUI::Macro;
 use WebGUI::Inbox;
 use WebGUI::SQL;
 use WebGUI::Asset::Wobject;
-use WebGUI::Utility qw(isIn);
 use WebGUI::Pluggable;
 use WebGUI::DateTime;
 use WebGUI::User;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
-use JSON;
+use JSON ();
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -1339,7 +1336,8 @@ sub www_editTabSave {
 #-------------------------------------------------------------------
 sub www_exportTab {
     my $self = shift;
-    return $self->session->privilege->insufficient
+    my $session = $self->session;
+    return $session->privilege->insufficient
         unless $self->canEdit;
     my @exportFields;
     for my $field ( map { $self->getFieldConfig($_) } @{$self->getFieldOrder} ) {
@@ -1356,7 +1354,10 @@ sub www_exportTab {
         'submissionDate',
         @exportFields,
     );
-    my $outText = $tsv->string;
+
+    $session->http->setFilename($self->get("url").".tab","text/plain");
+    $session->http->sendHeader;
+    $session->output->print($tsv->string, 1);
 
     my $entryIter = $self->entryClass->iterateAll($self);
 
@@ -1370,10 +1371,9 @@ sub www_exportTab {
             $entry->submissionDate->webguiDate,
             @{ $entryFields }{@exportFields},
         );
-        $outText .= $tsv->string;
+        $session->output->print($tsv->string, 1);
     }
-    $self->session->http->setFilename($self->get("url").".tab","text/plain");
-    return $outText;
+    return 'chunked';
 }
 
 #-------------------------------------------------------------------

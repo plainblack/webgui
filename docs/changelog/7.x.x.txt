@@ -55,6 +55,7 @@
  - fixed #8982: Deploy package doesn't take back to asset manager 
  - fixed #8956: Not checking for populated variable
  - fixed #9130: fixed: Rich editor creates root <p> tag even when set to use <br />
+ - fixed: DataForm times out when exporting large data sets
 
 7.6.3
  - improved performance of file uploads
