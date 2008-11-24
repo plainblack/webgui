@@ -97,21 +97,25 @@ sub get {
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
     my $cmd = "WebGUI::i18n::".$language."::".$namespace;
-    eval { WebGUI::Pluggable::load($cmd); };
-    if ($@) {
-        if ($language eq 'English') {
-            $session->log->error("Unable to load $cmd");
-            return '';
-        }
-        else {
-            my $output = $self->get($id, $namespace, 'English');
-            return $output;
-        }
-    }
     my $table = do {
         no strict 'refs';
         ${"$cmd\::I18N"};
     };
+    if (! $table) {
+        eval { WebGUI::Pluggable::load($cmd); };
+        if ($@) {
+            if ($language eq 'English') {
+                $session->log->error("Unable to load $cmd");
+                return '';
+            }
+            else {
+                my $output = $self->get($id, $namespace, 'English');
+                return $output;
+            }
+        }
+        no strict 'refs';
+        $table = ${"$cmd\::I18N"};
+    }
     my $output = $table->{$id}->{message};
     $output = $self->get($id, $namespace, "English")
         if ($output eq "" && $language ne "English");
