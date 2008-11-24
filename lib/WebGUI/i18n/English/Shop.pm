@@ -45,6 +45,12 @@ our $I18N = {
         context        => q|address book label|,
     },
 
+    'organization help' => {
+        message     => q|The name of an organization that uses this address.  Probably the place you work.|,
+        lastUpdated    => 1227495231,
+        context        => q|address book template variable hover help|,
+    },
+
     'email' => {
         message     => q|Email|,
         lastUpdated    => 0,
@@ -1490,6 +1496,30 @@ our $I18N = {
         message => q|Export Taxes|,
         lastUpdated => 1217125391,
         context => q|Label for the manage tax screen|,
+    },
+
+    'isCashier' => {
+        message => q|A boolean which is true if the current user can be a cashier inside the Shop.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posLookupForm' => {
+        message => q|A form where a cashier can lookup a user by email address.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posUsername' => {
+        message => q|The name of the user making the POS transaction.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posUserId' => {
+        message => q|The userId of the user making the POS transaction.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
     },
 
 };
