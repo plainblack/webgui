@@ -2,16 +2,6 @@ package WebGUI::i18n::English::Asset_Matrix;
 use strict;
 
 our $I18N = {
-	'isTooMany' => {
-		message => q|A condition indicating that the user has selected too many listings to compare. They may only compare Max Comparisons listings at a time.|,
-		lastUpdated => 1149783768,
-	},
-
-	'isTooFew' => {
-		message => q|A condition indicating that the user has selected too few listings to compare. They must compare at least two listings.|,
-		lastUpdated => 1149783768,
-	},
-
 	'product_loop' => {
 		message => q|A loop containing the product information (not contained in categories) for this listing.|,
 		lastUpdated => 1149783768,
@@ -123,6 +113,21 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+    'views label' => {
+        message => q|Views|,
+        lastUpdated => 0,
+    },
+
+    'compares label' => {
+        message => q|Compares|,
+        lastUpdated => 0,
+    },
+
+    'clicks label' => {
+        message => q|Clicks|,
+        lastUpdated => 0,
+    },
+
 	'ratings' => {
 		message => q|The ratings form (or results) for this listing.|,
 		lastUpdated => 1149784175,
@@ -168,20 +173,40 @@ our $I18N = {
                 message => q|Matrix Listing Detail Template Variables|
         },
 
-	'search.url' => {
+	'search_url' => {
 		message => q|The URL to the matrix search page.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
+
+    'search label' => {
+        message => q|Search|,
+        lastUpdated => 0,
+    },
 
 	'isLoggedIn' => {
 		message => q|A condition indicating whether the current user is logged in to the site.|,
-		lastUpdated => 1149795214,
+		lastUpdated => 0,
 	},
 
-	'field.list.url' => {
-		message => q|The URL to the page where you configure new fields for this matrix.|,
-		lastUpdated => 1149795214,
+	'listAttributes_url' => {
+		message => q|The URL to the page where you configure new listing attributes for this matrix.|,
+		lastUpdated => 0,
 	},
+
+    'list attributes label' => {
+        message => q|List Attributes|,
+        lastUpdated => 0,
+    },
+
+    'exportAttributes_url' => {
+        message => q|The URL to export the listing attributes for this matrix.|,
+        lastUpdated => 0,
+    },
+
+    'export attributes label' => {
+        message => q|Export Attributes|,
+        lastUpdated => 0,
+    },
 
 	'addMatrixListing_url' => {
 		message => q|The URL to the page where a user can add a new listing to the matrix.|,
@@ -398,10 +423,10 @@ our $I18N = {
 		lastUpdated => 1149996685,
 	},
 
-        'search template help title' => {
-                message => q|Matrix Search Template Variables|,
-                lastUpdated => 1184949060,
-        },
+    'search template help title' => {
+        message => q|Matrix Search Template Variables|,
+        lastUpdated => 1184949060,
+    },
 
 	'categories description' => {
                 message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
@@ -508,16 +533,17 @@ our $I18N = {
                 lastUpdated => 0,
         },
 
-        'search template description' => {
-                message => q|Select a template to be used to display the search engine interface.|,
-                lastUpdated => 0,
-        },
+    'search template description' => {
+        message => q|Select a template to be used to display the search engine interface.|,
+        lastUpdated => 0,
+    },
 
-        'compare template description' => {
-                message => q|Select a template to be used to show the listing comparison data.|,
-                lastUpdated => 0,
-        },
-	'categories label' => {
+    'compare template description' => {
+        message => q|Select a template to be used to show the listing comparison data.|,
+        lastUpdated => 0,
+    },
+	
+    'categories label' => {
 		message => q|Categories|,
 		lastUpdated => 0,
 	},
@@ -845,6 +871,20 @@ selectBox.</p>|
                 message => q|Select the category which this attribute falls into.|
         },
 
+    'comparison label' => {
+        lastUpdated => 0,
+        message => q|Comparison|,
+    },
+
+    'compare button label' => {
+        lastUpdated => 0,
+        message => q|Compare|,
+    },
+
+    'hide stickied button label' => {
+        lastUpdated => 0,
+        message => q|Hide/show stickied|,
+    },
 };
 
 1;

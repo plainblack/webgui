@@ -23,8 +23,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         var myColumnDefs = [
             	{key:"stickied",formatter:this.formatStickied,label:""},
-		{key:"label",formatter:this.formatLabel},
-		{key:"value"}
+		{key:"label",formatter:this.formatLabel,label:""},
+		{key:"value",label:""}
         ];
 
         this.myDataSource = new YAHOO.util.DataSource("?");

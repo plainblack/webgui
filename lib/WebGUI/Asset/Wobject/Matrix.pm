@@ -13,7 +13,6 @@ $VERSION = "2.0.0";
 #-------------------------------------------------------------------
 
 use strict;
-use warnings;
 use Tie::IxHash;
 use JSON;
 use WebGUI::International;
@@ -461,6 +460,7 @@ sub view {
     $var->{compareForm}             = $self->getCompareForm;
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
+    $var->{search_url}              = $self->getUrl('func=search');
 
     # Get the MatrixListing with the most views as an object using getLineage.
     my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {

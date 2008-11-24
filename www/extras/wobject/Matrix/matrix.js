@@ -14,7 +14,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         var myColumnDefs = [
 	    {key:"assetId",label:"",sortable:false, formatter:this.formatCheckBox},
-            {key:"title", label:"Name", sortable:true, formatter:this.formatUrl},
+            {key:"title", label:"", sortable:true, formatter:this.formatUrl},
             {key:"views", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
             {key:"clicks", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
             {key:"compares", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
