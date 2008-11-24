@@ -286,7 +286,12 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
-	return "";
+	if ($self->session->form->param("proceed") eq "manageAssets") {
+		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
+	} else {
+		$self->session->http->setRedirect($self->getUrl());
+	}
+	return undef;
 }
 
 #-------------------------------------------------------------------

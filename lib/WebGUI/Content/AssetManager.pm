@@ -490,7 +490,7 @@ ENDHTML
     $output .= '<div class="functionPane"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
     foreach my $asset (@{$currentAsset->getPackageList}) {
             $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p>
-                    <a href="'.$currentAsset->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
+                    <a href="'.$currentAsset->getUrl("func=deployPackage;assetId=".$asset->getId.";proceed=manageAssets").'">'.$asset->getTitle.'</a> '
                     .$session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
                     .$session->icon->export("func=exportPackage",$asset->get("url"))
                     .'<br />';
