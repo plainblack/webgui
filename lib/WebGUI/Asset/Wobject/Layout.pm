@@ -203,7 +203,8 @@ sub prepareView {
     my @positions = split /\./, $self->get("contentPositions");
     # cut positions off at the number we found in the template
     $#positions = $numPositions - 1
-        if $numPositions > scalar @positions;
+        if $numPositions < scalar @positions;
+
     my $positionIndex = 0;
     my @found;
     foreach my $position (@positions) {
