@@ -129,7 +129,7 @@ sub buildArrayRef {
     $sth->execute($params);
     my @array;
     while (my $data = $sth->arrayRef) {
-        push @array, @$data;
+        push @array, $data->[0];
     }
     return \@array;
 }
