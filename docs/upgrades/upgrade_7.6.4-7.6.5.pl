@@ -25,11 +25,11 @@ use WebGUI::Asset;
 my $toVersion = "7.6.5"; # make this match what version you're going to
 my $quiet; # this line required
 
-
 my $session = start(); # this line required
 
-# upgrade functions go here
+fixAccountMisspellings( $session );
 
+# upgrade functions go here
 finish($session); # this line required
 
 
@@ -42,6 +42,23 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+#Describe what our function does
+sub fixAccountMisspellings {
+    my $session = shift;
+    my $setting = $session->setting;
+    print "\tFix misspellings in Account settings... " unless $quiet;
+    # and here's our code
+    $setting->add("profileViewTemplateId",   $setting->get('profileViewTempalteId')  );
+    $setting->add("profileErrorTemplateId",  $setting->get('profileErrorTempalteId') );
+    $setting->add("inboxLayoutTemplateId",   $setting->get('inboxLayoutTempalteId')  );
+    $setting->add("friendsLayoutTemplateId", $setting->get('friendsLayoutTempalteId'));
+    $setting->remove("profileViewTemplateId");
+    $setting->remove("profileErrorTemplateId");
+    $setting->remove("inboxLayoutTemplateId");
+    $setting->remove("friendsLayoutTemplateId");
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

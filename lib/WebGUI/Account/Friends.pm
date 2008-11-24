@@ -96,7 +96,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("friends style template hoverHelp")
 	);
 	$f->template(
-		name      => "friendsLayoutTempalteId",
+		name      => "friendsLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("friends layout template label"),
@@ -166,7 +166,7 @@ sub editSettingsFormSave {
     my $form    = $session->form;
 
     $setting->set("friendsStyleTemplateId", $form->process("friendsStyleTemplateId","template"));
-    $setting->set("friendsLayoutTempalteId", $form->process("friendsLayoutTempalteId","template"));
+    $setting->set("friendsLayoutTemplateId", $form->process("friendsLayoutTemplateId","template"));
     $setting->set("friendsViewTemplateId", $form->process("friendsViewTemplateId","template"));
     $setting->set("friendsEditTemplateId",$form->process("friendsEditTemplateId","template"));
     $setting->set("friendsSendRequestTemplateId",$form->process("friendsSendRequestTemplateId","template"));
@@ -226,7 +226,7 @@ This method returns the template ID for the account layout.
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return $self->session->setting->get("friendsLayoutTempalteId") || "zrNpGbT3odfIkg6nFSUy8Q";
+    return $self->session->setting->get("friendsLayoutTemplateId") || "zrNpGbT3odfIkg6nFSUy8Q";
 }
 
 

@@ -103,7 +103,7 @@ sub editSettingsForm {
         hoverHelp => $i18n->get("inbox style template hoverHelp")
 	);
 	$f->template(
-		name      => "inboxLayoutTempalteId",
+		name      => "inboxLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
 		label     => $i18n->get("inbox layout template label"),
@@ -198,7 +198,7 @@ sub editSettingsForm {
 	);
     $f->template(
 		name      => "inboxInviteUserMessageTemplateId",
-		value     => $self->getInviteUserMessageTempalteId,
+		value     => $self->getInviteUserMessageTemplateId,
         namespace => "Account/Inbox/InviteUserMessage",
 		label     => $i18n->get("invite user message template label"),
         hoverHelp => $i18n->get("invite user message template hoverHelp")
@@ -237,7 +237,7 @@ sub editSettingsFormSave {
 
     #Messages Settings
     $setting->set("inboxStyleTemplateId", $form->process("inboxStyleTemplateId","template"));
-    $setting->set("inboxLayoutTempalteId", $form->process("inboxLayoutTempalteId","template"));
+    $setting->set("inboxLayoutTemplateId", $form->process("inboxLayoutTemplateId","template"));
     $setting->set("inboxViewTemplateId", $form->process("inboxViewTemplateId","template"));
     $setting->set("inboxViewMessageTemplateId",$form->process("inboxViewMessageTemplateId","template"));
     $setting->set("inboxSendMessageTemplateId",$form->process("inboxSendMessageTemplateId","template"));
@@ -305,13 +305,13 @@ sub getInvitationConfirmTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getInviteUserMessageTempalteId ( )
+=head2 getInviteUserMessageTemplateId ( )
 
 This method returns the template ID for the user email message
 
 =cut
 
-sub getInviteUserMessageTempalteId {
+sub getInviteUserMessageTemplateId {
     my $self = shift;
     return $self->session->setting->get("inboxInviteUserMessageTemplateId") || "XgcsoDrbC0duVla7N7JAdw";
 }
@@ -352,7 +352,7 @@ This method returns the template ID for the account layout.
 
 sub getLayoutTemplateId {
     my $self = shift;
-    return $self->session->setting->get("inboxLayoutTempalteId") || "gfZOwaTWYjbSoVaQtHBBEw";
+    return $self->session->setting->get("inboxLayoutTemplateId") || "gfZOwaTWYjbSoVaQtHBBEw";
 }
 
 
@@ -755,7 +755,7 @@ sub www_inviteUserSave {
         $session->url->getSiteURL,'op=auth;method=createAccount;code='.$inviteId
     );
 
-    my $emailBody  = $self->processTemplate($var,$self->getInviteUserMessageTempalteId);
+    my $emailBody  = $self->processTemplate($var,$self->getInviteUserMessageTemplateId);
 
     ##Create the invitation record.
     my $hash = {
