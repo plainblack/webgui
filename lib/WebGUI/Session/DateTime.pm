@@ -107,8 +107,7 @@ sub addToDate {
 	my $years = shift || 0;
 	my $months = shift || 0;
 	my $days = shift || 0;
-	my $time_zone = $self->getTimeZone();
-	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
+	my $date = DateTime->from_epoch(epoch=>$epoch);
 	$date->add(years=>$years, months=>$months, days=>$days);
 	return $date->epoch;
 }
@@ -158,8 +157,7 @@ sub addToDateTime {
 	my $hours = shift || 0;
 	my $mins = shift || 0;
 	my $secs = shift || 0;
-	my $time_zone = $self->getTimeZone();
-	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
+	my $date = DateTime->from_epoch(epoch=>$epoch);
 	$date->add(years=>$years, months=>$months, days=>$days, hours=>$hours, minutes=>$mins, seconds=>$secs);
 	return $date->epoch;
 }
@@ -194,8 +192,7 @@ sub addToTime {
 	my $hours = shift || 0;
 	my $mins = shift || 0;
 	my $secs = shift || 0;
-	my $time_zone = $self->getTimeZone();
-	my $date = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
+	my $date = DateTime->from_epoch(epoch=>$epoch);
 	$date->add(hours=>$hours, minutes=>$mins, seconds=>$secs);
 	return $date->epoch;
 }
@@ -255,9 +252,7 @@ An epoch date. Defaults to now.
 sub epochToHttp {
 	my $self = shift;
 	my $epoch = shift || time();
-	my $time_zone = $self->getTimeZone();
-	my $dt = DateTime->from_epoch(epoch=>$epoch, time_zone=>$time_zone);
-	$dt->set_time_zone('GMT');
+	my $dt = DateTime->from_epoch(epoch=>$epoch);
 	return $dt->strftime('%a, %d %b %Y %H:%M:%S GMT');
 }
 
@@ -532,8 +527,8 @@ sub getMonthDiff {
 	my $self = shift;
 	my $epoch1 = shift;
 	my $epoch2 = shift;
-	my ($year1, $month1) = split(' ', $self->session->datetime->epochToHuman($epoch1, '%y %M'));
-	my ($year2, $month2) = split(' ', $self->session->datetime->epochToHuman($epoch2, '%y %M'));
+	my ($year1, $month1) = split(' ', $self->epochToHuman($epoch1, '%y %M'));
+	my ($year2, $month2) = split(' ', $self->epochToHuman($epoch2, '%y %M'));
 	return 12 * ($year2 - $year1) + ($month2 - $month1);
 }
 
