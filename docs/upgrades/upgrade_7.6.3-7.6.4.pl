@@ -468,6 +468,8 @@ CREATE TABLE `Survey` (
   `exitURL` varchar(512) default NULL,
   `surveyJSON` longblob,
   `timeLimit` mediumint(8) unsigned NOT NULL,
+  `showProgress` tinyint(3) unsigned NOT NULL default '0',
+  `showTimeLimit` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 "); 
