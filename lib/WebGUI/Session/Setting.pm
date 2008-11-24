@@ -115,7 +115,7 @@ A reference to the current WebGUI::Session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $settings = $session->db->buildHashRef("select * from settings");
+	my $settings = $session->db->buildHashRef("select * from settings", [], {noOrder => 1});
 	bless {_settings=>$settings, _session=>$session}, $class;
 }
 

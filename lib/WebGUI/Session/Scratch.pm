@@ -176,7 +176,7 @@ The current session.
 sub new {
 	my $class = shift;
 	my $session = shift;
-	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId]);
+	my $data = $session->db->buildHashRef("select name,value from userSessionScratch where sessionId=?",[$session->getId], {noOrder => 1});
 	bless {_session=>$session, _data=>$data}, $class;
 }
 
