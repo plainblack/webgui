@@ -1,4 +1,6 @@
 7.6.5
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed: Products imported into the Shelf have bad URLs
 
 7.6.4
  - Survey now will show progress and time limit.

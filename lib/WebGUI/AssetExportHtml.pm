@@ -26,7 +26,7 @@ use URI::URL;
 
 =head1 NAME
 
-Package WebGUI::AssetExportHtml
+Package WebGUI::Asset (AssetExportHtml)
 
 =head1 DESCRIPTION
 

@@ -18,7 +18,7 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::AssetClipboard
+Package WebGUI::Asset (AssetClipboard)
 
 =head1 DESCRIPTION
 

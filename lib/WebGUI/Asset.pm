@@ -50,6 +50,8 @@ Package to manipulate items in WebGUI's asset system.
 
 An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
 
+The following modules are mixed in via declaration of the same package: AssetBranch.pm, AssetClipboard.pm, AssetExportHtml.pm, AssetLineage.pm, AssetMetaData.pm, AssetPackage.pm, AssetTrash.pm, AssetVersioning.pm.
+
 A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's ancestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
 
  use WebGUI::Asset;
