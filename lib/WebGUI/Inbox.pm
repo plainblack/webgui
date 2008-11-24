@@ -169,11 +169,11 @@ The WebGUI::User object of the user to retrieve the message for.  Defaults to th
 sub getNextMessage {
     my $self      = shift;
     my $session   = $self->session;
-    my $message   = shift;
+    my $baseMessage = shift;
     my $user      = shift || $session->user;
     
 	my $sql = $self->getMessageSql($user,{
-        whereClause => "ibox.dateStamp > ".$message->get("dateStamp"),
+        whereClause => "ibox.dateStamp > ".$baseMessage->get("dateStamp"),
         sortBy      => "ibox.dateStamp",
         sortDir     => "asc",
         limit       => 1
@@ -203,11 +203,11 @@ The WebGUI::User object of the user to retrieve the message for.  Defaults to th
 sub getPreviousMessage {
 	my $self      = shift;
     my $session   = $self->session;
-    my $message   = shift;
+    my $baseMessage = shift;
     my $user      = shift || $session->user;
 
     my $sql = $self->getMessageSql($user,{
-        whereClause => "ibox.dateStamp < ".$message->get("dateStamp"),
+        whereClause => "ibox.dateStamp < ".$baseMessage->get("dateStamp"),
         sortBy      => "ibox.dateStamp",
         sortDir     => "desc",
         limit       => 1

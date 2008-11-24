@@ -164,7 +164,7 @@ our $I18N = {
 	},
 
         'detail template help title' => {
-                lastUpdated =>
+                lastUpdated => 0,
                 message => q|Matrix Listing Detail Template Variables|
         },
 
