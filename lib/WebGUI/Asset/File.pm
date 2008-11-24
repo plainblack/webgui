@@ -21,8 +21,6 @@ use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
-use FileHandle;
-
 
 
 =head1 NAME
@@ -536,15 +534,12 @@ sub www_edit {
 sub exportHtml_view {
 	my $self = shift;
 	my $path = $self->getStorageLocation->getPath($self->get('filename'));
-	my $fh = eval { FileHandle->new($path) };
-	defined($fh) or return "";
-	binmode $fh or ($fh->close, return "");
-	my $block;
-	while (read($fh, $block, 16384) > 0) {
-		$self->session->output->print($block, 1);
-	}
-	$fh->close;
-	return 'chunked';
+    open my $fh, '<:raw', $path or return "";
+    while ( read $fh, my $block, 16384 ) {
+        $self->session->output->print($block, 1);
+    }
+    close $fh;
+    return 'chunked';
 }
 
 #--------------------------------------------------------------------

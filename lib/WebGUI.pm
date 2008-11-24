@@ -27,7 +27,7 @@ use Apache2::RequestIO;
 use Apache2::RequestUtil ();
 use Apache2::ServerUtil ();
 use APR::Request::Apache2;
-use MIME::Base64;
+use MIME::Base64 ();
 use WebGUI::Config;
 use WebGUI::Pluggable;
 use WebGUI::Session;

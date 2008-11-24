@@ -15,7 +15,7 @@ package WebGUI::Content::AjaxI18N;
 =cut
 
 use strict;
-use JSON;
+use JSON ();
 
 =head1 NAME
 

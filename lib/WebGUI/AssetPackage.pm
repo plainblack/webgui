@@ -15,7 +15,7 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use JSON;
+use JSON ();
 use WebGUI::Storage;
 
 =head1 NAME
