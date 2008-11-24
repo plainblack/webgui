@@ -105,7 +105,7 @@ A class method that returns a boolean indicating whether this control is compati
 =cut
 
 sub isDynamicCompatible {
-    return 1;
+    return 0;
 }
 
 #-------------------------------------------------------------------

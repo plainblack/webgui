@@ -18,7 +18,7 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::Asset (AssetBranch)
 
 =head1 DESCRIPTION
 

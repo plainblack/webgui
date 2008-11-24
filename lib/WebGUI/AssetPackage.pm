@@ -20,7 +20,7 @@ use WebGUI::Storage;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::Asset (AssetPackage)
 
 =head1 DESCRIPTION
 
