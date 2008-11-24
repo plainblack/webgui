@@ -836,7 +836,7 @@ sub _updateDataAndTriggerWorkflows {
                     className  => "WebGUI::User",
                     parameters => $user_id,
                 }
-            )->start;
+            )->start(1); # Skip realtime to avoid Workflow segfault bug 
         }
     }
 }
