@@ -118,6 +118,11 @@ our $I18N =
                 lastUpdated => 1166047618,
         },
 
+        'canEdit variable' => {
+                message => q|A boolean that indicates whether the current user can edit a page, or not.|,
+                lastUpdated => 1227501828,
+        },
+
         'historyLabel variable' => {
                 message => q|An internationalized label to go with historyUrl.|,
                 lastUpdated => 1166047618,
