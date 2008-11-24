@@ -14,6 +14,7 @@
  - fixed #8925: Collaboration System: Label missing
  - fixed #8908: No Post Captcha in Default Submission Form
  - fixed #9138: Fat fonts break WebGUI captchas
+ - fixed #8982: Deploy package doesn't take back to asset manager 
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
