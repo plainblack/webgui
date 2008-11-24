@@ -56,6 +56,7 @@
  - fixed #8956: Not checking for populated variable
  - fixed #9130: fixed: Rich editor creates root <p> tag even when set to use <br />
  - fixed: DataForm times out when exporting large data sets
+ - fixed: DataForm entry data field is too small
 
 7.6.3
  - improved performance of file uploads

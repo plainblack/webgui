@@ -42,9 +42,17 @@ addExtendedProfilePrivileges( $session );
 addStorageUrlMacro( $session );
 addRecurringSubscriptionSwitch( $session );
 upgradeMatrix( $session );
+increaseDataFormSizeLimits( $session );
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
+sub increaseDataFormSizeLimits {
+    my $session = shift;
+    print "\ttIncreasing size of DataForm entry data field... " unless $quiet;
+    $session->db->write("ALTER TABLE DataForm_entry MODIFY COLUMN entryData mediumtext");
+    print "Done.\n" unless $quiet;
+}
+
 sub upgradeMatrix {
     my $session = shift;
     print "\tUpgrading matrix assets... \n" unless $quiet;
