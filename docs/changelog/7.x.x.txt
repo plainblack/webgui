@@ -1,5 +1,6 @@
 7.6.4
  - Brand new Survey system.  Make sure to export your old results as they will
+ - Made it more obvious how to check out when viewing the cart.
  - Added a wait timeout parameter to the WAITING method, so that Spectre
    doesn't have to check something that the workflow activity knows it will
    have to wait on for a while.

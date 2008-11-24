@@ -916,7 +916,7 @@ our $I18N = {
 	},
 
 	'choose shipping button' => { 
-		message => q|Choose Address|,
+		message => q|Choose Address &amp; Checkout|,
 		lastUpdated => 1224818677,
 		context => q|a button the user clicks on to choose shipping information and tax calculation|
 	},
