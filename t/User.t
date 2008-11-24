@@ -588,7 +588,7 @@ is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessag
 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: illegal profile field doesn\'t allow messages to be received from anyone');
 
 ################################################################
 #

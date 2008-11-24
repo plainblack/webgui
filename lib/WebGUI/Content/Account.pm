@@ -63,11 +63,11 @@ These subroutines are available from this package:
 
 Creates an instance of an account pluggin
 
-=session
+=head3 session
 
 WebGUI::Session object
 
-=module
+=head3 module
 
 Module the method is in.  Defaults to the profileModuleIdentifier in the config file
 

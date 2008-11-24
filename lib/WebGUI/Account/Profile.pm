@@ -32,23 +32,23 @@ These subroutines are available from this package:
 
 =head2 appendCategoryVars ( var, category [,fields, errors] )
 
-    Appends cateogry variables to the hash ref passed in
-    
+Appends cateogry variables to the hash ref passed in
+
 =head3 var
 
-    The hash reference to append template variables to
+The hash reference to append template variables to
 
 =head3 category
 
-    WebGUI::ProfileCategory object to append variables for
+WebGUI::ProfileCategory object to append variables for
 
 =head3 fields
 
-    Optional array ref of fields in this category
+Optional array ref of fields in this category
 
 =head3 errors
 
-    Optional array ref of errors to attach to the category loop
+Optional array ref of errors to attach to the category loop
 
 =cut
 
@@ -95,11 +95,11 @@ sub appendCategoryVars {
 
 =head2 appendCommonVars ( var )
 
-    Appends common template variables that all profile templates use
-    
+Appends common template variables that all profile templates use
+
 =head3 var
 
-    The hash reference to append template variables to
+The hash reference to append template variables to
 
 =cut
 
@@ -137,7 +137,7 @@ sub appendCommonVars {
 
 =head2 editSettingsForm ( )
 
-  Creates form elements for user settings page custom to this account module
+Creates form elements for user settings page custom to this account module
 
 =cut
 
@@ -193,7 +193,7 @@ sub editSettingsForm {
 
 =head2 editSettingsFormSave ( )
 
-  Creates form elements for user settings page custom to this account module
+Creates form elements for user settings page custom to this account module
 
 =cut
 

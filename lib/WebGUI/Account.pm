@@ -39,11 +39,11 @@ public   store   => my %store;  #This is an all purpose hash to store stuff in: 
 
 =head2 appendCommonVars ( var )
 
-    Appends common template variables that all most templates will use
-    
+Appends common template variables that all most templates will use
+
 =head3 var
 
-    The hash reference to append template variables to
+The hash reference to append template variables to
 
 =cut
 
@@ -203,7 +203,7 @@ sub displayContent {
 
 =head2 canView ( )
 
-    Override this method to create permission levels for your Account Pluggin
+Override this method to create permission levels for your Account Pluggin
 
 =cut
 
@@ -216,7 +216,7 @@ sub canView {
 
 =head2 editSettingsForm ( )
 
-    Override this method to create settings for your Account Pluggin
+Override this method to create settings for your Account Pluggin
 
 =cut
 
@@ -229,7 +229,7 @@ sub editSettingsForm {
 
 =head2 editSettingsFormSave ( )
 
-    Override this method to create settings for your Account Pluggin
+Override this method to create settings for your Account Pluggin
 
 =cut
 
@@ -242,7 +242,7 @@ sub editSettingsFormSave {
 
 =head2 getLayoutTemplateId ( )
 
-    Override this method to return the template Id for the account layout.
+Override this method to return the template Id for the account layout.
 
 =cut
 
@@ -255,7 +255,7 @@ sub getLayoutTemplateId {
 
 =head2 getStyleTemplate ( )
 
-    Override this method to return the template for the main style.
+Override this method to return the template for the main style.
 
 =cut
 
@@ -269,17 +269,17 @@ sub getStyleTemplateId {
 
 =head2 getUrl ( [pairs,appendUID] )
 
-    Builds the url for the current page.
+Builds the url for the current page.
 
 =head3 pairs
 
-    name value pairs to append to the page url.  If pairs is not passed in
-    the current module and do values will be used.
+name value pairs to append to the page url.  If pairs is not passed in
+the current module and do values will be used.
 
 =head3 appendUID
 
-    If this flag is set and uid is passed along the url, the uid passed in will be
-    appended to the end of it to the end of the url
+If this flag is set and uid is passed along the url, the uid passed in will be
+appended to the end of it to the end of the url
 
 =cut
 
@@ -401,7 +401,7 @@ sub processTemplate {
 
 =head2 showError ( vars )
 
-    Returns a general error screen with the message passed in.
+Returns a general error screen with the message passed in.
 
 =head3 vars
 

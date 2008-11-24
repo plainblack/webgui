@@ -32,15 +32,15 @@ These subroutines are available from this package:
 
 =head2 appendCommonVars ( var, inbox )
 
-    Appends common template variables that all inbox templates use
-    
+Appends common template variables that all inbox templates use
+
 =head3 var
 
-    The hash reference to append template variables to
+The hash reference to append template variables to
 
 =head3 inbox
 
-    The instance of the inbox currently being worked with.
+The instance of the inbox currently being worked with.
 
 =cut
 
@@ -71,7 +71,7 @@ sub appendCommonVars {
 
 =head2 canView ( )
 
-    Returns whether or not the user can view the inbox tab
+Returns whether or not the user can view the inbox tab
 
 =cut
 
@@ -84,7 +84,7 @@ sub canView {
 
 =head2 editSettingsForm ( )
 
-  Creates form elements for user settings page custom to this account module
+Creates form elements for user settings page custom to this account module
 
 =cut
 
@@ -225,7 +225,7 @@ sub editSettingsForm {
 
 =head2 editSettingsFormSave ( )
 
-  Creates form elements for user settings page custom to this account module
+Creates form elements for user settings page custom to this account module
 
 =cut
 

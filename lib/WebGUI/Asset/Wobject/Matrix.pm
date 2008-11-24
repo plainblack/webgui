@@ -27,10 +27,10 @@ use base 'WebGUI::Asset::Wobject';
 
 Returns true if able to add MatrixListings. 
 
- Checks to make sure that the 
- Calendar has been committed at least once. Checks to make sure that
- the user is in the appropriate group (either the group that can edit
- the calendar, or the group that can edit events in the calendar).
+Checks to make sure that the 
+Calendar has been committed at least once. Checks to make sure that
+the user is in the appropriate group (either the group that can edit
+the calendar, or the group that can edit events in the calendar).
 
 =cut
 
@@ -38,18 +38,16 @@ sub canAddMatrixListing {
     my $self    = shift;
 
     return 1;
-=cut
-    my $userId  = shift;
-
-    my $user    = $userId
-                ? WebGUI::User->new( $self->session, $userId )
-                : $self->session->user
-                ;
-
-    return 1 if (
-        $user->isInGroup( $self->get("groupIdEventEdit") )
-    );
-=cut
+#    my $userId  = shift;
+#
+#    my $user    = $userId
+#                ? WebGUI::User->new( $self->session, $userId )
+#                : $self->session->user
+#                ;
+#
+#    return 1 if (
+#        $user->isInGroup( $self->get("groupIdEventEdit") )
+#    );
 }
 
 #-------------------------------------------------------------------

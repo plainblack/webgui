@@ -30,11 +30,11 @@ These methods are available from this class:
 
 =head2 appendCommonVars ( var )
 
-    Appends common template variables that shop templates will use
-    
+Appends common template variables that shop templates will use
+
 =head3 var
 
-    The hash reference to append template variables to
+The hash reference to append template variables to
 
 =cut
 
@@ -56,7 +56,7 @@ sub appendCommonVars {
 
 =head2 canView ( )
 
-    Returns whether or not the user can view the the tab for this module
+Returns whether or not the user can view the the tab for this module
 
 =cut
 
@@ -69,7 +69,7 @@ sub canView {
 
 =head2 editSettingsForm ( )
 
-  Creates form elements for user settings page custom to this account module
+Creates form elements for user settings page custom to this account module
 
 =cut
 
@@ -116,7 +116,7 @@ sub editSettingsForm {
 
 =head2 editSettingsFormSave ( )
 
-  Creates form elements for the settings page custom to this account module
+Creates form elements for the settings page custom to this account module
 
 =cut
 

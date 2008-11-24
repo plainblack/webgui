@@ -328,7 +328,7 @@ The number of rows to display per page. If left blank it defaults to 25.
 
 Specify the form variable the paginator should use in its links.  Defaults to "pn".
 
-=head pageNumber
+=head4 pageNumber
 
 By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
 
