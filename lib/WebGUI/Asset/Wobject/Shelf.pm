@@ -232,6 +232,7 @@ sub importProducts {
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
             $newProduct->update({
                 title => $newProduct->fixTitle($productRow{title}),
+                url   => $newProduct->fixUrl($productRow{title}),
                 sku   => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
