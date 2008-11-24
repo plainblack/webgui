@@ -51,6 +51,7 @@
  - fixed #8827: Slider JS bug for non-numeric values (Patrick Donelan, SDH Consulting)
  - fixed #8925: Collaboration System: Label missing
  - fixed #8908: No Post Captcha in Default Submission Form
+ - fixed #9138: Fat fonts break WebGUI captchas
 
 7.6.3
  - improved performance of file uploads
