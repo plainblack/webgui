@@ -151,7 +151,8 @@ sub authenticate {
 
 =head2 authMethod ( [authMethod] )
 
-Gets or sets the authMethod in the Auth Object
+Gets or sets the authMethod in the Auth Object.  Returns 'WebGUI' as the
+default method if a user has been created without an authMethod.
 
 =head3 authMethod
 
@@ -161,7 +162,9 @@ Gets or sets the authMethod in the Auth Object
 
 sub authMethod {
 	my $self = shift;
-	return $self->{authMethod} if(!$_[0]);
+	if (!$_[0]) {
+        return $self->{authMethod} || 'WebGUI';
+    }
 	$self->{authMethod} = $_[0];
 }
 
