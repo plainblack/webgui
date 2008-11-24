@@ -120,7 +120,7 @@ sub get {
     my $opt     = shift || {};
 	return undef if $self->session->config->get("disableCache");
     my $value   = $self->{_data}{$var};
-    return unless $value;
+    return undef unless defined $value;
     my $ref     = ref $value;
     return $value if ( !$ref || $opt->{noclone} );
 
