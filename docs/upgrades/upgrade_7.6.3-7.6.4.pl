@@ -341,7 +341,7 @@ sub migrateSurvey{
         $session->db->write("insert into Survey
             values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [
-                $$survey{groupToTakeSurvey},$$survey{grouptToViewReports},$$survey{groupToViewReports},'PBtmpl0000000000000064','PBtmpl0000000000000063',$$survey{maxResponsesPerUser},
+                $$survey{groupToTakeSurvey},$$survey{groupToViewReports},$$survey{groupToViewReports},'PBtmpl0000000000000064','PBtmpl0000000000000063',$$survey{maxResponsesPerUser},
                 $$survey{gradebookTemplateId},$$survey{assetId},'PBtmpl0000000000000061',$$survey{revisionDate},'GRUNFctldUgop-qRLuo_DA','AjhlNO3wZvN5k4i4qioWcg',
                 'wAc4azJViVTpo-2NYOXWvg', '1oBRscNIcFOI-pETrCOspA','d8jMMMRddSQ7twP4l1ZSIw','CxMpE_UPauZA3p8jdrOABw','','{}',0,0,0
             ]
