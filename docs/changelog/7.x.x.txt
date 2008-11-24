@@ -60,6 +60,7 @@
  - fixed: DataForm times out when exporting large data sets
  - fixed: DataForm entry data field is too small
  - fixed #4213: Can see "edit" tab even tho i am not logged in
+ - fixed #9139: Updating a workflow property causes workflow to be disabled
 
 7.6.3
  - improved performance of file uploads
