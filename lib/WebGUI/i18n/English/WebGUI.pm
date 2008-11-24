@@ -2112,6 +2112,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1220541683,
 	},
 
+	'pagination.activePage' => {
+		message => q|A boolean which will be true if the this page in the pageLoop is the currently viewed page.|,
+		lastUpdated => 1227493265,
+	},
+
 	'pagination.pageList.upTo20' => {
 		message => q|A list of links to the 20 nearest in the paginator relative to the current page. So if you're on page 60, you'll see links for 50-70.|,
 		lastUpdated => 1149182026,
