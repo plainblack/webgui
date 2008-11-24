@@ -151,22 +151,23 @@ sub validateProfileData {
 	my $opts      = shift || {};
     my $regOnly   = $opts->{regOnly};
     
-	my $error     = "";
-	my $warning   = "";
     my $fields    = $regOnly ? WebGUI::ProfileField->getRegistrationFields($session)
                           : WebGUI::ProfileField->getEditableFields($session);
 
     my $retHash   = $session->user->validateProfileDataFromForm($fields);
 
-    my $warnings  = $retHash->{warnings};
-    my $errors    = $retHash->{errors};
-
     my $format    = "<li>%s</li>";
+    my $warningMessage  = "";
+    my $errorMessage    = "";
 
-    map { $warning .= sprintf($format,$_) }@{$warnings};
-    map { $error   .= sprintf($format,$_) }@{$errors};
-    
-    return ($retHash->{profile},$error,$warning);
+    for my $warning ( @{ $retHash->{warnings} } ) {
+        $warningMessage .= sprintf $format, $warning;
+    }
+    for my $error ( @{ $retHash->{errors} } ) {
+        $errorMessage .= sprintf $format, $error;
+    }
+
+    return ($retHash->{profile}, $errorMessage, $warningMessage);
 }
 
 #-------------------------------------------------------------------

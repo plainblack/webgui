@@ -67,15 +67,15 @@ sub appendCommonVars {
 
 Calls the method passed in
 
-=method
+=head3 method
 
 Method to call.  If no method is passed in, the view method is called
 
-=args
+=head3 args
 
 array reference of arguments to pass to the method being called.
 
-=uid
+=head3 uid
 
 uid to set in the object.
 
@@ -123,11 +123,11 @@ sub callMethod {
 
 Wraps the content in the style and layout of the account pluggin
 
-=content
+=head3 content
 
 Content to wrap in the pluggin style and layout
 
-=withoutStyle
+=head3 withoutStyle
 
 Return the layout without the style wrapper
 

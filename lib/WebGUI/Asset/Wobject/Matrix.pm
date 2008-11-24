@@ -899,7 +899,7 @@ sub www_getCompareFormData {
     my $sort            = $session->scratch->get('sort') || $self->get('defaultSort');
     my $sortDirection   = ' asc';
 
-    if ( WebGUI::Utility::isIn($sort),qw(revisionDate score)) {
+    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
         $sortDirection = " desc";
     }
 

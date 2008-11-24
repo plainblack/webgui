@@ -20,7 +20,7 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 use WebGUI::Asset::Wobject::SyndicatedContent;
 use XML::FeedPP;
 

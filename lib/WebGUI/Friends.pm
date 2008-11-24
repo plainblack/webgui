@@ -311,7 +311,7 @@ sub rejectAddRequest {
 
 #-------------------------------------------------------------------
 
-=head2 sendAddRequest ( userId, message )
+=head2 sendAddRequest ( userId, message, inviteUrl )
 
 Sends a request to another user to be added to this user's friends list. Returns an invitationId.
 
@@ -323,7 +323,7 @@ The user to invite to be a friend.
 
 The message to lure them to accept.
 
-=head inviteUrl
+=head3 inviteUrl
 
 The url to view the friend request
 
