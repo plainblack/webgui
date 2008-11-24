@@ -9,16 +9,17 @@ sub new {
     my $json   = shift;
     my $log    = shift;
     my $survey = shift;
-    my $self   = {};
+    my $temp = decode_json($json) if defined $json;
+    my $self   = defined $temp ? $temp : {};
     $self->{survey} = $survey;
     $self->{log}    = $log;
-    my $temp = decode_json($json) if defined $json;
     $self->{surveyOrder}
         = defined $temp->{surveyOrder}
         ? $temp->{surveyOrder}
         : [];    #an array of question addresses, with the third member being an array of answers
     $self->{responses}    = defined $temp->{responses}    ? $temp->{responses}    : {};
     $self->{lastResponse} = defined $temp->{lastResponse} ? $temp->{lastResponse} : -1;
+    $self->{questionsAnswered} = defined $temp->{questionsAnswered} ? $temp->{questionsAnswered} : 0;
     bless( $self, $class );
     return $self;
 } ## end sub new
@@ -90,7 +91,7 @@ sub freeze {
 
 sub hasTimedOut{
     my $self=shift;
-    return 1 if($self->{startTime} + ($self->{timeLimit} * 60) < time());
+    return 1 if($self->{startTime} + ($self->{timeLimit} * 60) < time() and $self->{timeLimit} > 0);
     return 0;
 }
 
@@ -198,6 +199,7 @@ sub recordResponses {
             } ## end if ( defined( $responses...
         } ## end for my $answer ( @{ $question...
         $qAnswered = 0 if ( !$aAnswered and $question->{required} );
+        $self->{questionsAnswered}++ if($aAnswered);
     } ## end for my $question (@$questions)
 
     #if all responses completed, move the lastResponse index to the last question shown

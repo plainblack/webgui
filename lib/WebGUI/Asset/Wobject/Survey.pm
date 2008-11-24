@@ -39,7 +39,20 @@ sub definition {
             hoverHelp    => "A Survey System",
             label        => "Template ID"
         },
-        timeLimit => { fieldType => 'integer',
+        showProgress => {
+            fieldType => "yesNo",
+            defaultValue => 0,
+            tab => 'properties',
+            label => "Show user their progress"
+        },
+        showTimeLimit => {
+            fieldType => "yesNo",
+            defaultValue => 0,
+            tab => 'properties',
+            label => "Show user their time remaining"
+        },
+        timeLimit => { 
+            fieldType => 'integer',
             defaultValue => 0,
             tab => 'properties',
             hoverHelp => $i18n->get('timelimit hoverHelp'),
@@ -593,7 +606,6 @@ sub www_takeSurvey {
             return $self->surveyEnd();
         }
     };
-
     return $self->session->style->process($out,$self->get("styleTemplateId"));
 }
 
@@ -767,6 +779,11 @@ sub prepareShowSurveyTemplate {
         }
     } ## end foreach my $q (@$questions)
     $section->{'questions'} = $questions;
+    $section->{'questionsAnswered'} = $self->response->{questionsAnswered};
+    $section->{'totalQuestions'} = @{$self->response->surveyOrder};
+    $section->{'showProgress'} = $self->response->{showProgress};
+    $section->{'showTimeLimit'} = $self->response->{showTimeLimit};
+    $section->{'minutesLeft'} = int((($self->response->{startTime} + (60 * $self->response->{timeLimit})) - time())/60);
 
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
@@ -902,6 +919,8 @@ sub getResponseId {
             $self->{responseId} = $responseId;
             $self->response->{startTime} = $time;
             $self->response->{timeLimit} = $self->get("timeLimit");
+            $self->response->{showProgress} = $self->get("showProgress");
+            $self->response->{showTimeLimit} = $self->get("showTimeLimit");
             $self->saveResponseJSON();
             
         } ## end if ( $haveTaken < $allowedTakes)
@@ -1042,7 +1061,7 @@ sub loadTempReportTable {
 
 sub log {
     my $self = shift;
-    $self->session->log->error(shift);
+    $self->session->log->debug(shift);
 }
 
 1;
