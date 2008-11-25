@@ -2,6 +2,12 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'ok' => {
+		message => q|OK|,
+		context => q|used by database link and other things to give a message to the user that a test passed|,
+		lastUpdated => 0,
+	},
+
 	'is editable' => {
 		message => q|Is Editable?|,
 		context => q|group property|,
@@ -188,6 +194,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'home info short' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
+
 	'118' => {
 		message => q|Anonymous Registration|,
 		lastUpdated => 1031514049
@@ -242,6 +253,16 @@ our $I18N = {
 		message => q|Statistics|,
 		lastUpdated => 1031514049,
                 context => q|Title of the statistics viewer for the admin console.|
+	},
+
+    'required error' => {
+		message => q{%s is required.},
+		lastUpdated => 1031514049
+	},
+
+    'language not available error' => {
+		message => q|%s is not available.  Please select another language|,
+		lastUpdated => 1031514049
 	},
 
 	'451' => {
@@ -325,7 +346,7 @@ our $I18N = {
 	},
 
 	'861' => {
-		message => q|Make profile public?|,
+		message => q|Profile Privacy Setting|,
 		lastUpdated => 1043879954
 	},
 
@@ -604,6 +625,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'demographic info short' => {
+		message => q|Demographic|,
+        lastUpdated => 1031514049
+	},
+
 	'77' => {
 		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
 %sToo<br />
@@ -835,6 +861,11 @@ to add or remove users from their groups.
 		lastUpdated => 1031514049
 	},
 
+    'preferences short' => {
+ 		message => q|Preferences|,
+ 		lastUpdated => 1031514049
+ 	},
+
 	'1026' => {
 		message => q|Allow rich edit?|,
 		lastUpdated => 1065966219
@@ -898,6 +929,11 @@ to add or remove users from their groups.
 	'868' => {
 		message => q|Send welcome message?|,
 		lastUpdated => 1044138691
+	},
+
+	'868 help' => {
+		message => q|Should the user be sent an email when their account is created?|,
+		lastUpdated => 1227209376
 	},
 
 	'990' => {
@@ -1094,7 +1130,12 @@ to add or remove users from their groups.
 
 	'869' => {
 		message => q|Welcome Message|,
-		lastUpdated => 1044138730
+		lastUpdated => 1044138730,
+	},
+
+	'869 help' => {
+		message => q|This message will be part of the email sent to a user when they create an account on this WebGUI site.|,
+		lastUpdated => 1227209607,
 	},
 
 	'533' => {
@@ -1245,6 +1286,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 
 	'449' => {
 		message => q|Miscellaneous Information|,
+		lastUpdated => 1031514049
+	},
+
+    'misc info short' => {
+		message => q|Miscellaneous|,
 		lastUpdated => 1031514049
 	},
 
@@ -1515,6 +1561,11 @@ sent in HTML format. No attachments can be included.|,
 		message => q|Work Information|,
 		lastUpdated => 1031514049
 	},
+
+    'work info short' => {
+		message => q|Work|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'429' => {
 		message => q|Login Time|,
@@ -1906,6 +1957,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1031514049
 	},
 
+    'contact info short' => {
+		message => q|Contact Info|,
+		lastUpdated => 1031514049
+	},
+
 	'230' => {
 		message => q|Message|,
 		lastUpdated => 1031514049
@@ -2054,6 +2110,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 	'pagination.range' => {
 		message => q|Displays the range of available pages, in a start - end format.|,
 		lastUpdated => 1220541683,
+	},
+
+	'pagination.activePage' => {
+		message => q|A boolean which will be true if the this page in the pageLoop is the currently viewed page.|,
+		lastUpdated => 1227493265,
 	},
 
 	'pagination.pageList.upTo20' => {
@@ -2246,6 +2307,11 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		message => q|Personal Information|,
 		lastUpdated => 1031514049
 	},
+
+    'personal info short' => {
+		message => q|Personal|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'317' => {
 		message => q|<a href="http://www.icq.com">ICQ</a> UIN|,
@@ -2934,11 +3000,11 @@ or are under your current version tag.</p>
                 context => q|Field type name|
         },
 
-	'submit' => {
-		message => q|Submit|,
-		lastUpdated =>1140589512,
-                context => q|Field type name and button label|
-        },
+    'submit' => {
+        message => q|Submit|,
+        lastUpdated =>1140589512,
+        context => q|Field type name and button label|
+    },
 
 	'button' => {
 		message => q|Button|,
@@ -3183,13 +3249,8 @@ and tracked by WebGUI.|,
         },
 
         '1006 description' => {
-                message => q|Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will encrypt not only the login form, but all pages after that as well.|,
-                lastUpdated => 1163457062,
-        },
-
-        'Enable user invitations description' => {
-                message => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
-                lastUpdated => 1181017746,
+                message => q|Should the system use the HTTPS protocol for the login form?|,
+                lastUpdated => 1227291454,
         },
 
         '164 description' => {
@@ -3214,11 +3275,6 @@ a user.|,
         lastUpdated => 1167189802,
     },
 
-	'Enable user invitations' => {
-		message => q|Enable user invitations?|,
-		lastUpdated => 1181017730
-	},
-
 	'Illegal Warning' => {
 		message => q|Enabling this feature is illegal in some countries, like Australia. In addition, some countries require you to add a warning to your site if you use this feature. Consult your local authorities for local laws. Plain Black Corporation is not responsible for your illegal activities, regardless of ignorance or malice.|,
 		lastUpdated => 1089039511
@@ -3227,6 +3283,12 @@ a user.|,
 	'default rich editor' => {
 		message => q|Default Rich Editor|,
 		lastUpdated => 1118941685,
+	},
+
+    'account settings tab' => {
+		message => q|Account|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the account settings in WebGUI Settings.|
 	},
 
 	'account' => {
@@ -3534,6 +3596,11 @@ LongTruncOk=1</p>
 		lastUpdated => 1181019679,
     },
 
+    'inbox message status active' => {
+        message => q|Active|,
+		lastUpdated => 1181019679,    
+    },
+
     'private message prev label' => {
         message => q|Previous|,
 		lastUpdated => 1181019679,
@@ -3550,17 +3617,17 @@ LongTruncOk=1</p>
     },
 
     'user profile field private message allow label' => {
-        message => q|Allow All|,
+        message => q|Public|,
 		lastUpdated => 1181019679,
     },
 
     'user profile field private message friends only label' => {
-        message => q|Allow From My Friends Only|,
+        message => q|Friends Only|,
 		lastUpdated => 1181019679,
     },
 
     'user profile field private message allow none label' => {
-        message => q|Allow None|,
+        message => q|Private|,
 		lastUpdated => 1181019679,
     },
 
@@ -4146,6 +4213,118 @@ LongTruncOk=1</p>
         lastUpdated => 0,
         context     => q{Label for the user profile field used by the UsersOnline macro},
     },
+
+        #Support for versionTagMode.
+        'version tag mode' => {
+            message => q{Version tag mode},
+            lastUpdated => 0,
+            context     => q{Label for the settings screen},
+        },
+
+        'version tag mode help' => {
+            message => q{Determine version tag behaviour.
+<ul>
+<li>Multiple version tags per user: each user can have multiple open version tags.</li>
+<li>Single version tag per user: each user only has one open version tag. Existing open version tag is reclaimed automatically.</li>
+<li>One site-wide version tag: users work on one site-wide version tag.</li>
+<li>Commit automatically: version tags are committed automatically.</li>
+</ul>
+
+Users may override this setting in their profile.
+},
+            lastUpdated => 0,
+            context     => q{Hover help for the settings screen},
+        },
+
+        'versionTagMode multiPerUser' => {
+            message => q{Multiple version tags per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode singlePerUser' => {
+            message => q{Single version tag per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode siteWide' => {
+            message => q{One site-wide version tag},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode autoCommit' => {
+            message => q{Commit automatically},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode inherited' => {
+            message => q{Inherit from site settings},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        '< prev' => {
+            message => q{< prev},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
+        'next >' => {
+            message => q{next >},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
+        'years' => {
+            message => q{years},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'months' => {
+            message => q{months},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'weeks' => {
+            message => q{weeks},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'days' => {
+            message => q{days},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'hours' => {
+            message => q{hours},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'minutes' => {
+            message => q{minutes},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'seconds' => {
+            message => q{seconds},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'profile privacy settings' =>  {
+            message     => q{Privacy Settings},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
 
 };
 

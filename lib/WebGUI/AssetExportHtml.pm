@@ -15,9 +15,8 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use File::Basename;
-use File::Path;
-use FileHandle;
+use File::Basename ();
+use File::Path ();
 use Path::Class;
 use Scalar::Util 'looks_like_number';
 use WebGUI::International;
@@ -92,7 +91,7 @@ sub exportCheckPath {
     # now that we know that it's defined and not an empty string, test if it exists.
     if(!-e $exportPath) {
         # it doesn't exist; let's try making it
-        eval { mkpath( [$exportPath] ) };
+        eval { File::Path::mkpath( [$exportPath] ) };
         if($@) {
             WebGUI::Error->throw(error => "can't create exportPath $exportPath");
         }
@@ -543,7 +542,7 @@ sub exportGetUrlAsPath {
         return Path::Class::File->new($exportPath, @pathComponents, $filename, $index);
     }
     else { # got a dot
-        my $extension = (fileparse($filename, qr/[^.]*$/))[2]; # get just the extension
+        my $extension = (File::Basename::fileparse($filename, qr/[^.]*$/))[2]; # get just the extension
         
         # check if the file type is recognised by apache. if it is, return it
         # as-is. if not, slap on the directory separator, $index, and return
@@ -748,7 +747,7 @@ sub exportWriteFile {
     my $dest = $self->exportGetUrlAsPath;
     my $parent = $dest->parent;
 
-    eval { mkpath($parent->absolute->stringify) };
+    eval { File::Path::mkpath($parent->absolute->stringify) };
     if($@) {
         WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
     }
@@ -823,10 +822,12 @@ sub www_export {
         -name           => "index",
         -value          => "index.html"
     );
+
     $f->text(
         -label          => $i18n->get("Export site root URL"),
         -name           => 'exportUrl',
         -value          => '',
+        -hoverHelp      => $i18n->get("Export site root URL description"),
     );
 
     # TODO: maybe add copy options to these boxes alongside symlink

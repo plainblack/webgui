@@ -380,7 +380,7 @@ sub execute {
             if ($currentVersionTag) {
                 $currentVersionTag->setWorking;
             }
-            return $self->WAITING;
+            return $self->WAITING(1);
         }
         my $eventData = shift @$eventList;
         my $recur = $eventData->{recur};

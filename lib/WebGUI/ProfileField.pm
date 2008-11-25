@@ -66,7 +66,7 @@ Return true iff fieldName is reserved and therefore not usable as a profile fiel
 sub isReservedFieldName {
     my $class = shift;
     my $fieldName = shift;
-    return isIn($fieldName, ('func', 'op'));
+    return isIn($fieldName, ('func', 'op', 'wg_privacySettings'));
 }
 
 #-------------------------------------------------------------------
@@ -228,13 +228,19 @@ form.
 
 =cut
 
+# FIXME This would be better if it returned an OBJECT not the HTML
+# TODO add a toHtml sub to take the place of this sub and a getFormControl
+# And refactor to not require all these arguments HERE but rather in the 
+# constructor or something...
 sub formField {
-    my $self = shift;
-    my $properties = $self->formProperties(shift);
-    my $withWrapper = shift;
-    my $u = shift || $self->session->user;
-    my $skipDefault = shift;
+    my $self          = shift;
+    my $session       = $self->session;
+    my $properties    = $self->formProperties(shift);
+    my $withWrapper   = shift;
+    my $u             = shift || $session->user;
+    my $skipDefault   = shift;
     my $assignedValue = shift;
+    
     if ($skipDefault) {
         $properties->{value} = undef;
     }
@@ -244,38 +250,49 @@ sub formField {
     else {
         # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
-        # use submitted data if it exists
-        if (defined $self->session->form->process($properties->{name})) {
-            $properties->{value} = $self->session->form->process($self->getId,$self->get("fieldType"), undef, $properties);
+        #If the fieldId is actually found in the request, try to process the form
+        if ($session->form->param($self->getId)) {
+            $properties->{value} = $self->formProcess($u);
         }
-        # fall back on default
+        #If no value is set, go with the default value
         if(!defined $properties->{value}) {
-            $properties->{value} = WebGUI::Operation::Shared::secureEval($self->session,$properties->{dataDefault});
+            $properties->{value} = WebGUI::Operation::Shared::secureEval($session,$properties->{dataDefault});
         }
     }
     if ($withWrapper == 1) {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtmlWithWrapper;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtmlWithWrapper;
     } elsif ($withWrapper == 2) {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->getValueAsHtml;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->getValueAsHtml;
     } else {
-        return WebGUI::Form::DynamicField->new($self->session,%{$properties})->toHtml;
+        return WebGUI::Form::DynamicField->new($session,%{$properties})->toHtml;
     }
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 formProcess ( )
+=head2 formProcess ( [ user ] )
 
 Returns the value retrieved from a form post.
+
+=head3 user
+
+Optional user object to process properties for.  If no user object is passed
+in the current user will be used.
 
 =cut
 
 sub formProcess {
-    my $self = shift;
-    my $u = shift || $self->session->user;
-    my $properties = $self->formProperties({value => $u->profileField($self->getId)});
-    my $result = $self->session->form->process($self->getId,$self->get("fieldType"),WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")), $properties);
+    my $self       = shift;
+    my $u          = shift || $self->session->user;
+    my $userId     = $u->userId;
+    
+    my $properties  = $self->formProperties({value => $u->profileField($self->getId)});
+    my $result      = $self->session->form->process(
+        $self->getId,
+        $self->get("fieldType"),
+        WebGUI::Operation::Shared::secureEval($self->session,$self->get("dataDefault")),
+        $properties
+    );
     if (ref $result eq "ARRAY") {
         my @results = @$result;
         for (my $count=0;$count<scalar(@results);$count++) {
@@ -285,6 +302,7 @@ sub formProcess {
     } else {
         $result = WebGUI::HTML::filter($result, "javascript");
     }
+    
     return $result;
 }
 
@@ -319,7 +337,10 @@ Returns a WebGUI::ProfileCategory object for the category that this profile fiel
 
 sub getCategory {
     my $self = shift;
-    return WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
+    unless ($self->{_category}) {
+        $self->{_category} = WebGUI::ProfileCategory->new($self->session,$self->get("profileCategoryId"));
+    }
+    return $self->{_category};
 }
 
 
@@ -390,7 +411,7 @@ Returns an array reference of WebGUI::ProfileField objects that are marked "edit
 sub getEditableFields {
     my $class = shift;
     my $session = shift;
-    return $class->_listFieldsWhere($session, "f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1");
+    return $class->_listFieldsWhere($session, "c.editable=1 AND (f.required = 1 OR f.editable = 1 OR f.showAtRegistration = 1)");
 }
 
 #-------------------------------------------------------------------
@@ -418,6 +439,27 @@ Returns the full class name of the form control for this profile field.
 sub getFormControlClass {
     my $self    = shift;
     return "WebGUI::Form::" . ucfirst $self->get("fieldType");
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPrivacyOptions ( session )
+
+Class method which returns a hash reference containing the privacy options available.
+
+=cut
+
+sub getPrivacyOptions {
+    my $class   = shift;
+    my $session = shift;
+    my $i18n    = WebGUI::International->new($session);
+    tie my %hash, "Tie::IxHash";
+    %hash = (
+        all     => $i18n->get('user profile field private message allow label'),
+        friends => $i18n->get('user profile field private message friends only label'),
+        none    => $i18n->get('user profile field private message allow none label'),
+    );
+    return \%hash;
 }
 
 #-------------------------------------------------------------------
@@ -463,6 +505,29 @@ sub getPasswordRecoveryFields {
 
 #-------------------------------------------------------------------
 
+=head2 isDuplicate( fieldValue )
+
+Checks the value of the field to see if it is duplicated in the system.  Returns true of false.
+
+=head3 fieldValue
+
+value to check for duplicates against
+
+=cut
+
+sub isDuplicate {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $fieldId   = $self->getId;
+    my $value     = shift;
+
+    my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
+    my $duplicate = $session->db->quickScalar($sql,[$value, $session->user->userId]);
+    return ($duplicate > 0);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isEditable ( )
 
 Returns a boolean indicating whether this field may be editable by a user.
@@ -471,7 +536,7 @@ Returns a boolean indicating whether this field may be editable by a user.
 
 sub isEditable {
         my $self = shift;
-        return $self->get("editable") || $self->isRequired;
+        return $self->getCategory->isEditable && ($self->get("editable") || $self->isRequired);
 }
 
 
@@ -503,6 +568,30 @@ sub isRequired {
 
 #-------------------------------------------------------------------
 
+=head2 isValid ( [fieldValue] )
+
+Validates the profile field returning true (1) if valid or false(1) if false
+
+=head3 fieldValue
+
+value to validate the field against
+
+=cut
+
+sub isValid {
+	my $self       = shift;
+    my $fieldValue = shift;
+
+    #If the field value is an array ref, set the value to the first element
+    if(ref $fieldValue eq "ARRAY") {
+        $fieldValue = $fieldValue->[0];
+    }
+        
+	return !$self->isRequired || ($self->isRequired && $fieldValue ne "");
+}
+
+#-------------------------------------------------------------------
+
 =head2 isViewable ( )
 
 Returns a boolean indicating whether this field may be viewed by a user.
@@ -510,8 +599,8 @@ Returns a boolean indicating whether this field may be viewed by a user.
 =cut
 
 sub isViewable {
-        my $self = shift;
-        return $self->get("visible");
+    my $self = shift;
+    return $self->getCategory->isViewable && $self->get("visible");
 }
 
 #-------------------------------------------------------------------
@@ -766,6 +855,7 @@ sub setCategory {
     $self->_reorderFields($currentCategoryId) if ($currentCategoryId);
     $self->_reorderFields($categoryId);
 }
+
 
 1;
 

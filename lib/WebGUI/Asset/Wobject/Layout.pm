@@ -157,140 +157,137 @@ sub getEditForm {
     return $tabform;
 }
 
-
-
-
-
-
 #-------------------------------------------------------------------
 
 sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView;
-    my $children = $self->getLineage( ["children"], { returnObjects=>1, excludeClasses=>["WebGUI::Asset::Wobject::Layout"] });
-    my %vars;
-    # I'm sure there's a more efficient way to do this. We'll figure it out someday.
-    my @positions = split(/\./,$self->get("contentPositions"));
-    my @hidden = split("\n",$self->get("assetsToHide"));
-    my %placeHolder;
-    my $i = 1;
-    my $template = WebGUI::Asset->new($self->session,$self->get("templateId"),"WebGUI::Asset::Template");
+    my $session = $self->session;
+    my $template = WebGUI::Asset->new($session,$self->get("templateId"),"WebGUI::Asset::Template");
     $template->prepare( $self->getMetaDataAsTemplateVariables );
-    my $templateContent = $template->get("template");
     $self->{_viewTemplate} = $template;
+
+    my $templateContent = $template->get("template");
     my $numPositions = 1;
-    foreach my $j (2..15) {
-        $numPositions = $j if $templateContent =~ m/position${j}\_loop/;
+    while ($templateContent =~ /position(\d+)_loop/g) {
+        $numPositions = $1
+            if $1 > $numPositions;
     }
+
+    my %vars;
+
+    my $splitter = $self->{_viewSplitter} = $self->getSeparator;
+
+    my %hidden = map { $_ => 1 }
+        split "\n", $self->get("assetsToHide");
+
+    my %placeHolder;
+    my @children;
+
+    for my $child ( @{ $self->getLineage( ["children"], {
+        returnObjects   => 1,
+        excludeClasses  => ["WebGUI::Asset::Wobject::Layout"],
+    } ) } ) {
+        my $assetId = $child->getId;
+        next
+            if ($hidden{$assetId} || ! $child->canView);
+        $child->prepareView;
+        $placeHolder{$assetId} = $child;
+        push @children, {
+            id              => $assetId,
+            isUncommitted   => $child->get('status') eq 'pending',
+            content         => $splitter . $assetId . '~~',
+        };
+    }
+
+    my @positions = split /\./, $self->get("contentPositions");
+    # cut positions off at the number we found in the template
+    $#positions = $numPositions - 1
+        if $numPositions < scalar @positions;
+
+    my $positionIndex = 0;
     my @found;
     foreach my $position (@positions) {
-        my @assets = split(",",$position);
-        ASSET: foreach my $asset (@assets) {
-            my $childCount = 0;
-            CHILD: foreach my $child (@{$children}) {
-                if ($asset eq $child->getId) {
-                    unless (isIn($asset,@hidden) || !($child->canView)) {
-                        $child->prepareView;
-                        if ($i > $numPositions || $i==1) {
-                            $placeHolder{$child->getId} = $child;
-                            push(@{$vars{"position1_loop"}},{
-                                id=>$child->getId,
-                                isUncommitted=> $child->get('status') eq 'pending',
-                                content=>"~~~".$child->getId."~~~~~"
-                            });
-                        } else {
-                            $placeHolder{$child->getId} = $child;
-                            push(@{$vars{"position".$i."_loop"}},{
-                                id=>$child->getId,
-                                isUncommitted=>$child->get('status') eq 'pending',
-                                content=>"~~~".$child->getId."~~~~~"
-                            });
-                        }
-                    }
-                    splice(@{$children},$childCount,1);
-                                        next ASSET;
-                                }else{
-                                        $childCount++;
+        $positionIndex++;
+        my @assets = split ',', $position;
+        for my $assetId (@assets) {
+            CHILD: for my $childIndex (0..$#children) {
+                if ($children[$childIndex]{id} eq $assetId) {
+                    # remove found child from child list, add it to the appropriate position loop
+                    push @{ $vars{'position' . $positionIndex . '_loop'} },
+                        splice @children, $childIndex, 1;
+                    last CHILD;
                 }
             }
         }
-        $i++;
     }
     # deal with unplaced children
-    foreach my $child (@{$children}) {
-        unless (isIn($child->getId,@hidden)) {  
-            if ($child->canView) {
-                $child->prepareView;
-                $placeHolder{$child->getId} = $child;
-				#Add children to the top or bottom of the first content position based on assetOrder setting
-				if($self->getValue("assetOrder") eq "asc"){
-                	push(@{$vars{"position1_loop"}},{
-                    	id=>$child->getId,
-                    	content=>"~~~".$child->getId."~~~~~"
-                    });
-				} 
-				else {
-					unshift(@{$vars{"position1_loop"}},{
-                    	id=>$child->getId,
-                   	    content=>"~~~".$child->getId."~~~~~"
-                    });
-				} 
-            }
-        }
+    # Add children to the top or bottom of the first content position based on assetOrder setting
+    if($self->getValue("assetOrder") eq "asc") {
+        push @{ $vars{"position1_loop"} }, @children;
     }
-    $self->{_viewPlaceholder} = \%placeHolder;
-    $vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
-    $self->{_viewVars} = \%vars;
+    else {
+        unshift @{ $vars{"position1_loop"} }, reverse @children;
+    }
+
+    $vars{showAdmin} = ($session->var->isAdminOn && $self->canEdit && $self->canEditIfLocked);
     if ($vars{showAdmin}) {
         # under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
         # for end users to work with our templates
-        $self->session->style->setScript($self->session->url->extras("draggable.js"),{ type=>"text/javascript" });
-        $self->session->style->setLink($self->session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
-        $self->session->style->setRawHeadTags('
+        $session->style->setScript($session->url->extras("draggable.js"),{ type=>"text/javascript" });
+        $session->style->setLink($session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
+        $session->style->setRawHeadTags('
             <style type="text/css">
             .dragging, .empty {
-                  background-image: url("'.$self->session->url->extras('opaque.gif').'");
+                  background-image: url("'.$session->url->extras('opaque.gif').'");
             }
             </style>
-            ');
-    }
-}
-
-#-------------------------------------------------------------------
-sub view {
-    my $self = shift;
-    if ($self->{_viewVars}{showAdmin} && $self->canEditIfLocked) {
-        # under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
-        # for end users to work with our templates
-        $self->{_viewVars}{"dragger.icon"} = '<div class="dragTrigger dragTriggerWrap">'.$self->session->icon->drag('class="dragTrigger"').'</div>';
-        $self->{_viewVars}{"dragger.init"} = '
-            <iframe id="dragSubmitter" style="display: none;" src="'.$self->session->url->extras('spacer.gif').'"></iframe>
+        ');
+        $vars{"dragger.icon"} = '<div class="dragTrigger dragTriggerWrap">'.$session->icon->drag('class="dragTrigger"').'</div>';
+        $vars{"dragger.init"} = '
+            <iframe id="dragSubmitter" style="display: none;" src="'.$session->url->extras('spacer.gif').'"></iframe>
             <script type="text/javascript">
                 dragable_init("'.$self->getUrl("func=setContentPositions;map=").'");
             </script>
             ';
     }
-    my $showPerformance = $self->session->errorHandler->canShowPerformanceIndicators();
-    my $out = $self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate});
-    my @parts = split("~~~~~",$self->processTemplate($self->{_viewVars},undef,$self->{_viewTemplate}));
+
+    $self->{_viewVars} = \%vars;
+    $self->{_viewPlaceholder} = \%placeHolder;
+}
+
+#-------------------------------------------------------------------
+sub view {
+    my $self = shift;
+    my $session = $self->session;
+    my $showPerformance = $session->errorHandler->canShowPerformanceIndicators;
+    my @parts = split $self->{_viewSplitter},
+        $self->processTemplate($self->{_viewVars}, undef, $self->{_viewTemplate});
     my $output = "";
+
+    if ($self->{_viewPrintOverride}) {
+        $session->output->print(shift @parts);
+    }
+    else {
+        $output .= shift @parts;
+    }
     foreach my $part (@parts) {
-        my ($outputPart, $assetId) = split("~~~",$part,2);
-        if ($self->{_viewPrintOverride}) {
-            $self->session->output->print($outputPart);
-        } else {
-            $output .= $outputPart;
-        }
+        my ($assetId, $outputPart) = split '~~', $part, 2;
         my $asset = $self->{_viewPlaceholder}{$assetId};
         if (defined $asset) {
             my $t = [Time::HiRes::gettimeofday()] if ($showPerformance);
             my $assetOutput = $asset->view;
             $assetOutput .= "Asset:".Time::HiRes::tv_interval($t) if ($showPerformance);
             if ($self->{_viewPrintOverride}) {
-                $self->session->output->print($assetOutput);
+                $session->output->print($assetOutput);
             } else {
                 $output .= $assetOutput;
             }
+        }
+        if ($self->{_viewPrintOverride}) {
+            $session->output->print($outputPart);
+        } else {
+            $output .= $outputPart;
         }
     }
     return $output;
@@ -309,9 +306,9 @@ sub www_setContentPositions {
 
 #-------------------------------------------------------------------
 sub getContentLastModified {
-        # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
+    # Buggo: this is a little too conservative.  Children that are hidden maybe shouldn't count.  Hm.
     my $self = shift;
-    my $mtime = $self->get("revisionDate");
+    my $mtime = $self->SUPER::getContentLastModified;
     foreach my $child (@{$self->getLineage(["children"],{returnObjects=>1, excludeClasses=>['WebGUI::Asset::Wobject::Layout']})}) {
         my $child_mtime = $child->getContentLastModified;
         $mtime = $child_mtime if ($child_mtime > $mtime);

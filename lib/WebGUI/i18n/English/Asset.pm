@@ -103,8 +103,8 @@ our $I18N = {
 	},
 
 	'purge trash after help' => {
-		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it gets purged all it's revisions and descendants will be purged as well.|,
-		lastUpdated => 1167187074,
+		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it gets purged all its revisions and descendants will be purged as well.|,
+		lastUpdated => 1227289347,
 		context => q|the hover help for the purge trash after field|
 	},
 
@@ -768,7 +768,17 @@ case of the check box list, then enter one per line.  The total amount of data i
 	'directory index' => {
 		 lastUpdated => 1118896675,
 		 message => q|Directory Index|,
-	       },
+    },
+
+    'Export site root URL' => {
+        lastUpdated => 1227213703,
+        message => q|Export site root URL|,
+    },
+
+    'Export site root URL description' => {
+        lastUpdated => 1227213703,
+        message => q|A URL to pass on to Macro Widgets.|,
+    },
 
         'Depth description' => {
                 message => q|<p>Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,
@@ -1114,7 +1124,7 @@ Couldn't open %-s because %-s <br />
         context     => q{Message when no assets match search criteria},
     },
 
-    'menu label' => {
+    'More' => {
         message     => q{More},
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},

@@ -1030,6 +1030,7 @@ sub getEditForm {
             my $drawMethod = $properties->{$fieldName}{customDrawMethod};
             if ($drawMethod) {
                 $params{value} = $self->$drawMethod(\%params);
+                delete $params{name}; # don't want readOnly to generate a hidden field
                 $params{fieldType} = "readOnly";
             }
 
@@ -1286,6 +1287,23 @@ sub getRoot {
 	return WebGUI::Asset->new($session, "PBasset000000000000001");
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getSeparator
+
+Returns a very unique string that can be used for splitting head and body apart
+from the style template.  Made into a method in case it ever has to be changed
+again.
+
+=cut
+
+sub getSeparator {
+	my $self = shift;
+    my $padCharacter = shift || '~';
+    my $pad = $padCharacter x 3;
+	return $pad.$self->getId.$pad
+}
 
 #-------------------------------------------------------------------
 
@@ -2688,7 +2706,13 @@ sub www_view {
 	return $check if (defined $check);
 
     # if all else fails 
-	$self->prepareView;
+    if ($self->get('synopsis')) {
+        $self->session->style->setMeta({
+                name    => 'Description',
+                content => $self->get('synopsis'),
+        });
+    }
+    $self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;
 }

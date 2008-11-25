@@ -15,12 +15,11 @@ package WebGUI::Cache;
 =cut
 
 use strict;
-use File::Path;
+use File::Path ();
 use HTTP::Headers;
 use HTTP::Request;
 use LWP::UserAgent;
 use Digest::MD5;
-use Encode;
 
 =head1 NAME
 
@@ -92,7 +91,7 @@ Flushes the caching system. Must be overridden.
 
 sub flush {
 	my $self = shift;
-	rmtree($self->session->config->get("uploadsPath")."/temp");
+	File::Path::rmtree($self->session->config->get("uploadsPath")."/temp");
 }
 
 #-------------------------------------------------------------------
@@ -131,7 +130,6 @@ A subdivider to store this cache under. When building your own cache plug-in def
 =cut
 
 sub new {
-	my $cache;
 	my $class = shift;
 	my $session = shift;
 	if ($session->config->get("cacheType") eq "WebGUI::Cache::Database") {
@@ -170,7 +168,8 @@ sub parseKey {
     }
     foreach my $part (@key) {
         # convert to octets, then md5 them
-        $part = Digest::MD5::md5_base64(Encode::encode_utf8($part));
+        utf8::encode($part);
+        $part = Digest::MD5::md5_base64($part);
         $part =~ tr{/}{-};
     }
     return join('/', @key);
@@ -185,8 +184,7 @@ Returns a reference to the current session.
 =cut
 
 sub session {
-	my $self = shift;
-	return $self->{_session};
+    $_[0]->{_session};
 }
 
 #-------------------------------------------------------------------

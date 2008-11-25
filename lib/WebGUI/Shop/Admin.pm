@@ -74,6 +74,24 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
+=head2 isCashier ( [ $user ] )
+
+Determine whether or not a user is a cashier
+
+=head3 $user
+
+An optional WebGUI::User object. If this is not used, it uses the current session user object.
+
+=cut
+
+sub isCashier {
+    my $self   = shift;
+    my $user   = shift || $self->session->user;
+    return $user->isInGroup( $self->session->setting->get('groupIdCashier'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session )
 
 Constructor. 
@@ -126,6 +144,12 @@ sub www_editSettings {
         value       => $setting->get("groupIdAdminCommerce"),
         label       => $i18n->get('who can manage'),
         hoverHelp   => $i18n->get('who can manage help'),
+        );
+    $form->group(
+        name        => "groupIdCashier",
+        value       => $setting->get("groupIdCashier"),
+        label       => $i18n->get('who is a cashier'),
+        hoverHelp   => $i18n->get('who is a cashier help'),
         );
     $form->template(
         name        => "shopCartTemplateId",
@@ -182,7 +206,9 @@ sub www_editSettingsSave {
         shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
-    $setting->set("groupIdAdminCommerce", $form->get("groupIdAdminCommerce", "group"));
+    foreach my $group (qw(groupIdCashier groupIdAdminCommerce)) {
+        $setting->set($group, $form->get($group, "group"));
+    }
     return $self->www_editSettings();   
 }
 

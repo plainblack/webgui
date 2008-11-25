@@ -325,7 +325,7 @@ sub toHtml {
 		
 		$slider.setMaximum(|.$self->getSliderMaximum.qq|);
 		$slider.setMinimum(|.$self->getSliderMinimum.qq|);
-		$slider.setValue(|.$self->getSliderValue.qq|);
+		$slider.setValue("|.$self->getSliderValue.qq|");
 		
 		$slider.onchange = function () {|.
 			$self->getOnChangeSlider.qq|;

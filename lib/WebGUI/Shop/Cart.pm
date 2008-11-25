@@ -13,6 +13,7 @@ use WebGUI::Shop::CartItem;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::Ship;
 use WebGUI::Shop::Tax;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -83,7 +84,7 @@ sub calculateShopCreditDeduction {
     unless (defined $total) {
         $total = $self->calculateTotal
     }
-    return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session)->calculateDeduction($total));
+    return $self->formatCurrency(WebGUI::Shop::Credit->new($self->session, $self->get('posUserId'))->calculateDeduction($total));
 }
 
 #-------------------------------------------------------------------
@@ -344,6 +345,22 @@ sub getItemsByAssetId {
 
 #-------------------------------------------------------------------
 
+=head2 getPosUser
+
+Returns the userId of the user making a purchase. If there is a cashier and the cashier has specified a user, then that user will be returned. Otherwise, if it's a direct sale then $session->user will be returned.
+
+=cut
+
+sub getPosUser {
+    my $self = shift;
+    if ($self->get('posUserId') ne "") {
+        return WebGUI::User->new($self->session, $self->get('posUserId'));
+    }
+    return $self->session->user;    
+}
+
+#-------------------------------------------------------------------
+
 =head2 getShipper ()
 
 Returns the WebGUI::Shop::ShipDriver object that is attached to this cart for shipping.
@@ -365,7 +382,13 @@ Returns the WebGUI::Shop::Address object that is attached to this cart for shipp
 
 sub getShippingAddress {
     my $self = shift;
-    return $self->getAddressBook->getAddress($self->get("shippingAddressId"));
+    my $book = $self->getAddressBook;
+    if ($self->get("shippingAddressId")) {
+        return $book->getAddress($self->get("shippingAddressId"));
+    }
+    my $address = $book->getDefaultAddress;
+    $self->update({shippingAddressId=>$address->getId});
+    return $address;
 }
 
 #-------------------------------------------------------------------
@@ -533,6 +556,10 @@ The unique id for a shipping address attached to this cart.
 
 The unique id of the configured shipping driver that will be used to ship these goods.
 
+=head4 posUserId
+
+The ID of a user being checked out, if they're being checked out by a cashier.
+
 =cut
 
 sub update {
@@ -541,7 +568,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(shippingAddressId shipperId)) {
+    foreach my $field (qw(shippingAddressId posUserId shipperId)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});
@@ -612,6 +639,31 @@ sub www_continueShopping {
         return $self->www_view;
     }
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_lookupPosUser ( )
+
+Adds a Point of Sale user to the cart.
+
+=cut
+
+sub www_lookupPosUser {
+    my $self = shift;
+    my $session = $self->session;
+    my $email = $session->form->get('posEmail','email');
+    my $user = WebGUI::User->newByEmail($session, $email);
+    unless (defined $user) {
+        $user = WebGUI::User->newByUsername($session, $email);
+        unless (defined $user) {
+            $user = WebGUI::User->new($session, "new");
+            $user->username($email);
+            $user->profileField('email', $email);
+        }
+    }
+    $self->update({posUserId=>$user->userId});
+    return $self->www_view;
 }
 
 #-------------------------------------------------------------------
@@ -740,23 +792,24 @@ sub www_view {
             . WebGUI::Form::hidden($session, {name=>"itemId", value=>""})
             . WebGUI::Form::hidden($session, {name=>"callback", value=>""}),
         formFooter              => WebGUI::Form::formFooter($session),
-        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button")}),
+        updateButton            => WebGUI::Form::submit($session, {value=>$i18n->get("update cart button"), extras=>q|id="updateCartButton"|}),
         checkoutButton          => WebGUI::Form::submit($session, {value=>$i18n->get("checkout button"), 
-            extras=>q|onclick="this.form.method.value='checkout';this.form.submit;"|}),
+            extras=>q|onclick="this.form.method.value='checkout';this.form.submit;" id="checkoutButton"|}),
         continueShoppingButton  => WebGUI::Form::submit($session, {value=>$i18n->get("continue shopping button"), 
-            extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;"|}),
+            extras=>q|onclick="this.form.method.value='continueShopping';this.form.submit;" id="continueShoppingButton"|}),
         chooseShippingButton    => WebGUI::Form::submit($session, {value=>$i18n->get("choose shipping button"), 
-            extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
+            extras=>q|onclick="setCallbackForAddressChooser(this.form);" id="chooseAddressButton"|}),
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
         );
 
     # get the shipping address    
-    my $address = eval { $self->getShippingAddress };
-    if (WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
+    my $address          = eval { $self->getShippingAddress };
+    if (my $e = WebGUI::Error->caught("WebGUI::Error::ObjectNotFound")) {
         # choose another address cuz we've got a problem
-        $self->update({shippingAddressId=>""});
+        $self->update({shippingAddressId=>''});
+        
     }
     
     # if there is no shipping address we can't check out
@@ -782,13 +835,22 @@ sub www_view {
         $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
     }
     
+    # POS variables
+    $var{isCashier} = WebGUI::Shop::Admin->new($session)->isCashier;
+    $var{posLookupForm} = WebGUI::Form::email($session, {name=>"posEmail"})
+        .WebGUI::Form::submit($session, {value=>$i18n->get('search for email'), 
+            extras=>q|onclick="this.form.method.value='lookupPosUser';this.form.submit;"|});
+    my $posUser = $self->getPosUser;
+    $var{posUsername} = $posUser->username;
+    $var{posUserId} = $posUser->userId;
+
     # calculate price adjusted for in-store credit
     $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
-    my $credit = WebGUI::Shop::Credit->new($session);
+    my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
     $var{inShopCreditAvailable} = $credit->getSum;
     $var{inShopCreditDeduction} = $credit->calculateDeduction($var{totalPrice});
-    $var{totalPrice} = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction}); 
-
+    $var{totalPrice} = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
+    
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     return $session->style->userStyle($template->process(\%var));

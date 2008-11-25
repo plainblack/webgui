@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
 use WebGUI;
+use HTML::Entities ();
 
 =head1 NAME
 
@@ -281,7 +282,7 @@ sub setLink {
 	return undef if ($self->{_link}{$url});
 	my $tag = '<link href="'.$url.'"';
 	foreach my $name (keys %{$params}) {
-		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+		$tag .= ' '.$name.'="'.HTML::Entities::encode($params->{$name}).'"';
 	}
 	$tag .= ' />'."\n";
 	$self->{_link}{$url} = 1;
@@ -391,7 +392,7 @@ sub setScript {
 	return undef if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';
 	foreach my $name (keys %{$params}) {
-		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+		$tag .= ' '.$name.'="'.HTML::Entities::encode($params->{$name}).'"';
 	}
 	$tag .= '></script>'."\n";
 	$self->{_javascript}{$url} = 1;

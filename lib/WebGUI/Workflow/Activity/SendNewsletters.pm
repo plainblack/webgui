@@ -198,7 +198,7 @@ sub execute {
         if (time() - $time > 50) {
             $eh->info("Oops. Ran out of time. Will continue building newsletters in a bit.");
             $subscriptionResultSet->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         }
     }
 	return $self->COMPLETE;

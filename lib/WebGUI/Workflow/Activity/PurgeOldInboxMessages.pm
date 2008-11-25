@@ -100,13 +100,13 @@ sub execute {
         # give up if we're taking too long
         if (time - $start > 120) { 
             $sth->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         } 
     }
     
     # If there are more messages waiting to be purged, return WAITING
     if ( $sth->rows >= $limit ) {
-        return $self->WAITING;
+        return $self->WAITING(1);
     }
     else {
         return $self->COMPLETE;

@@ -64,6 +64,19 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 toHtml ( )
+
+A synonym for toHtmlAsHidden.
+
+=cut
+
+sub toHtml {
+    my $self = shift;
+    $self->toHtmlAsHidden;
+}
+
+#----------------------------------------------------------------
+
 =head2 toHtmlWithWrapper ( )
 
 Renders the form field to HTML as a table row. The row is not displayed because there is nothing to display, but it may not be left away because <input> may not be a child of <table> according to the XHTML standard.
@@ -73,11 +86,14 @@ Renders the form field to HTML as a table row. The row is not displayed because 
 sub toHtmlWithWrapper {
 	my $self         = shift;
     my $value        = $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($self->getOriginalValue))) || '';
-    my $manageButton = "&nbsp;";
     if ($value) {
-        $manageButton = $self->session->icon->manage("op=editGroup;gid=".$value);
+        my $manageButton = $self->session->icon->manage("op=editGroup;gid=".$value);
+        $self->set("subtext",$manageButton . $self->get("subtext"));
+        return $self->SUPER::toHtmlWithWrapper;
     }
-    return $manageButton . $self->toHtmlAsHidden;
+    else {
+        return $self->toHtmlAsHidden;
+    }
 }
 
 

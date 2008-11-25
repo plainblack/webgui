@@ -9,10 +9,46 @@ our $I18N = {
 		context		=> q|vendor label|,
 	},
 
+    'cashier' => {
+        message     => q|Cashier|,
+        lastUpdated    => 0,
+        context        => q|transaction label|,
+    },
+
+    'order for' => {
+        message     => q|Order For|,
+        lastUpdated    => 0,
+        context        => q|cart label, as in "This is an order for John Smith"|,
+    },
+
+    'search for email' => {
+        message     => q|Search for Email Address|,
+        lastUpdated    => 0,
+        context        => q|cart button label|,
+    },
+
+    'who is a cashier' => {
+        message     => q|Who is a cashier?|,
+        lastUpdated    => 0,
+        context        => q|shop admin setting|,
+    },
+
+    'who is a cashier help' => {
+        message     => q|Cashiers are able to make purchases on behalf of another user by typing the email address of the user into the cart.|,
+        lastUpdated    => 0,
+        context        => q|help for shop admin setting|,
+    },
+
     'organization' => {
         message     => q|Organization|,
         lastUpdated    => 0,
         context        => q|address book label|,
+    },
+
+    'organization help' => {
+        message     => q|The name of an organization that uses this address.  Probably the place you work.|,
+        lastUpdated    => 1227495231,
+        context        => q|address book template variable hover help|,
     },
 
     'email' => {
@@ -305,6 +341,12 @@ our $I18N = {
 
 	'editButton help' => {
 		message 	=> q|A button that will allow the user to edit an existing address.|,
+		lastUpdated	=> 0,
+		context		=> q|a help description|,
+	},
+
+	'defaultButton help' => {
+		message 	=> q|A button that will allow the user to set an address as a default.|,
 		lastUpdated	=> 0,
 		context		=> q|a help description|,
 	},
@@ -765,6 +807,12 @@ our $I18N = {
 		context => q|a button in the address book|
 	},
 
+	'default' => { 
+		message => q|Set Default|,
+		lastUpdated => 0,
+		context => q|a button in the address book|
+	},
+
 	'edit' => { 
 		message => q|Edit|,
 		lastUpdated => 0,
@@ -868,7 +916,7 @@ our $I18N = {
 	},
 
 	'choose shipping button' => { 
-		message => q|Choose Address|,
+		message => q|Choose Address &amp; Checkout|,
 		lastUpdated => 1224818677,
 		context => q|a button the user clicks on to choose shipping information and tax calculation|
 	},
@@ -1448,6 +1496,30 @@ our $I18N = {
         message => q|Export Taxes|,
         lastUpdated => 1217125391,
         context => q|Label for the manage tax screen|,
+    },
+
+    'isCashier' => {
+        message => q|A boolean which is true if the current user can be a cashier inside the Shop.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posLookupForm' => {
+        message => q|A form where a cashier can lookup a user by email address.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posUsername' => {
+        message => q|The name of the user making the POS transaction.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
+    },
+
+    'posUserId' => {
+        message => q|The userId of the user making the POS transaction.|,
+        lastUpdated => 1227495334,
+        context => q|template variable for Cart template|,
     },
 
 };

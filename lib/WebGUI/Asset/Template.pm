@@ -322,13 +322,9 @@ sub prepare {
 	$self->{_prepared} = 1;
 	my $templateHeadersSent = $self->session->stow->get("templateHeadersSent") || [];
 	my @sent = @{$templateHeadersSent};
-	unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
-		if ($self->session->style->sent) {
-            $self->session->output->print($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
-		} else {
-            $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
-		}
-	}
+    unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
+        $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
+    }
 	push(@sent, $self->getId);
 	$self->session->stow->set("templateHeadersSent", \@sent);
 }

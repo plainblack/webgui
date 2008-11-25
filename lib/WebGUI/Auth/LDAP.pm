@@ -224,7 +224,7 @@ sub createAccount {
     if ($self->session->user->isRegistered) {
        return $self->displayAccount;
     }
-    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
+    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('inboxInviteUserEnabled')) {
  	   return $self->displayLogin;
     } 
 	
@@ -304,9 +304,18 @@ sub createAccountSave {
     #Check that username is valid and not a duplicate in the system.
     $error .= $self->error if(!$self->validUsername($username));
     #Validate profile data.
-    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
+    my $fields    = WebGUI::ProfileField->getEditableFields($self->session);
+    my $retHash   = $self->user->validateProfileDataFromForm($fields);
+    my $profile   = $retHash->{profile};
+    my $temp      = "";
+    my $warning   = "";
+
+    my $format    = "<li>%s</li>";
+    map { $warning .= sprintf($format,$_)  } @{$retHash->{warnings}};
+    map { $temp    .= sprintf($format,$_)  } @{$retHash->{errors}};
+
     $error .= $temp;
-    return $self->createAccount("<li>".$error."</li1>") unless ($error eq "");
+    return $self->createAccount("<li>".$error."</li>") unless ($error eq "");
     #If Email address is not unique, a warning is displayed
     if($warning ne "" && !$self->session->form->process("confirm")){
         return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
@@ -336,18 +345,29 @@ sub deactivateAccountConfirm {
 
 #-------------------------------------------------------------------
 sub displayAccount {
-   my $self = shift;
-   my $vars;
-   return $self->displayLogin($_[0]) if ($self->isVisitor);
+    my $self = shift;
+    my $vars;
+    return $self->displayLogin($_[0]) if ($self->isVisitor);
 	my $i18n = WebGUI::International->new($self->session);
-   $vars->{displayTitle} = '<h1>'.$i18n->get(61).'</h1>';
-   $vars->{'account.message'} = $i18n->get(856);
-   if($self->session->setting->get("useKarma")){
-      $vars->{'account.form.karma'} = $self->session->user->profileField("karma");
-	  $vars->{'account.form.karma.label'} = $i18n->get(537);
-   }
-   $vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
-   return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    $vars->{displayTitle} = '<h1>'.$i18n->get(61).'</h1>';
+    $vars->{'account.message'} = $i18n->get(856);
+    if($self->session->setting->get("useKarma")){
+        $vars->{'account.form.karma'} = $self->session->user->profileField("karma");
+        $vars->{'account.form.karma.label'} = $i18n->get(537);
+    }
+
+    ########### ACCOUNT SHUNT
+    #The following is a shunt which allows the displayAccount page to be displayed in the
+    #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
+    my $output = WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    #If the account system is calling this method, just return the template
+    my $op = $self->session->form->get("op");
+    if($op eq "account") {
+        return $output;
+    }
+    #Otherwise wrap the template into the account layout
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"user");
+    return $instance->displayContent($output,1);
 }
 
 #-------------------------------------------------------------------
@@ -581,4 +601,3 @@ sub setConnectDN {
 
 
 1;
-

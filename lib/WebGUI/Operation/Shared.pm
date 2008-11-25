@@ -27,73 +27,15 @@ Shared routines for WebGUI Operations.
 
 TODO: DOCUMENT ME
 
+DEPRECATED - USE Macros to display account options
+
 =cut
 
 #-------------------------------------------------------------------
  sub accountOptions {
 	my $session = shift;
-	my $i18n = WebGUI::International->new($session);
-	my @array;
-	my $op = $session->form->process("op");
-	
-	if ($session->user->isInGroup(12)) {
-		my %hash;
-		if ($session->var->isAdminOn) {
-			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOffAdmin').'">'.$i18n->get(12).'</a>';
-		} else {
-			$hash{'options.display'} .= '<a href="'.$session->url->page('op=switchOnAdmin').'">'.$i18n->get(63).'</a>';
-		}
-	    push(@array,\%hash);
-	}
-	unless ($op eq "displayAccount"){
-		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=init').'">'.$i18n->get(342).'</a>';
-		push(@array,\%hash);
-	}
-	unless ($op eq "editProfile"){
-		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=editProfile').'">'.$i18n->get(341).'</a>';
-		push(@array,\%hash);
-	}
-	unless ($op eq "viewProfile"){
-		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewProfile;uid='.$session->user->userId).'">'.$i18n->get(343).'</a>';
-		push(@array,\%hash);
-	}
-	unless ($op eq "viewInbox"){
-		my %hash;
-		$hash{'options.display'} = '<a href="'.$session->url->page('op=viewInbox').'">'.$i18n->get(354).'</a>';
-		push(@array,\%hash);
-	}
-		push(@array, {'options.display' => '<a href="'.$session->url->page('shop=transaction;method=manageMy').'">'.$i18n->get('my purchases', 'Shop').'</a>'});
-	
-    if ($session->setting->get('userInvitationsEnabled')) {
-        push @array, {
-            'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=inviteUser'), $i18n->get('invite a friend')),
-        };
-    }
-	unless ($op eq "manageFriends") {
-        push @array, {
-            'options.display' => sprintf('<a href=%s>%s</a>', $session->url->page('op=manageFriends'), $i18n->get('see my friends', 'Friends')),
-        };
-    }
-	my %logout;
-	$logout{'options.display'} = '<a href="'.$session->url->page('op=auth;method=logout').'">'.$i18n->get(64).'</a>'; 
-	push(@array,\%logout);
-	if ($session->setting->get("selfDeactivation") && !$session->user->isAdmin){
-	   my %hash;
-	   $hash{'options.display'} = '<a href="'.$session->url->page('op=auth;method=deactivateAccount').'">'.$i18n->get(65).'</a>';
-	   push(@array,\%hash);
-	}
-    { ##Return to site link
-        my %hash;
-        $hash{'options.display'} = '<a href="'.$session->url->getBackToSiteURL.'">'.$i18n->get(493).'</a>';
-        push(@array,\%hash);
-    }
-    
-	return \@array;
+    return "";
 }
-
 
 =head2 secureEval ( $session, $code )
 

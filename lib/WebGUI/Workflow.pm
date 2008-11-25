@@ -517,11 +517,11 @@ sub set {
 		$properties->{mode} = "singleton";
 	}
 
-    $self->{_data}{mode} = $properties->{mode} || "parallel";
-	$self->{_data}{enabled} = ($properties->{enabled} == 1) ? 1 : 0;
-	$self->{_data}{title} = $properties->{title} || $self->{_data}{title} || "Untitled";
+    $self->{_data}{mode}        = $properties->{mode} || $self->{_data}{mode} || "parallel";
+	$self->{_data}{enabled}     = exists $properties->{enabled} ? $properties->{enabled} : $self->{_data}{enabled};
+	$self->{_data}{title}       = $properties->{title} || $self->{_data}{title} || "Untitled";
 	$self->{_data}{description} = (exists $properties->{description}) ? $properties->{description} : $self->{_data}{description};
-	$self->{_data}{type} = $properties->{type} || $self->{_data}{type} || "None";
+	$self->{_data}{type}        = $properties->{type} || $self->{_data}{type} || "None";
 	$self->session->db->setRow("Workflow","workflowId",$self->{_data});
 }
 

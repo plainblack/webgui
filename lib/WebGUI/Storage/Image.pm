@@ -65,7 +65,7 @@ These methods are available from this class:
 
 =head2 addFileFromCaptcha ( )
 
-Generates a captcha image (105px x 26px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
+Generates a captcha image (125px x 26px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
 
 =cut 
 
@@ -76,7 +76,7 @@ sub addFileFromCaptcha {
 	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".$self->session->id->generate().".gif";
 	my $image = $graphicsPackage->new();
-	$error = $image->Set(size=>'105x26');
+	$error = $image->Set(size=>'125x26');
 	if($error) {
         $self->session->errorHandler->warn("Error setting captcha image size: $error");
     }

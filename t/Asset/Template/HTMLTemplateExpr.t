@@ -27,23 +27,26 @@ plan tests => 2 + $num_tests;
 my $session = WebGUI::Test->session;
  
 # put your tests here
-
-my $module = use_ok('HTML::Template::Expr');
-my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
-
 my ($versionTag, $template);
 my $originalParsers = $session->config->get('templateParsers');
 
+my $module = use_ok('HTML::Template::Expr');
 SKIP: {
-	skip $num_tests, "HTML::Template::Expr or plugin not loaded" unless $module and $plugin;
+	skip "HTML::Template::Expr or plugin not loaded", $num_tests+1 unless $module;
+    my $plugin = use_ok('WebGUI::Asset::Template::HTMLTemplateExpr');
 
-	$session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
-	($versionTag, $template) = setup_assets($session);
-	my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
-	my $companyName = $session->config->get('companyName');
-	like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
-	like($templateOutput, qr/FOOBAR=baz/, "explicit variable with dots");
-	like($templateOutput, qr/EQN=4/, "explicit variable with dots in expr");
+    SKIP: {
+        skip "HTML::Template::Expr or plugin not loaded", $num_tests unless $plugin;
+
+        $session->config->set('templateParsers', ['WebGUI::Asset::Template::HTMLTemplate', 'WebGUI::Asset::Template::HTMLTemplateExpr',] );
+        ($versionTag, $template) = setup_assets($session);
+        my $templateOutput = $template->process({ "foo.bar" => "baz", "number.value" => 2 });
+        my $companyName = $session->config->get('companyName');
+        like($templateOutput, qr/NAME=$companyName/, "session variable with underscores");
+        like($templateOutput, qr/FOOBAR=baz/, "explicit variable with dots");
+        like($templateOutput, qr/EQN=4/, "explicit variable with dots in expr");
+    }
+
 }
 
 sub setup_assets {

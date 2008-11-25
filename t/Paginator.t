@@ -48,17 +48,21 @@ cmp_bag([25..49], $p->getPageData(2), 'page 2 data correct');
 cmp_bag([      ], $p->getPageData(5), 'page 5 data correct');
 
 # Test getPageLinks
-cmp_deeply(
-    [ 
-        map { +{ 
+my $expectedPages;
+$expectedPages = [  map { +{ 
             'pagination.text'   => ( $_ + 1 ), 
             'pagination.range'  => ( 25 * $_ + 1 ) . "-" . ( $_ * 25 + 25 <= $endingRowNum + 1 ? $_ * 25 + 25 : $endingRowNum + 1 ), # First row number - Last row number
             'pagination.url'    => ( $_ != 0 ? $url . '?pn=' . ( $_ + 1 ) : '' ), # Current page has no URL
-        } } (0..$NumberOfPages-1)
-    ], 
+        } } (0..$NumberOfPages-1) ];
+
+$expectedPages->[0]->{'pagination.activePage'} = 'true';
+
+cmp_deeply(
     ($p->getPageLinks)[0], 
+    $expectedPages, 
     'page links correct',
 );
+
 
 $startingRowNum =   0;
 $endingRowNum   = 100;
@@ -83,16 +87,19 @@ is('100', $p->getPage(5), '(101) page 5 stringification okay');
 
 is($p->getPageNumber, 1, 'Default page number is 1'); ##Additional page numbers are specified at instantiation
 
-# Test getPageLinks
-cmp_deeply(
-    ($p->getPageLinks)[0], 
-    [ 
-        map { +{ 
+$expectedPages = [  map { +{ 
             'pagination.text'   => ( $_ + 1 ), 
             'pagination.range'  => ( 25 * $_ + 1 ) . "-" . ( $_ * 25 + 25 <= $endingRowNum + 1 ? $_ * 25 + 25 : $endingRowNum + 1 ), # First row number - Last row number
             'pagination.url'    => ( $_ != 0 ? $url . '?pn=' . ( $_ + 1 ) : '' ), # Current page has no URL
-        } } (0..$NumberOfPages-1)
-    ], 
+        } } (0..$NumberOfPages-1) ];
+
+$expectedPages->[0]->{'pagination.activePage'} = 'true';
+
+
+# Test getPageLinks
+cmp_deeply(
+    ($p->getPageLinks)[0], 
+    $expectedPages,
     'page links correct',
 );
 

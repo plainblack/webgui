@@ -1,3 +1,69 @@
+7.6.4
+ - Survey now will show progress and time limit.
+ - Brand new Survey system.  Make sure to export your old results as they will
+ - Made it more obvious how to check out when viewing the cart.
+ - Added a wait timeout parameter to the WAITING method, so that Spectre
+   doesn't have to check something that the workflow activity knows it will
+   have to wait on for a while.
+ - Added --stop and --start aliases to spectre.pl.
+ - New pluggable framework added for cutsomizing WebGUI's Account system
+ - New Profile Account module added providing a better interface for users to view and update their profile
+ - New Inbox Account module added providing a better interface into WebGUI's various messaging systems
+ - New Friends Account module added providing a better interface into WebGUI's friends system
+ - New Contributions Account module added which displays public assets a user has contributed to the website
+ - rfe: Event hover detail exclusions  (#8761)
+ - rfe: Database Link test  (#513)
+ - rfe: User Profile Privacy Settings (#507) - users now have granular control of whether or not their profile fields are viewable - admin settings still apply
+ - The Display Account and My Purchases interfaces have been added to the new Account system
+ - Added a new macro which returns the self deactivation link if the setting is enabled.
+ - Added a new macro which returns the back to site link
+ - Added a new macro which allows users to test to see if a value is not empty and set the display text accordingly.
+   not be imported, only the surveys themselves.
+ - Made syndicated content asset use cache.
+ - Added Cashier/Point of Sale mode for the Shop.
+ - Added the notion of a default address to the Shop's address book.
+ - fixed #8837: When you move an asset to a new version, only the current version is moved, instead of all of them.
+ - Added version tag modes: multiple tags per user, single tag per user, site wide version tag and auto commit (thanks to Long Term Results B.V.)
+ - fixed #9076: Thingy broken in latest beta, Save and Close buttons missing
+   from Add/Edit Field dialogs (SDH Consulting Group).
+ - fixed #4214: Missing i18n in asset manager
+ - fixed #8849: More missing i18n
+ - fixed #4182: Edit links show in asset manager for locked assets
+ - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
+ - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
+ - fixed #9068: field.inTab
+ - fixed #8845: Workflows refusing to show edit screen
+ - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
+ - fixed #4161: asset manager: switching title to descending order reverts to ascending on next page
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed: Get CS Mail workflow doesn't commit version tags created
+ - rfe: Thingy can now copy thingy entries
+ - Added a switch to subscriptions so that they can be also non-recurring to
+   facilitate eg. limited time meberships (Martin Kamerbeek / Oqapi)
+ - Replaced Matrix with newer version
+ - fixed #8822: Password Recovery Tempalte not working
+ - fixed: WebGUI::User now actually checks whether the friends group exists
+   (Martin Kamerbeek / Oqapi)
+ - fixed #9039: Synopsis not output as a meta field
+ - fixed #9132: usage error in Hover Help
+ - fixed #4181: hoover help for 'encrypt login' is wrong
+ - fixed #4186: search results (macro not expanded in the synopsis field)
+ - fixed #4191: Using 3 consecutive tildes in a Post title makes a bad URL/Pos
+ - fixed #8927: Collaboration System: Thread approval workflow setting ignore
+ - fixed #8827: Slider JS bug for non-numeric values (Patrick Donelan, SDH Consulting)
+ - fixed #8925: Collaboration System: Label missing
+ - fixed #8908: No Post Captcha in Default Submission Form
+ - fixed #9138: Fat fonts break WebGUI captchas
+ - fixed #8982: Deploy package doesn't take back to asset manager 
+ - fixed #8956: Not checking for populated variable
+ - fixed #9130: fixed: Rich editor creates root <p> tag even when set to use <br />
+ - fixed: DataForm times out when exporting large data sets
+ - fixed: DataForm entry data field is too small
+ - fixed #4213: Can see "edit" tab even tho i am not logged in
+ - fixed #9139: Updating a workflow property causes workflow to be disabled
+ - fixed #9140: Date format error when adding tasks to PM
+
+
 7.6.3
  - improved performance of file uploads
  - changed format of created uploads locations, avoiding case sensitivity problems

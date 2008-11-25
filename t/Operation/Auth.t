@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 4;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the getInstance method
@@ -54,20 +54,6 @@ unlike(
     qr/<input type="hidden" name="method" value="login" /, 
     "Hidden form elements for login NOT displayed to valid user",
 );
-
-like(
-    $output,
-    qr/Edit account information/,
-    "Edit account information link exists"
-);
-
-like(
-    $output,
-    qr/Edit profile/,
-    "Edit Profile link exists"
-);
-
-
 
 
 #----------------------------------------------------------------------------

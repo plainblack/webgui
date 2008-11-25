@@ -2422,8 +2422,8 @@ ENDJS
     
     ### Show the processed template
     $session->http->sendHeader;
-    my $style = $session->style->process("~~~",$self->getParent->get("styleTemplateId"));
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $session->style->process($self->getSeparator,$self->getParent->get("styleTemplateId"));
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
     $self->session->output->print($self->processTemplate($var, undef, $template));
     $self->session->output->print($foot, 1);
@@ -2460,8 +2460,8 @@ sub www_view {
     $self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
     $self->session->http->sendHeader;    
     $self->prepareView;
-    my $style = $self->getParent->processStyle("~~~");
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $self->getParent->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head,1);
     $self->session->output->print($self->view);
     $self->session->output->print($foot,1);

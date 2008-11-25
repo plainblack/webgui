@@ -43,43 +43,6 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
-=head2 appendChoppedTemplateDescriptionVars ( var ) 
-
-Appends shorter versions of the feeds description field to template vars returned.
-
-=cut
-
-sub appendChoppedDescriptionTemplateVars {
-	my $item = shift;
-
-        $item->{"descriptionFull"} = $item->{description};
-        $item->{"descriptionFirst100words"} = $item->{"descriptionFull"};
-        $item->{"descriptionFirst100words"} =~ s/(((\S+)\s+){100}).*/$1/s;
-        $item->{"descriptionFirst75words"} = $item->{"descriptionFirst100words"};
-        $item->{"descriptionFirst75words"} =~ s/(((\S+)\s+){75}).*/$1/s;
-        $item->{"descriptionFirst50words"} = $item->{"descriptionFirst75words"};
-        $item->{"descriptionFirst50words"} =~ s/(((\S+)\s+){50}).*/$1/s;
-        $item->{"descriptionFirst25words"} = $item->{"descriptionFirst50words"};
-        $item->{"descriptionFirst25words"} =~ s/(((\S+)\s+){25}).*/$1/s;
-        $item->{"descriptionFirst10words"} = $item->{"descriptionFirst25words"};
-        $item->{"descriptionFirst10words"} =~ s/(((\S+)\s+){10}).*/$1/s;
-        $item->{"descriptionFirst2paragraphs"} = $item->{"descriptionFull"};
-        $item->{"descriptionFirst2paragraphs"} =~ s/^((.*?\n){2}).*/$1/s;
-        $item->{"descriptionFirstParagraph"} = $item->{"descriptionFirst2paragraphs"};
-        $item->{"descriptionFirstParagraph"} =~ s/^(.*?\n).*/$1/s;
-        $item->{"descriptionFirst4sentences"} = $item->{"descriptionFull"};
-        $item->{"descriptionFirst4sentences"} =~ s/^((.*?\.){4}).*/$1/s;
-        $item->{"descriptionFirst3sentences"} = $item->{"descriptionFirst4sentences"};
-        $item->{"descriptionFirst3sentences"} =~ s/^((.*?\.){3}).*/$1/s;
-        $item->{"descriptionFirst2sentences"} = $item->{"descriptionFirst3sentences"};
-        $item->{"descriptionFirst2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
-        $item->{"descriptionFirstSentence"} = $item->{"descriptionFirst2sentences"};
-        $item->{"descriptionFirstSentence"} =~ s/^(.*?\.).*/$1/s;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 definition ( definition )
 
 Defines the properties of this asset.
@@ -170,14 +133,19 @@ sub generateFeed {
 	my $log = $self->session->log;
 	
 	# build one feed out of many
-	foreach my $url (split("\n", $self->get('rssUrl'))) {
+    my $newlyCached = 0;
+	foreach my $url (split(/\s+/, $self->get('rssUrl'))) {
 		$log->info("Processing FEED: ".$url);
 		$url =~ s/^feed:/http:/;
 		if ($self->get('processMacroInRssUrl')) {
 			WebGUI::Macro::process($self->session, \$url);
 		}
 		my $cache = WebGUI::Cache->new($self->session, $url, "RSS");
-		my $value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
+		my $value = $cache->get;
+		unless ($value) {
+    		$value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
+            $newlyCached = 1;
+        }
 		eval { $feed->merge($value) };
 		if (my $e = WebGUI::Error->caught()) {
 			$log->error("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$e->message);
@@ -202,7 +170,7 @@ sub generateFeed {
 	$feed->limit_item($self->get('maxHeadlines'));
 	
 	# mark this asset as updated
-	$self->update({lastModified=>time});
+	$self->update({}) if ($newlyCached);
 	
 	return $feed;
 }
@@ -225,7 +193,7 @@ sub getTemplateVariables {
 	my %var;
 	$var{channel_title} = WebGUI::HTML::filter($feed->title, 'javascript');
 	$var{channel_description} = WebGUI::HTML::filter($feed->description, 'javascript');
-	$var{channel_date} = WebGUI::HTML::filter($feed->pubDate, 'javascript');
+	$var{channel_date} = WebGUI::HTML::filter($feed->get_pubDate_epoch, 'javascript');
 	$var{channel_copyright} = WebGUI::HTML::filter($feed->copyright, 'javascript');
 	$var{channel_link} = WebGUI::HTML::filter($feed->link, 'javascript');
 	my @image = $feed->image;
@@ -238,7 +206,7 @@ sub getTemplateVariables {
 	foreach my $object (@items) {
 		my %item;
         $item{title} = WebGUI::HTML::filter($object->title, 'javascript');
-        $item{date} = WebGUI::HTML::filter($object->pubDate, 'javascript');
+        $item{date} = WebGUI::HTML::filter($object->get_pubDate_epoch, 'javascript');
         $item{category} = WebGUI::HTML::filter($object->category, 'javascript');
         $item{author} = WebGUI::HTML::filter($object->author, 'javascript');
         $item{guid} = WebGUI::HTML::filter($object->guid, 'javascript');
@@ -286,7 +254,6 @@ sub prepareView {
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 	my $title = $self->get("title");
-	$title =~ s/\"/&quot;/g;
 	my $style = $self->session->style;
 	$style->setLink($self->getUrl("func=viewRss"), { rel=>'alternate', type=>'application/rss+xml', title=>$title.' (RSS)' });
 	$style->setLink($self->getUrl("func=viewRdf"), { rel=>'alternate', type=>'application/rdf+xml', title=>$title.' (RDF)' });

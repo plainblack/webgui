@@ -11,19 +11,11 @@ package WebGUI::Operation::Profile;
 #-------------------------------------------------------------------
 
 use strict qw(vars subs);
-use URI;
-use WebGUI::Asset::Template;
-use WebGUI::Operation::Auth;
-use WebGUI::HTML;
-use WebGUI::HTMLForm;
+use WebGUI::Content::Account;
 use WebGUI::International;
-use WebGUI::SQL;
+use WebGUI::ProfileField;
 use WebGUI::User;
 use WebGUI::Utility;
-use WebGUI::ProfileField;
-use WebGUI::ProfileCategory;
-use WebGUI::Operation::Shared;
-use WebGUI::Operation::Friends;
 
 =head1 NAME
 
@@ -46,7 +38,7 @@ These methods are available from this package:
 Returns an array of hashes for required profile fields.  This array is ready
 to be used as template variables in the WebGUI template system.
 
-This method is deprecated, and should not be used in new code.  Use
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
 the getRequiredFields method from WebGUI::ProfileField and specify the
 translation to template variables directly instead.
 
@@ -80,6 +72,9 @@ duplicated in the system.  Returns true of false.  Will return false
 if the email address passed in is same as the email address of the
 current user.
 
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the isDuplicate method from WebGUI::ProfileField instead
+
 =head3 email
 
 email address to check for duplication
@@ -89,12 +84,9 @@ email address to check for duplication
 sub isDuplicateEmail {
     my $session     = shift;
     my $email       = shift;
-    my ($otherEmail) 
-        = $session->db->quickArray(
-            'select count(*) from userProfileData where email = ? and userId <> ?',
-            [$email, $session->user->userId]
-        );
-    return ($otherEmail > 0);
+
+    my $field = WebGUI::ProfileField->new($session,'email');
+    return $field->isDuplicate($email);
 }
 
 #-------------------------------------------------------------------
@@ -102,6 +94,9 @@ sub isDuplicateEmail {
 =head2 saveProfileFields ( session, user, profile )
 
 Saves profile data to a user's profile.  Does not validate any of the data.
+
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the updateProfileFields method in WebGUI::User
 
 =head3 session
 
@@ -119,12 +114,9 @@ Hash ref of profile data to save.
 
 sub saveProfileFields {
 	my $session = shift;
-	my $u = shift;
+	my $u       = shift;
 	my $profile = shift;
-
-	foreach my $fieldName (keys %{$profile}) {
-		$u->profileField($fieldName,${$profile}{$fieldName});
-	}
+    $u->updateProfileFields($profile);
 }
 
 #-------------------------------------------------------------------
@@ -133,6 +125,9 @@ sub saveProfileFields {
 
 Validates profile data from the session form variables.  Returns processed data, warnings
 and errors.
+
+DEPRECATED - This method is deprecated, and should not be used in new code.  Use
+the validateProfileDataFromForm method from WebGUI::User instead
 
 There are two levels of validation:
 
@@ -152,46 +147,35 @@ warning if it is a duplicate.
 =cut
 
 sub validateProfileData {
-	my $session = shift;
-	my $opts = shift || {};
-    my $regOnly = $opts->{regOnly};
-    my %data = ();
-	my $error = "";
-	my $warning = "";
-	my $i18n = WebGUI::International->new($session);
-    my $fields = $regOnly ? WebGUI::ProfileField->getRegistrationFields($session)
+	my $session   = shift;
+	my $opts      = shift || {};
+    my $regOnly   = $opts->{regOnly};
+    
+    my $fields    = $regOnly ? WebGUI::ProfileField->getRegistrationFields($session)
                           : WebGUI::ProfileField->getEditableFields($session);
-	foreach my $field (@$fields) {
-		my $fieldValue = $field->formProcess;
-		if (ref $fieldValue eq "ARRAY") {
-			$data{$field->getId} = $$fieldValue[0];
-		} else {
-			$data{$field->getId} = $fieldValue;
-		}
-		if ($field->isRequired && $data{$field->getId} eq "") {
-			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
-		} elsif ($field->getId eq "email" && isDuplicateEmail($session,$data{$field->getId}) && WebGUI::ProfileField->new($session, "email")->isRequired() ) {
-			$warning .= '<li>'.$i18n->get(1072).'</li>';
-		}
-		if ($field->getId eq "language" && $fieldValue ne "") { 
-			unless (exists $i18n->getLanguages()->{$fieldValue}) {
-				$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
-			}
-		}
-	}
-	return (\%data, $error, $warning);
+
+    my $retHash   = $session->user->validateProfileDataFromForm($fields);
+
+    my $format    = "<li>%s</li>";
+    my $warningMessage  = "";
+    my $errorMessage    = "";
+
+    for my $warning ( @{ $retHash->{warnings} } ) {
+        $warningMessage .= sprintf $format, $warning;
+    }
+    for my $error ( @{ $retHash->{errors} } ) {
+        $errorMessage .= sprintf $format, $error;
+    }
+
+    return ($retHash->{profile}, $errorMessage, $warningMessage);
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_editProfile ( session )
 
-Provide a form where user profile data can be entered or edited.  The subroutine
-makes a large set of template variables which are passed to a template for presentation
-and styling.  The default template is PBtmpl0000000000000051 and is not user
-selectable.
-
-Calls www_editProfileSave on submission.
+DEPRECATED - This method is deprecated, and should not be used in new code.
+Use WebGUI::Account::Profile::www_edit
 
 =head3 session
 
@@ -200,86 +184,18 @@ A reference to the current session.
 =cut
 
 sub www_editProfile {
-	my $session = shift;
-	return WebGUI::Operation::Auth::www_auth($session,"init") if($session->user->isVisitor);
-	my $i18n = WebGUI::International->new($session);
-	my $vars = {};
-	$vars->{displayTitle} .= $i18n->get(338);
-	$vars->{'profile.message'} = $_[0] if($_[0]);
-	$vars->{'profile.form.header'} = "\n\n".WebGUI::Form::formHeader($session,{});
-	$vars->{'profile.form.footer'} = WebGUI::Form::formFooter($session,);
-
-	$vars->{'profile.form.hidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"editProfileSave"});
-	$vars->{'profile.form.hidden'} .= WebGUI::Form::hidden($session,{"name"=>"uid","value"=>$session->user->userId});
-	my @array = ();
-	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-		next unless $category->isEditable;
-		my @temp = ();
-		foreach my $field (@{$category->getFields}) {
-			next unless ($field->isEditable);
-			next if $field->getId =~ /contentPositions/;
-			push(@temp, {
-				'profile.form.element' => $field->formField,
-				'profile.form.element.label' => $field->getLabel,
-				'profile.form.element.subtext' => $field->isRequired ? "*" : undef,
-                'profile.form.element.extras' => $field->getExtras,
-				});
-		}
-		push(@array, {
-            'profile.form.category' => $category->getLabel,
-            'profile.form.category.loop' => \@temp
-        });
-	}
-	$vars->{'profile.form.elements'} = \@array;
-	$vars->{'profile.form.submit'} = WebGUI::Form::submit($session,{});
-	$vars->{'profile.form.cancel'} = WebGUI::Form::button($session,{
-        value => $i18n->get('cancel'),
-        extras=>q|onclick="history.go(-1);" class="backwardButton"|,
-    });
-	$vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
-	return $session->style->userStyle(WebGUI::Asset::Template->new($session, $session->setting->get('editUserProfileTemplate'))->process($vars));
+	my $session  = shift;
+    my $instance = WebGUI::Content::Account->createInstance($session,"profile");
+    return $instance->displayContent($instance->callMethod("edit"));
 }
 
-#-------------------------------------------------------------------
-
-=head2 www_editProfileSave ( session )
-
-Validates all data submitted by www_editProfile.  If errors or warnings are present, 
-they are concatenated and sent back to www_editProfile for display and to let the user
-correct their mistakes.
-
-If no mistakes are present, saves the data to the user's profile, updates the session user
-object.
-
-Returns the user to WebGUI::Operation::Auth::www_auth when done.
-
-=head3 session
-
-A reference to the current session.
-
-=cut
-
-sub www_editProfileSave {
-	my $session = shift;
-	my ($profile, $error, $warning);
-	return WebGUI::Operation::Auth::www_auth($session, "init") if ($session->user->isVisitor);
-	($profile, $error, $warning) = validateProfileData($session);
-	$error .= $warning;
-	return www_editProfile($session, '<ul>'.$error.'</ul>') if($error ne "");
-	foreach my $fieldName (keys %{$profile}) {
-		$session->user->profileField($fieldName,$profile->{$fieldName});
-	}
-	return WebGUI::Operation::Auth::www_auth($session);
-}
 
 #-------------------------------------------------------------------
 
 =head2 www_viewProfile ( session )
 
-View the profile data for a user by the userId specified by the form variable C<uid>.
-Validates that the user requesting the profile data is allowed to see it.
-Similarly to www_editProfile, this method is templated.  The default template
-is PBtmpl0000000000000052.  The template is not user selectable.
+DEPRECATED:  This method is deprecated, and should not be used in new code.
+Use WebGUI::Account::Profile::www_view
 
 =head3 session
 
@@ -288,46 +204,10 @@ A reference to the current session.
 =cut
 
 sub www_viewProfile {
-    my $session = shift;
-    my $u       = WebGUI::User->new($session,$session->form->process("uid"));
-    my $i18n    = WebGUI::International->new($session);
-    my $vars    = {};
-    $vars->{displayTitle} = $i18n->get(347).' '.$u->username;
-
-    return $session->privilege->notMember() if($u->username eq "");
-
-    return $session->style->userStyle($vars->{displayTitle}.'. '.$i18n->get(862)) if($u->profileField("publicProfile") < 1 && ($session->user->userId ne $session->form->process("uid") || $session->user->isAdmin));
-    return $session->privilege->insufficient() if(!$session->user->isRegistered);
-
-    my @array = ();
-    foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {
-        next unless ($category->get("visible"));
-        push(@array, {'profile.category' => $category->getLabel});
-        foreach my $field (@{$category->getFields}) {
-            next unless ($field->get("visible"));
-            next if ($field->get("fieldName") eq "email" && !$u->profileField("publicEmail"));
-            push @array, {
-                'profile.label'     => $field->getLabel,
-                'profile.value'     => $field->formField(undef,2,$u),
-                'profile.extras'    => $field->getExtras,
-            };
-        }
-    }
-    $vars->{'profile.elements'} = \@array;
-
-    if ($session->user->userId eq $session->form->process("uid")) {
-        $vars->{'profile.accountOptions'} = WebGUI::Operation::Shared::accountOptions($session);
-    }
-    else {
-        ## TODO: Make this more legible code, maybe refactor into a method
-        push @{$vars->{'profile.accountOptions'}}, {
-            'options.display'   => '<a href="'.$session->url->page("op=addFriend;userId=".$u->userId).'">'.$i18n->get('add to friends list', 'Friends').'</a>',
-        }, {
-            'options.display'   => '<a href="'.$session->url->page('op=sendPrivateMessage;uid='.$session->form->process("uid")).'">'.$i18n->get('send private message').'</a>',
-        };
-    }
-
-    return $session->style->userStyle(WebGUI::Asset::Template->new($session, $session->setting->get('viewUserProfileTemplate'))->process($vars));
+    my $session  = shift;
+    my $uid      = $session->form->process("uid");
+    my $instance = WebGUI::Content::Account->createInstance($session,"profile");
+    return $instance->displayContent($instance->callMethod("view",[],$uid));
 }
 
 

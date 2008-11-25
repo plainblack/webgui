@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 140; # increment this value for each test you create
+use Test::More tests => 143; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -588,7 +588,7 @@ is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessag
 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: illegal profile field doesn\'t allow messages to be received from anyone');
 
 ################################################################
 #
@@ -620,8 +620,26 @@ cmp_bag(
     'getGroupIdsRecursive returns the correct set of groups, ignoring expire date and not duplicating groups'
 );
 
+
+#----------------------------------------------------------------------------
+# Test the new create() method
+SKIP: {
+    eval{ require Test::Exception; import Test::Exception };
+    skip 1, 'Test::Exception not found' if $@;
+
+    throws_ok( sub{ WebGUI::User->create }, 'WebGUI::Error::InvalidObject', 
+        'create() throws if no session passed'
+    );
+};
+
+ok( my $newCreateUser = WebGUI::User->create( $session ),
+    'create() returns something'
+);
+isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
+
+
 END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish) {
+    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
 

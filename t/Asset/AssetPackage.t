@@ -23,7 +23,7 @@ use WebGUI::VersionTag;
 
 use Test::More; # increment this value for each test you create
 use Test::MockObject;
-plan tests => 7;
+plan tests => 6;
 
 my $session = WebGUI::Test->session;
 $session->user({userId => 3});
@@ -63,8 +63,7 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 
 $versionTag->commit;
 
-my $deployReturn = $targetFolder->www_deployPackage();
-is($deployReturn, "", 'www_deployPackage returns empty string');
+$targetFolder->www_deployPackage();
 
 $targetFolderChildren = $targetFolder->getLineage(["children"], {returnObjects => 1,});
 is(scalar @{ $targetFolderChildren }, 1, 'target folder now has 1 child');

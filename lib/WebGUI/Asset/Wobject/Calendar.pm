@@ -2087,8 +2087,8 @@ sub www_search {
     # This is very bad! It should be $self->processStyle or whatnot.
     $self->session->http->sendHeader;
     my $template    = WebGUI::Asset::Template->new($self->session,$self->get("templateIdSearch"));
-    my $style = $self->session->style->process("~~~",$self->get("styleTemplateId"));
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $self->session->style->process($self->getSeparator,$self->get("styleTemplateId"));
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
     $self->session->output->print($self->processTemplate($var, undef, $template));
     $self->session->output->print($foot, 1);

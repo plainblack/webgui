@@ -130,13 +130,14 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'synopsis' => {
-		message => q|The synopsis of the Asset found in the search.|,
-		lastUpdated => 1169843465,
+		message => q|The synopsis of the Asset found in the search.  Macros in the synopsis will be expanded.|,
+		lastUpdated => 1227292885,
 	},
+
 	'assetId' => { 
-                message => q|The assetId of the Asset found in the search.|,
-                lastUpdated => 1169843465,
-        },
+        message => q|The assetId of the Asset found in the search.|,
+        lastUpdated => 1169843465,
+    },
 
 	'results_found' => {
 		message => q|A conditional variable that will be true if any results were found.|,

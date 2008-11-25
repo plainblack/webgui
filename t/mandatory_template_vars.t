@@ -21,15 +21,6 @@ use File::Find;
 #variables exist in their templates.
 
 my @tmplVarTable = (
-	## Templates from WebGUI:Operation::Profile.pm
-	{
-		id   => 'PBtmpl0000000000000051',
-		var  => [ qw(profile.form.footer profile.form.header profile.form.hidden profile.form.submit) ],
-	},
-	{
-		id   => 'PBtmpl0000000000000052',
-		var  => [ ],
-	},
 	## Templates from WebGUI::AdminConsole.pm
 	{
 		id   => 'PBtmpl0000000000000137',

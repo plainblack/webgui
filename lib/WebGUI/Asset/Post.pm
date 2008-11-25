@@ -418,7 +418,7 @@ Formats the url to view a users profile.
 
 sub getPosterProfileUrl {
 	my $self = shift;
-	return $self->getUrl("op=viewProfile;uid=".$self->get("ownerUserId"));
+	return WebGUI::User->new($self->session,$self->get("ownerUserId"))->getProfileUrl;
 }
 
 #-------------------------------------------------------------------

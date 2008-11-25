@@ -61,13 +61,19 @@ WebGUI.AssetManager.findRow
     Format the Edit and More links for the row
 */
 WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNumber ) {
-    elCell.innerHTML 
-        = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">Edit</a>'
-        + ' | '
-        ;
+    if ( oRecord.getData( 'actions' ) ) {
+        elCell.innerHTML 
+            = '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=edit;proceed=manageAssets') + '">'
+            + WebGUI.AssetManager.i18n.get('Asset', 'edit') + '</a>'
+            + ' | '
+            ;
+    }
+    else {
+        elCell.innerHTML = "";
+    }
     var more    = document.createElement( 'a' );
     elCell.appendChild( more );
-    more.appendChild( document.createTextNode( 'More' ) );
+    more.appendChild( document.createTextNode( WebGUI.AssetManager.i18n.get('Asset','More' ) ) );
     more.href   = '#';
 
     // Delete the old menu
@@ -170,9 +176,9 @@ WebGUI.AssetManager.DefaultSortedBy = {
 */
 WebGUI.AssetManager.BuildQueryString = function ( state, dt ) {
     var query = "recordOffset=" + state.pagination.recordOffset 
-            + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
+            + ';orderByDirection=' + ((state.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
             + ';rowsPerPage=' + state.pagination.rowsPerPage
-            + ';orderByColumn=' + state.sorting.key
+            + ';orderByColumn=' + state.sortedBy.key
             ;
         return query;
     };
@@ -207,46 +213,42 @@ WebGUI.AssetManager.formatTitle = function ( elCell, oRecord, oColumn, orderNumb
 
 /*---------------------------------------------------------------------------
     WebGUI.AssetManager.initManager ( )
-    Initialize the www_manage page
+    Initialize the i18n interface
 */
 WebGUI.AssetManager.initManager = function (o) {
+    WebGUI.AssetManager.i18n
+    = new WebGUI.i18n( { 
+            namespaces  : {
+                'Asset' : [
+                    "edit",
+                    "More"
+                ],
+                'WebGUI' : [
+                    "< prev",
+                    "next >"
+                ]
+            },
+            onpreload   : {
+                fn       : WebGUI.AssetManager.initDataTable
+            }
+        } );
+};
+
+/*---------------------------------------------------------------------------
+    WebGUI.AssetManager.initDataTable ( )
+    Initialize the www_manage page
+*/
+WebGUI.AssetManager.initDataTable = function (o) {
     var assetPaginator = new YAHOO.widget.Paginator({
-        containers         : ['pagination'],
-        pageLinks          : 7,
-        rowsPerPage        : 100,
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
+        containers            : ['pagination'],
+        pageLinks             : 7,
+        rowsPerPage           : 100,
+        previousPageLinkLabel : WebGUI.AssetManager.i18n.get('WebGUI', '< prev'),
+        nextPageLinkLabel     : WebGUI.AssetManager.i18n.get('WebGUI', 'next >'),
+        template              : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink}"
     });
 
 
-    // Custom function to handle pagination requests
-    var handlePagination = function (state,dt) {
-        var sortedBy  = dt.get('sortedBy');
-
-        // Define the new state
-        var newState = {
-            startIndex: state.recordOffset, 
-            sorting: {
-                key: sortedBy.key,
-                dir: ((sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc")
-            },
-            pagination : { // Pagination values
-                recordOffset: state.recordOffset, // Default to first page when sorting
-                rowsPerPage: dt.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: dt.onDataReturnSetRows,
-            failure: dt.onDataReturnSetRows,
-            scope: dt,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        dt.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, dt), oCallback);
-    };
- 
    // initialize the data source
    WebGUI.AssetManager.DataSource
         = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage;',{connTimeout:30000} );
@@ -284,52 +286,15 @@ WebGUI.AssetManager.initManager = function (o) {
                 initialRequest          : 'recordOffset=0',
                 dynamicData             : true,
                 paginator               : assetPaginator,
-                sortedBy                : WebGUI.AssetManager.DefaultSortedBy
+                sortedBy                : WebGUI.AssetManager.DefaultSortedBy,
+                generateRequest         : WebGUI.AssetManager.BuildQueryString
             }
         );
-     WebGUI.AssetManager.DataTable.onPaginatorChangeRequest  = handlePagination;
 
-        
     WebGUI.AssetManager.DataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
         oPayload.totalRecords = oResponse.meta.totalRecords;
         return oPayload;
     }
-
-    // Override function for custom server-side sorting
-    WebGUI.AssetManager.DataTable.sortColumn = function(oColumn) {
-        // Default ascending
-        var sDir = "asc";
-        
-        // If already sorted, sort in opposite direction
-        if(oColumn.key === this.get("sortedBy").key) {
-            sDir = (this.get("sortedBy").dir === YAHOO.widget.DataTable.CLASS_ASC) ?
-                    "desc" : "asc";
-        }
-
-        // Define the new state
-        var newState = {
-            startIndex: 0,
-            sorting: { // Sort values
-                key: oColumn.key,
-                dir: (sDir === "desc") ? YAHOO.widget.DataTable.CLASS_DESC : YAHOO.widget.DataTable.CLASS_ASC
-            },
-            pagination : { // Pagination values
-                recordOffset: 0, // Default to first page when sorting
-                rowsPerPage: this.get("paginator").getRowsPerPage() // Keep current setting
-            }
-        };
-
-        // Create callback object for the request
-        var oCallback = {
-            success: this.onDataReturnSetRows,
-            failure: this.onDataReturnSetRows,
-            scope: this,
-            argument: newState // Pass in new state as data payload for callback function to use
-        };
-        
-        // Send the request
-        this.getDataSource().sendRequest(WebGUI.AssetManager.BuildQueryString(newState, this), oCallback);
-    };
 
 };
 

@@ -18,7 +18,7 @@ sub new {
         $self->newObject( [] );
     }
     return $self;
-}
+} ## end sub new
 
 sub freeze {
     my $self = shift;
@@ -45,7 +45,7 @@ sub newObject {
         $$address[2] = $#{ $self->answers($address) };
         return $address;
     }
-}
+} ## end sub newObject
 
 #address is the array of objects currently selected in the edit screen
 #data is the array of hash items for displaying
@@ -53,40 +53,32 @@ sub getDragDropList {
     my $self    = shift;
     my $address = shift;
     my @data;
-    for ( my $i = 0 ; $i <= $#{ $self->sections } ; $i++ ) {
-        push( @data,
-            { text => $self->section( [$i] )->{title}, type => 'section' } );
+    for ( my $i = 0; $i <= $#{ $self->sections }; $i++ ) {
+        push( @data, { text => $self->section( [$i] )->{title}, type => 'section' } );
         if ( $address->[0] == $i ) {
 
-            for ( my $x = 0 ; $x <= $#{ $self->questions($address) } ; $x++ ) {
+            for ( my $x = 0; $x <= $#{ $self->questions($address) }; $x++ ) {
                 push(
-                    @data,
-                    {
+                    @data, {
                         text => $self->question( [ $i, $x ] )->{text},
                         type => 'question'
                     }
                 );
                 if ( $address->[1] == $x ) {
-                    for (
-                        my $y = 0 ;
-                        $y <= $#{ $self->answers($address) } ;
-                        $y++
-                      )
-                    {
+                    for ( my $y = 0; $y <= $#{ $self->answers($address) }; $y++ ) {
                         push(
-                            @data,
-                            {
+                            @data, {
                                 text => $self->answer( [ $i, $x, $y ] )->{text},
                                 type => 'answer'
                             }
                         );
                     }
                 }
-            }
-        }
-    }
+            } ## end for ( my $x = 0; $x <= ...
+        } ## end if ( $address->[0] == ...
+    } ## end for ( my $i = 0; $i <= ...
     return \@data;
-}
+} ## end sub getDragDropList
 
 sub getObject {
     my ( $self, $address ) = @_;
@@ -94,12 +86,10 @@ sub getObject {
         return $self->{sections}->[ $address->[0] ];
     }
     elsif ( @$address == 2 ) {
-        return $self->{sections}->[ $address->[0] ]->{questions}
-          ->[ $address->[1] ];
+        return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
     }
     else {
-        return $self->{sections}->[ $address->[0] ]->{questions}
-          ->[ $address->[1] ]->{answers}->[ $address->[2] ];
+        return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
     }
 }
 
@@ -138,7 +128,7 @@ sub getSectionEditVars {
         }
     }
     return \%var;
-}
+} ## end sub getSectionEditVars
 
 sub getQuestionEditVars {
     my $self    = shift;
@@ -150,22 +140,14 @@ sub getQuestionEditVars {
     delete $var{answers};
     delete $var{questionType};
     my @types = (
-        'Agree/Disagree',  'Certainty',
-        'Concern',         'Confidence',
-        'Currency',        'Date',
-        'Date Range',      'Dual Slider - Range',
-        'Education',       'Effectiveness',
-        'Email',           'File Upload',
-        'Gender',          'Hidden',
-        'Ideology',        'Importance',
-        'Likelihood',      'Multi Slider - Allocate',
-        'Multiple Choice', 'Oppose/Support',
-        'Party',           'Phone Number',
-        'Race',            'Risk',
-        'Satisfaction',    'Scale',
-        'Security',        'Slider',
-        'Text',            'Text Date',
-        'Threat',          'True/False',
+        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
+        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
+        'Education',      'Effectiveness',           'Email',           'File Upload',
+        'Gender',         'Hidden',                  'Ideology',        'Importance',
+        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
+        'Party',          'Phone Number',            'Race',            'Risk',
+        'Satisfaction',   'Scale',                   'Security',        'Slider',
+        'Text',           'Text Date',               'Threat',          'True/False',
         'Yes/No'
     );
 
@@ -178,14 +160,14 @@ sub getQuestionEditVars {
         }
     }
     return \%var;
-}
+} ## end sub getQuestionEditVars
 
 sub getAnswerEditVars {
     my $self    = shift;
     my $address = shift;
     my $object  = $self->answer($address);
     my %var     = %{$object};
-    $var{id} = $address->[0] . "-" . $address->[1] . "-" . $address->[2];
+    $var{id}           = $address->[0] . "-" . $address->[1] . "-" . $address->[2];
     $var{displayed_id} = $address->[2] + 1;
     return \%var;
 }
@@ -217,15 +199,14 @@ sub update {
         }
     }
     if ( @$address == 2 and !$newQuestion ) {
-        if ( $ref->{questionType} ne $self->question($address)->{questionType} )
-        {
+        if ( $ref->{questionType} ne $self->question($address)->{questionType} ) {
             $self->updateQuestionAnswers( $address, $ref->{questionType} );
         }
     }
     for my $key ( keys %$object ) {
         $object->{$key} = $ref->{$key} if ( defined $$ref{$key} );
     }
-}
+} ## end sub update
 
 #determine what to add and add it.
 # ref should contain all the information for the new
@@ -262,8 +243,7 @@ sub remove {
     my ( $self, $address, $movingOverride ) = @_;
     if ( @$address == 1 ) {
         splice( @{ $self->{sections} }, $$address[0], 1 )
-          if ( $$address[0] != 0 or defined $movingOverride )
-          ;    #can't delete the first section
+            if ( $$address[0] != 0 or defined $movingOverride );    #can't delete the first section
     }
     elsif ( @$address == 2 ) {
         splice( @{ $self->questions($address) }, $$address[1], 1 );
@@ -275,18 +255,12 @@ sub remove {
 
 sub newSection {
     my %members = (
-        'text',                   '',
-        'title',                  'NEW SECTION',
-        'variable',               '',
-        'questionsPerPage',       5,
-        'questionsOnSectionPage', 1,
-        'randomizeQuestions',     0,
-        'everyPageTitle',         1,
-        'everyPageText',          1,
-        'terminal',               0,
-        'terminalUrl',            '',
-        'goto',                   '',
-        'timeLimit',              0,
+        'text',                   '', 'title',              'NEW SECTION',
+        'variable',               '', 'questionsPerPage',   5,
+        'questionsOnSectionPage', 1,  'randomizeQuestions', 0,
+        'everyPageTitle',         1,  'everyPageText',      1,
+        'terminal',               0,  'terminalUrl',        '',
+        'goto',                   '', 'timeLimit',          0,
         'type',                   'section'
     );
     $members{questions} = [];
@@ -315,17 +289,12 @@ sub newQuestion {
     );
     $members{answers} = [];
     return \%members;
-}
+} ## end sub newQuestion
 
 sub newAnswer {
     my %members = (
-        'text',        '', 'verbatim',       0,
-        'textCols',    10, 'textRows',       5,
-        'goto',        '', 'recordedAnswer', '',
-        'isCorrect',   1,  'min',            1,
-        'max',         10, 'step',           1,
-        'value',       1,  'terminal',       0,
-        'terminalUrl', '', 'type',           'answer'
+        'text', '', 'verbatim', 0, 'textCols', 10, 'textRows', 5, 'goto', '', 'recordedAnswer', '', 'isCorrect', 1,
+        'min', 1, 'max', 10, 'step', 1, 'value', 1, 'terminal', 0, 'terminalUrl', '', 'type', 'answer'
     );
     return \%members;
 }
@@ -380,20 +349,12 @@ sub updateQuestionAnswers {
         $self->addAnswersToQuestion( \@addy, \@ans, { 7, 1 } );
     }
     elsif ( $type eq 'Party' ) {
-        my @ans = (
-            'Democratic party',
-            'Republican party (or GOP)',
-            'Independant party',
-            'Other party (verbatim)'
-        );
+        my @ans = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
         $self->addAnswersToQuestion( \@addy, \@ans, { 3, 1 } );
     }
     elsif ( $type eq 'Race' ) {
-        my @ans = (
-            'American Indian',    'Asian',
-            'Black',              'Hispanic',
-            'White non-Hispanic', 'Something else (verbatim)'
-        );
+        my @ans
+            = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' );
         $self->addAnswersToQuestion( \@addy, \@ans, { 5, 1 } );
     }
     elsif ( $type eq 'Ideology' ) {
@@ -409,69 +370,43 @@ sub updateQuestionAnswers {
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Security' ) {
-        my @ans = (
-            'Not at all secure',
-            '', '', '', '', '', '', '', '', '', 'Extremely secure'
-        );
+        my @ans = ( 'Not at all secure', '', '', '', '', '', '', '', '', '', 'Extremely secure' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Threat' ) {
-        my @ans =
-          ( 'No threat', '', '', '', '', '', '', '', '', '', 'Extreme threat' );
+        my @ans = ( 'No threat', '', '', '', '', '', '', '', '', '', 'Extreme threat' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Risk' ) {
-        my @ans =
-          ( 'No risk', '', '', '', '', '', '', '', '', '', 'Extreme risk' );
+        my @ans = ( 'No risk', '', '', '', '', '', '', '', '', '', 'Extreme risk' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Concern' ) {
-        my @ans = (
-            'Not at all concerned',
-            '', '', '', '', '', '', '', '', '', 'Extremely concerned'
-        );
+        my @ans = ( 'Not at all concerned', '', '', '', '', '', '', '', '', '', 'Extremely concerned' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Effectiveness' ) {
-        my @ans = (
-            'Not at all effective',
-            '', '', '', '', '', '', '', '', '', 'Extremely effective'
-        );
+        my @ans = ( 'Not at all effective', '', '', '', '', '', '', '', '', '', 'Extremely effective' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Confidence' ) {
-        my @ans = (
-            'Not at all confident',
-            '', '', '', '', '', '', '', '', '', 'Extremely confident'
-        );
+        my @ans = ( 'Not at all confident', '', '', '', '', '', '', '', '', '', 'Extremely confident' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Satisfaction' ) {
-        my @ans = (
-            'Not at all satisfied',
-            '', '', '', '', '', '', '', '', '', 'Extremely satisfied'
-        );
+        my @ans = ( 'Not at all satisfied', '', '', '', '', '', '', '', '', '', 'Extremely satisfied' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Certainty' ) {
-        my @ans = (
-            'Not at all certain',
-            '', '', '', '', '', '', '', '', '', 'Extremely certain'
-        );
+        my @ans = ( 'Not at all certain', '', '', '', '', '', '', '', '', '', 'Extremely certain' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Likelihood' ) {
-        my @ans = (
-            'Not at all likely',
-            '', '', '', '', '', '', '', '', '', 'Extremely likely'
-        );
+        my @ans = ( 'Not at all likely', '', '', '', '', '', '', '', '', '', 'Extremely likely' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Importance' ) {
-        my @ans = (
-            'Not at all important',
-            '', '', '', '', '', '', '', '', '', 'Extremely important'
-        );
+        my @ans = ( 'Not at all important', '', '', '', '', '', '', '', '', '', 'Extremely important' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Oppose/Support' ) {
@@ -497,7 +432,7 @@ sub updateQuestionAnswers {
     else {
         push( @{ $question->{answers} }, $self->newAnswer() );
     }
-}
+} ## end sub updateQuestionAnswers
 
 sub addAnswersToQuestion {
     my $self  = shift;
@@ -508,16 +443,13 @@ sub addAnswersToQuestion {
         push( @{ $self->question($addy)->{answers} }, $self->newAnswer() );
         $$addy[2] = $_;
         if ( defined $$verbs{$_} and $_ == $$verbs{$_} ) {
-            $self->update( $addy,
-                { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 }
-            );
+            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 } );
         }
         else {
-            $self->update( $addy,
-                { 'text', $$ans[$_], 'recordedAnswer', $_ + 1 } );
+            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1 } );
         }
     }
-}
+} ## end sub addAnswersToQuestion
 
 #------------------------------
 #accessors and helpers
@@ -548,15 +480,13 @@ sub question {
 sub answers {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]
-      ->{answers};
+    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers};
 }
 
 sub answer {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]
-      ->{answers}->[ $$address[2] ];
+    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers}->[ $$address[2] ];
 }
 
 sub log {

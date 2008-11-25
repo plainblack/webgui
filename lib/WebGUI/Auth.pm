@@ -30,6 +30,7 @@ use WebGUI::Operation::Shared;
 use WebGUI::Operation::Profile;
 use WebGUI::Workflow::Instance;
 use WebGUI::Inbox;
+use WebGUI::Friends;
 
 # Profile field name for the number of times the showMessageOnLogin has been
 # seen.
@@ -150,7 +151,8 @@ sub authenticate {
 
 =head2 authMethod ( [authMethod] )
 
-Gets or sets the authMethod in the Auth Object
+Gets or sets the authMethod in the Auth Object.  Returns 'WebGUI' as the
+default method if a user has been created without an authMethod.
 
 =head3 authMethod
 
@@ -160,7 +162,9 @@ Gets or sets the authMethod in the Auth Object
 
 sub authMethod {
 	my $self = shift;
-	return $self->{authMethod} if(!$_[0]);
+	if (!$_[0]) {
+        return $self->{authMethod} || 'WebGUI';
+    }
 	$self->{authMethod} = $_[0];
 }
 
@@ -194,7 +198,7 @@ sub createAccount {
         ;
     
     # User Defined Options
-    my $userInvitation = $self->session->setting->get('userInvitationsEnabled');
+    my $userInvitation = $self->session->setting->get('inboxInviteUserEnabled');
     $vars->{'create.form.profile'} = [];
     foreach my $field (@{WebGUI::ProfileField->getRegistrationFields($self->session)}) {
         my $id         = $field->getId;
@@ -270,7 +274,7 @@ Password entered by the user.  This is only used in for sending the user a notif
 
 =head3 profile
 
-Hashref of profile values returned by the function WebGUI::Operation::Profile::validateProfileData($self->session)
+Hashref of profile values returned by the function WebGUI::User::validateProfileDataFromForm($fields);
 
 =cut
 
@@ -290,8 +294,8 @@ sub createAccountSave {
 	$u->username($username);
 	$u->authMethod($self->authMethod);
 	$u->karma($self->session->setting->get("karmaPerLogin"),"Login","Just for logging in.") if ($self->session->setting->get("useKarma"));
-	WebGUI::Operation::Profile::saveProfileFields($self->session,$u,$profile) if($profile);
-	$self->saveParams($userId,$self->authMethod,$properties);
+	$u->updateProfileFields($profile) if ($profile);
+    $self->saveParams($userId,$self->authMethod,$properties);
 
 	if ($self->getSetting("sendWelcomeMessage")){
 		my $authInfo = "\n\n".$i18n->get(50).": ".$username;
@@ -321,15 +325,20 @@ sub createAccountSave {
     ##Finalize the record in the user invitation table.
     my $inviteId = $self->session->form->get('uniqueUserInvitationCode');
     if ($inviteId) {
-        $self->session->db->setRow(
-            'userInvitations',
-            'inviteId',
-            {
-                inviteId    => $inviteId,
-                newUserId   => $u->userId,
-                dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
-            },
-        );
+        $self->session->db->setRow('userInvitations','inviteId',{
+            inviteId    => $inviteId,
+            newUserId   => $u->userId,
+            dateCreated => WebGUI::DateTime->new($self->session, time)->toMysqlDate,
+        });
+        #Get the invite record
+        my $inviteRecord = $self->session->db->getRow('userInvitations','inviteId',$inviteId);
+        #Get the user
+        my $inviteUser   = WebGUI::User->new($self->session,$inviteRecord->{userId});
+        #Automatically add the friend that invited the user and vice versa if the friend has friends enabled
+        if($inviteUser->acceptsFriendsRequests($u)) {
+            my $friends  = WebGUI::Friends->new($self->session,$u);
+            $friends->add([$inviteUser->userId]);
+        }
     }
 
     # If we have something to do after login, do it
@@ -460,10 +469,10 @@ Array ref of template vars from subclass
 =cut
 
 sub displayAccount {
-	my $self = shift;
-	my $method = $_[0];
-	my $vars = $_[1];
-
+	my $self   = shift;
+	my $method = shift;
+	my $vars   = shift;
+    
 	my $i18n = WebGUI::International->new($self->session);
 	$vars->{title} = $i18n->get(61);
 
@@ -476,9 +485,19 @@ sub displayAccount {
 	}
 	$vars->{'account.form.submit'} = WebGUI::Form::submit($self->session,{});
 	$vars->{'account.form.footer'} = WebGUI::Form::formFooter($self->session,);
-
-	$vars->{'account.options'} = WebGUI::Operation::Shared::accountOptions($self->session);
-	return WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    
+    ########### ACCOUNT SHUNT
+    #The following is a shunt which allows the displayAccount page to be displayed in the
+    #Account system.  This shunt will be replaced in WebGUI 8 when the API can be broken
+    my $output = WebGUI::Asset::Template->new($self->session,$self->getAccountTemplateId)->process($vars);
+    #If the account system is calling this method, just return the template
+    my $op = $self->session->form->get("op");
+    if($op eq "account") {
+        return $output;
+    }
+    #Otherwise wrap the template into the account layout
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"user");
+    return $instance->displayContent($output,1);
 }
 
 #-------------------------------------------------------------------
@@ -610,7 +629,7 @@ sub getAccountTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getAccountTemplateId ( )
+=head2 getCreateAccountTemplateId ( )
 
 This method should be overridden by the subclass and should return the template ID for the create account screen.
 
@@ -760,6 +779,8 @@ sub isVisitor {
 Superclass method that performs standard login routines.  This is what should happen after a user has been authenticated.
 Authentication should always happen in the subclass routine.
 
+Open version tag is reclaimed if user is in site wide or singlePerUser mode.
+
 =cut
 
 sub login {
@@ -803,7 +824,12 @@ sub login {
 		$self->session->http->setRedirect($self->session->scratch->get("redirectAfterLogin"));
 	  	$self->session->scratch->delete("redirectAfterLogin");
 	}
-	
+
+        # Get open version tag. This is needed if we want
+        # to reclaim a version right after login (singlePerUser and siteWide mode)
+        # and to have the correct version displayed.
+        WebGUI::VersionTag->getWorking($self->session(), q{noCreate});
+
 	return undef;
 }
 

@@ -119,7 +119,7 @@ sub execute {
         $instance->setScratch('LowStockMessage', $message);
         $instance->setScratch('LowStockLast',    $counter);
         $instance->setScratch('LowStockBelow',   $belowThreshold);
-        return $self->WAITING;
+        return $self->WAITING(1);
     }
 
     $instance->deleteScratch('LowStockMessage');

@@ -14,8 +14,8 @@ package WebGUI::SQL;
 
 =cut
 
-use DBI;
 use strict;
+use DBI;
 use Tie::IxHash;
 use WebGUI::SQL::ResultSet;
 use WebGUI::Utility;
@@ -99,19 +99,9 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub buildArray {
-	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, $data, @array, $i);
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	$i=0;
-	while (($data) = $sth->array) {
-		$array[$i] = $data;
-		$i++;
-	}
-	$sth->finish;
-	return @array;
+    my $self = shift;
+    my $arrayRef = $self->buildArrayRef(@_);
+    return @{ $arrayRef };
 }
 
 
@@ -135,14 +125,19 @@ sub buildArrayRef {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-	my @array = $self->buildArray($sql,$params);
-	return \@array;
+    my $sth = $self->prepare($sql);
+    $sth->execute($params);
+    my @array;
+    while (my $data = $sth->arrayRef) {
+        push @array, $data->[0];
+    }
+    return \@array;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 buildHash ( sql, params )
+=head2 buildHash ( sql, params, options )
 
 Builds a hash of data from a series of rows.
 
@@ -154,30 +149,28 @@ An SQL query. The query should select at least two columns of data, the first be
 
 An array reference containing values for any placeholder params used in the SQL query.
 
+=head3 options
+
+A hash reference of options
+
+=head4 noOrder
+
+By default, buildHash returns the result tied to Tie::IxHash to maintain
+order.  Setting this option will prevent the tie, so the result will be a
+straight hash that is faster but does not maintain order.
+
 =cut
 
 sub buildHash {
 	my $self = shift;
-	my $sql = shift;
-	my $params = shift;
-	my ($sth, %hash, @data);
-	tie %hash, "Tie::IxHash";
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	while (@data = $sth->array) {
-		my $value = pop @data;
-		my $key = join(":",@data); # if more than two columns is selected, join them together with :
-		$key = $value unless ($key); # if only one column is selected, then it is both the key and the value
-		$hash{$key} = $value;
-	}
-	$sth->finish;
-	return %hash;
+    my $hashRef = $self->buildHashRef(@_);
+    return %{ $hashRef };
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 buildHashRef ( sql )
+=head2 buildHashRef ( sql, params, options )
 
 Builds a hash reference of data from a series of rows.
 
@@ -189,16 +182,37 @@ An SQL query. The query should select at least two columns of data, the first be
 
 An array reference containing values for any placeholder params used in the SQL query.
 
+=head3 options
+
+A hash reference of options
+
+=head4 noOrder
+
+By default, buildHashRef returns the result tied to Tie::IxHash to maintain
+order.  Setting this option will prevent the tie, so the result will be a
+straight hash that is faster but does not maintain order.
+
 =cut
 
 sub buildHashRef {
 	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
-	my ($sth, %hash);
-	tie %hash, "Tie::IxHash";
-	%hash = $self->buildHash($sql, $params);
-	return \%hash;
+    my $options = shift || {};
+    my %hash;
+    unless ($options->{noOrder}) {
+        tie %hash, "Tie::IxHash";
+    }
+    my $sth = $self->prepare($sql);
+    $sth->execute($params);
+    while (my @data = $sth->array) {
+        my $value = pop @data;
+        my $key = join(":", @data); # if more than two columns is selected, join them together with :
+        $key = $value unless ($key); # if only one column is selected, then it is both the key and the value
+        $hash{$key} = $value;
+    }
+    $sth->finish;
+    return \%hash;
 }
 
 
@@ -220,16 +234,16 @@ An array reference containing values for any placeholder params used in the SQL 
 =cut
 
 sub buildArrayRefOfHashRefs {
-	my @array;
-	my $class = shift;
-	my $sql = shift;
-	my $params = shift;
-	my $sth = $class->read($sql,$params);
-	while (my $data = $sth->hashRef) {
-		push(@array,$data);
-	}
-	$sth->finish;
-	return \@array;
+    my $self = shift;
+    my $sql = shift;
+    my $params = shift;
+    my @array;
+    my $sth = $self->read($sql, $params);
+    while (my $data = $sth->hashRef) {
+        push @array, $data;
+    }
+    $sth->finish;
+    return \@array;
 }
 
 
@@ -296,15 +310,14 @@ Which column of the result set to use as the key when creating the hashref.
 =cut
 
 sub buildHashRefOfHashRefs {
-	my %hash;
-	my $class = shift;
+	my $self = shift;
 	my $sql = shift;
 	my $params = shift;
 	my $key = shift;
-	my $sth = $class->read($sql,$params);
-	my $data;
+	my $sth = $self->read($sql, $params);
+	my %hash;
 	tie %hash, "Tie::IxHash";
-	while ($data = $sth->hashRef) {
+	while (my $data = $sth->hashRef) {
 		$hash{$data->{$key}} = $data;
 	}
 	$sth->finish;
@@ -623,13 +636,9 @@ An array reference containing values for any placeholder params used in the SQL 
 sub quickArray {
 	my $self = shift;
 	my $sql = shift;
-	my $params = shift;
-	my ($sth, @data);
-	$sth = $self->prepare($sql);
-	$sth->execute($params);
-	@data = $sth->array;
-	$sth->finish;
-	return @data;
+	my $params = shift || [];
+    my $data = $self->dbh->selectrow_arrayref($sql, {}, @{ $params }) || [];
+    return @{ $data };
 }
 
 

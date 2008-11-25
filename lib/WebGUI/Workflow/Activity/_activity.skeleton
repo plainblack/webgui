@@ -80,8 +80,10 @@ sub execute {
     # do some work here, whatever this activity is supposed to do
 	# Workflow is finished
     return $self->COMPLETE;
-	# Or needs to be run again to finish processing
-    #return $self->WAITING;
+    # Or we ran out of time, run again ASAP
+    return $self->WAITING(1);
+	# Or we're waiting on some external process to complete, wait an hour
+    #return $self->WAITING(60*60);
     # Or encountered an error and cannot finish
 	#return $self->ERROR;
 }

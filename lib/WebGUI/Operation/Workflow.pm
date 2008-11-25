@@ -216,8 +216,12 @@ sub www_editWorkflow {
 	my $addmenu = '<div style="float: left; width: 200px; font-size: 11px;">';
 	foreach my $class (@{$workflowActivities->{$workflow->get("type")}}) {
 		my $activity = WebGUI::Workflow::Activity->newByPropertyHashRef($session, {className=>$class});
-        next unless defined $activity;
-		$addmenu .= '<a href="'.$session->url->page("op=editWorkflowActivity;className=".$class.";workflowId=".$workflow->getId).'">'.$activity->getName."</a><br />\n";
+        if (defined $activity) {
+            $addmenu .= '<a href="'.$session->url->page("op=editWorkflowActivity;className=".$class.";workflowId=".$workflow->getId).'">'.$activity->getName."</a><br />\n";
+        }
+        else {
+            $addmenu .= sprintf $i18n->get('bad workflow activity code'), $class;
+        }
 	}	
 	$addmenu .= '</div>';
 	my $f = WebGUI::HTMLForm->new($session);

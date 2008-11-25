@@ -91,7 +91,7 @@ sub execute {
 		if (time() - $start > $ttl) {
 			$items->finish;
 			$log->('Ran out of time. Will have to expire the rest later.');
-			return $self->WAITING;
+			return $self->WAITING(1);
 		}
 	}
 	$log->info('No more EMS items to expire.');

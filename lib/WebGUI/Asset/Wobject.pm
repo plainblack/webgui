@@ -110,6 +110,43 @@ sub definition {
 	return $class->SUPER::definition($session,$definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 copyCollateral ( tableName, keyName, keyValue )
+
+Copies a row of collateral data where keyName=keyValue.  Generates a new key for keyName.
+
+=head3 tableName
+
+The name of the table you wish to copy the data from.
+
+=head3 keyName
+
+The name of a column in the table. Is not checked for invalid input.
+
+=head3 keyValue
+
+Criteria (value) used to find the data to copy.
+
+=cut
+
+sub copyCollateral {
+	my $self = shift;
+	my $table = shift;
+	my $keyName = shift;
+	my $keyValue = shift;
+    my $db = $self->session->db;
+    my $newId = $self->session->id->generate;
+
+    my $temp = $self->session->db->buildArrayRefOfHashRefs(
+        "select * from ".$db->dbh->quote_identifier($table)." where ".$db->dbh->quote_identifier($keyName)."=".$db->quote($keyValue));
+    my $hash = $temp->[0];
+    $hash->{$keyName} = $newId;
+    my @keys = keys %$hash;
+    my $sql = "insert into ".$db->dbh->quote_identifier($table)
+            ." (".join(',',map("`$_`",@keys)).") values(".join(',',map("?",@keys)).")";
+    $self->session->db->write($sql,[map($hash->{$_},@keys)]);
+}
 
 #-------------------------------------------------------------------
 
@@ -503,9 +540,16 @@ sub www_view {
 	return $check if (defined $check);
 	$self->session->http->setLastModified($self->getContentLastModified);
 	$self->session->http->sendHeader;
+    ##Have to dupe this code here because Wobject does not call SUPER.
+    if ($self->get('synopsis')) {
+        $self->session->style->setMeta({
+                name    => 'Description',
+                content => $self->get('synopsis'),
+        });
+    }
 	$self->prepareView;
-	my $style = $self->processStyle("~~~");
-	my ($head, $foot) = split("~~~",$style);
+	my $style = $self->processStyle($self->getSeparator);
+	my ($head, $foot) = split($self->getSeparator,$style);
 	$self->session->output->print($head, 1);
 	$self->session->output->print($self->view);
 	$self->session->output->print($foot, 1);

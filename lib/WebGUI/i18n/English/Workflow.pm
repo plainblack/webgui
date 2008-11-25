@@ -262,6 +262,12 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'bad workflow activity code' => {
+		message => q|Syntax error found in %s, unable to edit this activity.|,
+		context => q|Error message in the edit workflow screen, when an activity cannot be instanciated.|,
+		lastUpdated => 1226814463,
+	},
+
 };
 
 1;

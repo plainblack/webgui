@@ -194,7 +194,7 @@ sub execute {
         # Update approval status
         $instance->setScratch( "status", "notified" );
         
-        return $self->WAITING;
+        return $self->WAITING(60*20);
     } 
     # Second and subsequent times, check status
     # Tag is denied
@@ -217,7 +217,7 @@ sub execute {
     }
 
     # If we haven't done anything, spin the wheel again
-    return $self->WAITING;
+    return $self->WAITING(60*60);
 }
 
 #----------------------------------------------------------------------------

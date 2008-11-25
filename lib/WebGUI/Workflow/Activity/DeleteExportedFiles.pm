@@ -116,7 +116,7 @@ sub execute {
     pause:
 	$instance->setScratch(DELETE_FILES_SCRATCH, Storable::freeze(\@files));
 	$instance->setScratch(PRUNE_DIRS_SCRATCH, Storable::freeze(\@dirs));
-	return $self->WAITING;
+	return $self->WAITING(1);
 }
 
 1;

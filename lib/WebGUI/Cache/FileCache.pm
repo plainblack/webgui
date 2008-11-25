@@ -15,9 +15,9 @@ package WebGUI::Cache::FileCache;
 =cut
 
 use strict;
-use Storable qw(nstore retrieve);
-use File::Path;
-use File::Find;
+use Storable ();
+use File::Path ();
+use File::Find ();
 
 our @ISA = qw(WebGUI::Cache);
 
@@ -54,7 +54,7 @@ sub delete {
 	my $self = shift;
 	my $folder = $self->getFolder;
 	if (-e $folder) {
-		rmtree($folder);
+		File::Path::rmtree($folder);
 	}
 }
 
@@ -74,7 +74,7 @@ sub deleteChunk {
 	my $self = shift;
 	my $folder = $self->getNamespaceRoot."/".$self->parseKey(shift);
 	if (-e $folder) {
-		rmtree($folder);
+		File::Path::rmtree($folder);
 	}
 }
 
@@ -91,7 +91,7 @@ sub flush {
 	$self->SUPER::flush();
 	my $folder = $self->getNamespaceRoot;
 	if (-e $folder) {
-		rmtree($folder);
+		File::Path::rmtree($folder);
 	}
 }
 
@@ -110,9 +110,9 @@ sub get {
 	if (-e $folder."/expires" && -e $folder."/cache" && open(my $FILE,"<",$folder."/expires")) {
 		my $expires = <$FILE>;
 		close($FILE);
-		return undef if ($expires < $self->session->datetime->time());
+		return undef if ($expires < time);
 		my $value;
-		eval {$value = retrieve($folder."/cache")};
+		eval {$value = Storable::retrieve($folder."/cache")};
 		if (ref $value eq "SCALAR") {
 			return $$value;
 		} else {
@@ -155,7 +155,7 @@ sub getNamespaceRoot {
 		$root .= "/WebGUICache";
 	}
 	$root .= "/".$self->{_namespace};
-	return $root;	
+	return $root;
 }
 
 #-------------------------------------------------------------------
@@ -167,24 +167,29 @@ Returns the size (in bytes) of the current cache under this namespace. Consequen
 =cut
 
 sub getNamespaceSize {
-        my $self = shift;
-        my $expiresModifier = shift || 0;
-        $self->session->stow->set("cacheSize", 0);
-        File::Find::find({no_chdir=>1, wanted=> sub {
-                                return undef unless $File::Find::name =~ m/^(.*)expires$/;
-                                my $dir = $1;
-                                if (open(my $FILE,"<",$dir."/expires")) {
-                                        my $expires = <$FILE>;
-                                        close($FILE);
-                                        if ($expires <$self->session->datetime->time()+$expiresModifier) {
-                                                rmtree($dir);
-                                        } else {
-                                                $self->session->stow->set("cacheSize", $self->session->stow->get("cacheSize") + -s $dir.'cache');
-                                        }
-                                }
-                        }
-                }, $self->getNamespaceRoot);
-        return $self->session->stow->get("cacheSize");
+    my $self = shift;
+    my $expiresModifier = shift || 0;
+    my $cacheSize = 0;
+    File::Find::find({
+        no_chdir => 1,
+        wanted => sub {
+            return
+                unless $File::Find::name =~ m/expires$/;
+            if ( open my $FILE, "<", $File::Find::name ) {
+                my $expires = <$FILE>;
+                close $FILE;
+                if ($expires < time + $expiresModifier) {
+                    File::Path::rmtree($File::Find::dir);
+                    $File::Find::prune = 1;
+                    return
+                }
+                else {
+                    $cacheSize += -s $File::Find::dir.'/cache';
+                }
+            }
+        },
+    }, $self->getNamespaceRoot);
+    return $cacheSize;
 }
 
 #-------------------------------------------------------------------
@@ -241,7 +246,7 @@ sub set {
 	umask(0000);
 	my $path = $self->getFolder();
 	unless (-e $path) {
-		eval {mkpath($path,0)};
+		eval {File::Path::mkpath($path,0)};
 		if ($@) {
 			$self->session->errorHandler->error("Couldn't create cache folder: ".$path." : ".$@);
 			return undef;
@@ -253,10 +258,10 @@ sub set {
 	} else {
 		$value = $content;
 	}
-	nstore($value, $path."/cache");
-	open(my $FILE,">",$path."/expires");
-	print $FILE $self->session->datetime->time()+$ttl;
-	close($FILE);
+	Storable::nstore($value, $path."/cache");
+	open my $FILE, ">", $path."/expires";
+	print $FILE time + $ttl;
+	close $FILE;
 	umask($oldumask);
 }
 
