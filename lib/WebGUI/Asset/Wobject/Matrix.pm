@@ -415,8 +415,8 @@ purges it's data.
 
 sub purge {
 	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your Matrix asset/wobject table.
+	
+    $self->session->db->write("delete from Matrix_attribute where assetId=?",[$self->getId]);
 	return $self->SUPER::purge;
 }
 
@@ -894,7 +894,7 @@ sub www_getCompareFormData {
     my $self            = shift;
     my $session         = $self->session;
     my $form            = $session->form;
-    my $sort            = $session->scratch->get('sort') || $self->get('defaultSort');
+    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' asc';
 
     if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
@@ -1179,7 +1179,7 @@ sub www_setSort {
     my $self = shift;
 
     if(my $sort = $self->session->form->process("sort")){
-        $self->session->scratch->set('sort',$sort);
+        $self->session->scratch->set('matrixSort',$sort);
     }        
     return undef;
 }
@@ -1188,7 +1188,7 @@ sub www_setSort {
 
 =head2 www_setStickied  (  )
 
-Sets the sort scratch variable.
+Sets the stickied scratch variable.
 
 =cut
 

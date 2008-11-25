@@ -17,8 +17,9 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 12; # increment this value for each test you create
 use Test::Deep;
+use JSON;
 use WebGUI::Asset::Wobject::Matrix;
 
 my $session = WebGUI::Test->session;
@@ -91,8 +92,43 @@ is($newAttribute->{attributeId},undef,"The new attribute was successfully delete
 
 # TODO: test deleting of listing data for attribute
 
+# add a listing
+
+my $matrixListing = $matrix->addChild({className=>'WebGUI::Asset::MatrixListing'});
+
+my $secondVersionTag = WebGUI::VersionTag->new($session,$matrixListing->get("tagId"));
+$secondVersionTag->commit;
+
+# Test for sane object type
+isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
+
+# Test getting compareFormData including the newly added listing
+
+$session->user({userId => 3});
+my $json = $matrix->www_getCompareFormData('score');
+
+my $compareFormData = JSON->new->utf8->decode($json);
+
+cmp_deeply(
+        $compareFormData,
+        {ResultSet=>{
+            Result=>[{
+                    views=>"0",
+                    lastUpdated=>$matrixListing->get('revisionDate'),
+                    clicks=>"0",
+                    compares=>"0",
+                    assetId=>$matrixListing->getId,
+                    url=>'/'.$matrixListing->get('url'),
+                    title=>$matrixListing->get('title')
+                    }]
+            }
+        },
+        'Getting compareFormData as JSON: www_getCompareFormData returns correct data as JSON.'
+    );        
+
 END {
 	# Clean up after thy self
 	$versionTag->rollback();
+    $secondVersionTag->rollback();
 }
 
