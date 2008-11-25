@@ -6,6 +6,8 @@
  - fixed: #9149: Account: default templates do not work right
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
  - fixed #9152: Pagination broken in Contribs Section of new Account System
+ - fixed #4159: more menu doesn't appear for current asset on crumb trail
+ - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
 
 7.6.4
  - Survey now will show progress and time limit.
@@ -71,6 +73,25 @@
  - fixed #4213: Can see "edit" tab even tho i am not logged in
  - fixed #9139: Updating a workflow property causes workflow to be disabled
  - fixed #9140: Date format error when adding tasks to PM
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed #9143: Yes No user profile fields problem when default == 1
+
+7.5.34
+ - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
+ - fixed #8849: More missing i18n
+ - fixed: Performance issue with Stow. Added a way to bypass safety for speed.
+ - fixed #4182: Edit links show in asset manager for locked assets
+ - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
+ - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
+ - fixed #9068: field.inTab
+ - fixed #8845: Workflows refusing to show edit screen
+ - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
+ - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed #8822: Password Recovery Tempalte not working
+ - fixed: DataForm times out when exporting large data sets
+ - fixed: DataForm entry data field is too small
+>>>>>>> .merge-right.r8665
 
 
 7.6.3

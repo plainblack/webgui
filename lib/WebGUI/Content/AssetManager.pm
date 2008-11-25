@@ -428,7 +428,7 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s'); return false;">%s</a></li>},
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink'); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
             $currentAsset->getUrl,
             $currentAsset->get( "menuTitle" ),
             ;
