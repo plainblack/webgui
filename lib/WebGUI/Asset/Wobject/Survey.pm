@@ -632,7 +632,7 @@ sub www_deleteResponses {
     return $self->session->privilege->insufficient() 
         unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
         
-    $self->session->db->write('delete from Survey_response');
+    $self->session->db->write('delete from Survey_response where assetId = ?',[$self->getId]);
 
     return;
 }
