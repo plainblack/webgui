@@ -651,6 +651,11 @@
         "className"  : "WebGUI::Account::Friends"
     },
     {
+        "identifier" : "contributions",
+        "className"  : "WebGUI::Account::Contributions",
+        "title"      : "^International(title,Account_Contributions);"
+    },
+    {
         "identifier" : "shop",
         "title"      : "^International(title,Account_Shop);",
         "className"  : "WebGUI::Account::Shop"
