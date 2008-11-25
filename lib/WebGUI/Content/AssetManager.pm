@@ -445,7 +445,7 @@ ENDHTML
                     . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" />}
                     . q{<input type="submit" name="action_delete" value="} . $i18n->get( "delete" ) . q{" onclick="return confirm('} . $i18n->get( 43 ) . q{')" />}
                     . q{<input type="submit" name="action_cut" value="} . $i18n->get( 'cut' ) . q{" />}
-                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "copy" ) . q{" />}
+                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "Copy" ) . q{" />}
                     . q{<input type="submit" name="action_duplicate" value="} . $i18n->get( "duplicate" ) . q{" />}
                     . q{</p>}
                     . q{</form>}
