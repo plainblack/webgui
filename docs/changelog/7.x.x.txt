@@ -5,6 +5,8 @@
  - fixed: #9148: Account: account links do not work
  - fixed: #9149: Account: default templates do not work right
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
+ - fixed #9152: Pagination broken in Contribs Section of new Account System
+
 7.6.4
  - Survey now will show progress and time limit.
  - Brand new Survey system.  Make sure to export your old results as they will
