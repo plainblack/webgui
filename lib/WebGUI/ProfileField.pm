@@ -239,6 +239,7 @@ sub formField {
 	my $u = shift || $self->session->user;
 	my $skipDefault = shift;
 	my $assignedValue = shift;
+    my $session = $self->session;
 	if ($skipDefault) {
 	    $properties->{value} = undef;
 	}
@@ -248,8 +249,8 @@ sub formField {
 	else {
 	    # start with specified (or current) user's data.  previous data needed by some form types as well (file).
         $properties->{value} = $u->profileField($self->getId);
-        # use submitted data if it exists
-        if ($self->formProcess($u) != $self->get('dataDefault')) {
+        #If the fieldId is actually found in the request, try to process the form
+        if ($session->form->param($self->getId)) {
             $properties->{value} = $self->formProcess($u);
 	    }
 	    # fall back on default
