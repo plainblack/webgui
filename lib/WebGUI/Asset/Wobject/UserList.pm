@@ -11,6 +11,7 @@ package WebGUI::Asset::Wobject::UserList;
 #-------------------------------------------------------------------
 
 use strict;
+use warnings;
 use HTML::Entities;
 use Tie::CPHash;
 use Tie::IxHash;

@@ -16,6 +16,7 @@ package WebGUI::Workflow::Activity::CalendarUpdateFeeds;
 =cut
 
 use strict;
+use warnings;
 use base 'WebGUI::Workflow::Activity';
 
 use WebGUI::Asset::Wobject::Calendar;

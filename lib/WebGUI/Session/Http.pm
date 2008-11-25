@@ -507,10 +507,6 @@ url is the same as the current page, as found through $session->url->page.
 
 Defaults to 302 (temporary redirect), but you can optionally set 301 (permanent redirect).
 
-=head3 type
-
-Defaults to 302 (temporary redirect), but you can optionally set 301 (permanent redirect).
-
 =cut
 
 sub setRedirect {
