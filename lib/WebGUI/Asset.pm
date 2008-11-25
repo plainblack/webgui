@@ -645,7 +645,7 @@ sub fixUrl {
 	# add automatic extension if we're supposed to
 	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
 	&&  !($url =~ /\./)                           # don't add an extension of the url already contains a dot
-	&&  lc($self->get("url")) eq lc($self->getId) # only add it if we're creating a new url
+    &&  !$self->get("url")                        # Only add it if this is a new asset.
     &&  $url ne lc($self->getId)                  # but don't assign it the original time
 	) {
 		$url .= ".".$self->session->setting->get("urlExtension");
