@@ -36,7 +36,7 @@ to the group.
 
 =head3 template
 
-An optional template for formatting the text and link.
+The URL of an optional template for formatting the text and link.
 
 =cut
 

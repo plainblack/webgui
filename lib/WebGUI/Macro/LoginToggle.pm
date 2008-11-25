@@ -38,7 +38,7 @@ internationalized message will be used.
 
 =head3 templateId
 
-The ID of a template for custom layout of the link and text.
+The URL of a template for custom layout of the link and text.
 
 =cut
 

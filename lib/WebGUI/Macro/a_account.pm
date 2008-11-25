@@ -33,7 +33,7 @@ The text of the link.  If no text is displayed an internationalized default will
 
 =head3 template
 
-A template to use for formatting the link.
+The URL of a template to use for formatting the link.
 
 =cut
 

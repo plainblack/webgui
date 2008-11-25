@@ -42,7 +42,7 @@ If this is blank an internationalized default is used.
 
 =head3 template
 
-A template from the Macro/EditableToggle namespace to use for formatting the link.
+The URL of a template from the Macro/EditableToggle namespace to use for formatting the link.
 
 =cut
 
