@@ -21,7 +21,6 @@ use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
 use Data::Dumper;
 
-#<tmpl if admin <tmpl_if canEditSurvey><a href="<tmpl_var editSUrvey_url>"><tmpl_var editSurvey_label></a></tmpl_if>
 #-------------------------------------------------------------------
 sub definition {
     my $class      = shift;
@@ -261,6 +260,9 @@ Loads the initial edit survey page.  All other edit actions are JSON calls from 
 
 sub www_editSurvey {
     my $self = shift;
+    
+    return $self->session->privilege->insufficient() 
+        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
 
     my %var;
     my $out = $self->processTemplate( \%var, $self->get("surveyEditTemplateId") );
@@ -271,6 +273,9 @@ sub www_editSurvey {
 #-------------------------------------------------------------------
 sub www_submitObjectEdit {
     my $self = shift;
+    
+    return $self->session->privilege->insufficient() 
+        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
 
     #    my $ref = @{decode_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
@@ -334,6 +339,10 @@ sub deleteObject {
 #-------------------------------------------------------------------
 sub www_newObject {
     my $self = shift;
+    
+    return $self->session->privilege->insufficient() 
+        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
+        
     my $ref;
 
     my $ids = $self->session->form->process("data");
@@ -354,6 +363,10 @@ sub www_newObject {
 #-------------------------------------------------------------------
 sub www_dragDrop {
     my $self = shift;
+    
+    return $self->session->privilege->insufficient() 
+        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
+        
     my $p    = decode_json( $self->session->form->process("data") );
 
     my @tid = split /-/, $p->{target}->{id};
@@ -598,15 +611,30 @@ sub www_takeSurvey {
     my $self = shift;
     my %var;
 
-    my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
-
     eval {
         my $responseId = $self->getResponseId();
         if ( !$responseId ) {
-            return $self->surveyEnd();
+            $self->session->log->debug('No responseId, surveyEnd');
+#            return $self->surveyEnd(); # disabled. let the js handle the exitUrl redirection
+        } else {
+            $self->session->log->debug("ResponseId: $responseId");
         }
     };
+    
+    my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
     return $self->session->style->process($out,$self->get("styleTemplateId"));
+}
+
+#-------------------------------------------------------------------
+sub www_deleteResponses {
+    my $self = shift;
+    
+    return $self->session->privilege->insufficient() 
+        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
+        
+    $self->session->db->write('delete from Survey_response');
+
+    return;
 }
 
 #handles questions that were submitted
@@ -614,15 +642,16 @@ sub www_takeSurvey {
 sub www_submitQuestions {
     my $self = shift;
 
-    #can user take survey
     if ( !$self->canTakeSurvey() ) {
-
-        # return encode_json({"type","FAIL LOGIN"});
+        $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
     }
 
     my $responseId = $self->getResponseId();
-    if ( !$responseId ) { return $self->surveyEnd(); }
+    if ( !$responseId ) {
+        $self->session->log->debug('No response id, surveyEnd');
+        return $self->surveyEnd(); 
+    }
 
     my $responses = $self->session->form->paramsHashRef();
     delete $$responses{'func'};
@@ -631,11 +660,12 @@ sub www_submitQuestions {
 
     $self->loadBothJSON();
 
-    my $termInfo = $self->response->recordResponses($responses);
+    my $termInfo = $self->response->recordResponses($self->session, $responses);
 
     $self->saveResponseJSON();
 
     if ( $termInfo->[0] ) {
+        $self->session->log->debug('Terminal, surveyEnd');
         return $self->surveyEnd( $termInfo->[1] );
     }
 
@@ -679,18 +709,24 @@ sub www_loadQuestions {
     my $self = shift;
 
     if ( !$self->canTakeSurvey() ) {
+        $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
     }
 
     my $responseId = $self->getResponseId();    #also loads the survey and response
     if ( !$responseId ) {
+        $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
     }
     if($self->response->hasTimedOut()){
+        $self->session->log->debug('Response hasTimedOut, surveyEnd');
         return $self->surveyEnd();
     }
 
-    return $self->surveyEnd() if ( $self->response->surveyEnd() );
+    if ( $self->response->surveyEnd() ) {
+        $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
+        return $self->surveyEnd();
+    }
 
     my $questions;
     eval { $questions = $self->response->nextQuestions(); };
@@ -708,17 +744,18 @@ sub www_loadQuestions {
 sub surveyEnd {
     my $self       = shift;
     my $url        = shift;
-    my $responseId = $self->getResponseId();    #also loads the survey and response
-
-    #    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
-    $self->session->db->setRow(
-        "Survey_response",
-        "Survey_responseId", {
-            Survey_responseId => $responseId,
-            endDate           => time(),#WebGUI::DateTime->now->toDatabase,
-            isComplete        => 1
-        }
-    );
+    
+    if (my $responseId = $self->getResponseId()) {    #also loads the survey and response
+        #    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
+        $self->session->db->setRow(
+            "Survey_response",
+            "Survey_responseId", {
+                Survey_responseId => $responseId,
+                endDate           => time(),#WebGUI::DateTime->now->toDatabase,
+                isComplete        => 1
+            }
+        );
+    }
     if ( $url !~ /\w/ ) { $url = 0; }
     if ( $url eq "undefined" ) { $url = 0; }
     if ( !$url ) {
@@ -730,8 +767,8 @@ sub surveyEnd {
             $url = "/";
         }
     }
-    $self->session->http->setMimeType('application/json');
-    return encode_json( { "type", "forward", "url", $url } );
+#    $self->session->http->setRedirect($url);
+    return encode_json({ "type", "forward", "url", $url });
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
@@ -844,7 +881,6 @@ sub response {
 
 sub getResponseId {
     my $self = shift;
-
     return $self->{responseId} if ( defined $self->{responseId} );
 
     my $ip = $self->session->env->getIp;
@@ -925,6 +961,7 @@ sub getResponseId {
             
         } ## end if ( $haveTaken < $allowedTakes)
         else {
+            $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
         }
     } ## end if ( !$responseId )
     $self->{responseId} = $responseId;
@@ -974,9 +1011,12 @@ sub canTakeSurvey {
 #-------------------------------------------------------------------
 sub www_viewGradeBook{
     my $self = shift;
-    $self->loadTempReportTable();
-    return ""
+    
+    return $self->session->privilege->insufficient() 
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+        
+    $self->loadTempReportTable();
+    
     my @peoples = $self->session->db->quickArray("SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",[$self->getId()]);
     for my $people(@peoples){
         #my $
@@ -988,9 +1028,12 @@ sub www_viewGradeBook{
 #-------------------------------------------------------------------
 sub www_exportSimpleResults{
     my $self = shift;
-    $self->loadTempReportTable();
-    return ""
+    
+    return $self->session->privilege->insufficient() 
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+    
+    $self->loadTempReportTable();
+        
     my $filename = $self->session->url->escape( $self->get("title") . "_results.tab" );
     my $content
         = $self->session->db->quickTab(
