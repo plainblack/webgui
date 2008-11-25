@@ -293,9 +293,10 @@ sub incrementCounter {
     unless ($self->get($counter."LastIp") eq $currentIp) {
         $self->update({ 
             $counter."LastIp"   => $currentIp,
-            $counter            => $self->get($counter)+1,
+            $counter            => $self->get($counter)+1
         });
     }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -310,6 +311,7 @@ sub indexContent {
 	my $self = shift;
 	my $indexer = $self->next::method;
 	$indexer->setIsPublic(0);
+    return undef;
 }
 
 
@@ -327,6 +329,7 @@ sub prepareView {
 	my $template = WebGUI::Asset::Template->new($self->session, $self->getParent->get('detailTemplateId'));
     $template->prepare;
 	$self->{_viewTemplate} = $template;
+    return undef;
 }
 
 
@@ -363,6 +366,7 @@ sub processPropertiesFromFormPost {
     $self->update({score => $score});    
 
     $self->requestAutoCommit;
+    return undef;
 }
 
 
@@ -438,6 +442,7 @@ sub setRatings {
             (listingId, category, meanValue, medianValue, countValue, matrixId) 
             values (?,?,?,?,?,?)",[$self->getId,$category,$mean,$median,$count,$matrixId]);
     }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -450,7 +455,7 @@ method called by the container www_view method.
 
 A boolean indicating if the user has rated this listing.
 
-=head3 hasRated
+=head3 emailSent 
 
 A boolean indicating if an email to the listing maintianer was sent.
 
@@ -472,7 +477,7 @@ sub view {
     	$var->{emailSent}       = 1;
     }
     $var->{controls}            = $self->getToolbar;
-    $var->{comments}            = $self->getFormattedComments(),
+    $var->{comments}            = $self->getFormattedComments();
     $var->{productName}         = $var->{title};
     $var->{lastUpdated_epoch}   = $self->get('lastUpdated');
     $var->{lastUpdated_date}    = $self->session->datetime->epochToHuman($self->get('lastUpdated'),"%z");
@@ -731,7 +736,10 @@ Sets the sort scratch variable.
 sub www_deleteStickied {
 
     my $self = shift;
+    
+    return $self->session->privilege->noAccess() unless $self->canView;
     $self->getParent->www_deleteStickied();
+
     return undef;
 }
 
@@ -927,6 +935,8 @@ Saves a rating of a matrix listing and returns the listing view.
 sub www_rate {
     my $self = shift;
     my $form = $self->session->form;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
     
     my $hasRated    = $self->hasRated;
     my $sameRating  = 1;
@@ -995,7 +1005,10 @@ Sets the sort scratch variable.
 sub www_setStickied {
 
     my $self = shift;
+
+    return $self->session->privilege->noAccess() unless $self->canView;
     $self->getParent->www_setStickied();
+
     return undef;
 }
 #-------------------------------------------------------------------
@@ -1009,7 +1022,9 @@ Web facing method which is the default view page.  This method does a
 
 sub www_view {
 	my $self = shift;
+
 	return $self->session->privilege->noAccess() unless $self->canView;
+
     $self->prepareView;
 	return $self->view;
 }
