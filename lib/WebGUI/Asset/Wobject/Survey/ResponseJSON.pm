@@ -130,9 +130,9 @@ sub currentSection {
 
 sub recordResponses {
     my $self      = shift;
-    my $responses = shift;
     my $session   = shift;
-
+    my $responses = shift;
+    
     my %mcTypes = (
         'Agree/Disagree', 1, 'Certainty',       1, 'Concern',        1, 'Confidence', 1, 'Education',  1,
         'Effectiveness',  1, 'Gender',          1, 'Ideology',       1, 'Importance', 1, 'Likelihood', 1,
