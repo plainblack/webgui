@@ -23,14 +23,10 @@ use File::Copy ();
 use File::Find ();
 use File::Path ();
 use File::Spec;
+use Image::Magick;
 use Storable ();
 use WebGUI::Utility qw(isIn);
 
-BEGIN {
-    unless (eval { require Image::Magick; 1 }) {
-        croak "You must have Image::Magick installed to run WebGUI.\n";
-    }
-}
 
 =head1 NAME
 
