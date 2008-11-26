@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset;
 
 
 my $toVersion = "7.6.5"; # make this match what version you're going to
@@ -27,11 +28,41 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 
-fixAccountMisspellings( $session );
+fixAccountMisspellings(  $session );
+removeTemplateHeadBlock( $session );
 
 # upgrade functions go here
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub removeTemplateHeadBlock {
+    my $session = shift;
+    print "\tMerging Template head blocks into the Extra Head Tags field... " unless $quiet;
+    my $sth = $session->db->prepare('select assetId, revisionDate, headBlock from template');
+    $sth->execute();
+    TMPL: while (my $templateData = $sth->hashRef) {
+        my $template = WebGUI::Asset->new($session,
+            $templateData->{assetId}, 'WebGUI::Asset::Template',
+            $templateData->{revisionDate},
+        );
+        next TMPL unless defined $template;
+        if ($template->get('namespace') eq 'style') {
+            $template->update({
+                extraHeadTags => '',
+            });
+        }
+        else {
+            $template->update({
+                extraHeadTags => $template->getExtraHeadTags . $templateData->{headBlock},
+            });
+        }
+    }
+    $session->db->write('ALTER TABLE template DROP COLUMN headBlock');
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

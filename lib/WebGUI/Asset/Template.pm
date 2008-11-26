@@ -90,10 +90,6 @@ sub definition {
                 fieldType       => 'selectList',
                 defaultValue    => [$session->config->get("defaultTemplateParser")],
             },	
-            headBlock => {
-                fieldType       => "codearea",
-                defaultValue    => undef,
-            },
             namespace => {
                 fieldType       => 'combo',
                 defaultValue    => undef,
@@ -102,6 +98,25 @@ sub definition {
     };
     return $class->SUPER::definition($session,$definition);
 }
+
+#-------------------------------------------------------------------
+
+=head2 drawExtraHeadTags ( )
+
+Override the master drawExtraHeadTags to prevent Style template from having
+Extra Head Tags.
+
+=cut
+
+sub drawExtraHeadTags {
+	my ($self, $params) = @_;
+    if ($self->get('namespace') eq 'style') {
+        my $i18n = WebGUI::International->new($self->session);
+        return $i18n->get(881);
+    }
+    return $self->SUPER::drawExtraHeadTags($params);
+}
+
 
 #-------------------------------------------------------------------
 
@@ -125,15 +140,20 @@ sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
     # TODO: Perhaps add a way to check template syntax before it blows stuff up?
+    my %data;
+    my $needsUpdate = 0;
 	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
-		my %data;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {
 			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
 		}
-		$self->update(\%data);
 	}
+	if ($self->session->form->process("namespace") eq 'style') {
+        $needsUpdate = 1;
+        $data{extraHeadTags} = '';
+    }
+    $self->update(\%data) if $needsUpdate;
 }
 
 #-------------------------------------------------------------------
@@ -184,12 +204,6 @@ sub getEditForm {
 		-hoverHelp=>$i18n->get('template description'),
         -syntax => "html",
 		-value=>$self->getValue("template")
-		);
-        $tabform->getTab("properties")->codearea(
-		-name=>"headBlock",
-		-label=>$i18n->get('head block'),
-		-hoverHelp=>$i18n->get('head block description'),
-		-value=>$self->getValue("headBlock")
 		);
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
@@ -323,7 +337,7 @@ sub prepare {
 	my $templateHeadersSent = $self->session->stow->get("templateHeadersSent") || [];
 	my @sent = @{$templateHeadersSent};
     unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
-        $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
+        $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->getExtraHeadTags, $vars));
     }
 	push(@sent, $self->getId);
 	$self->session->stow->set("templateHeadersSent", \@sent);
