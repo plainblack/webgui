@@ -511,7 +511,7 @@ listing,|,
      },
 
     'categories default value' => {
-                message => q|Features\nBenefits|,
+                message => qq|Features\nBenefits|,
                 lastUpdated => 0,
      },
 

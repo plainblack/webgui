@@ -455,10 +455,12 @@ sub view {
             limit               => 1,
             returnObjects       => 1,
         }) };
-    $var->{bestViews_url}           = $bestViews_listing->getUrl;
-    $var->{bestViews_count}         = $bestViews_listing->get('views');
-    $var->{bestViews_name}          = $bestViews_listing->get('title');
-    $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+    if($bestViews_listing){
+        $var->{bestViews_url}           = $bestViews_listing->getUrl;
+        $var->{bestViews_count}         = $bestViews_listing->get('views');
+        $var->{bestViews_name}          = $bestViews_listing->get('title');
+        $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+    }
 
     # Get the MatrixListing with the most compares as an object using getLineage.
 
@@ -469,10 +471,12 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
-    $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
-    $var->{bestCompares_name}       = $bestCompares_listing->get('title');
-    $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+    if($bestCompares_listing){
+        $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
+        $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
+        $var->{bestCompares_name}       = $bestCompares_listing->get('title');
+        $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+    }
 
     # Get the MatrixListing with the most clicks as an object using getLineage.
     my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
@@ -482,11 +486,12 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
-    $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
-    $var->{bestClicks_name}         = $bestClicks_listing->get('title');
-    $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
-
+    if($bestClicks_listing){
+        $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
+        $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
+        $var->{bestClicks_name}         = $bestClicks_listing->get('title');
+        $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
+    }
     # Get the 5 MatrixListings that were last updated as objects using getLineage.
 
     my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
