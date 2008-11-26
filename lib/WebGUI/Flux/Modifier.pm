@@ -214,16 +214,8 @@ sub _checkDefinition {
         }
     }
     
-    # Make sure that all of the Modifier's defined Args have been supplied..
-    my $modifierDefnArgs_ref =  $modifierDefn_ref->{args};
-    my $args_ref = $args{id $self};
-    foreach my $field ( keys %{$modifierDefnArgs_ref} ) {
-        if ( !exists $args_ref->{$field} ) {
-            WebGUI::Error::InvalidParam->throw(
-                param => $field,
-                error => 'Missing required Modifier arg.',
-            );
-        }
-    }
+    # Make sure that the supplied arguments match the spec..
+    my @args = %{$args{id $self}};
+    validate(@args, $modifierDefn_ref->{args});
 }
 1;

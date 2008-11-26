@@ -209,6 +209,10 @@ sub _checkDefinition {
     my $self = shift;
     
     # Operator definition not used yet
+    
+    # Make sure that the supplied arguments match the spec..
+#    my @args = %{$args{id $self}};
+#    validate(@args, $operatorDefn_ref->{args});
 }
 
 1;

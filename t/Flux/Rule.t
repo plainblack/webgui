@@ -462,8 +462,11 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     my $rule = WebGUI::Flux::Rule->create($session);
     $rule->update( { onRuleFirstTrueWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
+    
+    wait_for_workflow($session, $test_workflow->getId());
+    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
 
-    # Workflow should have completed in real-time and user should be a member of the new group
+    # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
 
     # Clean up
@@ -484,8 +487,11 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     my $rule = WebGUI::Flux::Rule->create($session);
     $rule->update( { onAccessTrueWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
+    
+    wait_for_workflow($session, $test_workflow->getId());
+    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
 
-    # Workflow should have completed in real-time and user should be a member of the new group
+    # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
 
     # Clean up
@@ -514,8 +520,11 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     );
     $rule->update( { onAccessFirstFalseWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
+    
+    wait_for_workflow($session, $test_workflow->getId());
+    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
 
-    # Workflow should have completed in real-time and user should be a member of the new group
+    # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
 
     # Clean up
@@ -572,6 +581,21 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
 sub _secondsFromNow {
     my $dt = shift;
     return WebGUI::DateTime->now()->subtract_datetime($dt)->in_units('seconds');
+}
+
+sub wait_for_workflow {
+    my $session = shift;
+    my $workflow_id = shift;
+    my $wf = WebGUI::Workflow->new($session, $workflow_id);
+    my $maxwait = 50;
+    my $ctr = 0;
+    
+    while (my @instances = @{$wf->getInstances()}) {
+        my $status = $instances[0]->get('lastStatus') || 'undefined';
+        diag("Waiting for workflow: $workflow_id. Status $status. " . ($maxwait - $ctr) . " tries remaining.");
+        last if $ctr++ > $maxwait;
+        sleep 1;
+    }
 }
 
 END {
