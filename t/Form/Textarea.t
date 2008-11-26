@@ -44,7 +44,7 @@ my $testBlock = [
 
 my $formType = 'textarea';
 
-my $numTests = 7 + scalar @{ $testBlock } + 5;
+my $numTests = 7 + scalar @{ $testBlock } + 6;
 
 
 plan tests => $numTests;
@@ -103,6 +103,15 @@ is($txt->getValue("some \ntest \r\nhere"), "some \ntest \r\nhere", 'getValue(new
 
 is($session->form->textarea(undef,"some test here"), "some test here", 'session->form->textarea(undef,text)');
 is($session->form->textarea(undef,"some \ntest \r\nhere"), "some \ntest \r\nhere", 'session->form->textarea(undef,newlines)');
+
+###################################################################
+#
+# getValueAsHtml
+#
+###################################################################
+
+$txt = WebGUI::Form::Textarea->new($session, { value => "line1\nline2\nline3", });
+is($txt->getValueAsHtml, 'line1<br>line2<br>line3', 'getValueAsHtml translates newlines into break tags');
 
 
 __END__

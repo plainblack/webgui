@@ -194,6 +194,7 @@ sub getValueAsHtml {
     my $self = shift;
     my $value = $self->SUPER::getValueAsHtml(@_);
     $value = WebGUI::HTML::filter($value, 'text');
+    $value =~ s/\n/<br>/sg;
     return $value;
 }
 

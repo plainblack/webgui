@@ -10,8 +10,8 @@
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
  - fixed #9152: Pagination broken in Contribs Section of new Account System
  - fixed #4159: more menu doesn't appear for current asset on crumb trail
- - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
  - fixed #9157: another typ-o in i18n
+ - fixed #9112: Thingy View Thing screen doesn't preserve newlines
 
 7.6.4
  - Survey now will show progress and time limit.
@@ -79,6 +79,7 @@
  - fixed #9140: Date format error when adding tasks to PM
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
  - fixed #9143: Yes No user profile fields problem when default == 1
+ - fixed #9155: purpose of "headblock" duplicates "extra head tags"
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
