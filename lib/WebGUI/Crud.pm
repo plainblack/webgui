@@ -465,7 +465,7 @@ sub crud_updateTable {
 		else {
 			$db->write("alter table $tableName add column ".$dbh->quote_identifier($property)." $fieldType $notNullClause $defaultClause");
 		}
-		if ($isKey) {
+		if ($isKey && !$tableFields{$property}{key}) {
 			$db->write("alter table $tableName add index ".$dbh->quote_identifier($property)." (".$dbh->quote_identifier($property).")");
 		}
 		delete $tableFields{$property};

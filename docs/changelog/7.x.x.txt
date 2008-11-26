@@ -4,6 +4,7 @@
  - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything WebGUI::Storage::Image can do.
  - The deprecated use of Graphics::Magick has been eliminated. WebGUI uses Image::Magick exclusively for all image processing functions once again.
  - fixed: #9147: Misspellings in Account
+ - fixed: a bug in Crud where keys being updated would cause a crash
  - fixed: #9148: Account: account links do not work
  - fixed: #9149: Account: default templates do not work right
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
