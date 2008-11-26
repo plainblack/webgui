@@ -15,9 +15,7 @@ Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidPar
 my $recursiveDepthCounter = 0;    # Used as an extra (hopefully never needed) guard against infinite loops
 
 =head1 NAME
-
 Package WebGUI::Flux::Rule;
-
 =head1 DESCRIPTION
 
 Rule to be used as part of Flux rule-based authorisation layer for WebGUI 
@@ -836,7 +834,17 @@ sub _updateDataAndTriggerWorkflows {
                     className  => "WebGUI::User",
                     parameters => $user_id,
                 }
-            )->start(1); # Skip realtime to avoid Workflow segfault bug 
+                )->start( !$ENV{FLUX_REALTIME_WORKFLOWS} );
+
+=for Workaround
+
+By default we start workflow instances with the skipRealtime flag preset, because
+there is a segfault bug that rears its head when a workflow triggers itself recursively 
+in realtime mode under load. The ENV flag is used here because it's handy to be able to run 
+in realtime mode for tests, just for speed reasons.
+
+=cut
+
         }
     }
 }

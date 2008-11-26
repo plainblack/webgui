@@ -299,7 +299,8 @@ the rule has been flagged as skippable.
 
 Excluding situations where you allow multipel rules to be skipped, this sub will only
 wastefully evaluate one Rule (the first rule that fails). If most of your rules are sticky
-then this sub doesn't need to do much work at all.
+then this sub doesn't need to do much work at all. If you want to optimise even further,
+set the minimal flag to true. In this case no rules will be evaluated at all.
 
 Returns an array of result hashes, with the result undefined for rules that we didn't reach.
 
@@ -343,9 +344,15 @@ sub getLinearProgression {
             next;
         }
 
-        if ( $args{minimal} ) {
-            $session->log->debug("getLinearProgression wanted to eval $fluxRuleId but 'minimal' flag detected");
-            last;
+        if ( $args{minimal}) {
+            if ( $skippable{$fluxRuleId} ) {
+                $session->log->debug("Wanted to eval $fluxRuleId but minimal and skippable, continuing search..");
+                next;
+            }
+            else {
+                $session->log->debug("Wanted to eval $fluxRuleId but minimal and not skippable, search ends here");
+                last;
+            }
         }
 
         $session->log->debug("Evaluating $fluxRuleId due to getLinearProgression search");
@@ -354,12 +361,12 @@ sub getLinearProgression {
         push @results, { id => $fluxRuleId, success => $result };
 
         if ($result) {
-            $session->log->debug("$fluxRuleId evaluated true, continuing search..");
+            $session->log->debug("Result was true, continuing search..");
             next;
         }
 
         if ( $skippable{$fluxRuleId} ) {
-            $session->log->debug("$fluxRuleId evaluated false, but in skippable so continuing search..");
+            $session->log->debug("Result was false, but skippable so continuing search..");
             next;
         }
 
