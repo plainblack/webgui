@@ -8,6 +8,7 @@
  - fixed #9152: Pagination broken in Contribs Section of new Account System
  - fixed #4159: more menu doesn't appear for current asset on crumb trail
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
+ - fixed #9157: another typ-o in i18n
 
 7.6.4
  - Survey now will show progress and time limit.
