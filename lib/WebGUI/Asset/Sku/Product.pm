@@ -15,7 +15,7 @@ use Tie::CPHash;
 use Tie::IxHash;
 use WebGUI::Cache;
 use WebGUI::HTMLForm;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
 use JSON;
@@ -443,11 +443,11 @@ sub getQuantityAvailable {
 =head2 getThumbnailUrl ( [$store] )
 
 Return a URL to the thumbnail for an image stored in this Product by creating
-a WebGUI::Storage::Image object and calling its getThumbnailUrl method.
+a WebGUI::Storage object and calling its getThumbnailUrl method.
 
 =head3 $store
 
-This should be a WebGUI::Storage::Image object.  If it is not defined,
+This should be a WebGUI::Storage object.  If it is not defined,
 then by default getThumbnailUrl will attempt to look up the URL for
 the 'image1' property.
 
@@ -463,7 +463,7 @@ sub getThumbnailUrl {
         return $store->getThumbnailUrl($store->getFiles->[0]); 
     }
     elsif ($self->get('image1')) {
-        $store = WebGUI::Storage::Image->get($self->session, $self->get('image1'));
+        $store = WebGUI::Storage->get($self->session, $self->get('image1'));
         return $store->getThumbnailUrl($store->getFiles->[0]); 
     }
     else {
@@ -1451,19 +1451,19 @@ sub view {
     }
     #---image1
     if ($image1) {
-        my $file = WebGUI::Storage::Image->get($session,$image1);
+        my $file = WebGUI::Storage->get($session,$image1);
         $var{thumbnail1} = $self->getThumbnailUrl($file);
         $var{image1}     = $self->getFileUrl($file);
     }
     #---image2
     if ($image2) {
-        my $file = WebGUI::Storage::Image->get($session,$image2);
+        my $file = WebGUI::Storage->get($session,$image2);
         $var{thumbnail2} = $self->getThumbnailUrl($file);
         $var{image2}     = $self->getFileUrl($file);
     }
     #---image3
     if ($image3) {
-        my $file = WebGUI::Storage::Image->get($session,$image3);
+        my $file = WebGUI::Storage->get($session,$image3);
         $var{thumbnail3} = $self->getThumbnailUrl($file);
         $var{image3}     = $self->getFileUrl($file);
    }

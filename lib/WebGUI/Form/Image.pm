@@ -17,7 +17,7 @@ package WebGUI::Form::Image;
 use strict;
 use base 'WebGUI::Form::File';
 use WebGUI::International;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::Form::YesNo;
 use WebGUI::Utility qw/isIn/;
 
@@ -134,7 +134,7 @@ Returns the WebGUI::Storage object for this control.
 sub getStorageLocation {
     my $self = shift;
     my $value = $self->getOriginalValue;
-	my $storage = WebGUI::Storage::Image->get($self->session, $value) if ($value);
+	my $storage = WebGUI::Storage->get($self->session, $value) if ($value);
     return $storage;
 }
 
@@ -151,7 +151,7 @@ sub getValue {
 	my $self = shift;
 	my $id = $self->SUPER::getValue(@_);
 	if (defined $id) {
-		my $storage = WebGUI::Storage::Image->get($self->session, $id);
+		my $storage = WebGUI::Storage->get($self->session, $id);
 		if (defined $storage) {
 			my @files = @{$storage->getFiles};
 			my @images = grep{$storage->isImage($_)} @files; # Put all filenames that isImage returns true for into @images
@@ -184,7 +184,7 @@ sub getValueAsHtml {
 	my ($self) = @_;
     my $value = $self->getOriginalValue;
 	return '' unless $value;
-	my $location = WebGUI::Storage::Image->get($self->session, $value);
+	my $location = WebGUI::Storage->get($self->session, $value);
 	my $file = shift @{ $location->getFiles };
 	my $fileValue = sprintf qq|<img src="%s" />&nbsp;%s|, $location->getUrl($file), $file; 
 	return $fileValue;

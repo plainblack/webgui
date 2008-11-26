@@ -579,7 +579,7 @@ sub www_styleWizard {
 		my $logo;
 		my $logoContent = '';
 		if ($storageId) {
-			my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+			my $storage = WebGUI::Storage->get($self->session,$storageId);
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
 				title=>join(' ', $form->get("heading"), $i18n->get('logo')),

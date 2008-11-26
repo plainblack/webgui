@@ -548,7 +548,7 @@ sub www_view {
         if($hash->{'isViewable'}) {
             $hash->{'friend_profile_url'} = $friend->getProfileUrl;
             if($friend->profileField("photo")) {
-                my $store = WebGUI::Storage::Image->get($session,$friend->profileField("photo"));
+                my $store = WebGUI::Storage->get($session,$friend->profileField("photo"));
                 my $file  = $store->getFiles->[0];
                 $hash->{'friend_photo_url'      } = $store->getUrl($file);
                 $hash->{'friend_photo_url_thumb'} = $store->getThumbnailUrl($file);

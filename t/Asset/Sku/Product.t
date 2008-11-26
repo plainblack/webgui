@@ -24,7 +24,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Product;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 #----------------------------------------------------------------------------
 # Init
@@ -47,7 +47,7 @@ my $product = $node->addChild({
 
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
 
-my $image = WebGUI::Storage::Image->create($session);
+my $image = WebGUI::Storage->create($session);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
 
 my $imagedProduct = $node->addChild({
@@ -60,7 +60,7 @@ my $imagedProduct = $node->addChild({
 ok($imagedProduct->getThumbnailUrl(), 'getThumbnailUrl is not empty');
 is($imagedProduct->getThumbnailUrl(), $image->getThumbnailUrl('lamp.jpg'), 'getThumbnailUrl returns the right path to the URL');
 
-my $otherImage = WebGUI::Storage::Image->create($session);
+my $otherImage = WebGUI::Storage->create($session);
 $otherImage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
 
 ok($imagedProduct->getThumbnailUrl($otherImage), 'getThumbnailUrl with an explicit storageId returns something');

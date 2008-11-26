@@ -16,7 +16,7 @@ package WebGUI::Asset::File::Image;
 
 use strict;
 use base 'WebGUI::Asset::File';
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::HTMLForm;
 use WebGUI::Utility;
 use WebGUI::Form::Image;
@@ -189,7 +189,7 @@ Returns the class name of the WebGUI::Storage we should use for this asset.
 =cut
 
 sub getStorageClass {
-    return 'WebGUI::Storage::Image';
+    return 'WebGUI::Storage';
 }
 
 #-------------------------------------------------------------------

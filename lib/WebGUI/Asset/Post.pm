@@ -27,7 +27,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Operation;
 use WebGUI::Paginator;
 use WebGUI::SQL;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::VersionTag;
@@ -351,7 +351,7 @@ sub getAvatarUrl {
 	#Get avatar field, storage Id.
 	my $storageId = $user->profileField("avatar");
 	return '' unless $storageId;
-	my $avatar = WebGUI::Storage::Image->get($self->session,$storageId);
+	my $avatar = WebGUI::Storage->get($self->session,$storageId);
 	my $avatarUrl = '';
 	if ($avatar) {
 		#Get url from storage object.
@@ -476,10 +476,10 @@ sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
 		if ($self->get("storageId") eq "") {
-			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
 		}
 	}
 	return $self->{_storageLocation};

@@ -18,7 +18,7 @@ use strict;
 use base 'WebGUI::Form::Control';
 use WebGUI::Asset;
 use WebGUI::International;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::VersionTag;
 
 =head1 NAME
@@ -287,7 +287,7 @@ sub www_upload {
     my $session = shift;
     my $form = $session->form;
     my @assetIds = $form->param("attachments");
-    my $storage = WebGUI::Storage::Image->createTemp($session);
+    my $storage = WebGUI::Storage->createTemp($session);
     my $filename = $storage->addFileFromFormPost("attachment");
     my $tempspace = WebGUI::Asset->getTempspace($session);
     my $asset = "";

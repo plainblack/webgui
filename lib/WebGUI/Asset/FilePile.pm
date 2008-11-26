@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::SQL;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -151,10 +151,10 @@ sub editSave {
 
 	##This is a hack.  File uploads should go through the WebGUI::Form::File API
     my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValue;
-	my $tempStorage       = WebGUI::Storage::Image->get($self->session, $tempFileStorageId);
+	my $tempStorage       = WebGUI::Storage->get($self->session, $tempFileStorageId);
 
 	foreach my $filename (@{$tempStorage->getFiles}) {
-		#my $storage = WebGUI::Storage::Image->create($self->session);
+		#my $storage = WebGUI::Storage->create($self->session);
 		#$storage->addFileFromFilesystem($tempStorage->getPath($filename));
 		
 		#$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));

@@ -16,7 +16,7 @@ use WebGUI::Test;
 use WebGUI::Macro::Thumbnail;
 use WebGUI::Session;
 use WebGUI::Image;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
@@ -46,7 +46,7 @@ my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
 
 ##Create a storage location
-my $storage = WebGUI::Storage::Image->create($session);
+my $storage = WebGUI::Storage->create($session);
 
 ##Save the image to the location
 $square->saveToStorageLocation($storage, 'square.png');

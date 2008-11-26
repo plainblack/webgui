@@ -26,7 +26,7 @@ use Tie::IxHash;
 use WebGUI::DateTime;
 use WebGUI::Friends;
 use WebGUI::Utility;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 
 =head1 NAME
@@ -44,7 +44,7 @@ use WebGUI::Asset::File::GalleryFile::Photo
 
 =head2 Geometry '...' is invalid. Skipping.
 
-makeResolutions will not pass invalid geometries to WebGUI::Storage::Image::resize().
+makeResolutions will not pass invalid geometries to WebGUI::Storage::resize().
 Valid geometries are one of the following forms:
 
  ^\d+$
@@ -259,7 +259,7 @@ Image class.
 =cut
 
 sub getStorageClass {
-    return 'WebGUI::Storage::Image';
+    return 'WebGUI::Storage';
 }
 
 #----------------------------------------------------------------------------

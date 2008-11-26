@@ -373,7 +373,7 @@ Save the image to the specified storage location.
 
 =head3 storage
 
-An instanciated WebGUI::Storage::Image object.
+An instanciated WebGUI::Storage object.
 
 =head3 filename
 

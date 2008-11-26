@@ -19,7 +19,7 @@ use Digest::MD5;
 use WebGUI::Asset;
 use WebGUI::HTMLForm;
 use WebGUI::International;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::VersionTag;
 use WebGUI::Utility;
 
@@ -173,7 +173,7 @@ sub handler {
         my $url = $session->url;
         my $logoUrl = $url->extras("plainblack.gif");
         if (defined $storageId) {
-            my $storage = WebGUI::Storage::Image->get($session, $storageId);
+            my $storage = WebGUI::Storage->get($session, $storageId);
             my $importNode = WebGUI::Asset->getImportNode($session);
             my $logo = addAsset($importNode, {
                 title       => $storage->getFiles->[0],

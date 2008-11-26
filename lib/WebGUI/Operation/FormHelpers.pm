@@ -17,7 +17,7 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Form::Group;
 use WebGUI::HTMLForm;
 use WebGUI::Pluggable;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::Utility;
 
 =head1 NAME
