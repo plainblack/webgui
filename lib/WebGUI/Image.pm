@@ -2,20 +2,7 @@ package WebGUI::Image;
 
 use strict;
 use WebGUI::Image::Palette;
-use Carp qw(croak);
-
-our $graphicsPackage;
-BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $graphicsPackage = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
-        $graphicsPackage = 'Image::Magick';
-    }
-    else {
-        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
-    }
-}
+use Image::Magick;
 
 =head1 NAME
 
@@ -186,7 +173,7 @@ sub new {
 	my $width = shift || 300;
 	my $height = shift || 300;
 
-	my $img = $graphicsPackage->new(
+	my $img = Image::Magick->new(
 		size => $width.'x'.$height,
 	);
 
@@ -263,13 +250,7 @@ The height of the image in pixels.
 sub setImageHeight {
 	my $self = shift;
 	my $height = shift;
-	
-    if ($graphicsPackage eq 'Graphics::Magick') {
-        $self->image->Resize(height => $height);
-    }
-    else {
-	    $self->image->Extent(height => $height);
-    }
+	$self->image->Extent(height => $height);
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{height} = $height;
 }
@@ -289,12 +270,7 @@ Teh width of the image in pixels.
 sub setImageWidth {
 	my $self = shift;
 	my $width = shift;
-    if ($graphicsPackage eq 'Graphics::Magick') {
-        $self->image->Resize(width => $width);
-    }
-    else {
-	    $self->image->Extent(width => $width);
-    }
+	$self->image->Extent(width => $width);
 	$self->image->Colorize(fill => $self->getBackgroundColor);
 	$self->{_properties}->{width} = $width;
 }
@@ -417,13 +393,7 @@ sub text {
 	my $anchorX = $properties{x};
 	my $anchorY = $properties{y};
 
-    my %testProperties = %properties;
-    delete $testProperties{align};
-    delete $testProperties{style};
-    delete $testProperties{fill};
-    delete $testProperties{alignHorizontal};
-    delete $testProperties{alignVertical};
-    my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryFontMetrics(%testProperties);
+    my ($x_ppem, $y_ppem, $ascender, $descender, $width, $height, $max_advance) = $self->image->QueryMultilineFontMetrics(%properties);
 
 	# Process horizontal alignment
 	if ($properties{alignHorizontal} eq 'center') {

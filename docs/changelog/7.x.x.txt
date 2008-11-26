@@ -1,8 +1,8 @@
 7.6.5
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
  - fixed: Products imported into the Shelf have bad URLs
- - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything
-   WebGUI::Storage::Image can do.
+ - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything WebGUI::Storage::Image can do.
+ - The deprecated use of Graphics::Magick has been eliminated. WebGUI uses Image::Magick exclusively for all image processing functions once again.
  - fixed: #9147: Misspellings in Account
  - fixed: #9148: Account: account links do not work
  - fixed: #9149: Account: default templates do not work right

@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.5
+--------------------------------------------------------------------
+   * The deprecated use of Graphics::Magick has been eliminated. WebGUI uses
+    Image::Magick exclusively for all image processing functions once again.
+    
+
 7.6.4
 --------------------------------------------------------------------
    * The user facing portions of WebGUI's profile, inbox, friends, and "invite
