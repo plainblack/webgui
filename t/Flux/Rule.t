@@ -23,6 +23,9 @@ use Test::Exception;
 my $session = WebGUI::Test->session;
 WebGUI::Error->Trace(1);
 
+# Use realtime workflows otherwise tests take all day..
+$ENV{FLUX_REALTIME_WORKFLOWS} = 1;
+
 #----------------------------------------------------------------------------
 # Tests
 

@@ -25,16 +25,16 @@ See WebGUI::Flux::Operator base class for more information.
 =cut
 
 sub evaluate {
-    my ( $self) = @_;
-    
+    my ($self) = @_;
+
     my $a = $self->operand1();
     my $b = $self->operand2();
-    
+
     if ( looks_like_number($a) && looks_like_number($b) ) {
         return $a <= $b;
     }
     else {
-        return $a le $b;
+        return $a && $b && $a le $b;
     }
 }
 

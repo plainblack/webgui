@@ -4,6 +4,7 @@ use strict;
 use GraphViz;
 use JSON;
 use Readonly;
+use WebGUI::Flux::Rule;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 

@@ -145,10 +145,10 @@ sub evaluateUsing {
     # Do a little bit of pre-processing on the operands
     foreach my $operand qw(operand1 operand2) {
         
-        # Stringify undefs (to shut up warnings about unitialized strings)
-        if (!defined $arg_ref->{$operand}) {
-            $arg_ref->{$operand} = q{};
-        }
+#        # Stringify undefs (to shut up warnings about unitialized strings)
+#        if (!defined $arg_ref->{$operand}) {
+#            $arg_ref->{$operand} = q{};
+#        }
         
         # Trim whitespace
         $arg_ref->{$operand} =~ s/^\s+|\s+$//g;

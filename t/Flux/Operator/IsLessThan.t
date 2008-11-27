@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 15;
+plan tests => 21;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -51,6 +51,16 @@ my $rule   = WebGUI::Flux::Rule->create($session);
     ok( WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => 23, operand2 => '24 '} ), q{23 < "24 "} );
     ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => 23, operand2 => ' 23'} ), q{23 < " 23"} );
     ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => 23, operand2 => '22 '} ), q{23 < "22 "} );
+    
+    # undefs
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => undef, operand2 => '5'} ), q{undef >= 5} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => 5, operand2 => undef} ), q{5 >= undef} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => undef, operand2 => undef} ), q{undef >= undef} );
+    
+    # empty strings
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => '', operand2 => '5'} ), q{'' >= 5} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => 5, operand2 => ''} ), q{5 >= ''} );
+    ok( !WebGUI::Flux::Operator->evaluateUsing( 'IsLessThan', {rule => $rule, operand1 => '', operand2 => ''} ), q{'' >= ''} );
 }
 
 #----------------------------------------------------------------------------
