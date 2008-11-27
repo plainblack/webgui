@@ -2805,9 +2805,10 @@ sub www_manage {
     my $var = $self->get;
     my $url = $self->getUrl;
     
-    $var->{canEditThings} = $self->canEdit;
+    $var->{canEditThings}  = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
-    $var->{"manage_url"} = $session->url->append($url, 'func=manage');
+    $var->{"manage_url"}   = $session->url->append($url, 'func=manage');
+    $var->{"view_url"}     = $session->url->page;
 
     #Get things in this Thingy
     $things = $self->getThings;

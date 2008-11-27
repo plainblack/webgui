@@ -13,6 +13,7 @@
  - fixed #9157: another typ-o in i18n
  - fixed #9112: Thingy View Thing screen doesn't preserve newlines
  - fixed #9155: purpose of "headblock" duplicates "extra head tags"
+ - fixed: Improve Thingy navigation.
 
 7.6.4
  - Survey now will show progress and time limit.
