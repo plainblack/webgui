@@ -1,7 +1,50 @@
 package WebGUI::Asset::Wobject::Survey::SurveyJSON;
 
+=head1 LEGAL
+
+-------------------------------------------------------------------
+WebGUI is Copyright 2001-2008 Plain Black Corporation.
+-------------------------------------------------------------------
+Please read the legal notices (docs/legal.txt) and the license
+(docs/license.txt) that came with this distribution before using
+this software.
+-------------------------------------------------------------------
+http://www.plainblack.com                     info@plainblack.com
+-------------------------------------------------------------------
+
+=cut
+
+=head1 NAME
+
+Package WebGUI::Asset::Wobject::Survey::SurveyJSON
+
+=head1 DESCRIPTION
+
+Helper class for WebGUI::Asset::Wobject::Survey.  It handles
+serializing and deserializing JSON data, and manages the data for
+the Survey.  This package is not intended to be used by any other
+Asset in WebGUI.
+
+=cut
+
 use strict;
 use JSON;
+
+=head2 new ( $json, $log )
+
+Object constructor.
+
+=head3 $json
+
+Pass in some JSON to be serialized into a data structure.  At the very least, you
+must pass in the "null" JSON string, '{}'.
+
+=head3 $log
+
+The session logger, from $session->log.  The class needs nothing else from the
+session object.
+
+=cut
 
 sub new {
     my $class = shift;
@@ -20,6 +63,12 @@ sub new {
     return $self;
 } ## end sub new
 
+=head2 freeze
+
+Serializes the survey and sections data into JSON and returns the JSON.
+
+=cut
+
 sub freeze {
     my $self = shift;
     my %temp;
@@ -27,6 +76,40 @@ sub freeze {
     $temp{survey}   = $self->{survey};
     return encode_json( \%temp );
 }
+
+=head2 newObject ( $address )
+
+Add new, empty elements to the survey data structure.  It returns $address,
+modified to show what was added.
+
+=head3 $address
+
+An array ref.  The number of elements array set what is added, and
+where.
+
+This method modifies $address if it has 1 or more elements.
+
+=over 4
+
+=item empty
+
+If the array ref is empty, a new section is added.
+
+=item 1 element
+
+If there's just 1 element, then that element is used as an index into
+the array of sections, and a new question is added to that section.
+
+=item 2 elements
+
+If there are 2 elements, then the first element is an index into
+section array, and the second element is an index into the questions
+in that section.  A new answer is added to the specified question in
+the specified section.
+
+=back
+
+=cut
 
 sub newObject {
     my $self    = shift;
@@ -224,6 +307,39 @@ sub insertObject {
 
 }
 
+=head2 copy ( $address )
+
+Duplicate the structure pointed to by $address, and add it to the end of the list of
+similar structures
+
+=head3 $address
+
+An array ref.  The number of elements array set what is added, and
+where.
+
+This method modifies $address if it has 1 or more elements.
+
+=over 4
+
+=item 1 element
+
+If there's just 1 element, then the section with that index is duplicated
+at the end of the array of sections.
+
+=item 2 elements
+
+If there are 2 elements, question in the section that is indexed
+will be duplicated and added to the end of the array of questions
+in that section.
+
+=item 3 elements, or more
+
+Nothing happens.  It is not allowed to duplicate answers.
+
+=back
+
+=cut
+
 sub copy {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
@@ -255,7 +371,8 @@ sub remove {
 
 sub newSection {
     my %members = (
-        'text',                   '', 'title',              'NEW SECTION',
+        'text',                   '',
+        'title',                  'NEW SECTION', ##i18n
         'variable',               '', 'questionsPerPage',   5,
         'questionsOnSectionPage', 1,  'randomizeQuestions', 0,
         'everyPageTitle',         1,  'everyPageText',      1,
@@ -454,10 +571,28 @@ sub addAnswersToQuestion {
 #------------------------------
 #accessors and helpers
 #------------------------------
+
+=head2 sections
+
+Returns a reference to all the sections in this object.
+
+=cut
+
 sub sections {
     my $self = shift;
     return $self->{sections};
 }
+
+=head2 section $address
+
+Returns a reference to one section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section whose questions will be returned.
+
+=cut
 
 sub section {
     my $self    = shift;
@@ -465,11 +600,34 @@ sub section {
     return $self->{sections}->[ $$address[0] ];
 }
 
+=head2 questions $address
+
+Returns a reference to all the questions from a particular section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section whose questions will be returned.
+
+=cut
+
 sub questions {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $$address[0] ]->{questions};
 }
+
+=head2 question $address
+
+Return a reference to one question from a particular section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.
+
+=cut
 
 sub question {
     my $self    = shift;
