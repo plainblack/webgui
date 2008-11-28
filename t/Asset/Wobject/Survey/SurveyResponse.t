@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin/../../lib";
+use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
@@ -24,27 +24,24 @@ plan tests => $tests + 1;
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
-my ($user, $import_node, $survey);
+my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ResponseJSON');
+my ($responseJSON);
 
 SKIP: {
 
-skip $tests, "Unable to load Survey" unless $usedOk;
-$user = WebGUI::User->new( $session, 'new' );
-$import_node = WebGUI::Asset->getImportNode($session);
+skip $tests, "Unable to load ResponseJSON" unless $usedOk;
 
-# Create a Survey
-$survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
-isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
+####################################################
+#
+# new, part 1
+#
+####################################################
+
+$responseJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new('{}', $session->log);
+isa_ok($responseJSON , 'WebGUI::Asset::Wobject::Survey::ResponseJSON');
 
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
-END {
-    $user->delete() if $user;
-    $survey->purge() if $survey;
-
-    my $versionTag = WebGUI::VersionTag->getWorking( $session, 1 );
-    $versionTag->rollback() if $versionTag;
-}
+END { }
