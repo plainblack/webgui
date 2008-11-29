@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 22;
+my $tests = 26;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -254,6 +254,101 @@ cmp_deeply(
 
 ####################################################
 #
+# insertObject, section
+#
+####################################################
+
+$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new('{}', $session->log);
+{
+    my $section = $surveyJSON->section([0]);
+    $section->{title} = 'Section 0';
+}
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [],
+        },
+    ],
+    'section: Set the title for the default section'
+);
+
+{
+    my $section = $surveyJSON->newSection;
+    $section->{title} = 'Section 1';
+    $surveyJSON->insertObject($section, [0]);
+}
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'section: Insert a new section after the default section'
+);
+
+{
+    my $section = $surveyJSON->newSection;
+    $section->{title} = 'Section 0+';
+    $surveyJSON->insertObject($section, [0]);
+}
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [],
+        },
+        {
+            title     => 'Section 0+',
+            questions => [],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'section: Insert another new section after the default section'
+);
+
+{
+    my $question = $surveyJSON->newQuestion;
+    $question->{text} = 'Question 0-0';
+    $surveyJSON->insertObject($question, [0,0]);
+}
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                }
+            ],
+        },
+        {
+            title     => 'Section 0+',
+            questions => [],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'section: Insert a question into the first section'
+);
+
+####################################################
+#
 # TODO
 #
 ####################################################
@@ -263,6 +358,35 @@ cmp_deeply(
 # Copy the section, then alter one question in it.  It should
 # alter the original since it is a reference.
 
+}
+
+# Go through a JSON survey type data structure and just grab some unique
+# elements
+
+sub summarizeSectionSkeleton {
+    my ($skeleton) = @_;
+    my $summary = [];
+    foreach my $section (@{ $skeleton->{sections} }) {
+        my $summarySection = {
+            title     => $section->{title},
+            questions => [],
+        };
+        foreach my $question ( @{ $section->{questions} } ) {
+            my $summaryQuestion = {
+                text   => $question->{text},
+                answers => [],
+            };
+            foreach my $answer ( @{ $question->{answers} } ) {
+                my $summaryAnswer = {
+                    text => $answer->{text},
+                };
+                push @{ $summaryQuestion->{answers} }, $summaryAnswer;
+            }
+            push @{ $summarySection->{questions} }, $summaryQuestion;
+        }
+        push @{ $summary }, $summarySection;
+    }
+    return $summary;
 }
 
 #  [

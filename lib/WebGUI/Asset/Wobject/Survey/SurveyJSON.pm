@@ -293,16 +293,62 @@ sub update {
 
 #determine what to add and add it.
 # ref should contain all the information for the new
+
+=head2 insertObject ( $object, $address )
+
+Add new "objects" into the current data structure.  It does not
+return anything significant.
+
+=head3 $object
+
+A perl data structure.  Note, that it is not checked for homegeneity,
+so it is possible to add a "question" object into the list of section
+objects.
+
+=head3 $address
+
+An array ref.  The number of elements array set what is added, and
+where.
+
+=over 4
+
+=item empty
+
+If the array ref is empty, nothing is done.
+
+=item 1 element
+
+If there's just 1 element, then that element is used as an index into
+the array of sections, and $object is spliced into place right after
+that index.
+
+=item 2 elements
+
+If there are 2 elements, then the first element is an index into
+section array, and the second element is an index into the questions
+in that section.  $object is added right after that question.
+
+=back
+
+=item 3 elements
+
+Three elements are enough to reference an answer, inside of a particular
+question in a section.  $object is spliced in right after that answer.
+
+=back
+
+=cut
+
 sub insertObject {
     my ( $self, $object, $address ) = @_;
     if ( @$address == 1 ) {
-        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );
+        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );  ##always a default section
     }
     elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object );
+        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object ); ##warning, beyond end of array
     }
     elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );
+        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );   ##warning, beyond end of array
     }
 
 }
