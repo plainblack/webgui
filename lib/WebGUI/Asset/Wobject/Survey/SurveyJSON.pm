@@ -163,6 +163,41 @@ sub getDragDropList {
     return \@data;
 } ## end sub getDragDropList
 
+=head2 getObject ( $address )
+
+Retrieve objects from the sections data structure by address.
+
+=head3 $address
+
+An array ref.  The number of elements array set what is fetched.
+
+=over 4
+
+=item empty
+
+If the array ref is empty, nothing is done.
+
+=item 1 element
+
+If there's just 1 element, returns the section with that index.
+
+=item 2 elements
+
+If there are 2 elements, then the first element is an index into
+section array, and the second element is an index into the questions
+in that section.  Returns that question.
+
+=back
+
+=item 3 elements
+
+Three elements are enough to reference an answer, inside of a particular
+question in a section.  Returns that answer.
+
+=back
+
+=cut
+
 sub getObject {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
@@ -254,6 +289,52 @@ sub getAnswerEditVars {
     $var{displayed_id} = $address->[2] + 1;
     return \%var;
 }
+
+=head2 update ( $address, $object )
+
+Update new "objects" into the current data structure, or add new ones.  It does not
+return anything significant.
+
+=head3 $address
+
+An array ref.  The number of elements array set what is updated.
+
+=over 4
+
+=item empty
+
+If the array ref is empty, nothing is done.
+
+=item 1 element
+
+If there's just 1 element, then that element is used as an index into
+the array of sections, and information from $object is used to replace
+the properties of that section.  If the select section does not exist, such
+as by using an out of bounds array index, then a new section is appended
+to the list of sections.
+
+=item 2 elements
+
+If there are 2 elements, then the first element is an index into
+section array, and the second element is an index into the questions
+in that section.
+
+=back
+
+=item 3 elements
+
+Three elements are enough to reference an answer, inside of a particular
+question in a section.  $object is spliced in right after that answer.
+
+=head3 $object
+
+A perl data structure.  Note, that it is not checked for homegeneity,
+so it is possible to add a "question" object into the list of section
+objects.
+
+=back
+
+=cut
 
 sub update {
     my ( $self, $address, $ref ) = @_;
@@ -415,6 +496,12 @@ sub remove {
     }
 }
 
+=head2 newSection
+
+Returns a reference to a new, empty section.
+
+=cut
+
 sub newSection {
     my %members = (
         'text',                   '',
@@ -429,6 +516,12 @@ sub newSection {
     $members{questions} = [];
     return \%members;
 }
+
+=head2 newQuestion
+
+Returns a reference to a new, empty question.
+
+=cut
 
 sub newQuestion {
     my %members = (
@@ -453,6 +546,12 @@ sub newQuestion {
     $members{answers} = [];
     return \%members;
 } ## end sub newQuestion
+
+=head2 newAnswer
+
+Returns a reference to a new, empty answer.
+
+=cut
 
 sub newAnswer {
     my %members = (

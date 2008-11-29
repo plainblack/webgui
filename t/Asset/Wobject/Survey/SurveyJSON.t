@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 26;
+my $tests = 28;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -271,7 +271,7 @@ cmp_deeply(
             questions => [],
         },
     ],
-    'section: Set the title for the default section'
+    'insertObject: Set the title for the default section'
 );
 
 {
@@ -291,7 +291,7 @@ cmp_deeply(
             questions => [],
         },
     ],
-    'section: Insert a new section after the default section'
+    'insertObject: Insert a new section after the default section'
 );
 
 {
@@ -315,7 +315,7 @@ cmp_deeply(
             questions => [],
         },
     ],
-    'section: Insert another new section after the default section'
+    'insertObject: Insert another new section after the default section'
 );
 
 {
@@ -344,8 +344,135 @@ cmp_deeply(
             questions => [],
         },
     ],
-    'section: Insert a question into the first section'
+    'insertObject: Insert a question into the first section'
 );
+
+{
+    my $question = $surveyJSON->newQuestion;
+    $question->{text} = 'Question 0-1';
+    $surveyJSON->insertObject($question, [0,0]);
+    my $question1 = $surveyJSON->newQuestion;
+    $question1->{text} = 'Question 0-2';
+    $surveyJSON->insertObject($question1, [0,1]);
+    my $question2 = $surveyJSON->newQuestion;
+    $question2->{text} = 'Question 0+-0';
+    $surveyJSON->insertObject($question2, [1,0]);
+    my $answer1 = $surveyJSON->newAnswer;
+    $answer1->{text} = 'Answer 0-1-0';
+    $surveyJSON->insertObject($answer1, [0,1,0]);
+    my $answer2 = $surveyJSON->newAnswer;
+    $answer2->{text} = 'Answer 0-1-1';
+    $surveyJSON->insertObject($answer2, [0,1,0]);
+    my $answer3 = $surveyJSON->newAnswer;
+    $answer3->{text} = 'Answer 0-1-2';
+    $surveyJSON->insertObject($answer3, [0,1,1]);
+}
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                        {
+                            text    => 'Answer 0-1-2',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 0+',
+            questions => [
+                {
+                    text    => 'Question 0+-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'insertObject: Adding questions and answers'
+);
+
+####################################################
+#
+# getObject, update
+#
+####################################################
+
+my $section1 = $surveyJSON->getObject([2]);
+##Now, there was a little naming problem created when inserting
+##sections out of order.  Let's fix it and show the danger of
+##using references.
+
+$section1->{title} = 'Section 2';
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                        {
+                            text    => 'Answer 0-1-2',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 0+',
+            questions => [
+                {
+                    text    => 'Question 0+-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [],
+        },
+    ],
+    'getObject: Returns live, dangerous references'
+);
+
 
 ####################################################
 #
