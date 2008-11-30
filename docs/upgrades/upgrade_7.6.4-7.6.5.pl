@@ -37,6 +37,32 @@ finish($session); # this line required
 
 #----------------------------------------------------------------------------
 # Describe what our function does
+
+sub updateMatrixListingScores {
+    my $session = shift;
+    print "\tUpdating score for every MatrixListing asset... " unless $quiet;
+    my $matrixListings   = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
+        {
+            statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+            statusToInclude     => ['pending','approved','deleted','archived'],
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            returnObjects       => 1,
+        });
+
+    for my $matrixListing (@{$matrixListings})
+    {
+        next unless defined $matrixListing;
+        my $score = $session->db->quickScalar("select sum(value) from MatrixListing_attribute 
+            left join Matrix_attribute using(attributeId) 
+            where matrixListingId = ? and fieldType = 'MatrixCompare'",
+            [$matrixListing->getId]);
+        $matrixListing->update({score => $score});
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+
 sub removeTemplateHeadBlock {
     my $session = shift;
     print "\tMerging Template head blocks into the Extra Head Tags field... " unless $quiet;
