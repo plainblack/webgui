@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 28;
+my $tests = 33;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ cmp_deeply(
 
 ####################################################
 #
-# getObject, update
+# getObject, update, remove
 #
 ####################################################
 
@@ -424,6 +424,15 @@ my $section1 = $surveyJSON->getObject([2]);
 ##Now, there was a little naming problem created when inserting
 ##sections out of order.  Let's fix it and show the danger of
 ##using references.
+
+cmp_deeply(
+    $section1,
+    superhashof({
+        type  => 'section',
+        title => 'Section 1',
+    }),
+    'getObject: Retrieved correct section'
+);
 
 $section1->{title} = 'Section 2';
 cmp_deeply(
@@ -471,6 +480,93 @@ cmp_deeply(
         },
     ],
     'getObject: Returns live, dangerous references'
+);
+
+my $question1 = $surveyJSON->getObject([1, 0]);
+
+cmp_deeply(
+    $question1,
+    superhashof({
+        type => 'question',
+        text => 'Question 0+-0',
+    }),
+    'getObject: Retrieved correct question'
+);
+
+$surveyJSON->update([1], { title => 'Section 1'} );
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                        {
+                            text    => 'Answer 0-1-2',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 0+-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [],
+        },
+    ],
+    'Update: updated a section'
+);
+
+$surveyJSON->update([1, 0], { text  => 'Question 1-0'} );
+
+cmp_deeply(
+    $surveyJSON->getObject([1, 0]),
+    superhashof({
+        type => 'question',
+        text => 'Question 1-0',
+        answers => [
+            superhashof ({
+                text    => '',
+            }),
+        ],
+    }),
+    'update: updating a question adds a new, default answer?'
+);
+
+$surveyJSON->remove([1, 0, 0]),
+cmp_deeply(
+    $surveyJSON->getObject([1, 0]),
+    superhashof({
+        type => 'question',
+        text => 'Question 1-0',
+        answers => [
+        ],
+    }),
+    'remove: removed that extra, default answer'
 );
 
 

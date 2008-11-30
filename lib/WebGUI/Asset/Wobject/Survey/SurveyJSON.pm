@@ -323,14 +323,15 @@ in that section.
 
 =item 3 elements
 
-Three elements are enough to reference an answer, inside of a particular
-question in a section.  $object is spliced in right after that answer.
+Three elements are enough to reference an answer, for a particular
+question in a section.
 
 =head3 $object
 
-A perl data structure.  Note, that it is not checked for homegeneity,
-so it is possible to add a "question" object into the list of section
-objects.
+A perl data structure.  Note, that it is not checked for type, so it is
+possible to add a "question" object into the list of section objects.
+Only the properties defined in $object will be defined in the data
+structure, so it is not a replacement.
 
 =back
 
@@ -481,6 +482,42 @@ sub copy {
         return $address;
     }
 }
+
+=head2 remove ( $address, $movingOverride )
+
+Delete the structure pointed to by $address.
+
+=head3 $address
+
+An array ref.  The number of elements array set what is added, and
+where.
+
+This method modifies $address if it has 1 or more elements.
+
+=over 4
+
+=item 1 element
+
+If there's just 1 element, then the section with that index is removed.  Normally,
+the first section, index 0, cannot be removed.  See $movingOverride below.
+
+=item 2 elements
+
+If there are 2 elements, the question in the section is removed.
+in that section.
+
+=item 3 elements
+
+Removes the answer in the specified question and section.
+
+=back
+
+=head3 $movingOverride
+
+If $movingOverride is defined (meaning including 0 and ''), then the first section
+is allowed to be removed.
+
+=cut
 
 sub remove {
     my ( $self, $address, $movingOverride ) = @_;
