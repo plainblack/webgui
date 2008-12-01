@@ -97,7 +97,6 @@
  - fixed #8822: Password Recovery Tempalte not working
  - fixed: DataForm times out when exporting large data sets
  - fixed: DataForm entry data field is too small
->>>>>>> .merge-right.r8665
 
 
 7.6.3
