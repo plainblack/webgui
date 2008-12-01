@@ -277,6 +277,41 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
+=head2 duplicateThing ( thingId )
+
+Duplicates a thing.
+
+=head3 thingId
+
+The id of the Thing that will be duplicated.
+
+=cut
+
+sub duplicateThing {
+
+    my $self        = shift;
+    my $oldThingId  = shift;
+    my $db          = $self->session->db;
+
+    my $thingProperties = $self->getThing($oldThingId);
+    $thingProperties->{thingId} = 'new';
+    $thingProperties->{label}   = $thingProperties->{label}.' (copy)';
+    
+    my $newThingId = $self->addThing($thingProperties);
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$oldThingId]);
+    foreach my $field (@$fields) {
+        # set thingId to newly created thing's id.
+        $field->{thingId} = $newThingId;
+        $self->addField($field,0);
+    }
+
+    return $newThingId;
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 deleteField ( fieldId , thingId )
 
 Deletes a field from Collateral and drops the fields column in the thingy table.
@@ -1395,6 +1430,26 @@ sub www_deleteFieldConfirm {
 
     return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteFieldConfirm ( )
+
+Duplicates a Thing.
+
+=cut
+
+sub www_duplicateThing {
+    my $self = shift;
+    my $session = $self->session;
+    my $thingId = $session->form->process("thingId");
+    return $session->privilege->insufficient() unless $self->canEdit;
+
+    $self->duplicateThing($thingId);
+
+    return $self->www_manage;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_copyThingData( )
@@ -2805,9 +2860,10 @@ sub www_manage {
     my $var = $self->get;
     my $url = $self->getUrl;
     
-    $var->{canEditThings} = $self->canEdit;
+    $var->{canEditThings}  = $self->canEdit;
     $var->{"addThing_url"} = $session->url->append($url, 'func=editThing;thingId=new');
-    $var->{"manage_url"} = $session->url->append($url, 'func=manage');
+    $var->{"manage_url"}   = $session->url->append($url, 'func=manage');
+    $var->{"view_url"}     = $session->url->page;
 
     #Get things in this Thingy
     $things = $self->getThings;
@@ -2820,6 +2876,8 @@ sub www_manage {
                 "",$i18n->get('delete thing warning')),
             'thing_editUrl' => $session->url->append($url, 'func=editThing;thingId='.$thing->{thingId}),
             'thing_editIcon' => $session->icon->edit('func=editThing;thingId='.$thing->{thingId}),
+            'thing_copyUrl' => $session->url->append($url, 'func=duplicateThing;thingId='.$thing->{thingId}),
+            'thing_copyIcon' => $session->icon->copy('func=duplicateThing;thingId='.$thing->{thingId}),
             'thing_addUrl' => $session->url->append($url,
                 'func=editThingData;thingId='.$thing->{thingId}.';thingDataId=new'),
             'thing_searchUrl' => $session->url->append($url, 'func=search;thingId='.$thing->{thingId}), 
