@@ -15,6 +15,7 @@
  - fixed #9155: purpose of "headblock" duplicates "extra head tags"
  - fixed: Improve Thingy navigation.
  - fixed #9126: UserList is completely broken in 7.6.4 (Yung Han Khoe)
+ - fixed #9177: Wide-characters break product varients
 
 7.6.4
  - Survey now will show progress and time limit.

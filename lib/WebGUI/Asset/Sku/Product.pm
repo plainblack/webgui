@@ -260,7 +260,7 @@ sub getAllCollateral {
     my $json = $self->get($tableName);
     my $table;
     if ($json) {
-        $table = decode_json($json);
+        $table = from_json($json);
     }
     else {
         $table = [];
@@ -785,7 +785,7 @@ The name of the table to insert the data.
 sub setAllCollateral {
     my $self       = shift;
     my $tableName  = shift;
-    my $json = encode_json($self->{_collateral}->{$tableName});
+    my $json = to_json($self->{_collateral}->{$tableName});
     $self->update({ $tableName => $json });
     return;
 }
