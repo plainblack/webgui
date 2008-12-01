@@ -434,7 +434,7 @@ sub view {
 	}
     
     # Query user profile data. Exclude the visitor account and users that have been deactivated.
-	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile, userProfileData.publicEmail ";
+	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile ";
 	# Include remaining profile fields in the query
 	foreach my $profileField (@profileFields){
     	$sql .= ", userProfileData.$profileField->{fieldName}";
@@ -534,26 +534,17 @@ sub view {
 	$p->setDataByArrayRef(\@visibleUsers);
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
-	    if ($self->get('overridePublicProfile') || $user->{publicProfile} eq "1" || ($user->{publicProfile} eq "" && $defaultPublicProfile eq "1")){
+        my $userObject = WebGUI::User->new($self->session,$user->{userId});
+	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable($userObject)){
 		    my (@profileFieldValues);
 			my %userProperties;
-			my $emailNotPublic;
-            if ($user->{publicEmail} eq "0" || ($user->{publicEmail} eq "" && $defaultPublicEmail ne "1")){
-                unless ($self->get('overridePublicEmail')){
-                    $emailNotPublic = 1;
-                }
-            }
 			foreach my $profileField (@profileFields){
-				if ($profileField->{fieldName} eq "email" && $emailNotPublic){
-			    	push (@profileFieldValues, {
-				    	"profile_emailNotPublic"=>1,
-    				});
-				}
-                else {
-                    # Assign field name
-                    my $profileFieldName = $profileField->{fieldName};
-                    $profileFieldName =~ s/ /_/g;
-                    $profileFieldName =~ s/\./_/g;
+                # Assign field name
+                my $profileFieldName = $profileField->{fieldName};
+                $profileFieldName =~ s/ /_/g;
+                $profileFieldName =~ s/\./_/g;
+
+				if ($userObject->canViewField($profileField->{fieldName},$self->session->user)){
                     # Assign value
                     my $value = $user->{$profileField->{fieldName}};
                     # Assign default value if not available
@@ -577,8 +568,13 @@ sub view {
                         $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;
                     }
 				}
+                else{
+                    push (@profileFieldValues, {
+                        "profile_notPublic"=>1,
+                    });
+                    $userProperties{'user_profile_'.$profileFieldName.'_notPublic'} = 1;
+                }
 			}
-			$userProperties{"user_profile_emailNotPublic"} = $emailNotPublic;
 			$userProperties{"user_id"} = $user->{userId};
 			$userProperties{"user_name"} = $user->{userName};
 			$userProperties{"user_profile_loop"} = \@profileFieldValues;

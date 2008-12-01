@@ -165,9 +165,9 @@ User List.|,
                 lastUpdated => 1081514049
         },
 
-        'Email not public message' => {
-                message => q|Email not public|,
-                lastUpdated => 1081514049
+        'Field not public message' => {
+                message => q|Field not public|,
+                lastUpdated => 1228125347 
         },
 
         'id label' => {
@@ -329,6 +329,12 @@ be searched or not. This will only have an effect if the limitSearch tmpl_var is
                 lastUpdated => 1081514049
         },
 
+        'user_profile_PROFILEFIELDNAME_notPublic' => {
+                message => q|A conditional which is true if the profile field with the name PROFILEFIELDNAME is not
+public, example &lt;tmpl_var user_profile_firstName_notPublic&gt;|,
+                lastUpdated => 1228125347 
+        },
+
         'user_profile_PROFILEFIELDNAME_value' => {
                 message => q|The value of the profile field with the name PROFILEFIELDNAME in the users user
 profile. Example &lt;tmpl_var user_profile_firstName_value&gt;|,
@@ -342,20 +348,14 @@ an image.|,
                 lastUpdated => 1081514049
         },
 
-        'user_profile_emailNotPublic' => {
-                message => q|A conditional that is true if the users email address is not public.|,
-                lastUpdated => 1081514049
-        },
-
         'user_profile_loop' => {
                 message => q|A loop containing the users profile fields.|,
                 lastUpdated => 1081514049
         },
 
-        'profile_emailNotPublic' => {
-                message => q|A conditional that is true if the users email address is not public. It will only be
-true for the 'email' profile field.|,
-                lastUpdated => 1081514049
+        'profile_notPublic' => {
+                message => q|A conditional that is true for each field that is not public.|,
+                lastUpdated => 1228125347
         },
 
         'profile_value' => {
