@@ -210,7 +210,7 @@ like( $surveyJSON->freeze, qr/"survey":\{\}/, 'freeze: got back something that l
 
 my $stompedAddress = [];
 is_deeply($surveyJSON->newObject($stompedAddress), [1], 'newObject returns the new data structure index');
-is_deeply($stompedAddress, [], 'newObject does not stomp on the address argument if it is empty');
+is_deeply($stompedAddress, [1], 'newObject stomps on $address');
 
 cmp_deeply(
     $surveyJSON->sections,
@@ -421,9 +421,6 @@ cmp_deeply(
 ####################################################
 
 my $section1 = $surveyJSON->getObject([2]);
-##Now, there was a little naming problem created when inserting
-##sections out of order.  Let's fix it and show the danger of
-##using references.
 
 cmp_deeply(
     $section1,
@@ -434,6 +431,7 @@ cmp_deeply(
     'getObject: Retrieved correct section'
 );
 
+##Try a reference stomp
 $section1->{title} = 'Section 2';
 cmp_deeply(
     summarizeSectionSkeleton($surveyJSON),
@@ -475,25 +473,19 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 2',
+            title     => 'Section 1',
             questions => [],
         },
     ],
-    'getObject: Returns live, dangerous references'
+    'getObject: Returns safe, cloned references'
 );
 
-my $question1 = $surveyJSON->getObject([1, 0]);
-
-cmp_deeply(
-    $question1,
-    superhashof({
-        type => 'question',
-        text => 'Question 0+-0',
-    }),
-    'getObject: Retrieved correct question'
-);
-
-$surveyJSON->update([1], { title => 'Section 1'} );
+##Propertly update a section
+{
+    my $section = $surveyJSON->getObject([1]);
+    $section->{title} = 'Section 1';
+    $surveyJSON->update([1], $section );
+}
 cmp_deeply(
     summarizeSectionSkeleton($surveyJSON),
     [
@@ -534,14 +526,26 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 2',
+            title     => 'Section 1',
             questions => [],
         },
     ],
     'Update: updated a section'
 );
 
-$surveyJSON->update([1, 0], { text  => 'Question 1-0'} );
+my $question1 = $surveyJSON->getObject([1, 0]);
+
+cmp_deeply(
+    $question1,
+    superhashof({
+        type => 'question',
+        text => 'Question 0+-0',
+    }),
+    'getObject: Retrieved correct question'
+);
+
+$question1->{text} = 'Question 1-0';
+$surveyJSON->update([1, 0], $question1 );
 
 cmp_deeply(
     $surveyJSON->getObject([1, 0]),
@@ -549,9 +553,6 @@ cmp_deeply(
         type => 'question',
         text => 'Question 1-0',
         answers => [
-            superhashof ({
-                text    => '',
-            }),
         ],
     }),
     'update: updating a question adds a new, default answer?'
@@ -566,7 +567,7 @@ cmp_deeply(
         answers => [
         ],
     }),
-    'remove: removed that extra, default answer'
+    'remove: No problems with removing nonexistant data'
 );
 
 

@@ -29,6 +29,7 @@ Asset in WebGUI.
 
 use strict;
 use JSON;
+use Clone qw/clone/;
 
 =head2 new ( $json, $log )
 
@@ -87,7 +88,7 @@ modified to show what was added.
 An array ref.  The number of elements array set what is added, and
 where.
 
-This method modifies $address if it has 1 or more elements.
+This method modifies $address.  It also returns $address.
 
 =over 4
 
@@ -116,18 +117,17 @@ sub newObject {
     my $address = shift;
     if ( @$address == 0 ) {
         push( @{ $self->sections }, $self->newSection() );
-        return [ $#{ $self->sections } ];
+        $address->[0] = $#{ $self->sections };
     }
     elsif ( @$address == 1 ) {
         push( @{ $self->questions($address) }, $self->newQuestion($address) );
         $$address[1] = $#{ $self->questions($address) };
-        return $address;
     }
     elsif ( @$address == 2 ) {
         push( @{ $self->answers($address) }, $self->newAnswer($address) );
         $$address[2] = $#{ $self->answers($address) };
-        return $address;
     }
+    return $address;
 } ## end sub newObject
 
 #address is the array of objects currently selected in the edit screen
@@ -201,13 +201,13 @@ question in a section.  Returns that answer.
 sub getObject {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        return $self->{sections}->[ $address->[0] ];
+        return clone $self->{sections}->[ $address->[0] ];
     }
     elsif ( @$address == 2 ) {
-        return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
     }
     else {
-        return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
     }
 }
 
@@ -330,8 +330,7 @@ question in a section.
 
 A perl data structure.  Note, that it is not checked for type, so it is
 possible to add a "question" object into the list of section objects.
-Only the properties defined in $object will be defined in the data
-structure, so it is not a replacement.
+$object should never be a partial object, but contain all properties.
 
 =back
 
@@ -378,7 +377,7 @@ sub update {
 
 =head2 insertObject ( $object, $address )
 
-Add new "objects" into the current data structure.  It does not
+Used to move existing objects in the current data structure.  It does not
 return anything significant.
 
 =head3 $object
@@ -424,13 +423,13 @@ question in a section.  $object is spliced in right after that answer.
 sub insertObject {
     my ( $self, $object, $address ) = @_;
     if ( @$address == 1 ) {
-        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );  ##always a default section
+        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );
     }
     elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object ); ##warning, beyond end of array
+        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object );
     }
     elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );   ##warning, beyond end of array
+        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );
     }
 
 }
@@ -438,7 +437,7 @@ sub insertObject {
 =head2 copy ( $address )
 
 Duplicate the structure pointed to by $address, and add it to the end of the list of
-similar structures
+similar structures.
 
 =head3 $address
 

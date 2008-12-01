@@ -291,9 +291,22 @@ is( $product5->getCollateral('variantsJSON', 'vid', $newVid)->{check}, 'no leaks
 
 $product5->purge;
 
+my $product6 = $root->addChild({
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Wide character attempt",
+});
+
+$newVid = $product6->setCollateral('variantsJSON', 'vid', 'new', { wideChar => q!“I hope this has a smart quote in it.”!
+, vid => 'new' });
+
+use Data::Dumper;
+diag Dumper $product6->getCollateral('variantsJSON', 'vid', $newVid);
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+
+    WebGUI::VersionTag->getWorking($session)->rollback;
 
 }
 
