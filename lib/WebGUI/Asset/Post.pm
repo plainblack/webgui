@@ -764,7 +764,9 @@ sub notifySubscribers {
     my $returnAddress = $setting->get("mailReturnPath");
     my $companyAddress = $setting->get("companyEmail");
     my $listAddress = $cs->get("mailAddress");
-    my $posterAddress = $user->profileField("email");
+    my $posterAddress = $user->getProfileFieldPrivacySetting('email') eq "all"
+                      ? $user->profileField('email')
+                      : '';
     my $from = $posterAddress || $listAddress || $companyAddress;
     my $replyTo = $listAddress || $returnAddress || $companyAddress;
     my $sender = $listAddress || $companyAddress || $posterAddress;

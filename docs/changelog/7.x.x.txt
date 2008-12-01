@@ -16,6 +16,7 @@
  - fixed: Improve Thingy navigation.
  - fixed #9126: UserList is completely broken in 7.6.4 (Yung Han Khoe)
  - fixed #9177: Wide-characters break product varients
+ - fixed #9191: Message Board reveals user email, ignores profile privacy setting (#9180)
 
 7.6.4
  - Survey now will show progress and time limit.
