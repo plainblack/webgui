@@ -1565,8 +1565,13 @@ the Collaboration Asset, the user will be notified.|,
 	},
 
 	'pubDate' => {
-		message => q|The date the item was published.|,
+		message => q|The date the item was published formatted in RFC 822 format.|,
 		lastUpdated => 1149656056,
+	},
+
+	'epochDate' => {
+		message => q|The date the item was published in epoch format.|,
+		lastUpdated => 1228242648,
 	},
 
 	'attachmentLoop' => {
