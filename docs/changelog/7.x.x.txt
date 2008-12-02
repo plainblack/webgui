@@ -26,6 +26,7 @@
  - fixed #9112: Thingy View Thing screen doesn't preserve newlines
  - fixed #9177: Wide-characters break product varients
  - fixed #4209: i18n in Rich edit in Dutch breaks
+ - fixed #9196: Shelf lacks pagination
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
