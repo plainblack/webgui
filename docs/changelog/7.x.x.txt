@@ -19,6 +19,7 @@
  - fixed #9191: Message Board reveals user email, ignores profile privacy setting (#9180)
  - fixed #4209: i18n in Rich edit in Dutch breaks
  - fixed #9196: Shelf lacks pagination
+ - fixed #4208: EMS badges with Admin security visible to all
 
 7.6.4
  - Survey now will show progress and time limit.
