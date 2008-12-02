@@ -449,6 +449,23 @@ sub setRatings {
 
 =head2 view ( hasRated )
 
+Updates the score of a MatrixListing. 
+
+=cut
+
+sub updateScore {
+    my $self = shift;
+    my $score = $self->session->db->quickScalar("select sum(value) from MatrixListing_attribute 
+            left join Matrix_attribute using(attributeId) 
+            where matrixListingId = ? and fieldType = 'MatrixCompare'",[$self->getId]);
+    $self->update({score => $score});
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 view ( hasRated )
+
 method called by the container www_view method. 
 
 =head3 hasRated

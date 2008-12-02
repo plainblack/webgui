@@ -201,6 +201,17 @@ sub deleteAttribute {
     my $attributeId = shift;
 
     $self->deleteCollateral("Matrix_attribute","attributeId",$attributeId);
+    $self->session->db->write("delete from MatrixListing_attribute where attributeId=? and matrixId=?",
+        [$attributeId,$self->getId]);
+
+    # recalculate scores for MatrixListings
+    my @listings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            returnObjects       => 1,
+        }) };
+    foreach my $listing (@listings){
+        $listing->updateScore;
+    }
 
     return undef;
 }
