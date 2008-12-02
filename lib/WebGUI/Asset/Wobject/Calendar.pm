@@ -467,7 +467,8 @@ sub createSubscriptionGroup {
 
 =head2 duplicate ( )
 
-Duplicates an Event Calendar. Duplicates all the events in this Event Calendar.
+Duplicates an Event Calendar. Duplicates all the events in this Event Calendar.  In 7.6,
+this method will be eliminated.
 
 =cut
 
@@ -485,10 +486,24 @@ sub duplicate {
     
     for my $event (@{ $events }) {
         my %eventProperties = %{ $event->get() };
-        $newCalendar->addChild(\%eventProperties);
+        $newCalendar->addChild(\%eventProperties, '', '', { skipAutoCommitWorkflows => 1, });
     }
     
     return $newCalendar;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 duplicateBranch ( )
+
+Defer to our overridden duplicate method.  In 7.6, this will be removed and Calendar will
+inherit duplicateBranch from AssetBranch.
+
+=cut
+
+sub duplicateBranch {
+    my $self = shift;
+    $self->duplicate(@_);
 }
 
 #----------------------------------------------------------------------------
