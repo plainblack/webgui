@@ -22,7 +22,6 @@
  - fixed #9143: Yes No user profile fields problem when default == 1
  - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
  - fixed #4159: more menu doesn't appear for current asset on crumb trail
- - fixed #9155: purpose of "headblock" duplicates "extra head tags"
  - fixed #9112: Thingy View Thing screen doesn't preserve newlines
  - fixed #9177: Wide-characters break product varients
  - fixed #4209: i18n in Rich edit in Dutch breaks
