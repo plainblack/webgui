@@ -277,7 +277,7 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient() 
         unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
 
-    #    my $ref = @{decode_json($self->session->form->process("data"))};
+    #    my $ref = @{from_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
 
     my @address = split /-/, $responses->{id};
@@ -367,7 +367,7 @@ sub www_dragDrop {
     return $self->session->privilege->insufficient() 
         unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
         
-    my $p    = decode_json( $self->session->form->process("data") );
+    my $p    = from_json( $self->session->form->process("data") );
 
     my @tid = split /-/, $p->{target}->{id};
     my @bid = split /-/, $p->{before}->{id};
@@ -512,7 +512,7 @@ sub www_loadSurvey {
         "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
     };
     $self->session->http->setMimeType('application/json');
-    return encode_json($return);
+    return to_json($return);
 } ## end sub www_loadSurvey
 
 #-------------------------------------------------------------------
@@ -768,7 +768,7 @@ sub surveyEnd {
         }
     }
 #    $self->session->http->setRedirect($url);
-    return encode_json({ "type", "forward", "url", $url });
+    return to_json({ "type", "forward", "url", $url });
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
@@ -825,7 +825,7 @@ sub prepareShowSurveyTemplate {
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
     $self->session->http->setMimeType('application/json');
-    return encode_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
+    return to_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
 } ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------

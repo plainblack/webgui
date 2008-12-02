@@ -53,7 +53,7 @@ sub new {
     my $log   = shift;
     my $self  = {};
     $self->{log} = $log;
-    my $temp = decode_json($json) if defined $json;
+    my $temp = from_json($json) if defined $json;
     $self->{sections} = defined $temp->{sections} ? $temp->{sections} : [];
     $self->{survey}   = defined $temp->{survey}   ? $temp->{survey}   : {};
     bless( $self, $class );
@@ -75,7 +75,7 @@ sub freeze {
     my %temp;
     $temp{sections} = $self->{sections};
     $temp{survey}   = $self->{survey};
-    return encode_json( \%temp );
+    return to_json( \%temp );
 }
 
 =head2 newObject ( $address )
