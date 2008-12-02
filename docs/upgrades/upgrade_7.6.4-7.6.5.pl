@@ -30,6 +30,7 @@ my $session = start(); # this line required
 
 fixAccountMisspellings(  $session );
 removeTemplateHeadBlock( $session );
+updateMatrixListingScores( $session );
 
 # upgrade functions go here
 finish($session); # this line required
