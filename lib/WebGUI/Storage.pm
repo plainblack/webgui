@@ -365,9 +365,12 @@ The content to write to the file.
 =cut
 
 sub addFileFromScalar {
-	my $self = shift;
-	my $filename = $self->session->url->makeCompliant(shift);
-	my $content = shift;
+	my ($self, $filename, $content) = @_;
+    if (isIn($self->getFileExtension($filename), qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
+        $filename =~ s/\./\_/g;
+        $filename .= ".txt";
+    }
+    $filename = $self->session->url->makeCompliant($filename);
 	if (open(my $FILE, ">", $self->getPath($filename))) {
 		print $FILE $content;
 		close($FILE);
