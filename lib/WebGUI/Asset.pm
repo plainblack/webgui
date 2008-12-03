@@ -1995,6 +1995,7 @@ sub prepareView {
             content => join(',', @keywords),
         }); 
     }
+    $style->setRawHeadTags($self->getExtraHeadTags);
 }
 
 #-------------------------------------------------------------------
