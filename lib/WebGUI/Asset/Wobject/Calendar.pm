@@ -459,34 +459,6 @@ sub createSubscriptionGroup {
 
 #----------------------------------------------------------------------------
 
-=head2 duplicate ( )
-
-Duplicates an Event Calendar. Duplicates all the events in this Event Calendar.
-
-=cut
-
-sub duplicate {
-    my $self        = shift;
-    
-    # Superclass duplicates the calendar
-    my $newCalendar = $self->SUPER::duplicate(@_);
-    
-    # Duplicate the events in this calendar
-    my $events = $self->getLineage(["descendants"], {
-            returnObjects       => 1,
-            includeOnlyClasses  => ['WebGUI::Asset::Event'],
-        });
-    
-    for my $event (@{ $events }) {
-        my %eventProperties = %{ $event->get() };
-        $newCalendar->addChild(\%eventProperties);
-    }
-    
-    return $newCalendar;
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getEditForm
 
 Adds an additional tab for feeds. 
