@@ -144,12 +144,6 @@ my @tmplVarTable = (
 		id   => 'WeatherDataTmpl0000001',
 		var  => [ qw(controls) ],
 	},
-	###WS Client
-	{
-		id   => 'PBtmpl0000000000000069',
-		var  => [ qw(controls) ],
-	},
-
 );
 
 use Test::More; # increment this value for each test you create

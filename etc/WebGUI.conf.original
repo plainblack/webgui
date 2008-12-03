@@ -502,9 +502,6 @@
       "isContainer" : 1,
       "category" : "community"
    },
-   "WebGUI::Asset::Wobject::WSClient" : {
-      "category" : "utilities"
-   },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },

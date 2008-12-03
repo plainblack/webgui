@@ -11,12 +11,20 @@ save you many hours of grief.
 --------------------------------------------------------------------
    * The deprecated use of Graphics::Magick has been eliminated. WebGUI uses
      Image::Magick exclusively for all image processing functions once again.
-    
+
    * The Head Block of Templates has been merged into the Extra Head
      Tags field.  Extra Head Tags are now added for all templates and
      assets included on a page, except for Style templates, which do
      not have Extra Head Tags.  Existing Extra Head Tags for Style
      templates have been removed.
+
+   * Web Services Client is no longer part of the official distribution of
+     WebGUI, but is still available to be maintained by third-parties. However,
+     if you don't want to use Web Services Client any longer, make sure you
+     delete all Web Services Clients from your site prior to the upgrade *and*
+     purge them from your trash. Then the upgrade will automatically uninstall
+     the Web Services Client from your site.
+
 
 7.6.4
 --------------------------------------------------------------------
