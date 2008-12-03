@@ -9,8 +9,8 @@ our $I18N = {
 	},
 
 	'toolbar buttons description' => {
-		message => q|Shows which toolbar buttons will be used in which toolbars in the editor.  To remove a toolbar, deselect all buttons in that toolbar's column.  Note that other fields may add buttons to a toolbar row as well, such as Enable Context Menu.|,
-        	lastUpdated => 1166844107,
+		message => q|Shows which toolbar buttons will be used in which toolbars in the editor.  To remove a toolbar, deselect all buttons in that toolbar's column.  Note that other fields may add buttons to a toolbar row as well, such as Enable Context Menu.  Adding buttons also may not enable functionality.  You may also need to update the Valid Elements for this editor.|,
+        	lastUpdated => 1228332284,
 	},
 
 	'using rich edit' => {
