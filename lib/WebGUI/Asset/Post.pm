@@ -33,7 +33,41 @@ use WebGUI::Utility;
 use WebGUI::VersionTag;
 our @ISA = qw(WebGUI::Asset);
 
+#-------------------------------------------------------------------
 
+=head2 _fixReplyCount ( asset )
+
+Fixes the mismatch in number of replies and lastPost in a thread and/or a CS that occurs after a cut or paste
+action.
+
+Note: if invoked on a thread the CS containing it will very likely be changed as well, but likely in an incorrect
+manner. Therfore, after running this method on a Thread you probably also want to run it on the container CS.
+
+=head3 asset
+
+The instanciated asset to fix. This may only be either a WebGUI::Asset::Post::Thread or a
+WebGUI::Asset::Wobject::Collaboration.
+
+=cut
+
+sub _fixReplyCount {
+    my $self    = shift;
+    my $asset   = shift;
+
+    my $lastPost = $asset->getLineage( [ qw{ self descendants } ], {
+        returnObjects   => 1,
+        isa             => 'WebGUI::Asset::Post',
+        orderByClause   => 'assetData.revisionDate desc',
+        limit           => 1,
+    } )->[0];
+
+    if ($lastPost) {
+        $asset->incrementReplies( $lastPost->get( 'revisionDate' ), $lastPost->getId );
+    }
+    else {
+        $asset->incrementReplies( undef, undef );
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -173,6 +207,29 @@ sub commit {
 		}
         	$self->getThread->incrementReplies($self->get("revisionDate"),$self->getId);# if ($self->isReply);
 	}
+}
+
+#-------------------------------------------------------------------
+sub cut {
+    my $self = shift;
+
+    # Fetch the Thread and CS before cutting the asset.
+    my $thread  = $self->getThread;
+    my $cs      = $thread->getParent;
+
+    # Cut the asset
+    my $result = $self->SUPER::cut;
+
+    # If a post is being cut update the thread reply count first
+    if ($thread->getId ne $self->getId) {
+        $self->_fixReplyCount( $thread );
+    }
+
+    # Update the CS reply count. This step is also necessary when a Post is cut since the Thread's incrementReplies
+    # also calls the CS's incrementReplies, possibly with the wrong last post Id.
+    $self->_fixReplyCount( $cs );
+
+    return $result;
 }
 
 #-------------------------------------------------------------------
@@ -820,6 +877,43 @@ sub notifySubscribers {
     }
 }
 
+#-------------------------------------------------------------------
+sub paste {
+    my $self = shift;
+
+    $self->SUPER::paste(@_);
+
+    # First, figure out what Thread we're under
+    my $thread = $self->getLineage( [ qw{ self ancestors } ], {
+        returnObjects   => 1,
+        isa             => 'WebGUI::Asset::Post::Thread',
+    } )->[0];
+
+    # If the pasted asset is not a thread we'll have to update the threadId of it and all posts below it.
+    if ( $self->get('threadId') ne $self->getId ) {
+        # Check if we're actually pasting under a thread.
+        if ($thread) {
+            # If so, get the threadId from the thread and fetch all posts that must be updated.
+            my $threadId   = $thread->getId;
+            my $childPosts = $self->getLineage( [ qw{ self descendants } ], {
+                returnObjects   => 1,
+                isa             => 'WebGUI::Asset::Post',
+            } );
+
+            # Finally update all these Posts
+            foreach my $asset ( @{ $childPosts } ) {
+                $asset->update( { threadId => $threadId } );
+            }
+        }
+        else {
+            # We're putting Posts in a place they don't belong, so issue a warning.
+            $self->session->log->warn('Posts pasted under an asset that is not a Thread');
+        }
+    }
+
+    # Recount the replies under the thread.
+    $thread->sumReplies;
+}
 
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
@@ -884,11 +978,12 @@ sub postProcess {
 
 #-------------------------------------------------------------------
 
-sub publish {
-	my $self = shift;
-	$self->SUPER::publish(@_);
-	$self->getThread->sumReplies;
-}
+#sub publish {
+#	my $self = shift;
+#	$self->SUPER::publish(@_);
+#
+#	$self->getThread->sumReplies;
+#}
 
 #-------------------------------------------------------------------
 
