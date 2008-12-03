@@ -330,8 +330,9 @@ sub query {
 	my $placeholders = shift;
 	$self->{_queryCount}++;
 	my $plac;
-	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@{$placeholders})) {
-        $plac = "\n  with placeholders:  " . JSON->new->encode($placeholders);
+	if (defined $placeholders and ref $placeholders eq "ARRAY" && scalar(@$placeholders)) {
+        my @placeholders = map {ref $_ ? "$_" : $_} @$placeholders; # stringify objects
+        $plac = "\n  with placeholders:  " . JSON->new->encode(\@placeholders);
 	}
 	else {
 		$plac = '';
