@@ -21,7 +21,7 @@ use WebGUI::Search::Index;
 
 =head1 NAME
 
-Package WebGUI::AssetVersioning
+Package WebGUI::Asset (AssetVersioning)
 
 =head1 DESCRIPTION
 

@@ -26,27 +26,14 @@ use base 'WebGUI::Asset::Wobject';
 
 Returns true if able to add MatrixListings. 
 
-Checks to make sure that the 
-Calendar has been committed at least once. Checks to make sure that
-the user is in the appropriate group (either the group that can edit
-the calendar, or the group that can edit events in the calendar).
-
 =cut
 
 sub canAddMatrixListing {
     my $self    = shift;
 
+    return 0 if $self->session->user->isVisitor;
+
     return 1;
-#    my $userId  = shift;
-#
-#    my $user    = $userId
-#                ? WebGUI::User->new( $self->session, $userId )
-#                : $self->session->user
-#                ;
-#
-#    return 1 if (
-#        $user->isInGroup( $self->get("groupIdEventEdit") )
-#    );
 }
 
 #-------------------------------------------------------------------
@@ -66,15 +53,15 @@ sub definition {
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
-	templateId =>{
-		fieldType       =>"template",  
-		defaultValue    =>'matrixtmpl000000000001',
-		tab             =>"display",
-		noFormPost      =>0,  
-		namespace       =>"Matrix", 
-		hoverHelp       =>$i18n->get('template description'),
-		label           =>$i18n->get('template label'),
-	},
+	    templateId =>{
+		    fieldType       =>"template",  
+    		defaultValue    =>'matrixtmpl000000000001',
+	    	tab             =>"display",
+		    noFormPost      =>0,  
+    		namespace       =>"Matrix", 
+	    	hoverHelp       =>$i18n->get('template description'),
+		    label           =>$i18n->get('template label'),
+    	},
         searchTemplateId=>{
             defaultValue    =>"matrixtmpl000000000005",
             fieldType       =>"template",
@@ -214,7 +201,17 @@ sub deleteAttribute {
     my $attributeId = shift;
 
     $self->deleteCollateral("Matrix_attribute","attributeId",$attributeId);
-    #TODO: delete listing data, $self->deleteCollateral("Matrix_listingData","attributeId",$attributeId);
+    $self->session->db->write("delete from MatrixListing_attribute where attributeId=? and matrixId=?",
+        [$attributeId,$self->getId]);
+
+    # recalculate scores for MatrixListings
+    my @listings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            returnObjects       => 1,
+        }) };
+    foreach my $listing (@listings){
+        $listing->updateScore;
+    }
 
     return undef;
 }
@@ -287,10 +284,12 @@ sub getCategories {
     my $self = shift;
     my %categories;
     tie %categories, 'Tie::IxHash';
-    my $categories = $self->getValue("categories");
-    $categories =~ s/\r//g;
+
+    my $categories  = $self->getValue("categories");
+    $categories     =~ s/\r//g;
     chomp($categories);
-    my @categories = split(/\n/,$categories);
+
+    my @categories  = split(/\n/,$categories);
     foreach my $category (@categories) {
         $categories{$category} = $category;
     }
@@ -302,7 +301,7 @@ sub getCategories {
 
 =head2 getCompareColor  (  )
 
-Returns the compare form.
+Returns the compare color for a MatrixCompare value.
 
 =head3 value
 
@@ -339,10 +338,6 @@ sub getCompareColor {
 
 Returns the compare form.
 
-=head3 selectedListingIds
-
-An array of listingIds that should be selected in the compare form.
-
 =cut
 
 sub getCompareForm {
@@ -371,8 +366,6 @@ sub getCompareForm {
     return $form;
 }
 
-
-
 #-------------------------------------------------------------------
 
 =head2 getEditForm ( )
@@ -382,7 +375,7 @@ returns the tabform object that will be used in generating the edit page for Mat
 =cut
 
 sub getEditForm {
-	my $self = shift;
+	my $self    = shift;
 	my $tabform = $self->SUPER::getEditForm();
 	return $tabform;
 }
@@ -397,10 +390,13 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
 	my $self = shift;
+
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare;
 	$self->{_viewTemplate} = $template;
+
+    return undef;
 }
 
 
@@ -415,8 +411,8 @@ purges it's data.
 
 sub purge {
 	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your Matrix asset/wobject table.
+	
+    $self->session->db->write("delete from Matrix_attribute where assetId=?",[$self->getId]);
 	return $self->SUPER::purge;
 }
 
@@ -470,10 +466,12 @@ sub view {
             limit               => 1,
             returnObjects       => 1,
         }) };
-    $var->{bestViews_url}           = $bestViews_listing->getUrl;
-    $var->{bestViews_count}         = $bestViews_listing->get('views');
-    $var->{bestViews_name}          = $bestViews_listing->get('title');
-    $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+    if($bestViews_listing){
+        $var->{bestViews_url}           = $bestViews_listing->getUrl;
+        $var->{bestViews_count}         = $bestViews_listing->get('views');
+        $var->{bestViews_name}          = $bestViews_listing->get('title');
+        $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+    }
 
     # Get the MatrixListing with the most compares as an object using getLineage.
 
@@ -484,10 +482,12 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
-    $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
-    $var->{bestCompares_name}       = $bestCompares_listing->get('title');
-    $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+    if($bestCompares_listing){
+        $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
+        $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
+        $var->{bestCompares_name}       = $bestCompares_listing->get('title');
+        $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+    }
 
     # Get the MatrixListing with the most clicks as an object using getLineage.
     my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
@@ -497,11 +497,12 @@ sub view {
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
-    $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
-    $var->{bestClicks_name}         = $bestClicks_listing->get('title');
-    $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
-
+    if($bestClicks_listing){
+        $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
+        $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
+        $var->{bestClicks_name}         = $bestClicks_listing->get('title');
+        $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
+    }
     # Get the 5 MatrixListings that were last updated as objects using getLineage.
 
     my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
@@ -611,13 +612,17 @@ assetData.revisionDate
 
 Returns the compare screen
 
+=head3 listingIds
+
+An array of listingIds that should be selected in the compare form.
+
 =cut
 
 sub www_compare {
 
-    my $self = shift;
-    my $var = $self->get;
-    my @listingIds = @_;
+    my $self        = shift;
+    my $var         = $self->get;
+    my @listingIds  = @_;
     my @responseFields;
 
     unless (scalar(@listingIds)) {
@@ -683,8 +688,9 @@ Deletes an Attribute, including listing data for this attribute.
 =cut
 
 sub www_deleteAttribute {
-    my $self = shift;
+    my $self        = shift;
     my $attributeId = $self->session->form->process("attributeId");
+
     return $self->session->privilege->insufficient() unless $self->canEdit;
 
     $self->deleteAttribute($attributeId);
@@ -719,7 +725,7 @@ Shows a form to edit or add an attribute.
 =cut
 
 sub www_editAttribute {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
     my ($attributeId, $attribute);
     
@@ -762,9 +768,6 @@ sub www_editAttribute {
     my $defaultValueForm = WebGUI::Form::Text($self->session, {
                 name=>"defaultValue",
                 value=>$attribute->{defaultValue},
-                #subtext=>'<br />'.$i18n->get('default value subtext'),
-                #width=>200,
-                #height=>60,
                 resizable=>0,
             });
     my $optionsForm = WebGUI::Form::Textarea($self->session, {
@@ -865,9 +868,9 @@ Exports search attributes as csv.
 =cut
 
 sub www_exportAttributes {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;
-    my $output = WebGUI::Text::joinCSV("name","description","category");
+    my $output  = WebGUI::Text::joinCSV("name","description","category");
 
     my $attributes = $session->db->read("select name, description, category 
             from Matrix_attribute where assetId = ? order by category, name",[$self->getId]);
@@ -875,6 +878,7 @@ sub www_exportAttributes {
     while (my $attribute = $attributes->hashRef) {
         $output .= "\n".WebGUI::Text::joinCSV($attribute->{name},$attribute->{description},$attribute->{category});
     }
+
     my $fileName = "export_matrix_attributes.csv";
     $self->session->http->setFilename($fileName,"application/octet-stream");
     $self->session->http->sendHeader;
@@ -887,6 +891,10 @@ sub www_exportAttributes {
 
 Returns the compare form data as JSON.
 
+=head3 sort 
+
+The criterium by which the listings should be sorted.
+
 =cut
 
 sub www_getCompareFormData {
@@ -894,7 +902,7 @@ sub www_getCompareFormData {
     my $self            = shift;
     my $session         = $self->session;
     my $form            = $session->form;
-    my $sort            = $session->scratch->get('sort') || $self->get('defaultSort');
+    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' asc';
 
     if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
@@ -951,19 +959,17 @@ assetData.revisionDate
                             left join Matrix_attribute using(attributeId)
                             where listing.attributeId = ? and listing.matrixListingId = ?
                         ",[$attributeId,$result->{assetId}]);
-                        $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
+                        #$self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
                         if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
-                            #undef $result->{checked};
                             $result->{checked} = '';
                             last;
                         }
                         elsif(($fieldType ne 'MatrixCompare') && ($form->process($param) ne $listingValue)){
-                            #undef $result->{checked};
                             $result->{checked} = '';
                             last;
                         }
                         else{
-                            $self->session->errorHandler->warn("--Checked--");
+                            #$self->session->errorHandler->warn("--Checked--");
                             $result->{checked} = 'checked';
                         }
                     }
@@ -977,12 +983,6 @@ assetData.revisionDate
             }
             $result->{assetId}  =~ s/-/_____/g;
             $result->{url}      = "/".$result->{url};
-            #$result->{checkBox} = "<input type='checkbox' name='listingId' value='".$result->{assetId}
-            #                        ."' id='".$result->{assetId}."_checkBox' ";
-            #if($result->{checked}){
-            #    $result->{checkBox} .= " checked='checked'";
-            #}
-            #$result->{checkBox} .= " onChange='javascript:compareFormButton()' class='compareCheckBox'>";
     }
 
     my $jsonOutput;
@@ -997,19 +997,23 @@ assetData.revisionDate
 
 Returns the compare list data as JSON.
 
+=head3 listingIds
+
+An array of listingIds that should be shown in the compare list datatable.
+
 =cut
 
 sub www_getCompareListData {
 
-    my $self = shift;
-    my @listingIds = @_;
+    my $self        = shift;
+    my @listingIds  = @_;
+    my $session     = $self->session;
+    my (@results,@columnDefs);
+
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
     }
 
-    my $session = $self->session;
-    my (@results,$results,@columnDefs);
-    #my $sortDirection = ' asc';
 
     foreach my $listingId (@listingIds){
         $listingId =~ s/_____/-/g;
@@ -1043,24 +1047,24 @@ sub www_getCompareListData {
     }
     foreach my $result (@results){
         unless($result->{fieldType} eq 'category'){
-        foreach my $listingId (@listingIds) {
-            $result->{attributeId} =~ s/-/_____/g;
-            my $listingId_safe = $listingId;
-            $listingId_safe =~ s/-/_____/g;
-            if ($result->{fieldType} eq 'MatrixCompare'){
-                my $originalValue = $result->{$listingId_safe};
-                $result->{$listingId_safe.'_compareColor'} = $self->getCompareColor($result->{$listingId_safe});
-                $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
-                    { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
+            foreach my $listingId (@listingIds) {
+                $result->{attributeId} =~ s/-/_____/g;
+                my $listingId_safe = $listingId;
+                $listingId_safe =~ s/-/_____/g;
+                if ($result->{fieldType} eq 'MatrixCompare'){
+                    my $originalValue = $result->{$listingId_safe};
+                    $result->{$listingId_safe.'_compareColor'} = $self->getCompareColor($result->{$listingId_safe});
+                    $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
+                        { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
+                }
+                if($session->scratch->get('stickied_'.$result->{attributeId})){
+                    $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
+                    $result->{checked} = 'checked';
+                }
+                else{
+                    $result->{checked} = '';
+                }
             }
-            if($session->scratch->get('stickied_'.$result->{attributeId})){
-                $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
-                $result->{checked} = 'checked';
-            }
-            else{
-                $result->{checked} = '';
-            }
-        }
         }
     }
 
@@ -1179,7 +1183,7 @@ sub www_setSort {
     my $self = shift;
 
     if(my $sort = $self->session->form->process("sort")){
-        $self->session->scratch->set('sort',$sort);
+        $self->session->scratch->set('matrixSort',$sort);
     }        
     return undef;
 }
@@ -1188,7 +1192,7 @@ sub www_setSort {
 
 =head2 www_setStickied  (  )
 
-Sets the sort scratch variable.
+Sets the stickied scratch variable.
 
 =cut
 

@@ -58,8 +58,8 @@ sub process {
     my $filename = shift;
 	my $output = ""; 
 
-    # Use WebGUI::Storage::Image because we might be getting an image
-    my $storage = WebGUI::Storage::Image->get( $session, $storageId );
+    # Use WebGUI::Storage because we might be getting an image
+    my $storage = WebGUI::Storage->get( $session, $storageId );
     return "" if !$storage;
 
     if ( !$filename ) {

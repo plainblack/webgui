@@ -19,7 +19,7 @@ use Carp qw( croak );
 
 =head1 NAME
 
-Package WebGUI::AssetLineage
+Package WebGUI::Asset (AssetLineage)
 
 =head1 DESCRIPTION
 

@@ -824,7 +824,8 @@ sub www_getBadgesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
     $results{records} = [];
-	foreach my $badge (@{$self->getBadges}) {
+	BADGE: foreach my $badge (@{$self->getBadges}) {
+        next BADGE unless $badge->canView;
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
 			description			=> $badge->get('description'),

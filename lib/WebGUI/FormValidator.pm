@@ -162,22 +162,14 @@ sub process {
 
 	my ($name, $type, $default, $params) = @$args{qw( name type default params )};
 	$params->{name} = $name;
-	if (wantarray) {	
+    $params->{defaultValue} = $default
+        unless defined $params->{defaultValue};
+	if (wantarray) {
 		my @values = $self->$type($params);
-		if (scalar(@values) < 1 && ref $default eq "ARRAY") {
-			return @{$default};
-		} else {
-			return @values;
-		}
+        return @values;
 	} else {
 		my $value = $self->$type($params);
-		unless (defined $value) {
-			return $default;
-		}
-		if ($value =~ /^[\s]+$/) {
-			return undef;
-		}
-		return $value;
+        return $value;
 	}
 }
 

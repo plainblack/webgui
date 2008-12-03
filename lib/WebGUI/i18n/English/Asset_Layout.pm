@@ -73,8 +73,8 @@ specifically placed are put inside of position 1.|,
 	},
 
 	'assets to hide' => {
-		message => q|Assets To Hide.|,
-		lastUpdated => 1118942468
+		message => q|Assets To Hide|,
+		lastUpdated => 1227648416
 	},
 
 	'823' => {

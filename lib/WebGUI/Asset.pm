@@ -51,6 +51,8 @@ Package to manipulate items in WebGUI's asset system.
 
 An asset is the basic class of content in WebGUI. This handles security, urls, and other basic information common to all content items.
 
+The following modules are mixed in via declaration of the same package: AssetBranch.pm, AssetClipboard.pm, AssetExportHtml.pm, AssetLineage.pm, AssetMetaData.pm, AssetPackage.pm, AssetTrash.pm, AssetVersioning.pm.
+
 A lineage is a concatenated series of sequence numbers, each six digits long, that explain an asset's position in its familiy tree. Lineage describes who the asset's ancestors are, how many ancestors the asset has in its family tree (lineage length), and the asset's position (rank) amongst its siblings. In addition, lineage provides enough information about an asset to generate a list of its siblings and descendants.
 
  use WebGUI::Asset;
@@ -400,7 +402,7 @@ sub definition {
 					    uiLevel=>3,
                         fieldType=>'text',
                         defaultValue=>'',
-					    filter=>'fixUrl'
+					    filter=>'fixUrl',
                     },
 				    isHidden=>{
 					    tab=>"display",
@@ -416,7 +418,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('940 description'),
 					    uiLevel=>9,
 					    fieldType=>'yesNo',
-					    defaultValue=>0
+					    defaultValue=>0,
 					},
 				    encryptPage=>{
 					    fieldType       => ($session->config->get("sslEnabled") ? 'yesNo' : 'hidden'),
@@ -433,7 +435,7 @@ sub definition {
 					    uiLevel=>6,
                         fieldType=>'user',
 					    filter=>'fixId',
-                        defaultValue=>'3'
+                        defaultValue=>'3',
                     },
                     groupIdView=>{
 					    tab=>"security",
@@ -442,7 +444,7 @@ sub definition {
 					    uiLevel=>6,
                         fieldType=>'group',
 					    filter=>'fixId',
-                        defaultValue=>'7'
+                        defaultValue=>'7',
                     },
                     groupIdEdit=>{
 					    tab=>"security",
@@ -452,7 +454,7 @@ sub definition {
 					    uiLevel=>6,
                         fieldType=>'group',
 					    filter=>'fixId',
-                        defaultValue=>'4'
+                        defaultValue=>'4',
                     },
                     fluxEnabled=>{
                        tab=>"security",
@@ -481,15 +483,16 @@ sub definition {
 					    hoverHelp=>$i18n->get('412 description'),
 					    uiLevel=>3,
                         fieldType=>'textarea',
-                        defaultValue=>undef
+                        defaultValue=>undef,
                     },
                     extraHeadTags=>{
 					    tab=>"meta",
 					    label=>$i18n->get("extra head tags"),
 					    hoverHelp=>$i18n->get('extra head tags description'),
 					    uiLevel=>5,
-                        fieldType=>'textarea',
-                        defaultValue=>undef
+                        fieldType=>'codearea',
+                        defaultValue=>undef,
+                        customDrawMethod => 'drawExtraHeadTags',
                     },
 				    isPackage=>{
 					    label=>$i18n->get("make package"),
@@ -497,7 +500,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('make package description'),
 					    uiLevel=>7,
 					    fieldType=>'yesNo',
-					    defaultValue=>0
+					    defaultValue=>0,
 					},
 				    isPrototype=>{
 					    tab=>"meta",
@@ -505,7 +508,7 @@ sub definition {
 					    hoverHelp=>$i18n->get('make prototype description'),
 					    uiLevel=>9,
 					    fieldType=>'yesNo',
-					    defaultValue=>0
+					    defaultValue=>0,
 					},
                     isExportable=>{
                         tab=>'meta',
@@ -526,7 +529,7 @@ sub definition {
 				    status=>{
 					    noFormPost=>1,
 					    fieldType=>'hidden',
-					    defaultValue=>'pending'
+					    defaultValue=>'pending',
 					},
 				    lastModified=>{
 					    noFormPost=>1,
@@ -536,7 +539,7 @@ sub definition {
 				    assetSize=>{
 					    noFormPost=>1,
 					    fieldType=>'hidden',
-					    defaultValue=>0
+					    defaultValue=>0,
 					},
     );
     push(@{$definition}, {
@@ -549,6 +552,25 @@ sub definition {
         }
     );
     return $definition;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 drawExtraHeadTags ( )
+
+Draw the Extra Head Tags.  Done with a customDrawMethod because the Template
+will override this.
+
+=cut
+
+sub drawExtraHeadTags {
+	my ($self, $params) = @_;
+    return WebGUI::Form::codearea($self->session, {
+        name         => $params->{name},
+        value        => $self->get($params->{name}),
+        defaultValue => undef,
+    });
 }
 
 
@@ -695,7 +717,7 @@ sub fixUrl {
 	# add automatic extension if we're supposed to
 	if ($self->session->setting->get("urlExtension") ne "" #don't add an extension if one isn't set
 	&&  !($url =~ /\./)                           # don't add an extension of the url already contains a dot
-	&&  lc($self->get("url")) eq lc($self->getId) # only add it if we're creating a new url
+    &&  !$self->get("url")                        # Only add it if this is a new asset.
     &&  $url ne lc($self->getId)                  # but don't assign it the original time
 	) {
 		$url .= ".".$self->session->setting->get("urlExtension");
@@ -2008,7 +2030,7 @@ OUTPUT
 
 =head2 prepareView ( )
 
-Executes what is necessary to make the view() method work with content chunking. This includes things like processing template head tags.
+Executes what is necessary to make the view() method work with content chunking.
 
 =cut
 
@@ -2020,12 +2042,11 @@ sub prepareView {
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
-        $style->setMeta( {
+        $style->setMeta({
             name    => 'keywords',
             content => join(',', @keywords),
-            }); 
+        }); 
     }
-	$style->setRawHeadTags($self->getExtraHeadTags);
 }
 
 #-------------------------------------------------------------------
@@ -2164,7 +2185,9 @@ sub processTemplate {
 
 =head2 processStyle ( html )
 
-Returns some HTML wrappered in a style. Should be overridden by subclasses, because this one actually doesn't do anything other than return the html back to you.
+Returns some HTML wrappered in a style. Should be overridden by subclasses, because
+this one actually doesn't do anything other than return the html back to you and
+adds the Asset's extraHeadTags into the raw head tags.
 
 =head3 html
 
@@ -2174,6 +2197,7 @@ The content to wrap up.
 
 sub processStyle {
 	my ($self, $output) = @_;
+    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
 	return $output;
 }
 

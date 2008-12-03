@@ -159,6 +159,36 @@ sub exportAssetData {
 	return $data;
 }
 
+#-------------------------------------------------------------------
+
+sub exportWriteFile {
+    my $self = shift;
+
+    # we have no assurance whether the exportPath is valid or not, so check it.
+    WebGUI::Asset->exportCheckPath($self->session);
+
+    # if we're still here, everything is well with the export path. let's make
+    # sure that this user can view the asset that we want to export.
+    unless($self->canView) {
+        WebGUI::Error->throw(error => "user can't view asset at " .  $self->getUrl . " to export it");
+    }
+
+    # if we're still here, everything is well with the export path. let's get
+    # our destination FS path and then make any required directories.
+
+    my $dest = $self->exportGetUrlAsPath;
+    my $parent = $dest->parent;
+
+    eval { File::Path::mkpath($parent->absolute->stringify) };
+    if($@) {
+        WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
+    }
+
+    if ( ! File::Copy::copy($self->getStorageLocation->getPath($self->get('filename')), $dest->stringify) ) {
+        WebGUI::Error->throw(error => "can't copy " . $self->getStorageLocation->getPath($self->get('filename'))
+            . ' to ' . $dest->absolute->stringify . ": $!");
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -529,20 +559,6 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-# setStreamedFile and setRedirect do not interact well with the
-# exporter.  We have a separate method for this now.
-sub exportHtml_view {
-	my $self = shift;
-	my $path = $self->getStorageLocation->getPath($self->get('filename'));
-    open my $fh, '<:raw', $path or return "";
-    while ( read $fh, my $block, 16384 ) {
-        $self->session->output->print($block, 1);
-    }
-    close $fh;
-    return 'chunked';
-}
-
-#--------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;

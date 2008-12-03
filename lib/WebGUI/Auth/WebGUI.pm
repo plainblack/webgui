@@ -18,7 +18,7 @@ use WebGUI::Auth;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
 use WebGUI::Mail::Send;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
 use Encode ();

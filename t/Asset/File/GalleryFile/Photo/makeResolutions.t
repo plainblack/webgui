@@ -19,15 +19,7 @@ use WebGUI::Test;
 use WebGUI::Session;
 use Test::More; 
 use Test::Deep;
-my $graphicsClass;
-BEGIN {
-    if (eval { require Image::Magick; 1 }) {
-        $graphicsClass = 'Image::Magick';
-    }
-    elsif (eval { require Graphics::Magick; 1 }) {
-        $graphicsClass = 'Graphics::Magick';
-    }
-}
+use Image::Magick;
 use WebGUI::Asset::File::GalleryFile::Photo;
 
 #----------------------------------------------------------------------------

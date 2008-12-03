@@ -207,7 +207,7 @@ sub editSettingsFormSave {
     $setting->set("profileLayoutTemplateId", $form->process("profileLayoutTemplateId","template"));
     $setting->set("profileDisplayLayoutTemplateId", $form->process("profileDisplayLayoutTemplateId","template"));
     $setting->set("profileEditTemplateId", $form->process("profileEditTemplateId","template"));
-    $setting->set("profileViewTempalteId", $form->process("profileViewTemplateId","template"));
+    $setting->set("profileViewTemplateId", $form->process("profileViewTemplateId","template"));
     $setting->set("profileErrorTemplateId",$form->process("profileErrorTemplateId","template"));
 
 }

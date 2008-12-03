@@ -23,7 +23,7 @@ BEGIN {
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Image;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::Asset::File::Image;
 use WebGUI::Form::File;
 
@@ -37,7 +37,7 @@ my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
 
 ##Create a storage location
-my $storage = WebGUI::Storage::Image->create($session);
+my $storage = WebGUI::Storage->create($session);
 
 ##Save the image to the location
 $square->saveToStorageLocation($storage, 'square.png');

@@ -502,9 +502,6 @@
       "isContainer" : 1,
       "category" : "community"
    },
-   "WebGUI::Asset::Wobject::WSClient" : {
-      "category" : "utilities"
-   },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },
@@ -651,6 +648,11 @@
         "className"  : "WebGUI::Account::Friends"
     },
     {
+        "identifier" : "contributions",
+        "className"  : "WebGUI::Account::Contributions",
+        "title"      : "^International(title,Account_Contributions);"
+    },
+    {
         "identifier" : "shop",
         "title"      : "^International(title,Account_Shop);",
         "className"  : "WebGUI::Account::Shop"
@@ -720,10 +722,12 @@
     "AOIHits"          : "AOIHits", 
     "AOIRank"          : "AOIRank", 
     "AssetProxy"       : "AssetProxy", 
+    "BackToSite"       : "BackToSite",
     "CanEditText"      : "CanEditText", 
     "CartItemCount"    : "CartItemCount",
     "c"                : "c_companyName", 
     "D"                : "D_date", 
+    "DeactivateAccount": "DeactivateAccount",
     "EditableToggle"   : "EditableToggle", 
     "e"                : "e_companyEmail", 
     "Extras"           : "Extras", 
@@ -733,6 +737,7 @@
     "GroupDelete"      : "GroupDelete", 
     "GroupText"        : "GroupText", 
     "H"                : "H_homeLink", 
+    "If"               : "If",
     "International"    : "International", 
     "LastModified"     : "LastModified", 
     "L"                : "L_loginBox", 
@@ -891,6 +896,7 @@
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::AssetDiscovery",
     "WebGUI::Content::AjaxI18N",
+    "WebGUI::Content::Account",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",

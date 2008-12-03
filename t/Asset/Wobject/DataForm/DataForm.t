@@ -69,7 +69,7 @@ my $filename = "page_title.jpg";
 my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
 
 # Use some test collateral to create a storage location and assign it to our article
-my $storage = WebGUI::Storage::Image->create($session);
+my $storage = WebGUI::Storage->create($session);
 my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
@@ -86,7 +86,7 @@ my $duplicateArticle = $article->duplicate();
 isa_ok($duplicateArticle, 'WebGUI::Asset::Wobject::Article');
 
 my $duplicateStorageId = $duplicateArticle->get("storageId");
-my $duplicateStorage = WebGUI::Storage::Image->get($session,$duplicateStorageId);
+my $duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
 my $duplicateFilename = $duplicateStorage->getFiles->[0];
 
 is ($duplicateFilename, $filename, "duplicate method copies collateral");
@@ -96,7 +96,7 @@ is ($duplicateFilename, $filename, "duplicate method copies collateral");
 $duplicateArticle->purge();
 
 # The get method will create the directory if it doesnt exist... very strange.
-$duplicateStorage = WebGUI::Storage::Image->get($session,$duplicateStorageId);
+$duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
 
 # so lets check for the file instead
 $duplicateFilename = $duplicateStorage->getFiles->[0];

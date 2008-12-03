@@ -63,7 +63,19 @@ The topic of this message. Defaults to 'Notification'.
 
 =head4 status
 
-May be "pending" or "completed". Defaults to "pending". You should set this to completed if this is a message without an action, such as a notification.
+May be "unread", "pending", or "completed". Defaults to "pending".
+
+You should set this to "pending" if the message requires an action which will later be completed.
+
+WebGUI::Inbox->create( $session, { status => "pending"} )
+
+You should set this to "unread" if this is a message without an action, such as a notification.
+
+WebGUI::Inbox->create( $session, { status => "unread" } );
+
+You should only set this to "completed" if this is an action that would normally be "pending" but for some reason
+requries no further action.  For instance, if the user submitting some content is also the approver you may choose
+to simply set the status immediately to completed.
 
 =head4 userId
 
@@ -307,6 +319,24 @@ sub isRead {
 
 #-------------------------------------------------------------------
 
+=head2 isValidStatus ( status ) 
+
+Returns whether or not the status passed in is valid.  Can be called as a class or instance method
+
+=head4 status
+
+The id of the user that replied to this message. Defaults to the current user.
+
+=cut
+
+sub isValidStatus {
+	my $self   = shift;
+    my $status = shift;
+    return (exists $self->statusCodes->{$status});
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, messageId )
 
 Constructor used to access existing messages.  Use create for making
@@ -319,6 +349,10 @@ A reference to the current session.
 =head3 messageId
 
 The unique id of a message.
+
+=head3 userId
+
+The userId for this message.  Defaults to the current user.
 
 =cut
 
@@ -460,7 +494,23 @@ sub setReplied {
 
 =head2 setStatus ( status,[ userId ] ) 
 
-Marks a message completed.
+Sets the current status of the message
+
+There are two levels of status for any inbox message:
+
+Global Message Status - This is the status of the entire message and holds true for everyone who received the message.  These status values are as follows:
+
+pending - indicates that there is some action for one of the users who received this message to act on.
+active  - indicates that this is a message that requires no action by any users who received this message.
+completed - indicates that the action that was required is now completed.
+
+Individual Message Status - This is the status of the message for each individual who received it.  If you send a message to a group, each person who received the message will be able to see the message in one of the following states:
+
+unread  - indicates that this message has not be read by the current user
+read    - indicates that this message has been read by the current user
+replied - indicates that the user has replied to this message
+
+It is important to note that there is one more status not listed here which is deleted.  This is a special state which cannot be set through this method.  You should use the setDeleted method in this class if you wish to delete a message for a user. 
 
 =head4 status
 
@@ -537,11 +587,32 @@ sub setUnread {
 
 =head2 statusCodes ( session ) 
 
-Returns a hash ref of valid status values.  Can be called as a class or instance method
+Returns a hash ref of valid status values.  Can be called as a class or instance method:
 
-=head4 status
+WebGUI::Inbox::Message->statusCodes($session);
 
-The id of the user that replied to this message. Defaults to the current user.
+my $message     = WebGUI::Inbox::Message->new($session, $messageId);
+my $statusCodes = $inbox->statusCodes;
+
+There are two levels of status for any inbox message:
+
+Global Message Status - This is the status of the entire message and holds true for everyone who received the message.  These status values are as follows:
+
+pending - indicates that there is some action for one of the users who received this message to act on.
+active  - indicates that this is a message that requires no action by any users who received this message.
+completed - indicates that the action that was required is now completed.
+
+Individual Message Status - This is the status of the message for each individual who received it.  If you send a message to a group, each person who received the message will be able to see the message in one of the following states:
+
+unread  - indicates that this message has not be read by the current user
+read    - indicates that this message has been read by the current user
+replied - indicates that the user has replied to this message
+
+It is important to note that there is one more status not listed here which is deleted.  This is a special state and you should use the setDeleted method in this class if you wish to delete a message for a user. 
+
+=head4 session
+
+The current session object.
 
 =cut
 
@@ -562,24 +633,6 @@ sub statusCodes {
         "read"      => $i18n->get("private message status read"),
         "replied"   => $i18n->get("private message status replied"),        
     }
-}
-
-#-------------------------------------------------------------------
-
-=head2 isValidStatus ( status ) 
-
-Returns whether or not the status passed in is valid.  Can be called as a class or instance method
-
-=head4 status
-
-The id of the user that replied to this message. Defaults to the current user.
-
-=cut
-
-sub isValidStatus {
-	my $self   = shift;
-    my $status = shift;
-    return (exists $self->statusCodes->{$status});
 }
 
 1;

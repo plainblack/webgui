@@ -1002,6 +1002,16 @@ search has been done.|,
         message => q|Error: You must assign fields to your new Thing.|,
         lastUpdated => 1219424285,
     },
+
+    'back to thingy default view' => {
+        message => q|Back to Thingy default view|,
+        lastUpdated => 1227736916,
+    },
+
+    'view_url' => {
+        message => q|The URL that will take the user back to the Thingy default view.|,
+        lastUpdated => 1227737813,
+    },
 };
 
 1;

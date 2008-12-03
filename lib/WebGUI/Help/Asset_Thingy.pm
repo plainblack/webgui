@@ -14,6 +14,7 @@ our $HELP = {
             },
         ],
          variables => [
+            { 'name' => 'view_url' },
             {   'name'      => 'things_loop',
                 'variables' => [
                     { 'name' => 'thing_editIcon' },

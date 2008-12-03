@@ -9,7 +9,7 @@ sub new {
     my $json   = shift;
     my $log    = shift;
     my $survey = shift;
-    my $temp = decode_json($json) if defined $json;
+    my $temp = from_json($json) if defined $json;
     my $self   = defined $temp ? $temp : {};
     $self->{survey} = $survey;
     $self->{log}    = $log;
@@ -84,7 +84,7 @@ sub freeze {
     my %temp = %{$self};
     delete $temp{log};
     delete $temp{survey};
-    return encode_json( \%temp );
+    return to_json( \%temp );
 }
 
 #Hash the survey timed out?

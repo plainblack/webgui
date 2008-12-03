@@ -188,10 +188,10 @@ sub getValue {
 	elsif ($self->session->form->param($self->privateName('action')) eq 'upload') {
 		my $storage = undef;
 		if ($value ne "") {
-			$storage = WebGUI::Storage::Image->get($self->session, $value);
+			$storage = WebGUI::Storage->get($self->session, $value);
 		}
 		else {
-			$storage = WebGUI::Storage::Image->create($self->session);
+			$storage = WebGUI::Storage->create($self->session);
 		}
 		$storage->addFileFromFormPost($self->get("name")."_file",1000);
 		my @files = @{ $storage->getFiles };

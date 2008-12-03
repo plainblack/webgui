@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 51;
+my $tests = 53;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -148,6 +148,7 @@ SKIP: {
     my $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
     isa_ok($soda, 'WebGUI::Asset::Sku::Product');
     is($soda->getTitle(), 'Sweet Soda-bottled in Oregon', 'Title set correctly for soda');
+    is($soda->get('url'), 'sweet-soda-bottled-in-oregon', 'URL for new product from the title');
     my $sodaCollateral = $soda->getAllCollateral('variantsJSON');
     cmp_deeply(
         $sodaCollateral,
@@ -316,7 +317,8 @@ SKIP: {
     is($count, 3, 'still have 3 products, nothing new added');
 
     $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
-    is($soda->getTitle(), 'Sweet Soda-totally organic', 'Title updated correctly for soda');
+    is($soda->getTitle(), 'Sweet Soda-totally organic',   'Title updated correctly for soda');
+    is($soda->get('url'), 'sweet-soda-bottled-in-oregon', 'URL for updated product from the original title, not the updated title');
     $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
     $shirtCollateral = $shirt->getAllCollateral('variantsJSON');
     cmp_deeply(

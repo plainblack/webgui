@@ -19,7 +19,7 @@ use WebGUI::Asset::Shortcut;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::Asset (AssetTrash)
 
 =head1 DESCRIPTION
 

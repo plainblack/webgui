@@ -16,7 +16,7 @@ package WebGUI::Session::Form;
 
 use strict qw(vars subs);
 use WebGUI::HTML;
-use Encode;
+use Encode ();
 use base 'WebGUI::FormValidator';
 
 =head1 NAME

@@ -18,18 +18,26 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 2;
+my $tests = 1;
+plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-use_ok('WebGUI::Asset::Wobject::Survey');
-my $user = WebGUI::User->new( $session, 'new' );
-my $import_node = WebGUI::Asset->getImportNode($session);
+my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
+my ($user, $import_node, $survey);
+
+SKIP: {
+
+skip $tests, "Unable to load Survey" unless $usedOk;
+$user = WebGUI::User->new( $session, 'new' );
+$import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
-my $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
+$survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
+
+}
 
 #----------------------------------------------------------------------------
 # Cleanup

@@ -106,7 +106,7 @@ my $html = join "\n",
 	$header, 
 	$formClass->new($session, {
 		name => 'StorageClass',
-		value => 'WebGUI::Storage::Image',
+		value => 'WebGUI::Storage',
 	})->toHtml,
 	$footer;
 
@@ -114,7 +114,7 @@ my $html = join "\n",
 @inputs = $forms[0]->inputs;
 my $input = $inputs[0];
 is($input->name, 'StorageClass', 'Checking input name');
-is($input->value, 'WebGUI::Storage::Image', 'Checking default value');
+is($input->value, 'WebGUI::Storage', 'Checking default value');
 
 ##Test Form Output parsing
 

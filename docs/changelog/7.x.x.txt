@@ -1,3 +1,33 @@
+7.6.5
+ - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed: Products imported into the Shelf have bad URLs
+ - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything WebGUI::Storage::Image can do.
+ - The deprecated use of Graphics::Magick has been eliminated. WebGUI uses Image::Magick exclusively for all image processing functions once again.
+ - fixed: #9147: Misspellings in Account
+ - fixed: a bug in Crud where keys being updated would cause a crash
+ - fixed: #9148: Account: account links do not work
+ - fixed: #9149: Account: default templates do not work right
+ - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
+ - fixed #9152: Pagination broken in Contribs Section of new Account System
+ - fixed #4159: more menu doesn't appear for current asset on crumb trail
+ - fixed #9157: another typ-o in i18n
+ - fixed #9112: Thingy View Thing screen doesn't preserve newlines
+ - fixed #9155: purpose of "headblock" duplicates "extra head tags"
+ - fixed: Improve Thingy navigation.
+ - fixed #9126: UserList is completely broken in 7.6.4 (Yung Han Khoe)
+ - fixed #9177: Wide-characters break product varients
+ - fixed #9191: Message Board reveals user email, ignores profile privacy setting (#9180)
+ - fixed #4209: i18n in Rich edit in Dutch breaks
+ - fixed #9196: Shelf lacks pagination
+ - fixed #4208: EMS badges with Admin security visible to all
+ - fixed Calendar copy behavior.  In the Asset toolbar, Copy Just this Asset
+   was broken.  This has been fixed.  As a side effect, in the Asset Manager
+   the default behavior is to copy ONLY the Calendar, and none of the events.
+ - fixed: filtering of rich text areas very slow for large content
+ - fixed: international characters are corrupted on export
+ - removed: WSClient
+
 7.6.4
  - Survey now will show progress and time limit.
  - Brand new Survey system.  Make sure to export your old results as they will
@@ -62,6 +92,24 @@
  - fixed #4213: Can see "edit" tab even tho i am not logged in
  - fixed #9139: Updating a workflow property causes workflow to be disabled
  - fixed #9140: Date format error when adding tasks to PM
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed #9143: Yes No user profile fields problem when default == 1
+
+7.5.34
+ - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
+ - fixed #8849: More missing i18n
+ - fixed: Performance issue with Stow. Added a way to bypass safety for speed.
+ - fixed #4182: Edit links show in asset manager for locked assets
+ - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
+ - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
+ - fixed #9068: field.inTab
+ - fixed #8845: Workflows refusing to show edit screen
+ - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
+ - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed #8822: Password Recovery Tempalte not working
+ - fixed: DataForm times out when exporting large data sets
+ - fixed: DataForm entry data field is too small
 
 
 7.6.3

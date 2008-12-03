@@ -20,7 +20,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use JSON;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -461,7 +461,7 @@ sub view {
 
             $graph->draw;
 
-            my $storage = WebGUI::Storage::Image->createTemp($self->session);
+            my $storage = WebGUI::Storage->createTemp($self->session);
             my $filename = 'poll'.$self->session->id->generate.".png";
             $graph->saveToStorageLocation($storage, $filename);
 

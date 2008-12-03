@@ -214,6 +214,7 @@ sub www_view {
     });
 
     $self->appendCommonVars($var);
+    $p->appendTemplateVars($var);
 
     return $self->processTemplate($var,$self->getViewTemplateId);
 }

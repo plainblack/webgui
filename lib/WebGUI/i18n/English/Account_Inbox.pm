@@ -160,8 +160,8 @@ our $I18N = {
     },
 
     'invite user template label' => {
-        message     => q|Invite User Send Tempalte|,
-        lastUpdated => 1119068809
+        message     => q|Invite User Send Template|,
+        lastUpdated => 1227564609
     },
 
     'invite user template hoverHelp' => {
@@ -466,8 +466,8 @@ our $I18N = {
 	},
 
     'already a member' => {
-		message     => q|The email address you entered is already regiestered to <a href="%s">%s</a> on this site.|,
-		lastUpdated => 1181410226,
+		message     => q|The email address you entered is already registered to <a href="%s">%s</a> on this site.|,
+		lastUpdated => 1227715272,
 	},
 
     'no email' => {

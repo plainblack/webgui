@@ -16,7 +16,7 @@ use WebGUI::AdSpace::Ad;
 use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::HTMLForm;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 =head1 NAME
 
@@ -214,7 +214,7 @@ sub www_editAd {
 		name=>"image"
 		);
 	if (defined $ad && $ad->get("storageId")) {
-		my $storage = WebGUI::Storage::Image->get($session, $ad->get("storageId"));
+		my $storage = WebGUI::Storage->get($session, $ad->get("storageId"));
 		$f->readOnly(value=>'<img src="'.$storage->getUrl($storage->getFiles->[0]).'" style="border: 0px;" />');
 	}
 	$f->fieldSetEnd;
@@ -265,7 +265,7 @@ sub www_editAdSave {
 	} else {
 		my $ad = WebGUI::AdSpace::Ad->new($session, $session->form->param("adId"));
 		if (defined $storageId && $ad->get("storageId")) {
-			WebGUI::Storage::Image->get($session, $ad->get("storageId"))->delete;
+			WebGUI::Storage->get($session, $ad->get("storageId"))->delete;
 		}
 		$ad->set(\%properties);
 	}

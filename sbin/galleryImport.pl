@@ -21,7 +21,7 @@ use WebGUI::Asset::Wobject::GalleryAlbum;
 use WebGUI::Asset::Wobject::Gallery;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Asset::Post::Thread;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 
 # custom flags
@@ -295,8 +295,8 @@ sub addAlbumFromThread {
 
     for my $post ( @{ $thread->getPosts } ) {
         if ( my $storageId = $post->get('storageId') ) {
-            # Use WebGUI::Storage::Image to avoid thumbnails if there
-            my $storage     = WebGUI::Storage::Image->get( $session, $storageId );
+            # Use WebGUI::Storage to avoid thumbnails if there
+            my $storage     = WebGUI::Storage->get( $session, $storageId );
             
             for my $filename ( @{$storage->getFiles} ) {
                 my $className       = $gallery->getAssetClassForFile( $filename );

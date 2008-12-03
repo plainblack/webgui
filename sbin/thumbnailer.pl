@@ -20,24 +20,12 @@ BEGIN {
 # thumbnails. 
 #-----------------------------------------
 
-use Carp qw(croak);
 use File::stat;
 use File::Find ();
 use Getopt::Long;
 use Pod::Usage;
+use Image::Magick;
 
-my $graphicsPackage;
-BEGIN {
-    if (eval { require Graphics::Magick; 1 }) {
-        $graphicsPackage = 'Graphics::Magick';
-    }
-    elsif (eval { require Image::Magick; 1 }) {
-        $graphicsPackage = 'Image::Magick';
-    }
-    else {
-        croak "You must have either Graphics::Magick or Image::Magick installed to run WebGUI.\n";
-    }
-}
 
 use WebGUI::Utility;
 
@@ -82,7 +70,7 @@ sub createThumbnail {
         my ($image, $x, $y, $r, $n, $type);
         my ($fileName, $fileDir) = @_;
         print "Nailing: $fileDir/$fileName\n";
-        $image = $graphicsPackage->new;
+        $image = Image::Magick->new;
         $image->Read($fileName);
         ($x, $y) = $image->Get('width','height');
         $r = $x>$y ? $x / $thumbnailSize : $y / $thumbnailSize;
@@ -144,7 +132,7 @@ have thumbnails, and create PNG thumbnails for the rest.
 Files with JPG, JPEG, GIF, PNG, TIF, TIFF and BMP extensions are
 regarded as graphic files.
 
-The thumbnails are created using L<Graphics::Magick> or L<Image::Magick>
+The thumbnails are created using L<Image::Magick>
 for image transformations.
 
 =over

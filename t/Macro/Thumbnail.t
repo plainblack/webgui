@@ -16,23 +16,11 @@ use WebGUI::Test;
 use WebGUI::Macro::Thumbnail;
 use WebGUI::Session;
 use WebGUI::Image;
-use WebGUI::Storage::Image;
-
+use WebGUI::Storage;
+use Image::Magick;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 9;
-
-my $graphicsPackage;
-if (eval { require Graphics::Magick; 1 }) {
-    $graphicsPackage = 'Graphics::Magick';
-}
-elsif (eval { require Image::Magick; 1 }) {
-    $graphicsPackage = 'Image::Magick';
-}
-else {
-    die "Unable to load Graphics::Magick or Image::Magick!\n";
-}
-pass "Load $graphicsPackage";
+plan tests => 8;
 
 my $session = WebGUI::Test->session;
 
@@ -46,7 +34,7 @@ my $square = WebGUI::Image->new($session, 100, 100);
 $square->setBackgroundColor('#0000FF');
 
 ##Create a storage location
-my $storage = WebGUI::Storage::Image->create($session);
+my $storage = WebGUI::Storage->create($session);
 
 ##Save the image to the location
 $square->saveToStorageLocation($storage, 'square.png');
@@ -98,7 +86,7 @@ SKIP: {
 
     ##Load the image into some parser and check a few pixels to see if they're blue-ish.
     ##->Get('pixel[x,y]') hopefully returns color in hex triplets
-    my $thumbImg = $graphicsPackage->new();
+    my $thumbImg = Image::Magick->new();
     $thumbImg->Read(filename => $thumbFile);
 
     cmp_bag([$thumbImg->GetPixels(width=>1, height=>1, x=>25, y=>25, map=>'RGB', normalize=>'true')], [0,0,1], 'blue pixel #1');
