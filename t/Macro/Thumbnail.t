@@ -20,7 +20,7 @@ use WebGUI::Storage;
 use Image::Magick;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 9;
+plan tests => 8;
 
 my $session = WebGUI::Test->session;
 

@@ -24,7 +24,7 @@ use WebGUI::Asset::File;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
-plan tests => 9;
+plan tests => 8;
 
 #TODO: This script tests certain aspects of WebGUI::Storage and it should not
 
@@ -87,7 +87,6 @@ my $fileStorage = WebGUI::Storage->create($session);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');
-isnt(ref $fileFormStorage, 'WebGUI::Storage', 'getStorageFromPost does not return an image storage object');
 
 END {
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {

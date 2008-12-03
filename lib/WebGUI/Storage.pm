@@ -578,8 +578,8 @@ sub deleteFile {
     my $filename = shift;
     return undef
         if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
-    unlink($self->getPath($filename));
     unlink($self->getPath('thumb-'.$filename));
+    unlink($self->getPath($filename));
 }
 
 
@@ -1113,7 +1113,10 @@ sub resize {
 
     # Next, resize dimensions
     if ( $width || $height ) {
-        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
+        if (!$height && $width =~ /^(\d+)x(\d+)$/) {
+            $width = $1;
+            $height = $2;
+        }
         my ($x, $y) = $image->Get('width','height');
         if (!$height) { # proportional scale by width
             $height = $width / $x * $y;
@@ -1121,6 +1124,7 @@ sub resize {
         elsif (!$width) { # proportional scale by height
             $width = $height * $x / $y;
         }
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
         $image->Resize( height => $height, width => $width );
     }
 
