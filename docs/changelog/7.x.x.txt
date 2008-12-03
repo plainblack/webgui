@@ -34,6 +34,7 @@
  - fixed #8775: Miscount in number of replies in CS Thread (Martin Kamerbeek / Oqapi)
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
  - fixed #8774: Forum Rich Edit no longer supports indent/outdent
+ - fixed #9212: WSClient Undefined Array Ref w/ PATCH (HD Publishing Group, Inc.)
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression

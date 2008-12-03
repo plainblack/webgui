@@ -436,7 +436,7 @@ sub view {
          # containing a single hashref for which we have been given a key name
         my $aref;
         eval{ $aref = $result[0]->{$self->get('paginateVar')} };
-        if(!$@) {
+        if(!$@ and defined $aref) {
             $var{'numResults'} = scalar @$aref;
             $p = WebGUI::Paginator->new($self->session,$url,  $self->get('paginateAfter'));
     		$p->setDataByArrayRef($aref);
