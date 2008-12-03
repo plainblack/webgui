@@ -2135,8 +2135,7 @@ sub processTemplate {
 =head2 processStyle ( html )
 
 Returns some HTML wrappered in a style. Should be overridden by subclasses, because
-this one actually doesn't do anything other than return the html back to you and
-adds the Asset's extraHeadTags into the raw head tags.
+this one actually doesn't do anything other than return the html back to you
 
 =head3 html
 
@@ -2146,7 +2145,6 @@ The content to wrap up.
 
 sub processStyle {
 	my ($self, $output) = @_;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
 	return $output;
 }
 

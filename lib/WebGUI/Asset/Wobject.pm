@@ -370,8 +370,7 @@ sub processPropertiesFromFormPost {
 
 =head2 processStyle ( output )
 
-Returns output parsed under the current style.  Sets the Asset's extra head tags
-into the raw head tags, too.
+Returns output parsed under the current style. 
 
 =head3 output
 
@@ -382,7 +381,6 @@ An HTML blob to be parsed into the current style.
 sub processStyle {
 	my $self = shift;
 	my $output = shift;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
 	return $self->session->style->process($output,$self->get("styleTemplateId"));
 }
 
