@@ -431,14 +431,15 @@ sub insertObject {
 =head2 copy ( $address )
 
 Duplicate the structure pointed to by $address, and add it to the end of the list of
-similar structures.
+similar structures.  copy returns $address with the last element changed to the highest
+index in that array.
 
 =head3 $address
 
 An array ref.  The number of elements array set what is added, and
 where.
 
-This method modifies $address if it has 1 or more elements.
+This method modifies $address.
 
 =over 4
 
@@ -449,7 +450,7 @@ at the end of the array of sections.
 
 =item 2 elements
 
-If there are 2 elements, question in the section that is indexed
+If there are 2 elements, the question in the section that is indexed
 will be duplicated and added to the end of the array of questions
 in that section.
 
@@ -464,14 +465,15 @@ Nothing happens.  It is not allowed to duplicate answers.
 sub copy {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        my %newSection = %{ $self->section($address) };
-        push( @{ $self->sections }, \%newSection );
-        return [ $#{ $self->sections } ];
+        my $newSection = clone $self->section($address);
+        push( @{ $self->sections }, $newSection );
+        $address->[0] = $#{ $self->sections };
+        return $address;
     }
     elsif ( @$address == 2 ) {
-        my %newQuestion = %{ $self->question($address) };
-        push( @{ $self->questions($address) }, \%newQuestion );
-        $$address[1] = $#{ $self->questions($address) };
+        my $newQuestion = clone $self->question($address);
+        push( @{ $self->questions($address) }, $newQuestion );
+        $address->[1] = $#{ $self->questions($address) };
         return $address;
     }
 }

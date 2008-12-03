@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 34;
+my $tests = 43;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -565,7 +565,7 @@ cmp_deeply(
         answers => [
         ],
     }),
-    'update: updating a question adds a new, default answer?'
+    'update: updating a question properly'
 );
 
 $surveyJSON->remove([1, 0, 0]),
@@ -580,6 +580,285 @@ cmp_deeply(
     'remove: No problems with removing nonexistant data'
 );
 
+$surveyJSON->remove([0, 1, 2]),
+cmp_deeply(
+    $surveyJSON->getObject([0, 1]),
+    superhashof({
+        type => 'question',
+        text => 'Question 0-1',
+        answers => [
+            superhashof({
+                type => 'answer',
+                text => 'Answer 0-1-0',
+            }),
+            superhashof({
+                type => 'answer',
+                text => 'Answer 0-1-1',
+            }),
+        ],
+    }),
+    'remove: Remove an answer'
+);
+
+####################################################
+#
+# copy
+#
+####################################################
+
+##Test return value, and stomped address
+$stompedAddress = [0, 1];
+my $returnedAddress = $surveyJSON->copy($stompedAddress);
+is_deeply($returnedAddress, [0, 3], 'Added a question');
+is_deeply($stompedAddress,  [0, 3], 'copy writes to the reference when copying a question');
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'copy: copied a question with answers'
+);
+
+##Test that copy handles references correctly
+$surveyJSON->answer([0,3,0])->{text} = 'Answer 0-3-0';
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-3-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [],
+        },
+    ],
+    'copy: copies safe references for a question'
+);
+
+##Now, try a section copy.
+##Update the title to make the copying clear.
+$surveyJSON->section([2])->{title} = 'Section 2';
+$stompedAddress = [1];
+$returnedAddress = $surveyJSON->copy($stompedAddress);
+is_deeply($returnedAddress, [3], 'Added a section');
+is_deeply($stompedAddress,  [3], 'copy writes to the reference when copying a section');
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-3-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+    ],
+    'copy: copied a section'
+);
+
+$surveyJSON->question([3,0])->{text} = 'Question 3-0';
+$surveyJSON->section([3])->{title} = 'Section 3';
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-3-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [],
+        },
+        {
+            title     => 'Section 3',
+            questions => [
+                {
+                    text    => 'Question 3-0',
+                    answers => [],
+                },
+            ],
+        },
+    ],
+    'copy: safe copy of a section'
+);
 
 ####################################################
 #
