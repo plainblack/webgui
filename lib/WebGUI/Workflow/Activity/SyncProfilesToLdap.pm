@@ -17,7 +17,6 @@ package WebGUI::Workflow::Activity::SyncProfilesToLdap;
 
 use strict;
 use base 'WebGUI::Workflow::Activity';
-use Net::LDAP;
 use Time::HiRes;
 use WebGUI::Auth;
 use WebGUI::User;

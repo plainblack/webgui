@@ -56,7 +56,7 @@ sub _isValidLDAPUser {
    }
    
    # Create an LDAP object
-   if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
+   if ($ldap = Net::LDAP->new( _ldap_uri( $uri ) )) {
 
       # Bind as a proxy user to search for the user trying to login
       if($connection->{connectDn}) {
@@ -88,7 +88,7 @@ sub _isValidLDAPUser {
             $ldap->unbind;
             
             # Create a new LDAP object
-            $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= $i18n->get(2,'AuthLDAP');
+            $ldap = Net::LDAP->new( _ldap_uri( $uri ) ) or $error .= $i18n->get(2,'AuthLDAP');
 
             # Try to bind to the directory using the users dn and password
             $auth = $ldap->bind(dn=>$connectDN, password=>$password);
@@ -162,7 +162,7 @@ sub authenticate {
    if($uri = URI->new($userData->{ldapUrl})) {
 
       # Create an LDAP object
-      $ldap = Net::LDAP->new($uri->host, (port=>$uri->port)) or $error .= '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
+      $ldap = Net::LDAP->new( _ldap_uri( $uri ) ) or $error .= '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
 
       if($error ne ""){
          $self->user(WebGUI::User->new($self->session,1));
@@ -266,7 +266,7 @@ sub createAccountSave {
    my $connection = $self->getLDAPConnection;
    #Get connectDN from settings   
    my $uri = URI->new($connection->{ldapUrl});
-   my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
+   my $ldap = Net::LDAP->new( _ldap_uri( $uri ) );
    my $auth;
    if($connection->{connectDn}) {
       $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
@@ -557,6 +557,18 @@ sub setConnectDN {
    $self->{_connectDN} = $_[0];
 }
 
+
+# Build an intermediate LDAP URI to extract components an use
+# as string in Net::LDAP new(). This allows proper functioning
+# of ldap, ldaps and ldapi URIs.
+
+sub _ldap_uri {
+    my $uri = shift;
+    my $luri = URI->new( $uri->scheme() . ':' );
+    $luri->host( $uri->host() );
+    $luri->port( $uri->port() );
+    return $luri->as_string();
+}
 
 1;
 

@@ -72,7 +72,10 @@ sub bind {
 	} 
 	
 	if ($uri = URI->new($ldapUrl)) {
-		unless ($ldap = Net::LDAP->new($uri->host, (port=>($uri->port || 389)))) {
+        my $luri = URI->new( $uri->scheme() . ':' );
+        $luri->host( $uri->host() );
+        $luri->port( $uri->port() );
+		unless ($ldap = Net::LDAP->new( $luri_as_string() )) {
 			$self->{_error} = 103;
 			return 0;
 		}
