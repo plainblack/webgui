@@ -111,7 +111,7 @@ is($session->form->textarea(undef,"some \ntest \r\nhere"), "some \ntest \r\nhere
 ###################################################################
 
 $txt = WebGUI::Form::Textarea->new($session, { value => "line1\nline2\nline3", });
-is($txt->getValueAsHtml, 'line1<br>line2<br>line3', 'getValueAsHtml translates newlines into break tags');
+is($txt->getValueAsHtml, "line1<br />\nline2<br />\nline3", 'getValueAsHtml translates newlines into break tags');
 
 
 __END__
