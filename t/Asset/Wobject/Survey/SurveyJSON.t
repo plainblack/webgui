@@ -8,6 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -20,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 33;
+my $tests = 34;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -193,6 +194,15 @@ cmp_deeply(
     ],
     'new: Always creates 1 section, if none is provided in the initial JSON string',
 );
+
+lives_ok
+    {
+        my $foo = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
+            qq!{ "survey" : "on 16\x{201d} hand-crocheted Cord" }!,
+            $session->log
+        );
+    }
+    'new handles wide characters';
 
 ####################################################
 #
