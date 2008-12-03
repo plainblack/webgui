@@ -2,6 +2,7 @@
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
  - fixed #8774: Forum Rich Edit no longer supports indent/outdent
  - fixed #4173: fieldnames in profilefields can contain spaces
+ - fixed #8811: Bug Tracker: Formatting is bad for the resolution form.
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
