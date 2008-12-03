@@ -187,8 +187,6 @@ If there are 2 elements, then the first element is an index into
 section array, and the second element is an index into the questions
 in that section.  Returns that question.
 
-=back
-
 =item 3 elements
 
 Three elements are enough to reference an answer, inside of a particular
@@ -319,20 +317,18 @@ If there are 2 elements, then the first element is an index into
 section array, and the second element is an index into the questions
 in that section.
 
-=back
-
 =item 3 elements
 
 Three elements are enough to reference an answer, for a particular
 question in a section.
+
+=back
 
 =head3 $object
 
 A perl data structure.  Note, that it is not checked for type, so it is
 possible to add a "question" object into the list of section objects.
 $object should never be a partial object, but contain all properties.
-
-=back
 
 =cut
 
@@ -408,8 +404,6 @@ that index.
 If there are 2 elements, then the first element is an index into
 section array, and the second element is an index into the questions
 in that section.  $object is added right after that question.
-
-=back
 
 =item 3 elements
 
