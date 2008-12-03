@@ -37,6 +37,7 @@
  - fixed #9212: WSClient Undefined Array Ref w/ PATCH (HD Publishing Group, Inc.)
  - fixed: international characters are corrupted on export
  - fixed: filtering of rich text areas very slow for large content
+ - fixed #4173: fieldnames in profilefields can contain spaces
 
 7.5.34
  - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
