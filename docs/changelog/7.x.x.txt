@@ -25,6 +25,7 @@
    was broken.  This has been fixed.  As a side effect, in the Asset Manager
    the default behavior is to copy ONLY the Calendar, and none of the events.
  - fixed: filtering of rich text areas very slow for large content
+ - fixed: international characters are corrupted on export
 
 7.6.4
  - Survey now will show progress and time limit.

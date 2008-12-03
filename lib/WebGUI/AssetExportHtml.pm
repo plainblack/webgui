@@ -753,7 +753,7 @@ sub exportWriteFile {
     }
 
     # next, get the contents, open the file, and write the contents to the file.
-    my $fh = eval { $dest->openw };
+    my $fh = eval { $dest->open('>:utf8') };
     if($@) {
         WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
     }
