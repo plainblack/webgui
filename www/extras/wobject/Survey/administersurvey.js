@@ -174,9 +174,7 @@ if (typeof Survey === "undefined") {
     
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
-        if (this.value === 'NaN') {
-            this.value = 0;
-        }
+		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
         sliders[this.id].setValue(Math.round(this.value * sliders[this.id].scale));
     }
     
@@ -338,14 +336,14 @@ if (typeof Survey === "undefined") {
             //YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});   
             
             if (qs[0]) {
-                if (lastSection !== s.id || s.everyPageTitle > 0) {
+                if (lastSection !== s.id || s.everyPageTitle === '1') {
                     document.getElementById('headertitle').style.display = 'block';
                 }
-                if (lastSection !== s.id || s.everyPageText > 0) {
+                if (lastSection !== s.id || s.everyPageText === '1') {
                     document.getElementById('headertext').style.display = 'block';
                 }
-                
-                if (lastSection !== s.id && s.questionsOnSectionPage !== 1) {
+				
+                if (lastSection !== s.id && s.questionsOnSectionPage !== '1') {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                     span.style.display = 'block';
@@ -353,10 +351,10 @@ if (typeof Survey === "undefined") {
                     document.getElementById('survey-header').appendChild(span);
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
-                        if (s.everyPageTitle === 0) {
+                        if (s.everyPageTitle !== '1') {
                             document.getElementById('headertitle').style.display = 'none';
                         }
-                        if (s.everyPageText === 0) {
+                        if (s.everyPageText !== '1') {
                             document.getElementById('headertext').style.display = 'none';
                         }
                         document.getElementById('questions').style.display = 'inline';
