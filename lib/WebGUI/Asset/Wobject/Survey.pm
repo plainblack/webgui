@@ -818,9 +818,9 @@ sub prepareShowSurveyTemplate {
     $section->{'questions'} = $questions;
     $section->{'questionsAnswered'} = $self->response->{questionsAnswered};
     $section->{'totalQuestions'} = @{$self->response->surveyOrder};
-    $section->{'showProgress'} = $self->response->{showProgress};
-    $section->{'showTimeLimit'} = $self->response->{showTimeLimit};
-    $section->{'minutesLeft'} = int((($self->response->{startTime} + (60 * $self->response->{timeLimit})) - time())/60);
+    $section->{'showProgress'} = $self->get('showProgress');
+    $section->{'showTimeLimit'} = $self->get('showTimeLimit');
+    $section->{'minutesLeft'} = int((($self->response->{startTime} + (60 * $self->get('timeLimit'))) - time())/60);
 
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
@@ -954,9 +954,6 @@ sub getResponseId {
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->response->{startTime} = $time;
-            $self->response->{timeLimit} = $self->get("timeLimit");
-            $self->response->{showProgress} = $self->get("showProgress");
-            $self->response->{showTimeLimit} = $self->get("showTimeLimit");
             $self->saveResponseJSON();
             
         } ## end if ( $haveTaken < $allowedTakes)
