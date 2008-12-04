@@ -248,6 +248,19 @@ sub getObject {
     }
 }
 
+=head2 getSectionEditVars ( $address )
+
+A dispatcher for getSectionEditVars, getQuestionEditVars and getAnswerEditVars.  Uses $address
+to figure out what has been requested, then invokes that method and returns the results
+from it.
+
+=head3 $address
+
+An array ref.  The number of elements determines whether edit vars are fetched for
+sections, questions, or answers.
+
+=cut
+
 sub getEditVars {
     my ( $self, $address ) = @_;
 
@@ -261,6 +274,23 @@ sub getEditVars {
         return $self->getAnswerEditVars($address);
     }
 }
+
+=head2 getSectionEditVars ( $address )
+
+Get a safe copy of the variables for this section, to use for editing
+purposes.  Adds two variables, id, which is the index of this section,
+and displayed_id, which is this question's index in a 1-based array
+(versus the default, perl style, 0-based array).
+
+It removes the questions array ref, and changes questionsPerPage from a single element, into
+an array of hashrefs, which list the available questions per page and which one is currently
+selected for this section.
+
+=head3 $address
+
+An array reference, specifying which question to fetch variables for.
+
+=cut
 
 sub getSectionEditVars {
     my $self    = shift;
@@ -298,7 +328,7 @@ selected for this question.
 
 =head3 $address
 
-An array reference, specifying which answer to fetch variables for.
+An array reference, specifying which question to fetch variables for.
 
 =cut
 
@@ -808,6 +838,27 @@ sub updateQuestionAnswers {
     }
 } ## end sub updateQuestionAnswers
 
+=head2 addAnswersToQuestion ($address, $answers, $verbatims)
+
+Helper routine for updateQuestionAnswers.  Adds an array of answers to a question.
+
+=head3 $address
+
+The address of the question to add answers to.
+
+=head3 $answers
+
+An array reference of answers to add.  Each element will be assigned to the text field of
+the answer that is created.
+
+=head3 $verbatims
+
+An hash reference.  Each key is an index into the answers array.  The value is a placeholder
+for doing existance lookups.  For each requested index, the verbatim flag in the answer is
+set to true.
+
+=cut
+
 sub addAnswersToQuestion {
     my $self  = shift;
     my $addy  = shift;
@@ -816,7 +867,7 @@ sub addAnswersToQuestion {
     for ( 0 .. $#$ans ) {
         push( @{ $self->question($addy)->{answers} }, $self->newAnswer() );
         $$addy[2] = $_;
-        if ( defined $$verbs{$_} and $_ == $$verbs{$_} ) {
+        if ( exists $$verbs{$_} and $verbs->{$_} ) {
             $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 } );
         }
         else {
@@ -840,7 +891,7 @@ sub sections {
     return $self->{sections};
 }
 
-=head2 section $address
+=head2 section ($address)
 
 Returns a reference to one section.
 
@@ -857,7 +908,7 @@ sub section {
     return $self->{sections}->[ $$address[0] ];
 }
 
-=head2 questions $address
+=head2 questions ($address)
 
 Returns a reference to all the questions from a particular section.
 
@@ -874,7 +925,7 @@ sub questions {
     return $self->{sections}->[ $$address[0] ]->{questions};
 }
 
-=head2 question $address
+=head2 question ($address)
 
 Return a reference to one question from a particular section.
 
@@ -892,17 +943,52 @@ sub question {
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ];
 }
 
+=head2 answers ($address)
+
+Return a reference to all answers from a particular question.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  An array ref of anwers from that question will be
+returned.
+
+=cut
+
 sub answers {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers};
 }
 
+=head2 answer ($address)
+
+Return a reference to one answer from a particular question and section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  The third element is the index of the answer.
+
+=cut
+
 sub answer {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers}->[ $$address[2] ];
 }
+
+=head2 log ($message)
+
+Logs an error message using the session logger.
+
+=head3 $message
+
+The message to log.  It will be logged as type "error".
+
+=cut
 
 sub log {
     my ( $self, $message ) = @_;

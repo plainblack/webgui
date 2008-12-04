@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 52;
+my $tests = 60;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -1071,6 +1071,160 @@ cmp_deeply(
 
 $surveyJSON->question([3,0])->{questionType} = 'Multiple Choice';
 
+
+####################################################
+#
+# getSectionEditVars
+#
+####################################################
+
+my @questionsPerPageVars = map {
+    {
+        index => $_, selected => ($_ == 5 ? 1 : 0),
+    }
+} 1 .. 20;
+
+cmp_deeply(
+    $surveyJSON->getSectionEditVars([3]),
+    superhashof({
+        id           => '3',
+        displayed_id => '4',
+        title        => 'Section 3',
+        type         => 'section',
+        questionsPerPage => \@questionsPerPageVars,
+    }),
+    'getSectionEditVars: retrieved correct section'
+);
+
+my $sectionEditVars = $surveyJSON->getSectionEditVars([3,0]);
+$sectionEditVars->{timeLimit} = 1000;
+my ($bareSection2, undef, undef) = getBareSkeletons();
+$bareSection2->{title}     = ignore();
+$bareSection2->{questions} = ignore();
+cmp_deeply(
+    $surveyJSON->section([3,0]),
+    $bareSection2,
+    'getSectionEditVars: uses a safe copy to build the vars hash'
+);
+
+$surveyJSON->section([3])->{questionsPerPage} = '15';
+
+@questionsPerPageVars = map {
+    {
+        index => $_, selected => ($_ == 15 ? 1 : 0),
+    }
+} 1 .. 20;
+
+cmp_deeply(
+    $surveyJSON->getSectionEditVars([3]),
+    superhashof({
+        questionsPerPage => \@questionsPerPageVars,
+    }),
+    'getSectionEditVars: does correct detection of questionsPerPage'
+);
+
+$surveyJSON->section([3])->{questionsPerPage} = 5;
+
+####################################################
+#
+# getEditVars
+#
+####################################################
+
+cmp_deeply(
+    $surveyJSON->getEditVars([0]),
+    superhashof({
+        type  => 'section',
+        title => 'Section 0',
+    }),
+    'getEditVars: fetch a section correctly'
+);
+
+cmp_deeply(
+    $surveyJSON->getEditVars([0,0]),
+    superhashof({
+        type => 'question',
+        text => 'Question 0-0',
+    }),
+    'getEditVars: fetch a question correctly'
+);
+
+cmp_deeply(
+    $surveyJSON->getEditVars([0,1,0]),
+    superhashof({
+        type => 'answer',
+        text => 'Answer 0-1-0',
+    }),
+    'getEditVars: fetch an answer correctly'
+);
+
+####################################################
+#
+# addAnswersToQuestion
+#
+####################################################
+
+#We'll work exclusively with Question 3-0
+
+$surveyJSON->addAnswersToQuestion( [3,0],
+    [ qw[ one two three ] ],
+    {}
+);
+
+cmp_deeply(
+    $surveyJSON->question([3,0]),
+    superhashof({
+        answers => [
+            superhashof({
+                text     => 'one',
+                verbatim => 0,
+                recordedAnswer => 1,
+            }),
+            superhashof({
+                text     => 'two',
+                verbatim => 0,
+                recordedAnswer => 2,
+            }),
+            superhashof({
+                text     => 'three',
+                verbatim => 0,
+                recordedAnswer => 3,
+            }),
+        ],
+    }),
+    'addAnswersToQuestion: setup three answers, no verbatims'
+);
+
+$surveyJSON->question([3,0])->{answers} = [];
+
+$surveyJSON->addAnswersToQuestion( [3,0],
+    [ qw[ one two three ] ],
+    { 1 => 1, 2 => 1 }
+);
+
+cmp_deeply(
+    $surveyJSON->question([3,0]),
+    superhashof({
+        answers => [
+            superhashof({
+                text     => 'one',
+                verbatim => 0,
+                recordedAnswer => 1,
+            }),
+            superhashof({
+                text     => 'two',
+                verbatim => 1,
+                recordedAnswer => 2,
+            }),
+            superhashof({
+                text     => 'three',
+                verbatim => 1,
+                recordedAnswer => 3,
+            }),
+        ],
+    }),
+    'addAnswersToQuestion: setup verbatims on two answers'
+);
 
 }
 
