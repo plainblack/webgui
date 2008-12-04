@@ -83,3 +83,8 @@ input.mcbutton-selected{
     background-image: url(/extras/wobject/Survey/gradient-glossy.png);
     background-position: 0px 0px;
 }
+
+/* By default the marker for invalid (required) fields is a red '*' */  
+.survey-invalid-marker {
+	color: #FF0000;
+}
