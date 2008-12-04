@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 60;
+my $tests = 87;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -1224,6 +1224,525 @@ cmp_deeply(
         ],
     }),
     'addAnswersToQuestion: setup verbatims on two answers'
+);
+
+####################################################
+#
+# updateQuestionAnswers
+#
+####################################################
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Some type of test that should never exist');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => '',
+        }),
+    ],
+    'updateQuestionAnswers: Handling undefined question types; no text, no verbatim, and no recorded answer'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Gender');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Male',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        superhashof({
+            text     => 'Female',
+            verbatim => 0,
+            recordedAnswer => 2,
+        }),
+    ],
+    'updateQuestionAnswers: Gender type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Yes/No');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Yes',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        superhashof({
+            text     => 'No',
+            verbatim => 0,
+            recordedAnswer => 2,
+        }),
+    ],
+    'updateQuestionAnswers: Yes/No type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'True/False');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'True',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        superhashof({
+            text     => 'False',
+            verbatim => 0,
+            recordedAnswer => 2,
+        }),
+    ],
+    'updateQuestionAnswers: Yes/No type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Agree/Disagree');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Strongly disagree',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 5,
+        superhashof({
+            text     => 'Strongly agree',
+            verbatim => 0,
+            recordedAnswer => 7,
+        }),
+    ],
+    'updateQuestionAnswers: Agree/Disagree type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Oppose/Support');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Strongly oppose',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 5,
+        superhashof({
+            text     => 'Strongly support',
+            verbatim => 0,
+            recordedAnswer => 7,
+        }),
+    ],
+    'updateQuestionAnswers: Agree/Disagree type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Importance');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all important',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely important',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Importance type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Likelihood');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all likely',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely likely',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Likelihood type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Certainty');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all certain',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely certain',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Certainty type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Satisfaction');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all satisfied',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely satisfied',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Satisfaction type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Confidence');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all confident',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely confident',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Confidence type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Effectiveness');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all effective',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely effective',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Effectiveness type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Concern');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all concerned',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely concerned',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Concern type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Risk');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'No risk',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extreme risk',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Risk type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Threat');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'No threat',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extreme threat',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Threat type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Security');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Not at all secure',
+            verbatim => 0,
+            recordedAnswer => 1,
+        }),
+        ( superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => ignore(),
+        }) )x 9,
+        superhashof({
+            text     => 'Extremely secure',
+            verbatim => 0,
+            recordedAnswer => 11,
+        }),
+    ],
+    'updateQuestionAnswers: Security type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Ideology');
+my $index = 1;
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        map {
+            superhashof({
+                text     => $_,
+                verbatim => 0,
+                recordedAnswer => $index++,
+            })
+        }
+            'Strongly liberal',
+            'Liberal',
+            'Somewhat liberal',
+            'Middle of the road',
+            'Slightly conservative',
+            'Conservative',
+            'Strongly conservative',
+    ],
+    'updateQuestionAnswers: Ideology type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Race');
+$index = 1;
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        map {
+            superhashof({
+                text     => $_,
+                verbatim => $index == 6 ? 1 : 0,
+                recordedAnswer => $index++,
+            })
+        } 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)',
+    ],
+    'updateQuestionAnswers: Race type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Party');
+$index = 1;
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        map {
+            superhashof({
+                text     => $_,
+                verbatim => $index == 4 ? 1 : 0,
+                recordedAnswer => $index++,
+            })
+        } 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)',
+    ],
+    'updateQuestionAnswers: Party type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Education');
+$index = 1;
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        map {
+            superhashof({
+                text     => $_,
+                verbatim => $index == 8 ? 1 : 0,
+                recordedAnswer => $index++,
+            })
+        }
+            'Elementary or some high school',
+            'High school/GED',
+            'Some college/vocational school',
+            'College graduate',
+            'Some graduate work',
+            'Master\'s degree',
+            'Doctorate (of any type)',
+            'Other degree (verbatim)'
+    ],
+    'updateQuestionAnswers: Education type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Email');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Email:',
+            verbatim => 0,
+            recordedAnswer => '',
+        }),
+    ],
+    'updateQuestionAnswers: Email type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Phone Number');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Phone Number:',
+            verbatim => 0,
+            recordedAnswer => '',
+        }),
+    ],
+    'updateQuestionAnswers: Phone Number type'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Text Date');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Date:',
+            verbatim => 0,
+            recordedAnswer => '',
+        }),
+    ],
+    'updateQuestionAnswers: Text Date'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Currency');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        superhashof({
+            text     => 'Currency Amount:',
+            verbatim => 0,
+            recordedAnswer => '',
+        }),
+    ],
+    'updateQuestionAnswers: Currency'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Date Range');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        (superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => '',
+        })) x 2,
+    ],
+    'updateQuestionAnswers: Date Range'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Multi Slider - Allocate');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        (superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => '',
+        })) x 2,
+    ],
+    'updateQuestionAnswers: Multi Slider - Allocate'
+);
+
+$surveyJSON->updateQuestionAnswers([3,0], 'Dual Slider - Range');
+cmp_deeply(
+    $surveyJSON->question([3,0])->{answers},
+    [
+        (superhashof({
+            text     => '',
+            verbatim => 0,
+            recordedAnswer => '',
+        })) x 2,
+    ],
+    'updateQuestionAnswers: Dual Slider - Range'
 );
 
 }

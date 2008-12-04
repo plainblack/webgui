@@ -703,6 +703,21 @@ sub newAnswer {
     return \%members;
 }
 
+=head2 updateQuestionAnswers ($address, $type);
+
+Add answers to a question, based on the requested type.
+
+=head3 $address
+
+Which question to add answers to.
+
+=head3 $type
+
+The question type to use to determine how many and what kind of answers
+to add to the question.
+
+=cut
+
 sub updateQuestionAnswers {
     my $self    = shift;
     my $address = shift;
@@ -722,7 +737,7 @@ sub updateQuestionAnswers {
     elsif ( $type eq 'Currency' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
         $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Currency Amount' } );
+        $self->update( \@addy, { 'text', 'Currency Amount:' } );
     }
     elsif ( $type eq 'Text Date' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
@@ -814,7 +829,7 @@ sub updateQuestionAnswers {
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Oppose/Support' ) {
-        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly Support' );
+        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly support' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Agree/Disagree' ) {
