@@ -288,8 +288,8 @@ sub getSectionEditVars {
 =head2 getQuestionEditVars ( $address )
 
 Get a safe copy of the variables for this question, to use for editing purposes.  Adds
-two variables, id, which is the indeces of the answer's position in its parent's question
-and section arrays joined by dashes '-', and displayed_id, which is this answer's index
+two variables, id, which is the indeces of the question's position in its parent's 
+section array joined by dashes '-', and displayed_id, which is this question's index
 in a 1-based array (versus the default, perl style, 0-based array).
 
 It removes the answers array ref, and changes questionType from a single element, into
@@ -311,17 +311,7 @@ sub getQuestionEditVars {
     $var{displayed_id} = $address->[1] + 1;
     delete $var{answers};
     delete $var{questionType};
-    my @types = (
-        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
-        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
-        'Education',      'Effectiveness',           'Email',           'File Upload',
-        'Gender',         'Hidden',                  'Ideology',        'Importance',
-        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
-        'Party',          'Phone Number',            'Race',            'Risk',
-        'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'Text Date',               'Threat',          'True/False',
-        'Yes/No'
-    );
+    my @types = $self->getValidQuestionTypes();
 
     for (@types) {
         if ( $_ eq $object->{questionType} ) {
@@ -333,6 +323,27 @@ sub getQuestionEditVars {
     }
     return \%var;
 } ## end sub getQuestionEditVars
+
+=head2 getValidQuestionTypes
+
+A convenience method.  Returns a list of question types.  If you add a question
+type to the Survey, you must handle it here, and also in updateQuestionAnswers
+
+=cut
+
+sub getValidQuestionTypes {
+    return(
+        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
+        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
+        'Education',      'Effectiveness',           'Email',           'File Upload',
+        'Gender',         'Hidden',                  'Ideology',        'Importance',
+        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
+        'Party',          'Phone Number',            'Race',            'Risk',
+        'Satisfaction',   'Scale',                   'Security',        'Slider',
+        'Text',           'Text Date',               'Threat',          'True/False',
+        'Yes/No'
+    );
+}
 
 =head2 getAnswerEditVars ( $address )
 

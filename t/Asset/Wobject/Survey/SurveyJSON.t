@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 49;
+my $tests = 52;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -802,34 +802,20 @@ cmp_deeply(
         {
             title     => 'Section 0',
             questions => [
-                {
-                    text    => 'Question 0-0',
-                    answers => [],
-                },
+                { text    => 'Question 0-0', answers => [], },
                 {
                     text    => 'Question 0-1',
                     answers => [
-                        {
-                            text    => 'Answer 0-1-0',
-                        },
-                        {
-                            text    => 'Answer 0-1-1',
-                        },
+                        { text    => 'Answer 0-1-0', },
+                        { text    => 'Answer 0-1-1', },
                     ],
                 },
-                {
-                    text    => 'Question 0-2',
-                    answers => [],
-                },
+                { text    => 'Question 0-2', answers => [], },
                 {
                     text    => 'Question 0-1',
                     answers => [
-                        {
-                            text    => 'Answer 0-3-0',
-                        },
-                        {
-                            text    => 'Answer 0-1-1',
-                        },
+                        { text    => 'Answer 0-3-0', },
+                        { text    => 'Answer 0-1-1', },
                     ],
                 },
             ],
@@ -837,23 +823,14 @@ cmp_deeply(
         {
             title     => 'Section 1',
             questions => [
-                {
-                    text    => 'Question 1-0',
-                    answers => [],
-                },
+                { text    => 'Question 1-0', answers => [], },
             ],
         },
-        {
-            title     => 'Section 2',
-            questions => [],
-        },
+        { title     => 'Section 2', questions => [], },
         {
             title     => 'Section 3',
             questions => [
-                {
-                    text    => 'Question 3-0',
-                    answers => [],
-                },
+                { text    => 'Question 3-0', answers => [], },
             ],
         },
     ],
@@ -871,33 +848,22 @@ cmp_deeply(
             title     => 'Section 0',
             questions => [
                 {
-                    text    => 'Question 0-0',
-                    answers => [],
+                    text    => 'Question 0-0', answers => [],
                 },
                 {
                     text    => 'Question 0-1',
                     answers => [
-                        {
-                            text    => 'Answer 0-1-0',
-                        },
-                        {
-                            text    => 'Answer 0-1-1',
-                        },
+                        { text    => 'Answer 0-1-0', },
+                        { text    => 'Answer 0-1-1', },
                     ],
                 },
-                {
-                    text    => 'Question 0-2',
-                    answers => [],
+                { text    => 'Question 0-2', answers => [],
                 },
                 {
                     text    => 'Question 0-3',
                     answers => [
-                        {
-                            text    => 'Answer 0-3-0',
-                        },
-                        {
-                            text    => 'Answer 0-3-1',
-                        },
+                        { text    => 'Answer 0-3-0', },
+                        { text    => 'Answer 0-3-1', },
                     ],
                 },
             ],
@@ -905,22 +871,17 @@ cmp_deeply(
         {
             title     => 'Section 1',
             questions => [
-                {
-                    text    => 'Question 1-0',
-                    answers => [],
-                },
+                { text    => 'Question 1-0', answers => [], },
             ],
         },
         {
-            title     => 'Section 2',
-            questions => [],
+            title     => 'Section 2', questions => [],
         },
         {
             title     => 'Section 3',
             questions => [
                 {
-                    text    => 'Question 3-0',
-                    answers => [],
+                    text    => 'Question 3-0', answers => [],
                 },
             ],
         },
@@ -1058,7 +1019,66 @@ cmp_deeply(
     'getAnswerEditVars: uses a safe copy to build the vars hash'
 );
 
+####################################################
+#
+# getQuestionEditVars
+#
+####################################################
+
+my @questionTypeVars = map {
+    {
+        text => $_, selected => ($_ eq 'Multiple Choice' ? 1 : 0),
+    }
+} $surveyJSON->getValidQuestionTypes();
+
+cmp_deeply(
+    $surveyJSON->getQuestionEditVars([3,0]),
+    superhashof({
+        id           => '3-0',
+        displayed_id => '1',
+        text         => 'Question 3-0',
+        type         => 'question',
+        questionType => \@questionTypeVars,
+    }),
+    'getQuestionEditVars: retrieved correct question'
+);
+
+my $questionEditVars = $surveyJSON->getQuestionEditVars([3,0]);
+$questionEditVars->{commentCols} = 1000;
+my (undef, $bareQuestion2, undef) = getBareSkeletons();
+$bareQuestion2->{text} = ignore();
+cmp_deeply(
+    $surveyJSON->question([3,0]),
+    $bareQuestion2,
+    'getQuestionEditVars: uses a safe copy to build the vars hash'
+);
+
+$surveyJSON->question([3,0])->{questionType} = 'Scale';
+
+@questionTypeVars = map {
+    {
+        text => $_, selected => ($_ eq 'Scale' ? 1 : 0),
+    }
+} $surveyJSON->getValidQuestionTypes();
+
+cmp_deeply(
+    $surveyJSON->getQuestionEditVars([3,0]),
+    superhashof({
+        questionType => \@questionTypeVars,
+    }),
+    'getQuestionEditVars: does correct detection of questionType'
+);
+
+$surveyJSON->question([3,0])->{questionType} = 'Multiple Choice';
+
+
 }
+
+####################################################
+#
+# Utility test routines
+#
+####################################################
 
 # Go through a JSON survey type data structure and just grab some unique
 # elements
