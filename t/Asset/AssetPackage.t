@@ -64,7 +64,7 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 $versionTag->commit;
 
 my $deployReturn = $targetFolder->www_deployPackage();
-is($deployReturn, "", 'www_deployPackage returns empty string');
+is($deployReturn, undef, 'www_deployPackage returns undef');
 
 $targetFolderChildren = $targetFolder->getLineage(["children"], {returnObjects => 1,});
 is(scalar @{ $targetFolderChildren }, 1, 'target folder now has 1 child');
