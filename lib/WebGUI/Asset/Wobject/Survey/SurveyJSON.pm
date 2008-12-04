@@ -132,6 +132,45 @@ sub newObject {
 
 #address is the array of objects currently selected in the edit screen
 #data is the array of hash items for displaying
+
+=head2 getDragDropList ( $address )
+
+Get a subset of the entire data structure.  It will be a list of all sections, along with
+one question from a section with all its answers.
+
+Returns an array reference.  Each element of the array will have a subset of section information as
+a hashref.  This will contain two keys:
+
+    {
+        type => 'section',
+        text => the section's title
+    }, 
+
+The questions for the referenced section will be included, like this:
+
+    {
+        type => 'question',
+        text => the question's text
+    }, 
+
+All answers for the referenced question will also be in the array reference:
+
+    {
+        type => 'answer',
+        text => the answer's text
+    }, 
+
+The sections, question and answer will be in depth-first order:
+
+section, section, section, question, answer, answer, answer, section, section
+
+=head3 $address
+
+An array ref.  Sets which question from a section will be listed, along with all
+its answers.  $address should ALWAYS have two elements.
+
+=cut
+
 sub getDragDropList {
     my $self    = shift;
     my $address = shift;
@@ -246,6 +285,23 @@ sub getSectionEditVars {
     return \%var;
 } ## end sub getSectionEditVars
 
+=head2 getQuestionEditVars ( $address )
+
+Get a safe copy of the variables for this question, to use for editing purposes.  Adds
+two variables, id, which is the indeces of the answer's position in its parent's question
+and section arrays joined by dashes '-', and displayed_id, which is this answer's index
+in a 1-based array (versus the default, perl style, 0-based array).
+
+It removes the answers array ref, and changes questionType from a single element, into
+an array of hashrefs, which list the available question types and which one is currently
+selected for this question.
+
+=head3 $address
+
+An array reference, specifying which answer to fetch variables for.
+
+=cut
+
 sub getQuestionEditVars {
     my $self    = shift;
     my $address = shift;
@@ -277,6 +333,19 @@ sub getQuestionEditVars {
     }
     return \%var;
 } ## end sub getQuestionEditVars
+
+=head2 getAnswerEditVars ( $address )
+
+Get a safe copy of the variables for this answer, to use for editing purposes.  Adds
+two variables, id, which is the indeces of the answer's position in its parent's question
+and section arrays joined by dashes '-', and displayed_id, which is this answer's index
+in a 1-based array (versus the default, perl style, 0-based array).
+
+=head3 $address
+
+An array reference, specifying which answer to fetch variables for.
+
+=cut
 
 sub getAnswerEditVars {
     my $self    = shift;

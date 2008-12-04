@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 43;
+my $tests = 49;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -860,16 +860,203 @@ cmp_deeply(
     'copy: safe copy of a section'
 );
 
+##Finish renaming copied sections for sane downstream testing
+
+$surveyJSON->question([0, 3])->{text} = 'Question 0-3';
+$surveyJSON->answer([0, 3, 1])->{text} = 'Answer 0-3-1';
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-3',
+                    answers => [
+                        {
+                            text    => 'Answer 0-3-0',
+                        },
+                        {
+                            text    => 'Answer 0-3-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [],
+        },
+        {
+            title     => 'Section 3',
+            questions => [
+                {
+                    text    => 'Question 3-0',
+                    answers => [],
+                },
+            ],
+        },
+    ],
+    'sanity check'
+);
+
 ####################################################
 #
-# TODO
+# getDragDropList
 #
 ####################################################
 
-# To try to bust the data object
-# Create a section, put questions in it.
-# Copy the section, then alter one question in it.  It should
-# alter the original since it is a reference.
+cmp_deeply(
+    $surveyJSON->getDragDropList([0, 1]),
+    [
+        {
+            type => 'section',
+            text => 'Section 0',
+        },
+        {
+            type => 'question',
+            text => 'Question 0-0',
+        },
+        {
+            type => 'question',
+            text => 'Question 0-1',
+        },
+        {
+            type => 'answer',
+            text => 'Answer 0-1-0',
+        },
+        {
+            type => 'answer',
+            text => 'Answer 0-1-1',
+        },
+        {
+            type => 'question',
+            text => 'Question 0-2',
+        },
+        {
+            type => 'question',
+            text => 'Question 0-3',
+        },
+        {
+            type => 'section',
+            text => 'Section 1',
+        },
+        {
+            type => 'section',
+            text => 'Section 2',
+        },
+        {
+            type => 'section',
+            text => 'Section 3',
+        },
+    ],
+    'getDragDropList: list of sections, questions and answers is correct'
+);
+
+cmp_deeply(
+    $surveyJSON->getDragDropList([1, 0]),
+    [
+        {
+            type => 'section',
+            text => 'Section 0',
+        },
+        {
+            type => 'section',
+            text => 'Section 1',
+        },
+        {
+            type => 'question',
+            text => 'Question 1-0',
+        },
+        {
+            type => 'section',
+            text => 'Section 2',
+        },
+        {
+            type => 'section',
+            text => 'Section 3',
+        },
+    ],
+    'getDragDropList: list of sections, and question with no answer'
+);
+
+cmp_deeply(
+    $surveyJSON->getDragDropList([2, 0]),
+    [
+        {
+            type => 'section',
+            text => 'Section 0',
+        },
+        {
+            type => 'section',
+            text => 'Section 1',
+        },
+        {
+            type => 'section',
+            text => 'Section 2',
+        },
+        {
+            type => 'section',
+            text => 'Section 3',
+        },
+    ],
+    'getDragDropList: list of sections, no questions'
+);
+
+####################################################
+#
+# getAnswerEditVars
+#
+####################################################
+
+cmp_deeply(
+    $surveyJSON->getAnswerEditVars([0,1,0]),
+    superhashof({
+        id           => '0-1-0',
+        displayed_id => '1',
+        text         => 'Answer 0-1-0',
+        type         => 'answer',
+    }),
+    'getAnswerEditVars: retrieved correct answer'
+);
+
+my $answerEditVars = $surveyJSON->getAnswerEditVars([0,1,0]);
+$answerEditVars->{textRows} = 1000;
+my (undef, undef, $bareAnswer2) = getBareSkeletons();
+$bareAnswer2->{text} = ignore();
+cmp_deeply(
+    $surveyJSON->answer([0,1,0]),
+    $bareAnswer2,
+    'getAnswerEditVars: uses a safe copy to build the vars hash'
+);
 
 }
 
