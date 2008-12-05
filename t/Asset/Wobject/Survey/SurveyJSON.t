@@ -687,6 +687,10 @@ cmp_deeply(
                 text => '',
                 type => 'question',
             }),
+            superhashof({
+                text => '',
+                type => 'question',
+            }),
         ],
     }),
     'Added a question to section 2 to test removing it'
@@ -698,7 +702,12 @@ cmp_deeply(
     superhashof({
         title => 'Section 2',
         type  => 'section',
-        questions => [],
+        questions => [
+            superhashof({
+                text => '',
+                type => 'question',
+            }),
+        ],
     }),
     'remove: removed a question'
 );
