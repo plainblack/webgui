@@ -91,7 +91,8 @@ sub freeze {
 
 sub hasTimedOut{
     my $self=shift;
-    return 1 if($self->{startTime} + ($self->{timeLimit} * 60) < time() and $self->{timeLimit} > 0);
+    my $limit = shift;
+    return 1 if($self->{startTime} + ($limit * 60) < time() and $limit > 0);
     return 0;
 }
 
