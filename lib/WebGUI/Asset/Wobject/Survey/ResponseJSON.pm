@@ -150,14 +150,15 @@ sub recordResponses {
     #These were just submitted from the user, so we need to see what and how they were (un)answered.
     my $questions = $self->nextQuestions();
     my $qAnswered = 1;
+    my $sterminal  = 0;
     my $terminal  = 0;
     my $terminalUrl;
     my $goto;
 
-    #my $section = $self->survey->section([$questions->[0]->{sid}]);
-    my $section = $self->currentSection();
+    my $section = $self->nextSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
+
     if ( $section->{terminal} ) {
-        $terminal    = 1;
+        $sterminal    = 1;
         $terminalUrl = $section->{terminalUrl};
     }
 
@@ -211,6 +212,11 @@ sub recordResponses {
     else {
         $terminal = 0;
     }
+    
+    if($sterminal and $self->nextSection != $self->currentSection){
+        $terminal = 1;
+    }     
+
     return [ $terminal, $terminalUrl ];
 } ## end sub recordResponses
 
