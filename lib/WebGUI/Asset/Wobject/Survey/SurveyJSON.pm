@@ -29,7 +29,8 @@ Asset in WebGUI.
 
 use strict;
 use JSON;
-use Clone qw/clone/;
+#use Clone qw/clone/;
+use Storable qw/dclone/;
 
 =head2 new ( $json, $log )
 
@@ -238,13 +239,13 @@ question in a section.  Returns that answer.
 sub getObject {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        return clone $self->{sections}->[ $address->[0] ];
+        return dclone $self->{sections}->[ $address->[0] ];
     }
     elsif ( @$address == 2 ) {
-        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
     }
     else {
-        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
     }
 }
 
@@ -575,13 +576,13 @@ Nothing happens.  It is not allowed to duplicate answers.
 sub copy {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        my $newSection = clone $self->section($address);
+        my $newSection = dclone $self->section($address);
         push( @{ $self->sections }, $newSection );
         $address->[0] = $#{ $self->sections };
         return $address;
     }
     elsif ( @$address == 2 ) {
-        my $newQuestion = clone $self->question($address);
+        my $newQuestion = dclone $self->question($address);
         push( @{ $self->questions($address) }, $newQuestion );
         $address->[1] = $#{ $self->questions($address) };
         return $address;
