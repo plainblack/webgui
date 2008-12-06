@@ -38,8 +38,8 @@ Object constructor.
 
 =head3 $json
 
-Pass in some JSON to be serialized into a data structure.  At the very least, you
-must pass in the "null" JSON string, '{}'.
+Pass in some JSON to be serialized into a data structure.  Useful JSON would
+be a hash with "survey" and "sections" keys with appropriate values.
 
 =head3 $log
 
