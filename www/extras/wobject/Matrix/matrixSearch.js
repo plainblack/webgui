@@ -16,10 +16,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
         var myColumnDefs = [
 	    {key:"assetId",label:"",sortable:false, formatter:this.formatCheckBox},
-            {key:"title", label:"Name", sortable:true, formatter:this.formatUrl},
-            {key:"views", sortable:true},
-            {key:"clicks", sortable:true},
-            {key:"compares", sortable:true}
+            {key:"title", label:"Name", sortable:true, formatter:this.formatUrl}
         ];
 
 	var uri = "func=getCompareFormData";
@@ -34,7 +31,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","checked","url","assetId"]
+            fields: ["title","checked","url","assetId"]
         };
 
         var myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,

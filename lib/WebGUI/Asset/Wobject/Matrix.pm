@@ -361,7 +361,8 @@ sub getCompareForm {
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }        
     $form .=  "\n<script type='text/javascript'>\n".
-        'var maxComparisons = '.$maxComparisons.';'.
+        'var maxComparisons = '.$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
         "\n</script>\n";
     return $form;
 }
@@ -449,7 +450,7 @@ sub view {
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
     'text/javascript'});
-
+    
 	my $var = $self->get;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
@@ -457,7 +458,7 @@ sub view {
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
-
+    
     # Get the MatrixListing with the most views as an object using getLineage.
     my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
@@ -674,6 +675,7 @@ sub www_compare {
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
         'var responseFields = new Array("attributeId", "name", "fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
         "</script>";
 
     return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
@@ -903,12 +905,12 @@ sub www_getCompareFormData {
     my $session         = $self->session;
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
-    my $sortDirection   = ' asc';
-
+    my $sortDirection   = ' desc';
+=cut
     if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
         $sortDirection = " desc";
     }
-
+=cut
     my @results;
     my @listingIds = $self->session->form->checkList("listingId");
     
@@ -983,7 +985,7 @@ assetData.revisionDate
                 }
             }
             $result->{assetId}  =~ s/-/_____/g;
-            $result->{url}      = "/".$result->{url};
+            $result->{url}      = $session->url->gateway($result->{url});
     }
 
     my $jsonOutput;
