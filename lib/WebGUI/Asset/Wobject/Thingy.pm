@@ -2431,6 +2431,10 @@ sequenceNumber');
         $query = "select thingDataId, ";
         $query .= join(", ",map {$dbh->quote_identifier('field_'.$_->{fieldId})} @displayInSearchFields);
         $query .= " from ".$dbh->quote_identifier("Thingy_".$thingId);
+        if($session->form->process('func') eq 'search'){
+            # Don't add constraints when the search screen is displayed as an 'after save' option.
+            $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
+        }
         $query .= " where ".join(" and ",@constraints) if (scalar(@constraints) > 0);
         if ($orderBy){
             $query .= " order by ".$dbh->quote_identifier("field_".$orderBy);

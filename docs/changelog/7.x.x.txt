@@ -1,6 +1,8 @@
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
  - fixed #9235: Image Bug in rich text editor.
+ - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH
+   Consulting Group)
 
 7.5.35
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. We recommend immediate upgrade for all 7.x users.
