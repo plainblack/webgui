@@ -234,7 +234,7 @@ sub processPropertiesFromFormPost {
 	});
 
 	if ($wiki->canAdminister) {
-		$self->update({isProtected => $self->session->form("isProtected")});
+		$self->update({isProtected => $self->session->form->process("isProtected")});
 	}
 
     my $options = {
