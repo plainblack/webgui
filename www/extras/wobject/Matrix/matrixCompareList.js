@@ -55,6 +55,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myDataTable = new YAHOO.widget.DataTable("compareList", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
 
+	window.removeListing = function(key) {
+		myDataTable.hideColumn(myDataTable.removeColumn(key));
+	}
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {
 		myDataTable.getRecordSet().reset();
@@ -72,6 +75,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		
 		for (var i = 0; i < len; i++) {
 		var c = oFullResponse.ColumnDefs[i];
+		oFullResponse.ColumnDefs[i].label = oFullResponse.ColumnDefs[i].label + "<a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
 		myDataTable.insertColumn(c);
 		}
 	    }
@@ -88,9 +92,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
             failure : myCallback,
             scope : myDataTable
         };
-
-
-	
 
 	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
         btnCompare.on("click", function(e) {
