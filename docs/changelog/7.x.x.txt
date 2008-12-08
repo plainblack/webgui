@@ -4,8 +4,8 @@
  - fixed #4173: fieldnames in profilefields can contain spaces
  - fixed #8811: Bug Tracker: Formatting is bad for the resolution form.
  - fixed #9235: Image Bug in rich text editor.
- - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH
-   Consulting Group)
+ - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
+ - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 

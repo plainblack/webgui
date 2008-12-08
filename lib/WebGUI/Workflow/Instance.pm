@@ -73,8 +73,10 @@ sub create {
         $sql .= ' and parameters IS NULL';
     }
 	my ($count) = $session->db->quickArray($sql,$placeHolders);
+    $session->stow->set('singletonWorkflowClash', 0);
     if ($isSingleton && $count) {
         $session->log->info("An instance of singleton workflow $properties->{workflowId} already exists, not creating a new one");
+        $session->stow->set('singletonWorkflowClash', 1);
         return undef
     }
 
