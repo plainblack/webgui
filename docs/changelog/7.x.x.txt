@@ -6,6 +6,7 @@
  - fixed #9235: Image Bug in rich text editor.
  - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
  - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
+ - fixed #9244: i18n for colin
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 

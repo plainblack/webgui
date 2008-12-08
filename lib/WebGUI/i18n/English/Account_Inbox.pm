@@ -75,8 +75,8 @@ our $I18N = {
     },
 
     'inbox manage invitations template hoverHelp' => {
-        message     => q|Choose the template to user for managing invitations|,
-        lastUpdated => 1119068809
+        message     => q|Choose the template to use for managing invitations|,
+        lastUpdated => 1228773936
     },
 
     'invitation confirm message template label' => {
