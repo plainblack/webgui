@@ -3,6 +3,7 @@
  - fixed #9235: Image Bug in rich text editor.
  - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
  - fixed #4179: Wiki: Protect this page from editing? Broken
+ - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
 
 7.5.35
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. We recommend immediate upgrade for all 7.x users.
