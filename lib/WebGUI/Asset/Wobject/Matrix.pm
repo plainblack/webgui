@@ -86,6 +86,14 @@ sub definition {
             hoverHelp       =>$i18n->get('compare template description'),
             label           =>$i18n->get('compare template label'),
         },
+        editListingTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000004",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/EditListing",
+            hoverHelp       =>$i18n->get('edit listing template description'),
+            label           =>$i18n->get('edit listing template label'),
+        },
         defaultSort=>{
             fieldType       =>"selectBox",
             tab             =>"display",
