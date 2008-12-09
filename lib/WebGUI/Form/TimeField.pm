@@ -115,51 +115,44 @@ sub getName {
 
 =head2 getValue ( [ value ] )
 
-If the defaultValue is a MySQL time, the value returned by this form element 
-will be a MySQL time. Note: Will not be adjusted for the user's time zone.
+If the defaultValue is a MySQL time, or the format property = 'mysql',
+the value returned by this form element will be a MySQL time.
+Note: Will not be adjusted for the user's time zone.
 
-Otherwise, the value returned by this form element will be a number of seconds,
-adjusted for the user's time zone..
+Otherwise, the value returned by this form element will be a number of seconds.
 
 =head3 value
 
-An optional value to process, instead of POST input. This should be in the form of an integer of seconds, 'HH:MM', or 'HH:MM:SS'.
+An optional value to process, instead of POST input. This should be
+in the form of an integer of seconds, 'HH:MM', or 'HH:MM:SS'.
 
 =cut
+
+my $mysqlFormattedDate = qr/^\d{2}\D\d{2}(?:\D\d{2})?$/;
 
 sub getValue {
 	my $self = shift;
     my $value = $self->SUPER::getValue(@_);
-	if (@_) {
-		if ($self->get('format') ne 'mysql' && (
-            !$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$value     
-        || $value =~ m/^\d+$/)) {
-			return $self->session->datetime->timeToSeconds($value)-($self->session->user->profileField("timeOffset")*3600);
-		}
-		elsif ($value =~ /^\d{2}\D\d{2}(\D\d{2})?$/) {
-			return $value
-		}
-		else {
-			return undef;
-		}
-	}
-
-    # This should probably be rewritten as a cascading ternary
-	if ($self->get('format') ne 'mysql' && (
-        !$self->get("defaultValue") 
-        || $self->get("defaultValue") =~ m/^\d+$/
-        || !$self->get("value")     
-        || $self->get("value") =~ m/^\d+$/)) {
-		# epoch format
-		return $self->session->datetime->timeToSeconds($value)-($self->session->user->profileField("timeOffset")*3600);
-	} 
-    else {
-		# Mysql format
-		return undef unless $value =~ /^\d{2}\D\d{2}(\D\d{2})?$/;
-		return $value;
-	}
+    my $mysqlMode =  $self->get('format') eq 'mysql'
+                  || $self->getDefaultValue =~ $mysqlFormattedDate;
+    my $mysqlDate = ($value =~ $mysqlFormattedDate);
+    my $digits = ($value =~ /^\d+/);
+    ##Format is fine
+    if (  ( $mysqlMode &&  $mysqlDate)
+        ||(!$mysqlMode && !$mysqlDate) && $digits) {
+        return $value;
+    }
+    ##Convert to mysql format
+    elsif ($mysqlMode && $digits) {
+        return $self->session->datetime->secondsToTime($value);
+    }
+    ##Convert to seconds.
+    elsif ($mysqlDate) {
+        return $self->session->datetime->timeToSeconds($value);
+    }
+    else { ##Bad stuff, maynard
+        return undef;
+    }
 }
 
 #-------------------------------------------------------------------
