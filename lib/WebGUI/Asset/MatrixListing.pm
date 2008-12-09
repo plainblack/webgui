@@ -426,7 +426,7 @@ sub setRatings {
     foreach my $category (keys %{$self->getParent->getCategories}) {
         if ($ratings->{$category}) {
             $db->write("insert into MatrixListing_rating 
-                (userId, category, rating, timeStamp, listingId, ipAddress, matrixId) values (?,?,?,?,?,?,?)",
+                (userId, category, rating, timeStamp, listingId, ipAddress, assetId) values (?,?,?,?,?,?,?)",
                 [$session->user->userId,$category,$ratings->{$category},$session->datetime->time(),$self->getId,
                 $session->env->get("HTTP_X_FORWARDED_FOR"),$matrixId]);
         }
@@ -439,7 +439,7 @@ sub setRatings {
         my $median  = $db->quickScalar("select rating $sql limit $half,$half",[$self->getId,$category]);
         
         $db->write("replace into MatrixListing_ratingSummary 
-            (listingId, category, meanValue, medianValue, countValue, matrixId) 
+            (listingId, category, meanValue, medianValue, countValue, assetId) 
             values (?,?,?,?,?,?)",[$self->getId,$category,$mean,$median,$count,$matrixId]);
     }
     return undef;
@@ -482,8 +482,9 @@ sub view {
 	my $self        = shift;
     my $hasRated    = shift || $self->hasRated;
     my $emailSent   = shift;
-    my $db          = $self->session->db;
-    my $i18n        = WebGUI::International->new($self->session, "Asset_Matrix");
+    my $session     = $self->session;
+    my $db          = $session->db;
+    my $i18n        = WebGUI::International->new($self->session, "Asset_MatrixListing");
     my @categories  = keys %{$self->getParent->getCategories};
    
     # Increment views before getting template var hash so that the views tmpl_var has the incremented value. 
@@ -497,7 +498,7 @@ sub view {
     $var->{comments}            = $self->getFormattedComments();
     $var->{productName}         = $var->{title};
     $var->{lastUpdated_epoch}   = $self->get('lastUpdated');
-    $var->{lastUpdated_date}    = $self->session->datetime->epochToHuman($self->get('lastUpdated'),"%z");
+    $var->{lastUpdated_date}    = $session->datetime->epochToHuman($self->get('lastUpdated'),"%z");
 
     $var->{manufacturerUrl_click}  = $self->getUrl("func=click;manufacturer=1");
     $var->{productUrl_click}       = $self->getUrl("func=click");
@@ -532,7 +533,7 @@ sub view {
     foreach my $category (@categories) {
         my $attributes;
         my @attribute_loop;
-        my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+        my $categoryLoopName = $session->url->urlize($category)."_loop";
         $attributes = $db->read("select * from Matrix_attribute as a
             left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
             where category =? and a.assetId = ?",
@@ -540,7 +541,7 @@ sub view {
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label} = $attribute->{name};
             if ($attribute->{fieldType} eq 'MatrixCompare'){
-                $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
+                $attribute->{value} = WebGUI::Form::MatrixCompare->new($session,$attribute)->getValueAsHtml;
             }
             push(@attribute_loop,$attribute);
         }
@@ -554,7 +555,7 @@ sub view {
     # Screenshots
 
     if ($var->{screenshots}) {
-        my $file = WebGUI::Form::File->new($self->session,{ value=>$var->{screenshots} });
+        my $file = WebGUI::Form::File->new($session,{ value=>$var->{screenshots} });
         my $storage = $file->getStorageLocation;
         my @files;
         @files = @{ $storage->getFiles } if (defined $storage);
@@ -631,11 +632,11 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
         <th>".$i18n->get('median label')."</th>
         <th>".$i18n->get('count label')."</th></tr>\n";
 
-    my $ratingForm = WebGUI::HTMLForm->new($self->session,
+    my $ratingForm = WebGUI::HTMLForm->new($session,
         -extras     =>'class="content"',
         -tableExtras=>'class="content"'
         );
-    $ratingForm = WebGUI::HTMLForm->new($self->session,
+    $ratingForm = WebGUI::HTMLForm->new($session,
         -extras     =>'class="ratingForm"',
         -tableExtras=>'class="ratingForm"'
         );
@@ -664,9 +665,9 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
     $ratingForm->submit(
         -extras =>'class="ratingForm"',
         -value  =>$i18n->get('rate submit label'),
-        -label  =>'<a href="'.$self->getUrl("func=rate").'">'.$i18n->get('show ratings').'</a>'
+        -label  =>'<a href="'.$self->getUrl("showRatings=1").'">'.$i18n->get('show ratings').'</a>'
         );
-    if ($hasRated) {
+    if ($hasRated || $session->form->process('showRatings')) {
         $var->{ratings} = $ratingsTable;
     } else {
         $var->{ratings} = $ratingForm->print;
@@ -674,7 +675,7 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
 
     # Mail form
 
-    my $mailForm = WebGUI::HTMLForm->new($self->session,
+    my $mailForm = WebGUI::HTMLForm->new($session,
         -extras     =>'class="content"',
         -tableExtras=>'class="content"'
         );
@@ -688,7 +689,7 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
     $mailForm->email(
         -extras     =>'class="content"',
         -name       =>"from",
-        -value      =>$self->session->user->profileField("email"),
+        -value      =>$session->user->profileField("email"),
         -label      =>$i18n->get('your email label'),
         );
     $mailForm->selectBox(

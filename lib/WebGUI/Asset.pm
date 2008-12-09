@@ -184,6 +184,8 @@ sub assetExists {
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
 
+A class method.
+
 =head3 session
 
 The session variable.

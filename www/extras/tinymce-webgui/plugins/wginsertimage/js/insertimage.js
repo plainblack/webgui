@@ -43,10 +43,10 @@ var WGInsertImageDialog = {
             img += ' hspace="' + parseInt(form.imagehspace.value) + '"';
         }
         if (form.imagevspace.value != "") {
-            img += ' vspace="' + parseInt(form.imagevspace.value) + "'";
+            img += ' vspace="' + parseInt(form.imagevspace.value) + '"';
         }
         if (form.imageborder.value != "") {
-            img += ' border="' + parseInt(form.imageborder.value) + "'";
+            img += ' border="' + parseInt(form.imageborder.value) + '"';
         }
         if (form.imagealign.value != "") {
             img += ' align="' + form.imagealign.value + '"';

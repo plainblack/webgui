@@ -5,7 +5,7 @@ if (typeof Survey == "undefined") {
 Survey.Data = new function(){
     var lastDataSet = {};
     var focus;
-
+    var lastId = -1;
 
     this.dragDrop = function(did){
         var type;
@@ -46,6 +46,14 @@ YAHOO.log(first.id+' '+data.id);
 
     this.loadData = function(d){
         focus = d.address;//What is the current highlighted item.
+        var showEdit = 1;
+        if(lastId.toString() == d.address.toString()){
+            showEdit = 0;
+            lastId = -1;
+        }else{
+            lastId = d.address;
+        }
+console.log(d.address);
         document.getElementById('sections').innerHTML=d.ddhtml;
         
         //add event handlers for if a tag is clicked
@@ -72,7 +80,11 @@ YAHOO.log('adding handler for '+ d.ids[x]);
             button.on("click", this.addAnswer,d.buttons['answer']); 
         }
 
-        this.loadObjectEdit(d.edithtml,d.type);
+        if(showEdit == 1){
+            this.loadObjectEdit(d.edithtml,d.type);
+        }else{
+            document.getElementById('edit').innerHTML = "";
+        }
         lastDataSet = d;
     }
 

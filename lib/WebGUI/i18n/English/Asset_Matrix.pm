@@ -780,47 +780,6 @@ listing,|,
 		lastUpdated => 0,
 	},
 
-	'your email label' => {
-		message => q|Your Email Address|,
-		lastUpdated => 0,
-	},
-
-	'report error label' => {
-		message => q|Report an error.|,
-		lastUpdated => 0,
-	},
-
-	'general comment label' => {
-		message => q|General comment.|,
-		lastUpdated => 0,
-	},
-
-	'request type label' => {
-		message => q|Type of Request|,
-		lastUpdated => 0,
-	},
-
-	'comment label' => {
-		message => q|Comment|,
-		lastUpdated => 0,
-	},
-
-    'send button label' => {
-        message => q|Send...|,
-        lastUpdated => 0,
-    },
-
-
-	'show ratings' => {
-		message => q|Show Ratings|,
-		lastUpdated => 0,
-	},
-
-    'rate submit label' => {
-        message => q|Rate|,
-        lastUpdated => 0,
-    },
-
 	'no copy' => {
 		message => q|This asset may not be copied.|,
 		lastUpdated => 1133758944,

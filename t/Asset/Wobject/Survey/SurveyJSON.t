@@ -13,7 +13,8 @@ use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
-use Clone qw/clone/;
+#use Clone qw/clone/;
+use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -21,12 +22,11 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 87;
+my $tests = 96;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
 # put your tests here
-
 
 ####################################################
 #
@@ -129,18 +129,9 @@ skip $tests, "Unable to load SurveyJSON" unless $usedOk;
 $surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new('{}', $session->log);
 isa_ok($surveyJSON, 'WebGUI::Asset::Wobject::Survey::SurveyJSON');
 
-####################################################
-#
-# log
-#
-####################################################
-
-WebGUI::Test->interceptLogging;
-
-my $logger = $surveyJSON->log("Everyone in here is innocent");
-is ($WebGUI::Test::logger_warns, undef, 'Did not log a warn');
-is ($WebGUI::Test::logger_info,  undef, 'Did not log an info');
-is ($WebGUI::Test::logger_error, "Everyone in here is innocent", 'Logged an error');
+my $sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(undef, $session->log);
+isa_ok($sJSON2, 'WebGUI::Asset::Wobject::Survey::SurveyJSON', 'even with absolutely no JSON');
+undef $sJSON2;
 
 ####################################################
 #
@@ -203,6 +194,23 @@ lives_ok
         );
     }
     'new handles wide characters';
+
+$sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
+    '{ "sections" : [ { "type" : "section" } ], "survey" : {} }',
+    $session->log,
+);
+
+cmp_deeply(
+    $sJSON2->sections,
+    [
+        {
+            type => 'section',
+        },
+    ],
+    'new: If the JSON has a section, a new one will not be added',
+);
+
+undef $sJSON2;
 
 ####################################################
 #
@@ -435,8 +443,9 @@ my $section1 = $surveyJSON->getObject([2]);
 cmp_deeply(
     $section1,
     superhashof({
-        type  => 'section',
-        title => 'Section 1',
+        type      => 'section',
+        title     => 'Section 1',
+        questions => [],
     }),
     'getObject: Retrieved correct section'
 );
@@ -496,16 +505,17 @@ cmp_deeply(
     $section->{title} = 'Section 1';
     $surveyJSON->update([1], $section );
 }
+##Update the title to make it clearer.
+$surveyJSON->section([2])->{title} = 'Section 2';
+##And give it a question
+$surveyJSON->newObject([2]);
 cmp_deeply(
     summarizeSectionSkeleton($surveyJSON),
     [
         {
             title     => 'Section 0',
             questions => [
-                {
-                    text    => 'Question 0-0',
-                    answers => [],
-                },
+                { text    => 'Question 0-0', answers => [], },
                 {
                     text    => 'Question 0-1',
                     answers => [
@@ -520,10 +530,7 @@ cmp_deeply(
                         },
                     ],
                 },
-                {
-                    text    => 'Question 0-2',
-                    answers => [],
-                },
+                { text    => 'Question 0-2', answers => [], },
             ],
         },
         {
@@ -536,8 +543,13 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 1',
-            questions => [],
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
         },
     ],
     'Update: updated a section'
@@ -548,8 +560,9 @@ my $question1 = $surveyJSON->getObject([1, 0]);
 cmp_deeply(
     $question1,
     superhashof({
-        type => 'question',
-        text => 'Question 0+-0',
+        type    => 'question',
+        text    => 'Question 0+-0',
+        answers => [],
     }),
     'getObject: Retrieved correct question'
 );
@@ -598,6 +611,106 @@ cmp_deeply(
         ],
     }),
     'remove: Remove an answer'
+);
+
+$surveyJSON->remove([0]),
+cmp_deeply(
+    $surveyJSON->getObject([0]),
+    superhashof({
+        type  => 'section',
+        title => 'Section 0',
+    }),
+    'remove: Cannot remove the first section, by default'
+);
+
+my $sectionAddress = $surveyJSON->newObject([]);
+
+cmp_deeply(
+    $surveyJSON->sections,
+    [
+        superhashof({
+            type      => 'section',
+            title     => 'Section 0',
+            questions => ignore(),
+        }),
+        superhashof({
+            type      => 'section',
+            title     => 'Section 1',
+            questions => ignore(),
+        }),
+        superhashof({
+            type      => 'section',
+            title     => 'Section 2',
+            questions => ignore(),
+        }),
+        superhashof({
+            type      => 'section',
+            title     => 'NEW SECTION',
+            questions => ignore(),
+        }),
+    ],
+    'Added new section for testing remove'
+);
+
+$surveyJSON->remove($sectionAddress),
+cmp_deeply(
+    $surveyJSON->sections,
+    [
+        superhashof({
+            type      => 'section',
+            title     => 'Section 0',
+            questions => ignore(),
+        }),
+        superhashof({
+            type      => 'section',
+            title     => 'Section 1',
+            questions => ignore(),
+        }),
+        superhashof({
+            type      => 'section',
+            title     => 'Section 2',
+            questions => ignore(),
+        }),
+    ],
+    'remove: Removed a section'
+);
+
+
+$surveyJSON->newObject([2]);
+cmp_deeply(
+    $surveyJSON->getObject([2]),
+    #$surveyJSON->section([2]),
+    superhashof({
+        title => 'Section 2',
+        type  => 'section',
+        questions => [
+            superhashof({
+                text => '',
+                type => 'question',
+            }),
+            superhashof({
+                text => '',
+                type => 'question',
+            }),
+        ],
+    }),
+    'Added a question to section 2 to test removing it'
+);
+
+$surveyJSON->remove([2,0]);
+cmp_deeply(
+    $surveyJSON->getObject([2]),
+    superhashof({
+        title => 'Section 2',
+        type  => 'section',
+        questions => [
+            superhashof({
+                text => '',
+                type => 'question',
+            }),
+        ],
+    }),
+    'remove: removed a question'
 );
 
 ####################################################
@@ -659,8 +772,13 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 1',
-            questions => [],
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
         },
     ],
     'copy: copied a question with answers'
@@ -716,16 +834,19 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 1',
-            questions => [],
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
         },
     ],
     'copy: copies safe references for a question'
 );
 
 ##Now, try a section copy.
-##Update the title to make the copying clear.
-$surveyJSON->section([2])->{title} = 'Section 2';
 $stompedAddress = [1];
 $returnedAddress = $surveyJSON->copy($stompedAddress);
 is_deeply($returnedAddress, [3], 'Added a section');
@@ -779,7 +900,12 @@ cmp_deeply(
         },
         {
             title     => 'Section 2',
-            questions => [],
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
         },
         {
             title     => 'Section 1',
@@ -826,7 +952,15 @@ cmp_deeply(
                 { text    => 'Question 1-0', answers => [], },
             ],
         },
-        { title     => 'Section 2', questions => [], },
+        {
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
+        },
         {
             title     => 'Section 3',
             questions => [
@@ -841,6 +975,89 @@ cmp_deeply(
 
 $surveyJSON->question([0, 3])->{text} = 'Question 0-3';
 $surveyJSON->answer([0, 3, 1])->{text} = 'Answer 0-3-1';
+
+##Now, try copying the last section.
+$surveyJSON->copy([3]);
+cmp_deeply(
+    summarizeSectionSkeleton($surveyJSON),
+    [
+        {
+            title     => 'Section 0',
+            questions => [
+                {
+                    text    => 'Question 0-0',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-1',
+                    answers => [
+                        {
+                            text    => 'Answer 0-1-0',
+                        },
+                        {
+                            text    => 'Answer 0-1-1',
+                        },
+                    ],
+                },
+                {
+                    text    => 'Question 0-2',
+                    answers => [],
+                },
+                {
+                    text    => 'Question 0-3',
+                    answers => [
+                        {
+                            text    => 'Answer 0-3-0',
+                        },
+                        {
+                            text    => 'Answer 0-3-1',
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            title     => 'Section 1',
+            questions => [
+                {
+                    text    => 'Question 1-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 3',
+            questions => [
+                {
+                    text    => 'Question 3-0',
+                    answers => [],
+                },
+            ],
+        },
+        {
+            title     => 'Section 3',
+            questions => [
+                {
+                    text    => 'Question 3-0',
+                    answers => [],
+                },
+            ],
+        },
+    ],
+    'copy: copied last section'
+);
+
+$surveyJSON->remove([4]);
+
 cmp_deeply(
     summarizeSectionSkeleton($surveyJSON),
     [
@@ -875,7 +1092,13 @@ cmp_deeply(
             ],
         },
         {
-            title     => 'Section 2', questions => [],
+            title     => 'Section 2',
+            questions => [
+                {
+                    text    => '',
+                    answers => [],
+                },
+            ],
         },
         {
             title     => 'Section 3',
@@ -985,11 +1208,15 @@ cmp_deeply(
             text => 'Section 2',
         },
         {
+            type => 'question',
+            text => '',
+        },
+        {
             type => 'section',
             text => 'Section 3',
         },
     ],
-    'getDragDropList: list of sections, no questions'
+    'getDragDropList: FIXME: list of sections, no questions'
 );
 
 ####################################################
@@ -1224,6 +1451,37 @@ cmp_deeply(
         ],
     }),
     'addAnswersToQuestion: setup verbatims on two answers'
+);
+
+$surveyJSON->question([3,0])->{answers} = [];
+
+$surveyJSON->addAnswersToQuestion( [3,0],
+    [ qw[ one two three ] ],
+    { 1 => 0 }
+);
+
+cmp_deeply(
+    $surveyJSON->question([3,0]),
+    superhashof({
+        answers => [
+            superhashof({
+                text     => 'one',
+                verbatim => 0,
+                recordedAnswer => 1,
+            }),
+            superhashof({
+                text     => 'two',
+                verbatim => 0,
+                recordedAnswer => 2,
+            }),
+            superhashof({
+                text     => 'three',
+                verbatim => 0,
+                recordedAnswer => 3,
+            }),
+        ],
+    }),
+    'addAnswersToQuestion: verbatims have to exist, and be true'
 );
 
 ####################################################
@@ -1745,6 +2003,19 @@ cmp_deeply(
     'updateQuestionAnswers: Dual Slider - Range'
 );
 
+####################################################
+#
+# log
+#
+####################################################
+
+WebGUI::Test->interceptLogging;
+
+my $logger = $surveyJSON->log("Everyone in here is innocent");
+is ($WebGUI::Test::logger_warns, undef, 'Did not log a warn');
+is ($WebGUI::Test::logger_info,  undef, 'Did not log an info');
+is ($WebGUI::Test::logger_error, "Everyone in here is innocent", 'Logged an error');
+
 }
 
 ####################################################
@@ -1792,13 +2063,13 @@ sub buildSectionSkeleton {
     my $sections = [];
     my ($bareSection, $bareQuestion, $bareAnswer) = getBareSkeletons();
     foreach my $questionSpec ( @{ $spec } ) {
-        my $section = clone $bareSection;
+        my $section = dclone $bareSection;
         push @{ $sections }, $section;
         foreach my $answers ( @{$questionSpec} ) {
-            my $question = clone $bareQuestion;
+            my $question = dclone $bareQuestion;
             push @{ $section->{questions} }, $question;
             while ($answers-- > 0) {
-                my $answer = clone $bareAnswer;
+                my $answer = dclone $bareAnswer;
                 push @{ $question->{answers} }, $answer;
             }
         }

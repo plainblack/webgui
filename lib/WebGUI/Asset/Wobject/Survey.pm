@@ -718,7 +718,7 @@ sub www_loadQuestions {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
     }
-    if($self->response->hasTimedOut()){
+    if($self->response->hasTimedOut($self->get('timeLimit'))){
         $self->session->log->debug('Response hasTimedOut, surveyEnd');
         return $self->surveyEnd();
     }
