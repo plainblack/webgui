@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+lengthenThingyDefaultValues($session);
 
 finish($session); # this line required
 
@@ -42,6 +43,16 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub lengthenThingyDefaultValues {
+    my $session = shift;
+    print "\tMake sure that Thingy fields can have a default value size appropriate to their field type... " unless $quiet;
+    # and here's our code
+    $session->db->write('alter table Thingy_fields modify defaultValue longtext');
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
