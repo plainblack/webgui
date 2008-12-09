@@ -7,6 +7,7 @@
  - fixed #9028: Thingy - No support for single quotes (')
  - fixed #9252: Thingy defaultValue length causes input to be truncated (SDH Consulting Group)
  - fixed #8937: Feeds in Calendar strip information
+ - fixed #9063: Thingy - Time Field editing errors
 
 7.5.35
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. We recommend immediate upgrade for all 7.x users.
