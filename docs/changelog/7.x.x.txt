@@ -8,6 +8,7 @@
  - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
  - fixed #9244: i18n for colin
  - fixed #9252: Thingy defaultValue length causes input to be truncated (SDH Consulting Group)
+ - fixed #8937: Feeds in Calendar strip information
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
