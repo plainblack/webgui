@@ -1,7 +1,7 @@
 package WebGUI::Form::AutoComplete;
 
 use strict;
-use base 'WebGUI::Form::List';
+use base 'WebGUI::Form::Text';
 use WebGUI::International;
 use JSON;
 
@@ -12,6 +12,8 @@ Package WebGUI::Form::AutoComplete
 =head1 DESCRIPTION
 
 Creates a YUI-based AutoComplete field.
+The options hashref is used to populate the YUI autocomplete data source.
+A trigger icon, a la the ExtJS AutoComplete has also been added.
 
 =head1 SEE ALSO
 
@@ -56,6 +58,8 @@ sub definition {
         {   maxlength => { defaultValue => 255 },
             size      => { defaultValue => $session->setting->get("textBoxSize") || 30 },
             defaultValue => {},
+            options      => { defaultValue => {} },
+            sortByValue  => { defaultValue => 0 },
         }
     );
     return $class->SUPER::definition( $session, $definition );
@@ -72,6 +76,153 @@ Returns the human readable name of this control.
 sub getName {
     my ( $self, $session ) = @_;
     return 'AutoComplete';
+}
+
+#-------------------------------------------------------------------
+
+=head2 getOptions ( )
+
+Taken from WebGUI::Form::List
+
+=cut
+
+sub getOptions {
+    my ($self)         = @_;
+    my $possibleValues = $self->get('options');
+    my %options        = ();
+    tie %options, 'Tie::IxHash';
+    if ( ref $possibleValues eq "HASH" ) {
+        %options = %{$possibleValues};
+    }
+    else {
+        foreach my $line ( split "\n", $possibleValues ) {
+            $line =~ s/^(.*)\r|\s*$/$1/;
+            if ( $line =~ m/(.*)\|(.*)/ ) {
+                $options{$1} = $2;
+            }
+            else {
+                $options{$line} = $line;
+            }
+        }
+    }
+    if ( $self->get('sortByValue') ) {
+        my %ordered = ();
+        tie %ordered, 'Tie::IxHash';
+        foreach my $optionKey ( sort { "\L$options{$a}" cmp "\L$options{$b}" } keys %options ) {
+            $ordered{$optionKey} = $options{$optionKey};
+        }
+        return \%ordered;
+    }
+    return \%options;
+}
+
+=head2 getOriginalValue ( )
+
+Taken from WebGUI::Form::List
+
+=cut
+
+sub getOriginalValue {
+    my $self = shift;
+    my @values = ();
+    foreach my $value ($self->get("value")) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+				$value =~ s/\r//g;
+                @values = split "\n", $value;
+            }
+        }
+    }
+    if(@values){
+    	return wantarray ? @values : join("\n",@values);
+    }
+    
+    foreach my $value ($self->getDefaultValue()) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+				$value =~ s/\r//g;
+                @values = split "\n", $value;
+            }
+        }
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValue ( [ value ] )
+
+Taken from WebGUI::Form::List
+
+=cut
+
+sub getValue {
+	my ($self, $value) = @_;
+    
+    my @values = ();
+    if (defined $value) {
+        if (ref $value eq "ARRAY") {
+            @values = @{$value};
+        }
+        else {
+			$value =~ s/\r//g;
+            @values = split "\n", $value;
+        }
+    }
+    if (scalar @values < 1 && $self->session->request) {
+        my $value = $self->session->form->param($self->get("name"));
+        if (defined $value) {
+            @values = $self->session->form->param($self->get("name"));
+        }
+    }
+    if (scalar @values < 1) {
+        @values = $self->getDefaultValue;
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getDefaultValue ( )
+
+Taken from WebGUI::Form::List
+
+=cut
+
+sub getDefaultValue {
+    my $self = shift;
+    my @values = ();
+    
+    foreach my $value ($self->get('defaultValue')) {
+        if (scalar @values < 1 && defined $value) {
+            if (ref $value eq "ARRAY") {
+                @values = @{$value};
+            }
+            else {
+				$value =~ s/\r//g;
+                @values = split "\n", $value;
+            }
+        }
+    }
+	return wantarray ? @values : join("\n",@values);
+}
+
+#-------------------------------------------------------------------
+
+=head2 areOptionsSettable ( )
+
+Returns a boolean indicating whether the options of the list are settable. Some have a predefined set of options. This is useful in generating dynamic forms. Returns 1.
+
+=cut
+
+sub areOptionsSettable {
+    return 1;
 }
 
 #-------------------------------------------------------------------
