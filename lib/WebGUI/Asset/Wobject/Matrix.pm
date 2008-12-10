@@ -914,11 +914,9 @@ sub www_getCompareFormData {
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' desc';
-=cut
-    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
-        $sortDirection = " desc";
-    }
-=cut
+#    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
+#        $sortDirection = " desc";
+#    }
     my @results;
     my @listingIds = $self->session->form->checkList("listingId");
     
