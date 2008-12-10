@@ -54,6 +54,8 @@ if ($] >= 5.008) {
 	failAndExit("Please upgrade to 5.8 or later! Cannot continue without Perl 5.8 or higher.");
 }
 
+##Doing this as a global is not nice, but it works
+my $missingModule = 0;
 
 checkModule("LWP",                          5.80         );
 checkModule("HTTP::Request",                1.40         );
@@ -116,6 +118,7 @@ checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
 
+failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
 ###################################
 # Checking WebGUI
@@ -266,6 +269,7 @@ sub checkModule {
         # skip  
         elsif ($simpleReport) {
            	printResult("Not Installed");
+            $missingModule = 1;
 		}
 
         # if we're root lets try and install it
@@ -281,12 +285,14 @@ sub checkModule {
             # install aborted by user
             else {
                 printResult("Install aborted by user input.");
+                $missingModule = 1;
             }
 		} 
 
         # can't install, not root        
         else {
 			printResult("Not installed, but you're not root, so you need to ask your administrator to install it.");
+            $missingModule = 1;
 		}
     }
 }

@@ -62,11 +62,10 @@ this plugin.
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->get('cash') })
+        . WebGUI::Form::submit($session, {value => $self->get('label') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
