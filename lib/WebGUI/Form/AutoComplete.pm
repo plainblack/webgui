@@ -17,7 +17,7 @@ A trigger icon, a la the ExtJS AutoComplete has also been added.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::List.
+This is a subclass of WebGUI::Form::Text with a heavy smattering of methods from WebGUI::Form::List.
 
 =head1 METHODS 
 
@@ -46,6 +46,14 @@ Defaults to undefined
 =head4 size
 
 Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
+
+=head4 options
+
+A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
+
+=head4 sortByValue
+
+A boolean value for whether or not the values in the options hash should be sorted. Defaults to "0".
 
 =cut
 
