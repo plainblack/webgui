@@ -4,7 +4,10 @@ if (typeof Survey === "undefined") {
 }
 
 (function(){
-
+	
+	var CLASS_INVALID = 'survey-invalid'; // For elements that fail input validation
+	var CLASS_INVALID_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
+	
     var multipleChoice = {
         'Multiple Choice': 1,
         'Gender': 1,
@@ -90,12 +93,20 @@ if (typeof Survey === "undefined") {
                         }
                     }
                 }
+				var node = document.getElementById(i + 'required');
+				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
-                    document.getElementById(i + 'required').innerHTML = "<font color=red>*</font>";
+					
+					// Apply CLASS_INVALID to the parent question div for people who want to skin Survey
+                    YAHOO.util.Dom.addClass(q_parent_node, CLASS_INVALID);
+					
+					// Insert default '*' marker (can be hidden via CSS for those who want something different)
+					node.innerHTML = "<span class='" + CLASS_INVALID_MARKER + "'>*</span>";
                 }
                 else {
-                    document.getElementById(i + 'required').innerHTML = "";
+                    YAHOO.util.Dom.removeClass(q_parent_node, CLASS_INVALID);
+					node.innerHTML = '';
                 }
             }
         }
