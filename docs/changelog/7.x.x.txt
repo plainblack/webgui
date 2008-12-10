@@ -1,4 +1,5 @@
 7.6.7
+ - fixed #9263: Thingy possibleValues processing, and List type autodetection.
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
