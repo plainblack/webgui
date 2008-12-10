@@ -119,13 +119,13 @@ sub toHtml {
     return <<"END_HTML";
 <style type="text/css">
 .yui-ac-trigger {
-    position:absolute; 
+    position: absolute; 
     right: 0; 
     top: 2px; 
-    z-index: 2; 
+    cursor: pointer; 
     height: 14px; 
     width: 14px; 
-    background: transparent url(uploads/minified/dashSprite.png) repeat scroll 0 -350px;
+    background: transparent url(extras/yui/build/assets/skins/sam/editor-sprite.gif) -1px -1122px;
 }
 </style>
 <div>
