@@ -139,7 +139,18 @@ sub freeze {
     return to_json( \%temp );
 }
 
-#Hash the survey timed out?
+#Has the survey timed out?
+
+=head2 hasTimedOut ( $limit )
+
+Checks to see whether this survey has timed out, based on the internally stored starting
+time, and $limit.
+
+=head3 $limit
+
+How long the user has to take the survey, in minutes.
+
+=cut
 
 sub hasTimedOut{
     my $self=shift;
