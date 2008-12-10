@@ -643,7 +643,10 @@ sub getEditFieldForm {
     }
     
     my $dialogPrefix;
-    if ($fieldId eq "new"){
+    if ($field->{oldFieldId}){
+        $dialogPrefix = "edit_".$field->{oldFieldId}."_Dialog_copy";
+    }
+    elsif($fieldId eq "new"){
         $dialogPrefix = "addDialog";
     }
     else{
@@ -702,12 +705,14 @@ sub getEditFieldForm {
         -value=>$field->{pretext},
         -label=>$i18n->get('pretext label'),
         -hoverHelp=>$i18n->get('pretext description'),
+        -maxlength=>'1024',
         );
     $f->text(
         -name=>"subtext",
         -value=>$field->{subtext},
         -label=>$i18n->get('subtext label'),
         -hoverHelp=>$i18n->get('subtext description'),
+        -maxlength=>'1024',
         );
     $f->selectBox(
         -name=>"status",
@@ -1725,7 +1730,10 @@ sub www_editThing {
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
             ."  <td style='width:370px;'>".$formElement."</td>\n"
             ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>" 
+            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>"
+            ." <input onClick=\"editListItem('".$self->session->url->page()
+            ."?func=editField;copy=1;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}
+            ."','copy')\" value='Copy' type='button'>" 
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
             ."value='Delete' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
@@ -2066,12 +2074,19 @@ Returns the html for a pop-up dialog to add or edit a field.
 
 sub www_editField {
 
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
     my (%properties,$thingId,$fieldId,$dialogBody);
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    $fieldId = $self->session->form->process("fieldId");
-    $thingId = $self->session->form->process("thingId");
-    %properties = $self->session->db->quickHash("select * from Thingy_fields where thingId=".$self->session->db->quote($thingId)." and fieldId = ".$self->session->db->quote($fieldId)." and assetId = ".$self->session->db->quote($self->get("assetId")));
+    return $session->privilege->insufficient() unless $self->canEdit;
+    $fieldId = $session->form->process("fieldId");
+    $thingId = $session->form->process("thingId");
+    %properties = $session->db->quickHash("select * from Thingy_fields where thingId=? and fieldId=? and assetId=?",
+        [$thingId,$fieldId,$self->get("assetId")]);
+    if($session->form->process("copy")){
+        $properties{oldFieldId} = $properties{fieldId};
+        $properties{fieldId}    = 'new';
+        $properties{label}      = $properties{label}.' (copy)';
+    }
     $dialogBody = $self->getEditFieldForm(\%properties);
     $self->session->output->print($dialogBody->print);
     return "chunked";
@@ -2155,6 +2170,9 @@ sub www_editFieldSave {
         ."<td style='width:370px;'>".$formElement."</td>\n"
         ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
         ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='Edit' type='button'>"
+        ." <input onClick=\"editListItem('".$self->session->url->page()
+            ."?func=editField;copy=1;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId
+            ."','copy')\" value='Copy' type='button'>"
         ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
         ."','".$properties{thingId}."')\" value='Delete' type='button'></td>\n</tr>\n</table>";
 
