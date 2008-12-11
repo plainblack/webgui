@@ -17,7 +17,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
-			elCell.innerHTML = sData;
+			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
 		}
         };
 
@@ -32,13 +32,18 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["label","value","attributeId","fieldType","checked"]
+            fields: ["label","value","attributeId","fieldType","checked","description"]
         };
 
 	var uri = "func=getAttributes";
 
+	var initAttributeHoverHelp = function() {
+		initHoverHelp('attributes');
+	}
+
         var myDataTable = new YAHOO.widget.DataTable("attributes", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
+	myDataTable.subscribe("initEvent", initAttributeHoverHelp);
 
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {

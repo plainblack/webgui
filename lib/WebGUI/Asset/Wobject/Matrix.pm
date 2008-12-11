@@ -664,6 +664,10 @@ sub www_compare {
     'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('hoverhelp.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('hoverhelp.css'),
+        {type =>'text/css', rel=>'stylesheet'});
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
@@ -681,7 +685,7 @@ sub www_compare {
     
     $var->{javascript} = "<script type='text/javascript'>\n".
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
-        'var responseFields = new Array("attributeId", "name", "fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
+        'var responseFields = new Array("attributeId", "name", "description","fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
         "var matrixUrl = '".$self->getUrl."';\n".
         "</script>";
@@ -1038,7 +1042,7 @@ sub www_getCompareListData {
 
     foreach my $category (keys %{$self->getCategories}) {
         push(@results,{name=>$category,fieldType=>'category'});
-        my $fields = " a.name, a.fieldType, a.attributeId ";
+        my $fields = " a.name, a.fieldType, a.attributeId, a.description ";
         my $from = "from Matrix_attribute a";
         my $tableCount = "b";
         foreach my $listingId (@listingIds) {

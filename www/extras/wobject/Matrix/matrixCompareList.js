@@ -28,7 +28,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
-			elCell.innerHTML = sData;
+			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
 		}
         };
 
@@ -52,8 +52,14 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		uri = uri+';listingId='+listingIds[i];
 	}
 
+	var initAttributeHoverHelp = function() {
+		initHoverHelp('compareList');
+	}
+
         var myDataTable = new YAHOO.widget.DataTable("compareList", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
+	myDataTable.subscribe("initEvent", initAttributeHoverHelp);
+
 
 	window.removeListing = function(key) {
 		myDataTable.hideColumn(myDataTable.removeColumn(key));
@@ -83,8 +89,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	}
 
         var myCallback = function() {
-            this.set("sortedBy", null);
-            this.onDataReturnAppendRows.apply(this,arguments);
+            	this.set("sortedBy", null);
+            	this.onDataReturnAppendRows.apply(this,arguments);
+		initHoverHelp('compareList');
         };
 
 	var callback2 = {
@@ -170,7 +177,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			hideStickies = 0;
 		}
 	},this,true);
-
     };
 });
 
