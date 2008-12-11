@@ -4,6 +4,7 @@
  - fixed #9266: controls missing on product asset
  - fixed #9150: Edit Data Table - Cannot add column (David Delikat)
  - fixed #9261: Cart Payment Screen not templated
+ - fixed #4124: Site starter uses floats in ways that cause problems
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
