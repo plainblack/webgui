@@ -15,6 +15,7 @@
  - fixed #9266: controls missing on product asset
  - fixed #9261: Cart Payment Screen not templated
  - fixed #9279: "Read more" text in Syndicated Articles is not a label
+ - fixed #4124: Site starter uses floats in ways that cause problems
 
 7.5.35
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. We recommend immediate upgrade for all 7.x users.
