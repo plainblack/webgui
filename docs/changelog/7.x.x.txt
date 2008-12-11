@@ -20,6 +20,7 @@
  - fixed #9237: Payment Gateways all display "cash"
  - fixed #8816: PayDriver "Label" of the instance of the driver should be used instead of the generic name
  - fixed #4220: testEnvironment.pl unable to find WebGUI modules...
+ - fixed #9279: "Read more" text in Syndicated Articles is not a label
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
