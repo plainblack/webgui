@@ -63,13 +63,12 @@ sub new {
     my $self   = defined $temp ? $temp : {};
     $self->{survey} = $survey;
     $self->{log}    = $log;
-    $self->{surveyOrder}
-        = defined $temp->{surveyOrder}
-        ? $temp->{surveyOrder}
-        : [];    #an array of question addresses, with the third member being an array of answers
-    $self->{responses}    = defined $temp->{responses}    ? $temp->{responses}    : {};
-    $self->{lastResponse} = defined $temp->{lastResponse} ? $temp->{lastResponse} : -1;
+    $self->{responses}         = defined $temp->{responses}         ? $temp->{responses}         : {};
+    $self->{lastResponse}      = defined $temp->{lastResponse}      ? $temp->{lastResponse}      : -1;
     $self->{questionsAnswered} = defined $temp->{questionsAnswered} ? $temp->{questionsAnswered} : 0;
+    $self->{startTime}         = defined $temp->{startTime}         ? $temp->{startTime}         : time();
+    #an array of question addresses, with the third member being an array of answers
+    $self->{surveyOrder}       = defined $temp->{surveyOrder}       ? $temp->{surveyOrder}       : [];
     bless( $self, $class );
     return $self;
 } ## end sub new
@@ -155,11 +154,23 @@ How long the user has to take the survey, in minutes.
 sub hasTimedOut{
     my $self=shift;
     my $limit = shift;
-    return 1 if($self->{startTime} + ($limit * 60) < time() and $limit > 0);
+    return 1 if($self->startTime() + ($limit * 60) < time() and $limit > 0);
     return 0;
 }
 
 #the index of the last surveyOrder entry shown
+
+=head2 lastResponse ([ $responseIndex ])
+
+Mutator for the index of the last surveyOrder entry shown.  With no arguments,
+returns the lastResponse index.
+
+=head3 $responseIndex
+
+If defined, sets the lastResponse to $responseIndex.
+
+=cut
+
 sub lastResponse {
     my $self = shift;
     my $res  = shift;
@@ -168,6 +179,28 @@ sub lastResponse {
     }
     else {
         return $self->{lastResponse};
+    }
+}
+
+=head2 startTime ([ $newStartTime ])
+
+Mutator for the time the user began the survey.  With no arguments,
+returns the startTime.
+
+=head3 $newStarttime
+
+If defined, sets the starting time to $newStartTime.
+
+=cut
+
+sub startTime {
+    my $self     = shift;
+    my $newTime  = shift;
+    if ( defined $newTime ) {
+        $self->{startTime} = $newTime;
+    }
+    else {
+        return $self->{startTime};
     }
 }
 
