@@ -4085,6 +4085,12 @@ LongTruncOk=1</p>
             context     => q{i18n label for time duration in WebGUI::DateTime},
         },
 
+        'read more' => {
+            message => q|Read More|,
+            lastUpdated => 1229013268,
+            context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
+        },
+
 };
 
 1;
