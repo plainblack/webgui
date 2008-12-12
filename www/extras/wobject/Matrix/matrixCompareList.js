@@ -55,6 +55,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myDataTable = new YAHOO.widget.DataTable("compareList", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
 
+	window.removeListing = function(key) {
+		myDataTable.hideColumn(myDataTable.removeColumn(key));
+	}
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {
 		myDataTable.getRecordSet().reset();
@@ -72,6 +75,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		
 		for (var i = 0; i < len; i++) {
 		var c = oFullResponse.ColumnDefs[i];
+		oFullResponse.ColumnDefs[i].label = oFullResponse.ColumnDefs[i].label + "<a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
 		myDataTable.insertColumn(c);
 		}
 	    }
@@ -91,8 +95,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
 	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
         btnCompare.on("click", function(e) {
-		var uri = "func=getCompareListData";
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		var uri = "func=getCompareListData";
 		for (var i = compareCheckBoxes.length; i--; ) {
 			if(compareCheckBoxes[i].checked == true){
 				uri = uri+';listingId='+compareCheckBoxes[i].value;
@@ -100,6 +104,23 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		}
             	this.myDataSource.sendRequest(uri,callback2); 
         },this,true);
+
+	var btnCompare2 = new YAHOO.widget.Button("compare2",{disabled:true,id:"compareButton2"});
+        btnCompare2.on("click", function(e) {
+		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
+		var uri = "func=getCompareListData";
+		for (var i = compareCheckBoxes.length; i--; ) {
+			if(compareCheckBoxes[i].checked == true){
+				uri = uri+';listingId='+compareCheckBoxes[i].value;
+			}
+		}
+            	this.myDataSource.sendRequest(uri,callback2); 
+        },this,true);
+
+	var btnSearch = new YAHOO.widget.Button("search");
+        btnSearch.on("click", function(e) {
+		window.location.href = matrixUrl + '?func=search';
+	},this,true);
 
 	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
@@ -111,8 +132,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
     		}
 		if (checked > 1 && checked < maxComparisons){
 			btnCompare.set("disabled",false);
+			btnCompare2.set("disabled",false);
 		}else{
 			btnCompare.set("disabled",true);
+			btnCompare2.set("disabled",true);
 		}
 	}
 

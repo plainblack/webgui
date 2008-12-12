@@ -1,3 +1,19 @@
+7.6.6
+ - fixed #8792: Image Preview gives ERROR in Collateral Manager
+ - fixed #8774: Forum Rich Edit no longer supports indent/outdent
+ - fixed #4173: fieldnames in profilefields can contain spaces
+ - fixed #8811: Bug Tracker: Formatting is bad for the resolution form.
+ - fixed #9235: Image Bug in rich text editor.
+ - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
+ - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
+ - fixed #9244: i18n for colin
+ - fixed #9252: Thingy defaultValue length causes input to be truncated (SDH Consulting Group)
+ - fixed #8937: Feeds in Calendar strip information
+ - fixed #9063: Thingy - Time Field editing errors
+ - fixed #9237: Payment Gateways all display "cash"
+ - fixed #8816: PayDriver "Label" of the instance of the driver should be used instead of the generic name
+ - fixed #4220: testEnvironment.pl unable to find WebGUI modules...
+
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
@@ -94,23 +110,7 @@
  - fixed #9140: Date format error when adding tasks to PM
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
  - fixed #9143: Yes No user profile fields problem when default == 1
-
-7.5.34
- - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
- - fixed #8849: More missing i18n
- - fixed: Performance issue with Stow. Added a way to bypass safety for speed.
- - fixed #4182: Edit links show in asset manager for locked assets
- - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
- - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
- - fixed #9068: field.inTab
- - fixed #8845: Workflows refusing to show edit screen
- - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
- - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
- - fixed #8914: epoch for calendar/List View for Calendar
- - fixed #8822: Password Recovery Tempalte not working
- - fixed: DataForm times out when exporting large data sets
- - fixed: DataForm entry data field is too small
-
+ - fixed #8775: Miscount in number of replies in CS Thread (Martin Kamerbeek / Oqapi)
 
 7.6.3
  - improved performance of file uploads

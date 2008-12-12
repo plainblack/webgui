@@ -86,6 +86,14 @@ sub definition {
             hoverHelp       =>$i18n->get('compare template description'),
             label           =>$i18n->get('compare template label'),
         },
+        editListingTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000004",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/EditListing",
+            hoverHelp       =>$i18n->get('edit listing template description'),
+            label           =>$i18n->get('edit listing template label'),
+        },
         defaultSort=>{
             fieldType       =>"selectBox",
             tab             =>"display",
@@ -361,7 +369,8 @@ sub getCompareForm {
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }        
     $form .=  "\n<script type='text/javascript'>\n".
-        'var maxComparisons = '.$maxComparisons.';'.
+        'var maxComparisons = '.$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
         "\n</script>\n";
     return $form;
 }
@@ -449,7 +458,7 @@ sub view {
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
     'text/javascript'});
-
+    
 	my $var = $self->get;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
@@ -457,7 +466,7 @@ sub view {
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
-
+    
     # Get the MatrixListing with the most views as an object using getLineage.
     my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
@@ -674,6 +683,7 @@ sub www_compare {
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
         'var responseFields = new Array("attributeId", "name", "fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
         "</script>";
 
     return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
@@ -903,12 +913,10 @@ sub www_getCompareFormData {
     my $session         = $self->session;
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
-    my $sortDirection   = ' asc';
-
-    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
-        $sortDirection = " desc";
-    }
-
+    my $sortDirection   = ' desc';
+#    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
+#        $sortDirection = " desc";
+#    }
     my @results;
     my @listingIds = $self->session->form->checkList("listingId");
     
@@ -948,18 +956,20 @@ assetData.revisionDate
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
     foreach my $result (@results){
             if($form->process("search")){
-                $self->session->errorHandler->warn("checking listing: ".$result->{title});
+                # $self->session->errorHandler->warn("checking listing: ".$result->{title});
+                my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
+                            select value, fieldType, attributeId from MatrixListing_attribute as listing
+                            left join Matrix_attribute using(attributeId)
+                            where listing.matrixListingId = ?
+                        ",[$result->{assetId}],'attributeId');
                 foreach my $param ($form->param) {
                     if($param =~ m/^search_/){
                         my $attributeId = $param;
                         $attributeId =~ s/^search_//;
                         $attributeId =~ s/_____/-/;
-                        my ($listingValue,$fieldType) = $session->db->quickArray("
-                            select value, fieldType from MatrixListing_attribute as listing
-                            left join Matrix_attribute using(attributeId)
-                            where listing.attributeId = ? and listing.matrixListingId = ?
-                        ",[$attributeId,$result->{assetId}]);
-                        #$self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
+                        my $fieldType       = $matrixListing_attributes->{$attributeId}->{fieldType};
+                        my $listingValue    = $matrixListing_attributes->{$attributeId}->{value};
+                        # $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
                         if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
                             $result->{checked} = '';
                             last;
@@ -969,7 +979,6 @@ assetData.revisionDate
                             last;
                         }
                         else{
-                            #$self->session->errorHandler->warn("--Checked--");
                             $result->{checked} = 'checked';
                         }
                     }
@@ -982,7 +991,7 @@ assetData.revisionDate
                 }
             }
             $result->{assetId}  =~ s/-/_____/g;
-            $result->{url}      = "/".$result->{url};
+            $result->{url}      = $session->url->gateway($result->{url});
     }
 
     my $jsonOutput;
@@ -1058,7 +1067,7 @@ sub www_getCompareListData {
                         { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
                 }
                 if($session->scratch->get('stickied_'.$result->{attributeId})){
-                    $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
+                    # $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
                     $result->{checked} = 'checked';
                 }
                 else{
@@ -1153,9 +1162,12 @@ sub www_search {
             $attribute->{id} = $attribute->{attributeId};
             $attribute->{id} =~ s/-/_____/g;
             $attribute->{extras} = " class='attributeSelect'";
-            if($attribute->{fieldType} eq 'Combo'){    
+            if($attribute->{fieldType} eq 'Combo'){
                 $attribute->{fieldType} = 'SelectBox';
-                $attribute->{options} = "blank\n".$attribute->{options};
+            }
+            if($attribute->{fieldType} eq 'SelectBox'){    
+                $attribute->{options}   = "blank\n".$attribute->{options};
+                $attribute->{value}     = 'blank';
             }
             $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
             push(@attribute_loop,$attribute);

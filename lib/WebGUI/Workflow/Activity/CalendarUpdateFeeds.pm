@@ -212,6 +212,7 @@ sub execute {
                     feedId      => $feed->{feedId},
                     description => _unwrapIcalText($events{$id}->{description}->[1]),
                     title       => _unwrapIcalText($events{$id}->{summary}->[1]),
+                    location    => _unwrapIcalText($events{$id}->{location}->[1]),
                     menuTitle   => substr($events{$id}->{summary}->[1],0,15),
                     className   => 'WebGUI::Asset::Event',
                     isHidden    => 1,

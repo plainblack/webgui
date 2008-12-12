@@ -1,8 +1,58 @@
 package WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
+=head1 LEGAL
+
+-------------------------------------------------------------------
+WebGUI is Copyright 2001-2008 Plain Black Corporation.
+-------------------------------------------------------------------
+Please read the legal notices (docs/legal.txt) and the license
+(docs/license.txt) that came with this distribution before using
+this software.
+-------------------------------------------------------------------
+http://www.plainblack.com                     info@plainblack.com
+-------------------------------------------------------------------
+
+=head1 NAME
+
+Package WebGUI::Asset::Wobject::Survey::ResponseJSON
+
+=head1 DESCRIPTION
+
+Helper class for WebGUI::Asset::Wobject::Survey.  It manages data
+from the user, sets the order of questions and answers in the survey,
+based on forks, and gotos, and also handles expiring the survey
+due to time limits.
+
+This package is not intended to be used by any other Asset in WebGUI.
+
+=cut
+
+
 use strict;
 use JSON;
 use Data::Dumper;
+
+=head2 new ( $json, $log, $survey )
+
+Object constructor.
+
+=head3 $json
+
+Pass in some JSON to be serialized into a data structure.  Useful JSON would
+contain a hash with "startTime", "surveyOrder", "responses", "lastReponse"
+and "questionsAnswered" keys, with appropriate values.
+
+=head3 $log
+
+The session logger, from $session->log.  The class needs nothing else from the
+session object.
+
+=head3 $survey
+
+A WebGUI::Asset::Wobject::Survey::SurveyJSON object that represents the current
+survey.
+
+=cut
 
 sub new {
     my $class  = shift;
@@ -28,9 +78,11 @@ sub new {
 
 =head2 createSurveyOrder ( SurveyJSON, [address,address] )
 
-This creates the order for the survey which will change after every fork.  
-The survey order is to precreate random questions and answers, which also leaves a record or what the user was presented with.
-Forks are passed in to show where to branch the new order.
+This creates the order for the survey which will change after every fork.  The survey
+order is to precreate random questions and answers, which also leaves a record or what
+the user was presented with.  Forks are passed in to show where to branch the new order.
+
+If questions and/or answers were set to be randomized, it is handled in here.
 
 =cut
 
@@ -87,11 +139,23 @@ sub freeze {
     return to_json( \%temp );
 }
 
-#Hash the survey timed out?
+#Has the survey timed out?
+
+=head2 hasTimedOut ( $limit )
+
+Checks to see whether this survey has timed out, based on the internally stored starting
+time, and $limit.
+
+=head3 $limit
+
+How long the user has to take the survey, in minutes.
+
+=cut
 
 sub hasTimedOut{
     my $self=shift;
-    return 1 if($self->{startTime} + ($self->{timeLimit} * 60) < time() and $self->{timeLimit} > 0);
+    my $limit = shift;
+    return 1 if($self->{startTime} + ($limit * 60) < time() and $limit > 0);
     return 0;
 }
 
@@ -149,14 +213,15 @@ sub recordResponses {
     #These were just submitted from the user, so we need to see what and how they were (un)answered.
     my $questions = $self->nextQuestions();
     my $qAnswered = 1;
+    my $sterminal  = 0;
     my $terminal  = 0;
     my $terminalUrl;
     my $goto;
 
-    #my $section = $self->survey->section([$questions->[0]->{sid}]);
-    my $section = $self->currentSection();
+    my $section = $self->nextSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
+
     if ( $section->{terminal} ) {
-        $terminal    = 1;
+        $sterminal    = 1;
         $terminalUrl = $section->{terminalUrl};
     }
 
@@ -210,6 +275,11 @@ sub recordResponses {
     else {
         $terminal = 0;
     }
+    
+    if($sterminal and $self->nextSection != $self->currentSection){
+        $terminal = 1;
+    }     
+
     return [ $terminal, $terminalUrl ];
 } ## end sub recordResponses
 

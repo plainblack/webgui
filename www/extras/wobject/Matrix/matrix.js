@@ -22,13 +22,13 @@ YAHOO.util.Event.addListener(window, "load", function() {
         ];
 
 	var uri = "func=getCompareFormData";
-	if(typeof(listingIds) != 'undefined'){
-	for (var i = 0; i < listingIds.length; i++) {
-		uri = uri+';listingId='+listingIds[i];
-	}
+		if(typeof(listingIds) != 'undefined'){
+		for (var i = 0; i < listingIds.length; i++) {
+			uri = uri+';listingId='+listingIds[i];
+		}
 	}
 
-        this.myDataSource = new YAHOO.util.DataSource("?");
+        this.myDataSource = new YAHOO.util.DataSource(matrixUrl + "?");
         this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
@@ -47,25 +47,25 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	var btnSortByViews = new YAHOO.widget.Button("sortByViews");
         btnSortByViews.on("click", function(e) {
 		this.myDataTable.sortColumn(this.myDataTable.getColumn(2)); 
-		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=views");
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=views");
         },this,true);
 
 	var btnSortByClicks = new YAHOO.widget.Button("sortByClicks");
         btnSortByClicks.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(3)); 
-		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=clicks");
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=clicks");
         },this,true);
 
 	var btnSortByCompares = new YAHOO.widget.Button("sortByCompares");
         btnSortByCompares.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(4)); 
-		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=compares");
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=compares");
         },this,true);
 
 	var btnSortByUpdated = new YAHOO.widget.Button("sortByUpdated");
         btnSortByUpdated.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(5)); 
-		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setSort;sort=lastUpdated");
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=lastUpdated");
         },this,true);
 
         var myCallback = function() {
@@ -77,6 +77,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
         btnCompare.on("click", function(e) {
 		window.document.forms['doCompare'].submit();
         },this,true);
+	var btnCompare2 = new YAHOO.widget.Button("compare2",{disabled:true,id:"compareButton2"});
+        btnCompare2.on("click", function(e) {
+		window.document.forms['doCompare'].submit();
+        },this,true);
+
+	var btnSearch = new YAHOO.widget.Button("search");
+        btnSearch.on("click", function(e) {
+		window.location.href = matrixUrl + '?func=search';
+	},this,true);
 
 	window.compareDataTable = this.myDataTable;
 
@@ -92,8 +101,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
     		}
 		if (checked > 1 && checked < maxComparisons){
 			btnCompare.set("disabled",false);
+			btnCompare2.set("disabled",false);
 		}else{
 			btnCompare.set("disabled",true);
+			btnCompare2.set("disabled",true);
 		}
 		var elements = window.compareDataTable.getRecordSet().getRecords();
 		for(j=0; j<elements.length; j++){

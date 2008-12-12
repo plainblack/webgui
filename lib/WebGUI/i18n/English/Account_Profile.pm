@@ -5,8 +5,8 @@ our $I18N = {
 
     'title' => {
         message     => q{Profile},
-        lastUpdated => 1225724810,
-        context     => q{Tab label for Profile Account pluggin},
+        lastUpdated => 1228764827,
+        context     => q{Tab label for Profile Account plugin},
     },
 
     'profile style template label' => {
@@ -15,7 +15,7 @@ our $I18N = {
 	},
 
     'profile style template hoverHelp' => {
-        message     => q|Select a style template from the list to enclose the inbox in.|,
+        message     => q|Select a style template from the list to enclose the profile in.|,
         lastUpdated => 1119068809
 	},
 
@@ -25,8 +25,8 @@ our $I18N = {
 	},
     
     'profile layout template hoverHelp' => {
-        message     => q{Choose a layout from the list to display the various account pluggins that are editable by the current user as well as the contents of the one currently chosen},
-        lastUpdated => 1119068809
+        message     => q{Choose a layout from the list to display the various account plugins that are usable by the current user as well as the contents of the plugin currently chosen.},
+        lastUpdated => 1228773692
     },
 
     'profile view template label' => {
@@ -35,7 +35,7 @@ our $I18N = {
     },
 
     'profile view template hoverHelp' => {
-        message     => q|Choose the main template for viewing a profile|,
+        message     => q|Choose the main template for viewing a profile.|,
         lastUpdated => 1119068809
     },
 
@@ -55,7 +55,7 @@ our $I18N = {
     },
 
     'profile edit layout template hoverHelp' => {
-        message     => q{Choose a layout from the list to display the various account pluggins that are viewable by others as well as the contents of the one currently chosen},
+        message     => q{Choose a layout from the list to display the user's profile for editing.},
         lastUpdated => 1119068809
     },
 

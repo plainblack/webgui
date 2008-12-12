@@ -29,7 +29,8 @@ Asset in WebGUI.
 
 use strict;
 use JSON;
-use Clone qw/clone/;
+#use Clone qw/clone/;
+use Storable qw/dclone/;
 
 =head2 new ( $json, $log )
 
@@ -37,8 +38,8 @@ Object constructor.
 
 =head3 $json
 
-Pass in some JSON to be serialized into a data structure.  At the very least, you
-must pass in the "null" JSON string, '{}'.
+Pass in some JSON to be serialized into a data structure.  Useful JSON would
+be a hash with "survey" and "sections" keys with appropriate values.
 
 =head3 $log
 
@@ -132,6 +133,45 @@ sub newObject {
 
 #address is the array of objects currently selected in the edit screen
 #data is the array of hash items for displaying
+
+=head2 getDragDropList ( $address )
+
+Get a subset of the entire data structure.  It will be a list of all sections, along with
+one question from a section with all its answers.
+
+Returns an array reference.  Each element of the array will have a subset of section information as
+a hashref.  This will contain two keys:
+
+    {
+        type => 'section',
+        text => the section's title
+    }, 
+
+The questions for the referenced section will be included, like this:
+
+    {
+        type => 'question',
+        text => the question's text
+    }, 
+
+All answers for the referenced question will also be in the array reference:
+
+    {
+        type => 'answer',
+        text => the answer's text
+    }, 
+
+The sections, question and answer will be in depth-first order:
+
+section, section, section, question, answer, answer, answer, section, section
+
+=head3 $address
+
+An array ref.  Sets which question from a section will be listed, along with all
+its answers.  $address should ALWAYS have two elements.
+
+=cut
+
 sub getDragDropList {
     my $self    = shift;
     my $address = shift;
@@ -199,15 +239,28 @@ question in a section.  Returns that answer.
 sub getObject {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        return clone $self->{sections}->[ $address->[0] ];
+        return dclone $self->{sections}->[ $address->[0] ];
     }
     elsif ( @$address == 2 ) {
-        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
     }
     else {
-        return clone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
     }
 }
+
+=head2 getSectionEditVars ( $address )
+
+A dispatcher for getSectionEditVars, getQuestionEditVars and getAnswerEditVars.  Uses $address
+to figure out what has been requested, then invokes that method and returns the results
+from it.
+
+=head3 $address
+
+An array ref.  The number of elements determines whether edit vars are fetched for
+sections, questions, or answers.
+
+=cut
 
 sub getEditVars {
     my ( $self, $address ) = @_;
@@ -222,6 +275,23 @@ sub getEditVars {
         return $self->getAnswerEditVars($address);
     }
 }
+
+=head2 getSectionEditVars ( $address )
+
+Get a safe copy of the variables for this section, to use for editing
+purposes.  Adds two variables, id, which is the index of this section,
+and displayed_id, which is this question's index in a 1-based array
+(versus the default, perl style, 0-based array).
+
+It removes the questions array ref, and changes questionsPerPage from a single element, into
+an array of hashrefs, which list the available questions per page and which one is currently
+selected for this section.
+
+=head3 $address
+
+An array reference, specifying which question to fetch variables for.
+
+=cut
 
 sub getSectionEditVars {
     my $self    = shift;
@@ -246,6 +316,23 @@ sub getSectionEditVars {
     return \%var;
 } ## end sub getSectionEditVars
 
+=head2 getQuestionEditVars ( $address )
+
+Get a safe copy of the variables for this question, to use for editing purposes.  Adds
+two variables, id, which is the indeces of the question's position in its parent's 
+section array joined by dashes '-', and displayed_id, which is this question's index
+in a 1-based array (versus the default, perl style, 0-based array).
+
+It removes the answers array ref, and changes questionType from a single element, into
+an array of hashrefs, which list the available question types and which one is currently
+selected for this question.
+
+=head3 $address
+
+An array reference, specifying which question to fetch variables for.
+
+=cut
+
 sub getQuestionEditVars {
     my $self    = shift;
     my $address = shift;
@@ -255,17 +342,7 @@ sub getQuestionEditVars {
     $var{displayed_id} = $address->[1] + 1;
     delete $var{answers};
     delete $var{questionType};
-    my @types = (
-        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
-        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
-        'Education',      'Effectiveness',           'Email',           'File Upload',
-        'Gender',         'Hidden',                  'Ideology',        'Importance',
-        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
-        'Party',          'Phone Number',            'Race',            'Risk',
-        'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'Text Date',               'Threat',          'True/False',
-        'Yes/No'
-    );
+    my @types = $self->getValidQuestionTypes();
 
     for (@types) {
         if ( $_ eq $object->{questionType} ) {
@@ -277,6 +354,40 @@ sub getQuestionEditVars {
     }
     return \%var;
 } ## end sub getQuestionEditVars
+
+=head2 getValidQuestionTypes
+
+A convenience method.  Returns a list of question types.  If you add a question
+type to the Survey, you must handle it here, and also in updateQuestionAnswers
+
+=cut
+
+sub getValidQuestionTypes {
+    return(
+        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
+        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
+        'Education',      'Effectiveness',           'Email',           'File Upload',
+        'Gender',         'Hidden',                  'Ideology',        'Importance',
+        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
+        'Party',          'Phone Number',            'Race',            'Risk',
+        'Satisfaction',   'Scale',                   'Security',        'Slider',
+        'Text',           'Text Date',               'Threat',          'True/False',
+        'Yes/No'
+    );
+}
+
+=head2 getAnswerEditVars ( $address )
+
+Get a safe copy of the variables for this answer, to use for editing purposes.  Adds
+two variables, id, which is the indeces of the answer's position in its parent's question
+and section arrays joined by dashes '-', and displayed_id, which is this answer's index
+in a 1-based array (versus the default, perl style, 0-based array).
+
+=head3 $address
+
+An array reference, specifying which answer to fetch variables for.
+
+=cut
 
 sub getAnswerEditVars {
     my $self    = shift;
@@ -465,13 +576,13 @@ Nothing happens.  It is not allowed to duplicate answers.
 sub copy {
     my ( $self, $address ) = @_;
     if ( @$address == 1 ) {
-        my $newSection = clone $self->section($address);
+        my $newSection = dclone $self->section($address);
         push( @{ $self->sections }, $newSection );
         $address->[0] = $#{ $self->sections };
         return $address;
     }
     elsif ( @$address == 2 ) {
-        my $newQuestion = clone $self->question($address);
+        my $newQuestion = dclone $self->question($address);
         push( @{ $self->questions($address) }, $newQuestion );
         $address->[1] = $#{ $self->questions($address) };
         return $address;
@@ -593,6 +704,21 @@ sub newAnswer {
     return \%members;
 }
 
+=head2 updateQuestionAnswers ($address, $type);
+
+Add answers to a question, based on the requested type.
+
+=head3 $address
+
+Which question to add answers to.
+
+=head3 $type
+
+The question type to use to determine how many and what kind of answers
+to add to the question.
+
+=cut
+
 sub updateQuestionAnswers {
     my $self    = shift;
     my $address = shift;
@@ -612,7 +738,7 @@ sub updateQuestionAnswers {
     elsif ( $type eq 'Currency' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
         $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Currency Amount' } );
+        $self->update( \@addy, { 'text', 'Currency Amount:' } );
     }
     elsif ( $type eq 'Text Date' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
@@ -704,7 +830,7 @@ sub updateQuestionAnswers {
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Oppose/Support' ) {
-        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly Support' );
+        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly support' );
         $self->addAnswersToQuestion( \@addy, \@ans, {} );
     }
     elsif ( $type eq 'Agree/Disagree' ) {
@@ -728,6 +854,27 @@ sub updateQuestionAnswers {
     }
 } ## end sub updateQuestionAnswers
 
+=head2 addAnswersToQuestion ($address, $answers, $verbatims)
+
+Helper routine for updateQuestionAnswers.  Adds an array of answers to a question.
+
+=head3 $address
+
+The address of the question to add answers to.
+
+=head3 $answers
+
+An array reference of answers to add.  Each element will be assigned to the text field of
+the answer that is created.
+
+=head3 $verbatims
+
+An hash reference.  Each key is an index into the answers array.  The value is a placeholder
+for doing existance lookups.  For each requested index, the verbatim flag in the answer is
+set to true.
+
+=cut
+
 sub addAnswersToQuestion {
     my $self  = shift;
     my $addy  = shift;
@@ -736,7 +883,7 @@ sub addAnswersToQuestion {
     for ( 0 .. $#$ans ) {
         push( @{ $self->question($addy)->{answers} }, $self->newAnswer() );
         $$addy[2] = $_;
-        if ( defined $$verbs{$_} and $_ == $$verbs{$_} ) {
+        if ( exists $$verbs{$_} and $verbs->{$_} ) {
             $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 } );
         }
         else {
@@ -760,7 +907,7 @@ sub sections {
     return $self->{sections};
 }
 
-=head2 section $address
+=head2 section ($address)
 
 Returns a reference to one section.
 
@@ -777,7 +924,7 @@ sub section {
     return $self->{sections}->[ $$address[0] ];
 }
 
-=head2 questions $address
+=head2 questions ($address)
 
 Returns a reference to all the questions from a particular section.
 
@@ -794,7 +941,7 @@ sub questions {
     return $self->{sections}->[ $$address[0] ]->{questions};
 }
 
-=head2 question $address
+=head2 question ($address)
 
 Return a reference to one question from a particular section.
 
@@ -812,17 +959,52 @@ sub question {
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ];
 }
 
+=head2 answers ($address)
+
+Return a reference to all answers from a particular question.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  An array ref of anwers from that question will be
+returned.
+
+=cut
+
 sub answers {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers};
 }
 
+=head2 answer ($address)
+
+Return a reference to one answer from a particular question and section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  The third element is the index of the answer.
+
+=cut
+
 sub answer {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers}->[ $$address[2] ];
 }
+
+=head2 log ($message)
+
+Logs an error message using the session logger.
+
+=head3 $message
+
+The message to log.  It will be logged as type "error".
+
+=cut
 
 sub log {
     my ( $self, $message ) = @_;

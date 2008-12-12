@@ -436,8 +436,9 @@ sub view {
     # Query user profile data. Exclude the visitor account and users that have been deactivated.
 	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile ";
 	# Include remaining profile fields in the query
+    my $dbh = $self->session->db->dbh;
 	foreach my $profileField (@profileFields){
-    	$sql .= ", userProfileData.$profileField->{fieldName}";
+    	$sql .= ", userProfileData." . $dbh->quote_identifier($profileField->{fieldName});
 	}
 	$sql .= " from users";
 	$sql .= " left join userProfileData using(userId) where users.userId != '1' and users.status = 'active'";

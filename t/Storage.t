@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 75; # increment this value for each test you create
+my $numTests = 74; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -37,9 +37,6 @@ ok ($uploadDir, "uploadDir defined in config");
 
 my $uploadUrl = $session->config->get('uploadsURL');
 ok ($uploadUrl, "uploadDir defined in config");
-
-my $originalCaseInsensitiveOS = $session->config->get('caseInsensitiveOS');
-$session->config->set('caseInsensitiveOS', 0);
 
 ####################################################
 #
@@ -147,7 +144,6 @@ $storage1 = WebGUI::Storage->create($session);
 
 isa_ok( $storage1, "WebGUI::Storage");
 ok($session->id->valid($storage1->getId), 'create returns valid sessionIds');
-is($storage1->getId, $storage1->getFileId, 'getId and getFileId are the same when caseInsensitiveOS=0');
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
@@ -462,5 +458,4 @@ END {
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
-    $session->config->set('caseInsensitiveOS', $originalCaseInsensitiveOS);
 }
