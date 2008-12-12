@@ -297,6 +297,10 @@ sub currentSection {
 
 #-------------------------------------------------------------------
 
+=head2 recordResponses
+
+=cut
+
 sub recordResponses {
     my $self      = shift;
     my $session   = shift;
@@ -350,7 +354,7 @@ sub recordResponses {
             {
 
                 $aAnswered = 1;
-                if ( $mcTypes{ $question->{questionType} } ) {
+                if ( exists $mcTypes{ $question->{questionType} } ) {
                     $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
                 }
                 else {
@@ -390,6 +394,18 @@ sub recordResponses {
 
 #-------------------------------------------------------------------
 
+=head2 goto ( $variable )
+
+Looks through all sections and questions for their variable key, in order.  If the requested
+$variable matches a variable, then the lastResponse is set so that that section or question
+is the next displayed.  If more than one section or question matches, then the first is used.
+
+=head3 $variable
+
+The variable to look for in all sections and questions.
+
+=cut
+
 sub goto {
     my $self = shift;
     my $goto = shift;
@@ -408,6 +424,10 @@ sub goto {
 } ## end sub goto
 
 #-------------------------------------------------------------------
+
+=head2 getPreviousAnswer
+
+=cut
 
 sub getPreviousAnswer {
     my $self          = shift;
@@ -501,6 +521,10 @@ sub surveyEnd {
 }
 
 #-------------------------------------------------------------------
+
+=head2 returnResponsesForReporting
+
+=cut
 
 sub returnResponseForReporting {
     my $self      = shift;
