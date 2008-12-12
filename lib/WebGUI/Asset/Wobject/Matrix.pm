@@ -334,7 +334,7 @@ sub getCompareColor {
     elsif($value == 3){
         return $self->get('compareColorFreeAddOn');
     }
-    elsif($value == 3){
+    elsif($value == 4){
         return $self->get('compareColorYes');
     }
 
@@ -1034,7 +1034,8 @@ sub www_getCompareListData {
         $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;
-        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors"});
+        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors",
+            url=>$listing->getUrl});
     }
 
     my $jsonOutput;
