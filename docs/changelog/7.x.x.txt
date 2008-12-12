@@ -1,4 +1,5 @@
 7.5.37
+ - Error #9301: in Shelf Template
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
