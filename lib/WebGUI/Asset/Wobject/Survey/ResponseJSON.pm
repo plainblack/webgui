@@ -217,20 +217,56 @@ sub startTime {
 }
 
 #array of addresses in which the survey should be presented
+
+=head2 surveyOrder
+
+Accessor for the survey order data structure.  It is a deep set of arrays, similar in
+structure to a WebGUI::Asset::Wobject::Survey::SurveyJSON address.
+
+    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
+
+There is one array element for every section and address in the survey.
+
+If there are no questions, or no addresses, those array elements will not be present.
+
+=cut
+
 sub surveyOrder {
     my $self = shift;
     return $self->{surveyOrder};
 }
+
+=head2 nextSectionId
+
+Relative to the surveyOrder and the lastResponse index, get the index of the
+next section.  Note, based on the number of questions in an section, this can
+be the same as the current section index.
+
+=cut
 
 sub nextSectionId {
     my $self = shift;
     return $self->surveyOrder->[ $self->lastResponse + 1 ]->[0];
 }
 
+=head2 nextSection
+
+Relative to the surveyOrder and the lastResponse index, gets the next section.
+Note, based on the number of questions in a section, this can be the same as
+the current section.
+
+=cut
+
 sub nextSection {
     my $self = shift;
     return $self->survey->section( [ $self->surveyOrder->[ $self->lastResponse + 1 ]->[0] ] );
 }
+
+=head2 currentSection
+
+Relative to the surveyOrder and the lastResponse index, get the current section.
+
+=cut
 
 sub currentSection {
     my $self = shift;
@@ -363,9 +399,7 @@ sub getPreviousAnswer {
 sub nextQuestions {
     my $self = shift;
 
-    if ( $self->lastResponse >= $#{ $self->surveyOrder } ) {
-        return [];
-    }
+    return [] if $self->surveyEnd;
 
     my $nextSectionId = $self->nextSectionId;
 
@@ -399,6 +433,13 @@ sub nextQuestions {
     } ## end for ( my $i = 1; $i <= ...
     return $questions;
 } ## end sub nextQuestions
+
+=head2 surveyEnd
+
+Returns true if the current index stored in lastResponse is greater than or
+equal to the number of sections in the survey order.
+
+=cut
 
 sub surveyEnd {
     my $self = shift;

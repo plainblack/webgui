@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 18;
+my $tests = 32;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -151,6 +151,69 @@ cmp_deeply(
     ##Restore the subroutine to the original
     *$shuffleName = &$shuffleRef;
 }
+
+####################################################
+#
+# surveyEnd
+#
+####################################################
+
+$rJSON->lastResponse(2);
+ok( ! $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 2 != end of survey');
+$rJSON->lastResponse(7);
+ok( ! $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 7 != end of survey');
+$rJSON->lastResponse(8);
+ok(   $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 8 == end of survey');
+$rJSON->lastResponse(20);
+ok(   $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 20 >= end of survey');
+
+####################################################
+#
+# nextSectionId, nextSection
+#
+####################################################
+
+$rJSON->lastResponse(0);
+is($rJSON->nextSectionId(), 0, 'nextSectionId, lastResponse=0, nextSectionId=0');
+cmp_deeply(
+    $rJSON->nextSection,
+    $rJSON->survey->section([0]),
+    'lastResponse=0, nextSection = section 0'
+);
+cmp_deeply(
+    $rJSON->currentSection,
+    $rJSON->survey->section([0]),
+    'lastResponse=0, currentSection = section 0'
+);
+
+$rJSON->lastResponse(2);
+is($rJSON->nextSectionId(), 1, 'nextSectionId, lastResponse=2, nextSectionId=1');
+cmp_deeply(
+    $rJSON->nextSection,
+    $rJSON->survey->section([1]),
+    'lastResponse=2, nextSection = section 1'
+);
+cmp_deeply(
+    $rJSON->currentSection,
+    $rJSON->survey->section([0]),
+    'lastResponse=2, currentSection = section 0'
+);
+
+$rJSON->lastResponse(6);
+is($rJSON->nextSectionId(), 3, 'nextSectionId, lastResponse=6, nextSectionId=3');
+cmp_deeply(
+    $rJSON->nextSection,
+    $rJSON->survey->section([3]),
+    'lastResponse=0, nextSection = section 3'
+);
+cmp_deeply(
+    $rJSON->currentSection,
+    $rJSON->survey->section([3]),
+    'lastResponse=6, currentSection = section 3'
+);
+
+$rJSON->lastResponse(20);
+is($rJSON->nextSectionId(), undef, 'nextSectionId, lastResponse > surveyEnd, nextSectionId=undef');
 
 }
 
