@@ -121,6 +121,12 @@ sub createSurveyOrder {
     $self->{surveyOrder} = $order;
 } ## end sub createSurveyOrder
 
+=head2 shuffle ( @array )
+
+Returns the contents of @array in a random order.
+
+=cut
+
 sub shuffle {
     my @a = splice @_;
     for my $i ( 0 .. $#a ) {
@@ -129,6 +135,12 @@ sub shuffle {
     }
     return @a;
 }
+
+=head2 freeze
+
+Serializes the object to JSON, after deleting the log and survey objects stored in it.
+
+=cut
 
 sub freeze {
     my $self = shift;
@@ -440,15 +452,41 @@ sub returnResponseForReporting {
 #the actual responses to the survey.  A response is for a question and is accessed by the exact same address as a survey member.
 #Questions only contain the comment and an array of answer Responses.
 #Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, and the assetId to the uploaded file.
+
+=head2 responses
+
+Returns a reference to the actual responses to the survey.  A response is for a question and
+is accessed by the exact same address as a survey member.  Questions only contain the comment
+and an array of answer Responses.  Answers only contain, entered text, entered verbatim,
+their index in the Survey Question Answer array, and the assetId to the uploaded file.
+
+Note, this is an unsafe reference.
+
+=cut
+
 sub responses {
     my $self = shift;
     return $self->{responses};
 }
 
+=head2 responses
+
+Returns a referece to the SurveyJSON object that this object was created with.
+
+Note, this is an unsafe reference.
+
+=cut
+
 sub survey {
     my $self = shift;
     return $self->{survey};
 }
+
+=head2 log
+
+Logs an error to the webgui log file, using the session logger.
+
+=cut
 
 sub log {
     my ( $self, $message ) = @_;

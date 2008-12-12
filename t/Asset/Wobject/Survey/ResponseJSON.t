@@ -8,6 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
+use Test::MockObject::Extends;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -19,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 13;
+my $tests = 18;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -78,6 +79,79 @@ ok(   $rJSON->hasTimedOut(1),    'hasTimedOut, timed out');
 ok( ! $rJSON->hasTimedOut(0),    'hasTimedOut, bad limit');
 ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 
+####################################################
+#
+# createSurveyOrder
+#
+####################################################
+
+$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(q!{}!, $session->log, buildSurveyJSON($session));
+
+$rJSON->createSurveyOrder();
+cmp_deeply(
+    $rJSON->surveyOrder,
+    [
+        [ 0, 0, [0] ],
+        [ 0, 1, [0] ],
+        [ 0, 2, [0, 1] ],
+        [ 1, 0, [0, 1] ],
+        [ 1, 1, [0, 1] ],
+        [ 2 ],
+        [ 3, 0, [0, 1] ],
+        [ 3, 1, [0, 1, 2, 3, 4, 5, 6] ],
+        [ 3, 2, [0] ],
+    ],
+    'createSurveyOrder, enumerated all sections, questions and answers'
+);
+
+####################################################
+#
+# shuffle
+#
+####################################################
+
+{
+    my @dataToRandomize = 0..49;
+    my @randomizedData = WebGUI::Asset::Wobject::Survey::ResponseJSON::shuffle(@dataToRandomize);
+    cmp_bag(\@dataToRandomize, \@randomizedData, 'shuffle: No data lost during shuffling');
+}
+
+####################################################
+#
+# createSurveyOrder, part 2
+#
+####################################################
+
+{
+    no strict "refs";
+    no warnings;
+    my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(q!{}!, $session->log, buildSurveyJSON($session));
+    $rJSON->survey->section([0])->{randomizeQuestions} = 0;
+    my $shuffleName = "WebGUI::Asset::Wobject::Survey::ResponseJSON::shuffle";
+    my $shuffleCalled = 0;
+    my $shuffleRef = \&$shuffleName;
+    *$shuffleName = sub {
+        $shuffleCalled = 1;
+        goto &$shuffleRef;
+    };
+    $rJSON->createSurveyOrder();
+    is($shuffleCalled, 0, 'createSurveyOrder did not call shuffle on a section');
+
+    $shuffleCalled = 0;
+    $rJSON->survey->section([0])->{randomizeQuestions} = 1;
+    $rJSON->createSurveyOrder();
+    is($shuffleCalled, 1, 'createSurveyOrder called shuffle on a section');
+
+    $shuffleCalled = 0;
+    $rJSON->survey->section([0])->{randomizeQuestions} = 0;
+    $rJSON->survey->question([0,0])->{randomizeAnswers} = 1;
+    $rJSON->createSurveyOrder();
+    is($shuffleCalled, 1, 'createSurveyOrder called shuffle on a question');
+
+    ##Restore the subroutine to the original
+    *$shuffleName = &$shuffleRef;
+}
+
 }
 
 ####################################################
@@ -89,8 +163,7 @@ ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 sub buildSurveyJSON {
     my $session = shift;
     my $sjson = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(undef, $session->log);
-    ##Build 4 sections
-    $sjson->newObject([]);
+    ##Build 4 sections.  Remembering that one is created by default when you make an empty SurveyJSON object
     $sjson->newObject([]);
     $sjson->newObject([]);
     $sjson->newObject([]);
