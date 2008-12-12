@@ -32,6 +32,8 @@ use strict;
 use JSON;
 use Data::Dumper;
 
+#-------------------------------------------------------------------
+
 =head2 new ( $json, $log, $survey )
 
 Object constructor.
@@ -121,6 +123,8 @@ sub createSurveyOrder {
     $self->{surveyOrder} = $order;
 } ## end sub createSurveyOrder
 
+#-------------------------------------------------------------------
+
 =head2 shuffle ( @array )
 
 Returns the contents of @array in a random order.
@@ -136,6 +140,8 @@ sub shuffle {
     return @a;
 }
 
+#-------------------------------------------------------------------
+
 =head2 freeze
 
 Serializes the object to JSON, after deleting the log and survey objects stored in it.
@@ -149,6 +155,8 @@ sub freeze {
     delete $temp{survey};
     return to_json( \%temp );
 }
+
+#-------------------------------------------------------------------
 
 #Has the survey timed out?
 
@@ -169,6 +177,8 @@ sub hasTimedOut{
     return 1 if($self->startTime() + ($limit * 60) < time() and $limit > 0);
     return 0;
 }
+
+#-------------------------------------------------------------------
 
 #the index of the last surveyOrder entry shown
 
@@ -194,6 +204,8 @@ sub lastResponse {
     }
 }
 
+#-------------------------------------------------------------------
+
 =head2 startTime ([ $newStartTime ])
 
 Mutator for the time the user began the survey.  With no arguments,
@@ -216,6 +228,8 @@ sub startTime {
     }
 }
 
+#-------------------------------------------------------------------
+
 #array of addresses in which the survey should be presented
 
 =head2 surveyOrder
@@ -236,6 +250,8 @@ sub surveyOrder {
     return $self->{surveyOrder};
 }
 
+#-------------------------------------------------------------------
+
 =head2 nextSectionId
 
 Relative to the surveyOrder and the lastResponse index, get the index of the
@@ -246,8 +262,11 @@ be the same as the current section index.
 
 sub nextSectionId {
     my $self = shift;
+    return undef if $self->surveyEnd();
     return $self->surveyOrder->[ $self->lastResponse + 1 ]->[0];
 }
+
+#-------------------------------------------------------------------
 
 =head2 nextSection
 
@@ -259,8 +278,11 @@ the current section.
 
 sub nextSection {
     my $self = shift;
+    return {} if $self->surveyEnd();
     return $self->survey->section( [ $self->surveyOrder->[ $self->lastResponse + 1 ]->[0] ] );
 }
+
+#-------------------------------------------------------------------
 
 =head2 currentSection
 
@@ -272,6 +294,8 @@ sub currentSection {
     my $self = shift;
     return $self->survey->section( [ $self->surveyOrder->[ $self->lastResponse ]->[0] ] );
 }
+
+#-------------------------------------------------------------------
 
 sub recordResponses {
     my $self      = shift;
@@ -364,6 +388,8 @@ sub recordResponses {
     return [ $terminal, $terminalUrl ];
 } ## end sub recordResponses
 
+#-------------------------------------------------------------------
+
 sub goto {
     my $self = shift;
     my $goto = shift;
@@ -381,6 +407,8 @@ sub goto {
     }
 } ## end sub goto
 
+#-------------------------------------------------------------------
+
 sub getPreviousAnswer {
     my $self          = shift;
     my $questionParam = shift;
@@ -395,6 +423,8 @@ sub getPreviousAnswer {
         }
     }
 }
+
+#-------------------------------------------------------------------
 
 sub nextQuestions {
     my $self = shift;
@@ -434,6 +464,8 @@ sub nextQuestions {
     return $questions;
 } ## end sub nextQuestions
 
+#-------------------------------------------------------------------
+
 =head2 surveyEnd
 
 Returns true if the current index stored in lastResponse is greater than or
@@ -446,6 +478,8 @@ sub surveyEnd {
     return 1 if ( $self->lastResponse >= $#{ $self->surveyOrder } );
     return 0;
 }
+
+#-------------------------------------------------------------------
 
 sub returnResponseForReporting {
     my $self      = shift;
@@ -490,6 +524,8 @@ sub returnResponseForReporting {
     return \@responses;
 } ## end sub returnResponseForReporting
 
+#-------------------------------------------------------------------
+
 #the actual responses to the survey.  A response is for a question and is accessed by the exact same address as a survey member.
 #Questions only contain the comment and an array of answer Responses.
 #Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, and the assetId to the uploaded file.
@@ -510,6 +546,8 @@ sub responses {
     return $self->{responses};
 }
 
+#-------------------------------------------------------------------
+
 =head2 responses
 
 Returns a referece to the SurveyJSON object that this object was created with.
@@ -522,6 +560,8 @@ sub survey {
     my $self = shift;
     return $self->{survey};
 }
+
+#-------------------------------------------------------------------
 
 =head2 log
 
