@@ -426,6 +426,27 @@ sub getPreviousAnswer {
 
 #-------------------------------------------------------------------
 
+=head2 nextQuestions
+
+Returns an array ref of the next questions in the survey.  The number of questions
+returned is set by the questionsPerPage property of the next section, as determined
+by nextSectionId rather than logical section ordering.
+
+If no questions are available, then it returns an empty array ref.  
+
+Each element of the array ref is a question data structure, from the
+WebGUI::Asset::Wobject::Survey::SurveyJSON class, with a section sid field (index of
+the containing section) and question id (section and question id concatenated with a
+'-') added.  The answers array of the question contains answer data structures, also
+from WebGUI::Asset::Wobject::Survey::SurveyJSON, with an id field which is the section,
+question and answer indexes concatentated together with dashes.
+
+Section and question [[var]] replacements in text fields.
+
+All questions and answers are safe copies of the survey data.
+
+=cut
+
 sub nextQuestions {
     my $self = shift;
 
@@ -454,10 +475,10 @@ sub nextQuestions {
         $question{id}  = "$$qAddy[0]-$$qAddy[1]";
         $question{sid} = "$$qAddy[0]";
         for ( @{ $$qAddy[2] } ) {
-            my $ans = $self->survey->answer( [ $$qAddy[0], $$qAddy[1], $_ ] );
-            $ans->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
-            $ans->{id} = "$$qAddy[0]-$$qAddy[1]-$_";
-            push( @{ $question{answers} }, $ans );
+            my %ans = %{ $self->survey->answer( [ $$qAddy[0], $$qAddy[1], $_ ] ) };
+            $ans{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
+            $ans{id} = "$$qAddy[0]-$$qAddy[1]-$_";
+            push( @{ $question{answers} }, \%ans );
         }
         push( @$questions, \%question );
     } ## end for ( my $i = 1; $i <= ...
