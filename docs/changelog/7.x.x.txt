@@ -1,3 +1,5 @@
+7.5.37
+
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
  - fixed #9235: Image Bug in rich text editor.
