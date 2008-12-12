@@ -1,4 +1,4 @@
-package WebGUI::Help::Shop::PayDriver::ITransact;
+package WebGUI::Help::PayDriver_ITransact;
 
 use strict; 
 
