@@ -297,7 +297,15 @@ sub currentSection {
 
 #-------------------------------------------------------------------
 
-=head2 recordResponses
+=head2 recordResponses ($session, $responses)
+
+=head3 $session
+
+A WebGUI session object
+
+=head3 $responses
+
+A hash ref.  More news at 6 o'clock.
 
 =cut
 
@@ -337,7 +345,7 @@ sub recordResponses {
     #There were no questions in the section just displayed, so increment the lastResponse by one
     if ( ref $questions ne 'ARRAY' ) {
         $self->lastResponse( $self->lastResponse + 1 );
-        return [ $terminal, $terminalUrl ];
+        return [ $sterminal, $terminalUrl ];
     }
 
     for my $question (@$questions) {

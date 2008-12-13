@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 41;
+my $tests = 44;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -318,6 +318,31 @@ $rJSON->goto('goto 0-1');
 is($rJSON->lastResponse(), 0, 'goto: works on existing question');
 $rJSON->goto('goto 3-0');
 is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
+
+####################################################
+#
+# recordResponses
+#
+####################################################
+
+$rJSON->lastResponse(4);
+my $terminals;
+cmp_deeply(
+    $rJSON->recordResponses($session, {}),
+    [ 0, undef ],
+    'recordResponses, if section has no questions, returns terminal info in the section.  With no terminal info, returns [0, undef]',
+);
+is($rJSON->lastResponse(), 5, 'recordResponses, increments lastResponse if there are no questions in the section');
+
+$rJSON->survey->section([2])->{terminal}    = 1;
+$rJSON->survey->section([2])->{terminalUrl} = '/terminal';
+
+$rJSON->lastResponse(4);
+cmp_deeply(
+    $rJSON->recordResponses($session, {}),
+    [ 1, '/terminal' ],
+    'recordResponses, if section has no questions, returns terminal info in the section.',
+);
 
 }
 
