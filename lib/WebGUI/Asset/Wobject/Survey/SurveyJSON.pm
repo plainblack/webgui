@@ -29,6 +29,7 @@ Asset in WebGUI.
 
 use strict;
 use JSON;
+
 #use Clone qw/clone/;
 use Storable qw/dclone/;
 
@@ -182,16 +183,16 @@ sub getDragDropList {
 
             for ( my $x = 0; $x <= $#{ $self->questions($address) }; $x++ ) {
                 push(
-                    @data, {
-                        text => $self->question( [ $i, $x ] )->{text},
+                    @data,
+                    {   text => $self->question( [ $i, $x ] )->{text},
                         type => 'question'
                     }
                 );
                 if ( $address->[1] == $x ) {
                     for ( my $y = 0; $y <= $#{ $self->answers($address) }; $y++ ) {
                         push(
-                            @data, {
-                                text => $self->answer( [ $i, $x, $y ] )->{text},
+                            @data,
+                            {   text => $self->answer( [ $i, $x, $y ] )->{text},
                                 type => 'answer'
                             }
                         );
@@ -245,7 +246,8 @@ sub getObject {
         return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
     }
     else {
-        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}
+            ->[ $address->[2] ];
     }
 }
 
@@ -363,7 +365,7 @@ type to the Survey, you must handle it here, and also in updateQuestionAnswers
 =cut
 
 sub getValidQuestionTypes {
-    return(
+    return (
         'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
         'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
         'Education',      'Effectiveness',           'Email',           'File Upload',
@@ -474,7 +476,7 @@ sub update {
             $self->updateQuestionAnswers( $address, $ref->{questionType} );
         }
     }
-    for my $key ( keys %$object ) {
+    for my $key ( keys %$ref ) {
         $object->{$key} = $ref->{$key} if ( defined $$ref{$key} );
     }
 } ## end sub update
@@ -646,18 +648,22 @@ Returns a reference to a new, empty section.
 =cut
 
 sub newSection {
-    my %members = (
-        'text',                   '',
-        'title',                  'NEW SECTION', ##i18n
-        'variable',               '', 'questionsPerPage',   5,
-        'questionsOnSectionPage', 1,  'randomizeQuestions', 0,
-        'everyPageTitle',         1,  'everyPageText',      1,
-        'terminal',               0,  'terminalUrl',        '',
-        'goto',                   '', 'timeLimit',          0,
-        'type',                   'section'
-    );
-    $members{questions} = [];
-    return \%members;
+    return {
+        text                   => '',
+        title                  => 'NEW SECTION',    ##i18n
+        variable               => '',
+        questionsPerPage       => 5,
+        questionsOnSectionPage => 1,
+        randomizeQuestions     => 0,
+        everyPageTitle         => 1,
+        everyPageText          => 1,
+        terminal               => 0,
+        terminalUrl            => '',
+        goto                   => '',
+        timeLimit              => 0,
+        type                   => 'section',
+        questions              => [],
+    };
 }
 
 =head2 newQuestion
@@ -667,28 +673,26 @@ Returns a reference to a new, empty question.
 =cut
 
 sub newQuestion {
-    my %members = (
-        'text',             '',
-        'variable',         '',
-        'allowComment',     0,
-        'commentCols',      10,
-        'commentRows',      5,
-        'randomizeAnswers', 0,
-        'questionType',     'Multiple Choice',
-        'randomWords',      '',
-        'verticalDisplay',  0,
-        'required',         0,
-        'maxAnswers',       1,
-        'value',            1,
-        'textInButton',     0,
-
-        #                'terminal',0,
-        #                'terminalUrl','',
-        'type', 'question'
-    );
-    $members{answers} = [];
-    return \%members;
-} ## end sub newQuestion
+    return {
+        text             => '',
+        variable         => '',
+        allowComment     => 0,
+        commentCols      => 10,
+        commentRows      => 5,
+        randomizeAnswers => 0,
+        questionType     => 'Multiple Choice',
+        randomWords      => '',
+        verticalDisplay  => 0,
+        required         => 0,
+        maxAnswers       => 1,
+        value            => 1,
+        textInButton     => 0,
+#       terminal         => 0,
+#       terminalUrl      => '',
+        type             => 'question',
+        answers          => [],
+    };
+}
 
 =head2 newAnswer
 
@@ -697,11 +701,22 @@ Returns a reference to a new, empty answer.
 =cut
 
 sub newAnswer {
-    my %members = (
-        'text', '', 'verbatim', 0, 'textCols', 10, 'textRows', 5, 'goto', '', 'recordedAnswer', '', 'isCorrect', 1,
-        'min', 1, 'max', 10, 'step', 1, 'value', 1, 'terminal', 0, 'terminalUrl', '', 'type', 'answer'
-    );
-    return \%members;
+    return {
+        text           => '',
+        verbatim       => 0,
+        textCols       => 10,
+        textRows       => 5,
+        goto           => '',
+        recordedAnswer => '',
+        isCorrect      => 1,
+        min            => 1,
+        max            => 10,
+        step           => 1,
+        value          => 1,
+        terminal       => 0,
+        terminalUrl    => '',
+        type           => 'answer'
+    };
 }
 
 =head2 updateQuestionAnswers ($address, $type);
@@ -769,12 +784,13 @@ sub updateQuestionAnswers {
         $self->addAnswersToQuestion( \@addy, \@ans, { 7, 1 } );
     }
     elsif ( $type eq 'Party' ) {
-        my @ans = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
+        my @ans
+            = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
         $self->addAnswersToQuestion( \@addy, \@ans, { 3, 1 } );
     }
     elsif ( $type eq 'Race' ) {
-        my @ans
-            = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' );
+        my @ans = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic',
+            'Something else (verbatim)' );
         $self->addAnswersToQuestion( \@addy, \@ans, { 5, 1 } );
     }
     elsif ( $type eq 'Ideology' ) {
