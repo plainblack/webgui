@@ -456,6 +456,9 @@ sub www_loadSurvey {
     elsif ( $var->{type} eq 'answer' ) {
         $editHtml = $self->processTemplate( $var, $self->get("answerEditTemplateId") );
     }
+    
+    # Generate the list of valid goto targets
+    my @gotoTargets = $self->survey->getGotoTargets;
 
     my %buttons;
     $buttons{question} = $$address[0];
@@ -509,7 +512,8 @@ sub www_loadSurvey {
     #type is the object type
     my $return = {
         "address", $address, "buttons", \%buttons, "edithtml", $editHtml,
-        "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
+        "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type},
+        gotoTargets => \@gotoTargets,
     };
     $self->session->http->setMimeType('application/json');
     return to_json($return);
@@ -820,7 +824,7 @@ sub prepareShowSurveyTemplate {
     $section->{'totalQuestions'} = @{$self->response->surveyOrder};
     $section->{'showProgress'} = $self->get('showProgress');
     $section->{'showTimeLimit'} = $self->get('showTimeLimit');
-    $section->{'minutesLeft'} = int((($self->response->{startTime} + (60 * $self->get('timeLimit'))) - time())/60);
+    $section->{'minutesLeft'} = int((($self->response->startTime() + (60 * $self->get('timeLimit'))) - time())/60);
 
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
@@ -953,7 +957,6 @@ sub getResponseId {
             $self->loadBothJSON($responseId);
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
-            $self->response->{startTime} = $time;
             $self->saveResponseJSON();
             
         } ## end if ( $haveTaken < $allowedTakes)
