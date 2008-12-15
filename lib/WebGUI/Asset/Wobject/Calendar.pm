@@ -1877,13 +1877,15 @@ sub www_ical {
         # Summary (the title)
         # Wrapped at 75 columns
         $ical   .= $self->wrapIcal("SUMMARY:".$event->get("title"))."\r\n";
-                
+
         # Description (the text)
         # Wrapped at 75 columns
         $ical   .= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\r\n";
-        
-        
-        
+
+        # Location (the text)
+        # Wrapped at 75 columns
+        $ical   .= $self->wrapIcal("LOCATION:".$event->get("location"))."\r\n";
+
         # X-WEBGUI lines
         if ($event->get("groupIdView")) {
             $ical   .= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\r\n";
@@ -1893,11 +1895,11 @@ sub www_ical {
         }
         $ical   .= "X-WEBGUI-URL:".$event->get("url")."\r\n";
         $ical   .= "X-WEBGUI-MENUTITLE:".$event->get("menuTitle")."\r\n"; 
-        
+
         $ical   .= qq{END:VEVENT\r\n};
     }
     # ENDVEVENT
-    
+
     $ical       .= qq{END:VCALENDAR\r\n};
     
     

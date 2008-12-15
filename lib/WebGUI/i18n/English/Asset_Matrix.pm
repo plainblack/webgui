@@ -619,6 +619,11 @@ listing,|,
         message => q|Select a template to be used to show the listing comparison data.|,
         lastUpdated => 0,
     },
+
+    'edit listing template description' => {
+        message => q|Select a template to be used to show the listing edit screen.|,
+        lastUpdated => 0,
+    },
 	
     'categories label' => {
 		message => q|Categories|,
@@ -744,6 +749,11 @@ listing,|,
 		message => q|Compare Template|,
 		lastUpdated => 0,
 	},
+
+    'edit listing template label' => {
+        message => q|Edit Listing Template|,
+        lastUpdated => 0,
+    },
 
 	'product name' => {
 		message => q|Product Name|,

@@ -226,11 +226,78 @@ sub getEditForm {
     my $session     = $self->session;
     my $db          = $session->db;
     my $matrixId    = $self->getParent->getId;
-    my $tabform     = $self->next::method();
     my $i18n        = WebGUI::International->new($session, 'Asset_MatrixListing');
+    my $func        = $session->form->process("func");
+
+    my $form = WebGUI::HTMLForm->new($session);
+    
+    if ($func eq "add" || ( $func eq "editSave" && $session->form->process("assetId") eq "new")) {
+        $form->hidden(
+            -name           =>'assetId',
+            -value          =>'new',
+        );
+        $form->hidden(
+            -name           =>'class',
+            -value          =>'WebGUI::Asset::MatrixListing',
+        );
+    }
+    $form->hidden(
+        -name           =>'func',
+        -value          =>'editSave',
+        );
+    $form->text(
+        -name           =>'title',
+        -defaultValue   =>'Untitled',
+        -label          =>$i18n->get("product name label"),
+        -hoverHelp      =>$i18n->get('product name description'),
+        -value          =>$self->getValue('title'),
+        );
+    $form->image(
+        -name           =>'screenshots',
+        -defaultValue   =>undef,
+        -maxAttachments =>20,
+        -label          =>$i18n->get("screenshots label"),
+        -hoverHelp      =>$i18n->get("screenshots description"),,
+        -value          =>$self->getValue('screenshots'),
+        );
+    $form->HTMLArea(
+        -name           =>'description',
+        -defaultValue   =>undef,
+        -label          =>$i18n->get("description label"),
+        -hoverHelp      =>$i18n->get("description description"),
+        -value          =>$self->getValue('description'),
+        );
+    $form->text(        
+        -name           =>'version',
+        -defaultValue   =>undef,
+        -label          =>$i18n->get("version label"),
+        -hoverHelp      =>$i18n->get("version description"),
+        -value          =>$self->getValue('version'),
+        );
+    $form->text(
+        -name           =>'manufacturerName',
+        -defaultValue   =>undef,
+        -label          =>$i18n->get("manufacturerName label"),
+        -hoverHelp      =>$i18n->get("manufacturerName description"),
+        -value          =>$self->getValue('manufacturerName'),
+        );
+    $form->url(
+        -name           =>'manufacturerURL',
+        -defaultValue   =>undef,
+        -label          =>$i18n->get("manufacturerURL label"),
+        -hoverHelp      =>$i18n->get("manufacturerURL description"),
+        -value          =>$self->getValue('manufacturerURL'),
+        );
+    $form->url(
+        -name           =>'productURL',
+        -defaultValue   =>undef,
+        -label          =>$i18n->get("productURL label"),
+        -hoverHelp      =>$i18n->get("productURL description"),
+        -value          =>$self->getValue('productURL'),
+        );
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
-        $tabform->getTab('properties')->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
+        $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
         my $attributes;
         if ($session->form->process('func') eq 'add'){
             $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
@@ -246,10 +313,13 @@ sub getEditForm {
             $attribute->{label}     = $attribute->{name};
             $attribute->{subtext}   = $attribute->{description};
             $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
-            $tabform->getTab("properties")->dynamicField(%{$attribute});           
+            $form->dynamicField(%{$attribute});           
         }
     }
-    return $tabform;
+
+    $form->submit();
+
+    return $form;
 }
 
 #-------------------------------------------------------------------
@@ -777,7 +847,12 @@ sub www_edit {
     my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit matrix listing title'));
+
+    my $var         = $self->get;
+    my $matrix      = $self->getParent;
+    $var->{form}    = $self->getEditForm->print;
+        
+    return $matrix->processStyle($self->processTemplate($var,$matrix->get("editListingTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -812,6 +887,7 @@ sub www_getAttributes {
             $attribute->{label} = $attribute->{name};
             $attribute->{attributeId} =~ s/-/_____/g;
             if ($attribute->{fieldType} eq 'MatrixCompare'){
+                $attribute->{compareColor} = $self->getParent->getCompareColor($attribute->{value});
                 $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
             }
             if($session->scratch->get('stickied_'.$attribute->{attributeId})){

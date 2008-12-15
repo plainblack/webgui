@@ -22,13 +22,18 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				Dom.setStyle(elCell.parentNode, "background-color", color);
 			}
 			elCell.innerHTML = sData;
+		}else{
+			elCell.innerHTML = sData;
 		}
         };
 	this.formatLabel = function(elCell, oRecord, oColumn, sData) {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
-			elCell.innerHTML = sData;
+			elCell.innerHTML = sData; 
+			if(oRecord.getData("description")){
+				elCell.innerHTML = elCell.innerHTML + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
+			}
 		}
         };
 
@@ -52,8 +57,14 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		uri = uri+';listingId='+listingIds[i];
 	}
 
+	var initAttributeHoverHelp = function() {
+		initHoverHelp('compareList');
+	}
+
         var myDataTable = new YAHOO.widget.DataTable("compareList", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
+	myDataTable.subscribe("initEvent", initAttributeHoverHelp);
+
 
 	window.removeListing = function(key) {
 		myDataTable.hideColumn(myDataTable.removeColumn(key));
@@ -75,7 +86,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		
 		for (var i = 0; i < len; i++) {
 		var c = oFullResponse.ColumnDefs[i];
-		oFullResponse.ColumnDefs[i].label = oFullResponse.ColumnDefs[i].label + "<a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
+		oFullResponse.ColumnDefs[i].label = "<a href='"+ oFullResponse.ColumnDefs[i].url +"'>" + oFullResponse.ColumnDefs[i].label + "</a> <a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
 		myDataTable.insertColumn(c);
 		}
 	    }
@@ -83,8 +94,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	}
 
         var myCallback = function() {
-            this.set("sortedBy", null);
-            this.onDataReturnAppendRows.apply(this,arguments);
+            	this.set("sortedBy", null);
+            	this.onDataReturnAppendRows.apply(this,arguments);
+		initHoverHelp('compareList');
         };
 
 	var callback2 = {
@@ -170,7 +182,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			hideStickies = 0;
 		}
 	},this,true);
-
     };
 });
 

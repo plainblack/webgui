@@ -113,6 +113,17 @@ this listing.|,
         lastUpdated => 0,
     },
 
+    'product name label' => {
+        message => q|Product Name|,
+        lastUpdated => 0,
+    },
+
+    'product name description' => {
+        message => q|Enter the name of the product. If there are entries for the product with different revisions,
+it would be best to make sure the names are the same.|,
+        lastUpdated => 0,
+    },
+
     'productURL description' => {
         message => q|If the product has its own website, enter the complete URL for it here.|,
         lastUpdated => 0,

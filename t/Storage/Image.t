@@ -75,9 +75,6 @@ ok ($uploadDir, "uploadDir defined in config");
 my $uploadUrl = $session->config->get('uploadsURL');
 ok ($uploadUrl, "uploadDir defined in config");
 
-my $originalCaseInsensitiveOS = $session->config->get('caseInsensitiveOS');
-$session->config->set('caseInsensitiveOS', 0);
-
 ####################################################
 #
 # getFile

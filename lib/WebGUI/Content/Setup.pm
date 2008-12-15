@@ -231,7 +231,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
 #pageBodyContainer { background-color: '.$form->get("contentBackgroundColor").'; color: '.$form->get("contentTextColor").'; }
 #mainNavigationContainer { min-height: 300px; padding: 5px; float: left; width: 180px; font-size: 10pt; background-color: '.$form->get("navigationBackgroundColor").'; }
 #mainNavigationContainer A, #mainNavigationContainer A:link { color: '.$form->get("navigationTextColor").'; }
-#mainBodyContentContainer { padding: 5px; margin-left: 200px; font-family: serif, times new roman; font-size: 12pt; }
+#mainBodyContentContainer { padding: 5px; margin-left: 200px; font-family: serif, times new roman; font-size: 12pt; overflow: auto; }
 #pageFooterContainer { text-align: center; background-color: '.$form->get("footerBackgroundColor").'; color: '.$form->get("footerTextColor").'; }
 #copyrightContainer { font-size: 8pt; }
 #pageWidthContainer { width: 80%; margin-left: auto; margin-right: auto; font-family: sans-serif, helvetica, arial; border: 3px solid black; }
