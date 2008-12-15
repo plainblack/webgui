@@ -1,5 +1,6 @@
 7.5.37
- - Error #9301: in Shelf Template
+ - fixed #9301: Error in Shelf Template
+ - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
