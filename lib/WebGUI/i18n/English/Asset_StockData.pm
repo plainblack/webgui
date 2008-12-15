@@ -395,6 +395,24 @@ our $I18N = {
 		lastUpdated => 1168646986
 	},
 
+	'Stock Watch' => {
+		message => q|Stock Watch|,
+		context => q|i18n header for the Stock List Template, probably meaning a set of stocks that are watched.|,
+		lastUpdated => 1229314732,
+	},
+
+	'Last Update' => {
+		message => q|Last Update|,
+		context => q|i18n label for the Stock List Template, the time something was last changed.|,
+		lastUpdated => 1229314732,
+	},
+
+	'delayed 20 minutes' => {
+		message => q|delayed 20 minutes|,
+		context => q|i18n label for the Stock List Template.|,
+		lastUpdated => 1229314732,
+	},
+
 };
 
 1;
