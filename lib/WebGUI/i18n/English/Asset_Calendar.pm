@@ -904,6 +904,25 @@ our $I18N = {
 		message => q{<h1>Error!</h1><p>You need to commit this calendar before you can create a new event</p>},
         lastUpdated => 1166848379,
     },
+
+    'New Year' => {
+        message => q{New Year},
+        context => q{template label,  In a list of events, used to indicate that the year has changed},
+        lastUpdated => 1229310924,
+    },
+
+    'New Month' => {
+        message => q{New Month},
+        context => q{template label,  In a list of events, used to indicate that the month has changed},
+        lastUpdated => 1229310924,
+    },
+
+    'New Day' => {
+        message => q{New Day},
+        context => q{template label,  In a list of events, used to indicate that the day has changed},
+        lastUpdated => 1229311001,
+    },
+
 };
 
 1;
