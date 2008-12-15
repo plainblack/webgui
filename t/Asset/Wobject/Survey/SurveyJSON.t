@@ -2118,6 +2118,7 @@ sub getBareSkeletons {
            textCols               => 10,
            textRows               => 5,
            goto                   => '',
+           gotoExpression         => '',
            recordedAnswer         => '',
            isCorrect              => 1,
            min                    => 1,

@@ -318,6 +318,14 @@ sub getSectionEditVars {
     return \%var;
 } ## end sub getSectionEditVars
 
+sub getGotoTargets {
+    my $self = shift;
+    
+    my @section_vars = map {$_->{variable}} @{$self->sections};
+    my @question_vars = map {$_->{variable}} @{$self->questions};
+    return grep {$_ ne ''} (@section_vars, @question_vars);   
+}
+
 =head2 getQuestionEditVars ( $address )
 
 Get a safe copy of the variables for this question, to use for editing purposes.  Adds
@@ -707,6 +715,7 @@ sub newAnswer {
         textCols       => 10,
         textRows       => 5,
         goto           => '',
+        gotoExpression => '',
         recordedAnswer => '',
         isCorrect      => 1,
         min            => 1,
