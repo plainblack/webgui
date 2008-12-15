@@ -27,170 +27,158 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 
 #-------------------------------------------------------------------
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_SQLReport");
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		uiLevel => 5,
-		icon=>'sqlReport.gif',
-		tableName=>'SQLReport',
-		className=>'WebGUI::Asset::Wobject::SQLReport',
-		properties=>{
-			templateId =>{
-				fieldType=>"template",
-				defaultValue=>'PBtmpl0000000000000059'
-				},
-			cacheTimeout=>{
-				fieldType=>"interval",
-				defaultValue=>0
-				},
-			paginateAfter=>{
-				fieldType=>"integer",
-				defaultValue=>50
-				},
-			dbQuery1=>{
-				fieldType=>"codearea",
-                syntax  => "sql",
-				defaultValue=>undef,
-				},
-			prequeryStatements1=>{
-				fieldType=>"codearea",
-                syntax  => "sql",
-				defaultValue=>undef
-				},
-			preprocessMacros1=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			placeholderParams1=>{
-				fieldType=>"textarea",
-				defaultValue=>undef
-				},
-                        databaseLinkId1=>{
-				fieldType=>"databaseLink",
-                                defaultValue=>0
-                        },
-			dbQuery2=>{
-                                fieldType=>"codearea",
-                syntax  => "sql",
-                                defaultValue=>undef
-                                },
-			prequeryStatements2=>{
-				fieldType=>"codearea",
-                syntax  => "sql",
-				defaultValue=>undef
-				},
-                        preprocessMacros2=>{
-				fieldType=>"yesNo",
-                                defaultValue=>0
-                                },
-                        placeholderParams2=>{
-                                fieldType=>"textarea",
-                                defaultValue=>undef
-                                },
-                        databaseLinkId2=>{
-				fieldType=>"databaseLink",
-                                defaultValue=>0
-                        },
-			dbQuery3=>{
-                                fieldType=>"codearea",
-                syntax  => "sql",
-                                defaultValue=>undef
-                                },
-			prequeryStatements3=>{
-				fieldType=>"codearea",
-                syntax  => "sql",
-				defaultValue=>undef
-				},
-                        preprocessMacros3=>{
-				fieldType=>"yesNo",
-                                defaultValue=>0
-                                },
-                        placeholderParams3=>{
-                                fieldType=>"textarea",
-                                defaultValue=>undef
-                                },
-                        databaseLinkId3=>{
-				fieldType=>"databaseLink",
-                                defaultValue=>0
-                        },
-			dbQuery4=>{
-                                fieldType=>"codearea",
-                                syntax  => "sql",
-                                defaultValue=>undef
-                                },
-			prequeryStatements4=>{
-				fieldType=>"codearea",
-                                syntax  => "sql",
-				defaultValue=>undef
-				},
-                        preprocessMacros4=>{
-				fieldType=>"yesNo",
-                                defaultValue=>0
-                                },
-                        placeholderParams4=>{
-                                fieldType=>"textarea",
-                                defaultValue=>undef
-                                },
-                        databaseLinkId4=>{
-				fieldType=>"databaseLink",
-                                defaultValue=>0
-                        },
-			dbQuery5=>{
-                                fieldType=>"codearea",
-                                syntax  => "sql",
-                                defaultValue=>undef
-                                },
-			prequeryStatements5=>{
-				fieldType=>"codearea",
-                                syntax  => "sql",
-				defaultValue=>undef
-				},
-                        preprocessMacros5=>{
-				fieldType=>"yesNo",
-                                defaultValue=>0
-                                },
-                        placeholderParams5=>{
-                                fieldType=>"textarea",
-                                defaultValue=>undef
-                                },
-                        databaseLinkId5=>{
-				fieldType=>"databaseLink",
-                                defaultValue=>0
-                        },
-			debugMode=>{
-				fieldType=>"yesNo",
-				defaultValue=>0
-				},
-			
-			# download
-			downloadType=>{
-				fieldType=>"text",
-				defaultValue=>"none",
-				},
-			downloadFilename=>{
-				fieldType=>"text",
-				defaultValue=>"",
-				},
-			downloadTemplateId=>{
-				fieldType=>"template",
-				defaultValue=>'SQLReportDownload00001',
-				},
-			downloadMimeType=>{
-				fieldType=>"text",
-				defaultValue=>"text/html",
-				},
-			downloadUserGroup=>{
-				fieldType=>"group",
-				defaultValue=>"text/html",
-				},
-			
-			
-                        }
-                });
-        return $class->SUPER::definition($session, $definition);
+    my $class = shift;
+    my $session = shift;
+    my $definition = shift;
+    my $i18n = WebGUI::International->new($session,"Asset_SQLReport");
+    push(@{$definition}, {
+        assetName=>$i18n->get('assetName'),
+        uiLevel => 5,
+        icon=>'sqlReport.gif',
+        tableName=>'SQLReport',
+        className=>'WebGUI::Asset::Wobject::SQLReport',
+        properties=>{
+            templateId =>{
+                fieldType=>"template",
+                defaultValue=>'PBtmpl0000000000000059',
+            },
+            cacheTimeout=>{
+                fieldType=>"interval",
+                defaultValue=>0,
+            },
+            paginateAfter=>{
+                fieldType=>"integer",
+                defaultValue=>50,
+            },
+            dbQuery1=>{
+                fieldType=>"codearea",
+                defaultValue=>undef,
+            },
+            prequeryStatements1=>{
+                fieldType=>"codearea",
+                defaultValue=>undef,
+            },
+            preprocessMacros1=>{
+                fieldType=>"yesNo",
+                defaultValue=>0,
+            },
+            placeholderParams1=>{
+                fieldType=>"textarea",
+                defaultValue=>undef,
+            },
+            databaseLinkId1=>{
+                fieldType=>"databaseLink",
+                defaultValue=>0
+            },
+            dbQuery2=>{
+                fieldType=>"codearea",
+                defaultValue=>undef,
+            },
+            prequeryStatements2=>{
+                fieldType=>"codearea",
+                defaultValue=>undef,
+            },
+            preprocessMacros2=>{
+                fieldType=>"yesNo",
+                defaultValue=>0
+            },
+            placeholderParams2=>{
+                fieldType=>"textarea",
+                defaultValue=>undef
+            },
+            databaseLinkId2=>{
+                fieldType=>"databaseLink",
+                defaultValue=>0
+            },
+            dbQuery3=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            prequeryStatements3=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            preprocessMacros3=>{
+                fieldType=>"yesNo",
+                defaultValue=>0
+            },
+            placeholderParams3=>{
+                fieldType=>"textarea",
+                defaultValue=>undef
+            },
+            databaseLinkId3=>{
+                fieldType=>"databaseLink",
+                defaultValue=>0
+            },
+            dbQuery4=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            prequeryStatements4=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            preprocessMacros4=>{
+                fieldType=>"yesNo",
+                defaultValue=>0
+            },
+            placeholderParams4=>{
+                fieldType=>"textarea",
+                defaultValue=>undef
+            },
+            databaseLinkId4=>{
+                fieldType=>"databaseLink",
+                defaultValue=>0
+            },
+            dbQuery5=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            prequeryStatements5=>{
+                fieldType=>"codearea",
+                defaultValue=>undef
+            },
+            preprocessMacros5=>{
+                fieldType=>"yesNo",
+                defaultValue=>0
+            },
+            placeholderParams5=>{
+                fieldType=>"textarea",
+                defaultValue=>undef
+            },
+            databaseLinkId5=>{
+                fieldType=>"databaseLink",
+                defaultValue=>0
+            },
+            debugMode=>{
+                fieldType=>"yesNo",
+                defaultValue=>0
+            },
+
+            # download
+            downloadType=>{
+                fieldType=>"text",
+                defaultValue=>"none",
+            },
+            downloadFilename=>{
+                fieldType=>"text",
+                defaultValue=>"",
+            },
+            downloadTemplateId=>{
+                fieldType=>"template",
+                defaultValue=>'SQLReportDownload00001',
+            },
+            downloadMimeType=>{
+                fieldType=>"text",
+                defaultValue=>"text/html",
+            },
+            downloadUserGroup=>{
+                fieldType=>"group",
+                defaultValue=>"text/html",
+            },
+        }
+    });
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
