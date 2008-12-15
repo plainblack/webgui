@@ -1428,7 +1428,7 @@ sub www_edit {
         name=>"storageId",
         value=>$self->get("storageId"),
         maxAttachments=>$numberOfAttachments,
-        deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
+        ##Removed deleteFileUrl, since it will go around the revision control system.
     }) if ($numberOfAttachments);
     
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {
