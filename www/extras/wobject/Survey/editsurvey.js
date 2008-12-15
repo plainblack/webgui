@@ -77,11 +77,17 @@ YAHOO.log('adding handler for '+ d.ids[x]);
 //        }
         if(d.buttons['answer']){
             var button = new YAHOO.widget.Button({ label:"Add Answer", id:"addanswer", container:"addAnswer" });
-            button.on("click", this.addAnswer,d.buttons['answer']); 
+            button.on("click", this.addAnswer,d.buttons['answer']);
         }
 
         if(showEdit == 1){
             this.loadObjectEdit(d.edithtml,d.type);
+			
+			// build the goto auto-complete widget
+			if (d.gotoTargets && document.getElementById('goto')) {
+				var ds = new YAHOO.util.LocalDataSource(d.gotoTargets); 
+				var ac = new YAHOO.widget.AutoComplete('goto', 'goto-yui-ac-container', ds);
+			}
         }else{
             document.getElementById('edit').innerHTML = "";
         }

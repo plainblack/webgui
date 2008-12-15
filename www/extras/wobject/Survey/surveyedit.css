@@ -129,4 +129,7 @@ li.newAnswer {
     padding-left:50px;    
 #    cursor: move; 
 }
-
+#goto-yui-ac {
+    width:15em;
+    margin-top:0.5em;
+}

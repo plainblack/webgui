@@ -456,6 +456,11 @@ sub www_loadSurvey {
     elsif ( $var->{type} eq 'answer' ) {
         $editHtml = $self->processTemplate( $var, $self->get("answerEditTemplateId") );
     }
+    
+    # Generate the list of valid goto targets
+    my @section_vars = map {$_->{variable}} @{$self->survey->sections};
+    my @question_vars = map {$_->{variable}} @{$self->survey->questions};
+    my @gotoTargets = grep {$_ ne ''} (@section_vars, @question_vars);
 
     my %buttons;
     $buttons{question} = $$address[0];
@@ -509,7 +514,8 @@ sub www_loadSurvey {
     #type is the object type
     my $return = {
         "address", $address, "buttons", \%buttons, "edithtml", $editHtml,
-        "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
+        "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type},
+        gotoTargets => \@gotoTargets,
     };
     $self->session->http->setMimeType('application/json');
     return to_json($return);
