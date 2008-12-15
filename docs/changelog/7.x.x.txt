@@ -1,6 +1,7 @@
 7.5.37
  - fixed #9301: Error in Shelf Template
  - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
+ - fixed: #9260: untitled (Delete icon "X" circumvents revision control)
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
