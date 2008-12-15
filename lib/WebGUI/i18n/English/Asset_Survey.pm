@@ -195,6 +195,10 @@ our $I18N = {
 		message => q|Jump to:|,
 		lastUpdated => 1224686319
 	},
+	'jump expression' => {
+		message => q|Jump expression:|,
+		lastUpdated => 1229318805
+	},
 	'text answer' => {
 		message => q|Text answer|,
 		lastUpdated => 1224686319
