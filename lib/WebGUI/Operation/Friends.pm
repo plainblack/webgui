@@ -142,7 +142,6 @@ sub www_addFriendSave {
         return $session->style->userStyle($output);
     }
 
-    my $friends = WebGUI::Friends->new($session);
     $friends->sendAddRequest($friendId, $session->form->get('comments'));
 
     # display result
