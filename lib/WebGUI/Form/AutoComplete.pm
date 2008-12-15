@@ -47,14 +47,6 @@ Defaults to undefined
 
 Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
 
-=head4 options
-
-A hash reference containing key values that will be returned with the form post and displayable text pairs. Defaults to an empty hash reference.
-
-=head4 sortByValue
-
-A boolean value for whether or not the values in the options hash should be sorted. Defaults to "0".
-
 =cut
 
 sub definition {
