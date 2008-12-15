@@ -141,6 +141,7 @@ sub execute {
 
 			$currentLinkId = $rowLinkId;
 			$link = WebGUI::LDAPLink->new($self->session, $rowLinkId);
+            next unless $link;
 			$ldapUrl = $link->get->{ldapUrl};
 			$ldap = $link->bind;
 

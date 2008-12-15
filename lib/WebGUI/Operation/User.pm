@@ -385,9 +385,11 @@ sub www_editUser {
 		-value=>$u->authMethod,
 		);
 	foreach (@{$session->config->get("authMethods")}) {
-		$tabform->getTab("account")->fieldSetStart($_);
 		my $authInstance = WebGUI::Operation::Auth::getInstance($session,$_,$u->userId);
-		$tabform->getTab("account")->raw($authInstance->editUserForm);
+        my $editUserForm = $authInstance->editUserForm;
+        next unless $editUserForm;
+		$tabform->getTab("account")->fieldSetStart($_);
+		$tabform->getTab("account")->raw($editUserForm);
 		$tabform->getTab("account")->fieldSetEnd;
 	}
 	foreach my $category (@{WebGUI::ProfileCategory->getCategories($session)}) {

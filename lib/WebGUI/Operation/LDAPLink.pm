@@ -158,7 +158,14 @@ Deletes the requested LDAP Link in the form variable C<llid>.  Returns the user 
 sub www_deleteLDAPLink {
 	my $session = shift;
 	return $session->privilege->insufficient unless canView($session);
-	$session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
+    my $llid = $session->form->process("llid");
+    if ($llid) {
+        $session->db->write("delete from ldapLink where ldapLinkId=?", [$llid]);
+    }
+    if ($llid eq $session->setting->get('ldapConnection')) {
+        $session->log->warn(sprintf 'user %s deleted the LDAP connection used for user authentication', $session->user->username);
+        $session->setting->set('ldapConnection', '');
+    }
 	return www_listLDAPLinks($session);
 }
 
