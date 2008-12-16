@@ -7,6 +7,7 @@
  - fixed #8838: Gallery Cross Publish template is broken
  - fixed #8898: versioning problem
  - fixed #9315: Password Recovery
+ - fixed #9298: Inconsistent date formats
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
