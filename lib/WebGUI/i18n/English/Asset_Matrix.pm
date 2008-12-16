@@ -15,13 +15,20 @@ our $I18N = {
 	'category_loop' => {
 		message => q|A loop containing all of the categories in this Matrix.|,
 		lastUpdated => 0,
+        context => q|Description of the category_loop tmpl_var for the template help.|,
 	},
 
     'categoryLabel' => {
         message => q|The label of a category.|,
-        lastUpdated => 1149783768,
+        lastUpdated => 0,
+        context => q|Description of the categoryLabel tmpl_var for the template help.|,
     },
 
+    'compareForm' => {
+        message => q|The compare box form. The list of matrix listings in this form is a yui datatable. See the <a href='http://developer.yahoo.com/yui/examples/datatable/dt_skinning.html'>yui docs</a> for information about skinning yui datatables.|,
+        lastUpdated => 0,
+        context => q|Description of the compareForm tmpl_var for the template help.|,
+    },
 
 	'tmplVar category' => {
 		message => q|The name of the current category.|,
@@ -139,8 +146,9 @@ our $I18N = {
 	},
 
     'attribute_loop' => {
-        message => q|A loop containing attributes and values for those attributes.|,
+        message => q|A loop containing matrix attributes.|,
         lastUpdated => 0,
+        context => q|Description of the attribute_loop tmpl_var for the template help.|,
     },
 
 	'tmplVar name' => {
@@ -168,10 +176,15 @@ our $I18N = {
 		lastUpdated => 1149784175,
 	},
 
-        'detail template help title' => {
-                lastUpdated => 0,
-                message => q|Matrix Listing Detail Template Variables|
-        },
+    'detail template help title' => {
+        lastUpdated => 0,
+        message => q|Matrix Listing Detail Template Variables|
+    },
+
+    'edit listing template help title' => {
+        lastUpdated => 0,
+        message => q|Edit Matrix Listing Template Variables|
+    },
 
 	'search_url' => {
 		message => q|The URL to the matrix search page.|,
@@ -475,29 +488,27 @@ listing,|,
         message => q|Matrix Ratings Detail Template Variables|
     },
 
-	'listing name' => {
-		message => q|The name of this listing.|,
-		lastUpdated => 1149996259,
-	},
-
 	'fieldType' => {
 		message => q|The type of field specified for this matrix field.|,
 		lastUpdated => 1149996685,
 	},
 
-	'listing label' => {
-		message => q|The label given to this field that describes what the field represents.|,
-		lastUpdated => 1149996685,
+	'tmplVar attribute_loop label' => {
+		message => q|The label given to this attribute that describes what the attribtute represents.|,
+		lastUpdated => 0,
+        context => q|Description of the listing label tmpl_var inside the attribute loop in the search screen.|,
 	},
 
-	'search field description' => {
-		message => q|A description of the field that gives more detail about the field and is used in the hover over tool tips.|,
-		lastUpdated => 1149996685,
+	'tmplVar attribute_loop description' => {
+		message => q|A description of the attribute that gives more detail about the field and is used in the hover over tool tips.|,
+		lastUpdated => 0,
+        context => q|Description of the description tmpl_var inside the attribute loop in the search screen.|,
 	},
 
-	'form' => {
-		message => q|The form element representing this field.|,
-		lastUpdated => 1149996685,
+	'tmplVar attribute_loop form' => {
+		message => q|The form element representing this attribute.|,
+		lastUpdated => 0,
+        context => q|Description of the form tmpl_var inside the attribute loop in the search screen.|,
 	},
 
     'search template help title' => {
