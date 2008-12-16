@@ -1,4 +1,5 @@
 7.6.8
+ - Updated captcha images to be more legible.
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
