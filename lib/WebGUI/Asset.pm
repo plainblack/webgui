@@ -2573,7 +2573,9 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
+    my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
+    return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
     return $self->session->privilege->insufficient() unless $self->canEdit;
     if ($self->session->config("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
@@ -2581,7 +2583,7 @@ sub www_editSave {
         return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
     }
     my $object;
-    if ($self->session->form->process("assetId") eq "new") {
+    if ($isNewAsset) {
         $object = $self->addChild({className=>$self->session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
