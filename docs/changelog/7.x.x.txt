@@ -1,3 +1,5 @@
+7.6.8
+
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
  - fixed: Alter WebGUI::Asset::Template's update method so that it can import packages that use the old, deprecated headBlock property.  The update method change is deprecatd.
