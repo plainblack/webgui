@@ -955,6 +955,13 @@ sub postProcess {
 	my $self = shift;
 	my %data = ();
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->get("synopsis"), $self->get("content"));
+    my $spamStopWords = $self->session->config->get('spamStopWords');
+    if (ref $spamStopWords eq 'ARRAY') {
+        my $spamRegex = join('|',@{$spamStopWords});
+        if ($data{content} =~ m/$spamRegex/xmsi) {
+            $self->trash;
+        }
+    }
 	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
