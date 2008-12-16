@@ -11,6 +11,7 @@
  - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
  - fixed #9284: User manager broken if no LDAP links exits
  - fixed #4136: Shortcut doesn't display all properties in override
+ - fixed #8838: Gallery Cross Publish template is broken
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
