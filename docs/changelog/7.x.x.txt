@@ -15,6 +15,8 @@
  - fixed #8898: versioning problem
  - fixed #9315: Password Recovery
  - fixed #9298: Inconsistent date formats
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH
+   Consulting Group)
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
