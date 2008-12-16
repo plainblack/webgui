@@ -724,6 +724,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message when a user tries to recover password for a disabled account},
     },
+
+    'no email address' => {
+        message     => q{There is no email address registered for this account.  Password recovery via email is not possible.},
+        lastUpdated => 1229391388,
+        context     => q{Error message when a user tries to recover password and they don't have an email address},
+    },
+
 };
 
 1;
