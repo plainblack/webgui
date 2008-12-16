@@ -4,6 +4,7 @@
  - fixed #9260: untitled (Delete icon "X" circumvents revision control)
  - fixed #9284: User manager broken if no LDAP links exits
  - fixed #4136: Shortcut doesn't display all properties in override
+ - fixed #8838: Gallery Cross Publish template is broken
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
