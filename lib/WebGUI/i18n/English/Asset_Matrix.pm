@@ -927,6 +927,12 @@ selectBox.</p>|
         message => q|Compare|,
     },
 
+    'last updated label' => {
+        lastUpdated => 0,
+        message => q|Last Updated|,
+        context => q|The label of the last updated field in the comparison table on the compare screen.|,
+    },
+
     'hide stickied button label' => {
         lastUpdated => 0,
         message => q|Hide/show stickied|,
