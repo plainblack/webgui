@@ -2669,6 +2669,10 @@ sequenceNumber');
             "label" => $field{label},
             "isHidden" => $hidden,
             "url" => $otherThingUrl,
+            "isVisible" => ($field{status} eq "visible" && !$hidden),
+            "isRequired" => ($field{status} eq "required" && !$hidden),
+            "pretext" => $field{pretext},
+            "subtext" => $field{subtext},
         );
         push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
         push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
