@@ -693,7 +693,7 @@ Logs an error to the webgui log file, using the session logger.
 sub log {
     my ( $self, $message ) = @_;
     if ( defined $self->{log} ) {
-        $self->{log}->error($message);
+        $self->{log}->debug($message);
     }
 }
 1;
