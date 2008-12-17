@@ -168,18 +168,22 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 =cut
 
 sub toHtmlWithWrapper {
-	my $self = shift;
-	my $template = WebGUI::Asset::Template->new($self->session,$self->getOriginalValue());
+    my $self = shift;
+    my $session = $self->session;
+    my $template = WebGUI::Asset::Template->new($session,$self->getOriginalValue());
         if (defined $template && $template->canEdit) {
-                my $returnUrl;
-                if (defined $self->session->asset && ref $self->session->asset ne "WebGUI::Asset::Template") {
-                        $returnUrl = ";proceed=goBackToPage;returnUrl=".$self->session->url->escape($self->session->asset->getUrl);
-                }
-                my $buttons = $self->session->icon->edit("func=edit".$returnUrl,$template->get("url"));
-                $buttons .= $self->session->icon->manage("op=assetManager",$template->getParent->get("url"));
-		$self->set("subtext",$buttons . $self->get("subtext"));
-	}
-	return $self->SUPER::toHtmlWithWrapper;
+            my $returnUrl;
+            if (defined $session->asset && ref $session->asset ne "WebGUI::Asset::Template") {
+                $returnUrl = ";proceed=goBackToPage;returnUrl=".$session->url->escape($self->session->asset->getUrl);
+            }
+            my $buttons = $session->icon->edit("func=edit".$returnUrl,$template->get("url"));
+            my $parent = $template->getParent();
+            if (defined $parent) {
+                $buttons .= $session->icon->manage("op=assetManager",$template->getParent->get("url"));
+            }
+        $self->set("subtext",$buttons . $self->get("subtext"));
+    }
+    return $self->SUPER::toHtmlWithWrapper;
 }
 
 1;
