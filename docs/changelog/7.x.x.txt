@@ -1,5 +1,6 @@
 7.6.8
  - Updated captcha images to be more legible.
+ - fixed #9285: modifing template prevents edit of syncontent
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
@@ -18,8 +19,7 @@
  - fixed #8898: versioning problem
  - fixed #9315: Password Recovery
  - fixed #9298: Inconsistent date formats
- - fixed #9296: Thingy View template not recognising field_isVisible (SDH
-   Consulting Group)
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
