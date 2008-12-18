@@ -1665,8 +1665,27 @@ the Collaboration Asset, the user will be notified.|,
         message => q|Post received template|,
         lastUpdated => 1221247761,
     },
+
     'post received template hoverHelp' => {
         message => q|The template for the message received when a user makes a post.|,
+        lastUpdated => 1221247761,
+    },
+
+    'Link Description' => {
+        message => q|Link Description|,
+        context => q|i18n label for the link list collaboration template.|,
+        lastUpdated => 1221247761,
+    },
+
+    'Link URL' => {
+        message => q|Link URL|,
+        context => q|i18n label for the link list collaboration template.|,
+        lastUpdated => 1221247761,
+    },
+
+    'List All Links' => {
+        message => q|List All Links|,
+        context => q|i18n label for the link list collaboration template.|,
         lastUpdated => 1221247761,
     },
 
