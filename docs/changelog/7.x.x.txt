@@ -11,6 +11,7 @@
  - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
  - fixed #9285: modifing template prevents edit of syncontent
  - fixed #8886: Search button in Asset manager
+ - fixed #4196: update button doesn't work in IE
 
 7.5.36
  - fixed: Resizable text areas form elements were not resizing.
