@@ -53,7 +53,6 @@ YAHOO.log(first.id+' '+data.id);
         }else{
             lastId = d.address;
         }
-console.log(d.address);
         document.getElementById('sections').innerHTML=d.ddhtml;
         
         //add event handlers for if a tag is clicked

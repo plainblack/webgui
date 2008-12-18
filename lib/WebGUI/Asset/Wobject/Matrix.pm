@@ -334,7 +334,7 @@ sub getCompareColor {
     elsif($value == 3){
         return $self->get('compareColorFreeAddOn');
     }
-    elsif($value == 3){
+    elsif($value == 4){
         return $self->get('compareColorYes');
     }
 
@@ -664,6 +664,10 @@ sub www_compare {
     'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('hoverhelp.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('hoverhelp.css'),
+        {type =>'text/css', rel=>'stylesheet'});
 
     my $maxComparisons;
     if($self->session->user->isVisitor){
@@ -681,7 +685,7 @@ sub www_compare {
     
     $var->{javascript} = "<script type='text/javascript'>\n".
         'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
-        'var responseFields = new Array("attributeId", "name", "fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
+        'var responseFields = new Array("attributeId", "name", "description","fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
         "var maxComparisons = ".$maxComparisons.";\n".
         "var matrixUrl = '".$self->getUrl."';\n".
         "</script>";
@@ -1017,6 +1021,7 @@ sub www_getCompareListData {
     my $self        = shift;
     my @listingIds  = @_;
     my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session,'Asset_Matrix');
     my (@results,@columnDefs);
 
     unless (scalar(@listingIds)) {
@@ -1030,15 +1035,22 @@ sub www_getCompareListData {
         $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;
-        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors"});
+        push(@columnDefs,{
+            key         =>$listingId_safe,
+            label       =>$listing->get('title').' '.$listing->get('version'),
+            formatter   =>"formatColors",
+            url         =>$listing->getUrl,
+            lastUpdated =>$session->datetime->epochToHuman( $listing->get('revisonDate'),"%z" ),
+        });
     }
-
+    push(@results,{name=>$i18n->get('last updated label'),fieldType=>'lastUpdated'});
+    
     my $jsonOutput;
     $jsonOutput->{ColumnDefs} = \@columnDefs;
 
     foreach my $category (keys %{$self->getCategories}) {
         push(@results,{name=>$category,fieldType=>'category'});
-        my $fields = " a.name, a.fieldType, a.attributeId ";
+        my $fields = " a.name, a.fieldType, a.attributeId, a.description ";
         my $from = "from Matrix_attribute a";
         my $tableCount = "b";
         foreach my $listingId (@listingIds) {
@@ -1055,7 +1067,18 @@ sub www_getCompareListData {
         ) });
     }
     foreach my $result (@results){
-        unless($result->{fieldType} eq 'category'){
+        if($result->{fieldType} eq 'category'){
+            # Row starting with a category label shows the listing name in each column
+            foreach my $columnDef (@columnDefs) {
+                $result->{$columnDef->{key}} = $columnDef->{label}; 
+            }
+        }
+        elsif($result->{fieldType} eq 'lastUpdated'){
+            foreach my $columnDef (@columnDefs) {
+                $result->{$columnDef->{key}} = $columnDef->{lastUpdated};
+            }
+        }
+        else{
             foreach my $listingId (@listingIds) {
                 $result->{attributeId} =~ s/-/_____/g;
                 my $listingId_safe = $listingId;

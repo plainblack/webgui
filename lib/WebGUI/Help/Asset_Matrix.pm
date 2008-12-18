@@ -7,19 +7,23 @@ our $HELP = {
         title     => 'search template help title',
         body      => '',
         variables => [
-            {   'name'      => 'CATEGORY_NAME_loop',
+            {   'name'      => 'compareForm', },
+            {   'name'      => 'category_loop',
                 'variables' => [
-                    {   'name'        => 'name',
-                        'description' => 'listing name'
+                    {   'name'          => 'categoryLabel'  },
+                    {   'name'          => 'attribute_loop',
+                        'variables'     => [
+                            {   'name'          => 'label',
+                                'description'   => 'tmplVar attribute_loop listing label'
+                            },
+                            {   'name'          => 'description',
+                                'description'   => 'tmplVar attribute_loop description'
+                            },
+                            {   'name'          => 'form',
+                                'description'   => 'tmplVar attribute_loop form' 
+                            },
+                        ],
                     },
-                    { 'name' => 'fieldType' },
-                    {   'name'        => 'label',
-                        'description' => 'listing label'
-                    },
-                    {   'name'        => 'description',
-                        'description' => 'search field description'
-                    },
-                    { 'name' => 'form' }
                 ],
             }
         ],
@@ -31,6 +35,9 @@ our $HELP = {
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'listing detail template',
+                namespace => 'Asset_Matrix'
+            },
+            {   tag       => 'edit listing template',
                 namespace => 'Asset_Matrix'
             },
         ],
@@ -61,6 +68,9 @@ our $HELP = {
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'listing detail template',
+                namespace => 'Asset_Matrix'
+            },
+            {   tag       => 'edit listing template',
                 namespace => 'Asset_Matrix'
             },
         ],
@@ -157,6 +167,9 @@ our $HELP = {
             {   tag       => 'listing detail template',
                 namespace => 'Asset_Matrix'
             },
+            {   tag       => 'edit listing template',
+                namespace => 'Asset_Matrix'
+            },
         ],
     },
 
@@ -216,6 +229,28 @@ our $HELP = {
                 namespace => 'Asset_Matrix'
             },
             {   tag       => 'main template',
+                namespace => 'Asset_Matrix'
+            },
+            {   tag       => 'edit listing template',
+                namespace => 'Asset_Matrix'
+            },
+        ],
+    },
+
+    'edit listing template' => {
+        title     => 'edit listing template help title',
+        body      => '',
+        variables => [
+            {   'name'      => 'form',  }
+        ],
+        related => [
+            {   tag       => 'compare template',
+                namespace => 'Asset_Matrix'
+            },
+            {   tag       => 'main template',
+                namespace => 'Asset_Matrix'
+            },
+            {   tag       => 'listing detail template',
                 namespace => 'Asset_Matrix'
             },
         ],

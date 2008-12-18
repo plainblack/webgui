@@ -8,8 +8,11 @@ Package WebGUI::Macro::PrevNext
 
 =head1 DESCRIPTION
 
-Provide a JS based previous and next button for each page, doing a depth-first
-search one level deep.
+Provides YUI-powered previous/next buttons for inline page navigation, doing a depth-first
+search one level deep. Handy if you want people to be able to click "next, next, next" to 
+navigate through your content. You probably want to use this in your Page Layout template.
+Generates attractive YUI button markup which gracefully degrades to a standard link tag when 
+javascript is disabled.  
 
 =head2 process( $session, $topPage, $depth, $templateId )
 
@@ -211,19 +214,30 @@ sub getStartPage {
     }
     my $topLineage  = $topPage->get('lineage');
     my $thisLineage = $thisPage->get('lineage');
-    #print '# topLineage: '.  $topLineage . "\n";
-    #print '# thisLineage: '.  $thisLineage . "\n";
     my $topLineageLength = length($topLineage);
-    #print '# topLineageLength: '.  $topLineageLength . "\n";
     my $startPageLineage = $topLineage . substr($thisLineage, $topLineageLength, 6 * $depth);
-    #print '# depth: '.  $depth . "\n";
-    #print '# startPageLineage: '.  $startPageLineage . "\n";
     my $startPage = WebGUI::Asset->newByLineage($topPage->session, $startPageLineage);
     if (!defined $startPage) {
         $startPage = $topPage;
     }
     return $startPage;
 }
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008 SDH Consulting Group. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See L<perlartistic>.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=head1 AUTHORS
+
+Colin Kuskie, perlDreamer Consulting, LLC
+Patrick Donelan, SDH Consulting Group
 
 1;
 

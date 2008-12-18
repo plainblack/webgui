@@ -1,7 +1,7 @@
 package WebGUI::Form::AutoComplete;
 
 use strict;
-use base 'WebGUI::Form::Text';
+use base 'WebGUI::Form::List';
 use WebGUI::International;
 use JSON;
 
@@ -11,13 +11,13 @@ Package WebGUI::Form::AutoComplete
 
 =head1 DESCRIPTION
 
-Creates a YUI-based AutoComplete field.
-The options hashref is used to populate the YUI autocomplete data source.
+Creates a YUI-based AutoComplete WebGUI form field.
+The list of possibleValues/options are used to populate the YUI autocomplete data source.
 A trigger icon, a la the ExtJS AutoComplete has also been added.
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Text with a heavy smattering of methods from WebGUI::Form::List.
+This is a subclass of WebGUI::Form::List.
 
 =head1 METHODS 
 
@@ -39,10 +39,6 @@ The following additional parameters have been added via this sub class.
 
 Defaults to 255. Determines the maximum number of characters allowed in this field.
 
-=head4 defaultValue
-
-Defaults to undefined
-
 =head4 size
 
 Defaults to the setting textBoxSize or 30 if that's not set. Specifies how big of a text box to display.
@@ -57,9 +53,6 @@ sub definition {
         @{$definition},
         {   maxlength => { defaultValue => 255 },
             size      => { defaultValue => $session->setting->get("textBoxSize") || 30 },
-            defaultValue => {},
-            options      => { defaultValue => {} },
-            sortByValue  => { defaultValue => 0 },
         }
     );
     return $class->SUPER::definition( $session, $definition );
@@ -80,153 +73,6 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getOptions ( )
-
-Taken from WebGUI::Form::List
-
-=cut
-
-sub getOptions {
-    my ($self)         = @_;
-    my $possibleValues = $self->get('options');
-    my %options        = ();
-    tie %options, 'Tie::IxHash';
-    if ( ref $possibleValues eq "HASH" ) {
-        %options = %{$possibleValues};
-    }
-    else {
-        foreach my $line ( split "\n", $possibleValues ) {
-            $line =~ s/^(.*)\r|\s*$/$1/;
-            if ( $line =~ m/(.*)\|(.*)/ ) {
-                $options{$1} = $2;
-            }
-            else {
-                $options{$line} = $line;
-            }
-        }
-    }
-    if ( $self->get('sortByValue') ) {
-        my %ordered = ();
-        tie %ordered, 'Tie::IxHash';
-        foreach my $optionKey ( sort { "\L$options{$a}" cmp "\L$options{$b}" } keys %options ) {
-            $ordered{$optionKey} = $options{$optionKey};
-        }
-        return \%ordered;
-    }
-    return \%options;
-}
-
-=head2 getOriginalValue ( )
-
-Taken from WebGUI::Form::List
-
-=cut
-
-sub getOriginalValue {
-    my $self = shift;
-    my @values = ();
-    foreach my $value ($self->get("value")) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
-        }
-    }
-    if(@values){
-    	return wantarray ? @values : join("\n",@values);
-    }
-    
-    foreach my $value ($self->getDefaultValue()) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
-        }
-    }
-	return wantarray ? @values : join("\n",@values);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getValue ( [ value ] )
-
-Taken from WebGUI::Form::List
-
-=cut
-
-sub getValue {
-	my ($self, $value) = @_;
-    
-    my @values = ();
-    if (defined $value) {
-        if (ref $value eq "ARRAY") {
-            @values = @{$value};
-        }
-        else {
-			$value =~ s/\r//g;
-            @values = split "\n", $value;
-        }
-    }
-    if (scalar @values < 1 && $self->session->request) {
-        my $value = $self->session->form->param($self->get("name"));
-        if (defined $value) {
-            @values = $self->session->form->param($self->get("name"));
-        }
-    }
-    if (scalar @values < 1) {
-        @values = $self->getDefaultValue;
-    }
-	return wantarray ? @values : join("\n",@values);
-}
-
-#-------------------------------------------------------------------
-
-=head2 getDefaultValue ( )
-
-Taken from WebGUI::Form::List
-
-=cut
-
-sub getDefaultValue {
-    my $self = shift;
-    my @values = ();
-    
-    foreach my $value ($self->get('defaultValue')) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
-        }
-    }
-	return wantarray ? @values : join("\n",@values);
-}
-
-#-------------------------------------------------------------------
-
-=head2 areOptionsSettable ( )
-
-Returns a boolean indicating whether the options of the list are settable. Some have a predefined set of options. This is useful in generating dynamic forms. Returns 1.
-
-=cut
-
-sub areOptionsSettable {
-    return 1;
-}
-
-#-------------------------------------------------------------------
-
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -235,6 +81,19 @@ A class method that returns a boolean indicating whether this control is compati
 
 sub isDynamicCompatible {
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml ( )
+
+Override WebGUI::Form::List's getValueAsHtml to revert it back to the WebGUI::Form::Control version
+
+=cut
+
+sub getValueAsHtml {
+    my $self = shift;
+    return $self->getOriginalValue(@_);
 }
 
 #-------------------------------------------------------------------
@@ -256,6 +115,9 @@ sub toHtml {
         $self->session->style->setScript( $self->session->url->extras("/yui/build/$yui"),
             { type => 'text/javascript' } );
     }
+    $self->session->style->setLink(
+        $self->session->url->extras("/yui/build/autocomplete/assets/skins/sam/autocomplete.css"),
+        { type => "text/css", rel => "stylesheet" } );
 
     my $id        = $self->get('id');
     my $name      = $self->get("name");
@@ -272,17 +134,22 @@ sub toHtml {
 .yui-ac-trigger {
     position: absolute; 
     right: 0; 
-    top: 2px; 
+    top: 5px; 
     cursor: pointer; 
     height: 14px; 
     width: 14px; 
-    background: transparent url(extras/yui/build/assets/skins/sam/editor-sprite.gif) -1px -1122px;
+    background: transparent url(/extras/yui/build/assets/skins/sam/editor-sprite.gif) -1px -1122px;
+}
+.wg-ac-wrapper {
+    padding-bottom: 1.8em;   
 }
 </style>
-<div>
-	<input id="$id" type="text" name="$name" value="$value" size="$size" maxlength="$maxlength" $extras>
-	<div id="yui-ac-$id"></div>
-	<div id="yui-ac-trigger-$id" class="yui-ac-trigger"></div>
+<div class="yui-skin-sam wg-ac-wrapper">
+    <div>
+    	<input id="$id" type="text" name="$name" value="$value" size="$size" maxlength="$maxlength" $extras>
+    	<div id="yui-ac-$id"></div>
+    	<div id="yui-ac-trigger-$id" class="yui-ac-trigger"></div>
+    </div>
 </div>
 
 <script type="text/javascript">

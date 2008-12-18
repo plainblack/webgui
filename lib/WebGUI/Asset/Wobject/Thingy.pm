@@ -902,7 +902,7 @@ sub getFormElement {
         }
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments Combo AutoComplete))) {
+    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
             @defaultValues = $self->session->form->selectList($name);
@@ -916,7 +916,9 @@ sub getFormElement {
         $param{value} = \@defaultValues;
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList SelectBox CheckList RadioList SelectSlider Combo AutoComplete))) {
+    my $class = 'WebGUI::Form::'. ucfirst $data->{fieldType};
+    eval { WebGUI::Pluggable::load($class) };
+    if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
 
         my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
@@ -970,7 +972,7 @@ sub getFormElement {
         $param{value} = $data->{value} || $data->{defaultValue};
     }
 
-    my $formElement =  eval { WebGUI::Pluggable::instanciate("WebGUI::Form::". ucfirst $param{fieldType}, "new", [$self->session, \%param ])};
+    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$self->session, \%param ])};
     return $formElement->toHtml();
 
 }
@@ -1086,6 +1088,10 @@ sub getViewThingVars {
                 "label" => $field{label},
                 "isHidden" => $hidden,
                 "url" => $otherThingUrl,
+                "isVisible" => ($field{status} eq "visible" && !$hidden),
+                "isRequired" => ($field{status} eq "required" && !$hidden),
+                "pretext" => $field{pretext},
+                "subtext" => $field{subtext},
             );
             push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
             push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });

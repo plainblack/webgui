@@ -17,14 +17,22 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
+			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
+		}
+        };
+	this.formatColors = function(elCell, oRecord, oColumn, sData) {
+		if(oRecord.getData("fieldType") != 'category'){
+			var color = oRecord.getData("compareColor");
+			if(color){
+				Dom.setStyle(elCell.parentNode, "background-color", color);
+			}
 			elCell.innerHTML = sData;
 		}
         };
-
         var myColumnDefs = [
             	{key:"stickied",formatter:this.formatStickied,label:""},
 		{key:"label",formatter:this.formatLabel,label:""},
-		{key:"value",label:""}
+		{key:"value",label:"",formatter:this.formatColors}
         ];
 
         this.myDataSource = new YAHOO.util.DataSource("?");
@@ -32,13 +40,18 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["label","value","attributeId","fieldType","checked"]
+            fields: ["label","value","attributeId","fieldType","checked","description","compareColor"]
         };
 
 	var uri = "func=getAttributes";
 
+	var initAttributeHoverHelp = function() {
+		initHoverHelp('attributes');
+	}
+
         var myDataTable = new YAHOO.widget.DataTable("attributes", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
+	myDataTable.subscribe("initEvent", initAttributeHoverHelp);
 
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {

@@ -1,3 +1,23 @@
+7.6.7
+ - fixed #9263: Thingy possibleValues processing, and List type autodetection.
+ - fixed: Alter WebGUI::Asset::Template's update method so that it can import packages that use the old, deprecated headBlock property.  The update method change is deprecatd.
+ - fixed #9266: controls missing on product asset
+ - fixed #9150: Edit Data Table - Cannot add column (David Delikat)
+ - fixed #9261: Cart Payment Screen not templated
+ - fixed #4124: Site starter uses floats in ways that cause problems
+ - fixed #9274: AdminBar errors and fails when an asset class cannot be loaded
+ - fixed #9301: Error in Shelf Template
+ - fixed #9260: untitled (Delete icon "X" circumvents revision control)
+ - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
+ - fixed #9284: User manager broken if no LDAP links exits
+ - fixed #4136: Shortcut doesn't display all properties in override
+ - fixed #8838: Gallery Cross Publish template is broken
+ - fixed #8898: versioning problem
+ - fixed #9315: Password Recovery
+ - fixed #9298: Inconsistent date formats
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH
+   Consulting Group)
+
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
  - fixed #8774: Forum Rich Edit no longer supports indent/outdent
@@ -13,6 +33,7 @@
  - fixed #9237: Payment Gateways all display "cash"
  - fixed #8816: PayDriver "Label" of the instance of the driver should be used instead of the generic name
  - fixed #4220: testEnvironment.pl unable to find WebGUI modules...
+ - fixed #9279: "Read more" text in Syndicated Articles is not a label
 
 7.6.5
  - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 

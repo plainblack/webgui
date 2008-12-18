@@ -887,6 +887,7 @@ sub www_getAttributes {
             $attribute->{label} = $attribute->{name};
             $attribute->{attributeId} =~ s/-/_____/g;
             if ($attribute->{fieldType} eq 'MatrixCompare'){
+                $attribute->{compareColor} = $self->getParent->getCompareColor($attribute->{value});
                 $attribute->{value} = WebGUI::Form::MatrixCompare->new($self->session,$attribute)->getValueAsHtml;
             }
             if($session->scratch->get('stickied_'.$attribute->{attributeId})){

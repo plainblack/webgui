@@ -3471,6 +3471,18 @@ LongTruncOk=1</p>
 		lastUpdated => 0,
 	},
 
+	'no ldap link for auth' => {
+		message => q|Unable to create your account because no LDAP connection has been defined for this site.|,
+        context => 'Error message in createAccount screen when no LDAP connection is defined.',
+		lastUpdated => 1229376071,
+	},
+
+	'no ldap logins' => {
+		message => q|Unable to log you in because no LDAP link has been defined for this site.|,
+        context => 'Error message for login when no LDAP connection is defined.',
+		lastUpdated => 1229376071,
+	},
+
 	'Select State' => {
 		message => q|Select State|,
 		lastUpdated => 1161388472,
@@ -4324,6 +4336,12 @@ Users may override this setting in their profile.
             message     => q{Privacy Settings},
             lastUpdated => 1226706547,
             context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'read more' => {
+            message => q|Read More|,
+            lastUpdated => 1229013268,
+            context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
         },
 
 };

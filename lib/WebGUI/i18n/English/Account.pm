@@ -1,4 +1,4 @@
-package WebGUI::i18n::English::Account_Profile;
+package WebGUI::i18n::English::Account;
 use strict;
 
 our $I18N = {

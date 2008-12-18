@@ -896,43 +896,48 @@ sub getFixTitleTests {
     },
     {
         title   => '',
-        fixed    => undef,
+        fixed   => undef,
         comment => "null string returns the Asset's title",
     },
     {
         title   => 'untitled',
-        fixed    => undef,
+        fixed   => undef,
         comment => "'untitled' returns the Asset's title",
     },
     {
         title   => 'UnTiTlEd',
-        fixed    => undef,
+        fixed   => undef,
         comment => "'untitled' in any case returns the Asset's title",
     },
     {
         title   => 'Username: ^@;',
-        fixed    => 'Username: &#94;@;',
+        fixed   => 'Username: &#94;@;',
         comment => "Macros are negated",
     },
     {
         title   => '<b>A bold title</b>',
-        fixed    => 'A bold title',
+        fixed   => 'A bold title',
         comment => "Markup is stripped out",
     },
     {
         title   => 'Javascript: <script>Evil code goes in here</script>',
-        fixed    => 'Javascript: ',
+        fixed   => 'Javascript: ',
         comment => "javascript removed",
     },
     {
         title   => 'This is a good Title',
-        fixed    => 'This is a good Title',
+        fixed   => 'This is a good Title',
         comment => "Good titles are passed",
     },
     {
         title   => '<b></b>',
-        fixed    => '',
+        fixed   => '',
         comment => "If there is no title left after processing, then it is set to untitled.",
+    },
+    {
+        title   => q|Quotes '"|,
+        fixed   => q|Quotes '"|,
+        comment => "Quotes are not processed.",
     },
     );
 }
