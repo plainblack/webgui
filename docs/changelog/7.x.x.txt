@@ -21,6 +21,7 @@
  - fixed #9315: Password Recovery
  - fixed #9298: Inconsistent date formats
  - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
+ - fixed #4196: update button doesn't work in IE
 
 7.6.6
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
