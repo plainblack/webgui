@@ -826,6 +826,10 @@ sub prepareShowSurveyTemplate {
     $section->{'showTimeLimit'} = $self->get('showTimeLimit');
     $section->{'minutesLeft'} = int((($self->response->startTime() + (60 * $self->get('timeLimit'))) - time())/60);
 
+    if(scalar @$questions == ($section->{'totalQuestions'} - $section->{'questionsAnswered'})){
+        $section->{isLastPage} = 1
+    }
+
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
     $self->session->http->setMimeType('application/json');
