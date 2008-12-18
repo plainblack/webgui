@@ -157,6 +157,11 @@ sub new
 	{
 		$self	= DateTime->from_epoch(epoch=>$_[0], time_zone=>"UTC", locale=>$locale);
 	}
+    elsif (!defined $_[0]) {
+        $self = $class->SUPER::now(
+            locale      => $locale,
+        );
+    }
     else {
         $self = $class->SUPER::new(
             _splitMysql($_[0]),
