@@ -239,6 +239,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 Colin Kuskie, perlDreamer Consulting, LLC
 Patrick Donelan, SDH Consulting Group
 
+=cut
+
 1;
 
 #vim:ft=perl
