@@ -1,3 +1,5 @@
+7.5.38
+
 7.5.37
  - fixed #9301: Error in Shelf Template
  - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
