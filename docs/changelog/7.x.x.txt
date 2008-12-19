@@ -25,6 +25,7 @@
  - fixed #4196: update button doesn't work in IE
 
 7.6.6
+ - fixed #9217: Survey 2.0 - "Cancel" button not working as expected(David Delikat)
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
  - fixed #8774: Forum Rich Edit no longer supports indent/outdent
  - fixed #4173: fieldnames in profilefields can contain spaces

@@ -429,13 +429,19 @@ sub www_dragDrop {
 #-------------------------------------------------------------------
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
+    my $editflag = 1;
 
     $self->loadSurveyJSON();
 
     my $address = defined $options->{address} ? $options->{address} : undef;
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process("data") ) {
-            $address = [ split /-/, $inAddress ];
+            if( $inAddress eq '-' ) {
+                 $editflag = 0;
+		 $address = [ 0 ];
+            } else {
+		$address = [ split /-/, $inAddress ];
+	    }
         }
         else {
             $address = [0];
@@ -509,7 +515,8 @@ sub www_loadSurvey {
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {
-        "address", $address, "buttons", \%buttons, "edithtml", $editHtml,
+        "address", $address, "buttons", \%buttons,
+        "edithtml", $editflag ? $editHtml : '',
         "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
     };
     $self->session->http->setMimeType('application/json');
