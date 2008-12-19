@@ -29,6 +29,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+setDefaultItransactCredentialTemplate($session);
 
 finish($session); # this line required
 
@@ -41,6 +42,27 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub setDefaultItransactCredentialTemplate {
+    my $session = shift;
+    print "\tSet default ITransact Credentials template if it is not set... " unless $quiet;
+    # and here's our code
+    my $pay = WebGUI::Shop::Pay->new($session);
+    my $drivers = $pay->getPaymentGateways($session);
+    DRIVER: foreach my $driver (@{ $drivers }) {
+        ##Only work on ITransact drivers
+        next DRIVER unless $driver->className eq "WebGUI::Shop::PayDriver::ITransact";
+        my $properties = $driver->get();
+        ##And only ones that don't already have a template set
+        next DRIVER if $properties->{credentialsTemplateId};
+        $properties->{credentialsTemplateId} = 'itransact_credentials1';
+        $driver->update($properties);
+    }
+
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

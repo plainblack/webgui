@@ -368,10 +368,11 @@ sub definition {
             hoverHelp   => $i18n->get('use cvv2 help'),
         },
         credentialsTemplateId  => {
-            fieldType   => 'template',
-            label       => $i18n->get('credentials template'),
-            hoverHelp   => $i18n->get('credentials template help'),
-            namespace   => 'Shop/Credentials',
+            fieldType    => 'template',
+            label        => $i18n->get('credentials template'),
+            hoverHelp    => $i18n->get('credentials template help'),
+            namespace    => 'Shop/Credentials',
+            defaultValue => 'itransact_credentials1',	
         },
         emailMessage    => {
             fieldType   => 'textarea',

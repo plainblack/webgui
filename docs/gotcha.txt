@@ -7,6 +7,13 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.5.38
+--------------------------------------------------------------------
+   * Due to an error during the 7.6.6 development cycle, an Itransact template,
+     for displaying the credentials screen, needs to be reimported.  Any changes
+     that you have made to this module will be lost, so please make a back up
+     of this template.
+
 7.5.21
 --------------------------------------------------------------------
  * Previous versions of WebGUI used the wrong day of the week for
