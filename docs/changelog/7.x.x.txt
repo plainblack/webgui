@@ -3,6 +3,9 @@
  - fixed #9285: modifing template prevents edit of syncontent
  - fixed #8886: Search button in Asset manager
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
+ - fixed a bug where clicking the apply button when func=add would return the
+   edit screen of the parent asset rather than that of the new asset. (Martin
+   Kamerbeek / Oqapi).
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
