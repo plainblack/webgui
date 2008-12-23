@@ -6,6 +6,7 @@
  - fixed a bug where clicking the apply button when func=add would return the
    edit screen of the parent asset rather than that of the new asset. (Martin
    Kamerbeek / Oqapi).
+ - fixed: Make sure that Form subclasses are found by WebGUI::Form::FieldType
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
