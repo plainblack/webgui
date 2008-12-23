@@ -1190,7 +1190,7 @@ sub validateProfileDataFromForm {
             push(@{$errorFields},$fieldId);
         }
         #Duplicate emails throw warnings
-        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue)) {
+        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue,$self->userId)) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
             push (@{$warnings},$i18n->get(1072));
             push(@{$warnFields},$fieldId);
