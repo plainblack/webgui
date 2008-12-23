@@ -141,7 +141,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 sub getValue {
 	my $self = shift;
 	my $fieldType = $self->SUPER::getValue(@_);
-	$fieldType =~ s/[^\w]//g;
+	$fieldType =~ s/[^\w:]//g;
 	return $fieldType || "text";
 }
 
