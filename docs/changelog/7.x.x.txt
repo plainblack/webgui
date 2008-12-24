@@ -9,6 +9,7 @@
  - fixed: Make sure that Form subclasses are found by WebGUI::Form::FieldType
  - fixed #9356: Data Form Mail Fields
  - fixed #9365: Account: when viewing another person's contribution, it displays my name
+ - fixed #9351: Cannot translate phrase
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

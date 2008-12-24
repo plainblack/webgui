@@ -73,31 +73,6 @@ our $I18N = {
 		lastUpdated => 0
 	},
 
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
 	'32' => {
 		message => q|Show unprivileged pages|,
 		lastUpdated => 1077080845
