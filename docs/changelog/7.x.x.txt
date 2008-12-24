@@ -10,6 +10,7 @@
  - fixed #9356: Data Form Mail Fields
  - fixed #9365: Account: when viewing another person's contribution, it displays my name
  - fixed #9351: Cannot translate phrase
+ - fixed #9368: Gallery: All children included into navigation
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

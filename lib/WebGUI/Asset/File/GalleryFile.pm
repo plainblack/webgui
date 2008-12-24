@@ -739,6 +739,21 @@ sub setComment {
     );
 }
 
+####################################################################
+
+=head2 update
+
+Wrap update so that isHidden is always set to be a 1.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
+}
+
+
 #----------------------------------------------------------------------------
 
 =head2 view ( )
