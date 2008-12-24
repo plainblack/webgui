@@ -216,6 +216,12 @@ sub www_view {
     $self->appendCommonVars($var);
     $p->appendTemplateVars($var);
 
+    #Overwrite these
+    my $user     = WebGUI::User->new($session,$userId);
+    $var->{'user_full_name'    } = $user->getWholeName;
+    $var->{'user_member_since' } = $user->dateCreated;
+
+
     return $self->processTemplate($var,$self->getViewTemplateId);
 }
 
