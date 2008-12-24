@@ -1,5 +1,6 @@
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
+ - fixed #9368: Gallery: All children included into navigation
 
 7.5.37
  - fixed #9301: Error in Shelf Template

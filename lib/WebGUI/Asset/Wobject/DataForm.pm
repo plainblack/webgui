@@ -1093,13 +1093,17 @@ sub www_editField {
 #-------------------------------------------------------------------
 sub www_editFieldSave {
     my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    my $form = $self->session->form;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $form = $session->form;
     my $fieldName = $form->process('fieldName');
-    my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
+    my $newName = $session->url->urlize($form->process('newName') || $form->process('label'));
     $newName =~ tr{-/}{};
+    use Data::Dumper;
     if ($fieldName) {
+        $session->log->warn("fieldName: $fieldName");
         my $field = $self->getFieldConfig($fieldName);
+        $session->log->warn(Dumper $field);
         if ($field->{isMailField}) {
             $newName = $fieldName;
         }

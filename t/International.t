@@ -97,6 +97,18 @@ sub installPigLatin {
 	);
 }
 
+sub installOldPigLatin {
+	mkdir File::Spec->catdir(WebGUI::Test->lib, 'WebGUI', 'i18n', 'PigLatin.old');
+	copy( 
+		WebGUI::Test->getTestCollateralPath('WebGUI.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.old WebGUI.pm/)
+	);
+	copy(
+		WebGUI::Test->getTestCollateralPath('PigLatin.pm'),
+		File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.old.pm/)
+	);
+}
+
 END {
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin WebGUI.pm/);
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n PigLatin.pm/);

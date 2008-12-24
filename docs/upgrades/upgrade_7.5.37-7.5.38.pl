@@ -31,6 +31,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 setDefaultItransactCredentialTemplate($session);
+hideGalleryPhotos($session);
 
 finish($session); # this line required
 
@@ -62,6 +63,19 @@ sub setDefaultItransactCredentialTemplate {
         $driver->update($properties);
     }
 
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub hideGalleryPhotos {
+    my $session = shift;
+    print "\tSet the isHidden bit in all Photos so your navigations do not blow up... " unless $quiet;
+    # and here's our code
+    my $getAPhoto = WebGUI::Asset::File::GalleryFile->getIsa($session);
+    while (my $photo = $getAPhoto->()) {
+        $photo->update(isHidden => 1);
+    }
     print "DONE!\n" unless $quiet;
 }
 
