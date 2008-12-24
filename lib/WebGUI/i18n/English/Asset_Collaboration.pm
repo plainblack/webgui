@@ -541,6 +541,12 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'date posted' => {
+		message => q|Date Posted|,
+		lastUpdated => 1229907194,
+        context => q|i18n lable for Collaboration template|,
+	},
+
 	'location' => {
 		message => q|Location|,
 		lastUpdated => 1109696029,
@@ -1687,6 +1693,12 @@ the Collaboration Asset, the user will be notified.|,
         message => q|List All Links|,
         context => q|i18n label for the link list collaboration template.|,
         lastUpdated => 1221247761,
+    },
+
+    'has posted to one of your subscriptions' => {
+        message => q|has posted to one of your subscriptions|,
+        context => q|i18n label for the notification template.  "user" has posted..|,
+        lastUpdated => 1229910435,
     },
 
 };

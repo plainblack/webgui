@@ -1013,6 +1013,13 @@ be useful, others may not.|,
         lastUpdated => 0,
         context     => q{Description of asset property},
     },
+
+    'Entry ID' => {
+        message     => q{Entry ID},
+        lastUpdated => 1229910550,
+        context     => q{},
+    },
+
 };
 
 1;
