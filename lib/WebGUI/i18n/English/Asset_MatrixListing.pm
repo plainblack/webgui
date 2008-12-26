@@ -365,6 +365,25 @@ it would be best to make sure the names are the same.|,
 	lastUpdated => 0,
 	context => q|Description of the fieldType tmpl_var in the attribute_loop for the template help.|,
     },
+
+    'Edit this listing.' => {
+	message => q|Edit this listing.|,
+	lastUpdated => 1230269571,
+	context => q|i18n label for template.|,
+    },
+
+    'Approve this listing.' => {
+	message => q|Approve this listing.|,
+	lastUpdated => 1230269571,
+	context => q|i18n label for template.|,
+    },
+
+    'Delete this listing.' => {
+	message => q|Delete this listing.|,
+	lastUpdated => 1230269571,
+	context => q|i18n label for template.|,
+    },
+
 };
 
 1;

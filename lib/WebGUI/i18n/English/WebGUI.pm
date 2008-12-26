@@ -4344,6 +4344,11 @@ Users may override this setting in their profile.
             context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
         },
 
+        'For' => {
+            message => q|For|,
+            lastUpdated => 1230269893,
+        },
+
 };
 
 1;
