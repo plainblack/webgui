@@ -923,6 +923,18 @@ our $I18N = {
         lastUpdated => 1229311001,
     },
 
+    'UP' => {
+        message => q{UP},
+        context => q{template label,  referring to the previous week, up.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
+    'DN' => {
+        message => q{DN},
+        context => q{template label,  referring to the next week, down.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
 };
 
 1;
