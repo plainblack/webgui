@@ -34,6 +34,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 setDefaultItransactCredentialTemplate($session);
 hideGalleryPhotos($session);
+addSubscriptionRedeemTemplateSetting($session);
 finish($session); # this line required
 
 
@@ -55,6 +56,18 @@ sub setDefaultItransactCredentialTemplate {
         $driver->update($properties);
     }
 
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addSubscriptionRedeemTemplateSetting {
+    my $session = shift;
+    print "\tAdd a field to the Subscription Asset so the user can select which Redeem Subscription code template to use... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+alter table Subscription add column redeemSubscriptionCodeTemplateId char(22) NOT NULL default ''
+EOSQL
     print "DONE!\n" unless $quiet;
 }
 
