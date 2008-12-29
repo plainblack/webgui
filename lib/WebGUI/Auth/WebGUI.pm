@@ -1211,13 +1211,17 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$self->session->form->process("key")]);
+    my $session = $self->session;
+	my ($userId) = $session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$session->form->process("key")]);
+    my $i18n = WebGUI::International->new($session, 'AuthWebGUI');
+    my $message = '';
 	if (defined $userId) {
-		my $u = WebGUI::User->new($self->session,$userId);
+		my $u = WebGUI::User->new($session,$userId);
 		$u->status("Active");
 		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'", [$userId]);
+        $message = $i18n->get('email validation confirmed','AuthWebGUI');
 	}
-	return $self->displayLogin;
+	return $self->displayLogin($message);
 }
 
 
