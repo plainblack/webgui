@@ -15,6 +15,7 @@
  - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
  - fixed #9374: Subscription Asset: Redeem subscription template not documented, or user selectable
  - fixed #9366: Gallery: Missing i18n
+ - fixed #9367: Gallery: Errors in templates
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

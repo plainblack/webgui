@@ -4307,6 +4307,12 @@ Users may override this setting in their profile.
             lastUpdated => 1230269893,
         },
 
+        'rss' => {
+            message => q|RSS|,
+            lastUpdated => 1230584702,
+            context => q|Abbreviation for Really Simple Syndication, and other similar terms.|,
+        },
+
 };
 
 1;
