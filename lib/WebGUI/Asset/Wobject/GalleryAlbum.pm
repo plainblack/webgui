@@ -881,6 +881,8 @@ sub www_addArchive {
     my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
 
+    my $i18n = WebGUI::International->new($session);
+
     $var->{ error           } = $params->{ error };
 
     $var->{ form_start      } 
@@ -893,7 +895,7 @@ sub www_addArchive {
     $var->{ form_submit     } 
         = WebGUI::Form::submit( $session, {
             name            => "submit",
-            value           => "Submit",
+            value           => $i18n->get("submit",'WebGUI'),
         });
 
     $var->{ form_archive    } 

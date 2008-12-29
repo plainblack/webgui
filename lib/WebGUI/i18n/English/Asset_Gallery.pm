@@ -671,9 +671,15 @@ our $I18N = {
     },
 
     'template listFilesForUser albums title' => {
-        message     => q{Albums},
-        lastUpdated => 0,
+        message     => q{My Albums},
+        lastUpdated => 1230576660,
         context     => q{Title for list of user's Albums},
+    },
+
+    'template listFilesForUser pictures title' => {
+        message     => q{My Pictures},
+        lastUpdated => 1230576660,
+        context     => q{Title for list of user's Pictures},
     },
 
     'template listFilesForUser albums files' => {

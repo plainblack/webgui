@@ -14,6 +14,7 @@
  - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
  - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
  - fixed #9374: Subscription Asset: Redeem subscription template not documented, or user selectable
+ - fixed #9366: Gallery: Missing i18n
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
