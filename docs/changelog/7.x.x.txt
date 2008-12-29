@@ -11,6 +11,8 @@
  - fixed #9365: Account: when viewing another person's contribution, it displays my name
  - fixed #9351: Cannot translate phrase
  - fixed #9368: Gallery: All children included into navigation
+ - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
+ - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

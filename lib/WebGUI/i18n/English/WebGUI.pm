@@ -4290,48 +4290,6 @@ Users may override this setting in their profile.
             context     => q{i18n label for YUI paginator},
         },
 
-        'years' => {
-            message => q{years},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'months' => {
-            message => q{months},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'weeks' => {
-            message => q{weeks},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'days' => {
-            message => q{days},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'hours' => {
-            message => q{hours},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'minutes' => {
-            message => q{minutes},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'seconds' => {
-            message => q{seconds},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
         'profile privacy settings' =>  {
             message     => q{Privacy Settings},
             lastUpdated => 1226706547,
