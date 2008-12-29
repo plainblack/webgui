@@ -4061,6 +4061,12 @@ LongTruncOk=1</p>
             context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
         },
 
+        'rss' => {
+            message => q|RSS|,
+            lastUpdated => 1230584702,
+            context => q|Abbreviation for Really Simple Syndication, and other similar terms.|,
+        },
+
 };
 
 1;

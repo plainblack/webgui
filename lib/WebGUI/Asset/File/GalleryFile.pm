@@ -141,10 +141,11 @@ sub appendTemplateVarsCommentForm {
             value       => $comment->{ bodyText },
         });
 
+    my $i18n = WebGUI::International->new($session, 'Asset_Photo');
     $var->{ commentForm_submit } 
         = WebGUI::Form::submit( $session, {
             name        => "submit",
-            value       => "Save Comment",
+            value       => $i18n->get('form comment save comment'),
         });
 
     return $var;
