@@ -21,6 +21,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Shop::Pay;
+use WebGUI::Asset::File::GalleryFile;
 
 
 my $toVersion = '7.5.38';
