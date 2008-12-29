@@ -119,6 +119,19 @@ sub getValue {
 
 #-------------------------------------------------------------------
 
+=head2 getValueAsHtml (  )
+
+Returns the interval formatted as quantity and units.
+
+=cut
+
+sub getValueAsHtml {
+	my $self = shift;
+    return join ' ', $self->session->datetime->secondsToInterval($self->getOriginalValue);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -138,35 +151,38 @@ Renders an interval control.
 =cut
 
 sub toHtml {
-	my $self = shift;
-	my %units;
-	tie %units, 'Tie::IxHash';
-	my $i18n = WebGUI::International->new($self->session);
-        %units = ('seconds'=>$i18n->get(704),
-                'minutes'=>$i18n->get(705),
-                'hours'=>$i18n->get(706),
-                'days'=>$i18n->get(700),
-                'weeks'=>$i18n->get(701),
-                'months'=>$i18n->get(702),
-                'years'=>$i18n->get(703));
-        my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
-	# not sure why, but these things need to be defined like this or
-	# they fail under some circumstnaces 
-	my $cmd = "WebGUI::Form::Integer";
-	my $out = $cmd->new($self->session,
-		name=>$self->get("name")."_interval",
-		value=>$interval,
-		extras=>$self->get("extras"),
-		id=>$self->get('id')."_interval",
-		)->toHtml;
-	$cmd = "WebGUI::Form::SelectBox";
-	$out .= $cmd->new($self->session,
-		options=>\%units,
-		name=>$self->get("name")."_units",
-		id=>$self->get('id')."_units",
-		value=>$units
-		)->toHtml;
-	return $out;
+    my $self = shift;
+    my %units;
+    tie %units, 'Tie::IxHash';
+    my $i18n = WebGUI::International->new($self->session);
+    %units = (seconds => $i18n->get(704),
+              minutes => $i18n->get(705),
+              hours   => $i18n->get(706),
+              days    => $i18n->get(700),
+              weeks   => $i18n->get(701),
+              months  => $i18n->get(702),
+              years   => $i18n->get(703),
+    );
+    my %reverseUnits = reverse %units;
+    my ($interval, $units) = $self->session->datetime->secondsToInterval($self->getOriginalValue);
+    # not sure why, but these things need to be defined like this or
+    # they fail under some circumstnaces 
+    my $cmd = "WebGUI::Form::Integer";
+    my $out = $cmd->new($self->session,
+        name   => $self->get("name")."_interval",
+        value  => $interval,
+        extras => $self->get("extras"),
+        id     => $self->get('id')."_interval",
+        )->toHtml;
+    $cmd = "WebGUI::Form::SelectBox";
+    my $key = $reverseUnits{$units};
+    $out .= $cmd->new($self->session,
+        options => \%units,
+        name    => $self->get("name")."_units",
+        id      => $self->get('id')."_units",
+        value   => $key,
+        )->toHtml;
+    return $out;
 }
 
 

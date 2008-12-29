@@ -1,6 +1,8 @@
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
  - fixed #9368: Gallery: All children included into navigation
+ - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
+ - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
 
 7.5.37
  - fixed #9301: Error in Shelf Template
