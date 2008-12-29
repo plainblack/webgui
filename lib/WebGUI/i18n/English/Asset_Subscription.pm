@@ -358,20 +358,23 @@ characters long.</p>|,
 		context => q|Shows up in the selection part of listSubscriptionCodes.|
 	},
 
-	'help redeem code template body' => {
-		message => q|The following template variables are available through this template:<br />
-<br />
-<b>batchDescription</b><br />
-The description of the batch tied to the subscription code.<br />
-<br />
-<b>message</b><br />
-The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.<br />
-<br />
-<b>codeForm</b><br />
-The form in which the user can enter his subscription code.<br />|,
-		lastUpdated => 1215618652,
-		context => q|The body of the help page of the code redemption template.|
-	},
+    'batchDescription' => {
+        message => q|The description of the batch tied to the subscription code.|,
+        context => q|Template variable in the redeem subscription code template|,
+        lastUpdated => 0,
+    },
+
+    'message' => {
+        message => q|The message that gives the result of your action. Depending on what you've done it says that you can enter a code, you've entered the wrong code, or you've successfully redeemed your code.|,
+        context => q|Template variable in the redeem subscription code template|,
+        lastUpdated => 0,
+    },
+
+    'codeForm' => {
+        message => q|The form in which the user can enter his subscription code.|,
+        context => q|Template variable in the redeem subscription code template|,
+        lastUpdated => 0,
+    },
 
 	'help redeem code template title' => {
 		message => q|Redeem subscription code template|,
@@ -427,6 +430,18 @@ The form in which the user can enter his subscription code.<br />|,
 
 	'template help' => {
 		message => q|Choose the template you wish to use to display this subscription|,
+		lastUpdated => 0,
+		context => q|Asset property hover help|,
+	},
+
+	'redeem subscription code template' => {
+		message => q|Redeem Subscription template|,
+		lastUpdated => 0,
+		context => q|Asset property|,
+	},
+
+	'redeem subscription code template help' => {
+		message => q|Choose the template that is used to display the screen where users redeem subscription codes.|,
 		lastUpdated => 0,
 		context => q|Asset property hover help|,
 	},
@@ -501,6 +516,20 @@ The form in which the user can enter his subscription code.<br />|,
 		message => q|A URL to reset the Product so that the user can continue shopping.|,
 		lastUpdated => 0,
 		context => q|template variable|
+	},
+
+	'recurring subscription' => {
+		message => q|Is subscription recurring?|,
+		lastUpdated => 0,
+		context => q|Label for swith to set subscription to be recurring or not.|
+	},
+
+    'recurring subscription description' => {
+		message => q|If set to yes, the customer will be charged after each term for a new one and the subscription
+will be renewed for an extra term. If set to no, the customer will be charged for the first term only, and after one
+term the subscription expires for the customer.|,
+		lastUpdated => 0,
+		context => q|Label for swith to set subscription to be recurring or not.|
 	},
 
 };
