@@ -175,7 +175,16 @@ our $HELP = {
         related => []
     },
 
-
+    'account activation template' => {
+        title => 'account activation template title',
+        body  => '',
+        variables => [
+            { 'name' => 'newUser_username' },
+            { 'name' => 'activationUrl' },
+        ],
+        fields  => [],
+        related => []
+    },
 };
 
 1;
