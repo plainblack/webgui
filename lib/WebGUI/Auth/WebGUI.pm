@@ -572,6 +572,13 @@ sub editUserSettingsForm {
 		-label     => $i18n->get("password recovery template"),
 		-hoverHelp => $i18n->get("password recovery template help")
     );
+    $f->template(
+        -name      => "webguiWelcomeMessageTemplate",
+        -value     => $self->session->setting->get("webguiWelcomeMessageTemplate"),
+        -namespace => "Auth/WebGUI/Welcome",
+        -label     => $i18n->get("welcome message template"),
+        -hoverHelp => $i18n->get("welcome message template help")
+    );
    return $f->printRowsOnly;
 }
 
@@ -623,6 +630,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiExpiredPasswordTemplate", $f->process("webguiExpiredPasswordTemplate","template"));
 	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
 	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
+    $s->set("webguiWelcomeMessageTemplate", $f->process("webguiWelcomeMessageTemplate","template"));
 
     if (@errors) {
         return \@errors;
