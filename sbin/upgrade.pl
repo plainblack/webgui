@@ -243,10 +243,12 @@ foreach my $filename (keys %config) {
                 print "\tProcessing upgrade executable failed!\n";
                 fatalError();
             }
+            ##Do a dummy load of the config
+            WebGUI::Config->clearCache();
 		}
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
-                sleep 1; # Sleep a second to avoid adding asset revisions too quickly
+        sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
 	my $session = WebGUI::Session->open($webguiRoot,$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);

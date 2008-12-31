@@ -19,6 +19,7 @@
  - fixed #9352: Account activation message MIA
  - fixed #9046: Wiki tabs all combined (David Delikat)
  - refixed #9147: Misspellings in Account
+ - fixed #9348: Required Upgrade Step Not Documented - 7.6.0
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
