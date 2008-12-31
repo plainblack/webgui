@@ -80,7 +80,7 @@ sub hideGalleryPhotos {
     # and here's our code
     my $getAPhoto = WebGUI::Asset::File::GalleryFile->getIsa($session);
     while (my $photo = $getAPhoto->()) {
-        $photo->update(isHidden => 1);
+        $photo->update({isHidden => 1});
     }
     print "DONE!\n" unless $quiet;
 }
