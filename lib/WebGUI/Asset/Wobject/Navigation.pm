@@ -402,16 +402,14 @@ sub view {
 	my $lineageToSkip = "noskip";
 	my $absoluteDepthOfLastPage;
 
-    # Get the lineage 'depth' of the first asset if there are any assets at all
-    my $absoluteDepthOfFirstPage = exists $assets->[0]
-                                 ? $assets->[0]->getLineageLength
-                                 : 0
-                                 ;
- 
 	my %lastChildren;
 	my $previousPageData = undef;
+
 	my $eh = $self->session->errorHandler;
+    my $absoluteDepthOfFirstPage;   # Will set on first iteration of loop, below
+
 	foreach my $asset (@{$assets}) {
+
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
 		next if ($pageLineage =~ m/^$lineageToSkip/);
@@ -428,6 +426,13 @@ sub view {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
+
+        # Set absoluteDepthOfFirstPage after we have determined if the first page is viewable!
+        # Otherwise, the indent loop calculation below will be off by 1 (or more)
+        if ( !defined $absoluteDepthOfFirstPage ) {
+            $absoluteDepthOfFirstPage   = $asset->getLineageLength;
+        }
+
 		my $pageData = {};
 		foreach my $property (@interestingProperties) {
 			$pageData->{"page.".$property} = $asset->get($property);
