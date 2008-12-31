@@ -35,6 +35,7 @@ my $session = start(); # this line required
 setDefaultItransactCredentialTemplate($session);
 hideGalleryPhotos($session);
 addSubscriptionRedeemTemplateSetting($session);
+reFixAccountMisspellings($session);
 finish($session); # this line required
 
 
@@ -81,6 +82,24 @@ sub hideGalleryPhotos {
     while (my $photo = $getAPhoto->()) {
         $photo->update(isHidden => 1);
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+#Describe what our function does
+sub reFixAccountMisspellings {
+    my $session = shift;
+    my $setting = $session->setting;
+    print "\tFix misspellings in Account settings... " unless $quiet;
+    # and here's our code
+    $setting->add("profileViewTemplateId",   $setting->get('profileViewTempalteId')  );
+    $setting->add("profileErrorTemplateId",  $setting->get('profileErrorTempalteId') );
+    $setting->add("inboxLayoutTemplateId",   $setting->get('inboxLayoutTempalteId')  );
+    $setting->add("friendsLayoutTemplateId", $setting->get('friendsLayoutTempalteId'));
+    $setting->remove("profileViewTempalteId");
+    $setting->remove("profileErrorTempalteId");
+    $setting->remove("inboxLayoutTempalteId");
+    $setting->remove("friendsLayoutTempalteId");
     print "DONE!\n" unless $quiet;
 }
 

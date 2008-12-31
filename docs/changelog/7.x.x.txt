@@ -18,6 +18,7 @@
  - fixed #9367: Gallery: Errors in templates
  - fixed #9352: Account activation message MIA
  - fixed #9046: Wiki tabs all combined (David Delikat)
+ - refixed #9147: Misspellings in Account
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
