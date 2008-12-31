@@ -8,6 +8,7 @@
  - fixed #9367: Gallery: Errors in templates
  - fixed #9352: Account activation message MIA
  - fixed #9046: Wiki tabs all combined (David Delikat)
+ - fixed #8993: Gallery Image Details Overlap Image
 
 7.5.37
  - fixed #9301: Error in Shelf Template
