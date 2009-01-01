@@ -346,7 +346,7 @@ sub DESTROY {
     my $self        = shift;
     for my $key ( qw/ _nextAlbum _prevAlbum / ) {
         my $asset       = delete $self->{ $key };
-        $asset->DESTROY;
+        $asset->DESTROY if $asset;
     }
 }
 

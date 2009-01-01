@@ -22,6 +22,7 @@
  - fixed #9348: Required Upgrade Step Not Documented - 7.6.0
  - fixed #8993: Gallery Image Details Overlap Image
  - fixed #9380: CoolMenus template - invalid markup affecting page layouts
+ - fixed #9387: Asset Manager breaks navigating into a Gallery Album
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
