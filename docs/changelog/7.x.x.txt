@@ -9,6 +9,8 @@
  - fixed #9352: Account activation message MIA
  - fixed #9046: Wiki tabs all combined (David Delikat)
  - fixed #8993: Gallery Image Details Overlap Image
+ - fixed #9380: CoolMenus template - invalid markup affecting page layouts
+ - fixed #4125: IE photo gallery pagination
 
 7.5.37
  - fixed #9301: Error in Shelf Template
