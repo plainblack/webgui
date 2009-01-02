@@ -15,7 +15,6 @@ package WebGUI::Form::Interval;
 =cut
 
 use strict;
-use warnings;
 use base qw(WebGUI::Form::Control);
 use Tie::IxHash;
 use WebGUI::Form::SelectBox;
