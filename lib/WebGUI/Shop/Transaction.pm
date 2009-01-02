@@ -744,7 +744,7 @@ sub www_manage {
     my $output = q| 
 
 <div class=" yui-skin-sam">
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364,'WebGUI').|" /></form></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364,'WebGUI').q|" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
 </div>
