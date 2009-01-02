@@ -371,7 +371,7 @@ sub _getTemplateVars {
 
 #-------------------------------------------------------------------
 
-=head2 _viewHelpIndex ( $session )
+=head2 www_viewHelpIndex ( $session )
 
 Display the index of all help entries in all namespaces.
 
