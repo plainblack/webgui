@@ -935,6 +935,24 @@ our $I18N = {
         lastUpdated => 1230356830,
     },
 
+    'Add a feed' => {
+        message => q{Add a feed},
+        context => q{feed refers to an iCalendar/iCal feed},
+        lastUpdated => 1230931579,
+    },
+
+    'Add' => {
+        message => q{Add},
+        context => q{to add, or append to a list},
+        lastUpdated => 1230931579,
+    },
+
+    'Feed URL' => {
+        message => q{Feed URL},
+        context => q{},
+        lastUpdated => 1230931579,
+    },
+
 };
 
 1;

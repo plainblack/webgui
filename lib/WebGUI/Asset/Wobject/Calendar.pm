@@ -584,26 +584,31 @@ sub getEditForm {
     
     </script>
 ENDJS
-    
-    
-    $tab->raw(<<'ENDHTML');
-    <label for="addFeed">Add a feed</label>
+
+
+    my $addFeed = $i18n->get('Add a feed');
+    my $add     = $i18n->get('Add');
+    my $feedUrl = $i18n->get('Feed URL');
+    my $status  = $i18n->get('434', 'WebGUI');
+    my $lastUpdated  = $i18n->get('454', 'WebGUI');
+    $tab->raw(<<"ENDHTML");
+    <label for="addFeed">$addFeed</label>
     <input type="text" size="60" id="addFeed" name="addFeed" value="" />
-    <input type="button" value="Add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
+    <input type="button" value="$add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
     
     <table id="feeds" style="width: 100%;">
     <thead>
         <th style="width: 30px;">&nbsp;</th>
-        <th style="width: 50%;">Feed URL</th>
-        <th>Status</th>
-        <th>Last Updated</th>
+        <th style="width: 50%;">$feedUrl</th>
+        <th>$status</th>
+        <th>$lastUpdated</th>
         <th>&nbsp;</th>
     </thead>
     </table>
 ENDHTML
-    
-    
-    
+
+
+
     # Add the existing feeds
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
@@ -612,8 +617,8 @@ ENDHTML
         $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
     }
     $tab->raw('</script>');
-    
-    
+
+
     $tab->raw("</td></tr>");
     return $form;
 }
