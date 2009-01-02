@@ -12,6 +12,7 @@
  - fixed #9380: CoolMenus template - invalid markup affecting page layouts
  - fixed #4125: IE photo gallery pagination
  - fixed #9387: sset Manager breaks navigating into a Gallery Album
+ - fixed #9001: Thingy add image broken
 
 7.5.37
  - fixed #9301: Error in Shelf Template
