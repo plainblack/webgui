@@ -1679,9 +1679,9 @@ sub www_editThing {
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
             ."  <td style='width:370px;'>".$formElement."</td>\n"
             ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>" 
+            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='".$i18n->get('Edit','Icon')."' type='button'>" 
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
-            ."value='Delete' type='button'></td>\n</tr>\n</table>\n</li>\n";
+            ."value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
         $fieldsViewScreen .= "<tr id='view_tr_".$field->{fieldId}."'>"
             ."<td class='formDescription' style='width:180px;' id='view_label_".$field->{fieldId}."'>".$field->{label}
@@ -2111,9 +2111,9 @@ sub www_editFieldSave {
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
         ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='Edit' type='button'>"
+        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
         ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
-        ."','".$properties{thingId}."')\" value='Delete' type='button'></td>\n</tr>\n</table>";
+        ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";
