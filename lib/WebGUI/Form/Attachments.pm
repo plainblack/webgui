@@ -219,12 +219,14 @@ sub www_show {
     $style->setLink($url->extras("/AttachmentsControl/AttachmentsControl.css"),
         {type=>"text/css", rel=>"stylesheet"});
     my $uploadControl = '';
-	my $i18n = WebGUI::International->new($session, "Control_Attachments");
+	my $i18n = WebGUI::International->new($session);
 	my $maxFiles = $form->param('maxAttachments') - scalar(@assetIds) ;
     my $attachmentForms = '';
     foreach my $assetId (@assetIds) {
         $attachmentForms .= '<input type="hidden" name="attachments" value="'.$assetId.'" />';
     }
+    my $upload           = $i18n->get('Upload','Operation_FormHelpers');
+    my $uploadAttachment = $i18n->get('Upload an attachment','WebGUI');
 	if ($maxFiles > 0) {
         $uploadControl = '<div id="uploadForm">
             <a href="#" onclick="WebguiAttachmentUploadForm.hide();" id="uploadFormCloser">X</a>
@@ -237,8 +239,8 @@ sub www_show {
             <input type="hidden" name="class" value="Attachments" />
             <input type="hidden" name="sub" value="upload" /> '. $attachmentForms 
             .'<input type="file" name="attachment" />
-            <input type="submit" value="Upload" /> </form> </div>
-            <a id="upload" href="#" onclick="WebguiAttachmentUploadForm.show();">Upload an attachment.</a>
+            <input type="submit" value="'.$upload.'" /> </form> </div>
+            <a id="upload" href="#" onclick="WebguiAttachmentUploadForm.show();">'.$uploadAttachment. '</a>
             ';
 	}
     my $attachments = '';
@@ -265,12 +267,13 @@ sub www_show {
             $attachments .= '</div>';
         }
     }
+    my $instructions = $i18n->get('Upload attachments here. Copy and paste attachments into the editor.','WebGUI');
     my $output = '<html><head> '.$style->generateAdditionalHeadTags.' 
           <script type="text/javascript">
             parent.document.getElementById("'.$form->get("name").'_formId").innerHTML = \''.$attachmentForms.'\';
           </script>
             </head> <body>
-        '.$uploadControl.' <div id="instructions">Upload attachments here. Copy and paste attachments into the editor.</div>
+        '.$uploadControl.' <div id="instructions">'.$instructions.'</div>
          <div id="attachments">'.$attachments.' </div> </body> </html> ';
     return $output;
 }

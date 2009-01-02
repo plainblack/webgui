@@ -4313,6 +4313,18 @@ Users may override this setting in their profile.
             context => q|Abbreviation for Really Simple Syndication, and other similar terms.|,
         },
 
+        'Upload an attachment' => {
+            message => q|Upload an attachment|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
+
+        'Upload attachments here. Copy and paste attachments into the editor.' => {
+            message => q|Upload attachments here. Copy and paste attachments into the editor.|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
+
 };
 
 1;
