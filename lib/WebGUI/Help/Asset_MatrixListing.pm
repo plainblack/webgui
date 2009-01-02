@@ -23,7 +23,9 @@ our $HELP = {
             { 'name' => 'productName' },
             { 'name' => 'productUrl' },
             { 'name' => 'productUrl_click' },
-            { 'name' => 'manufacturerName' },
+            { 'name' => 'manufacturerName',
+              description => 'manufacturerName description'
+            },
             { 'name' => 'manufacturerUrl' },
             { 'name' => 'manufacturerUrl_click' },
             { 'name' => 'version' },

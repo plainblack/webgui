@@ -749,6 +749,12 @@ selectBox.</p>|
         lastUpdated => 0,
         message => q|Hide/show stickied|,
     },
+
+    'matrix asset template variables title' => {
+        lastUpdated => 0,
+        message => q|Matrix Asset Template Variables|,
+    },
+
 };
 
 1;
