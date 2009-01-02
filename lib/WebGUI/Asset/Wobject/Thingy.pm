@@ -1661,6 +1661,9 @@ sub www_editThing {
         if ($field->{fieldType} eq "File"){
             $formElement = "<input type='file' name='file'>";
         }
+        if ($field->{fieldType} eq "Image"){
+            $formElement = "<input type='file' name='image'>";
+        }
         else{
             $formElement = $self->getFormElement($field);     
         }
@@ -2091,6 +2094,9 @@ sub www_editFieldSave {
 
     if ($properties{fieldType} eq "File"){ 
         $formElement = "<input type='file' name='file'>";
+    }
+    elsif ($properties{fieldType} eq "Image"){ 
+        $formElement = "<input type='file' name='image'>";
     }
     else{
         $formElement = $self->getFormElement(\%properties);
