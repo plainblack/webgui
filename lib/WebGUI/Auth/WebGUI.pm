@@ -494,7 +494,7 @@ sub editUserSettingsForm {
         -label     => $i18n->get(868,'WebGUI'),
         -hoverHelp => $i18n->get('868 help','WebGUI'),
     );
-    $f->textarea(
+    $f->HTMLArea(
         -name      => "webguiWelcomeMessage",
         -value     => $self->session->setting->get("webguiWelcomeMessage"),
         -label     => $i18n->get(869,'WebGUI'),
