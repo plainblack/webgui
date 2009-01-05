@@ -485,6 +485,46 @@ our $I18N = {
 		lastUpdated => 1181410226,
 	},
 
+    'common account variables' => {
+		message => q|Common Account, Inbox Plugin, Template Variables.|,
+		lastUpdated => 1230867391,
+	},
+
+    'view_inbox_url' => {
+		message => q|URL to view the Inbox screen.|,
+		lastUpdated => 1230867391,
+	},
+
+    'view_invitations_url' => {
+		message => q|URL to view the Invitations screen.|,
+		lastUpdated => 1230867391,
+	},
+
+    'unread_message_count' => {
+		message => q|The number of unread messages in the Inbox.|,
+		lastUpdated => 1230867391,
+	},
+
+    'invitation_count' => {
+		message => q|The number of Invitations this user has received.|,
+		lastUpdated => 1230867391,
+	},
+
+    'invitations_enabled' => {
+		message => q|A boolean that is true if the user is willing to receive invitations to join Friends Networks on this site.|,
+		lastUpdated => 1230867391,
+	},
+
+    'user_invitations_enabled' => {
+		message => q|A boolean that is true if this site is configured to send invitations to users outside of the site.|,
+		lastUpdated => 1230867391,
+	},
+
+    'invite_friend_url' => {
+		message => q|The URL to invite this user to be join your Friend Network.|,
+		lastUpdated => 1230867391,
+	},
+
 };
 
 1;
