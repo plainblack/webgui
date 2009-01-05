@@ -25,6 +25,7 @@
  - fixed #9387: Asset Manager breaks navigating into a Gallery Album
  - fixed #9001: Thingy add image broken
  - fixed #9386: Gallery: "Image resolutions" issue
+ - fixed #9342: Thingy - Cannot edit a thing
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

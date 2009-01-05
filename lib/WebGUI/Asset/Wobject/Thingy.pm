@@ -19,6 +19,7 @@ use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
+use Data::Dumper;
 
 
 #-------------------------------------------------------------------
@@ -840,9 +841,10 @@ sub getFormElement {
     my $self = shift;
     my $data = shift;
     my %param;
-    my $db = $self->session->db;
+    my $session = $self->session;
+    my $db = $session->db;
     my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
+    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -865,7 +867,7 @@ sub getFormElement {
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
-            @defaultValues = $self->session->form->selectList($name);
+            @defaultValues = $session->form->selectList($name);
         }
         else {
             foreach (split(/\n/x, $data->{value})) {
@@ -881,7 +883,7 @@ sub getFormElement {
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
 
-        my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
+        my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
         if (ref $values eq 'HASH') {
             $param{options} = $values;
         }
@@ -909,6 +911,7 @@ sub getFormElement {
         my $otherThingId = $data->{fieldType}; 
         $otherThingId =~ s/^otherThing_(.*)/$1/x;
         $param{fieldType} = "SelectList"; 
+        $class = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
         my $tableName = 'Thingy_'.$otherThingId;
         my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);  
@@ -932,7 +935,7 @@ sub getFormElement {
         $param{value} = $data->{value} || $data->{defaultValue};
     }
 
-    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$self->session, \%param ])};
+    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
     return $formElement->toHtml();
 
 }
