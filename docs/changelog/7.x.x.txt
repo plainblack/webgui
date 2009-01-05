@@ -26,6 +26,7 @@
  - fixed #9001: Thingy add image broken
  - fixed #9386: Gallery: "Image resolutions" issue
  - fixed #9342: Thingy - Cannot edit a thing
+ - fixed #9033: Deleting Linked Thing Field Crashes Thingy
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.

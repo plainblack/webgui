@@ -914,15 +914,16 @@ sub getFormElement {
         $class = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);  
+        my $fieldName = 'field_'.$data->{fieldInOtherThingId};
+        my ($otherThingTableExists) = $db->quickArray('show tables like ? ?',[$tableName, $fieldName]);  
         if ($otherThingTableExists){
             $options = $db->buildHashRef('select thingDataId, '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
+                .$dbh->quote_identifier($fieldName)
                 .' from '.$dbh->quote_identifier($tableName));
         
             my $value = $data->{value} || $data->{defaultValue};
             ($param{value}) = $db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
+                .$dbh->quote_identifier($fieldName)
                 .' from '.$dbh->quote_identifier($tableName)
                 .' where thingDataId = ?',[$value]);
         }
