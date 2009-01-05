@@ -28,6 +28,7 @@
  - fixed #9342: Thingy - Cannot edit a thing
  - fixed #9033: Deleting Linked Thing Field Crashes Thingy
  - fixed #9400: Form.captcha should be form_capcha in dataform help
+ - fixed #9402: i18n confusion
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
