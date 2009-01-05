@@ -14,6 +14,7 @@
  - fixed #9387: sset Manager breaks navigating into a Gallery Album
  - fixed #9001: Thingy add image broken
  - fixed #9386: Gallery: "Image resolutions" issue
+ - fixed #9033: Deleting Linked Thing Field Crashes Thingy
 
 7.5.37
  - fixed #9301: Error in Shelf Template

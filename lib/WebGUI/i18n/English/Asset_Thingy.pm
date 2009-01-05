@@ -936,6 +936,12 @@ search has been done.|,
         message => q|The Thing to which this field refers does not exist or has no table.|,
         lastUpdated => 1104630516,
     },
+
+    'other thing field missing message' => {
+        message => q|The field from the other Thing does not exist.|,
+        lastUpdated => 1231180362,
+    },
+
 };
 
 1;
