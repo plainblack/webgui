@@ -201,6 +201,38 @@ sub canViewThing {
 
 #-------------------------------------------------------------------
 
+=head2 badOtherThing ( tableName, fieldName )
+
+Checks that the table and field for the other Thing are okay.  Returns 0 if okay,
+otherwise, returns an i18n message appropriate for the type of error, like the
+table or the field in the table not existing.
+
+=head3 tableName
+
+The table name for the other thing.
+
+=head3 fieldName
+
+The field in the other thing to check for.
+
+=cut
+
+sub badOtherThing {
+    my ($self, $tableName, $fieldName) = @_;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Thingy');
+    my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);
+    return $i18n->get('other thing missing message') unless $otherThingTableExists;
+    my ($otherThingFieldExists) = $db->quickArray(
+        sprintf('show columns from %s like ?', $db->dbh->quote_identifier($tableName)),
+        [$fieldName]);
+    return $i18n->get('other thing field missing message') unless $otherThingFieldExists;
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( )
 
 defines wobject properties for Thingy instances. If you choose to "autoGenerateForms", the
@@ -804,10 +836,11 @@ sub getFieldValue {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $self->session->db->quickArray('show tables like ?',[$tableName]);
-        if ($otherThingTableExists){
+        my $fieldName = 'field_'.$field->{fieldInOtherThingId};
+        my $badThing  = $self->badOtherThing($tableName, $fieldName);
+        if (! $badThing){
             ($processedValue) = $self->session->db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$field->{fieldInOtherThingId})
+                .$dbh->quote_identifier($fieldName)
                 .' from '.$dbh->quote_identifier($tableName)
                 .' where thingDataId = ?',[$value]);
         }
@@ -913,23 +946,21 @@ sub getFormElement {
         $param{fieldType} = "SelectList"; 
         $class = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
+
         my $tableName = 'Thingy_'.$otherThingId;
         my $fieldName = 'field_'.$data->{fieldInOtherThingId};
-        my ($otherThingTableExists) = $db->quickArray('show tables like ? ?',[$tableName, $fieldName]);  
-        if ($otherThingTableExists){
-            $options = $db->buildHashRef('select thingDataId, '
-                .$dbh->quote_identifier($fieldName)
-                .' from '.$dbh->quote_identifier($tableName));
-        
-            my $value = $data->{value} || $data->{defaultValue};
-            ($param{value}) = $db->quickArray('select '
-                .$dbh->quote_identifier($fieldName)
-                .' from '.$dbh->quote_identifier($tableName)
-                .' where thingDataId = ?',[$value]);
-        }
-        else{
-            return $i18n->get('other thing missing message');
-        }
+        my $errorMessage = $self->badOtherThing($tableName, $fieldName);
+        return $errorMessage if $errorMessage;
+
+        $options = $db->buildHashRef('select thingDataId, '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName));
+    
+        my $value = $data->{value} || $data->{defaultValue};
+        ($param{value}) = $db->quickArray('select '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName)
+            .' where thingDataId = ?',[$value]);
         $param{size} = 1;
         $param{multiple} = 0;
         $param{options} = $options;
