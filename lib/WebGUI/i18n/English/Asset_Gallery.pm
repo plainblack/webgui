@@ -480,8 +480,8 @@ our $I18N = {
     },
 
     'helpvar albums rss' => {
-        message     => 'This is the loop over the albums being currently displayed.',
-        lastUpdated => 0,
+        message     => 'A loop containing an RSS feed for albums in the gallery.',
+        lastUpdated => 1231287030,
     },
 
     'helpvar rssDate' => {

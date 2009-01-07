@@ -2,6 +2,7 @@
  - Updated captcha images to be more legible.
  - fixed #9285: modifing template prevents edit of syncontent
  - fixed #8886: Search button in Asset manager
+ - fixed #9410: Wrong help text
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
  - fixed a bug where clicking the apply button when func=add would return the
    edit screen of the parent asset rather than that of the new asset. (Martin
