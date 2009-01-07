@@ -1,4 +1,5 @@
 7.5.39
+ - fixed #9410: Wrong help text
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
