@@ -176,6 +176,7 @@ sub www_view {
                 'WebGUI::Asset::Post',
                 'WebGUI::Asset::Wobject::GalleryAlbum',
                 'WebGUI::Asset::Event',
+                'WebGUI::Asset::WikiPage',
                 'WebGUI::Asset::Post::Thread',
             ],
             whereClause   => "asset.createdBy = '$userId' or assetData.ownerUserId = '$userId'",
