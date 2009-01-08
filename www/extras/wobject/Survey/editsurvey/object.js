@@ -24,7 +24,7 @@ Survey.ObjectTemplate = new function(){
 
         var form = new YAHOO.widget.Dialog(type,
            { 
-             width : "500px",
+             width : "600px",
 			 context: [document.body, 'tr', 'tr'],
              visible : false,
              constraintoviewport : true,
@@ -36,22 +36,21 @@ Survey.ObjectTemplate = new function(){
 	
 	var textareaId = type+'Text';
 	var textarea = YAHOO.util.Dom.get(textareaId);
+	
 	var height = YAHOO.util.Dom.getStyle(textarea,'height');
 	if (height == ''){
- 	height = '300px';
-	}
-	var width = YAHOO.util.Dom.getStyle(textarea,'width');
-	if (width == ''){
-		width = '500px';
+ 		height = '300px';
 	}
 	myTextarea = new YAHOO.widget.SimpleEditor(textareaId, {
 		height: height,
-		width: width,
+		width: '100%',
 		dompath: false //Turns on the bar at the bottom
 	});
-	myTextarea.get('toolbar').titlebar = false;
-	myTextarea.render();
 	
+	if (myTextarea.get('toolbar')) {
+		myTextarea.get('toolbar').titlebar = false;
+	}
+	myTextarea.render();	
 
         form.show();
     }
