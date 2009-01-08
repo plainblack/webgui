@@ -25,7 +25,7 @@ Survey.ObjectTemplate = new function(){
         var form = new YAHOO.widget.Dialog(type,
            { 
              width : "500px",
-             fixedcenter : true,
+			 context: [document.body, 'tr', 'tr'],
              visible : false,
              constraintoviewport : true,
              buttons : butts
@@ -49,7 +49,9 @@ Survey.ObjectTemplate = new function(){
 		width: width,
 		dompath: false //Turns on the bar at the bottom
 	});
+	myTextarea.get('toolbar').titlebar = false;
 	myTextarea.render();
+	
 
         form.show();
     }
