@@ -389,11 +389,12 @@ if (typeof Survey === "undefined") {
         addWidgets: function(qs){
             hasFile = false;
             for (var i = 0; i < qs.length; i++) {
+				var q = qs[i];
 				if (!q || !q.answers) {
 					// gracefully handle q with no answers
 					continue;
 				}
-                var q = qs[i];
+                
                 var verts = '';
                 for (var x in q.answers) {
                     if (YAHOO.lang.hasOwnProperty(q.answers, x)) {
