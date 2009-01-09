@@ -21,8 +21,14 @@ Survey.ObjectTemplate = new function(){
                 { text:"Cancel", handler:function(){this.cancel();}}, 
                 { text:"Delete", handler:function(){document.getElementById('delete').value = 1; this.submit();}}
             ];
+		if (type !== 'answer') {
+			butts.push({
+				text: "Preview",
+				handler: jumpTo
+			});
+		}
 
-        var form = new YAHOO.widget.Dialog(type,
+        var dialog = new YAHOO.widget.Dialog(type,
            { 
              width : "600px",
 			 context: [document.body, 'tr', 'tr'],
@@ -31,8 +37,11 @@ Survey.ObjectTemplate = new function(){
              buttons : butts
            } );
 
-        form.callback = Survey.Comm.callback;
-        form.render();
+        dialog.callback = Survey.Comm.callback;
+        dialog.render();
+		function jumpTo() {
+			window.location.search = 'func=jumpTo;id=' + dialog.form.id.value;
+		}
 	
 	var textareaId = type+'Text';
 	var textarea = YAHOO.util.Dom.get(textareaId);
@@ -52,7 +61,7 @@ Survey.ObjectTemplate = new function(){
 	}
 	myTextarea.render();	
 
-        form.show();
+        dialog.show();
     }
 }();
 

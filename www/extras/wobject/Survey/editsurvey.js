@@ -133,7 +133,7 @@ Survey.OnLoad = function() {
         initHandler: function(){
             new YAHOO.util.DDTarget("sections","sections");
             Survey.Comm.loadSurvey();
-        },
+        }
     }
 }();
 

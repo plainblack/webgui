@@ -299,6 +299,54 @@ sub www_submitObjectEdit {
 } ## end sub www_submitObjectEdit
 
 #-------------------------------------------------------------------
+=head2 Allow survey editors to "jump to" a particular section of question in a 
+Survey by tricking Survey into thinking they've completed the survey up to that
+point. Useful for survey builders.
+Note that calling this method will delete any existing survey responses for the
+current user (although only survey builders can call this method so that shouldn't be
+a problem
+=cut
+ 
+sub www_jumpTo {
+    my $self = shift;
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+
+    my $data = $self->session->form->paramsHashRef();
+    
+    $self->session->log->debug("jumpTo to $data->{id}");
+
+    # Remove existing responses for current user
+    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
+        [ $self->getId, $self->session->user->userId() ] );
+    my $responseId = $self->getResponseId();
+
+    $self->loadBothJSON();
+
+    # iterate over surveyOrder looking for the jumpTo target
+    for my $i ( 0 .. $#{ $self->response->surveyOrder() } ) {
+        my $address = $self->response->surveyOrder()->[$i];
+
+        my @possibilities = (
+            $self->survey->section($address),
+            $self->survey->question($address),
+        );
+        foreach my $possibilty (@possibilities) {
+            if ( ref $possibilty eq 'HASH' && $possibilty->{id} eq $data->{id} ) {
+                $self->session->log->debug("Found jumpTo target");
+                $self->response->lastResponse( $i - 1 );
+                $self->saveResponseJSON();
+                last;
+            }
+        }
+    }
+    $self->session->log->debug("Unable to find jumpTo target");
+
+    return $self->www_takeSurvey;
+}
+
+#-------------------------------------------------------------------
 sub copyObject {
     my ( $self, $address ) = @_;
 
