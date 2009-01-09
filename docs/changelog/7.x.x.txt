@@ -1,3 +1,5 @@
+7.6.9
+
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
  - Updated captcha images to be more legible.
