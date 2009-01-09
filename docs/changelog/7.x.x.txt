@@ -32,6 +32,7 @@
  - fixed #9400: Form.captcha should be form_capcha in dataform help
  - fixed #9402: i18n confusion
  - fixed #9403: i18n survey
+ - fixed: Syndicated Content corrupts wide characters
 
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
