@@ -753,6 +753,8 @@ sub get {
 		return $self->{_properties}{$propertyName};
 	}
 	my %copyOfHashRef = %{$self->{_properties}};
+        my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
+        if( $keywords ne '' ) { $copyOfHashRef{ keywords } = $keywords ; }
 	return \%copyOfHashRef;
 }
 
