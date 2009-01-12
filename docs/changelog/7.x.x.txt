@@ -1,5 +1,6 @@
 7.6.9
  - marked sbin scripts as executable
+ - Problem #9492: in passing form variables to Macro SQL inside a snippet
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
