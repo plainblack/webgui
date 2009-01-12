@@ -194,23 +194,24 @@ sub purgeCache {
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
-    my $versionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+    my $session = $self->session;
+    my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
-        $self->session->var->isAdminOn
+        $session->var->isAdminOn
         || $self->get("cacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
     unless ($noCache) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->get;
+		my $out = WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->get;
 		return $out if $out;
 	}
 	my $output = $self->get("snippet");
-	WebGUI::Macro::process($self->session,\$output);
-	$output = $self->getToolbar.$output if ($self->session->var->get("adminOn") && !$calledAsWebMethod);
+	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
 	if ($self->getValue("processAsTemplate")) {
-		$output = WebGUI::Asset::Template->processRaw($self->session, $output, $self->get);
+		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
 	}
+	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
+		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
 	}
        	return $output;
 }
