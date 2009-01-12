@@ -1,4 +1,5 @@
 7.6.9
+ - marked sbin scripts as executable
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
