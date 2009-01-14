@@ -1334,7 +1334,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit;
+    return undef unless $self->canEdit && $self->session->var->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
     my $userUiLevel = $self->session->user->profileField("uiLevel");
@@ -1433,6 +1433,7 @@ sub getToolbar {
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
     }
     $output .= '</ul></div></div>' . $toolbar . '</div>';
+    $self->{_toolbar} = $output;
     return $output;
 }
 
@@ -1991,9 +1992,8 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-    if ($self->session->var->isAdminOn) {
-        $self->{_toolbar} = $self->getToolbar;
-    }
+    ##Make the toolbar now and stick it in the cache.
+    $self->getToolbar;
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
@@ -2107,16 +2107,17 @@ sub processTemplate {
         return "Error: Can't process template for asset ".$self->getId." of type ".$self->get("className");
     }
 
-	$template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
-	if (defined $template) {
+    $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    if (defined $template) {
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
-		$var->{'controls'} = $self->getToolbar;
-                my %vars = (
+        $var->{'controls'} = $self->getToolbar;
+        my %vars = (
 			%{$self->{_properties}},
 			%{$var}
-			);
-		return $template->process(\%vars);
-	} else {
+        );
+        return $template->process(\%vars);
+    }
+    else {
 		$self->session->errorHandler->error("Can't instantiate template $templateId for asset ".$self->getId);
 		return "Error: Can't instantiate template ".$templateId;
 	}

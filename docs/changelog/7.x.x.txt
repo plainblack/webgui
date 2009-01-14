@@ -1,6 +1,7 @@
 7.5.39
  - fixed #9410: Wrong help text
- - Problem #9492: in passing form variables to Macro SQL inside a snippet
+ - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
+ - fixed #9404: Head tags for admin user with admin mode off
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
