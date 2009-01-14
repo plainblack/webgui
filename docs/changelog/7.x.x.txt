@@ -2,6 +2,7 @@
  - fixed #9410: Wrong help text
  - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
  - fixed #9404: Head tags for admin user with admin mode off
+ - fixed a problem where a Matrix listing could not be deleted if the CS it contained has already deleted.
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem

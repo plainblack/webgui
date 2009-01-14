@@ -402,7 +402,8 @@ sub www_deleteListingConfirm {
 	my $self = shift;
         return $self->session->privilege->insufficient() unless($self->canEdit);
 	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId})->purge;
+	my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
+    $forum->purge if defined $forum;
 	$self->session->db->write("delete from Matrix_listing where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_listingData where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
 	$self->session->db->write("delete from Matrix_rating where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
@@ -788,7 +789,6 @@ sub www_editListingSave {
             $oldTag->setWorking
                 if defined $oldTag;
         }
-        my $forum = WebGUI::
     }
 	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
 	$data{assetId} = $self->getId;
