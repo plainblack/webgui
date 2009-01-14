@@ -345,6 +345,12 @@ will always be false for query5.|,
 		lastUpdated => 0,
 	},
 
+	'Download this data' => {
+		message => "Download this data",
+		context => "Link label to download data form the report",
+		lastUpdated => 1229907351,
+	},
+
 	'sql report asset template variables title' => {
 		message => q|SQL Report Asset Template Variables|,
 		lastUpdated => 1168887204

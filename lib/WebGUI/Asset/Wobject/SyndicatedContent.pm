@@ -143,10 +143,14 @@ sub generateFeed {
 		my $cache = WebGUI::Cache->new($self->session, $url, "RSS");
 		my $value = $cache->get;
 		unless ($value) {
-    		$value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
+            $value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
             $newlyCached = 1;
         }
-		eval { $feed->merge($value) };
+        utf8::downgrade($value);
+        eval {
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1);
+            $feed->merge($singleFeed);
+        };
 		if (my $e = WebGUI::Error->caught()) {
 			$log->error("Syndicated Content asset (".$self->getId.") has a bad feed URL (".$url."). Failed with ".$e->message);
 		}

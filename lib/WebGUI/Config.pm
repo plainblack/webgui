@@ -64,6 +64,24 @@ These subroutines are available from this package:
 
 #-------------------------------------------------------------------
 
+=head2 clearCache ( ) 
+
+Clear the cache of in-memory configuration files.  This is required by the upgrade script, which
+forks to run each upgrade.  When the child is reaped, the original is untouched, so that the
+next script in the line recieves an old, in-memory config, essentially undoing any config
+changes in the first upgrade script.
+
+This is a class method.
+
+=cut
+
+sub clearCache {
+	my $class = shift;
+    %config = ();
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCookieName ( ) 
 
 Returns the cookie name defined in the config file. Returns "wgSession" if one isn't defined.

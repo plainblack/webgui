@@ -144,6 +144,21 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1170549116,
 	},
 
+	'resultsFeedback' => {
+		message => q|Search results for|,
+		lastUpdated => 1230678996,
+	},
+
+	'page' => {
+		message => q|Page|,
+		lastUpdated => 1230678996,
+	},
+
+	'of' => {
+		message => q|of|,
+		lastUpdated => 1230678996,
+	},
+
 	'no results' => {
 		message => q|No results were found.|,
 		lastUpdated => 1170549113,

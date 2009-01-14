@@ -1,4 +1,4 @@
-package WebGUI::Help::Shop::PayDriver::ITransact;
+package WebGUI::Help::PayDriver_ITransact;
 
 use strict; 
 
@@ -70,7 +70,7 @@ our $HELP = {
 			},
 			{
 				name		=> "emailField",
-				description	=> "emailNumberField help",
+				description	=> "emailField help",
 				required	=> 1,
 			},
 			{
@@ -80,12 +80,12 @@ our $HELP = {
 			},
 			{
 				name		=> "monthYearField",
-				description	=> "monthYearNumberField help",
+				description	=> "monthYearField help",
 				required	=> 1,
 			},
 			{
 				name		=> "cvv2Field",
-				description	=> "cvv2NumberField help",
+				description	=> "cvv2Field help",
 				required	=> 1,
 			},
 			{

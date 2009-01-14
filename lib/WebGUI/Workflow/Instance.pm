@@ -310,6 +310,8 @@ Executes the next iteration in this workflow. Returns a status code based upon w
  complete	The activity completed successfully, you may run the next one.
  waiting	The activity is waiting on an external event such as user input.
 
+B>NOTE:> You should normally never run this method. The workflow engine will use it instead. When you're ready to kick off a workflow you've created, use start() instead.
+
 =cut
 
 sub run {

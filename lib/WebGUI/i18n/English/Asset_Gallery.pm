@@ -480,8 +480,8 @@ our $I18N = {
     },
 
     'helpvar albums rss' => {
-        message     => 'This is the loop over the albums being currently displayed.',
-        lastUpdated => 0,
+        message     => 'A loop containing an RSS feed for albums in the gallery.',
+        lastUpdated => 1231287030,
     },
 
     'helpvar rssDate' => {
@@ -671,9 +671,15 @@ our $I18N = {
     },
 
     'template listFilesForUser albums title' => {
-        message     => q{Albums},
-        lastUpdated => 0,
+        message     => q{My Albums},
+        lastUpdated => 1230576660,
         context     => q{Title for list of user's Albums},
+    },
+
+    'template listFilesForUser pictures title' => {
+        message     => q{My Pictures},
+        lastUpdated => 1230576660,
+        context     => q{Title for list of user's Pictures},
     },
 
     'template listFilesForUser albums files' => {

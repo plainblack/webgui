@@ -210,7 +210,11 @@ cmp_deeply(
             field_value => 'test value',
             field_url => undef,
             field_name => "field_".$fieldId,
-            field_label => $i18n->get('assetName')." field"
+            field_label => $i18n->get('assetName')." field",
+            field_isRequired => '',
+            field_isVisible => '',
+            field_pretext => undef,
+            field_subtext => undef,
         }],
         'Getting newly added thing data: getViewThingVars returns correct field_loop.'
     );
@@ -227,7 +231,11 @@ cmp_deeply(
             field_value => 'test value',
             field_url => undef,
             field_name => "field_".$fieldId,
-            field_label => $i18n->get('assetName')." field"
+            field_label => $i18n->get('assetName')." field",
+            field_isRequired => '',
+            field_isVisible => '',
+            field_pretext => undef,
+            field_subtext => undef,
             }], 
         viewScreenTitle => "",
         },
@@ -246,7 +254,11 @@ cmp_deeply(
             field_value => 'new test value',
             field_url => undef,
             field_name => "field_".$fieldId,
-            field_label => $i18n->get('assetName')." field"
+            field_label => $i18n->get('assetName')." field",
+            field_isRequired => '',
+            field_isVisible => '',
+            field_pretext => undef,
+            field_subtext => undef,
         }],
         'Getting updated thing data: getViewThingVars returns correct field_loop with updated value.'
     );

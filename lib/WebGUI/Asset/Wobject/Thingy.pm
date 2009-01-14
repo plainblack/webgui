@@ -19,6 +19,7 @@ use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
+use Data::Dumper;
 
 
 #-------------------------------------------------------------------
@@ -196,6 +197,38 @@ sub canViewThing {
         $groupId = $self->session->db->quickScalar("select groupIdView from Thingy_things where thingId=?", [$thingId]);
     }
     return $self->hasPrivileges($groupId);
+}
+
+#-------------------------------------------------------------------
+
+=head2 badOtherThing ( tableName, fieldName )
+
+Checks that the table and field for the other Thing are okay.  Returns 0 if okay,
+otherwise, returns an i18n message appropriate for the type of error, like the
+table or the field in the table not existing.
+
+=head3 tableName
+
+The table name for the other thing.
+
+=head3 fieldName
+
+The field in the other thing to check for.
+
+=cut
+
+sub badOtherThing {
+    my ($self, $tableName, $fieldName) = @_;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Thingy');
+    my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);
+    return $i18n->get('other thing missing message') unless $otherThingTableExists;
+    my ($otherThingFieldExists) = $db->quickArray(
+        sprintf('show columns from %s like ?', $db->dbh->quote_identifier($tableName)),
+        [$fieldName]);
+    return $i18n->get('other thing field missing message') unless $otherThingFieldExists;
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -803,10 +836,11 @@ sub getFieldValue {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $self->session->db->quickArray('show tables like ?',[$tableName]);
-        if ($otherThingTableExists){
+        my $fieldName = 'field_'.$field->{fieldInOtherThingId};
+        my $badThing  = $self->badOtherThing($tableName, $fieldName);
+        if (! $badThing){
             ($processedValue) = $self->session->db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$field->{fieldInOtherThingId})
+                .$dbh->quote_identifier($fieldName)
                 .' from '.$dbh->quote_identifier($tableName)
                 .' where thingDataId = ?',[$value]);
         }
@@ -840,9 +874,10 @@ sub getFormElement {
     my $self = shift;
     my $data = shift;
     my %param;
-    my $db = $self->session->db;
+    my $session = $self->session;
+    my $db = $session->db;
     my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
+    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -865,7 +900,7 @@ sub getFormElement {
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
-            @defaultValues = $self->session->form->selectList($name);
+            @defaultValues = $session->form->selectList($name);
         }
         else {
             foreach (split(/\n/x, $data->{value})) {
@@ -881,7 +916,7 @@ sub getFormElement {
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
 
-        my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
+        my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
         if (ref $values eq 'HASH') {
             $param{options} = $values;
         }
@@ -909,30 +944,30 @@ sub getFormElement {
         my $otherThingId = $data->{fieldType}; 
         $otherThingId =~ s/^otherThing_(.*)/$1/x;
         $param{fieldType} = "SelectList"; 
+        $class = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
+
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);  
-        if ($otherThingTableExists){
-            $options = $db->buildHashRef('select thingDataId, '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-                .' from '.$dbh->quote_identifier($tableName));
-        
-            my $value = $data->{value} || $data->{defaultValue};
-            ($param{value}) = $db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-                .' from '.$dbh->quote_identifier($tableName)
-                .' where thingDataId = ?',[$value]);
-        }
-        else{
-            return $i18n->get('other thing missing message');
-        }
+        my $fieldName = 'field_'.$data->{fieldInOtherThingId};
+        my $errorMessage = $self->badOtherThing($tableName, $fieldName);
+        return $errorMessage if $errorMessage;
+
+        $options = $db->buildHashRef('select thingDataId, '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName));
+    
+        my $value = $data->{value} || $data->{defaultValue};
+        ($param{value}) = $db->quickArray('select '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName)
+            .' where thingDataId = ?',[$value]);
         $param{size} = 1;
         $param{multiple} = 0;
         $param{options} = $options;
         $param{value} = $data->{value} || $data->{defaultValue};
     }
 
-    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$self->session, \%param ])};
+    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
     return $formElement->toHtml();
 
 }
@@ -1048,6 +1083,10 @@ sub getViewThingVars {
                 "label" => $field{label},
                 "isHidden" => $hidden,
                 "url" => $otherThingUrl,
+                "isVisible" => ($field{status} eq "visible" && !$hidden),
+                "isRequired" => ($field{status} eq "required" && !$hidden),
+                "pretext" => $field{pretext},
+                "subtext" => $field{subtext},
             );
             push(@viewScreenTitleFields,$value) if ($field{viewScreenTitle});
             push(@field_loop, { map {("field_".$_ => $fieldProperties{$_})} keys(%fieldProperties) });
@@ -1657,6 +1696,9 @@ sub www_editThing {
         if ($field->{fieldType} eq "File"){
             $formElement = "<input type='file' name='file'>";
         }
+        if ($field->{fieldType} eq "Image"){
+            $formElement = "<input type='file' name='image'>";
+        }
         else{
             $formElement = $self->getFormElement($field);     
         }
@@ -1672,9 +1714,9 @@ sub www_editThing {
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
             ."  <td style='width:370px;'>".$formElement."</td>\n"
             ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>" 
+            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='".$i18n->get('Edit','Icon')."' type='button'>" 
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
-            ."value='Delete' type='button'></td>\n</tr>\n</table>\n</li>\n";
+            ."value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
         $fieldsViewScreen .= "<tr id='view_tr_".$field->{fieldId}."'>"
             ."<td class='formDescription' style='width:180px;' id='view_label_".$field->{fieldId}."'>".$field->{label}
@@ -2088,6 +2130,9 @@ sub www_editFieldSave {
     if ($properties{fieldType} eq "File"){ 
         $formElement = "<input type='file' name='file'>";
     }
+    elsif ($properties{fieldType} eq "Image"){ 
+        $formElement = "<input type='file' name='image'>";
+    }
     else{
         $formElement = $self->getFormElement(\%properties);
     }
@@ -2101,9 +2146,9 @@ sub www_editFieldSave {
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
         ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='Edit' type='button'>"
+        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
         ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
-        ."','".$properties{thingId}."')\" value='Delete' type='button'></td>\n</tr>\n</table>";
+        ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";

@@ -170,6 +170,12 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Last Trade' => {
+		message => q|Last Trade|,
+		context => q|i18n template label. The date and time when the stock was last traded.|,
+		lastUpdated => 1229493951,
+	},
+
 	'stocks.loop' => {
 		message => q|Loop containing all default or personalized stocks|,
 		lastUpdated => 1149565312,
@@ -195,9 +201,21 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Day High' => {
+		message => q|Day High|,
+		context => q|i18n template label.  Refers to the highest price of the stock during the day.|,
+		lastUpdated => 1149565312,
+	},
+
 	'stocks.low' => {
 		message => q|Lowest trade today|,
 		lastUpdated => 1149565312,
+	},
+
+	'Day Low' => {
+		message => q|Day Low|,
+		context => q|i18n template label.  the lowest price of the stock today|,
+		lastUpdated => 1229494373,
 	},
 
 	'stocks.date' => {
@@ -245,6 +263,12 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Volume' => {
+		message => q|Volume|,
+		context => q|i18n template label.  Referring to a quantity of stock.|,
+		lastUpdated => 1229494073,
+	},
+
 	'stocks.volume.millions' => {
 		message => q|Day's Volume In Millions|,
 		lastUpdated => 1149565312,
@@ -258,11 +282,13 @@ our $I18N = {
 	'stocks.bid' => {
 		message => q|Bid|,
 		lastUpdated => 1149565312,
+        context => q|Help doc, and i18n template label.  Refers to the price that people are bidding or asking for a stock.|,
 	},
 
 	'stocks.ask' => {
 		message => q|Ask|,
-		lastUpdated => 1149565312,
+		context => q|template help and i18n template label.  The price people are asking for the stock.|,
+		lastUpdated => 1229494441,
 	},
 
 	'stocks.close' => {
@@ -270,9 +296,21 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Prev Close' => {
+		message => q|Prev Close|,
+		context => q|i18n template label.  Short for Previous Close, the price of the stock from yesterday.|,
+		lastUpdated => 1229494287,
+	},
+
 	'stocks.open' => {
 		message => q|Today's Open|,
 		lastUpdated => 1149565312,
+	},
+
+	'Open' => {
+		message => q|Open|,
+		context => q|template label.  Refers to the price of the stock when trading opened.|,
+		lastUpdated => 1229493038,
 	},
 
 	'stocks.day_range' => {
@@ -290,6 +328,18 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'52 Wk High' => {
+		message => q|52 Wk High|,
+		context => q|i18n template label.  The highest price of the stock in 52 weeks.|,
+		lastUpdated => 1229493392,
+	},
+
+	'52 Wk Low' => {
+		message => q|52 Wk Low|,
+		context => q|i18n template label.  The lowest price of the stock in 52 weeks.|,
+		lastUpdated => 1229493392,
+	},
+
 	'stocks.year_low' => {
 		message => q|52-Week Low|,
 		lastUpdated => 1149565312,
@@ -300,9 +350,16 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'EPS' => {
+		message => q|E.P.S.|,
+		context => q|i18n template label.  Abbreviated from Earnings Per Share.|,
+		lastUpdated => 1229493466,
+	},
+
 	'stocks.pe' => {
 		message => q|P/E Ratio|,
-		lastUpdated => 1149565312,
+		context => q|template help and i18n label.  Short for Price to Earnings Ratio.|,
+		lastUpdated => 1229494503,
 	},
 
 	'stocks.div_date' => {
@@ -325,9 +382,23 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Market Cap' => {
+		message => q|Market Cap|,
+		lastUpdated => 1229492783,
+        context => q|Template label, short for market capitalization|,
+	},
+
 	'stocks.ex_div' => {
-		message => q|Ex-Dividend Date.|,
-		lastUpdated => 1149565312,
+		message => q|Ex-Dividend Date|,
+		lastUpdated => 1229493538,
+        context => q|template help and i18n label.  The date that a stock must be owned to receive a dividend.|,
+	},
+
+	'Dividend' => {
+		message => q|Dividend|,
+		context => q|i18n template label.  The amount you are paid just for owning a share of stock.|,
+		lastUpdated => 1229494596,
+        context => q|template help and i18n label.  The date that a stock must be owned to receive a dividend.|,
 	},
 
 	'stocks.nav' => {
@@ -340,9 +411,21 @@ our $I18N = {
 		lastUpdated => 1149565312,
 	},
 
+	'Yield' => {
+		message => q|Yield|,
+		context => q|i18n template label. ratio of divided to share price averaged over the last 30 days|,
+		lastUpdated => 1229493670,
+	},
+
 	'stocks.exchange' => {
 		message => q|The exchange the information was obtained from.|,
 		lastUpdated => 1149565312,
+	},
+
+	'Exchange' => {
+		message => q|Exchange|,
+		context => q|The place where the stock is traded.|,
+		lastUpdated => 1229494639,
 	},
 
 	'stocks.success' => {
@@ -393,6 +476,42 @@ our $I18N = {
 	'failover' => {
 		message => q|A conditional indicating whether or not failover has been set for this Stock Data Asset.|,
 		lastUpdated => 1168646986
+	},
+
+	'Stock Watch' => {
+		message => q|Stock Watch|,
+		context => q|i18n header for the Stock List Template, probably meaning a set of stocks that are watched.|,
+		lastUpdated => 1229314732,
+	},
+
+	'Last Update' => {
+		message => q|Last Update|,
+		context => q|i18n label for the Stock List Template, the time something was last changed.|,
+		lastUpdated => 1229314732,
+	},
+
+	'delayed 20 minutes' => {
+		message => q|delayed 20 minutes|,
+		context => q|i18n label for the Stock List Template.|,
+		lastUpdated => 1229314732,
+	},
+
+	'Change' => {
+		message => q|Change|,
+		context => q|i18n label for the Stock List Template. Refers to how much the stock changed in price today.|,
+		lastUpdated => 1229314732,
+	},
+
+	'% Change' => {
+		message => q|% Change|,
+		context => q|i18n label for the Stock List Template. Refers to how the percentage change in the price of the stock today.|,
+		lastUpdated => 1229314732,
+	},
+
+	'Close' => {
+		message => q|Close|,
+		context => q|i18n label for the Stock List Template. Used to close the window in the browser.|,
+		lastUpdated => 1229493261,
 	},
 
 };

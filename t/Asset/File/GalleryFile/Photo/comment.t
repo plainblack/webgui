@@ -204,7 +204,7 @@ cmp_deeply(
             re( qr{TinyMCE}i ),
         ),
         commentForm_submit => all(
-            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment"[^>]+>/ ),
+            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment."[^>]+>/ ),
         ),
     } ),
     "appendTemplateVarsCommentForm returns the correct structure",
@@ -243,7 +243,7 @@ cmp_deeply(
             re( qr{$comment->{bodyText}} ),
         ),
         commentForm_submit => all(
-            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment"[^>]+>/ ),
+            re( qr/<input[^>]+type="submit"[^>]+name="submit"[^>]+value="Save Comment."[^>]+>/ ),
         ),
     } ),
     "appendTemplateVarsCommentForm returns the correct structure",

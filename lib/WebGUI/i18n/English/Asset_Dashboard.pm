@@ -45,12 +45,17 @@ our $I18N = {
 		lastUpdated => 1118942468
 	},
 
-        'assets to hide description' => {
-                message => q|This list contains one checkbox for each child Asset of the Page Layout.  Select the
+    'assets to hide description' => {
+            message => q|This list contains one checkbox for each child Asset of the Page Layout.  Select the
 checkbox for any Asset that you do not want displayed in the Page Layout Asset.
 |,
-                lastUpdated => 1119410080,
-        },
+            lastUpdated => 1119410080,
+    },
+
+    'hide new content list' => {
+        message => q|Hide New Content List|,
+        lastUpdated => 1230356526,
+    },
 
 };
 

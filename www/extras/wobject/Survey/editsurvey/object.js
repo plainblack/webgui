@@ -7,14 +7,14 @@ if (typeof Survey === "undefined") {
 Survey.ObjectTemplate = (function(){
 
     var editor;
-	var dialog;
-    
+    var dialog;
+
     return {
-		
+
         loadObject: function(html, type){
-        
+
             document.getElementById('edit').innerHTML = html;
-            
+
             var btns = [{
                 text: "Submit",
                 handler: function(){
@@ -40,7 +40,7 @@ Survey.ObjectTemplate = (function(){
                     this.submit();
                 }
             }];
-            
+
             dialog = new YAHOO.widget.Dialog(type, {
                 width: "600px",
                 context: [document.body, 'tr', 'tr'],
@@ -48,7 +48,7 @@ Survey.ObjectTemplate = (function(){
                 constraintoviewport: true,
                 buttons: btns
             });
-            
+
             if (type !== 'answer') {
                 btns.push({
                     text: "Preview",
@@ -57,13 +57,13 @@ Survey.ObjectTemplate = (function(){
                     }
                 });
             }
-            
+
             dialog.callback = Survey.Comm.callback;
-            dialog.render();            
-            
+            dialog.render();
+
             var textareaId = type + 'Text';
             var textarea = YAHOO.util.Dom.get(textareaId);
-            
+
             var height = YAHOO.util.Dom.getStyle(textarea, 'height');
             if (!height) {
                 height = '300px';
@@ -73,12 +73,12 @@ Survey.ObjectTemplate = (function(){
                 width: '100%',
                 dompath: false //Turns on the bar at the bottom
             });
-            
+
             if (editor.get('toolbar')) {
                 editor.get('toolbar').titlebar = false;
             }
             editor.render();
-            
+
             dialog.show();
         }
     };

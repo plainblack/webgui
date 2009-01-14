@@ -15,18 +15,26 @@ our $I18N = {
 	'category_loop' => {
 		message => q|A loop containing all of the categories in this Matrix.|,
 		lastUpdated => 0,
+        context => q|Description of the category_loop tmpl_var for the template help.|,
 	},
+
+    'attribute_loop' => {
+        message => q|A loop containing all of the attributes in a category of this Matrix.|,
+        lastUpdated => 0,
+        context => q|Description of the attribute_loop tmpl_var for the template help.|,
+    },
 
     'categoryLabel' => {
         message => q|The label of a category.|,
-        lastUpdated => 1149783768,
+        lastUpdated => 0,
+        context => q|Description of the categoryLabel tmpl_var for the template help.|,
     },
 
-
-	'tmplVar category' => {
-		message => q|The name of the current category.|,
-		lastUpdated => 1149783768,
-	},
+    'compareForm' => {
+        message => q|The compare box form. The list of matrix listings in this form is a yui datatable. See the <a href='http://developer.yahoo.com/yui/examples/datatable/dt_skinning.html'>yui docs</a> for information about skinning yui datatables.|,
+        lastUpdated => 0,
+        context => q|Description of the compareForm tmpl_var for the template help.|,
+    },
 
 	'value' => {
 		message => q|The value of this field.|,
@@ -38,80 +46,18 @@ our $I18N = {
         lastUpdated => 1184949083,
     },
 
-	'comments' => {
-		message => q|The comments attached to this listing.|,
-		lastUpdated => 0,
-	},
+    'comparison template help body' => {
+        message => q|Both the compare box form and the comparison list on the matrix compare page are dynamically
+generated yui datatables. See the <a href='http://developer.yahoo.com/yui/examples/datatable/dt_skinning.html'>yui
+docs</a> for information about skinning yui datatables.|,
+        lastUpdated => 0,
+    },
 
-	'emailForm' => {
-		message => q|A form to use to send an email to the listing maintainer.|,
-		lastUpdated => 0,
-	},
-
-	'emailSent' => {
-		message => q|A condition indicating whether or not an email message was sent.|,
-		lastUpdated => 0,
-	},
-
-	'isPending' => {
-		message => q|A conditional indicating whether or not this listing has been approved or not.|,
-		lastUpdated => 1167186037,
-	},
-
-	'lastUpdated_epoch' => {
-		message => q|The epoch date of when this listing was last updated.|,
-		lastUpdated => 0,
-	},
-
-	'lastUpdated_date' => {
-		message => q|A human readable date of when this listing was last updated.|,
-		lastUpdated => 0,
-	},
-
-	'description' => {
-		message => q|The description of this listing.|,
-		lastUpdated => 0,
-	},
-
-	'productName' => {
-		message => q|The name of this listing. This is the same as this matrix listing's asset title.|,
-		lastUpdated => 0,
-	},
-
-	'productUrl' => {
-		message => q|The manufacturer's URL for this listing.|,
-		lastUpdated => 0,
-	},
-
-	'productUrl_click' => {
-		message => q|The product URL to use if you want to register the click count for this listing.|,
-		lastUpdated => 0,
-	},
-
-	'manufacturerUrl' => {
-		message => q|The manufacturer's URL.|,
-		lastUpdated => 0,
-	},
-
-	'manufacturerUrl_click' => {
-		message => q|The manufacturer URL to use if you want to register the click count for this listing.|,
-		lastUpdated => 0,
-	},
-
-	'views' => {
-		message => q|The total number of views this listing has received.|,
-		lastUpdated => 0,
-	},
-
-	'compares' => {
-		message => q|The total number of compares this listing has received.|,
-		lastUpdated => 0,
-	},
-
-	'clicks' => {
-		message => q|The total number of clicks this listing has received.|,
-		lastUpdated => 0,
-	},
+    'javascript' => {
+        message => q|The inline javascript for this template.|,
+        lastUpdated => 0,
+        context => q|Description of the javascript tmpl_var for the template help.|,
+    },
 
     'views label' => {
         message => q|Views|,
@@ -127,51 +73,6 @@ our $I18N = {
         message => q|Clicks|,
         lastUpdated => 0,
     },
-
-	'ratings' => {
-		message => q|The ratings form (or results) for this listing.|,
-		lastUpdated => 1149784175,
-	},
-
-	'CATEGORY_NAME_loop' => {
-		message => q|A loop containting attributes and values for those attributes is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
-		lastUpdated => 0,
-	},
-
-    'attribute_loop' => {
-        message => q|A loop containing attributes and values for those attributes.|,
-        lastUpdated => 0,
-    },
-
-	'tmplVar name' => {
-		message => q|The name of this field.|,
-		lastUpdated => 1149784175,
-	},
-
-	'label' => {
-		message => q|The label of this field.|,
-		lastUpdated => 1149784175,
-	},
-
-	'category listing description' => {
-		message => q|The description that tells the user what this field represents.|,
-		lastUpdated => 1149784175,
-	},
-
-	'tmplVar category' => {
-		message => q|The name of the category this field is in.|,
-		lastUpdated => 1149784175,
-	},
-
-	'tmplVar class' => {
-		message => q|The stylesheet class name for this field. The class is the field value with spaces replaced with underscores and all non alphanumeric characters removed.|,
-		lastUpdated => 1149784175,
-	},
-
-        'detail template help title' => {
-                lastUpdated => 0,
-                message => q|Matrix Listing Detail Template Variables|
-        },
 
 	'search_url' => {
 		message => q|The URL to the matrix search page.|,
@@ -268,6 +169,7 @@ listing,|,
 	'listAttributes_url' => {
 		message => q|The URL to the page where you configure new listing attributes for this matrix.|,
 		lastUpdated => 0,
+        context => q|Description of the listAttributes_url tmpl_var for the template help.|,
 	},
 
     'list attributes label' => {
@@ -288,177 +190,134 @@ listing,|,
 	'addMatrixListing_url' => {
 		message => q|The URL to the page where a user can add a new listing to the matrix.|,
 		lastUpdated => 0,
+        context => q|Description of the addMatrixListing_url tmpl_var for the template help.|,
 	},
 
 	'bestViews_url' => {
 		message => q|The URL to the listing that has the most views.|,
 		lastUpdated => 0,
+        context => q|Description of the bestViews_url tmpl_var for the template help.|,
 	},
 
 	'bestViews_count' => {
 		message => q|The total number of views of the listing that has the most views.|,
 		lastUpdated => 0,
+        context => q|Description of the bestViews_count tmpl_var for the template help.|,
 	},
 
 	'bestViews_name' => {
 		message => q|The name of the listing that has the most views.|,
 		lastUpdated => 0,
+        context => q|Description of the bestViews_name tmpl_var for the template help.|,
 	},
 
 	'bestCompares_url' => {
 		message => q|The URL to the listing that has the most compares.|,
 		lastUpdated => 0,
+        context => q|Description of the  tmpl_var for the template help.|,        
 	},
 
 	'bestCompares_count' => {
 		message => q|The number of compares of the listing that has the most compares.|,
 		lastUpdated => 0,
+        context => q|Description of the bestCompares_count tmpl_var for the template help.|,
 	},
 
 	'bestCompares_name' => {
 		message => q|The name of the listing that has the most compares.|,
 		lastUpdated => 0,
+        context => q|Description of the bestCompares_name tmpl_var for the template help.|,
 	},
 
 	'bestClicks_url' => {
 		message => q|The URL of the listing that has the most clicks.|,
 		lastUpdated => 0,
+        context => q|Description of the bestClicks_url tmpl_var for the template help.|,
 	},
 
 	'bestClicks_count' => {
 		message => q|The number of clicks of the listing that has the most clicks.|,
 		lastUpdated => 0,
+        context => q|Description of the bestClicks_count tmpl_var for the template help.|,
 	},
 
 	'bestClicks_name' => {
 		message => q|The name of the listing that has the most clicks.|,
 		lastUpdated => 0,
+        context => q|Description of the bestClicks_name tmpl_var for the template help.|,
 	},
 
 	'best_rating_loop' => {
-		message => q|A loop containing all of the categories for this matrix and their best ratings.|,
+		message => q|A loop containing the best rated listings for each categories of this matrix.|,
 		lastUpdated => 0,
+        context => q|Description of the best_rating_loop tmpl_loop for the template help.|,
 	},
 
-	'tmplVar best.url' => {
-		message => q|The URL of the listing that has the best rating for this category.|,
+	'url' => {
+		message => q|The URL of the listing.|,
 		lastUpdated => 0,
+        context => q|Description of the url tmpl_var for the template help.|,        
 	},
 
-	'tmplVar best.category' => {
-		message => q|The name of this category.|,
+	'category' => {
+		message => q|The category of the listing.|,
 		lastUpdated => 0,
+        context => q|Description of the category tmpl_var for the template help.|,        
 	},
 
-	'tmplVar best.name' => {
-		message => q|The name of the listing that has the best rating for this category.|,
+	'name' => {
+		message => q|The name of the listing.|,
 		lastUpdated => 0,
+        context => q|Description of the name tmpl_var for the template help.|,
 	},
 
 	'mean' => {
-		message => q|The mean (or average) rating of the best listing in this category.|,
+		message => q|The mean (or average) rating of the best/worst listing in this category.|,
 		lastUpdated => 0,
+        context => q|Description of the mean tmpl_var for the template help.|,
 	},
 
 	'median' => {
-		message => q|The median (or middle) rating of the best listing in this category.|,
+		message => q|The median (or middle) rating of the best/worst listing in this category.|,
 		lastUpdated => 0,
+        context => q|Description of the median tmpl_var for the template help.|,
 	},
 
 	'count' => {
-		message => q|The sum of all the votes of the best listing in this category.|,
+		message => q|The sum of all the votes of the best/worst listing in this category.|,
 		lastUpdated => 0,
+        context => q|Description of the count tmpl_var for the template help.|,
 	},
 
 	'worst_rating_loop' => {
-		message => q|A loop containing all of the categories for this matrix and their worst ratings.|,
+		message => q|A loop containing the worst rated listings for each categories of this matrix.|,
 		lastUpdated => 0,
-	},
-
-	'tmplVar worst.url' => {
-		message => q|The URL of the listing that has the worst rating for this category.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar worst.category' => {
-		message => q|The name of this category.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar worst.name' => {
-		message => q|The name of the listing that has the worst rating for this category.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar worst.mean' => {
-		message => q|The mean (or average) rating of the worst listing in this category.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar worst.median' => {
-		message => q|The median (or middle) rating of the worst listing in this category.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar worst.count' => {
-		message => q|The sum of all the votes of the worst listing in this category.|,
-		lastUpdated => 0,
-	},
-
-	'ratings.details.url' => {
-		message => q|The URL to the ratings details page.|,
-		lastUpdated => 1149795214,
-	},
-
-	'best.posts.url' => {
-		message => q|The URL to the listing that has the most forum posts.|,
-		lastUpdated => 1149795214,
+        context => q|Description of the worst_rating_loop tmpl_loop for the template help.|,
 	},
 
 	'last_updated_loop' => {
 		message => q|A loop containing the 20 most recently updated listings.|,
 		lastUpdated => 0,
+        context => q|Description of the last_updated_loop tmpl_loop for the template help.|,
 	},
 
-	'tmplVar last.url' => {
-		message => q|The URL to view this listing.|,
-		lastUpdated => 1149795214,
-	},
-
-	'tmplVar last.name' => {
-		message => q|The name of the product.|,
-		lastUpdated => 1149795214,
-	},
-
-	'tmplVar last.lastUpdated' => {
+	'lastUpdated' => {
 		message => q|The date this listing was updated.|,
 		lastUpdated => 1149795214,
+        context => q|Description of lastUpdated the tmpl_var for the template help.|,
 	},
 
 	'listingCount' => {
 		message => q|The number of listings in this matrix.|,
 		lastUpdated => 0,
+        context => q|Description of listingCount the tmpl_var for the template help.|,
 	},
 
 	'pending_loop' => {
 		message => q|A loop containing the list of pending listing.|,
 		lastUpdated => 0,
+        context => q|Description of the pending_loop tmpl_loop for the template help.|,
 	},
-
-	'tmplVar pending.url' => {
-		message => q|The URL to the pending listing.|,
-		lastUpdated => 0,
-	},
-
-	'tmplVar pending.name' => {
-		message => q|The product title of the pending listing.|,
-		lastUpdated => 0,
-	},
-
-    'narrow the matrix label' => {
-        message => q|Narrow The Matrix|,
-        lastUpdated => 0,
-    },
 
     'expand the matrix label' => {
         message => q|Expand The Matrix|,
@@ -470,34 +329,27 @@ listing,|,
         lastUpdated => 1184949132,
     },
 
-    'ratings detail template help title' => {
-        lastUpdated => 1230,
-        message => q|Matrix Ratings Detail Template Variables|
-    },
-
-	'listing name' => {
-		message => q|The name of this listing.|,
-		lastUpdated => 1149996259,
-	},
-
 	'fieldType' => {
 		message => q|The type of field specified for this matrix field.|,
 		lastUpdated => 1149996685,
 	},
 
-	'listing label' => {
-		message => q|The label given to this field that describes what the field represents.|,
-		lastUpdated => 1149996685,
+	'label' => {
+		message => q|The label given to this attribute that describes what the attribtute represents.|,
+		lastUpdated => 0,
+        context => q|Description of the listing label tmpl_var inside the attribute loop in the search screen.|,
 	},
 
-	'search field description' => {
-		message => q|A description of the field that gives more detail about the field and is used in the hover over tool tips.|,
-		lastUpdated => 1149996685,
+	'description' => {
+		message => q|A description of the attribute that gives more detail about the attribute and is used in the hover over tool tips.|,
+		lastUpdated => 0,
+        context => q|Description of the description tmpl_var inside the attribute loop in the search screen.|,
 	},
 
 	'form' => {
-		message => q|The form element representing this field.|,
-		lastUpdated => 1149996685,
+		message => q|The form element representing this attribute.|,
+		lastUpdated => 0,
+        context => q|Description of the form tmpl_var inside the attribute loop in the search screen.|,
 	},
 
     'search template help title' => {
@@ -506,13 +358,13 @@ listing,|,
     },
 
 	'categories description' => {
-                message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
-                lastUpdated => 0,
+        message => q|Specify one category per line here to define the categories for this matrix. Categories are used to subdivide fields and also represent the things users can rate each listing on.|,
+        lastUpdated => 0,
      },
 
     'categories default value' => {
-                message => qq|Features\nBenefits|,
-                lastUpdated => 0,
+        message => qq|Features\nBenefits|,
+        lastUpdated => 0,
      },
 
     'submission approval workflow description' => {
@@ -764,11 +616,6 @@ listing,|,
 		message => q|Name|,
 		lastUpdated => 0,
 	},
-
-#	'field label' => {
-#		message => q|Field Label|,
-#		lastUpdated => 1136499282,
-#	},
 	
     'fieldType label' => {
 		message => q|Field Type|,
@@ -788,11 +635,6 @@ listing,|,
 	'category label' => {
 		message => q|Category|,
 		lastUpdated => 0,
-	},
-
-	'no copy' => {
-		message => q|This asset may not be copied.|,
-		lastUpdated => 1133758944,
 	},
 
 	'no edit rights' => {
@@ -818,31 +660,6 @@ listing,|,
         'edit attribute title' => {
                 lastUpdated => 0,
                 message => q|Edit/Add Attribute|
-        },
-
-        'good bad' => {
-                lastUpdated => 1135279558,
-                message => q|Good Bad|
-        },
-
-        'text' => {
-                lastUpdated => 1135279558,
-                message => q|Text|
-        },
-
-        'url' => {
-                lastUpdated => 1135279558,
-                message => q|URL|
-        },
-
-        'text area' => {
-                lastUpdated => 1135279558,
-                message => q|Text Area|,
-        },
-
-        'combo' => {
-                lastUpdated => 1135279558,
-                message => q|Combo|,
         },
 
         'delete listing confirmation' => {
@@ -879,11 +696,6 @@ listing,|,
                 lastUpdated => 0,
                 message => q|The name of the attribute that you are creating.  It is case sensitive and must be unique.|
         },
-
-#        'field label description' => {
-#                lastUpdated => 1135279558,
-#                message => q|The name of the field that you are creating.  It is case sensitive and must be unique.|
-#        },
 
         'fieldType description' => {
                 lastUpdated => 0,
@@ -927,10 +739,22 @@ selectBox.</p>|
         message => q|Compare|,
     },
 
+    'last updated label' => {
+        lastUpdated => 0,
+        message => q|Last Updated|,
+        context => q|The label of the last updated field in the comparison table on the compare screen.|,
+    },
+
     'hide stickied button label' => {
         lastUpdated => 0,
         message => q|Hide/show stickied|,
     },
+
+    'matrix asset template variables title' => {
+        lastUpdated => 0,
+        message => q|Matrix Asset Template Variables|,
+    },
+
 };
 
 1;

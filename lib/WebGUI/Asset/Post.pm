@@ -955,6 +955,14 @@ sub postProcess {
 	my $self = shift;
 	my %data = ();
 	($data{synopsis}, $data{content}) = $self->getSynopsisAndContent($self->get("synopsis"), $self->get("content"));
+    my $spamStopWords = $self->session->config->get('spamStopWords');
+    if (ref $spamStopWords eq 'ARRAY') {
+        my $spamRegex = join('|',@{$spamStopWords});
+        if ($data{content} =~ m/$spamRegex/xmsi) {
+            $data{skipNotification} = 1;
+            $self->trash;
+        }
+    }
 	my $user = WebGUI::User->new($self->session, $self->get("ownerUserId"));
 	my $i18n = WebGUI::International->new($self->session, "Asset_Post");
 	if ($self->getThread->getParent->get("addEditStampToPosts")) {
@@ -1428,7 +1436,7 @@ sub www_edit {
         name=>"storageId",
         value=>$self->get("storageId"),
         maxAttachments=>$numberOfAttachments,
-        deleteFileUrl=>$self->getUrl("func=deleteFile;filename=")
+        ##Removed deleteFileUrl, since it will go around the revision control system.
     }) if ($numberOfAttachments);
     
     $var{'contentType.form'} = WebGUI::Form::contentType($session, {

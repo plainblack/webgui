@@ -34,6 +34,17 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
+    'user layout template title' => {
+        message     => q{Account User Layout Template},
+        lastUpdated => 1230846973,
+    },
+
+    'user layout template body' => {
+        message     => q{This Account plugin is only a wrapper for the WebGUI Auth system.  Please see
+        the display account templates for information about styling this screen.},
+        lastUpdated => 1230846978,
+    },
+
     
 };
 

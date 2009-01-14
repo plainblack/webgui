@@ -11,30 +11,44 @@ our $I18N = {
 
     'shop style template label' => {
         message     => q|Style Template|,
-        lastUpdated => 1119068809
+        lastUpdated => 1119068809,
 	},
 
     'shop style template hoverHelp' => {
         message     => q|Select a style template from the list to enclose the shop tab in.|,
-        lastUpdated => 1119068809
+        lastUpdated => 1119068809,
 	},
 
     'shop layout template label' => {
         message     => q|Layout Template|,
-        lastUpdated => 1119068809
+        lastUpdated => 1119068809,
 	},
-    
+
     'shop layout template hoverHelp' => {
         message     => q{Choose a layout template in which to enclose the content from the various methods within the shop tab},
-        lastUpdated => 1119068809
+        lastUpdated => 1119068809,
     },
 
     'manage purchases label' => {
         message     => q{Manage Purchases},
-        lastUpdated => 1119068809
+        lastUpdated => 1119068809,
     },
 
-    
+    'manage_purchases_url' => {
+        message     => q{The URL to the manage purchases screen.},
+        lastUpdated => 1119068809,
+    },
+
+    'managePurchasesIsActive' => {
+        message     => q{A boolean that is true if the current screen is view, managePurchases or viewTransaction.},
+        lastUpdated => 1119068809,
+    },
+
+    'common account variables' => {
+        message     => q{Common Account, Shop Plugin, Template Variables.},
+        lastUpdated => 1230867169,
+    },
+
 };
 
 1;

@@ -43,8 +43,9 @@ sub _isValidLDAPUser {
     my $self = shift;
     my ($error, $ldap, $search, $auth, $connectDN);
     my $i18n = WebGUI::International->new($self->session);
-   
+
     my $connection = $self->getLDAPConnection;
+    return 0 unless $connection;
     
     #Check to see that the LDAP Link is valid
     my $ldapLink = $self->getLDAPLink;
@@ -52,12 +53,19 @@ sub _isValidLDAPUser {
         $self->error('<li>'.$i18n->get(2,'AuthLDAP').'</li>');
         return 0;
     }
+    my $username = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
+    my $password = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
 
-    my $username   = $self->session->form->get("authLDAP_ldapId") || $self->session->form->get("username");
-    my $password   = $self->session->form->get("authLDAP_identifier") || $self->session->form->get("identifier");
-  
+    my $uri = URI->new($connection->{ldapUrl}) or $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
+
+    if($error ne ""){
+        $self->error($error);
+        return 0;
+    }
+
     # Create an LDAP object
-    if ($ldap = $ldapLink->connectToLDAP) {
+    if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
+
         my $uri  = $ldapLink->getURI;
         # Bind as a proxy user to search for the user trying to login
         if($connection->{connectDn}) {
@@ -85,7 +93,7 @@ sub _isValidLDAPUser {
                 # Remember the users DN so we can use it later.
                 $self->setConnectDN($connectDN);
                 $ldap->unbind;
-            
+
                 # Create a new LDAP object
                 $ldap = $ldapLink->connectToLDAP or $error .= $i18n->get(2,'AuthLDAP');
 
@@ -117,7 +125,7 @@ sub _isValidLDAPUser {
       $error = '<li>'.$i18n->get(2,'AuthLDAP').'</li>';
       $self->session->errorHandler->error("Couldn't create LDAP object: ".$connection->{ldapUrl});
    }
-  
+
    $self->error($error);
 
    # Return 1 on successful authentication
@@ -148,7 +156,7 @@ sub authenticate {
     my $userId = $self->userId;
     my $identifier = $_[1];
     my $userData = $self->getParams;
-		
+
     $error .= '<li>'.$i18n->get(12,'AuthLDAP').'</li>' if ($userData->{ldapUrl} eq "");
     $error .= '<li>'.$i18n->get(11,'AuthLDAP').'</li>' if ($userData->{connectDN} eq "");
     $self->error($error);
@@ -157,7 +165,7 @@ sub authenticate {
         $self->user(WebGUI::User->new($self->session,1));
         return 0 ;
     }
-	
+
     if($uri = URI->new($userData->{ldapUrl})) {
 
         # Create an LDAP object
@@ -179,14 +187,14 @@ sub authenticate {
             $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
             $self->session->errorHandler->error("LDAP error: ".$self->ldapStatusCode($auth->code));
         }
-	   
+
         $ldap->unbind;
     }
     else { 
         $error .= '<li>'.$i18n->get(13,'AuthLDAP').'</li>';
         $self->session->errorHandler->error("Could not process this LDAP URL: ".$userData->{ldapUrl});
     }
-	
+
     if($error ne ""){
         $self->error($error);
         $self->user(WebGUI::User->new($self->session,1));
@@ -208,8 +216,9 @@ sub connectToLDAP {
     my $self = shift;
     my $connectionId = $self->session->form->process("connection") || $self->session->setting->get("ldapConnection");
     my $ldapLink = WebGUI::LDAPLink->new($self->session,$connectionId);
+    return undef unless defined $ldapLink;
     my $connection = $ldapLink->get;
-   
+
     $self->{'_ldapLink'  } = $ldapLink;
     $self->{'_connection'} = $connection;   
     return $connection;
@@ -227,13 +236,17 @@ sub createAccount {
     elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('inboxInviteUserEnabled')) {
  	   return $self->displayLogin;
     } 
-	
-	
+
+
 	my $connection = $self->getLDAPConnection;
+    if (! $connection) {
+       $self->session->log->error('Unable to create LDAP account as there is no LDAP connection defined');
+       return $self->displayLogin;
+    }
 	$vars->{'create.message'} = $message if ($message);
 	my $i18n = WebGUI::International->new($self->session,"AuthLDAP");
 	$vars->{'create.form.ldapConnection.label'} = $i18n->get("ldapConnection");
-	
+
 	my $url = $self->session->url->page("op=auth;method=createAccount;connection=");
 	$vars->{'create.form.ldapConnection'} = WebGUI::Form::selectBox($self->session, {
 	                name=>"ldapConnection",
@@ -256,30 +269,31 @@ sub createAccount {
       extras => $self->getExtrasStyle($ldapPwd)
    });
    $vars->{'create.form.password.label'} = $connection->{ldapPasswordName};
-    
+
    $vars->{'create.form.hidden'} = WebGUI::Form::hidden($self->session,{"name"=>"confirm","value"=>$confirm});
    return $self->SUPER::createAccount("createAccountSave",$vars);
 }
 
 #-------------------------------------------------------------------
 sub createAccountSave {
-   my $self = shift;
-   my $username = $self->session->form->process('authLDAP_ldapId');
-   my $password = $self->session->form->process('authLDAP_identifier');
-   my $error = "";
-	my $i18n = WebGUI::International->new($self->session);
-   
-   #Validate user in LDAP
-   if(!$self->_isValidLDAPUser()){
-      return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$self->error);
-   }
-   
-    my $connection = $self->getLDAPConnection;
-    my $ldapLink   = $self->getLDAPLink;
+    my $self = shift;
+    my $username = $self->session->form->process('authLDAP_ldapId');
+    my $password = $self->session->form->process('authLDAP_identifier');
+    my $error = "";
+    my $i18n = WebGUI::International->new($self->session);
 
-    #Get connectDN from settings
-    my $ldap = $ldapLink->connectToLDAP;
-    my $uri  = $ldapLink->getURI;
+    #Validate user in LDAP
+    if(!$self->_isValidLDAPUser()){
+        return $self->createAccount("<h1>".$i18n->get(70)."</h1>".$self->error);
+    }
+
+    my $connection = $self->getLDAPConnection;
+    if (! $connection) {
+        return $self->createAccount("<h1>".$i18n->get('no ldap link for auth')."</h1>".$self->error);
+    }
+    #Get connectDN from settings   
+    my $uri = URI->new($connection->{ldapUrl});
+    my $ldap = Net::LDAP->new($uri->host, (port=>$uri->port));
     my $auth;
     if($connection->{connectDn}) {
         $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
@@ -299,28 +313,19 @@ sub createAccountSave {
         }
     }
     $ldap->unbind;
-   
-   
+
+
     #Check that username is valid and not a duplicate in the system.
     $error .= $self->error if(!$self->validUsername($username));
     #Validate profile data.
-    my $fields    = WebGUI::ProfileField->getEditableFields($self->session);
-    my $retHash   = $self->user->validateProfileDataFromForm($fields);
-    my $profile   = $retHash->{profile};
-    my $temp      = "";
-    my $warning   = "";
-
-    my $format    = "<li>%s</li>";
-    map { $warning .= sprintf($format,$_)  } @{$retHash->{warnings}};
-    map { $temp    .= sprintf($format,$_)  } @{$retHash->{errors}};
-
+    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session);
     $error .= $temp;
-    return $self->createAccount("<li>".$error."</li>") unless ($error eq "");
+    return $self->createAccount("<li>".$error."</li1>") unless ($error eq "");
     #If Email address is not unique, a warning is displayed
     if($warning ne "" && !$self->session->form->process("confirm")){
         return $self->createAccount('<li>'.$i18n->get(1078).'</li>', 1);
     }
-   
+
     my $properties;
     $properties->{connectDN} = $connectDN;
     $properties->{ldapUrl} = $connection->{ldapUrl};
@@ -331,9 +336,9 @@ sub createAccountSave {
 
 #-------------------------------------------------------------------
 sub deactivateAccount {
-   my $self = shift;
-   return $self->displayLogin if($self->isVisitor);
-   return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
+    my $self = shift;
+    return $self->displayLogin if($self->userId eq '1');
+    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
 #-------------------------------------------------------------------
@@ -388,9 +393,10 @@ sub displayLogin {
 =cut
 
 sub editUserForm {
-   my $self = shift;
+    my $self = shift;
     my $userData = $self->getParams;
 	my $connection = $self->getLDAPConnection;
+    return '' unless $connection;
     my $ldapUrl = $self->session->form->process('authLDAP_ldapUrl') || $userData->{ldapUrl} || $connection->{ldapUrl};
 	my $connectDN = $self->session->form->process('authLDAP_connectDN') || $userData->{connectDN};
 	my $ldapConnection = $self->session->form->process('authLDAP_ldapConnection') || $userData->{ldapConnection};
@@ -490,6 +496,8 @@ sub editUserSettingsFormSave {
 #-------------------------------------------------------------------
 sub getAccountTemplateId {
     my $self = shift;
+    my $ldapConnect = $self->getLDAPConnection;
+    return "PBtmpl0000000000000004" unless $ldapConnect;
 	return ($self->getLDAPConnection->{ldapAccountTemplate} || "PBtmpl0000000000000004");
 }
 
@@ -502,13 +510,15 @@ sub getConnectDN {
 #-------------------------------------------------------------------
 sub getCreateAccountTemplateId {
     my $self = shift;
+    my $ldapConnect = $self->getLDAPConnection;
+    return "PBtmpl0000000000000005" unless $ldapConnect;
 	return ($self->getLDAPConnection->{ldapCreateAccountTemplate} || "PBtmpl0000000000000005");
 }
 
 #-------------------------------------------------------------------
 sub getLDAPConnection {
    my $self = shift;
-   
+
    return $self->{_connection} if $self->{_connection};
    return $self->connectToLDAP;   
 }
@@ -523,34 +533,41 @@ sub getLDAPLink {
 #-------------------------------------------------------------------
 sub getLoginTemplateId {
     my $self = shift;
+    my $ldapConnect = $self->getLDAPConnection;
+    return "PBtmpl0000000000000006" unless $ldapConnect;
     return ($self->getLDAPConnection->{ldapLoginTemplate} || "PBtmpl0000000000000006");
 }
 
 #-------------------------------------------------------------------
 sub login {
-   my $self = shift;
-   my $i18n = WebGUI::International->new($self->session);
-   my $username = $self->session->form->process("username");
-   my $identifier = $self->session->form->process("identifier");
-   my $autoRegistration = $self->session->setting->get("automaticLDAPRegistration");
-   my $hasAuthenticated = 0;
-   
-   $hasAuthenticated = 1 if ( $self->authenticate($username,$identifier) );
-   
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session);
+    my $username = $self->session->form->process("username");
+    my $identifier = $self->session->form->process("identifier");
+    my $autoRegistration = $self->session->setting->get("automaticLDAPRegistration");
+    my $hasAuthenticated = 0;
+
+    $hasAuthenticated = 1 if ( $self->authenticate($username,$identifier) );
+
+    my $connection = $self->getLDAPConnection;
+    if (! $connection) {
+       return $self->displayLogin("<h1>".$i18n->get('no ldap logins')."</h1>".$self->error);
+    }
+
    # Autoregistration is on and they didn't authenticate yet
    if ($autoRegistration && !$hasAuthenticated) {
       # See if they are in LDAP and if so that they can bind with the password given.
       if($self->_isValidLDAPUser()) {
-            
+
          # Create a WebGUI Account
          if ($self->validUsername($username)) {
             $self->SUPER::createAccountSave($username, {
-                 connectDN => $self->getConnectDN,
-                 ldapUrl   => $self->getLDAPConnection->{ldapUrl},
-                 ldapConnection  => $self->getLDAPConnection->{ldapLinkId},
+                 connectDN       => $self->getConnectDN,
+                 ldapUrl         => $connection->{ldapUrl},
+                 ldapConnection  => $connection->{ldapLinkId},
             },$identifier);
             $hasAuthenticated = 1;
-                
+
             # Pull the users profile from LDAP to WebGUI
             WebGUI::Workflow::Instance->create($self->session, {
 			workflowId=>'AuthLDAPworkflow000001',
@@ -579,7 +596,7 @@ sub new {
    #my $connection = $session->scratch->get("ldapConnection") || $session->setting->get("ldapConnection");
    #my $ldaplink = WebGUI::LDAPLink->new($session,$connection); 
    #$self->{_connection} = $ldaplink->get if $ldaplink;
-   
+
 	my $i18n = WebGUI::International->new($session, "AuthLDAP");
 	my %ldapStatusCode = map { $_ => $i18n->get("LDAPLink_".$_) }
 			     (0..21, 32,33,34,36, 48..54, 64..71, 80);

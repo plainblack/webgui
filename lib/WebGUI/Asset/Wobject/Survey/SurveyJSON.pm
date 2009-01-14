@@ -320,10 +320,10 @@ sub getSectionEditVars {
 
 sub getGotoTargets {
     my $self = shift;
-    
+
     my @section_vars = map {$_->{variable}} @{$self->sections};
     my @question_vars = map {$_->{variable}} @{$self->questions};
-    return grep {$_ ne ''} (@section_vars, @question_vars);   
+    return grep {$_ ne ''} (@section_vars, @question_vars);
 }
 
 =head2 getQuestionEditVars ( $address )

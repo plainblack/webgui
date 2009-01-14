@@ -405,10 +405,6 @@ sub view {
 	my $previousPageData = undef;
 	my $eh = $self->session->errorHandler;
 	foreach my $asset (@{$assets}) {
-        # Set absoluteDepthOfFirstPage
-        if ( !defined $absoluteDepthOfFirstPage ) {
-            $absoluteDepthOfFirstPage   = $asset->getLineageLength;
-        }
 
 		# skip pages we shouldn't see
 		my $pageLineage = $asset->get("lineage");
@@ -426,6 +422,13 @@ sub view {
 			$lineageToSkip = $pageLineage unless ($pageLineage eq "000001");
 			next;
 		}
+
+        # Set absoluteDepthOfFirstPage after we have determined if the first page is viewable!
+        # Otherwise, the indent loop calculation below will be off by 1 (or more)
+        if ( !defined $absoluteDepthOfFirstPage ) {
+            $absoluteDepthOfFirstPage   = $asset->getLineageLength;
+        }
+
 		my $pageData = {};
         my $pageProperties = $asset->get;
         while (my ($property, $propertyValue) = each %{ $pageProperties }) {

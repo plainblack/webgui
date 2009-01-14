@@ -244,8 +244,8 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
 	'timelimit hoverHelp' => {
-		message => q|How many minutes the user has to finish the server from the moment they start.  0 means unlimited time.|,
-		lastUpdated => 1224686319
+		message => q|How many minutes the user has to finish the survey from the moment they start.  0 means unlimited time.|,
+		lastUpdated => 1231193335,
 	},
     
 };

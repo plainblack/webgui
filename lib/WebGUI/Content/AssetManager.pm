@@ -553,10 +553,11 @@ Search assets underneath this asset.
 =cut
 
 sub www_search {
-    my $session     = shift;
-    my $ac          = WebGUI::AdminConsole->new( $session, "assets" ); 
-    my $i18n        = WebGUI::International->new( $session, "Asset" );
-    my $output      = '<div id="assetSearch">' . getHeader( $session );
+    my $session      = shift;
+    my $ac           = WebGUI::AdminConsole->new( $session, "assets" ); 
+    my $i18n         = WebGUI::International->new( $session, "Asset" );
+    my $currentAsset = getCurrentAsset($session);
+    my $output       = '<div id="assetSearch">' . getHeader( $session );
     
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
@@ -564,20 +565,20 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
     ### Show the form
-    $output     .= q{<form><p>}
+    $output     .= q{<form method="post" enctype="multipart/form-data" action="} . $currentAsset->getUrl . q{"><p>}
                 . q{<input type="hidden" name="op" value="assetManager" />}
                 . q{<input type="hidden" name="method" value="search" />}
                 . q{<input type="text" size="45" name="keywords" value="} . $session->form->get('keywords') . q{" />}
                 . getClassSelectBox( $session )
-                . q{<button name="action" value="search">} . $i18n->get( "search" ) . q{</button>}
+                . q{<input type="submit" name="action" value="}.$i18n->get( "search" ).q{" />}
                 . q{</p></form>}
                 ;
 
     ### Actions
-    if ( my $action = $session->form->get( 'action' ) ) {
-        my @assetIds    = $session->form->get( 'assetId' );
+    if ( my $action = lc $session->form->get( 'action' ) ) {
+        my @assetIds = $session->form->get( 'assetId' );
 
-        if ( $action eq "trash" ) {
+        if ( $action eq "delete" ) { ##aka trash
             for my $assetId ( @assetIds ) {
                 my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
                 next unless $asset;
@@ -725,9 +726,9 @@ sub www_search {
             $output     .= q{</tbody>}
                         . q{</table>}
                         . q{<p class="actions">} . $i18n->get( 'with selected' )
-                        . q{<button name="action" value="trash">} . $i18n->get( 'delete' ) . q{</button>}
-                        . q{<button name="action" value="cut">} . $i18n->get( "cut" ) . q{</button>}
-                        . q{<button name="action" value="copy">} . $i18n->get( "copy" ) . q{</button>}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "copy" )    .q{" />}
                         . q{</p>}
                         . q{</form>}
                         ;

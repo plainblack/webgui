@@ -159,8 +159,8 @@ our $I18N = {
 	},
 
    	'emailField help' => {
-		message => q|A single text field for the user to enter in their street address.|,
-		lastUpdated => 0,
+		message => q|A single text field for the user to enter in their email address.|,
+		lastUpdated => 1231192368,
 		context => q|Template variable help.|
 	},
 

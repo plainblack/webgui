@@ -107,6 +107,12 @@ our $I18N = {
 		lastUpdated => 1078852836
 	},
 
+	'email validation confirmed' => {
+		message => q|Thank you for activating your account.  You may now log in with your username and password.|,
+		context => q|Message displayed to the user after they validate their email address.|,
+		lastUpdated => 1230588145,
+	},
+
 	'display account template title' => {
 		message => q|WebGUI Authentication Display Account Template|,
 		lastUpdated => 1078852836
@@ -724,6 +730,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message when a user tries to recover password for a disabled account},
     },
+
+    'no email address' => {
+        message     => q{There is no email address registered for this account.  Password recovery via email is not possible.},
+        lastUpdated => 1229391388,
+        context     => q{Error message when a user tries to recover password and they don't have an email address},
+    },
+
 };
 
 1;

@@ -984,8 +984,8 @@ search has been done.|,
     },
 
     'other thing missing message' => {
-        message => q|The Thing to which this field refers does not exist or has no table.|,
-        lastUpdated => 1104630516,
+        message => q|The Thing to which this field refers does not exist or has no table, or the field in it has been deleted.|,
+        lastUpdated => 1231178860,
     },
 
     'no permission to edit' => {
@@ -1012,6 +1012,12 @@ search has been done.|,
         message => q|The URL that will take the user back to the Thingy default view.|,
         lastUpdated => 1227737813,
     },
+
+    'other thing field missing message' => {
+        message => q|The field from the other Thing does not exist.|,
+        lastUpdated => 1231180362,
+    },
+
 };
 
 1;
