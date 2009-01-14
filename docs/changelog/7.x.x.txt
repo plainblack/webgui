@@ -3,6 +3,7 @@
  - marked sbin scripts as executable
  - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
  - fixed #9404: Head tags for admin user with admin mode off
+ - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
