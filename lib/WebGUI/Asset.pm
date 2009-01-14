@@ -1333,7 +1333,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit;
+    return undef unless $self->canEdit && $self->session->var->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
     my $userUiLevel = $self->session->user->profileField("uiLevel");
@@ -1432,6 +1432,7 @@ sub getToolbar {
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
     }
     $output .= '</ul></div></div>' . $toolbar . '</div>';
+    $self->{_toolbar} = $output;
     return $output;
 }
 
@@ -1988,9 +1989,8 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-    if ($self->session->var->isAdminOn) {
-        $self->{_toolbar} = $self->getToolbar;
-    }
+    ##Make the toolbar now and stick it in the cache.
+    $self->getToolbar;
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {

@@ -1,7 +1,8 @@
 7.6.9
  - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
  - marked sbin scripts as executable
- - Problem #9492: in passing form variables to Macro SQL inside a snippet
+ - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
+ - fixed #9404: Head tags for admin user with admin mode off
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
