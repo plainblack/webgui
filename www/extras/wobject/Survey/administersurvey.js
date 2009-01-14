@@ -385,7 +385,7 @@ if (typeof Survey === "undefined") {
                 Survey.Form.addWidgets(qs);
             }
         },
-        
+
         addWidgets: function(qs){
             hasFile = false;
             for (var i = 0; i < qs.length; i++) {
@@ -394,7 +394,7 @@ if (typeof Survey === "undefined") {
 					// gracefully handle q with no answers
 					continue;
 				}
-                
+
                 var verts = '';
                 for (var x in q.answers) {
                     if (YAHOO.lang.hasOwnProperty(q.answers, x)) {

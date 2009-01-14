@@ -92,9 +92,11 @@ li.squestion {
     min-height: 10px;
 }
 li.newQuestion {
-#    background-color: #D1E6EC;
-#    border:1px solid #7EA6B2;
-#    cursor: move; 
+/*
+    background-color: #D1E6EC;
+    border:1px solid #7EA6B2;
+    cursor: move;
+*/
 	padding-left:25px; 
 }
 
@@ -119,15 +121,17 @@ li.sanswer {
     background-color: #CC6600;
     border:1px solid #7EA6B2;
     cursor: move; 
-	padding-left:50px; 
+	padding-left:50px;
     width:60%;
     min-height: 10px;
 }
 li.newAnswer {
-#    background-color: #D1E6EC;
-#    border:1px solid #7EA6B2;
-    padding-left:50px;    
-#    cursor: move; 
+/*
+    background-color: #D1E6EC;
+    border:1px solid #7EA6B2;
+    cursor: move;
+*/
+    padding-left:50px; 
 }
 #goto-yui-ac {
     width:15em;
