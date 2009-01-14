@@ -524,7 +524,7 @@ call to goto($target).
 
 The expression is a simple subset of the formula language used in spreadsheet programs such as Excel, OpenOffice, Google Docs etc..
 
-Here is an example using section variables S1 and S2 as jump targets and question variables Q1-3 in the expression. 
+Here is an example using section variables S1 and S2 as jump targets and question variables Q1-3 in the expression.
 It  jumps to S1 if the user's answer to Q1 has a value of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
 S1: Q1 = 3
 S2: Q2 + Q3 < 10
@@ -552,11 +552,11 @@ But for now those things can be done manually using the limited subset defined.
 sub gotoExpression {
     my $self = shift;
     my $expression = shift;
-    
+
     my %responses = (
         # questionName => response answer value
     );
-    
+
     # Populate %responses with the user's data..
     foreach my $q (@{ $self->returnResponseForReporting() }) {
         if ($q->{questionName} =~ /\w/) {
@@ -564,17 +564,17 @@ sub gotoExpression {
             $responses{$q->{questionName}} = $value if defined $value;
         }
     }
-    
+
     # Process gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split '\n', $expression) {
         my $processed = $self->processGotoExpression($line, \%responses);
-        
+
         next unless $processed;
-        
+
         # (ab)use perl's eval to evaluate the processed expression
         my $result = eval "$processed->{expression}";
         $self->warn($@) if $@;
-        
+
         if ($result) {
             $self->debug("Truthy, goto [$processed->{target}]");
              $self->goto($processed->{target});
@@ -590,7 +590,7 @@ sub gotoExpression {
 =head2 processGotoExpression ( $expression, $responses)
 
 Parses a single gotoExpression. Returns undef if processing fails, or the following hashref
-if things work out well: 
+if things work out well:
  { target => $target, expression => $expression }
 
 =head3 $expression
@@ -605,14 +605,14 @@ Hashref that maps questionNames to response values
 
 Uses the following simple strategy:
 
-First, parse the expression as: 
+First, parse the expression as:
  target: expression
 
 Replace each questionName with its response value (from the $responses hashref)
 
 Massage the expression into valid perl
 
-Check that only valid tokens remain. This last step ensures that any invalid questionNames in 
+Check that only valid tokens remain. This last step ensures that any invalid questionNames in
 the expression generate an error because our list of valid tokens doesn't include a-z
 
 =cut
@@ -624,9 +624,9 @@ sub processGotoExpression {
 
     $self->debug("Processing gotoExpression: $expression");
 
-    # Valid gotoExpression tokens are.. 
+    # Valid gotoExpression tokens are..
     my $tokens = qr{\s|[-0-9=!<>+*/.()]};
-    
+
     my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
 
     $self->debug("Parsed as Target: [$target], Expression: [$rest]");
@@ -653,9 +653,9 @@ sub processGotoExpression {
         $self->warn("Contains invalid tokens: $rest");
         return;
     }
-    
+
     $self->debug("Processed as: $rest");
-    
+
     return {
         target => $target,
         expression => $rest,
@@ -854,7 +854,7 @@ Logs an error to the webgui log file, using the session logger.
 =cut
 
 sub log {
-    my ( $self, $message) = @_;
+    my ( $self, $message ) = @_;
     if ( defined $self->{log} ) {
         $self->{log}->debug($message);
     }
