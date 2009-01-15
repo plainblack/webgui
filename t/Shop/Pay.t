@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 19;
+my $tests = 18;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -106,15 +106,6 @@ throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDrive
     'addPaymentGateway croaks without a configured class',
 );
 
-throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash'); },
-    'WebGUI::Error::InvalidParam',
-    {
-        error => 'Must provide a label to create an object',
-    },
-    'addPaymentGateway requires a label',
-);
-
-
 throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL'); },
     'WebGUI::Error::InvalidParam', 
     {
@@ -123,7 +114,7 @@ throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDrive
     'addPaymentGateway croaks without options to build a object with',
 );
 
-throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', {}); },
+throws_deeply ( sub { $gateway = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', {}); },
     'WebGUI::Error::InvalidParam',
     {
         error => 'You must pass a hashref of options to create a new PayDriver object',
@@ -135,9 +126,9 @@ my $options = {
     enabled => 1,
     label   => 'Cold, stone hard cash',
 };
-$newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'JAL', $options);
+$newDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $options);
 isa_ok($newDriver, 'WebGUI::Shop::PayDriver::Cash', 'added a new, configured Cash driver');
-is($newDriver->label, 'JAL', 'label passed correctly to paydriver');
+is($newDriver->get('label'), 'Cold, stone hard cash', 'label passed correctly to paydriver');
 
 
 #TODO: check if options are stored.
@@ -212,14 +203,14 @@ my $otherOptions = {
     enabled     => 1,
     label       => 'Even harder cash',
 };
-$anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', 'Pomade', $otherOptions);
+$anotherDriver = $pay->addPaymentGateway('WebGUI::Shop::PayDriver::Cash', $otherOptions);
 
 my $gateways = $pay->getPaymentGateways;
-my @returnedIds = map {$_->label} @{ $gateways };
+my @returnedIds = map {$_->get('label')} @{ $gateways };
 cmp_bag(
     \@returnedIds,
     [ 
-        qw/Cash ITransact Pomade JAL/
+        qw/Cash ITransact/, 'Even harder cash', 'Cold, stone hard cash',
     ],
     'getPaymentGateways returns all create payment drivers',
 );
