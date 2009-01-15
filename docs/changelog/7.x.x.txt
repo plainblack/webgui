@@ -1,4 +1,5 @@
 7.5.39
+ - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
  - fixed #9428: added Keywords to Asset::get when no property is named
  - fixed #9410: Wrong help text
  - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
