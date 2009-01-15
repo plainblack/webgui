@@ -277,7 +277,8 @@ sub view {
 	my @childShelves = ();
 	foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
 		my $properties = $child->get;
-		$child->{url} = $self->getUrl;
+		$child->{url}   = $child->getUrl;
+		$child->{title} = $child->getTitle;
 		push @childShelves, $child;
 	}
 	
