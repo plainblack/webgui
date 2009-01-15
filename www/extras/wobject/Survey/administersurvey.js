@@ -36,7 +36,8 @@ if (typeof Survey === "undefined") {
         'Email': 1,
         'Phone Number': 1,
         'Text Date': 1,
-        'Currency': 1
+        'Currency': 1,
+	'TextArea': 1
     };
     var slider = {
         'Slider': 1,

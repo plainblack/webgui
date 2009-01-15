@@ -938,16 +938,18 @@ sub prepareShowSurveyTemplate {
         'Confidence',      1, 'Effectiveness', 1, 'Concern',    1, 'Risk',       1, 'Threat',         1,
         'Security',        1
     );
-    my %text = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
-    my %slider = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
-    my %dateType   = ( 'Date',        1, 'Date Range', 1 );
-    my %fileUpload = ( 'File Upload', 1 );
-    my %hidden     = ( 'Hidden',      1 );
+    my %textArea    = ( 'TextArea', 1 );
+    my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
+    my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
+    my %dateType    = ( 'Date',        1, 'Date Range', 1 );
+    my %fileUpload  = ( 'File Upload', 1 );
+    my %hidden      = ( 'Hidden',      1 );
 
     foreach my $q (@$questions) {
-        if    ( $fileUpload{ $$q{'questionType'} } ) { $q->{'fileLoader'} = 1; }
-        elsif ( $text{ $$q{'questionType'} } )       { $q->{'textType'}   = 1; }
-        elsif ( $hidden{ $$q{'questionType'} } )     { $q->{'hidden'}     = 1; }
+        if    ( $fileUpload{ $$q{'questionType'} } ) { $q->{'fileLoader'}   = 1; }
+        elsif ( $text{ $$q{'questionType'} } )       { $q->{'textType'}     = 1; }
+        elsif ( $textArea{ $$q{'questionType'} } )   { $q->{'textAreaType'} = 1; }
+        elsif ( $hidden{ $$q{'questionType'} } )     { $q->{'hidden'}       = 1; }
         elsif ( $multipleChoice{ $$q{'questionType'} } ) {
             $q->{'multipleChoice'} = 1;
             if ( $$q{'maxAnswers'} > 1 ) {

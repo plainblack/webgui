@@ -381,8 +381,8 @@ sub getValidQuestionTypes {
         'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
         'Party',          'Phone Number',            'Race',            'Risk',
         'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'Text Date',               'Threat',          'True/False',
-        'Yes/No'
+        'Text',           'TextArea',                'Text Date',       'Threat',          
+        'True/False',     'Yes/No'
     );
 }
 
