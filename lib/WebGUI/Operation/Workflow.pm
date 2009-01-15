@@ -202,7 +202,7 @@ sub www_demoteWorkflowActivity {
 
 =head2 www_editWorkflow ( session, workflow )
 
-Displays displays the editable properties of a workflow.
+Displays the editable properties of a workflow.
 
 =cut
 
