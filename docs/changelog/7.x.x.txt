@@ -6,6 +6,7 @@
  - fixed #9404: Head tags for admin user with admin mode off
  - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
  - fixed #9511: Subcategories displayed incorrectly
+ - fixed #4137: Calendar Search no longer puts head tags in body
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
