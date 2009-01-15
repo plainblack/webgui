@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Shop::Pay;
+use WebGUI::Shop::PayDriver;
 
 
 my $toVersion = '7.6.9';
@@ -31,6 +33,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixPayDriverLabels($session);
 
 finish($session); # this line required
 
@@ -43,6 +46,27 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Get rid of the duplicate label properties in the PayDrivers.
+sub fixPayDriverLabels {
+    my $session = shift;
+    print "\tGet rid of the duplicate label properties in the PayDrivers... " unless $quiet;
+    my $pay = WebGUI::Shop::Pay->new($session);
+    my $gateways = $pay->getPaymentGateways;
+    foreach my $gateway (@{ $gateways }) {
+        my $gatewayId = $gateway->getId;
+        my $jsonLabel = $gateway->get('label');
+        next if $jsonLabel;
+        my $dbLabel = $session->db->quickScalar('select label from paymentGateway where paymentGatewayId=?', [$gatewayId]);
+        my $properties = $gateway->get();
+        $properties->{label} = $dbLabel;
+        $gateway->update($properties);
+    }
+    $session->db->write('alter table paymentGateway drop column label');
+    print "DONE!\n" unless $quiet;
+}
+
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
