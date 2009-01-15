@@ -14,11 +14,6 @@ Survey.Data = (function(){
 	var autoComplete;
 	var sButton, qButton, aButton;
 
-	function purgeNode(node) {
-		YAHOO.util.Event.purgeElement(node, true);
-		document.getElementById(node).innerHTML = '';
-	}
-
     return {
         dragDrop: function(did){
 
