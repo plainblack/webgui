@@ -8,6 +8,16 @@ Survey.Data = (function(){
     var lastDataSet = {};
     var focus;
     var lastId = -1;
+	
+	// Keep references to widgets here so that we can destory any instances before
+	// creating new ones (to avoid memory leaks)
+	var autoComplete;
+	var sButton, qButton, aButton;
+
+	function purgeNode(node) {
+		YAHOO.util.Event.purgeElement(node, true);
+		document.getElementById(node).innerHTML = '';
+	}
 
     return {
         dragDrop: function(did){
@@ -57,6 +67,11 @@ Survey.Data = (function(){
             else {
                 lastId = d.address;
             }
+
+			// First purge any event handlers bound to sections node..
+			YAHOO.util.Event.purgeElement('sections', true);
+
+			// Now we can re-write its innerHTML without fear of memory leaks
             document.getElementById('sections').innerHTML = d.ddhtml;
 
             //add event handlers for if a tag is clicked
@@ -68,28 +83,25 @@ Survey.Data = (function(){
 				}
             }
 
-            //add the add object buttons
-            //        if(d.buttons['section']){
-            document.getElementById('addSection').innerHTML = '';
-            document.getElementById('addQuestion').innerHTML = '';
-            document.getElementById('addAnswer').innerHTML = '';
-            var sButton = new YAHOO.widget.Button({
+			sButton && sButton.destroy();
+			sButton = new YAHOO.widget.Button({
                 label: "Add Section",
                 id: "addsection",
                 container: "addSection"
             });
             sButton.on("click", this.addSection);
-            //        }
-            //        if(d.buttons['question']){
-            var qButton = new YAHOO.widget.Button({
+
+			qButton && qButton.destroy();
+            qButton = new YAHOO.widget.Button({
                 label: "Add Question",
                 id: "addquestion",
                 container: "addQuestion"
             });
             qButton.on("click", this.addQuestion, d.buttons.question);
-            //        }
+
             if (d.buttons.answer) {
-                var aButton = new YAHOO.widget.Button({
+				aButton && aButton.destroy();
+                aButton = new YAHOO.widget.Button({
                     label: "Add Answer",
                     id: "addanswer",
                     container: "addAnswer"
@@ -102,12 +114,16 @@ Survey.Data = (function(){
 
                 // build the goto auto-complete widget
                 if (d.gotoTargets && document.getElementById('goto')) {
-                    var ds = new YAHOO.util.LocalDataSource(d.gotoTargets);
-                    var ac = new YAHOO.widget.AutoComplete('goto', 'goto-yui-ac-container', ds);
+                    var ds =  new YAHOO.util.LocalDataSource(d.gotoTargets);
+                    autoComplete = new YAHOO.widget.AutoComplete('goto', 'goto-yui-ac-container', ds);
                 }
             }
             else {
-                document.getElementById('edit').innerHTML = "";
+				Survey.ObjectTemplate.unloadObject();
+				if (autoComplete) {
+					autoComplete.destroy();
+					autoComplete = null;
+				}
             }
             lastDataSet = d;
         },
