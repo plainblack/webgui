@@ -5,7 +5,7 @@
  - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
  - fixed #9404: Head tags for admin user with admin mode off
  - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
- - fixed #9511: Subcategories displayed incorrectly
+ - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search no longer puts head tags in body
 
 7.5.38
