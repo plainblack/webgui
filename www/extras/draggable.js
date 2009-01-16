@@ -312,14 +312,12 @@ function dragable_moveContent(from, to,position) {
     if (from!=to && from && to) {    
         var fromParent = from.parentNode;
         fromParent.removeChild(from);
-console.log(fromParent);
         if (dragable_getElementChildren(fromParent).length == 0) {
             var blank_id = dragable_appendBlankRow(fromParent);
             new YAHOO.util.DDTarget(blank_id);
         }
 
         var toParent = to.parentNode;
-console.log(toParent);
         var toChildren = dragable_getElementChildren(toParent);
         
         if (toChildren[0].id.indexOf("blank") != -1) {
@@ -356,7 +354,6 @@ function dragable_getContentMap() {
 
         //get down to the tr area
         children = dragable_getElementChildren(contentArea);
-console.log(children);        
         children=dragable_getElementChildren(children[0]);
         for (i=0;i<children.length;i++) {
             if (contentMap != "" && (contentMap.lastIndexOf(".") != contentMap.length-1)) {
