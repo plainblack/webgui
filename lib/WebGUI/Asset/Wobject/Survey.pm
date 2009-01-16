@@ -519,7 +519,8 @@ sub www_loadSurvey {
         "edithtml", $editflag ? $editHtml : '',
         "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
     };
-    $self->session->http->setMimeType('application/json');
+    #$self->session->http->setMimeType('application/json');
+#    $self->session->http->setMimeType('application/json');
     return to_json($return);
 } ## end sub www_loadSurvey
 
@@ -929,7 +930,7 @@ sub prepareShowSurveyTemplate {
 
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
-    $self->session->http->setMimeType('application/json');
+#    $self->session->http->setMimeType('application/json');
     return to_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
 } ## end sub prepareShowSurveyTemplate
 
