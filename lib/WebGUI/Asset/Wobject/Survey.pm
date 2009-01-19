@@ -57,6 +57,17 @@ sub definition {
             hoverHelp    => $i18n->get('timelimit hoverHelp'),
             label        => $i18n->get('timelimit')
         },
+        doAfterTimeLimit => {
+            fieldType    => 'selectBox',
+            defaultValue => 'exitUrl',
+            tab          => 'properties',
+            hoverHelp    => $i18n->get('do after timelimit hoverHelp'),
+            label        => $i18n->get('do after timelimit label'),
+            options      => {
+                                'exitUrl'       => $i18n->get('exit url label'),
+                                'restartSurvey' => $i18n->get('restart survey label'),
+                            },
+        },
         groupToEditSurvey => {
             fieldType    => 'group',
             defaultValue => 4,
@@ -738,6 +749,7 @@ sub www_view {
 }
 
 #-------------------------------------------------------------------
+
 sub www_takeSurvey {
     my $self = shift;
     my %var;
@@ -839,7 +851,8 @@ sub www_submitQuestions {
 #finds the questions to display next and builds the data structre to hold them
 #-------------------------------------------------------------------
 sub www_loadQuestions {
-    my $self = shift;
+    my $self            = shift;
+    my $wasRestarted    = shift;
 
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
@@ -867,7 +880,9 @@ sub www_loadQuestions {
     my $section = $self->response->nextSection();
 
     #return $self->prepareShowSurveyTemplate($section,$questions);
-    $section->{id} = $self->response->nextSectionId();
+    $section->{id}              = $self->response->nextSectionId();
+    $section->{wasRestarted}    = $wasRestarted;
+
     my $text = $self->prepareShowSurveyTemplate( $section, $questions );
     return $text;
 } ## end sub www_loadQuestions
@@ -911,18 +926,24 @@ sub surveyEnd {
             }
         );
     }
-    if ( $url !~ /\w/ ) { $url = 0; }
-    if ( $url eq "undefined" ) { $url = 0; }
-    if ( !$url ) {
-        $url
-            = $self->session->db->quickScalar(
-            "select exitURL from Survey where assetId = ? order by revisionDate desc limit 1",
-            [ $self->getId() ] );
+    if ($self->get('doAfterTimeLimit') eq 'restartSurvey' && $completeCode == 2){
+        $self->response->startTime(time());
+        undef $self->{response};
+        undef $self->{responseId};
+        return $self->www_loadQuestions('1');
+    }else{
+        if ( $url !~ /\w/ ) { $url = 0; }
+        if ( $url eq "undefined" ) { $url = 0; }
         if ( !$url ) {
-            $url = "/";
+            $url
+                = $self->session->db->quickScalar(
+                "select exitURL from Survey where assetId = ? order by revisionDate desc limit 1",
+                [ $self->getId() ] );
+            if ( !$url ) {
+                $url = "/";
+            }
         }
     }
-
     #    $self->session->http->setRedirect($url);
     return encode_json( { "type", "forward", "url", $url } );
 } ## end sub surveyEnd
