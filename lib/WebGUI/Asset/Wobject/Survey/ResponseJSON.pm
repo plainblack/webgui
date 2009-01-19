@@ -388,7 +388,7 @@ sub recordResponses {
         'Yes/No',         1
     );
     my %sliderTypes = ( 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1, 'Slider', 1 );
-    my %textTypes   = ( 'Currency',    'Email', 1, 'Phone Number', 1, 'Text', 1, 'Text Date', 1 );
+    my %textTypes   = ( 'Currency',    'Email', 1, 'Phone Number', 1, 'Text', 1, 'Text Date', 1 ,'TextArea', 1);
     my %fileTypes   = ( 'File Upload', 1 );
     my %dateTypes   = ( 'Date',        'Date Range', 1 );
     my %hiddenTypes = ( 'Hidden',      1 );

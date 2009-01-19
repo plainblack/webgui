@@ -120,6 +120,7 @@ checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
 checkModule("Module::Find",                 "0.06"       );
 checkModule("Class::C3",                    "0.19"       );
+checkModule("GraphViz",                     "2.00"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
@@ -395,7 +396,6 @@ sub prompt {
 __END__
 
 =head1 NAME
-
 testEnvironment - Test Perl environment for proper WebGUI support.
 
 =head1 SYNOPSIS
