@@ -277,7 +277,7 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
 
-    #    my $ref = @{from_json($self->session->form->process("data"))};
+    #    my $ref = @{decode_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
 
     my @address = split /-/, $responses->{id};
@@ -415,7 +415,7 @@ sub www_dragDrop {
     return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
 
-    my $p = from_json( $self->session->form->process("data") );
+    my $p = decode_json( $self->session->form->process("data") );
 
     my @tid = split /-/, $p->{target}->{id};
     my @bid = split /-/, $p->{before}->{id};
@@ -572,7 +572,7 @@ sub www_loadSurvey {
         ,gotoTargets => \@gotoTargets,
     };
     $self->session->http->setMimeType('application/json');
-    return to_json($return);
+    return encode_json($return);
 } ## end sub www_loadSurvey
 
 #-------------------------------------------------------------------
@@ -924,7 +924,7 @@ sub surveyEnd {
     }
 
     #    $self->session->http->setRedirect($url);
-    return to_json( { "type", "forward", "url", $url } );
+    return encode_json( { "type", "forward", "url", $url } );
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
@@ -988,7 +988,7 @@ sub prepareShowSurveyTemplate {
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
     $self->session->http->setMimeType('application/json');
-    return to_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
+    return encode_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
 } ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------
