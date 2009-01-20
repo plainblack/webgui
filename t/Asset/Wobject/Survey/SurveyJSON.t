@@ -189,7 +189,7 @@ cmp_deeply(
 lives_ok
     {
         my $foo = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
-            qq!{ "survey" : "on 16\x{201d} hand-crocheted Cord" }!,
+            encode_json({survey => "on 16\x{201d}" }),
             $session->log
         );
     }

@@ -30,6 +30,8 @@ Asset in WebGUI.
 use strict;
 use JSON;
 
+# N.B. We're currently using Storable::dclone instead of Clone::clone
+# because Colin uncovered some Clone bugs in Perl 5.10
 #use Clone qw/clone/;
 use Storable qw/dclone/;
 
@@ -39,8 +41,8 @@ Object constructor.
 
 =head3 $json
 
-Pass in some JSON to be serialized into a data structure.  Useful JSON would
-be a hash with "survey" and "sections" keys with appropriate values.
+A JSON string used to construct a new Perl object. The JSON string should
+contain a hash made up of "survey" and "sections" keys.
 
 =head3 $log
 
@@ -53,84 +55,101 @@ sub new {
     my $class = shift;
     my $json  = shift;
     my $log   = shift;
-    my $self  = {};
-    $self->{log} = $log;
-    my $temp = decode_json($json) if defined $json;
-    $self->{sections} = defined $temp->{sections} ? $temp->{sections} : [];
-    $self->{survey}   = defined $temp->{survey}   ? $temp->{survey}   : {};
+
+    # Create skeleton object..
+    my $self = {
+        log      => $log,
+        sections => [],
+        survey   => {},
+    };
+
+    # Load json object if given..
+    if ($json) {
+        my $decoded_json = decode_json($json);
+        $self->{sections} = $decoded_json->{sections} if defined $decoded_json->{sections};
+        $self->{survey}   = $decoded_json->{survey}   if defined $decoded_json->{survey};
+    }
+
     bless( $self, $class );
 
+    # Initialise the survey data structure if empty..
     if ( @{ $self->sections } == 0 ) {
         $self->newObject( [] );
     }
     return $self;
-} ## end sub new
+}
 
 =head2 freeze
 
-Serializes the survey and sections data into JSON and returns the JSON.
+Serialize this Perl object into a JSON string. The serialized object is made up of the survey and sections 
+components of this object.
 
 =cut
 
 sub freeze {
     my $self = shift;
-    my %temp;
-    $temp{sections} = $self->{sections};
-    $temp{survey}   = $self->{survey};
-    return encode_json( \%temp );
+    return encode_json(
+        {   sections => $self->{sections},
+            survey   => $self->{survey},
+        }
+    );
 }
 
 =head2 newObject ( $address )
 
-Add new, empty elements to the survey data structure.  It returns $address,
-modified to show what was added.
+Add a new, empty Section, Question or Answer to the survey data structure.
+
+Updates $address to point at the newly added object. Returns $address.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
-where.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. The first element of the array (if present) is the section index. The second
+element of the array (if present) is the question index.
 
-This method modifies $address.  It also returns $address.
+New objects are always added (pushed) onto the end of the list of similar objects at the
+given address.
+ 
+If the array ref is empty this sub assumes you want to add a new section.
 
-=over 4
+If the array ref contains a single element (a section index), this sub assumes you want to
+add a new question to the indexed section.
 
-=item empty
-
-If the array ref is empty, a new section is added.
-
-=item 1 element
-
-If there's just 1 element, then that element is used as an index into
-the array of sections, and a new question is added to that section.
-
-=item 2 elements
-
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.  A new answer is added to the specified question in
-the specified section.
-
-=back
+If the array ref contains two elements (a section index and a question index), this sub
+assumes you want to add a new answer to the indexed section/question.
 
 =cut
 
 sub newObject {
     my $self    = shift;
     my $address = shift;
-    if ( @$address == 0 ) {
+    
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    if ( $count == 0 ) { 
+        # Add a new section to the end of the list of sections..
         push( @{ $self->sections }, $self->newSection() );
+        
+        # Update $address with the index of the newly created section
         $address->[0] = $#{ $self->sections };
     }
-    elsif ( @$address == 1 ) {
+    elsif ( $count == 1 ) {
+        # Add a new question to the end of the list of questions in section located at $address
         push( @{ $self->questions($address) }, $self->newQuestion($address) );
-        $$address[1] = $#{ $self->questions($address) };
+        
+        # Update $address with the index of the newly created question
+        $address->[1] = $#{ $self->questions($address) };
     }
-    elsif ( @$address == 2 ) {
+    elsif ( $count == 2 ) {
+        # Add a new answer to the end of the list of answers in section/question located at $address
         push( @{ $self->answers($address) }, $self->newAnswer($address) );
-        $$address[2] = $#{ $self->answers($address) };
+        
+        # Update $address with the index of the newly created answer
+        $address->[2] = $#{ $self->answers($address) };
     }
     return $address;
-} ## end sub newObject
+}
 
 #address is the array of objects currently selected in the edit screen
 #data is the array of hash items for displaying
