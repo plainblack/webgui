@@ -25,6 +25,19 @@ serializing and deserializing JSON data, and manages the data for
 the Survey.  This package is not intended to be used by any other
 Asset in WebGUI.
 
+=head2 Address Parameter
+
+Many subroutines in this module accept an $address param. This param is an array ref that 
+serves as a multidimensional index into the section/question/answer structure.
+
+In general, the first element of the array is the section index, the second element is 
+the question index, and the third element is the answer index.
+
+Most subroutines will not expect or require all three elements to be present. 
+
+Some subroutines (such as newObject) will figure out what you want to do based on the
+number of elements you provide.
+
 =cut
 
 use strict;
@@ -104,8 +117,7 @@ Updates $address to point at the newly added object. Returns $address.
 =head3 $address
 
 An array ref that serves as a multidimensional index into the section/question/answer
-structure. The first element of the array (if present) is the section index. The second
-element of the array (if present) is the question index.
+structure. See L<"Address Parameter">.
 
 New objects are always added (pushed) onto the end of the list of similar objects at the
 given address.
@@ -151,9 +163,6 @@ sub newObject {
     return $address;
 }
 
-#address is the array of objects currently selected in the edit screen
-#data is the array of hash items for displaying
-
 =head2 getDragDropList ( $address )
 
 Get a subset of the entire data structure.  It will be a list of all sections, along with
@@ -187,8 +196,9 @@ section, section, section, question, answer, answer, answer, section, section
 
 =head3 $address
 
-An array ref.  Sets which question from a section will be listed, along with all
-its answers.  $address should ALWAYS have two elements.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. Sets which question from a section will be listed, along with all
+its answers.  Should ALWAYS have two elements.
 
 =cut
 
@@ -196,32 +206,32 @@ sub getDragDropList {
     my $self    = shift;
     my $address = shift;
     my @data;
-    for ( my $i = 0; $i <= $#{ $self->sections }; $i++ ) {
-        push( @data, { text => $self->section( [$i] )->{title}, type => 'section' } );
-        if ( $address->[0] == $i ) {
+    for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
+        push( @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' } );
+        if ( $address->[0] == $sIndex ) {
 
-            for ( my $x = 0; $x <= $#{ $self->questions($address) }; $x++ ) {
+            for ( my $qIndex = 0; $qIndex < $self->totalQuestions($address); $qIndex++ ) {
                 push(
                     @data,
-                    {   text => $self->question( [ $i, $x ] )->{text},
+                    {   text => $self->question( [ $sIndex, $qIndex ] )->{text},
                         type => 'question'
                     }
                 );
-                if ( $address->[1] == $x ) {
-                    for ( my $y = 0; $y <= $#{ $self->answers($address) }; $y++ ) {
+                if ( $address->[1] == $qIndex ) {
+                    for ( my $aIndex = 0; $aIndex < $self->totalAnswers($address); $aIndex++ ) {
                         push(
                             @data,
-                            {   text => $self->answer( [ $i, $x, $y ] )->{text},
+                            {   text => $self->answer( [ $sIndex, $qIndex, $aIndex ] )->{text},
                                 type => 'answer'
                             }
                         );
                     }
                 }
-            } ## end for ( my $x = 0; $x <= ...
-        } ## end if ( $address->[0] == ...
-    } ## end for ( my $i = 0; $i <= ...
+            }
+        }
+    }
     return \@data;
-} ## end sub getDragDropList
+}
 
 =head2 getObject ( $address )
 
@@ -229,7 +239,8 @@ Retrieve objects from the sections data structure by address.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is fetched.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements array set what is fetched.
 
 =over 4
 
@@ -278,7 +289,8 @@ from it.
 
 =head3 $address
 
-An array ref.  The number of elements determines whether edit vars are fetched for
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements determines whether edit vars are fetched for
 sections, questions, or answers.
 
 =cut
@@ -310,7 +322,8 @@ selected for this section.
 
 =head3 $address
 
-An array reference, specifying which question to fetch variables for.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 =cut
 
@@ -358,7 +371,8 @@ selected for this question.
 
 =head3 $address
 
-An array reference, specifying which question to fetch variables for.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 =cut
 
@@ -414,7 +428,8 @@ in a 1-based array (versus the default, perl style, 0-based array).
 
 =head3 $address
 
-An array reference, specifying which answer to fetch variables for.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. Specifies which answer to fetch variables for.
 
 =cut
 
@@ -435,7 +450,8 @@ return anything significant.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is updated.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements array set what is updated.
 
 =over 4
 
@@ -524,7 +540,8 @@ objects.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements array set what is added, and
 where.
 
 =over 4
@@ -576,7 +593,8 @@ index in that array.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements array set what is added, and
 where.
 
 This method modifies $address.
@@ -624,7 +642,8 @@ Delete the structure pointed to by $address.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The number of elements array set what is added, and
 where.
 
 This method modifies $address if it has 1 or more elements.
@@ -753,7 +772,8 @@ Add answers to a question, based on the requested type.
 
 =head3 $address
 
-Which question to add answers to.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. Which question to add answers to.
 
 =head3 $type
 
@@ -904,7 +924,8 @@ Helper routine for updateQuestionAnswers.  Adds an array of answers to a questio
 
 =head3 $address
 
-The address of the question to add answers to.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">. The address of the question to add answers to.
 
 =head3 $answers
 
@@ -951,21 +972,84 @@ sub sections {
     return $self->{sections};
 }
 
+=head2 totalSections
+
+Returns the total number of Sections
+
+=cut
+
+sub totalSections {
+    my $self = shift;
+    return scalar @{ $self->sections || [] };
+}
+
+=head2 totalQuestions ($address)
+
+Returns the total number of Questions overall, or in the given Section if $address given 
+
+=head3 $address
+
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
+
+=cut
+
+sub totalQuestions {
+    my $self = shift;
+    my $address = shift;
+    if ($address) {
+        return scalar @{ $self->questions($address) || [] };
+    } else {
+        my $count = 0;
+        for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
+            $count += $self->totalQuestions([$sIndex]);
+        }
+        return $count;
+    }
+}
+
+=head2 totalAnswers ($address)
+
+Returns the total number of Answers overall, or in the given Question if $address given
+
+=head3 $address
+
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
+
+=cut
+
+sub totalAnswers {
+    my $self = shift;
+    my $address = shift;
+    if ($address) {
+        return scalar @{ $self->answers($address) || [] };
+    } else {
+        my $count = 0;
+        for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
+            for ( my $qIndex = 0; $qIndex < $self->totalQuestions([$sIndex]); $qIndex++ ) {
+                $count += $self->totalAnswers([$sIndex, $qIndex]);
+            }
+        }
+        return $count;
+    }
+}
+
 =head2 section ($address)
 
 Returns a reference to one section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section whose questions will be returned.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
 
 =cut
 
 sub section {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ];
+    return $self->{sections}->[ $address->[0] ];
 }
 
 =head2 questions ($address)
@@ -974,15 +1058,15 @@ Returns a reference to all the questions from a particular section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section whose questions will be returned.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
 
 =cut
 
 sub questions {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions};
+    return $self->{sections}->[ $address->[0] ]->{questions};
 }
 
 =head2 question ($address)
@@ -991,16 +1075,15 @@ Return a reference to one question from a particular section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
 
 =cut
 
 sub question {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ];
+    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
 
 =head2 answers ($address)
@@ -1009,17 +1092,15 @@ Return a reference to all answers from a particular question.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.  An array ref of anwers from that question will be
-returned.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
 
 =cut
 
 sub answers {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers};
+    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
 }
 
 =head2 answer ($address)
@@ -1028,16 +1109,15 @@ Return a reference to one answer from a particular question and section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.  The third element is the index of the answer.
+An array ref that serves as a multidimensional index into the section/question/answer
+structure. See L<"Address Parameter">.
 
 =cut
 
 sub answer {
     my $self    = shift;
     my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers}->[ $$address[2] ];
+    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
 
 =head2 log ($message)
