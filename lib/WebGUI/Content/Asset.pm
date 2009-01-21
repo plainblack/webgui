@@ -170,6 +170,17 @@ sub page {
 				$method = "view";
 			}
 		}
+        ##Passive Analytics Logging
+        my $assetClass = $asset->get('className');
+        $assetClass =~ s/^WebGUI::Asset:://;
+        if (  $assetClass ne 'Snippet'
+           && substr($assetClass,0,4) ne 'File') {
+            $session->db->write(
+                q|INSERT INTO `passiveLog` (userId, sessionId, assetId, timestamp, url) VALUES (?,?,?,?,?)|,
+                [ $session->user->userId, $session->getId, $asset->getId, time(), $session->request->uri,]
+            );
+        }
+
 		$output = tryAssetMethod($session,$asset,$method);
 		$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 	}
