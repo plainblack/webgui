@@ -54,6 +54,9 @@ use JSON;
 #use Clone qw/clone/;
 use Storable qw/dclone/;
 
+# The maximum value of questionsPerPage is currently hardcoded here
+my $MAX_QUESTIONS_PER_PAGE = 20;
+
 =head2 new ( $json, $log )
 
 Object constructor.
@@ -92,7 +95,7 @@ sub new {
     bless( $self, $class );
 
     # Initialise the survey data structure if empty..
-    if ( @{ $self->sections } == 0 ) {
+    if ( $self->totalSections == 0 ) {
         $self->newObject( [] );
     }
     return $self;
@@ -157,21 +160,21 @@ sub newObject {
         push( @{ $self->sections }, $self->newSection() );
         
         # Update $address with the index of the newly created section
-        $address->[0] = $#{ $self->sections };
+        $address->[0] = $self->totalSections - 1;
     }
     elsif ( $count == 1 ) {
         # Add a new question to the end of the list of questions in section located at $address
         push( @{ $self->questions($address) }, $self->newQuestion($address) );
         
         # Update $address with the index of the newly created question
-        $address->[1] = $#{ $self->questions($address) };
+        $address->[1] = $self->totalQuestions($address) - 1;
     }
     elsif ( $count == 2 ) {
         # Add a new answer to the end of the list of answers in section/question located at $address
         push( @{ $self->answers($address) }, $self->newAnswer($address) );
         
         # Update $address with the index of the newly created answer
-        $address->[2] = $#{ $self->answers($address) };
+        $address->[2] = $self->totalAnswers($address) - 1;
     }
     return $address;
 }
@@ -220,7 +223,7 @@ sub getDragDropList {
     my @data;
     for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
         push( @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' } );
-        if ( $address->[0] == $sIndex ) {
+        if ( sIndex($address) == $sIndex ) {
 
             for ( my $qIndex = 0; $qIndex < $self->totalQuestions($address); $qIndex++ ) {
                 push(
@@ -229,7 +232,7 @@ sub getDragDropList {
                         type => 'question'
                     }
                 );
-                if ( $address->[1] == $qIndex ) {
+                if ( qIndex($address) == $qIndex ) {
                     for ( my $aIndex = 0; $aIndex < $self->totalAnswers($address); $aIndex++ ) {
                         push(
                             @data,
@@ -287,14 +290,14 @@ sub getObject {
     return unless $count;
     
     if ( $count == 1 ) {
-        return dclone $self->{sections}->[ $address->[0] ];
+        return dclone $self->{sections}->[ sIndex($address) ];
     }
     elsif ( $count == 2 ) {
-        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+        return dclone $self->{sections}->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}
-            ->[ $address->[2] ];
+        return dclone $self->{sections}->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+            ->[ aIndex($address) ];
     }
 }
 
@@ -314,23 +317,57 @@ sections, questions, or answers.
 sub getEditVars {
     my ( $self, $address ) = @_;
 
-    if ( @$address == 1 ) {
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    if ( $count == 1 ) {
         return $self->getSectionEditVars($address);
     }
-    elsif ( @$address == 2 ) {
+    elsif ( $count == 2 ) {
         return $self->getQuestionEditVars($address);
     }
-    elsif ( @$address == 3 ) {
+    elsif ( $count == 3 ) {
         return $self->getAnswerEditVars($address);
     }
+}
+
+=head2 getGotoTargets
+
+Generates the list of valid goto targets
+
+=cut
+
+sub getGotoTargets {
+    my $self = shift;
+
+    # Valid goto targets are all of the section variable names..
+    my @section_vars = map {$_->{variable}} @{$self->sections};
+    
+    # ..and all of the question variable names..
+    my @question_vars = map {$_->{variable}} @{$self->questions};
+    
+    # ..excluding the ones that are empty
+    return grep {$_ ne ''} (@section_vars, @question_vars);
 }
 
 =head2 getSectionEditVars ( $address )
 
 Get a safe copy of the variables for this section, to use for editing
-purposes.  Adds two variables, id, which is the index of this section,
-and displayed_id, which is this question's index in a 1-based array
-(versus the default, perl style, 0-based array).
+purposes.  
+
+Adds two variables:
+
+=over 4
+
+=item * id
+
+the index of this section
+
+=item * displayed_id
+
+this question's index in a 1-based array (versus the default, perl style, 0-based array)
+
+=back
 
 It removes the questions array ref, and changes questionsPerPage from a single element, into
 an array of hashrefs, which list the available questions per page and which one is currently
@@ -345,40 +382,47 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 sub getSectionEditVars {
     my $self    = shift;
     my $address = shift;
-    my $object  = $self->section($address);
-    my %var     = %{$object};
-    $var{id}           = $address->[0];
-    $var{displayed_id} = $address->[0] + 1;
+    my $section  = $self->section($address);
+    my %var     = %{$section};
+    
+    # Add the extra fields..
+    $var{id}           = sIndex($address);
+    $var{displayed_id} = sIndex($address) + 1;
+    
+    # Remove the fields we don't want..
     delete $var{questions};
     delete $var{questionsPerPage};
 
-    for ( 1 .. 20 ) {
-
-        #        if($_ == $self->section($address)->{questionsPerPage}){
-        if ( $_ == $object->{questionsPerPage} ) {
-            push( @{ $var{questionsPerPage} }, { 'index', $_, 'selected', 1 } );
+    # Change questionsPerPage from a single element, into an array of hashrefs, which list the 
+    # available questions per page and which one is currently selected for this section..
+    for my $index ( 1 .. $MAX_QUESTIONS_PER_PAGE ) {
+        if ( $index == $section->{questionsPerPage} ) {
+            push( @{ $var{questionsPerPage} }, { index => $index, selected => 1 } );
         }
         else {
-            push( @{ $var{questionsPerPage} }, { 'index', $_, 'selected', 0 } );
+            push( @{ $var{questionsPerPage} }, { index => $index, selected => 0 } );
         }
     }
     return \%var;
-} ## end sub getSectionEditVars
-
-sub getGotoTargets {
-    my $self = shift;
-
-    my @section_vars = map {$_->{variable}} @{$self->sections};
-    my @question_vars = map {$_->{variable}} @{$self->questions};
-    return grep {$_ ne ''} (@section_vars, @question_vars);
 }
 
 =head2 getQuestionEditVars ( $address )
 
-Get a safe copy of the variables for this question, to use for editing purposes.  Adds
-two variables, id, which is the indeces of the question's position in its parent's 
-section array joined by dashes '-', and displayed_id, which is this question's index
-in a 1-based array (versus the default, perl style, 0-based array).
+Get a safe copy of the variables for this question, to use for editing purposes.  
+
+Adds two variables:
+
+=over 4
+
+=item * id 
+
+the index of the question's position in its parent's section array joined by dashes '-'
+
+=item * displayed_id
+
+this question's index in a 1-based array (versus the default, perl style, 0-based array).
+
+=back
 
 It removes the answers array ref, and changes questionType from a single element, into
 an array of hashrefs, which list the available question types and which one is currently
@@ -393,24 +437,29 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 sub getQuestionEditVars {
     my $self    = shift;
     my $address = shift;
-    my $object  = $self->question($address);
-    my %var     = %{$object};
-    $var{id}           = $address->[0] . "-" . $address->[1];
-    $var{displayed_id} = $address->[1] + 1;
+    my $question  = $self->question($address);
+    my %var       = %{$question};
+    
+    # Add the extra fields..
+    $var{id}           = sIndex($address) . "-" . qIndex($address);
+    $var{displayed_id} = qIndex($address) + 1;
+    
+    # Remove the fields we don't want
     delete $var{answers};
     delete $var{questionType};
-    my @types = $self->getValidQuestionTypes();
 
-    for (@types) {
-        if ( $_ eq $object->{questionType} ) {
-            push( @{ $var{questionType} }, { 'text', $_, 'selected', 1 } );
+    # Change questionType from a single element into an array of hashrefs which list the available 
+    # question types and which one is currently selected for this question..
+    for ($self->getValidQuestionTypes) {
+        if ( $_ eq $question->{questionType} ) {
+            push( @{ $var{questionType} }, { text => $_, selected => 1 } );
         }
         else {
-            push( @{ $var{questionType} }, { 'text', $_, 'selected', 0 } );
+            push( @{ $var{questionType} }, { text => $_, selected => 0 } );
         }
     }
     return \%var;
-} ## end sub getQuestionEditVars
+}
 
 =head2 getValidQuestionTypes
 
@@ -435,10 +484,21 @@ sub getValidQuestionTypes {
 
 =head2 getAnswerEditVars ( $address )
 
-Get a safe copy of the variables for this answer, to use for editing purposes.  Adds
-two variables, id, which is the indeces of the answer's position in its parent's question
-and section arrays joined by dashes '-', and displayed_id, which is this answer's index
-in a 1-based array (versus the default, perl style, 0-based array).
+Get a safe copy of the variables for this answer, to use for editing purposes. 
+
+Adds two variables:
+
+=over 4
+
+=item * id 
+
+The index of the answer's position in its parent's question  and section arrays joined by dashes '-'
+
+=item * displayed_id
+
+This answer's index in a 1-based array (versus the default, perl style, 0-based array).
+
+=back
 
 =head3 $address
 
@@ -451,93 +511,104 @@ sub getAnswerEditVars {
     my $address = shift;
     my $object  = $self->answer($address);
     my %var     = %{$object};
-    $var{id}           = $address->[0] . "-" . $address->[1] . "-" . $address->[2];
-    $var{displayed_id} = $address->[2] + 1;
+    
+    # Add the extra fields..
+    $var{id}           = sIndex($address) . "-" . qIndex($address) . "-" . aIndex($address);
+    $var{displayed_id} = aIndex($address) + 1;
+    
     return \%var;
 }
 
-=head2 update ( $address, $object )
+=head2 update ( $address, $properties )
 
-Update new "objects" into the current data structure, or add new ones.  It does not
-return anything significant.
+Update a section/question/answer with $properties, or add new ones.  
+Does not return anything significant.
 
 =head3 $address
 
-See L<"Address Parameter">. The number of elements array set what is updated.
+See L<"Address Parameter">. 
+
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, nothing is done.
+Do Nothing
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then that element is used as an index into
-the array of sections, and information from $object is used to replace
-the properties of that section.  If the select section does not exist, such
+Update the addressed section with $properties. If the section does not exist, such
 as by using an out of bounds array index, then a new section is appended
 to the list of sections.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.
+Update the addressed question with $properties. 
 
-=item 3 elements
+=item * 3 elements
 
-Three elements are enough to reference an answer, for a particular
-question in a section.
+Update the addressed answer with $properties. 
 
 =back
 
-=head3 $object
+=head3 $properties
 
 A perl data structure.  Note, that it is not checked for type, so it is
-possible to add a "question" object into the list of section objects.
-$object should never be a partial object, but contain all properties.
+possible to add a "question" object into the list of sections.
+$properties should never be a partial object, but contain all properties.
 
 =cut
 
 sub update {
-    my ( $self, $address, $ref ) = @_;
+    my ( $self, $address, $properties ) = @_;
     my $object;
+    
+    # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
-    if ( @$address == 1 ) {
+    
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    # First retrieve the addressed object, or, if necessary, create it
+    if ( $count == 1 ) {
         $object = $self->section($address);
         if ( !defined $object ) {
             $object = $self->newSection();
             push( @{ $self->sections }, $object );
         }
     }
-    elsif ( @$address == 2 ) {
+    elsif ( $count == 2 ) {
         $object = $self->question($address);
         if ( !defined $object ) {
-            my $newQuestion = 1;
             $object = $self->newQuestion();
+            $newQuestion = 1; # make note that a new question was created
             push( @{ $self->questions($address) }, $object );
         }
     }
-    elsif ( @$address == 3 ) {
+    elsif ( $count == 3 ) {
         $object = $self->answer($address);
         if ( !defined $object ) {
             $object = $self->newAnswer();
             push( @{ $self->answers($address) }, $object );
         }
     }
-    if ( @$address == 2 and !$newQuestion ) {
-        if ( $ref->{questionType} ne $self->question($address)->{questionType} ) {
-            $self->updateQuestionAnswers( $address, $ref->{questionType} );
+    
+    # $object and $address now refer to the section/question/answer to be updated
+    
+    # In the case where we are updating an existing question..
+    if ( $count == 2 and !$newQuestion ) {
+        # We need to update all of the answers to reflect the new questionType
+        if ( $properties->{questionType} ne $self->question($address)->{questionType} ) {
+            $self->updateQuestionAnswers( $address, $properties->{questionType} );
         }
     }
-    for my $key ( keys %$ref ) {
-        $object->{$key} = $ref->{$key} if ( defined $$ref{$key} );
+    
+    # Update $object with all of the data in $properties 
+    for my $key ( keys %$properties ) {
+        $object->{$key} = $properties->{$key} if defined $properties->{$key};
     }
-} ## end sub update
-
-#determine what to add and add it.
-# ref should contain all the information for the new
+}
 
 =head2 insertObject ( $object, $address )
 
@@ -1118,6 +1189,39 @@ sub answer {
     my $self    = shift;
     my $address = shift;
     return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+}
+
+=head2 sIndex ($address)
+
+Convenience sub to extract the section index from a standard $address parameter. See L<"Address Parameter">.
+
+=cut
+ 
+sub sIndex {
+    my $address = shift;
+    return $address->[0];
+}
+
+=head2 qIndex ($address)
+
+Convenience sub to extract the question index from a standard $address parameter. See L<"Address Parameter">.
+
+=cut
+
+sub qIndex {
+    my $address = shift;
+    return $address->[1];
+}
+
+=head2 aIndex ($address)
+
+Convenience sub to extract the answer index from a standard $address parameter. See L<"Address Parameter">.
+
+=cut
+
+sub aIndex {
+    my $address = shift;
+    return $address->[2];
 }
 
 =head2 log ($message)
