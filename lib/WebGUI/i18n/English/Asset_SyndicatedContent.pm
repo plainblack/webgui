@@ -121,6 +121,11 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'date' => {
+		message => q|The publication date for this item.|,
+		lastUpdated => 0,
+	},
+
 	'author' => {
 		message => q|The publisher of this item.|,
 		lastUpdated => 0,
