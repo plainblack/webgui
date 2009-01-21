@@ -176,6 +176,7 @@ sub newObject {
         # Update $address with the index of the newly created answer
         $address->[2] = $self->totalAnswers($address) - 1;
     }
+    # Return the (modified) $address
     return $address;
 }
 
@@ -612,8 +613,8 @@ sub update {
 
 =head2 insertObject ( $object, $address )
 
-Used to move existing objects in the current data structure.  It does not
-return anything significant.
+Rearrange existing objects in the current data structure. 
+Does not return anything significant.
 
 =head3 $object
 
@@ -623,31 +624,27 @@ objects.
 
 =head3 $address
 
-See L<"Address Parameter">. The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
+
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, nothing is done.
+Do Nothing
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then that element is used as an index into
-the array of sections, and $object is spliced into place right after
-that index.
+Reposition $object immediately after the indexed section
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.  $object is added right after that question.
+Reposition $object immediately after the indexed question
 
-=item 3 elements
+=item * 3 elements
 
-Three elements are enough to reference an answer, inside of a particular
-question in a section.  $object is spliced in right after that answer.
+Reposition $object immediately after the indexed answer
 
 =back
 
@@ -655,47 +652,49 @@ question in a section.  $object is spliced in right after that answer.
 
 sub insertObject {
     my ( $self, $object, $address ) = @_;
-    if ( @$address == 1 ) {
-        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );
+    
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    return unless $count;
+    
+    # Use splice to rearrange the relevant array of objects..
+    if ( $count == 1 ) {
+        splice( @{ $self->sections($address) }, sIndex($address) + 1, 0, $object );
     }
-    elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object );
+    elsif ( $count == 2 ) {
+        splice( @{ $self->questions($address) }, qIndex($address) + 1, 0, $object );
     }
-    elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );
+    elsif ( $count == 3 ) {
+        splice( @{ $self->answers($address) }, aIndex($address) + 1, 0, $object );
     }
-
 }
 
 =head2 copy ( $address )
 
-Duplicate the structure pointed to by $address, and add it to the end of the list of
-similar structures.  copy returns $address with the last element changed to the highest
-index in that array.
+Duplicate the indexed section or question, and push the copy onto the end of the
+list of existing items. Modifies $address. Returns $address with the last element changed 
+to the highest index in that array.
 
 =head3 $address
 
-See L<"Address Parameter">. The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
 
-This method modifies $address.
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then the section with that index is duplicated
-at the end of the array of sections.
+Duplice the indexed section onto the end of the array of sections.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, the question in the section that is indexed
-will be duplicated and added to the end of the array of questions
-in that section.
+Duplice the indexed question onto the end of the array of questions.
 
-=item 3 elements, or more
+=item * 3 elements, or more
 
-Nothing happens.  It is not allowed to duplicate answers.
+Nothing happens. It is not allowed to duplicate answers.
 
 =back
 
@@ -703,67 +702,78 @@ Nothing happens.  It is not allowed to duplicate answers.
 
 sub copy {
     my ( $self, $address ) = @_;
-    if ( @$address == 1 ) {
-        my $newSection = dclone $self->section($address);
-        push( @{ $self->sections }, $newSection );
-        $address->[0] = $#{ $self->sections };
-        return $address;
+    
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    if ( $count == 1 ) {
+        # Clone the indexed section onto the end of the list of sections..
+        push( @{ $self->sections }, dclone $self->section($address) );
+        
+        # Update $address with the index of the newly created section
+        $address->[0] = $self->totalSections - 1;
     }
-    elsif ( @$address == 2 ) {
-        my $newQuestion = dclone $self->question($address);
-        push( @{ $self->questions($address) }, $newQuestion );
-        $address->[1] = $#{ $self->questions($address) };
-        return $address;
+    elsif ( $count == 2 ) {
+        # Clone the indexed question onto the end of the list of questions..
+        push( @{ $self->questions($address) }, dclone $self->question($address) );
+        
+        # Update $address with the index of the newly created question
+        $address->[1] = $self->totalQuestions($address) - 1;
     }
+    # Return the (modified) $address 
+    return $address;
 }
 
 =head2 remove ( $address, $movingOverride )
 
-Delete the structure pointed to by $address.
+Delete the section/question/answer indexed by $address. Modifies $address if it has 1 or more elements.
 
 =head3 $address
 
-See L<"Address Parameter">. The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
 
-This method modifies $address if it has 1 or more elements.
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then the section with that index is removed.  Normally,
-the first section, index 0, cannot be removed.  See $movingOverride below.
+Remove the indexed section. Normally, the first section, index 0, cannot be removed.  See $movingOverride below.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, the question in the section is removed.
-in that section.
+Remove the indexed question
 
 =item 3 elements
 
-Removes the answer in the specified question and section.
+Remove the indexed answer
 
 =back
 
 =head3 $movingOverride
 
-If $movingOverride is defined (meaning including 0 and ''), then the first section
-is allowed to be removed.
+If $movingOverride is defined (meaning including 0 and ''), then the first section is allowed to be removed.
 
 =cut
 
 sub remove {
     my ( $self, $address, $movingOverride ) = @_;
-    if ( @$address == 1 ) {
-        splice( @{ $self->{sections} }, $$address[0], 1 )
-            if ( $$address[0] != 0 or defined $movingOverride );    #can't delete the first section
+    
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @$address;
+    
+    # Use splice to remove the indexed section/question/answer..
+    if ( $count == 1 ) {
+        # Make sure the first section isn't removed unless we REALLY want to
+        if ( sIndex($address) != 0 || defined $movingOverride ) {
+            splice( @{ $self->{sections} }, sIndex($address), 1 );
+        }
     }
-    elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1], 1 );
+    elsif ( $count == 2 ) {
+        splice( @{ $self->questions($address) }, qIndex($address), 1 );
     }
-    elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2], 1 );
+    elsif ( $count == 3 ) {
+        splice( @{ $self->answers($address) }, aIndex($address), 1 );
     }
 }
 
@@ -852,7 +862,7 @@ Add answers to a question, based on the requested type.
 
 =head3 $address
 
-See L<"Address Parameter">. Which question to add answers to.
+See L<"Address Parameter">. Determines question to add answers to.
 
 =head3 $type
 
@@ -995,7 +1005,7 @@ sub updateQuestionAnswers {
     else {
         push( @{ $question->{answers} }, $self->newAnswer() );
     }
-} ## end sub updateQuestionAnswers
+}
 
 =head2 addAnswersToQuestion ($address, $answers, $verbatims)
 
