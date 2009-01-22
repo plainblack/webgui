@@ -31,7 +31,7 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 49;
+my $tests = 46;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -150,31 +150,9 @@ cmp_deeply  (
     'create takes exception to not giving it a session object',
 );
 
-eval { $driver = WebGUI::Shop::PayDriver->create($session); };
+eval { $driver = WebGUI::Shop::PayDriver->create($session,  {}); };
 $e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a label');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a human readable label in the hashref of options',
-    ),
-    'create takes exception to not giving it a hashref of options',
-);
-
-eval { $driver = WebGUI::Shop::PayDriver->create($session, 'Very human readable label'); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it a hashref of options');
-cmp_deeply  (
-    $e,
-    methods(
-        error => 'Must provide a hashref of options',
-    ),
-    'create takes exception to not giving it a hashref of options',
-);
-
-eval { $driver = WebGUI::Shop::PayDriver->create($session, 'Very human readable label', {}); };
-$e = Exception::Class->caught();
-isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to not giving it an empty hashref of options');
+isa_ok      ($e, 'WebGUI::Error::InvalidParam', 'create takes exception to giving it an empty hashref of options');
 cmp_deeply  (
     $e,
     methods(
@@ -185,7 +163,6 @@ cmp_deeply  (
 
 # Test functionality
 
-my $label = 'Human Readable Label';
 my $options = {
     label           => 'Fast and harmless',
     enabled         => 1,
@@ -193,24 +170,22 @@ my $options = {
     receiptMessage  => 'Pannenkoeken zijn nog lekkerder met spek',
 };
 
-$driver = WebGUI::Shop::PayDriver->create( $session, $label, $options );
+$driver = WebGUI::Shop::PayDriver->create( $session, $options );
 
 isa_ok  ($driver, 'WebGUI::Shop::PayDriver', 'create creates WebGUI::Shop::PayDriver object');
+like($driver->getId, $session->id->getValidator, 'driver id is a valid GUID');
 
 my $dbData = $session->db->quickHashRef('select * from paymentGateway where paymentGatewayId=?', [ $driver->getId ]);
 
-#diag        ($driver->getId);
 cmp_deeply  (
     $dbData,
     {
         paymentGatewayId    => $driver->getId,
         className           => ref $driver,
-        label               => $driver->label,
         options             => q|{"group":3,"receiptMessage":"Pannenkoeken zijn nog lekkerder met spek","label":"Fast and harmless","enabled":1}|,
     },
     'Correct data written to the db',
 );
-
 
 
 

@@ -7,6 +7,14 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.9
+--------------------------------------------------------------------
+   * The ukplayer example, slideshow.html in /extras/ukplayer, used
+     to be loaded with a javascript called AC_RunActiveContent.js. 
+     This file is removed due to licencing issues. If you use this 
+     script in custom HTML, you should replace it with swfobject.js 
+     as is demonstrated in the new example slideshow.html file. 
+
 7.6.8
 --------------------------------------------------------------------
    * Due to an error during the 7.6.6 development cycle, an Itransact template,

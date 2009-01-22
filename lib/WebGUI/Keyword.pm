@@ -137,7 +137,8 @@ sub generateCloud {
 
 =head2 getKeywordsForAsset ( { asset => $asset } )
 
-Returns a string of keywords separated by spaces.
+Returns a string of keywords separated by spaces.  If the keyword has spaces in it, it
+will be quoted.
 
 =head3 asset
 

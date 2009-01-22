@@ -35,6 +35,7 @@ our $HELP = {
                 'variables' => [
                     { 'name' => 'title' },
                     { 'name' => 'link' },
+                    { 'name' => 'date' },
                     { 'name' => 'category' },
                     { 'name' => 'author' },
                     { 'name' => 'guid' },

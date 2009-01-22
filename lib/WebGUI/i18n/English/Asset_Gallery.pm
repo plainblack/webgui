@@ -725,8 +725,8 @@ our $I18N = {
     },
 
     'imageDensity description' => {
-        message     => q{The density of the image. Print-quality images are more than three times the size of web-quality images.},
-        lastUpdated => 0,
+        message     => q{The density of the image. Print-quality images are more than three times the resolution of web-quality images.},
+        lastUpdated => 1231764657,
         context     => q{Description of asset property},
     },
 

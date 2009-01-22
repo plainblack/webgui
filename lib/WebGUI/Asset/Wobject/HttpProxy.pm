@@ -179,6 +179,12 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+sub getContentLastModified {
+    return time;
+}
+
+
+#-------------------------------------------------------------------
 sub getCookieJar {
 	my $self = shift;
 	my $storage;
