@@ -196,8 +196,15 @@ sub www_view {
     my @contribs = ();
     foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId ); 
-        push(@contribs,$asset->get);
+        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $props      = $asset->get;
+        if (ref $asset eq "WebGUI::Asset::Post") {
+            $asset = $asset->getThread;
+            $props = $asset->get;
+            $props->{className} = "WebGUI::Asset::Post";
+        }
+        
+        push(@contribs,$props);
     }
     my $contribsCount  = $p->getRowCount;
 

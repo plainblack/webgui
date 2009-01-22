@@ -439,7 +439,7 @@ sub view {
 		# build nav variables
 		$pageData->{"page.rank"}     = $asset->getRank;
 		$pageData->{"page.absDepth"} = $asset->getLineageLength;
-		$pageData->{"page.relDepth"} = $asset->getLineageLength - $start->getLineageLength;
+		$pageData->{"page.relDepth"} = $asset->getLineageLength - $absoluteDepthOfFirstPage;
 		$pageData->{"page.isSystem"} = $asset->get("isSystem");
 		$pageData->{"page.isHidden"} = $asset->get("isHidden");
 		$pageData->{"page.isViewable"} = $asset->canView;

@@ -299,6 +299,8 @@ sub exportAsHtml {
                 my $message = sprintf( $i18n->get('bad user privileges') . "\n") . $asset->getUrl;
                 $self->session->output->print($message);
             }
+            $exportSession->var->end;
+            $exportSession->close;
             next;
         }
 
@@ -307,12 +309,16 @@ sub exportAsHtml {
             if( !$quiet ) {
                 $self->session->output->print("$fullPath skipped, not exportable<br />");
             }
+            $exportSession->var->end;
+            $exportSession->close;
             next;
         }
 
         # tell the user which asset we're exporting.
         unless ($quiet) {
             my $message = sprintf $i18n->get('exporting page'), $fullPath;
+            $exportSession->var->end;
+            $exportSession->close;
             $self->session->output->print($message);
         }
 
@@ -322,6 +328,8 @@ sub exportAsHtml {
             $returnCode = 0;
             $message    = $@;
             $self->session->output->print("could not export asset with URL " . $asset->getUrl . ": $@");
+            $exportSession->var->end;
+            $exportSession->close;
             return ($returnCode, $message);
         }
 
@@ -332,6 +340,8 @@ sub exportAsHtml {
             $returnCode = 0;
             $message    = $@;
             $self->session->output->print("failed to export asset collateral for URL " . $asset->getUrl . ": $@");
+            $exportSession->var->end;
+            $exportSession->close;
             return ($returnCode, $message);
         }
 
