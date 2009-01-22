@@ -554,7 +554,7 @@ sub www_editBadgeGroup {
 	my ($form, $db) = $self->session->quick(qw(form db));
 	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
 	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
-	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::decode_json($badgeGroup->{badgeList}) : [];
+	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::from_json($badgeGroup->{badgeList}) : [];
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
 	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));

@@ -200,7 +200,7 @@ sub www_spellCheck {
     # work around TinyMCE JSON encoding bug
     $data =~ s/([^\\](?:\\\\)*)\\'/$1'/g;
 
-    my $params = JSON->new->utf8->decode($data);
+    my $params = JSON->new->decode($data);
 
     my $result;
     # dispatch to different subs based on the 'method' in the JSON data

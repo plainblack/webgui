@@ -2,7 +2,7 @@ package WebGUI::Content::AssetManager;
 
 use strict;
 
-use JSON qw( decode_json encode_json );
+use JSON qw( from_json to_json );
 use URI;
 use WebGUI::Form;
 use WebGUI::Paginator;
@@ -221,7 +221,7 @@ sub getMoreMenu {
         };
     }
 
-    return encode_json \@more_fields;
+    return to_json \@more_fields;
 }
 
 #----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
     $session->http->setMimeType( 'application/json' );
-    return encode_json( $assetInfo );
+    return to_json( $assetInfo );
 }
 
 #----------------------------------------------------------------------------

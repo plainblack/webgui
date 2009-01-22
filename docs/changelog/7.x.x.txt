@@ -10,6 +10,7 @@
  - fixed: Paginator generates bad markup for next page links
  - fixed: Exporting to static files can leak large amounts of memory
  - fixed: HTTP Proxy doesn't serve new content to visitors
+ - fixed: WebGUI doesn't handle UTF8 encoding on JSON consistently
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem

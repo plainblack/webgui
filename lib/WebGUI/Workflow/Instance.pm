@@ -65,7 +65,7 @@ sub create {
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and mode='singleton'",$placeHolders);
     my $sql = "select count(*) from WorkflowInstance where workflowId=?";
 	if (exists $properties->{parameters}) {
-        push @{ $placeHolders }, JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
+        push @{ $placeHolders }, JSON->new->canonical->encode({parameters => $properties->{parameters}});
         $sql .= ' and parameters=?';
     }
     else {
@@ -159,7 +159,7 @@ sub get {
     my $name = shift;
     if ($name eq "parameters") {
         if ($self->{_data}{parameters}) {
-            my $parameters = JSON::decode_json($self->{_data}{$name});
+            my $parameters = JSON::from_json($self->{_data}{$name});
             return $parameters->{parameters};
         }
         else {
@@ -452,7 +452,7 @@ sub set {
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	if (exists $properties->{parameters}) {
-		$self->{_data}{parameters} = JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
+		$self->{_data}{parameters} = JSON->new->canonical->encode({parameters => $properties->{parameters}});
 	}
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});

@@ -25,7 +25,7 @@ use DateTime::TimeZone;
 use WebGUI::VersionTag;
 
 use LWP::UserAgent;
-use JSON qw(encode_json decode_json);
+use JSON qw(to_json from_json);
 
 =head1 NAME
 
@@ -91,8 +91,8 @@ sub execute {
     my $eventList   = [];
     my $feedList;
     if ($instance->getScratch('events')) {
-        $eventList = decode_json($instance->getScratch('events'));
-        $feedList = decode_json($instance->getScratch('feeds'));
+        $eventList = from_json($instance->getScratch('events'));
+        $feedList = from_json($instance->getScratch('feeds'));
     }
     else {
         my $ua      = LWP::UserAgent->new(agent => "WebGUI");
@@ -377,8 +377,8 @@ sub execute {
     $self->session->log->info( "Have to add " . scalar( @$eventList ) . " events..." );
     while (@$eventList) {
         if ($startTime + 55 < time()) {
-            $instance->setScratch('events', encode_json($eventList));
-            $instance->setScratch('feeds', encode_json($feedList));
+            $instance->setScratch('events', to_json($eventList));
+            $instance->setScratch('feeds', to_json($feedList));
             return $self->WAITING;
         }
         my $eventData = shift @$eventList;

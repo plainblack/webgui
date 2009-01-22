@@ -452,7 +452,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 description         => "We welcome your feedback.",
                 acknowledgement     => "Thanks for for your interest in ^c;. We'll review your message shortly.",
                 mailData            => 1,
-                fieldConfiguration  => JSON::encode_json(\@fieldConfig),
+                fieldConfiguration  => JSON::to_json(\@fieldConfig),
                 });
         }
 

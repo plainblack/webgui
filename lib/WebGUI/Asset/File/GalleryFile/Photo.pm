@@ -19,7 +19,7 @@ use base 'WebGUI::Asset::File::GalleryFile';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
-use JSON qw/ encode_json decode_json /;
+use JSON qw/ to_json from_json /;
 use URI::Escape;
 use Tie::IxHash;
 use List::MoreUtils;
@@ -221,7 +221,7 @@ sub getExifData {
 
     # Our processing and eliminating of bad / unparsable keys
     # isn't perfect, so handle errors gracefully
-    my $exif    = eval { decode_json( $self->get('exifData') ) };
+    my $exif    = eval { from_json( $self->get('exifData') ) };
     if ( $@ ) {
         $self->session->errorHandler->warn( 
             "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
@@ -461,7 +461,7 @@ sub updateExifDataFromFile {
     }
 
     $self->update({
-        exifData    => encode_json( $info ),
+        exifData    => to_json( $info ),
     });
 }
 

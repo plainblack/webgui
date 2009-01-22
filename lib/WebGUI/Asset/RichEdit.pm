@@ -561,7 +561,7 @@ sub getRichEditor {
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " )\n"
             . "</script>";
 }
 

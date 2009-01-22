@@ -98,7 +98,7 @@ sub get {
                 return {};
             }
             else {
-                return JSON->new->utf8->decode($properties{id $self}{$name});
+                return JSON->new->decode($properties{id $self}{$name});
             }
         }
         return $properties{id $self}{$name};
@@ -294,7 +294,7 @@ sub update {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     if (exists $newProperties->{options} && ref($newProperties->{options}) eq "HASH") {
-        $properties{$id}{options} = JSON->new->utf8->encode($newProperties->{options});
+        $properties{$id}{options} = JSON->new->encode($newProperties->{options});
     }
     $properties{$id}{lastUpdated} = WebGUI::DateTime->new($self->transaction->session,time())->toDatabase;
     $self->transaction->session->db->setRow("transactionItem","itemId",$properties{$id});
