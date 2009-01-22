@@ -9,6 +9,7 @@
  - fixed #4137: Calendar Search no longer puts head tags in body
  - fixed: Paginator generates bad markup for next page links
  - fixed: Exporting to static files can leak large amounts of memory
+ - fixed: HTTP Proxy doesn't serve new content to visitors
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
