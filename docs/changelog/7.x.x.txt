@@ -8,6 +8,7 @@
  - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search no longer puts head tags in body
  - fixed: Paginator generates bad markup for next page links
+ - fixed: Exporting to static files can leak large amounts of memory
 
 7.5.38
  - fixed #9154: WebGUI Shop - Checkout Caching Problem
