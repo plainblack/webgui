@@ -165,10 +165,10 @@ sub create {
 		if ($msg =~ m/\<.*\>/) {
             $msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
 			$mail->addHtml($msg);
-            $mail->addText($preface . "\n\n" . $self->{_properties}{message});
+               } else {
             $msg = $preface."\n\n".$msg if($preface ne "");
 			$mail->addText($msg);
-        }
+            }
 		$mail->addFooter;
 		$mail->queue;
 	}
