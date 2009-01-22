@@ -1,3 +1,5 @@
+7.6.10
+
 7.6.9
  - fixed: ukplayer example is now loaded with swfobject.js released under the
           MIT licence, see gotcha's and /extras/ukplayer
