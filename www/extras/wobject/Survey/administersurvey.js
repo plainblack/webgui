@@ -4,7 +4,10 @@ if (typeof Survey === "undefined") {
 }
 
 (function(){
-
+	
+	var CLASS_INVALID = 'survey-invalid'; // For elements that fail input validation
+	var CLASS_INVALID_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
+	
     var multipleChoice = {
         'Multiple Choice': 1,
         'Gender': 1,
@@ -90,12 +93,20 @@ if (typeof Survey === "undefined") {
                         }
                     }
                 }
+				var node = document.getElementById(i + 'required');
+				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
-                    document.getElementById(i + 'required').innerHTML = "<font color=red>*</font>";
+					
+					// Apply CLASS_INVALID to the parent question div for people who want to skin Survey
+                    YAHOO.util.Dom.addClass(q_parent_node, CLASS_INVALID);
+					
+					// Insert default '*' marker (can be hidden via CSS for those who want something different)
+					node.innerHTML = "<span class='" + CLASS_INVALID_MARKER + "'>*</span>";
                 }
                 else {
-                    document.getElementById(i + 'required').innerHTML = "";
+                    YAHOO.util.Dom.removeClass(q_parent_node, CLASS_INVALID);
+					node.innerHTML = '';
                 }
             }
         }
@@ -174,9 +185,7 @@ if (typeof Survey === "undefined") {
     
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
-        if (this.value === 'NaN') {
-            this.value = 0;
-        }
+		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
         sliders[this.id].setValue(Math.round(this.value * sliders[this.id].scale));
     }
     
@@ -338,14 +347,14 @@ if (typeof Survey === "undefined") {
             //YAHOO.util.Event.addListener("testB", "click", function(){Survey.Comm.callServer('','loadQuestions');});   
             
             if (qs[0]) {
-                if (lastSection !== s.id || s.everyPageTitle > 0) {
+                if (lastSection !== s.id || s.everyPageTitle === '1') {
                     document.getElementById('headertitle').style.display = 'block';
                 }
-                if (lastSection !== s.id || s.everyPageText > 0) {
+                if (lastSection !== s.id || s.everyPageText === '1') {
                     document.getElementById('headertext').style.display = 'block';
                 }
-                
-                if (lastSection !== s.id && s.questionsOnSectionPage !== 1) {
+				
+                if (lastSection !== s.id && s.questionsOnSectionPage !== '1') {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                     span.style.display = 'block';
@@ -353,10 +362,10 @@ if (typeof Survey === "undefined") {
                     document.getElementById('survey-header').appendChild(span);
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
-                        if (s.everyPageTitle === 0) {
+                        if (s.everyPageTitle !== '1') {
                             document.getElementById('headertitle').style.display = 'none';
                         }
-                        if (s.everyPageText === 0) {
+                        if (s.everyPageText !== '1') {
                             document.getElementById('headertext').style.display = 'none';
                         }
                         document.getElementById('questions').style.display = 'inline';

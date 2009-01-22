@@ -1164,18 +1164,21 @@ sub www_editField {
 #-------------------------------------------------------------------
 sub www_editFieldSave {
     my $self = shift;
-    return $self->session->privilege->insufficient
+    my $session = $self->session;
+    return $session->privilege->insufficient
         unless $self->canEdit;
-    my $form = $self->session->form;
+    my $form = $session->form;
     my $fieldName = $form->process('fieldName');
-    my $newName = $self->session->url->urlize($form->process('newName') || $form->process('label'));
+    my $newName = $session->url->urlize($form->process('newName') || $form->process('label'));
     $newName =~ tr{-/}{};
 
     # Make sure we don't rename special fields
+    my $isMailField = 0;
     if ($fieldName) {
         my $field = $self->getFieldConfig($fieldName);
         if ($field->{isMailField}) {
             $newName = $fieldName;
+            $isMailField = 1;
         }
     }
 
@@ -1202,6 +1205,9 @@ sub www_editFieldSave {
         vertical        => $form->process("vertical", 'yesNo'),
         extras          => $form->process("extras"),
     );
+    if ($isMailField) {
+        $field{isMailField} = 1;
+    }
 
     my $newSelf = $self->addRevision;
     if ($fieldName) {

@@ -1,7 +1,12 @@
 United Knowledge Slideshow Player - readme.txt
 
 Copyright: United Knowledge, 2008
-Under the terms of the GNU General Public License, version 2
+
+The Slideshow PLayer is licensed under the terms of the GNU General Public License, version 2
+http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+SWFObject 2, the code used to display the Slideshow, is licensed under the MIT License
+http://www.opensource.org/licenses/mit-license.php
 
 
 **********************************************************************************************

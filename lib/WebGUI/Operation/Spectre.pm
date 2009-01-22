@@ -69,7 +69,7 @@ sub www_spectreGetSiteData {
 		my $cookieName = $session->config->getCookieName;
 		my @instances = ();
 		foreach my $instance (@{WebGUI::Workflow::Instance->getAllInstances($session)}) {
-			next unless $instance->getWorkflow->get("enabled");
+			next unless $instance->getWorkflow && $instance->getWorkflow->get("enabled");
 			push(@instances, {
 				instanceId 	=> $instance->getId,
 				priority 	=> $instance->get("priority"),

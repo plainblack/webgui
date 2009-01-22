@@ -1,4 +1,94 @@
+7.6.9
+ - fixed: ukplayer example is now loaded with swfobject.js released under the
+          MIT licence, see gotcha's and /extras/ukplayer
+ - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
+ - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
+ - marked sbin scripts as executable
+ - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
+ - fixed #9404: Head tags for admin user with admin mode off
+ - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
+ - fixed a bug where no Payment Gateway labels show up when checking out.
+ - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
+ - fixed #4137: Calendar Search page has head tags in body
+ - fixed: HTTP Proxy doesn't serve new content to visitors
+ - fixed: Exporting to static files can leak large amounts of memory
+
+7.6.8
+ - added #!/usr/bin/env perl to all utility scripts
+ - Updated captcha images to be more legible.
+ - fixed #9285: modifing template prevents edit of syncontent
+ - fixed #8886: Search button in Asset manager
+ - fixed #9410: Wrong help text
+ - fixed #9154: WebGUI Shop - Checkout Caching Problem
+ - fixed a bug where clicking the apply button when func=add would return the
+   edit screen of the parent asset rather than that of the new asset. (Martin
+   Kamerbeek / Oqapi).
+ - fixed: Make sure that Form subclasses are found by WebGUI::Form::FieldType
+ - fixed #9356: Data Form Mail Fields
+ - fixed #9365: Account: when viewing another person's contribution, it displays my name
+ - fixed #9351: Cannot translate phrase
+ - fixed #9368: Gallery: All children included into navigation
+ - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
+ - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
+ - fixed #9374: Subscription Asset: Redeem subscription template not documented, or user selectable
+ - fixed #9366: Gallery: Missing i18n
+ - fixed #9367: Gallery: Errors in templates
+ - fixed #9352: Account activation message MIA
+ - fixed #9046: Wiki tabs all combined (David Delikat)
+ - refixed #9147: Misspellings in Account
+ - fixed #9348: Required Upgrade Step Not Documented - 7.6.0
+ - fixed #8993: Gallery Image Details Overlap Image
+ - fixed #9380: CoolMenus template - invalid markup affecting page layouts
+ - fixed #9387: Asset Manager breaks navigating into a Gallery Album
+ - fixed #9001: Thingy add image broken
+ - fixed #9386: Gallery: "Image resolutions" issue
+ - fixed #9342: Thingy - Cannot edit a thing
+ - fixed #9033: Deleting Linked Thing Field Crashes Thingy
+ - fixed #9400: Form.captcha should be form_capcha in dataform help
+ - fixed #9402: i18n confusion
+ - fixed #9403: i18n survey
+ - fixed: Syndicated Content corrupts wide characters
+
+7.6.7
+ - fixed #9263: Thingy possibleValues processing, and List type autodetection.
+ - fixed: Alter WebGUI::Asset::Template's update method so that it can import packages that use the old, deprecated headBlock property.  The update method change is deprecatd.
+ - fixed #9266: controls missing on product asset
+ - fixed #9150: Edit Data Table - Cannot add column (David Delikat)
+ - fixed #9261: Cart Payment Screen not templated
+ - fixed #4124: Site starter uses floats in ways that cause problems
+ - fixed #9274: AdminBar errors and fails when an asset class cannot be loaded
+ - fixed #9301: Error in Shelf Template
+ - fixed #9260: untitled (Delete icon "X" circumvents revision control)
+ - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
+ - fixed #9284: User manager broken if no LDAP links exits
+ - fixed #4136: Shortcut doesn't display all properties in override
+ - fixed #8838: Gallery Cross Publish template is broken
+ - fixed #8898: versioning problem
+ - fixed #9315: Password Recovery
+ - fixed #9298: Inconsistent date formats
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
+ - fixed #4196: update button doesn't work in IE
+
+7.6.6
+ - fixed #9217: Survey 2.0 - "Cancel" button not working as expected(David Delikat)
+ - fixed #8792: Image Preview gives ERROR in Collateral Manager
+ - fixed #8774: Forum Rich Edit no longer supports indent/outdent
+ - fixed #4173: fieldnames in profilefields can contain spaces
+ - fixed #8811: Bug Tracker: Formatting is bad for the resolution form.
+ - fixed #9235: Image Bug in rich text editor.
+ - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
+ - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
+ - fixed #9244: i18n for colin
+ - fixed #9252: Thingy defaultValue length causes input to be truncated (SDH Consulting Group)
+ - fixed #8937: Feeds in Calendar strip information
+ - fixed #9063: Thingy - Time Field editing errors
+ - fixed #9237: Payment Gateways all display "cash"
+ - fixed #8816: PayDriver "Label" of the instance of the driver should be used instead of the generic name
+ - fixed #4220: testEnvironment.pl unable to find WebGUI modules...
+ - fixed #9279: "Read more" text in Syndicated Articles is not a label
+
 7.6.5
+ - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
  - fixed: Products imported into the Shelf have bad URLs
  - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything WebGUI::Storage::Image can do.
@@ -14,6 +104,18 @@
  - fixed #9112: Thingy View Thing screen doesn't preserve newlines
  - fixed #9155: purpose of "headblock" duplicates "extra head tags"
  - fixed: Improve Thingy navigation.
+ - fixed #9126: UserList is completely broken in 7.6.4 (Yung Han Khoe)
+ - fixed #9177: Wide-characters break product varients
+ - fixed #9191: Message Board reveals user email, ignores profile privacy setting (#9180)
+ - fixed #4209: i18n in Rich edit in Dutch breaks
+ - fixed #9196: Shelf lacks pagination
+ - fixed #4208: EMS badges with Admin security visible to all
+ - fixed Calendar copy behavior.  In the Asset toolbar, Copy Just this Asset
+   was broken.  This has been fixed.  As a side effect, in the Asset Manager
+   the default behavior is to copy ONLY the Calendar, and none of the events.
+ - fixed: filtering of rich text areas very slow for large content
+ - fixed: international characters are corrupted on export
+ - removed: WSClient
 
 7.6.4
  - Survey now will show progress and time limit.
@@ -81,24 +183,7 @@
  - fixed #9140: Date format error when adding tasks to PM
  - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
  - fixed #9143: Yes No user profile fields problem when default == 1
-
-7.5.34
- - fixed: Regression with ProfileField->formField. Added tests to prevent future regression
- - fixed #8849: More missing i18n
- - fixed: Performance issue with Stow. Added a way to bypass safety for speed.
- - fixed #4182: Edit links show in asset manager for locked assets
- - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
- - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
- - fixed #9068: field.inTab
- - fixed #8845: Workflows refusing to show edit screen
- - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
- - fixed #9106: Calendar Feed Workflow Creating Version Tags w/o Updates
- - fixed #8914: epoch for calendar/List View for Calendar
- - fixed #8822: Password Recovery Tempalte not working
- - fixed: DataForm times out when exporting large data sets
- - fixed: DataForm entry data field is too small
->>>>>>> .merge-right.r8665
-
+ - fixed #8775: Miscount in number of replies in CS Thread (Martin Kamerbeek / Oqapi)
 
 7.6.3
  - improved performance of file uploads

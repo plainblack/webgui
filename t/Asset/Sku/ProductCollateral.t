@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use JSON;
 use Data::Dumper;
 
@@ -35,7 +36,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 33;        # Increment this number for each test you create
+plan tests => 34;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -291,9 +292,26 @@ is( $product5->getCollateral('variantsJSON', 'vid', $newVid)->{check}, 'no leaks
 
 $product5->purge;
 
+##Handle wide characters
+
+my $product6 = $root->addChild({
+        className => "WebGUI::Asset::Sku::Product",
+        title     => "Wide character attempt",
+});
+
+$newVid = $product6->setCollateral('variantsJSON', 'vid', 'new', { wideChar => qq!on 16\x{201d} hand-crocheted Cord!
+, vid => 'new' });
+
+my $product6a = WebGUI::Asset->newByDynamicClass($session, $product6->getId);
+lives_ok { $product6a->getAllCollateral('variantsJSON', 'vid', $newVid); }, 'Product collateral handles wide-character encodings okay';
+
+$product6->purge;
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+
+    WebGUI::VersionTag->getWorking($session)->rollback;
 
 }
 

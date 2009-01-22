@@ -810,7 +810,7 @@ sub new {
 
 =head2 secondsToInterval ( seconds )
 
-Returns an interval and units derived the number of seconds.
+Returns an interval and internationalized units derived the number of seconds.
 
 =head3 seconds
 
@@ -825,31 +825,31 @@ sub secondsToInterval {
 	my ($interval, $units);
 	if ($seconds >= 31536000) {
 		$interval = round($seconds/31536000);
-		$units = $i18n->get("years");
+		$units = $i18n->get("703");
 	}
     elsif ($seconds >= 2592000) {
         $interval = round($seconds/2592000);
-        $units = $i18n->get("months");
+        $units = $i18n->get("702");
 	}
     elsif ($seconds >= 604800) {
         $interval = round($seconds/604800);
-        $units = $i18n->get("weeks");
+        $units = $i18n->get("701");
 	}
     elsif ($seconds >= 86400) {
         $interval = round($seconds/86400);
-        $units = $i18n->get("days");
+        $units = $i18n->get("700");
     }
     elsif ($seconds >= 3600) {
         $interval = round($seconds/3600);
-        $units = $i18n->get("hours");
+        $units = $i18n->get("706");
     }
     elsif ($seconds >= 60) {
         $interval = round($seconds/60);
-        $units = $i18n->get("minutes");
+        $units = $i18n->get("705");
     }
     else {
         $interval = $seconds;
-        $units = $i18n->get("seconds");
+        $units = $i18n->get("704");
 	}
 	return ($interval, $units);
 }

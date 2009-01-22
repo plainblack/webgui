@@ -56,8 +56,8 @@ isa_ok( $account, "WebGUI::Account", 'Blessed into the right class' );
 #----------------------------------------------------------------------------
 # Test getUrl
 
-is( $account->getUrl, $session->url->page('op=account;module=;do='), 
-    'getUrl adds op, module, and do' 
+is( $account->getUrl, $session->url->page('op=account;module=;do='.$account->method), 
+    'getUrl adds op, module, and do since no method has been set' 
 );
 
 is( $account->getUrl( 'foo=bar' ), $session->url->page( 'op=account;foo=bar' ),

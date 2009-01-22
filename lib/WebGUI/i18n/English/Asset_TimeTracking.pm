@@ -464,6 +464,18 @@ our $I18N = {
 		lastUpdated => 1168038164,
 	},
 
+    'next week' => {
+        message => q|Next Week|,
+        context => q|Template label for the week following the current week.|,
+        lastUpdated => 1229311274,
+    },
+
+    'last week' => {
+        message => q|Last Week.|,
+        context => q|Template label for the week preceeding the current week.|,
+        lastUpdated => 1229311309,
+    },
+
 };
 
 1;

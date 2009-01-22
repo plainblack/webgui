@@ -118,7 +118,7 @@ our $HELP = {
                 description => 'helpvar useCaptcha',
             },
             {
-                name        => 'form.captcha',
+                name        => 'form_captcha',
                 required    => 1,
                 description => 'helpvar form.captcha',
             },

@@ -11,7 +11,7 @@ Survey.ObjectTemplate = new function(){
         var butts = [ 
                 { text:"Submit", handler:function(){this.submit();}, isDefault:true }, 
                 { text:"Copy", handler:function(){document.getElementById('copy').value = 1; this.submit();}},
-                { text:"Cancel", handler:function(){this.cancel();}}, 
+                { text:"Cancel", handler:function(){this.cancel(); Survey.Comm.loadSurvey('-');}}, 
                 { text:"Delete", handler:function(){document.getElementById('delete').value = 1; this.submit();}}
             ];
 

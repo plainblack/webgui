@@ -19,6 +19,7 @@ use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
+use Clone qw/clone/;
 
 
 =head1 NAME
@@ -398,6 +399,30 @@ sub processRaw {
 	my $vars = shift;
 	my $parser = shift;
 	return $class->getParser($session,$parser)->process($template, $vars);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+Override update from Asset.pm to handle backwards compatibility with the old
+packages that contain headBlocks.
+
+This method is deprecated and will be removed in the future.  Don't plan
+on this being here.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $requestedProperties = shift;
+    my $properties = clone($requestedProperties);
+    if (exists $properties->{headBlock}) {
+        $properties->{extraHeadTags} .= $properties->{headBlock};
+        delete $properties->{headBlock};
+    }
+    $self->SUPER::update($properties);
 }
 
 

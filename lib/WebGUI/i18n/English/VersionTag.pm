@@ -374,7 +374,7 @@ our $I18N = {
     },
     
     'manageRevisionsInTag update' => {
-        message     => q{Update},
+        message     => q{Update Version Tag},
         lastUpdated => 0,
         context     => q{Label for button to update revisions},
     },
@@ -476,6 +476,7 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Explanation of Permission Denied message},
     },
+
 };
 
 1;

@@ -193,7 +193,7 @@ sub getChildCount {
 	my $self = shift;
     my $opts = shift || {};
 	my $stateWhere = $opts->{includeTrash} ? '' : "asset.state='published' and";
-	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
+	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
 	return $count;
 }
 
@@ -208,7 +208,7 @@ in the clipboard or trash.
 
 sub getDescendantCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
+	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
 	$count--; # have to subtract self
 	return $count;
 }

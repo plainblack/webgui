@@ -505,13 +505,17 @@ sub getPasswordRecoveryFields {
 
 #-------------------------------------------------------------------
 
-=head2 isDuplicate( fieldValue )
+=head2 isDuplicate( fieldValue, userId )
 
 Checks the value of the field to see if it is duplicated in the system.  Returns true of false.
 
 =head3 fieldValue
 
 value to check for duplicates against
+
+=head3 userId
+
+userId to check for duplicates againts
 
 =cut
 
@@ -520,9 +524,10 @@ sub isDuplicate {
     my $session   = $self->session;
     my $fieldId   = $self->getId;
     my $value     = shift;
+    my $userId    = shift || $session->user->userId;
 
     my $sql       = qq{select count(*) from userProfileData where $fieldId = ? and userId <> ?};
-    my $duplicate = $session->db->quickScalar($sql,[$value, $session->user->userId]);
+    my $duplicate = $session->db->quickScalar($sql,[$value, $userId]);
     return ($duplicate > 0);
 }
 

@@ -39,23 +39,23 @@ sub definition {
             label        => "Template ID"
         },
         showProgress => {
-            fieldType => "yesNo",
+            fieldType    => "yesNo",
             defaultValue => 0,
-            tab => 'properties',
-            label => "Show user their progress"
+            tab          => 'properties',
+            label        => "Show user their progress"
         },
         showTimeLimit => {
-            fieldType => "yesNo",
+            fieldType    => "yesNo",
             defaultValue => 0,
-            tab => 'properties',
-            label => "Show user their time remaining"
+            tab          => 'properties',
+            label        => "Show user their time remaining"
         },
-        timeLimit => { 
-            fieldType => 'integer',
+        timeLimit => {
+            fieldType    => 'integer',
             defaultValue => 0,
-            tab => 'properties',
-            hoverHelp => $i18n->get('timelimit hoverHelp'),
-            label => $i18n->get('timelimit') 
+            tab          => 'properties',
+            hoverHelp    => $i18n->get('timelimit hoverHelp'),
+            label        => $i18n->get('timelimit')
         },
         groupToEditSurvey => {
             fieldType    => 'group',
@@ -260,9 +260,9 @@ Loads the initial edit survey page.  All other edit actions are JSON calls from 
 
 sub www_editSurvey {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
-        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
 
     my %var;
     my $out = $self->processTemplate( \%var, $self->get("surveyEditTemplateId") );
@@ -273,11 +273,11 @@ sub www_editSurvey {
 #-------------------------------------------------------------------
 sub www_submitObjectEdit {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
-        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
 
-    #    my $ref = @{decode_json($self->session->form->process("data"))};
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+
+    #    my $ref = @{from_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
 
     my @address = split /-/, $responses->{id};
@@ -339,10 +339,10 @@ sub deleteObject {
 #-------------------------------------------------------------------
 sub www_newObject {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
-        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
-        
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+
     my $ref;
 
     my $ids = $self->session->form->process("data");
@@ -363,11 +363,11 @@ sub www_newObject {
 #-------------------------------------------------------------------
 sub www_dragDrop {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
-        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
-        
-    my $p    = decode_json( $self->session->form->process("data") );
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+
+    my $p = from_json( $self->session->form->process("data") );
 
     my @tid = split /-/, $p->{target}->{id};
     my @bid = split /-/, $p->{before}->{id};
@@ -415,6 +415,7 @@ sub www_dragDrop {
             $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
+
             #else put it back where it was
             $self->survey->insertObject( $target, \@tid );
         }
@@ -428,13 +429,19 @@ sub www_dragDrop {
 #-------------------------------------------------------------------
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
+    my $editflag = 1;
 
     $self->loadSurveyJSON();
 
     my $address = defined $options->{address} ? $options->{address} : undef;
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process("data") ) {
-            $address = [ split /-/, $inAddress ];
+            if( $inAddress eq '-' ) {
+                 $editflag = 0;
+		 $address = [ 0 ];
+            } else {
+		$address = [ split /-/, $inAddress ];
+	    }
         }
         else {
             $address = [0];
@@ -508,11 +515,13 @@ sub www_loadSurvey {
     #ids is a list of all ids passed in which are draggable (for adding events)
     #type is the object type
     my $return = {
-        "address", $address, "buttons", \%buttons, "edithtml", $editHtml,
+        "address", $address, "buttons", \%buttons,
+        "edithtml", $editflag ? $editHtml : '',
         "ddhtml",  $html,    "ids",     \@ids,     "type",     $var->{type}
     };
-    $self->session->http->setMimeType('application/json');
-    return encode_json($return);
+    #$self->session->http->setMimeType('application/json');
+#    $self->session->http->setMimeType('application/json');
+    return to_json($return);
 } ## end sub www_loadSurvey
 
 #-------------------------------------------------------------------
@@ -579,19 +588,90 @@ sub view {
     my $self = shift;
     my %var;
 
-    $var{'edit_survey_url'}     = $self->getUrl('func=editSurvey');
-    $var{'take_survey_url'}     = $self->getUrl('func=takeSurvey');
-    $var{'view_simple_results_url'}    = $self->getUrl('func=exportSimpleResults');
-    $var{'view_transposed_results_url'}    = $self->getUrl('func=exportTransposedResults');
-    $var{'view_statistical_overview_url'}    = $self->getUrl('func=viewStatisticalOverview');
-    $var{'view_grade_book_url'}         = $self->getUrl('func=viewGradeBook');
-    $var{'user_canTakeSurvey'}  = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
-    $var{'user_canViewReports'} = $self->session->user->isInGroup( $self->get("groupToViewReports") );
-    $var{'user_canEditSurvey'}  = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
+    $var{'edit_survey_url'}               = $self->getUrl('func=editSurvey');
+    $var{'take_survey_url'}               = $self->getUrl('func=takeSurvey');
+    $var{'view_simple_results_url'}       = $self->getUrl('func=exportSimpleResults');
+    $var{'view_transposed_results_url'}   = $self->getUrl('func=exportTransposedResults');
+    $var{'view_statistical_overview_url'} = $self->getUrl('func=viewStatisticalOverview');
+    $var{'view_grade_book_url'}           = $self->getUrl('func=viewGradeBook');
+    $var{'user_canTakeSurvey'}            = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
+    $var{'user_canViewReports'}           = $self->session->user->isInGroup( $self->get("groupToViewReports") );
+    $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
+    $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
+    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
+    $var{'lastResponseCompleted'} = $code;
+    $var{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
+    $var{'maxResponsesSubmitted'} = $overTakeLimit;
     my $out = $self->processTemplate( \%var, undef, $self->{_viewTemplate} );
 
     return $out;
-}
+} ## end sub view
+
+#-------------------------------------------------------------------
+
+=head2 getResponseInfoForView ( )
+
+Looks to see if this user has a response, looks at the last one to see if it was completed or timed out.
+Then it checks to see if the user has reached the max number of responses.
+
+=cut
+
+sub getResponseInfoForView {
+    my $self = shift;
+
+    my ( $code, $taken );
+
+    my $maxTakes = $self->getValue("maxResponsesPerUser");
+    my $id       = $self->session->user->userId();
+    my $anonId 
+        = $self->session->form->process("userid")
+        || $self->session->http->getCookies->{"Survey2AnonId"}
+        || undef;
+    $self->session->http->setCookie( "Survey2AnonId", $anonId ) if ($anonId);
+    my $ip = $self->session->env->getIp;
+    my $string;
+
+    #if there is an anonid or id is for a WG user
+    if ( $anonId or $id != 1 ) {
+        $string = 'userId';
+        if ($anonId) {
+            $string = 'anonId';
+            $id     = $anonId;
+        }
+        my $responseId
+            = $self->session->db->quickScalar(
+            "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
+            [ $id, $self->getId() ] );
+        if ( !$responseId ) {
+            $code = $self->session->db->quickScalar(
+                "select isComplete from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
+                [ $id, $self->getId() ]
+            );
+        }
+        $taken
+            = $self->session->db->quickScalar(
+            "select count(*) from Survey_response where $string = ? and assetId = ? and isComplete > 0",
+            [ $id, $self->getId() ] );
+
+    } ## end if ( $anonId or $id !=...
+    elsif ( $id == 1 ) {
+        my $responseId = $self->session->db->quickScalar(
+            "select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0",
+            [ $id, $ip, $self->getId() ]
+        );
+        if ( !$responseId ) {
+            $code = $self->session->db->quickScalar(
+                "select isComplete from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
+                [ $id, $ip, $self->getId() ]
+            );
+        }
+        $taken = $self->session->db->quickScalar(
+            "select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0",
+            [ $id, $ip, $self->getId() ]
+        );
+    } ## end elsif ( $id == 1 )
+    return ( $code, $taken >= $maxTakes );
+} ## end sub getResponseInfoForView
 
 #-------------------------------------------------------------------
 
@@ -615,24 +695,26 @@ sub www_takeSurvey {
         my $responseId = $self->getResponseId();
         if ( !$responseId ) {
             $self->session->log->debug('No responseId, surveyEnd');
-#            return $self->surveyEnd(); # disabled. let the js handle the exitUrl redirection
-        } else {
+
+            #            return $self->surveyEnd(); # disabled. let the js handle the exitUrl redirection
+        }
+        else {
             $self->session->log->debug("ResponseId: $responseId");
         }
     };
-    
+
     my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
-    return $self->session->style->process($out,$self->get("styleTemplateId"));
-}
+    return $self->session->style->process( $out, $self->get("styleTemplateId") );
+} ## end sub www_takeSurvey
 
 #-------------------------------------------------------------------
 sub www_deleteResponses {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
-        unless ($self->session->user->isInGroup($self->get('groupToEditSurvey')));
-        
-    $self->session->db->write('delete from Survey_response where assetId = ?',[$self->getId]);
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+
+    $self->session->db->write( 'delete from Survey_response where assetId = ?', [ $self->getId ] );
 
     return;
 }
@@ -650,7 +732,7 @@ sub www_submitQuestions {
     my $responseId = $self->getResponseId();
     if ( !$responseId ) {
         $self->session->log->debug('No response id, surveyEnd');
-        return $self->surveyEnd(); 
+        return $self->surveyEnd();
     }
 
     my $responses = $self->session->form->paramsHashRef();
@@ -660,7 +742,7 @@ sub www_submitQuestions {
 
     $self->loadBothJSON();
 
-    my $termInfo = $self->response->recordResponses($self->session, $responses);
+    my $termInfo = $self->response->recordResponses( $self->session, $responses );
 
     $self->saveResponseJSON();
 
@@ -718,9 +800,9 @@ sub www_loadQuestions {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
     }
-    if($self->response->hasTimedOut()){
+    if ( $self->response->hasTimedOut( $self->get('timeLimit') ) ) {
         $self->session->log->debug('Response hasTimedOut, surveyEnd');
-        return $self->surveyEnd();
+        return $self->surveyEnd( undef, 2 );
     }
 
     if ( $self->response->surveyEnd() ) {
@@ -740,19 +822,41 @@ sub www_loadQuestions {
 } ## end sub www_loadQuestions
 
 #-------------------------------------------------------------------
+
 #called when the survey is over.
+
+=head2 surveyEnd ( [ $url ], [ $completeCode ]  )
+
+Marks the survey completed with either 1 or the $completeCode and then sends the url to the site home or if defined, $url.
+
+=head3 $url
+
+An optional url to send the user to upon survey completion.
+
+=head3 $completeCode
+
+An optional code (defaults to 1) to say how the user completed the survey.
+
+1 is normal completion.
+2 is timed out.
+
+=cut
+
 sub surveyEnd {
-    my $self       = shift;
-    my $url        = shift;
-    
-    if (my $responseId = $self->getResponseId()) {    #also loads the survey and response
-        #    $self->session->db->write("update Survey_response set endDate = ? and isComplete = 1 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
+    my $self         = shift;
+    my $url          = shift;
+    my $completeCode = shift;
+
+    $completeCode = defined $completeCode ? $completeCode : 1;
+
+    if ( my $responseId = $self->getResponseId() ) {    #also loads the survey and response
+         #    $self->session->db->write("update Survey_response set endDate = ? and isComplete > 0 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
         $self->session->db->setRow(
             "Survey_response",
             "Survey_responseId", {
                 Survey_responseId => $responseId,
-                endDate           => time(),#WebGUI::DateTime->now->toDatabase,
-                isComplete        => 1
+                endDate           => time(),         #WebGUI::DateTime->now->toDatabase,
+                isComplete        => $completeCode
             }
         );
     }
@@ -767,8 +871,9 @@ sub surveyEnd {
             $url = "/";
         }
     }
-#    $self->session->http->setRedirect($url);
-    return encode_json({ "type", "forward", "url", $url });
+
+    #    $self->session->http->setRedirect($url);
+    return to_json( { "type", "forward", "url", $url } );
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
@@ -815,17 +920,18 @@ sub prepareShowSurveyTemplate {
             $$q{'verte'} = "</p>";
         }
     } ## end foreach my $q (@$questions)
-    $section->{'questions'} = $questions;
+    $section->{'questions'}         = $questions;
     $section->{'questionsAnswered'} = $self->response->{questionsAnswered};
-    $section->{'totalQuestions'} = @{$self->response->surveyOrder};
-    $section->{'showProgress'} = $self->response->{showProgress};
-    $section->{'showTimeLimit'} = $self->response->{showTimeLimit};
-    $section->{'minutesLeft'} = int((($self->response->{startTime} + (60 * $self->response->{timeLimit})) - time())/60);
+    $section->{'totalQuestions'}    = @{ $self->response->surveyOrder };
+    $section->{'showProgress'}      = $self->get('showProgress');
+    $section->{'showTimeLimit'}     = $self->get('showTimeLimit');
+    $section->{'minutesLeft'}
+        = int( ( ( $self->response->startTime() + ( 60 * $self->get('timeLimit') ) ) - time() ) / 60 );
 
     my $out = $self->processTemplate( $section, $self->get("surveyQuestionsId") );
 
-    $self->session->http->setMimeType('application/json');
-    return encode_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
+#    $self->session->http->setMimeType('application/json');
+    return to_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
 } ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------
@@ -944,8 +1050,8 @@ sub getResponseId {
                     userId            => $id,
                     ipAddress         => $ip,
                     username          => $self->session->user->username,
-                    startDate         => $time,#WebGUI::DateTime->now->toDatabase,
-                    endDate           => 0,#WebGUI::DateTime->now->toDatabase,
+                    startDate         => $time,                            #WebGUI::DateTime->now->toDatabase,
+                    endDate           => 0,                                #WebGUI::DateTime->now->toDatabase,
                     assetId           => $self->getId(),
                     anonId            => $anonId
                 }
@@ -953,12 +1059,8 @@ sub getResponseId {
             $self->loadBothJSON($responseId);
             $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
-            $self->response->{startTime} = $time;
-            $self->response->{timeLimit} = $self->get("timeLimit");
-            $self->response->{showProgress} = $self->get("showProgress");
-            $self->response->{showTimeLimit} = $self->get("showTimeLimit");
             $self->saveResponseJSON();
-            
+
         } ## end if ( $haveTaken < $allowedTakes)
         else {
             $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
@@ -989,14 +1091,14 @@ sub canTakeSurvey {
     if ( $id == 1 ) {
         $takenCount = $self->session->db->quickScalar(
             "select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? 
-                and isComplete = ?", [ $id, $ip, $self->getId(), 1 ]
+                and isComplete > ?", [ $id, $ip, $self->getId(), 0 ]
         );
     }
     else {
         $takenCount
             = $self->session->db->quickScalar(
-            "select count(*) from Survey_response where userId = ? and assetId = ? and isComplete = ?",
-            [ $id, $self->getId(), 1 ] );
+            "select count(*) from Survey_response where userId = ? and assetId = ? and isComplete > ?",
+            [ $id, $self->getId(), 0 ] );
     }
 
     if ( $takenCount >= $maxTakes ) {
@@ -1008,32 +1110,36 @@ sub canTakeSurvey {
     return $self->{canTake};
 
 } ## end sub canTakeSurvey
+
 #-------------------------------------------------------------------
-sub www_viewGradeBook{
+sub www_viewGradeBook {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
+
+    return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
-        
+
     $self->loadTempReportTable();
-    
-    my @peoples = $self->session->db->quickArray("SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",[$self->getId()]);
-    for my $people(@peoples){
+
+    my @peoples
+        = $self->session->db->quickArray( "SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",
+        [ $self->getId() ] );
+    for my $people (@peoples) {
+
         #my $
 
     }
-        
 
-}
+} ## end sub www_viewGradeBook
+
 #-------------------------------------------------------------------
-sub www_exportSimpleResults{
+sub www_exportSimpleResults {
     my $self = shift;
-    
-    return $self->session->privilege->insufficient() 
+
+    return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
-    
+
     $self->loadTempReportTable();
-        
+
     my $filename = $self->session->url->escape( $self->get("title") . "_results.tab" );
     my $content
         = $self->session->db->quickTab(

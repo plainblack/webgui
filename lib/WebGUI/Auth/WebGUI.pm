@@ -900,7 +900,7 @@ sub profileRecoverPasswordFinish {
     my $username;
     if ($self->getSetting('passwordRecoveryRequireUsername')) {
 		$username = $self->session->form->process('authWebGUI.username');
-		return $self->recoverPassword($i18n2->get('password recovery no username')) unless defined $username;
+		return $self->recoverPassword($i18n->get('password recovery no username', 'AuthWebGUI')) unless defined $username;
 	}
 
 	my @fields = @{WebGUI::ProfileField->getPasswordRecoveryFields($self->session)};
@@ -1011,7 +1011,6 @@ sub emailRecoverPasswordFinish {
     return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
 
     my $i18n        = WebGUI::International->new($self->session);
-    my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
     my $session     = $self->session;
     my ($form)      = $session->quick(qw/form/);
     my $email       = $form->param('email');
@@ -1032,7 +1031,7 @@ sub emailRecoverPasswordFinish {
 
     # Make sure the user is Active
     if ( $user->status ne "Active" ) {
-        return $self->recoverPassword( $i18n2->get( 'password recovery disabled' ) );
+        return $self->recoverPassword( $i18n->get( 'password recovery disabled', 'AuthWebGUI' ) );
     }
 
     # generate information necessry to proceed
@@ -1040,6 +1039,10 @@ sub emailRecoverPasswordFinish {
     my $url = $session->url->getSiteURL;
     my $userId = $user->userId; #get the user guid
     $email = $user->profileField('email');
+
+    if ( ! $email ) {
+        return $self->recoverPassword( $i18n->get( 'no email address', 'AuthWebGUI' ) );
+    }
 
     my $authsettings = $self->getParams($userId);
     $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
@@ -1208,13 +1211,17 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$self->session->form->process("key")]);
+    my $session = $self->session;
+	my ($userId) = $session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$session->form->process("key")]);
+    my $i18n = WebGUI::International->new($session, 'AuthWebGUI');
+    my $message = '';
 	if (defined $userId) {
-		my $u = WebGUI::User->new($self->session,$userId);
+		my $u = WebGUI::User->new($session,$userId);
 		$u->status("Active");
 		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'", [$userId]);
+        $message = $i18n->get('email validation confirmed','AuthWebGUI');
 	}
-	return $self->displayLogin;
+	return $self->displayLogin($message);
 }
 
 

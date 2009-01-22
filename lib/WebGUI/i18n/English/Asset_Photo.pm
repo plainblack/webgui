@@ -312,7 +312,31 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'The title of the default view of Photo assets',
     },
-    
+
+    'template view details' => {
+        message     => 'Details',
+        lastUpdated => 0,
+        context     => 'List of information about the photo',
+    },
+
+    'more details' => {
+        message     => 'More Details',
+        lastUpdated => 0,
+        context     => 'List of more information about the photo',
+    },
+
+    'hide' => {
+        message     => 'Hide',
+        lastUpdated => 0,
+        context     => 'To make hidden',
+    },
+
+    'template view available resolutions' => {
+        message     => 'Available Resolutions',
+        lastUpdated => 0,
+        context     => 'List of resolutions, in pixels, that this photo is available in',
+    },
+
     'template url_edit'  => {
         message     => 'Edit Photo',
         lastUpdated => 0,
@@ -510,7 +534,7 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message for Photo comments},
     },
-    
+
     'helpvar keywords' => {
         message     => q{A loop over the keywords associated with this photo},
         lastUpdated => 0,
@@ -663,6 +687,18 @@ our $I18N = {
 
     'template comment edit title' => {
         message     => q{Edit comment.},
+        lastUpdated => 0,
+        context     => q{Title for the edit comment screen.},
+    },
+
+    'template comment edit comment' => {
+        message     => q{Edit Comment},
+        lastUpdated => 0,
+        context     => q{Title for the edit comment screen.},
+    },
+
+    'form comment save comment' => {
+        message     => q{Save Comment.},
         lastUpdated => 0,
         context     => q{Title for the edit comment screen.},
     },

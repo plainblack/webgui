@@ -64,7 +64,7 @@ sub cleanSegment {
     my $html = shift;
     my $preserveStyleScript = shift;
     my $headers = "";
-    if ($html =~ s{(.*)<body\b.*?>}{}is && $preserveStyleScript) {
+    if ($html =~ s{^(.*)<body\b[^>]*>}{}is && $preserveStyleScript) {
         my $head = $1;
         # extract every link tag
         while ( $head =~ m{(<link\b[^>]+>)}isg ) {

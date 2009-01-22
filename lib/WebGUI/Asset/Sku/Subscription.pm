@@ -99,6 +99,14 @@ sub definition {
 			label           => $i18n->get("template"),
 			hoverHelp       => $i18n->get("template help"),
 		},
+        redeemSubscriptionCodeTemplateId => {
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Operation/RedeemSubscription",
+            defaultValue    => 'PBtmpl0000000000000053',
+            label           => $i18n->get("redeem subscription code template"),
+            hoverHelp       => $i18n->get("redeem subscription code template help"),
+        },
         thankYouMessage => {
             tab             => "properties",
 			defaultValue    => $i18n->get("default thank you message"),
@@ -980,7 +988,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var->{ codeForm } = $f->print;
 
-    return $self->processStyle($self->processTemplate($var, 'PBtmpl0000000000000053'));
+    return $self->processStyle($self->processTemplate($var, $self->get('redeemSubscriptionCodeTemplateId')));
 }
 
 1;

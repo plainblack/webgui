@@ -120,6 +120,7 @@ sub process {
 		my %assetList = %{$config->get('assets')};
 		foreach my $assetClass (keys %assetList) {
 			my $dummy = WebGUI::Asset->newByPropertyHashRef($session,{dummy=>1, className=>$assetClass});
+            next unless defined $dummy;
 			next if $dummy->getUiLevel($assetList{$assetClass}{uiLevel}) > $userUiLevel;
 			next unless ($dummy->canAdd($session));
 			next unless exists $categories{$assetList{$assetClass}{category}};

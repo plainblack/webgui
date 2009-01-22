@@ -141,10 +141,11 @@ sub appendTemplateVarsCommentForm {
             value       => $comment->{ bodyText },
         });
 
+    my $i18n = WebGUI::International->new($session, 'Asset_Photo');
     $var->{ commentForm_submit } 
         = WebGUI::Form::submit( $session, {
             name        => "submit",
-            value       => "Save Comment",
+            value       => $i18n->get('form comment save comment'),
         });
 
     return $var;
@@ -738,6 +739,21 @@ sub setComment {
         $properties, 
     );
 }
+
+####################################################################
+
+=head2 update
+
+Wrap update so that isHidden is always set to be a 1.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
+}
+
 
 #----------------------------------------------------------------------------
 

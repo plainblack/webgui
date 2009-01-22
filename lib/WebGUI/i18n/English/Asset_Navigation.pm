@@ -73,31 +73,6 @@ our $I18N = {
 		lastUpdated => 0
 	},
 
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
 	'32' => {
 		message => q|Show unprivileged pages|,
 		lastUpdated => 1077080845
@@ -612,6 +587,12 @@ be useful, others may not.|,
 	'reversePageLoop' => {
 		message => q|Whether or not the Navigation has been configured to display Assets depth first, instead of top to bottom.|,
 		lastUpdated => 1164841201,
+	},
+
+	'Where do you want to go?' => {
+		message => q|Where do you want to go?|,
+		context => q|i18n label for the drop down nav, asking the user which link they want to visit.|,
+		lastUpdated => 1229580897,
 	},
 
 };

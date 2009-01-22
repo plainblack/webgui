@@ -19,9 +19,10 @@ use base 'WebGUI::Asset::File::GalleryFile';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
-use JSON qw/ encode_json decode_json /;
+use JSON qw/ to_json from_json /;
 use URI::Escape;
 use Tie::IxHash;
+use List::MoreUtils;
 
 use WebGUI::DateTime;
 use WebGUI::Friends;
@@ -220,7 +221,7 @@ sub getExifData {
 
     # Our processing and eliminating of bad / unparsable keys
     # isn't perfect, so handle errors gracefully
-    my $exif    = eval { decode_json( $self->get('exifData') ) };
+    my $exif    = eval { from_json( $self->get('exifData') ) };
     if ( $@ ) {
         $self->session->errorHandler->warn( 
             "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
@@ -360,14 +361,19 @@ sub makeResolutions {
     my $storage     = $self->getStorageLocation;
     $self->session->errorHandler->info(" Making resolutions for '" . $self->get("filename") . q{'});
 
-    for my $res ( @$resolutions ) {
+    my $filename = $self->get('filename');
+    RESOLUTION: for my $res ( @$resolutions ) {
         # carp if resolution is bad
         if ( $res !~ /^\d+$/ && $res !~ /^\d*x\d*/ ) {
             carp "Geometry '$res' is invalid. Skipping.";
-            next;
+            next RESOLUTION;
         }
+        ##Only resize images if the image is too big!
+        my ($imageX, $imageY) = $storage->getSizeInPixels($filename);
+        my @resolutions = split /x/, $res;
+        next RESOLUTION if List::MoreUtils::any { $imageX < $_ && $imageY < $_ } @resolutions;
         my $newFilename     = $res . ".jpg";
-        $storage->copyFile( $self->get("filename"), $newFilename );
+        $storage->copyFile( $filename, $newFilename );
         $storage->resize( $newFilename, $res, undef, $self->getGallery->get( 'imageDensity' ) );
     }
 }
@@ -455,7 +461,7 @@ sub updateExifDataFromFile {
     }
 
     $self->update({
-        exifData    => encode_json( $info ),
+        exifData    => to_json( $info ),
     });
 }
 

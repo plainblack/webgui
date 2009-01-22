@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -30,13 +32,63 @@ my $session = start(); # this line required
 
 fixAccountMisspellings(  $session );
 removeTemplateHeadBlock( $session );
+updateMatrixListingScores( $session );
+removeSqlForm( $session );
 
 # upgrade functions go here
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+
+sub removeSqlForm {
+    my $session = shift;
+    print "\tOptionally removing Web Services Client...\n" unless $quiet;
+    my $db = $session->db;
+    unless ($db->quickScalar("select count(*) from asset where className='WebGUI::Asset::Wobject::WSClient'")) {
+        print "\t\tNot using it, so we're uninstalling it.\n" unless $quiet;
+        $session->config->delete("assets/WebGUI::Asset::Wobject::WSClient");
+        my @ids = $db->buildArray("select distinct assetId from template where namespace = 'WSClient'");
+        push @ids, qw(5YAbuwiVFUx-z8hcOAnsdQ);
+        foreach my $id (@ids) {
+            my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+            if (defined $asset) {
+                $asset->purge;
+            }
+        }
+        $db->write("drop table WSClient");
+    }
+    else {
+        print "\t\tThis site uses Web Services Client, so we won't uninstall it.\n" unless $quiet;
+    }
+}
 
 #----------------------------------------------------------------------------
-# Describe what our function does
+
+sub updateMatrixListingScores {
+    my $session = shift;
+    print "\tUpdating score for every MatrixListing asset... " unless $quiet;
+    my $matrixListings   = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
+        {
+            statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+            statusToInclude     => ['pending','approved','deleted','archived'],
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            returnObjects       => 1,
+        });
+
+    for my $matrixListing (@{$matrixListings})
+    {
+        next unless defined $matrixListing;
+        my $score = $session->db->quickScalar("select sum(value) from MatrixListing_attribute 
+            left join Matrix_attribute using(attributeId) 
+            where matrixListingId = ? and fieldType = 'MatrixCompare'",
+            [$matrixListing->getId]);
+        $matrixListing->update({score => $score});
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+
 sub removeTemplateHeadBlock {
     my $session = shift;
     print "\tMerging Template head blocks into the Extra Head Tags field... " unless $quiet;

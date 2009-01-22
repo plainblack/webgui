@@ -173,6 +173,7 @@ sub www_managePurchases {
     my $url     = $session->url;
 
     my $var     = {};
+    $var->{transactions} = [];
 
     # build list
     foreach my $id (@{WebGUI::Shop::Transaction->getTransactionIdsForUser($session)}) {

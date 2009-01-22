@@ -184,6 +184,8 @@ sub assetExists {
 
 Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
 
+A class method.
+
 =head3 session
 
 The session variable.
@@ -751,6 +753,8 @@ sub get {
 		return $self->{_properties}{$propertyName};
 	}
 	my %copyOfHashRef = %{$self->{_properties}};
+        my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
+        if( $keywords ne '' ) { $copyOfHashRef{ keywords } = $keywords ; }
 	return \%copyOfHashRef;
 }
 
@@ -1329,7 +1333,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit;
+    return undef unless $self->canEdit && $self->session->var->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
     my $userUiLevel = $self->session->user->profileField("uiLevel");
@@ -1428,6 +1432,7 @@ sub getToolbar {
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
     }
     $output .= '</ul></div></div>' . $toolbar . '</div>';
+    $self->{_toolbar} = $output;
     return $output;
 }
 
@@ -1984,9 +1989,8 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-    if ($self->session->var->isAdminOn) {
-        $self->{_toolbar} = $self->getToolbar;
-    }
+    ##Make the toolbar now and stick it in the cache.
+    $self->getToolbar;
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
@@ -1995,6 +1999,7 @@ sub prepareView {
             content => join(',', @keywords),
         }); 
     }
+    $style->setRawHeadTags($self->getExtraHeadTags);
 }
 
 #-------------------------------------------------------------------
@@ -2570,7 +2575,9 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
+    my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
+    return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
     return $self->session->privilege->insufficient() unless $self->canEdit;
     if ($self->session->config("maximumAssets")) {
         my ($count) = $self->session->db->quickArray("select count(*) from asset");
@@ -2578,7 +2585,7 @@ sub www_editSave {
         return $self->session->style->userStyle($i18n->get("over max assets")) if ($self->session->config("maximumAssets") <= $count);
     }
     my $object;
-    if ($self->session->form->process("assetId") eq "new") {
+    if ($isNewAsset) {
         $object = $self->addChild({className=>$self->session->form->process("class","className")});	
         return $self->www_view unless defined $object;
         $object->{_parent} = $self;
@@ -2623,7 +2630,12 @@ sub www_editSave {
 
     # Handle "saveAndReturn" button
     if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
-        return $self->www_edit;
+        if ($isNewAsset) {
+            return $object->www_edit;
+        }
+        else {
+            return $self->www_edit;
+        }
     }
 
     # Handle "proceed" form parameter

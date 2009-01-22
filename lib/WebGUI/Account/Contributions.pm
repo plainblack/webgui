@@ -176,6 +176,7 @@ sub www_view {
                 'WebGUI::Asset::Post',
                 'WebGUI::Asset::Wobject::GalleryAlbum',
                 'WebGUI::Asset::Event',
+                'WebGUI::Asset::WikiPage',
                 'WebGUI::Asset::Post::Thread',
             ],
             whereClause   => "asset.createdBy = '$userId' or assetData.ownerUserId = '$userId'",
@@ -195,8 +196,15 @@ sub www_view {
     my @contribs = ();
     foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId ); 
-        push(@contribs,$asset->get);
+        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $props      = $asset->get;
+        if (ref $asset eq "WebGUI::Asset::Post") {
+            $asset = $asset->getThread;
+            $props = $asset->get;
+            $props->{className} = "WebGUI::Asset::Post";
+        }
+        
+        push(@contribs,$props);
     }
     my $contribsCount  = $p->getRowCount;
 
@@ -215,6 +223,12 @@ sub www_view {
 
     $self->appendCommonVars($var);
     $p->appendTemplateVars($var);
+
+    #Overwrite these
+    my $user     = WebGUI::User->new($session,$userId);
+    $var->{'user_full_name'    } = $user->getWholeName;
+    $var->{'user_member_since' } = $user->dateCreated;
+
 
     return $self->processTemplate($var,$self->getViewTemplateId);
 }

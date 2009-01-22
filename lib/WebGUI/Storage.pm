@@ -15,7 +15,6 @@ package WebGUI::Storage;
 =cut
 
 use strict;
-use warnings;
 use Archive::Tar;
 use Carp qw( croak );
 use Cwd ();
@@ -157,7 +156,7 @@ sub _changeOwner {
 
 =head2 addFileFromCaptcha ( )
 
-Generates a captcha image (125px x 26px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
+Generates a captcha image (200x x 50px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
 
 =cut 
 
@@ -165,10 +164,10 @@ sub addFileFromCaptcha {
 	my $self = shift;
     my $error = "";
 	my $challenge;
-	$challenge.= ('A'..'Z')[rand(26)] foreach (1..6);
+	$challenge .= ('A'..'Z')[rand(26)] foreach (1..6);
 	my $filename = "captcha.".$self->session->id->generate().".gif";
 	my $image = Image::Magick->new();
-	$error = $image->Set(size=>'125x26');
+	$error = $image->Set(size=>'200x50');
 	if($error) {
         $self->session->errorHandler->warn("Error setting captcha image size: $error");
     }
@@ -181,12 +180,11 @@ sub addFileFromCaptcha {
         $self->session->errorHandler->warn("Error adding noise: $error");
     }
     # AddNoise generates a different average color depending on library.  This is ugly, but the best I can see for now
-    my $textColor = '#222222';
-    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>30, skewY=>0, skewX=>0, gravity=>'center', fill=>$textColor, antialias=>'true', text=>$challenge);
+    $error = $image->Annotate(font=>$self->session->config->getWebguiRoot."/lib/default.ttf", pointsize=>40, skewY=>0, skewX=>0, gravity=>'center', fill=>'#ffffff', antialias=>'true', text=>$challenge);
 	if($error) {
         $self->session->errorHandler->warn("Error Annotating image: $error");
     }
-    $error = $image->Draw(primitive=>"line", points=>"0,5 105,21", stroke=>$textColor, antialias=>'true', strokewidth=>2);
+    $error = $image->Draw(primitive=>"line", points=>"5,5 195,45", stroke=>'#ffffff', antialias=>'true', strokewidth=>2);
 	if($error) {
         $self->session->errorHandler->warn("Error drawing line: $error");
     }
@@ -365,9 +363,12 @@ The content to write to the file.
 =cut
 
 sub addFileFromScalar {
-	my $self = shift;
-	my $filename = $self->session->url->makeCompliant(shift);
-	my $content = shift;
+	my ($self, $filename, $content) = @_;
+    if (isIn($self->getFileExtension($filename), qw(pl perl sh cgi php asp html htm))) { # make us safe from malicious uploads
+        $filename =~ s/\./\_/g;
+        $filename .= ".txt";
+    }
+    $filename = $self->session->url->makeCompliant($filename);
 	if (open(my $FILE, ">", $self->getPath($filename))) {
 		print $FILE $content;
 		close($FILE);
@@ -575,8 +576,8 @@ sub deleteFile {
     my $filename = shift;
     return undef
         if $filename =~ m{\.\./};  ##prevent deleting files outside of this object
-    unlink($self->getPath($filename));
     unlink($self->getPath('thumb-'.$filename));
+    unlink($self->getPath($filename));
 }
 
 
@@ -1110,7 +1111,10 @@ sub resize {
 
     # Next, resize dimensions
     if ( $width || $height ) {
-        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
+        if (!$height && $width =~ /^(\d+)x(\d+)$/) {
+            $width = $1;
+            $height = $2;
+        }
         my ($x, $y) = $image->Get('width','height');
         if (!$height) { # proportional scale by width
             $height = $width / $x * $y;
@@ -1118,6 +1122,7 @@ sub resize {
         elsif (!$width) { # proportional scale by height
             $width = $height * $x / $y;
         }
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height" );
         $image->Resize( height => $height, width => $width );
     }
 
