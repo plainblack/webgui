@@ -30,9 +30,9 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
 my $session = start( $webguiRoot, $configFile );
 # Do your work here
-#installLoggingTables($session);
-#installPassiveAnalyticsRule($session);
-#installPassiveAnalyticsConfig($session);
+installLoggingTables($session);
+installPassiveAnalyticsRule($session);
+installPassiveAnalyticsConfig($session);
 installWorkflow($session);
 #addAdminGroup($session);
 
@@ -159,7 +159,7 @@ sub installWorkflow {
     my $bucket    = $workflow->addActivity('WebGUI::Workflow::Activity::BucketPassiveAnalytics');
     $summarize->set('title', 'Perform duration analysis');
     $bucket->set(   'title', 'Please log entries into buckets');
-    $workflow->update({enabled => 1});
+    $workflow->set({enabled => 1});
     print "DONE!\n";
 }
 
