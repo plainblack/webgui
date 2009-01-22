@@ -83,6 +83,7 @@ Survey.ObjectTemplate = (function(){
             
             dialog.callback = Survey.Comm.callback;
             dialog.render();
+
             if(type == 'question'){
                 var resize = new YAHOO.util.Resize('resize_randomWords_formId');
                 resize.on('resize', function(ev) {
