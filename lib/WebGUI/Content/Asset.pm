@@ -177,7 +177,7 @@ sub page {
            && substr($assetClass,0,4) ne 'File') {
             $session->db->write(
                 q|INSERT INTO `passiveLog` (userId, sessionId, assetId, timestamp, url) VALUES (?,?,?,?,?)|,
-                [ $session->user->userId, $session->getId, $asset->getId, time(), $session->request->uri,]
+                [ $session->user->userId, $session->getId, $asset->getId, time(), $session->request->unparsed_uri,]
             );
         }
 
