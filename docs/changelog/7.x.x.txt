@@ -11,6 +11,7 @@
  - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search page has head tags in body
  - fixed: HTTP Proxy doesn't serve new content to visitors
+ - fixed: Exporting to static files can leak large amounts of memory
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
