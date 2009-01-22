@@ -42,36 +42,47 @@ Defaults to 'url'. But if you want to use an assetId as the first parameter, the
 #-------------------------------------------------------------------
 sub process {
     my ($session, $identifier, $type) = @_;
-	my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
-	my $asset;
+    my $t = ($session->errorHandler->canShowPerformanceIndicators()) ? [Time::HiRes::gettimeofday()] : undef;
+    my $asset;
     if ($type eq 'assetId') {
         $asset = WebGUI::Asset->newByDynamicClass($session, $identifier);
     }
     else {
         $asset = WebGUI::Asset->newByUrl($session,$identifier);
     }
-	#Sorry, you cannot proxy the notfound page.
-	if (defined $asset && $asset->getId ne $session->setting->get("notFoundPage")) {
-		if ($asset->canView) {
-			$asset->toggleToolbar;
-			$asset->prepareView;
-			my $output = $asset->view;
-			$output .= "AssetProxy:".Time::HiRes::tv_interval($t) if ($session->errorHandler->canShowPerformanceIndicators());
-			return $output;
-		}
-		return undef;
-	} 
-    else {
+    if (!defined $asset) {
         $session->errorHandler->warn('AssetProxy macro called invalid asset: '.$identifier
             .'. The macro was called through this url: '.$session->asset->get('url'));
-        if ($session->var->get("adminOn")){
-    		my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
-	    	return $i18n->get('invalid url');
+        if ($session->var->isAdminOn) {
+            my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
+            return $i18n->get('invalid url');
         }
-        else{
-            return '';
+    }
+    elsif ($asset->get('state') =~ /^trash/) {
+        $session->errorHandler->warn('AssetProxy macro called on asset in trash: '.$identifier
+            .'. The macro was called through this url: '.$session->asset->get('url'));
+        if ($session->var->isAdminOn) {
+            my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
+            return $i18n->get('asset in trash');
         }
-	}
+    }
+    elsif ($asset->get('state') =~ /^clipboard/) {
+        $session->errorHandler->warn('AssetProxy macro called on asset in clipboard: '.$identifier
+            .'. The macro was called through this url: '.$session->asset->get('url'));
+        if ($session->var->isAdminOn) {
+            my $i18n = WebGUI::International->new($session, 'Macro_AssetProxy');
+            return $i18n->get('asset in clipboard');
+        }
+    }
+    elsif ($asset->canView) {
+        $asset->toggleToolbar;
+        $asset->prepareView;
+        my $output = $asset->view;
+        $output .= "AssetProxy:" . Time::HiRes::tv_interval($t)
+            if $t;
+        return $output;
+    }
+    return '';
 }
 
 

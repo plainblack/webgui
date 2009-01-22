@@ -112,6 +112,109 @@ our $I18N = {
 	},
  
 
+	'credentials template' => {
+		message => q|Credentials Template|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+   	'credentials template help' => {
+		message => q|Pick a template to display the form where the user will enter in their billing information and credit card information.|,
+		lastUpdated => 0,
+		context => q|Hover help for the credentials template field in the configuration form of the iTransact module.|
+	},
+
+	'edit credentials template' => {
+		message => q|Edit Credentials Template|,
+		lastUpdated => 0,
+		context => q|Title of the help page.|
+	},
+   	'edit credentials template help' => {
+		message => q|This template is used to display a form to the user where they can enter in contact and credit card billing information.|,
+		lastUpdated => 0,
+		context => q|Title of the help page.|
+	},
+
+   	'errors help' => {
+		message => q|A template loop containing a list of errors from processing the form.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'error help' => {
+		message => q|One error from the errors loop.  It will have minimal markup.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'checkoutButton help' => {
+		message => q|A button with an internationalized label to submit the form and continue the checkout process.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'addressField help' => {
+		message => q|A single text field for the user to enter in their street address.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'emailField help' => {
+		message => q|A single text field for the user to enter in their email address.|,
+		lastUpdated => 1231192368,
+		context => q|Template variable help.|
+	},
+
+   	'cardNumberField help' => {
+		message => q|A single text field for the user to enter in their credit card number.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'monthYearField help' => {
+		message => q|A combination form field for the user to enter in the month and year of the expiration date for the credit card.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+   	'cvv2Field help' => {
+		message => q|A single text field for the user to enter in their credit card verification number.  If the PayDriver is not configured to use CVV2, then this field will be empty.|,
+		lastUpdated => 0,
+		context => q|Template variable help.|
+	},
+
+	'password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+	},
+ 
+	'password' => {
+		message => q|Password|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+	'password help' => {
+		message => q|The password for your ITransact account.|,
+		lastUpdated => 0,
+		context => q|Hover help for the password field in the configuration form of the iTransact module.|
+	},
+
+	'credentials template' => {
+		message => q|Credentials Template|,
+		lastUpdated => 0,
+		context => q|Form label in the configuration form of the iTransact module.|
+	},
+   	'credentials template help' => {
+		message => q|Pick a template to display the form where the user will enter in their billing information and credit card information.|,
+		lastUpdated => 0,
+		context => q|Hover help for the credentials template field in the configuration form of the iTransact module.|
+	},
+ 
 	'password' => {
 		message => q|Password|,
 		lastUpdated => 0,

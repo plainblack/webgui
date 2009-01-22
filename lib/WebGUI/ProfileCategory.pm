@@ -117,38 +117,122 @@ sub get {
 
 #-------------------------------------------------------------------
 
-=head2 getCategories ( )
+=head2 getCategories ( session , options )
 
 Returns an array reference of all WebGUI::ProfileCategory objects in order of sequence. This is a class method.
+
+=head3 session
+
+WebGUI::Session object
+
+=head3 options
+
+hash reference of options for returning categories.  Passing in more than one option will limit the results to the intersection
+all the flags passed.
+
+=head4 editable
+
+boolean flag which which indicates a specific status of the editable flag for the profile category.
+If no editable flag is passed in all editable states are returned
+
+=head4 visible
+
+boolean flag which indicates the status of the visible flag for the profile category.
+If no visible flag is passed in all visible states are returend
 
 =cut
 
 sub getCategories {
-	my $class = shift;
-	my $session = shift;
-	my @categories = ();
- 	foreach my $id ($session->db->buildArray("select profileCategoryId from userProfileCategory order by sequenceNumber")) {
-		push(@categories,WebGUI::ProfileCategory->new($session,$id));
+	my $class       = shift;
+	my $session     = shift;
+    my $options     = shift || {};
+
+	my $categories  = [];
+    my $whereClause = "";
+    my $bindvars    = [];
+
+    foreach my $key (keys %{$options}) {
+        next unless WebGUI::Utility::isIn($key,qw(editable visible));
+        $whereClause .= " and" unless ($whereClause eq "");
+        $whereClause .= " $key=?";
+        push(@{$bindvars},$options->{$key});
+    }
+
+    $whereClause = "where ".$whereClause unless ($whereClause eq "");
+
+    my $sql = qq{
+        select
+            profileCategoryId
+        from
+            userProfileCategory
+        $whereClause
+        order by sequenceNumber
+    };
+
+ 	foreach my $id ($session->db->buildArray($sql,$bindvars)) {
+		push(@{$categories},WebGUI::ProfileCategory->new($session,$id));
 	}
-	return \@categories;
+	return $categories;
 }
 
 
 #-------------------------------------------------------------------
 
-=head2 getFields ( )
+=head2 getFields ( options )
 
 Returns an array reference of all WebGUI::ProfileField objects that are part of this category in order of sequence.
+
+=head3 options
+
+hash reference of options for returning fields.  Passing in more than one option will limit the results to the intersection
+all the flags passed.
+
+=head4 editable
+
+boolean flag which which indicates a specific status of the editable flag for the profile category.
+If no editable flag is passed in all editable states are returned
+
+=head4 visible
+
+boolean flag which indicates the status of the visible flag for the profile category.
+If no visible flag is passed in all viewable states are returend
+
+=head4 required
+
+boolean flag which indicates the status of the required flag for the profile category.
+If no required flag is passed in all required states are returend
 
 =cut
 
 sub getFields {
-	my $self = shift;
-	my @fields = ();
-	foreach my $fieldName ($self->session->db->buildArray("select fieldName from userProfileField where profileCategoryId=".$self->session->db->quote($self->getId)." order by sequenceNumber")){
-		push(@fields,WebGUI::ProfileField->new($self->session,$fieldName));
+	my $self        = shift;
+	my $options     = shift || {};
+    my $session     = $self->session;
+	my $fields      = [];
+    
+    my $whereClause = "where profileCategoryId=? ";
+    my $bindvars    = [$self->getId];
+
+    foreach my $key (keys %{$options}) {
+        #Skip bad stuff that will crash the query
+        next unless WebGUI::Utility::isIn($key,qw(editable visible required));
+        $whereClause .= " and $key=?";
+        push(@{$bindvars},$options->{$key});
+    }
+
+    my $sql = qq{
+        select
+            fieldName
+        from
+            userProfileField
+        $whereClause
+        order by sequenceNumber
+    };
+
+	foreach my $fieldName ($session->db->buildArray($sql,$bindvars)) {
+		push(@{$fields},WebGUI::ProfileField->new($session,$fieldName));
 	}
-	return \@fields;
+	return $fields;
 }
 
 #-------------------------------------------------------------------
@@ -176,6 +260,20 @@ sub getLabel {
         my $self = shift;
         return WebGUI::Operation::Shared::secureEval($self->session,$self->get("label"));
 }
+
+#-------------------------------------------------------------------
+
+=head2 getShortLabel ( )
+
+Returns the eval'd label for this category.
+
+=cut
+
+sub getShortLabel {
+    my $self = shift;
+    return WebGUI::Operation::Shared::secureEval($self->session,$self->get("shortLabel"));
+}
+
 
 #-------------------------------------------------------------------
 
@@ -235,7 +333,7 @@ Returns a boolean indicating whether the category's fields may be viewed by a us
 
 sub isViewable {
 	my $self = shift;
-	return $self->get("viewable");
+	return $self->get("visible");
 }
 
 
@@ -332,6 +430,10 @@ A hash reference containing the properties to be updated.
 
 A perl structure that will return a scalar. Defaults to 'Undefined'.
 
+=head4 shortLabel
+
+A perl structure that will return a scalar.  Defaults to 'Undefined'.
+
 =head4 visible
 
 A boolean indicating whether the fields in this category should be visible when a user views a user's profile.
@@ -353,6 +455,7 @@ sub set {
 	$properties->{editable} = 0 unless ($properties->{editable} == 1);
 	$properties->{protected} = 0 unless ($properties->{protected} == 1);
 	$properties->{label} = 'Undefined' if ($properties->{label} =~ /^[\"\']*$/);
+    $properties->{shortLabel} = 'Undefined' if ($properties->{shortLabel} =~ /^[\"\']*$/);
 	$properties->{profileCategoryId} = $self->getId;
 	$self->session->db->setRow("userProfileCategory","profileCategoryId",$properties);
 }

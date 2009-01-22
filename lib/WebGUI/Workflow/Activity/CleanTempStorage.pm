@@ -119,7 +119,7 @@ sub execute {
             }
         }
         # taking too long, give up
-        return $self->WAITING if (time() - $start > 50);
+        return $self->WAITING(1) if (time() - $start > 50);
     }
 
     # kill temporary files
@@ -149,7 +149,7 @@ sub recurseFileSystem {
         foreach my $file (@filelist) {
             unless ($file eq "." || $file eq "..") {
                 # taking too long, time to abort
-                return $self->WAITING if (time() - $start > 50);             
+                return $self->WAITING(1) if (time() - $start > 50);             
 
                 # must search for children
                 $self->recurseFileSystem($start, $path."/".$file);

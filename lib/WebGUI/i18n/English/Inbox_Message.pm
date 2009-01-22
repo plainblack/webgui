@@ -4,7 +4,7 @@ use strict;
 our $I18N = {
 
 	'from user preface' => {
-		message => q|You were sent a message from %s.|,
+		message => q|You were sent a message from |,
 		lastUpdated => 0
 	},
 };

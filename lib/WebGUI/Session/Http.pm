@@ -16,6 +16,7 @@ package WebGUI::Session::Http;
 
 
 use strict;
+use WebGUI::Utility;
 
 =head1 NAME
 
@@ -161,8 +162,7 @@ sub getRedirectLocation {
 =head2 getStatus ( ) {
 
 Returns the current HTTP status code.  If no code has been set,
-the code returned will be 200.  If no description has been set,
-the internal description will be set to "OK" and "OK" will be returned.
+the code returned will be 200.
 
 =cut
 
@@ -231,7 +231,7 @@ Returns a boolean value indicating whether the current page will redirect to som
 
 sub isRedirect {
 	my $self = shift;
-	return ($self->getStatus() eq "302");
+	return isIn($self->getStatus(), qw(302 301));
 }
 
 
@@ -279,7 +279,7 @@ sub sendHeader {
 	my %params;
 	if ($self->isRedirect()) {
 		$request->headers_out->set(Location => $self->getRedirectLocation);
-		$request->status(301);
+		$request->status($self->getStatus);
 	} else {
 		$request->content_type($self->getMimeType);
 		my $cacheControl = $self->getCacheControl;
@@ -494,24 +494,30 @@ sub setNoHeader {
 
 #-------------------------------------------------------------------
 
-=head2 setRedirect ( url )
+=head2 setRedirect ( url, [ type ] )
 
 Sets the necessary information in the HTTP header to redirect to another URL.
 
 =head3 url
 
-The URL to redirect to.
+The URL to redirect to.  To prevent infinite loops, no redirect will be set if
+url is the same as the current page, as found through $session->url->page.
+
+=head3 type
+
+Defaults to 302 (temporary redirect), but you can optionally set 301 (permanent redirect).
 
 =cut
 
 sub setRedirect {
 	my $self = shift;
 	my $url = shift;
+    my $type = shift || 302;
 	my @params = $self->session->form->param;
 	return undef if ($url eq $self->session->url->page() && scalar(@params) < 1); # prevent redirecting to self
 	$self->session->errorHandler->info("Redirecting to $url");
 	$self->setRedirectLocation($url);
-	$self->setStatus("302", "Redirect");
+	$self->setStatus($type, "Redirect");
 	$self->session->style->setMeta({"http-equiv"=>"refresh",content=>"0; URL=".$url});
 }
 

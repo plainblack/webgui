@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.1
+version: 2.6.0
 */
 /**
  * @description <p>Creates a Image Cropper control.</p>
@@ -199,6 +199,7 @@ var Dom = YAHOO.util.Dom,
             this._setBackgroundPosition(-(this.get('initialXY')[0]),  -(this.get('initialXY')[1]));
 
             this._resize.on('startResize', this._handleStartResizeEvent, this, true);
+            this._resize.on('endResize', this._handleEndResizeEvent, this, true);
             this._resize.on('dragEvent', this._handleDragEvent, this, true);
             this._resize.on('beforeResize', this._handleBeforeResizeEvent, this, true);
             this._resize.on('resize', this._handleResizeEvent, this, true);
@@ -440,6 +441,12 @@ var Dom = YAHOO.util.Dom,
             //YAHOO.log('Setting the image background position of the mask to: (' + l + ', ' + t + ')', 'log', 'ImageCropper');
             var bl = parseInt(Dom.getStyle(this._resize.get('element'), 'borderLeftWidth'), 10);
             var bt = parseInt(Dom.getStyle(this._resize.get('element'), 'borderTopWidth'), 10);
+            if (isNaN(bl)) {
+                bl = 0;
+            }
+            if (isNaN(bt)) {
+                bt = 0;
+            }
             var mask = this._resize.getWrapEl().firstChild;
             var pos = (l - bl) + 'px ' + (t - bt) + 'px';
             this._resizeMaskEl.style.backgroundPosition = pos;
@@ -460,8 +467,16 @@ var Dom = YAHOO.util.Dom,
         
         /**
         * @private
+        * @method _handleEndResizeEvent
+        * @description Handles the Resize Utilitys endResize event
+        */
+        _handleEndResizeEvent: function() {
+            this._setConstraints(true);
+        },
+        /**
+        * @private
         * @method _handleStartResizeEvent
-        * @description Handles the Resize Utilitys startResizeEvent event
+        * @description Handles the Resize Utilitys startResize event
         */
         _handleStartResizeEvent: function() {
             this._setConstraints(true);
@@ -519,7 +534,6 @@ var Dom = YAHOO.util.Dom,
             resize.dd.resetConstraints();
             var height = parseInt(resize.get('height'), 10),
                 width = parseInt(resize.get('width'), 10);
-
             if (inside) {
                 //Called from inside the resize callback
                 height = resize._cache.height;
@@ -552,7 +566,6 @@ var Dom = YAHOO.util.Dom,
             
             resize.dd.setXConstraint(left, right); 
             resize.dd.setYConstraint(top, bottom);
-
             YAHOO.log('Constraints: ' + top + ',' + right + ',' + bottom + ',' + left, 'log', 'ImageCropper');
 
             return {
@@ -588,10 +601,10 @@ var Dom = YAHOO.util.Dom,
         */
         reset: function() {
             YAHOO.log('Resetting the control', 'log', 'ImageCropper');
-            this._resize.resize(null, this.get('initHeight'), this.get('initWidth'), 0, 0, true);
-            this._resizeEl.style.top = this.get('initialXY')[1] + 'px';
-            this._resizeEl.style.left = this.get('initialXY')[0] + 'px';
-            this._syncBackgroundPosition();
+            this._resize.destroy();
+            this._resizeEl.parentNode.removeChild(this._resizeEl);
+            this._createResize();
+            this._setConstraints();
             return this;
         },
 
@@ -891,4 +904,4 @@ var Dom = YAHOO.util.Dom,
 
 })();
 
-YAHOO.register("imagecropper", YAHOO.widget.ImageCropper, {version: "2.5.1", build: "984"});
+YAHOO.register("imagecropper", YAHOO.widget.ImageCropper, {version: "2.6.0", build: "1321"});

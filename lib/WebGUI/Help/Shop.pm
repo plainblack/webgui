@@ -114,6 +114,18 @@ our $HELP = {
 						name		=> "shippingAddress",
 						description => "shippingAddress help",
 					},
+					{
+						name		=> "isCashier",
+					},
+					{
+						name		=> "posLookupForm",
+					},
+					{
+						name		=> "posUsername",
+					},
+					{
+						name		=> "posUserId",
+					},
 				],
 			},
 			{
@@ -227,6 +239,11 @@ our $HELP = {
 						required 	=> 1,
 					},
 					{
+						name		=> "defaultButton",
+						description => "defaultButton help",
+						required 	=> 1,
+					},
+					{
 						name		=> "deleteButton",
 						description => "deleteButton help",
 						required 	=> 1,
@@ -277,6 +294,10 @@ our $HELP = {
 			{
 				name 		=> "state",
 				description => "state help",
+			},
+			{
+				name 		=> "organization",
+				description => "organization help",
 			},
 			{
 				name 		=> "city",

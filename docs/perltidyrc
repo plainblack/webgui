@@ -1,0 +1,18 @@
+-syn        # Check syntax before and after
+-l=120      # maximum Line length
+-pscf=-c    # Perl Syntax Check Flags
+-ole=unix   # Output Line Ending
+-ci=4       # Continuation Indentation
+-sil=0      # Force starting indent level to 0
+-noll       # No Outdent Long Lines
+-pt=1       # Paren Tightness (PBP style)
+-sbt=1      # Square Brace Tightness (PBP style)
+-bt=1       # Brace Tightness (PBP style)
+-bbt=1      # Code block brace tightness
+-vt=2       # Vertical tightness (PBP style)
+-nsfs       # No Space For Semicolon
+-otr        # Opening token right
+-sot        # Stack Opening Tokens ( { [
+-bbao       # Break before all operators
+-csc        # Add closing side comments
+-csci=16    # Add closing side comments after 16 lines

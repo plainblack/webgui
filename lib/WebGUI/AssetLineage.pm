@@ -19,7 +19,7 @@ use Carp qw( croak );
 
 =head1 NAME
 
-Package WebGUI::AssetLineage
+Package WebGUI::Asset (AssetLineage)
 
 =head1 DESCRIPTION
 
@@ -113,16 +113,21 @@ sub cascadeLineage {
     my $self = shift;
     my $newLineage = shift;
     my $oldLineage = shift || $self->get("lineage");
-    my $prepared = $self->session->db->prepare("update asset set lineage=? where assetId=?");
-	my $descendants = $self->session->db->read("select assetId,lineage from asset where lineage like ?",[$oldLineage.'%']);
-	my $cache = WebGUI::Cache->new($self->session);
-	while (my ($assetId, $lineage) = $descendants->array) {
-		my $fixedLineage = $newLineage.substr($lineage,length($oldLineage));
-		$prepared->execute([$fixedLineage,$assetId]);
-        # we do the purge directly cuz it's a lot faster than instantiating all these assets
-        $cache->deleteChunk(["asset",$assetId]);
-	}
-	$descendants->finish;
+    my $records = $self->session->db->write(
+        "UPDATE asset SET lineage=CONCAT(?,SUBSTRING(lineage,?)) WHERE lineage LIKE ?",
+        [$newLineage, length($oldLineage) + 1, $oldLineage . '%']
+    );
+    my $cache = WebGUI::Cache->new($self->session);
+    if ($records > 20) {
+        $cache->flush;
+    }
+    else {
+        my $descendants = $self->session->db->read("SELECT assetId FROM asset WHERE lineage LIKE ?", [$newLineage . '%']);
+        while (my ($assetId, $lineage) = $descendants->array) {
+            $cache->deleteChunk(["asset",$assetId]);
+        }
+        $descendants->finish;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -188,7 +193,7 @@ sub getChildCount {
 	my $self = shift;
     my $opts = shift || {};
 	my $stateWhere = $opts->{includeTrash} ? '' : "asset.state='published' and";
-	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
+	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and $stateWhere parentId=? and (assetData.status in ('approved', 'archived') or assetData.tagId=?)", [$self->getId, $self->session->scratch->get('versionTag')]);
 	return $count;
 }
 
@@ -203,7 +208,7 @@ in the clipboard or trash.
 
 sub getDescendantCount {
 	my $self = shift;
-	my ($count) = $self->session->db->quickArray("select count(*) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
+	my ($count) = $self->session->db->quickArray("select count(distinct asset.assetId) from asset, assetData where asset.assetId=assetData.assetId and asset.state = 'published' and assetData.status in ('approved','archived') and asset.lineage like ?", [$self->get("lineage")."%"]);
 	$count--; # have to subtract self
 	return $count;
 }
@@ -300,6 +305,10 @@ An array reference containing a list of asset classes to remove from the result 
 
 A boolean indicating that we should return objects rather than asset ids.
 
+=head4 returnSQL
+
+A boolean indicating that we should return the sql statement rather than asset ids.
+
 =head4 invertTree
 
 A boolean indicating whether the resulting asset tree should be returned in reverse order.
@@ -336,6 +345,173 @@ The maximum amount of entries to return
 =cut
 
 sub getLineage {
+	my $self = shift;
+	my $relatives = shift;
+	my $rules = shift;
+	my $lineage = $self->get("lineage");
+	
+    my $sql = $self->getLineageSql($relatives,$rules);
+
+    unless ($sql) {
+        return [];
+    }
+
+	my @lineage;
+	my %relativeCache;
+	my $sth = $self->session->db->read($sql);
+	while (my ($id, $class, $parentId, $version) = $sth->array) {
+		# create whatever type of object was requested
+		my $asset;
+		if ($rules->{returnObjects}) {
+			if ($self->getId eq $id) { # possibly save ourselves a hit to the database
+				$asset =  $self;
+			} else {
+				$asset = WebGUI::Asset->new($self->session,$id, $class, $version);
+				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
+					$self->session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
+					next;
+				}
+			}
+		} else {
+			$asset = $id;
+		}
+		# since we have the relatives info now, why not cache it
+		if ($rules->{returnObjects}) {
+			my $parent = $relativeCache{$parentId};
+			$relativeCache{$id} = $asset;
+			$asset->{_parent} = $parent if exists $relativeCache{$parentId};
+			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
+			$parent->{_lastChild} = $asset;
+		}
+		push(@lineage,$asset);
+	}
+	$sth->finish;
+	return \@lineage;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLineageIterator ( relatives,rules )
+
+Takes the same parameters as getLineage, but instead of returning a list
+it returns an iterator.  Calling the iterator will return instantiated assets,
+or undef when there are no more assets available.  The iterator is just a sub
+ref, call like $asset = $iterator->()
+
+=cut
+
+sub getLineageIterator {
+    my $self = shift;
+    my $relatives = shift;
+    my $rules = shift;
+
+    my $sql = $self->getLineageSql($relatives, $rules);
+
+    my $sth = $self->session->db->read($sql);
+    my $sub = sub {
+        my $assetInfo = $sth->hashRef;
+        return
+            if !$assetInfo;
+        my $asset = WebGUI::Asset->new(
+            $self->session, $assetInfo->{assetId}, $assetInfo->{className}, $assetInfo->{revisionDate}
+        );
+        if (!$asset) {
+            WebGUI::Error::ObjectNotFound->throw(id => $assetInfo->{assetId});
+        }
+        return $asset;
+    };
+    return $sub;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLineageLength ( )
+
+Returns the number of Asset members in an Asset's lineage.
+
+=cut
+
+
+sub getLineageLength {
+	my $self = shift;
+	return length($self->get("lineage"))/6;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getLineageSql ( relatives,rules )
+
+Returns the sql statment for lineage based on relatives and rules passed in
+
+=head3 relatives
+
+An array reference of relatives to retrieve. Valid parameters are "siblings", "children", "ancestors", "self", "descendants", "pedigree".  If you want to retrieve all assets in the tree, use getRoot($session)->getLineage(["self","descendants"],{returnObjects=>1});
+
+=head3 rules
+
+A hash reference comprising modifiers to relative listing. Rules include:
+
+=head4 statesToInclude
+
+An array reference containing a list of states that should be returned. Defaults to 'published'. Options include
+'published', 'trash', 'clipboard', 'clipboard-limbo' and 'trash-limbo'.
+
+=head4 statusToInclude
+
+An array reference containing a list of status that should be returned. Defaults to 'approved'. Options include 'approved', 'pending', and 'archived'.
+
+=head4 endingLineageLength
+
+An integer limiting the length of the lineages of the assets to be returned. This can help limit levels of depth in the asset tree.
+
+=head4 assetToPedigree
+
+An asset object reference to draw a pedigree from. A pedigree includes ancestors, siblings, descendants and other information. It's specifically used in flexing navigations.
+
+=head4 ancestorLimit
+
+An integer describing how many levels of ancestry from the start point that should be retrieved.
+
+=head4 excludeClasses
+
+An array reference containing a list of asset classes to remove from the result set. The opposite of the includOnlyClasses rule.
+
+=head4 invertTree
+
+A boolean indicating whether the resulting asset tree should be returned in reverse order.
+
+=head4 includeOnlyClasses
+
+An array reference containing a list of asset classes to include in the result. If this is specified then no other classes except these will be returned. The opposite of the excludeClasses rule.
+
+=head4 isa
+
+A classname where you can look for classes of a similar base class. For example, if you're looking for Donations, Subscriptions, Products and other subclasses of WebGUI::Asset::Sku, then set isa to 'WebGUI::Asset::Sku'.
+
+=head4 includeArchived
+
+A boolean indicating that we should include archived assets in the result set.
+
+=head4 joinClass
+
+A string containing as asset class to join in. There is no real reason to use a joinClass without a whereClause, but it's trivial to use a whereClause if you don't use a joinClass.  You will only be able to filter on the asset table, however.
+
+=head4 whereClause
+
+A string containing extra where clause information for the query.
+
+=head4 orderByClause 
+
+A string containing an order by clause (without the "order by"). If specified,
+will override the "invertTree" option.
+
+=head4 limit
+
+The maximum amount of entries to return
+
+=cut
+
+sub getLineageSql {
 	my $self = shift;
 	my $relatives = shift;
 	my $rules = shift;
@@ -394,11 +570,8 @@ sub getLineage {
 	my $tables = "asset left join assetData on asset.assetId=assetData.assetId ";
 	if (exists $rules->{joinClass}) {
 		my $className = $rules->{joinClass};
-        my $file = $className;
-        $file =~ s{::}{/}g;
-        $file .= '.pm';
-        if (!exists $INC{ $file }) {  ##Alread loaded?
-            eval{ require $file };
+        (my $module = $className . '.pm') =~ s{::|'}{/}g;
+        if ( ! eval { require $module; 1 }) {
             $self->session->errorHandler->fatal("Couldn't compile asset package: ".$className.". Root cause: ".$@) if ($@);
         }
 		foreach my $definition (@{$className->definition($self->session)}) {
@@ -447,7 +620,7 @@ sub getLineage {
 	}
 	## finish up our where clause
 	if (!scalar(@whereModifiers)) {
-        return [];
+        return "";
     }
 	$where .= ' and ('.join(" or ",@whereModifiers).')';
 	if (exists $rules->{whereClause} && $rules->{whereClause}) {
@@ -466,53 +639,9 @@ sub getLineage {
 	if ($rules->{limit}) {
 		$sql	.= " limit ".$rules->{limit};
 	}
+
+    return $sql;
 	
-	my @lineage;
-	my %relativeCache;
-	my $sth = $self->session->db->read($sql);
-	while (my ($id, $class, $parentId, $version) = $sth->array) {
-		# create whatever type of object was requested
-		my $asset;
-		if ($rules->{returnObjects}) {
-			if ($self->getId eq $id) { # possibly save ourselves a hit to the database
-				$asset =  $self;
-			} else {
-				$asset = WebGUI::Asset->new($self->session,$id, $class, $version);
-				if (!defined $asset) { # won't catch everything, but it will help some if an asset blows up
-					$self->session->errorHandler->error("AssetLineage::getLineage - failed to instanciate asset with assetId $id, className $class, and revision $version");
-					next;
-				}
-			}
-		} else {
-			$asset = $id;
-		}
-		# since we have the relatives info now, why not cache it
-		if ($rules->{returnObjects}) {
-			my $parent = $relativeCache{$parentId};
-			$relativeCache{$id} = $asset;
-			$asset->{_parent} = $parent if exists $relativeCache{$parentId};
-			$parent->{_firstChild} = $asset unless(exists $parent->{_firstChild});
-			$parent->{_lastChild} = $asset;
-		}
-		push(@lineage,$asset);
-	}
-	$sth->finish;
-	return \@lineage;
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 getLineageLength ( )
-
-Returns the number of Asset members in an Asset's lineage.
-
-=cut
-
-
-sub getLineageLength {
-	my $self = shift;
-	return length($self->get("lineage"))/6;
 }
 
 

@@ -20,7 +20,7 @@ body {
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../../build/json/json-min.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
-<script type="text/javascript" src="../../build/datasource/datasource-beta-min.js"></script>
+<script type="text/javascript" src="../../build/datasource/datasource-min.js"></script>
 <script type="text/javascript" src="../../build/charts/charts-experimental-min.js"></script>
 
 
@@ -45,6 +45,7 @@ body {
 </head>
 
 <body class=" yui-skin-sam">
+
 
 <h1>Charts Quickstart Example</h1>
 
@@ -89,11 +90,7 @@ body {
 		{ displayName: "Utilities", yField: "utilities" }
 	];
 
-	var currencyAxis = new YAHOO.widget.NumericAxis();
-	currencyAxis.minimum = 800;
-	currencyAxis.labelFunction = "formatCurrencyAxisLabel";
-
-	function formatCurrencyAxisLabel( value )
+	YAHOO.example.formatCurrencyAxisLabel = function( value )
 	{
 		return YAHOO.util.Number.format( value,
 		{
@@ -103,19 +100,24 @@ body {
 		});
 	}
 
-	function getDataTipText( item, index, series )
+	YAHOO.example.getDataTipText = function( item, index, series )
 	{
 		var toolTipText = series.displayName + " for " + item.month;
-		toolTipText += "\n" + formatCurrencyAxisLabel( item[series.yField] );
+		toolTipText += "\n" + YAHOO.example.formatCurrencyAxisLabel( item[series.yField] );
 		return toolTipText;
 	}
+
+	var currencyAxis = new YAHOO.widget.NumericAxis();
+	currencyAxis.minimum = 800;
+	currencyAxis.labelFunction = YAHOO.example.formatCurrencyAxisLabel;
 
 	var mychart = new YAHOO.widget.LineChart( "chart", myDataSource,
 	{
 		series: seriesDef,
 		xField: "month",
 		yAxis: currencyAxis,
-		dataTipFunction: "getDataTipText",
+		dataTipFunction: YAHOO.example.getDataTipText,
+		//only needed for flash player express install
 		expressInstall: "assets/expressinstall.swf"
 	});
 

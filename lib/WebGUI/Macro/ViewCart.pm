@@ -40,12 +40,12 @@ sub process {
 		return $url;
 	}
 	elsif ($text) {
-		# us text specified
+		# use text specified
 	}
 	else {
         $text = WebGUI::International->new($session,"Shop")->get("view cart");
     }
-    return '<a href="'.$url.'"><img src="'.$session->url->extras('/macro/ViewCart/cart.gif').'" alt="'.$text.'" style="border: 0px;vertical-align: middle;" /></a> <a href="'.$url.'">'.$text.'</a>';
+    return '<a href="'.$url.'">'.$text.'</a>';
 }
 
 1;

@@ -21,6 +21,7 @@ use WebGUI::International;
 use WebGUI::Macro;
 use WebGUI::Asset::Template;
 use WebGUI;
+use HTML::Entities ();
 
 =head1 NAME
 
@@ -168,8 +169,8 @@ sub process {
 		$templateId = 'PBtmpl0000000000000132';
 	}
 $var{'head.tags'} = '
-<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="WebGUI '.$WebGUI::VERSION.'" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <script type="text/javascript">
@@ -183,7 +184,7 @@ return props[propName];
 <!--morehead-->
 ';
 
-if ($self->session->user->isInGroup(2) || $self->session->setting->get("preventProxyCache")) {
+if ($self->session->user->isRegistered || $self->session->setting->get("preventProxyCache")) {
 	# This "triple incantation" panders to the delicate tastes of various browsers for reliable cache suppression.
 	$var{'head.tags'} .= '
 <meta http-equiv="Pragma" content="no-cache" />
@@ -281,7 +282,7 @@ sub setLink {
 	return undef if ($self->{_link}{$url});
 	my $tag = '<link href="'.$url.'"';
 	foreach my $name (keys %{$params}) {
-		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+		$tag .= ' '.$name.'="'.HTML::Entities::encode($params->{$name}).'"';
 	}
 	$tag .= ' />'."\n";
 	$self->{_link}{$url} = 1;
@@ -391,7 +392,7 @@ sub setScript {
 	return undef if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';
 	foreach my $name (keys %{$params}) {
-		$tag .= ' '.$name.'="'.$params->{$name}.'"';
+		$tag .= ' '.$name.'="'.HTML::Entities::encode($params->{$name}).'"';
 	}
 	$tag .= '></script>'."\n";
 	$self->{_javascript}{$url} = 1;

@@ -36,7 +36,7 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 79 + 2*scalar(@{$addExceptions});
+my $tests = 80 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -45,6 +45,7 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::Tax');
 
 my $storage;
+my ($taxableDonation, $taxFreeDonation);
 
 SKIP: {
 
@@ -232,7 +233,7 @@ SKIP: {
 
     $storage = $taxer->exportTaxData();
     isa_ok($storage, 'WebGUI::Storage', 'exportTaxData returns a WebGUI::Storage object');
-    is($storage->{_part1}, 'temp', 'The storage object is in the temporary area');
+    is(substr($storage->getPathFrag, 0, 5), 'temp/', 'The storage object is in the temporary area');
     ok(-e $storage->getPath('siteTaxData.csv'), 'siteTaxData.csv file exists in the storage object');
     cmp_ok($storage->getFileSize('siteTaxData.csv'), '!=', 0, 'CSV file is not empty');
     my @fileLines = split /\n+/, $storage->getFileContentsAsScalar('siteTaxData.csv');
@@ -551,7 +552,7 @@ SKIP: {
         WebGUI::Test->getTestCollateralPath('taxTables/largeTaxTable.csv')
     ),
 
-    my $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
+    $taxableDonation = WebGUI::Asset->getRoot($session)->addChild({
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Taxable donation',
         defaultPrice => 100.00,
@@ -576,7 +577,7 @@ SKIP: {
     $cart->update({ shippingAddressId => $taxingAddress->getId});
     is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
 
-    my $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
+    $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Tax Free Donation',
         defaultPrice => 100.00,
@@ -608,6 +609,7 @@ SKIP: {
     $session->user({userId=>3});
     my $json = $taxer->www_getTaxesAsJson();
     ok($json, 'www_getTaxesAsJson returned something');
+    is($session->http->getMimeType, 'application/json', 'MIME type set to application/json');
     my $jsonTax = JSON::from_json($json);
     cmp_deeply(
         $jsonTax,
@@ -687,4 +689,12 @@ END {
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
     $storage->delete;
+
+    if (defined $taxableDonation and ref $taxableDonation eq 'WebGUI::Sku::Donation') {
+        $taxableDonation->purge;
+    }
+
+    if (defined $taxFreeDonation and ref $taxFreeDonation eq 'WebGUI::Sku::Donation') {
+        $taxFreeDonation->purge;
+    }
 }

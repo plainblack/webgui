@@ -1037,14 +1037,62 @@ our $I18N = {
         lastUpdated => 1138312761,
     },
 
+    'pre registration price' => {
+        message     => q|Pre-Registration Price|,
+        lastUpdated => 0,
+        context        => q|field label|,
+    },
+
+    'pre registration price help' => {
+        message        => q|The special price of this badge if the user orders insanely early.|,
+        lastUpdated    => 0,
+        context        => q|field label help|,
+    },
+
+    'pre registration price end date' => {
+        message     => q|Pre-Registration Price End Date|,
+        lastUpdated => 0,
+        context        => q|field label|,
+    },
+
+    'pre registration price end date help' => {
+        message        => q|The date that the pre-registration price is replaced by the early bird price.|,
+        lastUpdated    => 0,
+        context        => q|field label help|,
+    },
+
     'price' => {
-        message     => q|Price|,
-        lastUpdated => 1138312761,
+        message     => q|Full Price|,
+        lastUpdated => 1221590520,
         context        => q|field label|,
     },
 
     'price help' => {
-        message        => q|How much do you want to charge for this item?|,
+        message        => q|The regular price of this badge.|,
+        lastUpdated    => 1221590773,
+        context        => q|field label help|,
+    },
+
+    'early bird price' => {
+        message     => q|Early Bird Price|,
+        lastUpdated => 1221590520,
+        context        => q|field label|,
+    },
+
+    'early bird price help' => {
+        message        => q|The special price of this badge if the user orders early.|,
+        lastUpdated    => 0,
+        context        => q|field label help|,
+    },
+
+    'early bird price end date' => {
+        message     => q|Early Bird Price End Date|,
+        lastUpdated => 0,
+        context        => q|field label|,
+    },
+
+    'early bird price end date help' => {
+        message        => q|The date that the early bird price is replaced by the full price.|,
         lastUpdated    => 0,
         context        => q|field label help|,
     },
@@ -1058,12 +1106,6 @@ our $I18N = {
         message     => q|Price must be greater than 0|,
         lastUpdated => 1213318055,
         context        => q|field label|,
-    },
-
-    'price help' => {
-        message        => q|How much do you want to charge for this item?|,
-        lastUpdated    => 0,
-        context        => q|field label help|,
     },
 
     'add/edit useSalesTax' => {

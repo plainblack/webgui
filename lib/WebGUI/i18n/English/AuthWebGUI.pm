@@ -11,9 +11,15 @@ our $I18N = {
 		lastUpdated => 1078852836
 	
 	},
+
 	'account template' => {
 		message => q|Account Template|,
 		lastUpdated => 1078852836
+	},
+
+	'account template help' => {
+		message => q|Choose a template to style the screen that displays the user's account to them.|,
+		lastUpdated => 1227210576
 	},
 
 	'create account template' => {
@@ -21,9 +27,19 @@ our $I18N = {
 		lastUpdated => 1078852836
 	},
 
+	'create account template help' => {
+		message => q|Select a template to display the screen where the user creates a user account for this site.|,
+		lastUpdated => 1078852836,
+	},
+
 	'expired password template' => {
 		message => q|Expired Password Template|,
 		lastUpdated => 1078852836
+	},
+
+	'expired password template help' => {
+		message => q|Select a template to display the screen where the user enters a new password after their old one has expired.|,
+		lastUpdated => 1227210712,
 	},
 
 	'login template' => {
@@ -31,9 +47,19 @@ our $I18N = {
 		lastUpdated => 1078852836
 	},
 
+	'login template help' => {
+		message => q|Select a template to display the screen where the user can log in.  This is different from any of the Macros that also display login forms to the user.|,
+		lastUpdated => 1227210754,
+	},
+
 	'password recovery template' => {
 		message => q|Password Recovery Template|,
 		lastUpdated => 1078852836
+	},
+
+	'password recovery template help' => {
+		message => q|Select a template to display the screen where the user can recover a lost password.|,
+		lastUpdated => 1227210876,
 	},
 
 	'use captcha' => {
@@ -41,8 +67,18 @@ our $I18N = {
 		lastUpdated => 1078852836
 	},
 
+	'use captcha help' => {
+		message => q|If set to yes, the user will be required to enter in text from a captcha as part of making an account.|,
+		lastUpdated => 1078852836
+	},
+
 	'validate email' => {
 		message => q|Validate email addresses?|,
+		lastUpdated => 1078852836
+	},
+
+	'validate email help' => {
+		message => q|Should WebGUI send an email to this person, independently of the welcome message, with a link to start their account?  Their account will not be activated until the link is visited, and unvalidated accounts will expire after a configurable timeout.  This timeout is set in a workflow.|,
 		lastUpdated => 1078852836
 	},
 
@@ -68,6 +104,17 @@ our $I18N = {
 
 	'check email for validation' => {
 		message => q|Please check your email to activate your account.|,
+		lastUpdated => 1078852836
+	},
+
+	'email validation confirmed' => {
+		message => q|Thank you for activating your account.  You may now log in with your username and password.|,
+		context => q|Message displayed to the user after they validate their email address.|,
+		lastUpdated => 1230588145,
+	},
+
+	'display account template title' => {
+		message => q|WebGUI Authentication Display Account Template|,
 		lastUpdated => 1078852836
 	},
 
@@ -131,6 +178,11 @@ our $I18N = {
 		lastUpdated => 1164335682,
 	},
 
+	'subtitle' => {
+		message => q|Special instructions for the form.  May not be defined in all types of password recovery templates.|,
+		lastUpdated => 1227216717,
+	},
+
 	'login.message' => {
 		message => q|Any message returned by the system.  Usually displays after the form is submitted.|,
 		lastUpdated => 1149220294,
@@ -169,6 +221,11 @@ our $I18N = {
 	'18' => {
 		message => q|Allow Users to Change Passwords?|,
 		lastUpdated => 1076357595
+	},
+
+	'18 help' => {
+		message => q|Are users allowed to change their own passwords?  Note, using this in conjunction with password timeouts can cause a lot of Admin work.|,
+		lastUpdated => 1076357595,
 	},
 
 	'expired.form.header' => {
@@ -236,9 +293,9 @@ our $I18N = {
 		lastUpdated => 1071885309
 	},
 
-	'13' => {
-		message => q|Allow password recovery?|,
-		lastUpdated => 1071507940
+	'16 help' => {
+		message => q|The password timeout sets how long a password is good for.  After the timeout, the user will be required to enter in a new password.|,
+		lastUpdated => 1227208974
 	},
 
 	'6' => {
@@ -269,6 +326,11 @@ our $I18N = {
 	'9' => {
 		message => q|Expire passwords on user creation?|,
 		lastUpdated => 1071507780
+	},
+
+	'9 help' => {
+		message => q|This will immediately expire a user's password when their account is created.|,
+		lastUpdated => 1227209117
 	},
 
 	'12' => {
@@ -354,6 +416,11 @@ our $I18N = {
 	'15' => {
 		message => q|Minimum Password Length|,
 		lastUpdated => 1071885112
+	},
+
+	'15 help' => {
+		message => q|The minimum length of passwords that users are required to use, in characters.|,
+		lastUpdated => 1227208578
 	},
 
 	'8' => {
@@ -461,6 +528,11 @@ our $I18N = {
 		lastUpdated => 1076358029
 	},
 
+	'19 help' => {
+		message => q|Are users allowed to change their username after creating their account?|,
+		lastUpdated => 1227209885,
+	},
+
 	'10' => {
 		message => q|Old Password|,
 		lastUpdated => 1071507875
@@ -527,13 +599,28 @@ our $I18N = {
         lastUpdated     => 0,
     },
 
+    'setting webguiRequiredDigits help' => {
+        message         => q{How many digits/numbers are required to be in the user's password?},
+        lastUpdated     => 0,
+    },
+
     'setting webguiNonWordCharacters' => {
         message         => q{Number of non-word characters required in password},
         lastUpdated     => 0,
     },
 
+    'setting webguiNonWordCharacters help' => {
+        message         => q{The number of non-word characters, such as punctuation, are required to be in the user's password.},
+        lastUpdated     => 0,
+    },
+
     'setting webguiRequiredMixedCase' => {
         message         => q{Number of upper-case characters required in password},
+        lastUpdated     => 0,
+    },
+
+    'setting webguiRequiredMixedCase help' => {
+        message         => q{This setting will require that the user have upper-case characters in their password.  It will not require that they have lower-case characters},
         lastUpdated     => 0,
     },
 
@@ -602,14 +689,9 @@ our $I18N = {
 		lastUpdated => 177127324,
 	},
 
-	'email recover password finish message1' => {
-		message => q|An email has been sent to |,
-		lastUpdated => 177127324,
-	},
-
-	'email recover password finish message2' => {
-		message => q| with instructions for resetting your password.|,
-		lastUpdated => 177127324,
+	'email recover password finish message' => {
+		message => q|An email has been sent with instructions for resetting your password.|,
+		lastUpdated => 1223309904,
 	},
 
 	'email recover password start message' => {
@@ -648,6 +730,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Error message when a user tries to recover password for a disabled account},
     },
+
+    'no email address' => {
+        message     => q{There is no email address registered for this account.  Password recovery via email is not possible.},
+        lastUpdated => 1229391388,
+        context     => q{Error message when a user tries to recover password and they don't have an email address},
+    },
+
 };
 
 1;

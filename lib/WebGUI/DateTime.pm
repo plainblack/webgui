@@ -120,7 +120,7 @@ doing date/time math.
 
 sub new 
 {
-	# Drop-in replacement for Perl's DateTime.pm
+	# Drop-in replacement for Perl's DateTime
 	my $class	= shift;
     my $param0 = $_[0];
     my $self;

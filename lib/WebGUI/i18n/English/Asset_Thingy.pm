@@ -112,6 +112,21 @@ our $I18N = {
         lastUpdated => 1104630516,
     },
 
+    'max entries per user label' => {
+        message => q|Max entries per user|,
+        lastUpdated => 1223638290,
+    },
+
+    'max entries per user description' => {
+        message => q|The maximum number of entries a user can add of this thing.|,
+        lastUpdated => 1223638290,
+    },
+
+    'has entered max per user message' => {
+        message => q|You have reached the maximum number of entries.|,
+        lastUpdated => 1223638290,
+    },
+
     'who can add label' => {
         message => q|Who can add?|,
         lastUpdated => 1104630516,
@@ -128,8 +143,10 @@ our $I18N = {
     },
 
     'who can edit description' => {
-        message => q|The group that can edit this thing.|,
-        lastUpdated => 1104630516,
+        message => q|Select either:<br />- 'owner' if this things data should only be editable by the person who added it
+<br />or<br />- a group that can edit all the data in this thing.<br />A user who can edit this Thingy
+wobject can always view and edit all data.|,
+        lastUpdated => 1223372150,
     },
 
     'save button label label' => {
@@ -229,8 +246,10 @@ our $I18N = {
     },
 
     'who can view description' => {
-        message => q|The group that can view this thing.|,
-        lastUpdated => 1104630516,
+        message => q|Select either:<br />- 'owner' if this things data should only be viewable by the person who
+added it <br />or<br />- a group that can view all the data in this thing.<br />A user who can edit this Thingy
+wobject can always view and edit all data.|,
+        lastUpdated => 1223372150,
     },
 
     'view template label' => {
@@ -316,6 +335,17 @@ our $I18N = {
     'who can export description' => {
         message => q|The group that can export this things data.|,
         lastUpdated => 1104630516,
+    },
+
+    'export metadata label' => {
+        message => q|Export meta data?|,
+        lastUpdated => 1223555688,
+    },
+
+    'export metadata description' => {
+        message => q|Should the export function include the meta data fields like thingDataId, lastUpdated,
+ipAddress etc?|,
+        lastUpdated => 1223555688,
     },
 
     'search button label' => {
@@ -419,8 +449,9 @@ our $I18N = {
     },
 
     'default value description' => {
-        message => q|Enter the default value (if any) for the field.  For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
-        lastUpdated => 1119156590,
+        message => q|Enter the default value (if any) for the field. If you have defined the possible values for
+this field using a hash, then the default value has to be a key in that hash, and not a value. For Yes/No fields, enter "yes" to select "Yes" and "no" to select "No".|,
+        lastUpdated => 1223372150,
     },
 
     'default value subtext' => {
@@ -433,15 +464,28 @@ our $I18N = {
         lastUpdated => 1031514049
     },
 
-   'subtext description' => {
-        message => q|An extension of the label, this is additional information such as a description of what should go in the field or optional instructions for the field.|,
-        lastUpdated => 1133811301,
+    'subtext description' => {
+        message => q|An extension of the label, this is additional information such as a description of what should
+go in the field or optional instructions for the field. It will be displayed below/after the form element.|,
+        lastUpdated => 1224518799,
+    },
+
+    'pretext label' => {
+        message => q|Pre-text|,
+        lastUpdated => 1224518799,
+    },
+
+    'pretext description' => {
+        message => q|An extra extension of the label, this is additional information such as a description of what should
+go in the field or optional instructions for the field. It will be displayed above/before the form element.|,
+        lastUpdated => 1224518799,
     },
 
     'fieldstatus hidden label' => {
         message => q|Hidden|,
         lastUpdated => 1031514049
     },
+    
     'fieldstatus visible label' => {
         message => q|Visible|,
         lastUpdated => 1031514049
@@ -529,8 +573,20 @@ vertically.|,
     },
 
     'possible values description' => {
-        message => q{This field is used for the list types (like Checkbox List and Select List).  Enter the values you wish to appear, one per line. If you want a different label for a value, seperate them with a | (pipe) character: value|label },
-        lastUpdated => 1104630516,
+        message => q{This field is used for the list types (like Checkbox List and Select List).  Enter the values
+you wish to appear, one per line. <br />
+<br />If you want a different label for a value, the possible values list has to be
+formatted as follows:
+<pre>
+&#123;
+   "key1"=>"value1",
+   "key2"=>"value2",
+   "key3"=>"value3"
+   ...
+&#125;
+</pre>
+Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs},
+        lastUpdated => 1223372150,
     },
 
     'possible values subtext' => {
@@ -769,9 +825,16 @@ field.|,
         lastUpdated => 1104630516,
     },
 
+    'field_pretext' => {
+        message => q|An extra description of the field so that users know what to put in the field. To be
+displayed above/before the form element.|,
+        lastUpdated => 1224518799,
+    },
+
     'field_subtext' => {
-        message => q|A description of the field so that users know what to put in the field.|,
-        lastUpdated => 1104630516,
+        message => q|A description of the field so that users know what to put in the field. To be displayed
+below/after the form element.|,
+        lastUpdated => 1224518799,
     },
 
     'form_start' => {
@@ -921,9 +984,40 @@ search has been done.|,
     },
 
     'other thing missing message' => {
-        message => q|The Thing to which this field refers does not exist or has no table.|,
-        lastUpdated => 1104630516,
+        message => q|The Thing to which this field refers does not exist or has no table, or the field in it has been deleted.|,
+        lastUpdated => 1231178860,
     },
+
+    'no permission to edit' => {
+        message => q|You do not have permissions to edit this Thing.|,
+        lastUpdated => 1219424285,
+    },
+
+    'no permission to search' => {
+        message => q|You do not have permissions to search this Thing.|,
+        lastUpdated => 1219424285,
+    },
+    
+    'thing must have fields' => {
+        message => q|Error: You must assign fields to your new Thing.|,
+        lastUpdated => 1219424285,
+    },
+
+    'back to thingy default view' => {
+        message => q|Back to Thingy default view|,
+        lastUpdated => 1227736916,
+    },
+
+    'view_url' => {
+        message => q|The URL that will take the user back to the Thingy default view.|,
+        lastUpdated => 1227737813,
+    },
+
+    'other thing field missing message' => {
+        message => q|The field from the other Thing does not exist.|,
+        lastUpdated => 1231180362,
+    },
+
 };
 
 1;

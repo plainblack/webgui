@@ -223,6 +223,14 @@ END_SQL
 }
 
 #-------------------------------------------------------------------
+sub getContentLastModified {
+    my $self = shift;
+    my $assetRev = $self->get('revisionDate');
+    my $shortcuttedRev = $self->getShortcut->get('revisionDate');
+    return $assetRev > $shortcuttedRev ? $assetRev : $shortcuttedRev;
+}
+
+#-------------------------------------------------------------------
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -307,7 +315,7 @@ sub getEditForm {
 
 =head2 getExtraHeadTags (  )
 
-Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Layout::view for its child assets.  Overriden here in Shortcut.pm.
+Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Asset::Wobject::Layout for its child assets.  Overriden to also add tags from shortcutted asset.
 
 =cut
 
@@ -393,7 +401,7 @@ sub getOverridesList {
 sub _overridesCacheTag {
 	my $self = shift;
 	#cache by userId, assetId of this shortcut, and whether adminMode is on or not.
-	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->get("adminOn")];
+	return ["shortcutOverrides", $self->getId, $self->session->user->userId, $self->session->var->isAdminOn];
 }
 
 #-------------------------------------------------------------------
@@ -492,7 +500,7 @@ sub getShortcutByCriteria {
 	if ($assetId) {
 		$scratchId = "Shortcut_" . $assetId;
 		if($self->session->scratch->get($scratchId) && !$self->getValue("disableContentLock")) {
-			unless ($self->session->var->get("adminOn")) {
+			unless ($self->session->var->isAdminOn) {
 				return WebGUI::Asset->newByDynamicClass($self->session, $self->session->scratch->get($scratchId));
 			}
 		}
@@ -771,7 +779,7 @@ sub www_edit {
 sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self = shift;
-	return 'You are no longer logged in' if $self->session->user->userId eq '1';
+	return 'You are no longer logged in' if $self->session->user->isVisitor;
 	return 'You are not allowed to personalize this Dashboard.' unless $self->getParent->canPersonalize;
 	my $output;
 	my @fielden = $self->getPrefFieldsToShow;
@@ -839,7 +847,7 @@ sub www_saveUserPrefs {
 		my $field = WebGUI::ProfileField->new($self->session,$fieldId);
 		next unless $field;
 		$data{$field->getId} = $field->formProcess;
-		if ($field->getId eq 'email' && WebGUI::Operation::Profile::isDuplicateEmail($self->session,$data{$field->getId})) {
+        if ($field->getId eq 'email' && $field->isDuplicate($data{$field->getId})) {
 			return '<li>'.$i18n->get(1072).'</li>';
 		}
 		if ($field->isRequired && !$data{$field->getId}) {
@@ -962,11 +970,11 @@ sub www_view {
         # Make sure the www_view method won't be skipped b/c the asset is cached.
         $shortcut->purgeCache();
 
-        if ($shortcut->get("className") =~ m/Asset::Wobject/) {
+        if ($shortcut->isa('WebGUI::Asset::Wobject')) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
-                my $style = $shortcut->processStyle("~~~");
-                my ($head, $foot) = split("~~~",$style);
+                my $style = $shortcut->processStyle($self->getSeparator);
+                my ($head, $foot) = split($self->getSeparator,$style);
                 $self->session->output->print($head, 1);
                 $self->session->output->print($self->view);
                 $self->session->output->print($foot, 1);

@@ -86,7 +86,7 @@ sub execute {
         # get user object
         $eh->info("Getting user $userId");
         my $user = WebGUI::User->new($self->session, $userId);
-        next if ($user->userId eq "1");
+        next if ($user->isVisitor);
         my $emailAddress = $user->profileField("email");
         next if ($emailAddress eq "");
 
@@ -198,7 +198,7 @@ sub execute {
         if (time() - $time > 50) {
             $eh->info("Oops. Ran out of time. Will continue building newsletters in a bit.");
             $subscriptionResultSet->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         }
     }
 	return $self->COMPLETE;

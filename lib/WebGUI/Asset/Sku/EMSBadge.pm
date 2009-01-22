@@ -84,6 +84,34 @@ sub definition {
 			label           => $i18n->get("price"),
 			hoverHelp       => $i18n->get("price help"),
 			},
+		earlyBirdPrice => {
+			tab             => "shop",
+			fieldType       => "float",
+			defaultValue    => 0.00,
+			label           => $i18n->get("early bird price"),
+			hoverHelp       => $i18n->get("early bird price help"),
+			},
+		earlyBirdPriceEndDate => {
+			tab             => "shop",
+			fieldType       => "date",
+			defaultValue    => undef,
+			label           => $i18n->get("early bird price end date"),
+			hoverHelp       => $i18n->get("early bird price end date help"),
+			},
+		preRegistrationPrice => {
+			tab             => "shop",
+			fieldType       => "float",
+			defaultValue    => 0.00,
+			label           => $i18n->get("pre registration price"),
+			hoverHelp       => $i18n->get("pre registration price help"),
+			},
+		preRegistrationPriceEndDate => {
+			tab             => "shop",
+			fieldType       => "date",
+			defaultValue    => undef,
+			label           => $i18n->get("pre registration price end date"),
+			hoverHelp       => $i18n->get("pre registration price end date help"),
+			},
 		seatsAvailable => {
 			tab             => "shop",
 			fieldType       => "integer",
@@ -174,7 +202,13 @@ Returns the price field value.
 
 sub getPrice {
     my $self = shift;
-    return $self->get("price");
+	if ($self->get('earlyBirdPriceEndDate') < time) {
+		return $self->get('price');
+	}
+	elsif ($self->get('preRegistrationPriceEndDate') < time) {
+		return $self->get('earlyBirdPrice');
+	}
+	return $self->get('preRegistrationPrice');
 }
 
 #-------------------------------------------------------------------
@@ -289,7 +323,7 @@ sub onRemoveFromCart {
 
 =head2 prepareView
 
-See Asset.pm, prepareView for details.
+See WebGUI::Asset, prepareView for details.
 
 =cut
 
@@ -362,7 +396,7 @@ sub view {
                         });
     $vars{organization} = WebGUI::Form::text($session, {
                             name         => 'organization',
-                            defaultValue => $form->get("organization"),
+                            defaultValue => (defined $address) ? $address->get("organization") : $form->get('organization'),
                         });
     $vars{address1} = WebGUI::Form::text($session, {
                             name         => 'address1',
@@ -398,7 +432,7 @@ sub view {
                         });
     $vars{email}  = WebGUI::Form::text($session, {
                             name         => 'email',
-                            defaultValue => $form->get('email','email'),
+                            defaultValue => (defined $address) ? $address->get('email') : $form->get('email','email'),
                         });
     if($self->getQuantityAvailable() > 0){ 
         $vars{submitAddress} = WebGUI::Form::submit($session, {value => $i18n->get('add to cart'),});

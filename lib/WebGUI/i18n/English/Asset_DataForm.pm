@@ -1001,6 +1001,31 @@ be useful, others may not.|,
             lastUpdated => 0,
             context     => q{Description of template variable},
         },
+
+    'editForm workflowIdAddEntry label' => {
+        message     => q{Add Entry Workflow},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'editForm workflowIdAddEntry description' => {
+        message     => q{Workflow to be run when an entry is added to the DataForm},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
+
+    'Entry ID' => {
+        message     => q{Entry ID},
+        lastUpdated => 1229910550,
+        context     => q{Unique identifier for this entry.  i18n label for template},
+    },
+
+    'Submission Date' => {
+        message     => q{Submission Date},
+        lastUpdated => 1229910550,
+        context     => q{The date that this entry was submitted to the site. i18n label for template},
+    },
+
 };
 
 1;

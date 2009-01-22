@@ -17,7 +17,20 @@ use strict;
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use WebGUI::Test;
+use File::Find;
+use File::Spec;
+use Test::Deep;
 
+# Must load some Test::Deep modules before we start modifying @INC
+use Test::Deep::Array;
+use Test::Deep::ArrayLength;
+use Test::Deep::ArrayLengthOnly;
+use Test::Deep::ArrayElementsOnly;
+use Test::Deep::RefType;
+use Test::Deep::Shallow;
+use Test::Deep::Blessed;
+use Test::Deep::Isa;
+use Test::Deep::Set;
 
 use WebGUI::Pluggable;
 
@@ -28,7 +41,7 @@ use WebGUI::Pluggable;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 4;        # Increment this number for each test you create
+plan tests => 8;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -48,6 +61,52 @@ is($dumper->Dump, q|$VAR1 = {
           'color' => 'black'
         };
 |, "Can instanciate an object.");
+
+#----------------------------------------------------------------------------
+# Test find and findAndLoad
+{ # Block to localize @INC
+    my $lib     = WebGUI::Test->lib;
+    local @INC  = ( $lib );
+
+    # Use the i18n files to test
+    my @testFiles   = ();
+    File::Find::find( 
+        sub { 
+            if ( !/^[.]/ && /[.]pm$/ ) {
+                my $name    = $File::Find::name;
+                $name   =~ s{^$lib[/]}{};
+                $name   =~ s/[.]pm$//;
+                $name   =~ s{/}{::}g;
+                push @testFiles, $name;
+            }
+        },
+        File::Spec->catfile( $lib, 'WebGUI', 'i18n' ),
+    );
+    
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n' ) ],
+        bag( @testFiles ),
+        "find() finds all modules by default",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1 } ) ],
+        bag( grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+        "find() with onelevel",
+    );
+
+    cmp_deeply(
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { exclude => [ 'WebGUI::i18n::English::WebGUI' ] } ) ],
+        bag( grep { $_ ne 'WebGUI::i18n::English::WebGUI' } @testFiles ),
+        "find() with exclude",
+    );
+    
+    cmp_deeply( 
+        [ WebGUI::Pluggable::find( 'WebGUI::i18n', { onelevel => 1, return => "name" } ) ],
+        bag( map { /::([^:]+)$/; $1 } grep { /^WebGUI::i18n::[^:]+$/ } @testFiles ),
+        "find() with return => name",
+    );
+};
 
 #----------------------------------------------------------------------------
 # Cleanup

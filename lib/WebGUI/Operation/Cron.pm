@@ -291,6 +291,13 @@ sub www_runCronJob {
 			priority    => $task->get("priority"),
                     });
                 if ( !$instance ) {
+                    if ($session->stow->get('singletonWorkflowClash')) {
+                        $session->errorHandler->warn( 
+                            "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
+                            . "': It is a singleton workflow and is still running from the last invocation."
+                        );
+                        return "done";
+                    }
                     $session->errorHandler->error( 
                         "Could not create workflow instance for workflowId '" . $task->get( "workflowId" )
                         . "': The result was undefined"

@@ -83,14 +83,15 @@ sub execute {
     my $now = WebGUI::DateTime->new($session, $start);
     my $outdated = DateTime::Duration->new(seconds => $self->get("timeout"));
     my $pending = WebGUI::Friends->getAllPendingAddRequests($session);
+    my $ttl = $self->getTTL;
     while (my $invite = $pending->hashRef) {
         my $sentOn = WebGUI::DateTime->new($session, $invite->{dateSent});
         if (DateTime::Duration->compare($now - $sentOn, $outdated) == 1) {
             WebGUI::Friends->new($session, WebGUI::User->new($session, $invite->{friendId}))->rejectAddRequest($invite->{inviteId});
         }
-        if (time() - $start > 55) {
+        if (time() - $start > $ttl) {
             $pending->finish;
-            return $self->WAITING;
+            return $self->WAITING(1);
         }
     }
 	return $self->COMPLETE;

@@ -55,46 +55,60 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Folder");
-        push(@{$definition}, {
-		assetName => $i18n->get("assetName"),
-		uiLevel => 5,
-		icon => 'folder.gif',
-                tableName => 'Folder',
-                className => 'WebGUI::Asset::Wobject::Folder',
+    my $class       = shift;
+	my $session     = shift;
+    my $definition  = shift;
+	my $i18n        = WebGUI::International->new($session,"Asset_Folder");
+
+    my %optionsSortOrder = (
+        ASC     => $i18n->get( "editForm sortOrder ascending" ),
+        DESC    => $i18n->get( "editForm sortOrder descending" ),
+    );
+
+    push @{ $definition }, {
+		assetName   => $i18n->get("assetName"),
+		uiLevel     => 5,
+		icon        => 'folder.gif',
+        tableName   => 'Folder',
+        className   => 'WebGUI::Asset::Wobject::Folder',
 		autoGenerateForms => 1,
-                properties => {
+        properties  => {
 			visitorCacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("visitor cache timeout"),
-				hoverHelp => $i18n->get("visitor cache timeout help")
-				},
-
+				tab             => "display",
+				fieldType       => "interval",
+				defaultValue    => 3600,
+				uiLevel         => 8,
+				label           => $i18n->get("visitor cache timeout"),
+				hoverHelp       => $i18n->get("visitor cache timeout help"),
+            },
+            # TODO: This should probably be a proper "sortBy" with multiple possible fields
 			sortAlphabetically => {
-				fieldType => "yesNo",
-				defaultValue => 0,
-				tab => 'display',
-				label => $i18n->get('sort alphabetically'),
-			        hoverHelp => $i18n->get('sort alphabetically help'),
-				},
-
+				fieldType       => "yesNo",
+				defaultValue    => 0,
+				tab             => 'display',
+				label           => $i18n->get('sort alphabetically'),
+                hoverHelp       => $i18n->get('sort alphabetically help'),
+            },
+            sortOrder => {
+                tab             => 'display',
+                fieldType       => "selectBox",
+                options         => \%optionsSortOrder,
+                defaultValue    => "ASC",
+                label           => $i18n->get( "editForm sortOrder label" ),
+                hoverHelp       => $i18n->get( "editForm sortOrder description" ),
+            },
 			templateId => {
-				fieldType => "template",
-				defaultValue => 'PBtmpl0000000000000078',
-                                namespace => 'Folder',
-				tab => 'display',
-				label => $i18n->get('folder template title'),
-				hoverHelp => $i18n->get('folder template description'),
-				}
-                        }
-                });
-        return $class->SUPER::definition($session, $definition);
+				fieldType       => "template",
+				defaultValue    => 'PBtmpl0000000000000078',
+                namespace       => 'Folder',
+				tab             => 'display',
+				label           => $i18n->get('folder template title'),
+				hoverHelp       => $i18n->get('folder template description'),
+            },
+        },
+    };
+
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -139,6 +153,26 @@ sub getEditForm {
 	return $tabform;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getTemplateVars ( )
+
+Get the shared template vars for all views of the Folder.
+
+=cut
+
+sub getTemplateVars {
+    my $self        = shift;
+    my $vars        = $self->get;
+	my $i18n        = WebGUI::International->new($self->session, 'Asset_Folder');
+
+	$vars->{ 'addFile.label'    } = $i18n->get('add file label');
+	$vars->{ 'addFile.url'      } = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
+    $vars->{ canEdit            } = $self->canEdit;
+    $vars->{ canAddFile         } = $self->canEdit;
+    
+    return $vars;
+}
 
 #-------------------------------------------------------------------
 
@@ -173,21 +207,30 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 sub view {
-	my $self = shift;
-
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Folder');
+	my $self    = shift;
 	
-	if ($self->session->user->userId eq '1') {
+    # Use cached version for visitors
+	if ($self->session->user->isVisitor) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
-	my %rules = ( returnObjects => 1);
-	$rules{orderByClause} = 'assetData.title' if ($self->get("sortAlphabetically"));
-	my $children = $self->getLineage( ["children"], \%rules);
-	my %vars;
-	foreach my $child (@{$children}) {
-		if (ref($child) eq "WebGUI::Asset::Wobject::Folder") {
-			push(@{$vars{"subfolder_loop"}}, {
+
+	my $vars    = $self->getTemplateVars;
+    # TODO: Getting the children template vars should be a seperate method.
+	
+    my %rules   = ( returnObjects => 1);
+    if ( $self->get( "sortAlphabetically" ) ) {
+        $rules{ orderByClause   } = "assetData.title " . $self->get( "sortOrder" );
+    }
+    else {
+        $rules{ orderByClause   } = "asset.lineage " . $self->get( "sortOrder" );
+    }
+
+	my $children    = $self->getLineage( ["children"], \%rules);
+	foreach my $child ( @{ $children } ) {
+        # TODO: Instead of this it should be using $child->getTemplateVars || $child->get
+		if ( $child->isa("WebGUI::Asset::Wobject::Folder") ) {
+			push @{ $vars->{ "subfolder_loop" } }, {
 				id           => $child->getId,
 				url          => $child->getUrl,
 				title        => $child->get("title"),
@@ -195,42 +238,48 @@ sub view {
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,
-				});
-		} else {
-			my $isImage = (ref($child) =~ /^WebGUI::Asset::File::Image/);
-			my $thumbnail = $child->getThumbnailUrl if ($isImage);
-			my $isFile = (ref($child) =~ /^WebGUI::Asset::File/);
-			my $file = $child->getFileUrl if ($isFile);
-			push(@{$vars{"file_loop"}},{
-				id=>$child->getId,
-				canView => $child->canView(),
-				title=>$child->get("title"),
-				menuTitle=>$child->get("menuTitle"),
-				synopsis=>$child->get("synopsis") || '',
-				size=>WebGUI::Utility::formatBytes($child->get("assetSize")),
-				"date.epoch"=>$child->get("revisionDate"),
-				"icon.small"=>$child->getIcon(1),
-				"icon.big"=>$child->getIcon,
-				type=>$child->getName,
-				url=>$child->getUrl,
-				isImage=>$isImage,
-				canEdit=>$child->canEdit,
-				controls=>$child->getToolbar,
-				isFile=>$isFile,
-				"thumbnail.url"=>$thumbnail,
-				"file.url"=>$file
-				});
+			};
+		} 
+        else {
+            my $childVars   = {
+				id              => $child->getId,
+				canView         => $child->canView(),
+				title           => $child->get("title"),
+				menuTitle       => $child->get("menuTitle"),
+				synopsis        => $child->get("synopsis") || '',
+				size            => WebGUI::Utility::formatBytes($child->get("assetSize")),
+				"date.epoch"    => $child->get("revisionDate"),
+				"icon.small"    => $child->getIcon(1),
+				"icon.big"      => $child->getIcon,
+				type            => $child->getName,
+				url             => $child->getUrl,
+				canEdit         => $child->canEdit,
+				controls        => $child->getToolbar,
+            };
+            
+            if ( $child->isa('WebGUI::Asset::File::Image') ) {
+                $childVars->{ "isImage"         } = 1;
+                $childVars->{ "thumbnail.url"   } = $child->getThumbnailUrl;
+            }
+            
+            if ( $child->isa('WebGUI::Asset::File') ) {
+                $childVars->{ "isFile"          } = 1;
+                $childVars->{ "file.url"        } = $child->getFileUrl;
+            }
+
+			push @{ $vars->{ "file_loop" } }, $childVars;
 		}
 	}
 	
-	$vars{'addFile.label'} = $i18n->get('add file label');
-	$vars{'addFile.url'} = $self->getUrl('func=add;class=WebGUI::Asset::FilePile');
-	
-       	my $out = $self->processTemplate(\%vars,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1') {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
+    my $out = $self->processTemplate( $vars, undef, $self->{_viewTemplate} );
+
+    # Update the cache
+	if ($self->session->user->isVisitor) {
+		WebGUI::Cache->new($self->session,"view_".$self->getId)
+            ->set($out,$self->get("visitorCacheTimeout"));
 	}
-       	return $out;
+
+    return $out;
 }
 
 
@@ -244,7 +293,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
 	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
 	$self->SUPER::www_view(@_);
 }
 

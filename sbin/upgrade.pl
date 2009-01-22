@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -23,6 +25,7 @@ use Pod::Usage;
 use WebGUI::Config;
 use WebGUI::Session;
 use WebGUI::Utility;
+use Cwd;
 
 my $help;
 my $history;
@@ -188,9 +191,11 @@ foreach my $file (@files) {
 print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 
 my $notRun = 1;
-			
-chdir($upgradesPath);
+
+
+my $currentPath = getcwd();
 foreach my $filename (keys %config) {
+    chdir($upgradesPath);
 	my $clicmd = $config{$filename}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
@@ -226,17 +231,31 @@ foreach my $filename (keys %config) {
                 	}
 		}
 		if ($upgrade{$upgrade}{pl} ne "") {
-			my $cmd = $perl." ".$upgrade{$upgrade}{pl}." --configFile=".$filename;
-			$cmd .= " --quiet" if ($quiet);
-			if (system($cmd)) {
-				print "\tProcessing upgrade executable failed!\n";
-				fatalError();
-			}
+            my $pid = fork;
+            if (!$pid) {
+                local @ARGV = ("--configFile=$filename", $quiet ? ('--quiet') : ());
+                local $0 = $upgrade{$upgrade}{pl};
+                local $@;
+                do $0;
+                if ($@) {
+                    warn $@;
+                    exit 255;
+                };
+                exit;
+            }
+            waitpid $pid, 0;
+            if ($?) {
+                print "\tProcessing upgrade executable failed!\n";
+                fatalError();
+            }
+            ##Do a dummy load of the config
+            WebGUI::Config->clearCache();
 		}
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
-                sleep 1; # Sleep a second to avoid adding asset revisions too quickly
+        sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
+    chdir($currentPath);
 	my $session = WebGUI::Session->open($webguiRoot,$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
 	$session->setting->remove('specialState');

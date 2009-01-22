@@ -447,20 +447,20 @@ sub www_editGroup {
 	$f->text(
 	       -name=>"ldapGroup",
 		   -label=>$i18n->get("LDAPLink_ldapGroup","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroup","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroup description","AuthLDAP"),
 	       -value=>$g->ldapGroup
 		);
     $f->text(
 	       -name=>"ldapGroupProperty",
 		   -label=>$i18n->get("LDAPLink_ldapGroupProperty","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroupProperty","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapGroupProperty description","AuthLDAP"),
 		   -value=>$g->ldapGroupProperty,
 		   -defaultValue=>"member"
 	    );
     $f->text(
 	       -name=>"ldapRecursiveProperty",
 		   -label=>$i18n->get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
-		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveProperty","AuthLDAP"),
+		   -hoverHelp=>$i18n->get("LDAPLink_ldapRecursiveProperty description","AuthLDAP"),
 		   -value=>$g->ldapRecursiveProperty
 	    );
 	$f->textarea(
@@ -729,20 +729,18 @@ sub www_manageGroupsInGroup {
     );
 
 	my @groups;
-	my $group = WebGUI::Group->new($session,$session->form->process("gid"));
 	my $groupsIn = $group->getGroupsIn(1);
 	my $groupsFor = $group->getGroupsFor;
 	push(@groups, @$groupsIn,@$groupsFor,$session->form->process("gid"));
-	my $i18n = WebGUI::International->new($session);
-        $f->group(
+    $f->group(
 		-name=>"groups",
 		-excludeGroups=>\@groups,
 		-label=>$i18n->get(605),
 		-size=>5,
 		-multiple=>1
 		);
-        $f->submit;
-        my $output = $f->print;
+    $f->submit;
+    my $output = $f->print;
 	$output .= '<p />';
 	$output .= walkGroups($session, $session->form->process("gid"));
 	return _submenu($session,$output,'813');

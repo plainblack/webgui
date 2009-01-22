@@ -38,7 +38,7 @@ internationalized message will be used.
 
 =head3 templateId
 
-The ID of a template for custom layout of the link and text.
+The URL of a template for custom layout of the link and text.
 
 =cut
 
@@ -51,7 +51,7 @@ sub process {
         my $login = $param[0] || $i18n->get(716);
         my $logout = $param[1] || $i18n->get(717);
 	my %var;
-        if ($session->user->userId eq '1') {
+        if ($session->user->isVisitor) {
 		return $session->url->page("op=auth;method=init") if ($param[0] eq "linkonly");
         	$var{'toggle.url'} = $session->url->page('op=auth;method=init');
                	$var{'toggle.text'} = $login;

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -37,7 +39,9 @@ GetOptions(
 	'help'=>\$help,
 	'ping'=>\$ping,
 	'shutdown'=>\$shutdown,
+	'stop'=>\$shutdown,
 	'daemon'=>\$daemon,
+	'start'=>\$daemon,
 	'debug' =>\$debug,
 	'status' => \$status,
 	'run' => \$run,
@@ -75,17 +79,22 @@ if ($shutdown) {
 	die $POE::Component::IKC::ClientLite::error unless defined $result;
 	$remote->disconnect;
 	undef $remote;
-} elsif ($ping) {
+}
+elsif ($ping) {
 	my $res = ping();
 	print "Spectre is Alive!\n" unless $res;
 	print "Spectre is not responding.\n".$res if $res;
-} elsif ($status) {
+}
+elsif ($status) {
 	print getStatusReport();
-} elsif ($test) {
+}
+elsif ($test) {
 	Spectre::Admin->runTests($config);
-} elsif ($run) {
+}
+elsif ($run) {
 	Spectre::Admin->new($config, $debug);
-} elsif ($daemon) {
+}
+elsif ($daemon) {
     if (!ping()) {
         die "Spectre is already running.\n";
     }
@@ -140,9 +149,9 @@ spectre - WebGUI's workflow and scheduling.
 
 =head1 SYNOPSIS
 
- spectre {--daemon|--run} [--debug]
+ spectre {--daemon | --start | --run} [--debug]
 
- spectre --shutdown
+ spectre --shutdown | --stop
 
  spectre --ping
 
@@ -199,10 +208,18 @@ where B<IP-address> is the IP address and B<Port> is the port number
 where Spectre should be listening for connections on according to
 B<spectre.conf>.
 
+=item B<--start>
+
+Alias for --daemon.
+
 =item B<--status>
 
 Shows a summary of Spectre's internal status. The summary contains
 a tally of suspended, waiting and running WebGUI Workflows.
+
+=item B<--stop>
+
+Alias for --shutdown.
 
 =item B<--test>
 

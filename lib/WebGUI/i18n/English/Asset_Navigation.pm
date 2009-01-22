@@ -73,31 +73,6 @@ our $I18N = {
 		lastUpdated => 0
 	},
 
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
-	'' => {
-		message => '',
-		lastUpdated => 0
-	},
-
 	'32' => {
 		message => q|Show unprivileged pages|,
 		lastUpdated => 1077080845
@@ -273,8 +248,8 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page_loop' => {
-		message => q|A loop containing pages in nested, hierarchical order.|,
-		lastUpdated => 1149394665,
+		message => q|A loop containing pages in nested, hierarchical order.  Every property of each page is available.  A handfull of them are listed below.  Please consult the template variables for each Asset type for a full list.|,
+		lastUpdated => 1221602778,
 	},
 
 	'page.assetId' => {
@@ -528,9 +503,11 @@ the Navigation Template to determine who can see them in the menu.</p>
 	'1097' => {
 		message => q|<p>These variables are available in Navigation Templates:</p>
 <p><b>currentPage</b> refers to the page that the user is currently looking at. <b>page</b> refers to any
-given page inside of the <b>page_loop</b></p>
+given page inside of the <b>page_loop</b></p>.
+<p>When referring to a page every Asset property is available.  Only the most useful
+ones are listed below.</p>
 	|,
-		lastUpdated => 1163720438,
+		lastUpdated => 1221602772,
 	},
 
 	'mimeType' => {
@@ -610,6 +587,12 @@ be useful, others may not.|,
 	'reversePageLoop' => {
 		message => q|Whether or not the Navigation has been configured to display Assets depth first, instead of top to bottom.|,
 		lastUpdated => 1164841201,
+	},
+
+	'Where do you want to go?' => {
+		message => q|Where do you want to go?|,
+		context => q|i18n label for the drop down nav, asking the user which link they want to visit.|,
+		lastUpdated => 1229580897,
 	},
 
 };

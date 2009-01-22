@@ -82,7 +82,7 @@ sub execute {
 	my $versionTag = shift;
     my $session    = $self->session;
 	my $urlOfSingleAsset = "";
-	
+
     #By default, we'll make it so that things happen now.
     my $time = $session->datetime->time();
     
@@ -104,8 +104,8 @@ sub execute {
     if($now->epoch >= $dt->epoch) {
         return $self->COMPLETE;
     }
-    
-    return $self->WAITING;
+        
+    return $self->WAITING($dt->epoch - $now->epoch);
 }
 
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -8,7 +10,8 @@
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-our ($webguiRoot);
+$|++; # disable output buffering
+our ($webguiRoot, $configFile, $help, $man);
 
 BEGIN {
     $webguiRoot = "..";
@@ -21,24 +24,27 @@ use Getopt::Long;
 use WebGUI::Session;
 
 # Get parameters here, including $help
+GetOptions(
+    'configFile=s'  => \$configFile,
+    'help'          => \$help,
+    'man'           => \$man,
+);
 
-pod2usage( verbose => 2 ) if $help;
-pod2usage() unless $help;  # Change condition!
+pod2usage( verbose => 1 ) if $help;
+pod2usage( verbose => 2 ) if $man;
+pod2usage( msg => "Must specify a config file!" ) unless $configFile;  
 
-my $session = start();
+my $session = start( $webguiRoot, $configFile );
 # Do your work here
 finish($session);
 
-#-------------------------------------------------
+#----------------------------------------------------------------------------
 # Your sub here
 
-#-------------------------------------------------
+#----------------------------------------------------------------------------
 sub start {
-    my $configFile;
-    $| = 1; #disable output buffering
-    GetOptions(
-        'configFile=s' => \$configFile,
-    );
+    my $webguiRoot  = shift;
+    my $configFile  = shift;
     my $session = WebGUI::Session->open($webguiRoot,$configFile);
     $session->user({userId=>3});
     
@@ -52,7 +58,7 @@ sub start {
     return $session;
 }
 
-#-------------------------------------------------
+#----------------------------------------------------------------------------
 sub finish {
     my $session = shift;
     
@@ -83,6 +89,10 @@ utility - A template for WebGUI utility scripts
 
 This WebGUI utility script helps you...
 
+=head1 ARGUMENTS
+
+=head1 OPTIONS
+
 =over
 
 =item B<--configFile config.conf>
@@ -93,7 +103,11 @@ This parameter is required.
 
 =item B<--help>
 
-Shows this documentation, then exits.
+Shows a short summary and usage
+
+=item B<--man>
+
+Shows this document
 
 =back
 
@@ -102,3 +116,5 @@ Shows this documentation, then exits.
 Copyright 2001-2008 Plain Black Corporation.
 
 =cut
+
+#vim:ft=perl

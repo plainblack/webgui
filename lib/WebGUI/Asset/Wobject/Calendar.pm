@@ -425,14 +425,9 @@ sub canAddEvent {
                 : $self->session->user
                 ;
 
-    # Events can only be added after the Calendar has been committed once
-    return 0 if (
-        $self->get("status") ne "approved"
-        && $self->getTagCount <= 1
-    );
-            
-    return 1 if (        
+    return 1 if (
         $user->isInGroup( $self->get("groupIdEventEdit") ) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 
@@ -460,34 +455,6 @@ sub createSubscriptionGroup {
     });
 
     return undef;
-}
-
-#----------------------------------------------------------------------------
-
-=head2 duplicate ( )
-
-Duplicates an Event Calendar. Duplicates all the events in this Event Calendar.
-
-=cut
-
-sub duplicate {
-    my $self        = shift;
-    
-    # Superclass duplicates the calendar
-    my $newCalendar = $self->SUPER::duplicate(@_);
-    
-    # Duplicate the events in this calendar
-    my $events = $self->getLineage(["descendants"], {
-            returnObjects       => 1,
-            includeOnlyClasses  => ['WebGUI::Asset::Event'],
-        });
-    
-    for my $event (@{ $events }) {
-        my %eventProperties = %{ $event->get() };
-        $newCalendar->addChild(\%eventProperties);
-    }
-    
-    return $newCalendar;
 }
 
 #----------------------------------------------------------------------------
@@ -617,35 +584,41 @@ sub getEditForm {
     
     </script>
 ENDJS
-    
-    
-    $tab->raw(<<'ENDHTML');
-    <label for="addFeed">Add a feed</label>
+
+
+    my $addFeed = $i18n->get('Add a feed');
+    my $add     = $i18n->get('Add');
+    my $feedUrl = $i18n->get('Feed URL');
+    my $status  = $i18n->get('434', 'WebGUI');
+    my $lastUpdated  = $i18n->get('454', 'WebGUI');
+    $tab->raw(<<"ENDHTML");
+    <label for="addFeed">$addFeed</label>
     <input type="text" size="60" id="addFeed" name="addFeed" value="" />
-    <input type="button" value="Add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
+    <input type="button" value="$add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
     
     <table id="feeds" style="width: 100%;">
     <thead>
         <th style="width: 30px;">&nbsp;</th>
-        <th style="width: 50%;">Feed URL</th>
-        <th>Status</th>
-        <th>Last Updated</th>
+        <th style="width: 50%;">$feedUrl</th>
+        <th>$status</th>
+        <th>$lastUpdated</th>
         <th>&nbsp;</th>
     </thead>
     </table>
 ENDHTML
-    
-    
-    
+
+
+
     # Add the existing feeds
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
     for my $feedId (keys %$feeds) {
-        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".encode_json($feeds->{$feedId}).");\n");
+        my %row = %{ $feeds->{ $feedId } };
+        $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
     }
     $tab->raw('</script>');
-    
-    
+
+
     $tab->raw("</td></tr>");
     return $form;
 }
@@ -1909,13 +1882,15 @@ sub www_ical {
         # Summary (the title)
         # Wrapped at 75 columns
         $ical   .= $self->wrapIcal("SUMMARY:".$event->get("title"))."\r\n";
-                
+
         # Description (the text)
         # Wrapped at 75 columns
         $ical   .= $self->wrapIcal("DESCRIPTION:".$event->get("description"))."\r\n";
-        
-        
-        
+
+        # Location (the text)
+        # Wrapped at 75 columns
+        $ical   .= $self->wrapIcal("LOCATION:".$event->get("location"))."\r\n";
+
         # X-WEBGUI lines
         if ($event->get("groupIdView")) {
             $ical   .= "X-WEBGUI-GROUPIDVIEW:".$event->get("groupIdView")."\r\n";
@@ -1925,11 +1900,11 @@ sub www_ical {
         }
         $ical   .= "X-WEBGUI-URL:".$event->get("url")."\r\n";
         $ical   .= "X-WEBGUI-MENUTITLE:".$event->get("menuTitle")."\r\n"; 
-        
+
         $ical   .= qq{END:VEVENT\r\n};
     }
     # ENDVEVENT
-    
+
     $ical       .= qq{END:VCALENDAR\r\n};
     
     
@@ -2089,14 +2064,9 @@ sub www_search {
         });
 
     # This is very bad! It should be $self->processStyle or whatnot.
-    $self->session->http->sendHeader;
-    my $template    = WebGUI::Asset::Template->new($self->session,$self->get("templateIdSearch"));
-    my $style = $self->session->style->process("~~~",$self->get("styleTemplateId"));
-    my ($head, $foot) = split("~~~",$style);
-    $self->session->output->print($head, 1);
-    $self->session->output->print($self->processTemplate($var, undef, $template));
-    $self->session->output->print($foot, 1);
-    return "chunked";
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->get('templateIdSearch') )
+    );
 }
 
 #----------------------------------------------------------------------------

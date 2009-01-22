@@ -35,6 +35,8 @@
         require: ['reset-fonts-grids', 'utilities', 'logger', 'button', 'container', 'tabview', 'selector', 'resize', 'layout'],
         rollup: true,
         onSuccess: function() {
+            //Use the DD shim on all DD objects
+            YAHOO.util.DDM.useShim = true;
             //Load the global CSS file.
             YAHOO.log('Main files loaded..', 'info', 'main.js');
             YAHOO.util.Get.css('assets/css/example1.css');
@@ -65,6 +67,7 @@
                     YAHOO.util.Get.script('assets/js/buttons.js');
                     YAHOO.util.Get.script('assets/js/calendar.js');
                 }, 0);
+                YAHOO.example.app.layout.getUnitByPosition('right').collapse();
                 YAHOO.util.Dom.setStyle(document.body, 'visibility', 'visible');
                 setTimeout(function() {
                     YAHOO.example.app.layout.resize();

@@ -235,7 +235,6 @@ sub www_editVersionTag {
 		$f->workflow(
 			value=>$workflowId,
 			type=>"WebGUI::VersionTag",
-            includeRealtime=>1,
 			);
 		$f->group(
 			value=>[$groupId],
@@ -452,6 +451,13 @@ sub www_commitVersionTagConfirm {
 }
 
 #-------------------------------------------------------------------
+sub www_leaveVersionTag {
+    my $session = shift;
+    WebGUI::VersionTag->getWorking($session)->clearWorking;
+    return www_manageVersions($session);
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_manageCommittedVersions ( session )
 
@@ -544,37 +550,39 @@ sub www_manageVersions {
         return $session->privilege->insufficient() unless canView($session);
         my $ac = WebGUI::AdminConsole->new($session,"versions");
 	my $i18n = WebGUI::International->new($session,"VersionTag");
-	$ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
-	$ac->addSubmenuItem($session->url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
-	$ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
+    my ($icon, $url, $datetime, $user) = $session->quick(qw(icon url datetime user));
+	$ac->addSubmenuItem($url->page('op=editVersionTag'), $i18n->get("add a version tag"));
+	$ac->addSubmenuItem($url->page('op=managePendingVersions'), $i18n->get("manage pending versions")) if canView($session);
+	$ac->addSubmenuItem($url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
 	my ($tag,$workingTagId) = $session->db->quickArray("select name,tagId from assetVersionTag where tagId=?",[$session->scratch->get("versionTag")]);
 	$tag ||= "None";
 	my $rollback = $i18n->get("rollback");
 	my $commit = $i18n->get("commit");
 	my $setTag = $i18n->get("set tag");
+    my $leave = ($workingTagId eq "") ? "" : '<a href="'.$url->page('op=leaveVersionTag').'">['.$i18n->get("leave this tag").']</a>';
 	my $rollbackPrompt = $i18n->get("rollback version tag confirm");
 	my $commitPrompt = $i18n->get("commit version tag confirm");
-	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>.</p><table width="100%" class="content">
+	my $output = '<p>'.$i18n->get("current tag is called").': <b>'.$tag.'</b>. '.$leave.'</p><table width="100%" class="content">
 	<tr><th></th><th>'.$i18n->get("version tag name").'</th><th>'.$i18n->get("created on").'</th><th>'.$i18n->get("created by").'</th><th></th></tr> ';
 	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($session)}) {	
-		next unless ($session->user->isInGroup($tag->get("groupToUse")));
+		next unless ($user->isInGroup($tag->get("groupToUse")));
 		my $u = WebGUI::User->new($session,$tag->get("createdBy"));
 		$output .= '<tr>
 			<td>';
         if (canView($session)) {
-				$output .= $session->icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
+				$output .= $icon->delete("op=rollbackVersionTag;tagId=".$tag->getId,undef,$rollbackPrompt);
         }
-        $output .= $session->icon->edit("op=editVersionTag;tagId=".$tag->getId)
+        $output .= $icon->edit("op=editVersionTag;tagId=".$tag->getId)
 			.'</td>
-			<td><a href="'.$session->url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
-			<td>'.$session->datetime->epochToHuman($tag->get("creationDate")).'</td>
+			<td><a href="'.$url->page("op=manageRevisionsInTag;tagId=".$tag->getId).'">'.$tag->get("name").'</a></td>
+			<td>'.$datetime->epochToHuman($tag->get("creationDate")).'</td>
 			<td>'.$u->username.'</td>
 			<td>';
 		unless ($workingTagId eq $tag->getId) {
-			$output .= '<a href="'.$session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId).'">'.$setTag.'</a> | ';
+			$output .= '<a href="'.$url->page("op=setWorkingVersionTag;tagId=".$tag->getId).'">'.$setTag.'</a> | ';
 		}
 		$output .='
-			<a href="'.$session->url->page("op=commitVersionTag;tagId=".$tag->getId).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
+			<a href="'.$url->page("op=commitVersionTag;tagId=".$tag->getId).'" onclick="return confirm(\''.$commitPrompt.'\');">'.$commit.'</a></td></tr>';
 	}
 	$output .= '</table>';
 	return $ac->render($output);
@@ -602,20 +610,40 @@ sub www_manageRevisionsInTag {
     my $tag     = WebGUI::VersionTag->new($session, $tagId);
     return www_manageVersions( $session ) unless $tag;
     
+    my $i18n    = WebGUI::International->new($session,"VersionTag");
+
     ### Permissions check
     # This screen is also used to approve/deny the tag, so check that first
     if ( !canApproveVersionTag( $session, $tag ) && !canViewVersionTag( $session, $tag ) ) {
-        return $session->privilege->insufficient;
+        if ( $session->user->isVisitor ) {
+            return $session->privilege->noAccess;
+        }
+        else {
+            # Return a nice error message, since people are getting confused when they try 
+            # to approve a tag that's already approved
+            my $html    = '<h1>%s</h1>' . "\n"
+                        . '<p>%s</p>' . "\n"
+                        . q{<p><a href="%s">%s</a></p>} . "\n"
+                        ;
+
+            return $session->style->userStyle(
+                sprintf $html, 
+                    $i18n->get( "error permission www_manageRevisionsInTag title" ),
+                    $i18n->get( "error permission www_manageRevisionsInTag body" ),
+                    $session->url->getSiteURL,
+                    $i18n->get( "back to site" ),
+                );
+        }
     }
 
     my $ac      = WebGUI::AdminConsole->new($session,"versions");
-    my $i18n    = WebGUI::International->new($session,"VersionTag");
     $ac->addSubmenuItem($session->url->page('op=editVersionTag'), $i18n->get("add a version tag"));
     $ac->addSubmenuItem($session->url->page('op=manageCommittedVersions'), $i18n->get("manage committed versions")) if canView($session);
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
 
     # Process any actions
-    if ( $session->form->get('action') eq "purge" ) {
+    my $action = lc $session->form->get('action');
+    if ( $action eq "purge" ) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -630,7 +658,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $session->form->get('action') eq "move" ) {
+    elsif ( $action eq "move to:" ) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -658,7 +686,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $session->form->get('action') eq "update" ) {
+    elsif ( $action eq "update version tag" ) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -719,6 +747,10 @@ sub www_manageRevisionsInTag {
         ( getVersionTagOptions( $session ) ),
     );
 
+    ##Setup valid times for the datetime range form
+    my $filterStartTime = defined $tag->get('startTime') ? $tag->get('startTime') : '1970-01-17 05:00:00';
+    my $filterEndTime   = defined $tag->get('endTime')   ? $tag->get('endTime')   : time();
+
     # Output the revisions
     ### FIXME: Users who only pass canApproveVersionTag() and not canViewVersionTag() should
     # probably not be allowed to see the Actions or modify the Start and End dates
@@ -732,23 +764,23 @@ sub www_manageRevisionsInTag {
         . $i18n->get('startTime label').':&nbsp;'
         . WebGUI::Form::dateTime($session, {
             name  =>"startTime",
-            value => WebGUI::DateTime->new($session,$tag->get("startTime"))->epoch,
+            value => WebGUI::DateTime->new($session,$filterStartTime)->epoch,
         })
         . '<br />'.$i18n->get('endTime label').':&nbsp;'
         . WebGUI::Form::dateTime($session,{
             name  =>"endTime",
-            value => WebGUI::DateTime->new($session,$tag->get("endTime"))->epoch,
+            value => WebGUI::DateTime->new($session,$filterEndTime)->epoch,
         })
         . '<br />'
-        . '<button name="action" value="update">' . $i18n->get('manageRevisionsInTag update') . '</button>'
+        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
         . '</td>'
         . '</tr>'
         . '<tr><td colspan="5">&nbsp;</td></tr>'
         . '<tr>'
         . '<td colspan="5">'
         . $i18n->get("manageRevisionsInTag with selected")
-        . '<button name="action" value="purge" class="red">' . $i18n->get('manageRevisionsInTag purge') . '</button>'
-        . '<button name="action" value="move">' . $i18n->get("manageRevisionsInTag move") . '</button>'
+        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
+        . '<input type="submit" name="action" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
         . WebGUI::Form::SelectBox( $session, {
             name        => 'moveToTagId',
             options     => \%moveToTagOptions,

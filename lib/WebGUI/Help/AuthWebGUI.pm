@@ -72,7 +72,8 @@ our $HELP = {
         title     => 'recovery template title',
         body      => '',
         variables => [
-            { 'name' => 'title', },
+            { 'name' => 'title',    },
+            { 'name' => 'subtitle', },
             {   'name'        => 'recoverFormHeader',
                 'description' => 'recover.form.header',
             },

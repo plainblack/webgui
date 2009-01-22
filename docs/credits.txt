@@ -44,7 +44,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Tony Mountifield
                                      Kaleb Murphy / Plain Black
                                      Chris Nehren / Plain Black
-                                     Ernesto Hernandez Novich
+                                     Ernesto Hernández-Novich / itverx C.A.
                                      Tavis Parker / Plain Black
                                      Daniel Quinlan
                                      Jukka Raimovaara / Axxion Oy
@@ -65,9 +65,10 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
                                      Tabitha Zipperer / Plain Black
+                                     Henry Tang / Long Term Results B.V.
 
 The following are people/companies who didn't directly contribute
-to WebGUI, but who's work has made WebGUI possible:
+to WebGUI, but whose work has made WebGUI possible:
 
 
 Perl.................................Larry Wall / O'Reilly

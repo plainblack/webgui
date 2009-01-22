@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 11;
+my $tests = 14;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 my $storage;
+my ($driver, $cart, $car);
 
 SKIP: {
 
@@ -248,9 +249,84 @@ undef $driver;
 #
 #######################################################################
 
+$car = WebGUI::Asset->getImportNode($session)->addChild({
+    className          => 'WebGUI::Asset::Sku::Product',
+    title              => 'Automobiles',
+    isShippingRequired => 1,
+});
+
+my $crappyCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => '1987 Ford Escort',
+        varSku    => 'crappy-car',
+        price     => 600,
+        weight    => 1500,
+        quantity  => 5,
+    }
+);
+
+my $goodCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => '2004 Honda MPV minivan',
+        varSku    => 'used van',
+        price     => 15_000,
+        weight    => 2000,
+        quantity  => 15,
+    }
+);
+
+my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'Cadillac XLR-V',
+        varSku    => 'nice-car',
+        price     => 90_000,
+        weight    => 3000,
+        quantity  => 3,
+    }
+);
+
+$options = {
+    label   => 'flat rate, ship weight',
+    enabled => 1,
+    flatFee => 1.00,
+    percentageOfPrice => 0,
+    pricePerWeight    => 100,
+    pricePerItem      => 10,
+};
+
+$driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
+
+my $cart = WebGUI::Shop::Cart->newBySession($session);
+
+$car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
+is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
+
+$car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
+is($driver->calculate($cart), 4521, 'calculate by weight, perItem and flat fee work for two items');
+
+$options = {
+    label   => 'percentage of price',
+    enabled => 1,
+    flatFee => 0.00,
+    percentageOfPrice => 1/3*100,
+    pricePerWeight    => 0,
+    pricePerItem      => 0,
+};
+$driver->update($options);
+is($driver->calculate($cart), 30_200, 'calculate by percentage of price');
+
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    if (defined $driver and ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
+        $driver->delete;
+    }
+    if (defined $cart and ref $cart eq 'WebGUI::Shop::Cart') {
+        $cart->delete;
+    }
+    if (defined $car and (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
+        $car->purge;
+    }
 }

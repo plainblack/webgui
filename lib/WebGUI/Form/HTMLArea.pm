@@ -275,7 +275,7 @@ JS
         if ($child->isa('WebGUI::Asset::File::Image')) {
             $output .= '<a href="#" class="selectLink" onclick="selectImage(\''
                 . ($useAssetUrls ? $child->getUrl : $child->getFileUrl) . '\',\''
-                . $session->url->getSiteURL . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail')
+                . $session->url->gateway($child->get('url'), 'op=formHelper;class=HTMLArea;sub=viewThumbnail')
                 . '\'); return false;">[' . $i18n->get("select", 'WebGUI') . ']</a>';
         }
         else {

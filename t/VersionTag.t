@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::VersionTag;
-use Test::More tests => 34; # increment this value for each test you create
+use Test::More tests => 60; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -29,6 +29,65 @@ sub ok_open {
 
 sub getWorking { WebGUI::VersionTag->getWorking($session, @_) }
 sub getWorkingId { my $w = getWorking(@_); defined($w)? $w->getId : undef }
+
+# versionTagMode support. Test that setting version tag mode works. Also, make
+# sure that the versionTagMode is in multiPerUser before running the test below.
+
+sub setSiteVersionTagMode {
+    my ($session, $newMode) = @_;
+
+    $session->setting()->set(q{versionTagMode}, $newMode);
+
+    return;
+} #setSiteVersionTagMode
+
+sub setUserVersionTagMode {
+    my ($user, $newMode) = @_;
+
+    $user->profileField(q{versionTagMode}, $newMode);
+
+    return;
+} #setUserVersionTagMode
+
+can_ok(
+    q{WebGUI::VersionTag},
+    q{getVersionTagMode},
+);
+
+my $user = $session->user();
+
+setSiteVersionTagMode($session, q{multiPerUser});
+setUserVersionTagMode($user, q{inherited});
+
+is (
+    WebGUI::VersionTag->getVersionTagMode($session),
+    q{multiPerUser},
+    q{versionTagMode: both site and user setting multiPerUser},
+);
+
+setUserVersionTagMode($user, q{singlePerUser});
+
+is (
+    WebGUI::VersionTag->getVersionTagMode($session),
+    q{singlePerUser},
+    q{versionTagMode: user setting singlePerUser overrides site setting},
+);
+
+setSiteVersionTagMode($session, q{autoCommit});
+
+is (
+    WebGUI::VersionTag->getVersionTagMode($session),
+    q{singlePerUser},
+    q{versionTagMode: update site setting doesn't update user setting},
+);
+
+setUserVersionTagMode($user, q{multiPerUser});
+
+is (
+    WebGUI::VersionTag->getVersionTagMode($session),
+    q{multiPerUser},
+    q{versionTagMode: update user setting to multiPerUser},
+);
 
 my $tag = WebGUI::VersionTag->create($session, {});
 isa_ok($tag, 'WebGUI::VersionTag', 'empty tag');
@@ -104,6 +163,95 @@ $tag4->clearWorking;
 $tag3->rollback;
 $tag4->rollback;
 ($asset1, $asset2, $asset3, $tag3, $tag4) = ();
+
+#additional tests for versionTagMode
+# 
+
+setSiteVersionTagMode($session, q{singlePerUser});
+setUserVersionTagMode($user, q{inherited});
+
+ok(!defined getWorking(1), 'versionTagMode singlePerUser: no working tag initially present');
+
+$tag = WebGUI::VersionTag->create($session, {});
+isa_ok($tag, 'WebGUI::VersionTag', 'versionTagMode singlePerUser: empty tag');
+ok(defined $tag->getId, 'versionTagMode singlePerUser: empty tag has an ID');
+ok(!$tag->get(q{isSiteWide}), 'versionTagMode singlePerUser: empty is not site wide');
+
+my $userTagId = $tag->getId();
+my $userTag; # user tag in singlePerUser;
+my $siteWideTagId;
+my $siteWideTag;
+
+$tag->clearWorking();
+
+ok(defined ($userTag = getWorking(1)), 'versionTagMode singlePerUser: reclaim version tag after clearWorking');
+is ($userTag->getId(), $userTagId, q{versionTagMode singlePerUser:  reclaimed version tag has same id});
+
+
+#switch to sitewide mode
+
+$userTag->clearWorking();
+
+setSiteVersionTagMode($session, q{siteWide});
+
+ok(!defined ($siteWideTag = getWorking(1)), 'versionTagMode siteWide: no working tag initially present');
+
+$siteWideTag = getWorking(); #force create
+isa_ok($siteWideTag, 'WebGUI::VersionTag', 'versionTagMode siteWide: empty tag');
+ok($siteWideTag->get(q{isSiteWide}), 'versionTagMode ssiteWide: empty is site wide');
+
+ok(defined ($siteWideTagId = $siteWideTag->getId()), 'versionTagMode siteWide: empty tag has an ID');
+
+ok($siteWideTag->getId() ne $userTagId, 'versionTagMode siteWide: siteWide tag has different version tag id');
+
+$siteWideTag->clearWorking();
+
+my $asset4 = WebGUI::Asset->getRoot($session)->addChild({ className => 'WebGUI::Asset::Snippet' });
+
+ok(defined ($siteWideTag = getWorking(1)), 'versionTagMode siteWide: reclaim version tag after clearWorking and addding new asset');
+
+is($siteWideTag->getId(), $siteWideTagId, 'versionTagMode siteWide: reclaim site wide version tag has correct id');
+
+
+## Through in a new session as different user
+my $admin_session = WebGUI::Session->open($WebGUI::Test::WEBGUI_ROOT, $WebGUI::Test::CONFIG_FILE);
+$admin_session->user({'userId' => 3});
+
+setUserVersionTagMode($admin_session->user(), q{singlePerUser});
+
+my $adminUserTag = WebGUI::VersionTag->getWorking($admin_session, 0);
+isa_ok($adminUserTag, 'WebGUI::VersionTag', 'versionTagMode siteWide + admin singlePerUser: empty tag');
+ok(defined $adminUserTag->getId(), 'versionTagMode siteWide + admin singlePerUser: empty tag has an ID');
+ok(!$adminUserTag->get(q{isSiteWide}), 'versionTagMode siteWide + admin singlePerUser: empty is not site wide');
+ok($adminUserTag->getId() ne $userTagId, 'versionTagMode siteWide + admin singlePerUser: empty has different ID');
+ok($adminUserTag->getId() ne $siteWideTagId, 'versionTagMode siteWide + admin singlePerUser: empty has different ID than site wide');
+
+# Now switch to site wide
+
+$adminUserTag->clearWorking();
+
+setUserVersionTagMode($admin_session->user(), q{inherited});
+
+my $adminSiteWideTag = WebGUI::VersionTag->getWorking($admin_session, 0);
+
+isa_ok($adminSiteWideTag, 'WebGUI::VersionTag', 'versionTagMode siteWide + admin inherited: reclaimed empty tag');
+ok($adminSiteWideTag->get(q{isSiteWide}), 'versionTagMode siteWide + admin inherited: empty is site wide');
+ok($adminSiteWideTag->getId() eq $siteWideTagId, 'versionTagMode siteWide + admin inherited: empty has same ID as site wide');
+
+
+$admin_session->var()->end();
+$admin_session->close();
+
+
+
+$userTag->rollback();
+$siteWideTag->rollback();
+$adminUserTag->rollback();
+
+#reset (just in case other tests depends on this setting)
+setSiteVersionTagMode($session, q{multiPerUser});
+setUserVersionTagMode($user, q{inherited});
+
 
 # Local variables:
 # mode: cperl

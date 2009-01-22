@@ -17,6 +17,7 @@ package WebGUI::AdminConsole;
 use strict;
 use WebGUI::International;
 use WebGUI::Asset::Template;
+use WebGUI::Macro;
 use WebGUI::VersionTag;
 
 =head1 NAME
@@ -47,52 +48,6 @@ These methods are available from this class:
 
 =cut
 
-#-------------------------------------------------------------------
-
-=head2 _formatFunction ( function )
-
-Returns a Hash of title, icon, url, and canUse. title is the Internationalized title of the function. icon is the function icon, currently in extras/adminConsole/. url is current page with func= or op= depending on if the function is a function or operation. canUse checks if the current user is in the function group.
-
-=head3 function
-
-A hash ref to a function. Required.
-
-=cut
-
-sub _formatFunction {
-	my $self = shift;
-	my $function = shift;
-	my $url;
-    if ($function->{url}) {
-        $url = $function->{url};
-	} 
-    elsif (exists $function->{func}) {
-		$url = $self->session->url->page("func=".$function->{func});
-	} 
-    else {
-		$url = $self->session->url->page("op=".$function->{op});
-	}
-	my $i18n = WebGUI::International->new($self->session);
-
-    # Determine if the user can use this control
-    my $canUse  = 0;
-    if ($function->{class} && $function->{class}->can('canView')) {
-        eval { require $function->{class}; };
-        $canUse = $function->{class}->can('canView')->($self->session);
-    }
-    else {
-        $canUse = $self->session->user->isInGroup( $function->{group} );
-    }
-        
-	return {
-		title           => $i18n->get($function->{title}{id}, $function->{title}{namespace}),
-		icon            => $self->session->url->extras("/adminConsole/".$function->{icon}),
-		'icon.small'    => $self->session->url->extras("adminConsole/small/".$function->{icon}),
-		url             => $url,
-		canUse          => $canUse,
-		isCurrentOpFunc => ($self->session->form->process("op") eq $function->{op} || $self->session->form->process("func") eq $function->{func})
-	};
-}
 
 #-------------------------------------------------------------------
 
@@ -183,260 +138,67 @@ sub getAdminConsoleParams {
 
 #-------------------------------------------------------------------
 
-=head2 getAdminFunction ( [id, testing] )
+=head2 getAdminFunction ( )
 
-Returns _formatFunction list of available AdminFunctions.
-
-=head3 id
-
-If present, returns a _formatFunction hash based upon the given parameter.
-
-=head3 testing
-
-If true, then getAdminFunction will return the internal hash for i18n, icon and
-other tests.
+Returns an array reference of available AdminFunctions.
 
 =cut
 
 sub getAdminFunction {
 	my $self = shift;
-	my $id = shift;
 	my $testing = shift;
-	my $functions = {		# at some point in the future we'll need to make this pluggable/configurable
-		"spectre" => {
-			title => {
-				id          => "spectre",
-				namespace   => "Spectre",
-			},
-			icon    => "spectre.gif",
-			op      => "spectreStatus",
-            class   => "WebGUI::Operation::Spectre",
-		},
-		"assets" => {
-			title   => {
-				id          => "assets",
-				namespace   => "Asset",
-			},
-			icon    => "assets.gif",
-			op      => "assetManager",
-			group   => "12",
-		},
-		"versions" => {
-			title => {
-				id          => "version tags",
-				namespace   => "VersionTag",
-			},
-			icon    => "versionTags.gif",
-			op      => "manageVersions",
-            class   => "WebGUI::Operation::VersionTag",
-		},
-		"workflow" => {
-			title => {
-				id          => "topicName",
-				namespace   => "Workflow",
-			},
-			icon    => "workflow.gif",
-			op      => "manageWorkflows",
-            class   => 'WebGUI::Operation::Workflow',
-		},
-		"adSpace" => {
-			title => {
-				id          => "topicName",
-				namespace   => "AdSpace",
-			},
-			icon    => "advertising.gif",
-			op      => "manageAdSpaces",
-            class   => 'WebGUI::Operation::AdSpace',
-		},
-		"cron" => {
-			title => {
-				id          => "topicName",
-				namespace   => "Workflow_Cron",
-			},
-			icon    => "cron.gif",
-			op      => "manageCron",
-            class   => 'WebGUI::Operation::Cron',
-		},
-		"users" => {
-			title => {
-				id          => "149",
-				namespace   => "WebGUI",
-			},
-			icon    => "users.gif",
-			op      => "listUsers",
-            class   => 'WebGUI::Operation::User',
-		},
-		"clipboard" => {
-			title => {
-				id          => "948",
-				namespace   => "WebGUI",
-			},
-			icon    => "clipboard.gif",
-			func    => "manageClipboard",
-			group   => "12",
-		},
-		"trash" => {
-			title => {
-				id          => "trash",
-				namespace   => "WebGUI",
-			},
-			icon    => "trash.gif",
-			func    => "manageTrash",
-			group   => "12",
-		},
-		"databases" => {
-			title => {
-				id          => "databases",
-				namespace   => "WebGUI",
-			},
-			icon    => "databases.gif",
-			op      => "listDatabaseLinks",
-            class   => 'WebGUI::Operation::DatabaseLink',
-		},
-		"ldapconnections" => {
-			title => {
-				id          => "ldapconnections",
-				namespace   => "AuthLDAP",
-			},
-			icon    => "ldap.gif",
-			op      => "listLDAPLinks",
-            class   => 'WebGUI::Operation::LDAPLink',
-		},
-		"groups" => {
-			title => {
-				id          => "89",
-				namespace   => "WebGUI",
-			},
-			icon    => "groups.gif",
-			op      => "listGroups",
-			class   => 'WebGUI::Operation::Group',
-		},
-		"settings" => {
-			title => {
-				id          => "settings",
-				namespace   => "WebGUI",
-			},
-			icon    => "settings.gif",
-			op      => "editSettings",
-			class   => 'WebGUI::Operation::Settings',
-		},
-		"help" => {
-			title => {
-				id          => "help",
-				namespace   => "WebGUI",
-			},
-			icon    => "help.gif",
-			op      => "viewHelpIndex",
-            class   => 'WebGUI::Operation::Help',
-		},
-		"statistics" => {
-			title => {
-				id          => "437",
-				namespace   => "WebGUI",
-			},
-			icon    => "statistics.gif",
-			op      => "viewStatistics",
-            class   => 'WebGUI::Operation::Statistics',
-		},
-		"contentProfiling" => {
-			title => {
-				id          => "content profiling",
-				namespace   => "Asset",
-			},
-			icon    => "contentProfiling.gif",
-			func    => "manageMetaData",
-			group   => "4",
-		},
-		"contentFilters" => {
-			title => {
-				id          => "content filters",
-				namespace   => "WebGUI",
-			},
-			icon    => "contentFilters.gif",
-			op      => "listReplacements",
-            class   => 'WebGUI::Operation::Replacements',
-		},
-		"userProfiling" => {
-			title => {
-				id          => "user profiling",
-				namespace   => "WebGUIProfile",
-			},
-			icon    => "userProfiling.gif",
-			op      => "editProfileSettings",
-            class   => 'WebGUI::Operation::ProfileSettings',
-		},
-		"loginHistory" => {
-			title => {
-				id          => "426",
-				namespace   => "WebGUI",
-			},
-			icon    => "loginHistory.gif",
-			op      => "viewLoginHistory",
-            class   => 'WebGUI::Operation::LoginHistory',
-		},
-		"inbox" => {
-			title => {
-				id          => "159",
-				namespace   => "WebGUI",
-			},
-			icon    => "inbox.gif",
-			op      => "viewInbox",
-			group   => "2",
-		},
-		"activeSessions" => {
-			title => {
-				id          => "425",
-				namespace   => "WebGUI",
-			},
-			icon    => "activeSessions.gif",
-			op      => "viewActiveSessions",
-            class   => 'WebGUI::Operation::ActiveSessions',
-		},
-		"shop" => {
-			title => {
-				id          => "shop",
-				namespace   => "Shop",
-			},
-			icon    => "shop.gif",
-			url      => $self->session->url->page("shop=admin"),
-            group   => $self->session->setting->get('groupIdAdminCommerce'),
-		},
-		"cache" => {
-            title => {
-                id          => "manage cache",
-                namespace   => "WebGUI",
-            },
-            icon    => "cache.gif",
-            op      => "manageCache",
-            class   => 'WebGUI::Operation::Cache',
-        },
-		"graphics" => {
-			title => {
-				id          => "manage graphics",
-				namespace   => "Graphics",,
-			},
-			icon    => "graphics.gif",
-			op      => "listGraphicsOptions",
-            class   => 'WebGUI::Operation::Graphics',
-		},
-	};
-    return $functions if $testing;
-	if ($id) {
-		return $self->_formatFunction($functions->{$id});
-	} 
-    else {
-		my %names;
-		foreach my $id (keys %{$functions}) {
-			my $func = $self->_formatFunction($functions->{$id});
-			$names{$func->{title}} = $func;
+	my $session = $self->session;
+	my ($user, $url, $setting) = $session->quick(qw(user url setting));
+	my $functions = $session->config->get("adminConsole");
+	my %processed;
+	
+	# process the raw information from the config file
+	foreach my $function (keys %{$functions}) {
+		
+		# make title
+		my $title = $functions->{$function}{title};
+		WebGUI::Macro::process($session, \$title);
+		
+		# determine if the user can use this thing
+		my $canUse = 0;
+		if (defined $functions->{$function}{group}) {
+			$canUse = $user->isInGroup($functions->{$function}{group});
 		}
-		my @sorted = sort {$a cmp $b} keys %names;
-		my @list;
-		foreach my $key (@sorted) {
-			push(@list,$names{$key});
+		elsif (defined $functions->{$function}{groupSetting}) {
+			$canUse = $user->isInGroup($setting->get($functions->{$function}{groupSetting}));
 		}
-		return \@list;
+		if ($functions->{$function}{uiLevel} > $user->profileField("uiLevel")) {
+			$canUse = 0;
+		}
+		
+		# build the attributes
+		my %attributes = (
+			title           => $title,
+			icon            => $url->extras("/adminConsole/".$functions->{$function}{icon}),
+			'icon.small'    => $url->extras("adminConsole/small/".$functions->{$function}{icon}),
+			url             => $functions->{$function}{url},
+			canUse          => $canUse,
+		);
+		
+		# set the default function
+		if ($self->{_functionId} eq $function) {
+			$attributes{isCurrentOpFunc} = 1;
+			$self->{_function} = \%attributes;
+		}
+		
+		# build the list of processed items
+		$processed{$title} = \%attributes;
+
 	}
+
+	#sort the functions alphabetically
+	my @list;
+	foreach my $title (sort keys %processed) {
+		push @list, $processed{$title};
+	}
+	
+	# all done
+	return \@list;
 }
 
 #-------------------------------------------------------------------
@@ -451,7 +213,7 @@ A reference to the current session.
 
 =head3 id
 
-If supplied, updates the _function of the AdminFunction.
+If supplied, provides a list of defaults such as title and icons for the admin console.
 
 =cut
 
@@ -462,7 +224,8 @@ sub new {
 	my $self;
 	$self->{_session} = $session;
 	bless $self, $class;
-	$self->{_function} = $self->getAdminFunction($id) if ($id);
+	$self->{_function} = {};
+	$self->{_functionId} = $id;
 	return $self;
 }
 
@@ -484,13 +247,14 @@ sub render {
 	my $self = shift;
 	$self->session->http->setCacheControl("none");
 	my %var;
+	$var{"application_loop"} = $self->getAdminFunction;
 	$var{"application.workarea"} = shift;
 	$var{"application.title"} = shift || $self->{_function}{title};
 	my $i18n = WebGUI::International->new($self->session, "AdminConsole");
 	$var{"backtosite.label"} = $i18n->get("493", "WebGUI");
 	$var{"toggle.on.label"} = $i18n->get("toggle on");
 	$var{"toggle.off.label"} = $i18n->get("toggle off");
-	$var{"application.icon"} = $self->{_function}{icon};
+	$var{"application.icon"} = $self->{_icon} || $self->{_function}{icon};
 	$var{"application.canUse"} = $self->{_function}{canUse};
 	$var{"application.url"} = $self->{_function}{url};
 	if (exists $self->{_submenuItem}) {
@@ -506,26 +270,25 @@ sub render {
         my $workingId = "";
         my @tags = ();
         if ($working) {
-                $workingId = $working->getId;
-                push(@tags, {
-                        url=>$self->session->url->page("op=commitVersionTag;tagId=".$workingId),
-                        title=>$i18n->get("commit my changes","Macro_AdminBar"),
-                        icon=>$self->session->url->extras('adminConsole/small/versionTags.gif')
-                        });
+			$workingId = $working->getId;
+			push(@tags, {
+					url=>$self->session->url->page("op=commitVersionTag;tagId=".$workingId),
+					title=>$i18n->get("commit my changes","Macro_AdminBar"),
+					icon=>$self->session->url->extras('adminConsole/small/versionTags.gif')
+					});
         }
 	foreach my $tag (@{WebGUI::VersionTag->getOpenTags($self->session)}) {
-                next unless $self->session->user->isInGroup($tag->get("groupToUse"));
-                push(@tags, {
-                        url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId),
-                        title=>($tag->getId eq $workingId) ?  '* '.$tag->get("name") : $tag->get("name"),
-                        });
-        }
-        if (scalar(@tags)) {
+		next unless $self->session->user->isInGroup($tag->get("groupToUse"));
+		push(@tags, {
+				url=>$self->session->url->page("op=setWorkingVersionTag;tagId=".$tag->getId),
+				title=>($tag->getId eq $workingId) ?  '* '.$tag->get("name") : $tag->get("name"),
+				});
+	}
+	if (scalar(@tags)) {
 		$var{versionTags} = \@tags;
-        }
+	}
 
     $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
-	$var{"application_loop"} = $self->getAdminFunction;
 	return $self->session->style->process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
 }
 
@@ -597,7 +360,7 @@ sub setIcon {
 	my $self = shift;
 	my $icon = shift;
 	if ($icon) {
-		$self->{_function}{icon} = $icon;
+		$self->{_icon} = $icon;
 	}
 }
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -60,6 +62,22 @@ sub addPackage {
 
     # Make the package not a package anymore
     $package->update({ isPackage => 0 });
+    
+    # Set the default flag for templates added
+    my $assetIds
+        = $package->getLineage( ['self','descendants'], {
+            includeOnlyClasses  => [ 'WebGUI::Asset::Template' ],
+        } );
+    for my $assetId ( @{ $assetIds } ) {
+        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( !$asset ) {
+            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
+            next;
+        }
+        $asset->update( { isDefault => 1 } );
+    }
+
+    return;
 }
 
 #-------------------------------------------------
@@ -104,3 +122,4 @@ sub updateTemplates {
     }
 }
 
+#vim:ft=perl

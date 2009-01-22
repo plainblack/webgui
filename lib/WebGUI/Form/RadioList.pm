@@ -143,7 +143,7 @@ Renders a series of radio buttons.
 
 sub toHtml {
 	my $self = shift;
-	my $output;
+	my $output = '<fieldset style="border:none;margin:0;padding:0">';
 	my $alignment = $self->alignmentSeparator;
 	my $i=0;
     my $options = $self->getOptions;
@@ -160,8 +160,9 @@ sub toHtml {
             checked=>$checked,
             id=>$self->get('name').$i
             })->toHtml;
-            $output .= '<label for="'.$self->get('name').$i.'">'.$options->{$key}."</label>" . $alignment;
+        $output .= '<label for="'.$self->get('name').$i.'">'.$options->{$key}."</label>" . $alignment;
     }
+    $output .= "</fieldset>";
     return $output;
 }
 

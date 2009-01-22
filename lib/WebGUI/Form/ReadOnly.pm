@@ -52,18 +52,6 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getValue ( )
-
-Returns undef.
-
-=cut
-
-sub getValue {
-	return undef;
-}
-
-#-------------------------------------------------------------------
-
 =head2 isDynamicCompatible ( )
 
 A class method that returns a boolean indicating whether this control is compatible with the DynamicField control.
@@ -71,31 +59,39 @@ A class method that returns a boolean indicating whether this control is compati
 =cut
 
 sub isDynamicCompatible {
-    return 1;
+    return 0;
 }
 
 #-------------------------------------------------------------------
 
 =head2 toHtml ( )
 
-Renders the value.
+Renders the value and a hidden input type if a "name" attribute was specified.
 
 =cut
 
 sub toHtml {
 	my $self = shift;
-	return $self->getOriginalValue;
+    my $out = $self->getOriginalValue;
+    if ($self->get('name') ne '') {
+        $out .= $self->toHtmlAsHidden;
+    }
+    return $out;
 }
 
 #-------------------------------------------------------------------
 
 =head2 toHtmlAsHidden ( )
 
-Outputs nothing.
+Outputs nothing unless a "name" attribute was specified.
 
 =cut
 
 sub toHtmlAsHidden {
+    my $self = shift;
+    if ($self->get('name') ne '') {
+        return $self->SUPER::toHtmlAsHidden;
+    }
 	return undef;
 }	
 

@@ -3,6 +3,18 @@ use strict;
 
 our $I18N = { ##hashref of hashes
 
+	'paginate after' => {
+		message => q|Paginate After|,
+		lastUpdated => 0,
+		context => q|an asset property|
+	},
+
+	'paginate after help' => {
+		message => q|The number of items to be displayed before breaking further items into additional pages.|,
+		lastUpdated => 0,
+		context => q|an asset property help|
+	},
+
 	'useContainers' => {
 		message => q|Use container URLs in results?|,
 		lastUpdated => 0,
@@ -83,7 +95,7 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'result_set' => {
-		message => q|Paginated search results with pagination controls.|,
+		message => q|Paginated search results with pagination controls. The list of variables below are the main ones used, however every property of each asset in the result set is exposed and is usable in the template.|,
 		lastUpdated => 1149567859,
 	},
 
@@ -118,17 +130,33 @@ our $I18N = { ##hashref of hashes
 	},
 
 	'synopsis' => {
-		message => q|The synopsis of the Asset found in the search.|,
-		lastUpdated => 1169843465,
+		message => q|The synopsis of the Asset found in the search.  Macros in the synopsis will be expanded.|,
+		lastUpdated => 1227292885,
 	},
+
 	'assetId' => { 
-                message => q|The assetId of the Asset found in the search.|,
-                lastUpdated => 1169843465,
-        },
+        message => q|The assetId of the Asset found in the search.|,
+        lastUpdated => 1169843465,
+    },
 
 	'results_found' => {
 		message => q|A conditional variable that will be true if any results were found.|,
 		lastUpdated => 1170549116,
+	},
+
+	'resultsFeedback' => {
+		message => q|Search results for|,
+		lastUpdated => 1230678996,
+	},
+
+	'page' => {
+		message => q|Page|,
+		lastUpdated => 1230678996,
+	},
+
+	'of' => {
+		message => q|of|,
+		lastUpdated => 1230678996,
 	},
 
 	'no results' => {

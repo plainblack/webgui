@@ -20,7 +20,8 @@ use JSON;
 use WebGUI::Pluggable;
 use WebGUI::Workflow::Spectre;
 use WebGUI::Workflow;
-
+use WebGUI::International;
+use WebGUI::Operation::Spectre;
 
 =head1 NAME
 
@@ -58,7 +59,7 @@ The settable properties of the workflow instance. See the set() method for detai
 =cut
 
 sub create {
-	my ($class, $session, $properties, $skipRealtime) = @_;
+	my ($class, $session, $properties) = @_;
 
     # do singleton check
     my $placeHolders = [$properties->{workflowId}];
@@ -72,8 +73,10 @@ sub create {
         $sql .= ' and parameters IS NULL';
     }
 	my ($count) = $session->db->quickArray($sql,$placeHolders);
+    $session->stow->set('singletonWorkflowClash', 0);
     if ($isSingleton && $count) {
-        $session->log->info("singleton workflow $properties->{workflowId} already running, not running again");
+        $session->log->info("An instance of singleton workflow $properties->{workflowId} already exists, not creating a new one");
+        $session->stow->set('singletonWorkflowClash', 1);
         return undef
     }
 
@@ -307,6 +310,8 @@ Executes the next iteration in this workflow. Returns a status code based upon w
  complete	The activity completed successfully, you may run the next one.
  waiting	The activity is waiting on an external event such as user input.
 
+B>NOTE:> You should normally never run this method. The workflow engine will use it instead. When you're ready to kick off a workflow you've created, use start() instead.
+
 =cut
 
 sub run {
@@ -417,15 +422,17 @@ The id of the workflow we're executing.
 
 =head4 className
 
-The classname of an object that will be created to pass into the workflow.
+The classname of an object that will be created to pass into the workflow.  The object will not
+be constructed unless both className and methodName are true.
 
 =head4 methodName
 
-The method name of the constructor for className.
+The method name of the constructor for className.  The object will not
+be constructed unless both className and methodName are true.
 
 =head4 parameters
 
-The parameters to be passed into the constructor. Note that the system will always pass in the session as the first argument.
+A hashref of parameters to be passed into the constructor for className. Note that the system will always pass in the session as the first argument.
 
 =head4 currentActivityId
 
@@ -525,6 +532,13 @@ sub start {
 	$log->info('Could not complete workflow instance '.$self->getId.' in realtime, handing off to Spectre.');
 	my $spectre = WebGUI::Workflow::Spectre->new($self->session);
 	$spectre->notify("workflow/addInstance", {cookieName=>$self->session->config->getCookieName, gateway=>$self->session->config->get("gateway"), sitename=>$self->session->config->get("sitename")->[0], instanceId=>$self->getId, priority=>$self->{_data}{priority}});
+
+    my $spectreTest = WebGUI::Operation::Spectre::spectreTest($self->session);
+    if($spectreTest ne "success"){
+        return WebGUI::International->new($self->session, "Macro_SpectreCheck")->get($spectreTest);
+    }
+
+    return undef;
 }
 
 1;

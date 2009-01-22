@@ -31,7 +31,7 @@ YAHOO.example.GetNews = function() {
 		
 		//Load the transitional state of the results section:
 		elResults.innerHTML = "<h3>Retrieving news search results for for " +
-			Dom.get("p").value + ":</h3>" +
+			Dom.get("searchString").value + ":</h3>" +
 			"<img src='http://l.yimg.com/us.yimg.com/i/nt/ic/ut/bsc/busybar_1.gif' " +
 			"alt='Please wait...'>";
 		
@@ -40,7 +40,7 @@ YAHOO.example.GetNews = function() {
 			"appid=3wEDxLHV34HvAU2lMnI51S4Qra5m.baugqoSv4gcRllqqVZm3UrMDZWToMivf5BJ3Mom" +
 			"&results=10&output=json&" +
 			"&callback=YAHOO.example.GetNews.callback" +
-			"&query=" + encodeURIComponent(Dom.get("p").value);
+			"&query=" + encodeURIComponent(Dom.get("searchString").value);
 		
 		//This simple line is the call to the Get Utility; we pass
 		//in the URL and the configuration object, which in this case

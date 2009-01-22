@@ -99,6 +99,14 @@ sub definition {
 			label           => $i18n->get("template"),
 			hoverHelp       => $i18n->get("template help"),
 		},
+        redeemSubscriptionCodeTemplateId => {
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Operation/RedeemSubscription",
+            defaultValue    => 'PBtmpl0000000000000053',
+            label           => $i18n->get("redeem subscription code template"),
+            hoverHelp       => $i18n->get("redeem subscription code template help"),
+        },
         thankYouMessage => {
             tab             => "properties",
 			defaultValue    => $i18n->get("default thank you message"),
@@ -118,6 +126,12 @@ sub definition {
             label	        => $i18n->get('subscription group'),
             hoverHelp	    => $i18n->get('subscription group description'),
             defaultvalue	=> [ 2 ]
+        },
+        recurringSubscription => {
+            fieldType       => 'yesNo',
+            label           => $i18n->get('recurring subscription'),
+            hoverHelp       => $i18n->get('recurring subscription description'),
+            defaultValue    => 1,
         },
         duration        => { 
             fieldType       => 'selectBox',
@@ -415,7 +429,9 @@ Tells the commerce system this Sku is recurring.
 =cut
 
 sub isRecurring {
-    return 1;
+    my $self = shift;
+
+    return $self->getValue('recurringSubscription');
 }
 
 #-------------------------------------------------------------------
@@ -972,7 +988,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var->{ codeForm } = $f->print;
 
-    return $self->processStyle($self->processTemplate($var, 'PBtmpl0000000000000053'));
+    return $self->processStyle($self->processTemplate($var, $self->get('redeemSubscriptionCodeTemplateId')));
 }
 
 1;

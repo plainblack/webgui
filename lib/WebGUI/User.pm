@@ -18,8 +18,10 @@ use strict;
 use WebGUI::Cache;
 use WebGUI::Group;
 use WebGUI::DatabaseLink;
+use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use JSON;
 
 =head1 NAME
 
@@ -61,6 +63,9 @@ These methods are available from this class:
 =cut
 
 #-------------------------------------------------------------------
+# TODO This stays like this until we can break API, just in case somebody
+# doesn't realize that _ means private.
+# After API unfreeze, put this in the WebGUI::User->create routine
 sub _create {
     my $session = shift;
     my $userId = shift || $session->id->generate();
@@ -114,6 +119,9 @@ sub acceptsPrivateMessages {
     my $self      = shift;
     my $userId    = shift;
 
+    return 0 if ($self->isVisitor);  #Visitor can't get private messages
+    return 0 if ($self->userId eq $userId);  #Can't send private messages to yourself
+
     my $pmSetting = $self->profileField('allowPrivateMessages');
 
     return 0 if ($pmSetting eq "none");
@@ -126,7 +134,38 @@ sub acceptsPrivateMessages {
         return $sentBy->isInGroup($friendsGroup->getId);
     }
 
-    return 1;
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 acceptsFriendsRequests ( user )
+
+Returns whether or this user will accept friends requests from the user passed in
+
+=head3 user
+
+WebGUI::User object to check to see if user will accept requests from.
+
+=cut
+
+sub acceptsFriendsRequests {
+    my $self    = shift;
+    my $session = $self->session;
+    my $user    = shift;
+
+    return 0 unless ($user && ref $user eq "WebGUI::User"); #Sanity checks
+    return 0 if($self->isVisitor);  #Visitors can't have friends
+    return 0 if($user->isVisitor);  #Visitor can't be your friend either
+    return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
+
+    my $me     = WebGUI::Friends->new($session,$self);
+    my $friend = WebGUI::Friends->new($session,$user);
+
+    return 0 if ($me->isFriend($user->userId));  #Already a friend
+    return 0 if ($me->isInvited($user->userId) || $friend->isInvited($self->userId)); #Invitation sent by one or the other
+
+    return $self->profileField('ableToBeFriend'); #Return profile setting
 }
 
 #-------------------------------------------------------------------
@@ -153,6 +192,31 @@ sub authMethod {
 			lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
         }
         return $self->{_user}{"authMethod"};
+}
+
+#-------------------------------------------------------------------
+
+=head2 create ( session, [userId] )
+
+Create a new user. C<userId> is an option user ID to give the new user.
+Returns the newly created WebGUI::User object.
+
+=cut
+
+sub create {
+    my $class   = shift;
+    my $session = shift;
+    my $userId  = shift;
+
+    if ( !ref $session || !$session->isa( 'WebGUI::Session' ) ) {
+        WebGUI::Error::InvalidObject->throw(
+            expected => "WebGUI::Session",
+            got      => (ref $session),
+            error    => q{Must provide a session variable},
+        );
+    }
+
+    return WebGUI::User->new( $session, "new", $userId );
 }
 
 #-------------------------------------------------------------------
@@ -192,6 +256,42 @@ sub canUseAdminMode {
 
 	return $pass && $self->isInGroup(12)
 }
+
+#-------------------------------------------------------------------
+
+=head2 canViewField ( field, user)
+
+Returns whether or not the user passed in can view the field value for the user.
+This will only check the user level privileges.
+
+=head3 field
+
+Field to check privileges on
+
+=head3 user
+
+User to check field privileges for
+
+=cut
+
+sub canViewField {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $field     = shift;
+    my $user      = shift;
+
+    return 0 unless ($field && $user);
+    #Always true for yourself
+    return 1 if ($self->userId eq $user->userId);
+    
+    my $privacySetting = $self->getProfileFieldPrivacySetting($field);
+    return 0 unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+    return 1 if ($privacySetting eq "all");
+    return 0 if ($privacySetting eq "none");
+
+    #It's friends so return whether or not user is a friend
+    return WebGUI::Friends->new($session,$self)->isFriend($user->userId); 
+}   
 
 #-------------------------------------------------------------------
 
@@ -287,14 +387,30 @@ Returns the WebGUI::Group for this user's Friend's Group.
 
 sub friends {
     my $self = shift;
-    if ($self->{_user}{"friendsGroup"} eq "") {
-        my $myFriends = WebGUI::Group->new($self->session, "new");
+    my $myFriends;
+
+    # If the user already has a friend group fetch it.
+    if ( $self->{_user}{"friendsGroup"} ne "" ) {
+        if ( ! exists $self->{_friendsGroup} ) {
+            # Friends group is not in cache, so instantiate and cache it.
+            $myFriends = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
+            $self->{_friendsGroup} = $myFriends;
+        }
+        else {
+            # Friends group is cached, so fetch it from cache.
+            $myFriends = $self->{_friendsGroup};
+        }
+    }
+
+    # If there's no instantiated friends group, either the user has none yet or the group has been deleted. 
+    # Whatever the reason may be, we need to create a new friends group for this user.
+    unless ( $myFriends ) {
+        $myFriends = WebGUI::Group->new($self->session, "new",0,1);
         $myFriends->name($self->username." Friends");
         $myFriends->description("Friends of user ".$self->userId);
         $myFriends->expireOffset(60*60*24*365*60);
         $myFriends->showInForms(0);
         $myFriends->isEditable(0);
-        $myFriends->deleteUsers(['3']);
         $self->uncache;
         $self->{_user}{"friendsGroup"} = $myFriends->getId;
         $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
@@ -302,10 +418,8 @@ sub friends {
             [$myFriends->getId, $self->session->datetime->time(), $self->userId]);
         $self->{_friendsGroup} = $myFriends;
     }
-    elsif (! exists $self->{_friendsGroup}) {
-        $self->{_friendsGroup} = WebGUI::Group->new($self->session, $self->{_user}{"friendsGroup"});
-    }
-    return $self->{_friendsGroup};
+
+    return $myFriends;
 }
 
 #-------------------------------------------------------------------
@@ -389,6 +503,66 @@ sub getGroupIdsRecursive {
 
 #-------------------------------------------------------------------
 
+=head2 getProfileFieldPrivacySetting ( [field ])
+
+Returns the privacy setting for the field passed in.  If no field is passed in the entire hash is returned
+
+=head3 field
+
+Field to get privacy setting for.
+
+=cut
+
+sub getProfileFieldPrivacySetting {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $field     = shift;
+
+    unless ($self->{_privacySettings}) {
+        #Look it up manually because we want to cache this separately.
+        my $privacySettings        = $session->db->quickScalar(
+            q{select wg_privacySettings from userProfileData where userId=?},
+            [$self->userId]
+        );
+        $privacySettings          = "{}" unless $privacySettings;
+        $self->{_privacySettings} = JSON->new->decode($privacySettings);
+    }
+    
+    return $self->{_privacySettings} unless ($field);
+
+    #No privacy settings returned the privacy setting field
+    return "none" if($field eq "wg_privacySettings");
+
+    return $self->{_privacySettings}->{$field};
+}   
+
+
+#-------------------------------------------------------------------
+
+=head2 getProfileUrl ( [page] )
+
+Returns a link to the user's profile
+
+=head3 page
+
+If page is passed in, the profile ops will be appended to the page, otherwise
+the method will return the ops appended to the current page.
+
+=cut
+
+sub getProfileUrl {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $page      = shift || $session->url->page;
+
+    my $identifier = $session->config->get("profileModuleIdentifier");
+
+    return qq{$page?op=account;module=$identifier;do=view;uid=}.$self->userId;
+
+}   
+
+#-------------------------------------------------------------------
+
 =head2 getWholeName ( )
 
 Attempts to build the user's whole name from profile fields, and ultimately their alias and username if all else
@@ -402,6 +576,20 @@ sub getWholeName {
         return join ' ', $self->profileField('firstName'), $self->profileField('lastName');
     }
     return $self->profileField("alias") || $self->username;
+}
+
+#-------------------------------------------------------------------
+
+=head2 hasFriends ( )
+
+Returns whether or not the user has any friends on the site.
+
+=cut
+
+sub hasFriends {
+    my $self         = shift;
+    my $users = $self->friends->getUsers(1);
+    return scalar(@{$users}) > 0;
 }
 
 #-------------------------------------------------------------------
@@ -419,6 +607,19 @@ sub identifier {
         return $self->{_user}{"identifier"};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 isAdmin ()
+
+Returns 1 if the user is in the admins group.
+
+=cut
+
+sub isAdmin {
+	my $self = shift;
+	return $self->isInGroup(3);
+}
 
 #-------------------------------------------------------------------
 
@@ -444,7 +645,7 @@ sub isInGroup {
    return 1 if ($gid eq '1' && $uid eq '1'); 	# visitors are in the visitors group
    return 1 if ($gid eq '2' && $uid ne '1'); 	# if you're not a visitor, then you're a registered user
    ### Get data for auxillary checks.
-   my $isInGroup = $self->session->stow->get("isInGroup");
+   my $isInGroup = $self->session->stow->get("isInGroup", { noclone => 1 });
    ### Look to see if we've already looked up this group. 
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
@@ -479,6 +680,32 @@ sub isOnline {
     my ($flag) = $self->session->db->quickArray('select count(*) from userSession where userId=? and lastPageView>=?',
         [$self->userId, time() - 60*10]); 
     return $flag;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRegistered ()
+
+Returns 1 if the user is not a visitor.
+
+=cut
+
+sub isRegistered {
+	my $self = shift;
+	return $self->userId ne '1';
+}
+
+#-------------------------------------------------------------------
+
+=head2 isVisitor ()
+
+Returns 1 if the user is a visitor.
+
+=cut
+
+sub isVisitor {
+	my $self = shift;
+	return $self->userId eq '1';
 }
 
 
@@ -611,7 +838,7 @@ sub newByEmail {
 	my $email = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from userProfileData where email=?",[$email]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
+	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
 	return $user;
 }
@@ -640,7 +867,7 @@ sub newByUsername {
 	my $username = shift;
 	my ($id) = $session->dbSlave->quickArray("select userId from users where username=?",[$username]);
 	my $user = $class->new($session, $id);
-	return undef if ($user->userId eq "1"); # visitor is never valid for this method
+	return undef if ($user->isVisitor); # visitor is never valid for this method
 	return undef unless $user->username;
 	return $user;
 }
@@ -667,6 +894,7 @@ sub profileField {
     my $fieldName   = shift;
     my $value       = shift;
     my $db          = $self->session->db;
+    return "" if ($fieldName eq "wg_privacySettings");  # this is a special internal field, don't try to process it.
     if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
         $self->session->errorHandler->warn("No such profile field: $fieldName");
         return undef;
@@ -692,6 +920,36 @@ sub profileField {
         return join ',', @{ $self->{_profile}{$fieldName} };
     }
 	return $self->{_profile}{$fieldName};
+}
+
+#-------------------------------------------------------------------
+
+=head2 profileIsViewable ( user  )
+
+Returns whether or not the user's profile is viewable by the user passed in
+
+=head3 user
+
+The user to test to see if the profile is viewable for.  If no user is passed in,
+the current user in session will be tested
+
+=cut
+
+sub profileIsViewable {
+    my $self     = shift;
+    my $user     = shift || $self->session->user;
+    my $userId   = $user->userId;
+
+    return 0 if ($self->isVisitor);  #Can't view visitor's profile
+    return 1 if ($self->userId eq $userId);  #Users can always view their own profile
+
+    my $profileSetting = $self->profileField('publicProfile');
+    
+    return 0 if ($profileSetting eq "none");
+    return 1 if ($profileSetting eq "all");
+
+    my $friendsGroup = $self->friends;
+    return $user->isInGroup($friendsGroup->getId);
 }
 
 #-------------------------------------------------------------------
@@ -730,6 +988,43 @@ Returns a reference to the current session.
 sub session {
 	my $self = shift;
 	return $self->{_session};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 setProfileFieldPrivacySetting ( settings ) 
+
+Sets the profile field privacy settings
+
+=head3 settings
+
+hash ref containing the field and it's corresponding privacy setting
+
+=cut
+
+sub setProfileFieldPrivacySetting {
+    my $self     = shift;
+    my $session  = $self->session;
+    my $settings = shift;
+    
+    return undef unless scalar(keys %{$settings});
+
+    #Get the current settings
+    my $currentSettings = $self->getProfileFieldPrivacySetting;
+    
+    foreach my $fieldId (keys %{$settings}) {
+        my $privacySetting = $settings->{$fieldId};
+        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        $currentSettings->{$fieldId} = $settings->{$fieldId};
+    }
+    
+    #Store the data in the database
+    my $json = JSON->new->encode($currentSettings);
+    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$self->userId]);
+
+    #Recache the current settings
+    $self->{_privacySettings} = $currentSettings;
 }
 
 
@@ -784,6 +1079,27 @@ sub uncache {
 
 #-------------------------------------------------------------------
 
+=head2 updateProfileFields ( profile )
+
+Saves profile data to a user's profile.  Does not validate any of the data.
+
+=head3 profile
+
+Hash ref of key/value pairs of data in the users's profile to update.
+
+=cut
+
+sub updateProfileFields {
+    my $self    = shift;
+    my $profile = shift;
+
+	foreach my $fieldName (keys %{$profile}) {
+		$self->profileField($fieldName,$profile->{$fieldName});
+	}
+}
+
+#-------------------------------------------------------------------
+
 =head2 username ( [ value ] )
 
 Returns the username. 
@@ -817,6 +1133,78 @@ Returns the userId for this user.
 
 sub userId {
         return $_[0]->{_userId};
+}
+
+#-------------------------------------------------------------------
+
+=head2 validateProfileDataFromForm ( fields )
+
+Validates profile data from the session form variables.  Returns an data structure which contains the following
+
+{
+    profile        => Hash reference containing all of the profile fields and their values
+    errors         => Array reference of error messages to be displayed
+    errorCategory  => Category in which the first error was thrown
+    warnings       => Array reference of warnings to be displayed
+    errorFields    => Array reference of the fieldIds that threw an error
+    warningFields  => Array reference of the fieldIds that threw a warning
+}
+
+=head3 fields
+
+An array reference of profile field Ids to validate.
+
+=cut
+
+sub validateProfileDataFromForm {
+	my $self        = shift;
+    my $session     = $self->session;
+	my $fields      = shift;
+
+    my $i18n        = WebGUI::International->new($session);
+
+    my $data        = {};
+    my $errors      = [];
+    my $warnings    = [];
+    my $errorCat    = undef;
+    my $errorFields = [];
+    my $warnFields  = [];
+    
+	foreach my $field (@{$fields}) {
+        my $fieldId       = $field->getId;
+        my $fieldLabel    = $field->getLabel;
+    	my $fieldValue    = $field->formProcess;
+        my $isValid       = $field->isValid($fieldValue);
+
+        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
+
+        if(!$isValid) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$errors}, sprintf($i18n->get("required error"),$fieldLabel));
+            push(@{$errorFields},$fieldId);
+        }
+        #The language field is special and must be always be valid or WebGUI will croak
+        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$data->{$fieldId}})) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$errors}, sprintf($i18n->get("language not available error"),$data->{$fieldId}));
+            push(@{$errorFields},$fieldId);
+        }
+        #Duplicate emails throw warnings
+        elsif($fieldId eq "email" && $field->isDuplicate($fieldValue,$self->userId)) {
+            $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
+            push (@{$warnings},$i18n->get(1072));
+            push(@{$warnFields},$fieldId);
+        }
+    }
+
+	return {
+        profile       => $data,
+        errors        => $errors,
+        warnings      => $warnings,
+        errorCategory => $errorCat,
+        errorFields   => $errorFields,
+        warningFields => $warnFields,
+    };
 }
 
 #-------------------------------------------------------------------

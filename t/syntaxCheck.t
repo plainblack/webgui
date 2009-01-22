@@ -16,27 +16,58 @@ use WebGUI::Test;
 use File::Find;
 use WebGUI::Session;
 use Test::More;
+use File::Spec;
 
-plan skip_all => 'set TEST_SYNTAX to enable this test' unless $ENV{TEST_SYNTAX};
-
-my @modules;
 my $wgLib = WebGUI::Test->lib;
-#diag("Checking modules in $wgLib");
-File::Find::find( \&getWebGUIModules, $wgLib);
+my @modules = findModules($wgLib);
+my @scripts = findScripts(WebGUI::Test->root . '/docs/upgrades', WebGUI::Test->root . '/sbin');
 
-my $numTests = scalar @modules;
+plan tests => 2 * (scalar @modules + scalar @scripts);
 
-plan tests => $numTests;
+foreach my $library (@modules) {
+    my $warnings = '';
+    local $^W = 1;
+    local $SIG{__WARN__} = sub {
+        $warnings .= shift;
+    };
+    eval {
+        require $library;
+    };
+    chomp $warnings;
+    is($@, '', "$library compiles successfully");
+    is($warnings, '', "$library compiles without warnings");
+}
 
-#diag("Planning on $numTests tests");
-
-foreach my $package (@modules) {
-	my $command = "$^X -I$wgLib -wc $package 2>&1";
-	my $output = `$command`;
-	is($?, 0, "syntax check for $package");
+for my $script (@scripts) {
+    my $cmd = "$^X -wcI'$wgLib' $script 2>&1";
+    my $output = `$cmd`;
+    my $shortName = File::Spec->abs2rel($script, WebGUI::Test->root);
+    is($?, 0, "$shortName compiles successfully");
+    chomp $output;
+    $output =~ s/^\Q$script\E (?:had compilation errors\.|syntax OK)$//m;
+    is($output, '', "$shortName compiles without warnings");
 }
 
 #----------------------------------------
-sub getWebGUIModules {
-	push( @modules, $File::Find::name ) if /\.pm$/;
+sub findModules {
+    my $libDir = shift;
+    my @modules;
+    File::Find::find( {
+        no_chdir => 1,
+        wanted => sub {
+            next unless $File::Find::name =~ /\.pm$/;
+            my $lib = File::Spec->abs2rel($File::Find::name, $libDir);
+            push @modules, $lib;
+        },
+    }, $libDir);
+    return @modules;
 }
+
+sub findScripts {
+    my @scripts;
+    for my $dir (@_) {
+        push @scripts, glob("$dir/*.pl");
+    }
+    return @scripts;
+}
+

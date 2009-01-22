@@ -21,8 +21,6 @@ use WebGUI::Cache;
 use WebGUI::Storage;
 use WebGUI::SQL;
 use WebGUI::Utility;
-use FileHandle;
-
 
 
 =head1 NAME
@@ -161,6 +159,36 @@ sub exportAssetData {
 	return $data;
 }
 
+#-------------------------------------------------------------------
+
+sub exportWriteFile {
+    my $self = shift;
+
+    # we have no assurance whether the exportPath is valid or not, so check it.
+    WebGUI::Asset->exportCheckPath($self->session);
+
+    # if we're still here, everything is well with the export path. let's make
+    # sure that this user can view the asset that we want to export.
+    unless($self->canView) {
+        WebGUI::Error->throw(error => "user can't view asset at " .  $self->getUrl . " to export it");
+    }
+
+    # if we're still here, everything is well with the export path. let's get
+    # our destination FS path and then make any required directories.
+
+    my $dest = $self->exportGetUrlAsPath;
+    my $parent = $dest->parent;
+
+    eval { File::Path::mkpath($parent->absolute->stringify) };
+    if($@) {
+        WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
+    }
+
+    if ( ! File::Copy::copy($self->getStorageLocation->getPath($self->get('filename')), $dest->stringify) ) {
+        WebGUI::Error->throw(error => "can't copy " . $self->getStorageLocation->getPath($self->get('filename'))
+            . ' to ' . $dest->absolute->stringify . ": $!");
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -378,24 +406,31 @@ sub purgeRevision {
 
 #----------------------------------------------------------------------------
 
-=head2 setFile ( filename )
+=head2 setFile ( [pathtofile] )
 
-Set the file being handled by this storage location with a file from the 
-system.
+Tells the asset to do all the postprocessing on the file (setting privs, thubnails, or whatever).
+
+=head3 pathtofile
+
+If specified will copy a new file into the storage location from this path and delete any existing file.
+
 
 =cut
 
 sub setFile {
     my $self        = shift;
     my $filename    = shift;
-    my $storage     = $self->getStorageLocation;
 
-    # Clear the old file if any
-    $storage->clear;
-
-    $storage->addFileFromFilesystem($filename) 
-        || croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
-        # NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+	if ($filename) {
+	    my $storage     = $self->getStorageLocation;
+		# Clear the old file if any
+		$storage->clear;
+	
+		$storage->addFileFromFilesystem($filename) 
+			|| croak "Couldn't setFile: " . join(", ",@{ $storage->getErrors });
+			# NOTE: We should not croak here, the WebGUI::Storage should croak for us.
+			
+	}
 
     $self->updatePropertiesFromStorage;
     $self->applyConstraints;
@@ -524,23 +559,6 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
-# setStreamedFile and setRedirect do not interact well with the
-# exporter.  We have a separate method for this now.
-sub exportHtml_view {
-	my $self = shift;
-	my $path = $self->getStorageLocation->getPath($self->get('filename'));
-	my $fh = eval { FileHandle->new($path) };
-	defined($fh) or return "";
-	binmode $fh or ($fh->close, return "");
-	my $block;
-	while (read($fh, $block, 16384) > 0) {
-		$self->session->output->print($block, 1);
-	}
-	$fh->close;
-	return 'chunked';
-}
-
-#--------------------------------------------------------------------
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;

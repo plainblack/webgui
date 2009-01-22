@@ -141,10 +141,11 @@ sub appendTemplateVarsCommentForm {
             value       => $comment->{ bodyText },
         });
 
+    my $i18n = WebGUI::International->new($session, 'Asset_Photo');
     $var->{ commentForm_submit } 
         = WebGUI::Form::submit( $session, {
             name        => "submit",
-            value       => "Save Comment",
+            value       => $i18n->get('form comment save comment'),
         });
 
     return $var;
@@ -281,7 +282,12 @@ Returns the workflowId of the Gallery's approval workflow.
 
 sub getAutoCommitWorkflowId {
     my $self        = shift;
-    return $self->getGallery->get("workflowIdCommit");
+    my $gallery = $self->getGallery;
+    if ($gallery->hasBeenCommitted) {
+        return $gallery->get("workflowIdCommit")
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 #----------------------------------------------------------------------------
@@ -467,35 +473,16 @@ sub getTemplateVars {
         }
     }
     
-    # Add some things from Gallery
-    my $galleryVar  = $self->getGallery->getTemplateVars;
-    for my $key ( qw{ url_listFilesForCurrentUser url_search } ) {
-        $var->{ $key } = $galleryVar->{ $key };
-    }
-
-    # More things from Gallery, but with different names
-    for my $key ( qw{ title menuTitle url } ) {
-        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
-    }
-
-    # Add some things from Album
-    my $album       = $self->getParent;
-    my $albumVar    = $album->getTemplateVars;
-    for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
-        $var->{ "album_" . $key } = $albumVar->{ $key };
-    }
-
-    # Add the search form
-    $self->getGallery->appendTemplateVarsSearchForm( $var );
-
     # Add a text-only synopsis
     $var->{ synopsis_textonly   } = WebGUI::HTML::filter( $self->get('synopsis'), "all" );
 
     # Figure out on what page of the album the gallery file belongs.
+    my $album           = $self->getParent;
     my $fileIdsInAlbum  = $album->getFileIds;
+    my $id              = $self->getId;
     my $pageNumber      = 
         int (
-            ( first_index { $_ eq $self->getId } @{ $fileIdsInAlbum } )     # Get index of file in album
+            ( first_index { $_ eq $id } @{ $fileIdsInAlbum } )     # Get index of file in album
             / $album->getParent->get( 'defaultFilesPerPage' )               # Divide by the number of files per page
         ) + 1;                                                              # Round upwards
 
@@ -636,7 +623,7 @@ sub processCommentEditForm {
                     : 0
                     ;
 
-    my $visitorIp   = $session->user->userId eq "1"
+    my $visitorIp   = $session->user->isVisitor
                     ? $session->env->get("REMOTE_ADDR")
                     : undef
                     ;
@@ -682,8 +669,6 @@ sub processPropertiesFromFormPost {
             assetIdThumbnail        => $self->getId,
         } );
     }
-
-    $self->requestAutoCommit;
 
     return;
 }
@@ -755,6 +740,21 @@ sub setComment {
     );
 }
 
+####################################################################
+
+=head2 update
+
+Wrap update so that isHidden is always set to be a 1.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
+}
+
+
 #----------------------------------------------------------------------------
 
 =head2 view ( )
@@ -769,6 +769,27 @@ sub view {
     my $var     = $self->getTemplateVars;
     
     $self->appendTemplateVarsCommentForm( $var ); 
+
+    # Add the search form
+    $self->getGallery->appendTemplateVarsSearchForm( $var );
+
+    # Add some things from Gallery
+    my $galleryVar  = $self->getGallery->getTemplateVars;
+    for my $key ( qw{ url_listFilesForCurrentUser url_search } ) {
+        $var->{ $key } = $galleryVar->{ $key };
+    }
+
+    # More things from Gallery, but with different names
+    for my $key ( qw{ title menuTitle url } ) {
+        $var->{ "gallery_" . $key } = $galleryVar->{ $key };
+    }
+
+    # Add some things from Album
+    my $album       = $self->getParent;
+    my $albumVar    = $album->getTemplateVars;
+    for my $key ( qw{ title menuTitle url thumbnailUrl } ) {
+        $var->{ "album_" . $key } = $albumVar->{ $key };
+    }
 
     # Keywords
     my $k           = WebGUI::Keyword->new( $session );
@@ -1065,8 +1086,8 @@ sub www_view {
     $self->session->http->setLastModified($self->getContentLastModified);
     $self->session->http->sendHeader;
     $self->prepareView;
-    my $style = $self->processStyle("~~~");
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $self->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
     $self->session->output->print($self->view);
     $self->session->output->print($foot, 1);

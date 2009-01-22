@@ -19,7 +19,7 @@ use WebGUI::Asset::Shortcut;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::Asset (AssetTrash)
 
 =head1 DESCRIPTION
 
@@ -247,11 +247,18 @@ sub _invokeWorkflowOnExportedFiles {
 	my $workflowId = shift;
 	my $clearExportedAs = shift;
 
-	my ($lastExportedAs) = $self->get("lastExportedAs");
-	my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $self->session->setting->get('trashWorkflow') });
-	$wfInstance->setScratch(WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH(), Storable::freeze([defined($lastExportedAs)? ($lastExportedAs) : ()]));
-	$clearExportedAs and $self->session->db->write("UPDATE asset SET lastExportedAs = NULL WHERE assetId = ?", [$self->getId]);
-	$wfInstance->start(1);
+    if ($clearExportedAs) {
+        $self->session->db->write("UPDATE asset SET lastExportedAs = NULL WHERE assetId = ?", [$self->getId]);
+    }
+    if ($workflowId) {
+        my ($lastExportedAs) = $self->get("lastExportedAs");
+        my $wfInstance = WebGUI::Workflow::Instance->create($self->session, { workflowId => $workflowId });
+        $wfInstance->setScratch(
+            WebGUI::Workflow::Activity::DeleteExportedFiles::DELETE_FILES_SCRATCH() =>
+            Storable::freeze([ defined($lastExportedAs) ? ($lastExportedAs) : () ])
+        );
+        $wfInstance->start(1);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -311,7 +318,7 @@ sub www_manageTrash {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my ($header, $limit);
         $ac->setHelp("trash manage");
-	if ($self->session->form->process("systemTrash") && $self->session->user->isInGroup(3)) {
+	if ($self->session->form->process("systemTrash") && $self->session->user->isAdmin) {
 		$header = $i18n->get(965);
 		$ac->addSubmenuItem($self->getUrl('func=manageTrash'), $i18n->get(10,"WebGUI"));
 	} else {

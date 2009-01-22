@@ -295,6 +295,16 @@ Thanks,
 		lastUpdated => 1181493546,
 	},
 
+    'error user is already friend' => {
+        message     => q|This user is already a member of your friends network <br /><p> <a href="%s">%s</a></p>|,
+        lastUpdated => 1181493546,    
+    },
+
+    'error user is already invited' => {
+        message     => q|You have already sent an invitation for this user to join your friends network <br /> <p><a href="%s">%s</a></p>|,
+        lastUpdated => 1181493546,
+    }
+
 };
 
 1;

@@ -14,7 +14,6 @@ package WebGUI::Macro;
 
 =cut
 
-
 use strict;
 use WebGUI::Pluggable;
 
@@ -42,28 +41,24 @@ These functions are available from this package:
 
 =cut
 
-my $parenthesis;
-$parenthesis = qr /\(                      # Start with '(',
-                     (?:                     # Followed by
-                     (?>[^()]+)              # Non-parenthesis
-                     |(??{ $parenthesis })   # Or a balanced parenthesis block
-                     )*                      # zero or more times
-                     \)/x;                  # Ending with ')'
-
-my $nestedMacro;
-$nestedMacro = qr /(\^                     # Start with carat
-                     ([^\^;()]+)            # And one or more none-macro characters -tagged-
-                     ((?:                   # Followed by
-                     (??{ $parenthesis })   # a balanced parenthesis block
-                     |(?>[^\^;])            # Or not a carat or semicolon
-#                    |(??{ $nestedMacro }) # Or a balanced carat-semicolon block
-                     )*)                    # zero or more times -tagged-
-                     ;)/x;                   # End with  a semicolon.
-
-
-
-
 #-------------------------------------------------------------------
+my $parenthesis;
+$parenthesis = qr{
+    \(                      # Start with '(',
+    (?:                     # Followed by
+        (?>[^()]+)              # Non-parenthesis
+    |                       # or
+        (??{ $parenthesis })    # a balanced parenthesis block
+    )*                      # zero or more times
+    \)                      # Ending with ')'
+}x;
+
+my $macro_re = qr{
+    (\^                     # Start with carat
+    ([-a-zA-Z0-9_@#/*]{1,64})   # And one or more non-macro characters -tagged-
+    ((??{ $parenthesis })?) # a balanced parenthesis block
+    ;)                      # End with a semicolon.
+}msx;
 
 =head2 filter ( html )
 
@@ -76,10 +71,8 @@ The segment to be filtered as a scalar reference.
 =cut
 
 sub filter {
-	my $content = shift;
-        while ($$content =~ /($nestedMacro)/gs) {
-		$$content =~ s/\Q$1//gs;
-	}
+    my $content = shift;
+    ${ $content } =~ s/$macro_re//g;
 }
 
 
@@ -96,8 +89,8 @@ A scalar reference of HTML to be processed.
 =cut
 
 sub negate {
-	my $html = shift;
-	$$html =~ s/\^/\&\#94\;/g;
+    my $html = shift;
+    ${ $html } =~ s/\^/&#94;/g;
 }
 
 
@@ -117,39 +110,91 @@ A scalar reference of HTML to be processed.
 
 =cut
 
+
 sub process {
     my $session = shift;
-   	my $content = shift;
-   	while ($$content =~ /$nestedMacro/gs) {
-        my ($macro, $searchString, $params) = ($1, $2, $3);
-      	next if ($searchString =~ /^\d+$/); # don't process ^0; ^1; ^2; etc.
-      	next if ($searchString =~ /^\-$/); # don't process ^-;
-		if ($params ne "") {
-      		$params =~ s/(^\(|\)$)//g; # remove parenthesis
-      		&process($session,\$params); # recursive process params
-		}
-		my $macros = $session->config->get("macros");
-		if ($macros->{$searchString} ne "") {
-		    my @param;
-        	push(@param, $+) while $params =~ m {
-               		"([^\"\\]*(?:\\.[^\"\\]*)*)",?
-               		|       ([^,]+),?
-               		|       ,
-        		}gx;
-        	push(@param, undef) if substr($params,-1,1) eq ',';
-            my $result = eval { WebGUI::Pluggable::run("WebGUI::Macro::".$macros->{$searchString}, "process", [ $session, @param ] ) };
-            if ( $@ ) {
-                $session->errorHandler->error($@);
-            }
-            else {
-				if ($result =~ /\Q$macro/) {
-                    $result = "Endless macro loop detected. Stopping recursion.";
-					$session->errorHandler->error($macro." : ".$result);
-                }
-				$$content =~ s/\Q$macro/$result/ges;
-			}
-		}
-   	}
+    my $content = shift;
+    return '' if !defined $content;
+    our $macrodepth ||= 0;
+    local $macrodepth = $macrodepth + 1;
+    ${ $content } =~ s{$macro_re}{
+        if ( $macrodepth > 16 ) {
+            $session->errorHandler->error($2 . " : Too many levels of macro recursion.  Stopping.");
+            "Too many levels of macro recursion. Stopping.";
+        }
+        else {
+            my $initialText = $1;
+            my $replaceText = _processMacro($session, $2, $3);
+            # _processMacro returns undef on failure, use original text
+            defined $replaceText ? $replaceText : $initialText;
+        }
+    }ge;
+}
+
+
+# _processMacro ( $session, $macroname, $parameters )
+# processes an individual macro, taking the macro name and parameters as a string
+# returns the result text or undef on failure
+
+sub _processMacro {
+    my $session = shift;
+    my $macroname = shift;
+    my $parameters = shift;
+    if ($macroname =~ /^[-0-9]$/) {    # ^0; ^1; ^2; and ^-; have special uses, don't replace
+        return;
+    }
+    my $macrofile = $session->config->get("macros")->{$macroname};
+    if (!$macrofile) {
+        $session->errorHandler->error("No macro with name $macroname defined.");
+        return;
+    }
+    my $macropackage = "WebGUI::Macro::$macrofile";
+    if (! eval { WebGUI::Pluggable::load($macropackage) } ) {
+        $session->log->error($@);
+        return;
+    }
+    my $process = $macropackage->can('process');
+    if (!$process) {
+        $session->log->error("Macro has no process sub: $macropackage.");
+        return;
+    }
+    $parameters =~ s/^\(//;
+    $parameters =~ s/\)$//;
+
+    # there are two possible matches and only one will ever match at a time, so we filter out the undef ones
+    my @params = grep { defined $_ } ($parameters =~ /
+        (?<!\z)                             # don't try to match if we are at the end of the string
+        (?:                                 # either
+            \s* "                               # white space followed by quotes
+            ( (?:                               # capture inside
+                [^"\\]                              # something other than a quote or backslash
+            |                                   # or
+                \\.                                 # a backslash followed by any character
+            ) * )                               # as many times as needed
+            " \s*                               # end quote and any white space
+        |                                   # or
+            ([^,]*)                         # anything but a comma
+        )
+        (?:                                 # followed by
+            \z                                  # end of the string
+        |                                   # or
+            ,                                   # a comma
+        )
+    /xg);
+    for my $param (@params) {
+        $param =~ s/\\(.)/$1/xmsg;      # deal with backslash escapes
+        process($session, \$param)
+            if ($param);                # process any macros
+    }
+    my $output;
+    unless ( eval { $output = $process->($session, @params); 1 } ) {         # call process sub with parameters
+        $session->log->error("Unable to process macro '$macroname': $@");
+        return;
+    }
+    $output = ''
+        if !defined $output;
+    process($session, \$output);                                            # also need to process macros on output
+    return $output;
 }
 
 1;

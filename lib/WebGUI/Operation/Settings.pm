@@ -79,16 +79,30 @@ sub definition {
 		type=>"WebGUI::VersionTag",
 		label=>$i18n->get("default version tag workflow"),
 		hoverHelp=>$i18n->get('default version tag workflow help'),
-        includeRealtime=>1,
 		});
-	push(@fields, {
-		tab=>"content",
-		fieldType=>"yesNo",
-        name=>"autoRequestCommit",
-        label=>$i18n->get("auto request commit"),
-        hoverHelp=>$i18n->get("auto request commit help"),
-        defaultValue=>$setting->get("autoRequestCommit")
-		});
+
+        # Support for versionTagMode. We'll have:
+        # - multi version tag per user
+        # - one version tag per user (SwiftySite mode)
+        # - one site wide version tag
+        # - auto commit
+        push (
+            @fields,
+            {   tab          => q{content},
+		fieldType    => q{selectBox},
+                name         => q{versionTagMode},
+                defaultValue => [ $setting->get(q{versionTagMode}) ],
+                options      => {
+                    multiPerUser  => $i18n->get(q{versionTagMode multiPerUser}),
+                    singlePerUser => $i18n->get(q{versionTagMode singlePerUser}),
+                    siteWide      => $i18n->get(q{versionTagMode siteWide}),
+                    autoCommit    => $i18n->get(q{versionTagMode autoCommit}),
+                },
+                label        => $i18n->get(q{version tag mode}),
+                hoverHelp    => $i18n->get(q{version tag mode help}),
+            },
+        );
+
 	push(@fields, {
 		tab=>"content",
 		fieldType=>"yesNo",
@@ -104,7 +118,8 @@ sub definition {
 		defaultValue=>$setting->get("trashWorkflow"),
 		type=>"None",
 		label=>$i18n->get("trash workflow"),
-		hoverHelp=>$i18n->get('trash workflow help')
+		hoverHelp=>$i18n->get('trash workflow help'),
+        none => 1,
 		});
 	push(@fields, {
 		tab=>"content",
@@ -113,7 +128,8 @@ sub definition {
 		defaultValue=>$setting->get("purgeWorkflow"),
 		type=>"None",
 		label=>$i18n->get("purge workflow"),
-		hoverHelp=>$i18n->get('purge workflow help')
+		hoverHelp=>$i18n->get('purge workflow help'),
+        none => 1,
 		});
 	push(@fields, {
 		tab=>"content",
@@ -122,7 +138,8 @@ sub definition {
 		defaultValue=>$setting->get("changeUrlWorkflow"),
 		type=>"None",
 		label=>$i18n->get("changeUrl workflow"),
-		hoverHelp=>$i18n->get('changeUrl workflow help')
+		hoverHelp=>$i18n->get('changeUrl workflow help'),
+        none => 1,
 		});
 
         my %htmlFilter = (
@@ -224,33 +241,6 @@ sub definition {
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
 	# messaging settings
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxTemplateId",
-		label=>$i18n->get('view inbox template'),
-		hoverHelp=>$i18n->get('view inbox template description'),
-		namespace=>"Inbox",
-		defaultValue=>$setting->get("viewInboxTemplateId"),
-		});
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"viewInboxMessageTemplateId",
-		label=>$i18n->get('view inbox message template'),
-		hoverHelp=>$i18n->get('view inbox message template description'),
-		namespace=>"Inbox/Message",
-		defaultValue=>$setting->get("viewInboxMessageTemplateId"),
-		});    
-    push(@fields, {
-		tab=>"messaging",
-		fieldType=>"template",
-		name=>"sendPrivateMessageTemplateId",
-		label=>$i18n->get('send private message template'),
-		hoverHelp=>$i18n->get('send private message template description'),
-		namespace=>"Inbox/SendPrivateMessage",
-		defaultValue=>$setting->get("sendPrivateMessageTemplateId"),
-		});    
 	push(@fields, {
 		tab=>"messaging",
 		fieldType=>"text",
@@ -416,40 +406,6 @@ sub definition {
                 defaultValue=>$setting->get("passiveProfilingEnabled"),
                 extras=>'onchange="alert(\''.$i18n->get("Illegal Warning").'\')" '
 		});
-    push(@fields, {
-        tab=>"user",
-        fieldType=>"yesNo",
-        name=>"userInvitationsEnabled",
-        label=>$i18n->get("Enable user invitations"),
-        hoverHelp=>$i18n->get("Enable user invitations description"),
-        defaultValue=>$setting->get("userInvitationsEnabled"),
-    });
-    push(@fields, {
-        tab=>"user",
-        fieldType=>"textarea",
-        name=>"userInvitationsEmailExists",
-        label=>$i18n->get("user invitations email exists"),
-        hoverHelp=>$i18n->get("user invitations email exists description"),
-        defaultValue=>$setting->get("userInvitationsEmailExists"),
-    });
-    push(@fields, {
-		tab=>"user",
-		fieldType=>"template",
-		name=>"userInvitationsEmailTemplateId",
-		label=>$i18n->get('user email template'),
-		hoverHelp=>$i18n->get('user email template description'),
-		namespace=>"userInvite/Email",
-		defaultValue=>$setting->get("userInvitationsEmailTemplateId"),
-		});    
-    push(@fields, {
-        tab             => "user",
-        fieldType       => "template",
-        defaultValue    => "managefriends_________",
-        namespace       => "friends/manage",
-        name            => "manageFriendsTemplateId",
-        label           => $i18n->get("manage friends template", "Friends"),
-        hoverHelp       => $i18n->get("manage friends template help", "Friends"),
-        });
     push @fields, {
         tab             => "user",
         name            => "showMessageOnLogin",
@@ -481,24 +437,6 @@ sub definition {
         label           => $i18n->get( 'showMessageOnLoginBody label' ),
         hoverHelp       => $i18n->get( 'showMessageOnLoginBody description' ),
         defaultValue    => $setting->get('showMessageOnLoginBody'),
-    };
-    push @fields, {
-        tab             => "user",
-        name            => 'viewUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/View',
-        label           => $i18n->get( 'user profile view template' ),
-        hoverHelp       => $i18n->get( 'user profile view template description' ),
-        defaultValue    => $setting->get('viewUserProfileTemplate'),
-    };
-    push @fields, {
-        tab             => "user",
-        name            => 'editUserProfileTemplate',
-        fieldType       => 'template',
-        namespace       => 'Operation/Profile/Edit',
-        label           => $i18n->get( 'user profile edit template' ),
-        hoverHelp       => $i18n->get( 'user profile edit template description' ),
-        defaultValue    => $setting->get('editUserProfileTemplate'),
     };
 	# auth settings 
    	my $options;
@@ -574,7 +512,7 @@ keys:
 sub www_editSettings {
 	my $session     = shift;
     my $argsHash    = shift;
-	return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+	return $session->privilege->adminOnly() unless ($session->user->isAdmin);
 	my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $output      = '';
 
@@ -601,6 +539,7 @@ sub www_editSettings {
         ui          => { label => $i18n->get("ui") },
         messaging   => { label => $i18n->get("messaging") },
         misc        => { label => $i18n->get("misc") },
+        account     => { label => $i18n->get("account settings tab")},
         user        => { label => $i18n->get("user") },
         auth        => { label => $i18n->get("authentication") },
         perms       => { label => $i18n->get("permissions") },
@@ -626,6 +565,38 @@ sub www_editSettings {
 		$tabform->getTab("auth")->fieldSetEnd;
 	}
 
+     # Get fieldsets for avaiable account methods
+    my $accountConfigs = $session->config->get("account");
+
+	foreach my $account (@{$accountConfigs}) {
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+        if ( $@ ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        
+        #Get the content of the settings form from the instance
+        my $settingsForm = eval { $instance->editSettingsForm };
+        if( $@ ) {
+            $session->log->warn("Error calling editSettingsForm in $className...skipping : ".$@);
+            next;
+        }
+
+        #If editUserSettingsForm is empty, skip it
+        next if $settingsForm eq "";
+
+        #Set the title of the fieldset
+        my $title = $account->{title};
+        WebGUI::Macro::process($title);
+
+        #Print the settings form for this account pluggin
+		$tabform->getTab("account")->fieldSetStart($title);
+		$tabform->getTab("account")->raw($settingsForm);
+		$tabform->getTab("account")->fieldSetEnd;
+	}
+
 	$tabform->submit();
     $output .= $tabform->print;
 
@@ -644,7 +615,7 @@ is in group Admin (3).  Returns the user to the Edit Settings screen, www_editSe
 
 sub www_saveSettings {
     my $session     = shift;
-    return $session->privilege->adminOnly() unless ($session->user->isInGroup(3));
+    return $session->privilege->adminOnly() unless ($session->user->isAdmin);
     my $i18n        = WebGUI::International->new($session, "WebGUI");
     my $setting     = $session->setting;
     my $form        = $session->form;
@@ -664,6 +635,26 @@ sub www_saveSettings {
             push @errors, @{ $authErrors };
         }
     }
+
+    # Save account pluggin settings
+    my $accountConfigs = $session->config->get("account");
+	foreach my $account (@{$accountConfigs}) {
+        #Create the instance
+        my $className = $account->{className};
+		my $instance = eval { WebGUI::Pluggable::instanciate($className,"new",[ $session ]) };
+
+        if ( my $e = WebGUI::Error->caught ) {
+            $session->log->warn("Could not instantiate account pluggin $className...skipping");
+            next;
+        }
+        #Save the settings
+        eval { $instance->editSettingsFormSave };
+        
+        if( $@ ) {
+            $session->log->warn("Error calling editSettingsFormSave in $className...skipping : ".$@);
+            next;
+        }
+	}
 
     ### Handle special settings
     # Reset login message seen numbers

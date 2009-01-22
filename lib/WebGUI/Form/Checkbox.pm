@@ -66,6 +66,9 @@ sub definition {
 		defaultValue=>{
 			defaultValue=> undef
 			},
+        label   => {
+            defaultValue => undef,
+        },
 		});
         return $class->SUPER::definition($session, $definition);
 }
@@ -122,7 +125,11 @@ sub toHtml {
     $value = defined $value ? $self->fixMacros($self->fixQuotes($self->fixSpecialCharacters($value))) : '';
 	my $checkedText = $self->get("checked") ? ' checked="checked"' 			: '';
 	my $idText 		= $self->get('id') 		? ' id="'.$self->get('id').'" ' : '';
-	return '<input type="checkbox" name="'.($self->get("name")||'').'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';
+    my $control = '<input type="checkbox" name="'.($self->get("name")||'').'" value="'.$value.'"'.$idText.$checkedText.' '.($self->get("extras")||'').' />';
+    if ($self->get('label')) {
+        return "<label>$control" . $self->get('label') . '</label>';
+    }
+    return $control;
 }
 
 

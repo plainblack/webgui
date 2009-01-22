@@ -74,6 +74,24 @@ sub getAdminConsole {
 
 #-------------------------------------------------------------------
 
+=head2 isCashier ( [ $user ] )
+
+Determine whether or not a user is a cashier
+
+=head3 $user
+
+An optional WebGUI::User object. If this is not used, it uses the current session user object.
+
+=cut
+
+sub isCashier {
+    my $self   = shift;
+    my $user   = shift || $self->session->user;
+    return $user->isInGroup( $self->session->setting->get('groupIdCashier'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session )
 
 Constructor. 
@@ -113,7 +131,7 @@ Displays the general commerce settings.
 
 sub www_editSettings {
     my $self = shift;
-    return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
+    return $self->session->privilege->adminOnly() unless ($self->session->user->isAdmin);
     my $i18n = WebGUI::International->new($self->session, "Shop");    
     my $ac = $self->getAdminConsole; 
     my $setting = $self->session->setting;
@@ -126,6 +144,12 @@ sub www_editSettings {
         value       => $setting->get("groupIdAdminCommerce"),
         label       => $i18n->get('who can manage'),
         hoverHelp   => $i18n->get('who can manage help'),
+        );
+    $form->group(
+        name        => "groupIdCashier",
+        value       => $setting->get("groupIdCashier"),
+        label       => $i18n->get('who is a cashier'),
+        hoverHelp   => $i18n->get('who is a cashier help'),
         );
     $form->template(
         name        => "shopCartTemplateId",
@@ -176,13 +200,15 @@ Saves the general commerce settings.
 
 sub www_editSettingsSave {
     my $self = shift;
-    return $self->session->privilege->adminOnly() unless ($self->session->user->isInGroup("3"));
+    return $self->session->privilege->adminOnly() unless ($self->session->user->isAdmin);
     my ($setting, $form) = $self->session->quick(qw(setting form));
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
         shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
-    $setting->set("groupIdAdminCommerce", $form->get("groupIdAdminCommerce", "group"));
+    foreach my $group (qw(groupIdCashier groupIdAdminCommerce)) {
+        $setting->set($group, $form->get($group, "group"));
+    }
     return $self->www_editSettings();   
 }
 

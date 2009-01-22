@@ -58,7 +58,7 @@ sub _visitorCacheKey {
 #-------------------------------------------------------------------
 sub _visitorCacheOk {
 	my $self = shift;
-	return ($self->session->user->userId eq '1'
+	return ($self->session->user->isVisitor
 		&& !$self->session->form->process('sortBy'));
 }
 
@@ -308,7 +308,7 @@ sub canSubscribe {
                 ? WebGUI::User->new( $session, $userId )
                 : $self->session->user
                 ;
-    return ($user->userId ne "1" && $self->canView( $userId ) );
+    return ($user->isRegistered && $self->canView( $userId ) );
 }
 
 #-------------------------------------------------------------------
@@ -321,13 +321,8 @@ sub canStartThread {
                 : $self->session->user
                 ;
     return (
-            (
-                    $self->get("status") eq "approved" || 
-                    $self->getTagCount > 1 # checks to make sure that the cs has been committed at least once
-            ) && (
-                    $user->isInGroup($self->get("canStartThreadGroupId")) 
-                    || $self->SUPER::canEdit( $userId )
-            )
+        $user->isInGroup($self->get("canStartThreadGroupId")) 
+        || $self->SUPER::canEdit( $userId )
     );
 }
 
@@ -414,8 +409,6 @@ sub definition {
 			  ($useKarma? (karmaRank=>$i18n->get('karma rank')) : ()),
 			 );
 
-	my $richEditorOptions = $session->db->buildHashRef("select distinct(assetData.assetId), assetData.title from asset, assetData where asset.className='WebGUI::Asset::RichEdit' and asset.assetId=assetData.assetId order by assetData.title");
-    
 	my %properties;
 	tie %properties, 'Tie::IxHash';
 	%properties = (
@@ -612,12 +605,11 @@ sub definition {
 			hoverHelp=>$i18n->get('filter code description'),
 			},
 		richEditor =>{
-			fieldType=>"selectBox",
+			fieldType=>"selectRichEditor",
 			defaultValue=>"PBrichedit000000000002",
 			tab=>'display',
 			label=>$i18n->get('rich editor'),
 			hoverHelp=>$i18n->get('rich editor description'),
-			options=>$richEditorOptions,
 			},
 		attachmentsPerPost =>{
 			fieldType=>"integer",
@@ -789,6 +781,14 @@ sub definition {
             filter=>'fixId',
             defaultValue=>$groupIdEdit, # groupToEditPost should default to groupIdEdit
         },
+        postReceivedTemplateId =>{
+            fieldType=>'template',
+            namespace=>'Collaboration/PostReceived',
+            tab=>'display',
+            label=>$i18n->get('post received template'),
+            hoverHelp=>$i18n->get('post received template hoverHelp'),
+            defaultValue=>'default_post_received1',
+        },
         );
 
         push(@{$definition}, {
@@ -808,12 +808,6 @@ sub duplicate {
 	my $newAsset = $self->SUPER::duplicate(@_);
 	$newAsset->createSubscriptionGroup;
 	return $newAsset;
-}
-
-#-------------------------------------------------------------------
-# Too slow to try to find out children, just always assume new data
-sub getContentLastModified {
-    return time();
 }
 
 #-------------------------------------------------------------------
@@ -893,6 +887,7 @@ SQL
 		    'link'          => $postUrl, 
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
+            epochDate       => $post->get('creationDate'),
 		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
 		    attachmentLoop  => $attachmentLoop, 
 			userDefined1 => $post->get("userDefined1"),
@@ -1071,7 +1066,7 @@ sub getViewTemplateVars {
         $var{"add.url"} = $self->getNewThreadUrl;
         $var{"rss.url"} = $self->getRssUrl;
         $var{'user.isModerator'} = $self->canModerate;
-        $var{'user.isVisitor'} = ($self->session->user->userId eq '1');
+        $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
 	$var{'sortby.title.url'} = $self->getSortByUrl("title");
 	$var{'sortby.username.url'} = $self->getSortByUrl("username");
@@ -1387,35 +1382,6 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 www_editSave ( )
-
-We're extending www_editSave() here to deal with editing a post that has been denied by the approval process.  Our change will reassign the old working tag of this post to the user so that they can edit it.
-
-=cut
-
-sub www_editSave {
-	my $self    = shift;
-    my $session = $self->session;
-    
-    my $className = $session->form->param("class");
-    
-    #my $assetId = $self->session->form->param("assetId");
-    if($className eq "WebGUI::Asset::Post::Thread") {
-        my $assetId = $session->form->param("assetId");
-      
-        if($assetId eq "new" && $self->getValue("useCaptcha")) {
-            my $captcha = $self->session->form->process("captcha","Captcha");
-            unless ($captcha) {
-                return $self->www_add;
-            }
-        }
-    }
-    
-    return $self->SUPER::www_editSave();
-}
-
-#-------------------------------------------------------------------
-
 =head2 www_search ( )
 
 The web method to display and use the forum search interface.
@@ -1423,33 +1389,38 @@ The web method to display and use the forum search interface.
 =cut
 
 sub www_search {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Collaboration');
-        my %var;
-	my $query = $self->session->form->process("query","text");
-        $var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-         	.WebGUI::Form::hidden($self->session,{ name=>"func", value=>"search" })
-        	.WebGUI::Form::hidden($self->session,{ name=>"doit", value=>1 });
-        $var{'query.form'} = WebGUI::Form::text($self->session,{
-                name=>'query',
-                value=>$query
-                });
-        $var{'form.search'} = WebGUI::Form::submit($self->session,{value=>$i18n->get(170,'WebGUI')});
-        $var{'form.footer'} = WebGUI::Form::formFooter($self->session);
-        $var{'back.url'} = $self->getUrl;
-	$self->appendTemplateLabels(\%var);
-        $var{doit} = $self->session->form->process("doit");
-        if ($self->session->form->process("doit")) {
-		my $search = WebGUI::Search->new($self->session);
+    my $self    = shift;
+    my $session = $self->session;
+	my $i18n    = WebGUI::International->new($session, 'Asset_Collaboration');
+    my $var     = {};
+	
+    my $query   = $self->session->form->process("query","text");
+    $var->{'form.header'} = WebGUI::Form::formHeader($self->session,{
+        action=>$self->getUrl("func=search;doit=1")
+    });
+    $var->{'query.form'}  = WebGUI::Form::text($self->session,{
+        name  => 'query',
+        value => $query
+    });
+    $var->{'form.search'} = WebGUI::Form::submit($self->session,{
+        value => $i18n->get(170,'WebGUI')
+    });
+    $var->{'form.footer'} = WebGUI::Form::formFooter($self->session);
+    $var->{'back.url'   } = $self->getUrl;
+	
+    $self->appendTemplateLabels($var);
+    $var->{'doit'       } = $self->session->form->process("doit");
+    if ($self->session->form->process("doit")) {
+        my $search = WebGUI::Search->new($self->session);
 		$search->search({
-				keywords=>$query,
-				lineage=>[$self->get("lineage")],
-				classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
-				});
-		my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->get("threadsPerPage"));
-		$self->appendPostListTemplateVars(\%var, $p);
-        }
-        return  $self->processStyle($self->processTemplate(\%var, $self->get("searchTemplateId")));
+            keywords=>$query,
+            lineage=>[$self->get("lineage")],
+            classes=>["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"]
+        });
+        my $p = $search->getPaginatorResultSet($self->getUrl("func=search;doit=1;query=".$query), $self->get("threadsPerPage"));
+        $self->appendPostListTemplateVars($var, $p);
+    }
+    return  $self->processStyle($self->processTemplate($var, $self->get("searchTemplateId")));
 }
 
 #-------------------------------------------------------------------
@@ -1488,7 +1459,7 @@ sub www_unsubscribe {
 sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1" && !$disableCache);
+	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor && !$disableCache);
 	return $self->SUPER::www_view(@_);
 }
 

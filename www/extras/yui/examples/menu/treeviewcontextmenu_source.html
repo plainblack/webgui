@@ -216,46 +216,20 @@
 
                 function onTriggerContextMenu(p_oEvent) {
 
-
-                    /*
-                         Returns a TextNode instance that corresponds to the DOM
-                         element whose "contextmenu" event triggered the display
-                         of the ContextMenu instance.
-                    */
-        
-                    function getTextNodeFromEventTarget(p_oTarget) {
-        
-                        if (p_oTarget.tagName.toUpperCase() == "A" && 
-                                p_oTarget.className == "ygtvlabel") {
-
-                            return oTextNodeMap[p_oTarget.id];
-        
-                        }
-                        else {
-    
-                            if (p_oTarget.parentNode && 
-                                    p_oTarget.parentNode.nodeType == 1) {
-    
-                                return getTextNodeFromEventTarget(p_oTarget.parentNode);
-                            
-                            }
-                        
-                        }
-                    
-                    }
-
+					var oTarget = this.contextEventTarget,
+						Dom = YAHOO.util.Dom;
 
                     /*
                          Get the TextNode instance that that triggered the 
                          display of the ContextMenu instance.
                     */
 
-                    var oTextNode = getTextNodeFromEventTarget(this.contextEventTarget);
-
+                    var oTextNode = Dom.hasClass(oTarget, "ygtvlabel") ? 
+                    					oTarget : Dom.getAncestorByClassName(oTarget, "ygtvlabel");
 
                     if (oTextNode) {
 
-                        oCurrentTextNode = oTextNode;
+                        oCurrentTextNode = oTextNodeMap[oTarget.id];
 
                     }
                     else {

@@ -28,6 +28,7 @@ use Test::More;
 use Test::Deep;
 use Test::MockObject;
 use HTML::TokeParser;
+use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
 
@@ -36,6 +37,7 @@ my @fixTitleTests = getFixTitleTests($session);
 my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
+my $originalAssetOverrides = dclone($session->config->get('assets'));
 
 ##Test users.
 ##All users in here will be deleted at the end of the test.  DO NOT PUT
@@ -146,7 +148,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 100 
+plan tests => 103 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -490,21 +492,13 @@ TODO: {
 #
 ################################################################
 
-my $origAssetAddPrivileges = $session->config->get('assetAddPrivilege');
-$session->config->set('assetAddPrivilege', { 'WebGUI::Asset' => $testGroups{'canAdd asset'}->getId } );
+$session->config->set('assets/WebGUI::Asset/addGroup', $testGroups{'canAdd asset'}->getId );
 
 $canAddMaker->run;
 
-diag 'Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege';
+#Without proper group setup, Turn On Admin is excluded from adding assets via assetAddPrivilege
 
 $canAddMaker2->run;
-
-if (defined $origAssetAddPrivileges) {
-    $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
-}
-else {
-    $session->config->delete('assetUiLevel');
-}
 
 ################################################################
 #
@@ -587,21 +581,12 @@ is($canEditAsset->getUiLevel,  1, 'getUiLevel: WebGUI::Asset uses the default ui
 is($fixTitleAsset->getUiLevel, 5, 'getUiLevel: Snippet has an uiLevel of 5');
 
 my $origAssetUiLevel = $session->config->get('assetUiLevel');
-$session->config->set('assetUiLevel',
-                      {
-                        'WebGUI::Asset'          => 8,
-                        'WebGUI::Asset::Snippet' => 9,
-                      } );
+$session->config->set('assets/WebGUI::Asset/uiLevel', 8);
+$session->config->set('assets/WebGUI::Asset::Snippet/uiLevel', 8);
 
 is($canEditAsset->getUiLevel,  8, 'getUiLevel: WebGUI::Asset has a configured uiLevel of 8');
-is($fixTitleAsset->getUiLevel, 9, 'getUiLevel: Snippet has a configured uiLevel of 9');
+is($fixTitleAsset->getUiLevel, 8, 'getUiLevel: Snippet has a configured uiLevel of 8');
 
-if (defined $origAssetUiLevel) {
-    $session->config->set('assetUiLevel', $origAssetUiLevel);
-}
-else {
-    $session->config->delete('assetUiLevel');
-}
 
 ################################################################
 #
@@ -638,7 +623,8 @@ is($canViewAsset->isValidRssItem, 1, 'isValidRssItem: By default, all Assets are
 #
 ################################################################
 
-is($canViewAsset->getEditTabs, undef, 'getEditTabs: No extra tabs by default');
+my @tabs = $canViewAsset->getEditTabs;
+is(scalar(@tabs), 4, 'getEditTabs: 4 tabs by default');
 
 ################################################################
 #
@@ -691,6 +677,15 @@ $session->setting->set('notFoundPage', $origNotFoundPage);
 #
 ################################################################
 is($rootAsset->get('isExportable'), 1, 'isExportable exists, defaults to 1');
+
+################################################################
+#
+# getSeparator
+#
+################################################################
+is($rootAsset->getSeparator,      '~~~PBasset000000000000001~~~', 'getSeparator, known assetId');
+is($rootAsset->getSeparator('!'), '!!!PBasset000000000000001!!!', 'getSeparator, given pad character');
+isnt($rootAsset->getSeparator, $mediaFolder->getSeparator, 'getSeparator: unique string');
 
 ################################################################
 #
@@ -811,21 +806,16 @@ is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheritu
 
 
 END {
-    $session->config->set( 'extrasURL',    $origExtras);
-    $session->config->set( 'uploadsURL',   $origUploads);
-    $session->setting->set('urlExtension', $origUrlExtension);
-    $session->setting->set('notFoundPage', $origNotFoundPage);
-    if (defined $origAssetAddPrivileges) {
-        $session->config->set('assetAddPrivilege', $origAssetAddPrivileges);
-    }
-    else {
-        $session->config->delete('assetUiLevel');
-    }
-    if (defined $origAssetUiLevel) {
-        $session->config->set('assetUiLevel', $origAssetUiLevel);
-    }
-    else {
-        $session->config->delete('assetUiLevel');
+    $session->config->set( 'extrasURL',    $origExtras)
+        if defined $origExtras;
+    $session->config->set( 'uploadsURL',   $origUploads)
+        if defined $origUploads;
+    $session->setting->set('urlExtension', $origUrlExtension)
+        if defined $origUrlExtension;
+    $session->setting->set('notFoundPage', $origNotFoundPage)
+        if defined $origNotFoundPage;
+    if (defined $originalAssetOverrides) {
+        $session->config->set('assets', $originalAssetOverrides);
     }
     foreach my $vTag ($versionTag, $versionTag2, $versionTag3, $versionTag4, ) {
         $vTag->rollback;
@@ -906,43 +896,48 @@ sub getFixTitleTests {
     },
     {
         title   => '',
-        fixed    => undef,
+        fixed   => undef,
         comment => "null string returns the Asset's title",
     },
     {
         title   => 'untitled',
-        fixed    => undef,
+        fixed   => undef,
         comment => "'untitled' returns the Asset's title",
     },
     {
         title   => 'UnTiTlEd',
-        fixed    => undef,
+        fixed   => undef,
         comment => "'untitled' in any case returns the Asset's title",
     },
     {
         title   => 'Username: ^@;',
-        fixed    => 'Username: &#94;@;',
+        fixed   => 'Username: &#94;@;',
         comment => "Macros are negated",
     },
     {
         title   => '<b>A bold title</b>',
-        fixed    => 'A bold title',
+        fixed   => 'A bold title',
         comment => "Markup is stripped out",
     },
     {
         title   => 'Javascript: <script>Evil code goes in here</script>',
-        fixed    => 'Javascript: ',
+        fixed   => 'Javascript: ',
         comment => "javascript removed",
     },
     {
         title   => 'This is a good Title',
-        fixed    => 'This is a good Title',
+        fixed   => 'This is a good Title',
         comment => "Good titles are passed",
     },
     {
         title   => '<b></b>',
-        fixed    => '',
+        fixed   => '',
         comment => "If there is no title left after processing, then it is set to untitled.",
+    },
+    {
+        title   => q|Quotes '"|,
+        fixed   => q|Quotes '"|,
+        comment => "Quotes are not processed.",
     },
     );
 }

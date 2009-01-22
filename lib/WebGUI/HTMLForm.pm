@@ -83,7 +83,6 @@ sub AUTOLOAD {
 	my $self = shift;
     my $name = ucfirst((split /::/, $AUTOLOAD)[-1]);
     my %params = @_;
-	$params{uiLevelOverride} ||= $self->{_uiLevelOverride};
 	$params{rowClass} ||= $self->{_class};
     my $control = eval { WebGUI::Pluggable::instanciate("WebGUI::Form::".$name, "new", [ $self->session, %params ]) };
     if ($@) {
@@ -269,7 +268,7 @@ sub new {
 	$header .= "\n<table ".$param{tableExtras}.' style="width: 100%;"><tbody>';
 	$footer = "</tbody></table>\n" ;
 	$footer .= WebGUI::Form::formFooter($session);
-        bless {_session=>$session, _tableExtras=>$param{tableExtras}, _uiLevelOverride=>$param{uiLevelOverride},  _header => $header, _footer => $footer, _data => ''}, $class;
+	bless {_session=>$session, _tableExtras=>$param{tableExtras}, _header => $header, _footer => $footer, _data => ''}, $class;
 }
 
 #-------------------------------------------------------------------

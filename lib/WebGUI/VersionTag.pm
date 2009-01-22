@@ -17,6 +17,7 @@ package WebGUI::VersionTag;
 use strict;
 use WebGUI::Asset;
 use WebGUI::Workflow::Instance;
+use WebGUI::DateTime;
 
 =head1 NAME
 
@@ -36,6 +37,64 @@ These methods are available from this class:
 
 =cut
 
+
+#-------------------------------------------------------------------
+
+=head2 autoCommitWorkingIfEnabled ( $session, $options )
+
+A class method that automatically commits the working version tag if auto commit is
+enabled.  Returns 'commit' if the tag was committed, 'redirect' if a redirect for
+comments was set (only possible with allowComments), or false if no action was taken.
+
+=head3 $options
+
+Hashref with options for how to do auto commit
+
+=head4 override
+
+Do autocommit even if not enabled for the site
+
+=head4 allowComments
+
+Whether to allow comments to be added.  If enabled, instead of
+committing directly, will set a redirect for the user to enter
+a comment.
+
+=head4 returnUrl
+
+If allowComments is enabled, the URL to return to after committing
+
+=cut
+
+sub autoCommitWorkingIfEnabled {
+    my $class = shift;
+    my $session = shift;
+    my $options = shift || {};
+    # need a version tag to do any auto commit
+    my $versionTag = $class->getWorking($session, "nocreate");
+    return undef
+        unless $versionTag;
+
+    #Auto commit is no longer determined from autoRequestCommit
+
+    # auto commit assets
+    # save and commit button and site wide auto commit work the same
+    if (
+        $options->{override}
+        || $class->getVersionTagMode($session) eq q{autoCommit}
+    ) {
+        if ($session->setting->get("skipCommitComments") || !$options->{allowComments}) {
+            $versionTag->requestCommit;
+            return 'commit';
+        }
+        else {
+            my $url = $options->{returnUrl} || $session->url->page;
+            $url = $session->url->append($url, "op=commitVersionTag;tagId=" . $versionTag->getId);
+            $session->http->setRedirect($url);
+            return 'redirect';
+        }
+    }
+}
 
 #-------------------------------------------------------------------
 
@@ -305,6 +364,35 @@ sub getRevisionCount {
 
 #-------------------------------------------------------------------
 
+=head2 getVersionTagMode ( session )
+
+Return version tag mode for current session
+
+=cut
+
+sub getVersionTagMode {
+    my $class   = shift;
+    my $session = shift;
+
+    my $mode = q{};
+
+    $mode = $session->user()->profileField(q{versionTagMode});
+
+    #verify mode.
+    if (!(defined $mode && WebGUI::Utility::isIn($mode, qw{autoCommit siteWide singlePerUser multiPerUser}))) {
+        $mode = q{};
+    }
+
+    #Get mode from settings
+    if ($mode eq q{}) {
+        $mode = $session->setting()->get(q{versionTagMode});
+    }
+
+    return $mode;
+} #getVersionTagMode
+
+#-------------------------------------------------------------------
+
 =head2 getWorkflowInstance ( )
 
 Returns a reference to the workflow instance attached to this version tag if any.
@@ -333,26 +421,92 @@ A boolean that if set to true, will prevent this method from creating an autotag
 =cut
 
 sub getWorking {
-	my $class = shift;
-	my $session = shift;
-	my $noCreate = shift;
-	if ($session->stow->get("versionTag")) {
-		return $session->stow->get("versionTag");
-	} else {
-		my $tagId = $session->scratch->get("versionTag");
-		if ($tagId) {
-			my $tag = $class->new($session, $tagId);
-			$session->stow->set("versionTag",$tag);
-			return $tag;
-		} elsif ($noCreate) {
-			return undef;
-		} else {
-			my $tag = $class->create($session);
-			$tag->setWorking;
-			return $tag;	
-		}
-	}
-}
+    my $class    = shift;
+    my $session  = shift;
+    my $noCreate = shift;
+
+    my $stow = $session->stow();
+    my $mode = $class->getVersionTagMode($session);
+    my $tag;
+    my $tagId;
+
+    #First see if there is already a version tag
+    $tag = $stow->get(q{versionTag});
+
+    return $tag if $tag;
+
+    $tagId = $session->scratch()->get(q{versionTag});
+    if ($tagId) {
+        $tag = $class->new($session, $tagId);
+
+        $stow->set(q{versionTag}, $tag);
+
+        return $tag;
+    }
+
+    #No tag found. Create or reclaim one?
+    # multiPerUser / autoCommit: no reclaim, create if not noCreate
+    # singlePerUser: try to reclaim previous if only 1 open tag
+    # siteWide: try to claim site-wide version tag
+    # autoCommit: 
+
+    if ($mode eq q{singlePerUser}) {
+        # Get all open tags for user. If only 1 tag open then reclaim
+        # it.
+        my @openTags = ();
+        my $userId = $session->user()->userId();
+
+      OPENTAG:
+        foreach my $openTag (@{WebGUI::VersionTag->getOpenTags($session)}) {
+
+            # Do not reclaim site wide tag in singlePerUser mode
+            next OPENTAG if $openTag->get(q{isSiteWide});
+
+            if ($openTag->get(q{createdBy}) eq $userId) {
+
+                push @openTags, $openTag;
+            }
+        }
+        # For now, we only reclaim if 1 tag open.
+        if (scalar @openTags == 1) {
+            $tag = $openTags[0];
+
+            $tag->setWorking();
+
+            return $tag;
+        }
+    }
+    elsif ($mode eq q{siteWide}) {
+        # Check for site wide version tag. Reclaim if available
+
+      OPENTAG:
+        foreach my $openTag (@{WebGUI::VersionTag->getOpenTags($session)}) {
+            if ($openTag->get(q{isSiteWide})) {
+
+                $tag = $openTag;
+
+                $tag->setWorking();
+
+                return $tag;
+            }
+        }
+    }
+
+    return undef if $noCreate;
+
+    # Create new tag.
+    my %properties = ();
+
+    if ($mode eq q{siteWide}) {
+        $properties{isSiteWide} = 1;
+    }
+
+    $tag = $class->create($session, \%properties);
+
+    $tag->setWorking();
+
+    return $tag;
+} #getWorking
 
 #-------------------------------------------------------------------
 
@@ -407,6 +561,7 @@ fails.
 
 sub requestCommit {
 	my $self = shift;
+    
 	$self->lock;
 	my $instance = WebGUI::Workflow::Instance->create($self->session, {
 		workflowId=>$self->get("workflowId"),
@@ -417,7 +572,7 @@ sub requestCommit {
 	$self->{_data}{committedBy} = $self->session->user->userId;
 	$self->{_data}{workflowInstanceId} = $instance->getId;
 	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-    $instance->start;
+    return $instance->start;
     return undef;
 }
 
@@ -497,17 +652,20 @@ The time that a version tag shoudl stop displaying on the website.
 =cut
 
 sub set {
-	my $self = shift;
-	my $properties = shift;
-    
+    my $self = shift;
+    my $properties = shift;
+
     my $now        = $self->session->datetime->time();
     my $startTime  = WebGUI::DateTime->new($self->session,$now)->toDatabase;
     my $endTime    = WebGUI::DateTime->new($self->session,'2036-01-01 00:00:00')->toDatabase;
-    
-	$self->{_data}{'name'      } = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman()." (Autotag)";
-	$self->{_data}{'workflowId'} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
-	$self->{_data}{'groupToUse'} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
-    
+
+    #In case of site wide version tag, mark it as Site wide autotag instead
+    my $isSiteWide = $properties->{isSiteWide} || $self->{_data}{isSiteWide} || 0;
+
+    $self->{_data}{'name'      } = $properties->{name} || $self->{_data}{name} || $self->session->user->username." / ".$self->session->datetime->epochToHuman().($isSiteWide ? q{ (Site wide autotag)} : q{ (Autotag)});
+    $self->{_data}{'workflowId'} = $properties->{workflowId} || $self->{_data}{workflowId} || $self->session->setting->get("defaultVersionTagWorkflow");
+    $self->{_data}{'groupToUse'} = $properties->{groupToUse} || $self->{_data}{groupToUse} || "12";
+
     #This is necessary for upgrade prior to 7.5.11 in order to ensure that this field exists.
     #The if() blocks should be removd once the next branch point is reached.
     my $assetVersionTagDesc = $self->session->db->buildHashRef('describe assetVersionTag');
@@ -516,15 +674,22 @@ sub set {
         $self->{_data}{'startTime' } = $properties->{startTime} || $self->{_data}{startTime} || $startTime;
         $self->{_data}{'endTime'   } = $properties->{endTime} || $self->{_data}{endTime} || $endTime;
     }
-	if (exists $properties->{comments}) {
-		$self->{_data}{comments}=$self->session->datetime->epochToHuman.' - '.$self->session->user->username
-                                ."\n"
-                                .$properties->{comments}
-                                ."\n\n"
-				.$self->{_data}{comments};
-	}
-	$self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
-}
+
+    #New field isSiteWide is added. Check if field exists. This is needed to let upgrades work
+    if (grep { $_ =~ /^isSiteWide/ } keys %{$assetVersionTagDesc}) {
+
+        $self->{_data}{'isSiteWide'} = $isSiteWide;
+    }
+
+    if (exists $properties->{comments}) {
+        $self->{_data}{comments}=$self->session->datetime->epochToHuman.' - '.$self->session->user->username
+            ."\n"
+            .$properties->{comments}
+            ."\n\n"
+            .$self->{_data}{comments};
+    }
+    $self->session->db->setRow("assetVersionTag","tagId",$self->{_data});
+} #set
 
 #-------------------------------------------------------------------
 

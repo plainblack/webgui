@@ -82,6 +82,39 @@ sub addPrivateMessage {
 
 #-------------------------------------------------------------------
 
+=head2 canRead ( messageId [, user] ) 
+
+Returns whether or not a user can view the message passed in.
+
+=head3 message
+
+A WebGUI::Inbox::Message object
+
+=head3 user
+
+WebGUI::User object to test against.  Defaults to the current user.
+
+=cut
+
+sub canRead {
+	my $self    = shift;
+    my $message = shift;
+    my $user    = shift || $self->session->user;
+
+    unless (ref $message eq "WebGUI::Inbox::Message") {
+        $self->session->log->warn("Message passed in was either empty or not a valid WebGUI::Inbox::Message.  Got: ".(ref $message));
+        return 0
+    }
+
+    my $userId = $message->get("userId");
+    my $groupId = $message->get("groupId");
+
+    return ($user->userId eq $userId || (defined $groupId && $user->isInGroup($groupId)));
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 DESTROY ( )
 
 Deconstructor.
@@ -95,7 +128,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 getMessage ( messageId ) 
+=head2 getMessage ( messageId [, userId] ) 
 
 Returns a WebGUI::Inbox::Message object.
 
@@ -103,17 +136,91 @@ Returns a WebGUI::Inbox::Message object.
 
 The id of the message to retrieve.
 
+=head3 userId
+
+The id of the user to retrieve the message for.  Defaults to the current user.
+
 =cut
 
 sub getMessage {
-	my $self = shift;
-	return WebGUI::Inbox::Message->new($self->session, shift);
-}
+	my $self      = shift;
+    my $messageId = shift;
+    my $userId    = shift;
 
+	return WebGUI::Inbox::Message->new($self->session, $messageId, $userId);
+}
 
 #-------------------------------------------------------------------
 
-=head2 getMessagesForUser ( user [ , limit ] )
+=head2 getNextMessage ( message [, userId] ) 
+
+Returns the message that was send after the message passed in for the user
+
+=head3 message
+
+The message to find the next message for
+
+=head3 user
+
+The WebGUI::User object of the user to retrieve the message for.  Defaults to the current user.
+
+=cut
+
+sub getNextMessage {
+    my $self      = shift;
+    my $session   = $self->session;
+    my $baseMessage = shift;
+    my $user      = shift || $session->user;
+    
+	my $sql = $self->getMessageSql($user,{
+        whereClause => "ibox.dateStamp > ".$baseMessage->get("dateStamp"),
+        sortBy      => "ibox.dateStamp",
+        sortDir     => "asc",
+        limit       => 1
+    });
+    
+    my $message = $self->session->db->quickHashRef($sql);
+    
+    return $self->getMessage($message->{messageId});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPreviousMessage ( message [, userId] ) 
+
+Returns the message that was sent before the message passed in for the user
+
+=head3 message
+
+The message to find the previous message for
+
+=head3 user
+
+The WebGUI::User object of the user to retrieve the message for.  Defaults to the current user.
+
+=cut
+
+sub getPreviousMessage {
+	my $self      = shift;
+    my $session   = $self->session;
+    my $baseMessage = shift;
+    my $user      = shift || $session->user;
+
+    my $sql = $self->getMessageSql($user,{
+        whereClause => "ibox.dateStamp < ".$baseMessage->get("dateStamp"),
+        sortBy      => "ibox.dateStamp",
+        sortDir     => "desc",
+        limit       => 1
+    });
+    
+    my $message = $self->session->db->quickHashRef($sql);
+    
+    return $self->getMessage($message->{messageId});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getMessagesForUser ( user [ , limit, page, sortBy ] )
 
 Returns an array reference containing the most recent message objects for a given user.
 
@@ -125,6 +232,14 @@ A user object.
 
 An integer indicating the number of messages to fetch. Defaults to 50.
 
+=head3 page
+
+An integer indication the page to return.  Defaults to 1
+
+=head3 sortby
+
+The column to sort by
+
 =cut
 
 sub getMessagesForUser {
@@ -134,59 +249,263 @@ sub getMessagesForUser {
     my $page        = shift || 1;
     my $sortBy      = shift;
     
-    my @messages = ();
-    my $counter  = 0;
+    my $p = $self->getMessagesPaginator( $user , {
+        sortBy        => $sortBy,
+        sortDir       => "desc",
+        paginateAfter => $perpage,
+        pageNumber    => $page
+        
+    });
     
-    my ( $sql, @bindvars );
-    my $start   = (($page-1) * $perpage);
-    my $end     = $start + $page * $perpage;
-    my $limit   = "$start, $perpage";
-
-    ### Here we're going to get enough rows to fill our needs ($end) from each subquery, then
-    ### use the UNION to grab only the rows we want to display ($limit)
-
-    # If we have a way to sort, use that
-    if ( grep { $_ eq $sortBy } qw( subject sentBy dateStamp ) ) {
-        $sql        = q{ ( SELECT messageId, userId, groupId, %s FROM inbox WHERE userId = "%s" ORDER BY %s LIMIT %s ) }
-                    . q{ UNION }
-                    . q{ ( SELECT messageId, userId, groupId, %s FROM inbox WHERE groupId IN ( %s ) ORDER BY %s LIMIT %s ) }
-                    . q{ ORDER BY %s LIMIT %s }
-                    ;
-        @bindvars   = ( 
-                        $sortBy, $user->userId, $sortBy, $end, 
-                        $sortBy, $self->session->db->quoteAndJoin( $user->getGroupIdsRecursive ), $sortBy, $end,
-                        $sortBy, $limit
-                    );
-    }
-    # Otherwise put "pending" messages above "completed" messaged and sort by date descending
-    else {
-        $sql    = 
-                 q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="pending" AND groupId IN ( %s ) ORDER BY dateStamp DESC LIMIT %s ) }
-                . q{ UNION }
-                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="pending" AND userId = "%s" ORDER BY dateStamp DESC LIMIT %s ) }
-                . q{ UNION }
-                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="completed" AND groupId IN ( %s ) ORDER BY dateStamp DESC LIMIT %s ) }
-                . q{ UNION }
-                . q{ ( SELECT messageId, status, dateStamp FROM inbox WHERE status="completed" AND userId = "%s" ORDER BY dateStamp DESC LIMIT %s ) }
-                . q{ ORDER BY status="pending" DESC, dateStamp DESC LIMIT %s }
-                ;
-
-        @bindvars   = ( 
-                        ( $self->session->db->quoteAndJoin( $user->getGroupIdsRecursive ), $end,
-                        $user->userId, $end, 
-                        ) x 2,
-                        $limit,
-                    );
-    }
-
-    my $rs      = $self->session->db->read( sprintf $sql, @bindvars );
-    while ( my ( $messageId ) = $rs->array ) {
-        push @messages, $self->getMessage( $messageId );
-    }
-    $rs->finish;
-
-    return \@messages;	
+    return $self->getMessagesOnPage($p);
 }
+
+#-------------------------------------------------------------------
+
+=head2 getMessagesOnPage ( paginator ) 
+
+Returns an array ref of WebGUI::Inbox::Message objects created from the current
+page of data.
+
+=head3 paginator
+
+The id of the message to retrieve.
+
+=cut
+
+sub getMessagesOnPage {
+	my $self     = shift;
+    my $p        = shift;
+    my @messages = ();
+   
+    unless (defined $p and ref $p eq "WebGUI::Paginator") {
+        $self->session->log->warn("Paginator was not defined");
+        return [];
+    }
+
+    foreach my $row (@{$p->getPageData}) {
+        push @messages, $self->getMessage( $row->{messageId} );
+    }
+    
+    return \@messages;
+}
+
+
+
+#-------------------------------------------------------------------
+
+=head2 getMessagesPaginator ( user [, properties ] )
+
+Returns an reference to a WebGUI::Paginator object filled with all the messages in a user's inbox
+
+=head3 user
+
+A user object.
+
+=head3 properties
+
+Properties which can be set to determine how many rows are returned, etc
+
+=head4 sortBy
+
+Column to sort the inbox by.  Valid values are subject, sentBy, and dateStamp.  Defaults to
+dateStamp if value is invalid.  Defaults to status="pending" DESC, dateStamp DESC if value not set.
+
+=head4 sortDir
+
+Direction to sort the results by.  Defaults to desc.  This only works if a sortBy value is set.
+
+=head4 baseUrl
+
+The URL of the current page including attributes. The page number will be appended to this in all links generated by the paginator.
+Defaults to $session->url->pge
+
+=head4 paginateAfter
+
+The number of rows to display per page. If left blank it defaults to 25.
+
+=head4 formVar
+
+Specify the form variable the paginator should use in its links.  Defaults to "pn".
+
+=head4 pageNumber
+
+By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
+
+=cut
+
+sub getMessagesPaginator {    
+    my $self          = shift;
+    my $session       = $self->session;
+    my $user          = shift || $session->user;
+    my $properties    = shift;
+    
+    my $userId        = $user->userId;
+    my $sortBy        = $properties->{sortBy};
+    my $sortDir       = $properties->{sortDir}  || "desc";
+    my $baseUrl       = $properties->{baseUrl}  || $session->url->page;
+    my $paginateAfter = $properties->{paginateAfter};
+    my $formVar       = $properties->{formVar};
+    my $pageNumber    = $properties->{pageNumber};
+
+    #Make sure a valid sortBy is passed in
+    if($sortBy && !WebGUI::Utility::isIn($sortBy,qw( subject sentBy dateStamp status ))) {
+        $sortBy = q{dateStamp}
+    }
+    #Sort by fullname if user wants to sort by who sent the message
+    if ($sortBy eq "sentBy") {
+        $sortBy  = q{fullName};
+    }
+    elsif ($sortBy eq "status") {
+        $sortBy  = q{messageStatus};
+    }
+    elsif($sortBy) {
+        $sortBy  = qq{ibox.$sortBy};
+    }
+    else {
+        $sortBy  = q{messageStatus='pending' DESC, dateStamp DESC};
+        $sortDir = q{};
+    }
+    
+    my $sql = $self->getMessageSql($user, {
+        user    => $user,
+        sortBy  => $sortBy,
+        sortDir => $sortDir
+    });
+
+    #$session->log->warn($sql);
+
+    my $p = WebGUI::Paginator->new(
+        $session,
+        $baseUrl,
+        $paginateAfter,
+        $formVar,
+        $pageNumber
+    );
+
+    $p->setDataByQuery($sql,undef,undef);
+
+    return $p;	
+}
+
+#-------------------------------------------------------------------
+
+=head2 getMessageSql ( user, properties ) 
+
+Returns the SQL used to return the messages in a user's inbox.
+
+=head3 user
+
+WebGUI::User object of user to get messages for.  Defaults to current user.
+
+=head3 properties
+
+Hash reference of properties
+
+=head4 sortBy
+
+Column to sort by.  Valid columns are:
+
+    ibox.messageId,
+    ibox.subject,
+    ibox.sentBy,
+    ibox.dateStamp,
+    ibox.status,
+    messageStatus,
+    fullName
+
+=head4 sortDir
+
+Direction to sort by
+
+=head4 whereClause
+
+A where clause to use
+
+=head4 limit
+
+Column
+
+=cut
+
+sub getMessageSql {
+	my $self        = shift;
+    my $session     = $self->session;
+    my $user        = shift || $session->user;
+    my $props       = shift || {};
+
+    my $userId      = $user->userId;
+    my $sortBy      = $props->{sortBy};
+    my $sortDir     = $props->{sortDir};
+    my $whereClause = $props->{whereClause};
+    my $limit       = $props->{limit};
+
+    if($sortBy) {
+        $sortBy = qq{ORDER BY $sortBy $sortDir};
+    }
+
+    if($whereClause) {
+        $whereClause = qq{WHERE $whereClause};
+    }
+
+    if($limit) {
+        $limit = qq{LIMIT $limit};
+    }
+
+    my $messageLimit = 20_000;
+    my $limitHalf    = $messageLimit / 2;
+    my $limitQuarter = $messageLimit / 4;
+    my $userGroups   = $session->db->quoteAndJoin( $user->getGroupIdsRecursive );
+    $userGroups      = "''" if $userGroups eq "";
+
+    # for performance purposes don't use datasets larger than 20000 no matter how man messages are in the inbox
+    my $sql = qq{
+        SELECT
+            ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
+            (IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
+            (IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+        FROM (
+                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE userId = '$userId' order by dateStamp desc limit $limitHalf)
+                UNION
+                ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE groupId IN ( $userGroups ) order by dateStamp desc limit $limitHalf )
+        ) AS ibox
+        JOIN inbox_messageState on inbox_messageState.messageId=ibox.messageId and inbox_messageState.userId='$userId' and inbox_messageState.deleted=0
+        LEFT JOIN users on users.userId=ibox.sentBy
+        LEFT JOIN userProfileData on userProfileData.userId=ibox.sentBy
+        $whereClause
+        $sortBy
+        $limit
+    };
+
+    #$session->log->warn($sql);
+
+    return $sql;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getUnreadMessageCount ( [userId] ) 
+
+Returns the number of unread messages for the user passed in
+
+=head3 userId
+
+user to get unread message count for.  Defaults to current user.
+
+=cut
+
+sub getUnreadMessageCount {
+	my $self     = shift;
+    my $session  = $self->session;
+    my $userId   = shift || $session->user->userId;
+
+    return $session->db->quickScalar(
+        qq{select count(*) from inbox_messageState where userId=? and deleted=0 and isRead=0 },
+        [$userId]
+    );
+}
+
 
 
 #-------------------------------------------------------------------
@@ -222,4 +541,3 @@ sub session {
 
 
 1;
-

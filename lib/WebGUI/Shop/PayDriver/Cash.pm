@@ -62,11 +62,10 @@ this plugin.
 sub getButton {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new($session, 'PayDriver_Cash');
 
     my $payForm = WebGUI::Form::formHeader($session)
         . $self->getDoFormTags('getCredentials')
-        . WebGUI::Form::submit($session, {value => $i18n->get('cash') })
+        . WebGUI::Form::submit($session, {value => $self->get('label') })
         . WebGUI::Form::formFooter($session);
 
     return $payForm;
@@ -105,7 +104,18 @@ Optionally supply this variable which will set the payment address to this addre
 sub www_getCredentials {
     my ($self, $addressId)    = @_;
     my $session = $self->session;
-    $addressId = $session->form->process('addressId') if ($addressId eq "");
+
+    # Process address from address book if passed
+    $addressId   = $session->form->process( 'addressId' );
+    my $address;
+    if ( $addressId ) {
+        $address    = eval{ $self->getAddress( $addressId ) };
+    }
+    else { 
+        $address    = $self->getCart->getShippingAddress;
+    }
+    my $billingAddressHtml = $address->getHtmlFormatted;
+
     # Generate the json string that defines where the address book posts the selected address
     my $callbackParams = {
         url     => $session->url->page,
@@ -126,18 +136,11 @@ sub www_getCredentials {
         . WebGUI::Form::submit( $session, { value => 'Choose billing address' } )
         . WebGUI::Form::formFooter( $session);
 
-    # Get billing address
-    my $billingAddress = eval { $self->getAddress($addressId) };
-   
-    my $billingAddressHtml;
-    if ($billingAddress) {
-        $billingAddressHtml = $billingAddress->getHtmlFormatted;
-    }
 
     # Generate 'Proceed' button
     my $proceedButton = WebGUI::Form::formHeader( $session )
         . $self->getDoFormTags('pay')
-        . WebGUI::Form::hidden($session, {name=>"addressId", value=>$addressId})
+        . WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
         . WebGUI::Form::submit( $session, { value => 'Pay' } )
         . WebGUI::Form::formFooter( $session);
 

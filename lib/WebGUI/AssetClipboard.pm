@@ -18,7 +18,7 @@ use strict;
 
 =head1 NAME
 
-Package WebGUI::AssetClipboard
+Package WebGUI::Asset (AssetClipboard)
 
 =head1 DESCRIPTION
 
@@ -89,6 +89,17 @@ sub duplicate {
     while (my $h = $sth->hashRef) {
         $self->session->db->write("insert into metaData_values (fieldId, assetId, value) values (?, ?, ?)", [$h->{fieldId}, $newAsset->getId, $h->{value}]);
     }
+
+    # Duplicate keywords
+    my $k = WebGUI::Keyword->new( $self->session );
+    my $keywords    = $k->getKeywordsForAsset( {
+        asset       => $self,
+        asArrayRef  => 1,
+    } );
+    $k->setKeywordsForAsset( {
+        asset       => $newAsset,
+        keywords    => $keywords,
+    } );
 
     return $newAsset;
 }
@@ -205,18 +216,15 @@ sub www_copy {
     else {
         $newAsset = $self->duplicate({skipAutoCommitWorkflows => 1});
     }
-    $newAsset->update({ title=>$self->getTitle.' (copy)'});
+    my $i18n = WebGUI::International->new($self->session, 'Asset');
+    $newAsset->update({ title=>sprintf("%s (%s)",$self->getTitle,$i18n->get('copy'))});
     $newAsset->cut;
-    if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-            $self->session->http->setRedirect($self->getUrl(
-                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
-            ));
-            return undef;
-        }
-    }
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
     return $self->session->asset($self->getContainer)->www_view;
 }
 
@@ -275,17 +283,14 @@ sub www_createShortcut {
     if (! $isOnDashboard) {
         $child->cut;
     }
-    if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } else {
-            $self->session->http->setRedirect($self->getUrl(
-                "op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId
-            ));
-            return 1;
-        }
-    }
-	if ($isOnDashboard) {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    })) {
+        return undef;
+    };
+
+    if ($isOnDashboard) {
 		return $self->getParent->www_view;
 	} else {
 		$self->session->asset($self->getContainer);
@@ -373,7 +378,7 @@ sub www_emptyClipboard {
 	my $self = shift;
 	my $ac = WebGUI::AdminConsole->new($self->session,"clipboard");
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));
-	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)))}) {
+	foreach my $asset (@{$self->getAssetsInClipboard(!($self->session->form->process("systemClipboard") && $self->session->user->isAdmin))}) {
 		$asset->trash;
 	}
 	return $self->www_manageClipboard();
@@ -394,7 +399,7 @@ sub www_manageClipboard {
 	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(12));
 	my $i18n = WebGUI::International->new($self->session, "Asset");
 	my ($header,$limit);
-	if ($self->session->form->process("systemClipboard") && $self->session->user->isInGroup(3)) {
+	if ($self->session->form->process("systemClipboard") && $self->session->user->isAdmin) {
 		$header = $i18n->get(966);
 		$ac->addSubmenuItem($self->getUrl('func=manageClipboard'), $i18n->get(949));
 		$ac->addSubmenuItem($self->getUrl('func=emptyClipboard;systemClipboard=1'), $i18n->get(959), 

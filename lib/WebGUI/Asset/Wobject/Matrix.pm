@@ -1,183 +1,392 @@
 package WebGUI::Asset::Wobject::Matrix;
- 
+
 use strict;
+our $VERSION = "2.0.0";
+
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
+
 use Tie::IxHash;
-use WebGUI::Form;
-use WebGUI::HTMLForm;
-use WebGUI::Cache;
-use WebGUI::Mail::Send;
-use WebGUI::SQL;
-use WebGUI::Storage::Image;
-use WebGUI::User;
+use JSON;
+use WebGUI::International;
 use WebGUI::Utility;
-use WebGUI::Inbox;
-use WebGUI::Asset::Wobject;
-use WebGUI::Asset::Wobject::Collaboration;
+use WebGUI::Asset::MatrixListing;
+use base 'WebGUI::Asset::Wobject';
 
- 
-our @ISA = qw(WebGUI::Asset::Wobject);
- 
+#----------------------------------------------------------------------------
+
+=head2 canAddMatrixListing (  )
+
+Returns true if able to add MatrixListings. 
+
+=cut
+
+sub canAddMatrixListing {
+    my $self    = shift;
+
+    return 0 if $self->session->user->isVisitor;
+
+    return 1;
+}
+
 #-------------------------------------------------------------------
+
+=head2 definition ( )
+
+defines wobject properties for Matrix instances. 
+
+=cut
+
 sub definition {
-        my $class = shift;
+	my $class = shift;
 	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Matrix");
-        push(@{$definition}, {
-		icon=>'matrix.gif',
-                tableName=>'Matrix',
-                className=>'WebGUI::Asset::Wobject::Matrix',
+	my $definition = shift;
+	my $i18n = WebGUI::International->new($session, 'Asset_Matrix');
+
+	my %properties;
+	tie %properties, 'Tie::IxHash';
+	%properties = (
+	    templateId =>{
+		    fieldType       =>"template",  
+    		defaultValue    =>'matrixtmpl000000000001',
+	    	tab             =>"display",
+		    noFormPost      =>0,  
+    		namespace       =>"Matrix", 
+	    	hoverHelp       =>$i18n->get('template description'),
+		    label           =>$i18n->get('template label'),
+    	},
+        searchTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000005",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Search",
+            hoverHelp       =>$i18n->get('search template description'),
+            label           =>$i18n->get('search template label'),
+        },
+        detailTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000003",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Detail",
+            hoverHelp       =>$i18n->get('detail template description'),
+            label           =>$i18n->get('detail template label'),
+        },
+        compareTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000002",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Compare",
+            hoverHelp       =>$i18n->get('compare template description'),
+            label           =>$i18n->get('compare template label'),
+        },
+        editListingTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000004",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/EditListing",
+            hoverHelp       =>$i18n->get('edit listing template description'),
+            label           =>$i18n->get('edit listing template label'),
+        },
+        defaultSort=>{
+            fieldType       =>"selectBox",
+            tab             =>"display",
+            options         =>{ 
+                                score           => $i18n->get('sort by score label'),
+                                title           => $i18n->get('sort alpha numeric label'),
+                                lineage         => $i18n->get('sort by asset rank label'),
+                                revisionDate    => $i18n->get('sort by last updated label'),
+                              },
+            defaultValue    =>"score",
+            hoverHelp       =>$i18n->get('default sort description'),
+            label           =>$i18n->get('default sort label'),
+        },
+        compareColorNo=>{
+            fieldType       =>"color",
+            tab             =>"display",
+            defaultValue    =>"#ffaaaa",
+            hoverHelp       =>$i18n->get('compare color no description'),
+            label           =>$i18n->get('compare color no label'),
+        },
+        compareColorLimited=>{
+            fieldType       =>"color",
+            tab             =>"display",
+            defaultValue    =>"#ffffaa",
+            hoverHelp       =>$i18n->get('compare color limited description'),
+            label           =>$i18n->get('compare color limited label'),
+        },
+        compareColorCostsExtra=>{
+            fieldType       =>"color",
+            tab             =>"display",
+            defaultValue    =>"#ffffaa",
+            hoverHelp       =>$i18n->get('compare color costs extra description'),
+            label           =>$i18n->get('compare color costs extra label'),
+        },
+        compareColorFreeAddOn=>{
+            fieldType       =>"color",
+            tab             =>"display",
+            defaultValue    =>"#ffffaa",
+            hoverHelp       =>$i18n->get('compare color free add on description'),
+            label           =>$i18n->get('compare color free add on label'),
+        },
+        compareColorYes=>{
+            fieldType       =>"color",
+            tab             =>"display",
+            defaultValue    =>"#aaffaa",
+            hoverHelp       =>$i18n->get('compare color yes description'),
+            label           =>$i18n->get('compare color yes label'),
+        },
+        categories=>{
+            fieldType       =>"textarea",
+            tab             =>"properties",
+            defaultValue    =>$i18n->get('categories default value'),
+            hoverHelp       =>$i18n->get('categories description'),
+            label           =>$i18n->get('categories label'),
+            subtext         =>$i18n->get('categories subtext'),
+        },
+        maxComparisons=>{
+            fieldType       =>"integer",
+            tab             =>"properties",
+            defaultValue    =>25,
+            hoverHelp       =>$i18n->get('max comparisons description'),       
+            label           =>$i18n->get('max comparisons label'),
+        },
+        maxComparisonsPrivileged=>{
+            fieldType       =>"integer",
+            tab             =>"properties",
+            defaultValue    =>10,
+            hoverHelp       =>$i18n->get('max comparisons privileged description'),
+            label           =>$i18n->get('max comparisons privileged label'),
+        },
+        submissionApprovalWorkflowId=>{
+            fieldType       =>"workflow",
+            tab             =>"security",
+            type            =>'WebGUI::VersionTag',
+            defaultValue    =>"pbworkflow000000000003",
+            hoverHelp       =>$i18n->get('submission approval workflow description'),
+            label           =>$i18n->get('submission approval workflow label'),
+        },
+        ratingsDuration=>{
+            fieldType       =>"interval",
+            tab             =>"properties",
+            defaultValue    =>7776000, # 3 months 3*30*24*60*60
+            hoverHelp       =>$i18n->get('ratings duration description'),
+            label           =>$i18n->get('ratings duration label'),
+        },
+	);
+	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-                properties=>{
-			visitorCacheTimeout => {
-				tab => "display",
-				fieldType => "interval",
-				defaultValue => 3600,
-				uiLevel => 8,
-				label => $i18n->get("visitor cache timeout"),
-				hoverHelp => $i18n->get("visitor cache timeout help")
-				},
-			categories=>{
-                                defaultValue=>"Features\nBenefits",
-				fieldType=>"textarea"
-                                },
-			maxComparisons=>{
-				defaultValue=>10,
-				fieldName=>"integer"
-				},
-                        templateId=>{
-                                defaultValue=>"matrixtmpl000000000001",
-				fieldType=>"template"
-                                },
-                        searchTemplateId=>{
-                                defaultValue=>"matrixtmpl000000000005",
-				fieldType=>"template"
-                                },
-                        detailTemplateId=>{
-                                defaultValue=>"matrixtmpl000000000003",
-				fieldType=>"template"
-                                },
-                        ratingDetailTemplateId=>{                                
-				defaultValue=>"matrixtmpl000000000004",
-				fieldType=>"template"
-                                },                  
-                        compareTemplateId=>{
-                                defaultValue=>"matrixtmpl000000000002",
-				fieldType=>"template"
-                                },
-			privilegedGroup=>{
-				defaultValue=>'2',
-				fieldType=>"group",
-				},
-			groupToRate=>{
-				defaultValue=>'2',
-				fieldType=>"group",
-				},
-			groupToAdd=>{
-				defaultValue=>'2',
-				fieldType=>"group",
-				},
-			maxComparisonsPrivileged=>{
-				defaultValue=>10,
-				fieldType=>"integer",
-				},
-			ratingTimeout=>{
-				defaultValue=>60*60*24*365,
-				fieldType=>"interval"
-				},
-			ratingTimeoutPrivileged=>{
-				defaultValue=>60*60*24*365,
-				fieldType=>"interval"
-				}
-                        }
-                });
-        return $class->SUPER::definition($session, $definition);
+		icon=>'matrix.gif',
+		autoGenerateForms=>1,
+		tableName=>'Matrix',
+		className=>'WebGUI::Asset::Wobject::Matrix',
+		properties=>\%properties
+		});
+    return $class->SUPER::definition($session, $definition);
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteAttribute ( attributeId )
+
+Deletes an attribute and listing data for this attribute from Collateral.
+
+=head3 attributeId
+
+The id of the attribute that should be deleted.
+
+=cut
+
+sub deleteAttribute {
+
+    my $self = shift;
+    my $attributeId = shift;
+
+    $self->deleteCollateral("Matrix_attribute","attributeId",$attributeId);
+    $self->session->db->write("delete from MatrixListing_attribute where attributeId=? and matrixId=?",
+        [$attributeId,$self->getId]);
+
+    # recalculate scores for MatrixListings
+    my @listings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            returnObjects       => 1,
+        }) };
+    foreach my $listing (@listings){
+        $listing->updateScore;
+    }
+
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+duplicates a Matrix. 
+
+=cut
+
 sub duplicate {
-	# Buggo: how do we duplicate these?
-	return undef;
-}
-
-#-------------------------------------------------------------------
-# Too much data to keep track of modification dates, always assume new data
-sub getContentLastModified {
-    return time();
-}
-
-#-------------------------------------------------------------------
-sub formatURL {
 	my $self = shift;
-	my $func = shift;
-	my $listingId = shift;
-	my $url = $self->getUrl("func=".$func.";listingId=".$listingId);
-	return $url;
+	my $newAsset = $self->SUPER::duplicate(@_);
+	return $newAsset;
 }
 
+#-------------------------------------------------------------------
+
+=head2 editAttributeSave ( attributeProperties  )
+
+Saves an attribute. 
+
+=head3 attributeProperties
+
+A hashref containing the properties of the attribute.
+
+=cut
+
+sub editAttributeSave {
+    my $self                = shift;
+    my $attributeProperties = shift;
+    my $session             = $self->session;
+    my $form                = $session->form;
+
+    return $session->privilege->insufficient() unless $self->canEdit;
+
+    my $attributeId = $self->setCollateral("Matrix_attribute","attributeId",$attributeProperties,0,1);
+
+    return $attributeId;
+}
 
 #-------------------------------------------------------------------
+
+=head2 getAttribute  ( attributeId )
+
+Returns a hash reference of the properties of an attribute.
+
+=head3 attributeId
+
+The unique id of an attribute.
+
+=cut
+
+sub getAttribute {
+    my ($self, $attributeId) = @_;
+    return $self->session->db->quickHashRef("select * from Matrix_attribute where attributeId=?",[$attributeId]);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getCategories  (  )
+
+Returns the categories for this Matrix as a hashref.
+
+=cut
+
 sub getCategories {
-	my $self = shift;
-	my $cat = $self->getValue("categories");
-	$cat =~ s/\r//g;
-	chomp($cat);
-	my @categories = split(/\n/,$cat);
-	return @categories;
+    my $self = shift;
+    my %categories;
+    tie %categories, 'Tie::IxHash';
+
+    my $categories  = $self->getValue("categories");
+    $categories     =~ s/\r//g;
+    chomp($categories);
+
+    my @categories  = split(/\n/,$categories);
+    foreach my $category (@categories) {
+        $categories{$category} = $category;
+    }
+    return \%categories;
+
 }
 
 #-------------------------------------------------------------------
+
+=head2 getCompareColor  (  )
+
+Returns the compare color for a MatrixCompare value.
+
+=head3 value
+
+The value of a MatrixCompare form field.
+
+=cut
+
+sub getCompareColor {
+
+    my $self    = shift;
+    my $value   = shift;
+
+    if($value == 0){
+        return $self->get('compareColorNo');
+    }
+    elsif($value == 1){
+        return $self->get('compareColorLimited');
+    }
+    elsif($value == 2){
+        return $self->get('compareColorCostsExtra');
+    }
+    elsif($value == 3){
+        return $self->get('compareColorFreeAddOn');
+    }
+    elsif($value == 4){
+        return $self->get('compareColorYes');
+    }
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 getCompareForm  (  )
+
+Returns the compare form.
+
+=cut
+
 sub getCompareForm {
-	my $self = shift;
-	my @ids = @_;
-	my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::submit($self->session, {
-			value=>"compare"
-			})
-		."<br />"
-		."<br />"
-		.WebGUI::Form::hidden($self->session, {
-			name=>"func",
-			value=>"compare"
-			})
-		.WebGUI::Form::checkList($self->session, {
-			name=>"listingId",
-			vertical=>1,
-			value=>\@ids,
-			options=>$self->session->db->buildHashRef("select listingId, concat('<a href=\\\"".
-				$self->getUrl("func=viewDetail").";listingId=',listingId,'\\\">', productName,'</a>') from Matrix_listing 
-				where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by productName")
-			})
-		."<br />"
-		.WebGUI::Form::submit($self->session,{
-			value=>"compare"
-			})
-		.WebGUI::Form::formFooter($self->session);
-	return $form;
-}
+    my $self = shift;
 
+    my $form = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,extras=>'name="doCompare"'})
+        ."<br />"
+        .WebGUI::Form::hidden($self->session, {
+            name=>"func",
+            value=>"compare"
+            })
+        .'<div id="compareForm"></div> '
+        ."<br />"
+        .WebGUI::Form::formFooter($self->session);
 
-#-------------------------------------------------------------------
-sub hasRated {
-	my $self = shift;
-	my $listingId = shift;
-	return 1 unless ($self->session->user->isInGroup($self->get("groupToRate")));
-	my $ratingTimeout = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("ratingTimeoutPrivileged") : $self->get("ratingTimeout");
-	my ($hasRated) = $self->session->db->quickArray("select count(*) from Matrix_rating where 
-		((userId=".$self->session->db->quote($self->session->user->userId)." and userId<>'1') or (userId='1' and ipAddress=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).")) and 
-		listingId=".$self->session->db->quote($listingId)." and timeStamp>".($self->session->datetime->time()-$ratingTimeout));
-	return $hasRated;
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }        
+    $form .=  "\n<script type='text/javascript'>\n".
+        'var maxComparisons = '.$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
+        "\n</script>\n";
+    return $form;
 }
 
 #-------------------------------------------------------------------
-sub incrementCounter {
-	my $self = shift;
-	my $listingId = shift;
-	my $counter = shift;
-	my ($lastIp) = $self->session->db->quickArray("select ".$counter."LastIp from Matrix_listing where listingId = ".$self->session->db->quote($listingId));
-	unless ($lastIp eq $self->session->env->get("HTTP_X_FORWARDED_FOR")) {
-		$self->session->db->write("update Matrix_listing set $counter=$counter+1, ".$counter."LastIp=".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR"))." where listingId=".$self->session->db->quote($listingId));
-	}
+
+=head2 getEditForm ( )
+
+returns the tabform object that will be used in generating the edit page for Matrix.
+
+=cut
+
+sub getEditForm {
+	my $self    = shift;
+	my $tabform = $self->SUPER::getEditForm();
+	return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -190,1187 +399,846 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
 	my $self = shift;
+
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
+	$template->prepare;
 	$self->{_viewTemplate} = $template;
+
+    return undef;
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 purge ( )
+
+removes collateral data associated with a Matrix when the system
+purges it's data.  
+
+=cut
+
 sub purge {
-       my $self = shift;
-       $self->session->db->write("delete from Matrix_listing where assetId=".$self->session->db->quote($self->getId));
-       $self->session->db->write("delete from Matrix_listingData where assetId=".$self->session->db->quote($self->getId));
-       $self->session->db->write("delete from Matrix_field where assetId=".$self->session->db->quote($self->getId));
-       $self->session->db->write("delete from Matrix_rating where assetId=".$self->session->db->quote($self->getId));
-       $self->session->db->write("delete from Matrix_ratingSummary where assetId=".$self->session->db->quote($self->getId));
-       $self->SUPER::purge;
+	my $self = shift;
+	
+    $self->session->db->write("delete from Matrix_attribute where assetId=?",[$self->getId]);
+	return $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------
 
-=head2 purgeCache ( )
+=head2 view ( )
 
-See WebGUI::Asset::purgeCache() for details.
+method called by the www_view method.  Returns a processed template
+to be displayed within the page style.  
 
 =cut
 
-sub purgeCache {
-	my $self = shift;
-	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->SUPER::purgeCache;
-}
-
-#-------------------------------------------------------------------
-sub setRatings { 
-	my $self = shift;
-	my $listingId = shift;
-	my $ratings = shift;
-	foreach my $category ($self->getCategories) {
-		if ($ratings->{$category}) {
-			$self->session->db->write("insert into Matrix_rating (userId, category, rating, timeStamp, listingId,ipAddress, assetId) values (
-				".$self->session->db->quote($self->session->user->userId).", ".$self->session->db->quote($category).", ".$self->session->db->quote($ratings->{$category}).", ".$self->session->datetime->time()
-				.", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($self->session->env->get("HTTP_X_FORWARDED_FOR")).",".$self->session->db->quote($self->getId).")");
-		}
-		my $sql = "from Matrix_rating where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category);
-		my ($sum) = $self->session->db->quickArray("select sum(rating) $sql");
-		my ($count) = $self->session->db->quickArray("select count(*) $sql");
-		my $half = round($count/2);
-		my $mean = $sum / ($count || 1);
-		my ($median) = $self->session->db->quickArray("select rating $sql limit $half,$half");
-		$self->session->db->write("replace into Matrix_ratingSummary  (listingId, category, meanValue, medianValue, countValue,assetId) values (
-			".$self->session->db->quote($listingId).", ".$self->session->db->quote($category).", $mean, ".$self->session->db->quote($median).", $count, ".$self->session->db->quote($self->getId).")");
-	}
-}
-
-#-------------------------------------------------------------------
-sub www_approveListing {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless($self->canEdit);
-	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	$self->session->db->write("update Matrix_listing set status='approved' where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	my $inbox = WebGUI::Inbox->new($self->session);
-	$inbox->addMessage({
-		subject=>"New Listing Approved",
-		message=>"Your new listing, ".$listing->{productName}.", has been approved.",
-		status=>'completed',
-		userId=>$listing->{maintainerId}
-		});
-	my $message = $inbox->getMessage($listing->{approvalMessageId});
-	if (defined $message) {
-		$message->setCompleted;
-	}
-	return $self->www_viewDetail;
-}
-
-
-#-------------------------------------------------------------------
-sub www_click {
-	my $self = shift;
-	$self->incrementCounter($self->session->form->process("listingId"),"clicks");
-	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	if ($self->session->form->process("m")) {
-		$self->session->http->setRedirect($listing->{manufacturerUrl});
-	} 
-    else {
-		$self->session->http->setRedirect($listing->{productUrl});
-	}
-	return undef;
-}
-
-
-#-------------------------------------------------------------------
-sub www_compare {
-	my $self = shift;
-	my @cmsList = @_;
-	unless (scalar(@cmsList)) {
-		@cmsList = $self->session->form->checkList("listingId");
-	}
-    my ($style, $url) = ($self->session->style, $self->session->url);
-	my ( %var, @prodcol, @datecol);
-	my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
-	$var{isTooMany} = (scalar(@cmsList)>$max);
-	$var{isTooFew} = (scalar(@cmsList)<2);
-	$var{'compare.form'} = $self->getCompareForm(@cmsList);
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
-	if ($var{isTooMany} || $var{isTooFew}) {
-		return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
-	}
-	foreach my $cms (@cmsList) {
-		$self->incrementCounter($cms,"compares");
-		my $data = $self->session->db->quickHashRef("select listingId, productName, versionNumber, lastUpdated
-			from Matrix_listing where listingId=".$self->session->db->quote($cms));
-		push(@prodcol, {
-			name=>$data->{productName} || "__untitled__",
-			version=>$data->{versionNumber},
-			url=>$self->formatURL("viewDetail",$cms)
-			});
-		push(@datecol, {
-			lastUpdated=>$self->session->datetime->epochToHuman($data->{lastUpdated},"%z")
-			});
-	}
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	my %goodBad = (
-		"No"          => $i18n->get("no"),
-		"Yes"         => $i18n->get("yes"),
-		"Free Add On" => $i18n->get("free"),
-		"Costs Extra" => $i18n->get("extra"),
-		"Limited"     => $i18n->get("limited"),
-	);
-	$var{product_loop} = \@prodcol;
-	$var{lastupdated_loop} = \@datecol;
-	my @categoryloop;
-	foreach my $category ($self->getCategories()) {
-		my @rowloop;
-		my $select = "select a.fieldType, a.label, a.description";
-		my $from = "from Matrix_field a";
-		my $tableCount = "b";
-		foreach my $cms (@cmsList) {
-			$select .= ", ".$tableCount.".value";
-			$from .= " left join Matrix_listingData ".$tableCount." on a.fieldId="
-				.$tableCount.".fieldId and ".$tableCount.".listingId=".$self->session->db->quote($cms);
-			$tableCount++;
-		}
-		my $sth = $self->session->db->read("$select $from where a.category=".$self->session->db->quote($category)." and a.assetId=".$self->session->db->quote($self->getId)." order by a.label");
-		while (my @row = $sth->array) {
-			my @columnloop;
-			my $first = 1;
-            my $type = shift @row;
-			foreach my $value (@row) {
-				my $desc = "";
-				if ($first) {
-					$desc = $row[1];
-					shift(@row);
-					$first = 0;
-				}
-                elsif ($type eq 'goodBad') {
-                    $value = $goodBad{$value};
-                }
-				my $class = lc($value);
-				$class =~ s/\s/_/g;
-				$class =~ s/\W//g;
-				push(@columnloop,{
-					value=>$value,
-					class=>$class,
-					description=>$desc
-					});
-			}
-			push(@rowloop,{
-				column_loop=>\@columnloop
-				});
-		}
-		$sth->finish;
-		push(@categoryloop,{
-			category=>$category,
-			columnCount=>$#cmsList+2,
-			row_loop=>\@rowloop
-			});
-	}		
-	$var{category_loop} = \@categoryloop;
-	return $self->processStyle($self->processTemplate(\%var,$self->get("compareTemplateId")));
-}
-
-#-------------------------------------------------------------------
-sub www_copy {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no copy');
-}
-
-#-------------------------------------------------------------------
-sub www_deleteField {
-	my $self = shift;
-	my $id = $self->session->form->param("fieldId");
-	$self->session->db->write("delete from Matrix_field where fieldId=?",[$id]);
-	$self->session->db->write("delete from Matrix_listingData where fieldId=?",[$id]);
-	$self->www_listFields();
-}
-
-#-------------------------------------------------------------------
-sub www_deleteListing {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	my $output = sprintf $i18n->get('delete listing confirmation'),
-		$self->getUrl("func=deleteListingConfirm;listingId=".$self->session->form->process("listingId")),
-		$self->formatURL("viewDetail",$self->session->form->process("listingId"));
-	return $self->processStyle($output);
-}
-
-#-------------------------------------------------------------------
-sub www_deleteListingConfirm {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless($self->canEdit);
-	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId})->purge;
-	$self->session->db->write("delete from Matrix_listing where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	$self->session->db->write("delete from Matrix_listingData where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	$self->session->db->write("delete from Matrix_rating where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	$self->session->db->write("delete from Matrix_ratingSummary where listingId=".$self->session->db->quote($self->session->form->process("listingId")));
-	my $inbox = WebGUI::Inbox->new($self->session);
-	$inbox->addMessage({
-		status=>'completed',
-		subject=>"Listing Deleted",
-		message=>"Your listing, ".$listing->{productName}.", has been deleted from the matrix.",
-		userId=>$listing->{maintainerId}
-		});
-	my $message = $inbox->getMessage($listing->{approvalMessageId});
-	if (defined $message) {
-		$message->setCompleted;
-	}
-	return "";
-}
-
-#-------------------------------------------------------------------
-sub getEditForm {
-        my $self = shift;
-        my $tabform = $self->SUPER::getEditForm();
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
- 	$tabform->getTab("display")->interval(
- 		-name=>"visitorCacheTimeout",
-		-label=>$i18n->get('visitor cache timeout'),
-		-hoverHelp=>$i18n->get('visitor cache timeout help'),
-		-value=>$self->getValue('visitorCacheTimeout'),
-		-uiLevel=>8,
-		-defaultValue=>3600
-	);
-	$tabform->getTab("properties")->textarea(
-			-name=>"categories",
-			-label=>$i18n->get('categories'),
-			-hoverHelp=>$i18n->get('categories description'),
-			-value=>$self->getValue("categories"),
-			-subtext=>$i18n->get('categories subtext'),
-			);
-	$tabform->getTab("properties")->integer(
-			-name=>"maxComparisons",
-			-label=>$i18n->get("max comparisons"),
-			-hoverHelp=>$i18n->get("max comparisons description"),
-			-value=>$self->getValue("maxComparisons")
-			);
-	$tabform->getTab("properties")->integer(
-			-name=>"maxComparisonsPrivileged",
-			-label=>$i18n->get("max comparisons privileged"),
-			-hoverHelp=>$i18n->get("max comparisons privileged description"),
-			-value=>$self->getValue("maxComparisonsPrivileged")
-			);
-	$tabform->getTab("properties")->interval(
-			-name=>"ratingTimeout",
-			-label=>$i18n->get("rating timeout"),
-			-hoverHelp=>$i18n->get("rating timeout description"),
-			-value=>$self->getValue("ratingTimeout")
-			);
-	$tabform->getTab("properties")->interval(
-			-name=>"ratingTimeoutPrivileged",
-			-label=>$i18n->get("rating timeout privileged"),
-			-hoverHelp=>$i18n->get("rating timeout privileged description"),
-			-value=>$self->getValue("ratingTimeoutPrivileged")
-			);
-	$tabform->getTab("security")->group(
-			-name=>"groupToAdd",
-			-label=>$i18n->get("group to add"),
-			-hoverHelp=>$i18n->get("group to add description"),
-			-value=>[$self->getValue("groupToAdd")]
-			);
-	$tabform->getTab("security")->group(
-			-name=>"privilegedGroup",
-			-label=>$i18n->get("privileged group"),
-			-hoverHelp=>$i18n->get("privileged group description"),
-			-value=>[$self->getValue("privilegedGroup")]
-			);
-	$tabform->getTab("security")->group(
-			-name=>"groupToRate",
-			-label=>$i18n->get("rating group"),
-			-hoverHelp=>$i18n->get("rating group description"),
-			-value=>[$self->getValue("groupToRate")]
-			);
-	$tabform->getTab("display")->template(
-			-name=>"templateId",
-			-value=>$self->getValue("templateId"),
-			-label=>$i18n->get("main template"),
-			-hoverHelp=>$i18n->get("main template description"),
-			-namespace=>"Matrix"
-			);
-	$tabform->getTab("display")->template(
-			-name=>"detailTemplateId",
-			-value=>$self->getValue("detailTemplateId"),
-			-label=>$i18n->get("detail template"),
-			-hoverHelp=>$i18n->get("detail template description"),
-			-namespace=>"Matrix/Detail"
-			);
-	$tabform->getTab("display")->template(
-			-name=>"ratingDetailTemplateId",
-			-value=>$self->getValue("ratingDetailTemplateId"),
-			-label=>$i18n->get("rating detail template"),
-			-hoverHelp=>$i18n->get("rating detail template description"),
-			-namespace=>"Matrix/RatingDetail"
-			);
-	$tabform->getTab("display")->template(
-			-name=>"searchTemplateId",
-			-value=>$self->getValue("searchTemplateId"),
-			-label=>$i18n->get("search template"),
-			-hoverHelp=>$i18n->get("search template description"),
-			-namespace=>"Matrix/Search"
-			);
-	$tabform->getTab("display")->template(
-			-name=>"compareTemplateId",
-			-value=>$self->getValue("compareTemplateId"),
-			-label=>$i18n->get("compare template"),
-			-hoverHelp=>$i18n->get("compare template description"),
-			-namespace=>"Matrix/Compare"
-			);
-	return $tabform;
-}
-
-#-------------------------------------------------------------------
-sub www_edit {  
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	my $i18n = WebGUI::International->new($self->session, 'Asset_Wobject');
-	my $addEdit = ($self->session->form->process("func") eq 'add') ? $i18n->get('add') : $i18n->get('edit');
-    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_deleteImage ( )
-
-Deletes and attached file.
-
-=cut
-
-sub www_deleteImage {
-	my $self = shift;
-        my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no edit rights') unless ($self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
-	if ($listing->{storageId} ne "") {
-		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
-		$storage->delete;
-	}
-	return $self->www_editListing($listing, $i18n);
-}
-
-
- 
-#-------------------------------------------------------------------
-sub www_editListing {
-        my $self = shift;
-        my $listing= shift || $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	my $i18n = shift || WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
-        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-                -name=>"func",
-                -value=>"editListingSave"
-                );
-        $f->hidden(
-                -name=>"listingId",
-                -value=>$self->session->form->process("listingId")
-                );
-	$f->text(
-		-name=>"productName",
-		-value=>$listing->{productName} || 'Undefined',
-		-label=>$i18n->get('product name'),
-		-hoverHelp=>$i18n->get('product name description'),
-		-maxLength=>25
-		);
-	$f->text(
-		-name=>"versionNumber",
-		-value=>$listing->{versionNumber},
-		-label=>$i18n->get('version number'),
-		-hoverHelp=>$i18n->get('version number description'),
-		);
-	$f->url(
-		-name=>"productUrl",
-		-value=>$listing->{productUrl},
-		-label=>$i18n->get('product url'),
-		-hoverHelp=>$i18n->get('product url description'),
-		);
-	$f->image(
-		name=>"screenshot",
-		label=>$i18n->get("screenshot"),
-		value=>$listing->{storageId},
-		hoverHelp=>$i18n->get("screenshot help"),
-		deleteFileUrl=>$self->getUrl("func=deleteImage;listingId=".$listing->{listingId}.";filename=")
-		);
-	$f->text(
-		-name=>"manufacturerName",
-		-value=>$listing->{manufacturerName},
-		-label=>$i18n->get('manufacturer name'),
-		-hoverHelp=>$i18n->get('manufacturer name description'),
-		);
-	$f->url(
-		-name=>"manufacturerUrl",
-		-value=>$listing->{manufacturerUrl},
-		-label=>$i18n->get('manufacturer url'),
-		);
-	$f->textarea(
-		-name=>"description",
-		-value=>$listing->{description},
-		-label=>$i18n->get('description'),
-		);
-        if ($self->canEdit) {
-		$f->user(
-			name=>"maintainerId",
-			value=>$listing->{maintainerId},
-			label=>$i18n->get('listing maintainer'),
-			hoverHelp=>$i18n->get('listing maintainer description'),
-			);
-	}
-	my %goodBad = (
-		"No"          => $i18n->get("no"),
-		"Yes"         => $i18n->get("yes"),
-		"Free Add On" => $i18n->get("free"),
-		"Costs Extra" => $i18n->get("extra"),
-		"Limited"     => $i18n->get("limited"),
-	);
-	foreach my $category ($self->getCategories()) {
-		$f->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
-		my $a;
-		if ($self->session->form->process("listingId") ne "new") {
-			$a = $self->session->db->read(
-                "select a.name, a.fieldType, a.defaultValue, a.description, a.label, b.value, a.fieldId
-                from Matrix_field a left join Matrix_listingData b on a.fieldId=b.fieldId and
-                listingId=? where a.category=? and a.assetId=? order by a.label",
-                [$self->session->form->process("listingId"), $category, $self->getId]);
-		} else {
-			$a = $self->session->db->read("select name, fieldType, defaultValue, description, label, fieldId
-				from Matrix_field where category=".$self->session->db->quote($category)." and  assetId=".$self->session->db->quote($self->getId));
-		}
-		while (my $field = $a->hashRef) {
-			if ($field->{fieldType} eq "text") {
-				$f->text(
-					-name=>$field->{name},
-					-value=>$field->{value} || $field->{defaultValue},
-					-label=>$field->{label},
-					-subtext=>"<br />".$field->{description}
-					);
-			} elsif ($field->{fieldType} eq "goodBad") {
-				my $value = ($field->{value} || $field->{defaultValue} || $i18n->get("no"));
-				$f->selectBox(
-					-name=>$field->{name},
-					-value=>[$value],
-					-label=>$field->{label},
-					-options=>\%goodBad,
-					-subtext=>"<br />".$field->{description}
-					);
-			} elsif ($field->{fieldType} eq "textarea") {
-				$f->textarea(
-					-name=>$field->{name},
-					-value=>$field->{value} || $field->{defaultValue},
-					-label=>$field->{label},
-					-subtext=>"<br />".$field->{description}
-					);
-			} elsif ($field->{fieldType} eq "url") {
-				$f->url(
-					-name=>$field->{name},
-					-value=>$field->{value} || $field->{defaultValue},
-					-label=>$field->{label},
-					-subtext=>"<br />".$field->{description}
-					);
-			} elsif ($field->{fieldType} eq "combo") {
-				my $value = ($field->{value} || $field->{defaultValue});
-				$f->combo(
-					-name=>$field->{name},
-					-value=>[$value],
-					-label=>$field->{label},
-					-options=>$self->session->db->buildHashRef("select distinct value,value from Matrix_listingData 
-						where fieldId=".$self->session->db->quote($field->{fieldId})." and
-						 assetId=".$self->session->db->quote($self->getId)." order by value"),
-					-subtext=>"<br />".$field->{description}
-					);
-			}
-			
-		}
-		$a->finish;
-	}
-        $f->submit;
-        return $self->processStyle($i18n->get('edit listing').$f->print);
-}
- 
- 
-#-------------------------------------------------------------------
-sub www_editListingSave {
-        my $self = shift;
-        my $listing = $self->session->db->getRow("Matrix_listing","listingId",$self->session->form->process("listingId"));
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	return $i18n->get('no edit rights') unless (($self->session->form->process("listingId") eq "new" && $self->session->user->isInGroup($self->get("groupToAdd"))) || $self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
-	my %data = (
-		listingId => $self->session->form->process("listingId"),
-		lastUpdated => $self->session->datetime->time(),
-		productName => $self->session->form->process("productName") || 'Undefined',
-		productUrl => $self->session->form->process("productUrl"),
-		manufacturerName => $self->session->form->process("manufacturerName"),
-		manufacturerUrl => $self->session->form->process("manufacturerUrl"),
-		description => $self->session->form->process("description"),
-		versionNumber=>$self->session->form->process("versionNumber")
-		);
-    
-    my $storageId = WebGUI::Form::Image->new($self->session,{name => 'screenshot', value => $listing->{storageId}})->getValue;
-    if ($storageId) {
-        $data{storageId} = $storageId;
-        $data{filename} = WebGUI::Storage->get($self->session, $storageId)->getFiles->[0];
-    }
-    
-	my $productName = $self->session->form->process("productName");
-
-	my $isNew = 0;
-	if ($self->session->form->process("listingId") eq "new") {
-		$data{maintainerId} = $self->session->user->userId if ($self->session->form->process("listingId") eq "new");
-
-		my $newTag = WebGUI::VersionTag->create($self->session, {
-			name => $productName.' / '.$self->session->user->username,
-			workflowId => 'pbworkflow000000000003' });
-		my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
-		$newTag->setWorking;
-
-		my $forum = $self->addChild({
-			className=>"WebGUI::Asset::Wobject::Collaboration",
-			title=>$productName,
-			menuTitle=>$productName,
-			url=>$productName,
-			groupIdView=>$self->get('groupIdView'),
-			groupIdEdit=>$self->get('groupIdEdit'),
-                        displayLastReply => 0,
-                        allowReplies => 1,
-                        threadsPerPage => 30,
-                        postsPerPage => 10,
-                        archiveAfter =>31536000,
-        		useContentFilter => 1,
-                        filterCode => 'javascript',
-                        richEditor => "PBrichedit000000000002",
-                        attachmentsPerPost => 0,
-                        editTimeout => 3600,
-                        addEditStampToPosts => 0,
-                        usePreview => 1,
-                        sortOrder => 'desc',
-                        sortBy => 'assetData.revisionDate',
-			rssTemplateId=>'PBtmpl0000000000000142',
-                     	notificationTemplateId=>'PBtmpl0000000000000027',
-                        searchTemplateId=>'PBtmpl0000000000000031',
-                        postFormTemplateId=>'PBtmpl0000000000000029',
-                        threadTemplateId=>'PBtmpl0000000000000032',
-                        collaborationTemplateId=>'PBtmpl0000000000000026',
-                        karmaPerPost =>0,
-                        karmaSpentToRate => 0,
-			approvalWorkflow=>"pbworkflow000000000003",
-                        karmaRatingMultiplier => 0,
-                        moderatePosts => 0,
-                        moderateGroupId => $self->get('groupIdEdit'),
-                        postGroupId => $self->get('groupIdView'),
-			styleTemplateId => $self->get('styleTemplateId'),
-			printableStyleTemplateId => $self->get('printableStyleTemplateId'),
-			});
-		$newTag->requestCommit;
-		$newTag->clearWorking;
-		$oldTag->setWorking if defined $oldTag;
-
-		$data{forumId} = $forum->getId;
-		$data{status} = "pending";
-		$isNew = 1;
-	}
-    else {
-        my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
-        if ($forum && $forum->get('title') ne $productName) {
-            my $oldTag = WebGUI::VersionTag->getWorking($self->session, 1);
-            my $newTag = WebGUI::VersionTag->create($self->session, {
-                name => $productName.' / '.$self->session->user->username,
-                workflowId => 'pbworkflow000000000003' });
-            $newTag->setWorking;
-            $forum->addRevision({
-                title       => $productName,
-                menuTitle   => $productName,
-                url         => $productName,
-            });
-            $newTag->requestCommit;
-            $newTag->clearWorking;
-            $oldTag->setWorking
-                if defined $oldTag;
-        }
-        my $forum = WebGUI::
-    }
-	$data{maintainerId} = $self->session->form->process("maintainerId") if ($self->canEdit);
-	$data{assetId} = $self->getId;
-	my $listingId = $self->session->db->setRow("Matrix_listing","listingId",\%data);
-	if ($data{status} eq "pending" && !$listing->{approvalMessageId}) {
-		my $approvalMessage = WebGUI::Inbox->new($self->session)->addMessage({
-			status=>'pending',
-			groupId=>$self->get("groupIdEdit"),
-			userId=>$self->get("ownerUserId"),
-			subject=>"New Listing Added",
-			message=>"A new listing, ".$data{productName}.", is waiting to be added.\n\n".$self->session->url->getSiteURL()."/".$self->formatURL("viewDetail",$listingId)
-			});
-		$self->session->db->setRow("Matrix_listing","listingId",{listingId=>$listingId, approvalMessageId=>$approvalMessage->getId});
-	}
-	my $a = $self->session->db->read("select fieldId, name, fieldType from Matrix_field");
-	while (my ($id, $name, $type) = $a->array) {
-		my $value;
-		if ($type eq "goodBad") {
-			$value = $self->session->form->selectBox($name);
-		} else {
-			$value = $self->session->form->process($name,$type);
-		}
-		$self->session->db->write("replace into Matrix_listingData (assetId, listingId, fieldId, value) values (
-			".$self->session->db->quote($self->getId).", ".$self->session->db->quote($listingId).", ".$self->session->db->quote($id).", ".$self->session->db->quote($value).")");
-	}
-	$a->finish;
-        return $self->www_viewDetail($listingId);
-}
- 
-#-------------------------------------------------------------------
-sub www_editField {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless($self->canEdit);
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-        my $field = $self->session->db->getRow("Matrix_field","fieldId",$self->session->form->process("fieldId"));
-        my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-        $f->hidden(
-                -name=>"func",
-                -value=>"editFieldSave"
-                );
-        $f->hidden(
-                -name=>"fieldId",
-                -value=>$self->session->form->process("fieldId")
-		);
-	$f->text(
-		-name=>"name",
-		-value=>$field->{name},
-		-label=>$i18n->get('field name'),
-		-hoverHelp=>$i18n->get('field name description'),
-		);
-	$f->text(
-		-name=>"label",
-		-value=>$field->{label},
-		-label=>$i18n->get('field label'),
-		-hoverHelp=>$i18n->get('field label description'),
-		);
-	$f->selectBox(
-		-name=>"fieldType",
-		-value=>[$field->{fieldType}],
-		-label=>$i18n->get('field type'),
-		-hoverHelp=>$i18n->get('field type description'),
-		-options=>{
-			'goodBad'  => $i18n->get('good bad'),
-			'text'     => $i18n->get('text'),
-			'url'      => $i18n->get('url'),
-			'textarea' => $i18n->get('text area'),
-			'combo'    => $i18n->get('combo'),
-			}
-		);
-	$f->textarea(
-		-name=>"description",
-		-value=>$field->{description},
-		-label=>$i18n->get('field description'),
-		-hoverHelp=>$i18n->get('field description description'),
-		);
-	$f->text(
-		-name=>"defaultValue",
-		-value=>$field->{defaultValue},
-		-label=>$i18n->get('default value'),
-		-hoverHelp=>$i18n->get('default value description'),
-		);
-	my %cats;
-	foreach my $category ($self->getCategories) {
-		$cats{$category} = $category;
-	}
-	$f->selectBox(
-		-name=>"category",
-		-value=>[$field->{category}],
-		-label=>$i18n->get('category'),
-		-hoverHelp=>$i18n->get('category description'),
-		-options=>\%cats
-		);
-	$f->submit;
-	return $self->processStyle($i18n->get('edit field').$f->print);
-}
-
-
-#-------------------------------------------------------------------
-sub www_editFieldSave {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless($self->canEdit);
-	$self->session->db->setRow("Matrix_field","fieldId",{
-		fieldId=>$self->session->form->process("fieldId"),
-		name=>$self->session->form->process("name"),
-		label=>$self->session->form->process("label"),
-		fieldType=>$self->session->form->process("fieldType"),
-		description=>$self->session->form->process("description"),
-		defaultValue=>$self->session->form->process("defaultValue"),
-		category=>$self->session->form->process("category"),
-		assetId=>$self->getId
-		});
-	return $self->www_listFields();
-}
-
-#-------------------------------------------------------------------
-sub www_listFields {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless($self->canEdit);
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	my $output = sprintf $i18n->get('list fields'),
-				$self->getUrl("func=editField;fieldId=new");
-	my $sth = $self->session->db->read("select fieldId, label from Matrix_field where assetId=".$self->session->db->quote($self->getId)." order by label");
-	while (my ($id, $label) = $sth->array) {
-		$output .= $self->session->icon->delete("func=deleteField;fieldId=".$id, $self->get("url"), $i18n->get("delete field confirm"))
-			.$self->session->icon->edit("func=editField;fieldId=".$id)
-			.' '.$label."<br />\n";
-	}
-	$sth->finish;
-	return $self->processStyle($output);
-}
-
-
-#-------------------------------------------------------------------
-sub www_rate {
-	my $self = shift;
-	my $hasRated = $self->hasRated($self->session->form->process("listingId"));
-	my $sameRating = 1;
-	my $first = 1;
-	my $lastRating;
-	foreach my $category ($self->getCategories) {
-		if ($first) {
-			$first=0;
-		} else {
-			if ($lastRating != $self->session->form->process($category)) {
-				$sameRating = 0;
-			} 
-		}
-		$lastRating = $self->session->form->process($category);
-	} 
-	return $self->www_viewDetail("",1) if ($hasRated || $sameRating); # Throw out ratings that are all the same number, or if the user rates twice.
-	$self->setRatings($self->session->form->process("listingId"),$self->session->form->paramsHashRef);
-	return $self->www_viewDetail;	
-}
-
-#-------------------------------------------------------------------
-sub www_search {
-	my $self = shift;
-	my %var;
-	my @list = $self->session->db->buildArray("select listingId from Matrix_listing");
-	if ($self->session->form->process("doit")) {
-		my $count;
-		my $keyword;
-		if ($self->session->form->process("keyword")) {
-			$keyword = " and (a.value like ".$self->session->db->quote('%'.$self->session->form->process("keyword").'%')." or a.value='Any')";
-		}
-		my $sth = $self->session->db->read("select name,fieldType from Matrix_field");	
-		while (my ($name,$fieldType) = $sth->array) {
-			next unless ($self->session->form->process($name));
-			push(@list,0);	
-			my $where;
-			if ($fieldType ne "goodBad") {
-                                $where = "("
-					."a.value like ".$self->session->db->quote("%".$self->session->form->process($name)."%")
-					." or a.value='Any'"
-					." or a.value='Free'"
-					.")";
-			} else {
-				$where = "a.value<>'no'";
-			}
-			@list = $self->session->db->buildArray("select a.listingId from Matrix_listingData a left join Matrix_field b 
-				on (a.fieldId=b.fieldId)
-				where a.listingId in (".$self->session->db->quoteAndJoin(\@list).") and $where and b.name=".$self->session->db->quote($name));
-			$count = scalar(@list);
-			last unless ($count > 0);
-		}
-		$sth->finish;
-		if ($count > 1 && $count < 11) {
-			return $self->www_compare(@list);
-		} elsif ($count == 1) {
-			return $self->www_viewDetail($list[0]);
-		} else {
-			my $max = $self->session->user->isInGroup($self->get("privilegedGroup")) ? $self->get("maxComparisonsPrivileged") : $self->get("maxComparisons");
-			$var{isTooMany} = ($count>$max);
-			$var{isTooFew} = ($count<2);
-		}
-	}
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
-	$var{'compare.form'} = $self->getCompareForm(@list);
-	$var{'form.header'} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
-		.WebGUI::Form::hidden($self->session,{
-			name=>"doit",
-			value=>"1"
-			})
-		.WebGUI::Form::hidden($self->session,{
-			name=>"func",
-			value=>"search"
-			});
-	$var{'form.footer'} = "</form>";
-	$var{'form.keyword'} = WebGUI::Form::text($self->session,{
-		name=>"keyword",
-		value=>$self->session->form->process("keyword")
-		});
-	$var{'form.submit'} = WebGUI::Form::submit($self->session,{
-		value=>"search"
-		});
-	foreach my $category ($self->getCategories()) {
-		my $sth = $self->session->db->read("select name, fieldType, label, description from Matrix_field where category = ".$self->session->db->quote($category)." order by label");	
-		my @loop;
-		while (my $data = $sth->hashRef) {
-			if ($data->{fieldType} ne "goodBad") {
-				$data->{form} = WebGUI::Form::text($self->session,{
-					name=>$data->{name},
-					value=>$self->session->form->process($data->{name})
-					});
-			} else {
-				$data->{form} = WebGUI::Form::checkbox($self->session,{
-					name=>$data->{name},
-					value=>"1",
-					checked=>$self->session->form->process($data->{name})
-					});
-			}
-			push(@loop,$data);
-		}
-		$sth->finish;
-		$var{$self->session->url->urlize($category)."_loop"} = \@loop;
-	}
-	return $self->processStyle($self->processTemplate(\%var,$self->get("searchTemplateId")));
-}
-
-
-#-------------------------------------------------------------------
 sub view {
-        my $self = shift;
-	if ($self->session->user->userId eq '1') {
-		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
-		return $out if $out;
-	}
-        my (%var);
-	$var{'compare.form'} = $self->getCompareForm;
-	$var{'search.url'} = $self->getUrl("func=search");
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
-	$var{'field.list.url'} = $self->getUrl('func=listFields');	
-	$var{'listing.add.url'} = $self->formatURL("editListing","new");
+	my $self    = shift;
+	my $session = $self->session;	
+    my $db      = $session->db; 
 
-	my $data = $self->session->db->quickHashRef("select views, productName, listingId from Matrix_listing 
-		 where assetId=".$self->session->db->quote($self->getId)." and status='approved' order by views desc limit 1");
-	$var{'best.views.url'} = $self->formatURL("viewDetail",$data->{listingId});
-	$var{'best.views.count'} = $data->{views}; 
-	$var{'best.views.name'} = $data->{productName}; 
-	$data = $self->session->db->quickHashRef("select compares, productName, listingId from Matrix_listing 
-		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by compares desc limit 1");
-	$var{'best.compares.url'} = $self->formatURL("viewDetail",$data->{listingId});
-	$var{'best.compares.count'} = $data->{compares}; 
-	$var{'best.compares.name'} = $data->{productName}; 
-	$data = $self->session->db->quickHashRef("select clicks, productName, listingId from Matrix_listing 
-		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by clicks desc limit 1");
-	$var{'best.clicks.url'} = $self->formatURL("viewDetail",$data->{listingId});
-	$var{'best.clicks.count'} = $data->{clicks}; 
-	$var{'best.clicks.name'} = $data->{productName}; 
-	my (@best,@worst);
-	foreach my $category ($self->getCategories) {
-		my $sql = "
-			select 
-				Matrix_listing.productName, 
-				Matrix_listing.listingId,
-				Matrix_ratingSummary.meanValue,
-				Matrix_ratingSummary.medianValue,
-				Matrix_ratingSummary.countValue
-			from 
-				Matrix_listing 
-			left join
-				Matrix_ratingSummary
-			on
-				Matrix_listing.listingId=Matrix_ratingSummary.listingId and
-				Matrix_ratingSummary.category=".$self->session->db->quote($category)."
-			where 
-				Matrix_listing.assetId=".$self->session->db->quote($self->getId)." and 
-				Matrix_listing.status='approved' and
-				Matrix_ratingSummary.countValue >= 10
-			order by 
-				Matrix_ratingSummary.meanValue
-			";
-		$data = $self->session->db->quickHashRef($sql." desc limit 1");
-		push(@best,{
-			url=>$self->formatURL("viewDetail",$data->{listingId}),
-			category=>$category,
-			name=>$data->{productName},
-			mean=>$data->{meanValue},
-			median=>$data->{medianValue},
-			count=>$data->{countValue}
-			});
-		$data = $self->session->db->quickHashRef($sql." asc limit 1");
-		push(@worst,{
-			url=>$self->formatURL("viewDetail",$data->{listingId}),
-			category=>$category,
-			name=>$data->{productName},
-			mean=>$data->{meanValue},
-			median=>$data->{medianValue},
-			count=>$data->{countValue}
-			});
-	}
-	$var{'best_rating_loop'} = \@best;
-	$var{'worst_rating_loop'} = \@worst;
-	$var{'ratings.details.url'} = $self->getUrl("func=viewRatingDetails");
-	$data = $self->session->db->quickHashRef("select lastUpdated, productName, listingId from Matrix_listing 
-		where assetId=".$self->session->db->quote($self->getId)." and status='approved'  order by lastUpdated desc limit 1");
-	my @lastUpdated;
-        my $sth = $self->session->db->read("select listingId,lastUpdated,productName from Matrix_listing order by lastUpdated desc limit 20");
-        while (my ($listingId, $lastUpdated, $productName) = $sth->array) {
-                push(@lastUpdated, {
-                        url => $self->formatURL("viewDetail",$listingId),
-                        name=>$productName,
-                        lastUpdated=>$self->session->datetime->epochToHuman($lastUpdated,"%z")
-                        });
-        }
-        $var{'last_updated_loop'} = \@lastUpdated;
-	$var{'best.updated.url'} = $self->formatURL("viewDetail",$data->{listingId});
-	$var{'best.updated.date'} = $self->session->datetime->epochToHuman($data->{lastUpdated},"%z");; 
-	$var{'best.updated.name'} = $data->{productName}; 
+    # javascript and css files for compare form datatable
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
+        {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
+    'text/javascript'});
+    
+	my $var = $self->get;
+    $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
+    $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
+    $var->{compareForm}             = $self->getCompareForm;
+    $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
+    $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
+    $var->{search_url}              = $self->getUrl('func=search');
+    
+    # Get the MatrixListing with the most views as an object using getLineage.
+    my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "views desc",
+            limit               => 1,
+            returnObjects       => 1,
+        }) };
+    if($bestViews_listing){
+        $var->{bestViews_url}           = $bestViews_listing->getUrl;
+        $var->{bestViews_count}         = $bestViews_listing->get('views');
+        $var->{bestViews_name}          = $bestViews_listing->get('title');
+        $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+    }
 
-	# site stats
-	($var{'user.count'}) = $self->session->db->quickArray("select count(*) from users");
-	($var{'current.user.count'}) = $self->session->db->quickArray("select count(*)+0 from userSession where lastPageView>".($self->session->datetime->time()-600));
-	($var{'listing.count'}) = $self->session->db->quickArray("select count(*) from Matrix_listing where status = 'approved' and assetId=".$self->session->db->quote($self->getId));
-        $sth = $self->session->db->read("select listingId,productName from Matrix_listing where status='pending' and assetId=?",[$self->getId]);
-        while (my ($id,$name) = $sth->array) {
-                push(@{$var{pending_list}},{
-                        url=>$self->formatURL("viewDetail",$id),
-                        productName=>$name
-                        });
-        }
-        $sth->finish;
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if ($self->session->user->userId eq '1') {
-		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("visitorCacheTimeout"));
-	}
-       	return $out;
-}
+    # Get the MatrixListing with the most compares as an object using getLineage.
+
+    my ($bestCompares_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "compares desc",
+            limit               => 1,   
+            returnObjects       => 1,   
+        }) };   
+    if($bestCompares_listing){
+        $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
+        $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
+        $var->{bestCompares_name}       = $bestCompares_listing->get('title');
+        $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+    }
+
+    # Get the MatrixListing with the most clicks as an object using getLineage.
+    my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "clicks desc",
+            limit               => 1,   
+            returnObjects       => 1,   
+        }) };   
+    if($bestClicks_listing){
+        $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
+        $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
+        $var->{bestClicks_name}         = $bestClicks_listing->get('title');
+        $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
+    }
+    # Get the 5 MatrixListings that were last updated as objects using getLineage.
+
+    my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            orderByClause       => "revisionDate desc",
+            limit               => 5,
+            returnObjects       => 1,
+        }) };
+    foreach my $lastUpdatedListing (@lastUpdatedListings){
+        push (@{ $var->{last_updated_loop} }, {
+                        url         => $lastUpdatedListing->getUrl,
+                        name        => $lastUpdatedListing->get('title'),
+                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('revisionDate'),"%z")
+                    });
+    }
+    $var->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+
+
+    # Get all the MatrixListings that are still pending.
+
+    my @pendingListings = @{ $self->getLineage(['descendants'], {
+            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+            orderByClause       => "revisionDate asc",
+            returnObjects       => 1,
+            statusToInclude     => ['pending'],
+        }) };
+    foreach my $pendingListing (@pendingListings){
+        push (@{ $var->{pending_loop} }, {
+                        url     => $pendingListing->getUrl,
+                        name    => $pendingListing->get('title'),
+                    });
+    }   
  
+    # For each category, get the MatrixListings with the best ratings.
+
+    foreach my $category (keys %{$self->getCategories}) {
+        my $data;
+        my $sql = "
+        select
+            assetData.title as productName,
+            assetData.url,
+            listing.assetId,
+            rating.meanValue,
+            rating.medianValue,
+            rating.countValue
+        from MatrixListing as listing
+            left join asset on listing.assetId = asset.assetId
+            left join MatrixListing_ratingSummary as rating on rating.listingId = listing.assetId
+            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
+assetData.revisionDate
+        where
+            asset.parentId=?
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate)
+                from
+                    assetData
+                where
+                    assetData.assetId=asset.assetId
+                    and (status='approved' or status='archived')
+            )
+            and status='approved'
+            and rating.category=?
+        group by
+            assetData.assetId
+        order by rating.meanValue ";
+        
+        $data = $db->quickHashRef($sql." desc limit 1",[$self->getId,$category]);
+        push(@{ $var->{best_rating_loop} },{
+            url=>'/'.$data->{url},
+            category=>$category,
+            name=>$data->{productName},
+            mean=>$data->{meanValue},
+            median=>$data->{medianValue},
+            count=>$data->{countValue}
+            });
+        $data = $db->quickHashRef($sql." asc limit 1",[$self->getId,$category]);
+        push(@{ $var->{worst_rating_loop} },{
+            url=>'/'.$data->{url},
+            category=>$category,
+            name=>$data->{productName},
+            mean=>$data->{meanValue},
+            median=>$data->{medianValue},
+            count=>$data->{countValue}
+            });
+    }
+
+    $var->{listingCount} = scalar $db->buildArray("
+        select  * 
+        from    asset, assetData
+        where   asset.assetId=assetData.assetId
+                and asset.parentId=?
+                and asset.state='published'
+                and asset.className='WebGUI::Asset::MatrixListing'
+                and assetData.status='approved'
+        group by asset.assetId",
+        [$self->getId]);
+	
+	return $self->processTemplate($var, undef, $self->{_viewTemplate});
+}
+
 #-------------------------------------------------------------------
 
-=head2 www_view ( )
+=head2 www_compare ( )
 
-See WebGUI::Asset::Wobject::www_view() for details.
+Returns the compare screen
+
+=head3 listingIds
+
+An array of listingIds that should be selected in the compare form.
 
 =cut
 
-sub www_view {
-	my $self = shift;
-	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
-	$self->SUPER::www_view(@_);
+sub www_compare {
+
+    my $self        = shift;
+    my $var         = $self->get;
+    my @listingIds  = @_;
+    my @responseFields;
+
+    unless (scalar(@listingIds)) {
+        @listingIds = $self->session->form->checkList("listingId");
+    }
+
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),
+        {type => 'text/javascript'});    
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), 
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),
+    {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('hoverhelp.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('hoverhelp.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }
+
+    foreach my $listingId (@listingIds){
+        my $listingId_safe = $listingId;
+        $listingId_safe =~ s/-/_____/g;
+        push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
+    }
+    
+    $var->{javascript} = "<script type='text/javascript'>\n".
+        'var listingIds = new Array('.join(", ",map {'"'.$_.'"'} @listingIds).");\n".
+        'var responseFields = new Array("attributeId", "name", "description","fieldType", "checked", '.join(", ",map {'"'.$_.'"'} @responseFields).");\n".
+        "var maxComparisons = ".$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
+        "</script>";
+
+    return $self->processStyle($self->processTemplate($var,$self->get("compareTemplateId")));
 }
 
 #-------------------------------------------------------------------
-sub www_viewDetail {
-	my $self = shift;
-	my $listingId = shift || $self->session->form->process("listingId");
-	my $hasRated = shift || $self->hasRated($listingId);
-	my %var;
-	my $i18n = WebGUI::International->new($self->session,'Asset_Matrix');
-	my $listing = $self->session->db->getRow("Matrix_listing","listingId",$listingId);
-	my $forum = WebGUI::Asset::Wobject::Collaboration->new($self->session, $listing->{forumId});
-	if ($listing->{storageId} && $listing->{filename}) {
-		my $storage = WebGUI::Storage::Image->get($self->session, $listing->{storageId});
-		$var{screenshot} = $storage->getUrl($listing->{filename});
-		$var{thumbnail} = $storage->getThumbnailUrl($listing->{filename});
-	}
-	$var{"discussion"} = $forum && $forum->view;
-	$var{'isLoggedIn'} = ($self->session->user->userId ne "1");
-	if ($self->session->form->process("do") eq "sendEmail" && $self->session->form->process("verify","captcha")) {
-		if ($self->session->form->process("body") ne "") {
-			my $u = WebGUI::User->new($self->session, $listing->{maintainerId});
-			my $mail = WebGUI::Mail::Send->create($self->session, {to=>$u->profileField("email"),subject=>$listing->{productName}." - ".$self->session->form->process("subject"),from=>$self->session->form->process("from")});
-			$mail->addText($self->session->form->process("body"));
-			$mail->addFooter;
-			$mail->queue;
-		}
-		$var{'email.wasSent'} = 1;
-	} else {
-		$self->incrementCounter($listingId,"views");
-	}
-	$var{'edit.url'} = $self->formatURL("editListing",$listingId);
-	$var{id} = $listingId;
-	$var{'user.canEdit'} = ($self->session->user->userId eq $listing->{maintainerId} || $self->canEdit);
-	$var{'user.canApprove'} = $self->canEdit;
-	$var{'approve.url'} = $self->getUrl("func=approveListing;listingId=".$listingId);
-	$var{'delete.url'} = $self->getUrl("func=deleteListing;listingId=".$listingId);
-	$var{'isPending'} = ($listing->{status} eq "pending");
-	$var{'lastUpdated.epoch'} = $listing->{lastupdated};
-	$var{'lastUpdated.date'} = $self->session->datetime->epochToHuman($listing->{lastUpdated},"%z");
-	$var{description} = $listing->{description};
-	$var{productName} = $listing->{productName};
-	$var{productUrl} = $listing->{productUrl};
-	$var{'productUrl.click'} = $self->formatURL("click",$listingId);
-	$var{manufacturerName} = $listing->{manufacturerName};
-	$var{manufacturerUrl} = $listing->{manufacturerUrl};
-	$var{'manufacturerUrl.click'} = $self->getUrl("m=1;func=click;listingId=".$listingId);
-	$var{versionNumber} = $listing->{versionNumber};
-	my $f = WebGUI::HTMLForm->new($self->session,
-		-extras=>'class="content"',
-		-tableExtras=>'class="content"'
-		);
-	$f->hidden(
-		-name=>"func",
-		-value=>"viewDetail"
-		);
-	$f->hidden(
-		-name=>"do",
-		-value=>"sendEmail"
-		);
-	$f->hidden(
-		-name=>"listingId",
-		-value=>$listingId
-		);
-	$f->captcha(
-		-name=>"verify"
-		);
-	$f->email(
-		-extras=>'class="content"',
-		-name=>"from",
-		-value=>$self->session->user->profileField("email"),
-		-label=>$i18n->get('your email'),
-		);
-	$f->selectBox(
-		-name=>"subject",
-		-extras=>'class="content"',
-		-options=>{
-			$i18n->get('report error')=>"Report an error.",
-			$i18n->get('general comment')=>"General comment.",
-			},
-		-label=>$i18n->get('request type'),
-		);
-	$f->textarea(
-		-rows=>4,
-		-extras=>'class="content"',
-		-columns=>35,
-		-name=>"body",
-		-label=>$i18n->get('comment'),
-		);
-	$f->submit(
-		-extras=>'class="content"',
-		-value=>"Send..."
-		);
-	$var{'email.form'} = $f->print;
-	$var{views} = $listing->{views};
-	$var{compares} = $listing->{compares};
-	$var{clicks} = $listing->{clicks};
-	my $sth = $self->session->db->read("select a.value, b.name, b.label, b.description, category, fieldType from Matrix_listingData a left join 
-		Matrix_field b on a.fieldId=b.fieldId and b.assetId=? where listingId=? order by b.label",[$self->getId, $listingId]);	
-	my %goodBad = (
-		"No"          => $i18n->get("no"),
-		"Yes"         => $i18n->get("yes"),
-		"Free Add On" => $i18n->get("free"),
-		"Costs Extra" => $i18n->get("extra"),
-		"Limited"     => $i18n->get("limited"),
-	);
-    while (my $data = $sth->hashRef) {
-        $data->{class} = lc($data->{value});
-		$data->{class} =~ s/\s/_/g;
-		$data->{class} =~ s/\W//g;
-        if ($data->{fieldType} eq 'goodBad') {
-            $data->{value} = $goodBad{$data->{value}};
+
+=head2 www_deleteAttribute ( )
+
+Deletes an Attribute, including listing data for this attribute.
+
+=cut
+
+sub www_deleteAttribute {
+    my $self        = shift;
+    my $attributeId = $self->session->form->process("attributeId");
+
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+
+    $self->deleteAttribute($attributeId);
+
+    return $self->www_listAttributes;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteStickied  (  )
+
+Sets the sort scratch variable.
+
+=cut
+
+sub www_deleteStickied {
+
+    my $self = shift;
+
+    if(my $attributeId = $self->session->form->process("attributeId")){
+        $self->session->scratch->delete('stickied_'.$attributeId);
+    }
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editAttribute ( )
+
+Shows a form to edit or add an attribute. 
+
+=cut
+
+sub www_editAttribute {
+    my $self    = shift;
+    my $session = $self->session;
+    my ($attributeId, $attribute);
+    
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $i18n = WebGUI::International->new($session, "Asset_Matrix");
+
+    $attributeId = $session->form->process("attributeId") || 'new';
+
+    unless($attributeId eq 'new'){
+        $attribute = $self->getAttribute($attributeId); 
+    }
+
+    my $form = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+    $form->hidden(
+        -name       =>"func",
+        -value      =>"editAttributeSave"
+        );
+    $form->hidden(
+        -name       =>"attributeId",
+        -value      =>$attributeId,
+        );
+    $form->text(
+        -name       =>"name",
+        -value      =>$attribute->{name},
+        -label      =>$i18n->get('attribute name label'),
+        -hoverHelp  =>$i18n->get('attribute name description'),
+        );
+    $form->textarea(
+        -name       =>"description",
+        -value      =>$attribute->{description},    
+        -label      =>$i18n->get('attribute description label'),
+        -hoverHelp  =>$i18n->get('attribute description description'),
+        );
+    $form->matrixFieldType(
+        -name       =>"fieldType",
+        -value      =>$attribute->{fieldType},
+        -label      =>$i18n->get('fieldType label'),
+        -hoverHelp  =>$i18n->get('fieldType description'),
+        );
+    my $defaultValueForm = WebGUI::Form::Text($self->session, {
+                name=>"defaultValue",
+                value=>$attribute->{defaultValue},
+                resizable=>0,
+            });
+    my $optionsForm = WebGUI::Form::Textarea($self->session, {
+                name=>"options",
+                value=>$attribute->{options},
+                });
+
+    my $html =  "\n<tr><td colspan='2'>\n";
+    $html .=    "\t<div id='optionsAndDefaultValue_module'>\n";
+    $html .=    "\t<div class='bd' style='padding:0px;'>\n";
+    $html .=    "\t<table cellpadding='0' cellspacing='0' style='width: 100%;'>\n";
+
+    $html .=    "\t<tr><td class='formDescription' valign='top' style='width:180px'>"
+                .$i18n->get('attribute defaultValue label')
+                ."<div class='wg-hoverhelp'>".$i18n->get('attribute defaultValue description')."</div></td>"
+                ."<td valign='top' class='tableData' style='padding-left:4px'>"
+                .$defaultValueForm."</td>"
+                ."\t\n</tr>\n";
+
+    $html .=    "\t<tr><td class='formDescription' valign='top' style='width:180px'>"
+                .$i18n->get('attribute options label')
+                ."<div class='wg-hoverhelp'>".$i18n->get('attribute options description')."</div></td>"
+                ."<td valign='top' class='tableData' style='padding-left:4px'>"
+                .$optionsForm."</td>"
+                ."\t\n</tr>\n";
+
+
+    $html .=    "\t</table>";
+    $html .=    "\t\n</div>\t\n</div>\n";
+    $html .=    "</td></tr>";
+
+    $html .=    "<script type='text/javascript'>\n"
+                ."var optionsAndDefaultValue_module = new YAHOO.widget.Module('optionsAndDefaultValue_module',"
+                ."{visible:false});\n"
+                ."optionsAndDefaultValue_module.render();\n"
+                ."YAHOO.util.Event.onContentReady('fieldType_formId', checkFieldType);\n"
+                ."YAHOO.util.Event.addListener('fieldType_formId', 'change', checkFieldType);\n"
+                ."var hasOptions = {'SelectBox': true,'Combo': true};\n"
+                ."function checkFieldType(){\n"
+                ."  if (this.value in hasOptions){\n"
+                ."      optionsAndDefaultValue_module.show();\n"
+                ."  }else{\n"
+                ."      optionsAndDefaultValue_module.hide();\n"
+                ."  }\n"
+                ."}\n"
+                ."</script>\n";
+
+    $form->raw($html);
+
+    $form->selectBox(
+        -name       =>"category",
+        -value      =>[$attribute->{category}],
+        -label      =>$i18n->get('category label'),
+        -hoverHelp  =>$i18n->get('category description'),
+        -options    =>$self->getCategories,
+        );
+    $form->submit;
+    return $self->getAdminConsole->render($form->print, $i18n->get('edit attribute title'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editAttributeSave ( )
+
+Processes and saves an attribute. 
+
+=cut
+
+sub www_editAttributeSave {
+    my $self                = shift;
+    my $session             = $self->session;
+    my $form                = $session->form;
+    
+    return $session->privilege->insufficient() unless $self->canEdit;
+
+    my $attributeProperties = {
+        attributeId     =>$form->process("attributeId") || 'new',
+        assetId         =>$self->getId,
+        name            =>$form->process('name'),
+        description     =>$form->process('description'),
+        fieldType       =>$form->process('fieldType'),
+        options         =>$form->process('options'),
+        defaultValue    =>$form->process('defaultValue'),
+        category        =>$form->process('category'),
+   };
+    
+    $self->editAttributeSave($attributeProperties);
+
+    return $self->www_listAttributes;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportAttributes ( )
+
+Exports search attributes as csv.
+
+=cut
+
+sub www_exportAttributes {
+    my $self    = shift;
+    my $session = $self->session;
+    my $output  = WebGUI::Text::joinCSV("name","description","category");
+
+    my $attributes = $session->db->read("select name, description, category 
+            from Matrix_attribute where assetId = ? order by category, name",[$self->getId]);
+
+    while (my $attribute = $attributes->hashRef) {
+        $output .= "\n".WebGUI::Text::joinCSV($attribute->{name},$attribute->{description},$attribute->{category});
+    }
+
+    my $fileName = "export_matrix_attributes.csv";
+    $self->session->http->setFilename($fileName,"application/octet-stream");
+    $self->session->http->sendHeader;
+    return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getCompareFormData  (  )
+
+Returns the compare form data as JSON.
+
+=head3 sort 
+
+The criterium by which the listings should be sorted.
+
+=cut
+
+sub www_getCompareFormData {
+
+    my $self            = shift;
+    my $session         = $self->session;
+    my $form            = $session->form;
+    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+    my $sortDirection   = ' desc';
+#    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
+#        $sortDirection = " desc";
+#    }
+    my @results;
+    my @listingIds = $self->session->form->checkList("listingId");
+    
+    $self->session->http->setMimeType("application/json");
+
+    my $sql = "
+        select
+            assetData.title,
+            assetData.url,
+            listing.assetId,
+            listing.views,
+            listing.compares,
+            listing.clicks,
+            listing.lastUpdated
+        from MatrixListing as listing
+            left join asset on listing.assetId = asset.assetId
+            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
+assetData.revisionDate
+        where
+            asset.parentId=?
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate=(
+                select
+                    max(revisionDate)
+                from
+                    assetData
+                where
+                    assetData.assetId=asset.assetId
+                    and (status='approved' or status='archived')
+            )
+            and status='approved'
+        group by
+            assetData.assetId
+        order by ".$sort.$sortDirection;
+
+    @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
+    foreach my $result (@results){
+            if($form->process("search")){
+                # $self->session->errorHandler->warn("checking listing: ".$result->{title});
+                my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
+                            select value, fieldType, attributeId from MatrixListing_attribute as listing
+                            left join Matrix_attribute using(attributeId)
+                            where listing.matrixListingId = ?
+                        ",[$result->{assetId}],'attributeId');
+                foreach my $param ($form->param) {
+                    if($param =~ m/^search_/){
+                        my $attributeId = $param;
+                        $attributeId =~ s/^search_//;
+                        $attributeId =~ s/_____/-/;
+                        my $fieldType       = $matrixListing_attributes->{$attributeId}->{fieldType};
+                        my $listingValue    = $matrixListing_attributes->{$attributeId}->{value};
+                        # $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
+                        if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
+                            $result->{checked} = '';
+                            last;
+                        }
+                        elsif(($fieldType ne 'MatrixCompare') && ($form->process($param) ne $listingValue)){
+                            $result->{checked} = '';
+                            last;
+                        }
+                        else{
+                            $result->{checked} = 'checked';
+                        }
+                    }
+                }
+            }
+            else{
+                $result->{assetId}  =~ s/-/_____/g;
+                if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
+                    $result->{checked} = 'checked';
+                }
+            }
+            $result->{assetId}  =~ s/-/_____/g;
+            $result->{url}      = $session->url->gateway($result->{url});
+    }
+
+    my $jsonOutput;
+    $jsonOutput->{ResultSet} = {Result=>\@results};
+
+    return JSON->new->utf8->encode($jsonOutput);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getCompareListData  (  )
+
+Returns the compare list data as JSON.
+
+=head3 listingIds
+
+An array of listingIds that should be shown in the compare list datatable.
+
+=cut
+
+sub www_getCompareListData {
+
+    my $self        = shift;
+    my @listingIds  = @_;
+    my $session     = $self->session;
+    my $i18n        = WebGUI::International->new($session,'Asset_Matrix');
+    my (@results,@columnDefs);
+
+    unless (scalar(@listingIds)) {
+        @listingIds = $self->session->form->checkList("listingId");
+    }
+
+
+    foreach my $listingId (@listingIds){
+        $listingId =~ s/_____/-/g;
+        my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
+        $listing->incrementCounter("compares");
+        my $listingId_safe = $listingId;
+        $listingId_safe =~ s/-/_____/g;
+        push(@columnDefs,{
+            key         =>$listingId_safe,
+            label       =>$listing->get('title').' '.$listing->get('version'),
+            formatter   =>"formatColors",
+            url         =>$listing->getUrl,
+            lastUpdated =>$session->datetime->epochToHuman( $listing->get('revisonDate'),"%z" ),
+        });
+    }
+    push(@results,{name=>$i18n->get('last updated label'),fieldType=>'lastUpdated'});
+    
+    my $jsonOutput;
+    $jsonOutput->{ColumnDefs} = \@columnDefs;
+
+    foreach my $category (keys %{$self->getCategories}) {
+        push(@results,{name=>$category,fieldType=>'category'});
+        my $fields = " a.name, a.fieldType, a.attributeId, a.description ";
+        my $from = "from Matrix_attribute a";
+        my $tableCount = "b";
+        foreach my $listingId (@listingIds) {
+            my $listingId_safe = $listingId;
+            $listingId_safe =~ s/-/_____/g;
+            $fields .= ", ".$tableCount.".value as `$listingId_safe`";
+            $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId="
+                .$tableCount.".attributeId and ".$tableCount.".matrixListingId=? ";
+            $tableCount++;
         }
-		my $cat = $self->session->url->urlize($data->{category})."_loop";
-		push(@{$var{$cat}},$data);
-	}
-	$sth->finish;
-	my %rating;
-	tie %rating, 'Tie::IxHash';
-	%rating = (
-		1=>"1 - Worst",
-                2=>2,
-                3=>3,
-                4=>4,
-                5=>"5 - Respectable",
-                6=>6,
-                7=>7,
-                8=>8,
-                9=>9,
-                10=>"10 - Best"
-		);
-	my $ratingsTable = '<table class="ratingForm"><tbody><tr><th></th><th>Mean</th><th>Median</th><th>Count</th></tr>';
-	$f = WebGUI::HTMLForm->new($self->session,
-		-extras=>'class="ratingForm"',
-		-tableExtras=>'class="ratingForm"'
-		);
-	$f->hidden(
-		-name=>"listingId",
-		-value=>$listingId
-		);
-	$f->hidden(
-		-name=>"func",
-		-value=>"rate"
-		);
-	foreach my $category ($self->getCategories) {
-		my ($mean,$median,$count) = $self->session->db->quickArray("select meanValue, medianValue, countValue from Matrix_ratingSummary
-			where listingId=".$self->session->db->quote($listingId)." and category=".$self->session->db->quote($category));
-		$ratingsTable .= '<tr><th>'.$category.'</th><td>'.$mean.'</td><td>'.$median.'</td><td>'.$count.'</td></tr>';
-		$f->selectBox(
-			-name=>$category,
-			-label=>$category,
-			-value=>[5],
-			-extras=>'class="ratingForm"',
-			-options=>\%rating
-			);
-	}
-	$ratingsTable .= '</tbody></table>';
-	$f->submit(
-		-extras=>'class="ratingForm"',
-		-value=>"Rate",
-		-label=>'<a href="'.$self->formatURL("rate",$listingId).'">'.$i18n->get('show ratings').'</a>'
-		);
-	if ($hasRated) {
-		$var{'ratings'} = $ratingsTable;
-	} else {
-		$var{'ratings'} = $f->print;
-	}
-	return $self->processStyle($self->processTemplate(\%var,$self->get("detailTemplateId")));
+        push(@results, @{ $self->session->db->buildArrayRefOfHashRefs(
+            "select $fields $from where a.category=? and a.assetId=? order by a.name",
+            [@listingIds,$category,$self->getId]
+        ) });
+    }
+    foreach my $result (@results){
+        if($result->{fieldType} eq 'category'){
+            # Row starting with a category label shows the listing name in each column
+            foreach my $columnDef (@columnDefs) {
+                $result->{$columnDef->{key}} = $columnDef->{label}; 
+            }
+        }
+        elsif($result->{fieldType} eq 'lastUpdated'){
+            foreach my $columnDef (@columnDefs) {
+                $result->{$columnDef->{key}} = $columnDef->{lastUpdated};
+            }
+        }
+        else{
+            foreach my $listingId (@listingIds) {
+                $result->{attributeId} =~ s/-/_____/g;
+                my $listingId_safe = $listingId;
+                $listingId_safe =~ s/-/_____/g;
+                if ($result->{fieldType} eq 'MatrixCompare'){
+                    my $originalValue = $result->{$listingId_safe};
+                    $result->{$listingId_safe.'_compareColor'} = $self->getCompareColor($result->{$listingId_safe});
+                    $result->{$listingId_safe} = WebGUI::Form::MatrixCompare->new( $self->session, 
+                        { value=>$result->{$listingId_safe} },defaultValue=>0)->getValueAsHtml;
+                }
+                if($session->scratch->get('stickied_'.$result->{attributeId})){
+                    # $self->session->errorHandler->warn("found checked stickie: ".$result->{attributeId});
+                    $result->{checked} = 'checked';
+                }
+                else{
+                    $result->{checked} = '';
+                }
+            }
+        }
+    }
+
+    $jsonOutput->{ResultSet} = {Result=>\@results};
+
+    $session->http->setMimeType("application/json");
+
+    return JSON->new->utf8->encode($jsonOutput);
+}
+#-------------------------------------------------------------------
+
+=head2 www_listAttributes ( )
+
+Lists all attributes of this Matrix. 
+
+=cut
+
+sub www_listAttributes {
+    my $self    = shift;
+    my $session = $self->session;
+    
+    return $session->privilege->insufficient() unless($self->canEdit);
+    
+    my $i18n = WebGUI::International->new($session,'Asset_Matrix');
+    my $output = "<br /><a href='".$self->getUrl("func=editAttribute;attributeId=new")."'>"
+                .$i18n->get('add attribute label')."</a><br /><br />";
+    
+    my $attributes = $session->db->read("select attributeId, name from Matrix_attribute where assetId=? order by name"
+        ,[$self->getId]);
+    while (my $attribute = $attributes->hashRef) {
+        $output .= $session->icon->delete("func=deleteAttribute;attributeId=".$attribute->{attributeId}
+            , $self->getUrl,$i18n->get("delete attribute confirm message"))
+            .$session->icon->edit("func=editAttribute;attributeId=".$attribute->{attributeId})
+            .' '.$attribute->{name}."<br />\n";
+    }
+    return $self->getAdminConsole->render($output, $i18n->get('list attributes title'));
 }
 
+#-------------------------------------------------------------------
 
-#-----------------------------------------------
-sub www_viewRatingDetails {
-	my $self = shift;
-	my %var;
-	my @ratingloop;
-	foreach my $category ($self->getCategories) {
-		my @detailloop;
-		my $sql = "
-			select 
-				Matrix_listing.productName, 
-				Matrix_listing.listingId,
-				Matrix_ratingSummary.meanValue,
-				Matrix_ratingSummary.medianValue,
-				Matrix_ratingSummary.countValue
-			from 
-				Matrix_listing 
-			left join
-				Matrix_ratingSummary
-			on
-				Matrix_listing.listingId=Matrix_ratingSummary.listingId and
-				Matrix_ratingSummary.category=".$self->session->db->quote($category)."
-			where 
-				Matrix_listing.assetId=".$self->session->db->quote($self->getId)." and 
-				Matrix_listing.status='approved' and
-				Matrix_ratingSummary.countValue > 0
-			order by 
-				Matrix_ratingSummary.meanValue desc
-			";
-		my $sth = $self->session->db->read($sql);
-		while (my $data = $sth->hashRef) {
-			push(@detailloop,{
-				url=>$self->formatURL("viewDetail",$data->{listingId}),
-				mean=>$data->{meanValue}, 
-				median=>$data->{medianValue}, 
-				count=>$data->{countValue}, 
-				name=>$data->{productName}
-				});
-		}
-		$sth->finish;
-		push(@ratingloop,{
-			category=>$category,
-			detail_loop=>\@detailloop
-			});
-	}
-	$var{rating_loop} = \@ratingloop;
-	return $self->processStyle($self->processTemplate(\%var,$self->get("ratingDetailTemplateId")));
+=head2 www_search  (  )
+
+Returns the search screen.
+
+=cut
+
+sub www_search {
+
+    my $self    = shift;
+    my $var     = $self->get;
+    
+    $var->{compareForm}     = $self->getCompareForm;
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/event/event-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'),
+        {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/get/get-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/element/element-beta-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datasource/datasource-min.js'),
+    {type => 'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/datatable/datatable-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
+    {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixSearch.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
+        {type =>'text/css', rel=>'stylesheet'});
+
+    foreach my $category (keys %{$self->getCategories}) {
+        my $attributes;
+        my @attribute_loop;
+        my $categoryLoopName = $self->session->url->urlize($category)."_loop";
+        $attributes = $self->session->db->read("select * from Matrix_attribute where category =? and assetId = ?",
+            [$category,$self->getId]);
+        while (my $attribute = $attributes->hashRef) {
+            $attribute->{label} = $attribute->{name};
+            $attribute->{id} = $attribute->{attributeId};
+            $attribute->{id} =~ s/-/_____/g;
+            $attribute->{extras} = " class='attributeSelect'";
+            if($attribute->{fieldType} eq 'Combo'){
+                $attribute->{fieldType} = 'SelectBox';
+            }
+            if($attribute->{fieldType} eq 'SelectBox'){    
+                $attribute->{options}   = "blank\n".$attribute->{options};
+                $attribute->{value}     = 'blank';
+            }
+            $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
+            push(@attribute_loop,$attribute);
+        }
+        $var->{$categoryLoopName} = \@attribute_loop;
+        push(@{$var->{category_loop}},{
+            categoryLabel   => $category,
+            attribute_loop  => \@attribute_loop,
+        });
+    }
+
+    return $self->processStyle($self->processTemplate($var,$self->get("searchTemplateId")));
 }
 
+#-------------------------------------------------------------------
 
- 
+=head2 www_setSort  (  )
 
+Sets the sort scratch variable.
+
+=cut
+
+sub www_setSort {
+
+    my $self = shift;
+
+    if(my $sort = $self->session->form->process("sort")){
+        $self->session->scratch->set('matrixSort',$sort);
+    }        
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_setStickied  (  )
+
+Sets the stickied scratch variable.
+
+=cut
+
+sub www_setStickied {
+
+    my $self = shift;
+
+    if(my $attributeId = $self->session->form->process("attributeId")){
+        $self->session->scratch->set('stickied_'.$attributeId,1);
+    }     
+    return undef;
+}
 
 1;
- 

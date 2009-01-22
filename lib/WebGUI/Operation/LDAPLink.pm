@@ -118,7 +118,7 @@ sub validateForm {
 	}
 	
 	# Check format of ldapUrl
-	push(@{$errors}, $i18n->get("ldap url malformed")) unless ($formFields->{ldapUrl} =~ m!^ldap://.*!);
+	push(@{$errors}, $i18n->get("ldap url malformed")) unless ($formFields->{ldapUrl} =~ m!^ldaps?://.*!);
 	
 	# Other checks here
 	
@@ -158,8 +158,14 @@ Deletes the requested LDAP Link in the form variable C<llid>.  Returns the user 
 sub www_deleteLDAPLink {
 	my $session = shift;
 	return $session->privilege->insufficient unless canView($session);
-	$session->db->write("delete from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
-	$session->form->process("op") = "listLDAPLinks";
+    my $llid = $session->form->process("llid");
+    if ($llid) {
+        $session->db->write("delete from ldapLink where ldapLinkId=?", [$llid]);
+    }
+    if ($llid eq $session->setting->get('ldapConnection')) {
+        $session->log->warn(sprintf 'user %s deleted the LDAP connection used for user authentication', $session->user->username);
+        $session->setting->set('ldapConnection', '');
+    }
 	return www_listLDAPLinks($session);
 }
 
@@ -175,125 +181,126 @@ Calls www_editLDAPLinkSave when done.
 sub www_editLDAPLink {
 	my $session = shift;
 	my $errors = shift;
-   return $session->privilege->insufficient unless canView($session);
-   my ($output, %db, $f);
+    my $form   = $session->form;
+    return $session->privilege->insufficient unless canView($session);
+    my ($output, %db, $f);
 
 
-   tie %db, 'Tie::CPHash';
-   %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
+    tie %db, 'Tie::CPHash';
+    %db = $session->db->quickHash("select * from ldapLink where ldapLinkId=".$session->db->quote($session->form->process("llid")));
    
-   my $i18n = WebGUI::International->new($session,"AuthLDAP");
-   $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
+    my $i18n = WebGUI::International->new($session,"AuthLDAP");
+    $f = WebGUI::HTMLForm->new($session, -extras=>'autocomplete="off"' );
 
-   if ($errors) {
-	foreach my $error (@$errors) {
-		$f->readOnly( -value => sprintf("<span style='font-weight: bold; color: red;'>%s: %s</span>", $i18n->get("error label"), $error) );
-	}
-   }
+    if ($errors) {
+        foreach my $error (@$errors) {
+            $f->readOnly( -value => sprintf("<span style='font-weight: bold; color: red;'>%s: %s</span>", $i18n->get("error label"), $error) );
+        }
+    }
 
-   $f->submit;
-   $f->hidden(
-   		-name => "op",
-		-value => "editLDAPLinkSave",
-	     );
-   $f->hidden(
-   		-name => "llid",
-		-value => $session->form->process("llid"),
-	     );
-	$f->hidden(
-   		-name => "returnUrl",
-		-value => $session->form->process("returnUrl"),
-	     );
-	$f->readOnly(
-		-label => $i18n->get("LDAPLink_991"),
-   		-value => $session->form->process("llid"),
-		);
-	$f->text(
-   		-name  => "ldapLinkName",
-		-label => $i18n->get("LDAPLink_992"),
+    $f->submit;
+    $f->hidden(
+   		-name      => "op",
+		-value     => "editLDAPLinkSave",
+    );
+    $f->hidden(
+   		-name      => "llid",
+		-value     => $form->process("llid"),
+    );
+    $f->hidden(
+   		-name      => "returnUrl",
+		-value     => $form->process("returnUrl"),
+    );
+    $f->readOnly(
+		-label     => $i18n->get("LDAPLink_991"),
+   		-value     => $form->process("llid"),
+    );
+    $f->text(
+   		-name      => "ldapLinkName",
+		-label     => $i18n->get("LDAPLink_992"),
 		-hoverHelp => $i18n->get("LDAPLink_992 description"),
-		-value => $db{ldapLinkName},
-	   );
-   $f->text(
-   		-name => "ldapUrl",
-		-label => $i18n->get("LDAPLink_993"),
+		-value     => $form->process("ldapLinkName") || $db{ldapLinkName},
+	);
+    $f->text(
+   		-name      => "ldapUrl",
+		-label     => $i18n->get("LDAPLink_993"),
 		-hoverHelp => $i18n->get("LDAPLink_993 description"),
-		-value => $db{ldapUrl},
-	   );
-   $f->text(
-   		-name => "connectDn",
-		-label => $i18n->get("LDAPLink_994"),
+		-value     => $form->process("ldapUrl") || $db{ldapUrl},
+	);
+    $f->text(
+   		-name      => "connectDn",
+		-label     => $i18n->get("LDAPLink_994"),
 		-hoverHelp => $i18n->get("LDAPLink_994 description"),
-		-value => $db{connectDn},
-	   );
-   $f->password(
-   		-name => "ldapIdentifier",
-		-label => $i18n->get("LDAPLink_995"),
+		-value     => $form->process("connectDn") || $db{connectDn},
+	);
+    $f->password(
+   		-name      => "ldapIdentifier",
+		-label     => $i18n->get("LDAPLink_995"),
 		-hoverHelp => $i18n->get("LDAPLink_995 description"),
-		-value => $db{identifier},
-		);
-   $f->text(
-   		-name => "ldapUserRDN",
-		-label => $i18n->get(9),
+		-value     => $form->process("ldapIdentifier") || $db{identifier},
+	);
+    $f->text(
+   		-name      => "ldapUserRDN",
+		-label     => $i18n->get(9),
 		-hoverHelp => $i18n->get('9 description'),
-		-value => $db{ldapUserRDN},
-	   );
-   $f->text(
-		-name => "ldapIdentity",
-		-label => $i18n->get(6),
+		-value     => $form->process("ldapUserRDN") || $db{ldapUserRDN},
+	);
+    $f->text(
+		-name      => "ldapIdentity",
+		-label     => $i18n->get(6),
 		-hoverHelp => $i18n->get('6 description'),
-		-value => $db{ldapIdentity},
-   );
-   $f->text(
-		-name => "ldapIdentityName",
-		-label => $i18n->get(7),
+		-value     => $form->process("ldapIdentity") || $db{ldapIdentity},
+    );
+    $f->text(
+		-name      => "ldapIdentityName",
+		-label     => $i18n->get(7),
 		-hoverHelp => $i18n->get('7 description'),
-		-value => $db{ldapIdentityName},
-   );
-   $f->text(
-		-name => "ldapPasswordName",
-		-label => $i18n->get(8),
+		-value     => $form->process("ldapIdentityName") || $db{ldapIdentityName},
+    );
+    $f->text(
+		-name      => "ldapPasswordName",
+		-label     => $i18n->get(8),
 		-hoverHelp => $i18n->get('8 description'),
-		-value => $db{ldapPasswordName},
-   );
-   $f->textarea(
-        -name => "ldapGlobalRecursiveFilter",
-		-label => $i18n->get("global recursive filter label"),
+		-value     => $form->process("ldapPasswordName") || $db{ldapPasswordName},
+    );
+    $f->textarea(
+        -name      => "ldapGlobalRecursiveFilter",
+		-label     => $i18n->get("global recursive filter label"),
 		-hoverHelp => $i18n->get("global recursive filter label description"),
-		-value => $db{ldapGlobalRecursiveFilter}
-   );
-	$f->yesNo(
-		-name=>"ldapSendWelcomeMessage",
-		-value=>$db{ldapSendWelcomeMessage},
-		-label=>$i18n->get(868),
-		-hoverHelp=>$i18n->get('868 description'),
+		-value     => $form->process("ldapGlobalRecursiveFilter") || $db{ldapGlobalRecursiveFilter}
+    );
+    $f->yesNo(
+		-name      =>"ldapSendWelcomeMessage",
+		-value     =>$form->yesNo("ldapSendWelcomeMessage") || $db{ldapSendWelcomeMessage},
+		-label     =>$i18n->get(868),
+		-hoverHelp =>$i18n->get('868 description'),
 	);
 	$f->textarea(
-                -name=>"ldapWelcomeMessage",
-                -value=>$db{ldapWelcomeMessage},
-                -label=>$i18n->get(869),
-                -hoverHelp=>$i18n->get('869 description'),
-               );
+        -name      =>"ldapWelcomeMessage",
+        -value     =>$form->textarea("ldapWelcomeMessage") || $db{ldapWelcomeMessage},
+        -label     =>$i18n->get(869),
+        -hoverHelp =>$i18n->get('869 description'),
+    );
 	$f->template(
-		-name=>"ldapAccountTemplate",
-		-value=>$db{ldapAccountTemplate},
-		-namespace=>"Auth/LDAP/Account",
-		-label=>$i18n->get("account template"),
-		-hoverHelp=>$i18n->get("account template description"),
+		-name      =>"ldapAccountTemplate",
+		-value     =>$form->template("ldapAccountTemplate") || $db{ldapAccountTemplate},
+		-namespace =>"Auth/LDAP/Account",
+		-label     =>$i18n->get("account template"),
+		-hoverHelp =>$i18n->get("account template description"),
 		);
 	$f->template(
-		-name=>"ldapCreateAccountTemplate",
-		-value=>$db{ldapCreateAccountTemplate},
-		-namespace=>"Auth/LDAP/Create",
-		-label=>$i18n->get("create account template"),
-		-hoverHelp=>$i18n->get("create account template description"),
+		-name      =>"ldapCreateAccountTemplate",
+		-value     =>$form->template("ldapCreateAccountTemplate") || $db{ldapCreateAccountTemplate},
+		-namespace =>"Auth/LDAP/Create",
+		-label     =>$i18n->get("create account template"),
+		-hoverHelp =>$i18n->get("create account template description"),
 		);
 	$f->template(
-		-name=>"ldapLoginTemplate",
-		-value=>$db{ldapLoginTemplate},
-		-namespace=>"Auth/LDAP/Login",
-		-label=>$i18n->get("login template"),
-		-hoverHelp=>$i18n->get("login template description"),
+		-name      =>"ldapLoginTemplate",
+		-value     =>$form->template("ldapLoginTemplate") || $db{ldapLoginTemplate},
+		-namespace =>"Auth/LDAP/Login",
+		-label     =>$i18n->get("login template"),
+		-hoverHelp =>$i18n->get("login template description"),
 		);
    
    $f->submit;

@@ -24,14 +24,14 @@ our @ISA = qw(WebGUI::Asset::Wobject);
 #-------------------------------------------------------------------
 sub canManage {
 	my $self = shift;
-	return 0 if $self->session->user->userId eq '1';
+	return 0 if $self->session->user->isVisitor;
 	return $self->session->user->isInGroup($self->get("adminsGroupId"));
 }
 
 #-------------------------------------------------------------------
 sub canPersonalize {
 	my $self = shift;
-	return 0 if $self->session->user->userId eq '1';
+	return 0 if $self->session->user->isVisitor;
 	return $self->session->user->isInGroup($self->get("usersGroupId"));
 }
 
@@ -273,7 +273,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 
@@ -286,7 +286,7 @@ sub view {
 								shortcutUrl=>$child->getUrl,
 								canPersonalize=>$self->canPersonalize,
 								showReloadIcon=>$child->{_properties}{showReloadIcon},
-								canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+								canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 							});
 							$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 						}
@@ -309,13 +309,13 @@ sub view {
 					shortcutUrl=>$child->getUrl,
 					showReloadIcon=>$child->{_properties}{showReloadIcon},
 					canPersonalize=>$self->canPersonalize,
-					canEditUserPrefs=>(($self->session->user->userId ne '1') && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
+					canEditUserPrefs=>(($self->session->user->isRegistered) && (ref $child eq 'WebGUI::Asset::Shortcut') && (scalar($child->getPrefFieldsToShow) > 0))
 				});
 				$newStuff .= 'available_dashlets["'.$child->getId.'"]=\''.$child->getUrl.'\';';
 			}
 		}
 	}
-	$vars{showAdmin} = ($self->session->var->get("adminOn") && $self->canEdit);
+	$vars{showAdmin} = ($self->session->var->isAdminOn && $self->canEdit);
 	$vars{"dragger.init"} = '
 		<script type="text/javascript">
 			dragable_init("'.$self->getUrl.'");
@@ -329,7 +329,7 @@ sub view {
 #-------------------------------------------------------------------
 sub www_setContentPositions {
 	my $self = shift;
-	return 'Visitors cannot save settings' if($self->session->user->userId eq '1');
+	return 'Visitors cannot save settings' if($self->session->user->isVisitor);
 	return $self->session->privilege->insufficient() unless ($self->canPersonalize);
 	return 'empty' unless $self->get("isInitialized");
 	my $dummy = $self->initialize unless $self->get("isInitialized");
@@ -352,10 +352,10 @@ sub www_view {
         unless ($self->canView) {
                 if ($self->get("state") eq "published") { # no privileges, make em log in
                         return $self->session->privilege->noAccess();
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^trash/) { # show em trash
+                } elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^trash/) { # show em trash
                         $self->session->http->setRedirect($self->getUrl("func=manageTrash"));
                         return undef;
-                } elsif ($self->session->var->get("adminOn") && $self->get("state") =~ /^clipboard/) { # show em clipboard
+                } elsif ($self->session->var->isAdminOn && $self->get("state") =~ /^clipboard/) { # show em clipboard
                         $self->session->http->setRedirect($self->getUrl("func=manageClipboard"));
                         return undef;
                 } else { # tell em it doesn't exist anymore

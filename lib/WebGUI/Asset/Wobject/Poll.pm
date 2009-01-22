@@ -20,7 +20,7 @@ use WebGUI::User;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Image::Graph;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use JSON;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -192,7 +192,7 @@ sub freezeGraphConfig {
     my $self        = shift;
     my $obj         = shift;
     
-    return JSON::encode_json($obj);
+    return JSON::to_json($obj);
 }
 
 
@@ -404,7 +404,7 @@ sub thawGraphConfig {
     my $string      = shift;
     
     return unless $string;
-    return JSON::decode_json($string);
+    return JSON::from_json($string);
 }
 
 #-------------------------------------------------------------------
@@ -461,7 +461,7 @@ sub view {
 
             $graph->draw;
 
-            my $storage = WebGUI::Storage::Image->createTemp($self->session);
+            my $storage = WebGUI::Storage->createTemp($self->session);
             my $filename = 'poll'.$self->session->id->generate.".png";
             $graph->saveToStorageLocation($storage, $filename);
 

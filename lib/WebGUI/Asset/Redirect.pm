@@ -67,25 +67,27 @@ sub definition {
                 tableName=>'redirect',
                 className=>'WebGUI::Asset::Redirect',
                 properties=>{
-                                redirectUrl=>{
-					tab=>"properties",
-                			label=>$i18n->get('redirect url'),
-                			hoverHelp=>$i18n->get('redirect url description'),
-                                        fieldType=>'url',
-                                        defaultValue=>undef
-                                        }
-                        }
-                });
+                        redirectUrl=>{
+                                tab             => "properties",
+                                label           => $i18n->get('redirect url'),
+                                hoverHelp       => $i18n->get('redirect url description'),
+                                fieldType       => 'url',
+                                defaultValue    => undef
+                        },
+                        redirectType=>{
+                                tab             => "properties",
+                                label           => $i18n->get('Redirect Type'),
+                                hoverHelp       => $i18n->get('redirect type description'),
+                                fieldType       => 'selectBox',
+                                defaultValue    => 302,
+                                options         => {
+                                        302 => $i18n->get('302 Moved Temporarily'),       
+                                        301 => $i18n->get('301 Moved Permanently'),       
+                                }
+                        },
+                },
+        });
         return $class->SUPER::definition($session,$definition);
-}
-
-
-#-------------------------------------------------------------------
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 
 #-------------------------------------------------------------------
@@ -104,6 +106,32 @@ sub exportHtml_view {
 	return '' if ($url eq $self->get("url"));
 	$self->session->http->setRedirect($url);
 	return $self->session->style->process('', 'PBtmpl0000000000000060');
+}
+
+#-------------------------------------------------------------------
+
+=head2 view ( )
+
+Display the redirect url when in admin mode.
+
+=cut
+
+sub view {
+	my $self = shift;
+	if ($self->session->var->isAdminOn) {
+		return $self->getToolbar.' '.$self->getTitle.' '.$self->get('redirectUrl');
+	}
+    else {
+		return "";
+	}
+}
+
+#-------------------------------------------------------------------
+sub www_edit {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    return $self->getAdminConsole->render($self->getEditForm->print, $self->addEditLabel);
 }
 
 #-------------------------------------------------------------------
@@ -129,7 +157,7 @@ sub www_view {
              </ul>',$i18n->get("assetName"));
     }
     unless ($url eq $self->get("url")) {
-        $self->session->http->setRedirect($url);
+        $self->session->http->setRedirect($url,$self->get('redirectType'));
 		return undef;
 	}
     return $i18n->get('self_referential');

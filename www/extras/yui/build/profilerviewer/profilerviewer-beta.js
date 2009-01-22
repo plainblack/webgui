@@ -2,7 +2,7 @@
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.5.1
+version: 2.6.0
 */
 (function() {
 
@@ -1187,4 +1187,4 @@ version: 2.5.1
     };
 	
 })();
-YAHOO.register("profilerviewer", YAHOO.widget.ProfilerViewer, {version: "2.5.1", build: "984"});
+YAHOO.register("profilerviewer", YAHOO.widget.ProfilerViewer, {version: "2.6.0", build: "1321"});

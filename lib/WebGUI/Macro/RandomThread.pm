@@ -60,8 +60,6 @@ URL of the template to use to display the random thread. Must be a valid URL wit
 sub process {
 	my $session = shift;
 	my ($startURL, $relatives, $templateURL) = @_;
-	# Seed the randomizer:
-	srand;
 
 	# Set defaults (default template is set by id later):
 	$startURL ||= 'home';

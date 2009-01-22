@@ -19,6 +19,7 @@ use Weather::Com::Finder;
 BEGIN {
     # This is horrible, and needs to be removed when Weather::Com > 0.5.3 is released.
     my $old_get_weather = \&Weather::Com::Base::get_weather;
+    no warnings 'redefine';
     *Weather::Com::Base::get_weather = sub {
         my $self = shift;
         $self->{LINKS} = 1;
@@ -48,16 +49,16 @@ sub definition {
 			fieldType 	=> "text",
 			tab 		=> "properties",
 			defaultValue	=> undef,
-			hoverHelp	=> "partnerId help",
-			label		=> "partnerId",
+			hoverHelp	=> $i18n->get("partnerId help"),
+			label		=> $i18n->get("partnerId"),
 			subtext		=> '<a href="http://www.weather.com/services/xmloap.html">'.$i18n->get("you need a weather.com key").'</a>',
 			},
 		licenseKey => {
 			fieldType	=> "text",
 			tab		=> "properties",
 			defaultValue	=> undef,
-			hoverHelp	=> "licenseKey help",
-			label		=> "licenseKey",
+			hoverHelp	=> $i18n->get("licenseKey help"),
+			label		=> $i18n->get("licenseKey"),
 			},
 		templateId =>{
 			fieldType=>"template",

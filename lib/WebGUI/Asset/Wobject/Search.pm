@@ -16,6 +16,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Paginator;
 use WebGUI::Search;
+use HTML::Highlight;
 
 =head1 NAME
 
@@ -94,7 +95,8 @@ sub definition {
 				tab             => "properties",
 				hoverHelp       => $i18n->get("class limiter description"),
 				label           => $i18n->get("class limiter"),
-				options         => $session->db->buildHashRef("select distinct(className) from asset")
+				options         => $session->db->buildHashRef("select distinct(className) from asset"),
+                showSelectAll   => 1,
 				},
             useContainers => {
                 tab             => "properties",
@@ -103,7 +105,15 @@ sub definition {
                 fieldType       => "yesNo",
                 defaultValue    => 0,
                 },
-		);
+			paginateAfter => {
+				hoverHelp       => $i18n->get("paginate after help"),
+				label           => $i18n->get("paginate after"),
+				tab             => "display",
+				fieldType       => "integer",
+				defaultValue    => 25,
+				},
+ 		);
+
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
 		icon=>'search.gif',
@@ -141,48 +151,84 @@ Display search interface and results.
 =cut
 
 sub view {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset_Search");
+	my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $user    = $session->user;
+	my $i18n    = WebGUI::International->new($self->session, "Asset_Search");
+
+    my $keywords = $form->get("keywords");
 	my %var;
-	$var{'form_header'} = WebGUI::Form::formHeader($self->session, {action=>$self->getUrl})
-		.WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
-	$var{'form_footer'} = WebGUI::Form::formFooter($self->session);
-	$var{'form_submit'} = WebGUI::Form::submit($self->session, {value=>$i18n->get("search")});
-	$var{'form_keywords'} = WebGUI::Form::text($self->session, {name=>"keywords", value=>$self->session->form->get("keywords")});
-	$var{'no_results'} = $i18n->get("no results");
-	if ($self->session->form->get("doit")) {
-		my $search = WebGUI::Search->new($self->session);
-		my %rules = (
-			keywords=>$self->session->form->get("keywords"), 
-			lineage=>[WebGUI::Asset->newByDynamicClass($self->session,$self->getValue("searchRoot"))->get("lineage")],
-			);
-		my @classes = split("\n",$self->get("classLimiter"));
+	
+    $var{'form_header'  } = WebGUI::Form::formHeader($session, {
+        action=>$self->getUrl
+		})
+    .WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
+	$var{'form_footer'  } = WebGUI::Form::formFooter($session);
+	$var{'form_submit'  } = WebGUI::Form::submit($session, {
+        value=>$i18n->get("search")
+    });
+	$var{'form_keywords'} = WebGUI::Form::text($session, {
+        name=>"keywords",
+        value=>$keywords
+    });
+	$var{'no_results'   } = $i18n->get("no results");
+	
+    if ($form->get("doit")) {
+		my $search = WebGUI::Search->new($session);
+		my %rules   = (
+			keywords =>$keywords, 
+			lineage  =>[
+                WebGUI::Asset->newByDynamicClass($session,$self->getValue("searchRoot"))->get("lineage")
+            ],
+		);
+		my @classes     = split("\n",$self->get("classLimiter"));
 		$rules{classes} = \@classes if (scalar(@classes));
 		$search->search(\%rules);
-		my @results = ();
-		my $rs = $search->getResultSet;
-		while (my $data = $rs->hashRef) {
-			if ($self->session->user->userId eq $data->{ownerUserId} || $self->session->user->isInGroup($data->{groupIdView}) || $self->session->user->isInGroup($data->{groupIdEdit})) {
-            my $url = $data->{url};
-            if ($self->get("useContainers")) {
-                my $asset = WebGUI::Asset->new($self->session, $data->{assetId}, $data->{className});
-                if (defined $asset) {
-                    $url = $asset->getContainer->get("url");
+		
+        #Instantiate the highlighter
+        my @words     = split(/\s+/,$keywords);
+        my @wildcards = map { "%" } @words;
+        my $hl = HTML::Highlight->new(
+            words     => \@words,
+            wildcards => \@wildcards
+        );
+
+        #Set up the paginator
+        my $p         = $search->getPaginatorResultSet (
+            $self->getUrl('doit=1;keywords='.$session->url->escape($keywords)),
+			$self->get("paginateAfter"),
+        );
+
+        my @results   = ();
+        foreach my $data (@{$p->getPageData}) {
+            next unless (
+                $user->userId eq $data->{ownerUserId}
+                || $user->isInGroup($data->{groupIdView})
+                || $user->isInGroup($data->{groupIdEdit})
+            );
+
+            my $asset = WebGUI::Asset->new($session, $data->{assetId}, $data->{className});
+            if (defined $asset) {
+                my $properties = $asset->get;
+                if ($self->get("useContainers")) {
+                    $properties->{url} = $asset->getContainer->get("url");
                 }
-            }
-			push(@results, {
-				url         => $url,
-				title       => $data->{title},
-				synopsis    => $data->{synopsis},
-				assetId     => $data->{assetId},
-				});
-             $var{results_found} = 1;
-			}
-		} 
-		my $p = WebGUI::Paginator->new($self->session,$self->getUrl('doit=1;keywords='.$self->session->url->escape($self->session->form->get('keywords'))));
-		$p->setDataByArrayRef(\@results);	
-		$p->appendTemplateVars(\%var);
-		$var{result_set} = $p->getPageData;
+                #Add highlighting
+                $properties->{'title'               } = $hl->highlight($properties->{title} || '');
+                $properties->{'title_nohighlight'   } = $properties->{title};
+                my $synopsis = $properties->{'synopsis'} || '';
+                WebGUI::Macro::process($self->session, \$synopsis);
+                $properties->{'synopsis'            } = $hl->highlight($synopsis);
+                $properties->{'synopsis_nohighlight'} = $synopsis;
+                push(@results, $properties);
+                $var{results_found} = 1;
+            } 
+		}
+
+        $var{result_set} = \@results;
+        $p->appendTemplateVars(\%var);
+		
 	}
 	return $self->processTemplate(\%var, undef, $self->{_viewTemplate});
 }

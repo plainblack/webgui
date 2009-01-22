@@ -576,11 +576,12 @@ Suspends a workflow instance for a number of seconds defined in the config file,
 =cut
 
 sub suspendInstance {
-    my ($self, $instance, $kernel) = @_[OBJECT, ARG0, KERNEL];
-    $self->debug("Suspending workflow instance ".$instance->{instanceId}." for ".$self->config->get("suspensionDelay")." seconds.");
+    my ($self, $instance, $waitTimeout, $kernel) = @_[OBJECT, ARG0, ARG1, KERNEL];
+    $waitTimeout ||= $self->config->get("suspensionDelay");
+    $self->debug("Suspending workflow instance ".$instance->{instanceId}." for ".$waitTimeout." seconds.");
     my $priority = ($instance->{priority} - 1) * 10;
     $self->getSuspendedQueue->enqueue($priority, $instance);
-    $kernel->delay_set("returnInstanceToRunnableState",$self->config->get("suspensionDelay"), $instance);
+    $kernel->delay_set("returnInstanceToRunnableState", $waitTimeout, $instance);
 }
 
 #-------------------------------------------------------------------
@@ -611,30 +612,38 @@ sub workerResponse {
 		my $state = $response->content; 
 		$instance->{lastState} = $state;
 		$instance->{lastRunTime} = localtime(time());
-		if ($state eq "waiting") {
+		if ($state =~ m/^waiting\s*(\d+)?$/) {
+                my $waitTime = $1;
 			$self->debug("Was told to wait on $instanceId because we're still waiting on some external event.");
-			$kernel->yield("suspendInstance",$instance);
-		} elsif ($state eq "complete") {
+			$kernel->yield("suspendInstance",$instance, $waitTime);
+		}
+        elsif ($state eq "complete") {
 			$self->debug("Workflow instance $instanceId ran one of it's activities successfully.");
 			$kernel->yield("returnInstanceToRunnableState",$instance);
-		} elsif ($state eq "disabled") {
+		}
+        elsif ($state eq "disabled") {
 			$self->debug("Workflow instance $instanceId is disabled.");
 			$kernel->yield("suspendInstance",$instance);			
-		} elsif ($state eq "done") {
+		}
+        elsif ($state eq "done") {
 			$self->debug("Workflow instance $instanceId is now complete.");
 			$kernel->yield("deleteInstance",$instanceId);			
-		} elsif ($state eq "error") {
+		}
+        elsif ($state eq "error") {
 			$self->debug("Got an error response for $instanceId.");
 			$kernel->yield("suspendInstance",$instance);
-		} else {
+		}
+        else {
 			$self->error("Something bad happened on the return of $instance->{sitename} - $instanceId. ".$response->error_as_HTML);
 			$kernel->yield("suspendInstance",$instance);
 		}
-	} elsif ($response->is_redirect) {
+	}
+    elsif ($response->is_redirect) {
 		$self->error("Response for $instance->{sitename} - $instanceId was redirected. This should never happen if configured properly!!!");
 		$instance->{lastState} = "redirect";
 		$instance->{lastRunTime} = localtime(time());
-	} elsif ($response->is_error) {	
+	}
+    elsif ($response->is_error) {	
 		$instance->{lastState} = "comm error";
 		$instance->{lastRunTime} = localtime(time());
 		$self->error("Response for $instance->{sitename} - $instanceId had a communications error. ".$response->error_as_HTML);

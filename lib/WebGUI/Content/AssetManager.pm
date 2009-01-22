@@ -2,7 +2,7 @@ package WebGUI::Content::AssetManager;
 
 use strict;
 
-use JSON qw( decode_json encode_json );
+use JSON qw( from_json to_json );
 use URI;
 use WebGUI::Form;
 use WebGUI::Paginator;
@@ -104,7 +104,7 @@ sub getManagerPaginator {
                             ;
 
     my $recordOffset        = $session->form->get( 'recordOffset' ) || 1;
-    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 25;
+    my $rowsPerPage         = $session->form->get( 'rowsPerPage' ) || 100;
     my $currentPage         = int ( $recordOffset / $rowsPerPage ) + 1;
 
     my $p           = WebGUI::Paginator->new( $session, '', $rowsPerPage, 'pn', $currentPage );
@@ -221,7 +221,7 @@ sub getMoreMenu {
         };
     }
 
-    return encode_json \@more_fields;
+    return to_json \@more_fields;
 }
 
 #----------------------------------------------------------------------------
@@ -283,12 +283,12 @@ sub www_ajaxGetManagerPage {
             assetId         => $asset->getId,
             url             => $asset->getUrl,
             lineage         => $asset->get( "lineage" ),
-            title           => $asset->get( "title" ),
+            title           => $asset->get( "menuTitle" ),
             revisionDate    => $asset->get( "revisionDate" ),
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
             lockedBy        => $asset->get( 'isLockedBy' ),
-            canEditIfLocked => $asset->canEditIfLocked,
+            actions         => $asset->canEdit && $asset->canEditIfLocked,
         );
 
         $fields{ className } = {};
@@ -308,7 +308,8 @@ sub www_ajaxGetManagerPage {
     $assetInfo->{ dir           } = lc $session->form->get( 'orderByDirection' );
     
     $session->http->setMimeType( 'application/json' );
-    return encode_json( $assetInfo );
+
+    return to_json( $assetInfo );
 }
 
 #----------------------------------------------------------------------------
@@ -370,21 +371,13 @@ sub www_manage {
         }
     }
 
-    # Handle Auto Request Commit setting
-    if ($session->setting->get("autoRequestCommit")) {
-        # Make sure version tag hasn't already been committed by another process
-        my $versionTag = WebGUI::VersionTag->getWorking($session, "nocreate");
-
-        if ($versionTag && $session->setting->get("skipCommitComments")) {
-            $versionTag->requestCommit;
-        }
-        elsif ($versionTag) {
-            $session->http->setRedirect(
-                $currentAsset->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($session)->getId)
-            );
-            return undef;
-        }
-    }
+    # Handle autocommit workflows
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
+        allowComments   => 1,
+        returnUrl       => $currentAsset->getUrl,
+    }) eq 'redirect' ) {
+        return undef;
+    };
 
     # Show the page
     # i18n we'll need later
@@ -394,27 +387,33 @@ sub www_manage {
     );
 
     # Add script and stylesheets
+    $session->style->setLink( $session->url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
     $session->style->setLink( $session->url->extras('yui/build/menu/assets/skins/sam/menu.css'), {rel=>'stylesheet', type=>'text/css'});
-    $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
-    $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/element/element-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/connection/connection-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-beta-min.js ' ) );
-    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-beta-min.js ' ) );
+    $session->style->setLink( $session->url->extras('yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
+
+    $session->style->setScript( $session->url->extras( 'yui/build/utilities/utilities.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/paginator/paginator-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datasource/datasource-min.js ' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/datatable/datatable-min.js ' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/container/container-min.js' ) );
     $session->style->setScript( $session->url->extras( 'yui/build/menu/menu-min.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui/build/json/json-min.js' ) );
+    $session->style->setScript( $session->url->extras( 'yui-webgui/build/i18n/i18n.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.js' ) );
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
     my $extras      = $session->url->extras;
     $session->style->setRawHeadTags( <<ENDHTML );
-    <script type="text/javascript">
+    <link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.6.0/build/logger/assets/skins/sam/logger.css">
+    <script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/logger/logger-min.js"></script> 
+
+<script type="text/javascript">
         WebGUI.AssetManager.extrasUrl   = '$extras';
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
+    my $output          = WebGUI::Macro::AdminBar::process($session).'<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
@@ -429,7 +428,7 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s'); return false;">%s</a></li>},
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink'); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
             $currentAsset->getUrl,
             $currentAsset->get( "menuTitle" ),
             ;
@@ -446,7 +445,7 @@ ENDHTML
                     . q{<input type="submit" name="action_update" value="} . $i18n->get( "update" ) . q{" />}
                     . q{<input type="submit" name="action_delete" value="} . $i18n->get( "delete" ) . q{" onclick="return confirm('} . $i18n->get( 43 ) . q{')" />}
                     . q{<input type="submit" name="action_cut" value="} . $i18n->get( 'cut' ) . q{" />}
-                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "copy" ) . q{" />}
+                    . q{<input type="submit" name="action_copy" value="} . $i18n->get( "Copy" ) . q{" />}
                     . q{<input type="submit" name="action_duplicate" value="} . $i18n->get( "duplicate" ) . q{" />}
                     . q{</p>}
                     . q{</form>}
@@ -457,30 +456,6 @@ ENDHTML
     
     ### Clearing div
     $output         .= q{<div style="clear: both;">&nbsp;</div>};
-
-    ### New Content
-    $output         .= q{<div class="functionPane"><fieldset><legend>} . $i18n->get( '1083' ) . '</legend>';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","assetContainers")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '<hr />';
-    foreach my $link (@{$currentAsset->getAssetAdderLinks("proceed=manageAssets","utilityAssets")}) {
-        $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$link->{'icon.small'}.'" alt="'.$link->{label}.'" style="border: 0px;vertical-align:middle;" /></p>
-                <a href="'.$link->{url}.'">'.$link->{label}.'</a> ';
-        $output .= $session->icon->edit("func=edit;proceed=manageAssets",$link->{asset}->get("url")) if ($link->{isPrototype});
-        $output .= '<br />';
-    }
-    $output .= '</fieldset></div>';
 
     tie my %options, 'Tie::IxHash';
     my $hasClips = 0;
@@ -515,16 +490,21 @@ ENDHTML
     $output .= '<div class="functionPane"><fieldset> <legend>'.$i18n->get("packages").'</legend>';
     foreach my $asset (@{$currentAsset->getPackageList}) {
             $output .= '<p style="display:inline;vertical-align:middle;"><img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="vertical-align:middle;border: 0px;" /></p>
-                    <a href="'.$currentAsset->getUrl("func=deployPackage;assetId=".$asset->getId).'">'.$asset->getTitle.'</a> '
+                    <a href="'.$currentAsset->getUrl("func=deployPackage;assetId=".$asset->getId.";proceed=manageAssets").'">'.$asset->getTitle.'</a> '
                     .$session->icon->edit("func=edit;proceed=manageAssets",$asset->get("url"))
                     .$session->icon->export("func=exportPackage",$asset->get("url"))
                     .'<br />';
     }
-    $output .= '<br />'.WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
-            .WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
-            .'<input type="file" name="packageFile" size="10" style="font-size: 10px;" />'
-            .WebGUI::Form::submit($session, {value=>$i18n->get("import"), extras=>'style="font-size: 10px;"'})
-            .WebGUI::Form::formFooter($session);
+    $output .= '<br />'
+        . WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
+        . WebGUI::Form::hidden($session, {name=>"func", value=>"importPackage"})
+        . '<div><input type="file" name="packageFile" size="30" style="font-size: 10px;" /></div>'
+        . '<div style="font-size: 10px">'
+        . WebGUI::Form::checkbox($session, { label => $i18n->get('inherit parent permissions'), checked => 1, name => 'inheritPermissions', value => 1 })
+        . ' &nbsp; ' .  WebGUI::Form::submit($session, { value=>$i18n->get("import"), 'extras' => ' ' })
+        . '</div>'
+        . WebGUI::Form::formFooter($session)
+        ;
     $output .= ' </fieldset></div>';
 
     ### Clearing div
@@ -537,44 +517,6 @@ ENDHTML
                     ;
 
     $output         .= <<"ENDJS";
-    // Start the data source
-    WebGUI.AssetManager.DataSource
-        = new YAHOO.util.DataSource( '?op=assetManager;method=ajaxGetManagerPage' );
-    WebGUI.AssetManager.DataSource.responseType
-        = YAHOO.util.DataSource.TYPE_JSON;
-    WebGUI.AssetManager.DataSource.responseSchema
-        = {
-            resultsList: 'assets',
-            totalRecords: 'totalAssets',
-            fields: [
-                { key: 'assetId' },
-                { key: 'lineage' },
-                { key: 'actions' },
-                { key: 'title' },
-                { key: 'className' },
-                { key: 'revisionDate' },
-                { key: 'assetSize' },
-                { key: 'lockedBy' },
-                { key: 'icon' },
-                { key: 'url' },
-                { key: 'childCount' }
-            ]
-        };
-
-    WebGUI.AssetManager.DefaultSortedBy = { 
-        "key"       : "lineage",
-        "dir"       : YAHOO.widget.DataTable.CLASS_ASC
-    };
-    
-    WebGUI.AssetManager.BuildQueryString
-    = function ( state, dt ) {
-        var query = ";recordOffset=" + state.pagination.recordOffset 
-                + ';orderByDirection=' + ((state.sorting.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "DESC" : "ASC")
-                + ';rowsPerPage=' + state.pagination.rowsPerPage
-                + ';orderByColumn=' + state.sorting.key
-                ;
-            return query;
-        };
 
     var selectAllButton = "<input type=\\"checkbox\\" title=\\"$i18n{"select all"}\\" onclick=\\"WebGUI.Form.toggleAllCheckboxesInForm( document.forms[0], 'assetId' );\\" />";
 ENDJS
@@ -611,10 +553,11 @@ Search assets underneath this asset.
 =cut
 
 sub www_search {
-    my $session     = shift;
-    my $ac          = WebGUI::AdminConsole->new( $session, "assets" ); 
-    my $i18n        = WebGUI::International->new( $session, "Asset" );
-    my $output      = '<div id="assetSearch">' . getHeader( $session );
+    my $session      = shift;
+    my $ac           = WebGUI::AdminConsole->new( $session, "assets" ); 
+    my $i18n         = WebGUI::International->new( $session, "Asset" );
+    my $currentAsset = getCurrentAsset($session);
+    my $output       = '<div id="assetSearch">' . getHeader( $session );
     
     $session->style->setLink( $session->url->extras( 'yui-webgui/build/assetManager/assetManager.css' ), { rel => "stylesheet", type => 'text/css' } );
     $session->style->setScript( $session->url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ) );
@@ -622,20 +565,20 @@ sub www_search {
     $session->style->setScript( $session->url->extras( 'yui-webgui/build/form/form.js' ) );
 
     ### Show the form
-    $output     .= q{<form><p>}
+    $output     .= q{<form method="post" enctype="multipart/form-data" action="} . $currentAsset->getUrl . q{"><p>}
                 . q{<input type="hidden" name="op" value="assetManager" />}
                 . q{<input type="hidden" name="method" value="search" />}
                 . q{<input type="text" size="45" name="keywords" value="} . $session->form->get('keywords') . q{" />}
                 . getClassSelectBox( $session )
-                . q{<button name="action" value="search">} . $i18n->get( "search" ) . q{</button>}
+                . q{<input type="submit" name="action" value="}.$i18n->get( "search" ).q{" />}
                 . q{</p></form>}
                 ;
 
     ### Actions
-    if ( my $action = $session->form->get( 'action' ) ) {
-        my @assetIds    = $session->form->get( 'assetId' );
+    if ( my $action = lc $session->form->get( 'action' ) ) {
+        my @assetIds = $session->form->get( 'assetId' );
 
-        if ( $action eq "trash" ) {
+        if ( $action eq "delete" ) { ##aka trash
             for my $assetId ( @assetIds ) {
                 my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
                 next unless $asset;
@@ -738,7 +681,7 @@ sub www_search {
                     alt             => ( $count % 2 == 0 ? 'class="alt"' : '' ),
                     assetId         => $asset->getId,
                     url             => $asset->getUrl,
-                    title           => $asset->get( "title" ),
+                    title           => $asset->get( "menuTitle" ),
                     revisionDate    => $session->datetime->epochToHuman( $asset->get( "revisionDate" ) ),
                     hasChildren     => ( $asset->hasChildren ? "+&nbsp;" : "&nbsp;&nbsp;" ),
                     rank            => $asset->getRank,
@@ -783,9 +726,9 @@ sub www_search {
             $output     .= q{</tbody>}
                         . q{</table>}
                         . q{<p class="actions">} . $i18n->get( 'with selected' )
-                        . q{<button name="action" value="trash">} . $i18n->get( 'delete' ) . q{</button>}
-                        . q{<button name="action" value="cut">} . $i18n->get( "cut" ) . q{</button>}
-                        . q{<button name="action" value="copy">} . $i18n->get( "copy" ) . q{</button>}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( 'delete' ) . q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "cut" )    . q{" />}
+                        . q{<input type="submit" name="action" value="}.$i18n->get( "copy" )    .q{" />}
                         . q{</p>}
                         . q{</form>}
                         ;

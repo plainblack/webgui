@@ -19,7 +19,7 @@ use WebGUI::Asset;
 use WebGUI::Asset::File;
 use WebGUI::Asset::File::Image;
 use WebGUI::SQL;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::TabForm;
 use WebGUI::Utility;
 
@@ -91,13 +91,13 @@ sub edit {
        	        );
 	$tabform->addTab("security",$i18n->get(107,"Asset"),6);
 	my $subtext;
-       	if ($self->session->user->isInGroup(3)) {
+       	if ($self->session->user->isAdmin) {
                	 $subtext = $self->session->icon->manage('op=listUsers');
         } else {
        	         $subtext = "";
        	}
        	my $clause;
-       	if ($self->session->user->isInGroup(3)) {
+       	if ($self->session->user->isAdmin) {
        		my $group = WebGUI::Group->new($self->session,4);
                	my $contentManagers = $group->getAllUsers();
                 push (@$contentManagers, $self->session->user->userId);
@@ -151,10 +151,10 @@ sub editSave {
 
 	##This is a hack.  File uploads should go through the WebGUI::Form::File API
     my $tempFileStorageId = WebGUI::Form::File->new($self->session,{name => 'file'})->getValue;
-	my $tempStorage       = WebGUI::Storage::Image->get($self->session, $tempFileStorageId);
+	my $tempStorage       = WebGUI::Storage->get($self->session, $tempFileStorageId);
 
 	foreach my $filename (@{$tempStorage->getFiles}) {
-		#my $storage = WebGUI::Storage::Image->create($self->session);
+		#my $storage = WebGUI::Storage->create($self->session);
 		#$storage->addFileFromFilesystem($tempStorage->getPath($filename));
 		
 		#$storage->setPrivileges($self->getParent->get("ownerUserId"),$self->getParent->get("groupIdView"),$self->getParent->get("groupIdEdit"));
@@ -195,25 +195,13 @@ sub editSave {
 	}
 	$tempStorage->delete;
 
-    # deal with special commit rules
-	if ($self->session->form->process("saveAndCommit") ne "") {
-        if ($self->session->setting->get("skipCommitComments")) {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTagConfirm;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-        } 
-        else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-        }
-		return undef;
-	}
-	if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } 
-        else {
-		    $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-            return undef;
-        }
-	}
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        override        => scalar $self->session->form->process("saveAndCommit"),
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
 
 	return $self->getParent->www_manageAssets if ($self->session->form->process("proceed") eq "manageAssets");
 	return $self->getParent->www_view;

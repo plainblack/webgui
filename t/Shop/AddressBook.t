@@ -172,9 +172,10 @@ $book->update({ lastShipId => $address1->getId, lastPayId => $address2->getId});
 cmp_deeply(
     $book->get(),
     {
-        userId     => ignore,
-        sessionId  => ignore,
-        addressBookId  => ignore,
+        userId     => ignore(),
+        sessionId  => ignore(),
+        addressBookId  => ignore(),
+        defaultAddressId => ignore(),
     },
     'update updates the object properties cache'
 );

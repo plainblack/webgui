@@ -1,9 +1,16 @@
 package WebGUI::Asset::Wobject::UserList;
 
-#$VERSION = "2.0.0";
+#-------------------------------------------------------------------
+# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#-------------------------------------------------------------------
+# Please read the legal notices (docs/legal.txt) and the license
+# (docs/license.txt) that came with this distribution before using
+# this software.
+#-------------------------------------------------------------------
+# http://www.plainblack.com                     info@plainblack.com
+#-------------------------------------------------------------------
 
 use strict;
-use warnings;
 use HTML::Entities;
 use Tie::CPHash;
 use Tie::IxHash;
@@ -15,13 +22,6 @@ use WebGUI::Pluggable;
 use WebGUI::Form::Image;
 use WebGUI::Form::File;
 use base 'WebGUI::Asset::Wobject';
-
-=head1 LEGAL
-
-Copyright 2004-2008 United Knowledge
-
-http://www.unitedknowledge.nl
-developmentinfo@unitedknowledge.nl
 
 =head1 NAME
 
@@ -50,16 +50,28 @@ Returns an array ref that contains tmpl_vars for the Alphabet Search.
 
 sub getAlphabetSearchLoop {
     my $self = shift;
-    my $fieldName = shift || 'lastName';
+    my $fieldName = shift;
     my $alphabet = shift;
     my (@alphabet, @alphabetLoop);
+    
+    return [] if $fieldName eq 'disableAlphabetSearch';
     $alphabet ||= "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z";
     @alphabet = split(/,/,$alphabet);
     foreach my $letter (@alphabet){
         my $htmlEncodedLetter = encode_entities($letter);
         my $searchURL = "?searchExact_".$fieldName."=".$letter."%25"; 
-        my $hasResults = $self->session->db->quickScalar("select if ("
-            ."(select count(*) from userProfileData where ".$fieldName."  like '".$letter."%')<>0, 1, 0)");
+        my $hasResults;
+        my $users = $self->session->db->read("select userId from userProfileData where lastName like '".$letter."%'"); 
+        while (my $user = $users->hashRef){
+            my $showGroupId = $self->get("showGroupId");
+            if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
+                unless ($self->get("hideGroupId") ne '0' && $self->isInGroup($self->get("hideGroupId"),$user->{userId})){
+                    $hasResults = 1;
+                    last;
+                }
+            }
+        }
+
         push @alphabetLoop, {
             alphabetSearch_loop_label       => $htmlEncodedLetter || $letter,
             alphabetSearch_loop_hasResults  => $hasResults,
@@ -162,6 +174,9 @@ sub definition {
         my $label = WebGUI::Operation::Shared::secureEval($session,$field->{label});
         $profileFields{$field->{fieldName}} = $label;
     }
+    my %alphabetSearchFieldOptions;
+    tie %alphabetSearchFieldOptions, 'Tie::IxHash';
+    %alphabetSearchFieldOptions = ('disableAlphabetSearch'=>'Disable Alphabet Search',%profileFields);
 
     tie %properties, 'Tie::IxHash';
     %properties = (
@@ -206,7 +221,7 @@ sub definition {
             fieldType=>"selectBox",
             defaultValue=>"lastName",
             tab=>"display",
-            options=>\%profileFields,
+            options=>\%alphabetSearchFieldOptions,
             label=>$i18n->get("alphabetSearchField label"),
             hoverHelp=>$i18n->get('alphabetSearchField description'),
         },
@@ -374,6 +389,7 @@ sub view {
 		    		"sequenceNumber"=>$profileField->{sequenceNumber},
                     "visible"=>$profileField->{visible},
                     "fieldType"=>$profileField->{fieldType},
+                    "dataDefault"=>$profileField->{dataDefault},
 			    	});
         if($profileField->{visible}){
             push (@profileField_loop, {
@@ -416,13 +432,15 @@ sub view {
         });
 	}
     
-	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile, userProfileData.publicEmail ";
-	
+    # Query user profile data. Exclude the visitor account and users that have been deactivated.
+	$sql = "select distinct users.userId, users.userName, userProfileData.publicProfile ";
+	# Include remaining profile fields in the query
+    my $dbh = $self->session->db->dbh;
 	foreach my $profileField (@profileFields){
-    	$sql .= ", userProfileData.$profileField->{fieldName}";
+    	$sql .= ", userProfileData." . $dbh->quote_identifier($profileField->{fieldName});
 	}
-	$sql .= "	from users";
-	$sql .= " left join userProfileData using(userId) where users.userId != '1'";
+	$sql .= " from users";
+	$sql .= " left join userProfileData using(userId) where users.userId != '1' and users.status = 'active'";
 	
 	my $constraint;
     my @profileSearchFields = ();
@@ -516,26 +534,23 @@ sub view {
 	$p->setDataByArrayRef(\@visibleUsers);
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
-	    if ($self->get('overridePublicProfile') || $user->{publicProfile} eq "1" || ($user->{publicProfile} eq "" && $defaultPublicProfile eq "1")){
+        my $userObject = WebGUI::User->new($self->session,$user->{userId});
+	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable($userObject)){
 		    my (@profileFieldValues);
 			my %userProperties;
-			my $emailNotPublic;
-            if ($user->{publicEmail} eq "0" || ($user->{publicEmail} eq "" && $defaultPublicEmail ne "1")){
-                unless ($self->get('overridePublicEmail')){
-                    $emailNotPublic = 1;
-                }
-            }
 			foreach my $profileField (@profileFields){
-				if ($profileField->{fieldName} eq "email" && $emailNotPublic){
-			    	push (@profileFieldValues, {
-				    	"profile_emailNotPublic"=>1,
-    				});
-				}
-                else{
-                    my $profileFieldName = $profileField->{fieldName};
-                    $profileFieldName =~ s/ /_/g;
-                    $profileFieldName =~ s/\./_/g;
+                # Assign field name
+                my $profileFieldName = $profileField->{fieldName};
+                $profileFieldName =~ s/ /_/g;
+                $profileFieldName =~ s/\./_/g;
+
+				if ($userObject->canViewField($profileField->{fieldName},$self->session->user)){
+                    # Assign value
                     my $value = $user->{$profileField->{fieldName}};
+                    # Assign default value if not available
+                    $value = $profileField->{dataDefault} if $value eq '';
+                    # Handle special case of alias, which does not have a default value but is set to the username by default
+                    $value = $user->{userName} if ($profileFieldName eq 'alias' && $value eq '');
                     my %profileFieldValues;
                     if (WebGUI::Utility::isIn(ucfirst $profileField->{fieldType},qw(File Image)) && $value ne ''){
                         my $file = WebGUI::Form::DynamicField->new($self->session,
@@ -553,8 +568,13 @@ sub view {
                         $userProperties{'user_profile_'.$profileFieldName.'_value'} = $value;
                     }
 				}
+                else{
+                    push (@profileFieldValues, {
+                        "profile_notPublic"=>1,
+                    });
+                    $userProperties{'user_profile_'.$profileFieldName.'_notPublic'} = 1;
+                }
 			}
-			$userProperties{"user_profile_emailNotPublic"} = $emailNotPublic;
 			$userProperties{"user_id"} = $user->{userId};
 			$userProperties{"user_name"} = $user->{userName};
 			$userProperties{"user_profile_loop"} = \@profileFieldValues;

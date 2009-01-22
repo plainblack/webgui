@@ -23,7 +23,7 @@ use Data::Dumper;
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 
-my $num_tests = 52;
+my $num_tests = 53;
 
 plan tests => $num_tests;
  
@@ -70,10 +70,13 @@ is($http->getStatusDescription, 'packets are great', 'getStatusDescription: retu
 ####################################################
 
 $http->setStatus('200');
-is($http->isRedirect, '', 'isRedirect: is not');
+ok(!$http->isRedirect, 'isRedirect: 200 is not');
+
+$http->setStatus('301');
+ok($http->isRedirect, 'isRedirect: 301 is');
 
 $http->setStatus('302');
-is($http->isRedirect, 1, 'isRedirect: is too');
+ok($http->isRedirect, 'isRedirect: 302 is too');
 $http->setStatus('200');
 
 ####################################################
@@ -178,10 +181,16 @@ cmp_bag(\@metas, $expectedMetas, 'setRedirect:sets meta tags in the style object
 
 $request->uri('/here/now');
 $session->url->{_requestedUrl} = '';
-is($http->setRedirect('/here/now'), undef, 'setRedirect: returns undef if returning to self and no params');
+my $sessionAsset = $session->asset;
+$session->{_asset} = WebGUI::Asset->getDefault($session);
+my $defaultAssetUrl = $session->asset->getUrl;
+
+is($http->setRedirect($defaultAssetUrl), undef, 'setRedirect: returns undef if returning to self and no params');
 
 $request->setup_body({ param1 => 'value1' });
 isnt($http->setRedirect('/here/now'), undef, 'setRedirect: does not return undef if returning to self but there are params');
+
+$session->{_asset} = $sessionAsset;
 
 ####################################################
 #
@@ -216,7 +225,7 @@ $session->{_request} = $request;
 
 $http->setRedirect('/here/there');
 $http->sendHeader;
-is($request->status, 301, 'sendHeader as redirect: status set to 301');
+is($request->status, 302, 'sendHeader as redirect: status set to 301');
 is_deeply($request->headers_out->fetch, {'Location' => '/here/there'}, 'sendHeader as redirect: location set');
 
 ####################################################
@@ -304,9 +313,9 @@ $http->setFilename('');
 $request->protocol('HTTP 1.0');
 $http->setCacheControl(500);
 $http->sendHeader();
-my $headers_out = $request->headers_out->fetch;
-my $expire_header = delete $headers_out->{Expires};
-my $delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
+$headers_out = $request->headers_out->fetch;
+$expire_header = delete $headers_out->{Expires};
+$delta = deltaHttpTimes($session->datetime->epochToHttp(time+500), $expire_header);
 cmp_ok($delta->seconds, '<=', 2, 'sendHeader, old HTTP protocol, cacheControl=500: adds extra cache header field');
 is_deeply(
 	$request->headers_out->fetch,

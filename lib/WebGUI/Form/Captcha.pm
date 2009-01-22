@@ -17,7 +17,7 @@ package WebGUI::Form::Captcha;
 use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::International;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 =head1 NAME
 
@@ -134,7 +134,7 @@ Renders a captcha field.
 
 sub toHtml {
         my $self = shift;
- 	my $storage = WebGUI::Storage::Image->createTemp($self->session);
+ 	my $storage = WebGUI::Storage->createTemp($self->session);
         my ($filename, $challenge) = $storage->addFileFromCaptcha;
         $self->set("size", 6);
 	$self->set("maxlength", 6);

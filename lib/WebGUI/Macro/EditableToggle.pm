@@ -42,7 +42,7 @@ If this is blank an internationalized default is used.
 
 =head3 template
 
-A template from the Macro/EditableToggle namespace to use for formatting the link.
+The URL of a template from the Macro/EditableToggle namespace to use for formatting the link.
 
 =cut
 
@@ -55,7 +55,7 @@ sub process {
 	      my $i18n = WebGUI::International->new($session,'Macro_EditableToggle');
               my $turnOn = $param[0] || $i18n->get(516);
               my $turnOff = $param[1] || $i18n->get(517);
-                 if ($session->var->get("adminOn")) {
+                 if ($session->var->isAdminOn) {
                       $var{'toggle.url'} = $session->url->page('op=switchOffAdmin');
                       $var{'toggle.text'} = $turnOff;
                  } else {

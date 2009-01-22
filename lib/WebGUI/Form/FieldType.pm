@@ -20,6 +20,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use Module::Find qw(findallmod);
 
 =head1 NAME
 
@@ -112,15 +113,15 @@ sub getTypes {
     my $self = shift;
     my @types = @{$self->get('types')};
     unless (scalar(@types)) {
-        opendir(DIR,$self->session->config->getWebguiRoot."/lib/WebGUI/Form/");
-        foreach my $type (readdir(DIR)) {
-            if ($type =~ s/^(.*)\.pm$/$1/) {
-                if (WebGUI::Pluggable::instanciate('WebGUI::Form::'.ucfirst($type),'isDynamicCompatible')) {
+        my @classes = findallmod 'WebGUI::Form';
+        for my $class (@classes) {
+            if ($class =~ /^WebGUI::Form::(.*)/) {
+                my $type = $1;
+                if (WebGUI::Pluggable::instanciate($class, 'isDynamicCompatible')) {
                     push @types, $type;
                 }
             }
         }
-        closedir(DIR);
     }
     my %fields = ();
     foreach my $type (@types) {
@@ -140,7 +141,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 sub getValue {
 	my $self = shift;
 	my $fieldType = $self->SUPER::getValue(@_);
-	$fieldType =~ s/[^\w]//g;
+	$fieldType =~ s/[^\w:]//g;
 	return $fieldType || "text";
 }
 

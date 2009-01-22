@@ -8,6 +8,12 @@ our $I18N = {
 		context => q|A button added to all asset properties pages when save and commit mode is enabled.|
 	},
 
+    'apply' => {
+        message     => q{apply},
+        lastUpdated => 0,
+        context     => q{The label for the button to save and then return to the edit page.},
+    },
+
 	'keywords' => {
 		message => q|Keywords|,
 		lastUpdated => 0,
@@ -97,8 +103,8 @@ our $I18N = {
 	},
 
 	'purge trash after help' => {
-		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it gets purged all it's revisions and descendants will be purged as well.|,
-		lastUpdated => 1167187074,
+		message => q|How long should an asset stay in the trash before it's considered old enough to purge? Note that when it gets purged all its revisions and descendants will be purged as well.|,
+		lastUpdated => 1227289347,
 		context => q|the hover help for the purge trash after field|
 	},
 
@@ -235,19 +241,25 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
+
 	'duplicate' => {
 		message => q|Duplicate|,
 		lastUpdated => 0,
 		context => q|Used in asset context menus.|
 	},
-	
-	'copy' => {
+
+	'Copy' => {
 		message => q|Copy|,
-		lastUpdated => 0,
+		lastUpdated => 1221540086,
 		context => q|Used in asset context menus.|
 	},
-	
+
+	'copy' => {
+		message => q|copy|,
+		lastUpdated => 1221540088,
+		context => q|Same as Copy, but lower case.|
+	},
+
 	'this asset only' => {
 		message => q|This&nbsp;Asset&nbsp;Only|,
 		lastUpdated => 0,
@@ -555,8 +567,19 @@ as mouseover text in the asset properties tab.</p>|,
     },
 
     'Possible Values description' => {
-        message => q|<p>This field is used only for the Radio List and Select List data types. Enter
-the values you wish to appear, one per line.  Each line should be less than 255 characters long.</p>|,
+        message => q|This field is used for the list types (like Checkbox List and Select List).  Enter the values
+you wish to appear, one per line.<br />
+<br />If you want a different label for a value, the possible values list has to be
+formatted as follows:
+<pre>
+&#123;
+   "key1"=>"value1",
+   "key2"=>"value2",
+   "key3"=>"value3"
+   ...
+&#125;
+</pre>
+Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/value pairs|,
         lastUpdated => 1213247476,
     },
 
@@ -745,7 +768,17 @@ case of the check box list, then enter one per line.  The total amount of data i
 	'directory index' => {
 		 lastUpdated => 1118896675,
 		 message => q|Directory Index|,
-	       },
+    },
+
+    'Export site root URL' => {
+        lastUpdated => 1227213703,
+        message => q|Export site root URL|,
+    },
+
+    'Export site root URL description' => {
+        lastUpdated => 1227213703,
+        message => q|A URL to pass on to Macro Widgets.|,
+    },
 
         'Depth description' => {
                 message => q|<p>Sets the depth of the page tree to export. Use a depth of 0 to export only the current page. </p>|,
@@ -1091,7 +1124,7 @@ Couldn't open %-s because %-s <br />
         context     => q{Message when no assets match search criteria},
     },
 
-    'menu label' => {
+    'More' => {
         message     => q{More},
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},
@@ -1101,6 +1134,48 @@ Couldn't open %-s because %-s <br />
         message     => q{More},
         lastUpdated => 0,
         context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
+    'Export site root URL' => {
+        message     => q{Export site root URL},
+        lastUpdated => 0,
+        context     => q{Label for the menu to show actions to perform on an asset},
+    },
+
+    'Error: Cannot instantiate template' => {
+        message     => q{Error: Cannot instantiate template},
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
+    },
+
+    'inherit parent permissions' => {
+        message     => q{Inherit parent's permissions},
+        lastUpdated => 1221593874,
+        context     => q{Error message in Asset.pm},
+    },
+
+    'need a userId parameter' => {
+        message     => q{need a userId parameter},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'is not a valid userId' => {
+        message     => q{is not a valid userId},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    'need a depth' => {
+        message     => q{need a depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
+    },
+
+    '%s is not a valid depth' => {
+        message     => q{%s is not a valid depth},
+        lastUpdated => 0,
+        context     => q{Error message in exportAsHtml for an illegal parameter.},
     },
 
 };

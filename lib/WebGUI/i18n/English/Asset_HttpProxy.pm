@@ -266,12 +266,12 @@ be useful, others may not.|,
 		context => q|Translator note: the "%s" tokens in the message should not be translated.|,
 		lastUpdated => 1168994613
 	},
-    
+
     'url pattern filter label' => {
         message     => q|Url Pattern Filter|,
         lastUpdated => 1168994613,
     },
-    
+
     'url pattern filter hover help' => {
         message     => q|Enter patterns one per line (Perl regular expressions are valid) that should be filtered when re-writing urls
         <br /><br />
@@ -279,7 +279,25 @@ be useful, others may not.|,
             /bms/documents/document_\\d+\\.pdf
         |,
         lastUpdated => 1168994613,
-    }
+    },
+
+    'not found in content' => {
+        message     => q|not found in content|,
+        lastUpdated => 1230159074,
+        context     => q|i18n fragment used in default HTTP Proxy template|,
+    },
+
+    'Error: Search string' => {
+        message     => q|Error: search string|,
+        lastUpdated => 1230159074,
+        context     => q|i18n fragment used in default HTTP Proxy template|,
+    },
+
+    'Warning: Ending search point' => {
+        message     => q|Error search point|,
+        lastUpdated => 1230159074,
+        context     => q|i18n fragment used in default HTTP Proxy template|,
+    },
 
 };
 

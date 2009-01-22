@@ -60,7 +60,10 @@ sub handler {
 			    close($FILE);
 			    my @privs = split("\n", $fileContents);
 			    unless ($privs[1] eq "7" || $privs[1] eq "1") {
-				    my $session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+					my $session = $request->pnotes('wgSession');
+					unless (defined $session) {
+						$session = WebGUI::Session->open($server->dir_config('WebguiRoot'), $config->getFilename, $request, $server);
+					}
 				    my $hasPrivs = ($session->var->get("userId") eq $privs[0] || $session->user->isInGroup($privs[1]) || $session->user->isInGroup($privs[2]));
 				    $session->close();
 				    if ($hasPrivs) {

@@ -17,6 +17,7 @@ body {
 </style>
 
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="../../build/slider/assets/skins/sam/slider.css" />
 <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
@@ -131,6 +132,7 @@ body {
 
 <body class=" yui-skin-sam">
 
+
 <h1>Slider Button</h1>
 
 <div class="exampleIntro">
@@ -189,7 +191,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                                                 id: "opacitybutton", 
                                                 label: "<em id=\"opacitybutton-currentopactiy\">100%</em>", 
                                                 menu: oOpacityMenu,  
-                                                container: oDIV });
+                                                container: "opacitycontrols" });
 
 
             /*
@@ -198,7 +200,26 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                 of the Slider instance's "change" event.
             */
 
-            var oCurrentOpacity = Dom.get("opacitybutton-currentopactiy");
+            var oCurrentOpacity;
+
+
+			oButton.on("appendTo", function () {
+			
+                // Add Slider markup to the Menu instance's body element
+
+                oOpacityMenu.setBody("<div id=\"slider-bg\" tabindex=\"1\" title=\"Slider\"><div id=\"slider-thumb\"><img src=\"../button/assets/thumb-n.gif\"></div></div>");
+
+
+                /*
+                     Render the Menu instance into the element specified as the 
+                     Button instance's container
+                */
+
+                oOpacityMenu.render(this.get("container"));			
+			
+				oCurrentOpacity = Dom.get("opacitybutton-currentopactiy");
+			
+			});
             
 
             /*
@@ -210,53 +231,15 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
             var oHTMLButton = oButton.get("element").getElementsByTagName("button")[0];
             
             oHTMLButton.id = "opacitybutton-button";
-            
-                                                
-            function onButtonClick() {
-
-                // Add Slider markup to the Menu instance's body element
-
-                oOpacityMenu.setBody("<div id=\"slider-bg\" tabindex=\"1\" title=\"Slider\"><div id=\"slider-thumb\"><img src=\"../button/assets/thumb-n.gif\"></div></div>");
-
-
-                /*
-                     Render the Menu instance into the element specified as the 
-                     Button instance's container
-                */
-
-                oOpacityMenu.render(this.get("container"));
-
-
-                // Align the Menu instance to its corresponding Button
-
-                oOpacityMenu.align();
-                
-
-                /*
-                    Unsubscribe the listener from the "click" event so that
-                    this code runs only once.
-                */ 
-
-                this.unsubscribe("click", onButtonClick);
-            
-            }
-
-
-            /*
-                Subscribe to the Button instance's "click" event to render the 
-                Button instance's menu the first time it is made visible.
-            */
-
-            oButton.on("click", onButtonClick);
 
 
 
             /*
-                Add a "render" event handler to the Menu instance that 
+                Add a "beforeShow" event handler to the Menu instance that 
                 will instantiate the Slider.
             */
 
-            oOpacityMenu.subscribe("render", function () {
+			var onMenuBeforeShow = function () {
 
                 // Instantiate the Slider
 
@@ -302,9 +285,13 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                     oSliderEl.title = "slider value = " + nOpacity;
                     
 
+
+
                     // Set the opacity of the photo
 
                     Dom.setStyle("photo", "opacity", nOpacity);
+
+
 
 
                     // Update the text label of the Button instance
@@ -314,7 +301,7 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                 });
 
 
-                function focusSlider() {
+                var focusSlider = function () {
 
                     if ((YAHOO.env.ua.ie || YAHOO.env.ua.gecko) && oSliderEl) {
     
@@ -326,19 +313,26 @@ create an opacity slider button, similar to that found in Adobe Photoshop.
                     
                     }                    
                 
-                }    
+                };
 
 
-                // Focus the Slider instance
-
-                focusSlider();
+				focusSlider();
 
 
                 // Focus the Slider instance each time it is made visible
 
                 oOpacityMenu.subscribe("show", focusSlider);
+                
+
+                // Unsubscribe from the "beforeShow" event, since we only need to initialize the 
+                // Slider once.
+                
+            	oOpacityMenu.unsubscribe("beforeShow", onMenuBeforeShow);
             
-            });
+            };
+
+
+            oOpacityMenu.subscribe("beforeShow", onMenuBeforeShow);
 
         });
         

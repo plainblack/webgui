@@ -52,11 +52,11 @@ A reference to the current session.
 
 sub grabReferral {
 	my $session = shift;
-	if ($session->user->userId ne "1" && $session->user->referringAffiliate) {
+	if ($session->user->isRegistered && $session->user->referringAffiliate) {
 		return "";
-	} elsif ($session->user->userId ne "1" && (($session->user->referringAffiliate eq "0" && $session->form->process("referringAffiliate")) || $session->form->process("affiliateId"))) {
+	} elsif ($session->user->isRegistered && (($session->user->referringAffiliate eq "0" && $session->form->process("referringAffiliate")) || $session->form->process("affiliateId"))) {
 		$session->user->referringAffiliate($session->scratch->get("referringAffiliate"));
-	} elsif ($session->user->userId ne "1") {
+	} elsif ($session->user->isRegistered) {
 		$session->user->referringAffiliate(1);
 	} elsif ($session->form->process("affiliateId") ne "") {
 		$session->scratch->set("referringAffiliate",$session->form->process("affiliateId"));

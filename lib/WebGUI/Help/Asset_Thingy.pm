@@ -14,6 +14,7 @@ our $HELP = {
             },
         ],
          variables => [
+            { 'name' => 'view_url' },
             {   'name'      => 'things_loop',
                 'variables' => [
                     { 'name' => 'thing_editIcon' },
@@ -73,6 +74,7 @@ our $HELP = {
                     { 'name' => 'field_name' },
                     { 'name' => 'field_value' },
                     { 'name' => 'field_subtext' },
+                    { 'name' => 'field_pretext' },
                 ],
             },
             {   'name'      => 'listOfThings',
@@ -136,11 +138,15 @@ our $HELP = {
             {   'name'      => 'field_loop',
                 'variables' => [
                     { 'name' => 'field_isHidden' },
+                    { 'name' => 'field_isRequired' },
+                    { 'name' => 'field_isVisible' },
                     { 'name' => 'field_label' },
                     { 'name' => 'field_value' },
                     { 'name' => 'field_name' },
                     { 'name' => 'field_id' },
                     { 'name' => 'field_url' },
+                    { 'name' => 'field_subtext' },
+                    { 'name' => 'field_pretext' },
                 ],
             },
         ],

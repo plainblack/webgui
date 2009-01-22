@@ -96,7 +96,7 @@ sub addTab {
 	my $name = shift;
 	my $label = shift;
 	my $uiLevel = shift || 0;
-	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session,uiLevelOverride=>$self->{_uiLevelOverride});
+	$self->{_tab}{$name}{form} = WebGUI::HTMLForm->new($self->session);
 	$self->{_tab}{$name}{label} = $label;
 	$self->{_tab}{$name}{uiLevel} = $uiLevel;
 	return $self->{_tab}{$name}{form};
@@ -198,11 +198,10 @@ sub new {
 	my $startingTabs = shift;
 	my $css = shift || $session->url->extras('tabs/tabs.css');
 	my $cancelUrl = shift || $session->url->page();
-	my $uiLevelOverride = shift;
 	my %tabs;
 	tie %tabs, 'Tie::IxHash';
 	foreach my $key (keys %{$startingTabs}) {
-		$tabs{$key}{form} = WebGUI::HTMLForm->new($session,uiLevelOverride=>$uiLevelOverride);
+		$tabs{$key}{form} = WebGUI::HTMLForm->new($session);
 		$tabs{$key}{label} = $startingTabs->{$key}->{label};
 		$tabs{$key}{uiLevel} = $startingTabs->{$key}->{uiLevel};
 	}
@@ -211,8 +210,7 @@ sub new {
 			value=>$i18n->get('cancel'),
 			extras=>q|onclick="history.go(-1);" class="backwardButton"|
 			});
-	bless {	_session=>$session, _uiLevelOverride=>$uiLevelOverride, _cancel=>$cancel,
-        _submit=>WebGUI::Form::submit($session), 
+	bless {	_session=>$session, _cancel=>$cancel, _submit=>WebGUI::Form::submit($session), 
         _form=>WebGUI::Form::formHeader($session), _hidden=>"", _tab=>\%tabs, _css=>$css }, $class;
 }
 
@@ -229,35 +227,41 @@ sub print {
 	my $self = shift;
     my $style = $self->session->style;
     my $url = $self->session->url;
-	$style->setScript($url->extras('tabs/tabs.js'),{type=>"text/javascript"});
-	$style->setLink($self->{_css},{rel=>"stylesheet", rev=>"stylesheet",type=>"text/css"});
+	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
+	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
+	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
-    $style->setScript($url->extras('/yui/build/yahoo/yahoo-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/dom/dom-min.js'),{ type=>'text/javascript' });
-    $style->setScript($url->extras('/yui/build/event/event-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
-	my $output = $self->{_form};
-	$output .= $self->{_hidden};
 	my $i = 1;
-	my $tabs;
-	my $form;	
+	my $tabs = '<ul class="yui-nav">';
+	my $form = '<div class="yui-content">';
+	my $userUiLevel = $self->session->user->profileField("uiLevel");
+	my $first = 1;
 	foreach my $key (keys %{$self->{_tab}}) {
-		$tabs .= '<span onclick="toggleTab('.$i.')" id="tab'.$i.'" class="tab"';
-                if ($self->{_tab}->{$key}{uiLevel} > $self->session->user->profileField("uiLevel")) {
-                        $tabs .= 'style="display: none;"';
-                }
-                $tabs .= '>'.$self->{_tab}{$key}{label}.'</span> ';
-		$form .= '<div id="tabcontent'.$i.'" class="tabBody"><table><tbody>';
-		$form .= $self->{_tab}{$key}{form}->printRowsOnly;
-		$form .= '</tbody></table></div>';
+		my $hide = '';
+		if ($self->{_tab}->{$key}{uiLevel} > $userUiLevel) {
+			$hide = 'style="display: none;"';
+		}
+		my $selected = '';
+		if ($first && !$hide) {
+			$first = 0;
+			$selected = 'class="selected"';
+		}
+		$tabs .= '<li '.$selected.'><a href="#tab'.$i.'" '.$hide.'><em>'.$self->{_tab}{$key}{label}.'</em></a></li>';
+		$form .= '<div id="tab'.$i.'" '.$hide.'><table>'.$self->{_tab}{$key}{form}->printRowsOnly.'</table></div>';
 		$i++;
 	}
-	$output .= '<div class="tabs">'.$tabs.$self->{_submit}."&nbsp;&nbsp;".$self->{_cancel}.'</div>';
-	$output .= $form;
-	$output .= WebGUI::Form::formFooter($self->session,);
-	$output .= '<script type="text/javascript">var numberOfTabs = '.($i-1).'; initTabs();</script>';
+	$tabs .= '</ul>';
+	$form .= '</div>';
+	my $output = $self->{_form}.$self->{_hidden}.'<div style="position: absolute; top: 10px; right: 10px; z-index: 50000;">'.$self->{_submit}.$self->{_cancel}.'</div><div class="yui-skin-sam"><div id="webguiTabForm" class="yui-navset">'.$tabs.$form.'</div></div>';
+	$output .= WebGUI::Form::formFooter($self->session);
+	$output .= q{<script type="text/javascript">
+		var tabView = new YAHOO.widget.TabView('webguiTabForm');
+	</script>};
 	return $output;
 }
 

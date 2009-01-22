@@ -16,12 +16,12 @@ our $VERSION = "0.0.0";
 
 use Tie::IxHash;
 use Carp qw(croak);
-use Storable qw(nfreeze thaw);
 
 use WebGUI::International;
 use WebGUI::Asset::Template;
 use WebGUI::Form;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
+use Storable;
 
 use base 'WebGUI::Asset';
 
@@ -275,8 +275,7 @@ sub generateRecurringEvents {
                 $properties->{startTime} = $startDate->toDatabaseTime;
                 $properties->{endTime} = $endDate->toDatabaseTime;
             }
-            my $newEvent = $parent->addChild($properties);
-            $newEvent->requestAutoCommit;
+            my $newEvent = $parent->addChild($properties, undef, undef, { skipAutoCommitWorkflows => 1 });
         }
     }
     
@@ -298,8 +297,12 @@ By specifying this method, you activate this feature.
 
 sub getAutoCommitWorkflowId {
     my $self = shift;
-    return $self->getParent->get('workflowIdCommit')
-        || $self->session->setting->get('defaultVersionTagWorkflow');
+    my $parent = $self->getParent;
+    if ($parent->hasBeenCommitted) {
+        return $parent->get('workflowIdCommit')
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 
@@ -1211,10 +1214,10 @@ sub getStorageLocation {
     my $self = shift;
     unless (exists $self->{_storageLocation}) {
         if ($self->get("storageId") eq "") {
-            $self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+            $self->{_storageLocation} = WebGUI::Storage->create($self->session);
             $self->update({storageId=>$self->{_storageLocation}->getId});
         } else {
-            $self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+            $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
         }
     }
     return $self->{_storageLocation};
@@ -1469,7 +1472,7 @@ sub processPropertiesFromFormPost {
     my $self    = shift;
     $self->SUPER::processPropertiesFromFormPost;    # Updates the event
     my $session = $self->session;
-    my $form    = $self->session->form;
+    my $form    = $session->form;
     
     ### Verify the form was filled out correctly...
     my @errors;
@@ -1489,6 +1492,16 @@ sub processPropertiesFromFormPost {
         return \@errors;
     }
 
+    # Since we may be adding more events, set out version tag to be active if needed
+    # Leave the original version tag available, we will need to reactivate it before returning
+    my $activeVersionTag = WebGUI::VersionTag->getWorking($session, 'nocreate');
+    # if our version tag is active, we don't need a new one, and don't need to reactivate anything later
+    if ($activeVersionTag && $activeVersionTag->getId eq $self->get('tagId')) {
+        undef $activeVersionTag;
+    }
+    else {
+        WebGUI::VersionTag->new($session, $self->get('tagId'))->setWorking;
+    }
     
     ### Form is verified
     # Events are always hidden from navigation
@@ -1518,16 +1531,16 @@ sub processPropertiesFromFormPost {
         my $dtStart
             = WebGUI::DateTime->new($session, 
                 mysql       => $self->get("startDate") . " " . $self->get("startTime"),
-                time_zone   => $tz,   
+                time_zone   => $tz,
             );
         
         my $dtEnd
             = WebGUI::DateTime->new($session, 
                 mysql       => $self->get("endDate") . " " . $self->get("endTime"),
-                time_zone   => $tz,   
+                time_zone   => $tz,
             );
         
-        $self->update({    
+        $self->update({
             startDate   => $dtStart->toDatabaseDate,
             startTime   => $dtStart->toDatabaseTime,
             endDate     => $dtEnd->toDatabaseDate,
@@ -1603,7 +1616,6 @@ sub processPropertiesFromFormPost {
 
     $self->setRelatedLinks(\@rel_link_saves);
 
-
     # Determine if the pattern has changed
     if ($form->param("recurType")) {
         # Create the new recurrence hash
@@ -1617,16 +1629,19 @@ sub processPropertiesFromFormPost {
         
         
         # Pattern keys
-        if (nfreeze(\%recurrence_new) ne nfreeze(\%recurrence_old)) {
+        if (Storable::freeze(\%recurrence_new) ne Storable::freeze(\%recurrence_old)) {
             # Delete all old events and create new ones
             my $old_id  = $self->get("recurId");
 
             # Set the new recurrence pattern
             if (%recurrence_new) {
                 my $new_id  = $self->setRecurrence(\%recurrence_new);
-                return ["There is something wrong with your recurrence pattern."]
-                    unless $new_id;
-                
+                if (! $new_id) {
+                    $activeVersionTag->setWorking
+                        if $activeVersionTag;
+                    return ["There is something wrong with your recurrence pattern."];
+                }
+
                 # Generate the new recurring events
                 $self->generateRecurringEvents();
             }
@@ -1649,7 +1664,7 @@ sub processPropertiesFromFormPost {
             # TODO: Give users a form property to decide what events to update
             # TODO: Make a workflow activity to do this, so that updating
             # 1 million events doesn't kill the server.
-            # Just update related events            
+            # Just update related events
             my %properties    = %{ $self->get };
             delete $properties{startDate};
             delete $properties{endDate};
@@ -1663,23 +1678,21 @@ sub processPropertiesFromFormPost {
             });
            
             for my $eventId (@{$events}) {
-                my $event   = WebGUI::Asset->newByDynamicClass($session,$eventId);
+                my $event   = WebGUI::Asset->newByDynamicClass($session, $eventId);
                 
                 # Add a revision
                 $properties{ startDate  } = $event->get("startDate");
                 $properties{ endDate    } = $event->get("endDate");
                 
                 # addRevision returns the new revision
-                $event  = $event->addRevision(\%properties);
-                $event->requestAutoCommit();
+                $event  = $event->addRevision(\%properties, undef, { skipAutoCommitWorkflows => 1 });
             }
         }
     }
+    $activeVersionTag->setWorking
+        if $activeVersionTag;
 
-    # Finally, commit this event
     delete $self->{_storageLocation};
-    $self->requestAutoCommit;
-
     return undef;
 }
 
@@ -1689,7 +1702,7 @@ sub purge {
     my $self = shift;
     my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
     while (my ($storageId) = $sth->array) {
-        my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+        my $storage = WebGUI::Storage->get($self->session,$storageId);
         $storage->delete if defined $storage;
     }
     $sth->finish;
@@ -2409,8 +2422,8 @@ ENDJS
     
     ### Show the processed template
     $session->http->sendHeader;
-    my $style = $session->style->process("~~~",$self->getParent->get("styleTemplateId"));
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $session->style->process($self->getSeparator,$self->getParent->get("styleTemplateId"));
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
     $self->session->output->print($self->processTemplate($var, undef, $template));
     $self->session->output->print($foot, 1);
@@ -2444,11 +2457,11 @@ sub www_view {
     return $self->session->privilege->noAccess() unless $self->canView;
     my $check = $self->checkView;
     return $check if (defined $check);
-    $self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->userId eq "1");
+    $self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor);
     $self->session->http->sendHeader;    
     $self->prepareView;
-    my $style = $self->getParent->processStyle("~~~");
-    my ($head, $foot) = split("~~~",$style);
+    my $style = $self->getParent->processStyle($self->getSeparator);
+    my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head,1);
     $self->session->output->print($self->view);
     $self->session->output->print($foot,1);

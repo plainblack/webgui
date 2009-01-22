@@ -15,9 +15,8 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use File::Basename;
-use File::Path;
-use FileHandle;
+use File::Basename ();
+use File::Path ();
 use Path::Class;
 use Scalar::Util 'looks_like_number';
 use WebGUI::International;
@@ -27,7 +26,7 @@ use URI::URL;
 
 =head1 NAME
 
-Package WebGUI::AssetExportHtml
+Package WebGUI::Asset (AssetExportHtml)
 
 =head1 DESCRIPTION
 
@@ -92,7 +91,7 @@ sub exportCheckPath {
     # now that we know that it's defined and not an empty string, test if it exists.
     if(!-e $exportPath) {
         # it doesn't exist; let's try making it
-        eval { mkpath( [$exportPath] ) };
+        eval { File::Path::mkpath( [$exportPath] ) };
         if($@) {
             WebGUI::Error->throw(error => "can't create exportPath $exportPath");
         }
@@ -219,27 +218,27 @@ sub exportAsHtml {
     # verify them
     if(!defined $userId) {
         $returnCode = 0;
-        $message    = 'need a userId parameter';
+        $message    = $i18n->get('need a userId parameter');
         return ($returnCode, $message);
     }
 
     # we take either a numeric userId or a WebGUI::User object
     if( ref $userId ne 'WebGUI::User' && ! (looks_like_number($userId) || $session->id->valid($userId))) {
         $returnCode = 0;
-        $message    = "'$userId' is not a valid userId";
+        $message    = "'$userId' ".$i18n->get('is not a valid userId');
         return ($returnCode, $message);
     }
 
     # depth is required.
     if(!defined $depth) {
         $returnCode = 0;
-        $message    = 'need a depth';
+        $message    = $i18n->get('need a depth');
         return ($returnCode, $message);
     }
     # and it must be a number.
     if( !looks_like_number($depth) ) {
         $returnCode = 0;
-        $message    = "'$depth' is not a valid depth";
+        $message    = sprintf $i18n->get('%s is not a valid depth'), $depth;
         return ($returnCode, $message);
     }
 
@@ -300,6 +299,8 @@ sub exportAsHtml {
                 my $message = sprintf( $i18n->get('bad user privileges') . "\n") . $asset->getUrl;
                 $self->session->output->print($message);
             }
+            $exportSession->var->end;
+            $exportSession->close;
             next;
         }
 
@@ -308,12 +309,16 @@ sub exportAsHtml {
             if( !$quiet ) {
                 $self->session->output->print("$fullPath skipped, not exportable<br />");
             }
+            $exportSession->var->end;
+            $exportSession->close;
             next;
         }
 
         # tell the user which asset we're exporting.
         unless ($quiet) {
             my $message = sprintf $i18n->get('exporting page'), $fullPath;
+            $exportSession->var->end;
+            $exportSession->close;
             $self->session->output->print($message);
         }
 
@@ -323,6 +328,8 @@ sub exportAsHtml {
             $returnCode = 0;
             $message    = $@;
             $self->session->output->print("could not export asset with URL " . $asset->getUrl . ": $@");
+            $exportSession->var->end;
+            $exportSession->close;
             return ($returnCode, $message);
         }
 
@@ -333,6 +340,8 @@ sub exportAsHtml {
             $returnCode = 0;
             $message    = $@;
             $self->session->output->print("failed to export asset collateral for URL " . $asset->getUrl . ": $@");
+            $exportSession->var->end;
+            $exportSession->close;
             return ($returnCode, $message);
         }
 
@@ -528,10 +537,8 @@ sub exportGetUrlAsPath {
     # if we're still here, it's valid. get it.
     my $exportPath      = $config->get('exportPath');
     
-    # specify a list of file types apache recognises to be passed through as-is
-    my @fileTypes = qw/.html .htm .txt .pdf .jpg .css .gif .png .doc .xls .xml
-    .rss .bmp .mp3 .js .fla .flv .swf .pl .php .php3 .php4 .php5 .ppt .docx
-    .zip .tar .rar .gz .bz2/;
+    # get a list of file types to pass through as-is
+    my $fileTypes       = $config->get('exportBinaryExtensions');
 
     # get the asset's URL as a URI::URL object for easy parsing of components
     my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
@@ -545,12 +552,12 @@ sub exportGetUrlAsPath {
         return Path::Class::File->new($exportPath, @pathComponents, $filename, $index);
     }
     else { # got a dot
-        my $extension = (fileparse($filename, qr/\.[^.]*/))[2]; # get just the extension
+        my $extension = (File::Basename::fileparse($filename, qr/[^.]*$/))[2]; # get just the extension
         
         # check if the file type is recognised by apache. if it is, return it
         # as-is. if not, slap on the directory separator, $index, and return
         # it.
-        if( isIn($extension, @fileTypes) ) {
+        if( isIn($extension, @{ $fileTypes } ) ) {
             return Path::Class::File->new($exportPath, @pathComponents, $filename);
         }
         else { # don't know what it is
@@ -750,13 +757,13 @@ sub exportWriteFile {
     my $dest = $self->exportGetUrlAsPath;
     my $parent = $dest->parent;
 
-    eval { mkpath($parent->absolute->stringify) };
+    eval { File::Path::mkpath($parent->absolute->stringify) };
     if($@) {
         WebGUI::Error->throw(error => "could not make directory " . $parent->absolute->stringify);
     }
 
     # next, get the contents, open the file, and write the contents to the file.
-    my $fh = eval { $dest->openw };
+    my $fh = eval { $dest->open('>:utf8') };
     if($@) {
         WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
     }
@@ -825,10 +832,12 @@ sub www_export {
         -name           => "index",
         -value          => "index.html"
     );
+
     $f->text(
         -label          => $i18n->get("Export site root URL"),
         -name           => 'exportUrl',
         -value          => '',
+        -hoverHelp      => $i18n->get("Export site root URL description"),
     );
 
     # TODO: maybe add copy options to these boxes alongside symlink

@@ -20,8 +20,9 @@ use Data::Dumper;
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 20; # increment this value for each test you create
+use Test::More tests => 19; # increment this value for each test you create
 use WebGUI::Asset::Wobject::SyndicatedContent;
+use XML::FeedPP;
 
 my $session = WebGUI::Test->session;
 my %var;
@@ -49,9 +50,7 @@ isa_ok($syndicated_content, 'WebGUI::Asset::Wobject::SyndicatedContent');
 my $newSyndicatedContentSettings = {
 	cacheTimeout => 124,
 	templateId   => "PBtmpl0000000000000065", 
-	#rssUrl       => "http://morningmonologue.wordpress.com/feed/", # broken
-	#rssUrl       => "http://motivationalmuse.wordpress.com/feed/", #working feed
-        rssUrl      => 'https://svn.webgui.org/svnweb/plainblack/rss/WebGUI/',
+    rssUrl      => 'http://svn.webgui.org/svnweb/plainblack/rss/WebGUI/',
 };
 
 # update the new values for this instance
@@ -62,21 +61,9 @@ foreach my $newSetting (keys %{$newSyndicatedContentSettings}) {
 	is ($syndicated_content->get($newSetting), $newSyndicatedContentSettings->{$newSetting}, "updated $newSetting is ".$newSyndicatedContentSettings->{$newSetting});
 }
 
-# Can we get the rss url?
-ok($syndicated_content->getRssUrl, 'getRSSUrl returns something.');
-
-# test getContentLastModified
-ok($syndicated_content->getContentLastModified, 'getContentLastModified returns something.');
-
-# Test max headlines parsed from feed
-my $max_headlines = $syndicated_content->_getMaxHeadlines;
-ok($syndicated_content->_getMaxHeadlines, "Max Headlines returned a value [$max_headlines]");
-
-# Limit the headlines so the test will complete in a reasonable amount of time.
-# default is 100K titles, which is way too much for a test
-$syndicated_content->{maxHeadlines} = "3";
-my @validated_urls = $syndicated_content->_getValidatedUrls;
-ok($syndicated_content->_getValidatedUrls, "Validated Urls returned a value [@validated_urls]");
+my $feed = $syndicated_content->generateFeed;
+isa_ok($feed, 'XML::FeedPP', 'Got an XML::FeedPP object');
+isnt($feed->title,'', 'the feed has data');
 
 # Lets make sure the view method returns something.
 is ($syndicated_content->{_viewTemplate}, undef, 'internal template cache unset until prepareView is called');
@@ -85,33 +72,19 @@ $syndicated_content->prepareView;
 isnt ($syndicated_content->{_viewTemplate}, undef, 'internal template cache set by prepare view');
 isa_ok ($syndicated_content->{_viewTemplate}, 'WebGUI::Asset::Template', 'internal template cache');
 
-my $output = $syndicated_content->view('2.0');
-isnt ($output, "", 'Default view method returns something for RSS 2.0 format');
+ok($syndicated_content->view(), 'it generates some output');
 
-my $output = $syndicated_content->view('1.0');
-isnt ($output, "", 'Default view method returns something for RSS 1.0 format');
+my $output = $syndicated_content->www_viewRss;
+my $feed = XML::FeedPP->new($output);
+cmp_ok($feed->get_item, ">", 0, 'RSS has items');
 
-# Not really sure what this does...
-#my $hasTerms = $syndicated_content->getValue('hasTerms');
-#ok($hasTerms, "hasTerms contains a value [$hasTerms]");
+my $output = $syndicated_content->www_viewRdf;
+my $feed = XML::FeedPP->new($output);
+cmp_ok($feed->get_item, ">", 0, 'RDF has items');
 
-my $hasTermsRegex = $syndicated_content->_make_regex( $syndicated_content->getValue('hasTerms') );
-
-my $rss_info = WebGUI::Asset::Wobject::SyndicatedContent::_get_rss_data($session,$newSyndicatedContentSettings->{'rssUrl'});
-ok(ref($rss_info) eq 'HASH',  "Hashref returned from _get_rss_data");
-push(@rss_feeds, $rss_info);
-
-
-my $items = [];
-WebGUI::Asset::Wobject::SyndicatedContent::_create_interleaved_items($items, \@rss_feeds  , $max_headlines, $hasTermsRegex);
-ok($items , "Got results back from XML" );
-
-my($item_loop,$rss_feeds) = $syndicated_content->_get_items(\@validated_urls, $max_headlines);
-ok(ref($item_loop) eq 'ARRAY',"Arrayref of items returned from _get_items" );
-ok(ref($rss_feeds) eq 'ARRAY',"Arrayref of feeds returned from _get_items" );
-
-# update var with item_loop for the upcoming template processing
-$var{item_loop} = $item_loop;
+my $output = $syndicated_content->www_viewAtom;
+my $feed = XML::FeedPP->new($output);
+cmp_ok($feed->get_item, ">", 0, 'Atom has items');
 
 # create a new template object in preparation for rendering
 my $template = WebGUI::Asset::Template->new($session, $syndicated_content->get("templateId"));
@@ -120,12 +93,17 @@ isa_ok($template, 'WebGUI::Asset::Template');
 
 $syndicated_content->{_viewTemplate} = $template;
 
-# Is a WebGUI URL created for the RSS feed? 
-my $url = $syndicated_content->_createRSSURLs(\%var);
-ok($url,"A URL was created for RSS feed");
+# check out the template vars
+
+my $var = $syndicated_content->getTemplateVariables($feed);
+
+isnt($var->{channel_description}, '', 'got a channel description');
+isnt($var->{channel_title}, '', 'got a channel title');
+isnt($var->{channel_link}, '', 'got a channel link');
+cmp_ok(scalar(@{$var->{item_loop}}), '>', 0, 'the item loop has items');
 
 # processTemplate, this is where we run into trouble...
-my $processed_template = eval {$syndicated_content->processTemplate(\%var,undef,$template) };
+my $processed_template = eval {$syndicated_content->processTemplate($var,undef,$template) };
 ok($processed_template, "A response was received from processTemplate.");
 
 END {

@@ -24,9 +24,7 @@ use Test::Deep;
 my $session = WebGUI::Test->session;
 
 my @assets = grep { !isIn($_, qw/WebGUI::Asset::FilePile/) } (
-		@{ $session->config->get('assets') },
-		@{ $session->config->get('utilityAssets') },
-		@{ $session->config->get('assetContainers') },
+    keys %{ $session->config->get('assets') }
 );
 
 my $numTests = scalar (2*@assets) + 2;

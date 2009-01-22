@@ -17,6 +17,16 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'category short name' => {
+        message => q|Category Short Name|,
+        lastUpdated => 1031514049
+	},
+
+    'category short name description' => {
+        message => q|The short name of the this category.|,
+        lastUpdated => 1122315199,
+    },
+
 	'475' => {
 		message => q|Field Name|,
 		lastUpdated => 1031514049
@@ -283,6 +293,11 @@ If you wish to set the Default Value for any other field.  Create the field with
         lastUpdated => 1213326336,
     },
 
+    'profile.extras' => {
+        message => q|Extra HTML for this field.|,
+        lastUpdated => 1224631267,
+    },
+
 	'profile.category' => {
         message => q|The name of the current category.  This variable will only exist for the first profile field in each category.|,
         lastUpdated => 1213326336,
@@ -360,6 +375,12 @@ If you wish to set the Default Value for any other field.  Create the field with
         lastUpdated => 1221580083,
     },
 
+    'profile.form.extras' => {
+        message => q|Extra HTML for this field.|,
+        context => q|Template variable for edit profile field|,
+        lastUpdated => 1224631267,
+    },
+
 	'profile.form.category' => {
         message => q|The name of this category.|,
         context => q|Template variable for edit profile field|,
@@ -389,7 +410,14 @@ If you wish to set the Default Value for any other field.  Create the field with
         context => q|Template variable for edit profile field|,
         lastUpdated => 1221580083,
     },
-
+    'profile field extras label' => {
+        message => q|Extras|,
+        lastUpdated => 1224620527,
+    },
+    'profile field extras hoverHelp' => {
+        message => q|Extra HTML to include with this profile field.|,
+        lastUpdated => 1224620527,
+    },
 };
 
 1;

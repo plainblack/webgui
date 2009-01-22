@@ -16,7 +16,7 @@ package WebGUI::Form::SelectSlider;
 
 use strict;
 use base 'WebGUI::Form::Slider';
-use WebGUI::Form::SelectList;
+use WebGUI::Form::SelectBox;
 use WebGUI::International;
 
 =head1 NAME
@@ -46,7 +46,6 @@ sub definition {
 			defaultValue=>{},
 			},
 		value	=>{
-			defaultValue=>[],
 		},
 		});
         return $class->SUPER::definition($session, $definition);
@@ -87,8 +86,8 @@ Returns the value that should be displayed initially.
 
 sub getDisplayValue {
 	my $self = shift;
-
-	return $self->getOptions->{$self->getValue()->[0]};
+    my $options = $self->getOptions;
+	return $options->{$self->getOriginalValue} || $options->{(keys %$options)[0]};
 }
 
 #-------------------------------------------------------------------
@@ -102,12 +101,11 @@ Returns the form element used for manual input.
 sub getInputElement {
 	my $self = shift;
 
-	return WebGUI::Form::selectList($self->session, {
+	return WebGUI::Form::SelectBox($self->session, {
 		-name	=> $self->get('name'),
-		-value	=> $self->getValue(),
+		-value	=> $self->getOriginalValue,
 		-options=> $self->getOptions,
 		-id	=> 'view-'.$self->get('id'),
-		-size	=> 1,
 	});
 }
 
@@ -139,7 +137,7 @@ Returns the javascript code to update the form on a change of slider position.
 sub getOnChangeSlider {
 	my $self = shift;
 	
-	return 
+	return
 		$self->getInputVariable.'.selectedIndex = this.getValue();'.
 		$self->getDisplayVariable.'.innerHTML = '.$self->getInputVariable.'.options[this.getValue()].text;';
 }
@@ -215,10 +213,9 @@ sub getSliderValue {
 
 	my @keys = keys %{$self->getOptions};
 	for (my $i = 0; $i < @keys; $i++) {
-		return $i if $keys[$i] eq $self->getValue()->[0];
+		return $i if $keys[$i] eq $self->getOriginalValue;
 	}
-
-	return undef;
+    return $keys[0];
 }
 
 #-------------------------------------------------------------------
@@ -244,10 +241,10 @@ sub getValue {
 		-value	=> $self->get('value'),
 		-options=> $self->getOptions,
 		-id	=> 'view-'.$self->get('id'),
-		-size	=> 1,
 	};
 
-	return WebGUI::Form::SelectList->new($self->session, $properties)->getValue(@args);
+    my $newValue = WebGUI::Form::SelectBox->new($self->session, $properties)->getValue(@args);
+    return $self->{_param}{value} = $newValue;
 }
 
 

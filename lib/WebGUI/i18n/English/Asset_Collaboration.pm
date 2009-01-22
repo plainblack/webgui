@@ -541,6 +541,12 @@ our $I18N = {
 		lastUpdated => 1109696029,
 	},
 
+	'date posted' => {
+		message => q|Date Posted|,
+		lastUpdated => 1229907194,
+        context => q|i18n lable for Collaboration template|,
+	},
+
 	'location' => {
 		message => q|Location|,
 		lastUpdated => 1109696029,
@@ -1569,6 +1575,11 @@ the Collaboration Asset, the user will be notified.|,
 		lastUpdated => 1149656056,
 	},
 
+	'epochDate' => {
+		message => q|The date the item was published as an epoch date so that the Date macro can be used for custom date formatting.|,
+		lastUpdated => 1222106027,
+	},
+
 	'attachmentLoop' => {
 		message => q|A loop containg all attachements to this item (post).|,
 		lastUpdated => 1149656056,
@@ -1649,6 +1660,45 @@ the Collaboration Asset, the user will be notified.|,
     'keywords label' => {
         message => q|Keywords|,
         lastUpdated => 1170543345,
+    },
+    
+    'asset not committed' => {
+		message => q{<h1>Error!</h1><p>You need to commit this collaboration system before you can create a new thread</p>},
+        lastUpdated => 1166848379,
+    },
+
+    'post received template' => {
+        message => q|Post received template|,
+        lastUpdated => 1221247761,
+    },
+
+    'post received template hoverHelp' => {
+        message => q|The template for the message received when a user makes a post.|,
+        lastUpdated => 1221247761,
+    },
+
+    'Link Description' => {
+        message => q|Link Description|,
+        context => q|i18n label for the link list collaboration template.|,
+        lastUpdated => 1221247761,
+    },
+
+    'Link URL' => {
+        message => q|Link URL|,
+        context => q|i18n label for the link list collaboration template.|,
+        lastUpdated => 1221247761,
+    },
+
+    'List All Links' => {
+        message => q|List All Links|,
+        context => q|i18n label for the link list collaboration template.|,
+        lastUpdated => 1221247761,
+    },
+
+    'has posted to one of your subscriptions' => {
+        message => q|has posted to one of your subscriptions|,
+        context => q|i18n label for the notification template.  "user" has posted..|,
+        lastUpdated => 1229910435,
     },
 
 };

@@ -8,10 +8,15 @@ our $I18N = {
 		lastUpdated => 0 
 	},
 
-    'back to site' => {
-        message => q|Back to site.|,
-        lastUpdated => 0
-    },
+	'back to site' => {
+		message => q|Back to site.|,
+		lastUpdated => 0 
+	},
+
+	'leave this tag' => {
+		message => q|Leave This Tag|,
+		lastUpdated => 0 
+	},
 
 	'bad commit' => {
 		message => q|Something bad happened while trying to commit your content. Please contact your system
@@ -369,7 +374,7 @@ our $I18N = {
     },
     
     'manageRevisionsInTag update' => {
-        message     => q{Update},
+        message     => q{Update Version Tag},
         lastUpdated => 0,
         context     => q{Label for button to update revisions},
     },
@@ -459,6 +464,19 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Message for when someone approves a version tag},
     },
+    
+    "error permission www_manageRevisionsInTag title" => {
+        message     => q{Permission Denied},
+        lastUpdated => 0,
+        context     => q{Title of "permission denied" page for Manage Revisions In Tag},
+    },
+
+    "error permission www_manageRevisionsInTag body" => {
+        message     => q{You are not allowed to view this version tag. It is possible that it has already been approved or denied. },
+        lastUpdated => 0,
+        context     => q{Explanation of Permission Denied message},
+    },
+
 };
 
 1;

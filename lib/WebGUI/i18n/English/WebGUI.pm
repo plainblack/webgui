@@ -2,6 +2,12 @@ package WebGUI::i18n::English::WebGUI;
 use strict;
 
 our $I18N = {
+	'ok' => {
+		message => q|OK|,
+		context => q|used by database link and other things to give a message to the user that a test passed|,
+		lastUpdated => 0,
+	},
+
 	'is editable' => {
 		message => q|Is Editable?|,
 		context => q|group property|,
@@ -188,6 +194,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'home info short' => {
+		message => q|Home|,
+		lastUpdated => 1031514049
+	},
+
 	'118' => {
 		message => q|Anonymous Registration|,
 		lastUpdated => 1031514049
@@ -242,6 +253,16 @@ our $I18N = {
 		message => q|Statistics|,
 		lastUpdated => 1031514049,
                 context => q|Title of the statistics viewer for the admin console.|
+	},
+
+    'required error' => {
+		message => q{%s is required.},
+		lastUpdated => 1031514049
+	},
+
+    'language not available error' => {
+		message => q|%s is not available.  Please select another language|,
+		lastUpdated => 1031514049
 	},
 
 	'451' => {
@@ -325,7 +346,7 @@ our $I18N = {
 	},
 
 	'861' => {
-		message => q|Make profile public?|,
+		message => q|Profile Privacy Setting|,
 		lastUpdated => 1043879954
 	},
 
@@ -604,6 +625,11 @@ our $I18N = {
 		lastUpdated => 1031514049
 	},
 
+    'demographic info short' => {
+		message => q|Demographic|,
+        lastUpdated => 1031514049
+	},
+
 	'77' => {
 		message => q|That account name is already in use by another member of this site. Please try a different username. The following are some suggestions:<br />
 %sToo<br />
@@ -835,6 +861,11 @@ to add or remove users from their groups.
 		lastUpdated => 1031514049
 	},
 
+    'preferences short' => {
+ 		message => q|Preferences|,
+ 		lastUpdated => 1031514049
+ 	},
+
 	'1026' => {
 		message => q|Allow rich edit?|,
 		lastUpdated => 1065966219
@@ -900,6 +931,11 @@ to add or remove users from their groups.
 		lastUpdated => 1044138691
 	},
 
+	'868 help' => {
+		message => q|Should the user be sent an email when their account is created?|,
+		lastUpdated => 1227209376
+	},
+
 	'990' => {
 		message => q|Edit Database Link|,
 		lastUpdated => 1056151382
@@ -955,10 +991,10 @@ to add or remove users from their groups.
 <br />
 <br />We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
 <br />
-<br />^PageTitle(); - ^c();
+<br />&#94;PageTitle(); - &#94;c();
 <br />
 <br />That particular example will help you get good ranking on search engines.|,
-		lastUpdated => 1183420610,
+		lastUpdated => 1225222473,
 	},
 
 	'860' => {
@@ -1094,7 +1130,12 @@ to add or remove users from their groups.
 
 	'869' => {
 		message => q|Welcome Message|,
-		lastUpdated => 1044138730
+		lastUpdated => 1044138730,
+	},
+
+	'869 help' => {
+		message => q|This message will be part of the email sent to a user when they create an account on this WebGUI site.|,
+		lastUpdated => 1227209607,
 	},
 
 	'533' => {
@@ -1125,22 +1166,22 @@ to add or remove users from their groups.
 Here are some examples for other databases.</p>
 <div>
 <dl>
-<dt><a href="http://search.cpan.org/author/TIMB/DBD-Oracle-1.14/Oracle.pm#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::Oracle#CONNECTING_TO_ORACLE">Oracle</a>:</dt>
 <dd>DBI:Oracle:SID<br />
 DBD::Oracle must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv ORACLE_HOME /home/oracle/product/8.1.7</b> in httpd.conf. Without setting ORACLE_HOME, you can connect using DBI:Oracle:host=myhost.com;sid=SID
 </dd>
-<dt><a href="http://search.cpan.org/author/OYAMA/DBD-PgPP-0.04/PgPP.pm#THE_DBI_CLASS">PostgreSQL</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::PgPP#THE_DBI_CLASS">PostgreSQL</a>:</dt>
 <dd>DBI:PgPP:dbname=DBNAME[;host=hOST]<br />
 DBD::PgPP must be installed.
 </dd>
-<dt><a href="http://search.cpan.org/author/MEWP/DBD-Sybase-1.00/Sybase.pm#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
+<dt><a href="http://search.cpan.org/perldoc?DBD::Sybase#Specifying_other_connection_specific_parameters">Sybase</a>:</dt>
 <dd>DBI:Sybase:[server=SERVERNAME][database=DATABASE]<br />
 DBD::Sybase must be installed.<br />
 You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2</b> in httpd.conf.
 </dd>
 </dl></div>|,
-                lastUpdated => 1146630103,
+                lastUpdated => 1221362751,
         },
 
         '994 description' => {
@@ -1245,6 +1286,11 @@ You must be using mod_perl and configure <b>PerlSetEnv SYBASE /opt/sybase/11.0.2
 
 	'449' => {
 		message => q|Miscellaneous Information|,
+		lastUpdated => 1031514049
+	},
+
+    'misc info short' => {
+		message => q|Miscellaneous|,
 		lastUpdated => 1031514049
 	},
 
@@ -1515,6 +1561,11 @@ sent in HTML format. No attachments can be included.|,
 		message => q|Work Information|,
 		lastUpdated => 1031514049
 	},
+
+    'work info short' => {
+		message => q|Work|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'429' => {
 		message => q|Login Time|,
@@ -1901,93 +1952,13 @@ This group could then be named "Employees in HMO 1", and would allow you to rest
 		lastUpdated => 1056151382
 	},
 
-	'890' => {
-		message => q|<p>WebGUI has a sub-system that can create tabs. You'll see these in complex forms such as page editing. In order to make the tabs system look good and match your site, you'll need to add a section to your style's style sheet specifically for the tabs. 
-</p>
-
-<p>The following style sheet classes are available:
-</p>
-
-<p><b>.tab</b><br />
-The default look of each tab.
-</p>
-
-<p><b>div.tabs</b><br />
-This also sets some properties for all of the tabs. This should be used for the text labels in the tabs.
-</p>
-
-<p><b>.tabBody</b><br />
-The content area for each tab. This is where the form will show up. Note that for best results the background color of this should match the background color of .tabActive.
-</p>
-
-<p><b>.tabHover</b><br />
-The look of a tab as the mouse hovers over it.
-</p>
-
-<p><b>.tabActive</b><br />
-The look of the tab that is currently visible.
-</p>
-
-<p><i>Examples</i><br />
-You can use these instead of creating your own if you wish. Or just use these as guidelines for creating your own.
-</p>
-
-<table width="100%"><tr><td valign="top">
-<b>White or Light Colored Styles</b>
-<pre>
-.tab {
-  border: 1px solid black;
-   background-color: #eeeeee;
-}
-.tabBody {
-   border: 1px solid black;
-   border-top: 1px solid black;
-   border-left: 1px solid black;
-   background-color: #dddddd; 
-}
-div.tabs {
-    line-height: 15px;
-    font-size: 14px;
-}
-.tabHover {
-   background-color: #cccccc;
-}
-.tabActive { 
-   background-color: #dddddd; 
-}
-</pre>
-</td><td valign="top">
-<b>Black or Dark Colored Styles</b>
-<pre>
-.tab {
-  border: 1px solid white;
-   background-color: #333333;
-}
-.tabBody {
-   border: 1px solid white;
-   border-top: 1px solid white;
-   border-left: 1px solid white;
-   background-color: #444444; 
-}
-div.tabs {
-    line-height: 15px;
-    font-size: 14px;
-}
-.tabHover {
-   background-color: #555555;
-}
-.tabActive { 
-   background-color: #444444; 
-}
-</pre>
-</td></tr></table>
-
-|,
-		lastUpdated => 1146592150
-	},
-
 	'440' => {
 		message => q|Contact Information|,
+		lastUpdated => 1031514049
+	},
+
+    'contact info short' => {
+		message => q|Contact Info|,
 		lastUpdated => 1031514049
 	},
 
@@ -2134,6 +2105,16 @@ div.tabs {
 	'pagination.text' => {
 		message => q|The number of a page in the page loop.|,
 		lastUpdated => 1168464885,
+	},
+
+	'pagination.range' => {
+		message => q|Displays the range of available pages, in a start - end format.|,
+		lastUpdated => 1220541683,
+	},
+
+	'pagination.activePage' => {
+		message => q|A boolean which will be true if the this page in the pageLoop is the currently viewed page.|,
+		lastUpdated => 1227493265,
 	},
 
 	'pagination.pageList.upTo20' => {
@@ -2326,6 +2307,11 @@ div.tabs {
 		message => q|Personal Information|,
 		lastUpdated => 1031514049
 	},
+
+    'personal info short' => {
+		message => q|Personal|,
+ 		lastUpdated => 1031514049
+ 	},
 
 	'317' => {
 		message => q|<a href="http://www.icq.com">ICQ</a> UIN|,
@@ -3014,11 +3000,11 @@ or are under your current version tag.</p>
                 context => q|Field type name|
         },
 
-	'submit' => {
-		message => q|Submit|,
-		lastUpdated =>1140589512,
-                context => q|Field type name and button label|
-        },
+    'submit' => {
+        message => q|Submit|,
+        lastUpdated =>1140589512,
+        context => q|Field type name and button label|
+    },
 
 	'button' => {
 		message => q|Button|,
@@ -3104,11 +3090,11 @@ or are under your current version tag.</p>
                 context => q|Title of a tab in the global settings.|
         },
 
-	'company' => {
-		message => q|Company|,
-		lastUpdated =>1092930637,
-                context => q|Title of a tab in the global settings.|
-        },
+    'company' => {
+        message => q|Company|,
+        lastUpdated =>1092930637,
+        context => q|Title of a tab in the global settings.|
+    },
 
 	'misc' => {
 		message => q|Miscellaneous|,
@@ -3263,13 +3249,8 @@ and tracked by WebGUI.|,
         },
 
         '1006 description' => {
-                message => q|Should the system use the HTTPS protocol for the login form?  Note that setting this option to true will encrypt not only the login form, but all pages after that as well.|,
-                lastUpdated => 1163457062,
-        },
-
-        'Enable user invitations description' => {
-                message => q|Enable users to send emails to their friends, inviting them to come and create an account on this site.|,
-                lastUpdated => 1181017746,
+                message => q|Should the system use the HTTPS protocol for the login form?|,
+                lastUpdated => 1227291454,
         },
 
         '164 description' => {
@@ -3294,11 +3275,6 @@ a user.|,
         lastUpdated => 1167189802,
     },
 
-	'Enable user invitations' => {
-		message => q|Enable user invitations?|,
-		lastUpdated => 1181017730
-	},
-
 	'Illegal Warning' => {
 		message => q|Enabling this feature is illegal in some countries, like Australia. In addition, some countries require you to add a warning to your site if you use this feature. Consult your local authorities for local laws. Plain Black Corporation is not responsible for your illegal activities, regardless of ignorance or malice.|,
 		lastUpdated => 1089039511
@@ -3307,6 +3283,12 @@ a user.|,
 	'default rich editor' => {
 		message => q|Default Rich Editor|,
 		lastUpdated => 1118941685,
+	},
+
+    'account settings tab' => {
+		message => q|Account|,
+		lastUpdated => 1098327046,
+		context => q|Tab label for the account settings in WebGUI Settings.|
 	},
 
 	'account' => {
@@ -3489,6 +3471,18 @@ LongTruncOk=1</p>
 		lastUpdated => 0,
 	},
 
+	'no ldap link for auth' => {
+		message => q|Unable to create your account because no LDAP connection has been defined for this site.|,
+        context => 'Error message in createAccount screen when no LDAP connection is defined.',
+		lastUpdated => 1229376071,
+	},
+
+	'no ldap logins' => {
+		message => q|Unable to log you in because no LDAP link has been defined for this site.|,
+        context => 'Error message for login when no LDAP connection is defined.',
+		lastUpdated => 1229376071,
+	},
+
 	'Select State' => {
 		message => q|Select State|,
 		lastUpdated => 1161388472,
@@ -3614,6 +3608,11 @@ LongTruncOk=1</p>
 		lastUpdated => 1181019679,
     },
 
+    'inbox message status active' => {
+        message => q|Active|,
+		lastUpdated => 1181019679,    
+    },
+
     'private message prev label' => {
         message => q|Previous|,
 		lastUpdated => 1181019679,
@@ -3628,19 +3627,19 @@ LongTruncOk=1</p>
         message => q|Private Message Options|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message allow label' => {
-        message => q|Allow All|,
+        message => q|Public|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message friends only label' => {
-        message => q|Allow From My Friends Only|,
+        message => q|Friends Only|,
 		lastUpdated => 1181019679,
     },
-    
+
     'user profile field private message allow none label' => {
-        message => q|Allow None|,
+        message => q|Private|,
 		lastUpdated => 1181019679,
     },
 
@@ -3728,7 +3727,7 @@ LongTruncOk=1</p>
         message     => q{Group to view and expire active sessions.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminAdSpace label' => {
         message     => q{AdSpace},
@@ -3738,7 +3737,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage advertising.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminCache label' => {
         message     => q{Cache},
@@ -3748,7 +3747,7 @@ LongTruncOk=1</p>
         message     => q{Group to view and flush cache.},
         lastUpdated => 0,
     },
-        
+
 
 
     'settings groupIdAdminCron label' => {
@@ -3759,7 +3758,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage scheduled workflows.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminDatabaseLink label' => {
         message     => q{Database Link},
@@ -3769,7 +3768,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage database links.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGraphics label' => {
         message     => q{Graphics},
@@ -3779,7 +3778,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage fonts and palettes.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGroup label' => {
         message     => q{Groups},
@@ -3789,7 +3788,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage all groups.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminGroupAdmin label' => {
         message     => q{Groups (limited)},
@@ -3799,7 +3798,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage groups that user is administrator of.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminHelp label' => {
         message     => q{Help},
@@ -3809,7 +3808,7 @@ LongTruncOk=1</p>
         message     => q{Group that can view help.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminLDAPLink label' => {
         message     => q{LDAP},
@@ -3819,7 +3818,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage LDAP links.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminLoginHistory label' => {
         message     => q{Login History},
@@ -3829,7 +3828,7 @@ LongTruncOk=1</p>
         message     => q{Group to view login history.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminProfileSettings label' => {
         message     => q{User Profiling},
@@ -3839,7 +3838,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage user profile fields.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminReplacements label' => {
         message     => q{Content Filters},
@@ -3849,7 +3848,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage content filters.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminSpectre label' => {
         message     => q{Spectre},
@@ -3859,7 +3858,7 @@ LongTruncOk=1</p>
         message     => q{Group to view Spectre status},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminStatistics label' => {
         message     => q{Statistics},
@@ -3869,7 +3868,7 @@ LongTruncOk=1</p>
         message     => q{Group to view statistics},
         lastUpdated => 0,
     },
-        
+
     'settings groupIdAdminUser label' => {
         message     => q{Users},
         lastUpdated => 0,
@@ -3878,7 +3877,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage users. Can add and edit users.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminUserAdd label' => {
         message     => q{Users (add only)},
@@ -3888,7 +3887,7 @@ LongTruncOk=1</p>
         message     => q{Group that can only add new users.},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminVersionTag label' => {
         message     => q{Version Tags},
@@ -3898,7 +3897,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage version tags},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminWorkflow label' => {
         message     => q{Workflow},
@@ -3908,7 +3907,7 @@ LongTruncOk=1</p>
         message     => q{Group to manage workflows},
         lastUpdated => 0,
     },
-        
+
 
     'settings groupIdAdminWorkflowRun label' => {
         message     => q{Workflow (run)},
@@ -3958,7 +3957,7 @@ LongTruncOk=1</p>
         message     => q{Rich Editor},
         lastUpdated => 1202274234,
     },
-    
+
     'SubscriptionGroup formName' => {
         message     => q{Subscription Group},
         lastUpdated => 1202274234,
@@ -3974,54 +3973,357 @@ LongTruncOk=1</p>
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLogin description' => {
             message     => q{If yes, show a message after a user logs in.},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginTimes label' => {
             message     => q{Show Message Number of Times},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginTimes description' => {
             message     => q{The number of times a user sees the message, one per login},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginReset label' => {
             message     => q{Reset All Users Number of Times Seen},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginReset description' => {
             message     => q{If "yes", will force all users to see the login message again},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
         'showMessageOnLoginBody label' => {
             message     => q{Message on Login Body},
             lastUpdated => 0,
             context     => q{Label for site setting},
         },
-        
+
         'showMessageOnLoginBody description' => {
             message     => q{The body of the message to show on login. Macros are allowed.},
             lastUpdated => 0,
             context     => q{Description for site setting},
         },
-        
+
+    'site starter title' => {
+        message     => q{Site Starter},
+        lastUpdated => 0,
+        context     => q{Title for the site starter screen.},
+    },
+
+    'site starter body' => {
+        message     => q{Do you wish to use the WebGUI Site Starter, which will lead you through options to create a custom look and feel for your site, and set up some basic content areas?},
+        lastUpdated => 0,
+        context     => q{Body for the site starter screen.},
+    },
+
+    'no thanks' => {
+        message     => q{No, thanks},
+        lastUpdated => 0,
+        context     => q{Option in site starter to not run it},
+    },
+
+    'yes please' => {
+        message     => q{Yes, please},
+        lastUpdated => 0,
+        context     => q{Option in site starter to run the site starter},
+    },
+
+    'logo' => {
+        message     => q{Logo},
+        lastUpdated => 0,
+        context     => q{Label for the Logo upload field in the site starter.},
+    },
+
+    'upload logo' => {
+        message     => q{Upload Your Logo},
+        lastUpdated => 0,
+        context     => q{Title for the Logo upload screen in the site starter.},
+    },
+
+    'style designer' => {
+        message     => q{Style Designer},
+        lastUpdated => 0,
+        context     => q{Title for the style designer screen in the site starter.},
+    },
+
+    'save' => {
+        message     => q{Save},
+        lastUpdated => 0,
+        context     => q{General purpose, similar to submit.},
+    },
+
+    'save' => {
+        message     => q{Save},
+        lastUpdated => 0,
+        context     => q{General purpose, similar to submit.},
+    },
+
+    'company information' => {
+        message     => q{Company Information},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
+    },
+
+    'admin account' => {
+        message     => q{Admin Account},
+        lastUpdated => 0,
+        context     => q{Title for the company information screen in the site starter.},
+    },
+
+    'All Rights Reserved' => {
+        message     => q{All Rights Reserved},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Contact Us' => {
+        message     => q{All Contact Us},
+        lastUpdated => 0,
+        context     => q{Template label for automatically created Page layouts during Site Setup.},
+    },
+
+    'Initial Pages' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Header for the Site Setup screen},
+    },
+
+    'Forums' => {
+        message     => q{Initial Pages},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'About Us' => {
+        message     => q{About Us},
+        lastUpdated => 0,
+        context     => q{Label for the Site Setup screen},
+    },
+
+    'Put your about us content here.' => {
+        message     => q{Put your about us content here.},
+        lastUpdated => 0,
+        context     => q{Default content for the Site Setup screen},
+    },
+
+    'One forum name per line' => {
+        message     => q{One forum name per line},
+        lastUpdated => 0,
+        context     => q{Instructions for the names of forums in the Site Setup screen},
+    },
+
+    'Support' => {
+        message     => q{Support},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'General Discussion' => {
+        message     => q{General Discussion},
+        lastUpdated => 0,
+        context     => q{Default name of a forum in the Site Setup screen},
+    },
+
+    'Discuss your ideas and get help from our community.' => {
+        message     => q{Discuss your ideas and get help from our community.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'All the news you need to know.' => {
+        message     => q{All the news you need to know.},
+        lastUpdated => 0,
+        context     => q{Default description of a message board in the Site Setup screen},
+    },
+
+    'Welcome to our wiki. Here you can help us keep information up to date.' => {
+        message     => q{Welcome to our wiki. Here you can help us keep information up to date.},
+        lastUpdated => 0,
+        context     => q{Default description of a wiki in the Site Setup screen},
+    },
+
+    'Check out what is going on.' => {
+        message     => q{Check out what is going on.},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Your Email Address' => {
+        message     => q{Your Email Address},
+        lastUpdated => 0,
+        context     => q{Default description of a calendar in the Site Setup screen},
+    },
+
+    'Tell us how we can assist you.' => {
+        message     => q{Tell us how we can assist you.},
+        lastUpdated => 0,
+        context     => q{Subtext for the comments field in the Contact Us page of the Site Setup screen},
+    },
+
+    'We welcome your feedback.' => {
+        message     => q{We welcome your feedback.},
+        lastUpdated => 0,
+        context     => q{Default description of the Contact Us page of the Site Setup screen},
+    },
+
+    'Thanks for for your interest in ^c;. We will review your message shortly.' => {
+        message     => q{Thanks for for your interest in ^c;. We will review your message shortly.},
+        lastUpdated => 0,
+        context     => q{Default acknowledgement of the Contact Us page of the Site Setup screen},
+    },
+
+    'Cannot find what you are looking for? Try our search.' => {
+        message     => q{Cannot find what you are looking for? Try our search.},
+        lastUpdated => 0,
+        context     => q{Default description of the Search page of the Site Setup screen},
+    },
+
+    'WebGUI Initial Configuration' => {
+        message     => q{WebGUI Initial Configuration},
+        lastUpdated => 0,
+        context     => q{Main page title for the Site Setup screen},
+    },
+
+    'My Style' => {
+        message     => q{My Style},
+        lastUpdated => 0,
+        context     => q{Title of the template created by the Site Setup screen},
+    },
+
     'WebGUI password recovery' => {
         message     => q{WebGUI password recovery},
         lastUpdated => 0,
         context     => q{Title of the template created by the Site Setup screen},
     },
+
+    'session length' => {
+        message     => q{Session Length},
+        lastUpdated => 0,
+        context     => q{The length the session has been alive},
+    },
+
+    "time recorded" => {
+        message     => q{Time Recorded (excludes active sessions)},
+        lastUpdated => 0,
+        context     => q{Column heading for the total logged in time for the user},
+    },
+
+    'Show when online?' => {
+        message     => q{Show when online?},
+        lastUpdated => 0,
+        context     => q{Label for the user profile field used by the UsersOnline macro},
+    },
+
+        #Support for versionTagMode.
+        'version tag mode' => {
+            message => q{Version tag mode},
+            lastUpdated => 0,
+            context     => q{Label for the settings screen},
+        },
+
+        'version tag mode help' => {
+            message => q{Determine version tag behaviour.
+<ul>
+<li>Multiple version tags per user: each user can have multiple open version tags.</li>
+<li>Single version tag per user: each user only has one open version tag. Existing open version tag is reclaimed automatically.</li>
+<li>One site-wide version tag: users work on one site-wide version tag.</li>
+<li>Commit automatically: version tags are committed automatically.</li>
+</ul>
+
+Users may override this setting in their profile.
+},
+            lastUpdated => 0,
+            context     => q{Hover help for the settings screen},
+        },
+
+        'versionTagMode multiPerUser' => {
+            message => q{Multiple version tags per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode singlePerUser' => {
+            message => q{Single version tag per user},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode siteWide' => {
+            message => q{One site-wide version tag},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode autoCommit' => {
+            message => q{Commit automatically},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        'versionTagMode inherited' => {
+            message => q{Inherit from site settings},
+            lastUpdated => 0,
+            context     => q{Entry for version tag settings},
+        },
+
+        '< prev' => {
+            message => q{< prev},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
+        'next >' => {
+            message => q{next >},
+            lastUpdated => 1226704984,
+            context     => q{i18n label for YUI paginator},
+        },
+
+        'profile privacy settings' =>  {
+            message     => q{Privacy Settings},
+            lastUpdated => 1226706547,
+            context     => q{i18n label for time duration in WebGUI::DateTime},
+        },
+
+        'read more' => {
+            message => q|Read More|,
+            lastUpdated => 1229013268,
+            context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
+        },
+
+        'For' => {
+            message => q|For|,
+            lastUpdated => 1230269893,
+        },
+
+        'rss' => {
+            message => q|RSS|,
+            lastUpdated => 1230584702,
+            context => q|Abbreviation for Really Simple Syndication, and other similar terms.|,
+        },
+
+        'Upload an attachment' => {
+            message => q|Upload an attachment|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
+
+        'Upload attachments here. Copy and paste attachments into the editor.' => {
+            message => q|Upload attachments here. Copy and paste attachments into the editor.|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
 
 };
 

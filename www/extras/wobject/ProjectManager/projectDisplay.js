@@ -399,12 +399,12 @@ function isValidDate(dt) {
    var dd   = split[2];
       
    // if month out of range
-   if ( mm < 0 || mm > 11 ) {
+   if ( mm < 1 || mm > 12 ) {
       return false;
    }
    
    // get last day in month
-   var d = (11 == mm) ? new Date(yyyy + 1, 0, 0) : new Date(yyyy, mm + 1, 0);
+   var d = (12 == mm) ? new Date(yyyy + 1, 0, 0) : new Date(yyyy, mm + 1, 0);
 
    // if date out of range
    if ( dd < 1 || dd > d.getDate() ) {

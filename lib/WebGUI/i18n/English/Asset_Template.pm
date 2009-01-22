@@ -2,18 +2,6 @@ package WebGUI::i18n::English::Asset_Template;
 use strict;
 
 our $I18N = {
-	'head block' => {
-		message => q|Head Block|,
-		context => q|label for the get edit form where users should put things that go in the html head block|,
-		lastUpdated => 0,
-	},
-
-	'head block description' => {
-		message => q|Put meta tags, script tags, link tables, style sheets, and anything else here that you want to appear in the head block of the HTML document.|,
-		context => q|hover help for the head block field|,
-		lastUpdated => 0,
-	},
-
 	'style wizard' => {
 		message => q|Style Wizard|,
 		context => q|Label for link to engage the style wizard.|,
@@ -296,6 +284,19 @@ Any scratch variables will be available in the template with this syntax:<br/>
 		message => q|<p>The following template parsers are installed on your site and may be enabled for use.</p>|,
 		lastUpdated => 1162088018,
 	},
+
+    'warning default template' => {
+        message     => q{You are attempting to edit a default template. Any changes you make to this template
+                    may be lost when you next upgrade WebGUI. To be safe, you should make a duplicate of this template.},
+        lastUpdated => 0,
+        context     => q{Warning for users attempting to edit a default template},
+    },
+
+    'make duplicate label' => {
+        message     => q{Duplicate this template and edit},
+        lastUpdated => 0,
+        context     => q{Label for URL to make a duplicate and open the duplicate's edit screen},
+    },
 
 };
 

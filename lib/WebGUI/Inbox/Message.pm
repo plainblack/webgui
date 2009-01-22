@@ -63,7 +63,19 @@ The topic of this message. Defaults to 'Notification'.
 
 =head4 status
 
-May be "pending" or "completed". Defaults to "pending". You should set this to completed if this is a message without an action, such as a notification.
+May be "unread", "pending", or "completed". Defaults to "pending".
+
+You should set this to "pending" if the message requires an action which will later be completed.
+
+WebGUI::Inbox->create( $session, { status => "pending"} )
+
+You should set this to "unread" if this is a message without an action, such as a notification.
+
+WebGUI::Inbox->create( $session, { status => "unread" } );
+
+You should only set this to "completed" if this is an action that would normally be "pending" but for some reason
+requries no further action.  For instance, if the user submitting some content is also the approver you may choose
+to simply set the status immediately to completed.
 
 =head4 userId
 
@@ -77,6 +89,14 @@ A groupId of a group attached to this message.
 
 A userId that created this message. Defaults to '3' (Admin).
 
+=head4 emailMessage
+
+Email message to use rather than inbox message contents.
+
+=head4 emailSubject
+
+Email subject to use rather than inbox message subject.
+
 =cut
 
 sub create {
@@ -89,32 +109,65 @@ sub create {
 	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
 	$self->{_properties}{message}   = $session->crypt->encrypt_hex($properties->{message});
 	$self->{_properties}{dateStamp} = time();
-	$self->{_properties}{userId}    = $properties->{userId};
+	$self->{_properties}{userId}    = $properties->{userId} || $session->user->userId;
 	$self->{_properties}{groupId}   = $properties->{groupId};
     $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
-	if ($self->{_properties}{status} eq "completed") {
+
+    my $status = $self->{_properties}{status};
+    
+	if ($status eq "completed") {
 		$self->{_properties}{completedBy} = $session->user->userId;
 		$self->{_properties}{completedOn} = time();
 	}
+    elsif($status ne "pending") {
+        $self->{_properties}{status} = "active";
+    }
+
 	$self->{_messageId} = $self->{_properties}{messageId} = $session->db->setRow("inbox","messageId",$self->{_properties});
-	$self->{_properties}{message}   = $properties->{message}; # undo encryption for memory/cache	
+	$self->{_properties}{message}   = $properties->{message}; # undo encryption for memory/cache
+    $self->{_userId   } = $self->{_properties}{userId};
+    $self->{_inbox    } = $self->{_properties};
+
+    #Add the message state row for individual user passed in
+    if($self->{_properties}{userId}) {
+        $session->db->write(
+            q{ REPLACE INTO inbox_messageState (messageId,userId) VALUES (?,?) },
+            [$self->{_messageId},$self->{_properties}{userId}]
+        );
+    }
+    #Add the message state row for every user in the group
+    if($self->{_properties}{groupId}) {
+        my $g     = WebGUI::Group->new($session,$self->{_properties}{groupId});
+        my $users = $g->getAllUsers;
+        foreach my $userId (@{$users}) {
+            $session->db->write(
+                q{ REPLACE INTO inbox_messageState (messageId,userId) VALUES (?,?) },
+                [$self->{_messageId},$userId]
+            );
+        }
+    }
+
+	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
 	my $mail = WebGUI::Mail::Send->create($session, {
 		toUser=>$self->{_properties}{userId},
 		toGroup=>$self->{_properties}{groupId},
-		subject=>$self->{_properties}{subject}
+		subject=>$subject,
 		});
 	if (defined $mail) {
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
-        if ($fromUser) {
+        #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
+        unless ($fromUser->isVisitor || $fromUser->userId eq 3) {  #Can't use isAdmin because it will not send prefaces from normal users who in the admin group
             my $i18n = WebGUI::International->new($session, 'Inbox_Message');
             $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
         }
-        if ($self->{_properties}{message} =~ m/\<.*\>/) {
-            $mail->addHtml('<p>' . $preface . '</p><br />' . $self->{_properties}{message});
-        }
-        else {
+        my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
+		if ($msg =~ m/\<.*\>/) {
+            $msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
+			$mail->addHtml($msg);
             $mail->addText($preface . "\n\n" . $self->{_properties}{message});
+            $msg = $preface."\n\n".$msg if($preface ne "");
+			$mail->addText($msg);
         }
 		$mail->addFooter;
 		$mail->queue;
@@ -125,16 +178,34 @@ sub create {
 
 #-------------------------------------------------------------------
 
-=head2 delete ( )
+=head2 delete ( userId )
 
-Deletes this message from the inbox.
+Deletes this message from the inbox for the user passed in
+
+=head3 userId
+
+User to delete message for.  If no user is passed in, the current user will be used.
 
 =cut
 
 sub delete {
-	my $self = shift;
-	my $sth = $self->session->db->prepare("delete from inbox where messageId=?");
-	$sth->execute($self->getId);
+	my $self      = shift;
+    my $session   = $self->session;
+    my $db        = $session->db;
+    my $messageId = $self->getId;
+    my $userId    = shift || $self->{_userId};
+
+    $self->setDeleted($userId);
+
+    my $isActive  = $db->quickScalar(
+        q{ select count(*) from inbox_messageState where messageId=? and deleted=0 },
+        [$messageId]
+    );
+    #Delete the message from the database if everyone who was sent the message has deleted it
+    unless ($isActive) {
+        $db->write("delete from inbox where messageId=?",[$messageId]);
+        $db->write("delete from inbox_messageState where messageId=?",[$messageId]);
+    }
 }
 
 #-------------------------------------------------------------------
@@ -146,8 +217,8 @@ Deconstructor.
 =cut
 
 sub DESTROY {
-        my $self = shift;
-        undef $self;
+    my $self = shift;
+    undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -177,6 +248,17 @@ An epoch date representing when the action associated with this message was comp
 sub get {
 	my $self = shift;
 	my $name = shift;
+
+    if($name eq "status") {
+        my $status  = $self->{_properties}{status};
+        if($status eq "active") {
+            return "read"    if($self->{_properties}{isRead});
+            return "replied" if($self->{_properties}{repliedTo});
+            return "unread";
+        }
+        return $status;
+    }
+
 	return $self->{_properties}{$name};
 }
 
@@ -194,11 +276,72 @@ sub getId {
 	return $self->{_messageId};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getStatus ( [ userId ] ) 
+
+Gets the current status of the message for the user passed in
+
+=head3 userId
+
+The id of the user to get the status of the message for.  Defaults to the current user.
+
+=cut
+
+sub getStatus {
+	my $self   = shift;
+	my $userId = shift || $self->{_userId};
+
+    my $status      = $self->{_properties}{status};
+    my $statusCodes = $self->statusCodes;
+    
+    if($status eq "active") {
+        return $statusCodes->{"replied"} if($self->{_properties}{repliedTo});
+        return $statusCodes->{"read"   } if($self->{_properties}{isRead});
+        return $statusCodes->{"unread" };
+    }
+
+    return $statusCodes->{$self->get("status")};
+}
+
+#-------------------------------------------------------------------
+
+=head2 isRead ( ) 
+
+Returns whether or not the message has been read.
+
+=cut
+
+sub isRead {
+	my $self   = shift;
+    return $self->{_properties}{isRead};
+}
+
+#-------------------------------------------------------------------
+
+=head2 isValidStatus ( status ) 
+
+Returns whether or not the status passed in is valid.  Can be called as a class or instance method
+
+=head4 status
+
+The id of the user that replied to this message. Defaults to the current user.
+
+=cut
+
+sub isValidStatus {
+	my $self   = shift;
+    my $status = shift;
+    return (exists $self->statusCodes->{$status});
+}
+
 #-------------------------------------------------------------------
 
 =head2 new ( session, messageId )
 
-Constructor.
+Constructor used to access existing messages.  Use create for making
+new messages.
 
 =head3 session
 
@@ -208,15 +351,40 @@ A reference to the current session.
 
 The unique id of a message.
 
+=head3 userId
+
+The userId for this message.  Defaults to the current user.
+
 =cut
 
 sub new {
-	my $class = shift;
-	my $session = shift;
+	my $class     = shift;
+	my $session   = shift;
 	my $messageId = shift;
-	my $properties = $session->db->getRow("inbox","messageId",$messageId);
-	$properties->{message} = $session->crypt->decrypt_hex($properties->{message});
-	bless {_properties=>$properties, _session=>$session, _messageId=>$messageId}, $class;
+    my $userId    = shift || $session->user->userId;
+    
+    #Don't bother going on if a messageId wasn't passed in
+    return undef unless $messageId;
+
+    my $inbox = $session->db->getRow("inbox","messageId",$messageId);
+    my $statusValues = $session->db->quickHashRef(
+        q{ select isRead, repliedTo, deleted from inbox_messageState where messageId=? and userId=? },
+        [$messageId,$userId]
+    );
+
+    #Don't return messages that don't exist
+    return undef unless (scalar(keys %{$inbox}));
+
+    #Don't return deleted messages
+    return undef if($statusValues->{deleted});
+
+    my $self       = {};
+
+    my %properties  = (%{$inbox},%{$statusValues});
+    $properties{message} = $session->crypt->decrypt_hex($properties{message});
+
+ 
+	bless {_properties=>\%properties, _inbox=>$inbox, _session=>$session, _messageId=>$messageId, _userId=>$userId}, $class;
 }
 
 #-------------------------------------------------------------------
@@ -247,17 +415,105 @@ The id of the user that completed this task. Defaults to the current user.
 sub setCompleted {
 	my $self = shift;
 	my $userId = shift || $self->session->user->userId;
-	$self->{_properties}{status} = "completed";
+	$self->{_properties}{status}      = "completed";
 	$self->{_properties}{completedBy} = $userId;
 	$self->{_properties}{completedOn} = time();
-	$self->session->db->setRow("inbox","messageId",$self->{_properties});
+    $self->{_inbox}{status}           = "completed";
+    $self->{_inbox}{completedBy}      = $userId;
+    $self->{_inbox}{completedOn}      = time();
+	$self->session->db->setRow("inbox","messageId",$self->{_inbox});
+    #Completed messages should also be marked read
+    $self->setRead($userId);
 }
+
+#-------------------------------------------------------------------
+
+=head2 setDeleted ( [ userId ] ) 
+
+Marks a message deleted.
+
+=head4 userId
+
+The id of the user that deleted this message. Defaults to the current user.
+
+=cut
+
+sub setDeleted {
+	my $self   = shift;
+	my $userId = shift || $self->session->user->userId;
+
+    $self->session->db->write(
+        q{update inbox_messageState set deleted=1 where messageId=? and userId=?},
+        [$self->getId,$userId]
+    );
+}
+
+#-------------------------------------------------------------------
+
+=head2 setRead ( [ userId ] ) 
+
+Marks a message read.
+
+=head4 userId
+
+The id of the user that reads this message. Defaults to the current user.
+
+=cut
+
+sub setRead {
+	my $self   = shift;
+	my $userId = shift || $self->session->user->userId;
+
+    $self->session->db->write(
+        q{update inbox_messageState set isRead=1 where messageId=? and userId=?},
+        [$self->getId,$userId]
+    );
+}
+
+#-------------------------------------------------------------------
+
+=head2 setReplied ( [ userId ] ) 
+
+Marks a message replied.
+
+=head4 userId
+
+The id of the user that replied to this message. Defaults to the current user.
+
+=cut
+
+sub setReplied {
+	my $self   = shift;
+	my $userId = shift || $self->session->user->userId;
+
+    $self->session->db->write(
+        q{update inbox_messageState set repliedTo=1, isRead=1 where messageId=? and userId=?},
+        [$self->getId,$userId]
+    );
+}
+
 
 #-------------------------------------------------------------------
 
 =head2 setStatus ( status,[ userId ] ) 
 
-Marks a message completed.
+Sets the current status of the message
+
+There are two levels of status for any inbox message:
+
+Global Message Status - This is the status of the entire message and holds true for everyone who received the message.  These status values are as follows:
+
+pending - indicates that there is some action for one of the users who received this message to act on.
+active  - indicates that this is a message that requires no action by any users who received this message.
+completed - indicates that the action that was required is now completed.
+
+Individual Message Status - This is the status of the message for each individual who received it.  If you send a message to a group, each person who received the message will be able to see the message in one of the following states:
+
+unread  - indicates that this message has not be read by the current user
+read    - indicates that this message has been read by the current user
+replied - indicates that the user has replied to this message
+
+It is important to note that there is one more status not listed here which is deleted.  This is a special state which cannot be set through this method.  You should use the setDeleted method in this class if you wish to delete a message for a user. 
 
 =head4 status
 
@@ -270,22 +526,116 @@ The id of the user that completed this task. Defaults to the current user.
 =cut
 
 sub setStatus {
-	my $self = shift;
-    my $status = shift;
-	my $userId = shift || $self->session->user->userId;
+	my $self    = shift;
+    my $status  = shift;
+    my $session = $self->session;
+	my $userId  = shift || $session->user->userId;
 	unless ($status) {
-        $self->session->errorHandler->warn("No status passed in for message.  Exit without update");
+        $session->log->warn("No status passed in for message.  Exit without update");
         return undef;
     }
-    
+
+    unless($self->isValidStatus($status)) {
+        $self->session->log->warn("Invalid status $status passed in for message.  Exit without update");
+        return undef;
+    }
+
     if($status eq "completed") {
         $self->setCompleted($userId);
         return undef;
     }
-    $self->{_properties}{status} = $status;
-	$self->session->db->setRow("inbox","messageId",$self->{_properties});
+    elsif($status eq "read") {
+        $self->setRead($userId);
+    }
+    elsif($status eq "unread") {
+        $self->setUnread($userId);
+    }
+    elsif($status eq "replied")  {
+        $self->setReplied($userId);
+    }
+    
+    #Only let completed stuff go back to pending
+    if ( $status eq "pending" && $self->{_properties}{status} eq "completed") {
+        $self->{_properties}{status} = "pending";
+        $self->{_inbox}{status} = "pending"
+    }
+    
+	$self->session->db->setRow("inbox","messageId",$self->{_inbox});
     return undef;
 }
 
-1;
+#-------------------------------------------------------------------
 
+=head2 setUnread ( [ userId ] ) 
+
+Marks a message unread.
+
+=head4 userId
+
+The id of the user that reads this message. Defaults to the current user.
+
+=cut
+
+sub setUnread {
+	my $self   = shift;
+	my $userId = shift || $self->session->user->userId;
+
+    $self->session->db->write(
+        q{update inbox_messageState set isRead=0 where messageId=? and userId=?},
+        [$self->getId,$userId]
+    );
+}
+
+#-------------------------------------------------------------------
+
+=head2 statusCodes ( session ) 
+
+Returns a hash ref of valid status values.  Can be called as a class or instance method:
+
+WebGUI::Inbox::Message->statusCodes($session);
+
+my $message     = WebGUI::Inbox::Message->new($session, $messageId);
+my $statusCodes = $inbox->statusCodes;
+
+There are two levels of status for any inbox message:
+
+Global Message Status - This is the status of the entire message and holds true for everyone who received the message.  These status values are as follows:
+
+pending - indicates that there is some action for one of the users who received this message to act on.
+active  - indicates that this is a message that requires no action by any users who received this message.
+completed - indicates that the action that was required is now completed.
+
+Individual Message Status - This is the status of the message for each individual who received it.  If you send a message to a group, each person who received the message will be able to see the message in one of the following states:
+
+unread  - indicates that this message has not be read by the current user
+read    - indicates that this message has been read by the current user
+replied - indicates that the user has replied to this message
+
+It is important to note that there is one more status not listed here which is deleted.  This is a special state and you should use the setDeleted method in this class if you wish to delete a message for a user. 
+
+=head4 session
+
+The current session object.
+
+=cut
+
+sub statusCodes {
+	my $self    = shift;
+    my $session = shift;
+
+    if(ref $self eq "WebGUI::Inbox::Message") {
+        $session = $self->session;
+    }
+
+    my $i18n = WebGUI::International->new($session);
+    return {
+        "active"    => $i18n->get("inbox message status active"),
+        "pending"   => $i18n->get(552),
+        "completed" => $i18n->get(350),
+        "unread"    => $i18n->get("private message status unread"),
+        "read"      => $i18n->get("private message status read"),
+        "replied"   => $i18n->get("private message status replied"),        
+    }
+}
+
+1;

@@ -151,6 +151,61 @@ sub getAllPendingAddRequests {
 
 #-------------------------------------------------------------------
 
+=head2 getNextInvitation ( invitation ) 
+
+Returns the invitation that was sent to the user just after the invitation passed in.
+
+=cut
+
+sub getNextInvitation {
+    my $self       = shift;
+    my $invitation = shift;
+
+    my $sql = q{
+        select
+            *
+        from
+            friendInvitations
+        where
+            friendId = ?
+            and dateSent > ?
+        order by dateSent asc
+        limit 1
+    };
+    my $bindvars = [$self->user->userId,$invitation->{dateSent}];
+    return $self->session->db->quickHashRef($sql,$bindvars);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 getPreviousInvitation ( invitation ) 
+
+Returns the invitation that was sent to the user just before the invitation passed in.
+
+=cut
+
+sub getPreviousInvitation {
+    my $self       = shift;
+    my $invitation = shift;
+
+    my $sql = q{
+        select
+            *
+        from
+            friendInvitations
+        where
+            friendId = ?
+            and dateSent < ?
+        order by dateSent desc
+        limit 1
+    };
+    my $bindvars = [$self->user->userId,$invitation->{dateSent}];
+    return $self->session->db->quickHashRef($sql,$bindvars);
+}
+
+#-------------------------------------------------------------------
+
 =head2 isFriend ( userId )
 
 Returns a booelean indicating whether the userId is already a friend of this user.
@@ -165,6 +220,37 @@ sub isFriend {
     my $self = shift;
     my $userId = shift;
     return isIn($userId, @{$self->user->friends->getUsers});    
+}
+
+#-------------------------------------------------------------------
+
+=head2 isInvited ( userId )
+
+Returns a booelean indicating whether the user has already been invited to the friends network.
+
+=head3 userId
+
+The userId to check against this user.
+
+=cut
+
+sub isInvited {
+    my $self    = shift;
+    my $session = $self->session;
+    my $userId  = shift;
+    
+    my ($isInvited) = $session->db->quickArray(q{
+        select
+            count(*)
+        from
+            friendInvitations
+        where
+            inviterId = ?
+            and friendId = ?
+    },
+    [$self->user->userId,$userId]);
+
+    return $isInvited;    
 }
 
 #-------------------------------------------------------------------
@@ -225,7 +311,7 @@ sub rejectAddRequest {
 
 #-------------------------------------------------------------------
 
-=head2 sendAddRequest ( userId, message )
+=head2 sendAddRequest ( userId, message, inviteUrl )
 
 Sends a request to another user to be added to this user's friends list. Returns an invitationId.
 
@@ -237,12 +323,19 @@ The user to invite to be a friend.
 
 The message to lure them to accept.
 
+=head3 inviteUrl
+
+The url to view the friend request
+
 =cut
 
 sub sendAddRequest {
-    my $self = shift;
-    my $userId = shift;
-    my $comments = shift;
+    my $self       = shift;
+    my $userId     = shift;
+    my $comments   = shift;
+    my $url        = $self->session->url;
+    my $inviteUrl  = shift || $url->append($url->getSiteURL,'op=account');
+
     my $i18n = WebGUI::International->new($self->session, "Friends");
 
     # No sneaky attack paths...
@@ -250,7 +343,9 @@ sub sendAddRequest {
 
     # Create the invitation url.
     my $inviteId = $self->session->id->generate();
-    my $inviteUrl = $self->session->url->append($self->session->url->getSiteURL, 'op=friendRequest;inviteId='.$inviteId);
+    
+    $inviteUrl = $url->append($inviteUrl,'inviteId='.$inviteId);
+
     # Build the message
     my $messageText = sprintf $i18n->get("invitation approval email"), $self->user->getWholeName, $self->session->url->getSiteURL, $comments, $inviteUrl;
 

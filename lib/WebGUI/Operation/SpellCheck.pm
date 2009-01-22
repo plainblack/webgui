@@ -104,7 +104,7 @@ sub addWord {
     my $language = shift;
     my $word = shift;
     die "You must be logged in to add words to your dictionary.\n:"
-        if ($session->user->userId eq '1');
+        if ($session->user->isVisitor);
     my $speller = _getSpeller($session, $language);
     $speller->add_to_personal($word);
     $speller->save_all_word_lists;

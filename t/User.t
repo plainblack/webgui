@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 133; # increment this value for each test you create
+use Test::More tests => 143; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -222,6 +222,7 @@ is ($result, '194.168.0.101', "userSession setup correctly");
 
 ok (!$visitor->isInGroup($cm->getId), "Visitor is not member of group");
 ok ($admin->isInGroup($cm->getId), "Admin is member of group");
+ok($admin->isAdmin, "Admin user is in admins group");
 
 my $origFilter = $cm->ipFilter;
 
@@ -230,6 +231,8 @@ $cm->ipFilter('194.168.0.0/24');
 is( $cm->ipFilter, "194.168.0.0/24", "ipFilter assignment to local net, 194.168.0.0/24");
 
 ok ($visitor->isInGroup($cm->getId), "Visitor is allowed in via IP");
+ok ($visitor->isVisitor, "User checks out as visitor");
+ok (!$visitor->isAdmin,"User that isn't an admin doesn't look like admin");
 
 $session->db->write('update userSession set lastIP=? where sessionId=?',['193.168.0.101', $session->getId]);
 
@@ -244,7 +247,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 $user = WebGUI::User->new($session, "new");
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
-
+ok($user->isRegistered, "User is not a visitor");
 $user->addToGroups([3]);
 
 ok($user->isInGroup(3), "addToGroups: New user is in group 3(Admin)");
@@ -324,6 +327,13 @@ $newEnv{REMOTE_ADDR} = '10.0.0.2';
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: even with the right group permission, user must be in subnet if subnet is set');
 
+##Check for multiple IP settings
+$session->config->set('adminModeSubnets', ['10.0.0.0/24', '192.168.0.0/24', ]);
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, first IP range');
+
+$newEnv{REMOTE_ADDR} = '192.168.0.127';
+ok($dude->canUseAdminMode, 'canUseAdminMode: multiple IP settings, second IP range');
+
 ##restore the original session variables
 $session->env->{_env} = $origEnvHash;
 $session->config->delete('adminModeSubnets');
@@ -395,6 +405,12 @@ $copiedFieldData{'dataDefault'} = "'America/Hillsboro'";
 $profileField->set(\%copiedFieldData);
 
 is($profileField->get('dataDefault'), "'America/Hillsboro'", 'default timeZone set to America/Hillsboro');
+
+# now let's make sure it has an extras field, and that we can get/set it.
+$profileField->set( { extras => '<!-- hello world -->' } );
+is($profileField->getExtras, '<!-- hello world -->', 'extras field for profileField');
+$profileField->set( { extras => '' } );
+
 
 my $busterCopy = WebGUI::User->new($session, $buster->userId);
 is( $busterCopy->profileField('timeZone'), 'America/Hillsboro', 'busterCopy received updated user profile because there is no username set in his cached user object');
@@ -572,7 +588,7 @@ is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessag
 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: illegal profile field allows messages to be received from anyone');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: illegal profile field doesn\'t allow messages to be received from anyone');
 
 ################################################################
 #
@@ -604,8 +620,26 @@ cmp_bag(
     'getGroupIdsRecursive returns the correct set of groups, ignoring expire date and not duplicating groups'
 );
 
+
+#----------------------------------------------------------------------------
+# Test the new create() method
+SKIP: {
+    eval{ require Test::Exception; import Test::Exception };
+    skip 1, 'Test::Exception not found' if $@;
+
+    throws_ok( sub{ WebGUI::User->create }, 'WebGUI::Error::InvalidObject', 
+        'create() throws if no session passed'
+    );
+};
+
+ok( my $newCreateUser = WebGUI::User->create( $session ),
+    'create() returns something'
+);
+isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
+
+
 END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish) {
+    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
 

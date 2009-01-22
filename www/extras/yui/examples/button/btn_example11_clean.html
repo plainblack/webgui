@@ -16,6 +16,7 @@ body {
 }
 </style>
 
+<link rel="stylesheet" type="text/css" href="../../build/slider/assets/skins/sam/slider.css" />
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/colorpicker/assets/skins/sam/colorpicker.css" />
 <link rel="stylesheet" type="text/css" href="../../build/menu/assets/skins/sam/menu.css" />
@@ -147,6 +148,7 @@ body {
 
 <body class=" yui-skin-sam">
 
+
 <h1>Color Picker Button</h1>
 
 <div class="exampleIntro">
@@ -166,24 +168,6 @@ that should be applied to the image.
         function onButtonOption() {
 
             /*
-                Create an empty body element for the Menu instance in order to 
-                reserve space to render the ColorPicker instance into.
-            */
-
-            oColorPickerMenu.setBody("&#32;");
-
-            oColorPickerMenu.body.id = "color-picker-container";
-
-
-
-            // Render the Menu into the Button instance's parent element
-
-            oColorPickerMenu.render(this.get("container"));
-
-
-
-
-            /*
                  Create a new ColorPicker instance, placing it inside the body 
                  element of the Menu instance.
             */
@@ -195,14 +179,6 @@ that should be applied to the image.
                                         HUE_THUMB: "../../build/colorpicker/assets/hue_thumb.png"
                                     }
                                 });
-
-
-            // Align the Menu to its Button
-
-            oColorPickerMenu.align();
-
-  
-
 
 
             /*
@@ -226,8 +202,6 @@ that should be applied to the image.
             // Remove this event listener so that this code runs only once
 
             this.unsubscribe("option", onButtonOption);
-            
-
         
         }
 
@@ -244,7 +218,27 @@ that should be applied to the image.
                                             id: "color-picker-button", 
                                             label: "<em id=\"current-color\">Current color is #FFFFFF.</em>", 
                                             menu: oColorPickerMenu, 
-                                            container: this });
+                                            container: "button-container" });
+        
+        
+        oButton.on("appendTo", function () {
+        
+			/*
+				Create an empty body element for the Menu instance in order to 
+				reserve space to render the ColorPicker instance into.
+			*/
+	
+			oColorPickerMenu.setBody("&#32;");
+	
+			oColorPickerMenu.body.id = "color-picker-container";
+	
+	
+	
+			// Render the Menu into the Button instance's parent element
+	
+			oColorPickerMenu.render(this.get("container"));
+        
+        });
         
         
         /*

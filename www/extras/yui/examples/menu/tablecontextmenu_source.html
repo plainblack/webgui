@@ -99,24 +99,13 @@
         <script type="text/javascript">
 
             /*
-                 Utility function for triming the extra white space from the 
-                 begining and end of a string.
-            */
-
-            String.prototype.trim = function () {
-
-                var s = this.replace(/^\s+/, "");
-                return s.replace(/\s+$/, "");
-
-            };
-
-
-            /*
                  Initialize the ContextMenu instance when the the elements 
                  that trigger their display are ready to be scripted.
             */
 
             YAHOO.util.Event.onContentReady("dataset", function () {
+
+				var Dom = YAHOO.util.Dom;
 
                 /*
                     Map of CSS class names to arrays of MenuItem 
@@ -181,45 +170,6 @@
                 };
 
 
-                /*
-                     Utility function used to return the parent <tr> element of
-                     the actual node in the "dataset" table that fired the 
-                     "contextmenu" event.
-                */
-    
-                function getTableRowFromEventTarget(p_oNode) {
-    
-                    if (p_oNode.tagName.toUpperCase() == "TR") {
-                    
-                        return p_oNode;
-    
-                    }
-                    else {
-    
-
-                        /*
-                             If the target of the event was a child of a TR, 
-                             get the parent TR element
-                        */
-    
-                        do {
-        
-                            if (p_oNode.tagName.toUpperCase() == "TR") {
-    
-                                return p_oNode;                            
-    
-                                break;
-                            
-                            }
-        
-                        }
-                        while ((p_oNode = p_oNode.parentNode));
-                    
-                    }
-                
-                }
-
-
                 var oSelectedTR;    // The currently selected TR
 
 
@@ -232,8 +182,10 @@
 
                 function onContextMenuBeforeShow(p_sType, p_aArgs) {
 
-                    var aMenuItems,
+                    var oTarget = this.contextEventTarget,
+                    	aMenuItems,
                         aClasses;
+
 
                     if (this.getRoot() == this) {
 
@@ -241,8 +193,9 @@
                              Get the <tr> that was the target of the 
                              "contextmenu" event.
                         */
-    
-                        oSelectedTR = getTableRowFromEventTarget(this.contextEventTarget);
+        
+						oSelectedTR = oTarget.nodeName.toUpperCase() == "TR" ? 
+										oTarget : Dom.getAncestorByTagName(oTarget, "TR");
     
     
                         /*
@@ -250,7 +203,7 @@
                             the "oContextMenuItems" map.
                         */
     
-                        if (YAHOO.util.Dom.hasClass(oSelectedTR, "odd")) {
+                        if (Dom.hasClass(oSelectedTR, "odd")) {
     
                             aClasses = oSelectedTR.className.split(" ");
     
@@ -259,7 +212,7 @@
                         }
                         else {
                             
-                            aMenuItems = oContextMenuItems[oSelectedTR.className.trim()];
+                            aMenuItems = oContextMenuItems[YAHOO.lang.trim(oSelectedTR.className)];
     
                         }
     
@@ -284,7 +237,7 @@
                              the target of the "contextmenu" event.
                         */
     
-                        YAHOO.util.Dom.addClass(oSelectedTR, "selected");
+                        Dom.addClass(oSelectedTR, "selected");
                     
                     }
                     
@@ -300,7 +253,7 @@
 
                     if (this.getRoot() == this && oSelectedTR) {
 
-                        YAHOO.util.Dom.removeClass(oSelectedTR, "selected");
+                        Dom.removeClass(oSelectedTR, "selected");
                     
                     }
                 

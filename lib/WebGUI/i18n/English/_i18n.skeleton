@@ -18,3 +18,4 @@ our $I18N = { ##hashref of hashes
 };
 
 1;
+#vim:ft=perl

@@ -118,7 +118,9 @@ sub addArchive {
 
     for my $filePath (@files) {
         my ($volume, $directory, $filename) = File::Spec->splitpath( $filePath );
+        next unless $filename;
         next if $filename =~ m{^[.]};
+        next if $filename =~ m{^thumb-};
         my $class       = $gallery->getAssetClassForFile( $filePath );
         next unless $class; # class is undef for those files the Gallery can't handle
 
@@ -194,8 +196,10 @@ sub appendTemplateVarsFileLoop {
     my $session     = $self->session;
 
     for my $assetId (@$assetIds) {
-        push @{$var->{file_loop}}, 
-            WebGUI::Asset->newByDynamicClass($session, $assetId)->getTemplateVars;
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $assetId);
+        # Set the parent
+        $asset->{_parent} = $self;
+        push @{$var->{file_loop}}, $asset->getTemplateVars;
     }
 
     return $var;
@@ -332,6 +336,22 @@ sub canView {
 
 #----------------------------------------------------------------------------
 
+=head2 DESTROY
+
+Destroy the cached assets
+
+=cut
+
+sub DESTROY {
+    my $self        = shift;
+    for my $key ( qw/ _nextAlbum _prevAlbum / ) {
+        my $asset       = delete $self->{ $key };
+        $asset->DESTROY if $asset;
+    }
+}
+
+#----------------------------------------------------------------------------
+
 =head2 i18n ( session )
 
 Get a WebGUI::International object for this class. 
@@ -361,7 +381,12 @@ Returns the workflowId of the Gallery's approval workflow.
 
 sub getAutoCommitWorkflowId {
     my $self        = shift;
-    return $self->getParent->get("workflowIdCommit");
+    my $gallery = $self->getParent;
+    if ($gallery->hasBeenCommitted) {
+        return $gallery->get("workflowIdCommit")
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 #----------------------------------------------------------------------------
@@ -410,23 +435,31 @@ Gets an array reference of asset IDs for all the files in this album.
 
 sub getFileIds {
     my $self        = shift;
-    my $gallery     = $self->getParent;
 
-    # Deal with "pending" files.
-    my %pendingRules;
-    if ( $self->canEdit ) {
-        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+    if ( !$self->session->stow->get( 'fileIds-' . $self->getId ) ) {
+        my $gallery     = $self->getParent;
+        
+        # Deal with "pending" files.
+        my %pendingRules;
+        if ( $self->canEdit ) {
+            $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+        }
+        else {
+            $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
+            $pendingRules{ whereClause } = q{
+                ( 
+                    status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
+                )
+            };
+        }
+        
+        $self->session->stow->set( 
+            "fileIds-" . $self->getId, 
+            $self->getLineage( ['descendants'], { (%pendingRules) } ),
+        );
     }
-    else {
-        $pendingRules{ statusToInclude } = [ 'pending', 'approved' ];
-        $pendingRules{ whereClause } = q{
-            ( 
-                status = "approved" || ownerUserId = "} . $self->session->user->userId . q{"
-            )
-        };
-    }
-    
-    return $self->getLineage( ['descendants'], { (%pendingRules) } );
+
+    return $self->session->stow->get( "fileIds-" . $self->getId );
 }
 
 #----------------------------------------------------------------------------
@@ -460,9 +493,11 @@ or undef if there is no next album.
 
 sub getNextAlbum {
     my $self        = shift;
+    return $self->{_nextAlbum} if $self->{_nextAlbum};
     my $nextId      = $self->getParent->getNextAlbumId( $self->getId );
     return undef unless $nextId;
-    return WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    $self->{_nextAlbum } = WebGUI::Asset->newByDynamicClass( $self->session, $nextId );
+    return $self->{_nextAlbum};
 }
 
 #----------------------------------------------------------------------------
@@ -476,9 +511,11 @@ or undef if there is no previous album.
 
 sub getPreviousAlbum {
     my $self        = shift;
+    return $self->{_previousAlbum} if $self->{_previousAlbum};
     my $previousId  = $self->getParent->getPreviousAlbumId( $self->getId );
     return undef unless $previousId;
-    return WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    $self->{_previousAlbum} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
+    return $self->{_previousAlbum};
 }
 
 #----------------------------------------------------------------------------
@@ -708,8 +745,30 @@ sub processPropertiesFromFormPost {
     return $errors  if @$errors;
 
     ### Passes all checks
+}
 
-    $self->requestAutoCommit;
+#----------------------------------------------------------------------------
+
+=head2 sendChunkedContent ( callback )
+
+Send chunked content to the user. Will send the head of the style template, 
+run the C<callback> to get the body content, then send the footer of the style
+template.
+
+=cut
+
+sub sendChunkedContent {
+    my $self        = shift;
+    my $callback    = shift;
+
+	$self->session->http->setLastModified($self->getContentLastModified);
+	$self->session->http->sendHeader;
+	my $style = $self->processStyle($self->getSeparator);
+	my ($head, $foot) = split($self->getSeparator,$style);
+	$self->session->output->print($head, 1);
+	$self->session->output->print( $callback->() );
+	$self->session->output->print($foot, 1);
+	return "chunked";
 }
 
 #----------------------------------------------------------------------------
@@ -790,9 +849,12 @@ sub view_thumbnails {
     if (!$asset) {
         $asset  = $self->getFirstChild;
     }
-    my %assetVars   = %{ $asset->getTemplateVars };
-    for my $key ( keys %assetVars ) {
-        $var->{ 'file_' . $key } = $assetVars{ $key };
+    
+    if ( $asset ) {
+        my %assetVars   = %{ $asset->getTemplateVars };
+        for my $key ( keys %assetVars ) {
+            $var->{ 'file_' . $key } = $assetVars{ $key };
+        }
     }
 
     return $self->processTemplate($var, $self->getParent->get("templateIdViewThumbnails"));
@@ -819,6 +881,8 @@ sub www_addArchive {
     my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
 
+    my $i18n = WebGUI::International->new($session);
+
     $var->{ error           } = $params->{ error };
 
     $var->{ form_start      } 
@@ -831,7 +895,7 @@ sub www_addArchive {
     $var->{ form_submit     } 
         = WebGUI::Form::submit( $session, {
             name            => "submit",
-            value           => "Submit",
+            value           => $i18n->get("submit",'WebGUI'),
         });
 
     $var->{ form_archive    } 
@@ -900,6 +964,98 @@ sub www_addArchiveSave {
     return $self->processStyle(
         sprintf $i18n->get('addArchive message'), $self->getUrl,
     );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 www_addFileService ( )
+
+A web service to create files in albums. Returns a json string that looks like this:
+
+    {
+       "lastUpdated" : "2008-10-13 20:06:13",
+       "thumbnailUrl" : "http://dev.localhost.localdomain/uploads/W1/X9/W1X9A95iagNbq4n1utdXug/thumb-jt_25.jpg",
+       "url" : "http://dev.localhost.localdomain/cool-gallery/the-cool-album3/jt13",
+       "title" : "JT",
+       "dateCreated" : "2008-10-13 20:06:13"
+    }
+
+You can make the request as a post to the gallery url with the following variables:
+
+=head3 func
+
+Required. Must have a value of "addFileService"
+
+=head3 as
+
+Defaults to 'json', but if specified as 'xml' then the return result will be:
+
+    <opt>
+      <dateCreated>2008-10-13 20:08:18</dateCreated>
+      <lastUpdated>2008-10-13 20:08:18</lastUpdated>
+      <thumbnailUrl>http://dev.localhost.localdomain/uploads/1k/-B/1k-BTF8m4e6wmXJKRxraIA/thumb-jt_25.jpg</thumbnailUrl>
+      <title>JT</title>
+      <url>http://dev.localhost.localdomain/cool-gallery/the-cool-album3/jt14</url>
+    </opt>
+
+=head3 title
+
+The title of the album you wish to create.
+
+=head3 synopsis
+
+A brief description of the album you wish to create.
+
+=head3 file
+
+A file attached to the multi-part post.
+
+=cut
+
+sub www_addFileService {
+    my $self        = shift;
+    my $session     = $self->session;
+    
+    return $session->privilege->insufficient unless ($self->canAddFile);
+    my $form = $session->form;
+    
+    
+    my $file = $self->addChild({
+        className       => "WebGUI::Asset::File::GalleryFile::Photo",
+        title           => $form->get('title','text'),
+        description     => $form->get('synopsis','textarea'),
+        synopsis        => $form->get('synopsis','textarea'),
+    });
+
+    my $storage = $file->getStorageLocation;
+    my $filename = $storage->addFileFromFormPost('file');
+    $file->setFile;
+#  my $storageId =  $form->get('file','File');
+#    my $filePath = $storage->getPath( $storage->getFiles->[0] );
+ #   $self->setFile( $filePath );
+  #  $storage->delete;
+    $session->log->warn('XX:'. $filename);
+    
+    $file->requestAutoCommit;
+    
+    my $siteUrl = $session->url->getSiteURL;
+    my $date = $session->datetime;
+    my $as = $form->get('as') || 'json';
+
+    my $document = {
+        title           => $file->getTitle,
+        url             => $siteUrl.$file->getUrl,
+        thumbnailUrl    => $siteUrl.$file->getThumbnailUrl,
+        dateCreated     => $date->epochToHuman($file->get('creationDate'), '%y-%m-%d %j:%n:%s'),
+        lastUpdated     => $date->epochToHuman($file->get('revisionDate'), '%y-%m-%d %j:%n:%s'),
+    };
+    if ($as eq "xml") {
+        $session->http->setMimeType('text/xml');
+        return XML::Simple::XMLout($document, NoAttr => 1);
+    }
+        
+    $session->http->setMimeType('application/json');
+    return JSON->new->pretty->encode($document);
 }
 
 #-----------------------------------------------------------------------------
@@ -1169,9 +1325,9 @@ a javascript application in the template.
 sub www_slideshow {
     my $self        = shift;
 
-    return $self->session->privilege->insufficient unless $self->canView;
-
-    return $self->processStyle( $self->view_slideshow );
+	my $check = $self->checkView;
+	return $check if (defined $check);
+    return $self->sendChunkedContent( sub { $self->view_slideshow } );
 }
 
 #----------------------------------------------------------------------------
@@ -1183,11 +1339,10 @@ Show the thumbnails for the album.
 =cut
 
 sub www_thumbnails {
-    my $self        = shift;
-    
-    return $self->session->privilege->insufficient unless $self->canView;
-
-    return $self->processStyle( $self->view_thumbnails );
+	my $self = shift;
+	my $check = $self->checkView;
+	return $check if (defined $check);
+    return $self->sendChunkedContent( sub { $self->view_thumbnails } );
 }
 
 #----------------------------------------------------------------------------

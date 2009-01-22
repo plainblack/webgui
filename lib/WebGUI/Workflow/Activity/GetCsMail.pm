@@ -119,6 +119,7 @@ sub addPost {
 			$storage->addFileFromScalar($filename, $file->{content});
 		}
 	}
+    $post->requestAutoCommit;
 	$post->postProcess;
 	$post->getThread->unarchive if ($post->getThread->get("status") eq "archived");
 	return $post;
@@ -167,6 +168,7 @@ sub execute {
 	my $i18n = WebGUI::International->new($self->session, "Asset_Collaboration");
 	my $postGroup = $cs->get("postGroupId"); #group that's allowed to post to the CS
     
+    my $ttl = $self->getTTL;
 	while (my $message = $mail->getNextMessage) {
 		next unless (scalar(@{$message->{parts}})); # no content, skip it
 		my $from = $message->{from};
@@ -187,7 +189,7 @@ sub execute {
 					my $send = WebGUI::Mail::Send->create($self->session, {
 						to=>$message->{from},
 						inReplyTo=>$message->{messageId},
-						subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$self->{subject},
+						subject=>$cs->get("mailPrefix").$i18n->get("rejected")." ".$message->{subject},
 						from=>$cs->get("mailAddress")
 						});
 					$send->addText($i18n->get("rejected because no user account"));
@@ -227,7 +229,7 @@ sub execute {
 			$send->send;
 		}
 		# just in case there are a lot of messages, we should release after a minutes worth of retrieving
-		last if (time() > $start + 60);
+		last if (time() > $start + $ttl);
 	}
 	$mail->disconnect;
 	return $self->COMPLETE;

@@ -18,9 +18,10 @@ use WebGUI::Auth;
 use WebGUI::HTMLForm;
 use WebGUI::Macro;
 use WebGUI::Mail::Send;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
+use Encode ();
 
 our @ISA = qw(WebGUI::Auth);
 
@@ -119,7 +120,7 @@ sub authenticate {
 	
 	$identifier = $_[1];
 	$userData = $self->getParams;
-	if ((Digest::MD5::md5_base64($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
+	if (($self->hashPassword($identifier) eq $$userData{identifier}) && ($identifier ne "")) {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
@@ -131,43 +132,63 @@ sub authenticate {
 #-------------------------------------------------------------------
 sub createAccount {
     my $self        = shift;
+    my $session     = $self->session;
+    my $form        = $session->form;
+    my $setting     = $session->setting;
+
     my $message     = shift;
-    my $confirm     = shift || $self->session->form->process("confirm");
-    my $vars        = shift || {}; 
+    my $confirm     = shift || $form->process("confirm");
+    my $vars        = shift || {};
+    my $i18n        = WebGUI::International->new($session);
     
-    #$self->session->errorHandler->warn('WebGUI::Auth::createAccount called');
-    if ($self->session->user->userId ne "1") {
+    if ($self->session->user->isRegistered) {
         return $self->displayAccount;
     }
-    elsif (!$self->session->setting->get("anonymousRegistration") && !$self->session->setting->get('userInvitationsEnabled')) {
+    elsif (!$setting->get("anonymousRegistration") && !$setting->get('inboxInviteUserEnabled')) {
         return $self->displayLogin;
     } 
-	my $i18n = WebGUI::International->new($self->session);
+    
     $vars->{'create.message'} = '<ul>'.$message.'</ul>' if ($message);
-	$vars->{useCaptcha} = $self->session->setting->get("webguiUseCaptcha");
+	$vars->{'useCaptcha'    } = $setting->get("webguiUseCaptcha");
+    
 	if ($vars->{useCaptcha}) {
 		use WebGUI::Form::Captcha;
-		my $captcha = WebGUI::Form::Captcha->new($self->session,{"name"=>"authWebGUI.captcha"});
+		my $captcha = WebGUI::Form::Captcha->new($session,{
+            name   => "authWebGUI.captcha",
+            extras => $self->getExtrasStyle
+        });
    		$vars->{'create.form.captcha'} 
             = $captcha->toHtml . '<span class="formSubtext">' . $captcha->get('subtext').'</span>';
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
-    $vars->{'create.form.username'} 
+
+    my $username = $form->process("authWebGUI.username");
+   $vars->{'create.form.username'} 
         = WebGUI::Form::text($self->session, {
-            "name"      => "authWebGUI.username",
-            "value"     => $self->session->form->process("authWebGUI.username"),
+            name   => "authWebGUI.username",
+            value  => $username,
+            extras => $self->getExtrasStyle($username)
         });
     $vars->{'create.form.username.label'} = $i18n->get(50);
-    $vars->{'create.form.password'} 
+    
+    my $password = $form->process("authWebGUI.identifier");
+    $vars->{'create.form.password'}
         = WebGUI::Form::password($self->session, {
-            "name"      => "authWebGUI.identifier"
+            name    => "authWebGUI.identifier",
+            value   => $password,
+            extras  => $self->getExtrasStyle($password)
         });
     $vars->{'create.form.password.label'} = $i18n->get(51);
+
+    my $passwordConfirm = $form->process("authWebGUI.identifierConfirm");
     $vars->{'create.form.passwordConfirm'} 
         = WebGUI::Form::password($self->session, {
-            "name"      => "authWebGUI.identifierConfirm"
+            name   => "authWebGUI.identifierConfirm",
+            value  =>  $passwordConfirm,
+            extras => $self->getExtrasStyle($passwordConfirm)
         });
     $vars->{'create.form.passwordConfirm.label'} = $i18n->get(2,'AuthWebGUI');
+
     $vars->{'create.form.hidden'} 
         = WebGUI::Form::hidden($self->session, {
             "name"      => "confirm",
@@ -188,10 +209,10 @@ sub createAccountSave {
     my $i18n        = WebGUI::International->new($session);
 
     # Logged in users cannot see this page
-    return $self->displayAccount if ($session->user->userId ne "1");
+    return $self->displayAccount if ($session->user->isRegistered);
 
     # Make sure anonymous registration is enabled 
-    if (!$setting->get("anonymousRegistration") && !$setting->get("userInvitationsEnabled")) {    
+    if (!$setting->get("anonymousRegistration") && !$setting->get("inboxInviteUserEnabled")) {    
         $session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
         return $self->displayLogin;
     }
@@ -202,16 +223,29 @@ sub createAccountSave {
     # Validate input
     my $error;
     $error = $self->error unless($self->validUsername($username));
-        if ($setting->get("webguiUseCaptcha")) {
-            unless ($form->process('authWebGUI.captcha', "Captcha")) {
-                $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
-            }
+    if ($setting->get("webguiUseCaptcha")) {
+        unless ($form->process('authWebGUI.captcha', "Captcha")) {
+            $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
         }
+    }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
-    my ($profile, $temp, $warning) = WebGUI::Operation::Profile::validateProfileData($self->session, {regOnly => 1});
+
+    my $fields    = WebGUI::ProfileField->getRegistrationFields($session);
+    my $retHash   = $self->user->validateProfileDataFromForm($fields);
+    my $profile   = $retHash->{profile};
+    my $temp      = "";
+    my $warning   = "";
+
+    my $format    = "<li>%s</li>";
+    map { $warning .= sprintf($format,$_)  } @{$retHash->{warnings}};
+    map { $temp    .= sprintf($format,$_)  } @{$retHash->{errors}};
+
     $error .= $temp;
      
-    return $self->createAccount($error) unless ($error eq "");
+    unless ($error eq "") {
+        $self->error($error);
+        return $self->createAccount($error);
+    }
 
     # If Email address is not unique, a warning is displayed
     if ($warning ne "" && !$self->session->form->process("confirm")) {
@@ -222,23 +256,24 @@ sub createAccountSave {
     my $properties;
     $properties->{ changeUsername       } = $setting->get("webguiChangeUsername");
     $properties->{ changePassword       } = $setting->get("webguiChangePassword");   
-    $properties->{ identifier           } = Digest::MD5::md5_base64($password);
+    $properties->{ identifier           } = $self->hashPassword($password);
     $properties->{ passwordLastUpdated  } = $session->datetime->time();
     $properties->{ passwordTimeout      } = $setting->get("webguiPasswordTimeout");
     $properties->{ status } = 'Deactivated' if ($setting->get("webguiValidateEmail"));
 
+    my $afterCreateMessage = $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+
     # Send validation e-mail if required
     if ($setting->get("webguiValidateEmail")) {
-        my $key = $session->id->generate();
+        my $key = $session->id->generate;
         $self->saveParams($self->userId,"WebGUI",{emailValidationKey=>$key});
-        my $mail = WebGUI::Mail::Send->create($self->session,{
+        my $mail = WebGUI::Mail::Send->create($self->session, {
             to      => $profile->{email},
             subject => $i18n->get('email address validation email subject','AuthWebGUI')
-            });
+        });
         $mail->addText(
             $i18n->get('email address validation email body','AuthWebGUI') . "\n\n"
-            . $session->url->getSiteURL() 
-            . $session->url->page("op=auth;method=validateEmail;key=".$key) . "\n\n"
+            . $session->url->page("op=auth;method=validateEmail;key=".$key, 'full') . "\n\n"
         );
         $mail->addFooter;
         $mail->send;
@@ -250,13 +285,13 @@ sub createAccountSave {
         $self->logout;
         return $self->displayLogin($i18n->get('check email for validation','AuthWebGUI'));
     }
-    return $self->SUPER::createAccountSave($username,$properties,$password,$profile);
+    return $afterCreateMessage;
 }
 
 #-------------------------------------------------------------------
 sub deactivateAccount {
    my $self = shift;
-   return $self->displayLogin if($self->userId eq '1');
+   return $self->displayLogin if($self->isVisitor);
    return $self->SUPER::deactivateAccount("deactivateAccountConfirm");
 }
 
@@ -283,7 +318,7 @@ sub deactivateAccountConfirm {
 sub displayAccount {
    my $self = shift;
    my $vars;
-   return $self->displayLogin($_[0]) if ($self->userId eq '1');
+   return $self->displayLogin($_[0]) if ($self->isVisitor);
 	my $i18n = WebGUI::International->new($self->session);
    my $userData = $self->getParams;
    $vars->{'account.message'} = $_[0] if ($_[0]);
@@ -315,7 +350,7 @@ The initial login screen an unauthenticated user sees
 sub displayLogin {
    	my $self = shift;
    	my $vars;
-   	return $self->displayAccount($_[0]) if ($self->userId ne "1");
+   	return $self->displayAccount($_[0]) if ($self->isRegistered);
     my $i18n = WebGUI::International->new($self->session);
    	$vars->{'login.message'}             = '<ul>'.$_[0].'</ul>' if ($_[0]);
    	$vars->{'recoverPassword.isAllowed'} = $self->getSetting("passwordRecovery");
@@ -384,7 +419,7 @@ sub editUserFormSave {
    my $userData = $self->getParams($userId);
    my $identifier = $self->session->form->process('authWebGUI.identifier');
    unless (!$identifier || $identifier eq "password") {
-      $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process('authWebGUI.identifier'));
+      $properties->{identifier} = $self->hashPassword($self->session->form->process('authWebGUI.identifier'));
 	   if($userData->{identifier} ne $properties->{identifier}){
 	     $properties->{passwordLastUpdated} =$self->session->datetime->time();
       }
@@ -415,111 +450,128 @@ sub editUserSettingsForm {
     my $i18n = WebGUI::International->new($self->session,'AuthWebGUI');
     my $f = WebGUI::HTMLForm->new($self->session);
 
-   $f->integer(
-	         -name=>"webguiPasswordLength",
-			 -value=>$self->session->setting->get("webguiPasswordLength"),
-			 -label=>$i18n->get(15),
-			);
-   $f->integer(
-	-name  => "webguiRequiredDigits",
-	-label => $i18n->get('setting webguiRequiredDigits'),
-	-value => $self->session->setting->get("webguiRequiredDigits")
+    $f->integer(
+        -name      => "webguiPasswordLength",
+        -value     => $self->session->setting->get("webguiPasswordLength"),
+        -label     => $i18n->get(15),
+        -hoverHelp => $i18n->get('15 help'),
+    );
+    $f->integer(
+        -name      => "webguiRequiredDigits",
+        -label     => $i18n->get('setting webguiRequiredDigits'),
+        -value     => $self->session->setting->get("webguiRequiredDigits"),
+        -hoverHelp => $i18n->get('setting webguiRequiredDigits help'),
    	);
-   $f->integer(
-	-name  => "webguiNonWordCharacters",
-	-label => $i18n->get('setting webguiNonWordCharacters'),
-	-value => $self->session->setting->get("webguiNonWordCharacters")
+    $f->integer(
+        -name      => "webguiNonWordCharacters",
+        -label     => $i18n->get('setting webguiNonWordCharacters'),
+        -value     => $self->session->setting->get("webguiNonWordCharacters"),
+        -hoverHelp => $i18n->get('setting webguiNonWordCharacters help'),
    	);
-   $f->integer(
-	-name  => "webguiRequiredMixedCase",
-	-label => $i18n->get('setting webguiRequiredMixedCase'),
-	-value => $self->session->setting->get("webguiRequiredMixedCase")
+    $f->integer(
+        -name      => "webguiRequiredMixedCase",
+        -label     => $i18n->get('setting webguiRequiredMixedCase'),
+        -value     => $self->session->setting->get("webguiRequiredMixedCase"),
+        -hoverHelp => $i18n->get('setting webguiRequiredMixedCase help'),
 	);
-   $f->interval(
-	-name=>"webguiPasswordTimeout",
-	-label=>$i18n->get(16),
-	-value=>$self->session->setting->get("webguiPasswordTimeout")
+    $f->interval(
+        -name      => "webguiPasswordTimeout",
+        -label     => $i18n->get(16),
+        -value     => $self->session->setting->get("webguiPasswordTimeout"),
+        -hoverHelp => $i18n->get('16 help'),
 	);
-   $f->yesNo(
-             -name=>"webguiExpirePasswordOnCreation",
-             -value=>$self->session->setting->get("webguiExpirePasswordOnCreation"),
-             -label=>$i18n->get(9)
-             );
-   $f->yesNo(
-             -name=>"webguiSendWelcomeMessage",
-             -value=>$self->session->setting->get("webguiSendWelcomeMessage"),
-             -label=>$i18n->get(868,'WebGUI')
-             );
-   $f->textarea(
-                -name=>"webguiWelcomeMessage",
-                -value=>$self->session->setting->get("webguiWelcomeMessage"),
-                -label=>$i18n->get(869,'WebGUI')
-               );
-   $f->yesNo(
-                -name=>"webguiChangeUsername",
-                -value=>$self->session->setting->get("webguiChangeUsername"),
-                -label=>$i18n->get(19)
-             );
-   $f->yesNo(
-                -name=>"webguiChangePassword",
-                -value=>$self->session->setting->get("webguiChangePassword"),
-                -label=>$i18n->get(18)
-             );
-   $f->selectList(
-	         -name => "webguiPasswordRecovery",
-                 -value => $self->session->setting->get("webguiPasswordRecovery"),
-                 -label => $i18n->get(6),
-                 -hoverHelp => $i18n->get('webguiPasswordRecovery hoverHelp'),
-                 -options => $self->getPasswordRecoveryTypesAvailable,
-                 -size => 1,
-                 -multiple => 0,
-             );
-   $f->yesNo(
-	         -name => "webguiPasswordRecoveryRequireUsername",
-                 -value => $self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
-                 -label => $i18n->get('require username for password recovery'),
-	         -hoverHelp => $i18n->get('webguiPasswordRecoveryRequireUsername hoverHelp')
-             );
+    $f->yesNo(
+        -name      => "webguiExpirePasswordOnCreation",
+        -value     => $self->session->setting->get("webguiExpirePasswordOnCreation"),
+        -label     => $i18n->get(9),
+        -hoverHelp => $i18n->get('9 help')
+    );
+    $f->yesNo(
+        -name      => "webguiSendWelcomeMessage",
+        -value     => $self->session->setting->get("webguiSendWelcomeMessage"),
+        -label     => $i18n->get(868,'WebGUI'),
+        -hoverHelp => $i18n->get('868 help','WebGUI'),
+    );
+    $f->textarea(
+        -name      => "webguiWelcomeMessage",
+        -value     => $self->session->setting->get("webguiWelcomeMessage"),
+        -label     => $i18n->get(869,'WebGUI'),
+        -hoverHelp => $i18n->get('869 help','WebGUI'),
+    );
+    $f->yesNo(
+        -name      => "webguiChangeUsername",
+        -value     => $self->session->setting->get("webguiChangeUsername"),
+        -label     => $i18n->get(19),
+        -hoverHelp => $i18n->get('19 help'),
+    );
+    $f->yesNo(
+        -name      => "webguiChangePassword",
+        -value     => $self->session->setting->get("webguiChangePassword"),
+        -label     => $i18n->get(18),
+        -hoverHelp => $i18n->get('18 help'),
+    );
+    $f->selectList(
+        -name      => "webguiPasswordRecovery",
+        -value     => $self->session->setting->get("webguiPasswordRecovery"),
+        -label     => $i18n->get(6),
+        -hoverHelp => $i18n->get('webguiPasswordRecovery hoverHelp'),
+        -options   => $self->getPasswordRecoveryTypesAvailable,
+        -size      => 1,
+        -multiple  => 0,
+    );
+    $f->yesNo(
+        -name      => "webguiPasswordRecoveryRequireUsername",
+        -value     => $self->session->setting->get("webguiPasswordRecoveryRequireUsername"),
+        -label     => $i18n->get('require username for password recovery'),
+        -hoverHelp => $i18n->get('webguiPasswordRecoveryRequireUsername hoverHelp'),
+    );
    	$f->yesNo(
-		-name=>"webguiValidateEmail",
-             	-value=>$self->session->setting->get("webguiValidateEmail"),
-             	-label=>$i18n->get('validate email')
-             	);
+        -name      => "webguiValidateEmail",
+        -value     => $self->session->setting->get("webguiValidateEmail"),
+        -label     => $i18n->get('validate email'),
+        -hoverHelp => $i18n->get('validate email help'),
+    );
    	$f->yesNo(
-	     	-name=>"webguiUseCaptcha",
-             	-value=>$self->session->setting->get("webguiUseCaptcha"),
-             	-label=>$i18n->get('use captcha')
-             	);
+        -name      => "webguiUseCaptcha",
+        -value     => $self->session->setting->get("webguiUseCaptcha"),
+        -label     => $i18n->get('use captcha'),
+        -hoverHelp => $i18n->get('use captcha help'),
+    );
 	$f->template(
-		-name=>"webguiAccountTemplate",
-		-value=>$self->session->setting->get("webguiAccountTemplate"),
-		-namespace=>"Auth/WebGUI/Account",
-		-label=>$i18n->get("account template")
+		-name      => "webguiAccountTemplate",
+		-value     => $self->session->setting->get("webguiAccountTemplate"),
+		-namespace => "Auth/WebGUI/Account",
+		-label     => $i18n->get("account template"),
+		-hoverHelp => $i18n->get("account template help"),
+    );
+	$f->template(
+		-name      => "webguiCreateAccountTemplate",
+		-value     => $self->session->setting->get("webguiCreateAccountTemplate"),
+		-namespace => "Auth/WebGUI/Create",
+		-label     => $i18n->get("create account template"),
+		-hoverHelp => $i18n->get("create account template help"),
+    );
+	$f->template(
+		-name      => "webguiExpiredPasswordTemplate",
+		-value     => $self->session->setting->get("webguiExpiredPasswordTemplate"),
+		-namespace => "Auth/WebGUI/Expired",
+		-label     => $i18n->get("expired password template"),
+		-hoverHelp => $i18n->get("expired password template"),
+    );
+	$f->template(
+		-name      => "webguiLoginTemplate",
+		-value     => $self->session->setting->get("webguiLoginTemplate"),
+		-namespace => "Auth/WebGUI/Login",
+		-label     => $i18n->get("login template"),
+		-hoverHelp => $i18n->get("login template help"),
 		);
 	$f->template(
-		-name=>"webguiCreateAccountTemplate",
-		-value=>$self->session->setting->get("webguiCreateAccountTemplate"),
-		-namespace=>"Auth/WebGUI/Create",
-		-label=>$i18n->get("create account template")
-		);
-	$f->template(
-		-name=>"webguiExpiredPasswordTemplate",
-		-value=>$self->session->setting->get("webguiExpiredPasswordTemplate"),
-		-namespace=>"Auth/WebGUI/Expired",
-		-label=>$i18n->get("expired password template")
-		);
-	$f->template(
-		-name=>"webguiLoginTemplate",
-		-value=>$self->session->setting->get("webguiLoginTemplate"),
-		-namespace=>"Auth/WebGUI/Login",
-		-label=>$i18n->get("login template")
-		);
-	$f->template(
-		-name=>"webguiPasswordRecoveryTemplate",
-		-value=>$self->session->setting->get("webguiPasswordRecoveryTemplate"),
-		-namespace=>"Auth/WebGUI/Recovery2",
-		-label=>$i18n->get("password recovery template")
-		);
+		-name      => "webguiPasswordRecoveryTemplate",
+		-value     => $self->session->setting->get("webguiPasswordRecoveryTemplate"),
+		-namespace => "Auth/WebGUI/Recovery2",
+		-label     => $i18n->get("password recovery template"),
+		-hoverHelp => $i18n->get("password recovery template help")
+    );
    return $f->printRowsOnly;
 }
 
@@ -647,6 +699,13 @@ sub getUserIdByPasswordRecoveryToken {
 }
 
 #-------------------------------------------------------------------
+sub hashPassword {
+    my ($self, $password) = @_;
+    return Digest::MD5::md5_base64(Encode::encode_utf8($password));
+}
+
+
+#-------------------------------------------------------------------
 sub login {
    my $self = shift;
    if(!$self->authenticate($self->session->form->process("username"),$self->session->form->process("identifier"))){
@@ -685,7 +744,7 @@ sub new {
 =head2 recoverPassword ( args )
 
 Initiates the password recovery process.  Checks for recovery type, 
-and then runs the appropriate method. arguments to this sub are
+and then runs the appropriate method. Arguments to this sub are
 passed directly to the approprate method.
 
 =cut
@@ -693,7 +752,7 @@ passed directly to the approprate method.
 sub recoverPassword {
     my $self = shift;
 
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
 
     my $type = $self->getPasswordRecoveryType;
 
@@ -706,55 +765,61 @@ sub recoverPassword {
 }
  
 #-------------------------------------------------------------------
- 
+
+=head2 emailRecoverPassword ( $error )
+
+Templated email recovery form.
+
+=head3 $error
+
+$error is any error from the system which needs to be reported to the user.
+
+=cut
+
 sub emailRecoverPassword {
     my $self    = shift;
-    my $error   = shift;
-    my $i18n    = WebGUI::International->new($self->session);
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session);
 
-    my $output 
-        = "<h1>" . $i18n->get('recover password banner', 'AuthWebGUI') . " </h1> "
-        . "<h3>" . $i18n->get('email recover password start message', 'AuthWebGUI') ."</h3>"
-        ;
+    my $vars = {};
+    $vars->{title}    = $i18n->get('recover password banner', 'AuthWebGUI');
+    $vars->{subtitle} = $i18n->get('email recover password start message', 'AuthWebGUI');
+
+	$vars->{'recoverFormHeader'} = "\n\n".WebGUI::Form::formHeader($session,{});
+	$vars->{'recoverFormHidden'} = WebGUI::Form::hidden($session,{"name"=>"op","value"=>"auth"});
+	$vars->{'recoverFormHidden'} .= WebGUI::Form::hidden($session,{"name"=>"method","value"=>"recoverPasswordFinish"});
+
+	$vars->{'recoverFormSubmit'} = WebGUI::Form::submit($session,{});
+	$vars->{'recoverFormFooter'} = WebGUI::Form::formFooter($session,);
+	$vars->{'loginUrl'} = $session->url->page('op=auth;method=init');
+	$vars->{'loginLabel'} = $i18n->get(58);
+
+	$vars->{'anonymousRegistrationIsAllowed'} = ($session->setting->get("anonymousRegistration"));
+	$vars->{'createAccountUrl'} = $session->url->page('op=auth;method=createAccount');
+	$vars->{'createAccountLabel'} = $i18n->get(67);
+	$vars->{'recoverMessage'} = $_[0] if ($_[0]);
+
+    $vars->{'recoverFormProfile'} = [];
     
-    if ( $error ) {
-        $output .= '<p class="error">' . $error . '</p>';
-    }
+    ##just one element
+    my $emailForm = WebGUI::Form::email($session, {name        => "email",});
+    my $label     = $i18n->get('password recovery email label', 'AuthWebGUI');
+    push @{$vars->{'recoverFormProfile'}},
+        {
+            'id'          => 'email',
+            'formElement' => $emailForm,
+            'label'       => $label,
+        };
 
-    my $f = WebGUI::HTMLForm->new($self->session);
+    $vars->{'recoverFormProfileFieldEmailFormElement'} = $emailForm;
+    $vars->{'recoverFormProfileFieldEmailLabel'}       = $label;
 
-    $f->hidden(
-        name        => 'op',
-        value       => 'auth',
-    );
+    ##Username is handled by this form
+    $vars->{'recoverFormUsername'}      = WebGUI::Form::text($session, {name => 'username'});
+    $vars->{'recoverFormUsernameLabel'} = $i18n->get(50);
 
-    $f->hidden(
-        name        => "method",
-        value       => "recoverPasswordFinish",
-    );
-
-    $f->text(
-        name        => "username",
-        label       => $i18n->get('password recovery login label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery login hoverHelp', 'AuthWebGUI'),
-        uiLevel     => 0,
-    );
-
-    $f->email(
-        name        => "email",
-        label       => $i18n->get('password recovery email label', 'AuthWebGUI'),
-        hoverHelp   => $i18n->get('password recovery email hoverHelp', 'AuthWebGUI'),
-        uiLevel     => 0,
-    );
-    
-    $f->submit(
-        uiLevel     => 0,
-    );
-
-    $output .= $f->print;
-$self->session->log->error($output);
-    return  $output;
- }
+	return WebGUI::Asset::Template->new($self->session,$self->getPasswordRecoveryTemplateId)->process($vars);
+}
  
 #-------------------------------------------------------------------
  
@@ -830,12 +895,12 @@ sub profileRecoverPasswordFinish {
     my $session     = $self->session;
     my $i18n        = WebGUI::International->new($self->session);
     my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
   
     my $username;
     if ($self->getSetting('passwordRecoveryRequireUsername')) {
 		$username = $self->session->form->process('authWebGUI.username');
-		return $self->recoverPassword($i18n2->get('password recovery no username')) unless defined $username;
+		return $self->recoverPassword($i18n->get('password recovery no username', 'AuthWebGUI')) unless defined $username;
 	}
 
 	my @fields = @{WebGUI::ProfileField->getPasswordRecoveryFields($self->session)};
@@ -930,7 +995,7 @@ sub profileRecoverPasswordFinish {
 	if ($self->_isValidPassword($password, $passwordConfirm)) {
 		$self->user( $user );
 		$self->saveParams($userId, $self->authMethod,
-				  { identifier => Digest::MD5::md5_base64($password),
+				  { identifier => $self->hashPassword($password),
 				    passwordLastUpdated => $self->session->datetime->time });
 		$self->_logSecurityMessage;
 		return $self->SUPER::login;
@@ -943,10 +1008,9 @@ sub profileRecoverPasswordFinish {
 
 sub emailRecoverPasswordFinish {
     my $self = shift;
-    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->userId eq '1';
+    return $self->displayLogin unless ($self->session->setting->get('webguiPasswordRecovery') ne '') and $self->isVisitor;
 
     my $i18n        = WebGUI::International->new($self->session);
-    my $i18n2       = WebGUI::International->new($self->session, 'AuthWebGUI');
     my $session     = $self->session;
     my ($form)      = $session->quick(qw/form/);
     my $email       = $form->param('email');
@@ -967,14 +1031,18 @@ sub emailRecoverPasswordFinish {
 
     # Make sure the user is Active
     if ( $user->status ne "Active" ) {
-        return $self->recoverPassword( $i18n2->get( 'password recovery disabled' ) );
+        return $self->recoverPassword( $i18n->get( 'password recovery disabled', 'AuthWebGUI' ) );
     }
 
     # generate information necessry to proceed
     my $recoveryGuid = $session->id->generate();
     my $url = $session->url->getSiteURL;
     my $userId = $user->userId; #get the user guid
-    $email = $user->profileField('email') unless $email; #get email address from the profile, unless we already have it
+    $email = $user->profileField('email');
+
+    if ( ! $email ) {
+        return $self->recoverPassword( $i18n->get( 'no email address', 'AuthWebGUI' ) );
+    }
 
     my $authsettings = $self->getParams($userId);
     $authsettings->{emailRecoverPasswordVerificationNumber} = $recoveryGuid;
@@ -984,7 +1052,7 @@ sub emailRecoverPasswordFinish {
     my $mail = WebGUI::Mail::Send->create($session, { to=>$email, subject=>$i18n->get('WebGUI password recovery')});
     $mail->addText($i18n->get('recover password email text1', 'AuthWebGUI') . $url. ". \n\n".$i18n->get('recover password email text2', 'AuthWebGUI')." \n\n ".$url."?op=auth;method=emailResetPassword;token=$recoveryGuid"."\n\n ". $i18n->get('recover password email text3', 'AuthWebGUI'));
     $mail->send;
-    return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message1', 'AuthWebGUI'). $email . $i18n->get('email recover password finish message2', 'AuthWebGUI') . "</h3>";
+    return "<h1>". $i18n->get('recover password banner', 'AuthWebGUI')." </h1> <br> <br> <h3>". $i18n->get('email recover password finish message', 'AuthWebGUI') . "</h3>";
 }
 
 #-------------------------------------------------------------------
@@ -1006,8 +1074,7 @@ sub emailResetPassword {
 
 #      do not proceed unless we have an incoming guid from the email, and that guid corresponds to a valid user.
        if(!defined $userId){
-	        my $i18n = WebGUI::International->new($self->session,"AuthWebGUI");
-            return $i18n->get("token already used");
+            return $i18n->get("token already used", 'AuthWebGUI');
        }
 
 #      login the user and take them to a page where they can change their password.
@@ -1079,7 +1146,7 @@ sub emailResetPasswordFinish {
        if ($self->_isValidPassword($password, $passwordConfirm)) {
                $self->user(WebGUI::User->new($self->session, $userId));
                $self->saveParams($userId, $self->authMethod,
-                                 { identifier => Digest::MD5::md5_base64($password),
+                                 { identifier => $self->hashPassword($password),
                                    passwordLastUpdated => $self->session->datetime->time });
                $self->_logSecurityMessage;
 
@@ -1133,7 +1200,7 @@ sub resetExpiredPasswordSave {
    
    return $self->resetExpiredPassword($u->userId, "<h1>".$i18n->get(70)."</h1><ul>".$error.'</ul>') if ($error);
    
-   $properties->{identifier} = Digest::MD5::md5_base64($self->session->form->process("identifier"));
+   $properties->{identifier} = $self->hashPassword($self->session->form->process("identifier"));
    $properties->{passwordLastUpdated} =$self->session->datetime->time();
    
    $self->saveParams($u->userId,$self->authMethod,$properties);
@@ -1144,13 +1211,17 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$self->session->form->process("key")]);
+    my $session = $self->session;
+	my ($userId) = $session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$session->form->process("key")]);
+    my $i18n = WebGUI::International->new($session, 'AuthWebGUI');
+    my $message = '';
 	if (defined $userId) {
-		my $u = WebGUI::User->new($self->session,$userId);
+		my $u = WebGUI::User->new($session,$userId);
 		$u->status("Active");
 		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'", [$userId]);
+        $message = $i18n->get('email validation confirmed','AuthWebGUI');
 	}
-	return $self->displayLogin;
+	return $self->displayLogin($message);
 }
 
 
@@ -1172,7 +1243,7 @@ sub updateAccount {
    my $display = '<ul><li>'.$i18n->get(81).'</li></ul>';
    my $error = "";
    
-   if($self->userId eq '1'){
+   if($self->isVisitor){
       return $self->displayLogin;
    }
    
@@ -1205,7 +1276,7 @@ sub updateAccount {
 	  if($password){
 	     my $userData = $self->getParams;
          unless ($password eq "password") {
-            $properties->{identifier} = Digest::MD5::md5_base64($password);
+            $properties->{identifier} = $self->hashPassword($password);
 			$self->_logSecurityMessage();
 	        if($userData->{identifier} ne $properties->{identifier}){
 	           $properties->{passwordLastUpdated} =$self->session->datetime->time();

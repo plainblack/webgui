@@ -14,9 +14,9 @@ use warnings;
 use lib "$FindBin::Bin/../lib"; ##t/lib
 
 use WebGUI::Test;
-use WebGUI::AdminConsole;
 use WebGUI::International;
 use WebGUI::Session;
+use WebGUI::Macro;
 
 #The goal of this test is to verify all the i18n labels in
 #the Admin Console functions
@@ -29,9 +29,7 @@ my $lib = WebGUI::Test->lib;
 
 # put your tests here
 
-my $ac = WebGUI::AdminConsole->new($session);
-
-my %consoleFuncs = %{ $ac->getAdminFunction('', 1) };
+my %consoleFuncs = %{ $session->config->get("adminConsole") };
 
 
 $numTests = scalar keys %consoleFuncs;
@@ -41,9 +39,10 @@ plan tests => $numTests;
 my $i18n = WebGUI::International->new($session);
 
 my ($label, $func);
-while ( ($label, $func) = each %consoleFuncs ) {
-	ok($i18n->get(@{ $func->{title} }{qw(id namespace )} ),
-	sprintf "The title for %s, tag: %s, namespace: %s exists", $label, @{ $func->{title} }{'id', 'namespace'});
+foreach my $key (keys %consoleFuncs ) {
+	my $label = $consoleFuncs{$key}{title};
+	WebGUI::Macro::process($session, \$label);
+	isnt($label,'', "admin console func $key: ".$consoleFuncs{$key}{title});
 }
 
 

@@ -3,13 +3,19 @@ package WebGUI::i18n::English::Macro_SpectreCheck;
 use strict;
 
 our $I18N = {
-	'spectre ok' => {
+	'success' => {
 		message => q|Spectre is OK|,
-		lastUpdated => 1202771219,
+		lastUpdated => 1226175390,
 		context => q|Message saying that Spectre is doing okay.|
 	},
 
-	'spectre is down' => {
+	'subnet' => {
+		message => q|There is a problem with Spectre's subnet setting.|,
+		lastUpdated => 1202771219,
+		context => q|Message saying that Spectre has a problem with its subnet setting.|
+	},
+
+	'spectre' => {
 		message => q|Spectre is down|,
 		lastUpdated => 1202771224,
 		context => q|Message saying that Spectre is unable to be contacted.|

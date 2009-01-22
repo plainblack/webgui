@@ -19,6 +19,7 @@ use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
+use Clone qw/clone/;
 
 
 =head1 NAME
@@ -40,7 +41,6 @@ These methods are available from this class:
 
 =cut
 
-
 #-------------------------------------------------------------------
 
 =head2 definition ( session, definition )
@@ -58,45 +58,81 @@ A hash reference passed in from a subclass definition.
 =cut
 
 sub definition {
-        my $class = shift;
-	my $session = shift;
-        my $definition = shift;
-	my $i18n = WebGUI::International->new($session,"Asset_Template");
-        push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'template.gif',
-                tableName=>'template',
-                className=>'WebGUI::Asset::Template',
-                properties=>{
-                                template=>{
-                                        fieldType=>'codearea',
-                                        defaultValue=>undef
-                                        },
-				isEditable=>{
-					noFormPost=>1,
-					fieldType=>'hidden',
-					defaultValue=>1
-					},
-				showInForms=>{
-					fieldType=>'yesNo',
-					defaultValue=>1
-				},
-				parser=>{
-					noFormPost=>1,
-					fieldType=>'selectList',
-					defaultValue=>[$session->config->get("defaultTemplateParser")]
-				},	
-				headBlock=>{
-					fieldType=>"codearea",
-					defaultValue=>undef
-					},
-				namespace=>{
-					fieldType=>'combo',
-					defaultValue=>undef
-					}
-                        }
-                });
-        return $class->SUPER::definition($session,$definition);
+    my $class       = shift;
+	my $session     = shift;
+    my $definition  = shift;
+	my $i18n        = WebGUI::International->new($session,"Asset_Template");
+    push @{$definition}, {
+		assetName   => $i18n->get('assetName'),
+		icon        => 'template.gif',
+        tableName   => 'template',
+        className   => 'WebGUI::Asset::Template',
+        properties  => {
+            template => {
+                fieldType       => 'codearea',
+                syntax          => "html",
+                defaultValue    => undef,
+            },
+            isEditable => {
+                noFormPost      => 1,
+                fieldType       => 'hidden',
+                defaultValue    => 1,
+            },
+            isDefault => {
+                fieldType       => 'hidden',
+                defaultValue    => 0,
+            },
+            showInForms => {
+                fieldType       => 'yesNo',
+                defaultValue    => 1,
+            },
+            parser => {
+                noFormPost      => 1,
+                fieldType       => 'selectList',
+                defaultValue    => [$session->config->get("defaultTemplateParser")],
+            },	
+            namespace => {
+                fieldType       => 'combo',
+                defaultValue    => undef,
+            },
+        },
+    };
+    return $class->SUPER::definition($session,$definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 drawExtraHeadTags ( )
+
+Override the master drawExtraHeadTags to prevent Style template from having
+Extra Head Tags.
+
+=cut
+
+sub drawExtraHeadTags {
+	my ($self, $params) = @_;
+    if ($self->get('namespace') eq 'style') {
+        my $i18n = WebGUI::International->new($self->session);
+        return $i18n->get(881);
+    }
+    return $self->SUPER::drawExtraHeadTags($params);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 duplicate
+
+Subclass the duplicate method so that the isDefault flag is set to 0 on any
+copy.
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newTemplate = $self->SUPER::duplicate;
+    $newTemplate->update({isDefault => 0});
+    return $newTemplate;
 }
 
 #-------------------------------------------------------------------
@@ -104,15 +140,21 @@ sub definition {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
+    # TODO: Perhaps add a way to check template syntax before it blows stuff up?
+    my %data;
+    my $needsUpdate = 0;
 	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
-		my %data;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {
 			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
 		}
-		$self->update(\%data);
 	}
+	if ($self->session->form->process("namespace") eq 'style') {
+        $needsUpdate = 1;
+        $data{extraHeadTags} = '';
+    }
+    $self->update(\%data) if $needsUpdate;
 }
 
 #-------------------------------------------------------------------
@@ -161,13 +203,8 @@ sub getEditForm {
 		-name=>"template",
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
+        -syntax => "html",
 		-value=>$self->getValue("template")
-		);
-        $tabform->getTab("properties")->codearea(
-		-name=>"headBlock",
-		-label=>$i18n->get('head block'),
-		-hoverHelp=>$i18n->get('head block description'),
-		-value=>$self->getValue("headBlock")
 		);
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
@@ -300,13 +337,9 @@ sub prepare {
 	$self->{_prepared} = 1;
 	my $templateHeadersSent = $self->session->stow->get("templateHeadersSent") || [];
 	my @sent = @{$templateHeadersSent};
-	unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
-		if ($self->session->style->sent) {
-            $self->session->output->print($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
-		} else {
-            $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->get('headBlock'), $vars));
-		}
-	}
+    unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
+        $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->getExtraHeadTags, $vars));
+    }
 	push(@sent, $self->getId);
 	$self->session->stow->set("templateHeadersSent", \@sent);
 }
@@ -324,6 +357,9 @@ A hash reference containing template variables and loops. Automatically includes
 
 =cut
 
+# TODO: Have this throw an error so we can catch it and print more information
+# about the template that has the error. Finding an "ERROR: Error in template" 
+# in the error log is not very helpful...
 sub process {
 	my $self = shift;
 	my $vars = shift;
@@ -367,13 +403,76 @@ sub processRaw {
 
 
 #-------------------------------------------------------------------
+
+=head2 update
+
+Override update from Asset.pm to handle backwards compatibility with the old
+packages that contain headBlocks.
+
+This method is deprecated and will be removed in the future.  Don't plan
+on this being here.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $requestedProperties = shift;
+    my $properties = clone($requestedProperties);
+    if (exists $properties->{headBlock}) {
+        $properties->{extraHeadTags} .= $properties->{headBlock};
+        delete $properties->{headBlock};
+    }
+    $self->SUPER::update($properties);
+}
+
+
+#-------------------------------------------------------------------
 sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Template");
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $url     = $session->url;
+    my $i18n    = WebGUI::International->new($session, "Asset_Template");
+    my $output  = '';
+
+    # Add an unfriendly warning message if this is a default template
+    if ( $self->get( 'isDefault' ) ) {
+        # Get a proper URL to make the duplicate
+        my $duplicateUrl = $self->getUrl( "func=editDuplicate" );
+        if ( $form->get( "proceed" ) ) {
+            $duplicateUrl = $url->append( $duplicateUrl, "proceed=" . $form->get( "proceed" ) );
+            if ( $form->get( "returnUrl" ) ) {
+                $duplicateUrl = $url->append( $duplicateUrl, "returnUrl=" . $form->get( "returnUrl" ) );
+            }
+        }
+        
+        $session->style->setRawHeadTags( <<'ENDHTML' );
+<style type="text/css">
+.wGwarning { 
+    border              : 1px solid red;
+    background-color    : #FF6666;
+    padding             : 10px;
+    margin              : 5px;
+    /* TODO: Add a nice little image here */
+    /* TODO: Make this a generic warning class from the default webgui stylesheet */
+}
+</style>
+ENDHTML
+
+        $output .= q{<div class="wGwarning"><p>}
+                . $i18n->get( "warning default template" )
+                . q{</p><p>}
+                . sprintf( q{<a href="} . $duplicateUrl . q{">%s</a>}, $i18n->get( "make duplicate label" ) )
+                . q{</p></div}
+                ;
+    }
+    
+    $output .= $self->getEditForm->print;
+
     $self->getAdminConsole->addSubmenuItem($self->getUrl('func=styleWizard'),$i18n->get("style wizard")) if ($self->get("namespace") eq "style");
-    return $self->getAdminConsole->render($self->getEditForm->print,$i18n->get('edit template'));
+    return $self->getAdminConsole->render( $output, $i18n->get('edit template') );
 }
 
 #-------------------------------------------------------------------
@@ -383,6 +482,52 @@ sub www_goBackToPage {
 	return undef;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 www_editDuplicate
+
+Make a duplicate of this template and edit that instead.
+
+=cut
+
+sub www_editDuplicate {
+    my $self        = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+
+    my $session     = $self->session;
+    my $form        = $self->session->form;
+
+    my $newTemplate = $self->duplicate;
+    $newTemplate->update( { 
+        isDefault   => 0, 
+        title       => $self->get( "title" ) . " (copy)",
+        menuTitle   => $self->get( "menuTitle" ) . " (copy)",
+    } );
+
+    # Make our asset use our new template
+    if ( $self->session->form->get( "proceed" ) eq "goBackToPage" ) {
+        if ( my $asset = WebGUI::Asset->newByUrl( $session, $form->get( "returnUrl" ) ) ) {
+            # Find which property we should set by comparing namespaces and current values
+            DEF: for my $def ( @{ $asset->definition( $self->session ) } ) {
+                my $properties  = $def->{ properties };
+                PROP: for my $prop ( keys %{ $properties } ) {
+                    next PROP unless lc $properties->{ $prop }->{ fieldType } eq "template";
+                    next PROP unless $asset->get( $prop ) eq $self->getId;
+                    if ( $properties->{ $prop }->{ namespace } eq $self->get( "namespace" ) ) {
+                        $asset->addRevision( { $prop => $newTemplate->getId } );
+
+                        # Auto-commit our revision if necessary
+                        # TODO: This needs to be handled automatically somehow...
+                        WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session);
+                        last DEF;
+                    }
+                }
+            }
+        }
+    }
+    
+    return $newTemplate->www_edit;
+}
 
 #-------------------------------------------------------------------
 sub www_manage {
@@ -473,7 +618,7 @@ sub www_styleWizard {
 		my $logo;
 		my $logoContent = '';
 		if ($storageId) {
-			my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+			my $storage = WebGUI::Storage->get($self->session,$storageId);
 			$logo = $self->addChild({
 				className=>"WebGUI::Asset::File::Image",
 				title=>join(' ', $form->get("heading"), $i18n->get('logo')),

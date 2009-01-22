@@ -46,63 +46,98 @@ our $I18N = {
 		message => q|Edit Syndicated Content|
 	},
 
-	'channel.title' => {
-		message => q|The title of this piece of syndicated content. This will be the same as the title of the Syndicated Content object when you're creating an aggregate feed.|,
-		lastUpdated => 1149567508,
+	'channel_title' => {
+		message => q|The title of this piece of syndicated content. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'channel.description' => {
-		message => q|A description of the content available through this channel. This will be the same as the description of the Syndicated Content object when you're creating an aggregate feed.|,
-		lastUpdated => 1149567508,
+	'channel_description' => {
+		message => q|A description of the content available through this channel. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'channel.link' => {
-		message => q|A URL back to the originating site of this channel. This variable *will not* exist when you're creating an aggregate feed, because there's no single channel to link to.|,
-		lastUpdated => 1149567508,
+	'channel_link' => {
+		message => q|A URL back to the originating site of this channel. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'rss.url' => {
-		message => q|This is the URL to use to get the contents of this Syndicated Content wobject as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:|,
-		lastUpdated => 1149567508,
+	'channel_date' => {
+		message => q|The date this channel was updated. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'rss.url.0.9' => {
-		message => q|The contents of this wobject as an RSS 0.9 feed.|,
-		lastUpdated => 1149567508,
+	'channel_copyright' => {
+		message => q|Copyright holder information. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'rss.url.0.91' => {
-		message => q|The contents of this wobject as an RSS 0.91 feed.|,
-		lastUpdated => 1149567508,
+	'channel_image_url' => {
+		message => q|The URL of the image attached to this feed. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'rss.url.1.0' => {
-		message => q|The contents of this wobject as an RSS 1.0 feed.|,
-		lastUpdated => 1149567508,
+	'channel_image_title' => {
+		message => q|The title of the image attached to this feed. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
 	},
 
-	'rss.url.2.0' => {
-		message => q|The contents of this wobject as an RSS 2.0 feed.|,
-		lastUpdated => 1149567508,
+	'channel_image_description' => {
+		message => q|The description of the image attached to this feed. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
+	},
+
+	'channel_image_link' => {
+		message => q|The URL of the link that should wrap this feed's image. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
+	},
+
+	'channel_image_width' => {
+		message => q|The width in pixels of this feed's image. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
+	},
+
+	'channel_image_height' => {
+		message => q|The height in pixels of this feed's image. This variable will be populated by the first feed in a multi-feed list.|,
+		lastUpdated => 0,
+	},
+
+	'rss_url' => {
+		message => q|This is the URL to use to get the contents of this Syndicated Content asset as an RSS 2.0 feed. Additionally, you can specify RSS versions via the following template variables:|,
+		lastUpdated => 0,
+	},
+
+	'rdf_url' => {
+		message => q|The contents of this asset as an RDF/RSS 1.0 feed.|,
+		lastUpdated => 0,
+	},
+
+	'atom_url' => {
+		message => q|The contents of this asset as an Atom 0.3 feed.|,
+		lastUpdated => 0,
+	},
+
+	'category' => {
+		message => q|A category this item belongs to.|,
+		lastUpdated => 0,
+	},
+
+	'date' => {
+		message => q|The publication date for this item.|,
+		lastUpdated => 0,
+	},
+
+	'author' => {
+		message => q|The publisher of this item.|,
+		lastUpdated => 0,
+	},
+
+	'guid' => {
+		message => q|A unique id for this item.|,
+		lastUpdated => 0,
 	},
 
 	'item_loop' => {
 		message => q|A loop containing the data from this channel.|,
-		lastUpdated => 1149567508,
-	},
-
-	'site_title' => {
-		message => q|The title of the RSS feed this item comes from|,
-		lastUpdated => 1149567508,
-	},
-
-	'site_link' => {
-		message => q|Link to the source RSS feed.|,
-		lastUpdated => 1149567508,
-	},
-
-	'new_rss_site' => {
-		message => q|A "boolean" variable (suitable for using in a &lt;tmpl_if&gt; tag) that indicates we've started outputting items from a source RSS feed different than the previous item. This is most useful when you're viewing feeds in "grouped" mode- it gives you a hook to output <b>site_title</b> and <b>site_link</b> at the right time.|,
 		lastUpdated => 1149567508,
 	},
 
@@ -126,29 +161,9 @@ our $I18N = {
                      message => q|Syndicated Content Template|
                    },
 
-	'displayModeLabel' => {
-		lastUpdated => 1047855526,
-		message => q|Display Mode|
-	},
-
-	'displayModeSubtext' => {
-		lastUpdated => 1047855526,
-		message => q|<p>"Interleaved" means items from all feeds are lumped together, "Grouped by Feed" means items are grouped by the feed they came from. Either setting is fine if you're only bringing in a single feed.</p>|
-	},
-
-	'grouped' => {
-		lastUpdated => 1047855526,
-		message => q|Grouped by Feed|
-	},
-
 	'hasTermsLabel' => {
 		lastUpdated => 1047855526,
 		message => q|With any of these terms|
-	},
-
-	'interleaved' => {
-		lastUpdated => 1047855526,
-		message => q|Interleaved|
 	},
 
 	'rssTabName' => {
@@ -156,19 +171,9 @@ our $I18N = {
 		message => q|RSS|
 	},
 
-	'RSS Feed Title Suffix' => {
-		lastUpdated => 1118417024,
-		message => q|RSS 2.0 Feed|
-	},
-
 	'72 description' => {
                 message => q|Select a template for this content.|,
                 lastUpdated => 1119977659,
-        },
-
-        'displayModeLabel description' => {
-                message => q|<p>If you're aggregating feeds, you can change the mode in which the items are displayed. "Grouped by Feed" means the items will be grouped together by the feeds they come from. "Interleaved" means the items will be mixed together in a "round-robin" fashion from all the feeds. If you're grouping your feeds, please look at <b>new_rss_site</b> "item_loop" template variables, it gives you a hook allowing you to output the feed title</p>|,
-                lastUpdated => 1146799950,
         },
 
         'hasTermsLabel description' => {
@@ -192,10 +197,10 @@ our $I18N = {
 <li><a href="http://w.moreover.com/">http://w.moreover.com/</a></li>
 </ul>
 </div>
-<p>Currently, WebGUI can handle RSS versions .90, .91, 1.0, and 2.0. Atom feeds aren't supported for now. Probably other RSS-ish files would work too.
+<p>Currently, WebGUI can handle RSS versions .90, .91, 1.0, and 2.0; Atom .3 and 1.0. Probably other RSS-ish files would work too.
 </p>
 <p>To create an aggregate RSS feed (one that pulls information from multiple RSS feeds), include a list of URLs, one on each line, instead of a single URL.  Items will be sorted by the date WebGUI first received the story.</p>|,
-                lastUpdated => 1168228049,
+                lastUpdated => 1225928949,
         },
 
 	'3 description' => {

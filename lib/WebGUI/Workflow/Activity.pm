@@ -51,13 +51,22 @@ A constant to be sent to Spectre informing it that this activity did not execute
 
 sub ERROR { return "error" };
 
-=head2 WAITING
+=head2 WAITING ( [ waitTime ] )
 
-A constant to be sent to Spectre informing it that this actiivty is waiting for some other event to be triggered.
+A constant to be sent to Spectre informing it that this actiivty is
+waiting for some other event to be triggered.  This is also used for
+long running activities to be released by Spectre and to be requeued.
+
+=head3 waitTime
+
+Instead of sending the constant it will set a time to wait before running the workflow again. Can be any number of seconds 1 or higher.
 
 =cut
 
-sub WAITING { return "waiting" };
+sub WAITING {
+    my ($class, $waitTime) = @_;
+    return "waiting $waitTime";
+}
 
 =head1 METHODS
 
@@ -263,6 +272,19 @@ sub getName {
 
 #-------------------------------------------------------------------
 
+=head2 getTTL ( )
+
+Returns the maximum amount of time, in seconds, that a Workflow
+Activity should run.  Currently 55 seconds.
+
+=cut
+
+sub getTTL {
+	return 55;
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, activityId  )
 
 Constructor.
@@ -324,7 +346,7 @@ sub newByPropertyHashRef {
     return undef unless defined $properties;
     return undef unless exists $properties->{className};
     my $className = $properties->{className};
-    eval { WebGUI::Pluggable::load($class) };
+    eval { WebGUI::Pluggable::load($className) };
     if ($@) {
         $session->errorHandler->error($@);
         return undef;

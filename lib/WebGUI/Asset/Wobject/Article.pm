@@ -16,7 +16,7 @@ use WebGUI::International;
 use WebGUI::Cache;
 use WebGUI::Paginator;
 use WebGUI::Asset::Wobject;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 our @ISA = qw(WebGUI::Asset::Wobject);
 
@@ -173,10 +173,10 @@ sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
 		if ($self->get("storageId") eq "") {
-			$self->{_storageLocation} = WebGUI::Storage::Image->create($self->session);
+			$self->{_storageLocation} = WebGUI::Storage->create($self->session);
 			$self->update({storageId=>$self->{_storageLocation}->getId});
 		} else {
-			$self->{_storageLocation} = WebGUI::Storage::Image->get($self->session,$self->get("storageId"));
+			$self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
 		}
 	}
 	return $self->{_storageLocation};
@@ -240,7 +240,7 @@ sub purge {
         my $self = shift;
         my $sth = $self->session->db->read("select storageId from Article where assetId=?",[$self->getId]);
         while (my ($storageId) = $sth->array) {
-		my $storage = WebGUI::Storage::Image->get($self->session,$storageId);
+		my $storage = WebGUI::Storage->get($self->session,$storageId);
                 $storage->delete if defined $storage;
         }
         $sth->finish;
@@ -306,7 +306,7 @@ sub view {
 				});
 		}
 	}
-        $var{description} = $self->get("description");
+    $var{description} = $self->get("description");
 	$var{"new.template"} = $self->getUrl("func=view").";overrideTemplateId=";
 	$var{"description.full"} = $var{description};
 	$var{"description.full"} =~ s/\^\-\;//g;

@@ -16,7 +16,7 @@ our $todo;
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Image;
-use WebGUI::Storage::Image;
+use WebGUI::Storage;
 
 use File::Spec;
 use Test::More;
@@ -75,16 +75,13 @@ ok ($uploadDir, "uploadDir defined in config");
 my $uploadUrl = $session->config->get('uploadsURL');
 ok ($uploadUrl, "uploadDir defined in config");
 
-my $originalCaseInsensitiveOS = $session->config->get('caseInsensitiveOS');
-$session->config->set('caseInsensitiveOS', 0);
-
 ####################################################
 #
 # getFile
 #
 ####################################################
 
-my $imageStore = WebGUI::Storage::Image->create($session);
+my $imageStore = WebGUI::Storage->create($session);
 my $expectedFiles = ['.', '..'];
 cmp_bag($imageStore->getFiles(1), $expectedFiles, 'Starting with an empty storage object, no files in here except for . and ..');
 $imageStore->addFileFromScalar('.dotfile', 'dot file');
@@ -98,6 +95,7 @@ cmp_bag($imageStore->getFiles(),  ['dot.file'],   'getFiles() returns normal fil
 cmp_bag($imageStore->getFiles(1), $expectedFiles, 'getFiles(1) returns all files, including dot files');
 
 $imageStore->addFileFromScalar('thumb-file.png', 'thumbnail file');
+push @{ $expectedFiles}, 'thumb-file.png';
 cmp_bag($imageStore->getFiles(),  ['dot.file', ],   'getFiles() ignores thumb- file');
 cmp_bag($imageStore->getFiles(1), $expectedFiles, '... even when the allFiles switch is passed');
 
@@ -119,7 +117,7 @@ foreach my $extTest ( @{ $extensionTests } ) {
 
 WebGUI::Test->interceptLogging();
 
-my $thumbStore = WebGUI::Storage::Image->create($session);
+my $thumbStore = WebGUI::Storage->create($session);
 my $square = WebGUI::Image->new($session, 500, 500);
 $square->setBackgroundColor('#FF0000');
 $square->saveToStorageLocation($thumbStore, 'square.png');
@@ -170,7 +168,7 @@ like($WebGUI::Test::logger_error, qr/^Couldn't read image to check the size of i
 ####################################################
 
 my $imageCopy = $thumbStore->copy();
-isa_ok($imageCopy, 'WebGUI::Storage::Image', 'copy returns an object');
+isa_ok($imageCopy, 'WebGUI::Storage', 'copy returns an object');
 cmp_bag(
     $imageCopy->getFiles(),
     ['square.png'],
@@ -217,7 +215,7 @@ is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square
 
 my $origMaxImageSize = $session->setting->get('maxImageSize');
 
-my $sizeTest = WebGUI::Storage::Image->create($session);
+my $sizeTest = WebGUI::Storage->create($session);
 
 my $resizeTarget = 80;
 $session->setting->set('maxImageSize', 200 );
@@ -286,7 +284,7 @@ END {
 	foreach my $stor (
         $imageStore, $thumbStore, $imageCopy, $sizeTest,
     ) {
-		ref $stor eq "WebGUI::Storage::Image" and $stor->delete;
+		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
     $session->setting->set('maxImageSize', $origMaxImageSize );
 }

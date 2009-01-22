@@ -232,6 +232,7 @@ sub importProducts {
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
             $newProduct->update({
                 title => $newProduct->fixTitle($productRow{title}),
+                url   => $newProduct->fixUrl($productRow{title}),
                 sku   => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
@@ -276,7 +277,8 @@ sub view {
 	my @childShelves = ();
 	foreach my $child (@{$self->getLineage(['children'],{returnObjects=>1,includeOnlyClasses=>['WebGUI::Asset::Wobject::Shelf']})}) {
 		my $properties = $child->get;
-		$child->{url} = $self->getUrl;
+		$child->{url}   = $child->getUrl;
+		$child->{title} = $child->getTitle;
 		push @childShelves, $child;
 	}
 	
@@ -385,21 +387,12 @@ sub www_importProducts {
 		}
 		else {
 			$status_message = $i18n->get('import successful');
-			##Copy and paste from Asset.pm, www_editSave
-			if ($self->session->setting->get("autoRequestCommit")) {
-				# Make sure version tag hasn't already been committed by another process
-				my $versionTag = WebGUI::VersionTag->getWorking($self->session, "nocreate");
-	
-				if ($versionTag && $self->session->setting->get("skipCommitComments")) {
-					$versionTag->requestCommit;
-				}
-				elsif ($versionTag) {
-					$self->session->http->setRedirect(  
-						$self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId)
-					);
-					return undef;
-				}
-			}
+            if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+                allowComments   => 1,
+                returnUrl       => $self->getUrl,
+            }) eq 'redirect') {
+                return undef;
+            };
 		}
 	}
  

@@ -1,19 +1,403 @@
-7.5.26
+7.6.9
+ - fixed: ukplayer example is now loaded with swfobject.js released under the
+          MIT licence, see gotcha's and /extras/ukplayer
+ - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
+ - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
+ - marked sbin scripts as executable
+ - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
+ - fixed #9404: Head tags for admin user with admin mode off
+ - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
+ - fixed a bug where no Payment Gateway labels show up when checking out.
+ - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
+ - fixed #4137: Calendar Search page has head tags in body
+ - fixed: HTTP Proxy doesn't serve new content to visitors
+ - fixed: Exporting to static files can leak large amounts of memory
 
-7.5.25
+7.6.8
+ - added #!/usr/bin/env perl to all utility scripts
+ - Updated captcha images to be more legible.
+ - fixed #9285: modifing template prevents edit of syncontent
+ - fixed #8886: Search button in Asset manager
+ - fixed #9410: Wrong help text
+ - fixed #9154: WebGUI Shop - Checkout Caching Problem
+ - fixed a bug where clicking the apply button when func=add would return the
+   edit screen of the parent asset rather than that of the new asset. (Martin
+   Kamerbeek / Oqapi).
+ - fixed: Make sure that Form subclasses are found by WebGUI::Form::FieldType
+ - fixed #9356: Data Form Mail Fields
+ - fixed #9365: Account: when viewing another person's contribution, it displays my name
+ - fixed #9351: Cannot translate phrase
+ - fixed #9368: Gallery: All children included into navigation
+ - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
+ - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
+ - fixed #9374: Subscription Asset: Redeem subscription template not documented, or user selectable
+ - fixed #9366: Gallery: Missing i18n
+ - fixed #9367: Gallery: Errors in templates
+ - fixed #9352: Account activation message MIA
+ - fixed #9046: Wiki tabs all combined (David Delikat)
+ - refixed #9147: Misspellings in Account
+ - fixed #9348: Required Upgrade Step Not Documented - 7.6.0
+ - fixed #8993: Gallery Image Details Overlap Image
+ - fixed #9380: CoolMenus template - invalid markup affecting page layouts
+ - fixed #9387: Asset Manager breaks navigating into a Gallery Album
+ - fixed #9001: Thingy add image broken
+ - fixed #9386: Gallery: "Image resolutions" issue
+ - fixed #9342: Thingy - Cannot edit a thing
+ - fixed #9033: Deleting Linked Thing Field Crashes Thingy
+ - fixed #9400: Form.captcha should be form_capcha in dataform help
+ - fixed #9402: i18n confusion
+ - fixed #9403: i18n survey
+ - fixed: Syndicated Content corrupts wide characters
+
+7.6.7
+ - fixed #9263: Thingy possibleValues processing, and List type autodetection.
+ - fixed: Alter WebGUI::Asset::Template's update method so that it can import packages that use the old, deprecated headBlock property.  The update method change is deprecatd.
+ - fixed #9266: controls missing on product asset
+ - fixed #9150: Edit Data Table - Cannot add column (David Delikat)
+ - fixed #9261: Cart Payment Screen not templated
+ - fixed #4124: Site starter uses floats in ways that cause problems
+ - fixed #9274: AdminBar errors and fails when an asset class cannot be loaded
+ - fixed #9301: Error in Shelf Template
+ - fixed #9260: untitled (Delete icon "X" circumvents revision control)
+ - fixed: Deleting an LDAP connection does not take you back to the List LDAP connections screen.
+ - fixed #9284: User manager broken if no LDAP links exits
+ - fixed #4136: Shortcut doesn't display all properties in override
+ - fixed #8838: Gallery Cross Publish template is broken
+ - fixed #8898: versioning problem
+ - fixed #9315: Password Recovery
+ - fixed #9298: Inconsistent date formats
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
+ - fixed #4196: update button doesn't work in IE
+
+7.6.6
+ - fixed #9217: Survey 2.0 - "Cancel" button not working as expected(David Delikat)
+ - fixed #8792: Image Preview gives ERROR in Collateral Manager
+ - fixed #8774: Forum Rich Edit no longer supports indent/outdent
+ - fixed #4173: fieldnames in profilefields can contain spaces
+ - fixed #8811: Bug Tracker: Formatting is bad for the resolution form.
+ - fixed #9235: Image Bug in rich text editor.
+ - fixed #9219: Thingy After Save Search This Thing not showing all rows (SDH Consulting Group)
+ - fixed #9231: Singleton workflows should not report an error when an attempt is made to run them again
+ - fixed #9244: i18n for colin
+ - fixed #9252: Thingy defaultValue length causes input to be truncated (SDH Consulting Group)
+ - fixed #8937: Feeds in Calendar strip information
+ - fixed #9063: Thingy - Time Field editing errors
+ - fixed #9237: Payment Gateways all display "cash"
+ - fixed #8816: PayDriver "Label" of the instance of the driver should be used instead of the generic name
+ - fixed #4220: testEnvironment.pl unable to find WebGUI modules...
+ - fixed #9279: "Read more" text in Syndicated Articles is not a label
+
+7.6.5
+ - security: A problem was discovered and fixed in which users could email executable attachments to a collaboration system and then when viewed online, could execute them. 
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed: Products imported into the Shelf have bad URLs
+ - Deprecated WebGUI::Storage::Image. WebGUI::Storage can now do everything WebGUI::Storage::Image can do.
+ - The deprecated use of Graphics::Magick has been eliminated. WebGUI uses Image::Magick exclusively for all image processing functions once again.
+ - fixed: #9147: Misspellings in Account
+ - fixed: a bug in Crud where keys being updated would cause a crash
+ - fixed: #9148: Account: account links do not work
+ - fixed: #9149: Account: default templates do not work right
+ - fixed: Adding a file extension for URLs in the system settings now properly affects newly created Assets.  It still does not update existing asset URL's.
+ - fixed #9152: Pagination broken in Contribs Section of new Account System
+ - fixed #4159: more menu doesn't appear for current asset on crumb trail
+ - fixed #9157: another typ-o in i18n
+ - fixed #9112: Thingy View Thing screen doesn't preserve newlines
+ - fixed #9155: purpose of "headblock" duplicates "extra head tags"
+ - fixed: Improve Thingy navigation.
+ - fixed #9126: UserList is completely broken in 7.6.4 (Yung Han Khoe)
+ - fixed #9177: Wide-characters break product varients
+ - fixed #9191: Message Board reveals user email, ignores profile privacy setting (#9180)
+ - fixed #4209: i18n in Rich edit in Dutch breaks
+ - fixed #9196: Shelf lacks pagination
+ - fixed #4208: EMS badges with Admin security visible to all
+ - fixed Calendar copy behavior.  In the Asset toolbar, Copy Just this Asset
+   was broken.  This has been fixed.  As a side effect, in the Asset Manager
+   the default behavior is to copy ONLY the Calendar, and none of the events.
+ - fixed: filtering of rich text areas very slow for large content
+ - fixed: international characters are corrupted on export
+ - removed: WSClient
+
+7.6.4
+ - Survey now will show progress and time limit.
+ - Brand new Survey system.  Make sure to export your old results as they will
+ - Made it more obvious how to check out when viewing the cart.
+ - Added a wait timeout parameter to the WAITING method, so that Spectre
+   doesn't have to check something that the workflow activity knows it will
+   have to wait on for a while.
+ - Added --stop and --start aliases to spectre.pl.
+ - New pluggable framework added for cutsomizing WebGUI's Account system
+ - New Profile Account module added providing a better interface for users to view and update their profile
+ - New Inbox Account module added providing a better interface into WebGUI's various messaging systems
+ - New Friends Account module added providing a better interface into WebGUI's friends system
+ - New Contributions Account module added which displays public assets a user has contributed to the website
+ - rfe: Event hover detail exclusions  (#8761)
+ - rfe: Database Link test  (#513)
+ - rfe: User Profile Privacy Settings (#507) - users now have granular control of whether or not their profile fields are viewable - admin settings still apply
+ - The Display Account and My Purchases interfaces have been added to the new Account system
+ - Added a new macro which returns the self deactivation link if the setting is enabled.
+ - Added a new macro which returns the back to site link
+ - Added a new macro which allows users to test to see if a value is not empty and set the display text accordingly.
+   not be imported, only the surveys themselves.
+ - Made syndicated content asset use cache.
+ - Added Cashier/Point of Sale mode for the Shop.
+ - Added the notion of a default address to the Shop's address book.
+ - fixed #8837: When you move an asset to a new version, only the current version is moved, instead of all of them.
+ - Added version tag modes: multiple tags per user, single tag per user, site wide version tag and auto commit (thanks to Long Term Results B.V.)
+ - fixed #9076: Thingy broken in latest beta, Save and Close buttons missing
+   from Add/Edit Field dialogs (SDH Consulting Group).
+ - fixed #4214: Missing i18n in asset manager
+ - fixed #8849: More missing i18n
+ - fixed #4182: Edit links show in asset manager for locked assets
+ - fixed #8971: UserList shows accounts that have been self-deactivated (Bernd Kalbfuß-Zimmermann)
+ - fixed #4199: Default values of user profile fields are not filled in correctly when shown by the UserList asset (Bernd Kalbfuß-Zimmerman)
+ - fixed #9068: field.inTab
+ - fixed #8845: Workflows refusing to show edit screen
+ - fixed #4198: Namespace of Template "Newsletter (Manager)" set to "Collaboration
+ - fixed #4161: asset manager: switching title to descending order reverts to ascending on next page
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed: Get CS Mail workflow doesn't commit version tags created
+ - rfe: Thingy can now copy thingy entries
+ - Added a switch to subscriptions so that they can be also non-recurring to
+   facilitate eg. limited time meberships (Martin Kamerbeek / Oqapi)
+ - Replaced Matrix with newer version
+ - fixed #8822: Password Recovery Tempalte not working
+ - fixed: WebGUI::User now actually checks whether the friends group exists
+   (Martin Kamerbeek / Oqapi)
+ - fixed #9039: Synopsis not output as a meta field
+ - fixed #9132: usage error in Hover Help
+ - fixed #4181: hoover help for 'encrypt login' is wrong
+ - fixed #4186: search results (macro not expanded in the synopsis field)
+ - fixed #4191: Using 3 consecutive tildes in a Post title makes a bad URL/Pos
+ - fixed #8927: Collaboration System: Thread approval workflow setting ignore
+ - fixed #8827: Slider JS bug for non-numeric values (Patrick Donelan, SDH Consulting)
+ - fixed #8925: Collaboration System: Label missing
+ - fixed #8908: No Post Captcha in Default Submission Form
+ - fixed #9138: Fat fonts break WebGUI captchas
+ - fixed #8982: Deploy package doesn't take back to asset manager 
+ - fixed #8956: Not checking for populated variable
+ - fixed #9130: fixed: Rich editor creates root <p> tag even when set to use <br />
+ - fixed: DataForm times out when exporting large data sets
+ - fixed: DataForm entry data field is too small
+ - fixed #4213: Can see "edit" tab even tho i am not logged in
+ - fixed #9139: Updating a workflow property causes workflow to be disabled
+ - fixed #9140: Date format error when adding tasks to PM
+ - fixed #8800: Errors in POD of Asset-related mix-in modules (Bernd Kalbfuß-Zimmermann)
+ - fixed #9143: Yes No user profile fields problem when default == 1
+ - fixed #8775: Miscount in number of replies in CS Thread (Martin Kamerbeek / Oqapi)
+
+7.6.3
+ - improved performance of file uploads
+ - changed format of created uploads locations, avoiding case sensitivity problems
+ - fixed #8989: Missing profile field "showOnline" for the UsersOnline macro.
+ - Added DataTable to WebGUI.conf.original
+ - Added a better mechanism for calculating when content was last modified for
+   cache headers.
+ - The Syndicated Content asset was rewritten, and now uses 35% less memory
+   and is 400% faster.
+ - fixed #9025: Testing function of UsersOnline macro fails.
+ - fixed #9028: Thingy fails when setting values containing single quotes
+ - fixed #9047: Unable to reorder DataForm tabs
+ - added: Delete columns from DataTable
+ - fixed: Now more than one DataTable can be put on a page
+ - fixed #9002: add a variant in admin product view misses i18n link
+ - fixed #9034: Removed all instances of srand.  This is called implicitily by rand and be dangerous if called mulitple times by the same process.
+ - fixed: DataForm now allows you to edit existing tabs
+ - fixed #9064: SQLReport now replaces field name spaces with hyphens for the direct access template params.
+
+7.6.2
+ - fixed: not allowed to add calendar events if in can edit group but not can add event group
+ - sped up lineage changes significantly
+ - fixed: site starter fails after site style page
+ - fixed #8829: moveUp.gif, moveDown.gif missing from uploads
+ - fixed #8980: possible to execute arbitrary perl code as any user that can upload files
+ - added extras to user profile fields. these can be accessed using the
+   profile.form.element.extras template variable when editing a profile
+   and the profile.extras field when viewing a profile.
+ - Added the NotifyAboutThing workflow activity. Use this activity to create
+   workflows for the add / edit / delete workflows for a thingy's things.
+ - Fixed basic auth to work on WRE demo servers.
+ - fixed #8839: Documentation is wrong for Stock Ticker
+ - Added Guid form control.
+ - Moved Asset ID and Class Name fields to the Meta tab of all assets.
+ - Made Classname from control a subclass of ReadOnly.
+ - Added query keys to WebGUI::Crud.
+ - EMS Saved Address  (#8864)
+ - rfe: Inclusion of UsersOnline macro into the core  (#766)
+ - rfe: Search - Paginate results  (#713)
+ - rfe: Leave Version Tag
+ - Migrated WebGUI::TabForm to use YUI tabs rather than the old fashioned
+   WebGUI tabs.
+ - WebGUI::Crud can now automatically resolve differences between its
+   definition and the table schema.
+ - Fixed a limit bug in the asset discovery service.
+ - Fixed #8853: link to manageWorkflows is broken
+ - Added: WebGUI::Pluggable find() and findAndLoad() for easier module loading
+ - Added RFE #327: Select All button to class list in Search asset
+ - Fixed #8984: Weather Asset missing hoverhelp
+ - Fixed #8983: Missing Help in Group Edit screen
+ - Fixed #8899: Calendar feeds somehow cause edit screen to fail
+ - Fixed #8891: Calendar still pulls feeds when in trash
+ - Fixed #8981: style template help -- Macro being replaced
+ - Fixed #8818: Visitor sends a welcome message
+ - Added: Google siteindex
+
+7.6.1
+ - changed: the list of extensions for the export system to pass through
+   unmodified has been moved to the configuration file under the
+   "exportBinaryExtensions" field.
+ - fixed: some default assets have ids shorter than 22 characters
  - fixed: failure when submitting a dataform that sends mail with an empty file field
  - fixed: DataForm ignores height on textarea fields
  - fixed: DataForm doesn't keep posted values properly when data fails validation
- - fixed: some default assets have ids shorter than 22 characters
+ - fixed: Documentation for DataForm and Thingy updated for Possible Values field
+ - added a new permission denied page for version tag approval
+ - fixed: Thingy list type form elements do not support key/value pairs (SDH
+   Consulting Group)
+ - rfe: enable/disable pagination in asset manager  (#756)
+ - Added Comments asset aspect, which allows comments to be added to any asset
+   easily.
+ - Added comments aspect to wiki.
+ - Removed cart icon from ViewCart macro.
+ - Added a basic auth mechanism to WebGUI, which will allow WebGUI to handle
+   authenticated web service queries.
+ - Updated WebGUI::Shop::PayDriver::processTransaction() to accept a
+   transaction as a param.
+ - fixed: Select Slider borked in Thingy (SDH Consulting Group)
+ - fixed: Shortcuts includes HTML head data twice 
+ - fixed: DataForm entry table isn't properly indexed
+ - fixed: DataForm can't export fields containing newlines
+ - fixed: UserList templates use incorrect variable names
+ - fixed: International characters in password prevents login
+ - fixed: SelectSlider form control is broken
+ - fixed: testEnvironment.pl can't find WebGUI modules after installing a prerequisite
+ - fixed: Combo box does not show possible values in Thingy (SDH Consulting
+   Group)
+ - Added some web services to the Gallery asset to support the use of remote
+   apps to post photos and create albums.
+ - fixed: Cross site scripting issue on operation pages
+ - fixed: Search asset shows blank page after searching
+ - rfe: Updated Thingy's edit instructions and search description fields to
+   HTMLAreas (SDH Consulting Group)
+ - rfe: Thingy Private Rows (SDH Consulting Group)
+ - fixed: Shop: Percentage of Weight Shipping Method doesn't work
+ - fixed #8776: duplicate does not duplicate keywords
+ - rfe: Thingy: export extra rows, meta data (SDH Consulting Group)
+ - rfe: Thingy: Max entries per user (SDH Consulting Group) 
+ - Added the Asset Discovery web service content handler.
+ - fixed: #4174: UserList template show links that should be hidden (Yung Han
+   Khoe)
+ - fixed #8802: isImage not functioning in Folders
+ - added RFE #480: Apply button for assets
+ - fixed #8807: _NewAsset.skeleton out of date
+ - added: "Duplicate this template and edit" now updates the asset we came from, if any
+ - fixed #8818: Visitor sends a welcome message
+ - added: "EditArea" code highlighter and editing tool for WebGUI::Form::Codearea, used
+    in Template, Snippet, SQLReport, and more
+ - fixed: email password recovery allows sending recovery mail to arbitrary address
+ - added: WebGUI::AssetCollateral::DataForm::Entry object for managing DataForm entries
+
+7.6.0
+ - added: users may now customize the post received page for the CS
+ - fixed: shortcuts don't notify browsers of updates to their shortcutted asset
+ - fixed: anonymous registration with email confirmation is broken
+ - added an epochDate field to the template for CS RSS items. The ^D();
+   macro can then format the epoch date.
+ - fixed: actove admin console tab isn't highlighted
+ - Added WebGUI::Crud API as a base for all database backed objects.
+ - Added Admin Console plugability.
+ - Reconfigured Asset management in config file.
+ - Rebuilt AdminBar. Now renders faster, and has categories in the new content
+   menu.
+ - no longer preloads files that start with .
+ - rfe: let package import inherit permissions
+ - added fieldsets around form controls with multiple elements
+ - rfe: Town Hall: Menu title in search results
+ - rfe: Process Macros in HTTP Proxy's URL
+ - rfe: TimeZone for the User Profiles displays incorrectly after installation
+ - rfe: choice of type of redirect on redirect assets
+ - Added isVisitor, isAdmin, and isRegistered methods to User object instead
+   of hard coding checks everywhere with group ids. And updated the code base 
+   to match.
+ - rfe: Town Hall: EMS badge early bird field/discount
+ - rewrite macro parser, improving speed and making parameter parsing more sane
+ - Made the charset metatag the highest thing in the head block.
+ - fixed: AssetProxy allows proxying content in the trash or clipboard
+ - fixed: Textarea resizer has a gap between textbox and resizer initially
+ - added: getLineageIterator method to simplify working on large sets of assets
+ - improved Rich Text selection list, changed CS and Wiki to use it
+ - remove Do Nothing On Delete workflow and allow none to be selected for on delete etc workflow
+ - remove remnants of realtime workflow selection code
+ - fixed: Select All checkbox in Asset Manager has returned
+ - added: Page range (start-finish) to available paginator text
+ - rfe: view profile
+ - rfe: Shop: workflow warning for almost out of stock
+ - added: Email from field now prefixed with username
+ - added: Inbox messages now tell you who the message was from
+ - fixed: Reoccurring transactions now update the correct user id
+ - fixed: Thingy Things can now have no fields and still be functional.
+ - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
+ - rfe: Add url to list of attributes tracked in assetHistory
+ - fixed: DataForms can now export all non-default fields
+ - rfe: Search results now return with keywords highlighted.
+ - rfe: Added sort order to Folder assets
+ - rfe: Added canEdit and canAddFile template vars to Folder assets
+ - rfe: Add logged-in time to Login History
+ - rfe: cancel button (for edit profile screen)
+ - rfe: Move hardcoded words to i18n
+ - rfe: Better info for Assets that require commit before adding children.  Add link is always availble now.  If the asset has not yet been committed an error is displayed.
+ - rfe: Add template variables for every property of all assets referenced in the Navigation.
+ - rfe: VIM perl mode for skeletons
+ - rfe: Add edit button to Manage Revisions page
+ - fixed: Asset Edit Form has URL of asset we went to, not asset we're editing
+ - rfe: Protected profile fields don't show delete icon
+ - fixed: Asset manager now sets "proceed" so we go back to asset manager after editing an asset
+ - rfe: Registration form to keep user entries on error - required and errored fields are now highlighted.
+ - added: Thingy view template now has access to field_dateCreated and field_lastUpdated for Things.
+ - added: AssetManager now times out after 30 seconds on the AJAX call to load assets. This will help people realize they are having network issues. 
+ - added: Default templates now show big warning message. All templates added via upgrade scripts
+   are set to be a "default" template.
+ - fixed: Utility script skeleton now more complete and less annoying
+ - rfe: Teach Thingy to be a Web Service (SDH Consulting Group)
  - fixed: ~~~ showing up on my site.
  - fixed: Shelf/Product import export does not work
  - fixed: Shelf/Product import does not work with windows files
- - fixed: Can no longer buy badges from receipt or direct link page if quantity is empty
- - fixed: DataForm entry table isn't properly indexed
- - fixed: DataForm can't export fields containing newlines
- - fixed: Documentation for DataForm and Thingy "Possible Values" field
- - fixed: Shortcuts includes HTML head data twice
- - fixed: UserList templates use incorrect variable names
+
+7.5.31
+ - fixed: debian licensing problem with user list
+ - fixed: Wrong password behaviour  (#8905)
+ - fixed: Duplicate Root URLs Allowed  (#8900)
+ - fixed: Edit branch not working with noCache  (#4154)
+ - removed the old js file IndexedSearch/ColorPicker2.js that hasn't been used
+   in about 3 years. 
+ - Fixed #8984: Weather Asset missing hoverhelp
+ - fixed #4177: You can send your people on your friends list a friends request  
+ - Fixed #8924: useProfile: s/viewable/visible/ig
+
+7.5.30
+ - fixed: can't add EMS tickets to badges
+ - fixed 8962: Wrong mime-type used for json data
+ - fixed: default site has no content
+ - fixed: possible to execute arbitrary perl code as any user that can upload files
+
+7.5.29
+ - fixed: Site Nav is broken
+
+7.5.28
+ - Fixed #8890: meta_loop in post form not working (United Knowledge)
+ - added: ldaps and ldapi are now supported when working with LDAP authentication
+ - rfe #740: Thingy Pre-Text (SDH Consulting Group)
+ - rfe #746: use the menu title in asset manager
+ - rfe #549: New macro for checking spectre status.  VersionTag::RequestCommit and Operation::VestionTag::www_commitVertionTag now both check for spectre status before trying to commit.
+ - rfe #637: Alphabetize wiki items under a keyword?
+ - Autocommit assets like CS posts or Calendar Events can now be added before the
+    parent is committed.  They will go into the same version tag as their parent.
+ - rfe #640: Refactored autocommit and autocomment
+ - added a perltidyrc to the docs folder. we'll be using this to clean up code.
+ - fixed: Site Nav navigation template can now be used more than once per page
+ - added: TextArea now supports "maxlength" attribute
+ - added: DataForm can now run a workflow when an entry is added
+ - Fixed #8921: Duplicating templates through conventional methods maintains default template flag
+ - Fixed #8962: Wrong mime-type used for json data
 
 7.5.24
  - fixed: Spelling mistake on site starter

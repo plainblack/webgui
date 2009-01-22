@@ -174,7 +174,7 @@ sub getEditForm {
 		'search' => $i18n->get('search'),
 		'replace' => $i18n->get('replace'),
 		'cut' => $i18n->get('cut'),
-		'copy' => $i18n->get('copy'),
+		'copy' => $i18n->get('Copy'),
 		'paste' => $i18n->get('paste'),
 		'pastetext' => $i18n->get('pastetext'),
 		'pasteword' => $i18n->get('pasteword'),
@@ -481,13 +481,14 @@ sub getRichEditor {
 		preformatted => $self->getValue("preformatted") ? JSON::true() : JSON::false(),
 		force_br_newlines => $self->getValue("useBr") ? JSON::true() : JSON::false(),
 		force_p_newlines => $self->getValue("useBr") ? JSON::false() : JSON::true(),
+        $self->getValue("useBr") ? ( forced_root_block => JSON::false() ) : (),
 		remove_linebreaks => $self->getValue("removeLineBreaks") ? JSON::true() : JSON::false(),
 		nowrap => $self->getValue("nowrap") ? JSON::true() : JSON::false(),
 		directionality => $self->getValue("directionality"),
 		theme_advanced_toolbar_location => $self->getValue("toolbarLocation"),
 		theme_advanced_statusbar_location => "bottom",
 		valid_elements => $self->getValue("validElements"),
-		wg_userIsVisitor => $self->session->user->userId eq '1' ? JSON::true() : JSON::false(),
+		wg_userIsVisitor => $self->session->user->isVisitor ? JSON::true() : JSON::false(),
 		);
 	foreach my $button (@toolbarButtons) {
 		if ($button eq "spellchecker" && $self->session->config->get('availableDictionaries')) {

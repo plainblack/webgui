@@ -17,6 +17,9 @@ use WebGUI::Session;
 
 use WebGUI::Macro;
 use WebGUI::Asset;
+use WebGUI::Macro;
+use WebGUI::HTML;
+use Tie::IxHash;
 
 use Test::More; # increment this value for each test you create
 
@@ -32,17 +35,24 @@ $session->user({user => $registeredUser});
 
 my %originalMacros = %{ $session->config->get('macros') };
 ##Overwrite any local configuration so that we know how to call it.
-foreach my $macro (qw/GroupText LoginToggle PageTitle/) {
+foreach my $macro (qw/
+    GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest
+    ReverseParams InfiniteMacro VisualMacro MacroEmpty MacroUndef
+/) {
 	$session->config->addToHash('macros', $macro, $macro);
 }
+$session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 10;
+plan tests => 33;
 
 my $macroText = "CompanyName: ^c;";
+my $companyName = $session->setting->get('companyName');
+WebGUI::HTML::makeParameterSafe( \$companyName );
+
 WebGUI::Macro::process($session, \$macroText),
 is(
 	$macroText,
-	"CompanyName: ".$session->setting->get('companyName'),
+	"CompanyName: $companyName",
 	"c_companyName Macro in text processed okay"
 );
 
@@ -66,7 +76,7 @@ my $macroText = q|GroupText(Registered Users, example: c/CompanyName Macro) : ^G
 WebGUI::Macro::process($session, \$macroText),
 is(
 	$macroText,
-	"GroupText(Registered Users, example: c/CompanyName Macro) : example: ".$session->setting->get('companyName'),
+	"GroupText(Registered Users, example: c/CompanyName Macro) : example: $companyName",
 	"GroupText Macro with nested c_companyName macro"
 );
 
@@ -136,8 +146,116 @@ my $macroText = <<'EOF'
 EOF
 ;
 
+my $macroTextOut = $macroText;
+WebGUI::Macro::process($session, \$macroTextOut);
+is ($macroTextOut, $macroText, "Impossibly ugly, invalid macro fails to process and fails to kill WebGUI");
+
+
+
+my $macroText = q|^GroupText("Registered Users","Commas ',' work?");|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"Commas ',' work?",
+	"GroupText Macro with quoted comma"
+);
+
+my $macroText = qq|^ReverseParams(1,"here's a quote: \\"",2);|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"2here's a quote: \"1",
+	"Escaped double quotes work properly"
+);
+
+my $macroText = q|^MacroNest();|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"/extras/",
+	"Nested macro evaluates results to extras",
+);
+
+my $macroText = q|^MacroStart;^MacroEnd;|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"^MacroNest();",
+	"Combined macro calls don't get evaluated",
+);
+
+my $macroText = q|^InfiniteMacro;|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"Too many levels of macro recursion. Stopping.",
+	"Infinite recursion gets broken",
+);
+
+my $macroText = qq|^ReverseParams(1,"carriage returns\npass through as needed",2);|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"2carriage returns\npass through as needed1",
+	"Carriage returns pass through as needed."
+);
+
+tie my %quotingEdges, 'Tie::IxHash';
+%quotingEdges = (
+    '^VisualMacro(text);'                           => '@MacroCall[`text`]:',
+    '^VisualMacro(^VisualMacro("something);");'     => '@MacroCall[`@MacroCall[`"something`]:"`]:',
+    '^VisualMacro("^VisualMacro("something););'     => '@MacroCall[`"@MacroCall[`"something`]:`]:',
+    '^VisualMacro("^VisualMacro(something"););'     => '@MacroCall[`"@MacroCall[`something"`]:`]:',
+    '^VisualMacro^VisualMacro(this);;'              => '^VisualMacro@MacroCall[`this`]:;',
+    '^VisualMacro(^VisualMacro);'                   => '@MacroCall[`^VisualMacro`]:',
+    '^VisualMacro(^VisualMacro(this));'             => '@MacroCall[`^VisualMacro(this)`]:',
+    '^VisualMacro("quotes\\");'                     => '@MacroCall[`"quotes"`]:',
+);
+while (my ($inText, $outText) = each %quotingEdges) {
+    my $procText = $inText;
+    WebGUI::Macro::process($session, \$procText),
+    is(
+        $procText,
+        $outText,
+        "Nesting edge case: $inText",
+    );
+}
+
+my @invalidCalls = (
+    '^;',
+    '^();',
+    '^MacroThatDoesntExist;',
+    "^Ex'tras;",
+    '^Extras(;',
+    '^Extras);',
+    '^Extras(;)',
+);
+for my $inText (@invalidCalls) {
+    my $outText = $inText;
+    WebGUI::Macro::process($session, \$outText),
+    is(
+        $outText,
+        $inText,
+        "Invalid macro call: $inText",
+    );
+}
+
+my $macroText = "^MacroEmpty;";
 WebGUI::Macro::process($session, \$macroText);
-is ($macroText, $macroText, "Impossibly ugly, invalid macro fails to process and fails to kill WebGUI");
+is(
+    $macroText,
+    '',
+    "Macro can return empty string",
+);
+
+my $macroText = "^MacroUndef;";
+WebGUI::Macro::process($session, \$macroText);
+is(
+    $macroText,
+    '',
+    "Macro can return undef",
+);
+
 
 END {
 	$session->config->set('macros', \%originalMacros);

@@ -158,7 +158,7 @@ sub get {
         $opts = {};
     }
     else {
-        $opts = decode_json($opts);
+        $opts = JSON::from_json($opts);
     }
     if (defined $param) {
         return $opts->{$param};
@@ -303,7 +303,7 @@ sub update {
     my $options = shift || {};
     WebGUI::Error::InvalidParam->throw(error => 'update was not sent a hashref of options to store in the database')
         unless ref $options eq 'HASH' and scalar keys %{ $options };
-    my $jsonOptions = encode_json($options);
+    my $jsonOptions = JSON::to_json($options);
     $options{id $self} = $jsonOptions;
     $self->session->db->write('update shipper set options=? where shipperId=?', [$jsonOptions, $self->getId]);
     return undef;
@@ -321,7 +321,7 @@ Generates an edit form.
 sub www_edit {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
     my $admin = WebGUI::Shop::Admin->new($session);
     my $i18n = WebGUI::International->new($session, "Shop");
     my $form = $self->getEditForm;
@@ -340,7 +340,7 @@ Saves the data from the post.
 sub www_editSave {
     my $self = shift;
     my $session = $self->session;
-    return $session->privilege->insufficient() unless $session->user->isInGroup(3);
+    return $session->privilege->insufficient() unless $session->user->isAdmin;
     $self->processPropertiesFromFormPost;
     $session->http->setRedirect($session->url->page('shop=ship;method=manage'));
     return undef;

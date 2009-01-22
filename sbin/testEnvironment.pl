@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2008 Plain Black Corporation.
 #-------------------------------------------------------------------
@@ -20,6 +22,7 @@ use strict;
 use CPAN;
 use Getopt::Long;
 use Pod::Usage;
+use Cwd ();
 
 
 my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
@@ -53,6 +56,8 @@ if ($] >= 5.008) {
 	failAndExit("Please upgrade to 5.8 or later! Cannot continue without Perl 5.8 or higher.");
 }
 
+##Doing this as a global is not nice, but it works
+my $missingModule = 0;
 
 checkModule("LWP",                          5.80         );
 checkModule("HTTP::Request",                1.40         );
@@ -82,14 +87,13 @@ checkModule("Time::HiRes",                  1.38         );
 checkModule("DateTime::Format::Strptime",   1.0601       );
 checkModule("DateTime::Format::Mail",       0.2901       );
 checkModule("Image::Magick",                "6.0",     2 );
-checkModule("Graphics::Magick",             "1.1.7",   2 );
 checkModule("Log::Log4perl",                0.51         );
 checkModule("Net::LDAP",                    0.25         );
 checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              0.07         );
 checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.05,      2 );
-checkModule("XML::RSSLite",                 0.11         );
+checkModule("XML::FeedPP",                  0.36         );
 checkModule("JSON",                         2.04         );
 checkModule("Config::JSON",                 "1.1.2"      );
 checkModule("Text::CSV_XS",                 "0.52"       );
@@ -114,7 +118,10 @@ checkModule("Path::Class",                  '0.16'       );
 checkModule("Exception::Class",             "1.23"       );
 checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
+checkModule("Module::Find",                 "0.06"       );
+checkModule("Class::C3",                    "0.19"       );
 
+failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
 ###################################
 # Checking WebGUI
@@ -265,6 +272,7 @@ sub checkModule {
         # skip  
         elsif ($simpleReport) {
            	printResult("Not Installed");
+            $missingModule = 1;
 		}
 
         # if we're root lets try and install it
@@ -280,12 +288,14 @@ sub checkModule {
             # install aborted by user
             else {
                 printResult("Install aborted by user input.");
+                $missingModule = 1;
             }
 		} 
 
         # can't install, not root        
         else {
 			printResult("Not installed, but you're not root, so you need to ask your administrator to install it.");
+            $missingModule = 1;
 		}
     }
 }
@@ -334,7 +344,9 @@ sub getOs {
 sub installModule {
         my $module = shift;
         print "Attempting to install ".$module."...\n";
+        my $cwd = Cwd::cwd;
         CPAN::Shell->install($module);
+        chdir $cwd;
 }
 
 #----------------------------------------

@@ -10,8 +10,9 @@ package WebGUI::Asset::WikiPage;
 #  http://www.plainblack.com                     info@plainblack.com
 # -------------------------------------------------------------------
 
-use base 'WebGUI::Asset';
 use strict;
+use Class::C3;
+use base qw(WebGUI::AssetAspect::Comments WebGUI::Asset);
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
@@ -40,7 +41,7 @@ Override the default method in order to deal with attachments.
 
 sub addRevision {
         my $self = shift;
-        my $newSelf = $self->SUPER::addRevision(@_);
+        my $newSelf = $self->next::method(@_);
 	my $now = time();
 	$newSelf->update({
 		isHidden => 1,
@@ -52,7 +53,7 @@ sub addRevision {
 sub canAdd {
 	my $class = shift;
 	my $session = shift;
-	$class->SUPER::canAdd($session, undef, '7');
+	$class->next::method($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
@@ -109,23 +110,19 @@ sub definition {
 	      properties => \%properties,
 	     };
 
-	return $class->SUPER::definition($session, $definition);
-}
-
-
-#-------------------------------------------------------------------
-# BUGGO: how to handle this?
-sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
+	return $class->next::method($session, $definition);
 }
 
 
 #-------------------------------------------------------------------
 sub getAutoCommitWorkflowId {
 	my $self = shift;
-	return $self->getWiki->get("approvalWorkflow");
+    my $wiki = $self->getWiki;
+    if ($wiki->hasBeenCommitted) {
+        return $wiki->get('approvalWorkflow')
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
 }
 
 
@@ -192,7 +189,7 @@ sub getWiki {
 #-------------------------------------------------------------------
 sub indexContent {
 	my $self = shift;
-	my $indexer = $self->SUPER::indexContent;
+	my $indexer = $self->next::method;
 	$indexer->addKeywords($self->get('content'));
 	return $indexer;
 }
@@ -216,7 +213,7 @@ sub preparePageTemplate {
 #-------------------------------------------------------------------
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView;
+	$self->next::method;
 	$self->preparePageTemplate;
 }
 
@@ -224,24 +221,27 @@ sub prepareView {
 #-------------------------------------------------------------------
 sub processPropertiesFromFormPost {
 	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost(@_);
+	$self->next::method(@_);
 	my $actionTaken = ($self->session->form->process("assetId") eq "new") ? "Created" : "Edited";
     my $wiki = $self->getWiki;
-	$self->update({ groupIdView => $wiki->get('groupIdView'),
-			groupIdEdit => $wiki->get('groupToAdminister'),
-			actionTakenBy => $self->session->user->userId,
-			actionTaken => $actionTaken,
-	});
+	my $properties = {
+		groupIdView 	=> $wiki->get('groupIdView'),
+		groupIdEdit 	=> $wiki->get('groupToAdminister'),
+		actionTakenBy 	=> $self->session->user->userId,
+		actionTaken 	=> $actionTaken,
+	};
 
 	if ($wiki->canAdminister) {
-		$self->update({isProtected => $self->session->form("isProtected")});
+		$properties->{isProtected} = $self->session->form->get("isProtected");
 	}
 
+	$self->update($properties);
+
+    # deal with attachments from the attachments form control
     my $options = {
         maxImageSize    => $wiki->get('maxImageSize'),
         thumbnailSize   => $wiki->get('thumbnailSize'),
     };
-    # deal with attachments from the attachments form control
     my @attachments = $self->session->form->param("attachments");
     my @tags = ();
     foreach my $assetId (@attachments) {
@@ -271,9 +271,7 @@ sub processPropertiesFromFormPost {
         }
     }
 
-    # wiki pages are auto committed
-	$self->requestAutoCommit;
-}	
+}
 
 #-------------------------------------------------------------------
 
@@ -311,7 +309,8 @@ Wrap update to force isHidden to be on, all the time.
 sub update {
     my $self = shift;
     my $properties = shift;
-    return $self->SUPER::update({%$properties, isHidden => 1});
+	$properties->{isHidden} = 1;
+    return $self->next::method($properties);
 }
 
 #-------------------------------------------------------------------
@@ -346,6 +345,8 @@ sub view {
 		historyUrl          => $self->getUrl("func=getHistory"),
 		editContent         => $self->getEditForm,
         allowsAttachments   => $self->getWiki->get("allowAttachments"),
+		comments			=> $self->getFormattedComments(),
+        canEdit             => $self->canEdit,
 		content             => $self->getWiki->autolinkHtml(
             $self->scrubContent,
             {skipTitles => [$self->get('title')]},
@@ -424,7 +425,7 @@ sub www_view {
 	$self->update({ views => $self->get('views')+1 });
 	# TODO: This should probably exist, as the CS has one.
 #	$self->session->http->setCacheControl($self->getWiki->get('visitorCacheTimeout'))
-#	    if ($self->session->user->userId eq '1');
+#	    if ($self->session->user->isVisitor);
 	$self->session->http->sendHeader;
 	$self->prepareView;
 	return $self->getWiki->processStyle($self->view);

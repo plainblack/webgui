@@ -119,3 +119,4 @@ sub getMechLogin {
 
     return $mech;
 }
+#vim:ft=perl

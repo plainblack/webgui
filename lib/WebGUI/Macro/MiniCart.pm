@@ -29,7 +29,7 @@ Renders the macro.
 
 =head3 templateId
 
-Pass in a template id other than the default.
+The ID of a template to use other than the default.
 
 =cut
 

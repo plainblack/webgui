@@ -1,5 +1,53 @@
 YUI Library Release Notes
 
+*** version 2.6.0 ***
+
+The 2.6.0 release of YUI contains:
+
+- Two new components:
+  - Carousel 
+  - Paginator (code that handles navigation of chunked data previously released as a part of DataTable)
+- Seven components promoted from Beta to GA status
+  - Cookie
+  - DataTable
+  - DataSource
+  - Layout Manager
+  - Rich Text Editor
+  - Resize 
+  - Profiler
+- Many bug fixes to DataTable as well as a number of enhancements including:  
+  - CellEditor, BaseCellEditor, and associated subclasses which handle inline cell editing
+  - ScrollingDataTable, a new subclass which to isolates and manages the fixed scrolling architecture
+  - Pagination and sorting features that have been reworked to better support dynamically driven DataTables
+- The addition of Undo/Redo support to Rich Text Editor in addition to updates to indent/outdent processing, 
+  text attribute handling, toolbar button support.
+- New configuration properties in both Menu and Button.
+- An updated TreeView component that now includes support for keyboard navigation, delegated event listeners, 
+  tree serialization/deserialization and other new features.
+- Enhancements for Flash 10 support in the Uploader.
+- Fixes to more than 280 Source Forge bug reports.
+
+This list is a brief summary of some of the highlights of this release.  There are many enhancements and  
+bug fixes throughout the library. Please see the README file for each component in the build directory, or the  
+README Digest posted to ydn-javascript as part of the 2.6.0 release announcement, for specific updates since 
+version 2.5.2.
+
+
+*** version 2.5.2 ***
+
+This update contains the following:
+
+- Patches for DataTable and Menu posted to developer site following the release of 2.5.1 have been incorporated into the build.
+- FireFox 3 compatibility in advance of its release. 
+- Opera 9.5 beta compatibility in advance of its release.
+- ActionScript source for Charts and Uploader is now included.
+- Charts component now includes support for dynamically created legends, and new chart and series styles.
+- DataTable bug fixes in pagination, scrolling, and column handling.
+- Several Rich Text Editor bug fixes.
+- Approximately 15 Source Forge bug fixes.
+
+Please see the README file for each component in the build directory for specific updates since version 2.5.1.
+
 *** version 2.5.1 ***
 
 This update contains the following:
@@ -11,8 +59,7 @@ an unquoted string as quoted which could allow unsafe scripts to be evaled
 lazy-load any part of YUI on-demand
 - over 60 bug fixes
 
-Please see the README file for each component in the build directory for specific updates since
-version 2.5.0.
+Please see the README file for each component in the build directory for specific updates since version 2.5.0.
 
 *** version 2.5.0 ***
 

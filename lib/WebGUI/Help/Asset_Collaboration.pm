@@ -223,6 +223,7 @@ our $HELP = {
                     },
                     { 'name' => 'guid' },
                     { 'name' => 'pubDate' },
+                    { 'name' => 'epochDate' },
                     {   'name'      => 'attachmentLoop',
                         'variables' => [
                             { 'name' => 'attachment_thumbnail' },

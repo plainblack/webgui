@@ -16,6 +16,7 @@ package WebGUI::Config;
 
 use strict;
 use Class::InsideOut qw(readonly id register);
+use Cwd ();
 use base 'Config::JSON';
 
 my %config = ();
@@ -60,6 +61,24 @@ Config::JSON
 These subroutines are available from this package:
 
 =cut
+
+#-------------------------------------------------------------------
+
+=head2 clearCache ( ) 
+
+Clear the cache of in-memory configuration files.  This is required by the upgrade script, which
+forks to run each upgrade.  When the child is reaped, the original is untouched, so that the
+next script in the line recieves an old, in-memory config, essentially undoing any config
+changes in the first upgrade script.
+
+This is a class method.
+
+=cut
+
+sub clearCache {
+	my $class = shift;
+    %config = ();
+}
 
 #-------------------------------------------------------------------
 
@@ -148,14 +167,14 @@ A boolean value that when set to true tells the config system not to store the c
 
 sub new {
 	my $class = shift;
-	my $webguiPath = shift;
+	my $webguiPath = Cwd::realpath(shift);
 	my $filename = shift;
 	my $noCache = shift;
     my $fullPath = $webguiPath.'/etc/'.$filename;
 	if (exists $config{$filename}) {
 		return $config{$filename};
 	} else {
-        my $self = Config::JSON->new($webguiPath."/etc/".$filename);
+        my $self = Config::JSON->new($fullPath);
         register($self, $class);
         $webguiRoot{id $self} = $webguiPath;
 		$config{$filename} = $self unless $noCache;
@@ -181,9 +200,9 @@ The path to the WebGUI installation.
 sub readAllConfigs {
 	my $class = shift;
 	my $webguiPath = shift;
-	opendir(DIR,$webguiPath."/etc");
-	my @files = readdir(DIR);
-	closedir(DIR);
+    opendir my $dh, $webguiPath."/etc";
+    my @files = readdir $dh;
+    closedir $dh;
 	my %configs;
 	foreach my $file (@files) {
         next
@@ -191,12 +210,14 @@ sub readAllConfigs {
             || $file =~ /^\./
             || $file eq 'log.conf'
             || $file eq 'spectre.conf';
-        $configs{$file} = eval{WebGUI::Config->new($webguiPath,$file)};
+        eval {
+            $configs{$file} = WebGUI::Config->new($webguiPath,$file)
+        };
         if ($@) {
             warn "Config file ".$file." looks to be corrupt or have a syntax error.";
         }
-	}
-	return \%configs;
+    }
+    return \%configs;
 }
 
 

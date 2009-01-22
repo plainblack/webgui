@@ -135,20 +135,13 @@ sub getOperations {
 		'viewInbox' => 'Inbox',
 		'viewInboxMessage' => 'Inbox',
         'sendPrivateMessage' => 'Inbox',
-        'sendPrivateMessageSave' => 'Inbox',
-		'deletePrivateMessage' => 'Inbox',
 
 		'inviteUser'       => 'Invite',
-		'inviteUserSave'   => 'Invite',
 		'acceptInvite'     => 'Invite',
 
 		'addFriend'      => 'Friends',
-		'addFriendSave'  => 'Friends',
 		'friendRequest'     => 'Friends',
-		'friendRequestSave' => 'Friends',
 		'manageFriends'     => 'Friends',
-		'removeFriends'     => 'Friends',
-		'sendMessageToFriends'     => 'Friends',
 
 		'copyLDAPLink' => 'LDAPLink',
 		'deleteLDAPLink' => 'LDAPLink',
@@ -159,7 +152,6 @@ sub getOperations {
 		'viewLoginHistory' => 'LoginHistory',
 
 		'editProfile' => 'Profile',
-		'editProfileSave' => 'Profile',
 		'viewProfile' => 'Profile',
 
 		'deleteProfileCategory' => 'ProfileSettings',
@@ -213,6 +205,7 @@ sub getOperations {
 		'commitVersionTagConfirm' => 'VersionTag',
 		'editVersionTag' => 'VersionTag',
 		'editVersionTagSave' => 'VersionTag',
+		'leaveVersionTag' => 'VersionTag',
 		'manageCommittedVersions' => 'VersionTag',
 		'managePendingVersions' => 'VersionTag',
 		'manageRevisionsInTag' => 'VersionTag',

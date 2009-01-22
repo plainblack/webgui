@@ -140,7 +140,7 @@ our $I18N = {
 	},
 
 	'9' => {
-		message => q|User RDN|,
+		message => q|Authentication Attribute|,
 		lastUpdated => 1053777552
 	},
 
@@ -546,28 +546,31 @@ our $I18N = {
         },
 
         'LDAPLink_993 description' => {
-                message => q|The URL used to connect to the LDAP server.|,
+                message => q|<p>The URL used to connect to the LDAP server. LDAP url should look like:</p>
+<p>ldap://ldap.mycompany.com/baseDN</p><p>baseDN is the node on your LDAP server that WebGUI should use to initialize user searches.  Typically this looks like dc=mycompany,dc=com.</p>
+<p>ldap://ldap.mycompany.com/dc=mycompany,dc=com</p>|,
                 lastUpdated => 1120164594,
         },
 
         'LDAPLink_994 description' => {
                 message => q|<p>DN = Distinguished Name. A DN is a unique path to a particular object within an LDAP
 directory. In this case, the "Connect DN" is the DN that points to the user account
-record. Usually that will look something like:</p>
+record for authenticating against this LDAP server at a permission level that has full read and write access to all of the users and groups on your LDAP server.
+Usually that will look something like:</p>
 <p>cn=Joe Shmoe,ou=people,dc=example,dc=com</p>|,
                 lastUpdated => 1146630168,
         },
 
         'LDAPLink_995 description' => {
-                message => q|The password for the LDAP connection|,
+                message => q|The password for the account entered in the "Connect DN" field|,
                 lastUpdated => 1120164594,
         },
 
         '9 description' => {
-                message => q|<p>RDN is a relative distinguished name. It means that we're looking at only part of the
-path. In this case, the "User RDN" is the path to where user records can be found.
-Usually the RDN looks something like:</p>
-<p>ou=people,dc=example,dc=com</p>|,
+                message => q|<p>Enter the attribute that should be used for each record in LDAP to uniquely identify a user.
+This field is used for auto creating user accounts for users already in your LDAP repository when they attempt to log in and
+for finding users who sign up for the site via the anonymous registration feature if it is enabled. In almost all cases this attrubute is 'dn'
+and should be entered as such.</p>|,
                 lastUpdated => 1146630220,
         },
 

@@ -150,25 +150,28 @@ sub toHtml {
 	my $i18n = WebGUI::International->new($self->session);
         my ($checkYes, $checkNo);
         if ($self->getOriginalValue) {
-                $checkYes = 1;
+            $checkYes = 1;
         } else {
-                $checkNo = 1;
+            $checkNo = 1;
         }
-        my $output = WebGUI::Form::Radio->new($self->session,
-                checked=>$checkYes,
-                name=>$self->get("name"),
-                value=>1,
-                extras=>$self->get("extras")
-                )->toHtml;
-        $output .= $i18n->get(138);
-        $output .= '&nbsp;&nbsp;&nbsp;';
-        $output .= WebGUI::Form::Radio->new($self->session,
-                checked=>$checkNo,
-                name=>$self->get("name"),
-                value=>0,
-                extras=>$self->get("extras")
-                )->toHtml;
-        $output .= $i18n->get(139);
+        my $output = '<fieldset style="border:none;margin:0;padding:0">'
+            . WebGUI::Form::Radio->new($self->session,
+                checked => $checkYes,
+                name    => $self->get("name"),
+                value   => 1,
+                extras  => $self->get("extras"),
+                label   => $i18n->get(138),
+            )->toHtml
+            . '&nbsp;&nbsp;&nbsp;'
+            . WebGUI::Form::Radio->new($self->session,
+                checked => $checkNo,
+                name    => $self->get("name"),
+                value   => 0,
+                extras  => $self->get("extras"),
+                label   => $i18n->get(139),
+            )->toHtml
+            . '</fieldset>'
+            ;
         return $output;
 }
 

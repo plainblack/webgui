@@ -42,10 +42,6 @@ back up to the top.
 
 The class of the new PayDriver object to create.
 
-=head4 $label
-
-The label for this instance.
-
 =head4 $options
 
 A list of properties to assign to this PayDriver.  See C<definition> for details.
@@ -55,17 +51,14 @@ A list of properties to assign to this PayDriver.  See C<definition> for details
 sub addPaymentGateway {
     my $self            = shift;
     my $requestedClass  = shift;
-    my $label           = shift;
     my $options         = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a class to create an object})
         unless defined $requestedClass;
     WebGUI::Error::InvalidParam->throw(error => q{The requested class is not enabled in your WebGUI configuration file}, param => $requestedClass)
         unless isIn($requestedClass, (keys %{$self->getDrivers}) );
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a label to create an object})
-        unless $label;
     WebGUI::Error::InvalidParam->throw(error => q{You must pass a hashref of options to create a new PayDriver object})
         unless defined($options) and ref $options eq 'HASH' and scalar keys %{ $options };
-    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $label, $options ]) };
+    my $driver = eval { WebGUI::Pluggable::instanciate($requestedClass, 'create', [ $self->session, $options ]) };
 
     return $driver;
 }
@@ -337,7 +330,7 @@ sub www_manage {
             .WebGUI::Form::formFooter($session)
 
             # Append payment gateway label
-            .' '. $paymentGateway->label()
+            .' '. $paymentGateway->get('label')
         .'</div>';        
     }
 
@@ -364,7 +357,7 @@ sub www_selectPaymentGateway {
     my $i18n    = WebGUI::International->new( $session, 'Shop' );
 
     # Make sure the user is logged in.
-    if ($session->user->userId eq '1') {
+    if ($session->user->isVisitor) {
         $session->scratch->set( 'redirectAfterLogin', $session->url->page('shop=pay;method=selectPaymentGateway') );
 
         # We cannot use WebGUI::Operation::execute( $session, 'auth'); because the method form param used by the
@@ -393,8 +386,13 @@ sub www_selectPaymentGateway {
     }
 
     # All the output stuff below is just a placeholder until it's templated.
+    my $payOptions  = $self->getOptions( $cart );
+
+    # TODO: If only one payOption exists, just send us there
+    # In order to do this, the PayDriver must give us a direct URL to go to
+
     my $output .= $i18n->get('choose payment gateway message');
-    foreach my $payOption ( values %{$self->getOptions( $cart )} ) {
+    foreach my $payOption ( values %{$payOptions} ) {
         $output .= $payOption->{button} . '<br />';
     }
    

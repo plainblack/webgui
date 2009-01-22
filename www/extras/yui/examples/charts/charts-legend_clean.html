@@ -20,7 +20,7 @@ body {
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../../build/json/json-min.js"></script>
 <script type="text/javascript" src="../../build/element/element-beta-min.js"></script>
-<script type="text/javascript" src="../../build/datasource/datasource-beta-min.js"></script>
+<script type="text/javascript" src="../../build/datasource/datasource-min.js"></script>
 <script type="text/javascript" src="../../build/charts/charts-experimental-min.js"></script>
 
 
@@ -29,7 +29,7 @@ body {
 	#chart
 	{
 		float: left;
-		width: 400px;
+		width: 450px;
 		height: 300px;
 	}
 
@@ -40,52 +40,6 @@ body {
 		font-weight: bold;
 		margin-bottom: 0.4em;
 	}
-
-	#legend
-	{
-		float: left;
-		list-style: none;
-		padding: 5px;
-		margin-left: 10px;
-		margin-top: 90px;
-		background-color: #ffffff;
-	}
-
-	#legend li
-	{
-		height: 1.2em;
-		padding-left: 15px;
-		margin-bottom: 4px;
-		list-style: none;
-	}
-
-	.categoryName
-	{
-		display: block;
-		padding-left: 4px;
-		background-color: #ffffff;
-	}
-	
-	.summer
-	{
-		background-color: #00b8bf;
-	}
-	.fall
-	{
-		background-color: #8dd5e7;
-	}
-	.spring
-	{
-		background-color: #c0fff6;
-	}
-	.winter
-	{
-		background-color: #ffa928;
-	}
-	.undecided
-	{
-		background-color: #edff9f;
-	}
 </style>
 <!--end custom header content for this example-->
 
@@ -93,10 +47,11 @@ body {
 
 <body class=" yui-skin-sam">
 
+
 <h1>Chart with Legend Example</h1>
 
 <div class="exampleIntro">
-	<p>Though the <a href="http://developer.yahoo.com/yui/charts/">YUI Charts Control</a> doesn't support legends out of the box, you can easily create a legend using a simple unordered list.  This example shows you how.</p>
+	<p>A legend may be displayed with the <a href="http://developer.yahoo.com/yui/charts/">YUI Charts Control</a> by setting a few simple styles. This example shows you how.</p>
 <p>Please note: The YUI Charts Control requires Flash Player 9.0.45 or higher. The latest version of Flash Player is available at the <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.</p>			
 </div>
 
@@ -104,14 +59,6 @@ body {
 
 <span class="chart_title">Survey: What is your favorite season?</span>
 <div id="chart">Unable to load Flash content. The YUI Charts Control requires Flash Player 9.0.45 or higher. You can install the latest version at the <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.</p></div>
-
-<ul id="legend">
-	<li class="summer"><span class="categoryName">Summer</span></li>
-	<li class="fall"><span class="categoryName">Fall</span></li>
-	<li class="spring"><span class="categoryName">Spring</span></li>
-	<li class="winter"><span class="categoryName">Winter</span></li>
-	<li class="undecided"><span class="categoryName">Undecided</span></li>
-</ul>
 
 <script type="text/javascript">
 
@@ -138,7 +85,22 @@ body {
 	{
 		dataField: "count",
 		categoryField: "response",
-		series: [{}],
+		style:
+		{
+			padding: 20,
+			legend:
+			{
+				display: "right",
+				padding: 10,
+				spacing: 5,
+				font:
+				{
+					family: "Arial",
+					size: 13
+				}
+			}
+		},
+		//only needed for flash player express install
 		expressInstall: "assets/expressinstall.swf"
 	});
 

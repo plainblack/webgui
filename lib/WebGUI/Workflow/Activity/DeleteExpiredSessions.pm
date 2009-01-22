@@ -68,20 +68,37 @@ See WebGUI::Workflow::Activity::execute() for details.
 
 sub execute {
 	my $self = shift;
-	my $sth = $self->session->db->read("select sessionId from userSession where expires<?",[time()]);
+	my $sth = $self->session->db->read("select sessionId, lastPageView from userSession where expires<?",[time()]);
 	my $time = time();
-        while (my ($sessionId) = $sth->array) {
+    my $ttl = $self->getTTL;
+
+    while ( my ( $sessionId, $lastPageView ) = $sth->array ) {
+        # timeRecordSessions
+        my ($nonTimeRecordedRows) = $self->session->db->quickArray("select count(*) from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$sessionId] );
+        if ($nonTimeRecordedRows eq "1") {
+            # We would normally expect to only find one entry
+            $self->session->db->write("update userLoginLog set lastPageViewed = ? where lastPageViewed = timeStamp and sessionId = ? ",
+                [ $lastPageView, $sessionId ]);
+        } elsif ($nonTimeRecordedRows eq "0") {
+            # Do nothing
+        } else {
+            # If something strange happened and we ended up with > 1 matching rows, cut our losses and remove offending userLoginLog rows (otherwise we
+            # could end up with ridiculously long user recorded times)
+            $self->session->errorHandler->warn("More than 1 old userLoginLog rows found, removing offending rows");
+            $self->session->db->write("delete from userLoginLog where lastPageViewed = timeStamp and sessionId = ? ", [$sessionId] );
+        }
 		my $session = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename, undef, undef, $sessionId, 1);
 		if (defined $session) {
 			$session->var->end;
 			$session->close;
 		}
-		if ((time() - $time) > 55) {
-        		$sth->finish;
-			return $self->WAITING;
+		if ((time() - $time) > $ttl) {
+            $sth->finish;
+			return $self->WAITING(1);
 		}
-        }
-	return $self->COMPLETE;
+    }
+	
+    return $self->COMPLETE;
 }
 
 

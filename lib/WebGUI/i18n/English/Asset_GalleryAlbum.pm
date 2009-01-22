@@ -366,15 +366,15 @@ our $I18N = {
     },
     
     'template add' => {
-        message     => "Add",
-        lastUpdated => 0,
-        context     => 'Verb shown in title when adding a new Album',
+        message     => "Add Album",
+        lastUpdated => 1230581051,
+        context     => 'To add a new album',
     },
 
     'template edit' => {
-        message     => "Edit",
-        lastUpdated => 0,
-        context     => 'Verb shown in title when editing an existing Album',
+        message     => "Edit Album",
+        lastUpdated => 1230581053,
+        context     => 'To edit an existing album',
     },
 
     'template assetName' => {
@@ -560,6 +560,12 @@ our $I18N = {
         message     => q{Others Can Add},
         lastUpdated => 0,
         context     => q{Description of asset property to allow people besides the owner to add files to the album},
+    },
+
+    'template use as thumbnail' => {
+        message     => q{Use as Album Thumbnail},
+        lastUpdated => 0,
+        context     => q{template label in the Edit Album template.  To pick a thumbnail to use to represent the Album.},
     },
 
 };

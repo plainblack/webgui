@@ -16,7 +16,7 @@ use WebGUI::Session;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Cron;
 use WebGUI::Utility qw/isIn/;
-use Test::More tests => 64; # increment this value for each test you create
+use Test::More tests => 67; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -48,7 +48,7 @@ is_deeply($wf->getCrons, [], 'workflow has no crons');
 isa_ok(WebGUI::Workflow->getList($session), 'HASH', 'getList returns a hashref');
 
 ok(!isIn($wfId, keys %{WebGUI::Workflow->getList($session)}), 'workflow not in enabled list');
-is(scalar keys %{WebGUI::Workflow->getList($session)}, 11, 'There are eleven default workflows in 7.5, of all types, shipped with WebGUI');
+is(scalar keys %{WebGUI::Workflow->getList($session)}, 10, 'There are ten default workflows, of all types, shipped with WebGUI');
 
 $wf->set({enabled => 1});
 ok($wf->get('enabled'), 'workflow is enabled');
@@ -57,6 +57,14 @@ $wf->set({enabled => 0});
 ok(!$wf->get('enabled'), 'workflow is disabled again');
 
 is(scalar keys %{WebGUI::Workflow->getList($session, 'WebGUI::User')}, 1, 'There is only 1 WebGUI::User based workflow that ships with WebGUI');
+
+##Throwing in another test here to test how enabled works.  It should be sticky
+
+$wf->set({enabled => 1});
+ok($wf->get('enabled'), 'Enable workflow again');
+$wf->set({description => 'Better stay enabled'});
+ok($wf->get('enabled'), 'Workflow is enabled after setting the description');
+$wf->set({enabled => 0});
 
 ##################################################
 #
@@ -77,6 +85,10 @@ $wf->set({'isSerial' => 1});
 is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '010', 'Is checks after setting mode to singleton');
 $wf->set({'isSingleton' => 1});
 is(join('', $wf->isSingleton, $wf->isSerial, $wf->isParallel), '100', 'Is checks after setting mode to singleton');
+
+##Checking sticky mode settings
+$wf->set({description => 'better stay singleton'});
+ok($wf->isSingleton, 'After setting description, workflow is still singleton');
 
 $wf->delete;
 ok(!defined WebGUI::Workflow->new($session, $wfId), 'deleted workflow cannot be retrieved');

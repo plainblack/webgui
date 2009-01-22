@@ -77,10 +77,11 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 sub _create {
-	my $self = shift;
-	my $override = shift;
+	my $self          = shift;
+	my $override      = shift;
+    my $noAdmin       = shift;
 	$self->{_groupId} = $self->session->db->setRow("groups","groupId", $self->_defaults, $override);
-	$self->addGroups([3]);
+	$self->addGroups([3]) unless ($noAdmin);
 }
 
 
@@ -103,6 +104,7 @@ sub _defaults {
 		autoDelete=>0,
 		isEditable=>1,
 		showInForms=>1,
+        isAdHocMailGroup=>0,
 		};
 }
 
@@ -849,7 +851,30 @@ u.expires > $time AND
 	( $scratchClause )
 EOQ
 	return $self->session->db->buildArrayRef($query, [ @scratchPlaceholders ]);
-}	
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUserList ( [ withoutExpired ] )
+
+Returns a hash reference with key of userId and value of username for users in the group
+
+=head3 withoutExpired
+
+A boolean that if set to true will return only the groups that the user is in where
+their membership hasn't expired.
+
+=cut
+
+sub getUserList {
+	my $self = shift;
+	my $withoutExpired = shift;
+	my $expireTime = 0;
+	if ($withoutExpired) {
+		$expireTime = $self->session->datetime->time();
+	}
+	return $self->session->db->buildHashRef("select users.userId, users.username from users join groupings using(userId) where expireDate > ? and groupId = ? order by username asc", [$expireTime, $self->getId]);
+}
 
 #-------------------------------------------------------------------
 
@@ -877,6 +902,55 @@ sub getUsers {
 	return \@users;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getUsersNotIn ( group [,withoutExpired])
+
+Returns an array reference containing a list of all of the users that are in this group
+and are not in the group passed in
+
+=head3 groupId
+
+groupId to check the users in this group against.
+
+=head3 withoutExpired
+
+A boolean that if set to true will return only the groups that the user is in where
+their membership hasn't expired.
+
+=cut
+
+sub getUsersNotIn {
+	my $self           = shift;
+    my $groupId        = shift;
+	my $withoutExpired = shift;
+
+    if($groupId eq "") {
+        return $self->getUsers($withoutExpired);
+    }
+	
+    my $expireTime = 0;
+	if ($withoutExpired) {
+		$expireTime = $self->session->datetime->time();
+	}
+
+    my $sql = q{
+        select
+            userId
+        from
+            groupings
+        where
+            expireDate > ?
+            and groupId=?
+            and userId not in (select userId from groupings where expireDate > ? and groupId=?)
+    };
+
+	my @users = $self->session->db->buildArray($sql, [$expireTime,$self->getId,$expireTime,$groupId]);
+	return \@users;
+
+}
+
+
 
 #-------------------------------------------------------------------
 
@@ -899,6 +973,27 @@ sub karmaThreshold {
         return $self->get("karmaThreshold");
 }
 
+#-------------------------------------------------------------------
+
+=head2 isAdHocMailGroup ( [ value ] )
+
+Returns a boolean value indicating whether the group is flagged as an AdHoc Mail Group or not.
+AdHoc Mail Groups are automatically deleted once the mail they are associated to has been sent.
+
+=head3 value
+
+If specified, isAdHocMailGroup is set to this value.
+
+=cut
+
+sub isAdHocMailGroup {
+    my $self  = shift;
+    my $value = shift;
+    if (defined $value) {
+        $self->set("isAdHocMailGroup",$value);
+    }
+    return $self->get("isAdHocMailGroup");
+}
 
 #-------------------------------------------------------------------
 
@@ -979,10 +1074,9 @@ sub name {
         return $self->get("groupName");
 }
 
-
 #-------------------------------------------------------------------
 
-=head2 new ( session, groupId [, overrideId ] )
+=head2 new ( session, groupId [, overrideId, noAdmin ] )
 
 Constructor.
 
@@ -998,6 +1092,10 @@ The groupId of the group you're creating an object reference for. If specified a
 
 If you specified "new" for groupId, you can use this property to specify an id you wish to create, rather than having the system generate one for you.
 
+=head3 noAdmin
+
+If you specified "new" for groupId, you can use this property to specify that you do not wish the admin user or group to be added to the group
+
 =cut
 
 sub new {
@@ -1007,13 +1105,14 @@ sub new {
     $self->{_session}   = shift;
 	$self->{_groupId}   = shift;
 	my $override        = shift;
+    my $noAdmin         = shift;
 
-    my $cached = $self->{_session}->stow->get("groupObj");
+    my $cached = $self->{_session}->stow->get("groupObj", { noclone => 1});
 	return $cached->{$self->{_groupId}} if ($cached->{$self->{_groupId}});
 
 	bless $self, $class;
         if ($self->{_groupId} eq "new") {
-		$self->_create($override);
+		$self->_create($override,$noAdmin);
 	}
 	elsif ($self->{_groupId} eq "") {
 		$self->{_group} = $self->_defaults();
@@ -1034,6 +1133,7 @@ sub new {
 	$self->{_session}->stow->set("groupObj", $cached);
 	return $self;
 }
+
 
 #-------------------------------------------------------------------
 
@@ -1311,6 +1411,8 @@ sub userIsAdmin {
 		$self->session->db->write("update groupings set groupAdmin=? where groupId=? and userId=?",[$value, $self->getId, $userId]);
 		return $value;
 	} else {
+        my $user = WebGUI::User->new($self->session, $userId);
+        return 1 if $user->isInGroup(3);
 		my ($admin) = $self->session->db->quickArray("select groupAdmin from groupings where groupId=? and userId=?", [$self->getId, $userId]);
 		return ($admin ? 1 : 0);
 	}

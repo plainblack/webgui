@@ -29,7 +29,7 @@ sub _createURL {
 	my $session = shift;
 	my $text    = shift;
     my $class   = shift;
-	my $url     =  '<a href="'.$session->url->page("op=viewInbox").'"';
+	my $url     =  '<a href="'.$session->url->page("op=account;module=inbox").'"';
     $url .= ' class="'.$class.'"' if($class);
     $url .= '>'.$text.'</a>';
     return $url;

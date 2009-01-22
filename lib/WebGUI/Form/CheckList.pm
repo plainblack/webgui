@@ -52,7 +52,7 @@ The following additional parameters have been added via this sub class.
 
 Boolean representing whether the checklist should be represented vertically or horizontally. If set to "1" will be displayed vertically. Defaults to "0".
 
-=head4 showSelectAllButton
+=head4 showSelectAll
 
 Flag that toggles a "Select All" toggle button on or off.
 
@@ -137,7 +137,7 @@ Renders a series of checkboxes.
 
 sub toHtml {
 	my $self        = shift;
-	my $output;
+    my $output = '<fieldset style="border:none;margin:0;padding:0">';
 	my $alignment   = $self->alignmentSeparator;
 
     # Add the select all button
@@ -164,7 +164,7 @@ sub toHtml {
             . $alignment
             ;
     }
-
+    $output .= "</fieldset>";
     return $output;
 }
 

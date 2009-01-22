@@ -18,6 +18,7 @@ package WebGUI::International;
 use strict qw(vars subs);
 use WebGUI::Session;
 use WebGUI::Pluggable;
+use Module::Find qw(findsubmod);
 
 =head1 NAME
 
@@ -30,15 +31,7 @@ This package provides an interface to the internationalization system.
 =head1 SYNOPSIS
 
  use WebGUI::International;
- $string = WebGUI::International::get($session,$internationalId,$namespace);
- $hashRef = WebGUI::International::getLanguage($session,$lang);
- $hashRef = WebGUI::International::getLanguages($session);
- $url = WebGUI::International::makeUrlCompliant($session,$url);
-
-This package can also be used in object-oriented (OO) style.
-
- use WebGUI::International;
- my $i = WebGUI::International->new($session,$namespace);
+ my $i = WebGUI::International->new($session, $namespace);
 
  $string = $i->get($internationalId);
  $string = $i->get($internationalId, $otherNamespace);
@@ -93,7 +86,7 @@ A string that specifies the language that the user should see.  Defaults to the 
 
 =cut
 
-my $safeRe = qr/[^\.\w\d\s\/]/;
+my $safeRe = qr/[^\.:\w\d\s\/\^\;\?%><\]\[]/;
 
 sub get {
 	my ($self, $id, $namespace, $language) = @_;
@@ -104,21 +97,28 @@ sub get {
 	$language =~ s/$safeRe//g;
 	$namespace =~ s/$safeRe//g;
     my $cmd = "WebGUI::i18n::".$language."::".$namespace;
-    eval { WebGUI::Pluggable::load($cmd); };
-    if ($@) {
-        if ($language eq 'English') {
-            $session->log->error('Unable to load $cmd');
-            return '';
+    my $table = do {
+        no strict 'refs';
+        ${"$cmd\::I18N"};
+    };
+    if (! $table) {
+        eval { WebGUI::Pluggable::load($cmd); };
+        if ($@) {
+            if ($language eq 'English') {
+                $session->log->error("Unable to load $cmd");
+                return '';
+            }
+            else {
+                my $output = $self->get($id, $namespace, 'English');
+                return $output;
+            }
         }
-        else {
-            my $output = $self->get($id, $namespace, 'English');
-            return $output;
-        }
+        no strict 'refs';
+        $table = ${"$cmd\::I18N"};
     }
-    our $table;
-    *table = *{"$cmd\::I18N"};  ##Create alias into symbol table
-	my $output = $table->{$id}->{message};
-	$output = $self->get($id,$namespace,"English") if ($output eq "" && $language ne "English");
+    my $output = $table->{$id}->{message};
+    $output = $self->get($id, $namespace, "English")
+        if ($output eq "" && $language ne "English");
     return $output;
 }
 
@@ -142,16 +142,18 @@ If this is specified, only the value of the property will be returned, instead o
 sub getLanguage {
 	my ($self, $language, $property) = @_;
 	$language = $language || $self->{_language} || "English";
-	my $cmd = "WebGUI::i18n::".$language;
-    WebGUI::Pluggable::load($cmd);
-    $cmd = '$'.$cmd.'::LANGUAGE';
-    my $hashRef = eval($cmd);
+    my $pack = "WebGUI::i18n::" . $language;
+    WebGUI::Pluggable::load($pack);
+    my $langInfo = do {
+        no strict 'refs';
+        ${"$pack\::LANGUAGE"};
+    };
     $self->session->errorHandler->warn("Failed to retrieve language properties because ".$@) if ($@);
     if ($property) {
-        return $hashRef->{$property};
+        return $langInfo->{$property};
     }
     else {
-        return $hashRef;
+        return $langInfo;
     }
 }
 
@@ -179,18 +181,12 @@ Returns a hash reference to the languages installed on this WebGUI system.
 
 sub getLanguages {
 	my ($self) = @_;
-        my ($hashRef);
-	my $dir = $self->session->config->getWebguiRoot."/lib/WebGUI/i18n";
-	opendir (DIR,$dir) or $self->session->errorHandler->fatal("Can't open I18N directory! ".$dir);
-	my @files = readdir(DIR);
-	closedir(DIR);
-	foreach my $file (@files) {
-		if ($file =~ /(.*?)\.pm$/) {
-			my $language = $1;
-			$hashRef->{$language} = $self->getLanguage($language,"label");
-		}
-	}
-        return $hashRef;
+    my $hashRef;
+    for my $lang ( findsubmod 'WebGUI::i18n' ) {
+        $lang =~ s/^WebGUI::i18n:://;
+        $hashRef->{$lang} = $self->getLanguage($lang, "label");
+    }
+    return $hashRef;
 }
 
 

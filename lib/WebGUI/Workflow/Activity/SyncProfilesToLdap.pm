@@ -133,6 +133,7 @@ sub execute {
 	my ($currentLinkId, $link, $ldapUrl, $ldap);
 	my $skippingLink = 0;
 
+    my $ttl = $self->getTTL;
 	while (my ($userId, $rowLinkId) = $sth->array) {
 		if ($rowLinkId ne $currentLinkId) {
 			$link->unbind if defined $link;
@@ -141,6 +142,7 @@ sub execute {
 
 			$currentLinkId = $rowLinkId;
 			$link = WebGUI::LDAPLink->new($self->session, $rowLinkId);
+            next unless $link;
 			$ldapUrl = $link->get->{ldapUrl};
 			$ldap = $link->bind;
 
@@ -178,12 +180,12 @@ sub execute {
 	} continue {
 		$index++;
 
-		if (time - $startTime >= 55) {
+		if (time - $startTime >= $ttl) {
 #			$self->session->errorHandler->warn("DEBUG: SyncProfilesToLdap: next round");
 			$link->unbind if defined $link;
 			$instance->setScratch('ldapSelectIndex', $index);
 			$sth->finish;
-			return $self->WAITING;
+			return $self->WAITING(1);
 		}
 	}
 	

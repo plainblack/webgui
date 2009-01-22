@@ -184,7 +184,25 @@ sub getBadgeGroups {
 
 =head2 getEventMetaFields (  )
 
-Returns an arrayref of hash references of the metadata fields.
+Returns an arrayref of hash references of the metadata fields. Each hash in the array has the following fields:
+
+fieldId - the GUID for this field.
+
+assetId - the EMS that this field is attached to.
+
+label - the human readable name for this field.
+
+dataType - the form field type for this field.
+
+visible - whether or not this field should display in public views.
+
+required - whether or not this field must be filled out as part of editing the ticket/event.
+
+possibleValues - a list of values that may be used to create this form field if it's  a list type.
+
+defaultValues - a list of default values that may be used to create this form field.
+
+sequenceNumber - the order in which this field should be displayed relative to other fields.
 
 =cut
 
@@ -192,6 +210,7 @@ sub getEventMetaFields {
 	my $self = shift;
 	return $self->session->db->buildArrayRefOfHashRefs("select * from EMSEventMetaField where assetId=? order by sequenceNumber, assetId",[$self->getId]);
 }
+
 #-------------------------------------------------------------------
 
 =head2 getEventFieldsForImport ()
@@ -805,7 +824,8 @@ sub www_getBadgesAsJson {
     my ($db, $form) = $session->quick(qw(db form));
     my %results = ();
     $results{records} = [];
-	foreach my $badge (@{$self->getBadges}) {
+	BADGE: foreach my $badge (@{$self->getBadges}) {
+        next BADGE unless $badge->canView;
 		push(@{$results{records}}, {
 			title 				=> $badge->getTitle,
 			description			=> $badge->get('description'),
@@ -821,7 +841,7 @@ sub www_getBadgesAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -838,7 +858,7 @@ sub www_getRegistrantAsJson {
 	my $session = $self->session;
 	my $db = $session->db;
     return $session->privilege->insufficient() unless $self->canView;
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
 	my @tickets = ();
 	my @tokens = ();
 	my @ribbons = ();
@@ -862,7 +882,7 @@ sub www_getRegistrantAsJson {
 			title			=> $ticket->getTitle,
 			eventNumber		=> $ticket->get('eventNumber'),
 			hasPurchased 	=> 1,
-			startDate		=> $startTime,
+			startDate		=> $startTime->toMysqlTime,
 			endDate			=> $ticket->get('endDate'),
 			location		=> $ticket->get('location'),
 			assetId			=> $ticket->getId,
@@ -909,7 +929,7 @@ sub www_getRegistrantAsJson {
 				title			=> $sku->getTitle,
 				eventNumber		=> $sku->get('eventNumber'),
 				itemId 			=> $item->getId,
-				startDate		=> $startTime,
+				startDate		=> $startTime->toMysqlTime,
 				endDate			=> $sku->get('endDate'),
 				location		=> $sku->get('location'),
 				assetId			=> $sku->getId,
@@ -1017,7 +1037,7 @@ sub www_getRegistrantsAsJson {
     $results{'dir'}          = "asc";
 	
 	# build json datasource
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1052,7 +1072,7 @@ sub www_getRibbonsAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1165,8 +1185,11 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         my $data = $ticket->get('eventMetaData');
         $data = '{}' if ($data eq "");
         my $meta = JSON->new->utf8->decode($data);
-        foreach my $field (keys %{$meta}) {
-            $description .= '<p><b>'.$field.'</b>: '.$meta->{$field}.'</p>' unless ($meta->{$field} eq "");
+        foreach my $field (@{$self->getEventMetaFields}) {
+            my $label = $field->{label};
+            if ($field->{visible} && $meta->{$label} ne "") {
+                $description .= '<p><b>'.$label.'</b>: '.$meta->{$label}.'</p>';
+            }
         }
 		my $date = WebGUI::DateTime->new($session, mysql => $ticket->get('startDate'))
                 ->set_time_zone($self->get("timezone"))
@@ -1204,7 +1227,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'startIndex'}   	= $startIndex;
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1239,7 +1262,7 @@ sub www_getTokensAsJson {
     $results{'startIndex'} = 0;
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -1422,7 +1445,7 @@ Displays the badges purchased by the current user, or all users if the user is p
 sub www_lookupRegistrant {
 	my ($self) = @_;
 	my $session = $self->session;
-	return $session->privilege->noAccess() unless ($self->canView && $self->session->user->userId ne "1");
+	return $session->privilege->noAccess() unless ($self->canView && $self->session->user->isRegistered);
 
 	# set up template variables
 	my %var = (

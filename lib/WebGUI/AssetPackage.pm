@@ -15,12 +15,12 @@ package WebGUI::Asset;
 =cut
 
 use strict;
-use JSON;
+use JSON ();
 use WebGUI::Storage;
 
 =head1 NAME
 
-Package WebGUI::Asset
+Package WebGUI::Asset (AssetPackage)
 
 =head1 DESCRIPTION
 
@@ -130,6 +130,7 @@ A hash reference containing the exported data.
 sub importAssetData {
     my $self        = shift;
     my $data        = shift;
+    my $options     = shift || {};
     my $error       = $self->session->errorHandler;
     my $id          = $data->{properties}{assetId};
     my $class       = $data->{properties}{className};
@@ -140,6 +141,12 @@ sub importAssetData {
 
     my $asset;
     my $revisionExists = WebGUI::Asset->assetExists($self->session, $id, $class, $version);
+    my %properties = %{ $data->{properties} };
+    if ($options->{inheritPermissions}) {
+        delete $properties{ownerUserId};
+        delete $properties{groupIdView};
+        delete $properties{groupIdEdit};
+    }
     if ($revisionExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
         $error->info("Updating an existing revision of asset $id");	
@@ -162,7 +169,13 @@ sub importAssetData {
         }
         else {  # add an entirely new asset
             $error->info("Adding $id that didn't previously exist.");
-            $asset = $self->addChild($data->{properties}, $id, $version, {skipAutoCommitWorkflows => 1});
+            my %properties = %{ $data->{properties} };
+            if ($options->{inheritPermissions}) {
+                $properties{ownerUserId} = $self->get('ownerUserId');
+                $properties{groupIdView} = $self->get('groupIdView');
+                $properties{groupIdEdit} = $self->get('groupIdEdit');
+            }
+            $asset = $self->addChild(\%properties, $id, $version, {skipAutoCommitWorkflows => 1});
         }
     }
 
@@ -205,6 +218,7 @@ A reference to a WebGUI::Storage object that contains a webgui package file.
 sub importPackage {
     my $self            = shift;
     my $storage         = shift;
+    my $options         = shift;
     my $decompressed    = $storage->untar($storage->getFiles->[0]);
     return undef
         if $storage->getErrorCount;
@@ -215,7 +229,7 @@ sub importPackage {
     foreach my $file (sort(@{$decompressed->getFiles})) {
         next unless ($decompressed->getFileExtension($file) eq "json");
         $error->info("Found data file $file");
-        my $data = eval{
+        my $data = eval {
             JSON->new->utf8->relaxed(1)->decode($decompressed->getFileContentsAsScalar($file))
         };
         if ($@ || $data->{properties}{assetId} eq "" || $data->{properties}{className} eq "" || $data->{properties}{revisionDate} eq "") {
@@ -228,7 +242,7 @@ sub importPackage {
             $decompressed->untar($storageId.".storage", $assetStorage);
         }
         my $asset = $assets{$data->{properties}{parentId}} || $self;
-        my $newAsset = $asset->importAssetData($data);
+        my $newAsset = $asset->importAssetData($data, $options);
         $newAsset->importAssetCollateralData($data);
         $assets{$newAsset->getId} = $newAsset;
         # First imported asset must be the "package"
@@ -272,7 +286,12 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
-	return "";
+	if ($self->session->form->param("proceed") eq "manageAssets") {
+		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
+	} else {
+		$self->session->http->setRedirect($self->getUrl());
+	}
+	return undef;
 }
 
 #-------------------------------------------------------------------
@@ -302,6 +321,7 @@ sub www_importPackage {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless ($self->canEdit && $self->session->user->isInGroup(4));
 	my $storage = WebGUI::Storage->createTemp($self->session);
+    my $inheritPermissions = $self->session->form->process('inheritPermissions');
 
 	##This is a hack.  It should use the WebGUI::Form::File API to insulate
 	##us from future form name changes.
@@ -309,7 +329,7 @@ sub www_importPackage {
 
 	my $error = "";
 	if ($storage->getFileExtension($storage->getFiles->[0]) eq "wgpkg") {
-		$error = $self->importPackage($storage);
+		$error = $self->importPackage($storage, {inheritPermissions => $inheritPermissions});
 	}
 	if (!blessed $error) {
 		my $i18n = WebGUI::International->new($self->session, "Asset");
@@ -321,15 +341,12 @@ sub www_importPackage {
         }
 	}
     # Handle autocommit workflows
-    if ($self->session->setting->get("autoRequestCommit")) {
-        if ($self->session->setting->get("skipCommitComments")) {
-            WebGUI::VersionTag->getWorking($self->session)->requestCommit;
-        } 
-        else {
-            $self->session->http->setRedirect($self->getUrl("op=commitVersionTag;tagId=".WebGUI::VersionTag->getWorking($self->session)->getId));
-            return undef;
-        }
-    }
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
 
     return $self->www_manageAssets();
 }

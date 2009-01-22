@@ -117,12 +117,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "TEXT".
+Returns "CHAR(22) BINARY".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "TEXT";
+    return "CHAR(22) BINARY";
 }
 
 #-------------------------------------------------------------------
@@ -188,7 +188,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 
 sub toHtmlWithWrapper {
 	my $self = shift;
-	if ($self->session->user->isInGroup(3)) {
+	if ($self->session->user->isAdmin) {
 		my $subtext;
 		if ($self->get("afterEdit")) {
 			$subtext = $self->session->icon->edit("op=editLDAPLink;llid=".$self->getOriginalValue.";afterEdit=".$self->session->url->escape($self->get("afterEdit")));

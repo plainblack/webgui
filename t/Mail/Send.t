@@ -11,7 +11,7 @@
 
 # This script tests the creation, sending, and queuing of mail messages
 # TODO: There is plenty left to do in this script.
-
+$|=1;
 use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
@@ -43,6 +43,7 @@ my $SMTP_PORT        = '54921';
 if ($hasServer) {
     $oldSettings{ smtpServer } = $session->setting->get('smtpServer');
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
+    
 }
 
 #----------------------------------------------------------------------------
@@ -101,7 +102,6 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtml should add newlines after 78 characters",
 );
 
-$mail   = WebGUI::Mail::Send->create( $session );
 # TODO: Test that addHtml does not create an HTML wrapper if html or body tag exist
 
 #----------------------------------------------------------------------------
@@ -142,6 +142,8 @@ SKIP: {
     # Override the emailOverride
     my $oldEmailOverride   = $session->config->get('emailOverride');
     $session->config->set( 'emailOverride', 'dufresne@localhost' );
+    my $oldEmailToLog      = $session->config->get('emailToLog');
+    $session->config->set( 'emailToLog', 0 );
     
     # Send the mail
     my $mail
@@ -163,7 +165,11 @@ SKIP: {
 
     # Restore the emailOverride
     $session->config->set( 'emailOverride', $oldEmailOverride );
+    $session->config->set( 'emailToLog', $oldEmailToLog );
 }
+
+# TODO: Test the emailToLog config setting
+
 
 #----------------------------------------------------------------------------
 # Cleanup
@@ -187,7 +193,7 @@ END {
 #                 by a MIME::Entity parser
 sub sendToServer {
     my $mail        = shift;
-    
+
     my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
     open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT |"
         or die "Could not open pipe to SMTPD: $!";

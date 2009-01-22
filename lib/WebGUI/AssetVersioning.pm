@@ -21,7 +21,7 @@ use WebGUI::Search::Index;
 
 =head1 NAME
 
-Package WebGUI::AssetVersioning
+Package WebGUI::Asset (AssetVersioning)
 
 =head1 DESCRIPTION
 
@@ -301,6 +301,19 @@ sub getTagCount {
 
 #-------------------------------------------------------------------
 
+=head2 hasBeenCommitted ( )
+
+Returns whether or not this asset has been committed
+
+=cut
+
+sub hasBeenCommitted {
+	my $self = shift; 
+	return $self->getTagCount > 1  || $self->get('status') ne "pending";
+}
+
+#-------------------------------------------------------------------
+
 =head2 isLocked ( )
 
 Returns a boolean indicating whether the asset is locked for editing by the versioning system.
@@ -436,7 +449,7 @@ A new version tag id.
 sub setVersionTag {
 	my $self = shift;
     my $tagId = shift;
-	$self->session->db->write("update assetData set tagId=? where assetId=?", [$tagId, $self->getId]);
+    $self->session->db->write("update assetData set tagId=? where assetId=? and tagId = ?", [$tagId, $self->getId,$self->get('tagId')]);
 	$self->updateHistory("changed version tag to $tagId");
 	$self->purgeCache;
 }
@@ -491,10 +504,11 @@ If not specified, current user is used.
 
 sub updateHistory {
 	my $self = shift;
+    my $session = $self->session;
 	my $action = shift;
-	my $userId = shift || $self->session->user->userId || '3';
-	my $dateStamp =$self->session->datetime->time();
-	$self->session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp) values (".$self->session->db->quote($self->getId).", ".$self->session->db->quote($userId).", ".$self->session->db->quote($action).", ".$dateStamp.")");
+	my $userId = shift || $session->user->userId || '3';
+	my $dateStamp =$session->datetime->time();
+	$session->db->write("insert into assetHistory (assetId, userId, actionTaken, dateStamp, url) values (?,?,?,?,?)", [$self->getId, $userId, $action, $dateStamp, $self->get('url')]);
 }
 
 
@@ -541,7 +555,8 @@ sub www_manageRevisions {
         while (my ($date,$by,$tag,$tagId) = $sth->array) {
                 $output .= '<tr><td>'
 			.$self->session->icon->delete("func=purgeRevision;revisionDate=".$date,$self->get("url"),$i18n->get("purge revision prompt"))
-			.$self->session->icon->view("func=view;revision=".$date)
+			.$self->session->icon->view( "func=view;revision=" . $date )
+            .$self->session->icon->edit( "func=edit;revision=" . $date )
 			.'</td>
 			<td>'.$self->session->datetime->epochToHuman($date).'</td>
 			<td>'.$by.'</td>

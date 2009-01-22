@@ -795,13 +795,13 @@ our $I18N = {
         },
 
         'helpvar dateTime start' => {
-            message         => 'A set of date/time variables with the prefix "start". See "Calendar Date/Time Variables" for more information.',
-            lastUpdated     => 0,
+            message         => 'A set of date/time variables with the prefix "start" that all deal with the starting date of the displayed interval for the List view of the Calendar. See "Calendar Date/Time Variables" for more information.',
+            lastUpdated     => 1226959335,
             context         => 'Description of template variable.',
         },
 
         'helpvar dateTime end' => {
-            message         => 'A set of date/time variables with the prefix "end". See "Calendar Date/Time Variables" for more information.',
+            message         => 'A set of date/time variables with the prefix "end" that all deal with the ending date of the displayed window for the List view of the Calendar. See "Calendar Date/Time Variables" for more information.',
             lastUpdated     => 1204303480,
             context         => 'Description of template variable',
         },
@@ -900,7 +900,58 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Description of the asset property workflowIdCommit',
     },
+    'asset not committed' => {
+		message => q{<h1>Error!</h1><p>You need to commit this calendar before you can create a new event</p>},
+        lastUpdated => 1166848379,
+    },
 
+    'New Year' => {
+        message => q{New Year},
+        context => q{template label,  In a list of events, used to indicate that the year has changed},
+        lastUpdated => 1229310924,
+    },
+
+    'New Month' => {
+        message => q{New Month},
+        context => q{template label,  In a list of events, used to indicate that the month has changed},
+        lastUpdated => 1229310924,
+    },
+
+    'New Day' => {
+        message => q{New Day},
+        context => q{template label,  In a list of events, used to indicate that the day has changed},
+        lastUpdated => 1229311001,
+    },
+
+    'UP' => {
+        message => q{UP},
+        context => q{template label,  referring to the previous week, up.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
+    'DN' => {
+        message => q{DN},
+        context => q{template label,  referring to the next week, down.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
+    'Add a feed' => {
+        message => q{Add a feed},
+        context => q{feed refers to an iCalendar/iCal feed},
+        lastUpdated => 1230931579,
+    },
+
+    'Add' => {
+        message => q{Add},
+        context => q{to add, or append to a list},
+        lastUpdated => 1230931579,
+    },
+
+    'Feed URL' => {
+        message => q{Feed URL},
+        context => q{},
+        lastUpdated => 1230931579,
+    },
 
 };
 

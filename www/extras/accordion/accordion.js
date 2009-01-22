@@ -6,7 +6,6 @@ var AccordionMenu = new function()
 	var oMenuCache = {};
 	var dLastHoverTitle ;
 	YUD.addClass(document.documentElement,'accordion-menu-js');
-    YAHOO.util.Event.on(window, "load", function () { document.body.style.marginLeft = "250px"; });
 
 	function getDT(e)
 	{
@@ -57,7 +56,7 @@ var AccordionMenu = new function()
 	function expand(dl,dt,dd)
 	{
     var bodyPanels = YUD.getElementsByClassName("a-m-d", "dd",dl); 
-    var bodyPanelHeight = YUD.getViewportHeight() - (30 * bodyPanels.length) - 20;
+    var bodyPanelHeight = YUD.getViewportHeight() - (30 * bodyPanels.length);
 	
 		dl.hasAnimation +=1;
 		YUD.addClass(dd,'a-m-d-before-expand');		

@@ -15,6 +15,7 @@ use WebGUI::Shop::AddressBook;
 use WebGUI::Shop::Credit;
 use WebGUI::Shop::TransactionItem;
 use WebGUI::Shop::Pay;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -154,8 +155,14 @@ sub create {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $transactionId = $session->id->generate;
-    $session->db->write('insert into transaction (transactionId, userId, username, dateOfPurchase) values (?,?,?,now())',
-        [$transactionId, $session->user->userId, $session->user->username]);
+    my $cashier = $session->user;
+    my $posUser = $cashier;
+    my $cart = $properties->{cart};
+    if (defined $cart) {
+        $posUser = $cart->getPosUser;
+    }
+    $session->db->write('insert into transaction (transactionId, userId, username, cashierUserId, dateOfPurchase) values (?,?,?,?,now())',
+        [$transactionId, $posUser->userId, $posUser->username, $cashier->userId]);
     my $self = $class->new($session, $transactionId);
     $self->update($properties);
     return $self;
@@ -519,7 +526,10 @@ Displays the default thank you page.
 sub thankYou {
     my ($self) = @_;
     my $i18n = WebGUI::International->new($self->session,'Shop');
-    return $self->www_viewMy($self->session, $self, $i18n->get('thank you message'));
+
+    my $args     = [$self,$i18n->get('thank you message')];
+    my $instance = WebGUI::Content::Account->createInstance($self->session,"shop");
+    return $instance->displayContent($instance->callMethod("viewTransaction",$args));
 }
 
 
@@ -700,7 +710,7 @@ sub www_getTransactionsAsJson {
     $results{'startIndex'}   = $startIndex;
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
-    $session->http->setMimeType('text/json');
+    $session->http->setMimeType('application/json');
     return JSON->new->utf8->encode(\%results);
 }
 
@@ -722,17 +732,19 @@ sub www_manage {
     # set up all the files that we need
     $style->setLink($url->extras('/yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setLink($url->extras('/yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type=>'text/css'});
+    $style->setLink($url->extras('/yui/build/paginator/assets/skins/sam/paginator.css'), {rel=>'stylesheet', type=>'text/css'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'), {type=>'text/javascript'});
     $style->setScript($url->extras('/yui/build/json/json-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datasource/datasource-beta-min.js'), {type=>'text/javascript'});
-    $style->setScript($url->extras('/yui/build/datatable/datatable-beta-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/paginator/paginator-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datasource/datasource-min.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('/yui/build/datatable/datatable-min.js'), {type=>'text/javascript'});
 
     # draw the html markup that's needed
     $style->setRawHeadTags('<style type="text/css"> #paging a { color: #0000de; } #search form { display: inline; } </style>');
     my $output = q| 
 
 <div class=" yui-skin-sam">
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364,'WebGUI').q|" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
 </div>
@@ -746,43 +758,29 @@ YAHOO.util.Event.onDOMReady(function () {
     |;
     
     # the datasource deals with the stuff returned from www_getTransactionsAsJson
-    $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson')."');";
+    $output .= "var mySource = new DataSource('".$url->page('shop=transaction;method=getTransactionsAsJson;')."');";
     $output .= <<STOP;
     mySource.responseType   = DataSource.TYPE_JSON;
     mySource.responseSchema = {
         resultsList : 'records',
-        totalRecords: 'totalRecords',
         fields      : [ 'transactionCode', 'orderNumber', 'paymentDriverLabel',
-            'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage']
+            'transactionId', 'dateOfPurchase', 'username', 'amount', 'isSuccessful', 'statusCode', 'statusMessage'],
+        metaFields: {
+            totalRecords: "totalRecords" // Access to value in the server response
+        }
     };
 STOP
 
-    # paginator does the cool ajaxy pagination and makes the requests as needed
-    $output .= <<STOP;
-    var buildQueryString = function (state,dt) {
-        return ";startIndex=" + state.pagination.recordOffset +
-               ";keywords=" + Dom.get('keywordsField').value +
-               ";results=" + state.pagination.rowsPerPage;
-    };
-
-    var myPaginator = new Paginator({
-        containers         : ['paging'],
-        pageLinks          : 5,
-        rowsPerPage        : 25,
-        rowsPerPageOptions : [10,25,50,100],
-        template           : "<strong>{CurrentPageReport}</strong> {PreviousPageLink} {PageLinks} {NextPageLink} {RowsPerPageDropdown}"
-    });
-STOP
 
     # create the data table, and a special formatter for the view transaction urls
     $output .= <<STOP;
     var myTableConfig = {
-        initialRequest         : ';startIndex=0',
-        generateRequest        : buildQueryString,
-        paginationEventHandler : DataTable.handleDataSourcePagination,
-        paginator              : myPaginator
+        initialRequest         : 'startIndex=0',
+        dynamicData: true, // Enables dynamic server-driven data
+        sortedBy : {key:"orderNumber", dir:YAHOO.widget.DataTable.CLASS_DESC}, // Sets UI initial sort arrow
+        paginator              : new YAHOO.widget.Paginator({ rowsPerPage:25 })
     };
-    YAHOO.widget.DataTable.formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
+    formatViewTransaction = function(elCell, oRecord, oColumn, orderNumber) {
 STOP
 	$output .= q{elCell.innerHTML = '<a href="}.$url->page(q{shop=transaction;method=view})
         .q{;transactionId=' + oRecord.getData('transactionId') + '">' + orderNumber + '</a>'; };
@@ -790,7 +788,7 @@ STOP
         }; 
         var myColumnDefs = [
     ';
-    $output .= '{key:"orderNumber", label:"'.$i18n->get('order number').'", formatter:YAHOO.widget.DataTable.formatViewTransaction},';
+    $output .= '{key:"orderNumber", label:"'.$i18n->get('order number').'", formatter:formatViewTransaction},';
     $output .= '{key:"dateOfPurchase", label:"'.$i18n->get('date').'",formatter:YAHOO.widget.DataTable.formatDate},';
     $output .= '{key:"username", label:"'.$i18n->get('username').'"},';
     $output .= '{key:"amount", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
@@ -800,15 +798,23 @@ STOP
     $output .= <<STOP;
     ];
     var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);
+    myTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+        oPayload.totalRecords = oResponse.meta.totalRecords;
+        return oPayload;
+    }
 STOP
 
     # add the necessary event handler to the search button that sends the search request via ajax
     $output .= <<STOP;
     Dom.get('keywordSearchForm').onsubmit = function () {
-         mySource.sendRequest(';keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
-            myTable.onDataReturnInitializeTable, myTable);
+        var state = myTable.getState();
+        state.pagination.recordOffset = 0;
+        mySource.sendRequest('keywords=' + Dom.get('keywordsField').value + ';startIndex=0', 
+            {success: myTable.onDataReturnInitializeTable, scope:myTable, argument:state});
         return false;
     };
+    
+     
 
 });
 </script>
@@ -829,22 +835,8 @@ each one in the list.
 
 sub www_manageMy {
     my ($class, $session) = @_;
-    my %var = ();
-    my $url = $session->url;
-
-    # build list
-    foreach my $id (@{$class->getTransactionIdsForUser($session)}) {
-        my $transaction = $class->new($session, $id);
-        push @{$var{transactions}}, {
-            %{$transaction->get},
-            viewDetailUrl   => $url->page('shop=transaction;method=viewMy;transactionId='.$id),
-            amount          => sprintf("%.2f", $transaction->get('amount')),
-        };
-    }
-
-    # render
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopMyPurchasesTemplateId"));
-    return $session->style->userStyle($template->process(\%var));    
+    my $instance = WebGUI::Content::Account->createInstance($session,"shop");
+    return $instance->displayContent($instance->callMethod("managePurchases"));    
 }
 
 #-------------------------------------------------------------------
@@ -921,6 +913,7 @@ sub www_view {
         }
         $output .= q{</div>};
     }
+    my $cashier = WebGUI::User->new($session, $transaction->get('cashierUserId'));
     $output .= q{   
         <table class="transactionDetail">
             <tr>
@@ -934,6 +927,9 @@ sub www_view {
             </tr>
             <tr>
                 <th>}. $i18n->get("username") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$transaction->get('userId')).q{">}. $transaction->get('username') .q{</a></td>
+            </tr>
+            <tr>
+                <th>}. $i18n->get("cashier") .q{</th><td><a href="}.$url->page('op=editUser;uid='.$cashier->userId).q{">}. $cashier->username .q{</a></td>
             </tr>
             <tr>
                 <th>}. $i18n->get("amount") .q{</th><td><b>}. sprintf("%.2f", $transaction->get('amount')) .q{</b></td>
@@ -1122,74 +1118,10 @@ Displays transaction detail for a user's purchase.
 
 sub www_viewMy {
     my ($class, $session, $transaction, $notice) = @_;
-    unless (defined $transaction) {
-        $transaction = $class->new($session, $session->form->get('transactionId'));
-    }
-    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
-    my $i18n = WebGUI::International->new($session, 'Shop');
-    my ($style, $url) = $session->quick(qw(style url));
-    my %var = (
-        %{$transaction->get},
-        notice                  => $notice,
-        cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId),
-        amount                  => sprintf("%.2f", $transaction->get('amount')),
-        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
-        taxes                   => sprintf("%.2f", $transaction->get('taxes')),
-        shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
-        shippingAddress         => $transaction->formatAddress({
-                                        name        => $transaction->get('shippingAddressName'),
-                                        address1    => $transaction->get('shippingAddress1'),
-                                        address2    => $transaction->get('shippingAddress2'),
-                                        address3    => $transaction->get('shippingAddress3'),
-                                        city        => $transaction->get('shippingCity'),
-                                        state       => $transaction->get('shippingState'),
-                                        code        => $transaction->get('shippingCode'),
-                                        country     => $transaction->get('shippingCountry'),
-                                        phoneNumber => $transaction->get('shippingPhoneNumber'),
-                                        }),
-        paymentAddress          =>  $transaction->formatAddress({
-                                        name        => $transaction->get('paymentAddressName'),
-                                        address1    => $transaction->get('paymentAddress1'),
-                                        address2    => $transaction->get('paymentAddress2'),
-                                        address3    => $transaction->get('paymentAddress3'),
-                                        city        => $transaction->get('paymentCity'),
-                                        state       => $transaction->get('paymentState'),
-                                        code        => $transaction->get('paymentCode'),
-                                        country     => $transaction->get('paymentCountry'),
-                                        phoneNumber => $transaction->get('paymentPhoneNumber'),
-                                        }),
-        );
-    
-    # items
-    my @items = ();
-    foreach my $item (@{$transaction->getItems}) {
-        my $address = '';
-        if ($transaction->get('shippingAddressId') ne $item->get('shippingAddressId')) {
-            $address = $transaction->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
-                            });
-        }
-        push @items, {
-            %{$item->get},
-            viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
-            price               => sprintf("%.2f", $item->get('price')),
-            itemShippingAddress => $address,
-            orderStatus         => $i18n->get($item->get('orderStatus')),
-        };
-    }
-    $var{items} = \@items;
 
-    # render
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopMyPurchasesDetailTemplateId"));
-    return $style->userStyle($template->process(\%var));
+    my $args     = [$transaction,$notice];
+    my $instance = WebGUI::Content::Account->createInstance($session,"shop");
+    return $instance->displayContent($instance->callMethod("viewTransaction",$args));
 }
 
 #-------------------------------------------------------------------
