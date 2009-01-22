@@ -247,7 +247,35 @@ our $I18N = {
 		message => q|How many minutes the user has to finish the survey from the moment they start.  0 means unlimited time.|,
 		lastUpdated => 1231193335,
 	},
-    
+    'do after timelimit label' => {
+        message => q|Do After Time Limit:|,
+        lastUpdated => 1224686319,
+        context => q|label for the 'do after timelimit' field on the Properties tab of the Survey's edit screen.|,
+    },
+    'do after timelimit hoverHelp' => {
+        message => q|Select what happens after the time limit for finishing the survey has expired.|,
+        lastUpdated => 1231193335,
+        context => q|description of the 'do after timelimit' field on the Properties tab of the Survey's edit
+screen|,
+    }, 
+    'exit url label' =>{
+        message => q|Exit URL|,
+        lastUpdated => 0,
+        context => q|Label for the 'exit url' option of the 'do after timelimit' field on the Properties tab of the
+Survey's edit screen|,
+    },
+    'restart survey label' =>{
+        message => q|Restart Survey|,
+        lastUpdated => 0,
+        context => q|Label for the 'restart survey' option of the 'do after timelimit' field on the Properties tab of the
+Survey's edit screen|,
+    },
+    'restart message' =>{
+        message => q|The survey was restarted because the time limit for completing the survey was reached.|,
+        lastUpdated => 0,
+        context => q|The message shown to the user taking the survey when the survey is restarted after reaching
+the time limit for completing the survey. This message is in the 'take survey' template.|,
+    },
 };
 
 1;

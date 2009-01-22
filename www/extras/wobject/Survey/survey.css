@@ -88,3 +88,8 @@ input.mcbutton-selected{
 .survey-invalid-marker {
 	color: #FF0000;
 }
+
+#restartMessage {
+    color: #FF0000;
+}
+

@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 96;
+my $tests = 134;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ cmp_deeply(
 lives_ok
     {
         my $foo = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
-            qq!{ "survey" : "on 16\x{201d} hand-crocheted Cord" }!,
+            encode_json({survey => "on 16\x{201d}" }),
             $session->log
         );
     }
@@ -2002,6 +2002,74 @@ cmp_deeply(
     ],
     'updateQuestionAnswers: Dual Slider - Range'
 );
+
+####################################################
+#
+# totalSections
+#
+####################################################
+{
+    my $s = WebGUI::Asset::Wobject::Survey::SurveyJSON->new();
+    is($s->totalSections, 1, 'a');
+    is($s->totalQuestions, 0, 'a');
+    is($s->totalAnswers, 0, 'a');
+    
+    # Add a new section
+    my $address = $s->newObject([]);
+    is($s->totalSections, 2, 'Now there are 2 sections');
+    is($s->totalQuestions, 0, '..but still no questions');
+    is($s->totalAnswers, 0, '..and no answers');
+    
+    # Add a question to first section 
+    $address = $s->newObject([0]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 1, '..and now 1 question');
+    is($s->totalQuestions([0]), 1, '..in the intended section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add a question to second section 
+    $address = $s->newObject([1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 2, '..and now 2 questions overall');
+    is($s->totalQuestions([0]), 1, '..one in the first section');
+    is($s->totalQuestions([1]), 1, '..and one in the second section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add another question to second section 
+    $address = $s->newObject([1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and now 3 questions overall');
+    is($s->totalQuestions([0]), 1, '..one in the first section');
+    is($s->totalQuestions([1]), 2, '..and two in the second section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add an answer to second section, first question
+    $address = $s->newObject([1,0]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 1, '..and now 1 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 0, '..0 in third question');
+    
+    # Add an answer to second section, second question
+    $address = $s->newObject([1,1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 2, '..and now 2 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 1, '..1 in third question');
+    
+    # Add a second answer to second section, second question
+    $address = $s->newObject([1,1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 3, '..and now 3 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 2, '..2 in third question');
+}
 
 ####################################################
 #
