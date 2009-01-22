@@ -67,50 +67,112 @@ our $I18N = {
 		message => q|Section Number:|,
 		lastUpdated => 1224686319
 	},
+    'section number description' => {
+        message => q|The number of this section.|,
+        context => q|Description of the 'section number' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'questions on section page' => {
 		message => q|Questions on section page:|,
 		lastUpdated => 1224686319
 	},
+    'questions on section page description' => {
+        message => q|Are question displayed on the initial page of this section or on the next page.|,
+        context => q|Description of the 'questions on section page' field, used as hoverhelp in the edit section
+dialog.|,
+        lastUpdated => 0
+    },
+
 	'section name' => {
 		message => q|Section name:|,
 		lastUpdated => 1224686319
 	},
+    'section name description' => {
+        message => q|he name of this section of questions.|,
+        lastUpdated => 0
+    },
 	'randomize questions' => {
 		message => q|Randomize questions:|,
 		lastUpdated => 1224686319
 	},
+    'randomize questions description' => {
+        message => q|If set to Yes, then the questions will be shuffled for each user.|,
+        context => q|Description of the 'randomize questions' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0 
+    },
 	'section custom variable name' => {
 		message => q|Section custom variable name:|,
 		lastUpdated => 1224686319
 	},
+    'section custom variable name description' => {
+        message => q|Enter a variable name to identify this section, so that it can be entered as a goto variable name in another section.|,
+        context => q|Description of the 'section custom variable name' field, used as hoverhelp in the edit section
+dialog.|,
+        lastUpdated => 0
+    },
 	'section branch goto variable name' => {
 		message => q|Section branch goto variable name:|,
 		lastUpdated => 1224686319
 	},
+    'section branch goto variable name description' => {
+        message => q|The section or question with this variable name will be the next to be displayed after this section.|,
+        context => q|Description of the 'section branch goto variable name' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'questions per page' => {
 		message => q|Questions per page:|,
 		lastUpdated => 1224686319
 	},
+    'questions per page description' => {
+        message => q|The number of questions displayed per page.|,
+        context => q|Description of the 'questions per page' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'section text' => {
 		message => q|Section text:|,
 		lastUpdated => 1224686319
 	},
+    'section text description' => {
+        message => q|Enter a description of this section.|,
+        context => q|Description of the 'section text' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'title on every page' => {
 		message => q|Title on every page:|,
 		lastUpdated => 1224686319
 	},
+    'title on every page description' => {
+        message => q|Should the title of this section be displayed on every page of this section?|,
+        context => q|Description of the 'title on every page' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'text on every page' => {
 		message => q|Text on every page:|,
 		lastUpdated => 1224686319
 	},
+    'text on every page description' => {
+        message => q|Should the text of this section be displayed on every page of this section?|,
+        context => q|Description of the 'text on every page' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'terminal section' => {
 		message => q|Terminal section:|,
 		lastUpdated => 1224686319
 	},
+    'terminal section description' => {
+        message => q|Is this a terminal section of this Survey?|,
+        context => q|Description of the 'terminal section' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'terminal section url' => {
 		message => q|Terminal section URL:|,
 		lastUpdated => 1224686319
 	},
+    'terminal section url description' => {
+        message => q|The url that will be displayed after this section. The terminal url setting in a question overrides the terminalUrl setting for its section.|,
+        context => q|Description of the 'terminal section url' field, used as hoverhelp in the edit section dialog.|,
+        lastUpdated => 0
+    },
 	'please enter section information' => {
 		message => q|Please enter section information|,
 		lastUpdated => 1224686319
@@ -135,6 +197,11 @@ our $I18N = {
 		message => q|Randomize answers:|,
 		lastUpdated => 1224686319
 	},
+    'randomize answers description' => {
+        message => q|If set to Yes, then the answers will be shuffled for each user.|,
+        context => q|Description of the 'randomize answers' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0 
+    },
 	'question type' => {
 		message => q|Question type:|,
 		lastUpdated => 1224686319

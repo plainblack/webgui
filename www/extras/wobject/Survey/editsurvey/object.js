@@ -27,6 +27,7 @@ Survey.ObjectTemplate = new function(){
         form.callback = Survey.Comm.callback;
         form.render();
         form.show();
+        initHoverHelp(type);
     }
 }();
 
