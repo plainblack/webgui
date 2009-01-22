@@ -45,7 +45,7 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
 	push(@{$definition}, {
-		name=>$i18n->get('activityName'),
+		name=>$i18n->get('Summarize Passive Analytics'),
 		properties=> {
 			deltaInterval => {
 				fieldType    => 'interval',
