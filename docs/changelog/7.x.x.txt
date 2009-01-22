@@ -10,6 +10,7 @@
  - fixed a bug where no Payment Gateway labels show up when checking out.
  - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search page has head tags in body
+ - fixed: HTTP Proxy doesn't serve new content to visitors
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
