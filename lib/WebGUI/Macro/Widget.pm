@@ -21,6 +21,7 @@ sub process {
     my $width           = shift || 600;
     my $height          = shift || 400;
     my $templateId      = shift || 'none';
+    my $styleTemplateId = shift || 'none';
 
     # Get location for CSS and JS files
     my $conf            = $session->config;
@@ -85,7 +86,7 @@ sub process {
         <script type='text/javascript'>
             function setupPage() {
                 WebGUI.widgetBox.retargetLinksAndForms();
-                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId', 'styleTemplateId' : $styleTemplateId } );
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
@@ -108,7 +109,7 @@ OUTPUT
     my $output          = <<EOHTML;
 <a href="#$assetId" id="show$assetId" name="show$assetId"><img src="$imgSrc" /></a>
 <script type="text/javascript">
-YAHOO.util.Event.addListener(window, 'load', WebGUI.widgetBox.initButton, { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+YAHOO.util.Event.addListener(window, 'load', WebGUI.widgetBox.initButton, { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId', 'styleTemplateId' : '$styleTemplateId' } );
 </script>
 EOHTML
 
