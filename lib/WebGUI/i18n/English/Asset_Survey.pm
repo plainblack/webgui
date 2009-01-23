@@ -196,7 +196,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'question text description' => {
-        message => q|Enter a description of this question.|,
+        message => q|Enter a text for this question.|,
         context => q|Description of the 'question text' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
@@ -268,7 +268,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'cols description' => {
-        message => q|The number of columns of the comment textarea input.|,
+        message => q|The number of columns of the textarea input.|,
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
@@ -277,7 +277,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'rows description' => {
-        message => q|The number of rows of the comment textarea input.|,
+        message => q|The number of rows of the textarea input.|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
@@ -317,18 +317,38 @@ our $I18N = {
 		message => q|Answer number:|,
 		lastUpdated => 1224686319
 	},
+    'answer number description' => {
+        message => q|The number of this answer|,
+        context => q|Description of the 'answer number' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'answer text' => {
 		message => q|Answer text:|,
 		lastUpdated => 1224686319
 	},
+    'answer text description' => {
+        message => q|Enter a text for this answer.|,
+        context => q|Description of the 'answer text' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'recorded answer' => {
 		message => q|Recorded answer:|,
 		lastUpdated => 1224686319
 	},
+    'recorded answer description' => {
+        message => q|The answer that will be recorded in the database.|,
+        context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'jump to' => {
 		message => q|Jump to:|,
 		lastUpdated => 1224686319
 	},
+    'jump to description' => {
+        message => q|The section or question with this variable name will be the next to be displayed after this answer.|,
+        context => q|Description of the 'jump to' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'text answer' => {
 		message => q|Text answer|,
 		lastUpdated => 1224686319
@@ -337,6 +357,11 @@ our $I18N = {
 		message => q|Is this the correct answer|,
 		lastUpdated => 1224686319
 	},
+    'is this the correct answer description' => {
+        message => q|Select wether this is the correct answer or not.|,
+        context => q|Description of the 'is this the correct answer' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'yes' => {
 		message => q|Yes|,
 		lastUpdated => 1224686319
@@ -349,22 +374,47 @@ our $I18N = {
 		message => q|Min|,
 		lastUpdated => 1224686319
 	},
+    'min description' => {
+        message => q|Set the min value of this answer for slider type questions.|,
+        context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'max' => {
 		message => q|Max|,
 		lastUpdated => 1224686319
 	},
+    'max description' => {
+        message => q|Set the max value of this answer for slider type questions.|,
+        context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'step' => {
 		message => q|Step|,
 		lastUpdated => 1224686319
 	},
+    'step description' => {
+        message => q|Set the step value of this answer for slider type questions.|,
+        context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'verbatim' => {
 		message => q|Verbatim|,
 		lastUpdated => 1224686319
 	},
+    'verbatim description' => {
+        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text.|,
+        context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'answer value' => {
 		message => q|Answer value:|,
 		lastUpdated => 1224686319
 	},
+    'answer value description' => {
+        message => q|Enter a value for this answer.|,
+        context => q|Description of the 'answer value' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'checked' => {
 		message => q|Checked|,
 		lastUpdated => 1224686319

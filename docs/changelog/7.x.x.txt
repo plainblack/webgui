@@ -4,6 +4,7 @@
  - fixed #9506: Choose billing address
  - fixed #9541: assets with uncommitted parent.
  - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
+ - fixed #9236: Survey 2.0 missing hoverhelp
 
 7.6.9
  - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
