@@ -49,6 +49,16 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
+    'inbox send message template label' => {
+        message     => q|Send Message Template|,
+        lastUpdated => 1119068809,
+    },
+
+    'inbox send message template hoverHelp' => {
+        message     => q|Choose the template for sending a message|,
+        lastUpdated => 1119068809,
+    },
+
     'inbox message confirm template label' => {
         message     => q|Inbox Message Confirm Template|,
         lastUpdated => 1119068809
