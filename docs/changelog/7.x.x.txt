@@ -1,10 +1,12 @@
 7.6.10
  - fixed #9455: fixed synopsis to pick out html paragraphs, fixed FeedPP fields to scalar when blank
  - fixed: With autocommit and no comments on, making a shortcut of an asset takes you to that asset's view.
+ - fixed #9506: Choose billing address
+ - fixed #9541: assets with uncommitted parent.
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
 
 7.6.9
- - fixed: ukplayer example is now loaded with swfobject.js released under the
-          MIT licence, see gotcha's and /extras/ukplayer
+ - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
  - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
  - marked sbin scripts as executable
