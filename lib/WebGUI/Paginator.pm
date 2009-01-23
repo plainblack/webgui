@@ -356,11 +356,12 @@ sub getNextPageLink {
     my $i18n = WebGUI::International->new($self->session);
     $ctext = $i18n->get(92);
     $text = $ctext.'&raquo;';
+    my $url = undef;
     if ($pn < $self->getNumberOfPages) {
-        my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
         $text = '<span id="nextPageLink"><a href="'.$url.'">' . $text . '</a></span>';
     }
-    return wantarray ? (undef,$ctext,$text) : $text;
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
@@ -524,11 +525,12 @@ sub getPreviousPageLink {
     my $i18n = WebGUI::International->new($self->session);
     $ctext = $i18n->get(91);
     $text = '&laquo;'.$ctext;
+    my $url = undef;
     if ($pn > 1) {
-        my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
         $text = '<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a></span>';
     }
-    return wantarray ? (undef,$ctext,$text) : $text;
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
