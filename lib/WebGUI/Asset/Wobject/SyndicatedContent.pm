@@ -196,9 +196,9 @@ sub getTemplateVariables {
 	my @items = $feed->get_item;
 	my %var;
 	$var{channel_title} = WebGUI::HTML::filter($feed->title, 'javascript');
-	$var{channel_description} = WebGUI::HTML::filter($feed->description, 'javascript');
-	$var{channel_date} = WebGUI::HTML::filter($feed->get_pubDate_epoch, 'javascript');
-	$var{channel_copyright} = WebGUI::HTML::filter($feed->copyright, 'javascript');
+	$var{channel_description} = WebGUI::HTML::filter(scalar($feed->description), 'javascript');
+	$var{channel_date} = WebGUI::HTML::filter(scalar($feed->get_pubDate_epoch), 'javascript');
+	$var{channel_copyright} = WebGUI::HTML::filter(scalar($feed->copyright), 'javascript');
 	$var{channel_link} = WebGUI::HTML::filter($feed->link, 'javascript');
 	my @image = $feed->image;
 	$var{channel_image_url} = WebGUI::HTML::filter($image[0], 'javascript');
@@ -215,7 +215,7 @@ sub getTemplateVariables {
         $item{author} = WebGUI::HTML::filter($object->author, 'javascript');
         $item{guid} = WebGUI::HTML::filter($object->guid, 'javascript');
         $item{link} = WebGUI::HTML::filter($object->link, 'javascript');
-        $item{description} = WebGUI::HTML::filter($object->description, 'javascript');
+        $item{description} = WebGUI::HTML::filter(scalar($object->description), 'javascript');
         $item{descriptionFirst100words} = $item{description};
         $item{descriptionFirst100words} =~ s/(((\S+)\s+){100}).*/$1/s;
         $item{descriptionFirst75words} = $item{descriptionFirst100words};

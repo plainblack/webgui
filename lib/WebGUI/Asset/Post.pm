@@ -548,11 +548,15 @@ sub getSynopsisAndContent {
 	my $synopsis = shift;
 	my $body = shift;
 	unless ($synopsis) {
-        	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
-       	 	my @content = split(/\^\-\;/,$body);
-		$synopsis = WebGUI::HTML::filter($content[0],"all");
+           my @content;
+           if( $body =~ /<p>/ ) {
+               @content = WebGUI::HTML::splitTag($body);
+           } else {
+       	       @content = split("\n",$body);
+           }
+           shift @content if $content[0] =~ /^\s*$/;
+           $synopsis = WebGUI::HTML::filter($content[0],"all");
 	}
-	$body =~ s/\^\-\;/\n/;
 	return ($synopsis,$body);
 }
 

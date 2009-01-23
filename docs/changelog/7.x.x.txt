@@ -1,4 +1,5 @@
 7.6.10
+ - fixed #9455: fixed synopsis to pick out html paragraphs, fixed FeedPP fields to scalar when blank
  - fixed: With autocommit and no comments on, making a shortcut of an asset takes you to that asset's view.
 
 7.6.9
