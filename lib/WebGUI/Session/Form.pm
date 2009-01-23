@@ -103,27 +103,18 @@ The name of the field to retrieve if you want to retrieve just one specific fiel
 
 sub param {
 	my $self = shift;
+    return undef unless $self->session->request;
 	my $field = shift;
 	if ($field) {
-		if ($self->session->request) {
-			my @data = $self->session->request->param($field);
-            foreach my $value (@data) {
-                $value = Encode::decode_utf8($value);
-            }
-			return wantarray ? @data : $data[0];
-		} else {
-			return undef;
-		}
-	} else {
-		if ($self->session->request) {
-			my %params;
-			foreach ($self->session->request->param) {
-				$params{$_} = 1;
-			}
-			return keys %params;
-		} else {
-			return undef;
-		}
+        my @data = $self->session->request->param($field);
+        foreach my $value (@data) {
+            $value = Encode::decode_utf8($value);
+        }
+        return wantarray ? @data : $data[0];
+	}
+    else {
+        my $paramRef = $self->session->request->param;
+        return keys %{ $paramRef };
 	}
 }
 
@@ -154,8 +145,8 @@ A full set of form params just as you'd pass into any of the form controls when 
 sub process {
 	my ($self, $name, $type, $default, $params) = @_;
 
-	$type = ucfirst($type);
 	return $self->param($name) if ($type eq "");
+	$type = ucfirst($type);
 
 	return $self->SUPER::process({
 		name	=>	$name,
