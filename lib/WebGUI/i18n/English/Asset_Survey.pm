@@ -310,7 +310,76 @@ dialog.|,
 		message => q|How many minutes the user has to finish the survey from the moment they start.  0 means unlimited time.|,
 		lastUpdated => 1231193335,
 	},
-    
+    'survey template' => {
+        message     => q|Survey Template|,
+        lastUpdated => 0,
+    },
+
+    'survey template help' => {
+        message     => q|The template to display the main page of the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Show user their progress' => {
+        message     => q|Show user their progress?|,
+        lastUpdated => 0,
+    },
+
+    'Show user their progress help' => {
+        message     => q|Set to yes to display to the user how many questions they have answered, and how many they have left to go.|,
+        lastUpdated => 0,
+    },
+
+    'Show user their time remaining' => {
+        message     => q|Show user their time remaining?|,
+        lastUpdated => 0,
+    },
+
+    'Show user their time remaining help' => {
+        message     => q|Set to yes to display to the user how much time they have left to finish the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Group to edit survey' => {
+        message     => q|Group to edit the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Group to edit survey help' => {
+        message     => q|Select a group who can edit the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Group to take survey' => {
+        message     => q|Group to take the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Group to take survey help' => {
+        message     => q|Select a group who can take the survey.|,
+        lastUpdated => 0,
+    },
+
+    'Group to view reports' => {
+        message     => q|Group to view reports.|,
+        lastUpdated => 0,
+    },
+
+    'Group to view reports help' => {
+        message     => q|Select a group who can view reports.|,
+        lastUpdated => 0,
+    },
+
+    'Survey Exit URL' => {
+        message     => q|Survey Exit URL|,
+        lastUpdated => 0,
+    },
+
+    'Survey Exit URL help' => {
+        message     => q|When the user finishes the surevey, they will be sent to this URL.  Leave blank if no special forwarding is required.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
