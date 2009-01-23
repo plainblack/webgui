@@ -16,6 +16,7 @@
  - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
  - fixed: HTTP Proxy doesn't serve new content to visitors
  - fixed: Exporting to static files can leak large amounts of memory
+ - fixed: Paginator generates bad markup for next page links
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts
