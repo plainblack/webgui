@@ -535,6 +535,17 @@ our $I18N = {
 		lastUpdated => 1230867391,
 	},
 
+    'inbox rich editor label' => {
+        message         => q{Inbox Rich Editor},
+        lastUpdated     => 0,
+        context         => q{Label for setting},
+    },
+
+    'inbox rich editor description' => {
+        message         => q{The rich editor used to compose messages},
+        lastUpdated     => 0,
+        context         => "Description of Inbox setting",
+    },
 };
 
 1;

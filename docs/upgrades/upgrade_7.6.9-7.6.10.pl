@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addRichEditorInboxSetting( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+# Add ability to select which rich editor for messages between users
+sub addRichEditorInboxSetting {
+    my $session = shift;
+    print "\tAdding rich editor selection to Inbox... " unless $quiet;
+
+    $session->setting->add("inboxRichEditId","PBrichedit000000000001");
+
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
