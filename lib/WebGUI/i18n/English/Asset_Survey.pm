@@ -78,8 +78,7 @@ our $I18N = {
 	},
     'questions on section page description' => {
         message => q|Are question displayed on the initial page of this section or on the next page.|,
-        context => q|Description of the 'questions on section page' field, used as hoverhelp in the edit section
-dialog.|,
+        context => q|Description of the 'questions on section page' field, used as hoverhelp in the edit section dialog.|,
         lastUpdated => 0
     },
 
@@ -88,7 +87,8 @@ dialog.|,
 		lastUpdated => 1224686319
 	},
     'section name description' => {
-        message => q|he name of this section of questions.|,
+        message => q|The name of this section of questions.|,
+        context => q|Description of the 'section name' field, used as hoverhelp in the edit section dialog.|,
         lastUpdated => 0
     },
 	'randomize questions' => {
@@ -106,8 +106,7 @@ dialog.|,
 	},
     'section custom variable name description' => {
         message => q|Enter a variable name to identify this section, so that it can be entered as a goto variable name in another section.|,
-        context => q|Description of the 'section custom variable name' field, used as hoverhelp in the edit section
-dialog.|,
+        context => q|Description of the 'section custom variable name' field, used as hoverhelp in the edit section dialog.|,
         lastUpdated => 0
     },
 	'section branch goto variable name' => {
@@ -175,24 +174,41 @@ dialog.|,
     },
 	'please enter section information' => {
 		message => q|Please enter section information|,
+        context => q|Title of the edit section dialog.|,
 		lastUpdated => 1224686319
 	},
 	'please enter question information' => {
 		message => q|Please enter question information|,
+        context => q|Title of the edit question dialog.|,
 		lastUpdated => 1224686319
 	},
 	'question number' => {
 		message => q|Question number:|,
 		lastUpdated => 1224686319
 	},
+    'question number description' => {
+        message => q|The number of this question.|,
+        context => q|Description of the 'question number' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'question text' => {
 		message => q|Question text:|,
 		lastUpdated => 1224686319
 	},
+    'question text description' => {
+        message => q|Enter a description of this question.|,
+        context => q|Description of the 'question text' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'question variable name' => {
 		message => q|Question variable name.|,
 		lastUpdated => 1224686319
 	},
+    'question variable name description' => {
+        message => q|Enter a variable name to identify this question, so that it can be entered as a goto variable name in another section.|,
+        context => q|Description of the 'question variable name' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'randomize answers' => {
 		message => q|Randomize answers:|,
 		lastUpdated => 1224686319
@@ -206,44 +222,95 @@ dialog.|,
 		message => q|Question type:|,
 		lastUpdated => 1224686319
 	},
+    'question type description' => {
+        message => q|Select this question's field type.|,
+        context => q|Description of the 'question type' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'randomized words' => {
 		message => q|Randomized words:|,
 		lastUpdated => 1224686319
 	},
+    'randomized words description' => {
+        message => q||,
+        context => q|Description of the 'randomized words' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'vertical display' => {
 		message => q|Vertical display:|,
 		lastUpdated => 1224686319
 	},
+    'vertical display description' => {
+        message => q|This property controls whether buttons of a multiple choice question are laid out horizontally or vertically.|,
+        context => q|Description of the 'vertical display' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'show text in button' => {
 		message => q|Show text in button:|,
 		lastUpdated => 1224686319
 	},
+    'show text in button description' => {
+        message => q|Select if the buttons of a multiple choice question display the answer values or not.|,
+        context => q|Description of the 'show text in button' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'allow comment' => {
 		message => q|Allow comment:|,
 		lastUpdated => 1224686319
 	},
+    'allow comment description' => {
+        message => q|Can the user add a comment about this question?|,
+        context => q|Description of the 'allow comment' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'cols' => {
 		message => q|Cols:|,
 		lastUpdated => 1224686319
 	},
+    'cols description' => {
+        message => q|The number of columns of the comment textarea input.|,
+        context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'rows' => {
 		message => q|Rows:|,
 		lastUpdated => 1224686319
 	},
+    'rows description' => {
+        message => q|The number of rows of the comment textarea input.|,
+        context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'maximum number of answers' => {
 		message => q|Maximum number of answers:|,
 		lastUpdated => 1224686319
 	},
+    'maximum number of answers description' => {
+        message => q|Enter the maximum number of answers.|,
+        context => q|Description of the 'maximum number of answers' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'required' => {
 		message => q|Required|,
 		lastUpdated => 1224686319
 	},
+    'required description' => {
+        message => q|Is this a required question?|,
+        context => q|Description of the 'required' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'question value' => {
 		message => q|Question value:|,
 		lastUpdated => 1224686319
 	},
+    'question value description' => {
+        message => q|Enter a value for this question.|,
+        context => q|Description of the 'question value' field, used as hoverhelp in the edit question dialog.|,
+        lastUpdated => 0
+    },
 	'please enter answer information' => {
 		message => q|Please enter answer information:|,
+        context => q|Title of the edit answer dialog.|,
 		lastUpdated => 1224686319
 	},
 	'answer number' => {
