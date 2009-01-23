@@ -21,7 +21,7 @@ use WebGUI::International;
 
 =head1 NAME
 
-Package WebGUI::Form::HexSlider
+Package WebGUI::Form::SelectSlider
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,7 @@ Creates a slider control that controls hex values, as in the red, gree, blue val
 
 =head1 SEE ALSO
 
-This is a subclass of WebGUI::Form::Control.
+This is a subclass of WebGUI::Form::Slider.
 
 =head1 METHODS 
 
