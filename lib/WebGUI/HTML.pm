@@ -436,7 +436,7 @@ sub splitTag {
 
     while (my $token = $p->get_tag($tag)) {
         my $text = $p->get_trimmed_text("/$tag");
-        next if $text =~ /^([:space:]|[:^print:])*$/;    # skip whitespace
+        next if $text =~ /^([[:space:]]|[[:^print:]])*$/;    # skip whitespace
         push @result, $text;          # add the text between the tags to the result array
         last if @result == $count;    # if we have a full count then quit
     }
