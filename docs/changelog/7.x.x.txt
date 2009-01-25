@@ -7,7 +7,8 @@
  - fixed #9236: Survey 2.0 missing hoverhelp
  - added: Widget Macro now uses a style, defaulting to the users.
  - added ability to select which rich editor is used to compose messages in the inbox
-
+ - removed random questions display from Survey Questions Edit template until
+   that feature is added.
 7.6.9
  - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
