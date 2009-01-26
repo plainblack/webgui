@@ -469,6 +469,25 @@ sub isEditable {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+Returns a boolean indicating whether this field was in the posted data.
+
+=cut
+
+sub isInRequest {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form = WebGUI::Form::DynamicField->new($session, 
+       fieldType => $self->get('fieldType'),
+       name      => $self->getId,
+    );
+    return $form->isInRequest;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 isProtected ( )
 
 Returns a boolean indicating whether this field may be deleted.

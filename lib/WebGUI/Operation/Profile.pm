@@ -161,13 +161,8 @@ sub validateProfileData {
 	my $i18n = WebGUI::International->new($session);
     my $fields = $regOnly ? WebGUI::ProfileField->getRegistrationFields($session)
                           : WebGUI::ProfileField->getEditableFields($session);
-	foreach my $field (@$fields) {
+	FIELD: foreach my $field (@$fields) {
 		my $fieldValue = $field->formProcess;
-		if (ref $fieldValue eq "ARRAY") {
-			$data{$field->getId} = $$fieldValue[0];
-		} else {
-			$data{$field->getId} = $fieldValue;
-		}
 		if ($field->isRequired && $data{$field->getId} eq "") {
 			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
 		} elsif ($field->getId eq "email" && isDuplicateEmail($session,$data{$field->getId}) && WebGUI::ProfileField->new($session, "email")->isRequired() ) {
@@ -177,6 +172,12 @@ sub validateProfileData {
 			unless (exists $i18n->getLanguages()->{$fieldValue}) {
 				$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
 			}
+		}
+        next FIELD unless $field->isInRequest;
+		if (ref $fieldValue eq "ARRAY") {
+			$data{$field->getId} = $$fieldValue[0];
+		} else {
+			$data{$field->getId} = $fieldValue;
 		}
 	}
 	return (\%data, $error, $warning);
