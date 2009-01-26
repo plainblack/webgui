@@ -563,15 +563,15 @@ $properties should never be a partial object, but contain all properties.
 
 sub update {
     my ( $self, $address, $properties ) = @_;
-    my $object;
-    
+
     # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
-    
+
     # First retrieve the addressed object, or, if necessary, create it
+    my $object;
     if ( $count == 1 ) {
         $object = $self->section($address);
         if ( !defined $object ) {
@@ -586,6 +586,10 @@ sub update {
             $newQuestion = 1; # make note that a new question was created
             push( @{ $self->questions($address) }, $object );
         }
+        # We need to update all of the answers to reflect the new questionType
+        if ( $properties->{questionType} ne $object->{questionType} ) {
+            $self->updateQuestionAnswers( $address, $properties->{questionType} );
+        }
     }
     elsif ( $count == 3 ) {
         $object = $self->answer($address);
@@ -594,17 +598,7 @@ sub update {
             push( @{ $self->answers($address) }, $object );
         }
     }
-    
-    # $object and $address now refer to the section/question/answer to be updated
-    
-    # In the case where we are updating an existing question..
-    if ( $count == 2 and !$newQuestion ) {
-        # We need to update all of the answers to reflect the new questionType
-        if ( $properties->{questionType} ne $self->question($address)->{questionType} ) {
-            $self->updateQuestionAnswers( $address, $properties->{questionType} );
-        }
-    }
-    
+
     # Update $object with all of the data in $properties 
     for my $key ( keys %$properties ) {
         $object->{$key} = $properties->{$key} if defined $properties->{$key};
