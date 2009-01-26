@@ -1198,6 +1198,33 @@ sub www_exportSimpleResults {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_exportTransposedResults (){
+
+Returns transposed results as a tabbed file.
+
+=cut
+
+sub www_exportTransposedResults {
+    my $self = shift;
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+
+    $self->loadTempReportTable();
+
+    my $filename = $self->session->url->escape( $self->get("title") . "_transposedResults.tab" );
+    my $content
+        = $self->session->db->quickTab(
+        "select r.userId, r.username, r.ipAddress, r.startDate, r.endDate, r.isComplete, t.*
+        from Survey_tempReport t 
+        left join Survey_response r using(Survey_responseId) 
+        where t.assetId=? 
+        order by r.userId, r.Survey_responseId, t.order",
+        [ $self->getId() ] );
+    return $self->export( $filename, $content );
+}
+
+#-------------------------------------------------------------------
 sub export {
     my $self     = shift;
     my $filename = shift;
