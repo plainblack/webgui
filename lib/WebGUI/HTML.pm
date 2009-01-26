@@ -37,7 +37,7 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::html2text($html);
  $html = WebGUI::HTML::makeAbsolute($session, $html);
  $html = WebGUI::HTML::processReplacements($session, $html);
- $html = WebGUI::HTML::splitTag([$tag,]$html[,$count]);    # defaults to ( 'p', $html, 0 )
+ $html = WebGUI::HTML::splitTag([$tag,]$html[,$count]);    # defaults to ( 'p', $html, 1 )
 
 =head1 METHODS
 
@@ -414,7 +414,7 @@ The block of HTML text that will be disected
 
 =head3 count
 
-How many items do we want?  defaults to 1; returns 1 non-blank item
+How many items do we want?  defaults to 1; returns 1 non-blank item; -1 returns all items
 
 =cut
 
@@ -423,14 +423,12 @@ sub splitTag {
     my $tag = shift;
     my $html = shift;
     my $count = shift || 1;
-    if( not defined $html or $html =~ /^(\d+)$/ ) {
+    if( not defined $html or $html =~ /^(-?\d+)$/ ) {
         $count = $html if $1;
         $html = $tag;
         $tag = 'p';                 # the default tag is 'p' -- grabs a paragraph
     }
     my @result;
-
-    $html =~ s/\&nbsp;//g;   # get rid of all non-breaking spaces
 
     my $p = HTML::TokeParser->new(\$html);
 
@@ -441,7 +439,8 @@ sub splitTag {
         last if @result == $count;    # if we have a full count then quit
     }
 
-    return @result;
+    return @result if wantarray;
+    return $result[0];
 }
 
 1;
