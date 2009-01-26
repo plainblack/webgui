@@ -22,6 +22,11 @@ use POSIX qw(ceil floor);
 use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
+
+=head2 _addDaysForMonth 
+
+=cut
+
 sub _addDaysForMonth {
    my $self = shift;
    my $dt = $self->session->datetime;
@@ -53,6 +58,11 @@ sub _addDaysForMonth {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _clobberImproperDependants 
+
+=cut
+
 sub _clobberImproperDependants {
 	my $self = shift;
 	my $projectId = shift;
@@ -62,6 +72,11 @@ sub _clobberImproperDependants {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _doGanttTaskResourceDisplay 
+
+=cut
+
 sub _doGanttTaskResourceDisplay {
 	my $self = shift;
 	my $hash = shift;
@@ -96,6 +111,11 @@ sub _doGanttTaskResourceDisplay {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _getDurationUnitHash 
+
+=cut
+
 sub _getDurationUnitHash {
    my $self = shift;
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -107,6 +127,11 @@ sub _getDurationUnitHash {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _getDurationUnitHashAbbrev 
+
+=cut
+
 sub _getDurationUnitHashAbbrev {
    my $self = shift;
    my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -118,6 +143,11 @@ sub _getDurationUnitHashAbbrev {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _groupSearchQuery 
+
+=cut
+
 sub _groupSearchQuery {
 	my $self = shift;
 	my $exclude = shift;
@@ -136,6 +166,11 @@ SQL
 }
 
 #-------------------------------------------------------------------
+
+=head2 _htmlOfResourceList 
+
+=cut
+
 sub _htmlOfResourceList {
 	my $self = shift;
 	my %args = %{+shift};
@@ -188,6 +223,11 @@ sub _htmlOfResourceList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _innerHtmlOfResources 
+
+=cut
+
 sub _innerHtmlOfResources {
 	my $self = shift;
 	my @resources = @_;
@@ -196,6 +236,11 @@ sub _innerHtmlOfResources {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _resourceListOfTask 
+
+=cut
+
 sub _resourceListOfTask {
 	my $self         = shift;
 	my $taskId       = shift;
@@ -219,6 +264,11 @@ sub _resourceListOfTask {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _resourceSearchPopup 
+
+=cut
+
 sub _resourceSearchPopup {
 	my $self = shift;
 	my %args = @_;
@@ -260,6 +310,11 @@ sub _resourceSearchPopup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _userSearchQuery 
+
+=cut
+
 sub _userSearchQuery {
 	my $self = shift;
 	my $exclude = shift;
@@ -280,6 +335,11 @@ SQL
 }
 
 #-------------------------------------------------------------------
+
+=head2 _updateDependantDates 
+
+=cut
+
 sub _updateDependantDates {
 	my $self = shift;
 	my $db = $self->session->db;
@@ -335,6 +395,11 @@ sub _updateDependantDates {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _userCanManageProject 
+
+=cut
+
 sub _userCanManageProject {
     my $self = shift;
     my $user = shift;
@@ -344,6 +409,11 @@ sub _userCanManageProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _userCanManageProjectList 
+
+=cut
+
 sub _userCanManageProjectList {
 	my $self = shift;
 	my $user = shift;
@@ -351,6 +421,11 @@ sub _userCanManageProjectList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _userCanObserveProject 
+
+=cut
+
 sub _userCanObserveProject {
 	my $self = shift;
 	my $user = shift;
@@ -360,6 +435,11 @@ sub _userCanObserveProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 definition 
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -439,6 +519,11 @@ sub definition {
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return the instance of the PM wobject which this project blongs
+
+=head2 getProjectInstance 
+
+=cut
+
 sub getProjectInstance {
    my $class = shift;
    my $session = shift;
@@ -454,6 +539,11 @@ sub getProjectInstance {
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return all projects in all assets for which the user passed in has tasks assigned
+
+=head2 getProjectList 
+
+=cut
+
 sub getProjectList {
 	my $self = shift;
 	my $db = $self->session->db;
@@ -474,6 +564,11 @@ SQL
 
 #-------------------------------------------------------------------
 #API method called by Time Tracker to return all tasks for the projectId passed in
+
+=head2 getTaskList 
+
+=cut
+
 sub getTaskList {
 	my $self = shift;
 	my $db = $self->session->db;
@@ -494,6 +589,11 @@ SQL
 }
 
 #-------------------------------------------------------------------
+
+=head2 i18n 
+
+=cut
+
 sub i18n {
    my $self    = shift;
    my $session = $self->session;
@@ -507,6 +607,11 @@ sub i18n {
 }
 
 #-------------------------------------------------------------------
+
+=head2 prepareView 
+
+=cut
+
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
@@ -516,6 +621,11 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processErrors 
+
+=cut
+
 sub processErrors {
    my $self = shift;
    my $errors = "";
@@ -531,6 +641,11 @@ sub processErrors {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+=cut
+
 sub purge {
 	my $self = shift;
 	#purge your wobject-specific data here.  This does not include fields 
@@ -539,6 +654,11 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setSessionVars 
+
+=cut
+
 sub setSessionVars {
    my $self = shift;
    my $session = $self->session;
@@ -556,6 +676,11 @@ sub setSessionVars {
 
 #-------------------------------------------------------------------
 # API method called by Time Tracker to set percent complete field in the task and update the project cache
+
+=head2 updateProjectTask 
+
+=cut
+
 sub updateProjectTask {
 	my $self = shift;
 	my $db = $self->session->db;
@@ -594,6 +719,11 @@ sub updateProjectTask {
 }
 
 #-------------------------------------------------------------------
+
+=head2 updateProject 
+
+=cut
+
 sub updateProject {
 	my $self = shift;
 	my ($session,$privilege,$form,$db,$dt,$i18n,$user) = $self->setSessionVars;
@@ -614,6 +744,11 @@ sub updateProject {
 
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $var = $self->get;
@@ -681,6 +816,11 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteProject 
+
+=cut
+
 sub www_deleteProject {
 	my $self = shift;
 	#Set Method Helpers
@@ -700,6 +840,11 @@ sub www_deleteProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteTask 
+
+=cut
+
 sub www_deleteTask {
    my $self = shift;
    #Set Method Helpers
@@ -743,6 +888,11 @@ sub www_deleteTask {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_drawGanttChart 
+
+=cut
+
 sub www_drawGanttChart {
 	my $self = shift;
 	my $var = {};
@@ -988,6 +1138,11 @@ sub www_drawGanttChart {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProject 
+
+=cut
+
 sub www_editProject {
    my $self = shift;
    #Set Method Helpers
@@ -1101,6 +1256,11 @@ sub www_editProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProjectSave 
+
+=cut
+
 sub www_editProjectSave {
 	my $self = shift;
     #Set Method Helpers
@@ -1166,6 +1326,11 @@ sub www_editProjectSave {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_editTask 
+
+=cut
+
 sub www_editTask {
    my $self = shift;
    my $var = {};
@@ -1362,6 +1527,11 @@ sub www_editTask {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editTaskSave 
+
+=cut
+
 sub www_editTaskSave {
    my $self = shift;
    my $var = {};
@@ -1452,6 +1622,11 @@ sub www_editTaskSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_groupSearchPopup 
+
+=cut
+
 sub www_groupSearchPopup {
 	my $self = shift;
 	my %args = (func => 'groupSearchPopup',
@@ -1462,6 +1637,11 @@ sub www_groupSearchPopup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_innerHtmlOfResources 
+
+=cut
+
 sub www_innerHtmlOfResources {
 	my $self = shift;
 	my @resources = map {
@@ -1472,6 +1652,11 @@ sub www_innerHtmlOfResources {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_saveExistingTasks 
+
+=cut
+
 sub www_saveExistingTasks {
    my $self = shift;
    my $var = {};
@@ -1515,6 +1700,11 @@ sub www_saveExistingTasks {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_userSearchPopup 
+
+=cut
+
 sub www_userSearchPopup {
 	my $self = shift;
 
@@ -1526,6 +1716,11 @@ sub www_userSearchPopup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_viewProject 
+
+=cut
+
 sub www_viewProject {
 	my $self      = shift;
 	my $var       = {};

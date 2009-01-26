@@ -35,6 +35,11 @@ use WebGUI::Asset::RSSFromParent;
 =cut
 
 #-------------------------------------------------------------------
+
+=head2 definition 
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -58,6 +63,11 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 update 
+
+=cut
+
 sub update {
 	# Re-force isHidden to 1 on each update; these should always be hidden.
 	my $self = shift;
@@ -66,6 +76,11 @@ sub update {
 }
 
 #------------------------------------------------
+
+=head2 _escapeXml 
+
+=cut
+
 sub _escapeXml {
 	my $text = shift;
     return $text unless (ref $text eq "");
@@ -73,6 +88,11 @@ sub _escapeXml {
 }
 
 #------------------------------------------------
+
+=head2 _tlsOfAsset 
+
+=cut
+
 sub _tlsOfAsset {
 	my $self = shift;
 	my $asset = shift;
@@ -86,12 +106,27 @@ sub _tlsOfAsset {
 }
 
 #------------------------------------------------
+
+=head2 { 
+
+=cut
+
 sub isValidRssItem { 0 }
 
 #------------------------------------------------
+
+=head2 displayInFolder2 
+
+=cut
+
 sub displayInFolder2 { 0 }
 
 #------------------------------------------------
+
+=head2 www_view 
+
+=cut
+
 sub www_view {
 	my $self = shift;
 	return '' unless $self->session->asset->getId eq $self->getId;

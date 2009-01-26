@@ -28,10 +28,4 @@ The use of this module is deprecated and is only here for backward compatibility
 
 =cut
 
-
-
-
-
-
 1;
-

@@ -13,6 +13,11 @@ package WebGUI::Macro::Widget;
 use strict;
 
 #-------------------------------------------------------------------
+
+=head2 process 
+
+=cut
+
 sub process {
 
     # get passed parameters
