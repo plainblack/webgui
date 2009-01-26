@@ -68,6 +68,24 @@ sub AUTOLOAD {
 
 #-------------------------------------------------------------------
 
+=head2 hasParam ( $param )
+
+Returns true if the param is part of the submitted form data, or a URL param.
+
+=cut
+
+sub hasParam {
+	my $self = shift;
+    my $param = shift;
+    return undef unless $param;
+    return undef unless $self->session->request;
+    my $hashRef = $self->session->request->param();
+    return exists $hashRef->{$param};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 paramsHashRef (  )
 
 Gets a hash ref of all the params passed in to this class, and their values. This should not be confused with the param() method.
