@@ -503,6 +503,10 @@ sub goto {
 
 =head2 getPreviousAnswer
 
+To resolve previous answers which are inserted into question or section text.
+
+Goes through the previous questions and returns the first recorded response for that question, if it exists.
+
 =cut
 
 sub getPreviousAnswer {
@@ -600,6 +604,12 @@ sub surveyEnd {
 
 =head2 returnResponsesForReporting
 
+Used to extract JSON responses for use in reporting results.
+
+Returns an array ref containing the current responses to the survey.  The array ref contains a list of hashes with the section, question,
+sectionName, questionName, questionComment, and an answer array ref.  The answer array ref contains a list of hashes, with isCorrect (1 true, 0 false),
+recorded value, and the id of the answer. 
+
 =cut
 
 sub returnResponseForReporting {
@@ -646,10 +656,6 @@ sub returnResponseForReporting {
 } ## end sub returnResponseForReporting
 
 #-------------------------------------------------------------------
-
-#the actual responses to the survey.  A response is for a question and is accessed by the exact same address as a survey member.
-#Questions only contain the comment and an array of answer Responses.
-#Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, and the assetId to the uploaded file.
 
 =head2 responses
 

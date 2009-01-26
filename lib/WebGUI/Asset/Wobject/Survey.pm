@@ -23,6 +23,17 @@ use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+
+=head2 definition ( session, [definition] )
+
+Returns an array reference of definitions. Adds tableName, className, properties to array definition.
+
+=head3 definition
+
+An array of hashes to prepend to the list
+
+=cut
+
 sub definition {
     my $class      = shift;
     my $session    = shift;
@@ -242,10 +253,6 @@ Saves the survey collateral to the DB
 
 =cut
 
-sub survey       { return shift->{survey}; }
-sub littleBuddy  { return shift->{survey}; }
-sub allyourbases { return shift->{survey}; }
-sub helpmehelpme { return shift->{survey}; }
 
 sub saveSurveyJSON {
     my $self = shift;
@@ -254,6 +261,19 @@ sub saveSurveyJSON {
 
     $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $data, $self->getId ] );
 }
+
+#-------------------------------------------------------------------
+
+=head2 survey ( )
+
+Helper to access the survey object.
+
+=cut
+
+sub survey       { return shift->{survey}; }
+sub littleBuddy  { return shift->{survey}; }
+sub allyourbases { return shift->{survey}; }
+sub helpmehelpme { return shift->{survey}; }
 
 #-------------------------------------------------------------------
 
@@ -276,6 +296,14 @@ sub www_editSurvey {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_submitObjectEdit ( )
+
+This is called when an edit is submitted to a survey object.  The POST should contain the id and updated params
+of the object, and also if the object is being deleted or copied.  
+
+=cut
+
 sub www_submitObjectEdit {
     my $self = shift;
 
@@ -304,6 +332,15 @@ sub www_submitObjectEdit {
 } ## end sub www_submitObjectEdit
 
 #-------------------------------------------------------------------
+
+=head2 copyObject ( )
+
+Takes the address of a survey object and creates a copy.  The copy is placed at the end of this object's parent's list. 
+
+Returns the address to the new object.
+
+=cut
+
 sub copyObject {
     my ( $self, $address ) = @_;
 
@@ -314,19 +351,32 @@ sub copyObject {
 
     $self->saveSurveyJSON();
 
-    #The parent address of the deleted object is returned.
-
     return $self->www_loadSurvey( { address => $address } );
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteObject( $address )
+
+Deletes the object matching the passed in address.
+
+Returns the address to the parent object, or the very first section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  The third element is the index of the answer.
+
+=cut
+
 sub deleteObject {
     my ( $self, $address ) = @_;
 
     $self->loadSurveyJSON();
 
-    my $message = $self->survey->remove($address)
-        ; #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->survey->remove($address);
 
     $self->saveSurveyJSON();
 
@@ -342,6 +392,13 @@ sub deleteObject {
 } ## end sub deleteObject
 
 #-------------------------------------------------------------------
+
+=head2 www_newObject()
+
+Creates a new object from a POST param containing the new objects id concat'd on hyphens.
+
+=cut
+
 sub www_newObject {
     my $self = shift;
 
@@ -366,6 +423,13 @@ sub www_newObject {
 } ## end sub www_newObject
 
 #-------------------------------------------------------------------
+
+=head2 www_dragDrop
+
+Takes two ids from a form POST.  The "target" is the object being moved, the "before" is the object directly preceding the "target".
+
+=cut
+
 sub www_dragDrop {
     my $self = shift;
 
@@ -432,6 +496,17 @@ sub www_dragDrop {
 } ## end sub www_dragDrop
 
 #-------------------------------------------------------------------
+
+=head2 www_loadSurvey([options])
+
+For loading the survey during editing.  Returns the survey meta list and the html data for editing a particular survey object.
+
+=head3 options
+
+Can either be a hashref containing the address to be edited.  And/or a the specific variables to be edited.  
+If undef, the address is pulled form the form POST.
+
+=cut
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
@@ -452,7 +527,6 @@ sub www_loadSurvey {
             $address = [0];
         }
     }
-    my $message = defined $options->{message} ? $options->{message} : '';
     my $var
         = defined $options->{var}
         ? $options->{var}
@@ -550,7 +624,11 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+=head2 purge
 
+Completely remove from WebGUI.
+
+=cut
 sub purge {
     my $self = shift;
     $self->session->db->write( "delete from Survey_response where assetId = ?",   [ $self->getId() ] );
@@ -574,7 +652,6 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
-
 sub purgeRevision {
     my $self = shift;
     return $self->SUPER::purgeRevision;
@@ -707,6 +784,13 @@ sub www_view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_takeSurvey
+
+Returns the template needed to take the survey.  This template dynamically loads the survey via async requests.
+
+=cut
+
 sub www_takeSurvey {
     my $self = shift;
     my %var;
@@ -728,6 +812,13 @@ sub www_takeSurvey {
 } ## end sub www_takeSurvey
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteResponses
+
+Deletes all the responses from the survey.
+
+=cut
+
 sub www_deleteResponses {
     my $self = shift;
 
@@ -739,8 +830,14 @@ sub www_deleteResponses {
     return;
 }
 
-#handles questions that were submitted
 #-------------------------------------------------------------------
+
+=head2 www_submitQuestions
+
+Handles questions submitted by the survey taker, adding them to their response.
+
+=cut
+
 sub www_submitQuestions {
     my $self = shift;
 
@@ -805,8 +902,14 @@ sub www_submitQuestions {
     return $self->www_loadQuestions($responseId);
 } ## end sub www_submitQuestions
 
-#finds the questions to display next and builds the data structre to hold them
 #-------------------------------------------------------------------
+
+=head2 www_loadQuestions
+
+Determines which questions to display to the survey taker next, loads and returns them.
+
+=cut
+
 sub www_loadQuestions {
     my $self = shift;
 
@@ -897,7 +1000,13 @@ sub surveyEnd {
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
-#sends the processed template and questions structure to the client
+
+=head2 prepareShowSurveyTemplate
+
+Sends the processed template and questions structure to the client
+
+=cut 
+
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
     my %multipleChoice = (
@@ -955,7 +1064,15 @@ sub prepareShowSurveyTemplate {
 } ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------
+=head2 loadBothJSON($rId)
 
+Loads both the Survey and the appropriate response objects from JSON.
+
+=head3 $rId
+
+The reponse id to load.
+
+=cut 
 sub loadBothJSON {
     my $self = shift;
     my $rId  = shift;
@@ -970,6 +1087,19 @@ sub loadBothJSON {
 }
 
 #-------------------------------------------------------------------
+=head2 loadResponseJSON([$jsonHash],[$rId])
+
+Loads the response object from JSON.  
+
+=head3 $jsonHash
+
+Optional, but if the hash has been pulled from the DB before, there is no need to pull it again.
+
+=head3 $rId
+
+Optional, but if not passed in, it is grabbed.
+
+=cut
 sub loadResponseJSON {
     my $self     = shift;
     my $jsonHash = shift;
@@ -988,23 +1118,40 @@ sub loadResponseJSON {
 } ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
+=head3 saveResponseJSON
+
+Turns the response object into JSON and saves it to the DB.  
+
+=cut
 sub saveResponseJSON {
     my $self = shift;
 
     my $data = $self->response->freeze();
 
     $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?",
+
         [ $data, $self->{responseId} ] );
 }
 
 #-------------------------------------------------------------------
+=head2 response
+
+Helper to easily grab the response object and prevent typos.  
+
+=cut
+
 sub response {
     my $self = shift;
     return $self->{response};
 }
 
 #-------------------------------------------------------------------
+=head2 getResponseId
 
+Determines the response id of the current user.  If there is not a response for the user, a new one is created.
+If the user is anonymous, the IP is used.  Or an email'd or linked code can be used.
+
+=cut
 sub getResponseId {
     my $self = shift;
     return $self->{responseId} if ( defined $self->{responseId} );
@@ -1092,6 +1239,11 @@ sub getResponseId {
 } ## end sub getResponseId
 
 #-------------------------------------------------------------------
+=head2 canTakeSurvey
+
+Determines if the current user has permissions to take the survey.
+
+=cut 
 
 sub canTakeSurvey {
     my $self = shift;
@@ -1225,6 +1377,21 @@ sub www_exportTransposedResults {
 }
 
 #-------------------------------------------------------------------
+
+=head2 export($filename,$content)
+
+Exports the data in $content to $filename, then forwards the user to $filename.
+
+=head3 $filename
+
+The name of the file you want exported.
+
+=head3 $content
+
+The data you want exported (CSV, tab, whatever).
+
+=cut
+
 sub export {
     my $self     = shift;
     my $filename = shift;
@@ -1246,6 +1413,16 @@ sub export {
 
     return undef;
 } ## end sub export
+
+
+
+#-------------------------------------------------------------------
+
+=head2 loadTempReportTable
+
+Loads the responses from the survey into the Survey_tempReport table, so that other or custom reports can be ran against this data.
+
+=cut
 
 sub loadTempReportTable {
     my $self = shift;
