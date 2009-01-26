@@ -497,6 +497,24 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'percentage label' => {
+        message => q|Percentage|,
+        context => q|Label for the Percentage column on the gradebook screen.|,
+        lastUpdated => 0
+    },
+
+    'user label' => {
+        message => q|User|,
+        context => q|Label for the User column on the gradebook screen.|,
+        lastUpdated => 0
+    },
+
+    'score label' => {
+        message => q|Score|,
+        context => q|Label for the Score column on the gradebook screen.|,
+        lastUpdated => 0
+    },
+
 };
 
 1;

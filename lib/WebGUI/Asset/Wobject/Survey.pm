@@ -15,6 +15,7 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
+use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
@@ -589,9 +590,30 @@ returns the output.
 =cut
 
 sub view {
+    my $self    = shift;
+    my $var     = $self->getMenuVars;
+
+    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
+    $var->{'lastResponseCompleted'} = $code;
+    $var->{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
+    $var->{'maxResponsesSubmitted'} = $overTakeLimit;
+    my $out = $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+
+    return $out;
+} ## end sub view
+
+#-------------------------------------------------------------------
+
+=head2 getMenuVars ( )
+
+Returns the top menu template variables as a hashref.
+
+=cut
+
+sub getMenuVars {
     my $self = shift;
     my %var;
-
+    
     $var{'edit_survey_url'}               = $self->getUrl('func=editSurvey');
     $var{'take_survey_url'}               = $self->getUrl('func=takeSurvey');
     $var{'view_simple_results_url'}       = $self->getUrl('func=exportSimpleResults');
@@ -601,15 +623,9 @@ sub view {
     $var{'user_canTakeSurvey'}            = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
     $var{'user_canViewReports'}           = $self->session->user->isInGroup( $self->get("groupToViewReports") );
     $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
-    $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
-    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
-    $var{'lastResponseCompleted'} = $code;
-    $var{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
-    $var{'maxResponsesSubmitted'} = $overTakeLimit;
-    my $out = $self->processTemplate( \%var, undef, $self->{_viewTemplate} );
 
-    return $out;
-} ## end sub view
+    return \%var;
+}
 
 #-------------------------------------------------------------------
 
@@ -1116,22 +1132,51 @@ sub canTakeSurvey {
 } ## end sub canTakeSurvey
 
 #-------------------------------------------------------------------
-sub www_viewGradeBook {
-    my $self = shift;
 
+=head2 www_viewGradeBook (){
+
+Returns the Grade Book screen.
+
+=cut
+
+sub www_viewGradeBook {
+    my $self    = shift;
+    my $db      = $self->session->db;
+    
     return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
 
+    my $var = $self->getMenuVars;
+
     $self->loadTempReportTable();
 
-    my @peoples
-        = $self->session->db->quickArray( "SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",
-        [ $self->getId() ] );
-    for my $people (@peoples) {
+    my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewGradebook'));
+    $paginator->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate 
+        from Survey_response     
+        where assetId=".$db->quote($self->getId)." order by username,ipAddress,startDate");
+    my $users = $paginator->getPageData;
 
-        #my $
-
+    $self->loadSurveyJSON();
+    $var->{question_count} = $self->survey->questionCount; 
+    
+    my @responseloop;
+    foreach my $user (@$users) {
+        my ($correctCount) = $db->quickArray("select count(*) from Survey_tempReport 
+            where Survey_responseId=? and isCorrect=1",[$user->{Survey_responseId}]);
+        push(@responseloop, {
+            # response_url is left out because it looks like Survey doesn't have a viewIndividualSurvey feature
+            # yet.
+            #'response_url'=>$self->getUrl('func=viewIndividualSurvey;responseId='.$user->{Survey_responseId}),
+            'response_user_name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
+            'response_count_correct' => $correctCount,
+            'response_percent' => round(($correctCount/$var->{question_count})*100)
+            });
     }
+    $var->{response_loop} = \@responseloop;
+    $paginator->appendTemplateVars($var);
+
+    my $out = $self->processTemplate( $var, $self->get("gradebookTemplateId") );
+    return $self->session->style->process( $out, $self->get("styleTemplateId") );
 
 } ## end sub www_viewGradeBook
 

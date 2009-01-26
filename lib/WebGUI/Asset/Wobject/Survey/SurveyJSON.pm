@@ -975,6 +975,25 @@ sub question {
     return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ];
 }
 
+#-------------------------------------------------------------------
+
+=head2 questionCount (){
+
+Return the total number of questions in this survey.
+
+=cut
+
+sub questionCount {
+    my $self    = shift;
+    my $count;
+    for ( my $s = 0; $s <= $#{ $self->sections() }; $s++ ) {
+        $count = $count + scalar @{$self->questions( [$s] )};
+    }
+    return $count;
+}
+
+#-------------------------------------------------------------------
+
 =head2 answers ($address)
 
 Return a reference to all answers from a particular question.
