@@ -96,6 +96,10 @@ sub violates {
         my @arguments = _get_args($arg_list);
         my $namespace;
         if ($arguments[1]) {
+            my $secondArgument = $arguments[1]->[0];
+            return unless $secondArgument->isa('PPI::Token::Quote');
+            use Data::Dumper;
+            print Dumper($arguments[1]);
             $namespace = $arguments[1]->[0]->string;
         }
         else {
