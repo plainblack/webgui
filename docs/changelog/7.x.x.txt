@@ -11,7 +11,8 @@
  - removed random questions display from Survey Questions Edit template until
    that feature is added.
  - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
-
+ - fixed: utf8 issues with Survey should be correct.  JSON fields are now
+   longText instead of longBlob.
 7.6.9
  - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
