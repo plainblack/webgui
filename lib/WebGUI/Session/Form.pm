@@ -98,6 +98,7 @@ sub paramsHashRef {
 		my %hash;
 		tie %hash, "Tie::IxHash";
 		foreach ($self->param) {
+            $_ =  Encode::decode_utf8($_);
 			my @arr = $self->process($_);
 			$hash{$_} = (scalar(@arr) > 1)?\@arr:$arr[0];
 		}
