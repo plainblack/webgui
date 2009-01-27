@@ -87,7 +87,7 @@ sub new {
 
     # Load json object if given..
     if ($json) {
-        my $decoded_json = decode_json($json);
+        my $decoded_json = from_json($json);
         $self->{sections} = $decoded_json->{sections} if defined $decoded_json->{sections};
         $self->{survey}   = $decoded_json->{survey}   if defined $decoded_json->{survey};
     }
@@ -110,7 +110,7 @@ components of this object.
 
 sub freeze {
     my $self = shift;
-    return encode_json(
+    return to_json(
         {   sections => $self->{sections},
             survey   => $self->{survey},
         }
