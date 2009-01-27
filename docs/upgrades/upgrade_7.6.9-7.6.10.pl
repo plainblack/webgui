@@ -39,7 +39,7 @@ finish($session); # this line required
 
 #Change the Survey and Survey_response tables' json fields to longText instead of longBlob to get back non-binary text
 #----------------------------------------------------------------------------
-sub alterSurveyJSONFIelds{
+sub alterSurveyJSONFields{
     my $session = shift;
     $session->db->write("alter table Survey modify surveyJSON longText");
     $session->db->write("alter table Survey_response modify responseJSON longText");
