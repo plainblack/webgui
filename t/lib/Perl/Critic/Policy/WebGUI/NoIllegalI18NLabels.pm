@@ -98,8 +98,6 @@ sub violates {
         if ($arguments[1]) {
             my $secondArgument = $arguments[1]->[0];
             return unless $secondArgument->isa('PPI::Token::Quote');
-            use Data::Dumper;
-            print Dumper($arguments[1]);
             $namespace = $arguments[1]->[0]->string;
         }
         else {
@@ -118,7 +116,11 @@ sub violates {
         ##constructing arguments for the get call.
         return if exists $arguments[0]->[1] and $arguments[0]->[1]->isa('PPI::Token::Operator');
         return unless $arguments[0]->[0]->isa('PPI::Token::Quote');
-        my $label = $arguments[0]->[0]->string;
+        my $firstArgument = $arguments[0]->[0];
+        my $label = $firstArgument->string;
+        ##Can't do variable interpolation
+        return if $firstArgument->isa('PPI::Token::Quote::Double')
+               && $label =~ /\$/;
         my $namespace = $self->{_i18n_objects}->{$symbol_name};
         if ($arguments[1]) {
             $namespace = $arguments[1]->[0]->string;
