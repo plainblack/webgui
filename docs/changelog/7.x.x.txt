@@ -3,6 +3,7 @@
  - fixed #9541: assets with uncommitted parent.
  - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
  - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
+ - fixed #9522: Time tracker does not display
 
 7.5.39
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
