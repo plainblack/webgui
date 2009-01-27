@@ -1139,7 +1139,7 @@ sub www_editProjectSave {
     }
 	
 	#Save the extended project data
-	my $projectId = $self->setCollateral("PM_project","projectId",$props,0,1);
+	$projectId = $self->setCollateral("PM_project","projectId",$props,0,1);
 	
 	if($origProjId eq "new") {
 	   #Create Project Start Milestone Task for new projects
