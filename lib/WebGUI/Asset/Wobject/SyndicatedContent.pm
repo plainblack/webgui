@@ -146,7 +146,10 @@ sub generateFeed {
             $value = $cache->setByHTTP($url, $self->get("cacheTimeout"));
             $newlyCached = 1;
         }
-        utf8::downgrade($value);
+        # if the content can be downgraded, it is either valid latin1 or didn't have
+        # an HTTP Content-Encoding header.  In the second case, XML::FeedPP will take
+        # care of any encoding specified in the XML prolog
+        utf8::downgrade($value, 1);
         eval {
             my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1);
             $feed->merge($singleFeed);
