@@ -268,27 +268,16 @@ sub getOriginalValue {
                 @values = @{$value};
             }
             else {
-				$value =~ s/\r//g;
+                $value =~ s/\r//g;
                 @values = split "\n", $value;
             }
         }
     }
-    if(@values){
-    	return wantarray ? @values : join("\n",@values);
+    if (@values) {
+        return wantarray ? @values : join("\n",@values);
     }
-    
-    foreach my $value ($self->getDefaultValue()) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
-        }
-    }
-	return wantarray ? @values : join("\n",@values);
+
+    return $self->getDefaultValue;
 }
 
 #-------------------------------------------------------------------
