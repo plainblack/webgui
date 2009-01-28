@@ -1,6 +1,7 @@
 7.6.11
  - fixed: Syndicated Content asset doesn't work with feeds that specify their encodings via HTTP headers
  - fixed #9375: Syndicated Content asset improperly decodes wide XML entities
+ - fixed #9592: DataForm deleteAttachedFiles method can crash
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
