@@ -50,7 +50,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session,'Asset_Photo');
 
     tie my %properties, 'Tie::IxHash', (
         views   => {
@@ -510,23 +510,6 @@ sub getTemplateVars {
 
 #----------------------------------------------------------------------------
 
-=head2 i18n ( session )
-
-Get the i18n object for this class. This sub must not be inherited, so always
-call it using C<__PACKAGE__>, not C<$self>.
-
-=cut
-
-sub i18n {
-    my $self        = shift;
-    my $session     = shift;
-    # TODO: Make a migration script to move the appropriate parts from 
-    # Asset_Photo to Asset_GalleryFile
-    return WebGUI::International->new( $session, "Asset_Photo" );
-}
-
-#----------------------------------------------------------------------------
-
 =head2 isFriendsOnly ( )
 
 Returns true if this GalleryFile is friends only. Returns false otherwise.
@@ -610,7 +593,7 @@ sub processCommentEditForm {
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $now         = WebGUI::DateTime->new( $session, time );
-    my $i18n        = __PACKAGE__->i18n( $session );
+    my $i18n        = WebGUI::International->new( $session,'Asset_Photo' );
 
     # Using die here to suppress line number and file path info
     die $i18n->get("commentForm error no commentId") . "\n"
@@ -649,7 +632,7 @@ sub processCommentEditForm {
 
 sub processPropertiesFromFormPost {
     my $self    = shift;
-    my $i18n    = __PACKAGE__->i18n( $self->session );
+    my $i18n    = WebGUI::International->new( $self->session,'Asset_Photo' );
     my $form    = $self->session->form;
     my $errors  = $self->SUPER::processPropertiesFromFormPost || [];
 
@@ -871,7 +854,7 @@ sub www_deleteComment {
 
     return $session->privilege->insufficient unless $self->canEdit;
     
-    my $i18n        = __PACKAGE__->i18n( $session );
+    my $i18n        = WebGUI::International->new( $session,'Asset_Photo' );
     my $commentId   = $session->form->get('commentId');
     
     $self->deleteComment( $commentId );
@@ -893,7 +876,7 @@ sub www_deleteConfirm {
 
     return $self->session->privilege->insufficient unless $self->canEdit;
 
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session,'Asset_Photo' );
 
     $self->purge;
 
@@ -965,7 +948,7 @@ Save a comment being edited
 sub www_editCommentSave {
     my $self        = shift;
     my $session     = $self->session;
-    my $i18n        = __PACKAGE__->i18n( $session );
+    my $i18n        = WebGUI::International->new( $session,'Asset_Photo' );
 
     # Process the form first, so we can know how to check permissions
     my $comment     = eval { $self->processCommentEditForm };

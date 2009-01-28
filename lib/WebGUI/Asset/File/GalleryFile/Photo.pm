@@ -70,7 +70,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_Photo');
 
     tie my %properties, 'Tie::IxHash', (
         exifData => {
@@ -313,27 +313,6 @@ sub getThumbnailUrl {
     return $self->getStorageLocation->getThumbnailUrl(
         $self->get("filename")
     );
-}
-
-#----------------------------------------------------------------------------
-
-=head2 i18n ( [ session ] )
-
-Get a WebGUI::International object for this class. 
-
-Can be called as a class method, in which case a WebGUI::Session object
-must be passed in.
-
-NOTE: This method can NOT be inherited, due to a current limitation 
-in the i18n system. You must ALWAYS call this with C<__PACKAGE__>
-
-=cut
-
-sub i18n {
-    my $self    = shift;
-    my $session = shift;
-    
-    return WebGUI::International->new($session, "Asset_Photo");
 }
 
 #----------------------------------------------------------------------------
@@ -617,7 +596,7 @@ Provides links to view the photo and add more photos.
 
 sub www_showConfirmation {
     my $self        = shift;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_Photo' );
 
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 

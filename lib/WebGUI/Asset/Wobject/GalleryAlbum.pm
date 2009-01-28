@@ -44,7 +44,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
 
     tie my %properties, 'Tie::IxHash', (
         allowComments   => {
@@ -348,27 +348,6 @@ sub DESTROY {
         my $asset       = delete $self->{ $key };
         $asset->DESTROY if $asset;
     }
-}
-
-#----------------------------------------------------------------------------
-
-=head2 i18n ( session )
-
-Get a WebGUI::International object for this class. 
-
-Can be called as a class method, in which case a WebGUI::Session object
-must be passed in.
-
-NOTE: This method can NOT be inherited, due to a current limitation 
-in the i18n system. You must ALWAYS call this with C<__PACKAGE__>
-
-=cut
-
-sub i18n {
-    my $self    = shift;
-    my $session = shift;
-    
-    return WebGUI::International->new($session, "Asset_GalleryAlbum");
 }
 
 #----------------------------------------------------------------------------
@@ -937,7 +916,7 @@ sub www_addArchiveSave {
 
     my $session     = $self->session;
     my $form        = $self->session->form;
-    my $i18n        = __PACKAGE__->i18n( $session );
+    my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
     my $properties  = {
         keywords        => $form->get("keywords"),
         friendsOnly     => $form->get("friendsOnly"),
@@ -1093,7 +1072,7 @@ sub www_deleteConfirm {
     return $self->session->privilege->insufficient unless $self->canEdit;
 
     my $gallery     = $self->getParent;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_GalleryAlbum' );
 
     $self->purge;
     
@@ -1119,7 +1098,7 @@ sub www_edit {
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
 
     return $session->privilege->insufficient unless $self->canEdit;
 
@@ -1299,7 +1278,7 @@ Provides links to view the album.
 
 sub www_showConfirmation {
     my $self        = shift;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_GalleryAlbum' );
 
     my $output      = '<p>' . sprintf( $i18n->get('save message'), $self->getUrl ) . '</p>'
                     . '<p>' . $i18n->get('what next') . '</p>'
