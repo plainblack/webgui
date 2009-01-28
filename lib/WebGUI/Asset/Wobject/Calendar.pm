@@ -24,7 +24,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
-use JSON qw/encode_json/;
+use JSON;
 
 =head1 NAME
 
