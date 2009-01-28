@@ -507,6 +507,7 @@ Can either be a hashref containing the address to be edited.  And/or a the speci
 If undef, the address is pulled form the form POST.
 
 =cut
+
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
@@ -624,11 +625,13 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+
 =head2 purge
 
 Completely remove from WebGUI.
 
 =cut
+
 sub purge {
     my $self = shift;
     $self->session->db->write( "delete from Survey_response where assetId = ?",   [ $self->getId() ] );
@@ -1005,7 +1008,7 @@ sub surveyEnd {
 
 Sends the processed template and questions structure to the client
 
-=cut 
+=cut
 
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
@@ -1064,6 +1067,7 @@ sub prepareShowSurveyTemplate {
 } ## end sub prepareShowSurveyTemplate
 
 #-------------------------------------------------------------------
+
 =head2 loadBothJSON($rId)
 
 Loads both the Survey and the appropriate response objects from JSON.
@@ -1072,7 +1076,8 @@ Loads both the Survey and the appropriate response objects from JSON.
 
 The reponse id to load.
 
-=cut 
+=cut
+
 sub loadBothJSON {
     my $self = shift;
     my $rId  = shift;
@@ -1087,6 +1092,7 @@ sub loadBothJSON {
 }
 
 #-------------------------------------------------------------------
+
 =head2 loadResponseJSON([$jsonHash],[$rId])
 
 Loads the response object from JSON.  
@@ -1100,6 +1106,7 @@ Optional, but if the hash has been pulled from the DB before, there is no need t
 Optional, but if not passed in, it is grabbed.
 
 =cut
+
 sub loadResponseJSON {
     my $self     = shift;
     my $jsonHash = shift;
@@ -1118,11 +1125,13 @@ sub loadResponseJSON {
 } ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
+
 =head3 saveResponseJSON
 
 Turns the response object into JSON and saves it to the DB.  
 
 =cut
+
 sub saveResponseJSON {
     my $self = shift;
 
@@ -1134,6 +1143,7 @@ sub saveResponseJSON {
 }
 
 #-------------------------------------------------------------------
+
 =head2 response
 
 Helper to easily grab the response object and prevent typos.  
@@ -1146,12 +1156,14 @@ sub response {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getResponseId
 
 Determines the response id of the current user.  If there is not a response for the user, a new one is created.
 If the user is anonymous, the IP is used.  Or an email'd or linked code can be used.
 
 =cut
+
 sub getResponseId {
     my $self = shift;
     return $self->{responseId} if ( defined $self->{responseId} );
@@ -1239,11 +1251,12 @@ sub getResponseId {
 } ## end sub getResponseId
 
 #-------------------------------------------------------------------
+
 =head2 canTakeSurvey
 
 Determines if the current user has permissions to take the survey.
 
-=cut 
+=cut
 
 sub canTakeSurvey {
     my $self = shift;
