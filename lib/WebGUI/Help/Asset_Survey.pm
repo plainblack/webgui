@@ -71,27 +71,19 @@ our $HELP = {
     },
 
     'survey template common vars' => {
-        title     => '90',
+        title     => 'survey template common vars title',
         body      => '',
         fields    => [],
         variables => [
-            { 'name' => 'user.canViewReports' },
-            { 'name' => 'delete.all.responses.url' },
-            { 'name' => 'delete.all.responses.label' },
-            { 'name' => 'export.answers.url' },
-            { 'name' => 'export.answers.label' },
-            { 'name' => 'export.questions.url' },
-            { 'name' => 'export.questions.label' },
-            { 'name' => 'export.responses.url' },
-            { 'name' => 'export.responses.label' },
-            { 'name' => 'export.composite.url' },
-            { 'name' => 'export.composite.label' },
-            { 'name' => 'report.gradebook.url' },
-            { 'name' => 'report.gradebook.label' },
-            { 'name' => 'report.overview.url' },
-            { 'name' => 'report.overview.label' },
-            { 'name' => 'survey.url' },
-            { 'name' => 'survey.label' }
+            { 'name' => 'user_canViewReports' },
+            { 'name' => 'delete_all_responses.url' },
+            { 'name' => 'export_answers_url' },
+            { 'name' => 'export_questions_url' },
+            { 'name' => 'export_responses_url' },
+            { 'name' => 'export_composite_url' },
+            { 'name' => 'report_gradebook_url' },
+            { 'name' => 'report_overview_url' },
+            { 'name' => 'survey_url' },
         ],
         related => [
             {   tag       => 'survey template',
@@ -101,7 +93,7 @@ our $HELP = {
     },
 
     'gradebook report template' => {
-        title  => '1087',
+        title  => 'gradebook report template title',
         body   => '',
         fields => [],
         isa    => [
@@ -116,17 +108,13 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'title' },
-            { 'name' => 'question.count' },
-            { 'name' => 'response.user.label' },
-            { 'name' => 'response.count.label' },
-            { 'name' => 'response.percent.label' },
+            { 'name' => 'question_count' },
             {   'name'      => 'response_loop',
                 'variables' => [
-                    { 'name' => 'response.url' },
-                    { 'name' => 'response.user.name' },
-                    { 'name' => 'response.count.correct' },
-                    { 'name' => 'response.percent' }
+                    { 'name' => 'response_url' },
+                    { 'name' => 'response_user_name' },
+                    { 'name' => 'response_count_correct' },
+                    { 'name' => 'response_percent' }
                 ]
             }
         ],
@@ -185,7 +173,7 @@ our $HELP = {
     },
 
     'statistical overview report template' => {
-        title  => '1091',
+        title  => 'statistical overview template title',
         body   => '',
         fields => [],
         isa    => [
@@ -200,31 +188,23 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'title', },
-            {   'name'        => 'answer.label',
-                'description' => 'report answer.label'
-            },
-            {   'name'        => 'response.count.label',
-                'description' => 'report response.count.label'
-            },
-            { 'name' => 'response.percent.label', },
-            { 'name' => 'show.responses.label' },
-            { 'name' => 'show.comments.label' },
             {   'name'      => 'question_loop',
                 'variables' => [
                     { 'name' => 'question', },
-                    { 'name' => 'question.id', },
-                    { 'name' => 'question.isRadioList', },
-                    { 'name' => 'question.response.total' },
-                    { 'name' => 'question.allowComment', },
+                    { 'name' => 'question_id', },
+                    { 'name' => 'question_isMultipleChoice', },
+                    { 'name' => 'question_response_total' },
+                    { 'name' => 'question_allowComment', },
                     {   'name'      => 'answer_loop',
                         'variables' => [
-                            { 'name' => 'answer.isCorrect' },
+                            { 'name' => 'answer_isCorrect' },
                             { 'name' => 'answer' },
-                            { 'name' => 'answer.response.count' },
-                            { 'name' => 'answer.response.percent' },
+                            { 'name' => 'answer_response_count' },
+                            { 'name' => 'answer_response_percent' },
+                            { 'name' => 'answer_comment' },
+                            { 'name' => 'answer_value' },
                             {   'name'      => 'comment_loop',
-                                'variables' => [ { 'name' => 'answer.comment' } ]
+                                'variables' => [ { 'name' => 'answer_comment' } ]
                             }
                         ]
                     }
@@ -246,7 +226,6 @@ our $HELP = {
         fields    => [],
         variables => [
             { 'name' => 'templateId' },
-            { 'name' => 'Survey_id' },
             { 'name' => 'questionOrder' },
             { 'name' => 'groupToTakeSurvey' },
             { 'name' => 'groupToViewReports' },

@@ -515,6 +515,168 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'answer label' => {
+        message => q|Answer|,
+        context => q|Label for the Answer column on the statistical overview screen.|,
+        lastUpdated => 0
+    },
+
+    'response count label' => {
+        message => q|Responses|,
+        context => q|Label for the Response Count column on the statistical overview screen.|,
+        lastUpdated => 0
+    },
+
+    'response percent label' => {
+        message => q|Percentage|,
+        context => q|Label for the Response Percent column on the statistical overview screen.|,
+        lastUpdated => 0
+    },
+
+    'show comments label' => {
+        message => q|View Comments|,
+        context => q|Label for the Show Comments link on the statistical overview screen.|,
+        lastUpdated => 0
+    },
+
+    'show responses label' => {
+        message => q|View Responses|,
+        context => q|Label for the View Responses link on the statistical overview screen.|,
+        lastUpdated => 0
+    },
+
+    'statistical overview template title' => {
+        message => q|Survey Statistical Overview Report Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'question_loop' => {
+        message => q|A loop containing questions.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'question' => {
+        message => q|The text of this question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'question_id' => {
+        message => q|The id of this question|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'question_allowComment' => {
+        message => q|A boolean indicating whether comments about this question are allowed.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'question_response_total' => {
+        message => q|The total number of responses for this answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'question_isMultipleChoice' => {
+        message => q|A boolean indicating whether this is a multiple choice question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer_loop' => {
+        message => q|A loop containing the answers and responses for this question.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer_isCorrect' => {
+        message => q|A boolean indicating whether this answer is marked correct. Only available for multiple choice questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer' => {
+        message => q|The answer itself.|,
+        context => q|Description of a template variable for a template Help page. Only available for multiple choice questions.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer_value' => {
+        message => q|The value of this answer. Not available for multiple choice questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'answer_response_count' => {
+        message => q|The total number of responses given for this answer. Only available for multiple choice questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer_response_percent' => {
+        message => q|The percent of responses to this question that went to this answer. Only available for multiple choice questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'comment_loop' => {
+        message => q|A loop that contains all of the comments for this answer. Only available for multiple choice questions.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 1149654954,
+    },
+
+    'answer_comment' => {
+        message => q|A comment. This tmpl_var is available in the comment_loop for multiple choice questions and
+directly inside the answer_loop for other types of questions.|,
+        context => q|Description of a template variable for a template Help page.|, 
+        lastUpdated => 0,
+    },
+
+    'gradebook report template title' => {
+        message => q|Survey Gradebook Report Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'question_count' => {
+        message => q|The number of questions in the survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654771,
+    },
+
+    'response_loop' => {
+        message => q|A loop containing a list of responses.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 1149654771,
+    },
+
+    'response_user_name' => {
+        message => q|The username of the user that gave this response.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654771,
+    },
+
+    'response_count_correct' => {
+        message => q|The total number of questions that this user got correct.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654771,
+    },
+
+    'response_percent' => {
+        message => q|The percentage of correct questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1149654771,
+    },
+
+    'survey template common vars title' => {
+        message => q|Survey Template Common Vars|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 1078223067
+    },
 };
 
 1;

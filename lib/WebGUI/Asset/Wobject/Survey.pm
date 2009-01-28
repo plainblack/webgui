@@ -1333,6 +1333,97 @@ sub www_viewGradeBook {
 } ## end sub www_viewGradeBook
 
 #-------------------------------------------------------------------
+
+=head2 www_viewStatisticalOverview (){
+
+Returns the Statistical Overview screen.
+
+=cut
+
+sub www_viewStatisticalOverview {
+    my $self    = shift;
+    my $db      = $self->session->db;
+
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+
+    $self->loadTempReportTable();
+    $self->loadSurveyJSON();
+    my $survey  = $self->survey;
+    my $var     = $self->getMenuVars;
+    
+    my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewStatisticalOverview'));
+    my @questionloop;
+    for ( my $sectionIndex = 0; $sectionIndex <= $#{ $survey->sections() }; $sectionIndex++ ) {
+        for ( my $questionIndex = 0; $questionIndex <= $#{ $survey->questions([$sectionIndex]) }; $questionIndex++ ) {
+        my $question        = $survey->question( [ $sectionIndex, $questionIndex ] );
+        my $questionType    = $question->{questionType};
+        my (@answerloop, $totalResponses);;
+
+        if ($questionType eq "Multiple Choice"){
+            $totalResponses = $db->quickScalar("select count(*) from Survey_tempReport
+                where sectionNumber=? and questionNumber=?",[$sectionIndex,$questionIndex]);
+
+            for ( my $answerIndex = 0; $answerIndex <= $#{ $survey->answers([$sectionIndex,$questionIndex]) }; $answerIndex++ ) {
+                my $numResponses = $db->quickScalar("select count(*) from Survey_tempReport
+                    where sectionNumber=? and questionNumber=? and answerNumber=?",
+                    [$sectionIndex,$questionIndex,$answerIndex]);
+                my $responsePercent;
+                if ($totalResponses) {
+                    $responsePercent = round(($numResponses/$totalResponses)*100);
+                } else {
+                    $responsePercent = 0;
+                }
+                my @commentloop;
+                my $comments = $db->read("select answerComment from Survey_tempReport 
+                    where sectionNumber=? and questionNumber=? and answerNumber=?",
+                    [$sectionIndex,$questionIndex,$answerIndex]);
+                while (my ($comment) = $comments->array) {
+                    push(@commentloop,{
+                        'answer_comment'=>$comment
+                        });
+                }
+                push(@answerloop,{
+                    'answer_isCorrect'=>$survey->answer( [ $sectionIndex, $questionIndex, $answerIndex ] )->{isCorrect},
+                    'answer' => $survey->answer( [ $sectionIndex, $questionIndex, $answerIndex ] )->{text},
+                    'answer_response_count' =>$numResponses,
+                    'answer_response_percent' =>$responsePercent,
+                    'comment_loop'=>\@commentloop
+                    });
+            }
+        }
+        else{
+            my $responses = $db->read("select value,answerComment from Survey_tempReport 
+                where sectionNumber=? and questionNumber=?",
+                [$sectionIndex,$questionIndex]); 
+            while (my $response = $responses->hashRef) {
+                push(@answerloop,{
+                    'answer_value'      =>$response->{value},
+                    'answer_comment'    =>$response->{answerComment}
+                    });
+            }
+        }
+        push(@questionloop,{
+            'question'                  => $question->{text},
+            'question_id'               => $sectionIndex.'_'.$questionIndex,
+            'question_isMultipleChoice' => ($questionType eq "Multiple Choice"),
+            'question_response_total'   => $totalResponses,
+            'answer_loop'               => \@answerloop,
+            'questionallowComment'      => $question->{allowComment}
+        });
+        } ## end for ( my $questionIndex = 0; $questionIndex <= ...
+    }
+    $paginator->setDataByArrayRef(\@questionloop);
+    @questionloop = @{$paginator->getPageData};
+
+    $var->{question_loop} = \@questionloop;
+    $paginator->appendTemplateVars($var);
+
+    my $out = $self->processTemplate( $var, $self->get("overviewTemplateId") );
+    return $self->session->style->process( $out, $self->get("styleTemplateId") );
+}
+
+#-------------------------------------------------------------------
 sub www_exportSimpleResults {
     my $self = shift;
 
