@@ -232,7 +232,7 @@ sub cancelRecurringPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generateCancelRecurXml( $transaction );
-    $session->errorHandler->info("XML Request: $xml");
+    $session->errorHandler->debug("XML Request: $xml");
 
     # Post the xml to ITransact 
     my $response = $self->doXmlRequest( $xml, 1 );
@@ -562,7 +562,7 @@ sub processPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generatePaymentRequestXML( $transaction );
-    $session->errorHandler->info("XML Request: $xml");
+    $session->errorHandler->debug("XML Request: $xml");
 
     # Send the xml to ITransact
     my $response = $self->doXmlRequest( $xml );
