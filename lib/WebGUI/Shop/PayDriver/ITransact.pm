@@ -424,8 +424,8 @@ sub doXmlRequest {
     
     # Create a request and stuff the xml in it
     my $request = HTTP::Request->new( POST => $xmlTransactionScript );
-	$request->content_type( 'application/x-www-form-urlencoded' );
-	$request->content( 'xml='.$xml );
+	$request->content_type( 'text/xml' );
+	$request->content( $xml );
 
     # Do the request
     my $response = $userAgent->request($request);
