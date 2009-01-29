@@ -21,6 +21,7 @@ use Test::More;
 use Test::Deep;
 use Scalar::Util;
 use WebGUI::Asset::File::GalleryFile::Photo;
+use WebGUI::International;
 
 #----------------------------------------------------------------------------
 # Init
@@ -268,7 +269,7 @@ like(
     "www_editCommentSave -- Permission denied if not Gallery->canAddComment",
 );
 
-my $i18n    = $photo->i18n($session);
+my $i18n    = WebGUI::International->new($session, 'Asset_Photo');
 my $errorMessage;
 
 # Required: commentId
