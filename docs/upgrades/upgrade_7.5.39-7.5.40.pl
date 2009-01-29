@@ -20,6 +20,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::GalleryAlbum;
 
 
 my $toVersion = '7.5.40';
@@ -27,6 +28,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+hideGalleryAlbums($session);
 
 # upgrade functions go here
 
@@ -42,6 +44,18 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+
+#----------------------------------------------------------------------------
+sub hideGalleryAlbums {
+    my $session = shift;
+    print "\tHiding all Gallery Albums from Navigation... " unless $quiet;
+    # and here's our code
+    my $getAnAlbum = WebGUI::Asset::Wobject::GalleryAlbum->getIsa($session);
+    while (my $album = $getAnAlbum->()) {
+        $album->update({});  ##The album will do the hiding automatically now
+    }
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
@@ -103,4 +117,3 @@ sub updateTemplates {
         addPackage( $session, $file );
     }
 }
-

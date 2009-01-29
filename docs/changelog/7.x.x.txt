@@ -6,6 +6,7 @@
  - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
  - fixed #9522: Time tracker does not display
  - fixed #9590: Upgrade from 7.4.40 to 7.5.39 is broken (Henry Tang, Long Term Results B.v.)
+ - fixed #9580: Gallery: albums shown in navigation
  - fixed #9592: DataForm deleteAttachedFiles method can crash
 
 7.5.39
