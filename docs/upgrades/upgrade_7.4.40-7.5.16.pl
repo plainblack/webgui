@@ -1904,14 +1904,14 @@ sub migratePaymentPlugins {
         );
 
         # And set new properties
-        $properties->{ groupToUse               } = $properties->{ whoCanUse };
-        $properties->{ receiptEmailTemplateId   } = 'BMzuE91-XB8E-XGll1zpvA';
+        $properties->{ groupToUse             } = $properties->{ whoCanUse };
+        $properties->{ receiptEmailTemplateId } = 'BMzuE91-XB8E-XGll1zpvA';
+        $properties->{ label                  } = $namespace || 'Credit Card',
 
         # Create paydriver instance
         my $plugin =  
          WebGUI::Pluggable::instanciate("WebGUI::Shop::PayDriver::$namespace", 'create', [ 
                 $session, 
-                $properties->{ label } || $namespace || 'Credit Card',
                 $properties
             ])
         ;
