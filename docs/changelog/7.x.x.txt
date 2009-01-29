@@ -1,4 +1,5 @@
 7.6.11
+ - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
  - fixed: Syndicated Content asset doesn't work with feeds that specify their encodings via HTTP headers
  - fixed #9375: Syndicated Content asset improperly decodes wide XML entities
  - fixed #9592: DataForm deleteAttachedFiles method can crash
