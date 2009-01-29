@@ -454,7 +454,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 description         => $i18n->get("We welcome your feedback."),
                 acknowledgement     => $i18n->get("Thanks for for your interest in ^c;. We will review your message shortly."),
                 mailData            => 1,
-                fieldConfiguration  => JSON::encode_json(\@fieldConfig),
+                fieldConfiguration  => JSON::to_json(\@fieldConfig),
                 });
         }
 

@@ -331,8 +331,8 @@ it would be best to make sure the names are the same.|,
     },
 
     'CATEGORY_NAME_loop' => {
-	message => q|A loop containting attributes and values for those attributes is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
-	lastUpdated => 0,
+	message => q|A loop containing attributes, and values for those attributes, is created for each category in this matrix. The name of the loop is the category name with spaces replaced with hyphens and a _loop added to the end. So if you have a category called "Bells and Whistles" then the loop would be called "bells-and-whistles_loop".|,
+	lastUpdated => 1231764520,
 	context => q|Description of the CATEGORY_NAME_loop tmpl_var for the template help.|,
     },
 

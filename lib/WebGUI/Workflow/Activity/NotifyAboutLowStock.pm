@@ -128,7 +128,7 @@ sub execute {
     if ($belowThreshold) {
         my $inbox = WebGUI::Inbox->new($self->session);
         $inbox->addMessage({
-            status  => 'completed',
+            status  => 'unread',
             subject => $self->get('subject'),
             groupId => $self->get('toGroup'),
             message => $message,
