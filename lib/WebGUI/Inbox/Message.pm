@@ -109,10 +109,12 @@ sub create {
 	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
 	$self->{_properties}{message}   = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
-	$self->{_properties}{userId}    = $properties->{userId} || $session->user->userId;
+	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};
     $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
-
+        unless ( $self->{_properties}{userId} || $self->{_properties}{groupId} ) {
+             $self->{_properties}{userId} = $session->user->userId;
+         }
     my $status = $self->{_properties}{status};
     
 	if ($status eq "completed") {
