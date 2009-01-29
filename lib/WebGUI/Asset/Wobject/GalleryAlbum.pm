@@ -752,6 +752,20 @@ sub sendChunkedContent {
 
 #----------------------------------------------------------------------------
 
+=head2 update ( )
+
+Override update to force isHidden=1 on all albums.
+
+=cut
+
+sub update {
+    my $self        = shift;
+    my $properties  = shift;
+    return $self->SUPER::update({ %{ $properties }, isHidden=>1 });
+}
+
+#----------------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
