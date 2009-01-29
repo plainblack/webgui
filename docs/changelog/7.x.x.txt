@@ -21,6 +21,7 @@
  - fixed: utf8 issues with Survey should be correct.  JSON fields are now longText instead of longBlob.
  - fixed #9522: Time tracker does not display
  - fixed #9215: Survey 2.0 results screens missing
+ - fixed #9018: orphan workflows from upgrade.
 
 7.6.9
  - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer

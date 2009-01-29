@@ -31,6 +31,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 hideGalleryAlbums($session);
+removeBrokenWorkflowInstances($session);
 
 # upgrade functions go here
 
@@ -54,6 +55,19 @@ sub hideGalleryAlbums {
     my $getAnAlbum = WebGUI::Asset::Wobject::GalleryAlbum->getIsa($session);
     while (my $album = $getAnAlbum->()) {
         $album->update({});  ##The album will do the hiding automatically now
+    }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub removeBrokenWorkflowInstances {
+    my $session = shift;
+    print "\tRemove Workflow Instances whose Workflows have been deleted... " unless $quiet;
+    # and here's our code
+    my $instances = WebGUI::Workflow::Instance->getAllInstances($session);
+    foreach my $instance (@{ $instances }) {
+        my $workflow = $instance->getWorkflow;
+        $instance->delete('skipNotify') if !defined $workflow;
     }
     print "DONE!\n" unless $quiet;
 }
