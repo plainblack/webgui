@@ -677,6 +677,126 @@ directly inside the answer_loop for other types of questions.|,
         context => q|The title of a template Help page.|,
         lastUpdated => 1078223067
     },
+
+    'survey template title' => {
+        message => q|Survey Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 1078223096
+    },
+
+    'lastResponseCompleted' => {
+        message => q|A boolean indicating wether the current user's last response was completed.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'lastResponseTimedOut' => {
+        message => q|A boolean indicating wether the current user's last response timed out.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'maxResponsesSubmitted' => {
+        message => q|A boolean indicating wether the current user has reached the maximum number of responses.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'user_canTakeSurvey' => {
+        message => q|A boolean indicating wether the current user can take the survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'user_canViewReports' => {
+        message => q|A boolean indicating wether the current user can view the survey reports.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'user_canEditSurvey' => {
+        message => q|A boolean indicating wether the current user can edit the survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'edit_survey_url' => {
+        message => q|The url for the survey edit screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'take_survey_url' => {
+        message => q|The url for the take survey screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'view_simple_results_url' => {
+        message => q|The url for the simple results screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'view_transposed_results_url' => {
+        message => q|The url for the transposed results screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'view_statistical_overview_url' => {
+        message => q|The url for the statistical overview screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'view_grade_book_url' => {
+        message => q|The url for the grade book report screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'templateId' => {
+        message => q|The ID of the template to show the Survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168639537,
+    },
+
+    'groupToTakeSurvey' => {
+        message => q|The ID of the group that is allowed to take the Survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168639812,
+    },
+
+    'groupToViewReports' => {
+        message => q|The ID of the group that is allowed to view reports from the Survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168639812,
+    },
+
+    'maxResponsesPerUser' => {
+        message => q|The number of times the user can attempt to get the correct answer on each question. The default is 1.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643566,
+    },
+
+    'overviewTemplateId' => {
+        message => q|The ID of the template used to show the overview screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
+
+    'gradebookTemplateId' => {
+        message => q|The ID of the template used to show the gradebook screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
+
+    'responseTemplateId' => {
+        message => q|The ID of the template used to show the Survey Response screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
 };
 
 1;
