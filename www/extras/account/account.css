@@ -381,10 +381,7 @@ ul.topTabs li {
 }
 ul.topTabs li {
 	display:inline-block;
-	/*
-	float:left;
 	margin-right: 5px;
-	*/
 }
 ul.topTabs li b {
 	display:block;
