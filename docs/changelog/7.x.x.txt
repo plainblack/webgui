@@ -8,6 +8,7 @@
  - fixed #9590: Upgrade from 7.4.40 to 7.5.39 is broken (Henry Tang, Long Term Results B.v.)
  - fixed #9580: Gallery: albums shown in navigation
  - fixed #9592: DataForm deleteAttachedFiles method can crash
+ - fixed #9018: orphan workflows from upgrade.
 
 7.5.39
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
