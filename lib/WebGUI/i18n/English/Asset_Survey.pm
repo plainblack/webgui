@@ -797,6 +797,156 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1168643669,
     },
+
+    'survey questions template title' => {
+        message => q|Survey Questions Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 0
+    },
+
+    'questionsAnswered' => {
+        message => q|The number of questions that has been answered.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'totalQuestions' => {
+        message => q|The total number of questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'totalQuestions' => {
+        message => q|A boolean indicating wether the user should see the total number of answers and the number of questions that have already been answered.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'showTimeLimit' => {
+        message => q|A boolean indicating wether the number of minutes until the survey times out should be displayed.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'minutesLeft' => {
+        message => q|The number of minutes the user has left to finish the survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'questions' => {
+        message => q|A loop containing the questions in this section.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'id' => {
+        message => q|The ID of this question/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'text' => {
+        message => q|The text of this question/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'sid' => {
+        message => q|The section ID of this question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'dualSlider' => {
+        message => q|A boolean indicating if this is a dualSlider type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'a1' => {
+        message => q|A loop containing the first list of answers for a dual slider type question.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'a2' => {
+        message => q|A loop containing the second list of answers for a dual slider type question.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'slider' => {
+        message => q|A boolean indicating if this is a slider type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'dateType' => {
+        message => q|A boolean indicating if this is a date type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'multipleChoice' => {
+        message => q|A boolean indicating if this is a multipleChoice type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'maxMoreOne' => {
+        message => q|A boolean indicating if the maximum number of answers that can be given to this question is greater than one.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'maxAnswers' => {
+        message => q|The maximum number of answers that can be given to this question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'hidden' => {
+        message => q|A boolean indicating if this is a hidden type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'textType' => {
+        message => q|A boolean indicating if this is a text type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'fileLoader' => {
+        message => q|A boolean indicating if this is a fileLoader type question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'verticalDisplay' => {
+        message => q|A boolean indicating if the answers to this question should be displayed vertically.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'verts' => {
+        message => q|A paragraph opening tag.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'verte' => {
+        message => q|A paragraph closing tag.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'answers' => {
+        message => q|A loop containing the answers to this question.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
 };
 
 1;

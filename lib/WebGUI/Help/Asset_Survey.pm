@@ -84,6 +84,65 @@ our $HELP = {
         ]
     },
 
+    'survey questions template' => {
+        title  => 'survey questions template title',
+        body   => '',
+        fields => [],
+        isa    => [
+            {   namespace => 'Asset_Survey',
+                tag       => 'survey template common vars'
+            },
+            {   namespace => 'Asset_Survey',
+                tag       => 'survey asset template variables'
+            },
+        ],
+        variables => [
+            {   'name'  => 'questionsAnswered' },
+            {   'name'  => 'totalQuestions' },
+            {   'name'  => 'showProgress' },
+            {   'name'  => 'showTimeLimit' },
+            {   'name'  => 'minutesLeft' },
+            {   'name'  => 'questions',
+                'variables' => [
+                    {   'name' => 'id' },
+                    {   'name' => 'sid' },
+                    {   'name' => 'text' },
+                    {   'name' => 'fileLoader' },
+                    {   'name' => 'textType' },
+                    {   'name' => 'multipleChoice' },
+                    {   'name' => 'maxAnswers' },
+                    {   'name' => 'maxMoreOne' },
+                    {   'name' => 'dateType' },
+                    {   'name' => 'slider' },
+                    {   'name' => 'dualSlider' },
+                    {   'name' => 'a1' },
+                    {   'name' => 'a2' },
+                    {   'name' => 'verticalDisplay' },
+                    {   'name' => 'verts' },
+                    {   'name' => 'verte' },
+                    {   'name' => 'answers',
+                        'variables' => [
+                            { 'name' => 'id' },
+                            { 'name' => 'text' },
+                        ]
+                    }
+                ]
+            }
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
+    },
+
+
     'survey response template' => {
         title => '1089',
         body  => '',
