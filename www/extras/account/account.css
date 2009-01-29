@@ -380,9 +380,11 @@ ul.topTabs li {
 	list-style-type:none;
 }
 ul.topTabs li {
-	display:block;
+	display:inline-block;
+	/*
 	float:left;
 	margin-right: 5px;
+	*/
 }
 ul.topTabs li b {
 	display:block;
