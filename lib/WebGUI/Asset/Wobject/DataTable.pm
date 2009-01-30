@@ -125,6 +125,7 @@ sub getDataTemplateVars {
     my $self = shift;
 
     my $json = $self->getDataJson;
+    $self->session->log->warn($json);
     my $dt   = JSON->new->decode($json);
 
     # Make row data more friendly to templates

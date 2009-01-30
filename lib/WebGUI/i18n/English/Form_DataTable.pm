@@ -139,6 +139,13 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Button to delete a column, shown in the Edit Schema dialog},
     },
+
+    "sortable" => {
+        message     => q{sortable},
+        lastUpdated => 0,
+        context     => q{Whether a column is sortable in the table},
+    },
+
 };
 
 1;
