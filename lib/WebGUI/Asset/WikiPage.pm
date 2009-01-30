@@ -59,10 +59,30 @@ sub canAdd {
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	my $form = $self->session->form;
-	return (($form->process("func") eq "add" || ($form->process("assetId") eq "new" && $form->process("func") eq "editSave" && $form->process("class","className") eq "WebGUI::Asset::WikiPage")) && $self->getWiki->canEditPages) # account for new pages
-		|| (!$self->isProtected && $self->getWiki->canEditPages)  # account for normal editing
-		|| $self->getWiki->canAdminister; # account for admins
+    my $wiki = $self->getWiki;
+    return undef unless defined $wiki;
+
+	my $form      = $self->session->form;
+    my $addNew    = $form->process("func"              ) eq "add";
+    my $editSave  = $form->process("assetId"           ) eq "new"
+                 && $form->process("func"              ) eq "editSave"
+                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+    return $wiki->canAdminister
+        || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
+}
+
+#-------------------------------------------------------------------
+
+=head2 canPaste
+
+Since so much of the Wiki Page depends on the Wiki Master, do not allow it
+to be pasted to anywhere but a WikiMaster.
+
+=cut
+
+sub canPaste {
+	my $self = shift;
+    return $self->session->asset->isa('WebGUI::Asset::Wobject::WikiMaster');
 }
 
 #-------------------------------------------------------------------
