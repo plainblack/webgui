@@ -14,6 +14,7 @@ package WebGUI::HTML;
 
 =cut
 
+use HTML::TokeParser;
 use HTML::TagFilter;
 use strict;
 use WebGUI::Macro;
@@ -36,6 +37,7 @@ A package for manipulating and massaging HTML.
  $html = WebGUI::HTML::html2text($html);
  $html = WebGUI::HTML::makeAbsolute($session, $html);
  $html = WebGUI::HTML::processReplacements($session, $html);
+ $html = WebGUI::HTML::splitTag([$tag,]$html[,$count]);    # defaults to ( 'p', $html, 1 )
 
 =head1 METHODS
 
@@ -394,6 +396,51 @@ sub processReplacements {
 		$session->stow->set("replacements",$replacements);
 	}
 	return $content;
+}
+
+#-------------------------------------------------------------------
+
+=head2 WebGUI::HTML::splitTag([$tag,]$html[,$count]);
+
+splits an block of HTML into an array based on the contents of a single tag
+
+=head3 tag
+
+The HTML tag top extract from the text.  this defaults to 'p' giving a list of paragraphs
+
+=head3 html
+
+The block of HTML text that will be disected
+
+=head3 count
+
+How many items do we want?  defaults to 1; returns 1 non-blank item; -1 returns all items
+
+=cut
+
+sub splitTag {
+
+    my $tag = shift;
+    my $html = shift;
+    my $count = shift || 1;
+    if( not defined $html or $html =~ /^(-?\d+)$/ ) {
+        $count = $html if $1;
+        $html = $tag;
+        $tag = 'p';                 # the default tag is 'p' -- grabs a paragraph
+    }
+    my @result;
+
+    my $p = HTML::TokeParser->new(\$html);
+
+    while (my $token = $p->get_tag($tag)) {
+        my $text = $p->get_trimmed_text("/$tag");
+        next if $text =~ /^([[:space:]]|[[:^print:]])*$/;    # skip whitespace
+        push @result, $text;          # add the text between the tags to the result array
+        last if @result == $count;    # if we have a full count then quit
+    }
+
+    return @result if wantarray;
+    return $result[0];
 }
 
 1;

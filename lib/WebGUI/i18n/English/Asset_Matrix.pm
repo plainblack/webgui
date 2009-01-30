@@ -755,6 +755,11 @@ selectBox.</p>|
         message => q|Matrix Asset Template Variables|,
     },
 
+    'matrix fieldtype' => {
+        lastUpdated => 0,
+        message => q|Matrix Fieldtype|,
+    },
+
 };
 
 1;

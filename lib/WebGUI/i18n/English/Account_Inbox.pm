@@ -49,6 +49,16 @@ our $I18N = {
         lastUpdated => 1119068809
     },
 
+    'inbox send message template label' => {
+        message     => q|Send Message Template|,
+        lastUpdated => 1119068809,
+    },
+
+    'inbox send message template hoverHelp' => {
+        message     => q|Choose the template for sending a message|,
+        lastUpdated => 1119068809,
+    },
+
     'inbox message confirm template label' => {
         message     => q|Inbox Message Confirm Template|,
         lastUpdated => 1119068809
@@ -525,6 +535,17 @@ our $I18N = {
 		lastUpdated => 1230867391,
 	},
 
+    'inbox rich editor label' => {
+        message         => q{Inbox Rich Editor},
+        lastUpdated     => 0,
+        context         => q{Label for setting},
+    },
+
+    'inbox rich editor description' => {
+        message         => q{The rich editor used to compose messages},
+        lastUpdated     => 0,
+        context         => "Description of Inbox setting",
+    },
 };
 
 1;

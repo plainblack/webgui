@@ -19,40 +19,51 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
+use LWP::MediaTypes;
+
+my $recentModule = $LWP::MediaTypes::VERSION > 5.800;
+
 my @testSets = (
 	{
-		input => 'webgui.txt',
-		output => 'text/plain',
+		input  => 'webgui.txt',
+		newput => 'text/plain',
+		oldput => 'text/plain',
 		comment => q|text|,
 	},
 	{
-		input => 'plainblack.gif',
-		output => 'image/gif',
+		input  => 'plainblack.gif',
+		newput => 'image/gif',
+		oldput => 'image/gif',
 		comment => q|gif|,
 	},
 	{
-		input => 'background.jpg',
-		output => 'image/jpeg',
+		input  => 'background.jpg',
+		newput => 'image/jpeg',
+		oldput => 'image/jpeg',
 		comment => q|jpeg|,
 	},
 	{
-		input => 'colorPicker.js',
-		output => 'application/octet-stream',
+		input  => 'colorPicker.js',
+		newput => 'application/x-javascript',
+		oldput => 'application/octet-stream',
 		comment => q|javascript|,
 	},
 	{
-		input => 'favIcon.ico',
-		output => 'application/octet-stream',
+		input  => 'favIcon.ico',
+		newput => 'image/vnd.microsoft.icon',
+		oldput => 'application/octet-stream',
 		comment => q|octet-stream for unknown type|,
 	},
 	{
-		input => '',
-		output => 'application/octet-stream',
+		input  => '',
+		newput => 'application/octet-stream',
+		oldput => 'application/octet-stream',
 		comment => q|Null path returns application/octet-stream|,
 	},
 	{
-		input => undef,
-		output => undef,
+		input  => undef,
+		newput => undef,
+		oldput => undef,
 		comment => q|Undef path returns undef|,
 	},
 );
@@ -75,7 +86,8 @@ foreach my $testSet (@testSets) {
 		 ? join '/', WebGUI::Test->root, 'www/extras', $testSet->{input}
 		 : $testSet->{input};
 	my $output = WebGUI::Macro::FetchMimeType::process($session, $file);
-	is($output, $testSet->{output}, $testSet->{comment} );
+    my $expected = $recentModule ? $testSet->{newput} : $testSet->{oldput};
+	is($output, $expected, $testSet->{comment} );
 }
 
 }

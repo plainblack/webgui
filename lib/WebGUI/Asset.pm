@@ -1909,7 +1909,7 @@ sub newPending {
 
 #-------------------------------------------------------------------
 
-=head2 outputWidgetMarkup ( width, height, templateId )
+=head2 outputWidgetMarkup ( width, height, templateId, [styleTemplateId] )
 
 Output the markup required for the widget view. Includes markup to handle the
 widget macro in the iframe holding the widgetized asset. This does the following: 
@@ -1961,12 +1961,20 @@ widget-in-widget function properly.
 
 =cut
 
+=head3 styleTemplateId
+
+The style templateId for this widgetized asset to use. Not required for making
+widget-in-widget function properly.
+
+=cut
+
 sub outputWidgetMarkup {
     # get our parameters.
-    my $self            = shift;
-    my $width           = shift;
-    my $height          = shift;
-    my $templateId      = shift;
+    my $self                = shift;
+    my $width               = shift;
+    my $height              = shift;
+    my $templateId          = shift;
+    my $styleTemplateId     = shift;
 
     # construct / retrieve the values we'll use later.
     my $assetId         = $self->getId;
@@ -1990,6 +1998,11 @@ sub outputWidgetMarkup {
     # we'll be serializing the content of the asset which is being widgetized. 
     my $storage         = WebGUI::Storage->get($session, $assetId);
     my $content         = $self->view;
+    if($styleTemplateId eq '' or $styleTemplateId eq 'none'){
+        $content = $self->session->style->userStyle($content); 
+    }else{
+        $content = $self->session->style->process($content,$styleTemplateId); 
+    }
     WebGUI::Macro::process($session, \$content);
     my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
@@ -2776,9 +2789,10 @@ sub www_widgetView {
 
     return $session->privilege->noAccess() unless $self->canView;
 
-    my $templateId  = $session->form->process('templateId');
-    my $width       = $session->form->process('width');
-    my $height      = $session->form->process('height');
+    my $templateId      = $session->form->process('templateId');
+    my $width           = $session->form->process('width');
+    my $height          = $session->form->process('height');
+    my $styleTemplateId = $session->form->process('styleTemplateId');
 
     if($templateId eq 'none') {
         $self->prepareView;
@@ -2786,7 +2800,7 @@ sub www_widgetView {
     else {
         $self->prepareWidgetView($templateId);
     }
-        return $self->outputWidgetMarkup($width, $height, $templateId);
+        return $self->outputWidgetMarkup($width, $height, $templateId, $styleTemplateId);
 }
 
 1;

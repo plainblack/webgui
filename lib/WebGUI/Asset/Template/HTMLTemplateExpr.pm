@@ -20,6 +20,11 @@ use HTML::Template::Expr;
 
 
 #-------------------------------------------------------------------
+
+=head2 _rewriteVars 
+
+=cut
+
 sub _rewriteVars { # replace dots with underscrores in keys (except in keys that aren't usable as variables (URLs etc.))
         my $vars = shift;
 	my $newVars = {};

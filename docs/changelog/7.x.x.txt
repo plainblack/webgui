@@ -1,6 +1,23 @@
+7.6.10
+ - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
+ - added test for splitTag function recently added to HTML module
+ - fixed #9455: fixed synopsis to pick out html paragraphs, fixed FeedPP fields to scalar when blank
+ - fixed: With autocommit and no comments on, making a shortcut of an asset takes you to that asset's view.
+ - fixed #9506: Choose billing address
+ - fixed #9541: assets with uncommitted parent.
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
+ - fixed #9236: Survey 2.0 missing hoverhelp
+ - added: Widget Macro now uses a style, defaulting to the users.
+ - added ability to select which rich editor is used to compose messages in the inbox
+ - removed random questions display from Survey Questions Edit template until
+   that feature is added.
+ - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
+ - fixed: utf8 issues with Survey should be correct.  JSON fields are now longText instead of longBlob.
+ - fixed #9522: Time tracker does not display
+ - fixed #9215: Survey 2.0 results screens missing
+
 7.6.9
- - fixed: ukplayer example is now loaded with swfobject.js released under the
-          MIT licence, see gotcha's and /extras/ukplayer
+ - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
  - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
  - marked sbin scripts as executable
@@ -10,8 +27,10 @@
  - fixed a bug where no Payment Gateway labels show up when checking out.
  - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search page has head tags in body
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
  - fixed: HTTP Proxy doesn't serve new content to visitors
  - fixed: Exporting to static files can leak large amounts of memory
+ - fixed: Paginator generates bad markup for next page links
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts

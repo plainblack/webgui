@@ -350,18 +350,18 @@ Returns a link to the next page's data.
 =cut
 
 sub getNextPageLink {
-	my ($self) = @_;
-        my ($text, $pn, $ctext);
-	$pn = $self->getPageNumber;
-	my $i18n = WebGUI::International->new($self->session);
-        $ctext = $i18n->get(92);
-        $text = $ctext.'&raquo;';
-        if ($pn < $self->getNumberOfPages) {
-                my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
-                return wantarray ? ($url,$ctext,'<span id="nextPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
-        } else {
-                return wantarray ? (undef,$ctext,$text) : $text;
-        }
+    my ($self) = @_;
+    my ($text, $pn, $ctext);
+    $pn = $self->getPageNumber;
+    my $i18n = WebGUI::International->new($self->session);
+    $ctext = $i18n->get(92);
+    $text = $ctext.'&raquo;';
+    my $url = undef;
+    if ($pn < $self->getNumberOfPages) {
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
+        $text = '<span id="nextPageLink"><a href="'.$url.'">' . $text . '</a></span>';
+    }
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
@@ -528,18 +528,18 @@ Returns a link to the previous page's data.
 =cut
 
 sub getPreviousPageLink {
-	my ($self) = @_;
-	my ($text, $pn, $ctext);
-	$pn = $self->getPageNumber;
-	my $i18n = WebGUI::International->new($self->session);
-	$ctext = $i18n->get(91);
-	$text = '&laquo;'.$ctext;
-	if ($pn > 1) {
-		my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
-		return wantarray ? ($url,$ctext,'<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
-        } else {
-            return wantarray ? (undef,$ctext,$text) : $text;
-        }
+    my ($self) = @_;
+    my ($text, $pn, $ctext);
+    $pn = $self->getPageNumber;
+    my $i18n = WebGUI::International->new($self->session);
+    $ctext = $i18n->get(91);
+    $text = '&laquo;'.$ctext;
+    my $url = undef;
+    if ($pn > 1) {
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
+        $text = '<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a></span>';
+    }
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
