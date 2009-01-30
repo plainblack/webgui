@@ -419,7 +419,7 @@ sub getOriginalValue {
 
 =head2 getDefaultValue ( )
 
-Returns the "defaultValue" passed in to the object in that order
+Returns the "defaultValue".
 
 =cut
 
@@ -454,10 +454,8 @@ Depricated. See getValue().
 # getValueFromPost is deprecated, use getValue
 sub getValueFromPost {
     my $self    = shift;
-    if ($self->session->request) {
-        my $value = $self->session->form->param($self->get("name"));
-        return $value if (defined $value);
-    }
+    my $value = $self->session->form->param($self->get("name"));
+    return $value if (defined $value);
     return $self->getDefaultValue;
 }
 
@@ -475,6 +473,25 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+Object method that returns true if the form variables for this control exist in the
+posted data from the client.  This is required for all controls that are dynamic
+compatible (->isDynamicCompatible=1).  It should be overridden by any class that
+changes the name of the form variable, or uses more than 1 named element per form.
+
+This method should only depend on the form name, and not secondary form properties
+such as value, defaultValue or storage or asset id's.
+
+=cut
+
+sub isInRequest {
+    my $self = shift;
+    return $self->session->form->hasParam($self->get('name'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 isProfileEnabled ( session )
 
 Depricated. See isDynamicCompatible().
@@ -484,7 +501,6 @@ Depricated. See isDynamicCompatible().
 
 sub isProfileEnabled {
     my $class = shift;
-    my $session = shift;
     return $class->isDynamicCompatible();
 }
 

@@ -125,22 +125,6 @@ sub getName {
 
 #-------------------------------------------------------------------
 
-=head2 getStorageLocation ( )
-
-Returns the WebGUI::Storage object for this control.
-
-=cut
-
-sub getStorageLocation {
-    my $self = shift;
-    my $value = $self->getOriginalValue;
-	my $storage = WebGUI::Storage->get($self->session, $value) if ($value);
-    return $storage;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 getValue ( )
 
 See WebGUI::Form::File::getValue() for details. Generates a thumbnail.

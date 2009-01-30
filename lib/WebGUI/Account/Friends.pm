@@ -539,6 +539,7 @@ sub www_view {
         next if($displayView && !$friend->profileField('ableToBeFriend'));
         
         my $hash     = {};
+        # TODO Move this into a sub that can be more easily overridden
         $hash->{'friend_full_name'         } = $friend->getWholeName;
         $hash->{'isViewable'               } = $friend->profileIsViewable;
         $hash->{'friend_id'                } = $friend->userId;

@@ -190,8 +190,12 @@ sub spectreTest{
     if (!defined $subnets) {
         $subnets = [];
     }
-	unless (isInSubnet($session->env->getIp, $subnets)) {
-		$session->errorHandler->security("Tried to make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$subnets}).".");
+    my $sessionIp = $session->env->getIp;
+	unless (isInSubnet($sessionIp, $subnets)) {
+		$session->errorHandler->security(
+            sprintf "Tried to make a Spectre workflow runner request from %s, but we're only allowed to accept requests from %s",
+                $sessionIp, join(",",@{$subnets})
+        );
         return "subnet";
 	}
 	my $remote = create_ikc_client(

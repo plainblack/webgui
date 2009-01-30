@@ -22,6 +22,11 @@ use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::ProjectManager;
 
 #-------------------------------------------------------------------
+
+=head2 definition 
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -82,6 +87,11 @@ sub definition {
 
 
 #-------------------------------------------------------------------
+
+=head2 prepareView 
+
+=cut
+
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
@@ -96,6 +106,11 @@ sub prepareView {
 }
 
 #-------------------------------------------------------------------
+
+=head2 processErrors 
+
+=cut
+
 sub processErrors {
    my $self = shift;
    my $errors = "";
@@ -111,6 +126,11 @@ sub processErrors {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge 
+
+=cut
+
 sub purge {
 	my $self = shift;
 	#purge your wobject-specific data here.  This does not include fields 
@@ -119,6 +139,11 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getDaysInWeek 
+
+=cut
+
 sub getDaysInWeek {
 	my $self = shift;
 	my $week = $_[0];
@@ -142,6 +167,11 @@ sub getDaysInWeek {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getSessionVars 
+
+=cut
+
 sub getSessionVars {
    my $self = shift;
    my @vars = @_;
@@ -159,6 +189,11 @@ sub getSessionVars {
 
 
 #-------------------------------------------------------------------
+
+=head2 view 
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $var = $self->get;
@@ -197,6 +232,11 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editTimeEntrySave 
+
+=cut
+
 sub www_editTimeEntrySave {
    	my $self = shift;
 	my ($session,$privilege,$form,$db,$user,$eh,$dt) = $self->getSessionVars("privilege","form","db","user","errorHandler","datetime");
@@ -271,6 +311,11 @@ sub www_editTimeEntrySave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteProject 
+
+=cut
+
 sub www_deleteProject {
    	my $self = shift;
     my ($session,$privilege,$form,$db,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","user","errorHandler","config");
@@ -293,6 +338,11 @@ sub www_deleteProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProject 
+
+=cut
+
 sub www_editProject {
 	my $self = shift;
     my ($session,$privilege,$form,$db,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","user","errorHandler","config");
@@ -393,6 +443,11 @@ sub www_editProject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_editProjectSave 
+
+=cut
+
 sub www_editProjectSave {
 	my $self = shift;
     my ($session,$privilege,$form,$db,$dt,$user,$eh) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler");    
@@ -453,6 +508,11 @@ sub www_editProjectSave {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_manageProjects 
+
+=cut
+
 sub www_manageProjects {
 	my $self = shift;
     my ($session,$privilege,$form,$db,$dt,$user,$eh,$config) = $self->getSessionVars("privilege","form","db","datetime","user","errorHandler","config");    
@@ -574,6 +634,11 @@ sub www_manageProjects {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_buildTimeTable 
+
+=cut
+
 sub www_buildTimeTable {
    	my $self = shift;
 	my $viewVar = $_[0];
@@ -738,6 +803,11 @@ sub www_buildTimeTable {
 }
 
 #-------------------------------------------------------------------
+
+=head2 _buildRow 
+
+=cut
+
 sub _buildRow {
 	my $self = shift;
 	my ($session,$dt,$eh,$form,$db,$user) = $self->getSessionVars("datetime","errorHandler","form","db","user");
@@ -762,20 +832,41 @@ sub _buildRow {
 	                           -name=>"taskEntryId_$rowCount",
 							   -value=>$entryId
 							});
-	
-	#Entry Date
+
+    ##Handle cases when a user has been removed from a project.  The projectList
+    ##and taskList hash refs that have been passed in will not contain entries for
+    ##their old project info
+
+    #Entry Task
+    tie my %taskHash, "Tie::IxHash";
+    if ($projectId) {
+        if (! exists $projectList->{$projectId}) {
+            my $projectName = $db->quickScalar('select projectName from TT_projectList where projectId=?',[$projectId]);
+            $projectList->{$projectId} = $projectName;
+        }
+        if (! exists $taskList->{$projectId}) {
+            %taskHash = $db->buildHash("select taskId, taskName from TT_projectTasks where projectId=?",[$projectId]);
+        }
+        else {
+            %taskHash = %{$taskList->{$projectId}};
+        }
+        #$eh->warn($projectId);
+    }	
 	my $chooseLabel = $i18n->get("Choose One");
+    %taskHash = (""=>$chooseLabel,%taskHash);
+
+	#Entry Date
 	$var->{'entry.hours'} = $entry->{hours};
 	if($reportComplete) {
 	   $var->{'form.date'} = $entry->{taskDate};
 	   $var->{'form.project'} = $projectList->{$projectId};
 	   
-	   my $taskHash = $taskList->{$projectId};
-	   $var->{'form.task'} = $taskHash->{$entry->{taskId}};
+	   $var->{'form.task'} = $taskHash{$entry->{taskId}};
 	   $var->{'form.hours'} = $var->{'entry.hours'};
 	   $var->{'form.comments'} = $entry->{comments};
 	   
-	} else {
+    }
+    else {
 	   tie my %days, "Tie::IxHash";
 	   %days = (""=>$chooseLabel, %{$daysInWeek});
 	   $var->{'form.date'} = WebGUI::Form::selectBox($session,{
@@ -793,15 +884,7 @@ sub _buildRow {
 				-value=>$projectId,
 				-extras=>qq|onchange="changeOptions(this,document.getElementById('$taskId'));" class="pt-select"|
 	            });
-	
-	   #Entry Task
-	   tie my %taskHash, "Tie::IxHash";
-	   %taskHash = (""=>$chooseLabel,%taskHash);
-	   if($projectId) {
-	      #$eh->warn($projectId);
-	      %taskHash = %{$taskList->{$projectId}};
-	   }	
-	
+
 	   $var->{'form.task'} = WebGUI::Form::selectBox($session,{
 	            -name=>$taskName,
 				-options=>\%taskHash,

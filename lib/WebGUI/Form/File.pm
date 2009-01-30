@@ -240,6 +240,21 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+=cut
+
+sub isInRequest {
+    my $self = shift;
+    my $form = $self->session->form;
+    my $name = $self->get('name');
+    my $isInRequest = $form->hasParam($name.'_file')
+                   || $form->hasParam($self->privateName('action'));
+    return $isInRequest;
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a file upload control.
