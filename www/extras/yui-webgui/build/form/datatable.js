@@ -337,7 +337,8 @@ WebGUI.Form.DataTable
                     "help select row",
                     "help add row",
                     "help default sort",
-                    "help reorder column"
+                    "help reorder column",
+                    "sortable"
                 ]
             },
             onpreload   : {
@@ -398,7 +399,8 @@ WebGUI.Form.DataTable
             div.parentNode.removeChild( div );
         };
 
-        var buttonLabel = this.i18n.get( "Form_DataTable", "delete column" );
+        var sortableLabel = this.i18n.get( "Form_DataTable", "sortable" ); 
+        var buttonLabel   = this.i18n.get( "Form_DataTable", "delete column" );
         var availableFormats    = [
             {
                 "value" : "text",
@@ -463,6 +465,16 @@ WebGUI.Form.DataTable
                 format.appendChild( opt );
             }
             div.appendChild( format );
+
+            div.appendChild( document.createTextNode(sortableLabel) );
+
+            var sorter  = document.createElement( "input" );
+            sorter.type     = "checkbox";
+            sorter.name     = "canSort_" + i;
+            sorter.checked  = cols[i].sortable;
+            sorter.value    = 1;
+            div.appendChild( sorter );
+
             return div;
         };
        
@@ -474,6 +486,7 @@ WebGUI.Form.DataTable
             var newIdx  = cols.length;
             // create a new column object
             cols[newIdx] = new YAHOO.widget.Column;
+            cols[newIdx].sortable = true;
             // add it to the dialog box
             this.appendChild( createTableColumn(newIdx,cols) );
         };
@@ -599,9 +612,10 @@ WebGUI.Form.DataTable
         // Update columns
         var i           = 0;
         while ( data[ "newKey_" + i ] ) {
-            var oldKey  = data[ "oldKey_" + i ];
-            var newKey  = data[ "newKey_" + i ];
-            var format  = data[ "format_" + i ][0];
+            var oldKey  = data[ "oldKey_"  + i ];
+            var newKey  = data[ "newKey_"  + i ];
+            var format  = data[ "format_"  + i ][0];
+            var canSort = data[ "canSort_" + i ]
             var col     = this.dataTable.getColumn( oldKey );
 
             // Don't allow adding multiple columns with same key
@@ -625,7 +639,7 @@ WebGUI.Form.DataTable
                 key         : newKey,
                 formatter   : format,
                 resizeable  : ( col ? col.resizeable : 1 ),
-                sortable    : ( col ? col.sortable : 1 )
+                sortable    : canSort
             };
             var newIndex    = col ? col.getKeyIndex() : undefined;
 
