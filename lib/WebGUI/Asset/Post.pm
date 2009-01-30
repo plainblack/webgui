@@ -23,6 +23,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Form::DynamicField;
 use WebGUI::International;
 use WebGUI::Inbox;
+use WebGUI::Macro;
 use WebGUI::Mail::Send;
 use WebGUI::Operation;
 use WebGUI::Paginator;
@@ -548,11 +549,15 @@ sub getSynopsisAndContent {
 	my $synopsis = shift;
 	my $body = shift;
 	unless ($synopsis) {
-        	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
-       	 	my @content = split(/\^\-\;/,$body);
-		$synopsis = WebGUI::HTML::filter($content[0],"all");
+           my @content;
+           if( $body =~ /<p>/ ) {
+               @content = WebGUI::HTML::splitTag($body);
+           } else {
+       	       @content = split("\n",$body);
+           }
+           shift @content if $content[0] =~ /^\s*$/;
+           $synopsis = WebGUI::HTML::filter($content[0],"all");
 	}
-	$body =~ s/\^\-\;/\n/;
 	return ($synopsis,$body);
 }
 
@@ -843,6 +848,7 @@ sub notifySubscribers {
         $var->{unsubscribeUrl} = $siteurl.$subscriptionAsset->getUnsubscribeUrl;
         $var->{unsubscribeLinkText} = $i18n->get("unsubscribe","Asset_Collaboration");
         my $message = $self->processTemplate($var, $cs->get("notificationTemplateId"));
+        WebGUI::Macro::process($self->session, \$message);
         my $groupId = $subscriptionAsset->get('subscriptionGroupId');
         my $mail = WebGUI::Mail::Send->create($self->session, {
 			from=>"<".$from.">",

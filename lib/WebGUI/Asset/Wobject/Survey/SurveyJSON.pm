@@ -563,15 +563,15 @@ $properties should never be a partial object, but contain all properties.
 
 sub update {
     my ( $self, $address, $properties ) = @_;
-    my $object;
-    
+
     # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
-    
+
     # First retrieve the addressed object, or, if necessary, create it
+    my $object;
     if ( $count == 1 ) {
         $object = $self->section($address);
         if ( !defined $object ) {
@@ -586,6 +586,10 @@ sub update {
             $newQuestion = 1; # make note that a new question was created
             push( @{ $self->questions($address) }, $object );
         }
+        # We need to update all of the answers to reflect the new questionType
+        if ( $properties->{questionType} ne $object->{questionType} ) {
+            $self->updateQuestionAnswers( $address, $properties->{questionType} );
+        }
     }
     elsif ( $count == 3 ) {
         $object = $self->answer($address);
@@ -594,17 +598,7 @@ sub update {
             push( @{ $self->answers($address) }, $object );
         }
     }
-    
-    # $object and $address now refer to the section/question/answer to be updated
-    
-    # In the case where we are updating an existing question..
-    if ( $count == 2 and !$newQuestion ) {
-        # We need to update all of the answers to reflect the new questionType
-        if ( $properties->{questionType} ne $self->question($address)->{questionType} ) {
-            $self->updateQuestionAnswers( $address, $properties->{questionType} );
-        }
-    }
-    
+
     # Update $object with all of the data in $properties 
     for my $key ( keys %$properties ) {
         $object->{$key} = $properties->{$key} if defined $properties->{$key};
@@ -858,7 +852,7 @@ sub newAnswer {
 
 =head2 updateQuestionAnswers ($address, $type);
 
-Add answers to a question, based on the requested type.
+Remove all existing answers and add a default set of answers to a question, based on question type.
 
 =head3 $address
 
@@ -866,8 +860,7 @@ See L<"Address Parameter">. Determines question to add answers to.
 
 =head3 $type
 
-The question type to use to determine how many and what kind of answers
-to add to the question.
+The question type determines how many answers to add and what answer text (if any) to use
 
 =cut
 
@@ -876,10 +869,21 @@ sub updateQuestionAnswers {
     my $address = shift;
     my $type    = shift;
 
-    my @addy     = @{$address};
+    # Make a private copy of the $address arrayref that we can use locally
+    # when updating answer text without causing side-effects for the caller's $address
+    my @address_copy     = @{$address};
+    
+    # Get the indexed question, and remove all of its existing answers
     my $question = $self->question($address);
     $question->{answers} = [];
 
+    # Add the default set of answers. The question type determines both the number
+    # of answers added and the answer text to use. When updating answer text
+    # first update $address_copy to point to the answer
+    
+    # TODO: Rather than being hard-coded, these question type/answer bundles should
+    # be loaded dynamically and customizable by the user (see also getValidQuestionTypes)
+    
     if (   $type eq 'Date Range'
         or $type eq 'Multi Slider - Allocate'
         or $type eq 'Dual Slider - Range' )
@@ -889,23 +893,23 @@ sub updateQuestionAnswers {
     }
     elsif ( $type eq 'Currency' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Currency Amount:' } );
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Currency Amount:' } );
     }
     elsif ( $type eq 'Text Date' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Date:' } );
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Date:' } );
     }
     elsif ( $type eq 'Phone Number' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Phone Number:' } );
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Phone Number:' } );
     }
     elsif ( $type eq 'Email' ) {
         push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Email:' } );
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Email:' } );
     }
     elsif ( $type eq 'Education' ) {
         my @ans = (
@@ -918,17 +922,17 @@ sub updateQuestionAnswers {
             'Doctorate (of any type)',
             'Other degree (verbatim)'
         );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 7, 1 } );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, { 7, 1 } );
     }
     elsif ( $type eq 'Party' ) {
         my @ans
             = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 3, 1 } );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, { 3, 1 } );
     }
     elsif ( $type eq 'Race' ) {
         my @ans = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic',
             'Something else (verbatim)' );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 5, 1 } );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, { 5, 1 } );
     }
     elsif ( $type eq 'Ideology' ) {
         my @ans = (
@@ -940,67 +944,67 @@ sub updateQuestionAnswers {
             'Conservative',
             'Strongly conservative'
         );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Security' ) {
         my @ans = ( 'Not at all secure', '', '', '', '', '', '', '', '', '', 'Extremely secure' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Threat' ) {
         my @ans = ( 'No threat', '', '', '', '', '', '', '', '', '', 'Extreme threat' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Risk' ) {
         my @ans = ( 'No risk', '', '', '', '', '', '', '', '', '', 'Extreme risk' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Concern' ) {
         my @ans = ( 'Not at all concerned', '', '', '', '', '', '', '', '', '', 'Extremely concerned' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Effectiveness' ) {
         my @ans = ( 'Not at all effective', '', '', '', '', '', '', '', '', '', 'Extremely effective' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Confidence' ) {
         my @ans = ( 'Not at all confident', '', '', '', '', '', '', '', '', '', 'Extremely confident' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Satisfaction' ) {
         my @ans = ( 'Not at all satisfied', '', '', '', '', '', '', '', '', '', 'Extremely satisfied' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Certainty' ) {
         my @ans = ( 'Not at all certain', '', '', '', '', '', '', '', '', '', 'Extremely certain' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Likelihood' ) {
         my @ans = ( 'Not at all likely', '', '', '', '', '', '', '', '', '', 'Extremely likely' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Importance' ) {
         my @ans = ( 'Not at all important', '', '', '', '', '', '', '', '', '', 'Extremely important' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Oppose/Support' ) {
         my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly support' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Agree/Disagree' ) {
         my @ans = ( 'Strongly disagree', '', '', '', '', '', 'Strongly agree' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'True/False' ) {
         my @ans = ( 'True', 'False' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Yes/No' ) {
         my @ans = ( 'Yes', 'No' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Gender' ) {
         my @ans = ( 'Male', 'Female' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
+        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     else {
         push( @{ $question->{answers} }, $self->newAnswer() );
@@ -1029,25 +1033,30 @@ set to true.
 =cut
 
 sub addAnswersToQuestion {
-    my $self  = shift;
-    my $addy  = shift;
-    my $ans   = shift;
-    my $verbs = shift;
-    for ( 0 .. $#$ans ) {
-        push( @{ $self->question($addy)->{answers} }, $self->newAnswer() );
-        $$addy[2] = $_;
-        if ( exists $$verbs{$_} and $verbs->{$_} ) {
-            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 } );
-        }
-        else {
-            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1 } );
-        }
-    }
-} ## end sub addAnswersToQuestion
+    my ( $self, $address, $answers, $verbatims ) = @_;
 
-#------------------------------
-#accessors and helpers
-#------------------------------
+    # Make a private copy of the $address arrayref that we can use locally
+    # when updating answer text without causing side-effects for the caller's $address
+    my @address_copy = @{$address};
+
+    for my $answer_index ( 0 .. $#$answers ) {
+
+        # Add a new answer to question
+        push( @{ $self->question( \@address_copy )->{answers} }, $self->newAnswer() );
+
+        # Update address to point at newly created answer (so that we can update it)
+        $address_copy[2] = $answer_index;
+
+        # Update the answer appropriately
+        $self->update(
+            \@address_copy,
+            {   text           => $answers->[$answer_index],
+                recordedAnswer => $answer_index + 1,
+                verbatim       => $verbatims->{$answer_index},
+            }
+        );
+    }
+}
 
 =head2 sections
 
@@ -1250,4 +1259,5 @@ sub log {
         $self->{log}->error($message);
     }
 }
+
 1;

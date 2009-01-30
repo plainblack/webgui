@@ -261,11 +261,12 @@ sub www_copyList {
 =cut
 
 sub www_createShortcut {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
+	my $self    = shift;
+    my $session = $self->session;
+	return $session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
 	my $isOnDashboard = $self->getParent->isa('WebGUI::Asset::Wobject::Dashboard');
 
-	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($self->session);
+	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($session);
 	my $child = $shortcutParent->addChild({
 		className=>'WebGUI::Asset::Shortcut',
 		shortcutToAssetId=>$self->getId,
@@ -283,11 +284,11 @@ sub www_createShortcut {
     if (! $isOnDashboard) {
         $child->cut;
     }
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
-        return undef;
+    }) eq 'redirect') {
+        return 'redirect';
     };
 
     if ($isOnDashboard) {

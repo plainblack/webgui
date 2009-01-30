@@ -216,7 +216,14 @@ sub getBackToSiteURL {
 			$url = WebGUI::Asset->getDefault($self->session)->getUrl;
 		}
         else {
-			$url = $self->session->asset->getContainer->getUrl;
+            my $container = $self->session->asset->getContainer;
+            ##Container may be under a different version tag if this asset has been moved.
+            if (defined $container) {
+                $url = $container->getUrl;
+            }
+            else {
+                $url = $self->session->url->page();
+            }
 		}
 	} else {
 		$url = $self->session->url->page();

@@ -7,6 +7,11 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.6.10
+--------------------------------------------------------------------
+   * The Survey JSON fields (Survey.surveyJSON and Survey_response.responseJSON)
+     will alter to longText from LongBlob's.
+
 7.6.9
 --------------------------------------------------------------------
    * The ukplayer example, slideshow.html in /extras/ukplayer, used
