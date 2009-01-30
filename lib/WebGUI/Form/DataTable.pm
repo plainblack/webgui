@@ -122,11 +122,11 @@ sub getDataTableHtml {
         # Not using a datastructure and JSON.pm because of function references for "parser"
         my $columnDef
             = '{'
-            . qq["key" : "$column->{ key }", ]
-            . qq["abbr" : "$column->{ key }", ]
+            . qq["key"       : "$column->{ key }", ]
+            . qq["abbr"      : "$column->{ key }", ]
             . qq["formatter" : "$column->{ formatter }", ]
             . qq["resizable" : 1, ]
-            . qq["sortable" : 1];
+            . qq["sortable"  : $column->{sortable} ];
 
         # Automatically determine the parser to use
         if ( $parsers{ $column->{formatter} } ) {
@@ -186,6 +186,7 @@ sub getDefaultValue {
                 columns => [ {
                         key       => "New Column",
                         formatter => "text",
+                        sortable  => "true",
                     },
                 ],
                 rows => [ { "New Column" => "Value", }, ],
