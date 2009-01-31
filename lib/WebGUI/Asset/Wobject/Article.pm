@@ -280,7 +280,8 @@ returns the output.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -343,7 +344,8 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
