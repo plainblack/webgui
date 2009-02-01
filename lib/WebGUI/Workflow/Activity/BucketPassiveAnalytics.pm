@@ -107,7 +107,11 @@ EOSQL1
         my $bucketFound = 0;
         RULE: foreach my $rule (@rules) {
            next RULE unless $rule->matchesBucket($entry); 
+           
+           # Into the bucket she goes..
            $bucketSth->execute([$entry->{userId}, $rule->get('bucketName'), $entry->{delta}, $entry->{stamp}]);
+           $bucketFound = 1;
+           last RULE;
         }
         if (!$bucketFound) {
            $bucketSth->execute([$entry->{userId}, 'Other', $entry->{delta}, $entry->{stamp}]);
