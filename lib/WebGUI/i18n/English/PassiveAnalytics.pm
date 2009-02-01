@@ -52,6 +52,8 @@ $ = end of url<br />
 * = any amount<br />
 + = 1 or more<br />
 ? = 0 or 1<br />
+Meta characters should be backslash-escaped if you want to match them as ordinary text, e.g.<br />
+home\?func=match, or<br />
 |,
 		lastUpdated => 0,
 		context => q||
