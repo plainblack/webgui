@@ -50,6 +50,12 @@ our $I18N = {
         context     => q{Format for a plain text column},
     },
 
+    "format textarea" => {
+        message     => q{Textarea},
+        lastUpdated => 0,
+        context     => q{Format for a textarea column},
+    },
+
     "format email" => {
         message     => q{E-mail},
         lastUpdated => 0,

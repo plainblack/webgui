@@ -112,8 +112,9 @@ sub getDataTableHtml {
     );
 
     my %editors = (
-        date    => "date",
-        textbox => "textbox",
+        date     => "date",
+        textbox  => "textbox",
+        textarea => "textarea",
     );
 
     my @columnsJson = ();
@@ -125,7 +126,7 @@ sub getDataTableHtml {
             . qq["key"       : "$column->{ key }", ]
             . qq["abbr"      : "$column->{ key }", ]
             . qq["formatter" : "$column->{ formatter }", ]
-            . qq["resizable" : 1, ]
+            . qq["resizable" : 'true', ]
             . qq["sortable"  : $column->{sortable} ];
 
         # Automatically determine the parser to use

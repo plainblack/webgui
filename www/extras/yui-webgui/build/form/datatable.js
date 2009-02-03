@@ -324,6 +324,7 @@ WebGUI.Form.DataTable
                     "delete confirm",
                     "delete column",
                     "format text",
+                    "format textarea",
                     "format email",
                     "format link",
                     "format number",
@@ -405,6 +406,10 @@ WebGUI.Form.DataTable
             {
                 "value" : "text",
                 "label" : this.i18n.get( "Form_DataTable", "format text" )
+            },
+            {
+                "value" : "textarea",
+                "label" : this.i18n.get( "Form_DataTable", "format textarea" )
             },
             {
                 "value" : "number",
@@ -646,6 +651,9 @@ WebGUI.Form.DataTable
             // Set the editor
             if ( format == "date" ) {
                 newCol.editor   = "date";
+            }
+            else if ( format == "textarea" ) {
+                newCol.editor   = "textarea";
             }
             else {
                 newCol.editor   = "textbox";
