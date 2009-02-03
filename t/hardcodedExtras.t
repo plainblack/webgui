@@ -16,6 +16,7 @@ use lib "$FindBin::Bin/lib"; ##t/lib
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
+use WebGUI::Asset::Snippet;
 
 #The goal of this test is to find hard coded extras paths in templates or in
 #the extraHeadTags of any assets.
@@ -47,6 +48,20 @@ TEMPLATE: while (my $templateAsset = $getATemplate->()) {
     }
 }
 
+my $getASnippet = WebGUI::Asset::Snippet->getIsa($session);
+SNIPPET: while (my $snippetAsset = $getASnippet->()) {
+    my $snippet = $snippetAsset->get('snippet');
+    next SNIPPET unless $snippet;
+    if ($snippet =~ m!$hardcodedExtras! ) {
+        push @hardcodedExtras, {
+            url        => $snippetAsset->getUrl,
+            id         => $snippetAsset->getId,
+            title      => $snippetAsset->getTitle,
+            type       => 'Snippet',
+        }
+    }
+}
+
 my $getAnAsset = WebGUI::Asset->getIsa($session);
 ASSET: while (my $asset = $getAnAsset->()) {
     my $headTags = $asset->get('extraHeadTags');
@@ -63,7 +78,13 @@ ASSET: while (my $asset = $getAnAsset->()) {
 
 $numTests = scalar @hardcodedExtras;
 
-plan tests => $numTests;
+if ($numTests) {
+    plan tests => $numTests;
+}
+else {
+    plan tests => 1;
+    ok(1, 'All assets pass');
+}
 
 foreach my $template ( @hardcodedExtras ) {
 	fail(
