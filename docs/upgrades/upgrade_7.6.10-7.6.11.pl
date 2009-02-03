@@ -35,6 +35,7 @@ removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
 removeProcessRecurringPaymentsFromConfig($session);
 
+fixDottedAssetIds($session);  ##This one should run last
 finish($session); # this line required
 
 
@@ -78,6 +79,29 @@ sub undotBinaryExtensions {
     my $extensions = $session->config->get('exportBinaryExtensions');
     my @newExtensions = map { s/\.//; $_ } @{ $extensions };
     $session->config->set('exportBinaryExtensions', \@newExtensions);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub fixDottedAssetIds {
+    my $session = shift;
+    print "\tRemoving dots from Asset IDs... " unless $quiet;
+    my @assetIds = $session->db->buildArray("select distinct(assetId) from asset where assetId like '%.%'");
+    my %assetIds = map { my $id = $_; $id =~ tr/./-/; $_ => $id } @assetIds;
+    # and here's our code
+    while (my ($fromId, $toId) = each %assetIds) {
+        $session->db->write('UPDATE `assetData`  SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `asset`      SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `assetIndex` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `wobject`    SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `Folder`     SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `Navigation` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `FileAsset`  SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `ImageAsset` SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+        $session->db->write('UPDATE `snippet`    SET `assetId`=? WHERE `assetId`=?', [$toId, $fromId]);
+
+        $session->db->write('UPDATE `asset`      SET `parentId`=? WHERE `parentId`=?', [$toId, $fromId]);
+    }
     print "DONE!\n" unless $quiet;
 }
 
