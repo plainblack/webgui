@@ -95,7 +95,7 @@ Returns the human readable name of this control.
 
 sub getName {
     my ($self, $session) = @_;
-    return WebGUI::International->new($session, 'Form_MatrixCompare')->get('topicName');
+    return WebGUI::International->new($session, 'Form_MatrixCompare')->get('matrix compare');
 }
 
 #-------------------------------------------------------------------

@@ -7,6 +7,7 @@
  - fixed #9580: Gallery: albums shown in navigation
  - fixed #9578: Use of "quotes" in badge name causes error
  - fixed #9603: moving wiki page
+ - fixed #9635: Matrix - Add attributes not working
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
