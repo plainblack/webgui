@@ -53,7 +53,7 @@ and "questionsAnswered" keys, with appropriate values.
 
 sub new {
     my $class  = shift;
-    my ($survey, $json)   = validate_pos(@_, {isa => 'WebGUI::Asset::Wobject::Survey::SurveyJSON' }, { type => SCALAR, optional => 1});
+    my ($survey, $json)   = validate_pos(@_, {isa => 'WebGUI::Asset::Wobject::Survey::SurveyJSON' }, { type => SCALAR | UNDEF, optional => 1});
 
     # Load json object if given..
     my $jsonData = $json ? from_json($json) : {};
@@ -63,16 +63,18 @@ sub new {
         # First define core members..
         _survey => $survey,
         _session => $survey->session,
-
-        # And now object defaults..
-        responses => {},
-        lastResponse => -1,
-        questionsAnswered => 0,
-        startTime => time(),
-        surveyOrder => [],
-
-        # And finally, allow jsonData to override defaults and/or add other members
-        %{$jsonData},
+        _response => {
+            
+            # Response hash defaults..
+            responses => {},
+            lastResponse => -1,
+            questionsAnswered => 0,
+            startTime => time(),
+            surveyOrder => [],
+    
+            # And then allow jsonData to override defaults and/or add other members
+            %{$jsonData},
+        },
     };
     
     return bless $self, $class;
@@ -123,7 +125,7 @@ sub createSurveyOrder {
             push( @$order, [ $s, $_, \@aorder ] );
         }
     } ## end for ( my $s = 0; $s <= ...
-    $self->{surveyOrder} = $order;
+    $self->response->{surveyOrder} = $order;
 } ## end sub createSurveyOrder
 
 #-------------------------------------------------------------------
@@ -166,10 +168,7 @@ Serializes the object to JSON, after deleting the log and survey objects stored 
 
 sub freeze {
     my $self = shift;
-    my %temp = %{$self};
-    delete $temp{_session};
-    delete $temp{_survey};
-    return to_json( \%temp );
+    return to_json($self->response);
 }
 
 #-------------------------------------------------------------------
@@ -213,10 +212,10 @@ sub lastResponse {
     my $self = shift;
     my $res  = shift;
     if ( defined $res ) {
-        $self->{lastResponse} = $res;
+        $self->response->{lastResponse} = $res;
     }
     else {
-        return $self->{lastResponse};
+        return $self->response->{lastResponse};
     }
 }
 
@@ -237,10 +236,10 @@ sub questionsAnswered {
     my $self      = shift;
     my $answered  = shift;
     if ( defined $answered ) {
-        $self->{questionsAnswered} += $answered;
+        $self->response->{questionsAnswered} += $answered;
     }
     else {
-        return $self->{questionsAnswered};
+        return $self->response->{questionsAnswered};
     }
 }
 
@@ -261,10 +260,10 @@ sub startTime {
     my $self     = shift;
     my $newTime  = shift;
     if ( defined $newTime ) {
-        $self->{startTime} = $newTime;
+        $self->response->{startTime} = $newTime;
     }
     else {
-        return $self->{startTime};
+        return $self->response->{startTime};
     }
 }
 
@@ -287,7 +286,7 @@ If there are no questions, or no addresses, those array elements will not be pre
 
 sub surveyOrder {
     my $self = shift;
-    return $self->{surveyOrder};
+    return $self->response->{surveyOrder};
 }
 
 #-------------------------------------------------------------------
@@ -830,6 +829,17 @@ sub returnResponseForReporting {
 #Questions only contain the comment and an array of answer Responses.
 #Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, and the assetId to the uploaded file.
 
+=head2 session
+
+Accessor for the Perl hash containing Response data
+
+=cut
+
+sub response {
+    my $self = shift;
+    return $self->{_response};
+}
+
 =head2 responses
 
 Returns a reference to the actual responses to the survey.  A response is for a question and
@@ -843,7 +853,13 @@ Note, this is an unsafe reference.
 
 sub responses {
     my $self = shift;
-    return $self->{responses};
+    my $responses = shift;
+    if ( defined $responses ) {
+        $self->response->{responses} = $responses;
+    }
+    else {
+        return $self->response->{responses};
+    }
 }
 
 #-------------------------------------------------------------------

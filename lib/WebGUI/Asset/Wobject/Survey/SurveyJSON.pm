@@ -76,7 +76,7 @@ a JSON hash made up of "survey" and "sections" keys.
 
 sub new {
     my $class = shift;
-    my ($session, $json)   = validate_pos(@_, {isa => 'WebGUI::Session' }, { type => SCALAR, optional => 1});
+    my ($session, $json)   = validate_pos(@_, {isa => 'WebGUI::Session' }, { type => SCALAR | UNDEF, optional => 1});
 
     # Load json object if given..
     my $jsonData = $json ? from_json($json) : {};
@@ -874,7 +874,7 @@ The question type determines how many answers to add and what answer text (if an
 
 sub updateQuestionAnswers {
     my $self    = shift;
-    my ($address, $type) = validate_pos(@_, { type => ARRAYREF }, { type => SCALAR, optional => 1});
+    my ($address, $type) = validate_pos(@_, { type => ARRAYREF }, { type => SCALAR | UNDEF, optional => 1});
 
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
@@ -1185,7 +1185,7 @@ See L<"Address Parameter">.
 
 sub questions {
     my $self    = shift;
-    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
     
     return $self->sections->[ $address->[0] ]->{questions};
 }

@@ -44,8 +44,8 @@ $responseJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSO
 isa_ok($responseJSON , 'WebGUI::Asset::Wobject::Survey::ResponseJSON');
 
 is($responseJSON->lastResponse(), -1, 'new: default lastResponse is -1');
-is($responseJSON->{questionsAnswered}, 0, 'new: questionsAnswered is 0 by default');
-cmp_ok((abs$responseJSON->{startTime} - $newTime), '<=', 2, 'new: by default startTime set to time');
+is($responseJSON->questionsAnswered, 0, 'new: questionsAnswered is 0 by default');
+cmp_ok((abs$responseJSON->startTime - $newTime), '<=', 2, 'new: by default startTime set to time');
 is_deeply( $responseJSON->responses, {}, 'new: by default, responses is an empty hashref');
 is_deeply( $responseJSON->surveyOrder, [], 'new: by default, responses is an empty arrayref');
 
@@ -390,7 +390,7 @@ is($rJSON->lastResponse(), -1, '.. lastResponse changed to -1 due to goto(s0)');
 $rJSON->gotoExpression('s2: s1q0 = 3');
 is($rJSON->lastResponse(), 4, '.. lastResponse changed to 4 due to goto(s2)');
 
-$rJSON->{responses} = {};
+$rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 
 ####################################################
@@ -455,7 +455,7 @@ cmp_deeply(
 
 $rJSON->survey->question([1,0,0])->{terminal}    = 1;
 $rJSON->survey->question([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
-$rJSON->{responses} = {};
+$rJSON->responses({});
 $rJSON->lastResponse(2);
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 
