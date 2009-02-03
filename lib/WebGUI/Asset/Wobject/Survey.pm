@@ -237,7 +237,7 @@ sub loadSurveyJSON {
     $jsonHash = $self->session->db->quickScalar( "select surveyJSON from Survey where assetId = ?", [ $self->getId ] )
         if ( !defined $jsonHash );
 
-    $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $jsonHash, $self->session->errorHandler );
+    $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $jsonHash );
 }
 
 #-------------------------------------------------------------------
