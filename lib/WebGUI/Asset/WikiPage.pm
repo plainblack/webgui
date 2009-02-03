@@ -51,11 +51,9 @@ sub addRevision {
 
 #-------------------------------------------------------------------
 sub canAdd {
-	my $class = shift;
-	my $session = shift;
-	my $assetCanAdd = $class->next::method($session, undef, '7');
-    my $parentCheck = $session->asset->isa('WebGUI::Asset::Wobject::WikiPage');
-    return $assetCanAdd && $parentCheck;
+    my $class = shift;
+    my $session = shift;
+    return $class->next::method($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
@@ -71,20 +69,6 @@ sub canEdit {
                  && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
     return $wiki->canAdminister
         || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
-}
-
-#-------------------------------------------------------------------
-
-=head2 canPaste
-
-Since so much of the Wiki Page depends on the Wiki Master, do not allow it
-to be pasted to anywhere but a WikiMaster.
-
-=cut
-
-sub canPaste {
-	my $self = shift;
-    return $self->session->asset->isa('WebGUI::Asset::Wobject::WikiMaster');
 }
 
 #-------------------------------------------------------------------
@@ -333,6 +317,22 @@ sub update {
     my $properties = shift;
 	$properties->{isHidden} = 1;
     return $self->next::method($properties);
+}
+
+#-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a WikiMaster for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Wobject::WikiMaster');
 }
 
 #-------------------------------------------------------------------

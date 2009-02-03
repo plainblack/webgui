@@ -182,7 +182,8 @@ sub assetExists {
 
 =head2 canAdd ( session, [userId, groupId] )
 
-Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
+Verifies that the user has the privileges necessary to add this type of asset and that the requested asset
+can be added as a child of this asset. Return a boolean.
 
 A class method.
 
@@ -224,7 +225,8 @@ sub canAdd {
     my $subclassGroupId = shift;
     my $addPrivsGroup = $session->config->get("assets/".$className."/addGroup");
     my $groupId = $addPrivsGroup || $subclassGroupId || '12';
-    return $user->isInGroup($groupId);
+    my $validParent = $className->validParent($session);
+    return $user->isInGroup($groupId) && $validParent;
 }
 
 
@@ -2430,6 +2432,22 @@ sub urlExists {
 	return $test;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 validParent ( )
+
+Make sure that the current session asset is a valid parent for the child and return true or false.
+For example, a WikiPage would check for a WikiMaster.  It should be overridden by those children
+that need to perform that kind of check.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    return 1;
+}
 
 #-------------------------------------------------------------------
 

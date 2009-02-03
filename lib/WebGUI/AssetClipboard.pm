@@ -48,7 +48,8 @@ paste a wiki page anywhere else but a wiki master.
 =cut
 
 sub canPaste {
-    return 1;
+    my $self = shift;
+    return $self->validParent($self->session);  ##Lazy call to a class method
 }
 
 #-------------------------------------------------------------------
