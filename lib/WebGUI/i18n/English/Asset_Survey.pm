@@ -947,6 +947,25 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template loop for a template Help page.|,
         lastUpdated => 0,
     },
+
+    'answers' => {
+        message => q|A loop containing the answers to this question.|,
+        context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'survey asset template variables title' => {
+        message => q|Survey Asset Template Variables.|,
+        context => q|Title of the page where asset template variables are documented.|,
+        lastUpdated => 0,
+    },
+
+    'showProgress' => {
+        message => q|A boolean that is true if the asset has been configured to show how much progess the user has made in completing this Survey.|,
+        context => q|Template variable doc.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

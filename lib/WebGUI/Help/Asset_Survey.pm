@@ -67,7 +67,6 @@ our $HELP = {
             { 'name' => 'question_count' },
             {   'name'      => 'response_loop',
                 'variables' => [
-                    { 'name' => 'response_url' },
                     { 'name' => 'response_user_name' },
                     { 'name' => 'response_count_correct' },
                     { 'name' => 'response_percent' }
