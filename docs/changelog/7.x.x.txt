@@ -7,6 +7,7 @@
  - fixed #9580: Gallery: albums shown in navigation
  - fixed #9578: Use of "quotes" in badge name causes error
  - fixed #9603: moving wiki page
+ - fixed #9302: Spectre Problem...
  - fixed #9635: Matrix - Add attributes not working
 
 7.6.10
