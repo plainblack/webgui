@@ -329,4 +329,8 @@ END {
     if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
     }
+    my $tag = WebGUI::VersionTag->getWorking($session, 'nocreate');
+    if (defined $tag) {
+        $tag->rollback;
+    }
 }
