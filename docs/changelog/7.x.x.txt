@@ -15,6 +15,7 @@
  - fixed: Fixed bad gateway macros in the Matrix templates.
  - fixed #9535: Bad characters in dom element ids when generated from assetId
  - fixed #9542: Default WebGUI config contains invalid workflow activity
+ - fixed #9623: preload.custom paths not included during upgrade
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
