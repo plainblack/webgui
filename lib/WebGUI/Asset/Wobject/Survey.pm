@@ -1039,7 +1039,7 @@ sub loadResponseJSON {
         if ( !defined $jsonHash );
 
     $self->{response}
-        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $jsonHash, $self->session->errorHandler, $self->survey );
+        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $self->survey, $jsonHash );
 } ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------

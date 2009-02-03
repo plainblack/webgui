@@ -20,60 +20,63 @@ Package WebGUI::Asset::Wobject::Survey::ResponseJSON
 
 Helper class for WebGUI::Asset::Wobject::Survey.  It manages data
 from the user, sets the order of questions and answers in the survey,
-based on forks, and gotos, and also handles expiring the survey
+based on branches, and gotos, and also handles expiring the survey
 due to time limits.
 
 This package is not intended to be used by any other Asset in WebGUI.
 
 =cut
 
-
 use strict;
 use JSON;
-use Data::Dumper;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
 
-=head2 new ( $json, $log, $survey )
+=head2 new ( $survey, $json )
 
 Object constructor.
-
-=head3 $json
-
-Pass in some JSON to be serialized into a data structure.  Useful JSON would
-contain a hash with "startTime", "surveyOrder", "responses", "lastReponse"
-and "questionsAnswered" keys, with appropriate values.
-
-=head3 $log
-
-The session logger, from $session->log.  The class needs nothing else from the
-session object.
 
 =head3 $survey
 
 A WebGUI::Asset::Wobject::Survey::SurveyJSON object that represents the current
 survey.
 
+=head3 $json
+
+A JSON string used to construct a new Perl object. The string should represent 
+a JSON hash made up of "startTime", "surveyOrder", "responses", "lastReponse"
+and "questionsAnswered" keys, with appropriate values.
+
 =cut
 
 sub new {
     my $class  = shift;
-    my $json   = shift;
-    my $log    = shift;
-    my $survey = shift;
-    my $temp = from_json($json) if defined $json;
-    my $self   = defined $temp ? $temp : {};
-    $self->{survey} = $survey;
-    $self->{log}    = $log;
-    $self->{responses}         = defined $temp->{responses}         ? $temp->{responses}         : {};
-    $self->{lastResponse}      = defined $temp->{lastResponse}      ? $temp->{lastResponse}      : -1;
-    $self->{questionsAnswered} = defined $temp->{questionsAnswered} ? $temp->{questionsAnswered} : 0;
-    $self->{startTime}         = defined $temp->{startTime}         ? $temp->{startTime}         : time();
-    #an array of question addresses, with the third member being an array of answers
-    $self->{surveyOrder}       = defined $temp->{surveyOrder}       ? $temp->{surveyOrder}       : [];
-    bless( $self, $class );
-    return $self;
-} ## end sub new
+    my ($survey, $json)   = validate_pos(@_, {isa => 'WebGUI::Asset::Wobject::Survey::SurveyJSON' }, { type => SCALAR, optional => 1});
+    
+    # Load json object if given..
+    my $jsonData = $json ? from_json($json) : {};
+    
+    # Create skeleton object..
+    my $self = {
+        # First define core members..
+        _survey => $survey,
+        _session => $survey->session,
+        
+        # And now object defaults..
+        responses => {},
+        lastResponse => -1,
+        questionsAnswered => 0,
+        startTime => time(),
+        surveyOrder => [],
+        
+        # And finally, allow jsonData to override defaults and/or add other members
+        %$jsonData,
+    };
+    
+    return bless( $self, $class );
+}
 
 #----------------------------------------------------------------------------
 
@@ -125,6 +128,19 @@ sub createSurveyOrder {
 
 #-------------------------------------------------------------------
 
+=head2 session
+
+Accessor method for the local WebGUI::Session reference
+
+=cut
+
+sub session {
+    my $self    = shift;
+    return $self->{_session};
+}
+
+#-------------------------------------------------------------------
+
 =head2 shuffle ( @array )
 
 Returns the contents of @array in a random order.
@@ -151,8 +167,8 @@ Serializes the object to JSON, after deleting the log and survey objects stored 
 sub freeze {
     my $self = shift;
     my %temp = %{$self};
-    delete $temp{log};
-    delete $temp{survey};
+    delete $temp{_session};
+    delete $temp{_survey};
     return to_json( \%temp );
 }
 
@@ -573,14 +589,14 @@ sub gotoExpression {
 
         # (ab)use perl's eval to evaluate the processed expression
         my $result = eval "$processed->{expression}";
-        $self->warn($@) if $@;
+        $self->session->log->warn($@) if $@;
 
         if ($result) {
-            $self->debug("Truthy, goto [$processed->{target}]");
+            $self->session->log->debug("Truthy, goto [$processed->{target}]");
              $self->goto($processed->{target});
              return $processed;
         } else {
-            $self->debug("Falsy, not branching");
+            $self->session->log->debug("Falsy, not branching");
             next;
         }
     }
@@ -622,22 +638,22 @@ sub processGotoExpression {
     my $expression = shift;
     my $responses      = shift;
 
-    $self->debug("Processing gotoExpression: $expression");
+    $self->session->log->debug("Processing gotoExpression: $expression");
 
     # Valid gotoExpression tokens are..
     my $tokens = qr{\s|[-0-9=!<>+*/.()]};
 
     my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
 
-    $self->debug("Parsed as Target: [$target], Expression: [$rest]");
+    $self->session->log->debug("Parsed as Target: [$target], Expression: [$rest]");
 
     if ( !defined $target ) {
-        $self->warn('Target undefined');
+        $self->session->log->warn('Target undefined');
         return;
     }
 
     if ( !defined $rest || $rest eq '' ) {
-        $self->warn('Expression undefined');
+        $self->session->log->warn('Expression undefined');
         return;
     }
 
@@ -650,11 +666,11 @@ sub processGotoExpression {
     $rest =~ s/(?<![!<>])=(?!=)/==/g;
 
     if ( $rest !~ /^$tokens+$/ ) {
-        $self->warn("Contains invalid tokens: $rest");
+        $self->session->log->warn("Contains invalid tokens: $rest");
         return;
     }
 
-    $self->debug("Processed as: $rest");
+    $self->session->log->debug("Processed as: $rest");
 
     return {
         target => $target,
@@ -842,35 +858,7 @@ Note, this is an unsafe reference.
 
 sub survey {
     my $self = shift;
-    return $self->{survey};
+    return $self->{_survey};
 }
 
-#-------------------------------------------------------------------
-
-=head2 log
-
-Logs an error to the webgui log file, using the session logger.
-
-=cut
-
-sub log {
-    my ( $self, $message ) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->debug($message);
-    }
-}
-
-sub debug {
-    my ( $self, $message) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->debug($message);
-    }
-}
-
-sub warn {
-    my ( $self, $message) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->warn($message);
-    }
-}
 1;

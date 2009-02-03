@@ -78,19 +78,15 @@ sub new {
     my $class = shift;
     my ($session, $json)   = validate_pos(@_, {isa => 'WebGUI::Session' }, { type => SCALAR, optional => 1});
 
+    # Load json object if given..
+    my $jsonData = $json ? from_json($json) : {};
+     
     # Create skeleton object..
     my $self = {
-        session      => $session,
-        sections => [],
-        survey   => {},
+        _session  => $session,
+        _sections => $jsonData->{sections} || [],
+        _survey   => $jsonData->{survey} || {},
     };
-
-    # Load json object if given..
-    if ($json) {
-        my $decoded_json = from_json($json);
-        $self->{sections} = $decoded_json->{sections} if defined $decoded_json->{sections};
-        $self->{survey}   = $decoded_json->{survey}   if defined $decoded_json->{survey};
-    }
 
     bless( $self, $class );
 
@@ -111,8 +107,8 @@ components of this object.
 sub freeze {
     my $self = shift;
     return to_json(
-        {   sections => $self->{sections},
-            survey   => $self->{survey},
+        {   sections => $self->sections,
+            survey   => $self->{_survey},
         }
     );
 }
@@ -293,13 +289,13 @@ sub getObject {
     return unless $count;
     
     if ( $count == 1 ) {
-        return dclone $self->{sections}->[ sIndex($address) ];
+        return dclone $self->sections->[ sIndex($address) ];
     }
     elsif ( $count == 2 ) {
-        return dclone $self->{sections}->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
+        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return dclone $self->{sections}->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
             ->[ aIndex($address) ];
     }
 }
@@ -770,7 +766,7 @@ sub remove {
     if ( $count == 1 ) {
         # Make sure the first section isn't removed unless we REALLY want to
         if ( sIndex($address) != 0 || defined $movingOverride ) {
-            splice( @{ $self->{sections} }, sIndex($address), 1 );
+            splice( @{ $self->sections }, sIndex($address), 1 );
         }
     }
     elsif ( $count == 2 ) {
@@ -1077,7 +1073,7 @@ Returns a reference to all the sections in this object.
 
 sub sections {
     my $self = shift;
-    return $self->{sections};
+    return $self->{_sections};
 }
 
 =head2 totalSections
@@ -1157,7 +1153,7 @@ sub section {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     
-    return $self->{sections}->[ $address->[0] ];
+    return $self->sections->[ $address->[0] ];
 }
 
 =head2 session
@@ -1168,7 +1164,7 @@ Accessor method for the local WebGUI::Session reference
 
 sub session {
     my $self    = shift;
-    return $self->{session};
+    return $self->{_session};
 }
 
 =head2 questions ($address)
@@ -1185,7 +1181,7 @@ sub questions {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     
-    return $self->{sections}->[ $address->[0] ]->{questions};
+    return $self->sections->[ $address->[0] ]->{questions};
 }
 
 =head2 question ($address)
@@ -1202,7 +1198,7 @@ sub question {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     
-    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
 
 =head2 answers ($address)
@@ -1219,7 +1215,7 @@ sub answers {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     
-    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
 }
 
 =head2 answer ($address)
@@ -1236,7 +1232,7 @@ sub answer {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     
-    return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
 
 =head2 sIndex ($address)

@@ -40,7 +40,7 @@ skip $tests, "Unable to load ResponseJSON" unless $usedOk;
 ####################################################
 
 my $newTime = time();
-$responseJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new('{}', $session->log);
+$responseJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), '{}');
 isa_ok($responseJSON , 'WebGUI::Asset::Wobject::Survey::ResponseJSON');
 
 is($responseJSON->lastResponse(), -1, 'new: default lastResponse is -1');
@@ -50,7 +50,7 @@ is_deeply( $responseJSON->responses, {}, 'new: by default, responses is an empty
 is_deeply( $responseJSON->surveyOrder, [], 'new: by default, responses is an empty arrayref');
 
 my $now = time();
-my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(qq!{ "startTime": $now }!, $session->log);
+my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), qq!{ "startTime": $now }!);
 cmp_ok(abs($rJSON->startTime() - $now), '<=', 2, 'new: startTime set using JSON');
 
 ####################################################
@@ -85,7 +85,7 @@ ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 #
 ####################################################
 
-$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(q!{}!, $session->log, buildSurveyJSON($session));
+$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
 
 $rJSON->createSurveyOrder();
 cmp_deeply(
@@ -125,7 +125,7 @@ cmp_deeply(
 {
     no strict "refs";
     no warnings;
-    my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(q!{}!, $session->log, buildSurveyJSON($session));
+    my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
     $rJSON->survey->section([0])->{randomizeQuestions} = 0;
     my $shuffleName = "WebGUI::Asset::Wobject::Survey::ResponseJSON::shuffle";
     my $shuffleCalled = 0;

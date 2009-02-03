@@ -2090,7 +2090,7 @@ isa_ok($surveyJSON->session, 'WebGUI::Session', 'session() accessor works');
 sub summarizeSectionSkeleton {
     my ($skeleton) = @_;
     my $summary = [];
-    foreach my $section (@{ $skeleton->{sections} }) {
+    foreach my $section (@{ $skeleton->{_sections} }) {
         my $summarySection = {
             title     => $section->{title},
             questions => [],
