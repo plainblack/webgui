@@ -10,8 +10,8 @@
  - fixed #9603: moving wiki page
  - fixed #9302: Spectre Problem...
  - fixed #9635: Matrix - Add attributes not working
- - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places
-          where they do not belong.
+ - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places where they do not belong.
+ - fixed: Hardcoded extras url in templates and in extra head tags in assets were replaced with the Extras macro.
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
