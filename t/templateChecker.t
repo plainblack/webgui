@@ -53,12 +53,12 @@ my @templateLabels;
 
 while (my $templateAsset = $getATemplate->()) {
     my $template = $templateAsset->get('template');
-    my $header   = $templateAsset->get('headBlock');
+    my $header   = $templateAsset->get('extraHeadTags');
     my $match =  ($template =~ $macro);
     if ($header) {
         $match ||= ($header =~ $macro);
     }
-    ok(!$match, sprintf "%s: (%s) has no bad gateway macros", $templateAsset->getTitle, $templateAsset->getId);
+    ok(!$match, sprintf "%s: %s (%s) has no bad gateway macros", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
 }
 
 
