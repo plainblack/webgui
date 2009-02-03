@@ -32,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 hideGalleryAlbums($session);
 removeBrokenWorkflowInstances($session);
+undotBinaryExtensions($session);
 
 # upgrade functions go here
 
@@ -56,6 +57,17 @@ sub hideGalleryAlbums {
     while (my $album = $getAnAlbum->()) {
         $album->update({});  ##The album will do the hiding automatically now
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub undotBinaryExtensions {
+    my $session = shift;
+    print "\tRemoving dots from list of exportBinaryExtensions... " unless $quiet;
+    # and here's our code
+    my $extensions = $session->config->get('exportBinaryExtensions');
+    my @newExtensions = map { s/\.//; $_ } @{ $extensions };
+    $session->config->set('exportBinaryExtensions', \@newExtensions);
     print "DONE!\n" unless $quiet;
 }
 
