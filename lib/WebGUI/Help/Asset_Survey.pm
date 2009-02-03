@@ -141,54 +141,6 @@ our $HELP = {
         ]
     },
 
-
-    'survey response template' => {
-        title => '1089',
-        body  => '',
-        isa   => [
-            {   namespace => 'Asset_Survey',
-                tag       => 'survey template common vars'
-            },
-            {   namespace => 'Asset_Survey',
-                tag       => 'survey asset template variables'
-            },
-        ],
-        fields    => [],
-        variables => [
-            { 'name' => 'title', },
-            { 'name' => 'delete.url' },
-            { 'name' => 'delete.label' },
-            { 'name' => 'start.date.label' },
-            { 'name' => 'start.date.epoch' },
-            { 'name' => 'start.date.human' },
-            { 'name' => 'start.time.human' },
-            { 'name' => 'end.date.label' },
-            { 'name' => 'end.date.epoch' },
-            { 'name' => 'end.date.human' },
-            { 'name' => 'end.time.human' },
-            { 'name' => 'duration.label' },
-            { 'name' => 'duration.minutes' },
-            { 'name' => 'duration.minutes.label' },
-            { 'name' => 'duration.seconds' },
-            { 'name' => 'duration.seconds.label' },
-            { 'name' => 'answer.label' },
-            { 'name' => 'response.label' },
-            { 'name' => 'comment.label' },
-            {   'name'      => 'question_loop',
-                'variables' => [
-                    { 'name' => 'question' },
-                    { 'name' => 'question.id', },
-                    { 'name' => 'question.isRadioList' },
-                    { 'name' => 'question.response' },
-                    { 'name' => 'question.comment' },
-                    { 'name' => 'question.isCorrect' },
-                    { 'name' => 'question.answer' }
-                ],
-            }
-        ],
-        related => []
-    },
-
     'statistical overview report template' => {
         title  => 'statistical overview template title',
         body   => '',
