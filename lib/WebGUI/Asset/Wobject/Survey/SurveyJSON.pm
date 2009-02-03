@@ -80,7 +80,7 @@ sub new {
 
     # Load json object if given..
     my $jsonData = $json ? from_json($json) : {};
-     
+
     # Create skeleton object..
     my $self = {
         _session  => $session,
@@ -88,7 +88,7 @@ sub new {
         _survey   => $jsonData->{survey} || {},
     };
 
-    bless( $self, $class );
+    bless $self, $class;
 
     # Initialise the survey data structure if empty..
     if ( $self->totalSections == 0 ) {
@@ -147,28 +147,28 @@ Add a new answer to the indexed question inside the indexed section.
 sub newObject {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
-    
-    if ( $count == 0 ) { 
+    my $count = @{$address};
+
+    if ( $count == 0 ) {
         # Add a new section to the end of the list of sections..
-        push( @{ $self->sections }, $self->newSection() );
-        
+        push @{ $self->sections }, $self->newSection();
+
         # Update $address with the index of the newly created section
         $address->[0] = $self->totalSections - 1;
     }
     elsif ( $count == 1 ) {
         # Add a new question to the end of the list of questions in section located at $address
-        push( @{ $self->questions($address) }, $self->newQuestion($address) );
-        
+        push @{ $self->questions($address) }, $self->newQuestion($address);
+
         # Update $address with the index of the newly created question
         $address->[1] = $self->totalQuestions($address) - 1;
     }
     elsif ( $count == 2 ) {
         # Add a new answer to the end of the list of answers in section/question located at $address
-        push( @{ $self->answers($address) }, $self->newAnswer($address) );
-        
+        push @{ $self->answers($address) }, $self->newAnswer($address);
+
         # Update $address with the index of the newly created answer
         $address->[2] = $self->totalAnswers($address) - 1;
     }
@@ -219,25 +219,23 @@ sub getDragDropList {
     my ($address) = validate_pos(@_, { type => ARRAYREF });
     
     my @data;
-    for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
-        push( @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' } );
+    for my $sIndex (0 .. $self->totalSections - 1) {
+        push @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' };
         if ( sIndex($address) == $sIndex ) {
 
-            for ( my $qIndex = 0; $qIndex < $self->totalQuestions($address); $qIndex++ ) {
-                push(
-                    @data,
+            for my $qIndex (0 .. $self->totalQuestions($address) - 1) {
+                push @data,
                     {   text => $self->question( [ $sIndex, $qIndex ] )->{text},
                         type => 'question'
                     }
-                );
+                ;
                 if ( qIndex($address) == $qIndex ) {
-                    for ( my $aIndex = 0; $aIndex < $self->totalAnswers($address); $aIndex++ ) {
-                        push(
-                            @data,
+                    for my $aIndex (0 .. $self->totalAnswers($address) - 1) {
+                        push @data,
                             {   text => $self->answer( [ $sIndex, $qIndex, $aIndex ] )->{text},
                                 type => 'answer'
                             }
-                        );
+                        ;
                     }
                 }
             }
@@ -282,11 +280,11 @@ Returns that answer.
 sub getObject {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
+    my $count = @{$address};
     
-    return unless $count;
+    return if !$count;
     
     if ( $count == 1 ) {
         return dclone $self->sections->[ sIndex($address) ];
@@ -318,7 +316,7 @@ sub getEditVars {
     my ($address) = validate_pos(@_, { type => ARRAYREF });
 
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
+    my $count = @{$address};
     
     if ( $count == 1 ) {
         return $self->getSectionEditVars($address);
@@ -342,12 +340,12 @@ sub getGotoTargets {
 
     # Valid goto targets are all of the section variable names..
     my @section_vars = map {$_->{variable}} @{$self->sections};
-    
+
     # ..and all of the question variable names..
     my @question_vars = map {$_->{variable}} @{$self->questions};
-    
+
     # ..excluding the ones that are empty
-    return grep {$_ ne ''} (@section_vars, @question_vars);
+    return grep { $_ ne q{} } (@section_vars, @question_vars);
 }
 
 =head2 getSectionEditVars ( $address )
@@ -385,11 +383,11 @@ sub getSectionEditVars {
     
     my $section  = $self->section($address);
     my %var     = %{$section};
-    
+
     # Add the extra fields..
     $var{id}           = sIndex($address);
     $var{displayed_id} = sIndex($address) + 1;
-    
+
     # Remove the fields we don't want..
     delete $var{questions};
     delete $var{questionsPerPage};
@@ -397,12 +395,10 @@ sub getSectionEditVars {
     # Change questionsPerPage from a single element, into an array of hashrefs, which list the 
     # available questions per page and which one is currently selected for this section..
     for my $index ( 1 .. $MAX_QUESTIONS_PER_PAGE ) {
-        if ( $index == $section->{questionsPerPage} ) {
-            push( @{ $var{questionsPerPage} }, { index => $index, selected => 1 } );
-        }
-        else {
-            push( @{ $var{questionsPerPage} }, { index => $index, selected => 0 } );
-        }
+        push @{ $var{questionsPerPage} }, {
+            index => $index,
+            selected => $index == $section->{questionsPerPage} ? 1 : 0
+        };
     }
     return \%var;
 }
@@ -441,24 +437,23 @@ sub getQuestionEditVars {
     
     my $question  = $self->question($address);
     my %var       = %{$question};
-    
+
     # Add the extra fields..
-    $var{id}           = sIndex($address) . "-" . qIndex($address);
+    $var{id}           = sIndex($address) . q{-} . qIndex($address);
     $var{displayed_id} = qIndex($address) + 1;
-    
+
     # Remove the fields we don't want
     delete $var{answers};
     delete $var{questionType};
 
     # Change questionType from a single element into an array of hashrefs which list the available 
     # question types and which one is currently selected for this question..
-    for ($self->getValidQuestionTypes) {
-        if ( $_ eq $question->{questionType} ) {
-            push( @{ $var{questionType} }, { text => $_, selected => 1 } );
-        }
-        else {
-            push( @{ $var{questionType} }, { text => $_, selected => 0 } );
-        }
+    
+    for my $qType ($self->getValidQuestionTypes) {
+        push @{ $var{questionType} }, {
+            text => $qType,
+            selected => $qType eq $question->{questionType} ? 1 : 0
+        };
     }
     return \%var;
 }
@@ -466,7 +461,8 @@ sub getQuestionEditVars {
 =head2 getValidQuestionTypes
 
 A convenience method.  Returns a list of question types.  If you add a question
-type to the Survey, you must handle it here, and also in updateQuestionAnswers
+type to the Survey, you must handle it here, and also in updateQuestionAnswers()
+and administersurvey.js
 
 =cut
 
@@ -479,7 +475,7 @@ sub getValidQuestionTypes {
         'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
         'Party',          'Phone Number',            'Race',            'Risk',
         'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'TextArea',                'Text Date',       'Threat',          
+        'Text',           'TextArea',                'Text Date',       'Threat',
         'True/False',     'Yes/No'
     );
 }
@@ -514,9 +510,9 @@ sub getAnswerEditVars {
     
     my $object  = $self->answer($address);
     my %var     = %{$object};
-    
+
     # Add the extra fields..
-    $var{id}           = sIndex($address) . "-" . qIndex($address) . "-" . aIndex($address);
+    $var{id}           = sIndex($address) . q{-} . qIndex($address) . q{-} . aIndex($address);
     $var{displayed_id} = aIndex($address) + 1;
     
     return \%var;
@@ -566,12 +562,12 @@ $properties should never be a partial object, but contain all properties.
 sub update {
     my $self    = shift;
     my ($address, $properties) = validate_pos(@_, { type => ARRAYREF }, {type => HASHREF});
-    
+
     # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
 
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
+    my $count = @{$address};
 
     # First retrieve the addressed object, or, if necessary, create it
     my $object;
@@ -579,7 +575,7 @@ sub update {
         $object = $self->section($address);
         if ( !defined $object ) {
             $object = $self->newSection();
-            push( @{ $self->sections }, $object );
+            push @{ $self->sections }, $object;
         }
     }
     elsif ( $count == 2 ) {
@@ -587,7 +583,7 @@ sub update {
         if ( !defined $object ) {
             $object = $self->newQuestion();
             $newQuestion = 1; # make note that a new question was created
-            push( @{ $self->questions($address) }, $object );
+            push @{ $self->questions($address) }, $object;
         }
         # We need to update all of the answers to reflect the new questionType
         if ( $properties->{questionType} ne $object->{questionType} ) {
@@ -598,14 +594,18 @@ sub update {
         $object = $self->answer($address);
         if ( !defined $object ) {
             $object = $self->newAnswer();
-            push( @{ $self->answers($address) }, $object );
+            push @{ $self->answers($address) }, $object;
         }
     }
 
-    # Update $object with all of the data in $properties 
-    for my $key ( keys %$properties ) {
-        $object->{$key} = $properties->{$key} if defined $properties->{$key};
+    # Update $object with all of the data in $properties
+    while (my ($key, $value) = each %{$properties}) {
+        if (defined $value) {
+            $object->{$key} = $value;
+        }
     }
+    
+    return;
 }
 
 =head2 insertObject ( $object, $address )
@@ -650,22 +650,24 @@ Reposition $object immediately after the indexed answer
 sub insertObject {
     my $self    = shift;
     my ($object, $address) = validate_pos(@_, {type => HASHREF}, { type => ARRAYREF });
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
+    my $count = @{$address};
     
-    return unless $count;
-    
+    return if !$count;
+
     # Use splice to rearrange the relevant array of objects..
     if ( $count == 1 ) {
-        splice( @{ $self->sections($address) }, sIndex($address) + 1, 0, $object );
+        splice @{ $self->sections($address) }, sIndex($address) + 1, 0, $object;
     }
     elsif ( $count == 2 ) {
-        splice( @{ $self->questions($address) }, qIndex($address) + 1, 0, $object );
+        splice @{ $self->questions($address) }, qIndex($address) + 1, 0, $object;
     }
     elsif ( $count == 3 ) {
-        splice( @{ $self->answers($address) }, aIndex($address) + 1, 0, $object );
+        splice @{ $self->answers($address) }, aIndex($address) + 1, 0, $object;
     }
+    
+    return;
 }
 
 =head2 copy ( $address )
@@ -701,21 +703,21 @@ Nothing happens. It is not allowed to duplicate answers.
 sub copy {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
+    my $count = @{$address};
     
     if ( $count == 1 ) {
         # Clone the indexed section onto the end of the list of sections..
-        push( @{ $self->sections }, dclone $self->section($address) );
-        
+        push @{ $self->sections }, dclone $self->section($address);
+
         # Update $address with the index of the newly created section
         $address->[0] = $self->totalSections - 1;
     }
     elsif ( $count == 2 ) {
         # Clone the indexed question onto the end of the list of questions..
-        push( @{ $self->questions($address) }, dclone $self->question($address) );
-        
+        push @{ $self->questions($address) }, dclone $self->question($address);
+
         # Update $address with the index of the newly created question
         $address->[1] = $self->totalQuestions($address) - 1;
     }
@@ -758,23 +760,25 @@ If $movingOverride is defined (meaning including 0 and ''), then the first secti
 sub remove {
     my $self    = shift;
     my ($address, $movingOverride) = validate_pos(@_, { type => ARRAYREF }, 0);
-    
+
     # Figure out what to do by counting the number of elements in the $address array ref
-    my $count = @$address;
-    
+    my $count = @{$address};
+
     # Use splice to remove the indexed section/question/answer..
     if ( $count == 1 ) {
         # Make sure the first section isn't removed unless we REALLY want to
         if ( sIndex($address) != 0 || defined $movingOverride ) {
-            splice( @{ $self->sections }, sIndex($address), 1 );
+            splice @{ $self->sections }, sIndex($address), 1;
         }
     }
     elsif ( $count == 2 ) {
-        splice( @{ $self->questions($address) }, qIndex($address), 1 );
+        splice @{ $self->questions($address) }, qIndex($address), 1;
     }
     elsif ( $count == 3 ) {
-        splice( @{ $self->answers($address) }, aIndex($address), 1 );
+        splice @{ $self->answers($address) }, aIndex($address), 1;
     }
+    
+    return;
 }
 
 =head2 newSection
@@ -785,17 +789,17 @@ Returns a reference to a new, empty section.
 
 sub newSection {
     return {
-        text                   => '',
+        text                   => q{},
         title                  => 'NEW SECTION',    ##i18n
-        variable               => '',
+        variable               => q{},
         questionsPerPage       => 5,
         questionsOnSectionPage => 1,
         randomizeQuestions     => 0,
         everyPageTitle         => 1,
         everyPageText          => 1,
         terminal               => 0,
-        terminalUrl            => '',
-        goto                   => '',
+        terminalUrl            => q{},
+        goto                   => q{},
         timeLimit              => 0,
         type                   => 'section',
         questions              => [],
@@ -810,21 +814,19 @@ Returns a reference to a new, empty question.
 
 sub newQuestion {
     return {
-        text             => '',
-        variable         => '',
+        text             => q{},
+        variable         => q{},
         allowComment     => 0,
         commentCols      => 10,
         commentRows      => 5,
         randomizeAnswers => 0,
         questionType     => 'Multiple Choice',
-        randomWords      => '',
+        randomWords      => q{},
         verticalDisplay  => 0,
         required         => 0,
         maxAnswers       => 1,
         value            => 1,
         textInButton     => 0,
-#       terminal         => 0,
-#       terminalUrl      => '',
         type             => 'question',
         answers          => [],
     };
@@ -838,20 +840,20 @@ Returns a reference to a new, empty answer.
 
 sub newAnswer {
     return {
-        text           => '',
+        text           => q{},
         verbatim       => 0,
         textCols       => 10,
         textRows       => 5,
-        goto           => '',
-        gotoExpression => '',
-        recordedAnswer => '',
+        goto           => q{},
+        gotoExpression => q{},
+        recordedAnswer => q{},
         isCorrect      => 1,
         min            => 1,
         max            => 10,
         step           => 1,
         value          => 1,
         terminal       => 0,
-        terminalUrl    => '',
+        terminalUrl    => q{},
         type           => 'answer'
     };
 }
@@ -877,7 +879,7 @@ sub updateQuestionAnswers {
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy     = @{$address};
-    
+
     # Get the indexed question, and remove all of its existing answers
     my $question = $self->question($address);
     $question->{answers} = [];
@@ -885,7 +887,7 @@ sub updateQuestionAnswers {
     # Add the default set of answers. The question type determines both the number
     # of answers added and the answer text to use. When updating answer text
     # first update $address_copy to point to the answer
-    
+
     # TODO: Rather than being hard-coded, these question type/answer bundles should
     # be loaded dynamically and customizable by the user (see also getValidQuestionTypes)
     
@@ -893,26 +895,26 @@ sub updateQuestionAnswers {
         or $type eq 'Multi Slider - Allocate'
         or $type eq 'Dual Slider - Range' )
     {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
+        push @{ $question->{answers} }, $self->newAnswer();
     }
     elsif ( $type eq 'Currency' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Currency Amount:' } );
     }
     elsif ( $type eq 'Text Date' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Date:' } );
     }
     elsif ( $type eq 'Phone Number' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Phone Number:' } );
     }
     elsif ( $type eq 'Email' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Email:' } );
     }
@@ -925,7 +927,7 @@ sub updateQuestionAnswers {
             'Some graduate work',
             'Master\'s degree',
             'Doctorate (of any type)',
-            'Other degree (verbatim)'
+            'Other degree (verbatim)',
         );
         $self->addAnswersToQuestion( \@address_copy, \@ans, { 7, 1 } );
     }
@@ -936,7 +938,7 @@ sub updateQuestionAnswers {
     }
     elsif ( $type eq 'Race' ) {
         my @ans = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic',
-            'Something else (verbatim)' );
+            'Something else (verbatim)', );
         $self->addAnswersToQuestion( \@address_copy, \@ans, { 5, 1 } );
     }
     elsif ( $type eq 'Ideology' ) {
@@ -947,73 +949,75 @@ sub updateQuestionAnswers {
             'Middle of the road',
             'Slightly conservative',
             'Conservative',
-            'Strongly conservative'
+            'Strongly conservative',
         );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Security' ) {
-        my @ans = ( 'Not at all secure', '', '', '', '', '', '', '', '', '', 'Extremely secure' );
+        my @ans = ( 'Not at all secure', (q{}) x 9, 'Extremely secure', );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Threat' ) {
-        my @ans = ( 'No threat', '', '', '', '', '', '', '', '', '', 'Extreme threat' );
+        my @ans = ( 'No threat', (q{}) x 9, 'Extreme threat', );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Risk' ) {
-        my @ans = ( 'No risk', '', '', '', '', '', '', '', '', '', 'Extreme risk' );
+        my @ans = ( 'No risk', (q{}) x 9, 'Extreme risk' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Concern' ) {
-        my @ans = ( 'Not at all concerned', '', '', '', '', '', '', '', '', '', 'Extremely concerned' );
+        my @ans = ( 'Not at all concerned', (q{}) x 9, 'Extremely concerned' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Effectiveness' ) {
-        my @ans = ( 'Not at all effective', '', '', '', '', '', '', '', '', '', 'Extremely effective' );
+        my @ans = ( 'Not at all effective', (q{}) x 9, 'Extremely effective' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Confidence' ) {
-        my @ans = ( 'Not at all confident', '', '', '', '', '', '', '', '', '', 'Extremely confident' );
+        my @ans = ( 'Not at all confident', (q{}) x 9, 'Extremely confident' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Satisfaction' ) {
-        my @ans = ( 'Not at all satisfied', '', '', '', '', '', '', '', '', '', 'Extremely satisfied' );
+        my @ans = ( 'Not at all satisfied', (q{}) x 9, 'Extremely satisfied' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Certainty' ) {
-        my @ans = ( 'Not at all certain', '', '', '', '', '', '', '', '', '', 'Extremely certain' );
+        my @ans = ( 'Not at all certain', (q{}) x 9, 'Extremely certain' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Likelihood' ) {
-        my @ans = ( 'Not at all likely', '', '', '', '', '', '', '', '', '', 'Extremely likely' );
+        my @ans = ( 'Not at all likely', (q{}) x 9, 'Extremely likely' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Importance' ) {
-        my @ans = ( 'Not at all important', '', '', '', '', '', '', '', '', '', 'Extremely important' );
+        my @ans = ( 'Not at all important', (q{}) x 9, 'Extremely important' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Oppose/Support' ) {
-        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly support' );
+        my @ans = ( 'Strongly oppose', (q{}) x 5, 'Strongly support' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Agree/Disagree' ) {
-        my @ans = ( 'Strongly disagree', '', '', '', '', '', 'Strongly agree' );
+        my @ans = ( 'Strongly disagree', (q{}) x 5, 'Strongly agree' );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'True/False' ) {
-        my @ans = ( 'True', 'False' );
+        my @ans = qw( True False );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Yes/No' ) {
-        my @ans = ( 'Yes', 'No' );
+        my @ans = qw( Yes No );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     elsif ( $type eq 'Gender' ) {
-        my @ans = ( 'Male', 'Female' );
+        my @ans = qw( Male Female );
         $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
     }
     else {
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
     }
+    
+    return;
 }
 
 =head2 addAnswersToQuestion ($address, $answers, $verbatims)
@@ -1046,10 +1050,10 @@ sub addAnswersToQuestion {
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy = @{$address};
 
-    for my $answer_index ( 0 .. $#$answers ) {
+    for my $answer_index ( 0 .. $#{$answers} ) {
 
         # Add a new answer to question
-        push( @{ $self->question( \@address_copy )->{answers} }, $self->newAnswer() );
+        push @{ $self->question( \@address_copy )->{answers} }, $self->newAnswer();
 
         # Update address to point at newly created answer (so that we can update it)
         $address_copy[2] = $answer_index;
@@ -1063,6 +1067,8 @@ sub addAnswersToQuestion {
             }
         );
     }
+    
+    return;
 }
 
 =head2 sections
@@ -1105,7 +1111,7 @@ sub totalQuestions {
         return scalar @{ $self->questions($address) || [] };
     } else {
         my $count = 0;
-        for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
+        for my $sIndex (0 .. $self->totalSections - 1) {
             $count += $self->totalQuestions([$sIndex]);
         }
         return $count;
@@ -1130,8 +1136,8 @@ sub totalAnswers {
         return scalar @{ $self->answers($address) || [] };
     } else {
         my $count = 0;
-        for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
-            for ( my $qIndex = 0; $qIndex < $self->totalQuestions([$sIndex]); $qIndex++ ) {
+        for my $sIndex (0 .. $self->totalSections - 1) {
+            for my $qIndex (0 .. $self->totalQuestions([$sIndex]) - 1) {
                 $count += $self->totalAnswers([$sIndex, $qIndex]);
             }
         }
@@ -1240,7 +1246,7 @@ sub answer {
 Convenience sub to extract the section index from a standard $address parameter. See L<"Address Parameter">.
 
 =cut
- 
+
 sub sIndex {
     my ($address) = validate_pos(@_, { type => ARRAYREF});
     return $address->[0];

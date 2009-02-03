@@ -54,28 +54,28 @@ and "questionsAnswered" keys, with appropriate values.
 sub new {
     my $class  = shift;
     my ($survey, $json)   = validate_pos(@_, {isa => 'WebGUI::Asset::Wobject::Survey::SurveyJSON' }, { type => SCALAR, optional => 1});
-    
+
     # Load json object if given..
     my $jsonData = $json ? from_json($json) : {};
-    
+
     # Create skeleton object..
     my $self = {
         # First define core members..
         _survey => $survey,
         _session => $survey->session,
-        
+
         # And now object defaults..
         responses => {},
         lastResponse => -1,
         questionsAnswered => 0,
         startTime => time(),
         surveyOrder => [],
-        
+
         # And finally, allow jsonData to override defaults and/or add other members
-        %$jsonData,
+        %{$jsonData},
     };
     
-    return bless( $self, $class );
+    return bless $self, $class;
 }
 
 #----------------------------------------------------------------------------
