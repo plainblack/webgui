@@ -777,6 +777,7 @@ sub view {
     # Keywords
     my $k           = WebGUI::Keyword->new( $session );
     my $keywords    = $k->getKeywordsForAsset( { asArrayRef => 1, asset => $self } ); 
+    $var->{keywords} = [ ];
     for my $keyword ( @{ $keywords } ) {
         push @{ $var->{keywords} }, {
             keyword             => $keyword,

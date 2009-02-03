@@ -1,4 +1,5 @@
 7.6.11
+ - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
  - fixed #9596: caching now takes into account the correct parameter for pagination
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
  - fixed: Syndicated Content asset doesn't work with feeds that specify their encodings via HTTP headers
