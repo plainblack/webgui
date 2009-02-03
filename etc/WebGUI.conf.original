@@ -533,7 +533,6 @@
       "category" : "utilities"
    },
    "WebGUI::Asset::Sku::Product" : {
-      "isContainer" : 1,
       "category" : "shop"
    },
    "WebGUI::Asset::Wobject::WeatherData" : {
@@ -803,7 +802,6 @@
         "WebGUI::Workflow::Activity::ExpireSubscriptionCodes",
         "WebGUI::Workflow::Activity::GetSyndicatedContent",
         "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags",
-        "WebGUI::Workflow::Activity::ProcessRecurringPayments",
         "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
         "WebGUI::Workflow::Activity::PurgeOldTrash",
         "WebGUI::Workflow::Activity::SendQueuedMailMessages",

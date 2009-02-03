@@ -13,6 +13,7 @@
  - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places where they do not belong.
  - fixed: Hardcoded extras url in templates and in extra head tags in assets were replaced with the Extras macro.
  - fixed: Fixed bad gateway macros in the Matrix templates.
+ - fixed #9542: Default WebGUI config contains invalid workflow activity
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields

@@ -33,8 +33,7 @@ my $session = start(); # this line required
 hideGalleryAlbums($session);
 removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
-
-# upgrade functions go here
+removeProcessRecurringPaymentsFromConfig($session);
 
 finish($session); # this line required
 
@@ -47,6 +46,17 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub removeProcessRecurringPaymentsFromConfig {
+    my $session = shift;
+    print "\tRemoving old ProcessRecurringPayments workflow activity from config..." unless $quiet;
+
+    $session->config->deleteFromArray('workflowActivities/None',
+        'WebGUI::Workflow::Activity::ProcessRecurringPayments');
+
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub hideGalleryAlbums {
