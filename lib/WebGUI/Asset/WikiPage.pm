@@ -53,7 +53,9 @@ sub addRevision {
 sub canAdd {
 	my $class = shift;
 	my $session = shift;
-	$class->next::method($session, undef, '7');
+	my $assetCanAdd = $class->next::method($session, undef, '7');
+    my $parentCheck = $session->asset->isa('WebGUI::Asset::Wobject::WikiPage');
+    return $assetCanAdd && $parentCheck;
 }
 
 #-------------------------------------------------------------------
