@@ -126,7 +126,7 @@ cmp_deeply(
 #
 #######################################################################
 
-my $driver;
+$driver;
 
 my $options = {
                 label   => 'flat rate, ship weight, items in the cart',
@@ -320,13 +320,13 @@ is($driver->calculate($cart), 30_200, 'calculate by percentage of price');
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if (defined $driver and ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
+    if (defined $driver && ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
         $driver->delete;
     }
-    if (defined $cart and ref $cart eq 'WebGUI::Shop::Cart') {
+    if (defined $cart && ref $cart eq 'WebGUI::Shop::Cart') {
         $cart->delete;
     }
-    if (defined $car and (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
+    if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
     }
 }
