@@ -150,7 +150,7 @@ Add a new answer to the indexed question inside the indexed section.
 
 sub newObject {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
     
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -220,7 +220,8 @@ its answers.  Should ALWAYS have two elements since we want to address a questio
 
 sub getDragDropList {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my @data;
     for ( my $sIndex = 0; $sIndex < $self->totalSections; $sIndex++ ) {
         push( @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' } );
@@ -283,7 +284,8 @@ Returns that answer.
 =cut
 
 sub getObject {
-    my ( $self, $address ) = @_;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
     
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -316,7 +318,8 @@ sections, questions, or answers.
 =cut
 
 sub getEditVars {
-    my ( $self, $address ) = @_;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -382,7 +385,8 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 sub getSectionEditVars {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my $section  = $self->section($address);
     my %var     = %{$section};
     
@@ -437,7 +441,8 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 sub getQuestionEditVars {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my $question  = $self->question($address);
     my %var       = %{$question};
     
@@ -509,7 +514,8 @@ See L<"Address Parameter">. Specifies which answer to fetch variables for.
 
 sub getAnswerEditVars {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my $object  = $self->answer($address);
     my %var     = %{$object};
     
@@ -555,15 +561,16 @@ Update the addressed answer with $properties.
 
 =head3 $properties
 
-A perl data structure.  Note, that it is not checked for type, so it is
+A perl hash reference.  Note, that it is not checked for type, so it is
 possible to add a "question" object into the list of sections.
 $properties should never be a partial object, but contain all properties.
 
 =cut
 
 sub update {
-    my ( $self, $address, $properties ) = @_;
-
+    my $self    = shift;
+    my ($address, $properties) = validate_pos(@_, { type => ARRAYREF }, {type => HASHREF});
+    
     # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
 
@@ -612,7 +619,7 @@ Does not return anything significant.
 
 =head3 $object
 
-A perl data structure.  Note, that it is not checked for homegeneity,
+A perl hash reference.  Note, that it is not checked for homegeneity,
 so it is possible to add a "question" object into the list of section
 objects.
 
@@ -645,7 +652,8 @@ Reposition $object immediately after the indexed answer
 =cut
 
 sub insertObject {
-    my ( $self, $object, $address ) = @_;
+    my $self    = shift;
+    my ($object, $address) = validate_pos(@_, {type => HASHREF}, { type => ARRAYREF });
     
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -695,7 +703,8 @@ Nothing happens. It is not allowed to duplicate answers.
 =cut
 
 sub copy {
-    my ( $self, $address ) = @_;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
     
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -751,7 +760,8 @@ If $movingOverride is defined (meaning including 0 and ''), then the first secti
 =cut
 
 sub remove {
-    my ( $self, $address, $movingOverride ) = @_;
+    my $self    = shift;
+    my ($address, $movingOverride) = validate_pos(@_, { type => ARRAYREF }, 0);
     
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @$address;
@@ -866,8 +876,7 @@ The question type determines how many answers to add and what answer text (if an
 
 sub updateQuestionAnswers {
     my $self    = shift;
-    my $address = shift;
-    my $type    = shift;
+    my ($address, $type) = validate_pos(@_, { type => ARRAYREF }, { type => SCALAR, optional => 1});
 
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
@@ -1033,7 +1042,9 @@ set to true.
 =cut
 
 sub addAnswersToQuestion {
-    my ( $self, $address, $answers, $verbatims ) = @_;
+    my $self = shift;
+    my ( $address, $answers, $verbatims )
+        = validate_pos( @_, { type => ARRAYREF }, { type => ARRAYREF }, { type => HASHREF } );
 
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
@@ -1084,15 +1095,16 @@ sub totalSections {
 
 Returns the total number of Questions overall, or in the given Section if $address given 
 
-=head3 $address
+=head3 $address  (optional)
 
 See L<"Address Parameter">.
 
 =cut
 
 sub totalQuestions {
-    my $self = shift;
-    my $address = shift;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    
     if ($address) {
         return scalar @{ $self->questions($address) || [] };
     } else {
@@ -1108,15 +1120,16 @@ sub totalQuestions {
 
 Returns the total number of Answers overall, or in the given Question if $address given
 
-=head3 $address
+=head3 $address (optional)
 
 See L<"Address Parameter">.
 
 =cut
 
 sub totalAnswers {
-    my $self = shift;
-    my $address = shift;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    
     if ($address) {
         return scalar @{ $self->answers($address) || [] };
     } else {
@@ -1142,7 +1155,8 @@ See L<"Address Parameter">.
 
 sub section {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
     return $self->{sections}->[ $address->[0] ];
 }
 
@@ -1169,7 +1183,8 @@ See L<"Address Parameter">.
 
 sub questions {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
     return $self->{sections}->[ $address->[0] ]->{questions};
 }
 
@@ -1185,7 +1200,8 @@ See L<"Address Parameter">.
 
 sub question {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
     return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
 
@@ -1201,7 +1217,8 @@ See L<"Address Parameter">.
 
 sub answers {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
     return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
 }
 
@@ -1217,7 +1234,8 @@ See L<"Address Parameter">.
 
 sub answer {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
     return $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
 
@@ -1228,7 +1246,7 @@ Convenience sub to extract the section index from a standard $address parameter.
 =cut
  
 sub sIndex {
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
     return $address->[0];
 }
 
@@ -1239,7 +1257,7 @@ Convenience sub to extract the question index from a standard $address parameter
 =cut
 
 sub qIndex {
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
     return $address->[1];
 }
 
@@ -1250,7 +1268,7 @@ Convenience sub to extract the answer index from a standard $address parameter. 
 =cut
 
 sub aIndex {
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
     return $address->[2];
 }
 
