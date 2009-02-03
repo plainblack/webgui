@@ -48,6 +48,8 @@ likely operate on the question indexed by:
 
 use strict;
 use JSON;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 # N.B. We're currently using Storable::dclone instead of Clone::clone
 # because Colin uncovered some Clone bugs in Perl 5.10
@@ -57,30 +59,28 @@ use Storable qw/dclone/;
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
 
-=head2 new ( $json, $log )
+=head2 new ( $session, json )
 
 Object constructor.
 
-=head3 $json
+=head3 $session
 
-A JSON string used to construct a new Perl object. The JSON string should
-contain a hash made up of "survey" and "sections" keys.
+WebGUI::Session object
 
-=head3 $log
+=head3 $json (optional)
 
-The session logger, from $session->log.  The class needs nothing else from the
-session object.
+A JSON string used to construct a new Perl object. The string should represent 
+a JSON hash made up of "survey" and "sections" keys.
 
 =cut
 
 sub new {
     my $class = shift;
-    my $json  = shift;
-    my $log   = shift;
+    my ($session, $json)   = validate_pos(@_, {isa => 'WebGUI::Session' }, { type => SCALAR, optional => 1});
 
     # Create skeleton object..
     my $self = {
-        log      => $log,
+        session      => $session,
         sections => [],
         survey   => {},
     };
@@ -1146,6 +1146,17 @@ sub section {
     return $self->{sections}->[ $address->[0] ];
 }
 
+=head2 session
+
+Accessor method for the local WebGUI::Session reference
+
+=cut
+
+sub session {
+    my $self    = shift;
+    return $self->{session};
+}
+
 =head2 questions ($address)
 
 Returns a reference to all the questions from a particular section.
@@ -1241,23 +1252,6 @@ Convenience sub to extract the answer index from a standard $address parameter. 
 sub aIndex {
     my $address = shift;
     return $address->[2];
-}
-
-=head2 log ($message)
-
-Logs an error message using the session logger.
-
-=head3 $message
-
-The message to log.  It will be logged as type "error".
-
-=cut
-
-sub log {
-    my ( $self, $message ) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->error($message);
-    }
 }
 
 1;

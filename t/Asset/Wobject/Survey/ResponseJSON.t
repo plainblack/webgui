@@ -493,7 +493,7 @@ is($rJSON->questionsAnswered, 0, 'question was all whitespace, not answered');
 
 sub buildSurveyJSON {
     my $session = shift;
-    my $sjson = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(undef, $session->log);
+    my $sjson = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session);
     ##Build 4 sections.  Remembering that one is created by default when you make an empty SurveyJSON object
     $sjson->newObject([]);
     $sjson->newObject([]);
