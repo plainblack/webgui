@@ -156,21 +156,21 @@ sub newObject {
         push @{ $self->sections }, $self->newSection();
 
         # Update $address with the index of the newly created section
-        $address->[0] = $self->totalSections - 1;
+        $address->[0] = $self->lastSectionIndex;
     }
     elsif ( $count == 1 ) {
         # Add a new question to the end of the list of questions in section located at $address
         push @{ $self->questions($address) }, $self->newQuestion($address);
 
         # Update $address with the index of the newly created question
-        $address->[1] = $self->totalQuestions($address) - 1;
+        $address->[1] = $self->lastQuestionIndex($address);
     }
     elsif ( $count == 2 ) {
         # Add a new answer to the end of the list of answers in section/question located at $address
         push @{ $self->answers($address) }, $self->newAnswer($address);
 
         # Update $address with the index of the newly created answer
-        $address->[2] = $self->totalAnswers($address) - 1;
+        $address->[2] = $self->lastAnswerIndex($address);
     }
     # Return the (modified) $address
     return $address;
@@ -219,18 +219,18 @@ sub getDragDropList {
     my ($address) = validate_pos(@_, { type => ARRAYREF });
     
     my @data;
-    for my $sIndex (0 .. $self->totalSections - 1) {
+    for my $sIndex (0 .. $self->lastSectionIndex) {
         push @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' };
         if ( sIndex($address) == $sIndex ) {
 
-            for my $qIndex (0 .. $self->totalQuestions($address) - 1) {
+            for my $qIndex (0 .. $self->lastQuestionIndex($address)) {
                 push @data,
                     {   text => $self->question( [ $sIndex, $qIndex ] )->{text},
                         type => 'question'
                     }
                 ;
                 if ( qIndex($address) == $qIndex ) {
-                    for my $aIndex (0 .. $self->totalAnswers($address) - 1) {
+                    for my $aIndex (0 .. $self->lastAnswerIndex($address)) {
                         push @data,
                             {   text => $self->answer( [ $sIndex, $qIndex, $aIndex ] )->{text},
                                 type => 'answer'
@@ -712,14 +712,14 @@ sub copy {
         push @{ $self->sections }, dclone $self->section($address);
 
         # Update $address with the index of the newly created section
-        $address->[0] = $self->totalSections - 1;
+        $address->[0] = $self->lastSectionIndex;
     }
     elsif ( $count == 2 ) {
         # Clone the indexed question onto the end of the list of questions..
         push @{ $self->questions($address) }, dclone $self->question($address);
 
         # Update $address with the index of the newly created question
-        $address->[1] = $self->totalQuestions($address) - 1;
+        $address->[1] = $self->lastQuestionIndex($address);
     }
     # Return the (modified) $address 
     return $address;
@@ -1082,6 +1082,52 @@ sub sections {
     return $self->{_sections};
 }
 
+=head2 lastSectionIndex
+
+Convenience method to return the index of the last Section. Frequently used to 
+iterate over all Sections. e.g. ( 0 .. lastSectionIndex )
+
+=cut
+
+sub lastSectionIndex {
+    my $self = shift;
+    return $self->totalSections(@_) - 1;
+}
+
+=head2 lastQuestionIndex
+
+Convenience method to return the index of the last Question, overall, or in the 
+given Section if $address given. Frequently used to  
+iterate over all Questions. e.g. ( 0 .. lastQuestionIndex )
+
+=head3 $address  (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub lastQuestionIndex {
+    my $self = shift;
+    return $self->totalQuestions(@_) - 1;
+}
+
+=head2 lastQuestionIndex
+
+Convenience method to return the index of the last Answer, overall, or in the 
+given Question if $address given. Frequently used to  
+iterate over all Answers. e.g. ( 0 .. lastAnswerIndex )
+
+=head3 $address  (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub lastAnswerIndex {
+    my $self = shift;
+    return $self->totalAnswers(@_) - 1;
+}
+
 =head2 totalSections
 
 Returns the total number of Sections
@@ -1095,7 +1141,7 @@ sub totalSections {
 
 =head2 totalQuestions ($address)
 
-Returns the total number of Questions overall, or in the given Section if $address given 
+Returns the total number of Questions, overall, or in the given Section if $address given 
 
 =head3 $address  (optional)
 
@@ -1111,7 +1157,7 @@ sub totalQuestions {
         return scalar @{ $self->questions($address) || [] };
     } else {
         my $count = 0;
-        for my $sIndex (0 .. $self->totalSections - 1) {
+        for my $sIndex (0 .. $self->lastSectionIndex) {
             $count += $self->totalQuestions([$sIndex]);
         }
         return $count;
@@ -1136,8 +1182,8 @@ sub totalAnswers {
         return scalar @{ $self->answers($address) || [] };
     } else {
         my $count = 0;
-        for my $sIndex (0 .. $self->totalSections - 1) {
-            for my $qIndex (0 .. $self->totalQuestions([$sIndex]) - 1) {
+        for my $sIndex (0 .. $self->lastSectionIndex) {
+            for my $qIndex (0 .. $self->lastQuestionIndex([$sIndex])) {
                 $count += $self->totalAnswers([$sIndex, $qIndex]);
             }
         }

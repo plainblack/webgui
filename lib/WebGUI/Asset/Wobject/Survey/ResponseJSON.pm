@@ -94,39 +94,41 @@ If questions and/or answers were set to be randomized, it is handled in here.
 
 sub createSurveyOrder {
     my $self = shift;
-    my $order;
-    my $qstarting = 0;
-    for ( my $s = 0; $s <= $#{ $self->survey->sections() }; $s++ ) {
+    
+    # Order Questions in each Section
+    my @surveyOrder;
+    for my $sIndex ( 0 .. $self->survey->lastSectionIndex ) {
 
-        #create question order for section
-        my @qorder;
-        if ( $self->survey->section( [$s] )->{randomizeQuestions} ) {
-            @qorder = shuffle( ( $qstarting .. $#{ $self->survey->questions( [$s] ) } ) );
+        #  Randomize Questions if required..
+        my @qOrder;
+        if ( $self->survey->section( [$sIndex] )->{randomizeQuestions} ) {
+            @qOrder = shuffle( 0 .. $self->survey->lastQuestionIndex( [$sIndex] ) );
         }
         else {
-            @qorder = ( ( $qstarting .. $#{ $self->survey->questions( [$s] ) } ) );
+            @qOrder = ( 0 .. $self->survey->lastQuestionIndex( [$sIndex] ) );
         }
 
-        #if this is an empty section, make sure it is still on the list to be seen
-        if ( @qorder == 0 ) {
-            push( @$order, [$s] );
-        }
-        $qstarting = 0;
-
-        #create answer order for question
-        for (@qorder) {
-            my @aorder;
-            if ( $self->survey->question( [ $s, $_ ] )->{randomizeAnswers} ) {
-                @aorder = shuffle( ( $qstarting .. $#{ $self->survey->question( [ $s, $_ ] )->{answers} } ) );
+        # Order Answers in each Question
+        for my $q (@qOrder) {
+            
+            # Randomize Answers if required..
+            my @aOrder;
+            if ( $self->survey->question( [ $sIndex, $q ] )->{randomizeAnswers} ) {
+                @aOrder = shuffle( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] ) );
             }
             else {
-                @aorder = ( ( $qstarting .. $#{ $self->survey->question( [ $s, $_ ] )->{answers} } ) );
+                @aOrder = ( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] ) );
             }
-            push( @$order, [ $s, $_, \@aorder ] );
+            push @surveyOrder, [ $sIndex, $q, \@aOrder ];
         }
-    } ## end for ( my $s = 0; $s <= ...
-    $self->response->{surveyOrder} = $order;
-} ## end sub createSurveyOrder
+        
+        # If Section had no Questions, make sure it is still added to @surveyOrder
+        if ( !@qOrder ) {
+            push @surveyOrder, [$sIndex];
+        }
+    }
+    $self->response->{surveyOrder} = \@surveyOrder;
+}
 
 #-------------------------------------------------------------------
 
