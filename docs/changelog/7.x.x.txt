@@ -20,6 +20,7 @@
  - fixed #9669: Folder: synopsis var of a subfolder broken
  - fixed #9658: gallery advanced search dates do not work
  - fixed #8965: Dashboard update profile url wrong
+ - fixed #9050: Safari Hover Help Hosed (and funny survey hover help in Firefox)
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
