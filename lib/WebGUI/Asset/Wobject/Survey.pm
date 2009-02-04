@@ -997,9 +997,12 @@ sub surveyEnd {
             $url = "/";
         }
     }
+    $url = $self->session->url->gateway($url);
 
-    #    $self->session->http->setRedirect($url);
-    return to_json( { "type", "forward", "url", $url } );
+    #$self->session->http->setRedirect($url);
+    #$self->session->http->setMimeType('application/json');
+    my $json = to_json( { "type", "forward", "url", $url } );
+    return $json;
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
