@@ -17,6 +17,7 @@
  - fixed #9542: Default WebGUI config contains invalid workflow activity
  - fixed #9623: preload.custom paths not included during upgrade
  - fixed #9638: Survey - Submit of survey creates new demo
+ - fixed #9669: Folder: synopsis var of a subfolder broken
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields

@@ -235,6 +235,7 @@ sub view {
 				url          => $child->getUrl,
 				title        => $child->get("title"),
 				menuTitle    => $child->get("menuTitle"),
+				synopsis     => $child->get("synopsis") || '',
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,
