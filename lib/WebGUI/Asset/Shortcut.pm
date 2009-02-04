@@ -856,7 +856,7 @@ sub www_saveUserPrefs {
 		}
 		$u->profileField($field->getId,$data{$field->getId});
 	}
-	return $self->www_view;
+	return $self->getParent->www_view;
 }
 
 #-------------------------------------------------------------------
