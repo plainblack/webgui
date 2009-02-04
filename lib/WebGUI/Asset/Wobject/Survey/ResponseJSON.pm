@@ -64,14 +64,14 @@ sub new {
         _survey => $survey,
         _session => $survey->session,
         _response => {
-            
+
             # Response hash defaults..
             responses => {},
             lastResponse => -1,
             questionsAnswered => 0,
             startTime => time(),
             surveyOrder => [],
-    
+
             # And then allow jsonData to override defaults and/or add other members
             %{$jsonData},
         },
@@ -82,19 +82,18 @@ sub new {
 
 #----------------------------------------------------------------------------
 
-=head2 createSurveyOrder ( SurveyJSON, [address,address] )
+=head2 createSurveyOrder
 
-This creates the order for the survey which will change after every fork.  The survey
-order is to precreate random questions and answers, which also leaves a record or what
-the user was presented with.  Forks are passed in to show where to branch the new order.
-
-If questions and/or answers were set to be randomized, it is handled in here.
+Computes the order of Sections, Questions and Aswers for this Survey. The order is represented as 
+an array of addresses (see L<"Address Parameter">), and is stored in the surveyOrder property.
+Questions and Answers that are set to be randomized are shuffled into a random order.
+The survey order leaves a record or what the user was presented with.
 
 =cut
 
 sub createSurveyOrder {
     my $self = shift;
-    
+
     # Order Questions in each Section
     my @surveyOrder;
     for my $sIndex ( 0 .. $self->survey->lastSectionIndex ) {
@@ -110,7 +109,7 @@ sub createSurveyOrder {
 
         # Order Answers in each Question
         for my $q (@qOrder) {
-            
+
             # Randomize Answers if required..
             my @aOrder;
             if ( $self->survey->question( [ $sIndex, $q ] )->{randomizeAnswers} ) {
@@ -121,13 +120,15 @@ sub createSurveyOrder {
             }
             push @surveyOrder, [ $sIndex, $q, \@aOrder ];
         }
-        
+
         # If Section had no Questions, make sure it is still added to @surveyOrder
         if ( !@qOrder ) {
             push @surveyOrder, [$sIndex];
         }
     }
     $self->response->{surveyOrder} = \@surveyOrder;
+    
+    return;
 }
 
 #-------------------------------------------------------------------
