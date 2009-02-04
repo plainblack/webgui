@@ -30,6 +30,7 @@ This package is not intended to be used by any other Asset in WebGUI.
 use strict;
 use JSON;
 use Params::Validate qw(:all);
+use List::Util qw(shuffle);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
@@ -101,7 +102,7 @@ sub createSurveyOrder {
         #  Randomize Questions if required..
         my @qOrder;
         if ( $self->survey->section( [$sIndex] )->{randomizeQuestions} ) {
-            @qOrder = shuffle( 0 .. $self->survey->lastQuestionIndex( [$sIndex] ) );
+            @qOrder = shuffle 0 .. $self->survey->lastQuestionIndex( [$sIndex] );
         }
         else {
             @qOrder = ( 0 .. $self->survey->lastQuestionIndex( [$sIndex] ) );
@@ -113,7 +114,7 @@ sub createSurveyOrder {
             # Randomize Answers if required..
             my @aOrder;
             if ( $self->survey->question( [ $sIndex, $q ] )->{randomizeAnswers} ) {
-                @aOrder = shuffle( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] ) );
+                @aOrder = shuffle 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] );
             }
             else {
                 @aOrder = ( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] ) );
@@ -142,23 +143,6 @@ Accessor method for the local WebGUI::Session reference
 sub session {
     my $self    = shift;
     return $self->{_session};
-}
-
-#-------------------------------------------------------------------
-
-=head2 shuffle ( @array )
-
-Returns the contents of @array in a random order.
-
-=cut
-
-sub shuffle {
-    my @a = splice @_;
-    for my $i ( 0 .. $#a ) {
-        my $j = int rand @a;
-        @a[ $i, $j ] = @a[ $j, $i ];
-    }
-    return @a;
 }
 
 #-------------------------------------------------------------------

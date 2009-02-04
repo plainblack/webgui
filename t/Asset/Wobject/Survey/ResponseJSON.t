@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 77;
+my $tests = 78;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -123,33 +123,30 @@ cmp_deeply(
 ####################################################
 
 {
-    no strict "refs";
-    no warnings;
     my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
-    $rJSON->survey->section([0])->{randomizeQuestions} = 0;
-    my $shuffleName = "WebGUI::Asset::Wobject::Survey::ResponseJSON::shuffle";
-    my $shuffleCalled = 0;
-    my $shuffleRef = \&$shuffleName;
-    *$shuffleName = sub {
-        $shuffleCalled = 1;
-        goto &$shuffleRef;
-    };
-    $rJSON->createSurveyOrder();
-    is($shuffleCalled, 0, 'createSurveyOrder did not call shuffle on a section');
 
-    $shuffleCalled = 0;
+    $rJSON->survey->section([0])->{randomizeQuestions} = 0;
+    $rJSON->createSurveyOrder();
+    my @question_order = map {$_->[1]} grep {$_->[0] == 0} @{$rJSON->surveyOrder};
+    cmp_deeply(\@question_order, [0,1,2], 'createSurveyOrder did not shuffle questions');
+
     $rJSON->survey->section([0])->{randomizeQuestions} = 1;
+    srand(42); # Make shuffle predictable
     $rJSON->createSurveyOrder();
-    is($shuffleCalled, 1, 'createSurveyOrder called shuffle on a section');
+    @question_order = map {$_->[1]} grep {$_->[0] == 0} @{$rJSON->surveyOrder};
+    cmp_deeply(\@question_order, [2,0,1], 'createSurveyOrder shuffled questions in first section');
 
-    $shuffleCalled = 0;
     $rJSON->survey->section([0])->{randomizeQuestions} = 0;
-    $rJSON->survey->question([0,0])->{randomizeAnswers} = 1;
+    $rJSON->survey->question([0,0])->{randomizeAnswers} = 0;
     $rJSON->createSurveyOrder();
-    is($shuffleCalled, 1, 'createSurveyOrder called shuffle on a question');
-
-    ##Restore the subroutine to the original
-    *$shuffleName = &$shuffleRef;
+    my @answer_order = map {@{$_->[2]}} grep {$_->[0] == 3 && $_->[1] == 1} @{$rJSON->surveyOrder};
+    cmp_deeply(\@answer_order, [0,1,2,3,4,5,6], 'createSurveyOrder did not shuffle answers');
+    
+    $rJSON->survey->question([3,1])->{randomizeAnswers} = 1;
+    srand(42); # Make shuffle predictable
+    $rJSON->createSurveyOrder();
+    @answer_order = map {@{$_->[2]}} grep {$_->[0] == 3 && $_->[1] == 1} @{$rJSON->surveyOrder};
+    cmp_deeply(\@answer_order, [1,3,4,5,6,0,2], 'createSurveyOrder shuffled answers');
 }
 
 ####################################################
