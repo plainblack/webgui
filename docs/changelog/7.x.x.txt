@@ -24,6 +24,7 @@
  - fixed #9675: gallary search list displays wrong date for pictures
  - fixed: Added survey.css as a snippet.  Had been left out.
  - fixed: Permissions aren't correctly applied to Article attachments
+ - fixed #9681: Form-related template errors in gallery
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
