@@ -22,6 +22,7 @@
  - fixed #8965: Dashboard update profile url wrong
  - fixed #9050: Safari Hover Help Hosed (and funny survey hover help in Firefox)
  - fixed #9675: gallary search list displays wrong date for pictures
+ - fixed: Added survey.css as a snippet.  Had been left out.
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
