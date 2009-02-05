@@ -364,9 +364,9 @@ sub purge {
     my $db = $self->session->db;
 
     # delete registrations
-	my $deleteTicket = $db->prepare("delete from EMSRegistrantTicket=?");
-	my $deleteToken = $db->prepare("delete from EMSRegistrantToken=?");
-	my $deleteRibbon = $db->prepare("delete from EMSRegistrantRibbon=?");
+	my $deleteTicket = $db->prepare("delete from EMSRegistrantTicket where badgeId=?");
+	my $deleteToken  = $db->prepare("delete from EMSRegistrantToken  where badgeId=?");
+	my $deleteRibbon = $db->prepare("delete from EMSRegistrantRibbon where badgeId=?");
     my $sth = $db->read("select badgeId from EMSRegistrant where emsAssetId=?",[$self->getId]);
     while (my ($id) = $sth->array) {
         $deleteTicket->execute([$id]);

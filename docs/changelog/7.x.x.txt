@@ -26,6 +26,7 @@
  - fixed: Added survey.css as a snippet.  Had been left out.
  - fixed: Permissions aren't correctly applied to Article attachments
  - fixed #9681: Form-related template errors in gallery
+ - fixed #9683: Problem with EMS related workflow
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
