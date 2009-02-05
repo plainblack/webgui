@@ -235,6 +235,23 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+sub update {
+    my $self = shift;
+    my $previousStorageId = $self->get('storageId');
+    $self->SUPER::update(@_);
+    ##update may have entered a new storageId.  Reset the cached one just in case.
+    if ($self->get("storageId") ne $previousStorageId) {
+        delete $self->{_storageLocation};
+    }
+    $self->getStorageLocation->setPrivileges(
+        $self->get("ownerUserId"),
+        $self->get("groupIdView"),
+        $self->get("groupIdEdit"),
+    );
+}
+
+
+#-------------------------------------------------------------------
 
 sub purge {
         my $self = shift;
