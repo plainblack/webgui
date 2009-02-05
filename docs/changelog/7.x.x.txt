@@ -10,6 +10,7 @@
  - fixed #9603: moving wiki page
  - fixed #9302: Spectre Problem...
  - fixed #9635: Matrix - Add attributes not working
+ - fixed #9597: Survey 2.0 Help not complete
  - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places where they do not belong.
  - fixed: Hardcoded extras url in templates and in extra head tags in assets were replaced with the Extras macro.
  - fixed: Fixed bad gateway macros in the Matrix templates.

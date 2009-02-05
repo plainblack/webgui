@@ -227,19 +227,12 @@ our $I18N = {
         context => q|Description of the 'question type' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'randomized words' => {
-		message => q|Randomized words:|,
-		lastUpdated => 1224686319
-	},
-    'randomized words description' => {
-        message => q||,
-        context => q|Description of the 'randomized words' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
-    },
+
 	'vertical display' => {
 		message => q|Vertical display:|,
 		lastUpdated => 1224686319
 	},
+
     'vertical display description' => {
         message => q|This property controls whether buttons of a multiple choice question are laid out horizontally or vertically.|,
         context => q|Description of the 'vertical display' field, used as hoverhelp in the edit question dialog.|,
@@ -290,7 +283,7 @@ our $I18N = {
         context => q|Description of the 'maximum number of answers' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'required' => {
+	'required label' => {
 		message => q|Required|,
 		lastUpdated => 1224686319
 	},
@@ -327,7 +320,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'answer text description' => {
-        message => q|Enter a text for this answer.|,
+        message => q|Enter a text for this answer. For multiple choice questions this answer will be displayed above the buttons.|,
         context => q|Description of the 'answer text' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -336,7 +329,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'recorded answer description' => {
-        message => q|The answer that will be recorded in the database.|,
+        message => q|The answer that will be recorded in the database. The recorded answer will be displayed in a multiple choice question's buttons, only if the question's 'Show text in button' property is set to yes. Otherwise the multiple choice buttons will be empty. |,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -379,7 +372,7 @@ our $I18N = {
         context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'max' => {
+	'max label' => {
 		message => q|Max|,
 		lastUpdated => 1224686319
 	},
@@ -388,7 +381,7 @@ our $I18N = {
         context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'step' => {
+	'step label' => {
 		message => q|Step|,
 		lastUpdated => 1224686319
 	},
@@ -397,7 +390,7 @@ our $I18N = {
         context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'verbatim' => {
+	'verbatim label' => {
 		message => q|Verbatim|,
 		lastUpdated => 1224686319
 	},
@@ -841,13 +834,19 @@ directly inside the answer_loop for other types of questions.|,
     },
 
     'id' => {
-        message => q|The ID of this question/answer.|,
+        message => q|The ID of this section/question/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'displayed_id' => {
+        message => q|The displayed ID of this section/question/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'text' => {
-        message => q|The text of this question/answer.|,
+        message => q|The text of this section/question/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
@@ -942,9 +941,215 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 0,
     },
 
-    'answers' => {
-        message => q|A loop containing the answers to this question.|,
+    'survey section edit template title' => {
+        message => q|Survey Section Edit Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'survey question edit template title' => {
+        message => q|Survey Question Edit Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'survey answer edit template title' => {
+        message => q|Survey Answer Edit Template|,
+        context => q|The title of a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'title' => {
+        message => q|The section's title.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'text' => {
+        message => q|The text of this section/question/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'variable' => {
+        message => q|A variable name to identify a section/question, so that it can be entered as a goto variable name
+in another section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'goto' => {
+        message => q|The section or question with this variable name will be the next to be displayed after this
+section/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'questionsPerPage' => {
+        message => q|The number loop containing a number/index for each question in this section.|,
         context => q|Description of a template loop for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'index' => {
+        message => q|The index/number of a question in this section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'selected' => {
+        message => q|A boolean indicating whether this is the selected number of questions per page.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'questionsOnSectionPage' => {
+        message => q|A boolean indicating whether question are displayed on the initial page of this section or on the next page.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'randomizeQuestions' => {
+        message => q|A boolean indicating whether the order of the questions in this section should be randomized.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'everyPageTitle' => {
+        message => q|A boolean indicating whether the title should be displayed on every page of this section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'everyPageText' => {
+        message => q|A boolean indicating whether the text should be displayed on every page of this section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'terminal' => {
+        message => q|A boolean indicating whether this is a terminal section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'terminalUrl' => {
+        message => q|The url to which the Survey should redirect if this is a terminal section.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'randomizeAnswers' => {
+        message => q|A boolean indicating wether this question's answers should be randomized.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'questionType' => {
+        message => q|A loop containing the possible question types.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'selected' => {
+        message => q|A boolean indicating whether this is the selected question type.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'value' => {
+        message => q|The value of this question/answer.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'maxAnswers' => {
+        message => q|The maximum number of answers that can be given to this question.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'commentRows' => {
+        message => q|The number of rows for the comment textarea.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'commentCols' => {
+        message => q|The number of columns for the comment textarea.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'verticalDisplay' => {
+        message => q|A boolean indicating whether the answers to this question should be displayed vertically.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'textInButton' => {
+        message => q|A boolean indicating whether the buttons for answers to multiple choice questions should display the answer's text.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'allowComment' => {
+        message => q|A boolean indicating whether adding a comment about this question is allowed.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'required' => {
+        message => q|A boolean indicating whether this question is required.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'isCorrect' => {
+        message => q|A boolean indicating whether this answer is correct.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'verbatim' => {
+        message => q|A boolean indicating whether this answer shows an extra text input, where the user can enter a single line of text.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'min' => {
+        message => q|The min value of this answer for slider type questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'max' => {
+        message => q|The max value of this answer for slider type questions..|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'step' => {
+        message => q|The step value of this answer for slider type questions..|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'recordedAnswer' => {
+        message => q|The value that gets recorded for this answer in the database.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'textCols' => {
+        message => q|The number of columns for textarea answers.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'textRows' => {
+        message => q|The number of rows for textarea answers.|,
+        context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 

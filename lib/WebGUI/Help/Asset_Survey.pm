@@ -26,6 +26,15 @@ our $HELP = {
             {   tag       => 'statistical overview report template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
         ]
     },
 
@@ -78,6 +87,15 @@ our $HELP = {
                 namespace => 'Asset_Survey'
             },
             {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
                 namespace => 'Asset_Survey'
             },
         ]
@@ -136,6 +154,142 @@ our $HELP = {
                 namespace => 'Asset_Survey'
             },
             {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },            
+        ]
+    },
+
+    'survey section edit template' => {
+        title  => 'survey section edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'everyPageText' },
+            { 'name' => 'title' },
+            { 'name' => 'everyPageTitle' },
+            { 'name' => 'variable' },
+            { 'name' => 'goto' },
+            { 'name' => 'randomizeQuestions' },
+            { 'name' => 'terminal' },
+            { 'name' => 'terminalUrl' },
+            { 'name' => 'questionsOnSectionPage' },
+            { 'name' => 'questionsPerPage',
+                        'variables' => [
+                            { 'name' => 'index' },
+                            { 'name' => 'selected' },
+                        ]
+            }
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
+    },
+
+    'survey question edit template' => {
+        title  => 'survey question edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'variable' },
+            { 'name' => 'randomizeAnswers' },
+            { 'name' => 'questionType' ,
+                        'variables' => [
+                            { 'name' => 'selected' },
+                        ]
+            },
+            { 'name' => 'textInButton' },
+            { 'name' => 'required' },
+            { 'name' => 'allowComment' },
+            { 'name' => 'verticalDisplay' },
+            { 'name' => 'commentCols' },
+            { 'name' => 'commentRows' },
+            { 'name' => 'maxAnswers' },
+            { 'name' => 'value' },
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
+    },
+
+    'survey answer edit template' => {
+        title  => 'survey answer edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'goto' },
+            { 'name' => 'value' },
+            { 'name' => 'isCorrect' },
+            { 'name' => 'textCols' },
+            { 'name' => 'textRows' },
+            { 'name' => 'min' },
+            { 'name' => 'max' },
+            { 'name' => 'step' },
+            { 'name' => 'verbatim' },
+            { 'name' => 'recordedAnswer' },
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
                 namespace => 'Asset_Survey'
             },
         ]
