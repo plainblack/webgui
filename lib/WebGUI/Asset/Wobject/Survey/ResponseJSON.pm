@@ -1105,48 +1105,57 @@ sub aIndexes {
 
 =cut
 
+# TODO: This sub should make use of recordedResponses
+
 sub returnResponseForReporting {
     my $self      = shift;
-    my @responses = ();
-    for my $entry ( @{ $self->surveyOrder } ) {
-        if ( @$entry == 1 ) {
+    my @report = ();
+    for my $address ( @{ $self->surveyOrder } ) {
+        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
+        my $section = $self->survey->section( $address );
+        my $question = $self->survey->question( [ $sIndex, $qIndex ] );
+        my $questionId = $self->questionId($sIndex, $qIndex);
+
+        # Skip if this is a Section without a Question
+        if ( !defined $qIndex ) {
             next;
         }
-        my @answers;
-        for ( @{ $$entry[2] } ) {
-            if ( defined $self->responses->{"$$entry[0]-$$entry[1]-$_"} ) {
-                $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{id} = $_;
-                if ( $self->survey->answer( [ $$entry[0], $$entry[1], $_ ] )->{isCorrect} ) {
-                    my $value;
-                    if ( $self->survey->answer( [ $$entry[0], $$entry[1], $_ ] )->{value} =~ /\w/ ) {
-                        $value = $self->survey->answer( [ $$entry[0], $$entry[1], $_ ] )->{value};
-                    }
-                    else {
-                        $value = $self->survey->question( [ $$entry[0], $$entry[1] ] )->{value};
-                    }
-                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{value}     = $value;
-                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{isCorrect} = 1;
+        
+        my @responses;
+        for my $aIndex (aIndexes($address)) {
+            my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
+
+            if ( $self->responses->{$answerId} ) {
+
+                # Make a safe copy of the response
+                my %response = %{$self->responses->{$answerId}};
+                $response{id} = $aIndex;
+
+                my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
+                if ( $answer->{isCorrect} ) {
+                    $response{value}
+                        = $answer->{value} =~ /\w/ ? $answer->{value}
+                                                   : $question->{value}
+                        ;
+                    $response{isCorrect} = 1;
                 }
                 else {
-                    $self->responses->{"$$entry[0]-$$entry[1]-$_"}->{isCorrect} = 0;
+                    $response{isCorrect} = 0;
                 }
-                push( @answers, ( $self->responses->{"$$entry[0]-$$entry[1]-$_"} ) );
-            } ## end if ( defined $self->responses...
-        } ## end for ( @{ $$entry[2] } )
-        push(
-            @responses, ( {
-                    'section',         $$entry[0],
-                    'question',        $$entry[1],
-                    'sectionName',     $self->survey->section( [ $$entry[0] ] )->{variable},
-                    'questionName',    $self->survey->question( [ $$entry[0], $$entry[1] ] )->{variable},
-                    'questionComment', $self->responses->{"$$entry[0]-$$entry[1]"}->{comment},
-                    'answers',         \@answers
-                }
-            )
-        );
-    } ## end for my $entry ( @{ $self...
-    return \@responses;
-} ## end sub returnResponseForReporting
+                push @responses, \%response;
+            }
+        }
+        push @report, {
+                    section         => $sIndex,
+                    question        => $qIndex,
+                    sectionName     => $section->{variable},
+                    questionName    => $question->{variable},
+                    questionComment => $self->responses->{$questionId}->{comment},
+                    answers         => \@responses
+                };
+    }
+    return \@report;
+}
 
 #-------------------------------------------------------------------
 
