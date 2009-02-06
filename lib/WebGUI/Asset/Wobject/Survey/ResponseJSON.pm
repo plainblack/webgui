@@ -18,12 +18,37 @@ Package WebGUI::Asset::Wobject::Survey::ResponseJSON
 
 =head1 DESCRIPTION
 
-Helper class for WebGUI::Asset::Wobject::Survey.  It manages data
-from the user, sets the order of questions and answers in the survey,
-based on branches, and gotos, and also handles expiring the survey
-due to time limits.
+Helper class for WebGUI::Asset::Wobject::Survey. "Reponse" in the context of
+this Wobject refers to a Survey response (not a single Question response).
+ie, this class represents the complete state of a user's response to a Survey instance.
+
+Instances of this class contain a response property that can be serialized
+as JSON to the database to allow for storage and retrieval of the complete state
+of a survey response.
+ 
+Survey instances that allow users to record multiple responses will persist multiple
+instances of this class to the database (one per distinct user response).
+
+Data stored in this object includes the order in which questions and answers are
+presented to the user (surveyOrder), a snapshot of all completed questions   
+from the user (responses), the most recently answered question (lastResponse), the 
+number of questions answered (questionsAnswered) and the Survey start time (startTime).
 
 This package is not intended to be used by any other Asset in WebGUI.
+
+=head2 surveyOrder
+
+Many methods in this class operate on the surveyOrder property.
+ 
+This data strucutre is a deep set of arrays, similar in structure to 
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>.
+
+In general, the surveyOrder data structure looks like:
+
+    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
+
+There is one array element for every section and address in the survey. If there are 
+no questions, or no addresses, those array elements will not be present.
 
 =cut
 
@@ -41,7 +66,7 @@ Object constructor.
 
 =head3 $survey
 
-A WebGUI::Asset::Wobject::Survey::SurveyJSON object that represents the current
+A L<WebGUI::Asset::Wobject::Survey::SurveyJSON> object that represents the current
 survey.
 
 =head3 $json
@@ -64,6 +89,8 @@ sub new {
         # First define core members..
         _survey => $survey,
         _session => $survey->session,
+
+        # Store all properties that are (de)serialized to/from JSON in a private variable
         _response => {
 
             # Response hash defaults..
@@ -85,10 +112,13 @@ sub new {
 
 =head2 createSurveyOrder
 
-Computes the order of Sections, Questions and Aswers for this Survey. The order is represented as 
-an array of addresses (see L<"Address Parameter">), and is stored in the surveyOrder property.
+Computers and stores the order of Sections, Questions and Aswers for this Survey. 
+The order is represented as an array of addresses 
+(see L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), 
+and is stored in the surveyOrder property. See also the L<"surveyOrder"> accessor).
+
 Questions and Answers that are set to be randomized are shuffled into a random order.
-The survey order leaves a record or what the user was presented with.
+The surveyOrder property is useful for keeping a record of what the user was presented with.
 
 =cut
 
@@ -136,12 +166,12 @@ sub createSurveyOrder {
 
 =head2 session
 
-Accessor method for the local WebGUI::Session reference
+Accessor method for the WebGUI::Session reference
 
 =cut
 
 sub session {
-    my $self    = shift;
+    my $self = shift;
     return $self->{_session};
 }
 
@@ -149,7 +179,7 @@ sub session {
 
 =head2 freeze
 
-Serializes the object to JSON, after deleting the log and survey objects stored in it.
+Serializes the internal perl hash representing the Response to a JSON string
 
 =cut
 
@@ -160,12 +190,10 @@ sub freeze {
 
 #-------------------------------------------------------------------
 
-#Has the survey timed out?
-
 =head2 hasTimedOut ( $limit )
 
 Checks to see whether this survey has timed out, based on the internally stored starting
-time, and $limit.
+time, and the suppied $limit value.
 
 =head3 $limit
 
@@ -174,100 +202,90 @@ How long the user has to take the survey, in minutes.
 =cut
 
 sub hasTimedOut{
-    my $self=shift;
-    my $limit = shift;
-    return 1 if($self->startTime() + ($limit * 60) < time() and $limit > 0);
-    return 0;
+    my $self = shift;
+    my ($limit) = validate_pos(@_, {type => SCALAR});
+    return $limit > 0 && $self->startTime + $limit * 60 < time;
 }
 
 #-------------------------------------------------------------------
 
-#the index of the last surveyOrder entry shown
-
 =head2 lastResponse ([ $responseIndex ])
 
-Mutator for the index of the last surveyOrder entry shown.  With no arguments,
-returns the lastResponse index.
+Mutator. The lastResponse property represents the index of the most recent surveyOrder entry shown. 
 
-=head3 $responseIndex
+This method returns (and optionally sets) the value of lastResponse.
 
-If defined, sets the lastResponse to $responseIndex.
+=head3 $responseIndex (optional)
+
+If defined, lastResponse is set to $responseIndex.
 
 =cut
 
 sub lastResponse {
     my $self = shift;
-    my $res  = shift;
-    if ( defined $res ) {
-        $self->response->{lastResponse} = $res;
+    my ($responseIndex) = validate_pos(@_, {type => SCALAR, optional => 1});
+    
+    if ( defined $responseIndex ) {
+        $self->response->{lastResponse} = $responseIndex;
     }
-    else {
-        return $self->response->{lastResponse};
-    }
+    
+    return $self->response->{lastResponse};
 }
 
 #-------------------------------------------------------------------
 
 =head2 questionsAnswered ([ $questionsAnswered ])
 
-Mutator for the number of questions answered.  With no arguments,
-does a set.
+Mutator for the number of questions answered.  
+Returns (and optionally sets) the value of questionsAnswered.
 
-=head3 $questionsAnswered.
+=head3 $questionsAnswered (optional)
 
 If defined, increments the number of questions by $questionsAnswered
 
 =cut
 
 sub questionsAnswered {
-    my $self      = shift;
-    my $answered  = shift;
-    if ( defined $answered ) {
-        $self->response->{questionsAnswered} += $answered;
+    my $self = shift;
+    my ($questionsAnswered) = validate_pos(@_, {type => SCALAR, optional => 1});
+    
+    if ( defined $questionsAnswered ) {
+        $self->response->{questionsAnswered} += $questionsAnswered;
     }
-    else {
-        return $self->response->{questionsAnswered};
-    }
+    
+    return $self->response->{questionsAnswered};
 }
 
 #-------------------------------------------------------------------
 
-=head2 startTime ([ $newStartTime ])
+=head2 startTime ([ $startTime ])
 
-Mutator for the time the user began the survey.  With no arguments,
-returns the startTime.
+Mutator for the time the user began the survey. 
+Returns (and optionally sets) the value of startTime.
 
-=head3 $newStarttime
+=head3 $startTime (optional)
 
-If defined, sets the starting time to $newStartTime.
+If defined, sets the starting time to $startTime.
 
 =cut
 
 sub startTime {
     my $self     = shift;
-    my $newTime  = shift;
-    if ( defined $newTime ) {
-        $self->response->{startTime} = $newTime;
+    my ($startTime) = validate_pos(@_, {type => SCALAR, optional => 1});
+
+    if ( defined $startTime ) {
+        $self->response->{startTime} = $startTime;
     }
-    else {
-        return $self->response->{startTime};
-    }
+
+    return $self->response->{startTime};
 }
 
 #-------------------------------------------------------------------
 
-#array of addresses in which the survey should be presented
-
 =head2 surveyOrder
 
-Accessor for the survey order data structure.  It is a deep set of arrays, similar in
-structure to a WebGUI::Asset::Wobject::Survey::SurveyJSON address.
-
-    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
-
-There is one array element for every section and address in the survey.
-
-If there are no questions, or no addresses, those array elements will not be present.
+Accessor for surveyOrder (see L<"surveyOrder">). 
+N.B. Use L<"createSurveyOrder"> to modify surveyOrder.
 
 =cut
 
@@ -278,47 +296,75 @@ sub surveyOrder {
 
 #-------------------------------------------------------------------
 
-=head2 nextSectionId
+=head2 nextResponse
 
-Relative to the surveyOrder and the lastResponse index, get the index of the
-next section.  Note, based on the number of questions in an section, this can
-be the same as the current section index.
+Returns the index of the next item that should be shown to the user, 
+that is, the index of the next item in the L<"surveyOrder"> array,
+e.g. L<"lastResponse"> + 1.
 
 =cut
 
-sub nextSectionId {
+sub nextResponse {
+    my $self = shift;
+    return $self->lastResponse + 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 nextResponseSectionIndex
+
+Returns the Section index of the next item that should be
+shown to the user, that is, the next item in the L<"surveyOrder"> array
+relative to L<"lastResponse">.
+
+We go to the effort of calling this property "nextResponseSectionIndex"
+rather than just "nextSectionIndex" to emphasize that this property is 
+distinct from the "next" section index in the Survey. For example, in
+a Section with multiple Questions, the value of nextResponseSectionIndex
+will be the same value (the current section index) for all Questions
+except the last Question.
+
+=cut
+
+sub nextResponseSectionIndex {
     my $self = shift;
     return undef if $self->surveyEnd();
-    return $self->surveyOrder->[ $self->lastResponse + 1 ]->[0];
+    return $self->surveyOrder->[ $self->nextResponse ]->[0];
 }
 
 #-------------------------------------------------------------------
 
-=head2 nextSection
+=head2 nextResponseSection
 
-Relative to the surveyOrder and the lastResponse index, gets the next section.
-Note, based on the number of questions in a section, this can be the same as
-the current section.
+Returns the Section corresponding to the next item that should be
+shown to the user, that is, the next item in the L<"surveyOrder"> array
+relative to L<"lastResponse">.
+
+As with L<"nextResponseSectionIndex">, we go to the effort of calling this property "nextResponseSection"
+rather than just "nextSection" to emphasize that this property is 
+distinct from the "next" section in the Survey.
 
 =cut
 
-sub nextSection {
+sub nextResponseSection {
     my $self = shift;
+    
     return {} if $self->surveyEnd();
-    return $self->survey->section( [ $self->surveyOrder->[ $self->lastResponse + 1 ]->[0] ] );
+    return $self->survey->section( [ $self->nextResponseSectionIndex ] );
 }
 
 #-------------------------------------------------------------------
 
-=head2 currentSection
+=head2 lastResponseSectionIndex
 
-Relative to the surveyOrder and the lastResponse index, get the current section.
+Returns the Section index of the last item that was shown to the user,
+based on the L<"surveyOrder"> array and L<"lastResponse">.
 
 =cut
 
-sub currentSection {
+sub lastResponseSectionIndex {
     my $self = shift;
-    return $self->survey->section( [ $self->surveyOrder->[ $self->lastResponse ]->[0] ] );
+    return $self->surveyOrder->[ $self->lastResponse ]->[0];
 }
 
 #-------------------------------------------------------------------
@@ -343,7 +389,7 @@ A hash ref of form param data.  Each element will look like:
         "__aid__comment" => "answer comment",
     }
 
-where __qid__ is a question id, as described in L<nextQuestions>, and __aid__ is an
+where __qid__ is a question id, as described in L<"nextQuestions">, and __aid__ is an
 answer id, also described there.
 
 =head3 terminal processing
@@ -404,7 +450,7 @@ sub recordResponses {
     my $goto;
     my $gotoExpression;
 
-    my $section = $self->nextSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
+    my $section = $self->nextResponseSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
 
     if ( $section->{terminal} ) {
         $sterminal    = 1;
@@ -413,7 +459,7 @@ sub recordResponses {
 
     #There were no questions in the section just displayed, so increment the lastResponse by one
     if ( ref $questions ne 'ARRAY' ) {
-        $self->lastResponse( $self->lastResponse + 1 );
+        $self->lastResponse( $self->nextResponse );
         return [ $sterminal, $terminalUrl ];
     }
 
@@ -468,7 +514,7 @@ sub recordResponses {
         $terminal = 0;
     }
     
-    if($sterminal and $self->nextSection != $self->currentSection){
+    if($sterminal and $self->nextResponseSectionIndex != $self->lastResponseSectionIndex){
         $terminal = 1;
     }     
 
@@ -691,7 +737,7 @@ sub getPreviousAnswer {
 
 Returns an array ref of the next questions in the survey.  The number of questions
 returned is set by the questionsPerPage property of the next section, as determined
-by nextSectionId rather than logical section ordering.
+by nextResponseSectionIndex rather than logical section ordering.
 
 If no questions are available, then it returns an empty array ref.  
 
@@ -713,12 +759,12 @@ sub nextQuestions {
 
     return [] if $self->surveyEnd;
 
-    my $nextSectionId = $self->nextSectionId;
+    my $nextResponseSectionIndex = $self->nextResponseSectionIndex;
 
-    my $qPerPage = $self->survey->section( [ $self->nextSectionId ] )->{questionsPerPage};
+    my $qPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
 
     #load Previous answer text
-    my $section = $self->nextSection();
+    my $section = $self->nextResponseSection();
     $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
 
     my $questions;
@@ -727,7 +773,7 @@ sub nextQuestions {
         next
             if ( !exists $$qAddy[1] );    #skip this if it doesn't have a question (for sections with no questions)
 
-        if ( $$qAddy[0] != $nextSectionId ) {
+        if ( $$qAddy[0] != $nextResponseSectionIndex ) {
             last;
         }
         my %question = %{ $self->survey->question( [ $$qAddy[0], $$qAddy[1] ] ) };

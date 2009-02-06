@@ -166,51 +166,51 @@ ok(   $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 20 >= end of survey');
 
 ####################################################
 #
-# nextSectionId, nextSection, currentSection
+# nextResponseSectionIndex, nextResponseSection, lastResponseSectionIndex
 #
 ####################################################
 
 $rJSON->lastResponse(0);
-is($rJSON->nextSectionId(), 0, 'nextSectionId, lastResponse=0, nextSectionId=0');
+is($rJSON->nextResponseSectionIndex, 0, 'nextResponseSectionIndex, lastResponse=0, nextResponseSectionIndex=0');
 cmp_deeply(
-    $rJSON->nextSection,
+    $rJSON->nextResponseSection,
     $rJSON->survey->section([0]),
-    'lastResponse=0, nextSection = section 0'
+    'lastResponse=0, nextResponseSection = section 0'
 );
-cmp_deeply(
-    $rJSON->currentSection,
-    $rJSON->survey->section([0]),
-    'lastResponse=0, currentSection = section 0'
+is(
+    $rJSON->lastResponseSectionIndex,
+    0,
+    'lastResponse=0, lastResponseSectionIndex = 0'
 );
 
 $rJSON->lastResponse(2);
-is($rJSON->nextSectionId(), 1, 'nextSectionId, lastResponse=2, nextSectionId=1');
+is($rJSON->nextResponseSectionIndex(), 1, 'nextResponseSectionIndex, lastResponse=2, nextResponseSectionIndex=1');
 cmp_deeply(
-    $rJSON->nextSection,
+    $rJSON->nextResponseSection,
     $rJSON->survey->section([1]),
-    'lastResponse=2, nextSection = section 1'
+    'lastResponse=2, nextResponseSection = section 1'
 );
-cmp_deeply(
-    $rJSON->currentSection,
-    $rJSON->survey->section([0]),
-    'lastResponse=2, currentSection = section 0'
+is(
+    $rJSON->lastResponseSectionIndex,
+    0,
+    'lastResponse=2, lastResponseSectionIndex = 0'
 );
 
 $rJSON->lastResponse(6);
-is($rJSON->nextSectionId(), 3, 'nextSectionId, lastResponse=6, nextSectionId=3');
+is($rJSON->nextResponseSectionIndex(), 3, 'nextResponseSectionIndex, lastResponse=6, nextResponseSectionIndex=3');
 cmp_deeply(
-    $rJSON->nextSection,
+    $rJSON->nextResponseSection,
     $rJSON->survey->section([3]),
-    'lastResponse=0, nextSection = section 3'
+    'lastResponse=0, nextResponseSection = section 3'
 );
 cmp_deeply(
-    $rJSON->currentSection,
-    $rJSON->survey->section([3]),
-    'lastResponse=6, currentSection = section 3'
+    $rJSON->lastResponseSectionIndex,
+    3,
+    'lastResponse=6, lastResponseSectionIndex = 3'
 );
 
 $rJSON->lastResponse(20);
-is($rJSON->nextSectionId(), undef, 'nextSectionId, lastResponse > surveyEnd, nextSectionId=undef');
+is($rJSON->nextResponseSectionIndex(), undef, 'nextResponseSectionIndex, lastResponse > surveyEnd, nextResponseSectionIndex=undef');
 
 ####################################################
 #
