@@ -354,6 +354,7 @@ sub upgradeMatrix {
             # migrate comments
             if($listing->{forumId}){
                 my $forum = WebGUI::Asset::Wobject::Collaboration->new($session, $listing->{forumId});
+                if ( defined $forum ) {
                 my @comments = @{ $forum->getLineage(['descendants'], {
                     includeOnlyClasses  => ["WebGUI::Asset::Post", "WebGUI::Asset::Post::Thread"],
                     returnObjects       => 1,
@@ -366,6 +367,7 @@ sub upgradeMatrix {
                 my $ownerUser = WebGUI::User->new($session,$comment->get('ownerUserId'));
                 $newMatrixListing->addComment($content,0,$ownerUser);
                 }
+            }
             }
         }
     }
