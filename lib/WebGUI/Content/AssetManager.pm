@@ -287,7 +287,7 @@ sub www_ajaxGetManagerPage {
             revisionDate    => $asset->get( "revisionDate" ),
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
-            lockedBy        => $asset->get( 'isLockedBy' ),
+            lockedBy        => ($asset->get( 'isLockedBy' ) ? $asset->lockedBy->username : ''),
             actions         => $asset->canEdit && $asset->canEditIfLocked,
         );
 

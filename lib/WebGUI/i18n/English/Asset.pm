@@ -1178,6 +1178,18 @@ Couldn't open %-s because %-s <br />
         context     => q{Error message in exportAsHtml for an illegal parameter.},
     },
 
+    'unlocked' => {
+        message     => q{unlocked},
+        lastUpdated => 0,
+        context     => q{Asset Manager label, when an asset is unlocked.},
+    },
+
+    'locked by' => {
+        message     => q{locked by},
+        lastUpdated => 0,
+        context     => q{Asset Manager label, as in "locked by admin"},
+    },
+
 };
 
 1;
