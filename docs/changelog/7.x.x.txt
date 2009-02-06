@@ -27,6 +27,7 @@
  - fixed: Permissions aren't correctly applied to Article attachments
  - fixed #9681: Form-related template errors in gallery
  - fixed #9683: Problem with EMS related workflow
+ - fixed #9611: Transaction Manage View, no go in ie6 (Henry Tang, Long Term Results B.v.)
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
