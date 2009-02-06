@@ -37,11 +37,21 @@ number of questions answered (L<"questionsAnswered">) and the Survey start time 
 This package is not intended to be used by any other Asset in WebGUI.
 
 =head2 surveyOrder
-
-Many methods in this class operate on the surveyOrder property.
  
-This data strucutre is a deep set of arrays, similar in structure to 
-L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>.
+This data strucutre is an array of Survey addresses (see  
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
+in which items are presented to the user.
+
+By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
+arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
+
+For example:
+
+ # Access sections in order..
+ for my $address (@{ $self->surveyOrder }) {
+        my $section  = $self->survey->section( $address );
+        # etc..
+ }
 
 In general, the surveyOrder data structure looks like:
 
@@ -133,12 +143,9 @@ sub new {
 =head2 createSurveyOrder
 
 Computers and stores the order of Sections, Questions and Aswers for this Survey. 
-The order is represented as an array of addresses 
-(see L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), 
-and is stored in the L<"surveyOrder"> property.
+See L<"surveyOrder">.
 
 Questions and Answers that are set to be randomized are shuffled into a random order.
-The L<"surveyOrder"> property is useful for keeping a record of what the user was presented with.
 
 =cut
 
@@ -563,8 +570,8 @@ sub recordResponses {
         $self->lastResponse( $self->lastResponse + @questions );
 
         # Do any requested branching.. 
-        $self->goto($goto)                     if ( defined $goto );
-        $self->gotoExpression($gotoExpression) if ( defined $gotoExpression );
+        $self->processGoto($goto)                     if ( defined $goto );
+        $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression );
     }
     else {
         # Required responses were missing, so we don't let the Survey terminate
@@ -580,38 +587,55 @@ sub recordResponses {
 
 #-------------------------------------------------------------------
 
-=head2 goto ( $variable )
+=head2 processGoto ( $variable )
 
-Looks through all sections and questions for their variable key, in order.  If the requested
+Looks through all sections and questions for their variable key, in order. If the requested
 $variable matches a variable, then the lastResponse is set so that that section or question
-is the next displayed.  If more than one section or question matches, then the first is used.
+is the next displayed.  If more than one variable name matches, then the first is used.
 
 =head3 $variable
 
-The variable to look for in all sections and questions.
+A variable name to match against all section and question variable names.
 
 =cut
 
-sub goto {
+sub processGoto {
     my $self = shift;
-    my $goto = shift;
-    for ( my $i = 0; $i <= $#{ $self->surveyOrder() }; $i++ ) {
-        my $section  = $self->survey->section( $self->surveyOrder()->[$i] );
-        my $question = $self->survey->question( $self->surveyOrder()->[$i] );
-        if ( ref $section eq 'HASH' and $section->{variable} eq $goto ) {
-            $self->lastResponse( $i - 1 );
+    my ($goto) = validate_pos(@_, {type => SCALAR});
+
+    # Iterate over items in order..
+    my $itemIndex = 0;
+    for my $address (@{ $self->surveyOrder }) {
+
+        # Retreive the section and question for this address..
+        my $section  = $self->survey->section( $address );
+        my $question = $self->survey->question( $address );
+
+        # See if our goto variable matches the section variable..
+        if ( ref $section eq 'HASH' && $section->{variable} eq $goto ) {
+
+            # Fudge lastReponse so that the next response item will be our matching item 
+            $self->lastResponse( $itemIndex - 1 );
             last;
         }
-        if ( ref $question eq 'HASH' and $question->{variable} eq $goto ) {
-            $self->lastResponse( $i - 1 );
+
+        # See if our goto variable matches the question variable..
+        if ( ref $question eq 'HASH' && $question->{variable} eq $goto ) {
+
+            # Fudge lastReponse so that the next response item will be our matching item
+            $self->lastResponse( $itemIndex - 1 );
             last;
         }
+
+        # Increment the item index counter
+        $itemIndex++;
     }
-} ## end sub goto
+    return;
+}
 
 #-------------------------------------------------------------------
 
-=head2 gotoExpression ( $gotoExpression )
+=head2 processGotoExpression ( $gotoExpression )
 
 =head3 $gotoExpression
 
@@ -654,7 +678,7 @@ But for now those things can be done manually using the limited subset defined.
 
 =cut
 
-sub gotoExpression {
+sub processGotoExpression {
     my $self = shift;
     my $expression = shift;
 
@@ -670,9 +694,9 @@ sub gotoExpression {
         }
     }
 
-    # Process gotoExpressions one after the other (first one that's true wins)
+    # Parse gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split '\n', $expression) {
-        my $processed = $self->processGotoExpression($line, \%responses);
+        my $processed = $self->parseGotoExpression($line, \%responses);
 
         next unless $processed;
 
@@ -682,7 +706,7 @@ sub gotoExpression {
 
         if ($result) {
             $self->session->log->debug("Truthy, goto [$processed->{target}]");
-             $self->goto($processed->{target});
+             $self->processGoto($processed->{target});
              return $processed;
         } else {
             $self->session->log->debug("Falsy, not branching");
@@ -692,7 +716,7 @@ sub gotoExpression {
     return;
 }
 
-=head2 processGotoExpression ( $expression, $responses)
+=head2 parseGotoExpression( ( $expression, $responses)
 
 Parses a single gotoExpression. Returns undef if processing fails, or the following hashref
 if things work out well:
@@ -722,12 +746,12 @@ the expression generate an error because our list of valid tokens doesn't includ
 
 =cut
 
-sub processGotoExpression {
+sub parseGotoExpression {
     my $self       = shift;
     my $expression = shift;
     my $responses      = shift;
 
-    $self->session->log->debug("Processing gotoExpression: $expression");
+    $self->session->log->debug("Parsing gotoExpression: $expression");
 
     # Valid gotoExpression tokens are..
     my $tokens = qr{\s|[-0-9=!<>+*/.()]};
