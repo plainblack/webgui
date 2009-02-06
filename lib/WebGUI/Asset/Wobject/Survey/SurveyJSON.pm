@@ -1290,6 +1290,7 @@ sub answer {
 =head2 sIndex ($address)
 
 Convenience sub to extract the section index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
 
 =cut
 
@@ -1301,6 +1302,7 @@ sub sIndex {
 =head2 qIndex ($address)
 
 Convenience sub to extract the question index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
 
 =cut
 
@@ -1312,6 +1314,7 @@ sub qIndex {
 =head2 aIndex ($address)
 
 Convenience sub to extract the answer index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
 
 =cut
 

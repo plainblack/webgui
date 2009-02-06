@@ -704,7 +704,7 @@ sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
 
-    my $responses = $self->getQuestionResponses();
+    my $responses = $self->recordedResponses();
 
     # Parse gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split /\n/, $expression) {
@@ -728,7 +728,17 @@ sub processGotoExpression {
     return;
 }
 
-sub getQuestionResponses {
+#-------------------------------------------------------------------
+
+=head2 recordedResponses
+
+Returns a hash (reference) of question responses. The hash keys are
+question variable names. The hash values are the corresponding answer
+values selected by the user. 
+
+=cut
+
+sub recordedResponses {
     my $self = shift;
     
     my $responses= {
@@ -738,10 +748,10 @@ sub getQuestionResponses {
     # Populate %responses with the user's data..
     for my $address ( @{ $self->surveyOrder } ) {
         my $question = $self->survey->question( $address );
-        my $sIndex = $address->[0];
-        my $qIndex = $address->[1];
-        for my $aIndex (@{ $address->[2] }) {
-            if ( defined $self->responses->{"$sIndex-$qIndex-$aIndex"} ) {
+        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
+        for my $aIndex (aIndexes($address)) {
+            my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
+            if ( defined $self->responses->{$answerId} ) {
                 my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
                 $responses->{$question->{variable}}
                     = $answer->{value} =~ /\w/  ? $answer->{value}
@@ -752,6 +762,8 @@ sub getQuestionResponses {
     }
     return $responses;
 }
+
+#-------------------------------------------------------------------
 
 =head2 parseGotoExpression( ( $expression, $responses)
 
@@ -828,7 +840,7 @@ sub parseGotoExpression {
 }
 
 # This method is unnecessary, as it can be expressed as:
-# $self->getQuestionResponses()->{$questionParam};
+# $self->recordedResponses()->{$questionParam};
 #
 #=head2 getPreviousAnswer
 #
@@ -854,62 +866,171 @@ sub parseGotoExpression {
 #    }
 #}
 
+
+#-------------------------------------------------------------------
+
+=head2 getTemplatedText ($text, $responses)
+
+Scans a string of text for instances of "[[var]]". Looks up each match in the given hash reference
+and replaces the string with the associated hash value.
+
+This method is used to enable simple templating in Survey Section/Question/Answer text. $responses will 
+usually be a hash of all of the users responses so that their previous responses can be displayed in
+the text of later questions. 
+
+=head3 text
+
+A string of text. e.g.
+
+ Your chose the value [[Q2]] in Question 2
+
+=head3 params
+
+A hash reference. Each matching key in the string will be replaced with its associated value. 
+
+=cut
+
+sub getTemplatedText {
+    my $self = shift;
+    my ($text, $params) = validate_pos(@_, { type => SCALAR }, { type => HASHREF });
+
+    # Replace all instances of [[var]] with the value from the $params hash reference
+    $text =~ s/\[\[([^\%]*?)\]\]/$params->{$1}/eg;
+
+    return $text;
+}
+
 #-------------------------------------------------------------------
 
 =head2 nextQuestions
 
-Returns an array of the next questions in the survey.  The number of questions
-returned is set by the questionsPerPage property of the next section, as determined
-by nextResponseSectionIndex rather than logical section ordering.
+Returns a list (array ref) of the Questions that should be shwon on the next page of the Survey.
+Each Question also contains a list (array ref) of associated Answers.
 
-Each element of the array ref is a question data structure, from the
-WebGUI::Asset::Wobject::Survey::SurveyJSON class, with a section sid field (index of
-the containing section) and question id (section and question id concatenated with a
-'-') added.  The answers array of the question contains answer data structures, also
-from WebGUI::Asset::Wobject::Survey::SurveyJSON, with an id field which is the section,
-question and answer indexes concatentated together with dashes.
+N.B. These are safe copies of the Survey data.
 
-Section and question [[var]] replacements in text fields.
+The number of questions is determined by the questionsPerPage property of the 'next' section
+in L<"surveyOrder">.
 
-All questions and answers are safe copies of the survey data.
+Each element of the array ref returned is a question data structure (see 
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON>), with some additional fields:
+
+=over 4
+
+=item sid Section Id field (see L<"sectionId">)
+
+=item id Question id (see L<"questionId">.
+
+=item answers An array of Answers (see L<WebGUI::Asset::Wobject::Survey::SurveyJSON>), with
+each answer in the array containing an Answer Id (see L<"answerId">)
+
+=back
+
+Survey, Question and Answer template text is processed here (see L<"getTemplatedText">)
 
 =cut
 
 sub nextQuestions {
     my $self = shift;
 
+    # See if we've reached the end of the Survey
     return if $self->surveyEnd;
 
+    # Get some information about the Section that the next response belongs to..
     my $section = $self->nextResponseSection();
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
-    my $questionResponses = $self->getQuestionResponses();
-    
-    $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
 
+    # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
+    my $recordedResponses = $self->recordedResponses();
+
+    # Do text replacement
+    $section->{text} = $self->getTemplatedText($section->{text}, $recordedResponses);
+
+    # Collect all the questions to be shown on the next page..
     my @questions;
     for my $i (1 .. $questionsPerPage ) {
-        my $qAddy = $self->surveyOrder->[ $self->lastResponse + $i ];
-        next
-            if ( !exists $$qAddy[1] );    #skip this if it doesn't have a question (for sections with no questions)
+        my $address = $self->surveyOrder->[ $self->lastResponse + $i ];
+        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
 
-        if ( $$qAddy[0] != $sectionIndex ) {
+        # Skip if this is a Section without a Question
+        if ( !defined $qIndex ) {
+            next;
+        }
+
+        # Stop if we have left the Section
+        if ( $sIndex != $sectionIndex ) {
             last;
         }
-        my %question = %{ $self->survey->question( [ $$qAddy[0], $$qAddy[1] ] ) };
-        $question{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
-        delete $question{answers};
-        $question{id}  = "$$qAddy[0]-$$qAddy[1]";
-        $question{sid} = "$$qAddy[0]";
-        for ( @{ $$qAddy[2] } ) {
-            my %ans = %{ $self->survey->answer( [ $$qAddy[0], $$qAddy[1], $_ ] ) };
-            $ans{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
-            $ans{id} = "$$qAddy[0]-$$qAddy[1]-$_";
-            push( @{ $question{answers} }, \%ans );
+
+        # Make a safe copy of the question
+        my %questionCopy = %{$self->survey->question( $address )};
+
+        # Do text replacement
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $recordedResponses);
+
+        # Add any extra fields we want..
+        $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
+        $questionCopy{sid} = $self->sectionId($sIndex);
+
+        # Rebuild the list of anwers with a safe copy
+        delete $questionCopy{answers};
+        for my $aIndex ( aIndexes($address) ) {
+            my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
+
+            # Do text replacement
+            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $recordedResponses);
+
+            # Add any extra fields we want..
+            $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+
+            push @{ $questionCopy{answers} }, \%answerCopy;
         }
-        push @questions, \%question;
+        push @questions, \%questionCopy;
     }
     return @questions;
+}
+
+=head2 sectionId
+
+Convenience method to construct a Section Id from the given Section index.
+
+A Section Id is identical to a Section index. This method is only present for consistency with questionId and answerId.
+
+=cut
+
+sub sectionId {
+    my $self = shift;
+    my ($sIndex) = validate_pos(@_, { type => SCALAR } );
+    return $sIndex;
+}
+
+=head2 questionId
+
+Convenience method to construct a Question Id from the given Section index and Question index.
+
+The id is constructed by hyphenating the Section index and Question index.
+
+=cut
+
+sub questionId {
+    my $self = shift;
+    my ($sIndex, $qIndex) = validate_pos(@_, { type => SCALAR }, { type => SCALAR } );
+    return "$sIndex-$qIndex";
+}
+
+=head2 answerId
+
+Convenience method to construct an Answer Id from the given Section index, Question index and Answer index.
+
+The id is constructed by hyphenating all three indices.
+
+=cut
+
+sub answerId {
+    my $self = shift;
+    my ($sIndex, $qIndex, $aIndex) = validate_pos(@_, { type => SCALAR }, { type => SCALAR }, { type => SCALAR } );
+    return "$sIndex-$qIndex-$aIndex";
 }
 
 #-------------------------------------------------------------------
@@ -925,6 +1046,57 @@ sub surveyEnd {
     my $self = shift;
     return 1 if ( $self->lastResponse >= $#{ $self->surveyOrder } );
     return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 sIndex ($address)
+
+Convenience sub to extract the section index from an address in the L<"surveyOrder"> array.
+This method exists purely to improve code readability.
+This method is identical to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/sIndex>.
+
+=cut
+
+sub sIndex {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    return $address->[0];
+}
+
+#-------------------------------------------------------------------
+
+=head2 qIndex ($address)
+
+Convenience sub to extract the question index from an address in the L<"surveyOrder"> array.
+This method exists purely to improve code readability.
+This method is identical to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/qIndex>.
+
+=cut
+
+sub qIndex {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    return $address->[1];
+}
+
+#-------------------------------------------------------------------
+
+=head2 aIndexes ($address)
+
+Convenience sub to extract the array of answer indices from an address in the L<"surveyOrder"> array.
+This method exists purely to improve code readability.
+Unlike sIndex and qIndex, this method is different to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/aIndex>.
+This is because the third element of the L<"surveyOrder"> address array ref in is an array of answer indices.
+
+=cut
+
+sub aIndexes {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
+    if (my $indexes = $address->[2]) {
+        return @{ $indexes };
+    }
+
+    return;
 }
 
 #-------------------------------------------------------------------
