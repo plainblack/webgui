@@ -39,6 +39,8 @@ use WebGUI::Utility qw(isIn);
 my $toVersion = '7.6.10';
 my $quiet; # this line required
 
+# in case we need to output UTF-8 chars
+binmode STDOUT, ':utf8';
 
 my $session = start(); # this line required
 
