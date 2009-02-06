@@ -874,10 +874,10 @@ sub www_loadQuestions {
     my @questions;
     eval { @questions = $self->response->nextQuestions(); };
 
-    my $section = $self->response->nextSection();
+    my $section = $self->response->nextResponseSection();
 
     #return $self->prepareShowSurveyTemplate($section,$questions);
-    $section->{id}              = $self->response->nextSectionId();
+    $section->{id}              = $self->response->nextResponseSectionIndex();
     $section->{wasRestarted}    = $wasRestarted;
 
     my $text = $self->prepareShowSurveyTemplate( $section, \@questions );
