@@ -149,13 +149,20 @@ sub importAssetData {
     }
     if ($revisionExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+
+        ##If the existing asset is not committed, do not allow the new package data to 
+        ##change the version control status.
+        if (  $asset->get('status') eq 'pending'
+           && $properties{'status'} ne 'pending' ) {
+           delete $properties{status};
+        }
         $error->info("Updating an existing revision of asset $id");	
-        $asset->update($data->{properties});
+        $asset->update(\%properties);
         ##Pending assets are assigned a new version tag
-        if ($data->{properties}->{status} eq 'pending') {
+        if ($properties{status} eq 'pending') {
             $self->session->db->write(
-                'update assetData set tagId=? where assetId=? and revisionDate='.$data->{properties}->{revisionDate},
-                [WebGUI::VersionTag->getWorking($self->session)->getId, $data->{properties}->{assetId}]
+                'update assetData set tagId=? where assetId=? and revisionDate=?',
+                [WebGUI::VersionTag->getWorking($self->session)->getId, $properties{assetId}, $properties{revisionDate},]
             );
         }
     }
