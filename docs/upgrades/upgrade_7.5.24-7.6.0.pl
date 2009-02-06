@@ -23,6 +23,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Product;
+use WebGUI::Utility qw(isIn);
 
 
 my $toVersion = '7.6.0';
