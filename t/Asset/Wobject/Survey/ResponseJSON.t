@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../../../lib";
 use Test::More;
 use Test::Deep;
 use Test::MockObject::Extends;
+use Test::Exception;
 use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
@@ -20,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 78;
+my $tests = 79;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -321,8 +322,9 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 # processGotoExpression
 #
 ####################################################
-is($rJSON->parseGotoExpression(),
-    undef, 'processGotoExpression undef with empty arguments');
+throws_ok { $rJSON->parseGotoExpression() } 'WebGUI::Error::InvalidParam', 'processGotoExpression takes exception to empty arguments';
+is($rJSON->parseGotoExpression(q{}),
+    undef, '.. and undef with empty expression');
 is($rJSON->parseGotoExpression('blah-dee-blah-blah'),
     undef, '.. and undef with duff expression');
 is($rJSON->parseGotoExpression(':'),

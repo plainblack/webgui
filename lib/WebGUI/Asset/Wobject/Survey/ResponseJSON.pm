@@ -570,8 +570,8 @@ sub recordResponses {
         $self->lastResponse( $self->lastResponse + @questions );
 
         # Do any requested branching.. 
-        $self->processGoto($goto)                     if ( defined $goto );
-        $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression );
+        $self->processGoto($goto)                     if ( defined $goto );           ## no critic
+        $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression ); ## no critic
     }
     else {
         # Required responses were missing, so we don't let the Survey terminate
@@ -637,83 +637,120 @@ sub processGoto {
 
 =head2 processGotoExpression ( $gotoExpression )
 
+Processes the given gotoExpression, and triggers a call to L<"processGoto"> if the expression
+indicates that we should branch.
+
 =head3 $gotoExpression
 
-The gotoExpression (one expression per line)
+The gotoExpression.
 
-=head3 Explanation
-
-A gotoExpression is a list of expressions (one per line) of the form:
+A gotoExpression is a string representing a list of expressions (one per line) of the form:
  target: expression
  target: expression
+ ...
 
 This subroutine iterates through the list, processing each line and, all things being
 well, evaluates the expression. The first expression to evaluate to true triggers a
 call to goto($target).
 
-The expression is a simple subset of the formula language used in spreadsheet programs such as Excel, OpenOffice, Google Docs etc..
+The expression is a simple subset of the formula language used in spreadsheet programs 
+such as Excel, OpenOffice, Google Docs etc..
 
-Here is an example using section variables S1 and S2 as jump targets and question variables Q1-3 in the expression.
-It  jumps to S1 if the user's answer to Q1 has a value of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
+Here is an example using section variables S1 and S2 as jump targets and question 
+variables Q1-3 in the expression. It  jumps to S1 if the user's answer to Q1 has a value 
+of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
 S1: Q1 = 3
 S2: Q2 + Q3 < 10
 
-=head3 Arguments are evaluated as follows:
+Arguments are evaluated as follows:
 
 Numeric arguments evaluate as numbers
-* No support for strings (and hence no string matching)
-* Question variable names (e.g. Q1) evaluate to the numeric value associated with user's answer to that question, or undefined if the user has not answered that question
+
+=over 4
+
+=item * No support for strings (and hence no string matching)
+
+=item * Question variable names (e.g. Q1) evaluate to the numeric value associated with 
+user's answer to that question, or undefined if the user has not answered that question
+
+=back
 
 Binary comparisons operators: = != < <= >= >
-* return boolean values based on perl's equivalent numeric comparison operators
+
+=over 4
+
+=item * return boolean values based on perl's equivalent numeric comparison operators
+
+=back
 
 Simple math operators: + - * /
-* return numeric values
 
-Later we may add Boolean operators: AND( x; y; z; ... ), OR( x; y; z; ... ), NOT( x )
-* args separated by semicolons (presumably because spreadsheet formulas use commas to indicate cell ranges)
+=over 4
 
-Later still you may be able to say AVG(section1) or SUM(section3) and have those functions automatically compute their result over the set of all questions in the given section.
+=item * return numeric values
+
+=back
+
+Later we may add Boolean operators: AND( x; y; z; ... ), OR( x; y; z; ... ), NOT( x ), with args separated by 
+semicolons (presumably because spreadsheet formulas use commas to indicate cell ranges)
+
+Later still you may be able to say AVG(section1) or SUM(section3) and have those functions automatically 
+compute their result over the set of all questions in the given section.
 But for now those things can be done manually using the limited subset defined.
 
 =cut
 
 sub processGotoExpression {
     my $self = shift;
-    my $expression = shift;
+    my ($expression) = validate_pos(@_, {type => SCALAR});
 
-    my %responses = (
-        # questionName => response answer value
-    );
-
-    # Populate %responses with the user's data..
-    foreach my $q (@{ $self->returnResponseForReporting() }) {
-        if ($q->{questionName} =~ /\w/) {
-            my $value = $q->{answers}[0]{value};
-            $responses{$q->{questionName}} = $value if defined $value;
-        }
-    }
+    my $responses = $self->getQuestionResponses();
 
     # Parse gotoExpressions one after the other (first one that's true wins)
-    foreach my $line (split '\n', $expression) {
-        my $processed = $self->parseGotoExpression($line, \%responses);
+    foreach my $line (split /\n/, $expression) {
+        my $processed = $self->parseGotoExpression($line, $responses);
 
-        next unless $processed;
+        next if !$processed;
 
         # (ab)use perl's eval to evaluate the processed expression
-        my $result = eval "$processed->{expression}";
-        $self->session->log->warn($@) if $@;
+        my $result = eval "$processed->{expression}";   ## no critic
+        $self->session->log->warn($@) if $@;            ## no critic
 
         if ($result) {
             $self->session->log->debug("Truthy, goto [$processed->{target}]");
              $self->processGoto($processed->{target});
              return $processed;
         } else {
-            $self->session->log->debug("Falsy, not branching");
+            $self->session->log->debug('Falsy, not branching');
             next;
         }
     }
     return;
+}
+
+sub getQuestionResponses {
+    my $self = shift;
+    
+    my $responses= {
+        # questionName => response answer value
+    };
+
+    # Populate %responses with the user's data..
+    for my $address ( @{ $self->surveyOrder } ) {
+        my $question = $self->survey->question( $address );
+        my $sIndex = $address->[0];
+        my $qIndex = $address->[1];
+        for my $aIndex (@{ $address->[2] }) {
+            if ( defined $self->responses->{"$sIndex-$qIndex-$aIndex"} ) {
+                my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
+                $responses->{$question->{variable}}
+                    = $answer->{value} =~ /\w/  ? $answer->{value}
+                                                : $question->{value}
+                    ;
+            }
+        }
+    }
+    return $responses;
 }
 
 =head2 parseGotoExpression( ( $expression, $responses)
@@ -748,8 +785,7 @@ the expression generate an error because our list of valid tokens doesn't includ
 
 sub parseGotoExpression {
     my $self       = shift;
-    my $expression = shift;
-    my $responses      = shift;
+    my ($expression, $responses) = validate_pos(@_, { type => SCALAR }, { type => HASHREF, default => {} });
 
     $self->session->log->debug("Parsing gotoExpression: $expression");
 
@@ -765,13 +801,13 @@ sub parseGotoExpression {
         return;
     }
 
-    if ( !defined $rest || $rest eq '' ) {
+    if ( !defined $rest || $rest eq q{} ) {
         $self->session->log->warn('Expression undefined');
         return;
     }
 
     # Replace each questionName with its response value
-    while ( my ( $questionName, $response ) = each %$responses ) {
+    while ( my ( $questionName, $response ) = each %{$responses} ) {
         $rest =~ s/$questionName/$response/g;
     }
 
@@ -791,26 +827,32 @@ sub parseGotoExpression {
     };
 }
 
-#-------------------------------------------------------------------
-
-=head2 getPreviousAnswer
-
-=cut
-
-sub getPreviousAnswer {
-    my $self          = shift;
-    my $questionParam = shift;
-    for my $q ( @{ $self->surveyOrder } ) {
-        my $question = $self->survey->question( [ $$q[0], $$q[1] ] );
-        if ( $question->{variable} eq $questionParam ) {
-            for ( 0 .. @{ $self->survey->answers( [ $$q[0], $$q[1] ] ) } ) {
-                if ( exists $self->responses->{ $$q[0] . "-" . $$q[1] . "-" . $_ } ) {
-                    return $self->responses->{ $$q[0] . "-" . $$q[1] . "-" . $_ }->{value};
-                }
-            }
-        }
-    }
-}
+# This method is unnecessary, as it can be expressed as:
+# $self->getQuestionResponses()->{$questionParam};
+#
+#=head2 getPreviousAnswer
+#
+#=cut
+#
+#sub getPreviousAnswer {
+#    my $self          = shift;
+#    my $questionParam = shift;
+#    
+#    for my $address ( @{ $self->surveyOrder } ) {
+#        my $question = $self->survey->question( $address );
+#        if ( $question->{variable} eq $questionParam ) {
+#            
+#            # Iterate over answers in the question..
+#            for ( 0 .. @{ $self->survey->answers( $address ) } ) {
+#                use Data::Dumper;
+#                $self->session->log->warn(Dumper($_));
+#                if ( exists $self->responses->{ $address->[0] . "-" . $address->[1] . "-" . $_ } ) {
+#                    return $self->responses->{ $address->[0] . "-" . $address->[1] . "-" . $_ }->{value};
+#                }
+#            }
+#        }
+#    }
+#}
 
 #-------------------------------------------------------------------
 
@@ -838,31 +880,30 @@ sub nextQuestions {
 
     return if $self->surveyEnd;
 
-    my $nextResponseSectionIndex = $self->nextResponseSectionIndex;
-
-    my $qPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
-
-    #load Previous answer text
     my $section = $self->nextResponseSection();
-    $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
+    my $sectionIndex = $self->nextResponseSectionIndex;
+    my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
+    my $questionResponses = $self->getQuestionResponses();
+    
+    $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
 
     my @questions;
-    for ( my $i = 1; $i <= $qPerPage; $i++ ) {
+    for my $i (1 .. $questionsPerPage ) {
         my $qAddy = $self->surveyOrder->[ $self->lastResponse + $i ];
         next
             if ( !exists $$qAddy[1] );    #skip this if it doesn't have a question (for sections with no questions)
 
-        if ( $$qAddy[0] != $nextResponseSectionIndex ) {
+        if ( $$qAddy[0] != $sectionIndex ) {
             last;
         }
         my %question = %{ $self->survey->question( [ $$qAddy[0], $$qAddy[1] ] ) };
-        $question{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
+        $question{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
         delete $question{answers};
         $question{id}  = "$$qAddy[0]-$$qAddy[1]";
         $question{sid} = "$$qAddy[0]";
         for ( @{ $$qAddy[2] } ) {
             my %ans = %{ $self->survey->answer( [ $$qAddy[0], $$qAddy[1], $_ ] ) };
-            $ans{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
+            $ans{'text'} =~ s/\[\[([^\%]*?)\]\]/$questionResponses->{$1}/eg;
             $ans{id} = "$$qAddy[0]-$$qAddy[1]-$_";
             push( @{ $question{answers} }, \%ans );
         }
