@@ -461,8 +461,8 @@ sub getQuestionEditVars {
 =head2 getValidQuestionTypes
 
 A convenience method.  Returns a list of question types.  If you add a question
-type to the Survey, you must handle it here, and also in updateQuestionAnswers()
-and administersurvey.js
+type to the Survey, you must handle it in the following places: here, updateQuestionAnswers,
+recordResponses (ResponseJSON) and administersurvey.js
 
 =cut
 

@@ -802,7 +802,7 @@ sub www_submitQuestions {
 
     $self->loadBothJSON();
 
-    my $termInfo = $self->response->recordResponses( $self->session, $responses );
+    my $termInfo = $self->response->recordResponses( $responses );
 
     $self->saveResponseJSON();
 
@@ -871,8 +871,8 @@ sub www_loadQuestions {
         return $self->surveyEnd();
     }
 
-    my $questions;
-    eval { $questions = $self->response->nextQuestions(); };
+    my @questions;
+    eval { @questions = $self->response->nextQuestions(); };
 
     my $section = $self->response->nextSection();
 
@@ -880,7 +880,7 @@ sub www_loadQuestions {
     $section->{id}              = $self->response->nextSectionId();
     $section->{wasRestarted}    = $wasRestarted;
 
-    my $text = $self->prepareShowSurveyTemplate( $section, $questions );
+    my $text = $self->prepareShowSurveyTemplate( $section, \@questions );
     return $text;
 } ## end sub www_loadQuestions
 

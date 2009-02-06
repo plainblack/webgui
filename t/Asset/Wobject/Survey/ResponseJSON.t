@@ -220,14 +220,14 @@ is($rJSON->nextResponseSectionIndex(), undef, 'nextResponseSectionIndex, lastRes
 
 $rJSON->lastResponse(20);
 ok($rJSON->surveyEnd, 'nextQuestions: lastResponse indicates end of survey');
-is_deeply($rJSON->nextQuestions, [], 'nextQuestions returns an empty array ref if there are no questions available');
+is_deeply([$rJSON->nextQuestions], [], 'nextQuestions returns an empty array if there are no questions available');
 $rJSON->survey->section([0])->{questionsPerPage} = 2;
 $rJSON->survey->section([1])->{questionsPerPage} = 2;
 $rJSON->survey->section([2])->{questionsPerPage} = 2;
 $rJSON->survey->section([3])->{questionsPerPage} = 2;
 $rJSON->lastResponse(-1);
 cmp_deeply(
-    $rJSON->nextQuestions(),
+    [$rJSON->nextQuestions],
     [
         superhashof({
             sid  => 0,
@@ -259,7 +259,7 @@ cmp_deeply(
 
 $rJSON->lastResponse(1);
 cmp_deeply(
-    $rJSON->nextQuestions(),
+    [$rJSON->nextQuestions],
     [
         superhashof({
             sid  => 0,
@@ -283,9 +283,9 @@ cmp_deeply(
 
 $rJSON->lastResponse(4);
 cmp_deeply(
-    $rJSON->nextQuestions(),
-    undef,
-    'nextQuestions: returns undef if the next section is empty'
+    [$rJSON->nextQuestions],
+    [],
+    'nextQuestions: returns an empty array if the next section is empty'
 );
 
 ####################################################
@@ -357,7 +357,7 @@ $rJSON->survey->question([1,0])->{variable} = 's1q0';
 $rJSON->survey->answer([1,0,0])->{value} = 3;
 
 $rJSON->lastResponse(2);
-$rJSON->recordResponses($session, {
+$rJSON->recordResponses({
     '1-0comment'   => 'Section 1, question 0 comment',
     '1-0-0'        => 'First answer',
     '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
@@ -399,7 +399,7 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->lastResponse(4);
 my $terminals;
 cmp_deeply(
-    $rJSON->recordResponses($session, {}),
+    $rJSON->recordResponses({}),
     [ 0, undef ],
     'recordResponses, if section has no questions, returns terminal info in the section.  With no terminal info, returns [0, undef]',
 );
@@ -410,7 +410,7 @@ $rJSON->survey->section([2])->{terminalUrl} = '/terminal';
 
 $rJSON->lastResponse(4);
 cmp_deeply(
-    $rJSON->recordResponses($session, {}),
+    $rJSON->recordResponses({}),
     [ 1, '/terminal' ],
     'recordResponses, if section has no questions, returns terminal info in the section.',
 );
@@ -421,7 +421,7 @@ $rJSON->survey->question([1,0])->{terminalUrl} = 'question 1-0 terminal';
 
 $rJSON->lastResponse(2);
 cmp_deeply(
-    $rJSON->recordResponses($session, {
+    $rJSON->recordResponses({
         '1-0comment'   => 'Section 1, question 0 comment',
         '1-0-0'        => 'First answer',
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
@@ -457,7 +457,7 @@ $rJSON->lastResponse(2);
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 
 cmp_deeply(
-    $rJSON->recordResponses($session, {
+    $rJSON->recordResponses({
         '1-0comment'   => 'Section 1, question 0 comment',
         '1-0-0'        => "\t\t\t\n\n\n\t\t\t", #SOS in whitespace
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',

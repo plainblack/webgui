@@ -22,17 +22,17 @@ Helper class for WebGUI::Asset::Wobject::Survey. "Reponse" in the context of
 this Wobject refers to a Survey response (not a single Question response).
 ie, this class represents the complete state of a user's response to a Survey instance.
 
-Instances of this class contain a response property that can be serialized
+At the heart of this class is a perl hash that can be serialized
 as JSON to the database to allow for storage and retrieval of the complete state
 of a survey response.
  
 Survey instances that allow users to record multiple responses will persist multiple
 instances of this class to the database (one per distinct user response).
 
-Data stored in this object includes the order in which questions and answers are
-presented to the user (surveyOrder), a snapshot of all completed questions   
-from the user (responses), the most recently answered question (lastResponse), the 
-number of questions answered (questionsAnswered) and the Survey start time (startTime).
+Data stored in this object include the order in which questions and answers are
+presented to the user (L<"surveyOrder">), a snapshot of all completed questions   
+from the user (L<"responses">), the most recently answered question (L<"lastResponse">), the 
+number of questions answered (L<"questionsAnswered">) and the Survey start time (L<"startTime">).
 
 This package is not intended to be used by any other Asset in WebGUI.
 
@@ -49,6 +49,26 @@ In general, the surveyOrder data structure looks like:
 
 There is one array element for every section and address in the survey. If there are 
 no questions, or no addresses, those array elements will not be present.
+
+=head2 responses
+
+A response is for a question and is accessed by the exact same address as a survey member. 
+Questions only contain the comment and an array of answer Responses.  
+Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, 
+and the assetId to the uploaded file.
+
+In general, the responses data structure looks like this:
+
+    responses => {
+        __qid__ => {
+            comment => "question comment",
+        },
+        __aid__ => {
+            time    => time(),
+            comment => "answer comment",
+            value   => "answer value",
+        },
+    }
 
 =cut
 
@@ -72,8 +92,8 @@ survey.
 =head3 $json
 
 A JSON string used to construct a new Perl object. The string should represent 
-a JSON hash made up of "startTime", "surveyOrder", "responses", "lastReponse"
-and "questionsAnswered" keys, with appropriate values.
+a JSON hash made up of L<"startTime">, L<"surveyOrder">, L<"responses">, L<"lastReponse">
+and L<"questionsAnswered"> keys, with appropriate values.
 
 =cut
 
@@ -115,10 +135,10 @@ sub new {
 Computers and stores the order of Sections, Questions and Aswers for this Survey. 
 The order is represented as an array of addresses 
 (see L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), 
-and is stored in the surveyOrder property. See also the L<"surveyOrder"> accessor).
+and is stored in the L<"surveyOrder"> property.
 
 Questions and Answers that are set to be randomized are shuffled into a random order.
-The surveyOrder property is useful for keeping a record of what the user was presented with.
+The L<"surveyOrder"> property is useful for keeping a record of what the user was presented with.
 
 =cut
 
@@ -369,19 +389,15 @@ sub lastResponseSectionIndex {
 
 #-------------------------------------------------------------------
 
-=head2 recordResponses ($session, $responses)
+=head2 recordResponses ($responses)
 
-Takes survey responses and puts them into the response hash of this object.  Does terminal
-handling for sections and questions, and goto processing.  Advances the survey page if
-all required questions have been answered.
-
-=head3 $session
-
-A WebGUI session object
+Processes and records submitted survey responses in the L<"responses"> data structure. 
+Does terminal handling, and branch processing, and advances the L<"lastResponse"> index 
+if all required questions have been answered.
 
 =head3 $responses
 
-A hash ref of form param data.  Each element will look like:
+A hash ref of form param data. Each element should look like:
 
     {
         "__qid__comment" => "question comment",
@@ -392,134 +408,175 @@ A hash ref of form param data.  Each element will look like:
 where __qid__ is a question id, as described in L<"nextQuestions">, and __aid__ is an
 answer id, also described there.
 
-=head3 terminal processing
+=head3 Terminal processing
 
 Terminal processing for a section and its questions and answers are handled in
 order.  The terminalUrl setting in a question overrides the terminalUrl setting
 for its section.  Similarly, with questions and answers, the last terminalUrl
 setting of the set of questions is what is returned for the page, with the questions
-and answers being answered in surveyOrder.
+and answers being answered in L<"surveyOrder">.
 
-=head3 goto processing
+=head3 Branch processing
 
-gotos are handled similarly as with terminalUrls.  The last goto in the set of questions
-wins.
-
-=head3 responses data structure
-
-This method also builds an internal data structure with the users' responses.  It
-is set up like this:
-
-    responses => {
-        __qid__ => {
-            comment => "question comment",
-        },
-        __aid__ => {
-            time    => time(),
-            comment => "answer comment",
-            value   => "answer value",
-        },
-    }
+gotos and gotoExpressions are handled similarly as with terminalUrls. The last goto or 
+gotoExpression in the set of questions wins.
 
 =cut
 
 sub recordResponses {
-    my $self      = shift;
-    my $session   = shift;
-    my $responses = shift;
-    
+    my $self = shift;
+    my ($responses) = validate_pos( @_, { type => HASHREF } );
+
     my %mcTypes = (
-        'Agree/Disagree', 1, 'Certainty',       1, 'Concern',        1, 'Confidence', 1, 'Education',  1,
-        'Effectiveness',  1, 'Gender',          1, 'Ideology',       1, 'Importance', 1, 'Likelihood', 1,
-        'Party',          1, 'Multiple Choice', 1, 'Oppose/Support', 1, 'Race',       1, 'Risk',       1,
-        'Satisfaction',   1, 'Scale',           1, 'Security',       1, 'Threat',     1, 'True/False', 1,
-        'Yes/No',         1
+        'Agree/Disagree'  => 1,
+        Certainty         => 1,
+        Concern           => 1,
+        Confidence        => 1,
+        Education         => 1,
+        Effectiveness     => 1,
+        Gender            => 1,
+        Ideology          => 1,
+        Importance        => 1,
+        Likelihood        => 1,
+        Party             => 1,
+        'Multiple Choice' => 1,
+        'Oppose/Support'  => 1,
+        Race              => 1,
+        Risk              => 1,
+        Satisfaction      => 1,
+        Scale             => 1,
+        Security          => 1,
+        Threat            => 1,
+        'True/False'      => 1,
+        'Yes/No'          => 1,
     );
-    my %sliderTypes = ( 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1, 'Slider', 1 );
-    my %textTypes   = ( 'Currency',    'Email', 1, 'Phone Number', 1, 'Text', 1, 'Text Date', 1 ,'TextArea', 1);
-    my %fileTypes   = ( 'File Upload', 1 );
-    my %dateTypes   = ( 'Date',        'Date Range', 1 );
-    my %hiddenTypes = ( 'Hidden',      1 );
+    my %sliderTypes = (
+        'Dual Slider - Range'     => 1,
+        'Multi Slider - Allocate' => 1,
+        Slider                    => 1,
+    );
+    my %textTypes = (
+        Currency       => 1,
+        Email          => 1,
+        'Phone Number' => 1,
+        Text           => 1,
+        'Text Date'    => 1,
+        'TextArea'     => 1,
+    );
+    my %fileTypes = (
+        'File Upload' => 1,
+    );
+    my %dateTypes = (
+        Date         => 1,
+        'Date Range' => 1,
+    );
+    my %hiddenTypes = (
+        Hidden => 1,
+    );
 
-    #These were just submitted from the user, so we need to see what and how they were (un)answered.
-    my $questions = $self->nextQuestions();
-    my $qAnswered = 1;
-    my $sterminal  = 0;
-    my $terminal  = 0;
+    # We want to record responses against the "next" response section and questions, since these are
+    # the items that have just been displayed to the user.
+    my $section = $self->nextResponseSection();
+    my @questions = $self->nextQuestions();
+
+    # Handle terminal Section..
     my $terminalUrl;
-    my $goto;
-    my $gotoExpression;
-
-    my $section = $self->nextResponseSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
-
+    my $sTerminal = 0;
     if ( $section->{terminal} ) {
-        $sterminal    = 1;
+        $sTerminal   = 1;
         $terminalUrl = $section->{terminalUrl};
     }
 
-    #There were no questions in the section just displayed, so increment the lastResponse by one
-    if ( ref $questions ne 'ARRAY' ) {
+    # Handle empty Section..
+    if ( !@questions ) {
+        # No questions to process, so increment lastResponse and return
         $self->lastResponse( $self->nextResponse );
-        return [ $sterminal, $terminalUrl ];
+        return [ $sTerminal, $terminalUrl ];
     }
 
-    for my $question (@$questions) {
+    # Process Questions in Section..
+    my $terminal = 0;
+    my $allRequiredQsAnswered = 1;
+    my ($goto, $gotoExpression);
+    for my $question (@questions) {
         my $aAnswered = 0;
+
+        # Handle terminal Questions..
         if ( $question->{terminal} ) {
             $terminal    = 1;
             $terminalUrl = $question->{terminalUrl};
         }
-        $self->responses->{ $question->{id} }->{comment} = $responses->{ $question->{id} . "comment" };
+
+        # Record Question comment
+        $self->responses->{ $question->{id} }->{comment} = $responses->{ $question->{id} . 'comment' };
+
+        # Process Answers in Question..
         for my $answer ( @{ $question->{answers} } ) {
 
-            if ( defined( $responses->{ $answer->{id} } )
-                and $responses->{ $answer->{id} } =~ /\S/ )
-            {
+            # Pluck the values out of the responses hash that we want to record..
+            my $answerValue = $responses->{ $answer->{id} };
+            my $answerComment = $responses->{ $answer->{id} . 'comment' };
 
+            # Proceed if we're satisfied that response is valid..
+            if ( defined $answerValue && $answerValue =~ /\S/ ) {
                 $aAnswered = 1;
                 if ( exists $mcTypes{ $question->{questionType} } ) {
                     $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
                 }
                 else {
-                    $self->responses->{ $answer->{id} }->{value} = $responses->{ $answer->{id} };
+                    $self->responses->{ $answer->{id} }->{value} = $answerValue;
                 }
-                $self->responses->{ $answer->{id} }->{'time'} = time();
-                $self->responses->{ $answer->{id} }->{comment} = $responses->{ $answer->{id} . "comment" };
+                $self->responses->{ $answer->{id} }->{time} = time;
+                $self->responses->{ $answer->{id} }->{comment} = $answerComment;
 
+                # Handle terminal Answers..
                 if ( $answer->{terminal} ) {
                     $terminal    = 1;
                     $terminalUrl = $answer->{terminalUrl};
                 }
+                # ..and also gotos..
                 elsif ( $answer->{goto} =~ /\w/ ) {
                     $goto = $answer->{goto};
                 }
+                # .. and also gotoExpressions..
                 elsif ( $answer->{gotoExpression} =~ /\w/ ) {
                     $gotoExpression = $answer->{gotoExpression};
                 }
-            } ## end if ( defined( $responses...
-        } ## end for my $answer ( @{ $question...
-        $qAnswered = 0 if ( !$aAnswered and $question->{required} );
-        if ($aAnswered) {
-            $self->questionsAnswered( +1 );
+            }
         }
-    } ## end for my $question (@$questions)
 
-    #if all responses completed, move the lastResponse index to the last question shown
-    if ($qAnswered) {
-        $self->lastResponse( $self->lastResponse + @$questions );
-        $self->goto($goto) if ( defined $goto );
+        # Check if a required Question was skipped 
+        if ( $question->{required} && !$aAnswered  ) {
+            $allRequiredQsAnswered = 0;
+        }
+
+        # If question was answered, increment the questionsAnswered count..
+        if ($aAnswered) {
+            $self->questionsAnswered(+1);
+        }
+    }
+
+    # If all required responses were given, proceed onwards!
+    if ($allRequiredQsAnswered) {
+
+        #  Move the lastResponse index to the last question answered
+        $self->lastResponse( $self->lastResponse + @questions );
+
+        # Do any requested branching.. 
+        $self->goto($goto)                     if ( defined $goto );
         $self->gotoExpression($gotoExpression) if ( defined $gotoExpression );
     }
     else {
+        # Required responses were missing, so we don't let the Survey terminate
         $terminal = 0;
     }
-    
-    if($sterminal and $self->nextResponseSectionIndex != $self->lastResponseSectionIndex){
+
+    if ( $sTerminal && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex ) {
         $terminal = 1;
-    }     
+    }
 
     return [ $terminal, $terminalUrl ];
-} ## end sub recordResponses
+}
 
 #-------------------------------------------------------------------
 
@@ -735,11 +792,9 @@ sub getPreviousAnswer {
 
 =head2 nextQuestions
 
-Returns an array ref of the next questions in the survey.  The number of questions
+Returns an array of the next questions in the survey.  The number of questions
 returned is set by the questionsPerPage property of the next section, as determined
 by nextResponseSectionIndex rather than logical section ordering.
-
-If no questions are available, then it returns an empty array ref.  
 
 Each element of the array ref is a question data structure, from the
 WebGUI::Asset::Wobject::Survey::SurveyJSON class, with a section sid field (index of
@@ -757,7 +812,7 @@ All questions and answers are safe copies of the survey data.
 sub nextQuestions {
     my $self = shift;
 
-    return [] if $self->surveyEnd;
+    return if $self->surveyEnd;
 
     my $nextResponseSectionIndex = $self->nextResponseSectionIndex;
 
@@ -767,7 +822,7 @@ sub nextQuestions {
     my $section = $self->nextResponseSection();
     $section->{'text'} =~ s/\[\[([^\%]*?)\]\]/$self->getPreviousAnswer($1)/eg;
 
-    my $questions;
+    my @questions;
     for ( my $i = 1; $i <= $qPerPage; $i++ ) {
         my $qAddy = $self->surveyOrder->[ $self->lastResponse + $i ];
         next
@@ -787,10 +842,10 @@ sub nextQuestions {
             $ans{id} = "$$qAddy[0]-$$qAddy[1]-$_";
             push( @{ $question{answers} }, \%ans );
         }
-        push( @$questions, \%question );
-    } ## end for ( my $i = 1; $i <= ...
-    return $questions;
-} ## end sub nextQuestions
+        push @questions, \%question;
+    }
+    return @questions;
+}
 
 #-------------------------------------------------------------------
 
@@ -858,11 +913,7 @@ sub returnResponseForReporting {
 
 #-------------------------------------------------------------------
 
-#the actual responses to the survey.  A response is for a question and is accessed by the exact same address as a survey member.
-#Questions only contain the comment and an array of answer Responses.
-#Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, and the assetId to the uploaded file.
-
-=head2 session
+=head2 response
 
 Accessor for the Perl hash containing Response data
 
@@ -875,10 +926,7 @@ sub response {
 
 =head2 responses
 
-Returns a reference to the actual responses to the survey.  A response is for a question and
-is accessed by the exact same address as a survey member.  Questions only contain the comment
-and an array of answer Responses.  Answers only contain, entered text, entered verbatim,
-their index in the Survey Question Answer array, and the assetId to the uploaded file.
+Mutator for the L<"responses"> property. 
 
 Note, this is an unsafe reference.
 
@@ -890,14 +938,12 @@ sub responses {
     if ( defined $responses ) {
         $self->response->{responses} = $responses;
     }
-    else {
-        return $self->response->{responses};
-    }
+    return $self->response->{responses};
 }
 
 #-------------------------------------------------------------------
 
-=head2 responses
+=head2 survey
 
 Returns a referece to the SurveyJSON object that this object was created with.
 
