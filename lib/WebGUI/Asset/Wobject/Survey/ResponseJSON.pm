@@ -18,9 +18,12 @@ Package WebGUI::Asset::Wobject::Survey::ResponseJSON
 
 =head1 DESCRIPTION
 
-Helper class for WebGUI::Asset::Wobject::Survey. "Reponse" in the context of
-this Wobject refers to a Survey response (not a single Question response).
-ie, this class represents the complete state of a user's response to a Survey instance.
+Helper class for WebGUI::Asset::Wobject::Survey. The class deals with both a 
+"reponse" in the sense of an overall Survey response, and also "response" in 
+the sense of a single Question response (which is closely related to an Answer but
+not quite the same).
+
+As a whole, this class represents the complete state of a user's response to a Survey instance.
 
 At the heart of this class is a perl hash that can be serialized
 as JSON to the database to allow for storage and retrieval of the complete state
@@ -38,7 +41,7 @@ This package is not intended to be used by any other Asset in WebGUI.
 
 =head2 surveyOrder
  
-This data strucutre is an array of Survey addresses (see  
+This data strucutre is an array (reference) of Survey addresses (see  
 L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
 in which items are presented to the user.
 
@@ -62,23 +65,32 @@ no questions, or no addresses, those array elements will not be present.
 
 =head2 responses
 
-A response is for a question and is accessed by the exact same address as a survey member. 
-Questions only contain the comment and an array of answer Responses.  
-Answers only contain, entered text, entered verbatim, their index in the Survey Question Answer array, 
-and the assetId to the uploaded file.
+This data structure stores a snapshot of all question responses. Both question data and answer data
+is stored in this hash reference.
 
-In general, the responses data structure looks like this:
+Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
+Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<"aIndex">.
+ 
+Question entries only contain a comment field:
+ {
+     ...
+     questionId => {
+         comment => "question comment",
+     }
+     ...
+ }
+          
+Answers entries contain: value (the recorded value), time and comment fields.
 
-    responses => {
-        __qid__ => {
-            comment => "question comment",
-        },
-        __aid__ => {
-            time    => time(),
-            comment => "answer comment",
-            value   => "answer value",
-        },
-    }
+ {
+     ...
+     answerId => {
+         value   => "answer value",
+         time    => time(),
+         comment => "answer comment",
+    },
+     ...
+ }
 
 =cut
 
@@ -407,13 +419,12 @@ if all required questions have been answered.
 A hash ref of form param data. Each element should look like:
 
     {
-        "__qid__comment" => "question comment",
-        "__aid__"        => "answer",
-        "__aid__comment" => "answer comment",
+        "questionId-comment"    => "question comment",
+        "answerId"              => "answer",
+        "answerId-comment"      => "answer comment",
     }
 
-where __qid__ is a question id, as described in L<"nextQuestions">, and __aid__ is an
-answer id, also described there.
+See L<"questionId"> and L<"answerId">.
 
 =head3 Terminal processing
 
@@ -838,34 +849,6 @@ sub parseGotoExpression {
         expression => $rest,
     };
 }
-
-# This method is unnecessary, as it can be expressed as:
-# $self->recordedResponses()->{$questionParam};
-#
-#=head2 getPreviousAnswer
-#
-#=cut
-#
-#sub getPreviousAnswer {
-#    my $self          = shift;
-#    my $questionParam = shift;
-#    
-#    for my $address ( @{ $self->surveyOrder } ) {
-#        my $question = $self->survey->question( $address );
-#        if ( $question->{variable} eq $questionParam ) {
-#            
-#            # Iterate over answers in the question..
-#            for ( 0 .. @{ $self->survey->answers( $address ) } ) {
-#                use Data::Dumper;
-#                $self->session->log->warn(Dumper($_));
-#                if ( exists $self->responses->{ $address->[0] . "-" . $address->[1] . "-" . $_ } ) {
-#                    return $self->responses->{ $address->[0] . "-" . $address->[1] . "-" . $_ }->{value};
-#                }
-#            }
-#        }
-#    }
-#}
-
 
 #-------------------------------------------------------------------
 
