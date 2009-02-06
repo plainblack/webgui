@@ -67,11 +67,11 @@ May be "unread", "pending", or "completed". Defaults to "pending".
 
 You should set this to "pending" if the message requires an action which will later be completed.
 
-WebGUI::Inbox->create( $session, { status => "pending"} )
+WebGUI::Inbox::Message->create( $session, { status => "pending"} )
 
 You should set this to "unread" if this is a message without an action, such as a notification.
 
-WebGUI::Inbox->create( $session, { status => "unread" } );
+WebGUI::Inbox::Message->create( $session, { status => "unread" } );
 
 You should only set this to "completed" if this is an action that would normally be "pending" but for some reason
 requries no further action.  For instance, if the user submitting some content is also the approver you may choose
