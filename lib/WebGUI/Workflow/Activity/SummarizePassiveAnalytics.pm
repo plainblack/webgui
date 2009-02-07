@@ -81,7 +81,7 @@ sub execute {
     my $endTime = time() + $self->getTTL;
     my $deltaInterval = $self->get('deltaInterval');
 
-    my $passive = 'select * from passiveLog where userId <> 1 order by userId, sessionId, timeStamp';
+    my $passive = q{select * from passiveLog where userId <> '1' order by userId, sessionId, timeStamp};
     my $sth;
     my $lastUserId;
     my $lastSessionId;
