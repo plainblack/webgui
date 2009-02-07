@@ -810,6 +810,25 @@ sub www_takeSurvey {
         }
     };
 
+    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/container/container-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/logger/logger-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/resize/resize-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/slider/slider-min.js'), {type =>
+    'text/javascript'});
+
     my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
     return $self->session->style->process( $out, $self->get("styleTemplateId") );
 } ## end sub www_takeSurvey
