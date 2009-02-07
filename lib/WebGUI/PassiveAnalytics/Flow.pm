@@ -110,7 +110,7 @@ sub www_editRuleflow {
     );
     $f->integer(
         name      => 'pauseInterval',
-        value     => 300,
+        value     => $session->form->get('pauseInterval') || 300,
         label     => $i18n->get('pause interval'),
         hoverHelp => $i18n->get('pause interval help'),
     );

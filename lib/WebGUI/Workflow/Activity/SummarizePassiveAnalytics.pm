@@ -101,7 +101,6 @@ sub execute {
     else {
         $sth  = $session->db->read($passive);
         my $logLine    = $sth->hashRef();
-        $logLine       = $sth->hashRef();
         $lastUserId    = $logLine->{userId};
         $lastSessionId = $logLine->{sessionId};
         $lastTimeStamp = $logLine->{timeStamp};
