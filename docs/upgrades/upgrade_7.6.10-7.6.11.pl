@@ -34,19 +34,19 @@ hideGalleryAlbums($session);
 removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
 removeProcessRecurringPaymentsFromConfig($session);
+noSessionSwitch($session);
 
 fixDottedAssetIds($session);  ##This one should run last
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub noSessionSwitch {
+    my $session = shift;
+    print "\tAdding noSession switch to Workflow Instances..." unless $quiet;
+    $session->db->write("alter table WorkflowInstance add column noSession boolean not null default 0");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub removeProcessRecurringPaymentsFromConfig {

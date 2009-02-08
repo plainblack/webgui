@@ -1,4 +1,6 @@
 7.6.11
+ - Added a switch to allow the use of non-WebGUI objects with the Workflow
+   engine.
  - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
  - fixed #9596: caching now takes into account the correct parameter for pagination
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
