@@ -722,7 +722,7 @@ sub www_getCredentials {
     });
     $var->{emailField} = WebGUI::Form::email($session, {
         name  => 'email',
-        value => $self->session->form->process("email") || $u->profileField('email'),
+        value => $form->process('email', 'email') || $addressData->{ email } || $u->profileField('email'),
     });
 
     # Credit card information
