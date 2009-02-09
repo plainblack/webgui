@@ -126,12 +126,18 @@ EOSQL1
         $instance->setScratch('logIndex', $logIndex);
         return $self->WAITING(1);
     }
+    my $message = 'Passive analytics is done.';
+    if ($session->setting->get('passiveAnalyticsDeleteDelta')) {
+        $session->log->info('Clearing Passive Analytics delta log');
+        $session->db->write('delete from deltaLog');
+        $message .= '  The delta log has been cleaned up.';
+    }
     my $inbox = WebGUI::Inbox->new($self->session);
     $inbox->addMessage({
         status  => 'unread',
         subject => 'Passive analytics is done',
         userId  => $self->get('userId'),
-        message => 'Passive analytics is done',
+        message => $message,
     });
 
     return $self->COMPLETE;
