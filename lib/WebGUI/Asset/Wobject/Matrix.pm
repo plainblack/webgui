@@ -577,7 +577,7 @@ sub view {
             assetData.assetId
         order by rating.meanValue ";
         
-        $data = $db->quickHashRef($sql." desc limit 1",[$self->getId,$category]);
+        $data = $db->quickHashRef($sql." desc limit 1",[$category,$self->getId]);
         push(@{ $var->{best_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,
@@ -586,7 +586,7 @@ sub view {
             median=>$data->{medianValue},
             count=>$data->{countValue}
             });
-        $data = $db->quickHashRef($sql." asc limit 1",[$self->getId,$category]);
+        $data = $db->quickHashRef($sql." asc limit 1",[$category,$self->getId]);
         push(@{ $var->{worst_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,
