@@ -35,6 +35,7 @@ installPassiveAnalyticsRule($session);
 installPassiveAnalyticsConfig($session);
 installWorkflow($session);
 #addAdminGroup($session);
+addPassiveAnalyticsSettings($session);
 
 finish($session);
 
@@ -90,6 +91,17 @@ sub installPassiveAnalyticsRule {
     print "\tInstall Passive Analytics rule table, via Crud... ";
     # and here's our code
     WebGUI::PassiveAnalytics::Rule->crud_createTable($session);
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the PassiveAnalytics Rule table
+sub addPassiveAnalyticsSettings {
+    my $session = shift;
+    print "\tInstall Passive Analytics settings... ";
+    # and here's our code
+    $session->setting->add('passiveAnalyticsInterval', 300);
+    $session->setting->add('passiveAnalyticsDeleteDelta', 0);
     print "DONE!\n";
 }
 

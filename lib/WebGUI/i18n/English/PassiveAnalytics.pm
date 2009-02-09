@@ -20,6 +20,16 @@ our $I18N = {
 		lastUpdated => 0,
 	},
 
+	'default pause interval' => {
+		message => q|Default Pause Threshold|,
+		lastUpdated => 0,
+	},
+
+	'default pause interval help' => {
+		message => q|Set the default pause interval displayed the user sees in the Passive Analytics screen.|,
+		lastUpdated => 0,
+	},
+
 	'other' => {
 		message => q|Other|,
 		lastUpdated => 0,
@@ -65,6 +75,12 @@ home\?func=match, or<br />
 		context => q||
 	},
 
+	'Passive Analytics Settings' => {
+		message => q|Passive Analytics Settings|,
+		lastUpdated => 0,
+		context => q||
+	},
+
 	'Edit Rule' => {
 		message => q|Edit Rule|,
 		lastUpdated => 0,
@@ -91,6 +107,18 @@ home\?func=match, or<br />
 
 	'Begin analysis' => {
 		message => q|Begin analysis|,
+		lastUpdated => 0,
+		context => q|Button label to begin analyzing the logs.|
+	},
+
+	'Delete Delta Table?' => {
+		message => q|Delete Delta Table?|,
+		lastUpdated => 0,
+		context => q|Button label to begin analyzing the logs.|
+	},
+
+	'Delete Delta Table? help' => {
+		message => q|Should the delta table be cleaned up after the Passive Analytics analyzer is done?|,
 		lastUpdated => 0,
 		context => q|Button label to begin analyzing the logs.|
 	},

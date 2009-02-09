@@ -110,7 +110,7 @@ sub www_editRuleflow {
     );
     $f->integer(
         name      => 'pauseInterval',
-        value     => $session->form->get('pauseInterval') || 300,
+        value     => $session->form->get('pauseInterval') || $session->setting->get('passiveAnalyticsInterval') || 300,
         label     => $i18n->get('pause interval'),
         hoverHelp => $i18n->get('pause interval help'),
     );
@@ -131,6 +131,7 @@ sub www_editRuleflow {
     }
     $steps .= '<tr><td>&nbsp;</td><td>Other</td></tbody></table><div style="clear: both;"></div>';
     my $ac = WebGUI::AdminConsole->new($session,'passiveAnalytics');
+    $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=settings'), $i18n->get('Passive Analytics Settings'));
     return $ac->render($error.$f->print.$addmenu.$steps, 'Passive Analytics');
 }
 
@@ -249,6 +250,66 @@ sub www_promoteRule {
         $rule->promote;
     }
 	return www_editRuleflow($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_settings ( session )
+
+Configure Passive Analytics settings.
+
+=cut
+
+sub www_settings {
+    my $session = shift;
+    my $error   = shift;
+    return $session->privilege->insufficient() unless canView($session);
+    if ($error) {
+        $error = qq|<div class="error">$error</div>\n|;
+    }
+    my $i18n = WebGUI::International->new($session, "PassiveAnalytics");
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->hidden(
+        name=>'op',
+        value=>'passiveAnalytics'
+    );
+    $f->hidden(
+        name=>'func',
+        value=>'settingsSave'
+    );
+    $f->integer(
+        name      => 'pauseInterval',
+        value     => $session->form->get('pauseInterval') || $session->setting->get('passiveAnalyticsInterval') || 300,
+        label     => $i18n->get('default pause interval'),
+        hoverHelp => $i18n->get('default pause interval help'),
+    );
+    $f->yesNo(
+        name      => 'deleteDelta',
+        value     => $session->form->get('deleteDelta') || $session->setting->get('passiveAnalyticsDeleteDelta') || 0,
+        label     => $i18n->get('Delete Delta Table?'),
+        hoverHelp => $i18n->get('Delete Delta Table? help'),
+    );
+    $f->submit();
+    my $ac = WebGUI::AdminConsole->new($session,'passiveAnalytics');
+    $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=editRuleflow'), $i18n->get('Passive Analytics'));
+    return $ac->render($error.$f->print, 'Passive Analytics Settings');
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_settingsSave ( session )
+
+Save Passive Analytics settings.
+
+=cut
+
+sub www_settingsSave {
+    my $session = shift;
+    return $session->privilege->insufficient() unless canView($session);
+    my $form = $session->form;
+    $session->setting->set('passiveAnalyticsInterval',    $form->process('pauseInterval', 'integer'));
+    $session->setting->set('passiveAnalyticsDeleteDelta', $form->process('deleteDelta',   'yesNo'  ));
+    return www_settings($session);
 }
 
 1;
