@@ -175,9 +175,12 @@ Displays a form to edit the properties rule.
 =cut
 
 sub www_editRule {
-    my $session = shift;
+    my ($session, $error) = @_;
     return $session->privilege->insufficient() unless canView($session);
 
+    if ($error) {
+        $error = qq|<div class="error">$error</div>\n|;
+    }
     ##Make a PassiveAnalytics rule to use to populate the form.
     my $ruleId = $session->form->get('ruleId'); 
     my $rule;
@@ -204,7 +207,7 @@ sub www_editRule {
     if ($ruleId eq 'new') {
         $rule->delete;
     }
-	return $ac->render($form->print,$i18n->get('Edit Rule'));
+	return $ac->render($error.$form->print,$i18n->get('Edit Rule'));
 }
 
 #-------------------------------------------------------------------
@@ -217,8 +220,19 @@ Saves the results of www_editRule().
 
 sub www_editRuleSave {
     my $session = shift;
+    my $form    = $session->form;
     return $session->privilege->insufficient() unless canView($session);
-    my $ruleId = $session->form->get('ruleId');
+    my $regexp = $form->get('regexp');
+    eval {
+        'fooBarBaz' =~ qr/$regexp/;
+    };
+    if ($@) {
+        $session->log->warn("Error: $@");
+        my $error = $@;
+        $error =~ s/at \S+?\.pm line \d+.*$//;
+        return www_editRule($session, $error);
+    }
+    my $ruleId = $form->get('ruleId');
     my $rule;
     if ($ruleId eq 'new') {
         $rule = WebGUI::PassiveAnalytics::Rule->create($session, {});
