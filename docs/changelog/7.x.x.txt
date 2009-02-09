@@ -32,6 +32,7 @@
  - fixed #9611: Transaction Manage View, no go in ie6 (Henry Tang, Long Term Results B.v.)
  - fixed #9686: Importing a package twice locks assets forever.
  - fixed #9671: Survey - breaks admin bar
+ - fixed #9702: Phone number on EMS badges not saving
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
