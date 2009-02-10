@@ -4325,6 +4325,19 @@ Users may override this setting in their profile.
             lastUpdated => 1230930518,
         },
 
+        'use recaptcha' => {
+            message     => q{Use reCAPTCHA?}
+        },
+        'use recaptcha description' => {
+            message     => q{reCAPTCHA is a free CAPTCHA service that helps to digitize books.  It requires a key set generated for your domain, available from <a href="http://recaptcha.net/">http://recaptcha.net/</a>.}
+        },
+
+        'recaptcha private key' => {
+            message     => 'reCAPTCHA Private Key'
+        },
+        'recaptcha public key' => {
+            message     => 'reCAPTCHA Public Key'
+        },
 };
 
 1;

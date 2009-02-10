@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::Text';
 use WebGUI::International;
 use WebGUI::Storage;
+use LWP::UserAgent;
 
 =head1 NAME
 
@@ -101,6 +102,27 @@ Returns a boolean indicating whether the string typed matched the image.
 
 sub getValue {
     my $self        = shift;
+
+    if ($self->session->setting->get('useRecaptcha')) {
+        my $privKey = $self->session->setting->get('recaptchaPrivateKey');
+        my $challenge = $self->session->form->param('recaptcha_challenge_field');
+        my $response = $self->session->form->param('recaptcha_response_field');
+
+        my $ua = LWP::UserAgent->new;
+        my $res = $ua->post('http://api-verify.recaptcha.net/verify', {
+            privatekey  => $privKey,
+            remoteip    => $self->session->env->getIp,
+            challenge   => $challenge,
+            response    => $response,
+        });
+        if ($res->is_success) {
+            my ($answer, $error) = split /\n/, $res->content, 2;
+            $self->{_error} = $error;
+            return $answer eq 'true';
+        }
+        return undef;
+    }
+
     my $value       = $self->SUPER::getValue(@_); 
     my $challenge   = $self->session->scratch->get("captcha_".$self->get("name"));
     $self->session->scratch->delete("captcha_".$self->get("name"));
@@ -133,14 +155,43 @@ Renders a captcha field.
 =cut
 
 sub toHtml {
-        my $self = shift;
- 	my $storage = WebGUI::Storage->createTemp($self->session);
-        my ($filename, $challenge) = $storage->addFileFromCaptcha;
-        $self->set("size", 6);
-	$self->set("maxlength", 6);
-	$self->session->scratch->set("captcha_".$self->get("name"), $challenge);
-	return $self->SUPER::toHtml.'<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>';
+    my $self = shift;
+
+    if ($self->session->setting->get('useRecaptcha')) {
+        my $env = $self->session->env;
+        my $pubKey = $self->session->setting->get('recaptchaPublicKey');
+        my $server = "http://api.recaptcha.net";
+        if ($env->get("HTTPS") eq "on" || $env->get("SSLPROXY")) {
+            $server = "http://api-secure.recaptcha.net";
+        }
+        return
+            '<script type="text/javascript" src="' . $server . '/challenge?k=' . $pubKey . '"></script>'
+            . '<noscript>'
+            . '<iframe src="' . $server . '/noscript?k=' . $pubKey
+            . '" height="300" width="500" frameborder="0"></iframe>'
+            . '<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>'
+            . '<input type="hidden" name="recaptcha_response_field" value="manual_challenge" />'
+            . '</noscript>';
+    }
+
+    my $storage = WebGUI::Storage->createTemp($self->session);
+    my ($filename, $challenge) = $storage->addFileFromCaptcha;
+    $self->set("size", 6);
+    $self->set("maxlength", 6);
+    $self->session->scratch->set("captcha_".$self->get("name"), $challenge);
+    return $self->SUPER::toHtml.'<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>';
 }
+
+sub getErrorMessage {
+    my $self = shift;
+    my $session = $self->session;
+	my $i18n = WebGUI::International->new($session,"Form_Captcha");
+    if ($session->setting->get('useRecaptcha')) {
+        return $i18n->get("recaptcha failure");
+    }
+    return $i18n->get("captcha failure");
+}
+
 
 1;
 

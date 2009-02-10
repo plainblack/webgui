@@ -35,6 +35,7 @@ removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
 removeProcessRecurringPaymentsFromConfig($session);
 noSessionSwitch($session);
+addReCaptchaSettings($session);
 
 fixDottedAssetIds($session);  ##This one should run last
 finish($session); # this line required
@@ -55,6 +56,27 @@ sub removeProcessRecurringPaymentsFromConfig {
 
     $session->config->deleteFromArray('workflowActivities/None',
         'WebGUI::Workflow::Activity::ProcessRecurringPayments');
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addReCaptchaSettings {
+    my $session = shift;
+    print "\tAdding settings for reCAPTCHA..." unless $quiet;
+    my $currentSetting;
+
+    $currentSetting = $session->setting->get('useRecaptcha');
+    $session->setting->remove('useRecaptcha');
+    $session->setting->add('useRecaptcha', $currentSetting);
+
+    $currentSetting = $session->setting->get('recaptchaPublicKey');
+    $session->setting->remove('recaptchaPublicKey');
+    $session->setting->add('recaptchaPublicKey', $currentSetting);
+
+    $currentSetting = $session->setting->get('recaptchaPrivateKey');
+    $session->setting->remove('recaptchaPrivateKey');
+    $session->setting->add('recaptchaPrivateKey', $currentSetting);
 
     print "Done.\n" unless $quiet;
 }

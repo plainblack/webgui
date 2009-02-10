@@ -21,6 +21,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Form::Captcha;
 use Encode ();
 
 our @ISA = qw(WebGUI::Auth);
@@ -224,8 +225,9 @@ sub createAccountSave {
     my $error;
     $error = $self->error unless($self->validUsername($username));
     if ($setting->get("webguiUseCaptcha")) {
-        unless ($form->process('authWebGUI.captcha', "Captcha")) {
-            $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
+        my $form = WebGUI::Form::Captcha->new($session, {name => 'authWebGUI.captcha'});
+        if (! $form->getValue) {
+            $error .= '<li>' . $form->getErrorMessage . '</li>';
         }
     }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));

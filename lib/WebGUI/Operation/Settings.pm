@@ -240,6 +240,28 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "yesNo",
+        name            => "useRecaptcha",
+        label           => $i18n->get('use recaptcha'),
+        hoverHelp       => $i18n->get('use recaptcha description'),
+        defaultValue    => $setting->get('useRecaptcha'),
+    });
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "text",
+        name            => "recaptchaPublicKey",
+        label           => $i18n->get('recaptcha public key'),
+        defaultValue    => $setting->get('recaptchaPublicKey'),
+    });
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "text",
+        name            => "recaptchaPrivateKey",
+        label           => $i18n->get('recaptcha private key'),
+        defaultValue    => $setting->get('recaptchaPrivateKey'),
+    });
 	# messaging settings
 	push(@fields, {
 		tab=>"messaging",
