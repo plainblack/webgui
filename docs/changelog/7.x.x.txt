@@ -1,4 +1,5 @@
 7.6.11
+ - fixed #9629: override stringify date format to use java default format.
  - Added a switch to allow the use of non-WebGUI objects with the Workflow
    engine.
  - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
