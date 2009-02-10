@@ -20,8 +20,6 @@ use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 
-use Data::Dumper;
-
 #-------------------------------------------------------------------
 
 =head2 definition ( session, [definition] )

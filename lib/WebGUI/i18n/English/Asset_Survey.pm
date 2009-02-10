@@ -83,7 +83,7 @@ our $I18N = {
     },
 
 	'section name' => {
-		message => q|Section name:|,
+		message => q|Section title:|,
 		lastUpdated => 1224686319
 	},
     'section name description' => {
@@ -101,7 +101,7 @@ our $I18N = {
         lastUpdated => 0 
     },
 	'section custom variable name' => {
-		message => q|Section custom variable name:|,
+		message => q|Section variable name:|,
 		lastUpdated => 1224686319
 	},
     'section custom variable name description' => {
@@ -110,7 +110,7 @@ our $I18N = {
         lastUpdated => 0
     },
 	'section branch goto variable name' => {
-		message => q|Section branch goto variable name:|,
+		message => q|Jump to:|,
 		lastUpdated => 1224686319
 	},
     'section branch goto variable name description' => {
@@ -260,21 +260,21 @@ our $I18N = {
         context => q|Description of the 'allow comment' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'cols' => {
-		message => q|Cols:|,
+	'comment cols' => {
+		message => q|Comment Cols:|,
 		lastUpdated => 1224686319
 	},
     'cols description' => {
-        message => q|The number of columns of the textarea input.|,
+        message => q|The number of columns used for the comment TextArea input field.|,
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'rows' => {
-		message => q|Rows:|,
+	'comment rows' => {
+		message => q|Comment Rows:|,
 		lastUpdated => 1224686319
 	},
     'rows description' => {
-        message => q|The number of rows of the textarea input.|,
+        message => q|The number of rows shown for the comment TextArea input field.|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
@@ -329,11 +329,11 @@ our $I18N = {
         lastUpdated => 0
     },
 	'recorded answer' => {
-		message => q|Recorded answer:|,
+		message => q|Answer title:|,
 		lastUpdated => 1224686319
 	},
     'recorded answer description' => {
-        message => q|The answer that will be recorded in the database. The recorded answer will be displayed in a multiple choice question's buttons, only if the question's 'Show text in button' property is set to yes. Otherwise the multiple choice buttons will be empty. |,
+        message => q|Text to display inside multiple-choice answer buttons (only if 'Show text in button' is enabled for this question).|,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -350,8 +350,13 @@ our $I18N = {
         context => q|Description of the 'jump to' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
+    'jump expression description' => {
+        message => q|An expression used to control complex branching based user responses to previous questions. A branch expression is made up of a list of rules, one per line, along with a branch target for each rule. |,
+        context => q|Description of the 'jump expression' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'text answer' => {
-		message => q|Text answer|,
+		message => q|TextArea|,
 		lastUpdated => 1224686319
 	},
 	'is this the correct answer' => {
@@ -371,34 +376,30 @@ our $I18N = {
 		message => q|No|,
 		lastUpdated => 1224686319
 	},
-	'min' => {
-		message => q|Min|,
-		lastUpdated => 1224686319
-	},
-	'max' => {
-		message => q|Max|,
+	'min label' => {
+		message => q|Slider Min|,
 		lastUpdated => 1224686319
 	},
     'min description' => {
-        message => q|Set the min value of this answer for slider type questions.|,
+        message => q|The minimum value of this answer for slider type questions.|,
         context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
 	'max label' => {
-		message => q|Max|,
+		message => q|Slider Max|,
 		lastUpdated => 1224686319
 	},
     'max description' => {
-        message => q|Set the max value of this answer for slider type questions.|,
+        message => q|The maximum value of this answer for slider type questions.|,
         context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
 	'step label' => {
-		message => q|Step|,
+		message => q|Slider Step|,
 		lastUpdated => 1224686319
 	},
     'step description' => {
-        message => q|Set the step value of this answer for slider type questions.|,
+        message => q|The step value of this answer for slider type questions.|,
         context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -407,7 +408,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'verbatim description' => {
-        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text.|,
+        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
         context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -416,7 +417,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'answer value description' => {
-        message => q|Enter a value for this answer.|,
+        message => q|Assign a numeric scores to this answers. Used in question scoring and jump expressions.|,
         context => q|Description of the 'answer value' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -1157,18 +1158,6 @@ section/answer.|,
         lastUpdated => 0,
     },
 
-    'min' => {
-        message => q|The min value of this answer for slider type questions.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
-    },
-
-    'max' => {
-        message => q|The max value of this answer for slider type questions..|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
-    },
-
     'step' => {
         message => q|The step value of this answer for slider type questions..|,
         context => q|Description of a template variable for a template Help page.|,
@@ -1182,13 +1171,13 @@ section/answer.|,
     },
 
     'textCols' => {
-        message => q|The number of columns for textarea answers.|,
+        message => q|The number of columns for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'textRows' => {
-        message => q|The number of rows for textarea answers.|,
+        message => q|The number of rows for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
