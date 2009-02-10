@@ -1,3 +1,6 @@
+7.6.12
+ - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
+
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
  - fixed #9629: override stringify date format to use java default format.
