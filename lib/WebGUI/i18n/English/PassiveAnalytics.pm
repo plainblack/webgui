@@ -123,6 +123,12 @@ home\?func=match, or<br />
 		context => q|Button label to begin analyzing the logs.|
 	},
 
+	'Regular Expression Error:' => {
+		message => q|Regular Expression Error:|,
+		lastUpdated => 0,
+		context => q|Error displayed when a user enters in a bad regular expression.  This label will be followed by the error from perl.|
+	},
+
 };
 
 1;

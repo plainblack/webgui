@@ -230,6 +230,8 @@ sub www_editRuleSave {
         $session->log->warn("Error: $@");
         my $error = $@;
         $error =~ s/at \S+?\.pm line \d+.*$//;
+        my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
+        $error = join ' ', $i18n->get('Regular Expression Error:'), $error;
         return www_editRule($session, $error);
     }
     my $ruleId = $form->get('ruleId');
