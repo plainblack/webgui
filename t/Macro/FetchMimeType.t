@@ -19,51 +19,30 @@ use Test::More; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-use LWP::MediaTypes;
-
-my $recentModule = $LWP::MediaTypes::VERSION > 5.800;
-
 my @testSets = (
 	{
 		input  => 'webgui.txt',
-		newput => 'text/plain',
-		oldput => 'text/plain',
+		output => 'text/plain',
 		comment => q|text|,
 	},
 	{
 		input  => 'plainblack.gif',
-		newput => 'image/gif',
-		oldput => 'image/gif',
+		output => 'image/gif',
 		comment => q|gif|,
 	},
 	{
 		input  => 'background.jpg',
-		newput => 'image/jpeg',
-		oldput => 'image/jpeg',
+		output => 'image/jpeg',
 		comment => q|jpeg|,
 	},
 	{
-		input  => 'colorPicker.js',
-		newput => 'application/x-javascript',
-		oldput => 'application/octet-stream',
-		comment => q|javascript|,
-	},
-	{
-		input  => 'favIcon.ico',
-		newput => 'image/vnd.microsoft.icon',
-		oldput => 'application/octet-stream',
-		comment => q|octet-stream for unknown type|,
-	},
-	{
 		input  => '',
-		newput => 'application/octet-stream',
-		oldput => 'application/octet-stream',
+		output => 'application/octet-stream',
 		comment => q|Null path returns application/octet-stream|,
 	},
 	{
 		input  => undef,
-		newput => undef,
-		oldput => undef,
+		output => undef,
 		comment => q|Undef path returns undef|,
 	},
 );
@@ -86,8 +65,7 @@ foreach my $testSet (@testSets) {
 		 ? join '/', WebGUI::Test->root, 'www/extras', $testSet->{input}
 		 : $testSet->{input};
 	my $output = WebGUI::Macro::FetchMimeType::process($session, $file);
-    my $expected = $recentModule ? $testSet->{newput} : $testSet->{oldput};
-	is($output, $expected, $testSet->{comment} );
+	is($output, $testSet->{output}, $testSet->{comment} );
 }
 
 }
