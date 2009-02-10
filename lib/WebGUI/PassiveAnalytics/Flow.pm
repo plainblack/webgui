@@ -25,6 +25,19 @@ running them.
 
 #----------------------------------------------------------------------------
 
+=head2 analysisActive ( session )
+
+Returns true if an instance of the PassiveAnalytics workflow is active.
+
+=cut
+
+sub analysisActive {
+    my $session     = shift;
+    return $session->db->quickScalar(q!select count(*) from WorkflowInstance where workflowId='PassiveAnalytics000001'!);
+}
+
+#----------------------------------------------------------------------------
+
 =head2 canView ( session [, user] )
 
 Returns true if the user can administrate this operation. user defaults to 
@@ -114,7 +127,12 @@ sub www_editRuleflow {
         label     => $i18n->get('pause interval'),
         hoverHelp => $i18n->get('pause interval help'),
     );
-    $f->submit(value => $i18n->get('Begin analysis'));
+    if (analysisActive($session)) {
+        $f->raw('Passive Analytics analysis is currently active');
+    }
+    else {
+        $f->submit(value => $i18n->get('Begin analysis'));
+    }
     my $steps = '<table class="content"><tbody>';
     my $getARule = WebGUI::PassiveAnalytics::Rule->getAllIterator($session);
     my $icon = $session->icon;
@@ -146,6 +164,8 @@ Saves the results of www_editRuleflow()
 sub www_editRuleflowSave {
     my $session = shift;
     return $session->privilege->insufficient() unless canView($session);
+    return www_editRuleflow($session, 'Passive Analytics is already active.  Please do not try to subvert the UI in the future')
+        if analysisActive($session);
     my $workflow = WebGUI::Workflow->new($session, 'PassiveAnalytics000001');
     return www_editRuleflow($session, "The Passive Analytics workflow has been deleted.  Please contact an Administrator immediately.") unless defined $workflow;
     my $delta = $session->form->process('pauseInterval','integer');
