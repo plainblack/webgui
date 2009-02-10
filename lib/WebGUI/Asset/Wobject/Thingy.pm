@@ -1517,7 +1517,7 @@ sub www_deleteThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -1528,11 +1528,11 @@ sub www_deleteThingDataViaAjax {
         $self->deleteThingData($thingId,$thingDataId);
 
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode({message => "Data with thingDataId $thingDataId was deleted."});
+        return JSON->new->encode({message => "Data with thingDataId $thingDataId was deleted."});
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you specified can not be found."});
+        return JSON->new->encode({message => "The thingId you specified can not be found."});
     }
 }
 
@@ -2455,7 +2455,7 @@ sub www_editThingDataSaveViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2467,19 +2467,19 @@ sub www_editThingDataSaveViaAjax {
 
         if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
             $session->http->setStatus("400", "Bad Request");
-            return JSON->new->utf8->encode({message => $i18n->get("has entered max per user message")});
+            return JSON->new->encode({message => $i18n->get("has entered max per user message")});
         }
 
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
     	if ($errors){
 	    $session->http->setStatus("400", "Bad Request");
-            return JSON->new->utf8->encode($errors);
+            return JSON->new->encode($errors);
     	}
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2568,7 +2568,7 @@ sub www_getThingViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't return thing properties without a thingId."});
+        return JSON->new->encode({message => "Can't return thing properties without a thingId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2586,11 +2586,11 @@ sub www_getThingViaAjax {
         $thingProperties->{field_loop} = \@field_loop;
         
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode($thingProperties);
+        return JSON->new->encode($thingProperties);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2620,11 +2620,11 @@ sub www_getThingsViaAjax {
         }
     }
     if (scalar @visibleThings > 0){
-        return JSON->new->utf8->encode(\@visibleThings);
+        return JSON->new->encode(\@visibleThings);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "No visible Things were found in this Thingy."});
+        return JSON->new->encode({message => "No visible Things were found in this Thingy."});
     }
 }
 
@@ -2982,7 +2982,7 @@ sub www_searchViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't perform search without a thingId."});
+        return JSON->new->encode({message => "Can't perform search without a thingId."});
     }
 
     if ($thingProperties->{thingId}){
@@ -2993,11 +2993,11 @@ sub www_searchViaAjax {
         my $var = $self->getSearchTemplateVars($thingId,$thingProperties);
 
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode($var);
+        return JSON->new->encode($var);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -3393,7 +3393,7 @@ sub www_viewThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -3404,16 +3404,16 @@ sub www_viewThingDataViaAjax {
         my $output = $self->getViewThingVars($thingId,$thingDataId);
 
         if ($output){
-            return JSON->new->utf8->encode($output);
+            return JSON->new->encode($output);
         }
         else{
             $session->http->setStatus("404", "Not Found");
-            return JSON->new->utf8->encode({message => "The thingDataId you requested can not be found."});
+            return JSON->new->encode({message => "The thingDataId you requested can not be found."});
         }
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 

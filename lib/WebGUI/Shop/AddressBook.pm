@@ -502,7 +502,7 @@ sub www_view {
     my $form = $session->form;
     my $callback = $form->get('callback');
     $callback =~ s/'/"/g;
-    $callback = JSON->new->utf8->decode($callback);
+    $callback = JSON->new->decode($callback);
     my $callbackForm = '';
     foreach my $param (@{$callback->{params}}) {
         $callbackForm .= WebGUI::Form::hidden($session, {name=>$param->{name}, value=>$param->{value}});

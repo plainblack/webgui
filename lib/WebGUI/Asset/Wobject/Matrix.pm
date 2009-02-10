@@ -987,7 +987,7 @@ assetData.revisionDate
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
-    my $encodedOutput = JSON->new->utf8->encode($jsonOutput);
+    my $encodedOutput = JSON->new->encode($jsonOutput);
     return $encodedOutput;
 }
 
@@ -1090,7 +1090,7 @@ sub www_getCompareListData {
 
     $session->http->setMimeType("application/json");
 
-    return JSON->new->utf8->encode($jsonOutput);
+    return JSON->new->encode($jsonOutput);
 }
 #-------------------------------------------------------------------
 

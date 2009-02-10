@@ -377,7 +377,7 @@ sub view {
                         . WebGUI::Form::hidden($session,
                             {
                                 name  => "callback",
-                                value => JSON->new->utf8->encode({ url => $self->getUrl})
+                                value => JSON->new->encode({ url => $self->getUrl})
                             })
                         . WebGUI::Form::submit($session, {value => $i18n->get("populate from address book")})
                         . WebGUI::Form::formFooter($session)

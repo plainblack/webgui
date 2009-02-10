@@ -107,7 +107,7 @@ isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
 $session->user({userId => 3});
 my $json = $matrix->www_getCompareFormData('score');
 
-my $compareFormData = JSON->new->utf8->decode($json);
+my $compareFormData = JSON->new->decode($json);
 
 cmp_deeply(
         $compareFormData,

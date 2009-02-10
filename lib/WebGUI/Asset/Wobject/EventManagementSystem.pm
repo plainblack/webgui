@@ -573,7 +573,7 @@ sub www_editBadgeGroup {
 	my ($form, $db) = $self->session->quick(qw(form db));
 	my $f = WebGUI::HTMLForm->new($self->session, action=>$self->getUrl);
 	my $badgeGroup = $db->getRow("EMSBadgeGroup","badgeGroupId",$form->get('badgeGroupId'));
-	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::decode_json($badgeGroup->{badgeList}) : [];
+	$badgeGroup->{badgeList} = ($badgeGroup->{badgeList} ne "") ? JSON::from_json($badgeGroup->{badgeList}) : [];
 	my $i18n = WebGUI::International->new($self->session, "Asset_EventManagementSystem");
 	$f->hidden(name=>'func', value=>'editBadgeGroupSave');
 	$f->hidden(name=>'badgeGroupId', value=>$form->get('badgeGroupId'));
@@ -842,7 +842,7 @@ sub www_getBadgesAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -974,7 +974,7 @@ sub www_getRegistrantAsJson {
 	$badgeInfo->{ribbons} = \@ribbons;
 	
 	# build json datasource
-    return JSON->new->utf8->encode($badgeInfo);
+    return JSON->new->encode($badgeInfo);
 }
 
 #-------------------------------------------------------------------
@@ -1038,7 +1038,7 @@ sub www_getRegistrantsAsJson {
 	
 	# build json datasource
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1073,7 +1073,7 @@ sub www_getRibbonsAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1184,7 +1184,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
         my $description = $ticket->get('description');
         my $data = $ticket->get('eventMetaData');
         $data = '{}' if ($data eq "");
-        my $meta = JSON->new->utf8->decode($data);
+        my $meta = JSON->new->decode($data);
         foreach my $field (@{$self->getEventMetaFields}) {
             my $label = $field->{label};
             if ($field->{visible} && $meta->{$label} ne "") {
@@ -1228,7 +1228,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $results{'sort'}       		= undef;
     $results{'dir'}        		= "asc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 
@@ -1263,7 +1263,7 @@ sub www_getTokensAsJson {
     $results{'sort'}       = undef;
     $results{'dir'}        = "asc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------

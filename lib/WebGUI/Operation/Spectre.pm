@@ -97,7 +97,7 @@ sub www_spectreGetSiteData {
 		}
 		$siteData{cron} = \@schedules;
 	}
-	return JSON::encode_json(\%siteData);
+	return JSON::to_json(\%siteData);
 }
 
 #-------------------------------------------------------------------

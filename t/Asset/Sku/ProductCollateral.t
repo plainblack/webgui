@@ -56,7 +56,7 @@ ok($session->id->valid($vid), 'a valid id was generated for the new collateral e
 
 my $json;
 $json = $product->get('variantsJSON');
-my $jsonData = decode_json($json);
+my $jsonData = JSON::from_json($json);
 cmp_deeply(
     $jsonData,
     [ {a => 'aye', b => 'bee', vid => $vid } ],

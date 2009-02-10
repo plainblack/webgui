@@ -902,7 +902,7 @@ sub www_getAttributes {
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
-    return JSON->new->utf8->encode($jsonOutput);
+    return JSON->new->encode($jsonOutput);
 }
 
 #-------------------------------------------------------------------
