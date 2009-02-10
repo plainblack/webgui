@@ -930,18 +930,17 @@ sub www_getCompareFormData {
             listing.views,
             listing.compares,
             listing.clicks,
-            listing.lastUpdated,
-            max(assetData.revisionDate)
+            listing.lastUpdated
         from asset
             left join assetData using(assetId)
-        left join MatrixListing as listing on listing.assetId = assetData.assetId and listing.revisionDate =
+            left join MatrixListing as listing on listing.assetId = assetData.assetId and listing.revisionDate =
 assetData.revisionDate
         where
             asset.parentId=?
             and asset.state='published'
             and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate = (SELECT max(revisionDate) from assetData where assetId=asset.assetId and status='approved')
             and status='approved'
-        group by assetData.assetId  
         order by ".$sort.$sortDirection;
 
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
