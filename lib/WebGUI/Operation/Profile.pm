@@ -163,8 +163,6 @@ sub validateProfileData {
                           : WebGUI::ProfileField->getEditableFields($session);
 	FIELD: foreach my $field (@$fields) {
 		my $fieldValue = $field->formProcess;
-        $session->log->warn("field: ". $field->getId . ' ' . $field->getLabel);
-        $session->log->warn("value: ". $fieldValue);
         if ($field->isRequired && $fieldValue eq "") {
 			$error .= '<li>'.$field->getLabel.' '.$i18n->get(451).'</li>';
         } elsif ($field->getId eq "email" && isDuplicateEmail($session,$fieldValue) && WebGUI::ProfileField->new($session, "email")->isRequired() ) {
