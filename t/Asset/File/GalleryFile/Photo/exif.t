@@ -46,7 +46,10 @@ my $photo
     { skipAutoCommitWorkflows => 1 },
     );
 $versionTag->commit;
-my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+
+$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+
+my $exif    = ImageInfo( $photo->getStorageLocation->getPath($photo->get('filename')) );
 # Sanitize Exif data by removing keys with references as values
 for my $key ( keys %$exif ) {
     if ( ref $exif->{$key} ) {
@@ -58,7 +61,6 @@ for my $key ( qw{ Directory } ) {
     delete $exif->{ $key };
 }
 
-$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
 #----------------------------------------------------------------------------
 # Cleanup
