@@ -128,7 +128,7 @@ sub www_editRuleflow {
         hoverHelp => $i18n->get('pause interval help'),
     );
     if (analysisActive($session)) {
-        $f->raw('Passive Analytics analysis is currently active');
+        $f->raw('<tr><td coldspan="2">Passive Analytics analysis is currently active</td></tr>');
     }
     else {
         $f->submit(value => $i18n->get('Begin analysis'));
@@ -182,7 +182,7 @@ sub www_editRuleflowSave {
         return www_editRuleflow($session, "Error creating the workflow instance.");
     }
     $instance->start('skipRealtime');
-    return www_editRuleflow($session, "Passive Analytics session started");
+    return www_editRuleflow($session);
 }
 
 
