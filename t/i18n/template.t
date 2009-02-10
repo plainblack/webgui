@@ -79,7 +79,7 @@ while (my $templateAsset = $getATemplate->()) {
     }
 }
 
-$numTests = scalar @templateLabels | scalar @questionableTemplates;
+$numTests = scalar @templateLabels + scalar @questionableTemplates;
 
 plan tests => $numTests;
 

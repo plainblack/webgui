@@ -27,6 +27,7 @@ use WebGUI::Asset::Wobject::Survey;
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use WebGUI::ProfileField;
+use WebGUI::Utility qw(isIn);
 use JSON;
 
 my $toVersion = '7.6.4';

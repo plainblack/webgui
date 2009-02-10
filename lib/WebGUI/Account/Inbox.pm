@@ -217,6 +217,12 @@ sub editSettingsForm {
 		label     => $i18n->get("invite user confirm template label"),
         hoverHelp => $i18n->get("invite user confirm template hoverHelp")
 	);
+    $f->selectRichEditor(
+        name        => "inboxRichEditorId",
+        value       => $self->getRichEditorId,
+        label       => $i18n->get("inbox rich editor label"),
+        hoverHelp   => $i18n->get("inbox rich editor description"),
+    );
     
     return $f->printRowsOnly;
 }
@@ -257,6 +263,7 @@ sub editSettingsFormSave {
     $setting->set("inboxInviteUserTemplateId",$form->process("inboxInviteUserTemplateId","template"));
     $setting->set("inboxInviteUserConfirmTemplateId",$form->process("inboxInviteUserConfirmTemplateId","template"));
 
+    $setting->set("inboxRichEditorId", $form->process("inboxRichEditorId", "selectRichEditor") );
 }
 
 
@@ -382,6 +389,18 @@ sub getMessageConfirmTemplateId {
     return $self->session->setting->get("inboxMessageConfirmationTemplateId") || "DUoxlTBXhVS-Zl3CFDpt9g";
 }
 
+#-------------------------------------------------------------------
+
+=head2 getRichEditorId
+
+This method returns the rich editor ID users compose messages with.
+
+=cut
+
+sub getRichEditorId {
+    my $self    = shift;
+    return $self->session->setting->get("inboxRichEditorId") || "PBrichedit000000000001";
+}
 
 #-------------------------------------------------------------------
 
@@ -668,6 +687,7 @@ sub www_inviteUser {
             name  => "message",
             value => $message,
             width => "600",
+            richEditId => $self->getRichEditorId,
         });
     }
     else {
@@ -1037,6 +1057,7 @@ sub www_sendMessage {
         name  => "message",
         value => $var->{'message_body'} || "",
         width => "600",
+        richEditId => $self->getRichEditorId,
     });
     
     $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{

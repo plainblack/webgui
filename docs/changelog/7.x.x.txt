@@ -1,6 +1,61 @@
+7.6.11
+ - Added a switch to allow the use of non-WebGUI objects with the Workflow
+   engine.
+ - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
+ - fixed #9596: caching now takes into account the correct parameter for pagination
+ - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
+ - fixed: Syndicated Content asset doesn't work with feeds that specify their encodings via HTTP headers
+ - fixed #9375: Syndicated Content asset improperly decodes wide XML entities
+ - fixed #9592: DataForm deleteAttachedFiles method can crash
+ - fixed #9580: Gallery: albums shown in navigation
+ - fixed #9578: Use of "quotes" in badge name causes error
+ - fixed #9603: moving wiki page
+ - fixed #9302: Spectre Problem...
+ - fixed #9635: Matrix - Add attributes not working
+ - fixed #9597: Survey 2.0 Help not complete
+ - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places where they do not belong.
+ - fixed: Hardcoded extras url in templates and in extra head tags in assets were replaced with the Extras macro.
+ - fixed: Fixed bad gateway macros in the Matrix templates.
+ - fixed #9535: Bad characters in dom element ids when generated from assetId
+ - fixed #9542: Default WebGUI config contains invalid workflow activity
+ - fixed #9623: preload.custom paths not included during upgrade
+ - fixed #9638: Survey - Submit of survey creates new demo
+ - fixed #9669: Folder: synopsis var of a subfolder broken
+ - fixed #9658: gallery advanced search dates do not work
+ - fixed #8965: Dashboard update profile url wrong
+ - fixed #9050: Safari Hover Help Hosed (and funny survey hover help in Firefox)
+ - fixed #9675: gallary search list displays wrong date for pictures
+ - fixed: Added survey.css as a snippet.  Had been left out.
+ - fixed: Permissions aren't correctly applied to Article attachments
+ - fixed #9681: Form-related template errors in gallery
+ - fixed #9683: Problem with EMS related workflow
+ - fixed #9611: Transaction Manage View, no go in ie6 (Henry Tang, Long Term Results B.v.)
+ - fixed #9686: Importing a package twice locks assets forever.
+ - fixed #9671: Survey - breaks admin bar
+ - fixed #9702: Phone number on EMS badges not saving
+ - fixed: Email address is not filled in for ITransact credentials.
+
+7.6.10
+ - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
+ - added test for splitTag function recently added to HTML module
+ - fixed #9455: fixed synopsis to pick out html paragraphs, fixed FeedPP fields to scalar when blank
+ - fixed: With autocommit and no comments on, making a shortcut of an asset takes you to that asset's view.
+ - fixed #9506: Choose billing address
+ - fixed #9541: assets with uncommitted parent.
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
+ - fixed #9236: Survey 2.0 missing hoverhelp
+ - added: Widget Macro now uses a style, defaulting to the users.
+ - added ability to select which rich editor is used to compose messages in the inbox
+ - removed random questions display from Survey Questions Edit template until
+   that feature is added.
+ - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
+ - fixed: utf8 issues with Survey should be correct.  JSON fields are now longText instead of longBlob.
+ - fixed #9522: Time tracker does not display
+ - fixed #9215: Survey 2.0 results screens missing
+ - fixed #9018: orphan workflows from upgrade.
+
 7.6.9
- - fixed: ukplayer example is now loaded with swfobject.js released under the
-          MIT licence, see gotcha's and /extras/ukplayer
+ - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
  - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
  - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
  - marked sbin scripts as executable
@@ -10,8 +65,10 @@
  - fixed a bug where no Payment Gateway labels show up when checking out.
  - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
  - fixed #4137: Calendar Search page has head tags in body
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
  - fixed: HTTP Proxy doesn't serve new content to visitors
  - fixed: Exporting to static files can leak large amounts of memory
+ - fixed: Paginator generates bad markup for next page links
 
 7.6.8
  - added #!/usr/bin/env perl to all utility scripts

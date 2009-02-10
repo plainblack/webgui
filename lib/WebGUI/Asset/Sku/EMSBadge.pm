@@ -463,10 +463,10 @@ sub www_addToCart {
 	foreach my $field (qw(name address1 address2 address3 city state organization)) {
 		$badgeInfo{$field} = $form->get($field, "text");
 	}
-	$badgeInfo{'phoneNumber'} = $form->get('phoneNumber', 'phone');
-	$badgeInfo{'email'} = $form->get('email', 'email');
-	$badgeInfo{'country'} = $form->get('country', 'country');
-	$badgeInfo{'zipcode'} = $form->get('zipcode', 'zipcode');
+	$badgeInfo{'phoneNumber'} = $form->get('phone',   'phone');
+	$badgeInfo{'email'}       = $form->get('email',   'email');
+	$badgeInfo{'country'}     = $form->get('country', 'country');
+	$badgeInfo{'zipcode'}     = $form->get('zipcode', 'zipcode');
 	
 
 	# check for required fields

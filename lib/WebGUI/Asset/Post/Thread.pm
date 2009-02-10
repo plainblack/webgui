@@ -869,6 +869,22 @@ sub updateThreadRating {
 
 
 #-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a CS for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration');
+}
+
+#-------------------------------------------------------------------
 sub view {
     my $self = shift;
 	my $currentPost = shift || $self;

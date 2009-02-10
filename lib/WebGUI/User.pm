@@ -1170,13 +1170,11 @@ sub validateProfileDataFromForm {
     my $errorFields = [];
     my $warnFields  = [];
     
-	foreach my $field (@{$fields}) {
+	FIELD: foreach my $field (@{$fields}) {
         my $fieldId       = $field->getId;
         my $fieldLabel    = $field->getLabel;
     	my $fieldValue    = $field->formProcess;
         my $isValid       = $field->isValid($fieldValue);
-
-        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
 
         if(!$isValid) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
@@ -1184,9 +1182,9 @@ sub validateProfileDataFromForm {
             push(@{$errorFields},$fieldId);
         }
         #The language field is special and must be always be valid or WebGUI will croak
-        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$data->{$fieldId}})) {
+        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$fieldValue})) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
-            push (@{$errors}, sprintf($i18n->get("language not available error"),$data->{$fieldId}));
+            push (@{$errors}, sprintf($i18n->get("language not available error"),$fieldValue));
             push(@{$errorFields},$fieldId);
         }
         #Duplicate emails throw warnings
@@ -1195,6 +1193,11 @@ sub validateProfileDataFromForm {
             push (@{$warnings},$i18n->get(1072));
             push(@{$warnFields},$fieldId);
         }
+
+        ##Do not return data unless the form field was actually in the posted data.
+        next FIELD unless $field->isInRequest;
+        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
+
     }
 
 	return {

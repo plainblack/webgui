@@ -1086,6 +1086,12 @@ sub aIndexes {
 
 =head2 returnResponsesForReporting
 
+Used to extract JSON responses for use in reporting results.
+
+Returns an array ref containing the current responses to the survey.  The array ref contains a list of hashes with the section, question,
+sectionName, questionName, questionComment, and an answer array ref.  The answer array ref contains a list of hashes, with isCorrect (1 true, 0 false),
+recorded value, and the id of the answer. 
+
 =cut
 
 # TODO: This sub should make use of recordedResponses

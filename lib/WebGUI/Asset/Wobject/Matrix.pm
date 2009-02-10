@@ -550,22 +550,20 @@ sub view {
     foreach my $category (keys %{$self->getCategories}) {
         my $data;
         my $sql = "
-        select
+        select 
             assetData.title as productName,
             assetData.url,
-            listing.assetId,
-            rating.meanValue,
-            rating.medianValue,
-            rating.countValue
-        from MatrixListing as listing
-            left join asset on listing.assetId = asset.assetId
-            left join MatrixListing_ratingSummary as rating on rating.listingId = listing.assetId
-            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
-assetData.revisionDate
-        where
-            asset.parentId=?
-            and asset.state='published'
-            and asset.className='WebGUI::Asset::MatrixListing'
+            rating.listingId, 
+            rating.meanValue, 
+            asset.parentId 
+        from 
+            MatrixListing_ratingSummary as rating 
+            left join asset on (rating.listingId = asset.assetId)
+            left join assetData on assetData.assetId = rating.listingId 
+        where 
+            rating.category =? 
+            and asset.parentId=? 
+            and asset.state='published' 
             and assetData.revisionDate=(
                 select
                     max(revisionDate)
@@ -575,13 +573,11 @@ assetData.revisionDate
                     assetData.assetId=asset.assetId
                     and (status='approved' or status='archived')
             )
-            and status='approved'
-            and rating.category=?
         group by
             assetData.assetId
         order by rating.meanValue ";
         
-        $data = $db->quickHashRef($sql." desc limit 1",[$self->getId,$category]);
+        $data = $db->quickHashRef($sql." desc limit 1",[$category,$self->getId]);
         push(@{ $var->{best_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,
@@ -590,7 +586,7 @@ assetData.revisionDate
             median=>$data->{medianValue},
             count=>$data->{countValue}
             });
-        $data = $db->quickHashRef($sql." asc limit 1",[$self->getId,$category]);
+        $data = $db->quickHashRef($sql." asc limit 1",[$category,$self->getId]);
         push(@{ $var->{worst_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,

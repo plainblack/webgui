@@ -24,7 +24,7 @@ Package WebGUI::Form::TimeZone
 
 =head1 DESCRIPTION
 
-Creates a template chooser control.
+Creates a time zone chooser control.
 
 =head1 SEE ALSO
 

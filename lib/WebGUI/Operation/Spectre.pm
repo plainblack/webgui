@@ -164,7 +164,10 @@ sub www_spectreStatus {
 
 =head2 www_spectreTest (  )
 
-Spectre executes this function to see if WebGUI connectivity is working.
+Spectre executes this function to see if WebGUI connectivity is working.  Note, the subnet checking
+is done in here because it is only, ever intended that Spectre use this method.  If a user were to
+call this method, it would lie, since it would be checking if the user's IP address was a valid
+spectreSubnet, instead of checking the IP address of the spectre process.
 
 =cut
 
@@ -172,6 +175,20 @@ sub www_spectreTest {
 	my $session = shift;
 	$session->http->setMimeType("text/plain");
 	$session->http->setCacheControl("none");
+
+    my $subnets = $session->config->get("spectreSubnets");
+    if (!defined $subnets) {
+        $subnets = [];
+    }
+
+    my $sessionIp = $session->env->getIp;
+	unless (isInSubnet($sessionIp, $subnets)) {
+		$session->errorHandler->security(
+            sprintf "Tried to make a Spectre workflow runner request from %s, but we're only allowed to accept requests from %s",
+                $sessionIp, join(",",@{$subnets})
+        );
+        return "subnet";
+	}
     return WebGUI::Operation::Spectre::spectreTest($session);
 }
 
@@ -179,21 +196,13 @@ sub www_spectreTest {
 
 =head2 spectreTest (  )
 
-Spectre executes this function to see if WebGUI connectivity is working.
+Spectre executes this function to see if WebGUI connectivity is working.  It does not
+do subnet checking, yet.
 
 =cut
 
 sub spectreTest{
 	my $session = shift;
-    my $subnets = $session->config->get("spectreSubnets");
-
-    if (!defined $subnets) {
-        $subnets = [];
-    }
-	unless (isInSubnet($session->env->getIp, $subnets)) {
-		$session->errorHandler->security("Tried to make a Spectre workflow runner request, but we're only allowed to accept requests from ".join(",",@{$subnets}).".");
-        return "subnet";
-	}
 	my $remote = create_ikc_client(
 		port=>$session->config->get("spectrePort"),
 		ip=>$session->config->get("spectreIp"),
@@ -205,6 +214,13 @@ sub spectreTest{
 	my $result = $remote->post_respond('admin/ping');
 	$remote->disconnect;
 	return "spectre" unless defined $result;
+    ##A real spectre subnet test would go here, and would consist of the following
+    ##events:
+    ## 1) WebGUI talks to spectre.
+    ## 2) Spectre makes a request of WebGUI
+    ## 3) WebGUI returns a token or an error
+    ## 4) spectre returns the result of the request to WebGUI
+    ## 5) WebGUI lets the user know how it all ended up.
 	return "success";
 }
 

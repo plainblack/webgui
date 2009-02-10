@@ -15,6 +15,7 @@ use Tie::IxHash;
 use JSON;
 use WebGUI::International;
 use WebGUI::Form::File;
+use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
@@ -22,6 +23,17 @@ use WebGUI::Asset::Wobject::Survey::ResponseJSON;
 use Data::Dumper;
 
 #-------------------------------------------------------------------
+
+=head2 definition ( session, [definition] )
+
+Returns an array reference of definitions. Adds tableName, className, properties to array definition.
+
+=head3 definition
+
+An array of hashes to prepend to the list
+
+=cut
+
 sub definition {
     my $class      = shift;
     my $session    = shift;
@@ -31,31 +43,33 @@ sub definition {
     tie %properties, 'Tie::IxHash';
     %properties = (
         templateId => {
-            fieldType    => "template",
+            fieldType    => 'template',
             defaultValue => 'PBtmpl0000000000000061',
-            tab          => "display",
-            namespace    => "Survey",
-            hoverHelp    => "A Survey System",
-            label        => "Template ID"
+            tab          => 'display',
+            namespace    => 'Survey',
+            label        => $i18n->get('survey template'),
+            hoverHelp    => $i18n->get('survey template help'),
         },
         showProgress => {
-            fieldType    => "yesNo",
+            fieldType    => 'yesNo',
             defaultValue => 0,
             tab          => 'properties',
-            label        => "Show user their progress"
+            label        => $i18n->get('Show user their progress'),
+            hoverHelp    => $i18n->get('Show user their progress help'),
         },
         showTimeLimit => {
-            fieldType    => "yesNo",
+            fieldType    => 'yesNo',
             defaultValue => 0,
             tab          => 'properties',
-            label        => "Show user their time remaining"
+            label        => $i18n->get('Show user their time remaining'),
+            hoverHelp    => $i18n->get('Show user their time remaining'),
         },
         timeLimit => {
             fieldType    => 'integer',
             defaultValue => 0,
             tab          => 'properties',
+            label        => $i18n->get('timelimit'),
             hoverHelp    => $i18n->get('timelimit hoverHelp'),
-            label        => $i18n->get('timelimit')
         },
         doAfterTimeLimit => {
             fieldType    => 'selectBox',
@@ -71,90 +85,92 @@ sub definition {
         groupToEditSurvey => {
             fieldType    => 'group',
             defaultValue => 4,
-            label        => "Group to edit survey",
+            label        => $i18n->get('Group to edit survey'),
+            hoverHelp    => $i18n->get('Group to edit survey help'),
         },
         groupToTakeSurvey => {
             fieldType    => 'group',
             defaultValue => 2,
-            label        => "Group to take survey",
+            label        => $i18n->get('Group to take survey'),
+            hoverHelp    => $i18n->get('Group to take survey help'),
         },
         groupToViewReports => {
             fieldType    => 'group',
             defaultValue => 4,
-            label        => "Group to view reports",
+            label        => $i18n->get('Group to view reports'),
+            hoverHelp    => $i18n->get('Group to view reports help'),
         },
         exitURL => {
             fieldType    => 'text',
             defaultValue => undef,
-            label        => "Set the URL that the survey will exit to",
-            hoverHelp =>
-                "When the user finishes the survey, they will be sent to this URL.  Leave blank if no forwarding required.",
+            label        => $i18n->get('Survey Exit URL'),
+            hoverHelp    => $i18n->get('Survey Exit URL help'),
         },
         maxResponsesPerUser => {
             fieldType    => 'integer',
             defaultValue => 1,
-            label        => "Max user reponses",
+            label        => 'Max user reponses',
         },
         overviewTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
             defaultValue => 'PBtmpl0000000000000063',
-            label        => "Overview template id",
+            label        => 'Overview template id',
             namespace    => 'Survey/Overview',
         },
         gradebookTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Grabebook template id",
+            label        => 'Grabebook template id',
             defaultValue => 'PBtmpl0000000000000062',
             namespace    => 'Survey/Gradebook',
         },
         responseTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Response template id",
+            label        => 'Response template id',
             defaultValue => 'PBtmpl0000000000000064',
             namespace    => 'Survey/Response',
         },
         surveyEditTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Survey edit template id",
+            label        => 'Survey edit template id',
             defaultValue => 'GRUNFctldUgop-qRLuo_DA',
             namespace    => 'Survey/Edit',
         },
         surveyTakeTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Take survey template id",
+            label        => 'Take survey template id',
             defaultValue => 'd8jMMMRddSQ7twP4l1ZSIw',
             namespace    => 'Survey/Take',
         },
         surveyQuestionsId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Questions template id",
+            label        => 'Questions template id',
             defaultValue => 'CxMpE_UPauZA3p8jdrOABw',
             namespace    => 'Survey/Take',
         },
         sectionEditTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Section Edit Tempalte",
+            label        => 'Section Edit Tempalte',
             defaultValue => '1oBRscNIcFOI-pETrCOspA',
             namespace    => 'Survey/Edit',
         },
         questionEditTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Question Edit Tempalte",
+            label        => 'Question Edit Tempalte',
             defaultValue => 'wAc4azJViVTpo-2NYOXWvg',
             namespace    => 'Survey/Edit',
         },
         answerEditTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => "Answer Edit Tempalte",
+            label        => 'Answer Edit Tempalte',
             defaultValue => 'AjhlNO3wZvN5k4i4qioWcg',
             namespace    => 'Survey/Edit',
         },
@@ -248,7 +264,6 @@ Saves the survey collateral to the DB
 
 =cut
 
-sub survey       { return shift->{survey}; }
 
 sub saveSurveyJSON {
     my $self = shift;
@@ -257,6 +272,19 @@ sub saveSurveyJSON {
 
     $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $data, $self->getId ] );
 }
+
+#-------------------------------------------------------------------
+
+=head2 survey ( )
+
+Helper to access the survey object.
+
+=cut
+
+sub survey       { return shift->{survey}; }
+sub littleBuddy  { return shift->{survey}; }
+sub allyourbases { return shift->{survey}; }
+sub helpmehelpme { return shift->{survey}; }
 
 #-------------------------------------------------------------------
 
@@ -279,6 +307,14 @@ sub www_editSurvey {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_submitObjectEdit ( )
+
+This is called when an edit is submitted to a survey object.  The POST should contain the id and updated params
+of the object, and also if the object is being deleted or copied.  
+
+=cut
+
 sub www_submitObjectEdit {
     my $self = shift;
 
@@ -355,6 +391,15 @@ sub www_jumpTo {
 }
 
 #-------------------------------------------------------------------
+
+=head2 copyObject ( )
+
+Takes the address of a survey object and creates a copy.  The copy is placed at the end of this object's parent's list. 
+
+Returns the address to the new object.
+
+=cut
+
 sub copyObject {
     my ( $self, $address ) = @_;
 
@@ -371,13 +416,28 @@ sub copyObject {
 }
 
 #-------------------------------------------------------------------
+
+=head2 deleteObject( $address )
+
+Deletes the object matching the passed in address.
+
+Returns the address to the parent object, or the very first section.
+
+=head3 $address
+
+An array ref.  The first element of the array ref is the index of
+the section.  The second element is the index of the question in
+that section.  The third element is the index of the answer.
+
+=cut
+
 sub deleteObject {
     my ( $self, $address ) = @_;
 
     $self->loadSurveyJSON();
 
-    my $message = $self->survey->remove($address)
-        ; #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    my $message = $self->survey->remove($address);
 
     $self->saveSurveyJSON();
 
@@ -393,6 +453,13 @@ sub deleteObject {
 } ## end sub deleteObject
 
 #-------------------------------------------------------------------
+
+=head2 www_newObject()
+
+Creates a new object from a POST param containing the new objects id concat'd on hyphens.
+
+=cut
+
 sub www_newObject {
     my $self = shift;
 
@@ -417,6 +484,13 @@ sub www_newObject {
 } ## end sub www_newObject
 
 #-------------------------------------------------------------------
+
+=head2 www_dragDrop
+
+Takes two ids from a form POST.  The "target" is the object being moved, the "before" is the object directly preceding the "target".
+
+=cut
+
 sub www_dragDrop {
     my $self = shift;
 
@@ -483,6 +557,18 @@ sub www_dragDrop {
 } ## end sub www_dragDrop
 
 #-------------------------------------------------------------------
+
+=head2 www_loadSurvey([options])
+
+For loading the survey during editing.  Returns the survey meta list and the html data for editing a particular survey object.
+
+=head3 options
+
+Can either be a hashref containing the address to be edited.  And/or a the specific variables to be edited.  
+If undef, the address is pulled form the form POST.
+
+=cut
+
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
@@ -503,7 +589,6 @@ sub www_loadSurvey {
             $address = [0];
         }
     }
-    my $message = defined $options->{message} ? $options->{message} : '';
     my $var
         = defined $options->{var}
         ? $options->{var}
@@ -605,6 +690,12 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 purge
+
+Completely remove from WebGUI.
+
+=cut
+
 sub purge {
     my $self = shift;
     $self->session->db->write( "delete from Survey_response where assetId = ?",   [ $self->getId() ] );
@@ -628,7 +719,6 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
-
 sub purgeRevision {
     my $self = shift;
     return $self->SUPER::purgeRevision;
@@ -644,9 +734,30 @@ returns the output.
 =cut
 
 sub view {
+    my $self    = shift;
+    my $var     = $self->getMenuVars;
+
+    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
+    $var->{'lastResponseCompleted'} = $code;
+    $var->{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
+    $var->{'maxResponsesSubmitted'} = $overTakeLimit;
+    my $out = $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+
+    return $out;
+} ## end sub view
+
+#-------------------------------------------------------------------
+
+=head2 getMenuVars ( )
+
+Returns the top menu template variables as a hashref.
+
+=cut
+
+sub getMenuVars {
     my $self = shift;
     my %var;
-
+    
     $var{'edit_survey_url'}               = $self->getUrl('func=editSurvey');
     $var{'take_survey_url'}               = $self->getUrl('func=takeSurvey');
     $var{'view_simple_results_url'}       = $self->getUrl('func=exportSimpleResults');
@@ -656,15 +767,9 @@ sub view {
     $var{'user_canTakeSurvey'}            = $self->session->user->isInGroup( $self->get("groupToTakeSurvey") );
     $var{'user_canViewReports'}           = $self->session->user->isInGroup( $self->get("groupToViewReports") );
     $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
-    $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get("groupToEditSurvey") );
-    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
-    $var{'lastResponseCompleted'} = $code;
-    $var{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
-    $var{'maxResponsesSubmitted'} = $overTakeLimit;
-    my $out = $self->processTemplate( \%var, undef, $self->{_viewTemplate} );
 
-    return $out;
-} ## end sub view
+    return \%var;
+}
 
 #-------------------------------------------------------------------
 
@@ -747,6 +852,12 @@ sub www_view {
 
 #-------------------------------------------------------------------
 
+=head2 www_takeSurvey
+
+Returns the template needed to take the survey.  This template dynamically loads the survey via async requests.
+
+=cut
+
 sub www_takeSurvey {
     my $self = shift;
     my %var;
@@ -763,11 +874,37 @@ sub www_takeSurvey {
         }
     };
 
+    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/container/container-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/logger/logger-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/resize/resize-min.js'), {type =>
+    'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/slider/slider-min.js'), {type =>
+    'text/javascript'});
+
     my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
     return $self->session->style->process( $out, $self->get("styleTemplateId") );
 } ## end sub www_takeSurvey
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteResponses
+
+Deletes all the responses from the survey.
+
+=cut
+
 sub www_deleteResponses {
     my $self = shift;
 
@@ -779,8 +916,14 @@ sub www_deleteResponses {
     return;
 }
 
-#handles questions that were submitted
 #-------------------------------------------------------------------
+
+=head2 www_submitQuestions
+
+Handles questions submitted by the survey taker, adding them to their response.
+
+=cut
+
 sub www_submitQuestions {
     my $self = shift;
 
@@ -845,8 +988,14 @@ sub www_submitQuestions {
     return $self->www_loadQuestions($responseId);
 } ## end sub www_submitQuestions
 
-#finds the questions to display next and builds the data structre to hold them
 #-------------------------------------------------------------------
+
+=head2 www_loadQuestions
+
+Determines which questions to display to the survey taker next, loads and returns them.
+
+=cut
+
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
@@ -941,12 +1090,21 @@ sub surveyEnd {
             }
         }
     }
-    #    $self->session->http->setRedirect($url);
-    return to_json( { "type", "forward", "url", $url } );
+    $url = $self->session->url->gateway($url);
+    #$self->session->http->setRedirect($url);
+    #$self->session->http->setMimeType('application/json');
+    my $json = to_json( { "type", "forward", "url", $url } );
+    return $json;
 } ## end sub surveyEnd
 
 #-------------------------------------------------------------------
-#sends the processed template and questions structure to the client
+
+=head2 prepareShowSurveyTemplate
+
+Sends the processed template and questions structure to the client
+
+=cut
+
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
     my %multipleChoice = (
@@ -1011,6 +1169,16 @@ sub prepareShowSurveyTemplate {
 
 #-------------------------------------------------------------------
 
+=head2 loadBothJSON($rId)
+
+Loads both the Survey and the appropriate response objects from JSON.
+
+=head3 $rId
+
+The reponse id to load.
+
+=cut
+
 sub loadBothJSON {
     my $self = shift;
     my $rId  = shift;
@@ -1025,6 +1193,21 @@ sub loadBothJSON {
 }
 
 #-------------------------------------------------------------------
+
+=head2 loadResponseJSON([$jsonHash],[$rId])
+
+Loads the response object from JSON.  
+
+=head3 $jsonHash
+
+Optional, but if the hash has been pulled from the DB before, there is no need to pull it again.
+
+=head3 $rId
+
+Optional, but if not passed in, it is grabbed.
+
+=cut
+
 sub loadResponseJSON {
     my $self     = shift;
     my $jsonHash = shift;
@@ -1043,22 +1226,44 @@ sub loadResponseJSON {
 } ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
+
+=head3 saveResponseJSON
+
+Turns the response object into JSON and saves it to the DB.  
+
+=cut
+
 sub saveResponseJSON {
     my $self = shift;
 
     my $data = $self->response->freeze();
 
     $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?",
+
         [ $data, $self->{responseId} ] );
 }
 
 #-------------------------------------------------------------------
+
+=head2 response
+
+Helper to easily grab the response object and prevent typos.  
+
+=cut
+
 sub response {
     my $self = shift;
     return $self->{response};
 }
 
 #-------------------------------------------------------------------
+
+=head2 getResponseId
+
+Determines the response id of the current user.  If there is not a response for the user, a new one is created.
+If the user is anonymous, the IP is used.  Or an email'd or linked code can be used.
+
+=cut
 
 sub getResponseId {
     my $self = shift;
@@ -1148,6 +1353,12 @@ sub getResponseId {
 
 #-------------------------------------------------------------------
 
+=head2 canTakeSurvey
+
+Determines if the current user has permissions to take the survey.
+
+=cut
+
 sub canTakeSurvey {
     my $self = shift;
 
@@ -1187,24 +1398,144 @@ sub canTakeSurvey {
 } ## end sub canTakeSurvey
 
 #-------------------------------------------------------------------
+
+=head2 www_viewGradeBook (){
+
+Returns the Grade Book screen.
+
+=cut
+
 sub www_viewGradeBook {
-    my $self = shift;
+    my $self    = shift;
+    my $db      = $self->session->db;
+    
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+
+    my $var = $self->getMenuVars;
+
+    $self->loadTempReportTable();
+
+    my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewGradebook'));
+    $paginator->setDataByQuery("select userId,username,ipAddress,Survey_responseId,startDate,endDate 
+        from Survey_response     
+        where assetId=".$db->quote($self->getId)." order by username,ipAddress,startDate");
+    my $users = $paginator->getPageData;
+
+    $self->loadSurveyJSON();
+    $var->{question_count} = $self->survey->questionCount; 
+    
+    my @responseloop;
+    foreach my $user (@$users) {
+        my ($correctCount) = $db->quickArray("select count(*) from Survey_tempReport 
+            where Survey_responseId=? and isCorrect=1",[$user->{Survey_responseId}]);
+        push(@responseloop, {
+            # response_url is left out because it looks like Survey doesn't have a viewIndividualSurvey feature
+            # yet.
+            #'response_url'=>$self->getUrl('func=viewIndividualSurvey;responseId='.$user->{Survey_responseId}),
+            'response_user_name'=>($user->{userId} eq '1') ? $user->{ipAddress} : $user->{username},
+            'response_count_correct' => $correctCount,
+            'response_percent' => round(($correctCount/$var->{question_count})*100)
+            });
+    }
+    $var->{response_loop} = \@responseloop;
+    $paginator->appendTemplateVars($var);
+
+    my $out = $self->processTemplate( $var, $self->get("gradebookTemplateId") );
+    return $self->session->style->process( $out, $self->get("styleTemplateId") );
+
+} ## end sub www_viewGradeBook
+
+#-------------------------------------------------------------------
+
+=head2 www_viewStatisticalOverview (){
+
+Returns the Statistical Overview screen.
+
+=cut
+
+sub www_viewStatisticalOverview {
+    my $self    = shift;
+    my $db      = $self->session->db;
 
     return $self->session->privilege->insufficient()
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
 
     $self->loadTempReportTable();
+    $self->loadSurveyJSON();
+    my $survey  = $self->survey;
+    my $var     = $self->getMenuVars;
+    
+    my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewStatisticalOverview'));
+    my @questionloop;
+    for ( my $sectionIndex = 0; $sectionIndex <= $#{ $survey->sections() }; $sectionIndex++ ) {
+        for ( my $questionIndex = 0; $questionIndex <= $#{ $survey->questions([$sectionIndex]) }; $questionIndex++ ) {
+        my $question        = $survey->question( [ $sectionIndex, $questionIndex ] );
+        my $questionType    = $question->{questionType};
+        my (@answerloop, $totalResponses);;
 
-    my @peoples
-        = $self->session->db->quickArray( "SELECT UNIQUE(Survey_responseId) from Survey_tempReport where assetId = ?",
-        [ $self->getId() ] );
-    for my $people (@peoples) {
+        if ($questionType eq "Multiple Choice"){
+            $totalResponses = $db->quickScalar("select count(*) from Survey_tempReport
+                where sectionNumber=? and questionNumber=?",[$sectionIndex,$questionIndex]);
 
-        #my $
-
+            for ( my $answerIndex = 0; $answerIndex <= $#{ $survey->answers([$sectionIndex,$questionIndex]) }; $answerIndex++ ) {
+                my $numResponses = $db->quickScalar("select count(*) from Survey_tempReport
+                    where sectionNumber=? and questionNumber=? and answerNumber=?",
+                    [$sectionIndex,$questionIndex,$answerIndex]);
+                my $responsePercent;
+                if ($totalResponses) {
+                    $responsePercent = round(($numResponses/$totalResponses)*100);
+                } else {
+                    $responsePercent = 0;
+                }
+                my @commentloop;
+                my $comments = $db->read("select answerComment from Survey_tempReport 
+                    where sectionNumber=? and questionNumber=? and answerNumber=?",
+                    [$sectionIndex,$questionIndex,$answerIndex]);
+                while (my ($comment) = $comments->array) {
+                    push(@commentloop,{
+                        'answer_comment'=>$comment
+                        });
+                }
+                push(@answerloop,{
+                    'answer_isCorrect'=>$survey->answer( [ $sectionIndex, $questionIndex, $answerIndex ] )->{isCorrect},
+                    'answer' => $survey->answer( [ $sectionIndex, $questionIndex, $answerIndex ] )->{text},
+                    'answer_response_count' =>$numResponses,
+                    'answer_response_percent' =>$responsePercent,
+                    'comment_loop'=>\@commentloop
+                    });
+            }
+        }
+        else{
+            my $responses = $db->read("select value,answerComment from Survey_tempReport 
+                where sectionNumber=? and questionNumber=?",
+                [$sectionIndex,$questionIndex]); 
+            while (my $response = $responses->hashRef) {
+                push(@answerloop,{
+                    'answer_value'      =>$response->{value},
+                    'answer_comment'    =>$response->{answerComment}
+                    });
+            }
+        }
+        push(@questionloop,{
+            'question'                  => $question->{text},
+            'question_id'               => $sectionIndex.'_'.$questionIndex,
+            'question_isMultipleChoice' => ($questionType eq "Multiple Choice"),
+            'question_response_total'   => $totalResponses,
+            'answer_loop'               => \@answerloop,
+            'questionallowComment'      => $question->{allowComment}
+        });
+        } ## end for ( my $questionIndex = 0; $questionIndex <= ...
     }
+    $paginator->setDataByArrayRef(\@questionloop);
+    @questionloop = @{$paginator->getPageData};
 
-} ## end sub www_viewGradeBook
+    $var->{question_loop} = \@questionloop;
+    $paginator->appendTemplateVars($var);
+
+    my $out = $self->processTemplate( $var, $self->get("overviewTemplateId") );
+    return $self->session->style->process( $out, $self->get("styleTemplateId") );
+}
 
 #-------------------------------------------------------------------
 sub www_exportSimpleResults {
@@ -1224,6 +1555,48 @@ sub www_exportSimpleResults {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_exportTransposedResults (){
+
+Returns transposed results as a tabbed file.
+
+=cut
+
+sub www_exportTransposedResults {
+    my $self = shift;
+    return $self->session->privilege->insufficient()
+        unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
+
+    $self->loadTempReportTable();
+
+    my $filename = $self->session->url->escape( $self->get("title") . "_transposedResults.tab" );
+    my $content
+        = $self->session->db->quickTab(
+        "select r.userId, r.username, r.ipAddress, r.startDate, r.endDate, r.isComplete, t.*
+        from Survey_tempReport t 
+        left join Survey_response r using(Survey_responseId) 
+        where t.assetId=? 
+        order by r.userId, r.Survey_responseId, t.order",
+        [ $self->getId() ] );
+    return $self->export( $filename, $content );
+}
+
+#-------------------------------------------------------------------
+
+=head2 export($filename,$content)
+
+Exports the data in $content to $filename, then forwards the user to $filename.
+
+=head3 $filename
+
+The name of the file you want exported.
+
+=head3 $content
+
+The data you want exported (CSV, tab, whatever).
+
+=cut
+
 sub export {
     my $self     = shift;
     my $filename = shift;
@@ -1245,6 +1618,16 @@ sub export {
 
     return undef;
 } ## end sub export
+
+
+
+#-------------------------------------------------------------------
+
+=head2 loadTempReportTable
+
+Loads the responses from the survey into the Survey_tempReport table, so that other or custom reports can be ran against this data.
+
+=cut
 
 sub loadTempReportTable {
     my $self = shift;

@@ -484,7 +484,9 @@ sub deleteAttachedFiles {
             my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
             if ($form->can('getStorageLocation')) {
                 my $storage = $form->getStorageLocation;
-                $storage->delete;
+                if ($storage) {
+                    $storage->delete;
+                }
             }
         }
     }

@@ -235,6 +235,23 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+sub update {
+    my $self = shift;
+    my $previousStorageId = $self->get('storageId');
+    $self->SUPER::update(@_);
+    ##update may have entered a new storageId.  Reset the cached one just in case.
+    if ($self->get("storageId") ne $previousStorageId) {
+        delete $self->{_storageLocation};
+    }
+    $self->getStorageLocation->setPrivileges(
+        $self->get("ownerUserId"),
+        $self->get("groupIdView"),
+        $self->get("groupIdEdit"),
+    );
+}
+
+
+#-------------------------------------------------------------------
 
 sub purge {
         my $self = shift;
@@ -280,7 +297,8 @@ returns the output.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -332,7 +350,7 @@ sub view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,1);
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,1,$self->paginateVar);
 	if ($self->session->form->process("makePrintable") || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
@@ -343,10 +361,25 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
+}
+
+#-------------------------------------------------------------------
+
+=head2 paginateVar ( )
+
+create a semi-unique variable for pagination based on the Asset Id
+
+=cut
+
+sub paginateVar {
+     my $self = shift;
+     my $id = $self->getId();
+     return 'pn' . substr($id,0,2) . substr($id,-2,2) ;
 }
 
 #-------------------------------------------------------------------

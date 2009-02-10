@@ -3,7 +3,7 @@ use strict;
 
 our $HELP = {
     'survey template' => {
-        title  => '88',
+        title  => 'survey template title',
         body   => '',
         fields => [],
         isa    => [
@@ -15,93 +15,50 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'question.add.url' },
-            { 'name' => 'question.add.label' },
-            { 'name' => 'section.add.url' },
-            { 'name' => 'section.add.label' },
-            { 'name' => 'user.canTakeSurvey' },
-            { 'name' => 'form.header' },
-            { 'name' => 'form.footer' },
-            { 'name' => 'form.submit' },
-            { 'name' => 'questions.sofar.label' },
-            { 'name' => 'start.newresponse.label' },
-            { 'name' => 'start.newresponse.url' },
-            { 'name' => 'thanks.survey.label' },
-            { 'name' => 'thanks.quiz.label' },
-            { 'name' => 'questions.total' },
-            { 'name' => 'questions.correct.count.label' },
-            { 'name' => 'questions.correct.percent.label' },
-            { 'name' => 'mode.isSurvey' },
-            { 'name' => 'survey.noprivs.label' },
-            { 'name' => 'quiz.noprivs.label' },
-            { 'name' => 'response.id' },
-            { 'name' => 'response.count' },
-            { 'name' => 'user.isFirstResponse' },
-            { 'name' => 'user.canRespondAgain' },
-            { 'name' => 'questions.sofar.count' },
-            { 'name' => 'questions.correct.count' },
-            { 'name' => 'questions.correct.percent' },
-            { 'name' => 'response.isComplete' },
-            {   'name'      => 'section.edit_loop',
-                'variables' => [
-                    { 'name' => 'section.edit.controls' },
-                    { 'name' => 'section.edit.sectionName' },
-                    { 'name' => 'section.edit.id' },
-                    {   'name'      => 'section.questions_loop',
-                        'variables' => [
-                            { 'name' => 'question.edit.controls' },
-                            { 'name' => 'question.edit.question' },
-                            { 'name' => 'question.edit.id' },
-                        ],
-                    },
-                ],
-            },
-            {   'name'      => 'question_loop',
-                'variables' => [
-                    { 'name' => 'question.question' },
-                    { 'name' => 'question.allowComment' },
-                    { 'name' => 'question.id' },
-                    { 'name' => 'question.comment.field' },
-                    { 'name' => 'question.comment.label' },
-                    { 'name' => 'question.answer.field' }
-                ]
-            },
+            { 'name' => 'lastResponseCompleted' },
+            { 'name' => 'lastResponseTimedOut' },
+            { 'name' => 'maxResponsesSubmitted' },
         ],
-        related => []
+        related => [
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
+        ]
     },
 
     'survey template common vars' => {
-        title     => '90',
+        private   => 1,
+        title     => 'survey template common vars title',
         body      => '',
         fields    => [],
         variables => [
-            { 'name' => 'user.canViewReports' },
-            { 'name' => 'delete.all.responses.url' },
-            { 'name' => 'delete.all.responses.label' },
-            { 'name' => 'export.answers.url' },
-            { 'name' => 'export.answers.label' },
-            { 'name' => 'export.questions.url' },
-            { 'name' => 'export.questions.label' },
-            { 'name' => 'export.responses.url' },
-            { 'name' => 'export.responses.label' },
-            { 'name' => 'export.composite.url' },
-            { 'name' => 'export.composite.label' },
-            { 'name' => 'report.gradebook.url' },
-            { 'name' => 'report.gradebook.label' },
-            { 'name' => 'report.overview.url' },
-            { 'name' => 'report.overview.label' },
-            { 'name' => 'survey.url' },
-            { 'name' => 'survey.label' }
+            { 'name' => 'user_canTakeSurvey' },
+            { 'name' => 'user_canViewReports' },
+            { 'name' => 'user_canEditSurvey' },
+            { 'name' => 'edit_survey_url' },
+            { 'name' => 'take_survey_url' },
+            { 'name' => 'view_simple_results_url' },
+            { 'name' => 'view_transposed_results_url' },
+            { 'name' => 'view_statistical_overview_url' },
+            { 'name' => 'view_grade_book_url' },
         ],
-        related => [
-            {   tag       => 'survey template',
-                namespace => 'Asset_Survey'
-            }
-        ]
+        related => []
     },
 
     'gradebook report template' => {
-        title  => '1087',
+        title  => 'gradebook report template title',
         body   => '',
         fields => [],
         isa    => [
@@ -116,17 +73,12 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'title' },
-            { 'name' => 'question.count' },
-            { 'name' => 'response.user.label' },
-            { 'name' => 'response.count.label' },
-            { 'name' => 'response.percent.label' },
+            { 'name' => 'question_count' },
             {   'name'      => 'response_loop',
                 'variables' => [
-                    { 'name' => 'response.url' },
-                    { 'name' => 'response.user.name' },
-                    { 'name' => 'response.count.correct' },
-                    { 'name' => 'response.percent' }
+                    { 'name' => 'response_user_name' },
+                    { 'name' => 'response_count_correct' },
+                    { 'name' => 'response_percent' }
                 ]
             }
         ],
@@ -134,13 +86,26 @@ our $HELP = {
             {   tag       => 'survey template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
         ]
     },
 
-    'survey response template' => {
-        title => '1089',
-        body  => '',
-        isa   => [
+    'survey questions template' => {
+        title  => 'survey questions template title',
+        body   => '',
+        fields => [],
+        isa    => [
             {   namespace => 'Asset_Survey',
                 tag       => 'survey template common vars'
             },
@@ -148,44 +113,190 @@ our $HELP = {
                 tag       => 'survey asset template variables'
             },
         ],
-        fields    => [],
         variables => [
-            { 'name' => 'title', },
-            { 'name' => 'delete.url' },
-            { 'name' => 'delete.label' },
-            { 'name' => 'start.date.label' },
-            { 'name' => 'start.date.epoch' },
-            { 'name' => 'start.date.human' },
-            { 'name' => 'start.time.human' },
-            { 'name' => 'end.date.label' },
-            { 'name' => 'end.date.epoch' },
-            { 'name' => 'end.date.human' },
-            { 'name' => 'end.time.human' },
-            { 'name' => 'duration.label' },
-            { 'name' => 'duration.minutes' },
-            { 'name' => 'duration.minutes.label' },
-            { 'name' => 'duration.seconds' },
-            { 'name' => 'duration.seconds.label' },
-            { 'name' => 'answer.label' },
-            { 'name' => 'response.label' },
-            { 'name' => 'comment.label' },
-            {   'name'      => 'question_loop',
+            {   'name'  => 'questionsAnswered' },
+            {   'name'  => 'totalQuestions' },
+            {   'name'  => 'showProgress' },
+            {   'name'  => 'showTimeLimit' },
+            {   'name'  => 'minutesLeft' },
+            {   'name'  => 'questions',
                 'variables' => [
-                    { 'name' => 'question' },
-                    { 'name' => 'question.id', },
-                    { 'name' => 'question.isRadioList' },
-                    { 'name' => 'question.response' },
-                    { 'name' => 'question.comment' },
-                    { 'name' => 'question.isCorrect' },
-                    { 'name' => 'question.answer' }
-                ],
+                    {   'name' => 'id' },
+                    {   'name' => 'sid' },
+                    {   'name' => 'text' },
+                    {   'name' => 'fileLoader' },
+                    {   'name' => 'textType' },
+                    {   'name' => 'multipleChoice' },
+                    {   'name' => 'maxAnswers' },
+                    {   'name' => 'maxMoreOne' },
+                    {   'name' => 'dateType' },
+                    {   'name' => 'slider' },
+                    {   'name' => 'dualSlider' },
+                    {   'name' => 'a1' },
+                    {   'name' => 'a2' },
+                    {   'name' => 'verticalDisplay' },
+                    {   'name' => 'verts' },
+                    {   'name' => 'verte' },
+                    {   'name' => 'answers',
+                        'variables' => [
+                            { 'name' => 'id' },
+                            { 'name' => 'text' },
+                        ]
+                    }
+                ]
             }
         ],
-        related => []
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },            
+        ]
+    },
+
+    'survey section edit template' => {
+        title  => 'survey section edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'everyPageText' },
+            { 'name' => 'title' },
+            { 'name' => 'everyPageTitle' },
+            { 'name' => 'variable' },
+            { 'name' => 'goto' },
+            { 'name' => 'randomizeQuestions' },
+            { 'name' => 'terminal' },
+            { 'name' => 'terminalUrl' },
+            { 'name' => 'questionsOnSectionPage' },
+            { 'name' => 'questionsPerPage',
+                        'variables' => [
+                            { 'name' => 'index' },
+                            { 'name' => 'selected' },
+                        ]
+            }
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
+    },
+
+    'survey question edit template' => {
+        title  => 'survey question edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'variable' },
+            { 'name' => 'randomizeAnswers' },
+            { 'name' => 'questionType' ,
+                        'variables' => [
+                            { 'name' => 'selected' },
+                        ]
+            },
+            { 'name' => 'textInButton' },
+            { 'name' => 'required' },
+            { 'name' => 'allowComment' },
+            { 'name' => 'verticalDisplay' },
+            { 'name' => 'commentCols' },
+            { 'name' => 'commentRows' },
+            { 'name' => 'maxAnswers' },
+            { 'name' => 'value' },
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
+    },
+
+    'survey answer edit template' => {
+        title  => 'survey answer edit template title',
+        body   => '',
+        fields => [],
+        isa    => [],
+        variables => [
+            { 'name' => 'id' },
+            { 'name' => 'displayed_id' },
+            { 'name' => 'text' },
+            { 'name' => 'goto' },
+            { 'name' => 'value' },
+            { 'name' => 'isCorrect' },
+            { 'name' => 'textCols' },
+            { 'name' => 'textRows' },
+            { 'name' => 'min' },
+            { 'name' => 'max' },
+            { 'name' => 'step' },
+            { 'name' => 'verbatim' },
+            { 'name' => 'recordedAnswer' },
+        ],
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
     },
 
     'statistical overview report template' => {
-        title  => '1091',
+        title  => 'statistical overview template title',
         body   => '',
         fields => [],
         isa    => [
@@ -200,38 +311,37 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'title', },
-            {   'name'        => 'answer.label',
-                'description' => 'report answer.label'
-            },
-            {   'name'        => 'response.count.label',
-                'description' => 'report response.count.label'
-            },
-            { 'name' => 'response.percent.label', },
-            { 'name' => 'show.responses.label' },
-            { 'name' => 'show.comments.label' },
             {   'name'      => 'question_loop',
                 'variables' => [
                     { 'name' => 'question', },
-                    { 'name' => 'question.id', },
-                    { 'name' => 'question.isRadioList', },
-                    { 'name' => 'question.response.total' },
-                    { 'name' => 'question.allowComment', },
+                    { 'name' => 'question_id', },
+                    { 'name' => 'question_isMultipleChoice', },
+                    { 'name' => 'question_response_total' },
+                    { 'name' => 'question_allowComment', },
                     {   'name'      => 'answer_loop',
                         'variables' => [
-                            { 'name' => 'answer.isCorrect' },
+                            { 'name' => 'answer_isCorrect' },
                             { 'name' => 'answer' },
-                            { 'name' => 'answer.response.count' },
-                            { 'name' => 'answer.response.percent' },
+                            { 'name' => 'answer_response_count' },
+                            { 'name' => 'answer_response_percent' },
+                            { 'name' => 'answer_comment' },
+                            { 'name' => 'answer_value' },
                             {   'name'      => 'comment_loop',
-                                'variables' => [ { 'name' => 'answer.comment' } ]
+                                'variables' => [ { 'name' => 'answer_comment' } ]
                             }
                         ]
                     }
                 ],
             }
         ],
-        related => []
+        related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+        ]
     },
 
     'survey asset template variables' => {
@@ -246,18 +356,12 @@ our $HELP = {
         fields    => [],
         variables => [
             { 'name' => 'templateId' },
-            { 'name' => 'Survey_id' },
-            { 'name' => 'questionOrder' },
             { 'name' => 'groupToTakeSurvey' },
             { 'name' => 'groupToViewReports' },
-            { 'name' => 'mode' },
-            { 'name' => 'anonymous' },
             { 'name' => 'maxResponsesPerUser' },
-            { 'name' => 'questionsPerPage' },
             { 'name' => 'overviewTemplateId' },
             { 'name' => 'gradebookTemplateId' },
             { 'name' => 'responseTemplateId' },
-            { 'name' => 'defaultSectionId' },
         ],
     },
 

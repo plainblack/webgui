@@ -151,12 +151,12 @@ WebGUI.AssetManager.formatLockedBy = function ( elCell, oRecord, oColumn, orderN
     elCell.innerHTML 
         = oRecord.getData( 'lockedBy' )
         ? '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/locked.gif" alt="locked by ' + oRecord.getData( 'lockedBy' ) + '" '
-            + 'title="locked by ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
+            + '<img src="' + extras + '/assetManager/locked.gif" alt="' + WebGUI.AssetManager.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" '
+            + 'title="' + WebGUI.AssetManager.i18n.get('WebGUI', 'locked by') + ' ' + oRecord.getData( 'lockedBy' ) + '" border="0" />'
             + '</a>'
         : '<a href="' + WebGUI.AssetManager.appendToUrl(oRecord.getData( 'url' ), 'func=manageRevisions') + '">'
-            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="unlocked" '
-            + 'title="unlocked" border="0" />'
+            + '<img src="' + extras + '/assetManager/unlocked.gif" alt="' + WebGUI.AssetManager.i18n.get('WebGUI', 'unlocked') + '" '
+            + 'title="' + WebGUI.AssetManager.i18n.get('WebGUI', 'unlocked') +'" border="0" />'
             + '</a>'
         ;
 };
@@ -231,7 +231,9 @@ WebGUI.AssetManager.initManager = function (o) {
             namespaces  : {
                 'Asset' : [
                     "edit",
-                    "More"
+                    "More",
+                    "unlocked",
+                    "locked by"
                 ],
                 'WebGUI' : [
                     "< prev",

@@ -92,7 +92,7 @@ sub getValue {
 	$value =~ tr/\r\n//d;
 	# empty
 	if ($value eq "" || $value =~ m{^http://$}i) {
-		return undef;
+		return "";
 	}
 	# proper email url
     elsif ($value =~ /mailto:/) {

@@ -121,6 +121,7 @@ Survey.ObjectTemplate = (function(){
             editor.render();
 
             dialog.show();
+            initHoverHelp(type);
         }
     };
 })();

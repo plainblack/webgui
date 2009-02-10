@@ -143,6 +143,20 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+=cut
+
+sub isInRequest {
+    my $self = shift;
+    my $form = $self->session->form;
+    my $name = $self->get('name');
+    return $form->hasParam($name.'_interval')
+        || $form->hasParam($name.'_units');
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders an interval control.

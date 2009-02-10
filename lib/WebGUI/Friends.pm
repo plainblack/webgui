@@ -105,7 +105,7 @@ sub approveAddRequest {
 
 =head2 delete ( \@userIds )
 
-Remove friends.
+Remove friends.  Also removes the reciprocal relationship.
 
 =head3 userIds
 
@@ -116,7 +116,13 @@ An array reference of userIds to remove from friends list.
 sub delete {
     my $self = shift;
     my $userIds = shift;
-    $self->user->friends->deleteUsers($userIds);
+    my $me = $self->user;
+
+    $me->friends->deleteUsers($userIds);
+    foreach my $userId (@{$userIds}) {
+        my $friend = WebGUI::User->new($self->session, $userId);
+        $friend->friends->deleteUsers([$me->userId]);
+    }
 }
 
 #-------------------------------------------------------------------
