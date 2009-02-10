@@ -930,30 +930,22 @@ sub www_getCompareFormData {
             listing.views,
             listing.compares,
             listing.clicks,
-            listing.lastUpdated
-        from MatrixListing as listing
-            left join asset on listing.assetId = asset.assetId
-            left join assetData on assetData.assetId = listing.assetId and listing.revisionDate =
+            listing.lastUpdated,
+            max(assetData.revisionDate)
+        from asset
+            left join assetData using(assetId)
+        left join MatrixListing as listing on listing.assetId = assetData.assetId and listing.revisionDate =
 assetData.revisionDate
         where
             asset.parentId=?
             and asset.state='published'
             and asset.className='WebGUI::Asset::MatrixListing'
-            and assetData.revisionDate=(
-                select
-                    max(revisionDate)
-                from
-                    assetData
-                where
-                    assetData.assetId=asset.assetId
-                    and (status='approved' or status='archived')
-            )
             and status='approved'
-        group by
-            assetData.assetId
+        group by assetData.assetId  
         order by ".$sort.$sortDirection;
 
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
+
     foreach my $result (@results){
             if($form->process("search")){
                 # $self->session->errorHandler->warn("checking listing: ".$result->{title});
@@ -993,11 +985,11 @@ assetData.revisionDate
             $result->{assetId}  =~ s/-/_____/g;
             $result->{url}      = $session->url->gateway($result->{url});
     }
-
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
-    return JSON->new->utf8->encode($jsonOutput);
+    my $encodedOutput = JSON->new->utf8->encode($jsonOutput);
+    return $encodedOutput;
 }
 
 #-------------------------------------------------------------------
@@ -1023,8 +1015,7 @@ sub www_getCompareListData {
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
     }
-
-
+    
     foreach my $listingId (@listingIds){
         $listingId =~ s/_____/-/g;
         my $listing = WebGUI::Asset::MatrixListing->new($session,$listingId);
@@ -1049,17 +1040,18 @@ sub www_getCompareListData {
         my $fields = " a.name, a.fieldType, a.attributeId, a.description ";
         my $from = "from Matrix_attribute a";
         my $tableCount = "b";
+        my $where;
         foreach my $listingId (@listingIds) {
             my $listingId_safe = $listingId;
             $listingId_safe =~ s/-/_____/g;
             $fields .= ", ".$tableCount.".value as `$listingId_safe`";
-            $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId="
-                .$tableCount.".attributeId and ".$tableCount.".matrixListingId=? ";
+            $from .= " left join MatrixListing_attribute ".$tableCount." on a.attributeId=".$tableCount.".attributeId";
+            $where .=  "and ".$tableCount.".matrixListingId=?";
             $tableCount++;
         }
         push(@results, @{ $self->session->db->buildArrayRefOfHashRefs(
-            "select $fields $from where a.category=? and a.assetId=? order by a.name",
-            [@listingIds,$category,$self->getId]
+            "select $fields $from where a.category=? and a.assetId=? ".$where." order by a.name",
+            [$category,$self->getId,@listingIds]
         ) });
     }
     foreach my $result (@results){
@@ -1095,7 +1087,6 @@ sub www_getCompareListData {
             }
         }
     }
-
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
     $session->http->setMimeType("application/json");
