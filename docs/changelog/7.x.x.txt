@@ -1,4 +1,5 @@
 7.6.11
+ - fixed: Asset Manager can generate URLs that are too long
  - fixed #9629: override stringify date format to use java default format.
  - Added a switch to allow the use of non-WebGUI objects with the Workflow
    engine.

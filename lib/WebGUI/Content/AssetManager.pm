@@ -436,7 +436,7 @@ ENDHTML
     
     ### The page of assets
     $output         .= q{<div>}
-                    . q{<form>}
+                    . q{<form method="post" enctype="multipart/form-data">}
                     . q{<input type="hidden" name="op" value="assetManager" />}
                     . q{<input type="hidden" name="method" value="manage" />}
                     . q{<div id="dataTableContainer">}
@@ -620,7 +620,7 @@ sub www_search {
         }
         else {
             ### Display the search results 
-            $output         .= q{<form>}
+            $output         .= q{<form method="post" enctype="multipart/form-data">}
                             . q{<input type="hidden" name="op" value="assetManager" />}
                             . q{<input type="hidden" name="method" value="search" />}
                             . q{<input type="hidden" name="pn" value="} . $session->form->get('pn') . q{" />}
