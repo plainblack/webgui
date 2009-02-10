@@ -55,7 +55,7 @@ my $snippet = $folder->addChild({
 });
 
 my $packageAssetId = $folder->getId;
-hack_session_request($session, $packageAssetId);
+$session->request->setup_body({ assetId => $packageAssetId });
 
 my $targetFolderChildren;
 $targetFolderChildren = $targetFolder->getLineage(["children"], {returnObjects => 1,});
@@ -83,21 +83,6 @@ $newVersionTag->commit;
 TODO: {
     local $TODO = "Tests to make later";
     ok(0, 'Check package deployment with 2-level package and look for new style templates propagating down the tree');
-}
-
-
-##This allows us to place an arbitrary assetId inside the form processor.
-##This is required for deploying a package.
-sub hack_session_request {
-    my ($session, $id) = @_;
-    my $request = Test::MockObject->new();
-    $request->mock('body',
-        sub {
-            return $id
-        },
-    );
-    $request->mock('param', sub { shift->body(@_) });
-    $session->{_request} = $request;
 }
 
 END {
