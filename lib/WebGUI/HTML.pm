@@ -443,5 +443,44 @@ sub splitTag {
     return $result[0];
 }
 
+sub splitHeadBody {
+    my $html = shift;
+
+    my $parser = HTML::Parser->new(api_version => 3);
+
+    my $head = '';
+    my $body = '';
+    my $accum;
+    $parser->handler(start => sub {
+        my ($tag, $text) = @_;
+        if ($tag eq 'head') {
+            $accum = \$head;
+        }
+        elsif ($tag eq 'body') {
+            $accum = \$body;
+        }
+        elsif ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->handler(end => sub {
+        my ($tag, $text) = @_;
+        if ($tag eq 'head' || $tag eq 'body') {
+            $accum = undef;
+        }
+        elsif ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->handler(default => sub {
+        my ($tag, $text) = @_;
+        if ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->parse($html);
+    return ($head, $body);
+}
+
 1;
 

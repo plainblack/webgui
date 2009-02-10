@@ -1948,13 +1948,12 @@ sub outputWidgetMarkup {
     # we'll be serializing the content of the asset which is being widgetized. 
     my $storage         = WebGUI::Storage->get($session, $assetId);
     my $content         = $self->view;
-    if($styleTemplateId eq '' or $styleTemplateId eq 'none'){
-        $content = $self->session->style->userStyle($content); 
-    }else{
+    if($styleTemplateId ne '' && $styleTemplateId ne 'none'){
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
+    my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $body } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
     my $jsonUrl         = $storage->getUrl("$assetId.js");
 
@@ -1985,6 +1984,7 @@ sub outputWidgetMarkup {
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
+        $headTags
     </head>
     <body id="widget$assetId">
         \${asset$assetId.content}

@@ -72,6 +72,11 @@ sub process {
         $wgWidgetPath       = $exportUrl . $extras . '/wgwidget.js';
         $scratch->delete('exportUrl');
         my $viewContent    = $asset->view;
+        if ($styleTemplateId ne '' && $styleTemplateId ne 'none') {
+            $viewContent = $session->style->process($viewContent,$styleTemplateId);
+        }
+        my ($headTags, $bodyContent) = WebGUI::HTML::splitHeadBody($viewContent);
+
         WebGUI::Macro::process($session, \$viewContent);
         my $containerCss    = $extras . '/yui/build/container/assets/container.css';
         my $containerJs     = $extras . '/yui/build/container/container-min.js';
@@ -95,9 +100,10 @@ sub process {
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
+        $headTags
     </head>
     <body id="widget$assetId">
-        $viewContent
+        $bodyContent
     </body>
 </html>
 OUTPUT
