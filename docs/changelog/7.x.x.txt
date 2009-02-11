@@ -1,6 +1,7 @@
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
  - fixed: Do not show the Edit entry in the More menu in the asset manager if the asset is locked.
+ - fixed #9677: no output from form helper template variable sticky.form and stick.label
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long

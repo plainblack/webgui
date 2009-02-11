@@ -929,30 +929,32 @@ sub paste {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
-	my $i18n = WebGUI::International->new($self->session);
-	if ($self->session->form->process("assetId") eq "new") {
+    my $session = $self->session;
+    my $form    = $session->form;
+	my $i18n = WebGUI::International->new($session);
+	if ($form->process("assetId") eq "new") {
 		my %data = (
-			ownerUserId => $self->session->user->userId,
-			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->username,
+			ownerUserId => $session->user->userId,
+			username => $form->process("visitorName") || $session->user->profileField("alias") || $session->user->username,
 			);
 		$self->update(\%data);
-		if ($self->getThread->getParent->canEdit) {
-			$self->getThread->lock if ($self->session->form->process('lock'));
-			$self->getThread->stick if ($self->session->form->process("stick"));
-		}
 	}
     # force the value to be empty so it gets updated properly by content
-    $self->update({synopsis => ($self->session->form->process("synopsis") || "")});
-	if ($self->session->form->process("archive") && $self->getThread->getParent->canModerate) {
+    $self->update({synopsis => ($form->process("synopsis") || "")});
+	if ($form->process("archive") && $self->getThread->getParent->canModerate) {
 		$self->getThread->archive;
 	} elsif ($self->getThread->get("status") eq "archived") {
 		$self->getThread->unarchive;
 	}
-    if ($self->session->form->process("subscribe")) {
+    if ($form->process("subscribe")) {
         $self->getThread->subscribe;
     }
     else {
         $self->getThread->unsubscribe;
+    }
+    if ($self->getThread->getParent->canEdit) {
+        $form->process('isLocked') ?  $self->getThread->lock  : $self->getThread->unlock;
+        $form->process('isSticky') ?  $self->getThread->stick : $self->getThread->unstick;
     }
 	delete $self->{_storageLocation};
 	$self->postProcess;
@@ -1229,14 +1231,16 @@ sub www_edit {
     
 	my (%var, $content, $title, $synopsis);
 	my $i18n = WebGUI::International->new($session);
+
+
+    my $className = $form->process("class","className") || $self->get('className');
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
-        #Add Form Header for all new posts
-        my $className = $form->process("class","className");
         #Post to the parent if this is a new request
         my $action    = $self->getParent->getUrl;
         #Post to self if there was an error Posting to a Thread (not a Collaboration)
         $action       = $self->getUrl if($func eq "editSave" && $className ne "WebGUI::Asset::Post::Thread");
         
+        #Add Form Header for all new posts
         $var{'form.header'} = WebGUI::Form::formHeader($session,{
             action=>$action
         });
@@ -1304,16 +1308,6 @@ sub www_edit {
 			return $privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{'isThread'    } = 1;
 			$var{'isNewThread' } = 1;
-            if ($self->getThread->getParent->canEdit) {
-                $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
-                    name=>'stick',
-                    value=>$form->process("stick")
-                });
-                $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
-                    name=>'lock',
-                    value=>$form->process('lock')
-                });
-			}
             my $subscribe = $form->process("subscribe");
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
@@ -1429,6 +1423,19 @@ sub www_edit {
         value=>$content,
         richEditId=>$self->getThread->getParent->get("richEditor")
     });
+    ##Edit variables just for Threads
+    $session->log->warn("className: $className");
+    $session->log->warn("canEdit parent: ". $self->getThread->getParent->canEdit);
+    if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {
+        $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
+            name=>'isSticky',
+            value=>$form->process('isSticky') || $self->get('isSticky'),
+        });
+        $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
+            name=>'isLocked',
+            value=>$form->process('isLocked') || $self->get('isLocked'),
+        });
+    }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
         extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
 	});
