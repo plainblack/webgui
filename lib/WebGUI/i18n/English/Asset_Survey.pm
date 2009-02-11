@@ -31,6 +31,10 @@ our $I18N = {
 		message => q|View Grade Book|,
 		lastUpdated => 1224686319
 	},
+    'delete responses' => {
+        message => q|Delete Responses|,
+        lastUpdated => 0
+    },
 	'continue button' => {
 		message => q|Continue|,
 		lastUpdated => 1224686319

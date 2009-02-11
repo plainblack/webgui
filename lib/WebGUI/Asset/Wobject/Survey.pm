@@ -443,9 +443,6 @@ sub www_jumpTo {
     $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
         [ $self->getId, $self->session->user->userId() ] );
 
-    # Create a new response
-#    $self->responseId();
-
     # Break the $id down into sIndex and qIndex
     my ($sIndex, $qIndex) = split /-/, $id;
 
@@ -843,6 +840,7 @@ sub getMenuVars {
     
     $var{'edit_survey_url'}               = $self->getUrl('func=editSurvey');
     $var{'take_survey_url'}               = $self->getUrl('func=takeSurvey');
+    $var{'delete_responses_url'}          = $self->getUrl('func=deleteResponses');
     $var{'view_simple_results_url'}       = $self->getUrl('func=exportSimpleResults');
     $var{'view_transposed_results_url'}   = $self->getUrl('func=exportTransposedResults');
     $var{'view_statistical_overview_url'} = $self->getUrl('func=viewStatisticalOverview');
@@ -930,61 +928,31 @@ See WebGUI::Asset::Wobject::www_view() for details.
 
 sub www_view {
     my $self = shift;
-    $self->SUPER::www_view(@_);
+    return $self->SUPER::www_view(@_);
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_takeSurvey
 
-Returns the template needed to take the survey.  This template dynamically loads the survey via async requests.
+The take survey page does very little. It is a simple shell (controlled by surveyTakeTemplateId).
+
+Survey questions are loaded asynchronously via javascript calls to L<"www_loadQuestions">.
 
 =cut
 
 sub www_takeSurvey {
     my $self = shift;
-    my %var;
-
-    eval {
-        my $responseId = $self->responseId();
-        if ( !$responseId ) {
-            $self->session->log->debug('No responseId, surveyEnd');
-
-            #            return $self->surveyEnd(); # disabled. let the js handle the exitUrl redirection
-        }
-        else {
-            $self->session->log->debug("ResponseId: $responseId");
-        }
-    };
-
-    $self->session->style->setScript($self->session->url->extras('yui/build/utilities/utilities.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/container/container-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/menu/menu-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/calendar/calendar-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/logger/logger-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/resize/resize-min.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('yui/build/slider/slider-min.js'), {type =>
-    'text/javascript'});
-
-    my $out = $self->processTemplate( \%var, $self->get("surveyTakeTemplateId") );
-    return $self->session->style->process( $out, $self->get("styleTemplateId") );
-} ## end sub www_takeSurvey
+    
+    my $out = $self->processTemplate( {}, $self->get('surveyTakeTemplateId') );
+    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+}
 
 #-------------------------------------------------------------------
 
 =head2 www_deleteResponses
 
-Deletes all the responses from the survey.
+Deletes all responses from this survey instance.
 
 =cut
 
@@ -992,7 +960,7 @@ sub www_deleteResponses {
     my $self = shift;
 
     return $self->session->privilege->insufficient()
-        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
     $self->session->db->write( 'delete from Survey_response where assetId = ?', [ $self->getId ] );
 
@@ -1086,7 +1054,7 @@ sub www_loadQuestions {
         return $self->surveyEnd();
     }
 
-    my $responseId = $self->responseId();    #also loads the survey and response
+    my $responseId = $self->responseId();
     if ( !$responseId ) {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
@@ -1142,7 +1110,7 @@ sub surveyEnd {
 
     $completeCode = defined $completeCode ? $completeCode : 1;
 
-    if ( my $responseId = $self->responseId() ) {    #also loads the survey and response
+    if ( my $responseId = $self->responseId ) {
          #    $self->session->db->write("update Survey_response set endDate = ? and isComplete > 0 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
         $self->session->db->setRow(
             "Survey_response",
