@@ -35,6 +35,7 @@ removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
 removeProcessRecurringPaymentsFromConfig($session);
 noSessionSwitch($session);
+surveyDoAfterTimeLimit($session);
 
 fixDottedAssetIds($session);  ##This one should run last
 finish($session); # this line required
@@ -79,6 +80,14 @@ sub undotBinaryExtensions {
     my $extensions = $session->config->get('exportBinaryExtensions');
     my @newExtensions = map { s/\.//; $_ } @{ $extensions };
     $session->config->set('exportBinaryExtensions', \@newExtensions);
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub surveyDoAfterTimeLimit {
+    my $session = shift;
+    print "\tAdding column doAfterTimeLimit to Survey table... " unless $quiet;
+    $session->db->write('alter table Survey add doAfterTimeLimit char(22)');
     print "DONE!\n" unless $quiet;
 }
 
