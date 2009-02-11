@@ -49,6 +49,7 @@ Survey.ObjectTemplate = (function(){
                 text: "Cancel",
                 handler: function(){
                     this.cancel();
+                    Survey.Comm.loadSurvey('-');
                 }
             }, {
                 text: "Delete",
