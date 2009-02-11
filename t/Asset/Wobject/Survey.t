@@ -61,7 +61,8 @@ $survey->saveSurveyJSON();
 
 # Now start a response as admin user
 $session->user( { userId =>3 } );
-$survey->getResponseId( { noCookie => 1 }); # triggers loadBothJSON()
+$survey->responseIdCookies(0);
+#$survey->responseId( { noCookie => 1 }); # triggers loadBothJSON()
 
 #for my $address (@{ $survey->responseJSON->surveyOrder }) {
 #    diag (Dumper $address);

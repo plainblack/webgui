@@ -334,7 +334,7 @@ sub responseJSON {
     my ($json, $responseId) = validate_pos(@_, { type => SCALAR | UNDEF, optional => 1 }, { type => SCALAR, optional => 1});
     
     if (!defined $responseId) {
-        $responseId = $self->{responseId};
+        $responseId = $self->responseId;
     }
      
     if (!$self->{_responseJSON} || $json) {
@@ -443,8 +443,8 @@ sub www_jumpTo {
     $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
         [ $self->getId, $self->session->user->userId() ] );
 
-    # Create a new response (and trigger loadBothJSON())
-    $self->getResponseId();
+    # Create a new response
+#    $self->responseId();
 
     # Break the $id down into sIndex and qIndex
     my ($sIndex, $qIndex) = split /-/, $id;
@@ -946,7 +946,7 @@ sub www_takeSurvey {
     my %var;
 
     eval {
-        my $responseId = $self->getResponseId();
+        my $responseId = $self->responseId();
         if ( !$responseId ) {
             $self->session->log->debug('No responseId, surveyEnd');
 
@@ -1015,7 +1015,7 @@ sub www_submitQuestions {
         return $self->surveyEnd();
     }
 
-    my $responseId = $self->getResponseId();
+    my $responseId = $self->responseId();
     if ( !$responseId ) {
         $self->session->log->debug('No response id, surveyEnd');
         return $self->surveyEnd();
@@ -1025,8 +1025,6 @@ sub www_submitQuestions {
     delete $$responses{'func'};
 
     my @goodResponses = keys %$responses;    #load everything.
-
-#    $self->loadBothJSON();
 
     my $termInfo = $self->responseJSON->recordResponses( $responses );
 
@@ -1088,7 +1086,7 @@ sub www_loadQuestions {
         return $self->surveyEnd();
     }
 
-    my $responseId = $self->getResponseId();    #also loads the survey and response
+    my $responseId = $self->responseId();    #also loads the survey and response
     if ( !$responseId ) {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
@@ -1144,7 +1142,7 @@ sub surveyEnd {
 
     $completeCode = defined $completeCode ? $completeCode : 1;
 
-    if ( my $responseId = $self->getResponseId() ) {    #also loads the survey and response
+    if ( my $responseId = $self->responseId() ) {    #also loads the survey and response
          #    $self->session->db->write("update Survey_response set endDate = ? and isComplete > 0 where Survey_responseId = ?",[WebGUI::DateTime->now->toDatabase,$responseId]);
         $self->session->db->setRow(
             "Survey_response",
@@ -1250,30 +1248,30 @@ sub prepareShowSurveyTemplate {
     return to_json( { "type", "displayquestions", "section", $section, "questions", $questions, "html", $out } );
 } ## end sub prepareShowSurveyTemplate
 
-#-------------------------------------------------------------------
-
-=head2 loadBothJSON($rId)
-
-Loads both the Survey and the appropriate response objects from JSON.
-
-=head3 $rId
-
-The reponse id to load.
-
-=cut
-
-sub loadBothJSON {
-    my $self = shift;
-    my $rId  = shift;
-#    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
-    my $ref = $self->session->db->buildArrayRefOfHashRefs( "
-        select s.surveyJSON,r.responseJSON 
-        from Survey s, Survey_response r 
-        where s.assetId = ? and r.Survey_responseId = ?",
-        [ $self->getId, $rId ] );
-    $self->surveyJSON( $ref->[0]->{surveyJSON} );
-    $self->responseJSON( $ref->[0]->{responseJSON}, $rId );
-}
+##-------------------------------------------------------------------
+#
+#=head2 loadBothJSON($rId)
+#
+#Loads both the Survey and the appropriate response objects from JSON.
+#
+#=head3 $rId
+#
+#The reponse id to load.
+#
+#=cut
+#
+#sub loadBothJSON {
+#    my $self = shift;
+#    my $rId  = shift;
+##    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
+#    my $ref = $self->session->db->buildArrayRefOfHashRefs( "
+#        select s.surveyJSON,r.responseJSON 
+#        from Survey s, Survey_response r 
+#        where s.assetId = ? and r.Survey_responseId = ?",
+#        [ $self->getId, $rId ] );
+#    $self->surveyJSON( $ref->[0]->{surveyJSON} );
+#    $self->responseJSON( $ref->[0]->{responseJSON}, $rId );
+#}
 
 #-------------------------------------------------------------------
 
@@ -1286,112 +1284,131 @@ Turns the response object into JSON and saves it to the DB.
 sub saveResponseJSON {
     my $self = shift;
     my $data = $self->responseJSON->freeze();
-    $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?", [ $data, $self->{responseId} ] );
+    $self->session->db->write( 'update Survey_response set responseJSON = ? where Survey_responseId = ?', [ $data, $self->responseId ] );
+    return;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getResponseId
+=head2 responseId
 
-Determines the response id of the current user.  If there is not a response for the user, a new one is created.
-If the user is anonymous, the IP is used.  Or an email'd or linked code can be used.
+Mutator for the responseIdCookies that determines whether cookies are used as
+part of the L<"responseId"> lookup process.
+
+Useful for disabling cookie operations during tests, since WebGUI::Test::getPage
+currently does not support cookies.
 
 =cut
 
-sub getResponseId {
+sub responseIdCookies {
     my $self = shift;
-    my %opts = validate(@_, { noCookie => 0 } ); # This is a hack to allow for testing (cookies cause problems)
-
-    return $self->{responseId} if ( defined $self->{responseId} );
-
-    my $ip = $self->session->env->getIp;
-    my $id = $self->session->user->userId();
-
-    my $anonId = $self->session->form->process('userid');
+    my ($x) = validate_pos(@_, {type => SCALAR, optional => 1});
     
-    unless ($opts{noCookie}) {
-        $anonId ||= $self->session->http->getCookies->{Survey2AnonId};
+    if (defined $x) {
+        $self->{_responseIdCookies} = $x;
     }
 
-    $anonId ||= undef;
+    # Defaults to true..
+    return defined $self->{_responseIdCookies} ? $self->{_responseIdCookies} : 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 responseId
+
+Accessor for the responseId property, which is the unique identifier for a single 
+L<WebGUI::Asset::Wobject::Survey::ResponseJSON> instance. See also L<"responseJSON">.
+
+The responseId of the current user is returned, or created if one does not already exist.
+If the user is anonymous, the IP is used. Or an emailed or linked code can be used.
+
+=cut
+
+sub responseId {
+    my $self = shift;
+
+    if (!defined $self->{responseId}) {
     
-    unless ($opts{noCookie}) {
-        $self->session->http->setCookie( Survey2AnonId => $anonId ) if ($anonId);
-    }
-
-    my $responseId;
-
-    my $string;
-
-    #if there is an anonid or id is for a WG user
-    if ( $anonId or $id != 1 ) {
-        $string = 'userId';
-        if ($anonId) {
-            $string = 'anonId';
-            $id     = $anonId;
+        my $ip = $self->session->env->getIp;
+        my $id = $self->session->user->userId;
+        my $anonId = $self->session->form->process('userid');
+        if ($self->responseIdCookies) {
+            $anonId ||= $self->session->http->getCookies->{Survey2AnonId}; ## no critic
         }
-        $responseId
-            = $self->session->db->quickScalar(
-            "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-            [ $id, $self->getId() ] );
-
-    }
-    elsif ( $id == 1 ) {
-        $responseId = $self->session->db->quickScalar(
-            "select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0",
-            [ $id, $ip, $self->getId() ]
-        );
-    }
-
-    if ( !$responseId ) {
-        my $allowedTakes
-            = $self->session->db->quickScalar(
-            "select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1",
-            [ $self->getId() ] );
-        my $haveTaken;
-
-        if ( $id == 1 ) {
-            $haveTaken
-                = $self->session->db->quickScalar(
-                "select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?",
-                [ $id, $ip, $self->getId() ] );
+        $anonId ||= undef;
+        
+        if ($self->responseIdCookies) {
+            $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
         }
-        else {
-            $haveTaken
+    
+        my ($responseId, $string);
+
+        # if there is an anonid or id is for a WG user
+        if ( $anonId or $id != 1 ) {
+            $string = 'userId';
+            if ($anonId) {
+                $string = 'anonId';
+                $id     = $anonId;
+            }
+            $responseId
                 = $self->session->db->quickScalar(
-                "select count(*) from Survey_response where $string = ? and assetId = ?",
+                "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
                 [ $id, $self->getId() ] );
+    
         }
-
-        if ( $haveTaken < $allowedTakes ) {
-            my $time = time();
-            $responseId = $self->session->db->setRow(
-                "Survey_response",
-                "Survey_responseId", {
-                    Survey_responseId => "new",
-                    userId            => $id,
-                    ipAddress         => $ip,
-                    username          => $self->session->user->username,
-                    startDate         => $time,                            #WebGUI::DateTime->now->toDatabase,
-                    endDate           => 0,                                #WebGUI::DateTime->now->toDatabase,
-                    assetId           => $self->getId(),
-                    anonId            => $anonId
-                }
+        elsif ( $id == 1 ) {
+            $responseId = $self->session->db->quickScalar(
+                'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
+                [ $id, $ip, $self->getId() ]
             );
-#            $self->loadBothJSON($responseId);
-#            $self->responseJSON(undef, $responseId);
-#            $self->responseJSON->createSurveyOrder();
-            $self->{responseId} = $responseId;
-            $self->saveResponseJSON();
+        }
+    
+        if ( !$responseId ) {
+            my $allowedTakes
+                = $self->session->db->quickScalar(
+                'select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1',
+                [ $self->getId() ] );
+            my $haveTaken;
+    
+            if ( $id == 1 ) {
+                $haveTaken
+                    = $self->session->db->quickScalar(
+                    'select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?',
+                    [ $id, $ip, $self->getId() ] );
+            }
+            else {
+                $haveTaken
+                    = $self->session->db->quickScalar(
+                    "select count(*) from Survey_response where $string = ? and assetId = ?",
+                    [ $id, $self->getId() ] );
+            }
+    
+            if ( $haveTaken < $allowedTakes ) {
+                $responseId = $self->session->db->setRow(
+                    'Survey_response',
+                    'Survey_responseId', {
+                        Survey_responseId => 'new',
+                        userId            => $id,
+                        ipAddress         => $ip,
+                        username          => $self->session->user->username,
+                        startDate         => scalar time,                      #WebGUI::DateTime->now->toDatabase,
+                        endDate           => 0,                                #WebGUI::DateTime->now->toDatabase,
+                        assetId           => $self->getId(),
+                        anonId            => $anonId
+                    }
+                );
 
+                # Store the newly created responseId and then persist ResponseJSON
+                $self->{responseId} = $responseId;
+                $self->saveResponseJSON();
+            }
+            else {
+                $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
+            }
         }
-        else {
-            $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
-        }
+        $self->{responseId} = $responseId;
     }
-    $self->{responseId} = $responseId;
-#    $self->loadBothJSON($responseId);
-    return $responseId;
+    return $self->{responseId};
 }
 
 #-------------------------------------------------------------------
@@ -1407,7 +1424,7 @@ sub canTakeSurvey {
 
     return $self->{canTake} if ( defined $self->{canTake} );
 
-    if ( !$self->session->user->isInGroup( $self->get("groupToTakeSurvey") ) ) {
+    if ( !$self->session->user->isInGroup( $self->get('groupToTakeSurvey') ) ) {
         return 0;
     }
 
@@ -1426,7 +1443,7 @@ sub canTakeSurvey {
     else {
         $takenCount
             = $self->session->db->quickScalar(
-            "select count(*) from Survey_response where userId = ? and assetId = ? and isComplete > ?",
+            'select count(*) from Survey_response where userId = ? and assetId = ? and isComplete > ?',
             [ $id, $self->getId(), 0 ] );
     }
 
@@ -1438,7 +1455,7 @@ sub canTakeSurvey {
     }
     return $self->{canTake};
 
-} ## end sub canTakeSurvey
+}
 
 #-------------------------------------------------------------------
 
