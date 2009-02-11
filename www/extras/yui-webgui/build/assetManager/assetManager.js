@@ -46,16 +46,19 @@ WebGUI.AssetManager.addHighlightToRow
     Build a WebGUI style "More" menu for the asset referred to by url
 */
 WebGUI.AssetManager.buildMoreMenu
-= function ( url, linkElement ) {
+= function ( url, linkElement, isNotLocked ) {
     // Build a more menu
     var rawItems    = WebGUI.AssetManager.MoreMenuItems;
     var menuItems   = [];
+    var isLocked    = !isNotLocked;
     for ( var i = 0; i < rawItems.length; i++ ) {
         var itemUrl     = rawItems[i].url.match( /<url>/ )
                         ? rawItems[i].url.replace( /<url>(?:\?(.*))?/, WebGUI.AssetManager.appendToUrl(url, "$1") )
                         : url + rawItems[i].url
                         ;
-        menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
+        if (! (itemUrl.match( /func=edit;/) && isLocked )) {
+            menuItems.push( { "url" : itemUrl, "text" : rawItems[i].label } );
+        }
     }
     var options = {
         "zindex"                    : 1000,
@@ -109,7 +112,7 @@ WebGUI.AssetManager.formatActions = function ( elCell, oRecord, oColumn, orderNu
         oldMenu.parentNode.removeChild( oldMenu );
     }
 
-    var options = WebGUI.AssetManager.buildMoreMenu(oRecord.getData( 'url' ), more);
+    var options = WebGUI.AssetManager.buildMoreMenu(oRecord.getData( 'url' ), more, oRecord.getData( 'actions' ));
 
     var menu    = new YAHOO.widget.Menu( "moreMenu" + oRecord.getData( 'assetId' ), options );
     YAHOO.util.Event.onDOMReady( function () { menu.render( document.getElementById( 'assetManager' ) ) } );
@@ -346,10 +349,10 @@ WebGUI.AssetManager.selectRow = function ( child ) {
     Build a More menu for the last element of the Crumb trail
 */
 WebGUI.AssetManager.showMoreMenu 
-= function ( url, linkTextId ) {
+= function ( url, linkTextId, isNotLocked ) {
     var more    = document.getElementById(linkTextId);
 
-    var options = WebGUI.AssetManager.buildMoreMenu(url, more);
+    var options = WebGUI.AssetManager.buildMoreMenu(url, more, isNotLocked);
 
     var menu    = new YAHOO.widget.Menu( "crumbMoreMenu", options );
     menu.render( document.getElementById( 'assetManager' ) );

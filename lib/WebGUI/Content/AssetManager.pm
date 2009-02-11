@@ -428,8 +428,9 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink'); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink', %s); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
             $currentAsset->getUrl,
+            ($currentAsset->canEdit && $currentAsset->canEditIfLocked ? 1 : 0),
             $currentAsset->get( "menuTitle" ),
             ;
     $output .= '</ol>';
