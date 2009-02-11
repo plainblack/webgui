@@ -530,6 +530,16 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|When the user finishes the surevey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
         lastUpdated => 1233714385,
     },
+    
+    'Max user responses' => {
+        message     => q|Max user responses|,
+        lastUpdated => 0,
+    },
+
+    'Max user responses help' => {
+        message     => q|The maximum number of times an individual user is allowed to complete the Survey.|,
+        lastUpdated => 0,
+    },
 
     'percentage label' => {
         message => q|Percentage|,

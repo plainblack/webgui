@@ -107,7 +107,8 @@ sub definition {
         maxResponsesPerUser => {
             fieldType    => 'integer',
             defaultValue => 1,
-            label        => 'Max user reponses',
+            label        => $i18n->get('Max user responses'),
+            hoverHelp    => $i18n->get('Max user responses help'),
         },
         overviewTemplateId => {
             tab          => 'display',
@@ -185,7 +186,7 @@ sub definition {
         }
     );
     return $class->SUPER::definition( $session, $definition );
-} ## end sub definition
+}
 
 #-------------------------------------------------------------------
 
