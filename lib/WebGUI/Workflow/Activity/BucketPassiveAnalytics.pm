@@ -74,7 +74,6 @@ Analyze the deltaLog table, and generate the bucketLog table.
 sub execute {
 	my ($self, undef, $instance) = @_;
     my $session = $self->session;
-    sleep 45;
     my $endTime = time() + $self->getTTL;
     my $expired = 0;
 
