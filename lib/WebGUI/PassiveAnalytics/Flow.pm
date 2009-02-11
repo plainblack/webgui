@@ -11,6 +11,7 @@ use WebGUI::Utility;
 use WebGUI::HTMLForm;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;
+use WebGUI::User;
 
 =head1 NAME
 
@@ -33,7 +34,11 @@ Returns true if an instance of the PassiveAnalytics workflow is active.
 
 sub analysisActive {
     my $session     = shift;
-    return $session->db->quickScalar(q!select count(*) from WorkflowInstance where workflowId='PassiveAnalytics000001'!);
+    my ($running, $startDate, $endDate, $userId) = $session->db->quickArray(q!select running, startDate, endDate, userId from passiveAnalyticsStatus!);
+    if (wantarray) {
+        return $running, $startDate, $endDate, WebGUI::User->new($session, $userId);
+    }
+    return $running;
 }
 
 #----------------------------------------------------------------------------
@@ -103,8 +108,12 @@ sub www_editRuleflow {
     my $session = shift;
     my $error   = shift;
     return $session->privilege->insufficient() unless canView($session);
+    my ($running, $startDate, $endDate, $user) = analysisActive($session);
     if ($error) {
         $error = qq|<div class="error">$error</div>\n|;
+    }
+    elsif (!$running) {
+        $error = qq|<div class="error">Passive Analytics analysis completed on $endDate</div>\n|;
     }
     my $i18n = WebGUI::International->new($session, "PassiveAnalytics");
     my $addmenu = '<div style="float: left; width: 200px; font-size: 11px;">';
@@ -127,8 +136,10 @@ sub www_editRuleflow {
         label     => $i18n->get('pause interval'),
         hoverHelp => $i18n->get('pause interval help'),
     );
-    if (analysisActive($session)) {
-        $f->raw('<tr><td coldspan="2">Passive Analytics analysis is currently active</td></tr>');
+    if ($running) {
+        $f->raw(sprintf <<EOD, $startDate, $user->username);
+<tr><td colspan="2">Passive Analytics analysis is currently active.  Analysis was begun at %s by %s</td></tr>
+EOD
     }
     else {
         $f->submit(value => $i18n->get('Begin analysis'));
@@ -182,6 +193,7 @@ sub www_editRuleflowSave {
         return www_editRuleflow($session, "Error creating the workflow instance.");
     }
     $instance->start('skipRealtime');
+    $session->db->write('update passiveAnalyticsStatus set startDate=NOW(), userId=?, endDate=?, running=1', [$session->user->userId, '']);
     return www_editRuleflow($session);
 }
 
@@ -247,7 +259,6 @@ sub www_editRuleSave {
         'fooBarBaz' =~ qr/$regexp/;
     };
     if ($@) {
-        $session->log->warn("Error: $@");
         my $error = $@;
         $error =~ s/at \S+?\.pm line \d+.*$//;
         my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');

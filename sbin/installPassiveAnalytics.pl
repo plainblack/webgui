@@ -34,8 +34,8 @@ installLoggingTables($session);
 installPassiveAnalyticsRule($session);
 installPassiveAnalyticsConfig($session);
 installWorkflow($session);
-#addAdminGroup($session);
 addPassiveAnalyticsSettings($session);
+addPassiveAnalyticsStatus($session);
 
 finish($session);
 
@@ -102,6 +102,28 @@ sub addPassiveAnalyticsSettings {
     # and here's our code
     $session->setting->add('passiveAnalyticsInterval', 300);
     $session->setting->add('passiveAnalyticsDeleteDelta', 0);
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the PassiveAnalytics Rule table
+sub addPassiveAnalyticsStatus {
+    my $session = shift;
+    my $db      = $session->db;
+    print "\tInstall Passive Analytics status table... ";
+    # and here's our code
+    $db->write(<<EOT2);
+DROP TABLE if exists passiveAnalyticsStatus;
+EOT2
+    $db->write(<<EOT3);
+CREATE TABLE `passiveAnalyticsStatus` (
+    `startDate` datetime,
+    `endDate`   datetime,
+    `running`   integer(2) DEFAULT 0,
+    `userId`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT3
+    $db->write('insert into passiveAnalyticsStatus (userId) VALUES (3)');
     print "DONE!\n";
 }
 
