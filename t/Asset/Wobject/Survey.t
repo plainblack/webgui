@@ -38,7 +38,6 @@ $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 # Load bare-bones survey, containing a single section (S0)
-$survey->loadSurveyJSON();
 $survey->surveyJSON->update([0], { variable => 'S0' });
 
 # Add 2 questions to S0
@@ -87,7 +86,6 @@ $survey->getResponseId( { noCookie => 1 }); # triggers loadBothJSON()
     );
     while (my ($id, $index) = each %expectedSurveyOrder) {
         WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => $id} } );
-        $survey->loadSurveyJSON();
         is($survey->responseJSON->nextResponse, $index, "jumpTo($id) sets nextResponse to $index");
     }
 }

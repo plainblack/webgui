@@ -207,7 +207,6 @@ sub exportAssetData {
     my $hash = $self->SUPER::exportAssetData();
 
     # Add in the SurveyJSON data..
-    $self->loadSurveyJSON();
     $hash->{properties}{surveyJSON} = $self->surveyJSON->freeze;
 
     return $hash;
@@ -251,47 +250,10 @@ sub duplicate {
     my $newAsset = $self->SUPER::duplicate($options);
 
     # Make sure SurveyJSON data also gets duplicated
-    $self->loadSurveyJSON();
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?',
         [ $self->surveyJSON->freeze, $newAsset->getId ] );
 
     return $newAsset;
-}
-
-#-------------------------------------------------------------------
-
-=head2 loadSurveyJSON ( )
-
-Associates a SurveyJSON object with the Survey instance. A serialized JSON-encoded
-version of the SurveyJSON object can be passed in, otherwise the surveyJSON object
-will be read from the database.
- 
-Afterwards, calls to L<"survey"> will return a the surveyJSON object.
-
-Repeated calls to this method have no effect.
-
-=head3 json (optional)
-
-A serialized JSON-encoded string representing a SurveyJSON object. If provided, 
-will be used to instantiate the SurveyJSON instance rather than querying the database.
-
-=cut
-
-sub loadSurveyJSON {
-    my $self     = shift;
-    my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
-
-    # Do nothing if survey is already loaded
-    return if $self->surveyJSON;
-
-    # See if we need to load surveyJSON from the database
-    if ( ! defined $json ) {
-        $json
-            = $self->session->db->quickScalar( 'select surveyJSON from Survey where assetId = ?', [ $self->getId ] );
-    }
-
-    # Instantiate the SurveyJSON instance, and store it
-    return $self->{_surveyJSON} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
 }
 
 #-------------------------------------------------------------------
@@ -313,14 +275,38 @@ sub saveSurveyJSON {
 
 #-------------------------------------------------------------------
 
-=head2 surveyJSON ( )
+=head2 surveyJSON ( [json] )
 
-Accessor for the SurveyJSON object. See L<"loadSurveyJSON"> and L<"saveSurveyJSON">
+Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::SurveyJSON> object.
+
+The surveyJSON property associates a SurveyJSON object with this Survey instance.
+It is stored in the database as a serialized JSON-encoded string in the surveyJSON field.
+
+See also L<"saveSurveyJSON">.
+
+=head3 json (optional)
+
+A serialized JSON-encoded string representing a SurveyJSON object. If provided, 
+will be used to instantiate the SurveyJSON instance rather than querying the database.
 
 =cut
 
 sub surveyJSON {
-    return shift->{_surveyJSON};
+    my $self = shift;
+    my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
+    
+    if (!$self->{_surveyJSON} || $json) {
+        
+        # See if we need to load surveyJSON from the database
+        if ( ! defined $json ) {
+            $json = $self->session->db->quickScalar( 'select surveyJSON from Survey where assetId = ?', [ $self->getId ] );
+        }
+    
+        # Instantiate the SurveyJSON instance, and store it
+        $self->{_surveyJSON} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
+    }
+        
+    return $self->{_surveyJSON};
 }
 
 #-------------------------------------------------------------------
@@ -362,8 +348,6 @@ sub www_submitObjectEdit {
 
     # Id is made up of: sectionIndex-questionIndex-answerIndex
     my @address = split /-/, $responses->{id};
-
-    $self->loadSurveyJSON();
 
     # See if any special actions were requested..
     if ( $responses->{delete} ) {
@@ -469,8 +453,6 @@ Returns the address to the new object.
 sub copyObject {
     my ( $self, $address ) = @_;
 
-    $self->loadSurveyJSON();
-
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
     $address = $self->surveyJSON->copy($address);
 
@@ -499,8 +481,6 @@ that section.  The third element is the index of the answer.
 
 sub deleteObject {
     my ( $self, $address ) = @_;
-
-    $self->loadSurveyJSON();
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
     my $message = $self->surveyJSON->remove($address);
@@ -538,8 +518,6 @@ sub www_newObject {
 
     my @inAddress = split /-/, $ids;
 
-    $self->loadSurveyJSON();
-
     #Don't save after this as the new object should not stay in the survey
     my $address = $self->surveyJSON->newObject( \@inAddress );
 
@@ -568,7 +546,6 @@ sub www_dragDrop {
     my @tid = split /-/, $p->{target}->{id};
     my @bid = split /-/, $p->{before}->{id};
 
-    $self->loadSurveyJSON();
     my $target = $self->surveyJSON->getObject( \@tid );
     $self->surveyJSON->remove( \@tid, 1 );
     my $address = [0];
@@ -638,8 +615,6 @@ If undef, the address is pulled form the form POST.
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
-
-    $self->loadSurveyJSON();
 
     my $address = defined $options->{address} ? $options->{address} : undef;
     if ( !defined $address ) {
@@ -1254,7 +1229,7 @@ sub loadBothJSON {
         from Survey s, Survey_response r 
         where s.assetId = ? and r.Survey_responseId = ?",
         [ $self->getId, $rId ] );
-    $self->loadSurveyJSON( $ref->[0]->{surveyJSON} );
+    $self->surveyJSON( $ref->[0]->{surveyJSON} );
     $self->loadResponseJSON( $ref->[0]->{responseJSON}, $rId );
 }
 
@@ -1498,7 +1473,6 @@ sub www_viewGradeBook {
         where assetId=".$db->quote($self->getId)." order by username,ipAddress,startDate");
     my $users = $paginator->getPageData;
 
-    $self->loadSurveyJSON();
     $var->{question_count} = $self->surveyJSON->questionCount; 
     
     my @responseloop;
@@ -1538,7 +1512,6 @@ sub www_viewStatisticalOverview {
         unless ( $self->session->user->isInGroup( $self->get("groupToViewReports") ) );
 
     $self->loadTempReportTable();
-    $self->loadSurveyJSON();
     my $survey  = $self->surveyJSON;
     my $var     = $self->getMenuVars;
     
@@ -1708,7 +1681,6 @@ Loads the responses from the survey into the Survey_tempReport table, so that ot
 sub loadTempReportTable {
     my $self = shift;
 
-    $self->loadSurveyJSON();
     my $refs = $self->session->db->buildArrayRefOfHashRefs( "select * from Survey_response where assetId = ?",
         [ $self->getId() ] );
     $self->session->db->write( "delete from Survey_tempReport where assetId = ?", [ $self->getId() ] );
