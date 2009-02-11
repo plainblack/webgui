@@ -129,6 +129,24 @@ home\?func=match, or<br />
 		context => q|Error displayed when a user enters in a bad regular expression.  This label will be followed by the error from perl.|
 	},
 
+	'Export bucket data' => {
+		message => q|Export bucket data|,
+		lastUpdated => 0,
+		context => q|URL label to export data in CSV format|,
+	},
+
+	'Export delta data' => {
+		message => q|Export delta data|,
+		lastUpdated => 0,
+		context => q|URL label to export data in CSV format|,
+	},
+
+	'Export raw logs' => {
+		message => q|Export raw logs|,
+		lastUpdated => 0,
+		context => q|URL label to raw log data in CSV format|,
+	},
+
 };
 
 1;

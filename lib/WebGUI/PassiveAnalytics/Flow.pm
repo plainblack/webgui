@@ -12,6 +12,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Workflow;
 use WebGUI::Workflow::Instance;
 use WebGUI::User;
+use WebGUI::Text;
 
 =head1 NAME
 
@@ -54,6 +55,44 @@ sub canView {
     my $session     = shift;
     my $user        = shift || $session->user;
     return $user->isInGroup( 3 );
+}
+
+#----------------------------------------------------------------------------
+
+=head2 exportSomething ( session, sth, filename )
+
+Generates CSV data from the supplied statement handle and generates
+a temporary WebGUI::Storage object containing that data in the requested
+filename.
+
+This subroutine also does a setRedirect to the URL of the file in
+the storage object.
+
+=head3 session
+
+Session variable, to set the http redirect correctly.
+
+=head3 sth
+
+Statement handle for reading data and getting column names
+
+=head3 filename
+
+The name of the file to create inside the storage object.
+
+=cut
+
+sub exportSomething {
+    my ($session, $sth, $filename) = @_;
+    my $storage = WebGUI::Storage->createTemp($session);
+    my @columns = $sth->getColumnNames;
+    my $csvData = WebGUI::Text::joinCSV( @columns ). "\n";
+    while (my $row = $sth->hashRef()) {
+        my @row = @{ $row }{@columns};
+        $csvData .= WebGUI::Text::joinCSV(@row) . "\n";
+    }
+    $storage->addFileFromScalar($filename, $csvData);
+    $session->http->setRedirect($storage->getUrl($filename));
 }
 
 #-------------------------------------------------------------------
@@ -161,6 +200,11 @@ EOD
     $steps .= '<tr><td>&nbsp;</td><td>Other</td></tbody></table><div style="clear: both;"></div>';
     my $ac = WebGUI::AdminConsole->new($session,'passiveAnalytics');
     $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=settings'), $i18n->get('Passive Analytics Settings'));
+    if (!$running) {
+        $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=exportBucketData'), $i18n->get('Export bucket data'));
+        $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=exportDeltaData'), $i18n->get('Export delta data'));
+        $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=exportLogs'), $i18n->get('Export raw logs'));
+    }
     return $ac->render($error.$f->print.$addmenu.$steps, 'Passive Analytics');
 }
 
@@ -275,6 +319,51 @@ sub www_editRuleSave {
     }
     $rule->updateFromFormPost if $rule;
     return www_editRuleflow($session);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportBucketData ( )
+
+Dump the contents of the bucket log.
+
+=cut
+
+sub www_exportBucketData {
+    my ($session) = @_;
+    my $bucket = $session->db->read('select * from bucketLog order by userId, Bucket, timeStamp');
+    exportSomething($session, $bucket, 'bucketData.csv');
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportDeltaData ( )
+
+Dump the contents of the delta log.
+
+=cut
+
+sub www_exportDeltaData {
+    my ($session) = @_;
+    my $delta = $session->db->read('select * from deltaLog order by userId, timeStamp');
+    exportSomething($session, $delta, 'deltaData.csv');
+    return "redirect";
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_exportLogs ( )
+
+Dump the contents of the raw log.
+
+=cut
+
+sub www_exportLogs {
+    my ($session) = @_;
+    my $raw = $session->db->read('select * from passiveLog order by userId, timeStamp');
+    exportSomething($session, $raw, 'passiveData.csv');
+    return "redirect";
 }
 
 #------------------------------------------------------------------
