@@ -540,6 +540,86 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The maximum number of times an individual user is allowed to complete the Survey.|,
         lastUpdated => 0,
     },
+    
+    'Overview Report Template' => {
+        message     => q|Overview Report Template|,
+        lastUpdated => 0,
+    },
+
+    'Overview Report Template help' => {
+        message     => q|The template used to display the Overview Report.|,
+        lastUpdated => 0,
+    },
+    
+    'Grabebook Report Template' => {
+        message     => q|Grabebook Report Template|,
+        lastUpdated => 0,
+    },
+
+    'Grabebook Report Template help' => {
+        message     => q|The template used to display the Gradebook Report|,
+        lastUpdated => 0,
+    },
+    
+    'Survey Edit Template' => {
+        message     => q|Survey Edit Template|,
+        lastUpdated => 0,
+    },
+
+    'Survey Edit Template help' => {
+        message     => q|The template used to display the Survey Edit screen.|,
+        lastUpdated => 0,
+    },
+    
+    'Take Survey Template' => {
+        message     => q|Take Survey Template|,
+        lastUpdated => 0,
+    },
+
+    'Take Survey Template help' => {
+        message     => q|The template used to control the initial Take Survey screen, from which responses are dynamically loaded into.|,
+        lastUpdated => 0,
+    },
+    
+    'Questions Template' => {
+        message     => q|Questions Template|,
+        lastUpdated => 0,
+    },
+
+    'Questions Template help' => {
+        message     => q|The template used to display individual questions, which are dynamically loaded into the Take Survey page.|,
+        lastUpdated => 0,
+    },
+    
+    'Section Edit Template' => {
+        message     => q|Section Edit Template|,
+        lastUpdated => 0,
+    },
+
+    'Section Edit Template help' => {
+        message     => q|The template used to display the Section Edit dialog on the Edit Survey page.|,
+        lastUpdated => 0,
+    },
+    
+    'Question Edit Template' => {
+        message     => q|Question Edit Template|,
+        lastUpdated => 0,
+    },
+
+    'Question Edit Template help' => {
+        message     => q|The template used to display the Question Edit dialog on the Edit Survey page.|,
+        lastUpdated => 0,
+    },
+    
+    'Answer Edit Template' => {
+        message     => q|Answer Edit Template|,
+        lastUpdated => 0,
+    },
+
+    'Answer Edit Template help' => {
+        message     => q|The template used to display the Answer Edit dialog on the Edit Survey page.|,
+        lastUpdated => 0,
+    },
 
     'percentage label' => {
         message => q|Percentage|,
@@ -800,12 +880,6 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 0,
     },
 
-    'templateId' => {
-        message => q|The ID of the template to show the Survey.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168639537,
-    },
-
     'groupToTakeSurvey' => {
         message => q|The ID of the group that is allowed to take the Survey.|,
         context => q|Description of a template variable for a template Help page.|,
@@ -822,24 +896,6 @@ directly inside the answer_loop for other types of questions.|,
         message => q|The number of times the user can attempt to get the correct answer on each question. The default is 1.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1168643566,
-    },
-
-    'overviewTemplateId' => {
-        message => q|The ID of the template used to show the overview screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
-    },
-
-    'gradebookTemplateId' => {
-        message => q|The ID of the template used to show the gradebook screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
-    },
-
-    'responseTemplateId' => {
-        message => q|The ID of the template used to show the Survey Response screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
     },
 
     'survey questions template title' => {
