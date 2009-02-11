@@ -277,10 +277,9 @@ sub saveSurveyJSON {
 
 =head2 surveyJSON ( [json] )
 
-Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::SurveyJSON> object.
+Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::SurveyJSON> property.
 
-The surveyJSON property associates a SurveyJSON object with this Survey instance.
-It is stored in the database as a serialized JSON-encoded string in the surveyJSON field.
+It is stored in the database as a serialized JSON-encoded string in the surveyJSON db field.
 
 See also L<"saveSurveyJSON">.
 
@@ -296,17 +295,60 @@ sub surveyJSON {
     my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
     
     if (!$self->{_surveyJSON} || $json) {
-        
+
         # See if we need to load surveyJSON from the database
-        if ( ! defined $json ) {
+        if ( !defined $json ) {
             $json = $self->session->db->quickScalar( 'select surveyJSON from Survey where assetId = ?', [ $self->getId ] );
         }
-    
+
         # Instantiate the SurveyJSON instance, and store it
         $self->{_surveyJSON} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
     }
         
     return $self->{_surveyJSON};
+}
+
+#-------------------------------------------------------------------
+
+=head2 responseJSON ( [json], [responseId] )
+
+Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::ResponseJSON> property.
+
+It is stored in the database as a serialized JSON-encoded string in the responseJSON db field.
+
+See also L<"saveResponseJSON">.
+
+=head3 json (optional)
+
+A serialized JSON-encoded string representing a ResponseJSON object. If provided, 
+will be used to instantiate the ResponseJSON instance rather than querying the database.
+
+=head3 responseId (optional)
+
+A responseId to use when retrieving ResponseJSON from the database (defaults to the value returned by L<"responseId">)
+
+=cut
+
+sub responseJSON {
+    my $self = shift;
+    my ($json, $responseId) = validate_pos(@_, { type => SCALAR | UNDEF, optional => 1 }, { type => SCALAR, optional => 1});
+    
+    if (!defined $responseId) {
+        $responseId = $self->{responseId};
+    }
+     
+    if (!$self->{_responseJSON} || $json) {
+
+        # See if we need to load responseJSON from the database
+        if (!defined $json) {
+            $json = $self->session->db->quickScalar( 'select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?', [ $self->getId, $responseId ] );
+        }
+
+        # Instantiate the ResponseJSON instance, and store it
+        $self->{_responseJSON} = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $self->surveyJSON, $json );
+    }
+    
+    return $self->{_responseJSON};
 }
 
 #-------------------------------------------------------------------
@@ -984,7 +1026,7 @@ sub www_submitQuestions {
 
     my @goodResponses = keys %$responses;    #load everything.
 
-    $self->loadBothJSON();
+#    $self->loadBothJSON();
 
     my $termInfo = $self->responseJSON->recordResponses( $responses );
 
@@ -1223,48 +1265,15 @@ The reponse id to load.
 sub loadBothJSON {
     my $self = shift;
     my $rId  = shift;
-    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
+#    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
     my $ref = $self->session->db->buildArrayRefOfHashRefs( "
         select s.surveyJSON,r.responseJSON 
         from Survey s, Survey_response r 
         where s.assetId = ? and r.Survey_responseId = ?",
         [ $self->getId, $rId ] );
     $self->surveyJSON( $ref->[0]->{surveyJSON} );
-    $self->loadResponseJSON( $ref->[0]->{responseJSON}, $rId );
+    $self->responseJSON( $ref->[0]->{responseJSON}, $rId );
 }
-
-#-------------------------------------------------------------------
-
-=head2 loadResponseJSON([$jsonHash],[$rId])
-
-Loads the response object from JSON.  
-
-=head3 $jsonHash
-
-Optional, but if the hash has been pulled from the DB before, there is no need to pull it again.
-
-=head3 $rId
-
-Optional, but if not passed in, it is grabbed.
-
-=cut
-
-sub loadResponseJSON {
-    my $self     = shift;
-    my $jsonHash = shift;
-    my $rId      = shift;
-    $rId = defined $rId ? $rId : $self->{responseId};
-    if ( defined $self->responseJSON and !defined $rId ) { return; }
-
-    $jsonHash
-        = $self->session->db->quickScalar(
-        "select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?",
-        [ $self->getId, $rId ] )
-        if ( !defined $jsonHash );
-
-    $self->{_responseJSON}
-        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $self->surveyJSON, $jsonHash );
-} ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
 
@@ -1276,25 +1285,8 @@ Turns the response object into JSON and saves it to the DB.
 
 sub saveResponseJSON {
     my $self = shift;
-
     my $data = $self->responseJSON->freeze();
-
-    $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?",
-
-        [ $data, $self->{responseId} ] );
-}
-
-#-------------------------------------------------------------------
-
-=head2 responseJSON
-
-Accessor for the ResponseJSON object  
-
-=cut
-
-sub responseJSON {
-    my $self = shift;
-    return $self->{_responseJSON};
+    $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?", [ $data, $self->{responseId} ] );
 }
 
 #-------------------------------------------------------------------
@@ -1309,22 +1301,22 @@ If the user is anonymous, the IP is used.  Or an email'd or linked code can be u
 sub getResponseId {
     my $self = shift;
     my %opts = validate(@_, { noCookie => 0 } ); # This is a hack to allow for testing (cookies cause problems)
-    
+
     return $self->{responseId} if ( defined $self->{responseId} );
 
     my $ip = $self->session->env->getIp;
     my $id = $self->session->user->userId();
 
-    my $anonId = $self->session->form->process("userid");
+    my $anonId = $self->session->form->process('userid');
     
     unless ($opts{noCookie}) {
-        $anonId ||= $self->session->http->getCookies->{"Survey2AnonId"};
+        $anonId ||= $self->session->http->getCookies->{Survey2AnonId};
     }
 
     $anonId ||= undef;
     
     unless ($opts{noCookie}) {
-        $self->session->http->setCookie( "Survey2AnonId", $anonId ) if ($anonId);
+        $self->session->http->setCookie( Survey2AnonId => $anonId ) if ($anonId);
     }
 
     my $responseId;
@@ -1386,21 +1378,21 @@ sub getResponseId {
                     anonId            => $anonId
                 }
             );
-#            $self->session->log->warn("post: $responseId");
-            $self->loadBothJSON($responseId);
+#            $self->loadBothJSON($responseId);
+#            $self->responseJSON(undef, $responseId);
 #            $self->responseJSON->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->saveResponseJSON();
 
-        } ## end if ( $haveTaken < $allowedTakes)
+        }
         else {
             $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
         }
-    } ## end if ( !$responseId )
+    }
     $self->{responseId} = $responseId;
-    $self->loadBothJSON($responseId);
+#    $self->loadBothJSON($responseId);
     return $responseId;
-} ## end sub getResponseId
+}
 
 #-------------------------------------------------------------------
 
@@ -1685,7 +1677,7 @@ sub loadTempReportTable {
         [ $self->getId() ] );
     $self->session->db->write( "delete from Survey_tempReport where assetId = ?", [ $self->getId() ] );
     for my $ref (@$refs) {
-        $self->loadResponseJSON( undef, $ref->{Survey_responseId} );
+        $self->responseJSON( undef, $ref->{Survey_responseId} );
         my $count = 1;
         for my $q ( @{ $self->responseJSON->returnResponseForReporting() } ) {
             if ( @{ $q->{answers} } == 0 and $q->{comment} =~ /\w/ ) {
@@ -1712,11 +1704,6 @@ sub loadTempReportTable {
         } ## end for my $q ( @{ $self->responseJSON...
     } ## end for my $ref (@$refs)
     return 1;
-} ## end sub loadTempReportTable
-
-sub log {
-    my $self = shift;
-    $self->session->log->debug(shift);
 }
 
 1;
