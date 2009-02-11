@@ -208,7 +208,7 @@ sub exportAssetData {
 
     # Add in the SurveyJSON data..
     $self->loadSurveyJSON();
-    $hash->{properties}{surveyJSON} = $self->survey->freeze;
+    $hash->{properties}{surveyJSON} = $self->surveyJSON->freeze;
 
     return $hash;
 }
@@ -253,7 +253,7 @@ sub duplicate {
     # Make sure SurveyJSON data also gets duplicated
     $self->loadSurveyJSON();
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?',
-        [ $self->survey->freeze, $newAsset->getId ] );
+        [ $self->surveyJSON->freeze, $newAsset->getId ] );
 
     return $newAsset;
 }
@@ -282,7 +282,7 @@ sub loadSurveyJSON {
     my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
 
     # Do nothing if survey is already loaded
-    return if $self->survey;
+    return if $self->surveyJSON;
 
     # See if we need to load surveyJSON from the database
     if ( ! defined $json ) {
@@ -291,7 +291,7 @@ sub loadSurveyJSON {
     }
 
     # Instantiate the SurveyJSON instance, and store it
-    return $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
+    return $self->{_surveyJSON} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
 }
 
 #-------------------------------------------------------------------
@@ -305,7 +305,7 @@ Serializes the SurveyJSON instance and persists it to the database
 sub saveSurveyJSON {
     my $self = shift;
 
-    my $data = $self->survey->freeze();
+    my $data = $self->surveyJSON->freeze();
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
@@ -313,14 +313,14 @@ sub saveSurveyJSON {
 
 #-------------------------------------------------------------------
 
-=head2 survey ( )
+=head2 surveyJSON ( )
 
 Accessor for the SurveyJSON object. See L<"loadSurveyJSON"> and L<"saveSurveyJSON">
 
 =cut
 
-sub survey {
-    return shift->{survey};
+sub surveyJSON {
+    return shift->{_surveyJSON};
 }
 
 #-------------------------------------------------------------------
@@ -374,7 +374,7 @@ sub www_submitObjectEdit {
     }
 
     # Each object checks the address and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    my $message = $self->survey->update( \@address, $responses );
+    my $message = $self->surveyJSON->update( \@address, $responses );
 
     # Persist the changes
     $self->saveSurveyJSON();
@@ -425,7 +425,7 @@ sub www_jumpTo {
 
     # Go through items in surveyOrder until we find the item corresponding to $id
     my $currentIndex = 0;
-    for my $address (@{ $self->response->surveyOrder }) {
+    for my $address (@{ $self->responseJSON->surveyOrder }) {
         my ($order_sIndex, $order_qIndex) = @{$address}[0,1];
 
         # For starters, check that we're on the right Section 
@@ -442,7 +442,7 @@ sub www_jumpTo {
 
             # Set the nextResponse to be the index we're up to
             $self->session->log->debug("Found id: $id at index: $currentIndex in surveyOrder");
-            $self->response->nextResponse( $currentIndex );
+            $self->responseJSON->nextResponse( $currentIndex );
             $self->saveResponseJSON();
             return $self->www_takeSurvey;
         }
@@ -472,7 +472,7 @@ sub copyObject {
     $self->loadSurveyJSON();
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    $address = $self->survey->copy($address);
+    $address = $self->surveyJSON->copy($address);
 
     $self->saveSurveyJSON();
 
@@ -503,7 +503,7 @@ sub deleteObject {
     $self->loadSurveyJSON();
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    my $message = $self->survey->remove($address);
+    my $message = $self->surveyJSON->remove($address);
 
     $self->saveSurveyJSON();
 
@@ -541,7 +541,7 @@ sub www_newObject {
     $self->loadSurveyJSON();
 
     #Don't save after this as the new object should not stay in the survey
-    my $address = $self->survey->newObject( \@inAddress );
+    my $address = $self->surveyJSON->newObject( \@inAddress );
 
     #The new temp object has an address of NEW, which means it is not a real final address.
 
@@ -569,15 +569,15 @@ sub www_dragDrop {
     my @bid = split /-/, $p->{before}->{id};
 
     $self->loadSurveyJSON();
-    my $target = $self->survey->getObject( \@tid );
-    $self->survey->remove( \@tid, 1 );
+    my $target = $self->surveyJSON->getObject( \@tid );
+    $self->surveyJSON->remove( \@tid, 1 );
     my $address = [0];
     if ( @tid == 1 ) {
 
         #sections can only be inserted after another section so chop off the question and answer portion of
         $#bid = 0;
         $bid[0] = -1 if ( !defined $bid[0] );
-        $self->survey->insertObject( $target, [ $bid[0] ] );
+        $self->surveyJSON->insertObject( $target, [ $bid[0] ] );
     }
     elsif ( @tid == 2 ) {    #questions can be moved to any section, but a pushed to the end of a new section.
         if ( $bid[0] !~ /\d/ ) {
@@ -597,23 +597,23 @@ sub www_dragDrop {
             else {
 
                 #else move to the end of the selected section
-                $bid[1] = $#{ $self->survey->questions( [ $bid[0] ] ) };
+                $bid[1] = $#{ $self->surveyJSON->questions( [ $bid[0] ] ) };
             }
         } ## end elsif ( @bid == 1 )
-        $self->survey->insertObject( $target, [ $bid[0], $bid[1] ] );
+        $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1] ] );
     } ## end elsif ( @tid == 2 )
     elsif ( @tid == 3 ) {    #answers can only be rearranged in the same question
         if ( @bid == 2 and $bid[1] == $tid[1] ) {
             $bid[2] = -1;
-            $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         elsif ( @bid == 3 ) {
-            $self->survey->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
 
             #else put it back where it was
-            $self->survey->insertObject( $target, \@tid );
+            $self->surveyJSON->insertObject( $target, \@tid );
         }
     }
 
@@ -658,7 +658,7 @@ sub www_loadSurvey {
     my $var
         = defined $options->{var}
         ? $options->{var}
-        : $self->survey->getEditVars($address);
+        : $self->surveyJSON->getEditVars($address);
 
     my $editHtml;
     if ( $var->{type} eq 'section' ) {
@@ -672,7 +672,7 @@ sub www_loadSurvey {
     }
 
     # Generate the list of valid goto targets
-    my @gotoTargets = $self->survey->getGotoTargets;
+    my @gotoTargets = $self->surveyJSON->getGotoTargets;
 
     my %buttons;
     $buttons{question} = $$address[0];
@@ -680,7 +680,7 @@ sub www_loadSurvey {
         $buttons{answer} = "$$address[0]-$$address[1]";
     }
 
-    my $data = $self->survey->getDragDropList($address);
+    my $data = $self->surveyJSON->getDragDropList($address);
     my $html;
     my ( $scount, $qcount, $acount ) = ( -1, -1, -1 );
     my $lastType;
@@ -1011,7 +1011,7 @@ sub www_submitQuestions {
 
     $self->loadBothJSON();
 
-    my $termInfo = $self->response->recordResponses( $responses );
+    my $termInfo = $self->responseJSON->recordResponses( $responses );
 
     $self->saveResponseJSON();
 
@@ -1076,23 +1076,23 @@ sub www_loadQuestions {
         $self->session->log->debug('No responseId, surveyEnd');
         return $self->surveyEnd();
     }
-    if ( $self->response->hasTimedOut( $self->get('timeLimit') ) ) {
+    if ( $self->responseJSON->hasTimedOut( $self->get('timeLimit') ) ) {
         $self->session->log->debug('Response hasTimedOut, surveyEnd');
         return $self->surveyEnd( undef, 2 );
     }
 
-    if ( $self->response->surveyEnd() ) {
+    if ( $self->responseJSON->surveyEnd() ) {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
         return $self->surveyEnd();
     }
 
     my @questions;
-    eval { @questions = $self->response->nextQuestions(); };
+    eval { @questions = $self->responseJSON->nextQuestions(); };
 
-    my $section = $self->response->nextResponseSection();
+    my $section = $self->responseJSON->nextResponseSection();
 
     #return $self->prepareShowSurveyTemplate($section,$questions);
-    $section->{id}              = $self->response->nextResponseSectionIndex();
+    $section->{id}              = $self->responseJSON->nextResponseSectionIndex();
     $section->{wasRestarted}    = $wasRestarted;
 
     my $text = $self->prepareShowSurveyTemplate( $section, \@questions );
@@ -1139,8 +1139,8 @@ sub surveyEnd {
         );
     }
     if ($self->get('doAfterTimeLimit') eq 'restartSurvey' && $completeCode == 2){
-        $self->response->startTime(time());
-        undef $self->{response};
+        $self->responseJSON->startTime(time());
+        undef $self->{_responseJSON};
         undef $self->{responseId};
         return $self->www_loadQuestions('1');
     }else{
@@ -1216,12 +1216,12 @@ sub prepareShowSurveyTemplate {
         }
     } ## end foreach my $q (@$questions)
     $section->{'questions'}         = $questions;
-    $section->{'questionsAnswered'} = $self->response->{questionsAnswered};
-    $section->{'totalQuestions'}    = @{ $self->response->surveyOrder };
+    $section->{'questionsAnswered'} = $self->responseJSON->{questionsAnswered};
+    $section->{'totalQuestions'}    = @{ $self->responseJSON->surveyOrder };
     $section->{'showProgress'}      = $self->get('showProgress');
     $section->{'showTimeLimit'}     = $self->get('showTimeLimit');
     $section->{'minutesLeft'}
-        = int( ( ( $self->response->startTime() + ( 60 * $self->get('timeLimit') ) ) - time() ) / 60 );
+        = int( ( ( $self->responseJSON->startTime() + ( 60 * $self->get('timeLimit') ) ) - time() ) / 60 );
 
     if(scalar @$questions == ($section->{'totalQuestions'} - $section->{'questionsAnswered'})){
         $section->{isLastPage} = 1
@@ -1248,7 +1248,7 @@ The reponse id to load.
 sub loadBothJSON {
     my $self = shift;
     my $rId  = shift;
-    if ( defined $self->survey and defined $self->response ) { return; }
+    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
     my $ref = $self->session->db->buildArrayRefOfHashRefs( "
         select s.surveyJSON,r.responseJSON 
         from Survey s, Survey_response r 
@@ -1279,7 +1279,7 @@ sub loadResponseJSON {
     my $jsonHash = shift;
     my $rId      = shift;
     $rId = defined $rId ? $rId : $self->{responseId};
-    if ( defined $self->response and !defined $rId ) { return; }
+    if ( defined $self->responseJSON and !defined $rId ) { return; }
 
     $jsonHash
         = $self->session->db->quickScalar(
@@ -1287,8 +1287,8 @@ sub loadResponseJSON {
         [ $self->getId, $rId ] )
         if ( !defined $jsonHash );
 
-    $self->{response}
-        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $self->survey, $jsonHash );
+    $self->{_responseJSON}
+        = WebGUI::Asset::Wobject::Survey::ResponseJSON->new( $self->surveyJSON, $jsonHash );
 } ## end sub loadResponseJSON
 
 #-------------------------------------------------------------------
@@ -1302,7 +1302,7 @@ Turns the response object into JSON and saves it to the DB.
 sub saveResponseJSON {
     my $self = shift;
 
-    my $data = $self->response->freeze();
+    my $data = $self->responseJSON->freeze();
 
     $self->session->db->write( "update Survey_response set responseJSON = ? where Survey_responseId = ?",
 
@@ -1311,15 +1311,15 @@ sub saveResponseJSON {
 
 #-------------------------------------------------------------------
 
-=head2 response
+=head2 responseJSON
 
-Helper to easily grab the response object and prevent typos.  
+Accessor for the ResponseJSON object  
 
 =cut
 
-sub response {
+sub responseJSON {
     my $self = shift;
-    return $self->{response};
+    return $self->{_responseJSON};
 }
 
 #-------------------------------------------------------------------
@@ -1413,7 +1413,7 @@ sub getResponseId {
             );
 #            $self->session->log->warn("post: $responseId");
             $self->loadBothJSON($responseId);
-#            $self->response->createSurveyOrder();
+#            $self->responseJSON->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->saveResponseJSON();
 
@@ -1499,7 +1499,7 @@ sub www_viewGradeBook {
     my $users = $paginator->getPageData;
 
     $self->loadSurveyJSON();
-    $var->{question_count} = $self->survey->questionCount; 
+    $var->{question_count} = $self->surveyJSON->questionCount; 
     
     my @responseloop;
     foreach my $user (@$users) {
@@ -1539,7 +1539,7 @@ sub www_viewStatisticalOverview {
 
     $self->loadTempReportTable();
     $self->loadSurveyJSON();
-    my $survey  = $self->survey;
+    my $survey  = $self->surveyJSON;
     my $var     = $self->getMenuVars;
     
     my $paginator = WebGUI::Paginator->new($self->session,$self->getUrl('func=viewStatisticalOverview'));
@@ -1715,7 +1715,7 @@ sub loadTempReportTable {
     for my $ref (@$refs) {
         $self->loadResponseJSON( undef, $ref->{Survey_responseId} );
         my $count = 1;
-        for my $q ( @{ $self->response->returnResponseForReporting() } ) {
+        for my $q ( @{ $self->responseJSON->returnResponseForReporting() } ) {
             if ( @{ $q->{answers} } == 0 and $q->{comment} =~ /\w/ ) {
                 $self->session->db->write(
                     "insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
@@ -1737,7 +1737,7 @@ sub loadTempReportTable {
                     ]
                 );
             }
-        } ## end for my $q ( @{ $self->response...
+        } ## end for my $q ( @{ $self->responseJSON...
     } ## end for my $ref (@$refs)
     return 1;
 } ## end sub loadTempReportTable
