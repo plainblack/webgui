@@ -40,7 +40,7 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, 'Asset_Survey' );
     my %properties;
-    tie %properties, 'Tie::IxHash';
+    tie %properties, 'Tie::IxHash'; ## no critic
     %properties = (
         templateId => {
             fieldType    => 'template',
@@ -196,13 +196,20 @@ sub definition {
 
 Override exportAssetData so that surveyJSON is included in package exports etc..
 
+N.B. Currently ResponseJSON data is not exported.
+
 =cut
 
 sub exportAssetData {
     my $self = shift;
+
+    # Start off with the wobject data that Wobject knows about
     my $hash = $self->SUPER::exportAssetData();
+
+    # Add in the SurveyJSON data..
     $self->loadSurveyJSON();
     $hash->{properties}{surveyJSON} = $self->survey->freeze;
+
     return $hash;
 }
 
@@ -212,12 +219,17 @@ sub exportAssetData {
 
 Override importAssetCollateralData so that surveyJSON gets imported from packages
 
+N.B. Currently ResponseJSON data is not imported.
+
 =cut
 
 sub importAssetCollateralData {
     my ( $self, $data ) = @_;
+
+    # Persist the SurveyJSON data to the database
     my $surveyJSON = $data->{properties}{surveyJSON};
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $surveyJSON, $self->getId ] );
+
     return;
 }
 
@@ -227,15 +239,22 @@ sub importAssetCollateralData {
 
 Override duplicate so that surveyJSON gets duplicated too
 
+N.B. Currently ResponseJSON data is not duplicated.
+
 =cut
 
 sub duplicate {
     my $self     = shift;
     my $options  = shift;
+
+    # Start off by letting Wobject duplicate the asset as it knows how
     my $newAsset = $self->SUPER::duplicate($options);
+
+    # Make sure SurveyJSON data also gets duplicated
     $self->loadSurveyJSON();
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?',
         [ $self->survey->freeze, $newAsset->getId ] );
+
     return $newAsset;
 }
 
@@ -243,13 +262,17 @@ sub duplicate {
 
 =head2 loadSurveyJSON ( )
 
-Loads the survey collateral into memory so that the surveyJSON object can be created.
-After this method returns, calls to L<"survey"> will return a surveyJSON instance.
-Successive calls to this method have no effect. 
+Associates a SurveyJSON object with the Survey instance. A serialized JSON-encoded
+version of the SurveyJSON object can be passed in, otherwise the surveyJSON object
+will be read from the database.
+ 
+Afterwards, calls to L<"survey"> will return a the surveyJSON object.
+
+Repeated calls to this method have no effect.
 
 =head3 json (optional)
 
-A json-encoded string representing a valid SurveyJSON serialization. If provided, 
+A serialized JSON-encoded string representing a SurveyJSON object. If provided, 
 will be used to instantiate the SurveyJSON instance rather than querying the database.
 
 =cut
@@ -275,7 +298,7 @@ sub loadSurveyJSON {
 
 =head2 saveSurveyJSON ( )
 
-Serializes the SurveyJSON instance and persists it to the DB
+Serializes the SurveyJSON instance and persists it to the database
 
 =cut
 
@@ -283,7 +306,6 @@ sub saveSurveyJSON {
     my $self = shift;
 
     my $data = $self->survey->freeze();
-
     $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
@@ -297,8 +319,8 @@ Accessor for the SurveyJSON object. See L<"loadSurveyJSON"> and L<"saveSurveyJSO
 
 =cut
 
-sub survey { 
-    return shift->{survey}; 
+sub survey {
+    return shift->{survey};
 }
 
 #-------------------------------------------------------------------
@@ -342,7 +364,7 @@ sub www_submitObjectEdit {
     my @address = split /-/, $responses->{id};
 
     $self->loadSurveyJSON();
-    
+
     # See if any special actions were requested..
     if ( $responses->{delete} ) {
         return $self->deleteObject( \@address );
@@ -362,6 +384,7 @@ sub www_submitObjectEdit {
 }
 
 #-------------------------------------------------------------------
+
 =head2 www_jumpTo
 
 Allow survey editors to jump to a particular section or question in a
