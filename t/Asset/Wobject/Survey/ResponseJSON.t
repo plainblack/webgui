@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 79;
+my $tests = 78;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -48,7 +48,6 @@ is($responseJSON->lastResponse(), -1, 'new: default lastResponse is -1');
 is($responseJSON->questionsAnswered, 0, 'new: questionsAnswered is 0 by default');
 cmp_ok((abs$responseJSON->startTime - $newTime), '<=', 2, 'new: by default startTime set to time');
 is_deeply( $responseJSON->responses, {}, 'new: by default, responses is an empty hashref');
-is_deeply( $responseJSON->surveyOrder, [], 'new: by default, responses is an empty arrayref');
 
 my $now = time();
 my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), qq!{ "startTime": $now }!);
@@ -82,13 +81,13 @@ ok( ! $rJSON->hasTimedOut(4*60), 'hasTimedOut, limit check');
 
 ####################################################
 #
-# createSurveyOrder
+# initSurveyOrder
 #
 ####################################################
 
 $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
 
-$rJSON->createSurveyOrder();
+#$rJSON->initSurveyOrder();
 cmp_deeply(
     $rJSON->surveyOrder,
     [
@@ -102,7 +101,7 @@ cmp_deeply(
         [ 3, 1, [0, 1, 2, 3, 4, 5, 6] ],
         [ 3, 2, [0] ],
     ],
-    'createSurveyOrder, enumerated all sections, questions and answers'
+    'initSurveyOrder, enumerated all sections, questions and answers'
 );
 
 ####################################################
@@ -119,7 +118,7 @@ cmp_deeply(
 
 ####################################################
 #
-# createSurveyOrder, part 2
+# initSurveyOrder, part 2
 #
 ####################################################
 
@@ -127,27 +126,27 @@ cmp_deeply(
     my $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session), q!{}!);
 
     $rJSON->survey->section([0])->{randomizeQuestions} = 0;
-    $rJSON->createSurveyOrder();
+    $rJSON->initSurveyOrder();
     my @question_order = map {$_->[1]} grep {$_->[0] == 0} @{$rJSON->surveyOrder};
-    cmp_deeply(\@question_order, [0,1,2], 'createSurveyOrder did not shuffle questions');
+    cmp_deeply(\@question_order, [0,1,2], 'initSurveyOrder did not shuffle questions');
 
     $rJSON->survey->section([0])->{randomizeQuestions} = 1;
     srand(42); # Make shuffle predictable
-    $rJSON->createSurveyOrder();
+    $rJSON->initSurveyOrder();
     @question_order = map {$_->[1]} grep {$_->[0] == 0} @{$rJSON->surveyOrder};
-    cmp_deeply(\@question_order, [2,0,1], 'createSurveyOrder shuffled questions in first section');
+    cmp_deeply(\@question_order, [2,0,1], 'initSurveyOrder shuffled questions in first section');
 
     $rJSON->survey->section([0])->{randomizeQuestions} = 0;
     $rJSON->survey->question([0,0])->{randomizeAnswers} = 0;
-    $rJSON->createSurveyOrder();
+    $rJSON->initSurveyOrder();
     my @answer_order = map {@{$_->[2]}} grep {$_->[0] == 3 && $_->[1] == 1} @{$rJSON->surveyOrder};
-    cmp_deeply(\@answer_order, [0,1,2,3,4,5,6], 'createSurveyOrder did not shuffle answers');
+    cmp_deeply(\@answer_order, [0,1,2,3,4,5,6], 'initSurveyOrder did not shuffle answers');
     
     $rJSON->survey->question([3,1])->{randomizeAnswers} = 1;
     srand(42); # Make shuffle predictable
-    $rJSON->createSurveyOrder();
+    $rJSON->initSurveyOrder();
     @answer_order = map {@{$_->[2]}} grep {$_->[0] == 3 && $_->[1] == 1} @{$rJSON->surveyOrder};
-    cmp_deeply(\@answer_order, [1,3,4,5,6,0,2], 'createSurveyOrder shuffled answers');
+    cmp_deeply(\@answer_order, [1,3,4,5,6,0,2], 'initSurveyOrder shuffled answers');
 }
 
 ####################################################

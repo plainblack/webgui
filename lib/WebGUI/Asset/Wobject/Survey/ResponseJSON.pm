@@ -140,7 +140,7 @@ sub new {
             lastResponse => -1,
             questionsAnswered => 0,
             startTime => time(),
-            surveyOrder => [],
+            surveyOrder => undef,
 
             # And then allow jsonData to override defaults and/or add other members
             %{$jsonData},
@@ -152,16 +152,17 @@ sub new {
 
 #----------------------------------------------------------------------------
 
-=head2 createSurveyOrder
+=head2 initSurveyOrder
 
-Computers and stores the order of Sections, Questions and Aswers for this Survey. 
-See L<"surveyOrder">.
+Computes and stores the order of Sections, Questions and Aswers for this Survey. 
+See L<"surveyOrder">. You normally don't need to call this, as L<"surveyOrder"> will
+call it for you the first time it is used.
 
 Questions and Answers that are set to be randomized are shuffled into a random order.
 
 =cut
 
-sub createSurveyOrder {
+sub initSurveyOrder {
     my $self = shift;
 
     # Order Questions in each Section
@@ -324,28 +325,43 @@ sub startTime {
 =head2 surveyOrder
 
 Accessor for surveyOrder (see L<"surveyOrder">). 
-N.B. Use L<"createSurveyOrder"> to modify surveyOrder.
+Initialized on first access via L<"initSurveyOrder">.
 
 =cut
 
 sub surveyOrder {
     my $self = shift;
+    
+    if (!defined $self->response->{surveyOrder}) {
+        $self->initSurveyOrder();
+    }
+    
     return $self->response->{surveyOrder};
 }
 
 #-------------------------------------------------------------------
 
-=head2 nextResponse
+=head2 nextResponse ([ $responseIndex ])
 
-Returns the index of the next item that should be shown to the user, 
+Mutator. The index of the next item that should be shown to the user, 
 that is, the index of the next item in the L<"surveyOrder"> array,
 e.g. L<"lastResponse"> + 1.
+
+=head3 $responseIndex (optional)
+
+If defined, nextResponse is set to $responseIndex.
 
 =cut
 
 sub nextResponse {
     my $self = shift;
-    return $self->lastResponse + 1;
+    my ($responseIndex) = validate_pos(@_, {type => SCALAR, optional => 1});
+    
+    if ( defined $responseIndex ) {
+        $self->lastResponse($responseIndex - 1);
+    }
+    
+    return $self->lastResponse() + 1
 }
 
 #-------------------------------------------------------------------

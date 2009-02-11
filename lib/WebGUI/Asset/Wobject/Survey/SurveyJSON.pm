@@ -414,6 +414,7 @@ Adds two variables:
 =item * id 
 
 the index of the question's position in its parent's section array joined by dashes '-'
+See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/questionIndex>.
 
 =item * displayed_id
 
@@ -491,6 +492,7 @@ Adds two variables:
 =item * id 
 
 The index of the answer's position in its parent's question  and section arrays joined by dashes '-'
+See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/answerIndex>.
 
 =item * displayed_id
 

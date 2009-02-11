@@ -19,6 +19,8 @@ use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
 
@@ -176,16 +178,15 @@ sub definition {
         },
     );
 
-    push(
-        @{$definition}, {
+    push @{$definition}, {
             assetName         => $i18n->get('assetName'),
             icon              => 'survey.gif',
             autoGenerateForms => 1,
             tableName         => 'Survey',
             className         => 'WebGUI::Asset::Wobject::Survey',
             properties        => \%properties
-        }
-    );
+        };
+
     return $class->SUPER::definition( $session, $definition );
 }
 
@@ -216,7 +217,8 @@ Override importAssetCollateralData so that surveyJSON gets imported from package
 sub importAssetCollateralData {
     my ( $self, $data ) = @_;
     my $surveyJSON = $data->{properties}{surveyJSON};
-    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $surveyJSON, $self->getId ] );
+    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $surveyJSON, $self->getId ] );
+    return;
 }
 
 #-------------------------------------------------------------------
@@ -232,7 +234,7 @@ sub duplicate {
     my $options  = shift;
     my $newAsset = $self->SUPER::duplicate($options);
     $self->loadSurveyJSON();
-    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?",
+    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?',
         [ $self->survey->freeze, $newAsset->getId ] );
     return $newAsset;
 }
@@ -241,50 +243,63 @@ sub duplicate {
 
 =head2 loadSurveyJSON ( )
 
-Loads the survey collateral into memory so that the survey objects can be created
+Loads the survey collateral into memory so that the surveyJSON object can be created.
+After this method returns, calls to L<"survey"> will return a surveyJSON instance.
+Successive calls to this method have no effect. 
+
+=head3 json (optional)
+
+A json-encoded string representing a valid SurveyJSON serialization. If provided, 
+will be used to instantiate the SurveyJSON instance rather than querying the database.
 
 =cut
 
 sub loadSurveyJSON {
     my $self     = shift;
-    my $jsonHash = shift;
-    if ( defined $self->survey ) { return; }    #already loaded
+    my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
 
-    $jsonHash = $self->session->db->quickScalar( "select surveyJSON from Survey where assetId = ?", [ $self->getId ] )
-        if ( !defined $jsonHash );
+    # Do nothing if survey is already loaded
+    return if $self->survey;
 
-    $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $jsonHash );
+    # See if we need to load surveyJSON from the database
+    if ( ! defined $json ) {
+        $json
+            = $self->session->db->quickScalar( 'select surveyJSON from Survey where assetId = ?', [ $self->getId ] );
+    }
+
+    # Instantiate the SurveyJSON instance, and store it
+    return $self->{survey} = WebGUI::Asset::Wobject::Survey::SurveyJSON->new( $self->session, $json );
 }
 
 #-------------------------------------------------------------------
 
 =head2 saveSurveyJSON ( )
 
-Saves the survey collateral to the DB
+Serializes the SurveyJSON instance and persists it to the DB
 
 =cut
-
 
 sub saveSurveyJSON {
     my $self = shift;
 
     my $data = $self->survey->freeze();
 
-    $self->session->db->write( "update Survey set surveyJSON = ? where assetId = ?", [ $data, $self->getId ] );
+    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
+
+    return;
 }
 
 #-------------------------------------------------------------------
 
 =head2 survey ( )
 
-Helper to access the survey object.
+Accessor for the SurveyJSON object. See L<"loadSurveyJSON"> and L<"saveSurveyJSON">
 
 =cut
 
-sub survey       { return shift->{survey}; }
-sub littleBuddy  { return shift->{survey}; }
-sub allyourbases { return shift->{survey}; }
-sub helpmehelpme { return shift->{survey}; }
+sub survey { 
+    return shift->{survey}; 
+}
 
 #-------------------------------------------------------------------
 
@@ -298,20 +313,20 @@ sub www_editSurvey {
     my $self = shift;
 
     return $self->session->privilege->insufficient()
-        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    my %var;
-    my $out = $self->processTemplate( \%var, $self->get("surveyEditTemplateId") );
-
-    return $out;
+    return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
 }
 
 #-------------------------------------------------------------------
 
 =head2 www_submitObjectEdit ( )
 
-This is called when an edit is submitted to a survey object.  The POST should contain the id and updated params
-of the object, and also if the object is being deleted or copied.  
+This is called when an edit is submitted to a survey object. The POST should contain the id and updated params
+of the object, and also if the object is being deleted or copied.
+
+In general, the id contains a section index, question index, and answer index, separated by dashes.
+See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/sectionIndex>. 
 
 =cut
 
@@ -319,14 +334,16 @@ sub www_submitObjectEdit {
     my $self = shift;
 
     return $self->session->privilege->insufficient()
-        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    #    my $ref = @{from_json($self->session->form->process("data"))};
     my $responses = $self->session->form->paramsHashRef();
 
+    # Id is made up of: sectionIndex-questionIndex-answerIndex
     my @address = split /-/, $responses->{id};
 
     $self->loadSurveyJSON();
+    
+    # See if any special actions were requested..
     if ( $responses->{delete} ) {
         return $self->deleteObject( \@address );
     }
@@ -334,60 +351,86 @@ sub www_submitObjectEdit {
         return $self->copyObject( \@address );
     }
 
-    #   each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    # Each object checks the address and then either updates or passes it to the correct child.  New objects will have an index of -1.
     my $message = $self->survey->update( \@address, $responses );
 
+    # Persist the changes
     $self->saveSurveyJSON();
 
+    # Return the updated Survey structure
     return $self->www_loadSurvey( { address => \@address } );
-} ## end sub www_submitObjectEdit
+}
 
 #-------------------------------------------------------------------
-=head2 Allow survey editors to "jump to" a particular section of question in a
+=head2 www_jumpTo
+
+Allow survey editors to jump to a particular section or question in a
 Survey by tricking Survey into thinking they've completed the survey up to that
-point. Useful for survey builders.
+point. This is useful for user-testing large Survey instances where you don't want 
+to waste your time clicking through all of the initial questions to get to the one 
+you want to look at. 
+
 Note that calling this method will delete any existing survey responses for the
 current user (although only survey builders can call this method so that shouldn't be
-a problem
+a problem).
+
 =cut
 
 sub www_jumpTo {
     my $self = shift;
 
     return $self->session->privilege->insufficient()
-        unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
+        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    my $data = $self->session->form->paramsHashRef();
+    my $id = $self->session->form->param('id');
 
-    $self->session->log->debug("jumpTo to $data->{id}");
+    # When the Edit Survey screen first loads the first section will have an id of 'undefined'
+    # In this case, treat it the same as '0'
+    $id = $id eq 'undefined' ? 0 : $id;
+
+    $self->session->log->debug("www_jumpTo: $id");
 
     # Remove existing responses for current user
     $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
         [ $self->getId, $self->session->user->userId() ] );
-    my $responseId = $self->getResponseId();
 
-    $self->loadBothJSON();
+    # Create a new response (and trigger loadBothJSON())
+    $self->getResponseId();
 
-    # iterate over surveyOrder looking for the jumpTo target
-    for my $i ( 0 .. $#{ $self->response->surveyOrder() } ) {
-        my $address = $self->response->surveyOrder()->[$i];
+    # Break the $id down into sIndex and qIndex
+    my ($sIndex, $qIndex) = split /-/, $id;
 
-        my @possibilities = (
-            $self->survey->section($address),
-            $self->survey->question($address),
-        );
-        foreach my $possibilty (@possibilities) {
-            if ( ref $possibilty eq 'HASH' && $possibilty->{id} eq $data->{id} ) {
-                $self->session->log->debug("Found jumpTo target");
-                $self->response->lastResponse( $i - 1 );
-                $self->saveResponseJSON();
-                last;
-            }
+    # Go through items in surveyOrder until we find the item corresponding to $id
+    my $currentIndex = 0;
+    for my $address (@{ $self->response->surveyOrder }) {
+        my ($order_sIndex, $order_qIndex) = @{$address}[0,1];
+
+        # For starters, check that we're on the right Section 
+        if ($sIndex ne $order_sIndex) {
+
+            # Bad luck, try the next one..
+            $currentIndex++;
+            next;
         }
-    }
-    $self->session->log->debug("Unable to find jumpTo target");
 
-    return $self->www_takeSurvey;
+        # For a match, either qIndex must be empty (target is a Section), or
+        # the qIndices must match
+        if (!defined $qIndex || $qIndex eq $order_qIndex) {
+
+            # Set the nextResponse to be the index we're up to
+            $self->session->log->debug("Found id: $id at index: $currentIndex in surveyOrder");
+            $self->response->nextResponse( $currentIndex );
+            $self->saveResponseJSON();
+            return $self->www_takeSurvey;
+        }
+
+        # Keep looking..
+        $currentIndex++;
+    }
+
+    # Search failed, so return the Edit Survey page instead.
+    $self->session->log->debug("Unable to find id: $id");
+    return $self->www_editSurvey;
 }
 
 #-------------------------------------------------------------------
@@ -1267,15 +1310,24 @@ If the user is anonymous, the IP is used.  Or an email'd or linked code can be u
 
 sub getResponseId {
     my $self = shift;
+    my %opts = validate(@_, { noCookie => 0 } ); # This is a hack to allow for testing (cookies cause problems)
+    
     return $self->{responseId} if ( defined $self->{responseId} );
 
     my $ip = $self->session->env->getIp;
     my $id = $self->session->user->userId();
-    my $anonId 
-        = $self->session->form->process("userid")
-        || $self->session->http->getCookies->{"Survey2AnonId"}
-        || undef;
-    $self->session->http->setCookie( "Survey2AnonId", $anonId ) if ($anonId);
+
+    my $anonId = $self->session->form->process("userid");
+    
+    unless ($opts{noCookie}) {
+        $anonId ||= $self->session->http->getCookies->{"Survey2AnonId"};
+    }
+
+    $anonId ||= undef;
+    
+    unless ($opts{noCookie}) {
+        $self->session->http->setCookie( "Survey2AnonId", $anonId ) if ($anonId);
+    }
 
     my $responseId;
 
@@ -1336,8 +1388,9 @@ sub getResponseId {
                     anonId            => $anonId
                 }
             );
+#            $self->session->log->warn("post: $responseId");
             $self->loadBothJSON($responseId);
-            $self->response->createSurveyOrder();
+#            $self->response->createSurveyOrder();
             $self->{responseId} = $responseId;
             $self->saveResponseJSON();
 

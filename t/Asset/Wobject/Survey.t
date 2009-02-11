@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 1;
+my $tests = 10;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -36,6 +36,61 @@ $import_node = WebGUI::Asset->getImportNode($session);
 # Create a Survey
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
+
+# Load bare-bones survey, containing a single section (S0)
+$survey->loadSurveyJSON();
+$survey->survey->update([0], { variable => 'S0' });
+
+# Add 2 questions to S0
+$survey->survey->newObject([0]);    # S0Q0
+$survey->survey->update([0,0], { variable => 'S0Q0' });
+$survey->survey->newObject([0]);    # S0Q1
+$survey->survey->update([0,1], { variable => 'S0Q1' });
+
+# Add a new section (S1)
+$survey->survey->newObject([]);     # S1
+$survey->survey->update([1], { variable => 'S1' });
+
+# Add 2 questions to S1
+$survey->survey->newObject([1]);    # S1Q0
+$survey->survey->update([1,0], { variable => 'S1Q0' });
+$survey->survey->newObject([1]);    # S1Q1
+$survey->survey->update([1,1], { variable => 'S1Q1' });
+
+# Persist to db
+$survey->saveSurveyJSON();
+
+# Now start a response as admin user
+$session->user( { userId =>3 } );
+$survey->getResponseId( { noCookie => 1 }); # triggers loadBothJSON()
+
+#for my $address (@{ $survey->response->surveyOrder }) {
+#    diag (Dumper $address);
+#}
+
+# www_jumpTo
+{
+    # Check a simple www_jumpTo request
+    WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => '0'} } );
+    is( $session->http->getStatus, '201', 'Page request ok' ); # why is "201 - created" status used??
+    is($survey->response->nextResponse, 0, 'S0 is the first response');
+    
+    tie my %expectedSurveyOrder, 'Tie::IxHash';
+    %expectedSurveyOrder =  (
+        'undefined' => 0,
+        '0' => 0,
+        '0-0' => 0,
+        '0-1' => 1,
+        '1' => 2,
+        '1-0' => 2,
+        '1-1' => 3,
+    );
+    while (my ($id, $index) = each %expectedSurveyOrder) {
+        WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => $id} } );
+        $survey->loadSurveyJSON();
+        is($survey->response->nextResponse, $index, "jumpTo($id) sets nextResponse to $index");
+    }
+}
 
 }
 
