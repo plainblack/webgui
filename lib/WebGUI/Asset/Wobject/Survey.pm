@@ -258,13 +258,96 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-=head2 saveSurveyJSON ( )
+=head2 surveyJSON_update ( )
 
-Serializes the SurveyJSON instance and persists it to the database
+Convenience method that delegates to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/update>
+and automatically calls L<"persistSurveyJSON"> afterwards.
 
 =cut
 
-sub saveSurveyJSON {
+sub surveyJSON_update {
+    my $self = shift;
+    my $ret = $self->surveyJSON->update(@_);
+    $self->persistSurveyJSON();
+    return $ret;
+}
+
+#-------------------------------------------------------------------
+
+=head2 surveyJSON_copy ( )
+
+Convenience method that delegates to L<WebGUI::Asset::Wobject::Survey::SurveyJSON/copy>
+and automatically calls L<"persistSurveyJSON"> afterwards.
+
+=cut
+
+sub surveyJSON_copy {
+    my $self = shift;
+    my $ret =$self->surveyJSON->copy(@_);
+    $self->persistSurveyJSON();
+    return $ret;
+}
+
+#-------------------------------------------------------------------
+
+=head2 surveyJSON_remove ( )
+
+Convenience method that delegates L<WebGUI::Asset::Wobject::Survey::SurveyJSON/remove>
+and automatically calls L<"persistSurveyJSON"> afterwards.
+
+=cut
+
+sub surveyJSON_remove {
+    my $self = shift;
+    my $ret = $self->surveyJSON->remove(@_);
+    $self->persistSurveyJSON();
+    return $ret;
+}
+
+#-------------------------------------------------------------------
+
+=head2 surveyJSON_newObject ( )
+
+Convenience method that delegates L<WebGUI::Asset::Wobject::Survey::SurveyJSON/newObject>
+and automatically calls L<"persistSurveyJSON"> afterwards.
+
+=cut
+
+sub surveyJSON_newObject {
+    my $self = shift;
+    my $ret = $self->surveyJSON->newObject(@_);
+    $self->persistSurveyJSON();
+    return $ret;
+}
+
+#-------------------------------------------------------------------
+
+=head2 recordResponses ( )
+
+Convenience method that delegates to L<WebGUI::Asset::Wobject::Survey::ResponseJSON/recordResponses>
+and automatically calls L<"persistSurveyJSON"> afterwards.
+
+=cut
+
+sub recordResponses {
+    my $self = shift;
+    my $ret = $self->responseJSON->recordResponses(@_);
+    $self->persistResponseJSON();
+    return $ret;
+}
+
+#-------------------------------------------------------------------
+
+=head2 persistSurveyJSON ( )
+
+Serializes the SurveyJSON instance and persists it to the database.
+
+Calling this method is only required if you have directly accessed and modified 
+the L<"surveyJSON"> object.
+
+=cut
+
+sub persistSurveyJSON {
     my $self = shift;
 
     my $data = $self->surveyJSON->freeze();
@@ -281,7 +364,8 @@ Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::SurveyJSON> prope
 
 It is stored in the database as a serialized JSON-encoded string in the surveyJSON db field.
 
-See also L<"saveSurveyJSON">.
+If you access and change surveyJSON you will need to manually call L<"persistSurveyJSON"> 
+to have your changes persisted to the database. 
 
 =head3 json (optional)
 
@@ -316,7 +400,8 @@ Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::ResponseJSON> pro
 
 It is stored in the database as a serialized JSON-encoded string in the responseJSON db field.
 
-See also L<"saveResponseJSON">.
+If you access and change responseJSON you will need to manually call L<"persistResponseJSON"> 
+to have your changes persisted to the database. 
 
 =head3 json (optional)
 
@@ -355,7 +440,7 @@ sub responseJSON {
 
 =head2 www_editSurvey ( )
 
-Loads the initial edit survey page.  All other edit actions are JSON calls from this page.
+Loads the initial edit survey page. All other edit actions are ajax calls from this page.
 
 =cut
 
@@ -386,24 +471,21 @@ sub www_submitObjectEdit {
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    my $responses = $self->session->form->paramsHashRef();
+    my $params = $self->session->form->paramsHashRef();
 
-    # Id is made up of: sectionIndex-questionIndex-answerIndex
-    my @address = split /-/, $responses->{id};
+    # Id is made up of at most: sectionIndex-questionIndex-answerIndex
+    my @address = split /-/, $params->{id};
 
     # See if any special actions were requested..
-    if ( $responses->{delete} ) {
+    if ( $params->{delete} ) {
         return $self->deleteObject( \@address );
     }
-    elsif ( $responses->{copy} ) {
+    elsif ( $params->{copy} ) {
         return $self->copyObject( \@address );
     }
 
-    # Each object checks the address and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    my $message = $self->surveyJSON->update( \@address, $responses );
-
-    # Persist the changes
-    $self->saveSurveyJSON();
+    # Update the addressed object
+    $self->surveyJSON_update( \@address, $params );
 
     # Return the updated Survey structure
     return $self->www_loadSurvey( { address => \@address } );
@@ -466,7 +548,7 @@ sub www_jumpTo {
             # Set the nextResponse to be the index we're up to
             $self->session->log->debug("Found id: $id at index: $currentIndex in surveyOrder");
             $self->responseJSON->nextResponse( $currentIndex );
-            $self->saveResponseJSON();
+            $self->persistResponseJSON(); # Manually persist ResponseJSON to the database
             return $self->www_takeSurvey;
         }
 
@@ -497,9 +579,7 @@ sub copyObject {
     my ( $self, $address ) = @_;
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    $address = $self->surveyJSON->copy($address);
-
-    $self->saveSurveyJSON();
+    $address = $self->surveyJSON_copy($address);
 
     #The parent address of the deleted object is returned.
 
@@ -524,9 +604,7 @@ sub deleteObject {
     my ( $self, $address ) = @_;
 
     #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
-    my $message = $self->surveyJSON->remove($address);
-
-    $self->saveSurveyJSON();
+    my $message = $self->surveyJSON_remove($address);
 
     #The parent address of the deleted object is returned.
     if ( @$address == 1 ) {
@@ -588,7 +666,7 @@ sub www_dragDrop {
     my @bid = split /-/, $p->{before}->{id};
 
     my $target = $self->surveyJSON->getObject( \@tid );
-    $self->surveyJSON->remove( \@tid, 1 );
+    $self->surveyJSON_remove( \@tid, 1 );
     my $address = [0];
     if ( @tid == 1 ) {
 
@@ -635,7 +713,8 @@ sub www_dragDrop {
         }
     }
 
-    $self->saveSurveyJSON();
+    # Manually persist SuveryJSON since we have directly modified it
+    $self->persistSurveyJSON();
 
     return $self->www_loadSurvey( { address => $address } );
 }
@@ -981,9 +1060,7 @@ sub www_submitQuestions {
 
     my @goodResponses = keys %{$responses};    #load everything.
 
-    my $termInfo = $self->responseJSON->recordResponses( $responses );
-
-    $self->saveResponseJSON();
+    my $termInfo = $self->recordResponses( $responses );
 
     if ( $termInfo->[0] ) {
         $self->session->log->debug('Terminal, surveyEnd');
@@ -1228,13 +1305,13 @@ sub prepareShowSurveyTemplate {
 
 #-------------------------------------------------------------------
 
-=head3 saveResponseJSON
+=head3 persistResponseJSON
 
 Turns the response object into JSON and saves it to the DB.  
 
 =cut
 
-sub saveResponseJSON {
+sub persistResponseJSON {
     my $self = shift;
     my $data = $self->responseJSON->freeze();
     $self->session->db->write( 'update Survey_response set responseJSON = ? where Survey_responseId = ?', [ $data, $self->responseId ] );
@@ -1351,9 +1428,11 @@ sub responseId {
                     }
                 );
 
-                # Store the newly created responseId and then persist ResponseJSON
+                # Store the newly created responseId
                 $self->{responseId} = $responseId;
-                $self->saveResponseJSON();
+                
+                # Manually persist ResponseJSON since we have changed $self->responseId
+                $self->persistResponseJSON();
             }
             else {
                 $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");

@@ -38,31 +38,27 @@ $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey
 isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
 
 # Load bare-bones survey, containing a single section (S0)
-$survey->surveyJSON->update([0], { variable => 'S0' });
+$survey->surveyJSON_update([0], { variable => 'S0' });
 
 # Add 2 questions to S0
-$survey->surveyJSON->newObject([0]);    # S0Q0
-$survey->surveyJSON->update([0,0], { variable => 'S0Q0' });
-$survey->surveyJSON->newObject([0]);    # S0Q1
-$survey->surveyJSON->update([0,1], { variable => 'S0Q1' });
+$survey->surveyJSON_newObject([0]);    # S0Q0
+$survey->surveyJSON_update([0,0], { variable => 'S0Q0' });
+$survey->surveyJSON_newObject([0]);    # S0Q1
+$survey->surveyJSON_update([0,1], { variable => 'S0Q1' });
 
 # Add a new section (S1)
-$survey->surveyJSON->newObject([]);     # S1
-$survey->surveyJSON->update([1], { variable => 'S1' });
+$survey->surveyJSON_newObject([]);     # S1
+$survey->surveyJSON_update([1], { variable => 'S1' });
 
 # Add 2 questions to S1
-$survey->surveyJSON->newObject([1]);    # S1Q0
-$survey->surveyJSON->update([1,0], { variable => 'S1Q0' });
-$survey->surveyJSON->newObject([1]);    # S1Q1
-$survey->surveyJSON->update([1,1], { variable => 'S1Q1' });
-
-# Persist to db
-$survey->saveSurveyJSON();
+$survey->surveyJSON_newObject([1]);    # S1Q0
+$survey->surveyJSON_update([1,0], { variable => 'S1Q0' });
+$survey->surveyJSON_newObject([1]);    # S1Q1
+$survey->surveyJSON_update([1,1], { variable => 'S1Q1' });
 
 # Now start a response as admin user
 $session->user( { userId =>3 } );
 $survey->responseIdCookies(0);
-#$survey->responseId( { noCookie => 1 }); # triggers loadBothJSON()
 
 #for my $address (@{ $survey->responseJSON->surveyOrder }) {
 #    diag (Dumper $address);
