@@ -95,13 +95,14 @@ sub installPassiveAnalyticsRule {
 }
 
 #----------------------------------------------------------------------------
-# Add the PassiveAnalytics Rule table
+# Add the PassiveAnalytics Settings
 sub addPassiveAnalyticsSettings {
     my $session = shift;
     print "\tInstall Passive Analytics settings... ";
     # and here's our code
     $session->setting->add('passiveAnalyticsInterval', 300);
     $session->setting->add('passiveAnalyticsDeleteDelta', 0);
+    $session->setting->add('passiveAnalyticsEnabled', 0);
     print "DONE!\n";
 }
 

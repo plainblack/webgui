@@ -425,6 +425,12 @@ sub www_settings {
         label     => $i18n->get('Delete Delta Table?'),
         hoverHelp => $i18n->get('Delete Delta Table? help'),
     );
+    $f->yesNo(
+        name      => 'enabled',
+        value     => $session->form->get('enabled') || $session->setting->get('passiveAnalyticsEnabled') || 0,
+        label     => $i18n->get('Enabled?'),
+        hoverHelp => $i18n->get('Enabled? help'),
+    );
     $f->submit();
     my $ac = WebGUI::AdminConsole->new($session,'passiveAnalytics');
     $ac->addSubmenuItem($session->url->page('op=passiveAnalytics;func=editRuleflow'), $i18n->get('Passive Analytics'));
@@ -445,6 +451,7 @@ sub www_settingsSave {
     my $form = $session->form;
     $session->setting->set('passiveAnalyticsInterval',    $form->process('pauseInterval', 'integer'));
     $session->setting->set('passiveAnalyticsDeleteDelta', $form->process('deleteDelta',   'yesNo'  ));
+    $session->setting->set('passiveAnalyticsEnabled',     $form->process('enabled',       'yesNo'  ));
     return www_settings($session);
 }
 

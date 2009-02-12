@@ -123,6 +123,18 @@ home\?func=match, or<br />
 		context => q|Button label to begin analyzing the logs.|
 	},
 
+	'Enabled?' => {
+		message => q|Enable Passive Analytics?|,
+		lastUpdated => 0,
+		context => q||
+	},
+
+	'Enabled? help' => {
+		message => q|Passive Analytics will do no logging until enabled.|,
+		lastUpdated => 0,
+		context => q||
+	},
+
 	'Regular Expression Error:' => {
 		message => q|Regular Expression Error:|,
 		lastUpdated => 0,
