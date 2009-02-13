@@ -110,7 +110,10 @@ Returns true if the user meets the condition to see debugging information and de
 
 sub canShowDebug {
 	my $self = shift;
+
+    ##This check prevents in infinite loop during startup.
 	return 0 unless ($self->session->hasSettings);
+
 	return 0 unless ($self->session->setting->get("showDebug"));
 	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
 	return $self->canShowBasedOnIP('debugIp');
