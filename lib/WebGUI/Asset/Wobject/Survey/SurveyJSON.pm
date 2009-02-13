@@ -655,12 +655,11 @@ sub insertObject {
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
-    
     return if !$count;
 
     # Use splice to rearrange the relevant array of objects..
     if ( $count == 1 ) {
-        splice @{ $self->sections($address) }, sIndex($address) + 1, 0, $object;
+        splice @{ $self->sections($address) }, sIndex($address) +1, 0, $object;
     }
     elsif ( $count == 2 ) {
         splice @{ $self->questions($address) }, qIndex($address) + 1, 0, $object;
