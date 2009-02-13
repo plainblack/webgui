@@ -490,6 +490,12 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar gallery_displayTitle' => {
+        message     => q{Whether the Gallery containing this File is set to display its title, or not.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
     'helpvar isPending' => {
         message     => q{A flag to set if the GalleryAlbum is not yet approved. Users who can edit the GalleryAlbum are allowed to see them before they are approved.},
         lastUpdated => 0,

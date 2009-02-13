@@ -537,7 +537,7 @@ sub getTemplateVars {
 
     # Add some specific vars from the Gallery
     my $galleryVar      = $gallery->getTemplateVars;
-    for my $key ( qw{ title menuTitle url } ) {
+    for my $key ( qw{ title menuTitle url displayTitle } ) {
         $var->{ "gallery_" . $key } = $galleryVar->{ $key };
     }
 
