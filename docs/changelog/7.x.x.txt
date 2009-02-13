@@ -3,12 +3,12 @@
  - fixed: Do not show the Edit entry in the More menu in the asset manager if the asset is locked.
  - fixed #9677: no output from form helper template variable sticky.form and stick.label
  - fixed #9738: Gallery Title [TEMPLATE]
+ - fixed #9739: Gallery Delete Album Template [TEMPLATE]
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
  - fixed #9629: override stringify date format to use java default format.
- - Added a switch to allow the use of non-WebGUI objects with the Workflow
-   engine.
+ - Added a switch to allow the use of non-WebGUI objects with the Workflow engine.
  - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
  - fixed #9596: caching now takes into account the correct parameter for pagination
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
