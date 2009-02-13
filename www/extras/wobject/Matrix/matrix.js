@@ -33,7 +33,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","checked","lastUpdated","url","assetId"]
+            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked", parser: "number"},{key: "lastUpdated", parser: "number"},"url","assetId"]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
