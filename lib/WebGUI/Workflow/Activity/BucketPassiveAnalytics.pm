@@ -132,13 +132,16 @@ EOSQL1
         $session->db->write('delete from deltaLog');
         $message .= '  The delta log has been cleaned up.';
     }
-    my $inbox = WebGUI::Inbox->new($self->session);
-    $inbox->addMessage({
-        status  => 'unread',
-        subject => 'Passive analytics is done',
-        userId  => $self->get('userId'),
-        message => $message,
-    });
+    ##If userId was set to 0, do not send any emails.
+    if ($self->get('userId')) {
+        my $inbox = WebGUI::Inbox->new($self->session);
+        $inbox->addMessage({
+            status  => 'unread',
+            subject => 'Passive analytics is done',
+            userId  => $self->get('userId'),
+            message => $message,
+        });
+    }
     $session->db->write('update passiveAnalyticsStatus set endDate=NOW(), running=0');
 
     return $self->COMPLETE;
