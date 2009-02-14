@@ -4,6 +4,7 @@
  - fixed #9677: no output from form helper template variable sticky.form and stick.label
  - fixed #9738: Gallery Title [TEMPLATE]
  - fixed #9739: Gallery Delete Album Template [TEMPLATE]
+ - fixed #9737: Upgrade Missed a Config Option
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long

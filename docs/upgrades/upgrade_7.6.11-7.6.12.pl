@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility qw/isIn/;
 
 
 my $toVersion = '7.6.12';
@@ -29,6 +30,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+addAssetDiscoveryServiceAgain( $session );
 
 # upgrade functions go here
 
@@ -43,6 +45,27 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addAssetDiscoveryServiceAgain {
+    my $session = shift;
+    print "\tAdding asset discovery service..." unless $quiet;
+    my @handlers = @{ $session->config->get('contentHandlers') };
+    if (isIn( 'WebGUI::Content::AssetDiscovery', @handlers) ) {
+        print "Done.\n" unless $quiet;
+        return;
+    }
+    my @newHandlers = ();
+    foreach my $handler (@handlers) {
+        if ($handler eq 'WebGUI::Content::Operation') {
+            push @newHandlers, 'WebGUI::Content::AssetDiscovery';
+        }
+        push @newHandlers, $handler;
+    }
+    $session->config->set('contentHandlers', \@newHandlers);
+    print "Done.\n" unless $quiet;
+}
+
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
