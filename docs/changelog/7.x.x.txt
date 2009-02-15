@@ -5,6 +5,7 @@
  - fixed #9738: Gallery Title [TEMPLATE]
  - fixed #9739: Gallery Delete Album Template [TEMPLATE]
  - fixed #9737: Upgrade Missed a Config Option
+ - fixed #9169: E-mail to Collab System creates invalid asset
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
