@@ -37,16 +37,11 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
                 this.myDataSource, {initialRequest:uri});
 
-	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {
-		myDataTable.getRecordSet().reset();
-		return oFullResponse;
-	}
 	var myDataSource = this.myDataSource;
 
         var myCallback = function() {
-		myDataTable.getRecordSet().reset();
-            this.set("sortedBy", null);
-            this.onDataReturnAppendRows.apply(this,arguments);
+		this.set("sortedBy", null);
+            	this.onDataReturnAppendRows.apply(this,arguments);
 		compareFormButton();
         };
 
@@ -66,6 +61,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         	}
 		myDataTable.getRecordSet().reset();
 		myDataTable.refreshView();
+		myDataTable.showTableMessage('Loading...');
 		
 		myDataSource.sendRequest(newUri,callback2);
 		

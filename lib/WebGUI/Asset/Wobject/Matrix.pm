@@ -945,34 +945,43 @@ assetData.revisionDate
 
     @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
 
+    my (@searchParams,@searchParams_sorted);
+    if($form->process("search")){
+        foreach my $param ($form->param) {
+            if($param =~ m/^search_/){
+                my $parameter;
+                $parameter->{name}  = $param;
+                $parameter->{value} = $form->process($param);
+                my $attributeId = $param;
+                $attributeId =~ s/^search_//;
+                $attributeId =~ s/_____/-/g;
+                $parameter->{attributeId} = $attributeId;
+                push(@searchParams,$parameter);
+            }
+        }
+    }
+    @searchParams_sorted = sort { $b->{value} <=> $a->{value} } @searchParams;
     foreach my $result (@results){
             if($form->process("search")){
-                # $self->session->errorHandler->warn("checking listing: ".$result->{title});
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from MatrixListing_attribute as listing
                             left join Matrix_attribute using(attributeId)
-                            where listing.matrixListingId = ?
-                        ",[$result->{assetId}],'attributeId');
-                foreach my $param ($form->param) {
-                    if($param =~ m/^search_/){
-                        my $attributeId = $param;
-                        $attributeId =~ s/^search_//;
-                        $attributeId =~ s/_____/-/;
-                        my $fieldType       = $matrixListing_attributes->{$attributeId}->{fieldType};
-                        my $listingValue    = $matrixListing_attributes->{$attributeId}->{value};
-                        # $self->session->errorHandler->warn("fieldType:".$fieldType.", attributeValue: ".$form->process($param).", listingvalue: ".$listingValue);
-                        if(($fieldType eq 'MatrixCompare') && ($listingValue < $form->process($param))){
+                            where listing.matrixListingId = ? order by value asc",
+                            [$result->{assetId}],'attributeId');
+                PARAM: foreach my $param (@searchParams_sorted) {
+                        my $fieldType       = $matrixListing_attributes->{$param->{attributeId}}->{fieldType};
+                        my $listingValue    = $matrixListing_attributes->{$param->{attributeId}}->{value};
+                        if(($fieldType eq 'MatrixCompare') && ($listingValue < $param->{value})){
                             $result->{checked} = '';
-                            last;
+                            last PARAM;
                         }
-                        elsif(($fieldType ne 'MatrixCompare') && ($form->process($param) ne $listingValue)){
+                        elsif(($fieldType ne 'MatrixCompare' && $fieldType ne '') && ($param->{value} ne $listingValue)){
                             $result->{checked} = '';
-                            last;
+                            last PARAM;
                         }
                         else{
                             $result->{checked} = 'checked';
                         }
-                    }
                 }
             }
             else{
