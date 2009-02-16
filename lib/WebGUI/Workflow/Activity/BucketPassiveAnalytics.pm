@@ -81,7 +81,8 @@ sub execute {
     my @rules = ();
     my $getARule = WebGUI::PassiveAnalytics::Rule->getAllIterator($session);
     while (my $rule = $getARule->()) {
-        push @rules, $rule;
+        my $regexp = $rule->get('regexp');
+        push @rules, [ $rule->get('bucketName'), qr/$regexp/];
     }
 
     ##Get the index stored from the last invocation of the Activity.  If this is
@@ -90,6 +91,7 @@ sub execute {
     if ($logIndex == 0) { 
         $session->db->write('delete from bucketLog');
     }
+    my %bucketCache = ();
 
     ##Configure all the SQL
     my $deltaSql  = <<"EOSQL1";
@@ -105,16 +107,24 @@ EOSQL1
     DELTA_ENTRY: while (my $entry = $deltaSth->hashRef()) {
         ++$logIndex;
         my $bucketFound = 0;
-        RULE: foreach my $rule (@rules) {
-           next RULE unless $rule->matchesBucket($entry); 
-           
-           # Into the bucket she goes..
-           $bucketSth->execute([$entry->{userId}, $rule->get('bucketName'), $entry->{delta}, $entry->{stamp}]);
-           $bucketFound = 1;
-           last RULE;
+        my $url = $entry->{url};
+        if (exists $bucketCache{$url}) {
+           $bucketSth->execute([$entry->{userId}, $bucketCache{$url}, $entry->{delta}, $entry->{stamp}]);
         }
-        if (!$bucketFound) {
-           $bucketSth->execute([$entry->{userId}, 'Other', $entry->{delta}, $entry->{stamp}]);
+        else {
+            RULE: foreach my $rule (@rules) {
+               next RULE unless $url =~ $rule->[1]; 
+               
+               # Into the bucket she goes..
+               $bucketCache{$url} = $rule->[0];
+               $bucketSth->execute([$entry->{userId}, $rule->[0], $entry->{delta}, $entry->{stamp}]);
+               $bucketFound = 1;
+               last RULE;
+            }
+            if (!$bucketFound) {
+               $bucketCache{$url} = 'Other';
+               $bucketSth->execute([$entry->{userId}, 'Other', $entry->{delta}, $entry->{stamp}]);
+            }
         }
         if (time() > $endTime) {
             $expired = 1;

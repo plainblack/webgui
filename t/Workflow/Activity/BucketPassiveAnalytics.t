@@ -72,11 +72,13 @@ diag "Data logged";
 ##Now, run it and wait for it to finish
 my $counter = 0;
 diag time();
+#DB::enable_profile();
 PAUSE: while (my $retval = $instance->run()) {
     diag $retval;
     last PAUSE if $retval eq 'done';
     last PAUSE if $counter++ >= 16;
 }
+#DB::disable_profile();
 diag time();
 
 ok(1, 'One test');
@@ -93,7 +95,7 @@ sub loadLogData {
     my $insert = $session->db->prepare(
         q!insert into passiveLog (userId, sessionId, timeStamp, url, assetId) VALUES (?,?,?,?,'assetId')!
     );
-    my $logCount = 5000;
+    my $logCount = 15000;
     my $counter;
     my $startTime = 1000;
     my $numUrls = scalar @urls;
