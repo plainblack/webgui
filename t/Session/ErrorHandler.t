@@ -153,23 +153,29 @@ my $origDebugIp   = $session->setting->get('debugIp');
 my $origShowDebug = $session->setting->get('showDebug');
 
 $session->setting->set('showDebug', 0);
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if not enabled');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if not enabled');
 
 $session->setting->set('showDebug', 1);
 $session->http->setMimeType('audio/mp3');
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if mime type is wrong');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if mime type is wrong');
 
 $session->http->setMimeType('text/html');
 $session->setting->set('debugIp', '');
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is empty string');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is empty string');
 
 $session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
 $newEnv{REMOTE_ADDR} = '172.17.0.5';
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
 $newEnv{REMOTE_ADDR} = '10.0.0.5';
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
 $newEnv{REMOTE_ADDR} = '192.168.0.5';
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
 
 ####################################################
 #

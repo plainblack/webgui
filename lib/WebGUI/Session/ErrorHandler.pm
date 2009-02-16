@@ -105,18 +105,21 @@ sub canShowBasedOnIP {
 =head2 canShowDebug ( )
 
 Returns true if the user meets the condition to see debugging information and debug mode is enabled.
+This method caches its value, so long processes may need to manually clear the cached in $self->{_canShowDebug}.
 
 =cut
 
 sub canShowDebug {
-	my $self = shift;
+    my $self = shift;
 
     ##This check prevents in infinite loop during startup.
-	return 0 unless ($self->session->hasSettings);
-
-	return 0 unless ($self->session->setting->get("showDebug"));
-	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
-	return $self->canShowBasedOnIP('debugIp');
+    return 0 unless ($self->session->hasSettings);
+    return $self->{_canShowDebug} if exists ($self->{_canShowDebug});
+    my $canShow = $self->session->setting->get("showDebug")
+               && substr($self->session->http->getMimeType(),0,9) eq "text/html"
+               && $self->canShowBasedOnIP('debugIp');
+    $self->{_canShowDebug} = $canShow;
+    return $canShow;
 }
 
 #-------------------------------------------------------------------
