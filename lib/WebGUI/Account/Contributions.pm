@@ -198,6 +198,7 @@ sub www_view {
         my $assetId    = $row->{assetId};
         my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         my $props      = $asset->get;
+        $props->{url}  = $asset->getUrl;
         if (ref $asset eq "WebGUI::Asset::Post") {
             $asset = $asset->getThread;
             $props = $asset->get;
