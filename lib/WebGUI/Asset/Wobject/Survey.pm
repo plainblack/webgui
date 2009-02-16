@@ -907,13 +907,13 @@ sub getMenuVars {
     my $self = shift;
 
     return {
-        edit_survey_url               => $self->getUrl('func=>editSurvey'),
-        take_survey_url               => $self->getUrl('func=>takeSurvey'),
-        delete_responses_url          => $self->getUrl('func=>deleteResponses'),
-        view_simple_results_url       => $self->getUrl('func=>exportSimpleResults'),
-        view_transposed_results_url   => $self->getUrl('func=>exportTransposedResults'),
-        view_statistical_overview_url => $self->getUrl('func=>viewStatisticalOverview'),
-        view_grade_book_url           => $self->getUrl('func=>viewGradeBook'),
+        edit_survey_url               => $self->getUrl('func=editSurvey'),
+        take_survey_url               => $self->getUrl('func=takeSurvey'),
+        delete_responses_url          => $self->getUrl('func=deleteResponses'),
+        view_simple_results_url       => $self->getUrl('func=exportSimpleResults'),
+        view_transposed_results_url   => $self->getUrl('func=exportTransposedResults'),
+        view_statistical_overview_url => $self->getUrl('func=viewStatisticalOverview'),
+        view_grade_book_url           => $self->getUrl('func=viewGradeBook'),
         user_canTakeSurvey            => $self->session->user->isInGroup( $self->get('groupToTakeSurvey') ),
         user_canViewReports           => $self->session->user->isInGroup( $self->get('groupToViewReports') ),
         user_canEditSurvey            => $self->session->user->isInGroup( $self->get('groupToEditSurvey') ),
