@@ -957,7 +957,10 @@ A Section Id is identical to a Section index. This method is only present for co
 
 sub sectionId {
     my $self = shift;
-    my ($sIndex) = validate_pos(@_, { type => SCALAR } );
+    my ($sIndex) = validate_pos(@_, { type => SCALAR | UNDEF } );
+    
+    return if !defined $sIndex;
+    
     return $sIndex;
 }
 
@@ -971,7 +974,10 @@ The id is constructed by hyphenating the Section index and Question index.
 
 sub questionId {
     my $self = shift;
-    my ($sIndex, $qIndex) = validate_pos(@_, { type => SCALAR }, { type => SCALAR } );
+    my ($sIndex, $qIndex) = validate_pos(@_, { type => SCALAR | UNDEF }, { type => SCALAR | UNDEF } );
+    
+    return if !defined $sIndex || !defined $qIndex;
+     
     return "$sIndex-$qIndex";
 }
 
@@ -985,7 +991,10 @@ The id is constructed by hyphenating all three indices.
 
 sub answerId {
     my $self = shift;
-    my ($sIndex, $qIndex, $aIndex) = validate_pos(@_, { type => SCALAR }, { type => SCALAR }, { type => SCALAR } );
+    my ($sIndex, $qIndex, $aIndex) = validate_pos(@_, { type => SCALAR | UNDEF  }, { type => SCALAR | UNDEF  }, { type => SCALAR | UNDEF  } );
+    
+    return if !defined $sIndex || !defined $qIndex || !defined $aIndex;
+    
     return "$sIndex-$qIndex-$aIndex";
 }
 
