@@ -101,7 +101,7 @@ sub definition {
                                 score           => $i18n->get('sort by score label'),
                                 title           => $i18n->get('sort alpha numeric label'),
                                 lineage         => $i18n->get('sort by asset rank label'),
-                                revisionDate    => $i18n->get('sort by last updated label'),
+                                lastUpdated     => $i18n->get('sort by last updated label'),
                               },
             defaultValue    =>"score",
             hoverHelp       =>$i18n->get('default sort description'),
@@ -516,7 +516,8 @@ sub view {
 
     my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            orderByClause       => "revisionDate desc",
+            joinClass           => "WebGUI::Asset::MatrixListing",
+            orderByClause       => "lastUpdated desc",
             limit               => 5,
             returnObjects       => 1,
         }) };
@@ -524,7 +525,7 @@ sub view {
         push (@{ $var->{last_updated_loop} }, {
                         url         => $lastUpdatedListing->getUrl,
                         name        => $lastUpdatedListing->get('title'),
-                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('revisionDate'),"%z")
+                        lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
     }
     $var->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
