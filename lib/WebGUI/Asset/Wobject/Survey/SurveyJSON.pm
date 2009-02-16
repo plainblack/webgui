@@ -59,6 +59,69 @@ use Storable qw/dclone/;
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
 
+my %MULTI_CHOICE_BUNDLES = (
+    'Agree/Disagree' => [ 'Strongly disagree',    (q{}) x 5, 'Strongly agree' ],
+    Certainty        => [ 'Not at all certain',   (q{}) x 9, 'Extremely certain' ],
+    Concern          => [ 'Not at all concerned', (q{}) x 9, 'Extremely concerned' ],
+    Confidence       => [ 'Not at all confident', (q{}) x 9, 'Extremely confident' ],
+    Education        => [
+        'Elementary or some high school',
+        'High school/GED',
+        'Some college/vocational school',
+        'College graduate',
+        'Some graduate work',
+        'Master\'s degree',
+        'Doctorate (of any type)',
+        'Other degree (verbatim)',
+    ],
+    Effectiveness => [ 'Not at all effective', (q{}) x 9, 'Extremely effective' ],
+    Gender        => [qw( Male Female )],
+    Ideology      => [
+        'Strongly liberal',
+        'Liberal',
+        'Somewhat liberal',
+        'Middle of the road',
+        'Slightly conservative',
+        'Conservative',
+        'Strongly conservative'
+    ],
+    Importance       => [ 'Not at all important', (q{}) x 9, 'Extremely important' ],
+    Likelihood       => [ 'Not at all likely',    (q{}) x 9, 'Extremely likely' ],
+    'Oppose/Support' => [ 'Strongly oppose',      (q{}) x 5, 'Strongly support' ],
+    Party =>
+        [ 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' ],
+    Race =>
+        [ 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' ],
+    Risk         => [ 'No risk',              (q{}) x 9, 'Extreme risk' ],
+    Satisfaction => [ 'Not at all satisfied', (q{}) x 9, 'Extremely satisfied' ],
+    Security     => [ 'Not at all secure',    (q{}) x 9, 'Extremely secure' ],
+    Threat       => [ 'No threat',            (q{}) x 9, 'Extreme threat' ],
+    'True/False' => [qw( True False )],
+    'Yes/No'     => [qw( Yes No )],
+    Scale => [q{}],
+    'Multiple Choice' => [q{}],
+);
+
+my @SPECIAL_QUESTION_TYPES = (
+    'Dual Slider - Range',
+    'Multi Slider - Allocate',
+    'Slider',
+    'Currency',
+    'Email',
+    'Phone Number',
+    'Text',
+    'Text Date',
+    'TextArea',
+    'File Upload',
+    'Date',
+    'Date Range',
+    'Hidden',
+);
+
+sub specialQuestionTypes {
+    return @SPECIAL_QUESTION_TYPES;
+}
+
 =head2 new ( $session, json )
 
 Object constructor.
@@ -461,24 +524,12 @@ sub getQuestionEditVars {
 
 =head2 getValidQuestionTypes
 
-A convenience method.  Returns a list of question types.  If you add a question
-type to the Survey, you must handle it in the following places: here, updateQuestionAnswers,
-recordResponses (ResponseJSON) and administersurvey.js
+A convenience method.  Returns a list of question types.
 
 =cut
 
 sub getValidQuestionTypes {
-    return (
-        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
-        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
-        'Education',      'Effectiveness',           'Email',           'File Upload',
-        'Gender',         'Hidden',                  'Ideology',        'Importance',
-        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
-        'Party',          'Phone Number',            'Race',            'Risk',
-        'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'TextArea',                'Text Date',       'Threat',
-        'True/False',     'Yes/No'
-    );
+    return sort (@SPECIAL_QUESTION_TYPES, keys %MULTI_CHOICE_BUNDLES);
 }
 
 =head2 getAnswerEditVars ( $address )
@@ -888,9 +939,6 @@ sub updateQuestionAnswers {
     # Add the default set of answers. The question type determines both the number
     # of answers added and the answer text to use. When updating answer text
     # first update $address_copy to point to the answer
-
-    # TODO: Rather than being hard-coded, these question type/answer bundles should
-    # be loaded dynamically and customizable by the user (see also getValidQuestionTypes)
     
     if (   $type eq 'Date Range'
         or $type eq 'Multi Slider - Allocate'
@@ -919,106 +967,39 @@ sub updateQuestionAnswers {
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Email:' } );
     }
-    elsif ( $type eq 'Education' ) {
-        my @ans = (
-            'Elementary or some high school',
-            'High school/GED',
-            'Some college/vocational school',
-            'College graduate',
-            'Some graduate work',
-            'Master\'s degree',
-            'Doctorate (of any type)',
-            'Other degree (verbatim)',
-        );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, { 7, 1 } );
-    }
-    elsif ( $type eq 'Party' ) {
-        my @ans
-            = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, { 3, 1 } );
-    }
-    elsif ( $type eq 'Race' ) {
-        my @ans = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic',
-            'Something else (verbatim)', );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, { 5, 1 } );
-    }
-    elsif ( $type eq 'Ideology' ) {
-        my @ans = (
-            'Strongly liberal',
-            'Liberal',
-            'Somewhat liberal',
-            'Middle of the road',
-            'Slightly conservative',
-            'Conservative',
-            'Strongly conservative',
-        );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Security' ) {
-        my @ans = ( 'Not at all secure', (q{}) x 9, 'Extremely secure', );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Threat' ) {
-        my @ans = ( 'No threat', (q{}) x 9, 'Extreme threat', );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Risk' ) {
-        my @ans = ( 'No risk', (q{}) x 9, 'Extreme risk' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Concern' ) {
-        my @ans = ( 'Not at all concerned', (q{}) x 9, 'Extremely concerned' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Effectiveness' ) {
-        my @ans = ( 'Not at all effective', (q{}) x 9, 'Extremely effective' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Confidence' ) {
-        my @ans = ( 'Not at all confident', (q{}) x 9, 'Extremely confident' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Satisfaction' ) {
-        my @ans = ( 'Not at all satisfied', (q{}) x 9, 'Extremely satisfied' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Certainty' ) {
-        my @ans = ( 'Not at all certain', (q{}) x 9, 'Extremely certain' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Likelihood' ) {
-        my @ans = ( 'Not at all likely', (q{}) x 9, 'Extremely likely' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Importance' ) {
-        my @ans = ( 'Not at all important', (q{}) x 9, 'Extremely important' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Oppose/Support' ) {
-        my @ans = ( 'Strongly oppose', (q{}) x 5, 'Strongly support' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Agree/Disagree' ) {
-        my @ans = ( 'Strongly disagree', (q{}) x 5, 'Strongly agree' );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'True/False' ) {
-        my @ans = qw( True False );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Yes/No' ) {
-        my @ans = qw( Yes No );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    elsif ( $type eq 'Gender' ) {
-        my @ans = qw( Male Female );
-        $self->addAnswersToQuestion( \@address_copy, \@ans, {} );
-    }
-    else {
+    elsif ( my $answerBundle = $self->getMultiChoiceBundle($type) ) {
+        # We found a known multi-choice bundle. 
+
+        # Mark any answer containing the string "verbatim" as verbatim
+        my $verbatims = {};
+        for my $answerIndex (0 .. $#$answerBundle) {
+            if ($answerBundle->[$answerIndex] =~ /\(verbatim\)/) {
+                $verbatims->{$answerIndex} = 1;
+            }
+        }
+        # Add the bundle of multi-choice answers, along with the verbatims hash
+        $self->addAnswersToQuestion( \@address_copy, $answerBundle, $verbatims );
+    } else {
+        # Default action is to add a single, default answer to the question
         push @{ $question->{answers} }, $self->newAnswer();
     }
-    
+
     return;
+}
+
+=head2 getMultiChoiceBundle
+
+Returns a list of answers for each multi-choice bundle.
+
+Currently these are hard-coded but soon they will live in the database.
+
+=cut
+
+sub getMultiChoiceBundle {
+    my $self = shift;
+    my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
+
+    return $MULTI_CHOICE_BUNDLES{$type};
 }
 
 =head2 addAnswersToQuestion ($address, $answers, $verbatims)

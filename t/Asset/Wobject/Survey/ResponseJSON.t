@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 78;
+my $tests = 79;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -430,6 +430,7 @@ cmp_deeply(
     [ 1, 'question 1-0 terminal' ],
     'recordResponses: question terminal overrides section terminal',
 );
+
 is($rJSON->lastResponse(), 4, 'lastResponse advanced to next page of questions');
 is($rJSON->questionsAnswered, 1, 'questionsAnswered=1, answered one question');
 
@@ -442,7 +443,7 @@ cmp_deeply(
         '1-0-0' => {
             comment => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
-            value   => 1,
+            value   => 1, # 'recordedAnswer' value used because question is multi-choice
         },
         '1-1'   => {
             comment => undef,
@@ -450,6 +451,36 @@ cmp_deeply(
     },
     'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
 );
+
+
+# Repeat with non multi-choice question, to check that submitted answer value is used
+# instead of recordedValue
+$rJSON->survey->question([1,0])->{questionType} = 'Text';
+$rJSON->lastResponse(2);
+$rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
+$rJSON->recordResponses({
+    '1-0comment'   => 'Section 1, question 0 comment',
+    '1-0-0'        => 'First answer',
+    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+});
+cmp_deeply(
+    $rJSON->responses,
+    {
+        '1-0'   => {
+            comment => 'Section 1, question 0 comment',
+        },
+        '1-0-0' => {
+            comment => 'Section 1, question 0, answer 0 comment',
+            'time'    => num(time(), 3),
+            value   => 'First answer', # submitted answer value used this time because non-mc
+        },
+        '1-1'   => {
+            comment => undef,
+        }
+    },
+    'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
+);
+$rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice'; # revert change
 
 $rJSON->survey->question([1,0,0])->{terminal}    = 1;
 $rJSON->survey->question([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
@@ -480,6 +511,9 @@ cmp_deeply(
     'recordResponses: if the answer is all whitespace, it is skipped over'
 );
 is($rJSON->questionsAnswered, 0, 'question was all whitespace, not answered');
+#delete $rJSON->{_session};
+#delete $rJSON->survey->{_session};
+#diag(Dumper($rJSON));
 
 }
 

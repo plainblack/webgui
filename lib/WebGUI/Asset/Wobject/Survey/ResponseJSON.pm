@@ -461,56 +461,12 @@ sub recordResponses {
     my $self = shift;
     my ($responses) = validate_pos( @_, { type => HASHREF } );
 
-    my %mcTypes = (
-        'Agree/Disagree'  => 1,
-        Certainty         => 1,
-        Concern           => 1,
-        Confidence        => 1,
-        Education         => 1,
-        Effectiveness     => 1,
-        Gender            => 1,
-        Ideology          => 1,
-        Importance        => 1,
-        Likelihood        => 1,
-        Party             => 1,
-        'Multiple Choice' => 1,
-        'Oppose/Support'  => 1,
-        Race              => 1,
-        Risk              => 1,
-        Satisfaction      => 1,
-        Scale             => 1,
-        Security          => 1,
-        Threat            => 1,
-        'True/False'      => 1,
-        'Yes/No'          => 1,
-    );
-    my %sliderTypes = (
-        'Dual Slider - Range'     => 1,
-        'Multi Slider - Allocate' => 1,
-        Slider                    => 1,
-    );
-    my %textTypes = (
-        Currency       => 1,
-        Email          => 1,
-        'Phone Number' => 1,
-        Text           => 1,
-        'Text Date'    => 1,
-        'TextArea'     => 1,
-    );
-    my %fileTypes = (
-        'File Upload' => 1,
-    );
-    my %dateTypes = (
-        Date         => 1,
-        'Date Range' => 1,
-    );
-    my %hiddenTypes = (
-        Hidden => 1,
-    );
+    # Build a lookup table of non-multiple choice question types
+    my %knownTypes = map {$_ => 1} $self->survey->specialQuestionTypes;
 
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
-    my $section = $self->nextResponseSection();
+    my $section   = $self->nextResponseSection();
     my @questions = $self->nextQuestions();
 
     # Handle terminal Section..
@@ -554,11 +510,12 @@ sub recordResponses {
             # Proceed if we're satisfied that response is valid..
             if ( defined $answerValue && $answerValue =~ /\S/ ) {
                 $aAnswered = 1;
-                if ( exists $mcTypes{ $question->{questionType} } ) {
-                    $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
-                }
-                else {
+                if ($knownTypes{$question->{questionType}}) {
                     $self->responses->{ $answer->{id} }->{value} = $answerValue;
+                } else {
+                    # Unknown type, must be a multi-choice bundle
+                    # For Multi-choice, use recordedAnswer instead of answerValue
+                    $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
                 }
                 $self->responses->{ $answer->{id} }->{time} = time;
                 $self->responses->{ $answer->{id} }->{comment} = $answerComment;
