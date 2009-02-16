@@ -338,26 +338,6 @@ sub recordResponses {
 
 #-------------------------------------------------------------------
 
-=head2 persistSurveyJSON ( )
-
-Serializes the SurveyJSON instance and persists it to the database.
-
-Calling this method is only required if you have directly accessed and modified 
-the L<"surveyJSON"> object.
-
-=cut
-
-sub persistSurveyJSON {
-    my $self = shift;
-
-    my $data = $self->surveyJSON->freeze();
-    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
-
-    return;
-}
-
-#-------------------------------------------------------------------
-
 =head2 surveyJSON ( [json] )
 
 Lazy-loading mutator for the L<WebGUI::Asset::Wobject::Survey::SurveyJSON> property.
@@ -578,11 +558,11 @@ See L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>
 sub copyObject {
     my ( $self, $address ) = @_;
 
-    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    # Each object checks the ref and then either updates or passes it to the correct child.  
+    # New objects will have an index of -1.
     $address = $self->surveyJSON_copy($address);
 
-    #The parent address of the deleted object is returned.
-
+    # The parent address of the deleted object is returned.
     return $self->www_loadSurvey( { address => $address } );
 }
 
@@ -603,25 +583,26 @@ See L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>
 sub deleteObject {
     my ( $self, $address ) = @_;
 
-    #each object checks the ref and then either updates or passes it to the correct child.  New objects will have an index of -1.
+    # Each object checks the ref and then either updates or passes it to the correct child. 
+    # New objects will have an index of -1.
     my $message = $self->surveyJSON_remove($address);
 
-    #The parent address of the deleted object is returned.
-    if ( @$address == 1 ) {
-        $$address[0] = 0;
+    # The parent address of the deleted object is returned.
+    if ( @{$address} == 1 ) {
+        $address->[0] = 0;
     }
     else {
-        pop( @{$address} );    # unless @$address == 1 and $$address[0] == 0;
+        pop @{$address};
     }
 
     return $self->www_loadSurvey( { address => $address, message => $message } );
-} ## end sub deleteObject
+}
 
 #-------------------------------------------------------------------
 
 =head2 www_newObject()
 
-Creates a new object from a POST param containing the new objects id concat'd on hyphens.
+Creates a new object from a POST param containing the new objects id concatenated on hyphens.
 
 =cut
 
@@ -637,20 +618,20 @@ sub www_newObject {
 
     my @inAddress = split /-/, $ids;
 
-    #Don't save after this as the new object should not stay in the survey
+    # Don't save after this as the new object should not stay in the survey
     my $address = $self->surveyJSON->newObject( \@inAddress );
 
-    #The new temp object has an address of NEW, which means it is not a real final address.
-
+    # The new temp object has an address of NEW, which means it is not a real final address.
     return $self->www_loadSurvey( { address => $address, message => undef } );
 
-} ## end sub www_newObject
+}
 
 #-------------------------------------------------------------------
 
 =head2 www_dragDrop
 
-Takes two ids from a form POST.  The "target" is the object being moved, the "before" is the object directly preceding the "target".
+Takes two ids from a form POST. 
+The "target" is the object being moved, the "before" is the object directly preceding the "target".
 
 =cut
 
@@ -727,9 +708,10 @@ sub www_dragDrop {
 
 #-------------------------------------------------------------------
 
-=head2 www_loadSurvey([options])
+=head2 www_loadSurvey( [options] )
 
-For loading the survey during editing.  Returns the survey meta list and the html data for editing a particular survey object.
+For loading the survey during editing. 
+Returns the survey meta list and the html data for editing a particular survey object.
 
 =head3 options
 
@@ -903,9 +885,11 @@ sub view {
     my $var     = $self->getMenuVars;
 
     my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
-    $var->{'lastResponseCompleted'} = $code;
-    $var->{'lastResponseTimedOut'}  = $code > 1 ? 1 : 0;
-    $var->{'maxResponsesSubmitted'} = $overTakeLimit;
+    
+    $var->{lastResponseCompleted} = $code;
+    $var->{lastResponseTimedOut}  = $code > 1 ? 1 : 0;
+    $var->{maxResponsesSubmitted} = $overTakeLimit;
+    
     my $out = $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 
     return $out;
@@ -921,20 +905,19 @@ Returns the top menu template variables as a hashref.
 
 sub getMenuVars {
     my $self = shift;
-    my %var;
-    
-    $var{'edit_survey_url'}               = $self->getUrl('func=editSurvey');
-    $var{'take_survey_url'}               = $self->getUrl('func=takeSurvey');
-    $var{'delete_responses_url'}          = $self->getUrl('func=deleteResponses');
-    $var{'view_simple_results_url'}       = $self->getUrl('func=exportSimpleResults');
-    $var{'view_transposed_results_url'}   = $self->getUrl('func=exportTransposedResults');
-    $var{'view_statistical_overview_url'} = $self->getUrl('func=viewStatisticalOverview');
-    $var{'view_grade_book_url'}           = $self->getUrl('func=viewGradeBook');
-    $var{'user_canTakeSurvey'}            = $self->session->user->isInGroup( $self->get('groupToTakeSurvey') );
-    $var{'user_canViewReports'}           = $self->session->user->isInGroup( $self->get('groupToViewReports') );
-    $var{'user_canEditSurvey'}            = $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
-    return \%var;
+    return {
+        edit_survey_url               => $self->getUrl('func=>editSurvey'),
+        take_survey_url               => $self->getUrl('func=>takeSurvey'),
+        delete_responses_url          => $self->getUrl('func=>deleteResponses'),
+        view_simple_results_url       => $self->getUrl('func=>exportSimpleResults'),
+        view_transposed_results_url   => $self->getUrl('func=>exportTransposedResults'),
+        view_statistical_overview_url => $self->getUrl('func=>viewStatisticalOverview'),
+        view_grade_book_url           => $self->getUrl('func=>viewGradeBook'),
+        user_canTakeSurvey            => $self->session->user->isInGroup( $self->get('groupToTakeSurvey') ),
+        user_canViewReports           => $self->session->user->isInGroup( $self->get('groupToViewReports') ),
+        user_canEditSurvey            => $self->session->user->isInGroup( $self->get('groupToEditSurvey') ),
+    };
 }
 
 #-------------------------------------------------------------------
@@ -1077,20 +1060,20 @@ sub www_submitQuestions {
 
 #    my $files = 0;
 #
-#    #    for my $id(@$orderOf){
-#    #if a file upload, write to disk
-#    #        my $path;
-#    #        if($id->{'questionType'} eq 'File Upload'){
-#    #            $files = 1;
-#    #            my $storage = WebGUI::Storage->create($self->session);
-#    #            my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
-#    #            $path = $storage->getPath($filename);
-#    #        }
-#    #$self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
-#    #        $self->session->db->write("insert into Survey_questionResponse
-#    #            select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
-#    #            [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
-#    #    }
+#        for my $id(@$orderOf){
+#    if a file upload, write to disk
+#            my $path;
+#            if($id->{'questionType'} eq 'File Upload'){
+#                $files = 1;
+#                my $storage = WebGUI::Storage->create($self->session);
+#                my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
+#                $path = $storage->getPath($filename);
+#            }
+#    $self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
+#            $self->session->db->write("insert into Survey_questionResponse
+#                select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
+#                [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
+#        }
 #    if ($files) {
 #        ##special case, need to check for more questions in section, if not, more current up one
 #        my $lastA      = $self->getLastAnswerInfo($responseId);
@@ -1105,6 +1088,7 @@ sub www_submitQuestions {
 #        return;
 #    }
 #    return $self->www_loadQuestions($responseId);
+
 }
 
 #-------------------------------------------------------------------
@@ -1311,6 +1295,26 @@ sub prepareShowSurveyTemplate {
 
 #-------------------------------------------------------------------
 
+=head2 persistSurveyJSON ( )
+
+Serializes the SurveyJSON instance and persists it to the database.
+
+Calling this method is only required if you have directly accessed and modified 
+the L<"surveyJSON"> object.
+
+=cut
+
+sub persistSurveyJSON {
+    my $self = shift;
+
+    my $data = $self->surveyJSON->freeze();
+    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
+
+    return;
+}
+
+#-------------------------------------------------------------------
+
 =head3 persistResponseJSON
 
 Turns the response object into JSON and saves it to the DB.  
@@ -1466,7 +1470,6 @@ sub canTakeSurvey {
         return 0;
     }
 
-    #Does user have too many finished survey responses
     my $maxTakes   = $self->getValue('maxResponsesPerUser');
     my $ip         = $self->session->env->getIp;
     my $id         = $self->session->user->userId();
@@ -1613,7 +1616,7 @@ sub www_viewStatisticalOverview {
                     };
             }
         }
-        push@questionloop,{
+        push @questionloop, {
             question                  => $question->{text},
             question_id               => "${sectionIndex}_$questionIndex",
             question_isMultipleChoice => ($questionType eq 'Multiple Choice'),
@@ -1699,7 +1702,7 @@ sub export {
     $filename =~ s/[^\w\d\.]/_/g;
     my $content = shift;
 
-    #Create a temporary directory to store files if it doesn't already exist
+    # Create a temporary directory to store files if it doesn't already exist
     my $store    = WebGUI::Storage->createTemp( $self->session );
     my $tmpDir   = $store->getPath();
     my $filepath = $store->getPath($filename);
