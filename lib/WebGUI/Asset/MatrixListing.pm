@@ -304,9 +304,9 @@ sub getEditForm {
                 [$category,$matrixId]);
         }
         else{
-            $attributes = $db->read("select * from Matrix_attribute as a 
-                left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?) 
-                where category =? and a.assetId = ?",
+            $attributes = $db->read("select * from Matrix_attribute as attribute 
+                left join MatrixListing_attribute as listing using(attributeId) 
+                where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
                 [$self->getId,$category,$matrixId]);
         }
         while (my $attribute = $attributes->hashRef) {
@@ -556,7 +556,7 @@ sub view {
     my $db          = $session->db;
     my $i18n        = WebGUI::International->new($self->session, "Asset_MatrixListing");
     my @categories  = keys %{$self->getParent->getCategories};
-   
+  
     # Increment views before getting template var hash so that the views tmpl_var has the incremented value. 
     $self->incrementCounter("views");
 
@@ -599,14 +599,14 @@ sub view {
         {type =>'text/css', rel=>'stylesheet'});
 
     # Attributes
-
+   
     foreach my $category (@categories) {
         my $attributes;
         my @attribute_loop;
         my $categoryLoopName = $session->url->urlize($category)."_loop";
-        $attributes = $db->read("select * from Matrix_attribute as a
-            left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
-            where category =? and a.assetId = ?",
+        $attributes = $db->read("select * from Matrix_attribute as attribute
+            left join MatrixListing_attribute as listing using(attributeId)
+            where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
             [$self->getId,$category,$self->getParent->getId]);
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label} = $attribute->{name};
@@ -784,7 +784,8 @@ pluginspage="http://www.macromedia.com/go/getflashplayer" />
         );
     $var->{emailForm} = $mailForm->print;
 
-	return $self->getParent->processStyle($self->processTemplate($var,undef, $self->{_viewTemplate}));
+    my $template = $self->processTemplate($var,undef, $self->{_viewTemplate});
+	return $self->getParent->processStyle($template);
 }
 
 
@@ -879,9 +880,9 @@ sub www_getAttributes {
         push(@results,{label=>$category,fieldType=>'category'});
         my $attributes;
         my @attribute_loop;
-        $attributes = $db->read("select * from Matrix_attribute as a
-            left join MatrixListing_attribute as l on (a.attributeId = l.attributeId and l.matrixListingId = ?)
-            where category =? and a.assetId = ?",
+        $attributes = $db->read("select * from Matrix_attribute as attribute
+            left join MatrixListing_attribute as listing using(attributeId)
+            where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
             [$self->getId,$category,$self->getParent->getId]);
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label} = $attribute->{name};
