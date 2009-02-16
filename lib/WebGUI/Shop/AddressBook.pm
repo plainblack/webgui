@@ -509,7 +509,11 @@ sub www_view {
     }
     my $i18n = WebGUI::International->new($session, "Shop");
     my @addresses = ();
-    foreach my $address (@{$self->getAddresses}) {
+    my @availableAddresses = @{ $self->getAddresses };
+    if (! @availableAddresses ) {
+        return $self->www_editAddress;
+    }
+    foreach my $address (@availableAddresses) {
         push(@addresses, {
             %{$address->get},
             address         => $address->getHtmlFormatted,
