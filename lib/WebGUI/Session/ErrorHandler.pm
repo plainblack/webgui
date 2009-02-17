@@ -112,14 +112,21 @@ This method caches its value, so long processes may need to manually clear the c
 sub canShowDebug {
     my $self = shift;
 
+    # if we have a cached false value, we can use it
+    # true values need additional checks
+    if (exists $self->{_canShowDebug} && !$self->{_canShowDebug}) {
+        return 0;
+    }
+
     ##This check prevents in infinite loop during startup.
     return 0 unless ($self->session->hasSettings);
-    return $self->{_canShowDebug} if exists ($self->{_canShowDebug});
+
     my $canShow = $self->session->setting->get("showDebug")
-               && substr($self->session->http->getMimeType(),0,9) eq "text/html"
-               && $self->canShowBasedOnIP('debugIp');
+        && $self->canShowBasedOnIP('debugIp');
     $self->{_canShowDebug} = $canShow;
-    return $canShow;
+
+    return $canShow
+        && substr($self->session->http->getMimeType(),0,9) eq "text/html";
 }
 
 #-------------------------------------------------------------------
