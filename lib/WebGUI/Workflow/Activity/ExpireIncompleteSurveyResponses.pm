@@ -108,7 +108,7 @@ sub execute {
 
     my $sql = "select r.Survey_responseId, r.username, r.userId, upd.email,upd.firstName,upd.lastName, r.startDate, s.timeLimit, ad.title, ad.url  
                 from Survey s, Survey_response r, assetData ad, userProfileData upd
-                where r.isComplete = 0 and s.timeLimit > 0 and (unix_timestamp() - r.startDate) > (s.timeLimit * 1) 
+                where r.isComplete = 0 and s.timeLimit > 0 and (unix_timestamp() - r.startDate) > (s.timeLimit * 60) 
                     and r.assetId = s.assetId and s.revisionDate = (select max(revisionDate) from Survey where assetId = s.assetId)
                     and ad.assetId = s.assetId and ad.revisionDate = s.revisionDate and upd.userId = r.userId"; 
     my $refs = $self->session->db->buildArrayRefOfHashRefs($sql);
