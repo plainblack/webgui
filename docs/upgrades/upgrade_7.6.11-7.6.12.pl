@@ -32,6 +32,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 addAssetDiscoveryServiceAgain( $session );
 changeMatrixAttributeIndexing( $session );
+fixCollaborationGroupToEditPost( $session );
 
 # upgrade functions go here
 
@@ -75,6 +76,23 @@ sub changeMatrixAttributeIndexing {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Fix the groupToEditPost in the Collaboration (should not be "")
+sub fixCollaborationGroupToEditPost {
+    my $session = shift;
+    print "\tFixing group to edit post in Collaboration..." unless $quiet;
+    # and here's our code
+    $session->db->write(<<'SQL');
+UPDATE Collaboration 
+SET groupToEditPost= ( 
+    SELECT groupIdEdit FROM assetData 
+    WHERE assetData.assetId=Collaboration.assetId 
+        AND assetData.revisionDate = Collaboration.revisionDate
+) 
+WHERE groupToEditPost = "";
+SQL
+    print "DONE!\n" unless $quiet;
+}
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------
