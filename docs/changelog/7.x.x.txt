@@ -9,6 +9,7 @@
  - fixed #9746: Shop: Add a new address unneeded extra click
  - fixed #9747: Account Contributions: URLs are wrong.
  - fixed #9749: Account Manager: AIM link
+ - fixed #9751: Account Manager: problem sorting in Contributions
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
