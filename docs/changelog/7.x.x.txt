@@ -11,6 +11,7 @@
  - fixed #9749: Account Manager: AIM link
  - fixed #9751: Account Manager: problem sorting in Contributions
  - fixed #9750: Account Manager: Inbox Messages per Page [TEMPLATE]
+ - fixed: If the Get Credentials template is deleted for the ITransact PayDriver, it now gives you an error message instead of throwing an error.
  - fixed: Collaboration groupToEditPost should not be blank
  - fixed: WebGUI::User->isInGroup had bad default groupId
 

@@ -668,7 +668,6 @@ sub www_getCredentials {
 
     # Process form errors
     $var->{errors} = [];
-    #### TODO: i18n
     if ($errors) {
         $var->{error_message} = $i18n->get('error occurred message');
         foreach my $error (@{ $errors} ) {
@@ -743,8 +742,16 @@ sub www_getCredentials {
     });
 
     my $template = WebGUI::Asset::Template->new($session, $self->get("credentialsTemplateId"));
-    $template->prepare;
-    return $session->style->userStyle($template->process($var));
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone');
+    }
+
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------
