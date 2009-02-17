@@ -31,6 +31,7 @@ my $quiet; # this line required
 
 my $session = start(); # this line required
 addAssetDiscoveryServiceAgain( $session );
+changeMatrixAttributeIndexing( $session );
 
 # upgrade functions go here
 
@@ -66,7 +67,13 @@ sub addAssetDiscoveryServiceAgain {
     print "Done.\n" unless $quiet;
 }
 
-
+#----------------------------------------------------------------------------
+sub changeMatrixAttributeIndexing {
+    my $session = shift;
+    print "\tChanging Matrix attribute indexing..." unless $quiet;
+    $session->db->write("alter table MatrixListing_attribute drop primary key, add primary key(attributeId,matrixListingId)");
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

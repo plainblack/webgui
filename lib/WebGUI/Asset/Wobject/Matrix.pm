@@ -965,8 +965,8 @@ assetData.revisionDate
     foreach my $result (@results){
             if($form->process("search")){
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
-                            select value, fieldType, attributeId from MatrixListing_attribute as listing
-                            left join Matrix_attribute using(attributeId)
+                            select value, fieldType, attributeId from Matrix_attribute
+                            left join MatrixListing_attribute as listing using(attributeId)
                             where listing.matrixListingId = ? order by value asc",
                             [$result->{assetId}],'attributeId');
                 PARAM: foreach my $param (@searchParams_sorted) {
@@ -1063,6 +1063,7 @@ sub www_getCompareListData {
             [$category,$self->getId,@listingIds]
         ) });
     }
+
     foreach my $result (@results){
         if($result->{fieldType} eq 'category'){
             # Row starting with a category label shows the listing name in each column
@@ -1096,8 +1097,8 @@ sub www_getCompareListData {
             }
         }
     }
-    $jsonOutput->{ResultSet} = {Result=>\@results};
 
+    $jsonOutput->{ResultSet} = {Result=>\@results};
     $session->http->setMimeType("application/json");
 
     return JSON->new->encode($jsonOutput);
