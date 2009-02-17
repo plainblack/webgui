@@ -2873,8 +2873,8 @@ or are under your current version tag.</p>
 	},
 
 	'318' => {
-		message => q|<a href="http://www.aol.com/aim/homenew.adp">AIM</a> Id|,
-		lastUpdated => 1031514049
+		message => q|<a href="http://www.aim.com/">AIM</a> Id|,
+		lastUpdated => 1234829971,
 	},
 
 	'972' => {

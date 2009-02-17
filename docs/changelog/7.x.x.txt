@@ -8,7 +8,7 @@
  - fixed #9169: E-mail to Collab System creates invalid asset
  - fixed #9746: Shop: Add a new address unneeded extra click
  - fixed #9747: Account Contributions: URLs are wrong.
-
+ - fixed #9749: Account Manager: AIM link
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
