@@ -33,6 +33,7 @@ my $session = start(); # this line required
 addAssetDiscoveryServiceAgain( $session );
 changeMatrixAttributeIndexing( $session );
 fixCollaborationGroupToEditPost( $session );
+convertLongVarcharsToText( $session );
 
 # upgrade functions go here
 
@@ -47,6 +48,17 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub convertLongVarcharsToText {
+    my $session = shift;
+    print "\tConverting Survey VARCHAR fields to TEXT... " unless $quiet;
+    $session->db->write("ALTER TABLE Survey MODIFY COLUMN exitURL TEXT");
+    $session->db->write("ALTER TABLE Survey_tempReport MODIFY COLUMN sectionName TEXT");
+    $session->db->write("ALTER TABLE Survey_tempReport MODIFY COLUMN questionName TEXT");
+    # and here's our code
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addAssetDiscoveryServiceAgain {
