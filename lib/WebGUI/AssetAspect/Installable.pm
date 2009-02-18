@@ -64,7 +64,7 @@ sub install {
     my $sql
         = q{CREATE TABLE `}
         . $installDef->{tableName} . q{` ( }
-        . q{`assetId` VARCHAR(22) BINARY NOT NULL, }
+        . q{`assetId` CHAR(22) BINARY NOT NULL, }
         . q{`revisionDate` BIGINT NOT NULL, };
     for my $column ( keys %{ $installDef->{properties} } ) {
         my $control = WebGUI::Form::DynamicField->new( $session, %{ $installDef->{properties}->{$column} } );

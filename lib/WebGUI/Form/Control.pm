@@ -358,12 +358,12 @@ sub get {
 
 =head2  getDatabaseFieldType ( )
 
-A class method that tells you what database field type this form field should be stored in. Defaults to "VARCHAR(255)".
+A class method that tells you what database field type this form field should be stored in. Defaults to "CHAR(255)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(255)";
+    return "CHAR(255)";
 }
 
 

@@ -209,7 +209,7 @@ sub crud_createTable {
 	my $tableName = $class->crud_getTableName($session);
 	$class->crud_dropTable($session);
 	$db->write('create table '.$dbh->quote_identifier($tableName).' (
-		'.$dbh->quote_identifier($class->crud_getTableKey($session)).' varchar(22) binary not null primary key,
+		'.$dbh->quote_identifier($class->crud_getTableKey($session)).' CHAR(22) binary not null primary key,
 		sequenceNumber int not null default 1,
 		dateCreated datetime,
 		lastUpdated datetime

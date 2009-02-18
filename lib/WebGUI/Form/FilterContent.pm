@@ -96,12 +96,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(16)".
+Returns "CHAR(16)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(16)";
+    return "CHAR(16)";
 }
 
 #-------------------------------------------------------------------

@@ -40,12 +40,12 @@ The following methods are specifically available from this class. Check the supe
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(7)".
+Returns "CHAR(7)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(7)";
+    return "CHAR(7)";
 }
 
 #-------------------------------------------------------------------

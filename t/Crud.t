@@ -37,7 +37,7 @@ WebGUI::Crud->crud_createTable($session);
 my $sth = $session->db->read("describe unnamed_crud_table");
 my ($col, $type) = $sth->array();
 is($col, 'id', "structure: id name");
-is($type, 'varchar(22)', "structure: id type");
+is($type, 'char(22)', "structure: id type");
 ($col, $type) = $sth->array();
 is($col, 'sequenceNumber', "structure: sequenceNumber name");
 is($type, 'int(11)', "structure: sequenceNumber type");

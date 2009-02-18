@@ -130,13 +130,13 @@ sub addThing {
     }
 
     $db->write("create table ".$db->dbh->quote_identifier("Thingy_".$newThingId)."(
-        thingDataId varchar(22) binary not null,
+        thingDataId CHAR(22) binary not null,
         dateCreated int not null,
-        createdById varchar(22) not null,
-        updatedById varchar(22) not null,
-        updatedByName varchar(255) not null,
+        createdById CHAR(22) not null,
+        updatedById CHAR(22) not null,
+        updatedByName CHAR(255) not null,
         lastUpdated int not null,
-        ipAddress varchar(255),
+        ipAddress CHAR(255),
         primary key (thingDataId)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
     
@@ -591,7 +591,7 @@ sub _getDbDataType {
     my ($dbDataType, $formClass);
 
     if ($fieldType =~ m/^otherThing/x){
-        $dbDataType = "varchar(22)";
+        $dbDataType = "CHAR(22)";
     }
     else{
         $formClass   = 'WebGUI::Form::' . ucfirst $fieldType;
