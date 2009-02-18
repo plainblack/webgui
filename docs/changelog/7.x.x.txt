@@ -1,4 +1,5 @@
 7.6.13
+ - fixed #9760: DataForm not working in demo.plainblack.com
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.

@@ -512,7 +512,7 @@ sub getAttachedFiles {
     my $fieldConfig = $self->getFieldConfig;
     my @paths;
     for my $field ( values %{$fieldConfig} ) {
-        my $form = $self->_createForm($field, $entryData->{$field->{name}});
+        my $form = $self->_createForm($field, $entryData->field($field->{name}));
         if ($form->can('getStorageLocation')) {
             my $storage = $form->getStorageLocation;
             if ($storage) {
@@ -1521,8 +1521,8 @@ sub www_process {
         unless $self->canView;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
-    my $entryId = $self->session->form->process('entryId');
-    my $entry = $self->entryClass->new($self, ( $entryId ? $entryId : () ) );
+    my $entryId = $session->form->process('entryId');
+    my $entry   = $self->entryClass->new($self, ( $entryId ? $entryId : () ) );
 
     my $var = $self->getTemplateVars;
 
