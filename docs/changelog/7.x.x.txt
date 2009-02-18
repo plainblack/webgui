@@ -14,6 +14,7 @@
  - fixed: If the Get Credentials template is deleted for the ITransact PayDriver, it now gives you an error message instead of throwing an error.
  - fixed: Collaboration groupToEditPost should not be blank
  - fixed: WebGUI::User->isInGroup had bad default groupId
+ - fixed: Fix a layout problem in the Contributions, similar to the Inbox[TEMPLATE]
 
 7.6.11
  - fixed: Asset Manager can generate URLs that are too long
