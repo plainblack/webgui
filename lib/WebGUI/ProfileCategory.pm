@@ -420,7 +420,8 @@ sub session {
 
 =head2 set ( properties )
 
-Update the profile field properties.
+Update the profile field properties.  Any property that is missing, or empty will be
+replaced with a default.
 
 =head3 properties
 
