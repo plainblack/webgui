@@ -302,12 +302,12 @@ sub create {
     }
 	my $message = MIME::Entity->build(
 		Type=>$type,
-		From=>$from,
-		To=>$headers->{to},
-		Cc=>$headers->{cc},
-		Bcc=>$headers->{bcc},
-		"Reply-To"=>$replyTo,
-		"In-Reply-To"=>$headers->{inReplyTo},
+		From=> encode('MIME-Q', $from),
+		To=> encode('MIME-Q', $headers->{to}),
+		Cc=> encode('MIME-Q', $headers->{cc}),
+		Bcc=> encode('MIME-Q', $headers->{bcc}),
+		"Reply-To"=> encode('MIME-Q', $replyTo),
+		"In-Reply-To"=> encode('MIME-Q', $headers->{inReplyTo}),
 		Subject=> encode('MIME-Q', $headers->{subject}),
 		"Message-Id"=>$id,
 		Date=>$session->datetime->epochToMail,
