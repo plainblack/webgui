@@ -16,12 +16,10 @@ dl.accordion-menu {
     position:fixed; 
     _position:absolute; 
     top:0; 
-	_top: -71px;
 	
-	/*
-    _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop)); */
+	
+    _top:expression(eval((document.documentElement && document.documentElement.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop));
     left:0;
-	_left: -175px;
     z-index: 100;
 }
 
