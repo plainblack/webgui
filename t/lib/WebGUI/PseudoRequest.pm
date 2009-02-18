@@ -2,6 +2,17 @@ package WebGUI::PseudoRequest;
 
 use strict;
 
+use Test::MockObject;
+
+my $mocker = Test::MockObject->new();
+$mocker->fake_module(
+    'Apache2::Cookie', 
+    new     => sub { return bless {}, 'Apache2::Cookie'; },
+    expires => sub { 1; },
+    domain  => sub { 1; },
+    bake    => sub { 1; },
+);
+
 =head1 LEGAL
 
  -------------------------------------------------------------------

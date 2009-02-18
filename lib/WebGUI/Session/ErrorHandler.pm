@@ -17,7 +17,7 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use Log::Log4perl;
-use Apache2::RequestUtil;
+#use Apache2::RequestUtil;
 use JSON;
 use HTML::Entities qw(encode_entities);
 
@@ -220,7 +220,8 @@ sub fatal {
 
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->session->http->setStatus("500","Server Error");
-	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
+	#Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
+	$self->session->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
 	$self->session->http->sendHeader if ($self->session->request);

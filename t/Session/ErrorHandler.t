@@ -18,7 +18,7 @@ use WebGUI::Session;
 use Test::More;
 use Test::MockObject::Extends;
 
-my $numTests = 37;
+my $numTests = 39;
 
 plan tests => $numTests;
 
@@ -222,6 +222,25 @@ foreach my $entry (qw/_debug_error _debug_warn _debug_info _debug_debug/) {
 }
 
 my $showDebug = $eh->showDebug;
+
+####################################################
+#
+# fatal, stub
+#
+####################################################
+
+my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+my $outputBuffer;
+open my $outputHandle, '>', \$outputBuffer or die "Unable to create scalar filehandle: $!\n";
+$newSession->output->setHandle($outputHandle);
+WEBGUI_FATAL: {
+    $newSession->log->fatal();
+}
+ok(1, 'fatal: recovered from fatal okay');
+TODO: {
+    local $TODO = 'Validate the fatal output';
+    ok(0, 'output from fatal when there is a db handler and request present');
+}
 
 END {
 	$session->setting->set('debugIp',   $origDebugIp);
