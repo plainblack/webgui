@@ -663,7 +663,6 @@ sub www_getCredentials {
         $addressData    = $self->getCart->getShippingAddress->get;
     }
                    
-    my $output;
     my $var = {};
 
     # Process form errors
