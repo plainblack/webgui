@@ -280,6 +280,8 @@ my $properties = {
     title       => 'Export Test',
     className   => 'WebGUI::Asset::File',
     url         => 'export-test.pl',
+    storageId   => $storage->getId,
+    filename    => 'somePerlFile_pl.txt',
 };
 my $defaultAsset = WebGUI::Asset->getDefault($session);
 my $asset = $defaultAsset->addChild($properties, $properties->{id});
