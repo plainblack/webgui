@@ -268,6 +268,7 @@ sub www_edit {
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Image');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),$i18n->get("resize image")) if ($self->get("filename"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=crop'),$i18n->get("crop image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->get("templateId"),
@@ -318,6 +319,108 @@ sub www_resize {
 	$f->submit;
 	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" /></div>';
         return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
+}
+
+#-------------------------------------------------------------------
+# feel free to take over typing
+sub www_crop {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+
+	if ($self->session->form->process("Width") || $self->session->form->process("Height") 
+        || $self->session->form->process("Top") || $self->session->form->process("Left")) {
+		my $newSelf = $self->addRevision();
+		delete $newSelf->{_storageLocation};
+		$newSelf->getStorageLocation->crop(
+            $newSelf->get("filename"),
+            $newSelf->session->form->process("Width"),
+            $newSelf->session->form->process("Height"),
+            $newSelf->session->form->process("Top"),
+            $newSelf->session->form->process("Left")
+        );
+		$self = $newSelf;
+	}
+
+	my $filename = $self->get("filename");
+
+	##YUI specific datatable CSS
+    my ($style, $url) = $self->session->quick(qw(style url));
+
+	my $crop_js = qq(
+		<script>
+		(function() {
+            var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, results = null; 
+
+        Event.onDOMReady(function() { 
+                var crop = new YAHOO.widget.ImageCropper('yui_img', { 
+                    initialXY: [20, 20], 
+                    keyTick: 5, 
+                    shiftKeyTick: 50 
+                }); 
+                crop.on('moveEvent', function() { 
+                    var region = crop.getCropCoords(); 
+                    element = document.getElementById('Width_formId');
+                    element.value = region.width;
+                    element = document.getElementById('Height_formId');
+                    element.value = region.height;
+                    element = document.getElementById('Top_formId');
+                    element.value = region.top;
+                    element = document.getElementById('Left_formId');
+                    element.value = region.left;
+                }); 
+            }); 
+        })(); 
+		</script>
+    );
+
+	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
+
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	$f->hidden(
+		-name=>"func",
+		-value=>"crop"
+		);
+	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($filename);
+	$f->integer(
+		-label=>$i18n->get('width'),
+		-hoverHelp=>$i18n->get('new width description'),
+		-name=>"Width",
+		-value=>$x,
+		);
+	$f->integer(
+		-label=>$i18n->get('height'),
+		-hoverHelp=>$i18n->get('new height description'),
+		-name=>"Height",
+		-value=>$y,
+		);
+	$f->integer(
+		-label=>$i18n->get('top'),
+		-hoverHelp=>$i18n->get('new width description'),
+		-name=>"Top",
+		-value=>$x,
+		);
+	$f->integer(
+		-label=>$i18n->get('left'),
+		-hoverHelp=>$i18n->get('new height description'),
+		-name=>"Left",
+		-value=>$y,
+		);
+	$f->submit;
+
+	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($filename).'" style="border-style:none;" alt="'.$filename.'" id="yui_img" /></div>'.$crop_js;
+
+    return $self->getAdminConsole->render($f->print.$image,$i18n->get("crop image"));
 }
 
 #-------------------------------------------------------------------

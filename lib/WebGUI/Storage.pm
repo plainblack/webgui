@@ -1054,6 +1054,78 @@ sub renameFile {
 
 #-------------------------------------------------------------------
 
+=head2 crop ( filename [, width, height ] )
+
+Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
+
+=head3 filename
+
+The name of the file to resize.
+
+=head3 width
+
+The new width of the image in pixels.
+
+=head3 height
+
+The new height of the image in pixels.
+
+=head3 x
+
+The top of the image in pixels.
+
+=head3 y
+
+The top of the image in pixels.
+
+=cut
+
+# TODO: Make this take a hash reference with width, height, and density keys.
+
+sub crop { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $width       = shift;
+    my $height      = shift;
+    my $x           = shift;
+    my $y           = shift;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't resize something that's not an image.");
+        return 0;
+    }
+    unless ($width || $height || $x || $y) {
+        $self->session->errorHandler->error("Can't resize with no resizing parameters.");
+        return 0;
+    }
+    my $image = Image::Magick->new;
+    my $error = $image->Read($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        return 0;
+    }
+
+    # Next, resize dimensions
+    if ( $width || $height || $x || $y ) {
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
+        $image->Crop( height => $height, width => $width, x => $x, y => $y );
+    }
+
+    # Write our changes to disk
+    $error = $image->Write($self->getPath('crop-'.$filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        return 0;
+    }
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 resize ( filename [, width, height ] )
 
 Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
