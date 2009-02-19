@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 66;        # Increment this number for each test you create
+plan tests => 67;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -111,6 +111,7 @@ is($transaction->get("isSuccessful"), 1,"update and get isSuccessful");
 is($transaction->get("transactionCode"), 'yyy',"update and get transaction code");
 is($transaction->get("statusCode"), 'jd31',"update and get status code");
 is($transaction->get("statusMessage"), 'was a success',"update and get status message");
+is($transaction->get('taxes'), 7, 'update does not modify things it was not sent');
 
 # make sure new() works
 my $tcopy = WebGUI::Shop::Transaction->new($session, $transaction->getId);
