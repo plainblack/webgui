@@ -648,6 +648,7 @@ sub getRecordTemplateVars {
         $var->{'edit.URL'       } = $self->getFormUrl('entryId=' . $entryId);
         $var->{'delete.url'     } = $self->getUrl('func=deleteEntry;entryId=' . $entryId);
         $var->{'delete.label'   } = $i18n->get(90);
+        $var->{'entryId'        } = $entryId;
     }
     my $func = $session->form->process('func');
     my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
