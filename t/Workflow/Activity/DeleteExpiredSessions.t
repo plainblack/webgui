@@ -19,12 +19,33 @@ use WebGUI::Workflow::Activity::DeleteExpiredSessions;
 
 use Test::More;
 
-plan tests => 5; # increment this value for each test you create
+plan tests => 7; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
-my $activity = WebGUI::Workflow::Activity::DeleteExpiredSessions->create($session);
-$activity->execute();  ##Clear out any old sessions that might interfere with this test;
+my $workflow  = WebGUI::Workflow->create($session,
+    {
+        enabled    => 1,
+        objectType => 'None',
+        mode       => 'realtime',
+    },
+);
+my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::DeleteExpiredSessions');
+
+my $instance1 = WebGUI::Workflow::Instance->create($session,
+    {
+        workflowId              => $workflow->getId,
+        skipSpectreNotification => 1,
+    }
+);
+
+my $retVal;
+
+$retVal = $instance1->run();
+is($retVal, 'complete', 'cleanup: activity complete');
+$retVal = $instance1->run();
+is($retVal, 'done', 'cleanup: activity is done');
+$instance1->delete;
 
 my $origSessionTimeout = $session->setting->get('sessionTimeout');
 
@@ -55,8 +76,20 @@ my $newScratchCount = $session->db->quickScalar('select count(*) from userSessio
 is ($newSessionCount, $sessionCount+4, 'all new sessions created correctly');
 is ($newScratchCount, $scratchCount+2, 'two of the new sessions have scratch entries');
 
-my $returnValue = $activity->execute();
-is ($returnValue, 'complete', 'DeleteExpiredSessions completed');
+my $instance2 = WebGUI::Workflow::Instance->create($session,
+    {
+        workflowId              => $workflow->getId,
+        skipSpectreNotification => 1,
+    }
+);
+
+my $counter = 0;
+PAUSE: while ($retVal = $instance2->run()) {
+    last PAUSE if $retVal eq 'done';
+    last PAUSE if $counter > 6;  #Emergency exit clause
+}
+
+is($retVal, 'done', 'Workflow completed successfully');
 
 $newSessionCount = $session->db->quickScalar('select count(*) from userSession');
 $newScratchCount = $session->db->quickScalar('select count(*) from userSessionScratch');
