@@ -225,7 +225,7 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'helpvar file_' => {
+    'helpvar file_*' => {
         message     => 'The current file being viewed in the thumbnails page. All the 
                         common variables for this file are available by prefixing "file_".',
         lastUpdated => 0,

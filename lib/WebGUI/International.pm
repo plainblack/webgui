@@ -79,49 +79,73 @@ An integer that relates to a message in the international table in the WebGUI da
 =head3 namespace
 
 A string that relates to the namespace field in the international table in the WebGUI database. Defaults to 'WebGUI'.
+This parameter is deprecated and will be removed in the future.
 
 =head3 language
 
 A string that specifies the language that the user should see.  Defaults to the user's defined language. If the user hasn't specified a default language it defaults to 'English'.
+This parameter is deprecated and will be removed in the future.
 
 =cut
 
-my $safeRe = qr/[^\.:\w\d\s\/\^\;\?%><\]\[]/;
-
 sub get {
-	my ($self, $id, $namespace, $language) = @_;
-    my $session = $self->session;
-	$namespace = $namespace || $self->{_namespace} || "WebGUI";
-	$language = $language || $self->{_language} || $session->user->profileField("language") || "English";
-	$id =~ s/$safeRe//g;
-	$language =~ s/$safeRe//g;
-	$namespace =~ s/$safeRe//g;
-    my $cmd = "WebGUI::i18n::".$language."::".$namespace;
+    my ($self, $id, $namespace, $language) = @_;
+    my $table = $self->{_table};
+    $namespace = $namespace || $self->{_namespace};
+    $language = $language || $self->{_language};
+
+    # if the requested namespace and language don't match our init params,
+    # we don't have its table readily available, so we need to load it.
+    if ( $namespace ne $self->{_namespace} || $language ne $self->{_language} ) {
+        $table = $self->_loadNamespace($language, $namespace);
+        my $message = $table->{$id}{message};
+        if ($message eq "" && $language ne 'English') {
+            $table = $self->_loadNamespace('English', $namespace);
+            return $table->{$id}{message};
+        }
+        return $message;
+    }
+    my $message = $table->{$id}{message};
+
+    # if there is a missing message in a translation, load and cache the
+    # english table, and get the message from there.
+    if ($message eq "" && $language ne 'English') {
+        $self->{_englishTable} ||= $self->_loadNamespace('English', $namespace);
+        return $self->{_englishTable}{$id}{message};
+    }
+
+    return $message;
+}
+
+sub _loadNamespace {
+    my ($self, $language, $namespace) = @_;
+    $language =~ s/\W//g;
+    $namespace =~ s/\W//g;
+    my $package = "WebGUI::i18n::".$language."::".$namespace;
+    # with preload, everything should already be in memory, so go directly for the
+    # variable first
     my $table = do {
         no strict 'refs';
-        ${"$cmd\::I18N"};
+        ${"$package\::I18N"};
     };
+
+    # if it wasn't there it may not be loaded or it may not be available.
     if (! $table) {
-        eval { WebGUI::Pluggable::load($cmd); };
+        eval { WebGUI::Pluggable::load($package); };
         if ($@) {
             if ($language eq 'English') {
-                $session->log->error("Unable to load $cmd");
-                return '';
+                $self->session->log->error("Unable to load $package");
+                return {};
             }
             else {
-                my $output = $self->get($id, $namespace, 'English');
-                return $output;
+                return $self->_loadNamespace('English', $namespace);
             }
         }
         no strict 'refs';
-        $table = ${"$cmd\::I18N"};
+        $table = ${"$package\::I18N"};
     }
-    my $output = $table->{$id}->{message};
-    $output = $self->get($id, $namespace, "English")
-        if ($output eq "" && $language ne "English");
-    return $output;
+    return $table;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -141,7 +165,7 @@ If this is specified, only the value of the property will be returned, instead o
 
 sub getLanguage {
 	my ($self, $language, $property) = @_;
-	$language = $language || $self->{_language} || "English";
+    $language ||= $self->{_language};
     my $pack = "WebGUI::i18n::" . $language;
     WebGUI::Pluggable::load($pack);
     my $langInfo = do {
@@ -231,6 +255,8 @@ The namespace to make the new default.
 sub setNamespace {
 	my ($self, $namespace) = @_;
 	$self->{_namespace} = $namespace;
+    $self->{_table} = $self->_loadNamespace($self->{_language}, $namespace);
+    return $namespace;
 }
 
 #-------------------------------------------------------------------
@@ -257,12 +283,15 @@ Specify a default language. Defaults to user preference or "English".
 
 sub new {
 	my ($class, $session, $namespace, $language) = @_;
+    $namespace ||= 'WebGUI';
+    $language ||= $session->user->profileField('language');
 	my $self =
         bless {
             _session   => $session,
             _namespace => $namespace,
-            _language  => ($language || $session->user->profileField('language')),
+            _language  => $language,
         }, $class;
+    $self->{_table} = $self->_loadNamespace($language, $namespace);
 	return $self;
 }
 
@@ -275,7 +304,7 @@ Returns the internally stored session variable
 =cut
 
 sub session {
-	return $_[0]->{_session};
+    return $_[0]->{_session};
 }
 
 1;

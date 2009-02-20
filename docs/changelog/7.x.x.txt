@@ -3,6 +3,7 @@
  - fixed #9759: Delete Entry Button missing in Data Form
  - fixed #9767: FileAsset breaks 'null' rule for FileAsset table
  - fixed defaultValues of undef cause mysql5.1 to complain about columns that are set to be NOT NULL.  5.0 doesn't care.
+ - International text retrieval has been optimized
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
