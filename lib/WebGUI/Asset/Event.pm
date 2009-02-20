@@ -116,7 +116,7 @@ sub definition {
         },
         'storageId' => {
             fieldType       => "Image",
-            defaultValue    => undef,
+            defaultValue    => '',
             maxAttachments  => 1,
         },
         'feedUid' => {

@@ -243,13 +243,13 @@ sub definition {
     my $properties = {
         storageId => {
             fieldType=>"image",
-            defaultValue=>undef,
+            defaultValue=>'',
             enforceSizeLimits => 0,
         },
         threadId => {
             noFormPost=>1,
             fieldType=>"hidden",
-            defaultValue=>undef
+            defaultValue=>'',
         },
         originalEmail => {
             noFormPost=>1,

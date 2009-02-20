@@ -118,12 +118,12 @@ sub definition {
 			subscriptionGroupId => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>'',
 				},
 			replies => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>0,
 				},
 			isSticky => {
 				fieldType=>"yesNo",
@@ -131,12 +131,12 @@ sub definition {
 				},
 			isLocked => {
 				fieldType=>"yesNo",
-				defaultValue=>0
+				defaultValue=>0,
 				},
 			lastPostId => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>'',
 				},
 			lastPostDate => {
 				noFormPost=>1,

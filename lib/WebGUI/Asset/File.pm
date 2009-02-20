@@ -116,12 +116,12 @@ sub definition {
 			filename=>{
 				noFormPost=>1,
 				fieldType=>'hidden',
-				defaultValue=>undef
+				defaultValue=>'',
 			},
 			storageId=>{
 				noFormPost=>1,
 				fieldType=>'hidden',
-				defaultValue=>undef
+				defaultValue=>'',
 			},
 			templateId=>{
 				fieldType=>'template',

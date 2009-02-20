@@ -96,13 +96,13 @@ sub definition {
 			},
 		actionTaken => {
 			fieldType => "text",
-			defaultValue => undef,
-			noFormPost => 1
+			defaultValue => '',
+			noFormPost => 1,
 			},
 		actionTakenBy => {
 			fieldType => "user",
-			defaultValue => undef,
-			noFormPost => 1
+			defaultValue => '',
+			noFormPost => 1,
 			},
 	    );
 
