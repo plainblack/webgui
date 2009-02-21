@@ -35,7 +35,7 @@ my $i18n = WebGUI::International->new($session, undef, 'English');
 
 isa_ok($i18n, 'WebGUI::International', 'object of correct type created');
 
-is($i18n->getNamespace(), undef, 'getNamespace: default namespace is undef');
+is($i18n->getNamespace(), 'WebGUI', 'getNamespace: default namespace is undef');
 is($i18n->get('topicName'), 'WebGUI', 'get: get English label for topicName with default namespace: WebGUI');
 
 $i18n->setNamespace('WebGUI');
@@ -73,7 +73,7 @@ SKIP: {
 	);
 	is(
 		$i18n->get('neverAValidKey','notAValidFile','PigLatin'),
-		'',
+		undef,
 		'Language check: key from non-existant file returns an empty string'
 	);
 
