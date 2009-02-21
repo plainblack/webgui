@@ -3154,7 +3154,7 @@ sequenceNumber');
     WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
 
     $paginatePage = $self->session->form->param('pn') || 1;
-    $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
+    $currentUrl = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;
     
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
 
