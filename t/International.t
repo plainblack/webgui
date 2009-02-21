@@ -76,6 +76,16 @@ SKIP: {
 		undef,
 		'Language check: key from non-existant file returns an empty string'
 	);
+	is(
+		$i18n->get('key with spaces in it','WebGUI','PigLatin'),
+		'Key Contained Spaces',
+		'keys with spaces work'
+	);
+	is(
+		$i18n->get('template url_addAlbum','Asset_Gallery'),
+		'Key Contained Spaces',
+		'keys with spaces work'
+	);
 
 }
 
