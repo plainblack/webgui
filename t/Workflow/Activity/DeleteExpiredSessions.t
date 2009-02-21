@@ -114,5 +114,6 @@ foreach my $testSession (@sessions) {
 ## Close and end all four sessions
 
 END {
+    $workflow->delete;
     $session->setting->set('sessionTimeout', $origSessionTimeout );
 }
