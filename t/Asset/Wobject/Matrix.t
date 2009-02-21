@@ -120,7 +120,7 @@ cmp_deeply(
                     lastUpdated=>$matrixListing->get('revisionDate'),
                     clicks=>"0",
                     compares=>"0",
-                    assetId=>$matrixListing->getId,
+                    assetId=>$expectedAssetId,
                     url=>'/'.$matrixListing->get('url'),
                     title=>$matrixListing->get('title')
                     }]
