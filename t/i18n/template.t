@@ -88,6 +88,7 @@ foreach my $label ( @questionableTemplates ) {
 }
 
 END {
+    defined $session &&
     $session->config->set('macros', $originalMacros);
 }
 
