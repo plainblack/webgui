@@ -6,6 +6,7 @@
  - International text retrieval has been optimized
  - fixed #9766: Thingy Pagination Broken
  - fixed #9779: Gallery: js for search (datepicker?) included in album view
+ - fixed #9783: payment methods are not added
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
