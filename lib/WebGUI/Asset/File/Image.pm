@@ -291,6 +291,57 @@ sub www_resize {
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
 		$self = $newSelf;
 	}
+
+	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+
+	##YUI specific datatable CSS
+	my ($style, $url) = $self->session->quick(qw(style url));
+
+	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/animation/animation-min.js'), {type=>'text/javascript'});
+
+	my $resize_js = qq(
+		<script>
+		(function() { 
+			alert('here');
+			  var Dom = YAHOO.util.Dom, 
+			      Event = YAHOO.util.Event; 
+		       
+			      var resize = new YAHOO.util.Resize('yui_img', { 
+				  handles: 'all', 
+				  knobHandles: true, 
+				  height: '${x}px', 
+				  width: '${y}px', 
+				    proxy: true, 
+				    ghost: true, 
+				    status: true, 
+				    draggable: false, 
+				    animate: true, 
+				    animateDuration: .75, 
+				    animateEasing: YAHOO.util.Easing.backBoth 
+				}); 
+			 
+				resize.on('startResize', function() { 
+				    this.getProxyEl().innerHTML = '<img src="' + this.get('element').src + '" style="height: 100%; width: 100%;">'; 
+				    Dom.setStyle(this.getProxyEl().firstChild, 'opacity', '.25'); 
+				}, resize, true); 
+
+				resize.on('resize', function(e) { 
+				    element = document.getElementById('newWidth_formId');
+				    element.value = e.width;
+
+				    element = document.getElementById('newHeight_formId');
+				    element.value = e.height;
+			        }, resize, true); 
+			})(); 
+		</script>
+	);
+
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
@@ -298,7 +349,6 @@ sub www_resize {
 		-name=>"func",
 		-value=>"resize"
 		);
-	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
        	$f->readOnly(
 		-label=>$i18n->get('image size'),
 		-hoverHelp=>$i18n->get('image size description'),
@@ -317,7 +367,7 @@ sub www_resize {
 		-value=>$y,
 		);
 	$f->submit;
-	my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" /></div>';
+	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>'.$resize_js;
         return $self->getAdminConsole->render($f->print.$image,$i18n->get("resize image"));
 }
 
