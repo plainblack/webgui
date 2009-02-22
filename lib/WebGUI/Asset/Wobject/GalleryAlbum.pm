@@ -647,7 +647,8 @@ sub prepareView {
         = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
-    $self->{_viewTemplate} = $template;
+    $self->{_viewTemplate}  = $template;
+    $self->{_viewVariables} = $self->getTemplateVars;
 }
 
 #----------------------------------------------------------------------------
@@ -776,7 +777,7 @@ to be displayed within the page style.
 sub view {
     my $self        = shift;
     my $session     = $self->session;	
-    my $var         = $self->getTemplateVars;
+    my $var         = delete $self->{_viewVariables};
     
     my $p           = $self->getFilePaginator;
     $p->appendTemplateVars( $var );
