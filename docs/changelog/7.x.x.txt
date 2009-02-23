@@ -1,4 +1,5 @@
 7.6.13
+ - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
  - fixed #9760: DataForm not working in demo.plainblack.com
  - fixed #9759: Delete Entry Button missing in Data Form
  - fixed #9767: FileAsset breaks 'null' rule for FileAsset table
