@@ -23,6 +23,7 @@ our $HELP = {
             { name => 'invitations_enabled', },
             { name => 'user_invitations_enabled', },
             { name => 'invite_friend_url', },
+            { name => 'userFilter', },
         ],
         related => [ ],
     },

@@ -1274,8 +1274,8 @@ ibox.sentBy,
 (IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
 EOSQL
     tie my %userHash, 'Tie::IxHash';
-    my $i18n = WebGUI::International->new($session);
-    %userHash = ( 'all' => $i18n->echo('all users'), $session->db->buildHash($userSql) );
+    my $i18n = WebGUI::International->new($session, 'Account_Inbox');
+    %userHash = ( 'all' => $i18n->get('All users'), $session->db->buildHash($userSql) );
     $var->{'userFilter'} = WebGUI::Form::selectBox($session,{
         name    => 'userFilter',
         options => \%userHash,
