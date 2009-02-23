@@ -97,12 +97,22 @@ Email message to use rather than inbox message contents.
 
 Email subject to use rather than inbox message subject.
 
+=head3 options
+
+A hash reference containing options for handling the message. 
+
+=head4 testing
+
+If testing is true, then no email will be made or sent.  Only
+the inbox message will be made.
+
 =cut
 
 sub create {
-	my $class = shift;
-	my $session = shift;
-	my $properties = shift;
+    my $class      = shift;
+    my $session    = shift;
+    my $properties = shift;
+    my $options    = shift || {};
 	my $self = {};
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status}    = $properties->{status} || "pending";
@@ -149,11 +159,13 @@ sub create {
     }
 
 	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
-	my $mail = WebGUI::Mail::Send->create($session, {
-		toUser=>$self->{_properties}{userId},
-		toGroup=>$self->{_properties}{groupId},
-		subject=>$subject,
-		});
+	my $mail = $options->{testing}
+             ? undef
+             : WebGUI::Mail::Send->create($session, {
+                   toUser=>$self->{_properties}{userId},
+                   toGroup=>$self->{_properties}{groupId},
+                   subject=>$subject,
+               });
 	if (defined $mail) {
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
