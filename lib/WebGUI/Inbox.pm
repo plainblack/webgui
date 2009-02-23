@@ -439,6 +439,7 @@ sub getMessageSql {
     my $sortDir     = $props->{sortDir};
     my $whereClause = $props->{whereClause};
     my $limit       = $props->{limit};
+    my $select      = $props->{'select'};
 
     if($sortBy) {
         $sortBy = qq{ORDER BY $sortBy $sortDir};
@@ -452,6 +453,14 @@ sub getMessageSql {
         $limit = qq{LIMIT $limit};
     }
 
+    if(!$select) {
+        $select =<<SELECT;
+ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
+(IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
+(IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+SELECT
+    }
+
     my $messageLimit = 20_000;
     my $limitHalf    = $messageLimit / 2;
     my $limitQuarter = $messageLimit / 4;
@@ -461,9 +470,7 @@ sub getMessageSql {
     # for performance purposes don't use datasets larger than 20000 no matter how man messages are in the inbox
     my $sql = qq{
         SELECT
-            ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
-            (IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
-            (IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+            $select
         FROM (
                 ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE userId = '$userId' order by dateStamp desc limit $limitHalf)
                 UNION
