@@ -23,7 +23,7 @@ our $I18N = {
         message     => q|Edit Layout Template|,
         lastUpdated => 1119068809
 	},
-    
+
     'inbox layout template hoverHelp' => {
         message     => q{Choose a layout from the list to display the various account pluggins that are editable by the current user as well as the contents of the one currently chosen},
         lastUpdated => 1119068809
@@ -194,7 +194,7 @@ our $I18N = {
         message     => q|Subject|,
         lastUpdated => 1119068809
     },
-    
+
     'status label' => {
         message     => q{Status},
         lastUpdated => 1119068809
@@ -214,7 +214,7 @@ our $I18N = {
         message     => q{Add Recipients},
         lastUpdated => 1119068809
     },
-    
+
     'from label' => {
         message     => q{From},
         lastUpdated => 1119068809
@@ -224,7 +224,7 @@ our $I18N = {
         message     => q{To},
         lastUpdated => 1119068809
     },
-    
+
     'member since' => {
         message     => q{Member Since },
         lastUpdated => 1119068809
@@ -234,7 +234,7 @@ our $I18N = {
         message     => q{Delete},
         lastUpdated => 1119068809
     },
-    
+
     'view my profile' => {
         message     => q{view my profile as others see it},
         lastUpdated => 1119068809
@@ -546,6 +546,73 @@ our $I18N = {
         lastUpdated     => 0,
         context         => "Description of Inbox setting",
     },
+
+     'subject_url' => {
+         message         => q{The URL to sort the inbox by subject.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'status_url' => {
+         message         => q{The URL to sort the inbox by status.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'from_url' => {
+         message         => q{The URL to sort the inbox by who sent the messages.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'dateStamp_url' => {
+         message         => q{The URL to sort the inbox by when the message was sent.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'rpp_url' => {
+         message         => q{The current URL with sort, sort direction and user filtering params added.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'has_messages' => {
+         message         => q{A boolean which is true if the user has messages.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_total' => {
+         message         => q{The total number of messages the user has in their inbox.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'new_message_url' => {
+         message         => q{The URL to take the user to the screen where they can send new messages to other users.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'canSendMessages' => {
+         message         => q{A boolean which is true if the user has friends that he can send messages to.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_loop' => {
+         message         => q{A loop containing all messages, as determined by the sorting and number of messages per page options.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'view inbox template' => {
+         message         => q{View Inbox Template},
+         lastUpdated     => 1235421123,
+         context         => "The template that allows you to view the contents of the Inbox",
+     },
+
 };
 
 1;

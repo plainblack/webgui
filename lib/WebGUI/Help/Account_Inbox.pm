@@ -27,6 +27,33 @@ our $HELP = {
         related => [ ],
     },
 
+     'view inbox' => {
+         title   => 'view inbox template',
+         body    => '',
+         isa => [
+             {
+                 tag => 'common vars',
+                 namespace => 'Account_Inbox',
+             },
+         ],
+         fields => [ ],
+         variables => [
+             { name => 'subject_url', },
+             { name => 'status_url', },
+             { name => 'from_url', },
+             { name => 'dateStamp_url', },
+             { name => 'rpp_url', },
+             { name => 'has_messages', },
+             { name => 'message_total', },
+             { name => 'new_message_url', },
+             { name => 'canSendMessages', },
+             {
+               name => 'message_loop',
+               variables => [],
+             },
+          ],
+          related => [ ],
+      },
 };
 
 1;
