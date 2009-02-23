@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Inbox;
 use WebGUI::User;
 
-use Test::More tests => 8; # increment this value for each test you create
+use Test::More tests => 9; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -59,7 +59,10 @@ ok($message->getId == $messageId, 'getMessage returns message object');
 #########################################################
 my $messageList = $inbox->getMessagesForUser($user);
 my $message_cnt = scalar(@{$messageList});
-ok($message_cnt > 0, 'Messages returned for user');
+is($message_cnt,  1, 'User only has 1 messages');
+
+$message->setDeleted(3);
+is(scalar(@{ $inbox->getMessagesForUser($user) }),  0, 'User has no undeleted messages');
 
 END {
     $session->db->write('delete from inbox where messageId = ?', [$message->getId]);
