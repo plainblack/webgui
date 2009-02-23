@@ -192,8 +192,8 @@ plan tests => testCount() ;
 
 my $output;
 foreach my $testSet (@testArray) {
-    $output = new FAKE_ENV( $testSet->{agent},
-		           $testSet->{address} || '69.42.78.32')
+    $output = FAKE_ENV->new( $testSet->{agent},
+		             $testSet->{address} || '69.42.78.32')
 		   ->requestNotViewed();
     is($output, $testSet->{output}, $testSet->{comment});
 }
