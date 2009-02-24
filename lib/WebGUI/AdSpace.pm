@@ -52,7 +52,7 @@ sub countClick {
 	my $session = shift;
 	my $id = shift;
 	my ($url) = $session->db->quickArray("select url from advertisement where adId=?",[$id]);
-        return $url if $self->session->env->requestNotViewed();
+        return $url if $session->env->requestNotViewed();
 	$session->db->write("update advertisement set clicks=clicks+1 where adId=?",[$id]);
 	return $url;
 }
