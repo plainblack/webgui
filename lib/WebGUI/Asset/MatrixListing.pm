@@ -631,53 +631,28 @@ sub view {
         @files = @{ $storage->getFiles } if (defined $storage);
         
         $var->{screenshots} = qq|
-<script language="javascript">AC_FL_RunContent = 0;</script>
-<script src="/extras/ukplayer/AC_RunActiveContent.js" language="javascript"></script>
-<script language="javascript">
-    if (AC_FL_RunContent == 0) {
-        alert("This page requires AC_RunActiveContent.js.");
-    } else {
-        AC_FL_RunContent(
-            'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0',
-            'width', '400',
-            'height', '300',
-            'src', 'swc/assets',
-            'quality', 'high',
-            'pluginspage', 'http://www.macromedia.com/go/getflashplayer',
-            'align', 'middle',
-            'play', 'true',
-            'loop', 'true',
-            'scale', 'showall',
-            'wmode', 'window',
-            'devicefont', 'false',
-            'id', 'slideShow',
-            'bgcolor', '#ffffff',
-            'name', 'coverflow',
-            'menu', 'true',
-            // note: the width & height in the flashVars below MUST match the width & height set above
-            'flashVars',
-'config=?func=getScreenshotsConfig&width=400&height=300&backgroundColor=0xCCCCCC&fontColor=&textBorderColor=&textBackgroundColor=&controlsColor=&controlsBorderColor=&controlsBackgroundColor=',
-            'allowFullScreen', 'false',
-            'allowScriptAccess','sameDomain',
-            'movie', '/extras/ukplayer/slideShow',
-            'salign', ''
-            ); //end AC code
-    }
+<script type="text/javascript" src="/extras/ukplayer/swfobject.js"></script>
+<script type="text/javascript">
+    swfobject.registerObject("myFlashContent","9.0.0","/extras/ukplayer/expressInstall.swf");
 </script>
-<noscript>
-    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="400"
-height="300" id="swc/assets" align="middle">
-    <param name="allowScriptAccess" value="sameDomain" />
-    <param name="allowFullScreen" value="false" />
-    <param name="flashVars" value="config=?func=getScreenshotsConfig" />
-    <param name="movie" value="/extras/ukplayer/slideShow.swf" /><param name="quality" value="high" /><param
-name="bgcolor" value="#ffffff" />   <embed src="/extras/ukplayer/slideShow.swf" quality="high" bgcolor="#ffffff"
-width="400" height="300" name="swc/assets" align="middle" allowScriptAccess="sameDomain" allowFullScreen="false"
-flashvars="config=?func=getScreenshotsConfig" type="application/x-shockwave-flash"
-pluginspage="http://www.macromedia.com/go/getflashplayer" />
+<div>
+    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="400" height="300" id="myFlashContent">
+        <param name="movie" value="/extras/ukplayer/slideShow.swf" />
+        <param name="flashvars" value="config=?func=getScreenshotsConfig" />
+        <!--[if !IE]>-->
+        <object type="application/x-shockwave-flash" data="/extras/ukplayer/slideShow.swf" width="400"
+height="300">
+            <param name="flashvars" value="config=?func=getScreenshotsConfig" />
+        <!--<![endif]-->
+            <a href="http:/www.adobe.com/go/getflashplayer">
+                <img src="http:/www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe
+Flash player" />
+            </a>
+        <!--[if !IE]>-->
+        </object>
+        <!--<![endif]-->
     </object>
-</noscript>
+</div>
 |;
     }
 
