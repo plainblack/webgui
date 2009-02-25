@@ -176,6 +176,12 @@ sub definition {
             defaultValue => 'PBtmpl0000000000000062',
             namespace    => 'Survey/Gradebook',
         },
+        surveyJSON => {
+            fieldType    => 'text',
+            defaultValue => '',
+            autoGenerate => 0,
+            noFormPost  => 1, 
+        },
     );
 
     push @{$definition}, {
@@ -188,72 +194,6 @@ sub definition {
         };
 
     return $class->SUPER::definition( $session, $definition );
-}
-
-#-------------------------------------------------------------------
-
-=head2 exportAssetData ( )
-
-Override exportAssetData so that surveyJSON is included in package exports etc..
-
-N.B. Currently ResponseJSON data is not exported.
-
-=cut
-
-sub exportAssetData {
-    my $self = shift;
-
-    # Start off with the wobject data that Wobject knows about
-    my $hash = $self->SUPER::exportAssetData();
-
-    # Add in the SurveyJSON data..
-    $hash->{properties}{surveyJSON} = $self->surveyJSON->freeze;
-
-    return $hash;
-}
-
-#-------------------------------------------------------------------
-
-=head2 importAssetData ( hashRef )
-
-Override importAssetCollateralData so that surveyJSON gets imported from packages
-
-N.B. Currently ResponseJSON data is not imported.
-
-=cut
-
-sub importAssetCollateralData {
-    my ( $self, $data ) = @_;
-
-    # Persist the SurveyJSON data to the database
-    my $surveyJSON = $data->{properties}{surveyJSON};
-    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $surveyJSON, $self->getId ] );
-
-    return;
-}
-
-#-------------------------------------------------------------------
-
-=head2 duplicate ( )
-
-Override duplicate so that surveyJSON gets duplicated too
-
-N.B. Currently ResponseJSON data is not duplicated.
-
-=cut
-
-sub duplicate {
-    my $self     = shift;
-    my $options  = shift;
-
-    # Start off by letting Wobject duplicate the asset as it knows how
-    my $newAsset = $self->SUPER::duplicate($options);
-
-    # Make sure SurveyJSON data also gets duplicated
-    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?',
-        [ $self->surveyJSON->freeze, $newAsset->getId ] );
-
-    return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -356,13 +296,14 @@ will be used to instantiate the SurveyJSON instance rather than querying the dat
 
 sub surveyJSON {
     my $self = shift;
+$self->session->errorHandler->error("surveyJSON was calle, wtf");
     my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
     
     if (!$self->{_surveyJSON} || $json) {
 
         # See if we need to load surveyJSON from the database
         if ( !defined $json ) {
-            $json = $self->session->db->quickScalar( 'select surveyJSON from Survey where assetId = ?', [ $self->getId ] );
+            $json = $self->get("surveyJSON");
         }
 
         # Instantiate the SurveyJSON instance, and store it
@@ -1182,10 +1123,7 @@ sub surveyEnd {
         if ( $url !~ /\w/ ) { $url = 0; }
         if ( $url eq 'undefined' ) { $url = 0; }
         if ( !$url ) {
-            $url
-                = $self->session->db->quickScalar(
-                'select exitURL from Survey where assetId = ? order by revisionDate desc limit 1',
-                [ $self->getId() ] );
+            $url = $self->get('exitURL');
             if ( !$url ) {
                 $url = q{/};
             }
@@ -1308,7 +1246,8 @@ sub persistSurveyJSON {
     my $self = shift;
 
     my $data = $self->surveyJSON->freeze();
-    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
+    $self->update({surveyJSON=>$data});
+#    $self->session->db->write( 'update Survey set surveyJSON = ? where assetId = ?', [ $data, $self->getId ] );
 
     return;
 }
@@ -1404,10 +1343,7 @@ sub responseId {
         }
     
         if ( !$responseId ) {
-            my $allowedTakes
-                = $self->session->db->quickScalar(
-                'select maxResponsesPerUser from Survey where assetId = ? order by revisionDate desc limit 1',
-                [ $self->getId() ] );
+            my $allowedTakes = $self->get('maxResponsesPerUser');
             my $haveTaken;
     
             if ( $id == 1 ) {
