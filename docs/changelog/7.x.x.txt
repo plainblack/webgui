@@ -12,6 +12,7 @@
  - fixed #9803: Survey 2.0- Gradebook spelled wrong
  - fixed #9801: Survey 2.0- Template spelled wrong
  - fixed #9802: Survey Template field names to be consistent
+ - fixed: HTMLForm generated forms have an extra double quote in the table tag.
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
