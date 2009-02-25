@@ -9,6 +9,9 @@
  - fixed #9779: Gallery: js for search (datepicker?) included in album view
  - fixed #9783: payment methods are not added
  - fixed #9785: Delete All button not working in Account/Inbox [TEMPLATE]
+ - fixed #9803: Survey 2.0- Gradebook spelled wrong
+ - fixed #9801: Survey 2.0- Template spelled wrong
+ - fixed #9802: Survey Template field names to be consistent
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
