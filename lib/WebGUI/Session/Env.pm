@@ -50,7 +50,7 @@ returns true if the remote address matches a site which is a known indexer or sp
 sub callerIsSearchSite {
 
     my $self = shift;
-    my $remoteAddress = $self->get('REMOTE_ADDR');
+    my $remoteAddress = $self->getIp;
 
     return 1 if $remoteAddress =~ /203\.87\.123\.1../    # Blaiz Enterprise Rawgrunt search
              || $remoteAddress =~ /123\.113\.184\.2../   # Unknown Yahoo Robot

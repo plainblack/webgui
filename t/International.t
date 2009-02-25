@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
 my $langTests = 4; ##For language look-up tests
-$numTests    += 11 + $langTests;
+$numTests    += 12 + $langTests;
 
 plan tests => $numTests;
 
@@ -78,11 +78,6 @@ SKIP: {
 	);
 	is(
 		$i18n->get('key with spaces in it','WebGUI','PigLatin'),
-		'Key Contained Spaces',
-		'keys with spaces work'
-	);
-	is(
-		$i18n->get('template url_addAlbum','Asset_Gallery'),
 		'Key Contained Spaces',
 		'keys with spaces work'
 	);
