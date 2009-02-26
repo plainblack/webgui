@@ -317,7 +317,15 @@ sub getEditForm {
         }
     }
 
-    $form->submit();
+    $form->raw(
+    '<tr><td COLSPAN=2>'.
+    WebGUI::Form::Button($session, {}).
+    WebGUI::Form::Button($session, {
+        -value  => $i18n->get('cancel', 'WebGUI'),
+        -extras => q|onclick="history.go(-1);" class="backwardButton"|
+    }).
+    '</td></tr>'
+    );
 
     return $form;
 }

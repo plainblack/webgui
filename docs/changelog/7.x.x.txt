@@ -6,6 +6,7 @@
  - fixed #9820: Survey: political party spelled wrong
  - fixed #9819: Survey: hoverhelp showing instead of field name
  - fixed #9822: Matrix: Wrong field label
+ - fixed #9823: Matrix: no cancel button in add/edit listing
 
 7.6.13
  - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
