@@ -104,9 +104,10 @@ sub create {
 	my $session = shift;
 	my $properties = shift;
 	my $self = {};
+    my $i18n = WebGUI::International->new('Inbox_Message');
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status}    = $properties->{status} || "pending";
-	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
+	$self->{_properties}{subject}   = $properties->{subject} || $i18n->get(523,'WebGUI');
 	$self->{_properties}{message}   = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
 	$self->{_properties}{userId}    = $properties->{userId};
