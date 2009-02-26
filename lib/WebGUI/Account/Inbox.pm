@@ -1151,14 +1151,16 @@ sub www_sendMessageSave {
     #Let sendMessage deal with displaying errors
     return $self->www_sendMessage($errorMsg) if $hasError;
 
+    my $messageProperties = {
+        message => $message,
+        subject => $subject,
+        status  => 'unread',
+        sentBy  => $fromUser->userId
+    };
+
     foreach my $uid (@toUsers) {
-        $inbox->addMessage({
-            message => $message,
-            subject => $subject,
-            userId  => $uid,
-            status  => 'unread',
-            sentBy  => $fromUser->userId
-        });
+        $messageProperties->{userId} = $uid;
+        $inbox->addMessage($messageProperties);
     }
 
     $self->appendCommonVars($var,$inbox);
