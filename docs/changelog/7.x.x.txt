@@ -1,5 +1,6 @@
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
+ - fixed: #9808: Search i18n 
 
 7.6.13
  - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
