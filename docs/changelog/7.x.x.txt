@@ -5,6 +5,7 @@
  - fixed #9809: Pagination list up to 10/20: not working correctly on last pages.
  - fixed #9820: Survey: political party spelled wrong
  - fixed #9819: Survey: hoverhelp showing instead of field name
+ - fixed #9822: Matrix: Wrong field label
 
 7.6.13
  - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
