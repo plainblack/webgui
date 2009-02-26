@@ -2,6 +2,7 @@
  - fixed: IE6 shows Admin Bar over Asset Manager
  - fixed #9808: Search i18n 
  - fixed #9818: deleteAttachedFiles bug (THE REVENGE)
+ - fixed #9809: Pagination list up to 10/20: not working correctly on last pages.
 
 7.6.13
  - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
