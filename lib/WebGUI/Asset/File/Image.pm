@@ -268,7 +268,9 @@ sub www_edit {
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Image');
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),$i18n->get("resize image")) if ($self->get("filename"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=rotate'),$i18n->get("rotate image")) if ($self->get("filename"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=crop'),$i18n->get("crop image")) if ($self->get("filename"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=undo'),$i18n->get("undo image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
 		-value=>$self->get("templateId"),
@@ -277,6 +279,111 @@ sub www_edit {
 		-defaultValue=>"PBtmpl0000000000000088"
 		);
         return $self->getAdminConsole->render($tabform->print,$i18n->get("edit image"));
+}
+
+#-------------------------------------------------------------------
+sub www_undo {
+    my $self = shift;
+    my $previous = (@{$self->getRevisions()})[-2];
+    if ($previous) {
+	    $self = $self->purgeRevision();
+	    $self = $previous;
+	    $self->generateThumbnail;
+    }
+    return $self->www_edit();
+}
+
+#-------------------------------------------------------------------
+sub www_rotate {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+	warn ($self->session->form->process("degree"));
+	if (defined $self->session->form->process("degree")) {
+		my $newSelf = $self->addRevision();
+		delete $newSelf->{_storageLocation};
+		$newSelf->getStorageLocation->rotate($newSelf->get("filename"),$newSelf->session->form->process("degree"));
+		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
+		$self = $newSelf;
+		$self->generateThumbnail;
+	}
+
+	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
+
+	##YUI specific datatable CSS
+	my ($style, $url) = $self->session->quick(qw(style url));
+
+	my $img_name = $self->getStorageLocation->getUrl($self->get("filename"));
+	my $img_file = $self->get("filename");
+	my $rotate_js = qq(
+	    <canvas id="canvas"></canvas>
+
+	    <script type="text/javascript">
+		var can = document.getElementById('canvas');
+		var ctx = can.getContext('2d');
+		var deg = 0;
+
+		var img = new Image();
+		img.onload = function(){
+		    can.width = img.width;
+		    can.height = img.height;
+		    ctx.drawImage(img, 0, 0, img.width, img.height);
+		}
+		img.src = '$img_name';
+		img.alt = '$img_file';
+
+		can.onclick = function() {
+		    var ctx = can.getContext('2d');
+		    var deg = parseInt(document.forms[0].degree.value);
+		    deg += 90;
+		    if (270 < deg) {
+		       deg = 0;
+		    }
+		    document.forms[0].degree.value = deg;
+		    //alert(deg);
+		    ctx.clearRect(0, 0, img.width, img.height);
+		    can.setAttribute('width', img.width);
+    		    can.setAttribute('height', img.height);
+		    var width = 0;
+		    var height = 0;
+		    if (0 == deg) {
+			width = 0;
+			height = 0;
+		    } else if (90 == deg) {
+			width = 0;
+			height = -img.height;
+		    } else if (180 == deg) {
+			width = -img.width;
+			height = -img.height;
+		    } else if (270 == deg) {
+			width = -img.width;
+			height = 0;
+		    }
+
+		    ctx.rotate(deg * Math.PI / 180);
+		    ctx.drawImage(img, width, height);
+		    };
+	    </script>
+	);
+	my $image = qq(<div align="center" class="yui-skin-sam">$rotate_js</div>);
+
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	$f->hidden(
+		-name=>"func",
+		-value=>"rotate"
+		);
+	$f->hidden(
+		-name=>"degree",
+		-value=>0
+		);
+       	$f->readOnly(
+		-value=>$i18n->get('rotate image label'),
+		-hoverHelp=>$i18n->get('rotate image description'),
+		);
+	$f->submit;
+        return $self->getAdminConsole->render($f->print.$image,$i18n->get("rotate image"));
 }
 
 #-------------------------------------------------------------------
@@ -290,6 +397,7 @@ sub www_resize {
 		$newSelf->getStorageLocation->resize($newSelf->get("filename"),$newSelf->session->form->process("newWidth"),$newSelf->session->form->process("newHeight"));
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
 		$self = $newSelf;
+		$self->generateThumbnail;
 	}
 
 	my ($x, $y) = $self->getStorageLocation->getSizeInPixels($self->get("filename"));
@@ -308,7 +416,6 @@ sub www_resize {
 	my $resize_js = qq(
 		<script>
 		(function() { 
-			alert('here');
 			  var Dom = YAHOO.util.Dom, 
 			      Event = YAHOO.util.Event; 
 		       
@@ -380,9 +487,9 @@ sub www_crop {
 
 	if ($self->session->form->process("Width") || $self->session->form->process("Height") 
         || $self->session->form->process("Top") || $self->session->form->process("Left")) {
-		my $newSelf = $self->addRevision();
-		delete $newSelf->{_storageLocation};
-		$newSelf->getStorageLocation->crop(
+            my $newSelf = $self->addRevision();
+            delete $newSelf->{_storageLocation};
+            $newSelf->getStorageLocation->crop(
             $newSelf->get("filename"),
             $newSelf->session->form->process("Width"),
             $newSelf->session->form->process("Height"),
@@ -390,6 +497,7 @@ sub www_crop {
             $newSelf->session->form->process("Left")
         );
 		$self = $newSelf;
+		$self->generateThumbnail;
 	}
 
 	my $filename = $self->get("filename");
@@ -437,6 +545,10 @@ sub www_crop {
 
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+	$f->hidden(
+		-name=>"degree",
+		-value=>"0"
+		);
 	$f->hidden(
 		-name=>"func",
 		-value=>"crop"

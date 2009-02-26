@@ -1115,9 +1115,57 @@ sub crop {
     }
 
     # Write our changes to disk
-    $error = $image->Write($self->getPath('crop-'.$filename));
+    $error = $image->Write($self->getPath($filename));
     if ($error) {
         $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        return 0;
+    }
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 rotate ( filename [ degrees ] )
+
+Rotates the image by the specified degrees.
+
+=head3 filename
+
+The name of the file to resize.
+
+=head3 width
+
+Number of degrees to rotate.
+
+=cut
+
+sub rotate { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $degree      = shift || 0;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        return 0;
+    }
+    my $image = Image::Magick->new;
+    my $error = $image->Read($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        return 0;
+    }
+
+    $self->session->errorHandler->info( "Rotating $filename by $degree degrees" );
+    $image->Rotate( $degree );
+
+    # Write our changes to disk
+    $error = $image->Write($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't rotate image: ".$error);
         return 0;
     }
 

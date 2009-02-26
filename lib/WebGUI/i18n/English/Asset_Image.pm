@@ -77,6 +77,18 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
+	'rotate image' => {
+		message => q|Rotate Image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'rotate image label' => {
+		message => q|Please click to rotate image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
 	'crop image' => {
 		message => q|Crop Image|,
 		context => q|label to crop the image|,
@@ -105,6 +117,12 @@ shown here.|,
 		message => q|New Height|,
 		context => q|Enter the new height for the Image in pixels.  If 0 is entered, a new height will be calculated using the width.|,
 		lastUpdated => 1130538987
+	},
+
+	'undo image' => {
+		message => q|Undo Image|,
+		context => q|undo editing operations|,
+		lastUpdated => 1106765841
 	},
 
 	'height' => {

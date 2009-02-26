@@ -249,9 +249,6 @@ sub getEditFormUploadControl {
 sub getFileUrl {
 	my $self = shift;
 	#return $self->get("url");
-    if (-f $self->getStorageLocation->getPath('crop-' . $self->get("filename"))) {
-        return $self->getStorageLocation->getUrl('crop-' . $self->get("filename"));
-    }
 	return $self->getStorageLocation->getUrl($self->get("filename"));
 }
 
@@ -560,6 +557,7 @@ sub www_edit {
 }
 
 #-------------------------------------------------------------------
+
 
 sub www_view {
 	my $self = shift;
