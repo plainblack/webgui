@@ -785,7 +785,7 @@ sub updateQuestionAnswers {
     }
     elsif ( $type eq 'Party' ) {
         my @ans
-            = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
+            = ( 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)' );
         $self->addAnswersToQuestion( \@addy, \@ans, { 3, 1 } );
     }
     elsif ( $type eq 'Race' ) {
