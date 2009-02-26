@@ -208,7 +208,7 @@ sub fieldSetStart {
 	my $legend = shift;
 	$self->{_data} .= "</tbody></table>\n"
 		."<fieldset>\n<legend>".$legend."</legend>\n"
-		."<table ".$self->{_tableExtras}.'" style="width: 100%;"><tbody>'
+		."<table ".$self->{_tableExtras}.' style="width: 100%;"><tbody>'
 		."\n";
 }
 
