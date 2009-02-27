@@ -16,6 +16,8 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
+use WebGUI::Asset::Story;
+use WebGUI::Asset::Wobject::Folder;
 use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
@@ -105,7 +107,7 @@ sub definition {
         autoGenerateForms=>1,
         tableName=>'StoryArchive',
         className=>'WebGUI::Asset::Wobject::StoryArchive',
-        properties=>\%properties
+        properties=>\%properties,
     });
     return $class->SUPER::definition($session, $definition);
 }
