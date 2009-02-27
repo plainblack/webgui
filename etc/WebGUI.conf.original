@@ -502,6 +502,13 @@
       "isContainer" : 1,
       "category" : "community"
    },
+   "WebGUI::Asset::Wobject::StoryArchive" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryTopic" : {
+      "category" : "community"
+   },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },

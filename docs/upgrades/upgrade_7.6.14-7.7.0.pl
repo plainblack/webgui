@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 installStoryManagerTables($session);
+upgradeConfigFiles($session);
 
 finish($session); # this line required
 
@@ -66,15 +67,16 @@ EOSTORY
 
     $db->write(<<EOARCHIVE);
 CREATE TABLE StoryArchive (
-    assetId         CHAR(22) BINARY NOT NULL,
-    revisionDate    BIGINT          NOT NULL,
-    storiesPerFeed  INTEGER,
-    storiesPerPage  INTEGER,
-    groupToPost     CHAR(22) BINARY,
-    templateId      CHAR(22) BINARY,
-    storyTemplateId CHAR(22) BINARY,
-    archiveAfter    INT(11),
-    richEditorId    CHAR(22) BINARY,
+    assetId             CHAR(22) BINARY NOT NULL,
+    revisionDate        BIGINT          NOT NULL,
+    storiesPerFeed      INTEGER,
+    storiesPerPage      INTEGER,
+    groupToPost         CHAR(22) BINARY,
+    templateId          CHAR(22) BINARY,
+    storyTemplateId     CHAR(22) BINARY,
+    editStoryTemplateId CHAR(22) BINARY,
+    archiveAfter        INT(11),
+    richEditorId        CHAR(22) BINARY,
     PRIMARY KEY ( assetId, revisionDate )
 )
 EOARCHIVE
@@ -90,6 +92,26 @@ CREATE TABLE StoryTopic (
 )
 EOTOPIC
 
+    print "DONE!\n" unless $quiet;
+}
+
+sub upgradeConfigFiles {
+    my ($session) = @_;
+    print "\tAdding Story Manager assets to config file... " unless $quiet;
+    my $config = $session->config;
+    $config->addToHash(
+        'assets',
+        'WebGUI::Asset::Wobject::StoryTopic' => {
+            'category' => 'community'
+        },
+    );
+    $config->addToHash(
+        'assets',
+        "WebGUI::Asset::Wobject::StoryArchive" => {
+            "isContainer" => 1,
+            "category" => "community"
+        },
+    );
     print "DONE!\n" unless $quiet;
 }
 
