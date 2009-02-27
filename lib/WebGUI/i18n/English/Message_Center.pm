@@ -4,26 +4,14 @@ use strict;
 
 our $I18N = {
 
-	'receive inbox notifications' => {
-		message => q|Inbox notifications contain.|,
+	'receive inbox emails' => {
+		message => q|Receive Inbox message notifications via email?|,
 		context => q|Allows a user to choose how they get notified about things in their Inbox.|,
 		lastUpdated => 1235685248,
 	},
 
-	'short notification' => {
-		message => q|Short notification|,
-		context => q|An abbreviated, short message that they have an email.|,
-		lastUpdated => 1235685248,
-	},
-
-	'full message' => {
-		message => q|Full content from message|,
-		context => q|The entire content of the Inbox message.|,
-		lastUpdated => 1235685248,
-	},
-
 	'receive inbox sms' => {
-		message => q|Receive inbox notification via SMS?|,
+		message => q|Receive Inbox message notifications via SMS?|,
 		context => q|Allows a user to choose how they get notified about things in their Inbox.|,
 		lastUpdated => 1235685248,
 	},

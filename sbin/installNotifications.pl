@@ -46,17 +46,13 @@ sub installUserProfileFields {
         $session,
         'receiveInboxEmailNotifications',
         {
-            label          => q!WebGUI::International::get('receive inbox notifications','Message_Center')!,
+            label          => q!WebGUI::International::get('receive inbox emails','Message_Center')!,
             visible        => 1,
             required       => 0,
             protected      => 1,
             editable       => 1,
-            fieldType      => 'radioList',
-            dataDefault    => 0,
-            possibleValues => q!{
-message => WebGUI::International::get('full message','Message_Center'),
-note    => WebGUI::International::get('short notification','Message_Center'),
-}!,
+            fieldType      => 'yesNo',
+            dataDefault    => 1,
         },
         4,
     );
