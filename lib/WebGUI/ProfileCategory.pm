@@ -1,6 +1,5 @@
 package WebGUI::ProfileCategory;
 
-
 =head1 LEGAL
 
  -------------------------------------------------------------------
