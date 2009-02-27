@@ -23,6 +23,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
 	var uri = "func=getCompareFormData";
 		if(typeof(listingIds) != 'undefined'){
+		uri = uri + ';__listingId_isIn=1';
 		for (var i = 0; i < listingIds.length; i++) {
 			uri = uri+';listingId='+listingIds[i];
 		}
@@ -33,7 +34,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked", parser: "number"},{key: "lastUpdated", parser: "number"},"url","assetId"]
+            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked"},{key: "lastUpdated", parser: "number"},"url","assetId"]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
