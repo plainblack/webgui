@@ -82,6 +82,7 @@ Deletes this ad.
 sub delete {
 	my $self = shift;
 	my $storage = WebGUI::Storage->get($self->session, $self->get("storageId"));
+# dav TODO update WebGUI::AssetColateral::Sku::Ad::Ad set delete flag for this AdId
 	$storage->delete if defined $storage;
 	$self->session->db->deleteRow("advertisement","adId",$self->getId);
 	$self = undef;

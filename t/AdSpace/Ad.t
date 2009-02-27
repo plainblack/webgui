@@ -115,7 +115,7 @@ SKIP: {
 
     ##Link checks
     $token = $textP->get_tag("a");
-    my $href = $token->[1]{href};
+    my $href = $token->[1]{onclick};
     like($href, qr/op=clickAd/,               'ad link has correct operation');
 
     my $adId = $textAd->getId;
@@ -159,7 +159,7 @@ SKIP: {
 
     ##Link checks
     $token = $textP->get_tag("a");
-    my $href = $token->[1]{href};
+    my $href = $token->[1]{onclick};
     like($href, qr/op=clickAd/,               'ad link has correct operation, image');
 
     $adId = $imageAd->getId;

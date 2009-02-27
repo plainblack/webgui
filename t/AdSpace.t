@@ -40,6 +40,10 @@ plan tests => $numTests;
 my $loaded = use_ok('WebGUI::AdSpace');
 
 my $session = WebGUI::Test->session;
+# we need to set env vars to satisfy the 'requestNotViewed'
+# test otherwise we will get nothing back...
+$session->env()->{_env}{HTTP_USER_AGENT} = 'Mozilla';
+$session->env()->{_env}{REMOTE_ADDR} = '127.0.0.1';
 my ($adSpace, $alfred, $alfred2, $bruce, $catWoman, $villianClone, $defaultAdSpace );
 my ($jokerAd, $penguinAd, $twoFaceAd);
 
