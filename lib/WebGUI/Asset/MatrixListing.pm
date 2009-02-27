@@ -313,6 +313,14 @@ sub getEditForm {
             $attribute->{label}     = $attribute->{name};
             $attribute->{subtext}   = $attribute->{description};
             $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
+            if($attribute->{fieldType} eq 'Combo'){
+                my %options;
+                tie %options, 'Tie::IxHash';
+                %options = $db->buildHash("select value, value from MatrixListing_attribute 
+                    where attributeId = ? and value != '' order by value",[$attribute->{attributeId}]);
+                $attribute->{options}   = \%options;
+                $attribute->{extras}    = "style='width:120px'";
+            }
             $form->dynamicField(%{$attribute});           
         }
     }
