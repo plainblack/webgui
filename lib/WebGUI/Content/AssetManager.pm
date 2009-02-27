@@ -323,7 +323,9 @@ JavaScript that will take over if the browser has the cojones.
 
 sub www_manage {
     my ( $session ) = @_;
-    my $ac              = WebGUI::AdminConsole->new( $session, "assets" );
+    my $ac              = WebGUI::AdminConsole->new( $session, "assets", {
+                            showAdminBar        => 1
+                        } );
     my $currentAsset    = getCurrentAsset( $session );
     my $i18n            = WebGUI::International->new( $session, "Asset" );
 
@@ -413,7 +415,7 @@ sub www_manage {
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = WebGUI::Macro::AdminBar::process($session).'<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
+    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';

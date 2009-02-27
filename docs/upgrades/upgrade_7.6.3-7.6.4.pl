@@ -102,7 +102,8 @@ sub upgradeMatrix {
     $db->write("alter table Matrix_rating rename MatrixListing_rating");
     $db->write("alter table Matrix_ratingSummary rename MatrixListing_ratingSummary");
     $db->write("alter table Matrix_field rename Matrix_attribute");
-    $db->write("alter table Matrix_attribute drop column label");
+    $db->write("alter table Matrix_attribute drop column name");
+    $db->write("alter table Matrix_attribute change label name char(255)");
     $db->write("alter table Matrix_attribute add column options text");
     $db->write("alter table Matrix_attribute change fieldType fieldType char(255) not null default 'MatrixCompare'");
     $db->write("alter table Matrix_attribute change fieldId attributeId char(22) not null");

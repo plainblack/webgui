@@ -161,12 +161,8 @@ our $I18N = { ##hashref of hashes
 
 	'no results' => {
 		message => q|No results were found.|,
+		content => q|An internationalized label for telling the user that no results were found.|,
 		lastUpdated => 1170549113,
-	},
-
-	'no_results' => {
-		message => q|An internationalized label for telling the user that no results were found.|,
-		lastUpdated => 1170549119,
 	},
 
 };

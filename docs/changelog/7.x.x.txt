@@ -1,10 +1,28 @@
+7.6.14
+ - fixed: IE6 shows Admin Bar over Asset Manager
+ - fixed #9808: Search i18n 
+ - fixed #9818: deleteAttachedFiles bug (THE REVENGE)
+ - fixed #9809: Pagination list up to 10/20: not working correctly on last pages.
+ - fixed #9820: Survey: political party spelled wrong
+ - fixed #9819: Survey: hoverhelp showing instead of field name
+ - fixed #9822: Matrix: Wrong field label
+ - fixed #9823: Matrix: no cancel button in add/edit listing
+
 7.6.13
+ - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
  - fixed #9760: DataForm not working in demo.plainblack.com
  - fixed #9759: Delete Entry Button missing in Data Form
  - fixed #9767: FileAsset breaks 'null' rule for FileAsset table
  - fixed defaultValues of undef cause mysql5.1 to complain about columns that are set to be NOT NULL.  5.0 doesn't care.
  - International text retrieval has been optimized
  - fixed #9766: Thingy Pagination Broken
+ - fixed #9779: Gallery: js for search (datepicker?) included in album view
+ - fixed #9783: payment methods are not added
+ - fixed #9785: Delete All button not working in Account/Inbox [TEMPLATE]
+ - fixed #9803: Survey 2.0- Gradebook spelled wrong
+ - fixed #9801: Survey 2.0- Template spelled wrong
+ - fixed #9802: Survey Template field names to be consistent
+ - fixed: HTMLForm generated forms have an extra double quote in the table tag.
 
 7.6.12
  - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.

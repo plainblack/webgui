@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
 my $langTests = 4; ##For language look-up tests
-$numTests    += 11 + $langTests;
+$numTests    += 12 + $langTests;
 
 plan tests => $numTests;
 
@@ -75,6 +75,11 @@ SKIP: {
 		$i18n->get('neverAValidKey','notAValidFile','PigLatin'),
 		undef,
 		'Language check: key from non-existant file returns an empty string'
+	);
+	is(
+		$i18n->get('key with spaces in it','WebGUI','PigLatin'),
+		'Key Contained Spaces',
+		'keys with spaces work'
 	);
 
 }

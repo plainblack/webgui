@@ -504,6 +504,10 @@ sub getPageLinks {
 		my $start = ($minPage > 0) ? $minPage : 1;
 		my $maxPage = $start + $limit - 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
+        if ($maxPage > $self->getNumberOfPages) {
+            $end = $self->getNumberOfPages;
+            $start = $self->getNumberOfPages - $limit + 1;
+        }
 		my @temp;
 		foreach my $page (@pages) {
 			if ($i <= $end && $i >= $start) {
@@ -752,6 +756,25 @@ sub setAlphabeticalKey {
 	$self->{abKey} = shift;
 	$self->{abInitialOnly} = shift;
 	return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setPageNumber ( pageNumber )
+
+Sets the page number.  This is really a convenience method for testing.
+Returns the page number that was set.
+
+=head3 pageNumber
+
+Sets the pageNumber.  Setting the pageNumber outside of the set of
+pages would cause the Paginator to behave poorly.
+
+=cut
+
+sub setPageNumber {
+	my $self = shift;
+    $self->{_pn} = shift;
 }
 
 1;

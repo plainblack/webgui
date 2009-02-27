@@ -95,3 +95,8 @@ foreach my $label ( @questionableTemplates ) {
         sprintf "Empty template:  %s, id: %s, url: %s", @{ $label }{qw/title id url/}
     );
 }
+
+END {
+    defined $session &&
+    $session->config->set('macros', $originalMacros);
+}

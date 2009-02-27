@@ -490,6 +490,116 @@ our $I18N = {
         lastUpdated => 1233714385,
     },
 
+    'Max user responses' => {
+        message => q|Max user responses|,
+        context => q|The maximum number of times a user may take this survey.|,
+        lastUpdated => 0
+    },
+
+    'Max user responses help' => {
+        message => q|The maximum number of times a user may take this survey.|,
+        lastUpdated => 0
+    },
+
+    'Survey Overview Template' => {
+        message => q|Survey Overview Template|,
+        context => q|The template that provides an overview of the survey.|,
+        lastUpdated => 0
+    },
+
+    'Survey Overview Template help' => {
+        message => q|The template that provides an overview of the survey.|,
+        lastUpdated => 0
+    },
+
+    'Gradebook Template' => {
+        message => q|Gradebook Template|,
+        context => q|The template for displaying the gradebook.|,
+        lastUpdated => 0
+    },
+
+    'Gradebook Template help' => {
+        message => q|The template for displaying the gradebook.|,
+        lastUpdated => 0
+    },
+
+    'Response Template' => {
+        message => q|Response Template|,
+        context => q|The template for displaying responses to the survey.|,
+        lastUpdated => 0
+    },
+
+    'Response Template help' => {
+        message => q|The template for displaying responses to the survey.|,
+        lastUpdated => 0
+    },
+
+    'Edit Survey Template' => {
+        message => q|Edit Survey Template|,
+        context => q|The template for displaying the screen for editing the survey.|,
+        lastUpdated => 0
+    },
+
+    'Edit Survey Template help' => {
+        message => q|The template for displaying the screen for editing the survey.|,
+        lastUpdated => 0
+    },
+
+    'Take Survey Template' => {
+        message => q|Take Survey Template|,
+        context => q|The template for displaying the screen where a user takes the survey.|,
+        lastUpdated => 0
+    },
+
+    'Take Survey Template help' => {
+        message => q|The template for displaying the screen where a user takes the survey.|,
+        lastUpdated => 0
+    },
+
+    'Questions Template' => {
+        message => q|Questions Template|,
+        context => q|The template for rendering questions in the survey.|,
+        lastUpdated => 0
+    },
+
+    'Questions Template help' => {
+        message => q|The template for rendering questions in the survey.|,
+        lastUpdated => 0
+    },
+
+    'Section Edit Template' => {
+        message => q|Section Edit Template|,
+        context => q|The template for adding or editing sections.|,
+        lastUpdated => 0
+    },
+
+    'Section Edit Template help' => {
+        message => q|The template for adding or editing sections.|,
+        lastUpdated => 0
+    },
+
+    'Question Edit Template' => {
+        message => q|Question Edit Template|,
+        context => q|The template for adding or editing questions.|,
+        lastUpdated => 0
+    },
+
+    'Question Edit Template help' => {
+        message => q|The template for adding or editing questions.|,
+        lastUpdated => 0
+    },
+
+    'Answer Edit Template' => {
+        message => q|Answer Edit Template|,
+        context => q|The template for adding or editing answers.|,
+        lastUpdated => 0
+    },
+
+    'Answer Edit Template help' => {
+        message => q|The template for adding or editing answers.|,
+        lastUpdated => 0
+    },
+
     'percentage label' => {
         message => q|Percentage|,
         context => q|Label for the Percentage column on the gradebook screen.|,

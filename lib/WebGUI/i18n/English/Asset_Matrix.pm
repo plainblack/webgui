@@ -418,8 +418,8 @@ listing,|,
     },
 
     'max comparisons privileged description' => {
-        message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
-        lastUpdated => 0,
+        message => q|Specifies how many comparisons are allowed in searches and comparisons for users who have accounts on the site.|,
+        lastUpdated => 1235681965,
     },
 
         'rating timeout description' => {
@@ -548,8 +548,8 @@ listing,|,
 	},
 
 	'max comparisons privileged label' => {
-		message => q|Maximum Comparisons (For Privileged Users)|,
-		lastUpdated => 0,
+		message => q|Maximum Comparisons (For Registered Users)|,
+		lastUpdated => 1235681967,
 	},
 
 	'rating timeout' => {
