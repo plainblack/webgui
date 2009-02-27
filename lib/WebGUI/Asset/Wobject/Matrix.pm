@@ -1024,6 +1024,7 @@ sub www_getCompareListData {
     unless (scalar(@listingIds)) {
         @listingIds = $self->session->form->checkList("listingId");
     }
+    my @responseFields = ("attributeId", "name", "description","fieldType", "checked");
     
     foreach my $listingId (@listingIds){
         $listingId =~ s/_____/-/g;
@@ -1038,11 +1039,13 @@ sub www_getCompareListData {
             url         =>$listing->getUrl,
             lastUpdated =>$session->datetime->epochToHuman( $listing->get('revisonDate'),"%z" ),
         });
+        push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
     }
     push(@results,{name=>$i18n->get('last updated label'),fieldType=>'lastUpdated'});
     
     my $jsonOutput;
-    $jsonOutput->{ColumnDefs} = \@columnDefs;
+    $jsonOutput->{ColumnDefs}       = \@columnDefs;
+    $jsonOutput->{ResponseFields}   = \@responseFields;
 
     foreach my $category (keys %{$self->getCategories}) {
         push(@results,{name=>$category,fieldType=>'category'});
