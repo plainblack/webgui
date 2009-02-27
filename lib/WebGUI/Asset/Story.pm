@@ -139,7 +139,6 @@ sub definition {
     push(@{$definition}, {
         assetName         => $i18n->get('assetName'),
         icon              => 'assets.gif',
-        autoGenerateForms => 1,
         tableName         => 'Story',
         className         => 'WebGUI::Asset::Story',
         properties        => \%properties,
