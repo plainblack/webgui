@@ -303,6 +303,15 @@ sub definition {
 		hoverHelp    => $i18n->get('send inbox notifications only help', 'Message_Center'),
 		defaultValue => $setting->get('sendInboxNotificationsOnly'),
 		});
+	push(@fields, {
+		tab          => 'messaging',
+		fieldType    => 'template',
+		name         => 'inboxNotificationTemplateId',
+		label        => $i18n->get('inbox notification template',      'Message_Center'),
+		hoverHelp    => $i18n->get('inbox notification template help', 'Message_Center'),
+		defaultValue => $setting->get('inboxNotificationTemplateId'),
+        namespace    => 'Account/Inbox/Notification',
+		});
 	# misc
 	push(@fields, {
 		tab=>"misc",

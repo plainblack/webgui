@@ -50,6 +50,11 @@ our $I18N = {
 		lastUpdated => 1235696295,
 	},
 
+	'inbox notification' => {
+		message => q|You have a new message in your Inbox.|,
+		lastUpdated => 1235708853,
+	},
+
 };
 
 1;

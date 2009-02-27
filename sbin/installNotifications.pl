@@ -79,7 +79,8 @@ note    => WebGUI::International::get('short notification','Message_Center'),
 sub installSettings {
     my $session = shift;
     $session->setting->add('smsGateway', '');
-    $session->setting->add('sendInboxNotificationsOnly', '');
+    $session->setting->add('sendInboxNotificationsOnly', 0);
+    $session->setting->add('inboxNotificationTemplateId', 'b1316COmd9xRv4fCI3LLGA');
 }
 
 #----------------------------------------------------------------------------
@@ -108,10 +109,63 @@ sub finish {
     # my $versionTag = WebGUI::VersionTag->getWorking($session);
     # $versionTag->commit;
     ##
+    updateTemplates($session);
+    my $versionTag = WebGUI::VersionTag->getWorking($session);
+    $versionTag->commit;
     
     $session->var->end;
     $session->close;
 }
+
+#-------------------------------------------------
+sub updateTemplates {
+    my $session = shift;
+    my $packageDir = "message_center_packages";
+    return undef unless (-d $packageDir);
+    print "\tUpdating packages.\n";
+    opendir(DIR,$packageDir);
+    my @files = readdir(DIR);
+    closedir(DIR);
+    my $newFolder = undef;
+    foreach my $file (@files) {
+        next unless ($file =~ /\.wgpkg$/);
+        # Fix the filename to include a path
+        $file       =  $packageDir . "/" . $file;
+        addPackage( $session, $file );
+    }
+}
+
+sub addPackage {
+    my $session     = shift;
+    my $file        = shift;
+
+    # Make a storage location for the package
+    my $storage     = WebGUI::Storage->createTemp( $session );
+    $storage->addFileFromFilesystem( $file );
+
+    # Import the package into the import node
+    my $package = WebGUI::Asset->getImportNode($session)->importPackage( $storage );
+
+    # Make the package not a package anymore
+    $package->update({ isPackage => 0 });
+    
+    # Set the default flag for templates added
+    my $assetIds
+        = $package->getLineage( ['self','descendants'], {
+            includeOnlyClasses  => [ 'WebGUI::Asset::Template' ],
+        } );
+    for my $assetId ( @{ $assetIds } ) {
+        my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        if ( !$asset ) {
+            print "Couldn't instantiate asset with ID '$assetId'. Please check package '$file' for corruption.\n";
+            next;
+        }
+        $asset->update( { isDefault => 1 } );
+    }
+
+    return;
+}
+
 
 __END__
 
