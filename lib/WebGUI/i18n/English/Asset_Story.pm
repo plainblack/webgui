@@ -3,6 +3,12 @@ use strict;
 
 our $I18N = {
 
+    'assetName' => {
+        message => q|Story|,
+        context => q|Story, as in news story.|,
+        lastUpdated => 0
+    },
+
     'headline' => {
         message => q|Headline|,
         context => q|Usually the title of a story. Label in the edit screen and template.|,
