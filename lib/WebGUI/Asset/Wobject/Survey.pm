@@ -296,7 +296,6 @@ will be used to instantiate the SurveyJSON instance rather than querying the dat
 
 sub surveyJSON {
     my $self = shift;
-$self->session->errorHandler->error("surveyJSON was calle, wtf");
     my ($json) = validate_pos(@_, { type => SCALAR, optional => 1 });
     
     if (!$self->{_surveyJSON} || $json) {
