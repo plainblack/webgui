@@ -157,7 +157,7 @@ Returns a group pull-down field. A group pull down provides a select list that p
 
 sub toHtml {
 	my $self = shift;
-	$self->set('options', { map { $_->getId => $_->getName } ( WebGUI::AdSpace->getAdSpaces() ) } );
+	$self->set('options', { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) } );
 	return $self->SUPER::toHtml();
 }
 

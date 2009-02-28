@@ -60,48 +60,48 @@ sub definition {
 			fieldType       => "template",
                         namespace       => "AdSku",
 			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',   #  TODO
-			label           => $i18n->get("purchase template"),
-			hoverHelp       => $i18n->get("purchase template help"),
+			label           => $i18n->get("property purchase template"),
+			hoverHelp       => $i18n->get("property purchase template help"),
 		},
 		manageTemplate      => {
 			tab             => "display",
 			fieldType       => "template",
                         namespace       => "AdSku",
 			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',   #  TODO
-			label           => $i18n->get("manage template"),
-			hoverHelp       => $i18n->get("manage template help"),
+			label           => $i18n->get("property manage template"),
+			hoverHelp       => $i18n->get("property manage template help"),
 		},
         adSpace => {
             tab             => "properties",
             fieldType       => "AdSpace",
             namespace       => "AdSku",
-            label           => $i18n->get("ad space"),
-            hoverHelp       => $i18n->get("ad Space help"),
+            label           => $i18n->get("property ad space"),
+            hoverHelp       => $i18n->get("property ad Space help"),
         },
         pricePerClick => {
             tab             => "properties",
             defaultValue    => '0.00',
 		fieldType       => "float",
-		label           => $i18n->get("price per click"),
-		hoverHelp       => $i18n->get("price per click help"),
+		label           => $i18n->get("property price per click"),
+		hoverHelp       => $i18n->get("property price per click help"),
             },
         pricePerImpression => {
             tab             => "properties",
             defaultValue    => '0.00',
 		fieldType       => "float",
-		label           => $i18n->get("price per impression"),
-		hoverHelp       => $i18n->get("price per impression help"),
+		label           => $i18n->get("property price per impression"),
+		hoverHelp       => $i18n->get("property price per impression help"),
             },
         clickDiscounts   => {
             fieldType       => 'textarea',
-            label	    => $i18n->get('click discounts'),
-            hoverHelp	    => $i18n->get('click discounts help'),
+            label	    => $i18n->get('property click discounts'),
+            hoverHelp	    => $i18n->get('property click discounts help'),
             defaultValue    => '',
         },
         impressionDiscounts => {
             fieldType       => 'textarea',
-            label	    => $i18n->get('impression discounts'),
-            hoverHelp	    => $i18n->get('impression discounts help'),
+            label	    => $i18n->get('property impression discounts'),
+            hoverHelp	    => $i18n->get('property impression discounts help'),
             defaultValue    => '',
         },
     );
@@ -110,8 +110,8 @@ sub definition {
     if ($session->setting->get("useKarma")) {
         $properties{ karma    } = {
             type            => 'integer',
-            label           => $i18n->get('adsku karma'),
-            hoverHelp       => $i18n->get('adsku karma description'),
+            label           => $i18n->get('property adsku karma'),
+            hoverHelp       => $i18n->get('property adsku karma description'),
             defaultvalue	=> 0,
         };
     }
