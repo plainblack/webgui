@@ -442,6 +442,8 @@ sub view {
     # javascript and css files for compare form datatable
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), 
         {type =>'text/css', rel=>'stylesheet'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type =>
+    'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/json/json-min.js'), {type =>
     'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/connection/connection-min.js'), {type =>

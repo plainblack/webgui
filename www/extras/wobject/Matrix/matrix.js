@@ -1,7 +1,7 @@
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
-            elCell.innerHTML = "<a href='" + oRecord.getData("url") + "' target='_blank'>" + sData + "</a>";
+            elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
         };
 	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
 		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
