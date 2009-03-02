@@ -22,6 +22,44 @@ use base 'WebGUI::Asset::Wobject';
 
 #-------------------------------------------------------------------
 
+=head2 addChild ( )
+
+Story Archive really only has Folders for children.  When addChild is
+called, check the date to see which folder to use.  If the correct folder
+does not exist, then make it.
+
+=cut
+
+sub addChild {
+    my $self = shift;
+    my ($properties) = @_;
+    ##Allow subclassing
+    return undef unless $properties->{className} =~ /^WebGUI::Asset::Story::/;
+    return $self->SUPER::addChild(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 canPostStories ( )
+
+Determines whether or not a user can post stories to this Archive.
+
+=head3 userId
+
+An explicit userId to check against.  If no userId is sent, then it
+will use the current session user instead.
+
+=cut
+
+sub canPostStories {
+	my ($self, $userId) = @_;
+    $userId ||= $self->session->user->userId;
+    my $user = WebGUI::User->new($self->session, $userId);
+	return $user->isInGroup($self->get("groupToPost")) || $self->canEdit($userId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( )
 
 defines wobject properties for New Wobject instances.  You absolutely need 
@@ -100,6 +138,14 @@ sub definition {
             hoverHelp    => $i18n->get('rich editor help'),
             defaultValue => 'PBrichedit000000000002',
         },
+        approvalWorkflowId =>{
+            tab           => 'security',
+            fieldType     => 'workflow',
+            defaultValue  => 'pbworkflow000000000003',
+            type          => 'WebGUI::VersionTag',
+            label         => $i18n->get('approval workflow'),
+            hoverHelp     => $i18n->get('approval workflow description'),
+        },    
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
@@ -115,18 +161,51 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 duplicate ( )
+=head2 getFolder ( date )
 
-duplicates a New Wobject.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to duplicate them here.
+Stories are stored in Folders under the Story Archive to prevent lineage issues.
+Gets the correct folder for stories.   If the Folder does not exist, then it will
+be created and autocommitted.  The autocommit is COMPLETELY automatic.  This is
+because it's possible to gum up the Story submitting proces with a Folder under
+a different version tag.
+
+=head3 date
+
+There is one folder for each day that Stories are submitted.  The requested date
+should be an epoch.  If no date is passed, it will use the current time instead.
 
 =cut
 
-sub duplicate {
-    my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
-    return $newAsset;
+sub getFolder {
+	my ($self, $date) = @_;
+    my $session    = $self->session;
+    my $folderName = $session->datetime->epochToHuman($date, '%c_%D_%y');
+    my $folderUrl  = join '/', $self->getUrl, $folderName;
+    my $folder     = WebGUI::Asset->newByUrl($session, $folderUrl);
+    return $folder if $folder;
+    ##The requested folder doesn't exist.  Make it and autocommit it.
+
+    ##For a fully automatic commit, save the current tag, create a new one
+    ##with the commit without approval workflow, commit it, then restore
+    ##the original if it exists
+    my $oldVersionTag = WebGUI::VersionTag->getWorking($session, 'noCreate');
+    my $newVersionTag = WebGUI::VersionTag->create($session, { workflowId => 'pbworkflow00000000003', });
+    $newVersionTag->setWorking;
+
+    ##Call SUPER because my addChild calls getFolder
+    $folder = $self->SUPER::addChild({
+        className => 'WebGUI::Asset::Wobject::Folder',
+        title     => $folderName,
+        menuTitle => $folderName,
+        url       => $folderUrl,
+        isHidden  => 1,
+    });
+    $newVersionTag->commit();
+    $oldVersionTag->setWorking();
+
+    ##Get a new version of the asset from the db with the correct state
+    $folder = WebGUI::Asset->newByUrl($session, $folderUrl);
+    return $folder;
 }
 
 #-------------------------------------------------------------------
@@ -167,25 +246,6 @@ sub view {
     
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  This method is entirely
-optional.  Take it out unless you specifically want to set a submenu in your
-adminConsole views.
-
-=cut
-
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   return $self->session->privilege->locked() unless $self->canEditIfLocked;
-#   my $i18n = WebGUI::International->new($self->session, "Asset_NewWobject");
-#   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
-#}
-
 
 1;
 #vim:ft=perl

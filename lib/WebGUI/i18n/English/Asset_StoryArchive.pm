@@ -105,6 +105,18 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'approval workflow' => {
+        message => q|Story Approval Workflow|,
+        context => q|Label in the edit screen and template.|,
+        lastUpdated => 0,
+    },
+
+    'approval workflow help' => {
+        message => q|Choose a workflow to be executed on each Story as it gets submitted.|,
+        context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

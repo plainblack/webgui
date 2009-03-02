@@ -24,6 +24,8 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::DateTime;
+use DateTime;
 
 ################################################################
 #
@@ -56,7 +58,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 2
+plan tests => 13
             + $tests
             + $canPostMaker->plan
             ;
@@ -93,6 +95,49 @@ is($archive->get('groupToPost'), $staff->getId, 'set Staff group to post to Stor
 $canPostMaker->{_tests}->[0]->{object} = $archive;
 
 $canPostMaker->run();
+
+################################################################
+#
+#  getFolder
+#
+################################################################
+
+##Note, this is just to prevent date rollover from happening.
+##We'll test implicit getFolder later on.
+my $now = time();
+my $todayFolder = $archive->getFolder($now);
+isa_ok($todayFolder, 'WebGUI::Asset::Wobject::Folder', 'getFolder created a Folder');
+is($archive->getChildCount, 1, 'getFolder created a child');
+my $dt = DateTime->from_epoch(epoch => $now, time_zone => $session->datetime->getTimeZone);
+my $folderName = $dt->strftime('%B_%d_%Y');
+$folderName =~ s/^(\w+_)0/$1/;
+is($todayFolder->getTitle, $folderName, 'getFolder: folder has the right name');
+my $folderUrl = join '/', $archive->getUrl, lc $folderName;
+is($todayFolder->getUrl, $folderUrl, 'getFolder: folder has the right URL');
+is($todayFolder->getParent->getId, $archive->getId, 'getFolder: created folder has the right parent');
+is($todayFolder->get('state'),  'published', 'getFolder: created folder is published');
+is($todayFolder->get('status'), 'approved',  'getFolder: created folder is approved');
+
+my $sameFolder = $archive->getFolder($now);
+is($sameFolder->getId, $todayFolder->getId, 'call with same time returns the same folder');
+undef $sameFolder;
+
+my ($startOfDay, $endOfDay) = $session->datetime->dayStartEnd($now);
+$sameFolder = $archive->getFolder($startOfDay);
+is($sameFolder->getId, $todayFolder->getId, 'call within same day(start) returns the same folder');
+undef $sameFolder;
+$sameFolder = $archive->getFolder($endOfDay);
+is($sameFolder->getId, $todayFolder->getId, 'call within same day(end) returns the same folder');
+undef $sameFolder;
+
+################################################################
+#
+#  addChild
+#
+################################################################
+
+my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic'});
+is($child, undef, 'addChild: Will only add Stories');
 
 }
 
