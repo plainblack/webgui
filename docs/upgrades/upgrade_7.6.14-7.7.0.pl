@@ -77,6 +77,7 @@ CREATE TABLE StoryArchive (
     editStoryTemplateId CHAR(22) BINARY,
     archiveAfter        INT(11),
     richEditorId        CHAR(22) BINARY,
+    approvalWorkflowId  CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
     PRIMARY KEY ( assetId, revisionDate )
 )
 EOARCHIVE
