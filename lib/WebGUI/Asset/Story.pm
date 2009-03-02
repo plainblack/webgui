@@ -40,8 +40,6 @@ These methods are available from this class:
 
 =cut
 
-
-
 #-------------------------------------------------------------------
 
 =head2 addChild ( )
@@ -58,16 +56,26 @@ sub addChild {
 
 =head2 addRevision
 
-Make sure that Stories are always hidden from navigation.
+Make sure that Stories are always hidden from navigation.  Copy storage locations so that
+purging individual revisions works correctly.
 
 =cut
 
 sub addRevision {
     my $self = shift;
     my $newSelf = $self->next::method(@_);
-    $newSelf->update({
+
+    my $newProperties = {
         isHidden => 1,
-    });
+    };
+
+    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
+        my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
+        $newProperties->{storageId} = $newStorage->getId;
+    }
+
+    $newSelf->update($newProperties);
+
     return $newSelf;
 }
 
@@ -134,7 +142,12 @@ sub definition {
         photo => {
             fieldType    => 'text',
             defaultValue => '',
-        }
+        },
+        storageId => {
+            fieldType    => 'hidden',
+            defaultValue => '',
+            noFormPost   => 1,
+        },
     );
     push(@{$definition}, {
         assetName         => $i18n->get('assetName'),
@@ -150,18 +163,37 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 indexContent ( )
+=head2 exportAssetData ( )
 
-Making private. See WebGUI::Asset::indexContent() for additonal details. 
+See WebGUI::AssetPackage::exportAssetData() for details.
+Add the storage location to the export data.
 
 =cut
 
-sub indexContent {
-    my $self = shift;
-    my $indexer = $self->SUPER::indexContent;
-    $indexer->setIsPublic(0);
+sub exportAssetData {
+	my $self = shift;
+	my $data = $self->SUPER::exportAssetData;
+	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
+	return $data;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getStorageLocation
+
+Returns the storage location for this Story.  If it does not exist,
+then it creates it via setStorageLocation.  Subsequent lookups return
+an internally cached Storage object to save time.
+
+=cut
+
+sub getStorageLocation {
+	my $self = shift;
+	unless (exists $self->{_storageLocation}) {
+		$self->setStorageLocation;
+	}
+	return $self->{_storageLocation};
+}
 
 #-------------------------------------------------------------------
 
@@ -200,21 +232,106 @@ sub processPropertiesFromFormPost {
 
 =head2 purge ( )
 
-Cleaning up storage objects.
+Cleaning up storage objects in all revisions.
 
 =cut
 
 sub purge {
     my $self = shift;
+    my $sth = $self->session->db->read("select storageId from Story where assetId=".$self->session->db->quote($self->getId));
+    while (my ($storageId) = $sth->array) {
+        WebGUI::Storage->get($self->session,$storageId)->delete;
+	}
+    $sth->finish;
     return $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeRevision
+
+Remove the storage location for this revision of the Asset.
+
+=cut
+
+sub purgeRevision {
+	my $self = shift;
+	$self->getStorageLocation->delete;
+	return $self->SUPER::purgeRevision;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setSize ( fileSize )
+
+Set the size of this asset by including all the files in its storage
+location. C<fileSize> is an integer of additional bytes to include in
+the asset size.
+
+=cut
+
+sub setSize {
+    my $self        = shift;
+    my $fileSize    = shift || 0;
+    my $storage     = $self->getStorageLocation;
+    if (defined $storage) {	
+        foreach my $file (@{$storage->getFiles}) {
+            $fileSize += $storage->getFileSize($file);
+        }
+    }
+    return $self->SUPER::setSize($fileSize);
+}
+
+#-------------------------------------------------------------------
+
+=head2 setStorageLocation ( [ $storage] )
+
+=head3 $storage
+
+A storage location to use for this Story.
+
+=cut
+
+sub setStorageLocation {
+    my $self    = shift;
+    my $storage = shift;
+    if (defined $storage) {
+        $self->{_storageLocation} = $storage;
+    }
+    elsif ($self->get("storageId") eq "") {
+        $self->{_storageLocation} = WebGUI::Storage->create($self->session);
+        $self->update({storageId=>$self->{_storageLocation}->getId});
+    }
+    else {
+        $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a StoryArchive for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset && $session->asset->isa('WebGUI::Asset::Wobject::StoryArchive');
+}
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the container www_view method. 
 
 =cut
+
+##Keyword cloud generated by WebGUI::Keyword
 
 sub view {
     my $self = shift;
