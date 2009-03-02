@@ -580,6 +580,8 @@ sub view {
     if ($emailSent){
     	$var->{emailSent}       = 1;
     }
+    $var->{canEdit}             = $self->canEdit;
+    $var->{editUrl}             = $self->getUrl("func=edit");
     $var->{controls}            = $self->getToolbar;
     $var->{comments}            = $self->getFormattedComments();
     $var->{productName}         = $var->{title};
