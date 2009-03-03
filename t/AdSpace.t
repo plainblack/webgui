@@ -47,6 +47,9 @@ SKIP: {
 
 	skip "Unable to load WebGUI::AdSpace", $numTests-1 unless $loaded;
 
+    local $ENV{REMOTE_ADDR} = '10.0.0.1';
+    local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+
 	$adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 
 	isa_ok($adSpace, 'WebGUI::AdSpace');

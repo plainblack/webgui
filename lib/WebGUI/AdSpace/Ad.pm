@@ -261,27 +261,32 @@ sub set {
 	$self->{_properties}{priority} = exists $properties->{priority} ? $properties->{priority} : $self->{_properties}{priority};
 	# prerender the ad for faster display
 	my $adSpace = WebGUI::AdSpace->new($self->session, $self->get("adSpaceId"));
-	if ($self->get("type") eq "text") {
-		$self->{_properties}{renderedAd} = '<div style="position:relative; width:' . ($adSpace->get("width")-2) . 'px; height:' . 
-                                 ($adSpace->get("height")-2) . 'px; margin:0px; overflow:hidden; border:solid ' . $self->get("borderColor") .
-                                 q{ 1px;"><a href='#' OnClick="window.location.assign('} .
-                                 $self->session->url->gateway(undef, "op=clickAd;id=".$self->getId) .
-                                 q{')" style="position:absolute; padding: 3px; top:0px; left:0px; width:100%; height:100%; z-index:10;} .
-                                 ' display:block; text-decoration:none; vertical-align:top; background-color:' . $self->get("backgroundColor") . 
-                                 '; font-size: 13px; font-weight: normal;"><b><span style="color:' . $self->get("textColor") . ';">' .
-                                 $self->get("title") . '</span></b><br /><span style="color:' . $self->get("textColor") . ';">' .
-                                 $self->get("adText") . '</span></a></div>';
-	} elsif ($self->get("type") eq "image") {
-		my $storage = WebGUI::Storage->get($self->session, $self->get("storageId"));
-		$self->{_properties}{renderedAd} = '<div style="position:relative; width:' . $adSpace->get("width") . 'px; height:' .
-                                 $adSpace->get("height") . 'px; margin:0px; overflow:hidden; border:0px;"><a href="#" ' .
-                                 q{onClick="window.location.assign('} .
-                                 $self->session->url->gateway(undef, "op=clickAd;id=".$self->getId) . q{')" style="position:absolute; padding: } .
-                                 '3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; ' .
-                                 'vertical-align:top;"><img ' .
-                                 'src="' . $storage->getUrl($storage->getFiles->[0]) . '" alt="' . $self->get("title") .
-                                 '" style="z-index:0;position:relative;border-style:none;border: 0px;" /></a></div>';
-	} elsif ($self->get("type") eq "rich") {
+    if ($self->get("type") eq "text") {
+        $self->{_properties}{renderedAd} =
+            q{<div style="position:relative; width:} . ($adSpace->get("width")-2) . q{px; height:}
+            . ($adSpace->get("height")-2) . q{px; margin:0px; overflow:hidden; border:solid }
+            . $self->get("borderColor") . q{ 1px;"><a href='#' onclick="window.location.assign('}
+            . $self->session->url->gateway(undef, "op=clickAd;id=".$self->getId)
+            . q{')" style="position:absolute; padding: 3px; top:0px; left:0px; width:100%; height:100%; z-index:10;}
+            . q{ display:block; text-decoration:none; vertical-align:top; background-color:}
+            . $self->get("backgroundColor") . q{; font-size: 13px; font-weight: normal;"><b><span style="color:}
+            . $self->get("textColor") . q{;">} . $self->get("title")
+            . q{</span></b><br /><span style="color:} . $self->get("textColor") . q{;">}
+            . $self->get("adText") . q{</span></a></div>};
+    }
+    elsif ($self->get("type") eq "image") {
+        my $storage = WebGUI::Storage->get($self->session, $self->get("storageId"));
+        $self->{_properties}{renderedAd} =
+            q{<div style="position:relative; width:} . $adSpace->get("width") . q{px; height:}
+            . $adSpace->get("height") . q{px; margin:0px; overflow:hidden; border:0px;"><a href="#" }
+            . q{onclick="window.location.assign('} .$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId)
+            . q{')" style="position:absolute; padding: }
+            . q{3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; }
+            . q{vertical-align:top;"><img }
+            . q{src="} . $storage->getUrl($storage->getFiles->[0]) . q{" alt="} . $self->get("title")
+            . q{" style="z-index:0;position:relative;border-style:none;border: 0px;" /></a></div>};
+    }
+    elsif ($self->get("type") eq "rich") {
 		my $ad = $self->get("richMedia");
 		WebGUI::Macro::process($self->session, \$ad);
 		$self->{_properties}{renderedAd} = $ad;
