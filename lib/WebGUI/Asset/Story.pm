@@ -262,7 +262,8 @@ Cleaning up storage objects in all revisions.
 sub purge {
     my $self = shift;
     my $sth = $self->session->db->read("select storageId from Story where assetId=".$self->session->db->quote($self->getId));
-    while (my ($storageId) = $sth->array) {
+    STORAGE: while (my ($storageId) = $sth->array) {
+        next STORAGE unless $storageId;
         WebGUI::Storage->get($self->session,$storageId)->delete;
 	}
     $sth->finish;

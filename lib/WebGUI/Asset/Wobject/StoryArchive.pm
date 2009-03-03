@@ -1,6 +1,6 @@
 package WebGUI::Asset::Wobject::StoryArchive;
 
-$VERSION = "1.0.0";
+our $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
 # WebGUI is Copyright 2001-2009 Plain Black Corporation.
@@ -18,7 +18,10 @@ use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Asset::Story;
 use WebGUI::Asset::Wobject::Folder;
+use WebGUI::Paginator;
 use base 'WebGUI::Asset::Wobject';
+
+use constant DATE_FORMAT => '%c_%D_%y';
 
 #-------------------------------------------------------------------
 
@@ -182,7 +185,7 @@ should be an epoch.  If no date is passed, it will use the current time instead.
 sub getFolder {
 	my ($self, $date) = @_;
     my $session    = $self->session;
-    my $folderName = $session->datetime->epochToHuman($date, '%c_%D_%y');
+    my $folderName = $session->datetime->epochToHuman($date, DATE_FORMAT);
     my $folderUrl  = join '/', $self->getUrl, $folderName;
     my $folder     = WebGUI::Asset->newByUrl($session, $folderUrl);
     return $folder if $folder;
@@ -213,6 +216,21 @@ sub getFolder {
 
 #-------------------------------------------------------------------
 
+=head2 folderDateFormat ( $epoch )
+
+Returns the date in the format for folders.  Encapsulated in this method
+so that it can be used everywhere in the sa
+
+=head $epoch
+
+
+=cut
+
+sub prepareView {
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.
@@ -238,16 +256,67 @@ to be displayed within the page style.
 =cut
 
 sub view {
-    my $self = shift;
+    my $self    = shift;
     my $session = $self->session;    
 
     #This automatically creates template variables for all of your wobject's properties.
     my $var = $self->get;
+    $self->viewTemplateVariables($var);
     
     #This is an example of debugging code to help you diagnose problems.
     #WebGUI::ErrorHandler::warn($self->get("templateId")); 
     
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
+}
+
+#-------------------------------------------------------------------
+
+=head2 viewTemplateVars ( $var )
+
+Add template variables to the existing template variables.
+
+=head3 $var
+
+A
+
+=cut
+
+sub viewTemplateVariables {
+    my ($self, $var)  = @_;
+    my $session = $self->session;    
+    ##Only return assetIds,  we'll build data for the things that are actually displayed.
+    my $storySql = $self->getLineageSql(['descendants'],{
+        excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
+        orderByClause  => 'creationDate, lineage',
+    });
+    my $p = WebGUI::Paginator->new($session, $self->getUrl, $self->get('storiesPerPage'));
+    $p->setDataByQuery($storySql);
+    my $storyIds = $p->getPageData();
+    $var->{date_loop} = [];
+    $p->appendTemplateVars($var);
+    my $lastStoryDate = '';
+    my $datePointer = undef;
+    ##Only build objects for the assets that we need
+    STORY: foreach my $storyId (@{ $storyIds }) {
+        my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
+        next STORY unless $story;
+        my $creationDate = $story->get('creationDate');
+        my ($creationDay,undef) = $session->datetime->dayStartEnd($creationDate);
+        my $storyDate = $session->datetime->epochToHuman($creationDay, DATE_FORMAT);
+        if ($storyDate ne $lastStoryDate) {
+            push @{ $var->{date_loop} }, {};
+            $datePointer = $var->{date_loop}->[-1];
+            $datePointer->{epochDate} = $creationDate;
+            $datePointer->{storyLoop} = [];
+            $lastStoryDate = $storyDate;
+        }
+        push @{$datePointer->{storyLoop}}, {
+            url           => $story->getUrl,
+            title         => $story->getTitle,
+            creationDate  => $creationDate
+        }
+    }
+    return 1;
 }
 
 1;
