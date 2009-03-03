@@ -1181,10 +1181,10 @@ sub annotate {
     }
     warn("there");
     # form->process("degree")
-	my $annotate_text = $form->process("annotate_text");
-	my $annotate_top = $form->process("annotate_top");
-	my $annotate_left = $form->process("annotate_left");
-	my $annotate_width = $form->process("annotate_width");
+	my $annotate_text   = $form->process("annotate_text");
+	my $annotate_top    = $form->process("annotate_top");
+	my $annotate_left   = $form->process("annotate_left");
+	my $annotate_width  = $form->process("annotate_width");
 	my $annotate_height = $form->process("annotate_height");
     warn("there");
     unless ($annotate_text) {
@@ -1197,10 +1197,15 @@ sub annotate {
     if ($imageAsset->{annotations} =~ /\n/) {
         $imageAsset->{annotations} .= "\n";
     }
-    warn("there");
     $imageAsset->{annotations} .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
-    $self->{_data}{annotations} = $self->{_data};
+    warn("there: $imageAsset->{annotations}");
+    $self->{_data}{annotations} = $imageAsset->{annotations};
+    warn("there: $self->{_data}{annotations}");
 	$self->session->db->setRow("ImageAsset","assetId",$self->{_data});
+
+    foreach my $k (sort keys %{ $self->{_data} }) {
+        warn("$k => $$self{_data}{$k}");
+    }
 
     return 1;
 }
