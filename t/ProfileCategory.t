@@ -31,7 +31,9 @@ my $categories = WebGUI::ProfileCategory->getCategories($session);
 
 my @labels = map { $_->getLabel } @{ $categories };
 
-$categories->[0]->set({ visible => 0});
+my %properties = %{ $categories->[0]->get };
+$properties{visible} = 0;
+$categories->[0]->set(\%properties);
 
 my $newCategories = WebGUI::ProfileCategory->getCategories($session);
 my @newLabels     = map { $_->getLabel } @{ $newCategories };
