@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 
 my $tests = 1;
-plan tests => 4
+plan tests => 12
             + $tests
             ;
 
@@ -58,7 +58,7 @@ ok(  WebGUI::Asset::Story->validParent($session), 'validParent: StoryArchive is 
 
 ############################################################
 #
-# make a new one
+# Make a new one.  Test defaults
 #
 ############################################################
 
@@ -68,6 +68,52 @@ $story = $defaultNode->addChild({
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
+is($story->get('storageId'), '', 'by default, there is no storageId');
+is($story->get('photo'),   '{}', 'by default, photos is an empty JSON hash');
+is($story->get('isHidden'), 1, 'by default, photos are hidden');
+$story->update({isHidden => 0});
+is($story->get('isHidden'), 1, 'photos cannot be set to not be hidden');
+
+############################################################
+#
+# Photo JSON
+#
+############################################################
+
+my $photoData = $story->getPhotoData();
+cmp_deeply(
+    $photoData, {},
+    'getPhotoData: returns an empty hash with no JSON data'
+);
+
+$story->setPhotoData({
+    filename1 => {
+        byLine  => 'Andrew Dufresne',
+        caption => 'Shawshank Prison',
+    },
+});
+
+is($story->get('photo'), q|{"filename1":{"caption":"Shawshank Prison","byLine":"Andrew Dufresne"}}|, 'setPhotoData: set JSON in the photo property');
+
+$photoData = $story->getPhotoData();
+$photoData->{filename1}->{caption}="My cell";
+
+cmp_deeply(
+    $story->getPhotoData,
+    {
+        filename1 => {
+            byLine  => 'Andrew Dufresne',
+            caption => 'Shawshank Prison',
+        },
+    },
+    'getPhotoData does not return an unsafe reference'
+);
+
+$story->setPhotoData();
+cmp_deeply(
+    $story->getPhotoData, {},
+    'setPhotoData: wipes the stored data if nothing is passed'
+);
 
 }
 

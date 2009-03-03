@@ -20,6 +20,8 @@ use base 'WebGUI::Asset';
 use Tie::IxHash;
 use WebGUI::Utility;
 use WebGUI::International;
+use JSON qw/from_json to_json/;
+use Storable qw/dclone/;
 
 =head1 NAME
 
@@ -56,8 +58,7 @@ sub addChild {
 
 =head2 addRevision
 
-Make sure that Stories are always hidden from navigation.  Copy storage locations so that
-purging individual revisions works correctly.
+Copy storage locations so that purging individual revisions works correctly.
 
 =cut
 
@@ -141,7 +142,7 @@ sub definition {
         },
         photo => {
             fieldType    => 'text',
-            defaultValue => '',
+            defaultValue => '{}',
         },
         storageId => {
             fieldType    => 'hidden',
@@ -179,17 +180,39 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
-=head2 getStorageLocation
+=head2 getPhotoData (  )
+
+Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
+
+=cut
+
+sub getPhotoData {
+	my $self     = shift;
+	if (!exists $self->{_photoData}) {
+        $self->{_photoData} = from_json($self->get('photo'));
+	}
+	return dclone($self->{_photoData});
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStorageLocation ( [$noCreate] )
 
 Returns the storage location for this Story.  If it does not exist,
 then it creates it via setStorageLocation.  Subsequent lookups return
 an internally cached Storage object to save time.
 
+=head3 $noCreate
+
+If $noCreate is true, then no storage location will be created, even
+if it does not exist.
+
 =cut
 
 sub getStorageLocation {
-	my $self = shift;
-	unless (exists $self->{_storageLocation}) {
+	my $self     = shift;
+    my $noCreate = shift;
+	if (!exists $self->{_storageLocation} && !$noCreate) {
 		$self->setStorageLocation;
 	}
 	return $self->{_storageLocation};
@@ -262,6 +285,56 @@ sub purgeRevision {
 
 #-------------------------------------------------------------------
 
+=head2 setPhotoData ( $perlStructure )
+
+Returns the storage location for this Story.  If it does not exist,
+then it creates it via setStorageLocation.  Subsequent lookups return
+an internally cached Storage object to save time.
+
+=head3 $perlStructure
+
+This should be a hash of hashes.  The keys will be names of photos in the
+storage location for this Story.  The values in the subhash will be
+metadata about the Photo.
+
+=item *
+
+caption
+
+=item *
+
+byLine
+
+=item *
+
+alt
+
+=item *
+
+title
+
+=item *
+
+url
+
+=back
+
+subhash keys can be empty, or missing altogether.  Shoot, you can really put anything you
+want in there so there's no valid content checking.
+
+=cut
+
+sub setPhotoData {
+	my $self      = shift;
+    my $photoData = shift || {};
+    my $photo     = to_json($photoData);
+    $self->update({photo => $photo});
+    delete $self->{_photoData};
+    return;
+}
+
+#-------------------------------------------------------------------
+
 =head2 setSize ( fileSize )
 
 Set the size of this asset by including all the files in its storage
@@ -273,7 +346,7 @@ the asset size.
 sub setSize {
     my $self        = shift;
     my $fileSize    = shift || 0;
-    my $storage     = $self->getStorageLocation;
+    my $storage     = $self->getStorageLocation('noCreate');
     if (defined $storage) {	
         foreach my $file (@{$storage->getFiles}) {
             $fileSize += $storage->getFileSize($file);
@@ -305,6 +378,20 @@ sub setStorageLocation {
     else {
         $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
     }
+}
+
+#-------------------------------------------------------------------
+
+=head2 update
+
+Extend the superclass to make sure that the asset always stays hidden from navigation.
+
+=cut
+
+sub update {
+    my $self   = shift;
+    my $properties = shift;
+    return $self->SUPER::update({%$properties, isHidden => 1});
 }
 
 #-------------------------------------------------------------------
