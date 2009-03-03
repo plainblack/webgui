@@ -34,8 +34,11 @@ sub addChild {
     my $self = shift;
     my ($properties) = @_;
     ##Allow subclassing
-    return undef unless $properties->{className} =~ /^WebGUI::Asset::Story::/;
-    return $self->SUPER::addChild(@_);
+    return undef unless $properties->{className} =~ /^WebGUI::Asset::Story/;
+    my $todayFolder = $self->getFolder;
+    return undef unless $todayFolder;
+    my $story = $todayFolder->addChild(@_);
+    return $story;
 }
 
 #-------------------------------------------------------------------

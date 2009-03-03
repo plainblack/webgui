@@ -58,7 +58,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 13
+plan tests => 19
             + $tests
             + $canPostMaker->plan
             ;
@@ -129,6 +129,8 @@ undef $sameFolder;
 $sameFolder = $archive->getFolder($endOfDay);
 is($sameFolder->getId, $todayFolder->getId, 'call within same day(end) returns the same folder');
 undef $sameFolder;
+$todayFolder->purge;
+is($archive->getChildCount, 0, 'leaving with an empty archive');
 
 ################################################################
 #
@@ -138,6 +140,14 @@ undef $sameFolder;
 
 my $child = $archive->addChild({className => 'WebGUI::Asset::Wobject::StoryTopic'});
 is($child, undef, 'addChild: Will only add Stories');
+
+$child = $archive->addChild({className => 'WebGUI::Asset::Story', title => 'First Story'});
+isa_ok($child, 'WebGUI::Asset::Story', 'addChild added and returned a Story');
+is($archive->getChildCount, 1, 'addChild: added it to the archive');
+my $folder = $archive->getFirstChild();
+isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', 'Folder was added to Archive');
+is($folder->getChildCount, 1, 'The folder has 1 child...');
+is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct child');
 
 }
 
