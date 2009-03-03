@@ -678,6 +678,32 @@ sub generateThumbnail {
 
 #-------------------------------------------------------------------
 
+=head2 getSize ( filename ) 
+
+Returns width and height of image.
+
+=head3 filename
+
+The file to generate a thumbnail for.
+
+=cut
+
+sub getSize {
+	my $self = shift;
+	my $filename = shift;
+        my $image = Image::Magick->new;
+        my $error = $image->Read($self->getPath($filename));
+	if ($error) {
+		$self->session->errorHandler->error("Couldn't read image for size reading: ".$error);
+		return 0;
+	}
+        my ($x, $y) = $image->Get('width','height');
+
+	return($x, $y);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getErrorCount ( )
 
 Returns the number of errors that have been generated on this object instance.
@@ -1120,6 +1146,61 @@ sub crop {
         $self->session->errorHandler->error("Couldn't resize image: ".$error);
         return 0;
     }
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 annotate ( filename [ text ] )
+
+Adds annotation text to the image.
+
+=head3 filename
+
+The name of the file to annotate.
+
+=head3 text
+
+Text to add.
+
+=cut
+
+sub annotate { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $form        = shift;
+    warn("there");
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        return 0;
+    }
+    warn("there");
+    # form->process("degree")
+	my $annotate_text = $form->process("annotate_text");
+	my $annotate_top = $form->process("annotate_top");
+	my $annotate_left = $form->process("annotate_left");
+	my $annotate_width = $form->process("annotate_width");
+	my $annotate_height = $form->process("annotate_height");
+    warn("there");
+    unless ($annotate_text) {
+        $self->session->errorHandler->error("Can't annotate with no text.");
+        return 0;
+    }
+    warn("there");
+
+	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
+    if ($imageAsset->{annotations} =~ /\n/) {
+        $imageAsset->{annotations} .= "\n";
+    }
+    warn("there");
+    $imageAsset->{annotations} .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
+    $self->{_data}{annotations} = $self->{_data};
+	$self->session->db->setRow("ImageAsset","assetId",$self->{_data});
 
     return 1;
 }

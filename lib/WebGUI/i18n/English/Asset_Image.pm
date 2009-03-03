@@ -77,6 +77,18 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
+	'annotate image' => {
+		message => q|Annotate Image|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'annotate image description' => {
+		message => q|Text Around the Image|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
 	'rotate image' => {
 		message => q|Rotate Image|,
 		context => q|label to rotate the image|,
@@ -122,6 +134,12 @@ shown here.|,
 	'undo image' => {
 		message => q|Undo Image|,
 		context => q|undo editing operations|,
+		lastUpdated => 1106765841
+	},
+
+	'delete' => {
+		message => q|Delete|,
+		context => q|label to delete annotation|,
 		lastUpdated => 1106765841
 	},
 

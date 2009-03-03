@@ -270,6 +270,7 @@ sub www_edit {
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=resize'),$i18n->get("resize image")) if ($self->get("filename"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=rotate'),$i18n->get("rotate image")) if ($self->get("filename"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=crop'),$i18n->get("crop image")) if ($self->get("filename"));
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=annotate'),$i18n->get("annotate image")) if ($self->get("filename"));
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=undo'),$i18n->get("undo image")) if ($self->get("filename"));
 	my $tabform = $self->getEditForm;
 	$tabform->getTab("display")->template(
@@ -284,13 +285,268 @@ sub www_edit {
 #-------------------------------------------------------------------
 sub www_undo {
     my $self = shift;
-    my $previous = (@{$self->getRevisions()})[-2];
+    my $previous = (@{$self->getRevisions()})[1];
+    # instantiate assetId 
     if ($previous) {
+	    warn("here");
+	    # my $session = $self->session;
+	    warn("here");
+
+	    # my $cache = WebGUI::Cache->new($self->session, ["asset",$self->getId,$self->getRevisionDate]);
+	    warn("here");
+	    # $cache->flush;
+	    warn("here");
+	    # my $cache = WebGUI::Cache->new($previous->session, ["asset",$previous->getId,$previous->getRevisionDate]);
+	    warn("here");
+	    # $cache->flush;
+	    warn("here");
+
+	    warn("$previous");
+  	    warn(ref $previous);
+	    warn($previous->getId);
 	    $self = $self->purgeRevision();
+	    # $self = undef;
+	    warn("here");
+	    # $self = WebGUI::Asset->new($previous->session, $previous->getId, ref $previous, $previous->getRevisionDate);
 	    $self = $previous;
+	    warn("$self");
+  	    warn(ref $self);
+	    warn($self->getId);
+	    warn($self->session->cache);
 	    $self->generateThumbnail;
     }
     return $self->www_edit();
+}
+
+#-------------------------------------------------------------------
+sub www_annotate {
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canEdit;
+    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+	if ($self->session->form->process("annotate_text")) {
+		my $newSelf = $self->addRevision();
+		delete $newSelf->{_storageLocation};
+        warn("here");
+		$newSelf->getStorageLocation->annotate($newSelf->get("filename"),$newSelf->session->form);
+        warn("here");
+		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
+        warn("here");
+		$self = $newSelf;
+        warn("here");
+		$self->generateThumbnail;
+        warn("here");
+	}
+
+    my ($style, $url) = $self->session->quick(qw(style url));
+	# http://www.kryogenix.org/code/browser/annimg/annimg.html (creative commons)
+	$style->setLink($url->extras('annotate/imageMap.css'), {rel=>'stylesheet', type=>'text/css'});
+
+	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
+
+	warn($imageAsset->{annotations});
+	my @pieces = split(/\n/, $imageAsset->{annotations});
+	# my ($top_left, $width_height, $note) = split(/\n/, $imageAsset->{annotations});
+	
+	my $imageLoc = $self->getStorageLocation->getUrl($self->get("filename"));
+	my $image = '<div align="center" class="yui-skin-sam"><img src="$imageLoc" style="border-style:none;" alt="'.$self->get("filename").'" class="image" id="yui-img" /></div>';
+
+	my ($width, $height) = $self->getStorageLocation->getSize($self->get("filename"));
+
+	my $hotspots = "";
+	my $notes = "";
+	my @checkboxes = ();
+	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
+	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
+
+	my $mouseCoord_js = qq(
+		<script type = "text/javascript"> 
+		   function updateMouseCoordinates(e)  
+		   { 
+            var posx = 0;
+            var posy = 0;
+            if (!e) var e = window.event;
+
+            element1 = document.getElementById('annotate_top_formId');
+            element2 = document.getElementById('annotate_left_formId');
+		    if (0 == element1.value && 0 == element2.value) {
+			element1.value = e.layerX || 1;
+			element2.value = e.layerY || 1;
+			return;
+		    }
+            element1 = document.getElementById('annotate_width_formId');
+            element2 = document.getElementById('annotate_height_formId');
+		    if (0 == element1.value && 0 == element2.value) {
+			element1.value = e.layerX || 1;
+			element2.value = e.layerY || 1;
+			return;
+		    }
+
+	if (e.pageX || e.pageY) 	{
+		posx = e.pageX;
+		posy = e.pageY;
+	}
+	else if (e.clientX || e.clientY) 	{
+		posx = e.clientX + document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+		posy = e.clientY + document.body.scrollTop
+			+ document.documentElement.scrollTop;
+	}
+	// posx and posy contain the mouse position relative to the document
+	// Do something with this information
+		   // alert(e.clientX - document.body.scrollLeft);
+		   // alert(posx);
+		   // alert(posy);
+		   // alert(e.offsetX);
+		   // alert(e.offsetY);
+	// alert(e.clientX);
+		   } 
+		</script>
+	);
+
+	my $crop_js = qq(
+		<script>
+		(function() {
+            var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, results = null; 
+
+        Event.onDOMReady(function() { 
+                var crop = new YAHOO.widget.ImageCropper('yui_img', { 
+                    initialXY: [20, 20], 
+                    keyTick: 5, 
+                    shiftKeyTick: 50 
+                }); 
+                crop.on('moveEvent', function() { 
+                    var region = crop.getCropCoords(); 
+                    element = document.getElementById('Width_formId');
+                    element.value = region.width;
+                    element = document.getElementById('Height_formId');
+                    element.value = region.height;
+                    element = document.getElementById('Top_formId');
+                    element.value = region.top;
+                    element = document.getElementById('Left_formId');
+                    element.value = region.left;
+                }); 
+            }); 
+        })(); 
+		</script>
+	);
+
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+		my $top_left = $pieces[$i];
+		my $width_height = $pieces[$i + 1];
+		my $note = $pieces[$i + 2];
+
+		$hotspots .= qq(
+			dd#Def_${i} { $top_left }
+			dd#Def_$i a{ position: absolute; $width_height; text-decoration: none; border: 1px solid #FFFCE6; background: transparent url(/www/extras/annotate/note.png) repeat; }
+			dd#Def_$i a span{ display: none; }
+			dd#Def_$i a:hover{ background: transparent url(/www/extras/annotate/hover.png) repeat; border: 1px solid #BCBCBC; }
+			dd#Def_$i a:hover span{
+				display: block;
+				text-indent: 0;
+				vertical-align: top;
+				color: #000;
+				background-color: #F4F4F4;
+				font-weight: bold;
+				position: absolute;
+				border: 1px solid #BCBCBC;
+				bottom: 100%;
+				margin: 0;
+				padding: 5px;
+				width: 75%;
+			}
+		);
+
+		$notes .= qq(
+			<dd id="Def_$i"><a href="#"><span>$note</span></a></dd>
+		);
+
+		push(@checkboxes, $f->checkbox(
+				-label=>$i18n->get('delete') . " '$note'",
+				-checked=>0,
+				-name=>"delAnnotate$i",
+				-value=>"1"
+			)
+		);
+		$f->hidden(
+			-name=>"annotates",
+			-value=>"$i"
+			);
+	}
+
+	my $imageMap = qq(
+		<div align="center" class="yui-skin-sam">
+		<dl id="imageMap" onmousedown="updateMouseCoordinates(event)">  
+		  <!-- <dt class="title">Shoes</dt> -->
+		  <!-- <dt id="shoe">My heel</dt> -->
+		  $notes
+		</dl>   
+		</div>
+	);
+
+	my $imageCss = qq(
+		<style type="text/css">
+		/* http://www.frankmanno.com/ideas/css-imagemap-redux/ Creative Commons */
+		/* ---------- hidden ONLY if CSS is enabled.  If disabled, image is rendered ---------- */
+		img.image{ display: none; }
+		/* 124 x 110 */
+		dl#imageMap{
+			id: yui-img;
+			class: "yui-skin-sam"
+			margin: 0;
+			padding: 0;
+			background: transparent url($imageLoc) top left no-repeat;
+			height: ${height}px;
+			width: ${width}px;
+			position: relative;
+		}
+
+		dt{ margin: 0; padding: 0; position: absolute; font-size: 85%; display: none; }
+		dd{ margin: 0; padding: 0; position: absolute;  font-size: 85%; }
+
+		dl#imageMap dt.title{
+			color: White;
+			display: block;
+			font-size: 115%;
+			padding: 5px 0 0 5px;
+		}
+
+		/* ---------- Hotspot Declarations ---------- */
+		$hotspots
+		</style>
+	);
+	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
+	$f->hidden(
+		-name=>"func",
+		-value=>"annotate"
+		);
+       	$f->text(
+		-label=>$i18n->get('annotate image'),
+		-value=>'',
+		-hoverHelp=>$i18n->get('annotate image description'),
+		-name=>'annotate_text'
+		);
+	$f->integer(
+		-label=>$i18n->get('top'),
+		-name=>"annotate_top",
+		-value=>,
+		);
+	$f->integer(
+		-label=>$i18n->get('left'),
+		-name=>"annotate_left",
+		-value=>,
+		);
+	$f->integer(
+		-label=>$i18n->get('width'),
+		-name=>"annotate_width",
+		-value=>,
+		);
+	$f->integer(
+		-label=>$i18n->get('height'),
+		-name=>"annotate_height",
+		-value=>,
+		);
+	$f->submit;
+        return $self->getAdminConsole->render($f->print."$mouseCoord_js\n$crop_js\n$imageCss\n$image\n$imageMap",$i18n->get("annotate image"));
 }
 
 #-------------------------------------------------------------------
@@ -298,7 +554,6 @@ sub www_rotate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	warn ($self->session->form->process("degree"));
 	if (defined $self->session->form->process("degree")) {
 		my $newSelf = $self->addRevision();
 		delete $newSelf->{_storageLocation};
@@ -428,6 +683,7 @@ sub www_resize {
 				    ghost: true, 
 				    status: true, 
 				    draggable: false, 
+				    ratio: true,
 				    animate: true, 
 				    animateDuration: .75, 
 				    animateEasing: YAHOO.util.Easing.backBoth 
