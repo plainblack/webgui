@@ -58,7 +58,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 19
+plan tests => 21
             + $tests
             + $canPostMaker->plan
             ;
@@ -148,6 +148,107 @@ my $folder = $archive->getFirstChild();
 isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', 'Folder was added to Archive');
 is($folder->getChildCount, 1, 'The folder has 1 child...');
 is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct child');
+
+################################################################
+#
+#  viewTemplateVariables
+#
+################################################################
+
+my $oldFolder = $archive->getFolder(997966800);
+my $tomorrow = time()+24*3600;
+my $newFolder = $archive->getFolder($tomorrow);
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released'});
+$session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
+$story = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
+$session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$story->getId]);
+
+my $templateVars;
+$templateVars = {};
+$archive->viewTemplateVariables($templateVars);
+KEY: foreach my $key (keys %{ $templateVars }) {
+    next KEY unless $key =~ /pagination\./;
+    delete $templateVars->{$key};
+}
+
+cmp_deeply(
+    $templateVars,
+    {
+        date_loop => [
+            {
+                epochDate => 997966800,
+                storyLoop => [ {
+                    creationDate => 997966800,
+                    url          => '/home/untitled/august_16_2001/webgui-is-released',
+                    title        => 'WebGUI is released',
+                }, ],
+            },
+            {
+                epochDate => ignore(),
+                storyLoop => [ {
+                    creationDate => ignore(),
+                    url          => re('first-story'),
+                    title        => 'First Story',
+                }, ],
+            },
+            {
+                epochDate => $tomorrow,
+                storyLoop => [{
+                    creationDate => $tomorrow,
+                    url          => re('theres-always-tomorrow'),
+                    title        => "There's always tomorrow",
+                }, ],
+            },
+        ]
+    },
+    'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
+);
+
+$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2'});
+$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3'});
+$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4'});
+$archive->update({storiesPerPage => 3});
+
+
+$templateVars = {};
+$archive->viewTemplateVariables($templateVars);
+KEY: foreach my $key (keys %{ $templateVars }) {
+    next KEY unless $key =~ /pagination\./;
+    delete $templateVars->{$key};
+}
+
+cmp_deeply(
+    $templateVars,
+    {
+        date_loop => [
+            {
+                epochDate => 997966800,
+                storyLoop => [ {
+                    creationDate => 997966800,
+                    url          => '/home/untitled/august_16_2001/webgui-is-released',
+                    title        => 'WebGUI is released',
+                }, ],
+            },
+            {
+                epochDate => ignore(),
+                storyLoop => [
+                    {
+                        creationDate => ignore(),
+                        url          => re('first-story'),
+                        title        => 'First Story',
+                    },
+                    {
+                        creationDate => ignore(),
+                        url          => ignore(),
+                        title        => 'Story 2',
+                    },
+                ],
+            },
+        ]
+    },
+    'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
+);
+
 
 }
 
