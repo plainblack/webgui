@@ -117,6 +117,54 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'storyarchive asset template variables title' => {
+        message => q|Story Archive Asset Template Variables.|,
+        context => q|Title of a help page for asset level template variables.|,
+        lastUpdated => 0,
+    },
+
+    'view template' => {
+        message => q|Story Archive, View Template|,
+        context => q|Title of a help page.|,
+        lastUpdated => 0,
+    },
+
+    'date_loop' => {
+        message => q|A loop containing stories in the date they were submitted, with subloops for each day.  The loop is paginated.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'epochDate' => {
+        message => q|The epoch that is the beginning of the day for a day where stories were submitted to the Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'story_loop' => {
+        message => q|A loop containing all stories there were submitted on the day given by epochDate.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'url' => {
+        message => q|The URL to view a story.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'title' => {
+        message => q|The title of a story.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'creationDate' => {
+        message => q|The epoch date when this story was created, or submitted, to the Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
