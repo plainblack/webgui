@@ -4,8 +4,8 @@ use strict;
 our $I18N = {
 
 	'assetName' => {
-		message => q|Survey|,
-		lastUpdated => 1224686319
+		message => q|Survey (beta)|,
+		lastUpdated => 1236187015 
 	},
 	'edit survey' => {
 		message => q|Edit Survey|,

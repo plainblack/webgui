@@ -1104,6 +1104,7 @@ sub www_addAlbumService {
         description     => $form->get('synopsis','textarea'),
         synopsis        => $form->get('synopsis','textarea'),
         othersCanAdd    => $form->get('othersCanAdd','yesNo'),
+        ownerUserId     => $session->user->userId,
     });
     
     $album->requestAutoCommit;

@@ -1019,6 +1019,7 @@ sub www_addFileService {
         title           => $form->get('title','text'),
         description     => $form->get('synopsis','textarea'),
         synopsis        => $form->get('synopsis','textarea'),
+        ownerUserId     => $session->user->userId,
     });
 
     my $storage = $file->getStorageLocation;

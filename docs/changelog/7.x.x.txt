@@ -1,5 +1,9 @@
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages
+ - Fixed a bug with Gallery where using the web service (iphone or iPhoto)
+   would cause images and albums to be uploaded as "admin" rather than the
+   user that actually uploaded them.
+ - Labeled Survey 2.0 as beta, per our quality policy.
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
