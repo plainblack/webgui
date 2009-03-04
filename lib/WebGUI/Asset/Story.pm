@@ -180,6 +180,46 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 getEditForm (  )
+
+Returns a tempalted form for adding or editing Stories.
+
+=cut
+
+sub getEditForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Story');
+    my $form    = $session->form;
+    my $archive = $self->getParent->getParent();
+    my $isNew   = $self->getId eq 'new';
+    my $url     = $isNew ? $archive->getUrl : $self->getUrl;
+    my $title   = $self->getTitle;
+    my $var     = {
+        formHeader    => WebGUI::Form::formHeader($session, {action => $url})
+                       . WebGUI::Form::hidden($session, { name => 'func', value => $url })
+                       . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
+        formFooter    => WebGUI::Form::formFooter($session),
+        formTitle     => $i18n->get('editing','Asset_WikiPage').' '.$title,
+        titleForm     => WebGUI::Form::text($session, { name => 'title',    value => $self->get('title')    } ),
+        subTitleForm  => WebGUI::Form::text($session, { name => 'subtitle', value => $self->get('subtitle') } ),
+        bylineForm    => WebGUI::Form::text($session, { name => 'byline',   value => $self->get('byline')   } ),
+        locationForm  => WebGUI::Form::text($session, { name => 'location', value => $self->get('location') } ),
+        keywordsForm  => WebGUI::Form::text($session, { name => 'keywords', value => WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })} ),
+        summaryForm    => WebGUI::Form::textarea($session, { name => 'summary',    value => $self->get('summary')    } ),
+        highlightsForm => WebGUI::Form::textarea($session, { name => 'highlights', value => $self->get('highlights') } ),
+        storyForm      => WebGUI::Form::HTMLArea($session, { name => 'story',      value => $self->get('story'), richEditId => $archive->get('richEditorId')}),
+    };
+    if ($isNew) {
+        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId',   value => 'new' })
+                           .  WebGUI::Form::hidden($session, { name => 'className', value => $form->process('class', 'className') });
+    }
+    return $self->processTemplate($var, $archive->getValue('editStoryTemplateId'));
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 getPhotoData (  )
 
 Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
@@ -440,12 +480,24 @@ the module.
 =cut
 
 sub www_edit {
-   my $self = shift;
-   my $session = $self->session;
-   return $session->privilege->insufficient() unless $self->canEdit;
-   return $session->privilege->locked() unless $self->canEditIfLocked;
-   my $i18n = WebGUI::International->new($session, 'Asset_NewAsset');
-   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get('edit asset'));
+    my $self = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    return $session->privilege->locked() unless $self->canEditIfLocked;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_showConfirmation ( )
+
+Shows a confirmation message letting the user know their page has been submitted.
+
+=cut
+
+sub www_showConfirmation {
+    my $self = shift;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Story");
+    return $self->getWiki->processStyle('<p>'.$i18n->get("page received").'</p><p><a href="'.$self->getWiki->getUrl.'">'.$i18n->get("493","WebGUI").'</a></p>');
 }
 
 

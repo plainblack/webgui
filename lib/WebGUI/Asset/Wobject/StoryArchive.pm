@@ -128,7 +128,7 @@ sub definition {
             hoverHelp    => $i18n->get('edit story template help'),
             filter       => 'fixId',
             namespace    => 'Story/Edit',
-            defaultValue => '',
+            defaultValue => 'E3tzZjzhmYoNlAyP2VW33Q',
         },
         archiveAfter => {
             tab          => 'display',  
@@ -277,7 +277,7 @@ Add template variables to the existing template variables.
 
 =head3 $var
 
-A
+Template variables will be added onto this hash ref.
 
 =cut
 
