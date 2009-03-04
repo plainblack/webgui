@@ -197,18 +197,43 @@ sub getEditForm {
     my $title   = $self->getTitle;
     my $var     = {
         formHeader    => WebGUI::Form::formHeader($session, {action => $url})
-                       . WebGUI::Form::hidden($session, { name => 'func', value => $url })
+                       . WebGUI::Form::hidden($session, { name => 'func',    value => $url })
                        . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
         formFooter    => WebGUI::Form::formFooter($session),
         formTitle     => $i18n->get('editing','Asset_WikiPage').' '.$title,
-        titleForm     => WebGUI::Form::text($session, { name => 'title',    value => $self->get('title')    } ),
-        subTitleForm  => WebGUI::Form::text($session, { name => 'subtitle', value => $self->get('subtitle') } ),
-        bylineForm    => WebGUI::Form::text($session, { name => 'byline',   value => $self->get('byline')   } ),
-        locationForm  => WebGUI::Form::text($session, { name => 'location', value => $self->get('location') } ),
-        keywordsForm  => WebGUI::Form::text($session, { name => 'keywords', value => WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })} ),
-        summaryForm    => WebGUI::Form::textarea($session, { name => 'summary',    value => $self->get('summary')    } ),
-        highlightsForm => WebGUI::Form::textarea($session, { name => 'highlights', value => $self->get('highlights') } ),
-        storyForm      => WebGUI::Form::HTMLArea($session, { name => 'story',      value => $self->get('story'), richEditId => $archive->get('richEditorId')}),
+        titleForm     => WebGUI::Form::text($session, {
+                            name  => 'title',
+                            value => $form->get('title')    || $self->get('title'),
+                         } ),
+        subTitleForm  => WebGUI::Form::text($session, {
+                            name  => 'subtitle',
+                            value => $form->get('subtitle') || $self->get('subtitle')
+                         } ),
+        bylineForm    => WebGUI::Form::text($session, {
+                            name  => 'byline',
+                            value => $form->get('byline')   || $self->get('byline')
+                         } ),
+        locationForm  => WebGUI::Form::text($session, {
+                            name  => 'location',
+                            value => $form->get('location') || $self->get('location')
+                         } ),
+        keywordsForm  => WebGUI::Form::text($session, {
+                            name  => 'keywords',
+                            value => $form->get('keywords') || WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })
+                         } ),
+        summaryForm    => WebGUI::Form::textarea($session, {
+                            name  => 'summary',
+                            value => $form->get('summary')     || $self->get('summary')
+                          } ),
+        highlightsForm => WebGUI::Form::textarea($session, {
+                            name  => 'highlights',
+                            value => $form->get('highlights')  || $self->get('highlights')
+                          } ),
+        storyForm      => WebGUI::Form::HTMLArea($session, {
+                            name  => 'story',
+                            value => $form->get('story')       || $self->get('story'),
+                            richEditId => $archive->get('richEditorId')
+                          }),
     };
     if ($isNew) {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId',   value => 'new' })
