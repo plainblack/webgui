@@ -88,7 +88,7 @@ sub definition {
             },
             parser => {
                 noFormPost      => 1,
-                fieldType       => 'selectList',
+                fieldType       => 'selectBox',
                 defaultValue    => [$session->config->get("defaultTemplateParser")],
             },	
             namespace => {
