@@ -108,16 +108,14 @@ sub definition {
             fieldType    => 'template',
             label        => $i18n->get('template'),
             hoverHelp    => $i18n->get('template help'),
-            filter       => 'fixId',
             namespace    => 'StoryArchive',
-            defaultValue => '',
+            defaultValue => 'yxD5ka7XHebPLD-LXBwJqw',
         },
         storyTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
             label        => $i18n->get('story template'),
             hoverHelp    => $i18n->get('story template help'),
-            filter       => 'fixId',
             namespace    => 'Story',
             defaultValue => '',
         },
@@ -126,7 +124,6 @@ sub definition {
             fieldType    => 'template',
             label        => $i18n->get('edit story template'),
             hoverHelp    => $i18n->get('edit story template help'),
-            filter       => 'fixId',
             namespace    => 'Story/Edit',
             defaultValue => 'E3tzZjzhmYoNlAyP2VW33Q',
         },
@@ -207,7 +204,8 @@ sub getFolder {
         isHidden  => 1,
     });
     $newVersionTag->commit();
-    $oldVersionTag->setWorking();
+    ##Restore the old one, if it exists
+    $oldVersionTag->setWorking() if $oldVersionTag;
 
     ##Get a new version of the asset from the db with the correct state
     $folder = WebGUI::Asset->newByUrl($session, $folderUrl);
@@ -266,6 +264,8 @@ sub view {
     #This is an example of debugging code to help you diagnose problems.
     #WebGUI::ErrorHandler::warn($self->get("templateId")); 
     
+    use Data::Dumper;
+    $session->log->warn(Dumper $var);
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
@@ -306,16 +306,19 @@ sub viewTemplateVariables {
         if ($storyDate ne $lastStoryDate) {
             push @{ $var->{date_loop} }, {};
             $datePointer = $var->{date_loop}->[-1];
-            $datePointer->{epochDate} = $creationDate;
-            $datePointer->{storyLoop} = [];
+            $datePointer->{epochDate} = $creationDay;
+            $datePointer->{story_loop} = [];
             $lastStoryDate = $storyDate;
         }
-        push @{$datePointer->{storyLoop}}, {
+        push @{$datePointer->{story_loop}}, {
             url           => $story->getUrl,
             title         => $story->getTitle,
             creationDate  => $creationDate
         }
     }
+
+    $var->{addStoryUrl}    = $self->getUrl('func=add;class=WebGUI::Asset::Story');
+    $var->{canPostStories} = $self->canPostStories;
     return 1;
 }
 

@@ -70,12 +70,15 @@ my $class  = 'WebGUI::Asset::Wobject::StoryArchive';
 my $loaded = use_ok($class);
 
 my $storage;
+my $versionTag;
 
 SKIP: {
 
 skip "Unable to load module $class", $tests unless $loaded;
 
-$archive = WebGUI::Asset->getDefault($session)->addChild({className => $class});
+$archive    = WebGUI::Asset->getDefault($session)->addChild({className => $class, title => 'My Stories', url => '/home/mystories'});
+$versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->commit;
 
 isa_ok($archive, 'WebGUI::Asset::Wobject::StoryArchive', 'created StoryArchive');
 
@@ -155,9 +158,15 @@ is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct c
 #
 ################################################################
 
-my $oldFolder = $archive->getFolder(997966800);
-my $tomorrow = time()+24*3600;
+my $wgBday    = 997966800;
+my $oldFolder = $archive->getFolder($wgBday);
+
+my $tomorrow  = time()+24*3600;
 my $newFolder = $archive->getFolder($tomorrow);
+
+my ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
+my ($tomorrowMorn,undef) = $session->datetime->dayStartEnd($tomorrow);
+
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released'});
 $session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
 $story = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
@@ -174,26 +183,28 @@ KEY: foreach my $key (keys %{ $templateVars }) {
 cmp_deeply(
     $templateVars,
     {
-        date_loop => [
+        canPostStories => 0,
+        addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
+        date_loop      => [
             {
-                epochDate => 997966800,
-                storyLoop => [ {
-                    creationDate => 997966800,
-                    url          => '/home/untitled/august_16_2001/webgui-is-released',
+                epochDate => $wgBdayMorn,
+                story_loop => [ {
+                    creationDate => $wgBday,
+                    url          => '/home/mystories/august_16_2001/webgui-is-released',
                     title        => 'WebGUI is released',
                 }, ],
             },
             {
                 epochDate => ignore(),
-                storyLoop => [ {
+                story_loop => [ {
                     creationDate => ignore(),
                     url          => re('first-story'),
                     title        => 'First Story',
                 }, ],
             },
             {
-                epochDate => $tomorrow,
-                storyLoop => [{
+                epochDate => $tomorrowMorn,
+                story_loop => [{
                     creationDate => $tomorrow,
                     url          => re('theres-always-tomorrow'),
                     title        => "There's always tomorrow",
@@ -209,6 +220,7 @@ $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3'});
 $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4'});
 $archive->update({storiesPerPage => 3});
 
+$session->user({userId => 3});
 
 $templateVars = {};
 $archive->viewTemplateVariables($templateVars);
@@ -217,21 +229,24 @@ KEY: foreach my $key (keys %{ $templateVars }) {
     delete $templateVars->{$key};
 }
 
+
 cmp_deeply(
     $templateVars,
     {
-        date_loop => [
+        canPostStories => 1,
+        addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
+        date_loop      => [
             {
-                epochDate => 997966800,
-                storyLoop => [ {
-                    creationDate => 997966800,
-                    url          => '/home/untitled/august_16_2001/webgui-is-released',
+                epochDate => $wgBdayMorn,
+                story_loop => [ {
+                    creationDate => $wgBday,
+                    url          => '/home/mystories/august_16_2001/webgui-is-released',
                     title        => 'WebGUI is released',
                 }, ],
             },
             {
                 epochDate => ignore(),
-                storyLoop => [
+                story_loop => [
                     {
                         creationDate => ignore(),
                         url          => re('first-story'),
@@ -258,7 +273,9 @@ END {
     if (defined $archive and ref $archive eq $class) {
         $archive->purge;
     }
-    WebGUI::VersionTag->getWorking($session)->rollback;
+    if ($versionTag) {
+        $versionTag->rollback;
+    }
     foreach my $user ($editor, $reporter, $reader) {
         $user->delete if defined $user;
     }
