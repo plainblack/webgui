@@ -24,6 +24,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Text;
+use WebGUI::Utility;
 use WebGUI::DateTime;
 use DateTime;
 
@@ -173,10 +174,9 @@ $story = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "T
 $session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$story->getId]);
 
 my $templateVars;
-$templateVars = {};
-$archive->viewTemplateVariables($templateVars);
+$templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY unless $key =~ /pagination\./;
+    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
     delete $templateVars->{$key};
 }
 
@@ -220,15 +220,15 @@ $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3'});
 $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4'});
 $archive->update({storiesPerPage => 3});
 
+##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});
+($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
 
-$templateVars = {};
-$archive->viewTemplateVariables($templateVars);
+$templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY unless $key =~ /pagination\./;
+    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
     delete $templateVars->{$key};
 }
-
 
 cmp_deeply(
     $templateVars,

@@ -258,31 +258,21 @@ sub view {
     my $session = $self->session;    
 
     #This automatically creates template variables for all of your wobject's properties.
-    my $var = $self->get;
-    $self->viewTemplateVariables($var);
-    
-    #This is an example of debugging code to help you diagnose problems.
-    #WebGUI::ErrorHandler::warn($self->get("templateId")); 
-    
-    #use Data::Dumper;
-    #$session->log->warn(Dumper $var);
+    my $var = $self->viewTemplateVariables();
+
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( $var )
+=head2 viewTemplateVars ( )
 
-Add template variables to the existing template variables.
-
-=head3 $var
-
-Template variables will be added onto this hash ref.
+Make template variables for the view template.
 
 =cut
 
 sub viewTemplateVariables {
-    my ($self, $var)  = @_;
+    my ($self)  = @_;
     my $session = $self->session;    
     ##Only return assetIds,  we'll build data for the things that are actually displayed.
     my $storySql = $self->getLineageSql(['descendants'],{
@@ -292,8 +282,9 @@ sub viewTemplateVariables {
     my $p = WebGUI::Paginator->new($session, $self->getUrl, $self->get('storiesPerPage'));
     $p->setDataByQuery($storySql);
     my $storyIds = $p->getPageData();
-    $var->{date_loop} = [];
+    my $var = $self->get;
     $p->appendTemplateVars($var);
+    $var->{date_loop} = [];
     my $lastStoryDate = '';
     my $datePointer = undef;
     ##Only build objects for the assets that we need
@@ -319,7 +310,7 @@ sub viewTemplateVariables {
 
     $var->{addStoryUrl}    = $self->getUrl('func=add;class=WebGUI::Asset::Story');
     $var->{canPostStories} = $self->canPostStories;
-    return 1;
+    return $var;
 }
 
 #-------------------------------------------------------------------
