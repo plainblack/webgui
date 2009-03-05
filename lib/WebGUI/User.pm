@@ -120,6 +120,7 @@ sub acceptsPrivateMessages {
     my $userId    = shift;
 
     return 0 if ($self->isVisitor);  #Visitor can't get private messages
+    return 0 if ($userId eq "1");    # Visitor can't send private messages
     return 0 if ($self->userId eq $userId);  #Can't send private messages to yourself
 
     my $pmSetting = $self->profileField('allowPrivateMessages');

@@ -1883,7 +1883,7 @@ cmp_deeply(
                 verbatim => $index == 4 ? 1 : 0,
                 recordedAnswer => $index++,
             })
-        } 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)',
+        } 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)',
     ],
     'updateQuestionAnswers: Party type'
 );

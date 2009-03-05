@@ -71,8 +71,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	}
 
 	this.myDataSource.doBeforeParseData = function (oRequest, oFullResponse) {
-		myDataTable.getRecordSet().reset();
-		myDataTable.refreshView();
+		this.responseSchema.fields = oFullResponse.ResponseFields;
 		var existingColumns = myDataTable.getColumnSet().keys;
 		for (var i = 0; i < existingColumns.length; i++) {
 		if(i > 1){
@@ -114,6 +113,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				uri = uri+';listingId='+compareCheckBoxes[i].value;
 			}
 		}
+		myDataTable.getRecordSet().reset();
+		myDataTable.refreshView();
+		myDataTable.showTableMessage('Loading...');
             	this.myDataSource.sendRequest(uri,callback2); 
         },this,true);
 
@@ -126,6 +128,9 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				uri = uri+';listingId='+compareCheckBoxes[i].value;
 			}
 		}
+		myDataTable.getRecordSet().reset();
+		myDataTable.refreshView();
+		myDataTable.showTableMessage('Loading...');
             	this.myDataSource.sendRequest(uri,callback2); 
         },this,true);
 
