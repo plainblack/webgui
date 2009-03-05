@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 
 my $tests = 1;
-plan tests => 12
+plan tests => 13
             + $tests
             ;
 
@@ -33,7 +33,7 @@ my $loaded = use_ok($class);
 my $story;
 
 my $defaultNode = WebGUI::Asset->getDefault($session);
-my $archive     = WebGUI::Asset->newByPropertyHashRef($session, {
+my $archive     = $defaultNode->addChild({
     className => 'WebGUI::Asset::Wobject::StoryArchive',
     title     => 'Test Archive',
                  #1234567890123456789012
@@ -62,7 +62,7 @@ ok(  WebGUI::Asset::Story->validParent($session), 'validParent: StoryArchive is 
 #
 ############################################################
 
-$story = $defaultNode->addChild({
+$story = $archive->addChild({
     className => 'WebGUI::Asset::Story',
     title     => 'Story 1',
 });
@@ -73,6 +73,14 @@ is($story->get('photo'),   '{}', 'by default, photos is an empty JSON hash');
 is($story->get('isHidden'), 1, 'by default, photos are hidden');
 $story->update({isHidden => 0});
 is($story->get('isHidden'), 1, 'photos cannot be set to not be hidden');
+
+############################################################
+#
+# getArchive
+#
+############################################################
+
+is($story->getArchive->getId, $archive->getId, 'getArchive gets the parent archive for the Story');
 
 ############################################################
 #
@@ -118,7 +126,7 @@ cmp_deeply(
 }
 
 END {
-    WebGUI::VersionTag->getWorking($session)->rollback;
     $story->purge   if $story;
     $archive->purge if $archive;
+    WebGUI::VersionTag->getWorking($session)->rollback;
 }

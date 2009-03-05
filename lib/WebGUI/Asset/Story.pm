@@ -180,9 +180,25 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 getArchive (  )
+
+Returns the parent archive for this Story.  Cache the entry for speed.
+
+=cut
+
+sub getArchive {
+    my $self = shift;
+    if (!$self->{_archive}) {
+        $self->{_archive} = $self->getParent->getParent;
+    }
+    return $self->{_archive};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm (  )
 
-Returns a tempalted form for adding or editing Stories.
+Returns a templated form for adding or editing Stories.
 
 =cut
 
@@ -191,7 +207,7 @@ sub getEditForm {
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session, 'Asset_Story');
     my $form    = $session->form;
-    my $archive = $self->getParent->getParent();
+    my $archive = $self->getArchive;
     my $isNew   = $self->getId eq 'new';
     my $url     = $isNew ? $archive->getUrl : $self->getUrl;
     my $title   = $self->getTitle;
@@ -239,7 +255,9 @@ sub getEditForm {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId',   value => 'new' })
                            .  WebGUI::Form::hidden($session, { name => 'className', value => $form->process('class', 'className') });
     }
-    return $self->processTemplate($var, $archive->getValue('editStoryTemplateId'));
+    $self->session->log->warn($archive->get('className'));
+    $self->session->log->warn($archive->get('editStoryTemplateId'));
+    return $self->processTemplate($var, $archive->get('editStoryTemplateId'));
 
 }
 
@@ -509,6 +527,7 @@ sub www_edit {
     my $session = $self->session;
     return $session->privilege->insufficient() unless $self->canEdit;
     return $session->privilege->locked() unless $self->canEditIfLocked;
+    return $self->getArchive->processStyle($self->getEditForm);
 }
 
 #-------------------------------------------------------------------
