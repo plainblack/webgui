@@ -18,9 +18,10 @@ use WebGUI::Storage;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
+use Data::Dumper;
 
 my $tests = 1;
-plan tests => 13
+plan tests => 16
             + $tests
             ;
 
@@ -121,6 +122,39 @@ $story->setPhotoData();
 cmp_deeply(
     $story->getPhotoData, {},
     'setPhotoData: wipes the stored data if nothing is passed'
+);
+
+############################################################
+#
+# viewTemplateVariables
+#
+############################################################
+
+$story->update({
+    highlights => "one\ntwo\nthree",
+    keywords   => "foxtrot tango whiskey",
+});
+is($story->get('highlights'), "one\ntwo\nthree", 'highlights set correctly for template var check');
+my $viewVariables = $story->viewTemplateVariables;
+#diag Dumper $viewVariables;
+cmp_deeply(
+    $viewVariables->{highlights_loop},
+    [
+        { highlight => "one", },
+        { highlight => "two", },
+        { highlight => "three", },
+    ],
+    'viewTemplateVariables: highlights_loop is okay'
+);
+
+cmp_bag(
+    $viewVariables->{keyword_loop},
+    [
+        { keyword => "foxtrot", url => '/home/test-archive?func=search;submit=1;keywords=foxtrot', },
+        { keyword => "tango",   url => '/home/test-archive?func=search;submit=1;keywords=tango', },
+        { keyword => "whiskey", url => '/home/test-archive?func=search;submit=1;keywords=whiskey', },
+    ],
+    'viewTemplateVariables: keywords_loop is okay'
 );
 
 }

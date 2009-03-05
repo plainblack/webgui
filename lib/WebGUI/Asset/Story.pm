@@ -110,7 +110,7 @@ sub definition {
             defaultValue => '',
         },
         subtitle => {
-            fieldType    => 'text',  
+            fieldType    => 'textarea',  
             #label        => $i18n->get('subtitle'),
             #hoverHelp    => $i18n->get('subtitle help'),
             defaultValue => '',
@@ -223,7 +223,7 @@ sub getEditForm {
                              name  => 'title',
                              value => $form->get('title')    || $self->get('title'),
                           } ),
-        subTitleForm   => WebGUI::Form::text($session, {
+        subTitleForm   => WebGUI::Form::textarea($session, {
                              name  => 'subtitle',
                              value => $form->get('subtitle') || $self->get('subtitle')
                           } ),
@@ -546,12 +546,24 @@ Template variables will be added onto this hash ref.
 sub viewTemplateVariables {
     my ($self)  = @_;
     my $session = $self->session;    
-    my $var = $self->get;
+    my $archive = $self->getArchive;
+    my $var     = $self->get;
+
     if ($var->{highlights}) {
-        my @highlights = split "\n", $var->{highlights};
+        my @highlights = split "\n+", $var->{highlights};
         foreach my $highlight (@highlights) {
-            push @{ $var->{highlightsLoop} }, { highlight => $highlight };
+            push @{ $var->{highlights_loop} }, { highlight => $highlight };
         }
+    }
+
+    my $key = WebGUI::Keyword->new($session);
+    my $keywords = $key->getKeywordsForAsset( { asArrayRef => 1, asset => $self  });
+    $var->{keyword_loop} = [];
+    foreach my $keyword (@{ $keywords }) {
+        push @{ $var->{keyword_loop} }, {
+            keyword => $keyword,
+            url     => $archive->getUrl("func=search;submit=1;keywords=".$session->url->escape($keyword)),
+        };
     }
     ##TODO: publish time, calculated from revisionDate
     return $var;
