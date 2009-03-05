@@ -333,11 +333,18 @@ www_add, find the right folder to use, then allow that folder to continue on.
 
 
 sub www_add {
-    my $self = shift;
-    my $form = $self->session->form;
-    return undef unless $form->get('class') eq 'WebGUI::Asset::Story';
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    if ($form->get('class') ne 'WebGUI::Asset::Story') {
+        $session->log->warn('Refusing to add '. $form->get('class'). ' to StoryArchive');
+        return undef;
+    }
     my $todayFolder = $self->getFolder;
-    return undef unless $todayFolder;
+    if (!$todayFolder) {
+        $session->log->warn('Unable to get folder for today.  Not adding Story');
+        return undef;
+    }
     $todayFolder->www_add;
 }
 

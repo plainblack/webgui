@@ -81,6 +81,29 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'save story' => {
+        message => q|Save Story|,
+        context => q|Button label in the Edit Story form.|,
+        lastUpdated => 0
+    },
+
+    'save and preview' => {
+        message => q|Save and Preview|,
+        context => q|Button label in the Edit Story form.|,
+        lastUpdated => 0
+    },
+
+    'save and add another photo' => {
+        message => q|Save and Add Another Photo|,
+        context => q|Button label in the Edit Story form.|,
+        lastUpdated => 0
+    },
+
+    'story received' => {
+        message => q|Your story has been received and is being processed so it can be added to the site. It will be available for further editing after being processed. Please be patient.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

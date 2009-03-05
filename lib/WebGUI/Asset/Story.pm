@@ -213,7 +213,7 @@ sub getEditForm {
     my $title   = $self->getTitle;
     my $var     = {
         formHeader    => WebGUI::Form::formHeader($session, {action => $url})
-                       . WebGUI::Form::hidden($session, { name => 'func',    value => $url })
+                       . WebGUI::Form::hidden($session, { name => 'func',    value => 'editSave' })
                        . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
         formFooter    => WebGUI::Form::formFooter($session),
         formTitle     => $i18n->get('editing','Asset_WikiPage').' '.$title,
@@ -250,13 +250,23 @@ sub getEditForm {
                             value => $form->get('story')       || $self->get('story'),
                             richEditId => $archive->get('richEditorId')
                           }),
+        saveButton     => WebGUI::Form::submit($session, {
+                            name  => 'saveStory',
+                            value => $i18n->get('save story'),
+                          }),
+        previewButton  => WebGUI::Form::submit($session, {
+                            name  => 'saveAndPreview',
+                            value => $i18n->get('save and preview'),
+                          }),
+        saveAndAddButton  => WebGUI::Form::submit($session, {
+                            name  => 'saveAndAddPhoto',
+                            value => $i18n->get('save and add another photo'),
+                          }),
     };
     if ($isNew) {
-        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId',   value => 'new' })
-                           .  WebGUI::Form::hidden($session, { name => 'className', value => $form->process('class', 'className') });
+        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId', value => 'new' })
+                           .  WebGUI::Form::hidden($session, { name => 'class',   value => $form->process('class', 'className') });
     }
-    $self->session->log->warn($archive->get('className'));
-    $self->session->log->warn($archive->get('editStoryTemplateId'));
     return $self->processTemplate($var, $archive->get('editStoryTemplateId'));
 
 }
@@ -540,8 +550,8 @@ Shows a confirmation message letting the user know their page has been submitted
 
 sub www_showConfirmation {
     my $self = shift;
-    my $i18n = WebGUI::International->new($self->session, "Asset_Story");
-    return $self->getWiki->processStyle('<p>'.$i18n->get("page received").'</p><p><a href="'.$self->getWiki->getUrl.'">'.$i18n->get("493","WebGUI").'</a></p>');
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Story');
+    return $self->getArchive->processStyle('<p>'.$i18n->get('story received').'</p><p><a href="'.$self->getArchive->getUrl.'">'.$i18n->get('493','WebGUI').'</a></p>');
 }
 
 
