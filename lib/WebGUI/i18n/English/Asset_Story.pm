@@ -104,6 +104,86 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'edit template' => {
+        message => q|Edit Story Template.|,
+        lastUpdated => 0,
+    },
+
+    'formHeader' => {
+        message => q|HTML code to begin the form for adding or editing a Story.|,
+        lastUpdated => 0,
+    },
+
+    'formTitle' => {
+        message => q|Internationalized title for this form.|,
+        lastUpdated => 0,
+    },
+
+    'titleForm' => {
+        message => q|Form for the user to enter a title for this story.|,
+        lastUpdated => 0,
+    },
+
+    'subtitleForm' => {
+        message => q|Form for the user to enter a subtitle for this story.|,
+        lastUpdated => 0,
+    },
+
+    'bylineForm' => {
+        message => q|Form for the user to enter a byline for this story.|,
+        lastUpdated => 0,
+    },
+
+    'locationForm' => {
+        message => q|Form for the user to enter a location for this story.|,
+        lastUpdated => 0,
+    },
+
+    'keywordsForm' => {
+        message => q|Form for the user to enter keywords for this story.|,
+        lastUpdated => 0,
+    },
+
+    'summaryForm' => {
+        message => q|Form for the user to enter a summary of this story.|,
+        lastUpdated => 0,
+    },
+
+    'highlightsForm' => {
+        message => q|Form for the user to enter highlights for this story.|,
+        lastUpdated => 0,
+    },
+
+    'storyForm' => {
+        message => q|Form for the user to enter the actual story.|,
+        lastUpdated => 0,
+    },
+
+    'saveButton' => {
+        message => q|Button for the user to save the form.|,
+        lastUpdated => 0,
+    },
+
+    'previewButton' => {
+        message => q|Button for the user to preview the story before saving.|,
+        lastUpdated => 0,
+    },
+
+    'saveAndAddButton' => {
+        message => q|Button for the user to save the form, and then reopen the edit form to add another photo.|,
+        lastUpdated => 0,
+    },
+
+    'cancelButton' => {
+        message => q|Button for the user to cancel this form without saving anything.|,
+        lastUpdated => 0,
+    },
+
+    'formFooter' => {
+        message => q|HTML code to end the form for adding or editing a Story.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
