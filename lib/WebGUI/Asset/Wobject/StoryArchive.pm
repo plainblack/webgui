@@ -264,8 +264,8 @@ sub view {
     #This is an example of debugging code to help you diagnose problems.
     #WebGUI::ErrorHandler::warn($self->get("templateId")); 
     
-    use Data::Dumper;
-    $session->log->warn(Dumper $var);
+    #use Data::Dumper;
+    #$session->log->warn(Dumper $var);
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
@@ -320,6 +320,25 @@ sub viewTemplateVariables {
     $var->{addStoryUrl}    = $self->getUrl('func=add;class=WebGUI::Asset::Story');
     $var->{canPostStories} = $self->canPostStories;
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_add ( )
+
+The only real children of StoryArchive are Folders, which then hold Stories.  So we intercept
+www_add, find the right folder to use, then allow that folder to continue on.
+
+=cut
+
+
+sub www_add {
+    my $self = shift;
+    my $form = $self->session->form;
+    return undef unless $form->get('class') eq 'WebGUI::Asset::Story';
+    my $todayFolder = $self->getFolder;
+    return undef unless $todayFolder;
+    $todayFolder->www_add;
 }
 
 1;
