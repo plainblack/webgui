@@ -92,8 +92,8 @@ sub definition {
         storiesPerPage => {
             tab          => 'display',  
             fieldType    => 'integer',  
-            label        => $i18n->get('stories per feed'),
-            hoverHelp    => $i18n->get('stories per feed help'),
+            label        => $i18n->get('stories per page'),
+            hoverHelp    => $i18n->get('stories per page help'),
             defaultValue => 25,
         },
         groupToPost => {
@@ -117,7 +117,7 @@ sub definition {
             label        => $i18n->get('story template'),
             hoverHelp    => $i18n->get('story template help'),
             namespace    => 'Story',
-            defaultValue => '',
+            defaultValue => '3QpYtHrq_jmAk1FNutQM5A',
         },
         editStoryTemplateId => {
             tab          => 'display',
