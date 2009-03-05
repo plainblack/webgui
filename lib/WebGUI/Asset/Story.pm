@@ -212,28 +212,28 @@ sub getEditForm {
     my $url     = $isNew ? $archive->getUrl : $self->getUrl;
     my $title   = $self->getTitle;
     my $var     = {
-        formHeader    => WebGUI::Form::formHeader($session, {action => $url})
-                       . WebGUI::Form::hidden($session, { name => 'func',    value => 'editSave' })
-                       . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
-        formFooter    => WebGUI::Form::formFooter($session),
-        formTitle     => $i18n->get('editing','Asset_WikiPage').' '.$title,
-        titleForm     => WebGUI::Form::text($session, {
-                            name  => 'title',
-                            value => $form->get('title')    || $self->get('title'),
-                         } ),
-        subTitleForm  => WebGUI::Form::text($session, {
-                            name  => 'subtitle',
-                            value => $form->get('subtitle') || $self->get('subtitle')
-                         } ),
-        bylineForm    => WebGUI::Form::text($session, {
-                            name  => 'byline',
-                            value => $form->get('byline')   || $self->get('byline')
-                         } ),
-        locationForm  => WebGUI::Form::text($session, {
-                            name  => 'location',
-                            value => $form->get('location') || $self->get('location')
-                         } ),
-        keywordsForm  => WebGUI::Form::text($session, {
+        formHeader     => WebGUI::Form::formHeader($session, {action => $url})
+                        . WebGUI::Form::hidden($session, { name => 'func',    value => 'editSave' })
+                        . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
+        formFooter     => WebGUI::Form::formFooter($session),
+        formTitle      => $i18n->get('editing','Asset_WikiPage').' '.$title,
+        titleForm      => WebGUI::Form::text($session, {
+                             name  => 'title',
+                             value => $form->get('title')    || $self->get('title'),
+                          } ),
+        subTitleForm   => WebGUI::Form::text($session, {
+                             name  => 'subtitle',
+                             value => $form->get('subtitle') || $self->get('subtitle')
+                          } ),
+        bylineForm     => WebGUI::Form::text($session, {
+                             name  => 'byline',
+                             value => $form->get('byline')   || $self->get('byline')
+                          } ),
+        locationForm   => WebGUI::Form::text($session, {
+                             name  => 'location',
+                             value => $form->get('location') || $self->get('location')
+                          } ),
+        keywordsForm   => WebGUI::Form::text($session, {
                             name  => 'keywords',
                             value => $form->get('keywords') || WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })
                          } ),
@@ -257,6 +257,11 @@ sub getEditForm {
         previewButton  => WebGUI::Form::submit($session, {
                             name  => 'saveAndPreview',
                             value => $i18n->get('save and preview'),
+                          }),
+        cancelButton   => WebGUI::Form::button($session, {
+                            name   => 'cancel',
+                            value  => $i18n->get('cancel','WebGUI'),
+                            extras => q|onclick="history.go(-1);" class="backwardButton"|,
                           }),
         saveAndAddButton  => WebGUI::Form::submit($session, {
                             name  => 'saveAndAddPhoto',
