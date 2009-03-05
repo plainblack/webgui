@@ -319,6 +319,13 @@ sub www_undo {
 }
 
 #-------------------------------------------------------------------
+
+# 
+# All of the images will have to change to support annotate.
+# The revision system doesn't support the blobs, it seems.
+# All of the image operations will have to be updated to support annotations.
+#
+
 sub www_annotate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
@@ -339,126 +346,60 @@ sub www_annotate {
 
     my ($style, $url) = $self->session->quick(qw(style url));
 	# http://www.kryogenix.org/code/browser/annimg/annimg.html (creative commons)
-	$style->setLink($url->extras('annotate/imageMap.css'), {rel=>'stylesheet', type=>'text/css'});
+    # $style->setLink($url->extras('annotate/imageMap.css'), {rel=>'stylesheet', type=>'text/css'});
 
 	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
 
-	warn($imageAsset->{annotations});
+	warn("annotations: " . $self->{annotations});
 	my @pieces = split(/\n/, $imageAsset->{annotations});
 	# my ($top_left, $width_height, $note) = split(/\n/, $imageAsset->{annotations});
 	
-	my $imageLoc = $self->getStorageLocation->getUrl($self->get("filename"));
-	my $image = '<div align="center" class="yui-skin-sam"><img src="$imageLoc" style="border-style:none;" alt="'.$self->get("filename").'" class="image" id="yui-img" /></div>';
+	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:1px;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
 
 	my ($width, $height) = $self->getStorageLocation->getSize($self->get("filename"));
 
-	my $hotspots = "";
-	my $notes = "";
 	my @checkboxes = ();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
 
-	my $mouseCoord_js = qq(
-		<script type = "text/javascript"> 
-		   function updateMouseCoordinates(e)  
-		   { 
-            var posx = 0;
-            var posy = 0;
-            if (!e) var e = window.event;
-
-            element1 = document.getElementById('annotate_top_formId');
-            element2 = document.getElementById('annotate_left_formId');
-		    if (0 == element1.value && 0 == element2.value) {
-			element1.value = e.layerX || 1;
-			element2.value = e.layerY || 1;
-			return;
-		    }
-            element1 = document.getElementById('annotate_width_formId');
-            element2 = document.getElementById('annotate_height_formId');
-		    if (0 == element1.value && 0 == element2.value) {
-			element1.value = e.layerX || 1;
-			element2.value = e.layerY || 1;
-			return;
-		    }
-
-	if (e.pageX || e.pageY) 	{
-		posx = e.pageX;
-		posy = e.pageY;
-	}
-	else if (e.clientX || e.clientY) 	{
-		posx = e.clientX + document.body.scrollLeft
-			+ document.documentElement.scrollLeft;
-		posy = e.clientY + document.body.scrollTop
-			+ document.documentElement.scrollTop;
-	}
-	// posx and posy contain the mouse position relative to the document
-	// Do something with this information
-		   // alert(e.clientX - document.body.scrollLeft);
-		   // alert(posx);
-		   // alert(posy);
-		   // alert(e.offsetX);
-		   // alert(e.offsetY);
-	// alert(e.clientX);
-		   } 
-		</script>
-	);
-
-	my $crop_js = qq(
-		<script>
-		(function() {
-            var Dom = YAHOO.util.Dom, Event = YAHOO.util.Event, results = null; 
-
-        Event.onDOMReady(function() { 
-                var crop = new YAHOO.widget.ImageCropper('yui_img', { 
-                    initialXY: [20, 20], 
-                    keyTick: 5, 
-                    shiftKeyTick: 50 
-                }); 
-                crop.on('moveEvent', function() { 
-                    var region = crop.getCropCoords(); 
-                    element = document.getElementById('Width_formId');
-                    element.value = region.width;
-                    element = document.getElementById('Height_formId');
-                    element.value = region.height;
-                    element = document.getElementById('Top_formId');
-                    element.value = region.top;
-                    element = document.getElementById('Left_formId');
-                    element.value = region.left;
-                }); 
-            }); 
-        })(); 
-		</script>
-	);
+    my $hotspots = '';
+    my $domMe = '';
 
 	for (my $i = 0; $i < $#pieces; $i += 3) {
 		my $top_left = $pieces[$i];
 		my $width_height = $pieces[$i + 1];
 		my $note = $pieces[$i + 2];
 
-		$hotspots .= qq(
-			dd#Def_${i} { $top_left }
-			dd#Def_$i a{ position: absolute; $width_height; text-decoration: none; border: 1px solid #FFFCE6; background: transparent url(/www/extras/annotate/note.png) repeat; }
-			dd#Def_$i a span{ display: none; }
-			dd#Def_$i a:hover{ background: transparent url(/www/extras/annotate/hover.png) repeat; border: 1px solid #BCBCBC; }
-			dd#Def_$i a:hover span{
-				display: block;
-				text-indent: 0;
-				vertical-align: top;
-				color: #000;
-				background-color: #F4F4F4;
-				font-weight: bold;
-				position: absolute;
-				border: 1px solid #BCBCBC;
-				bottom: 100%;
-				margin: 0;
-				padding: 5px;
-				width: 75%;
-			}
-		);
+        $hotspots .= qq(
+            <span id=span_tooltip$i>
+            </span>
+        );
 
-		$notes .= qq(
-			<dd id="Def_$i"><a href="#"><span>$note</span></a></dd>
-		);
+        $domMe .= qq(
+            <script type="text/javascript" defer="defer">
+                function on_load_$i() {
+                    var xy = YAHOO.util.Dom.getXY('yui_img'); 
+
+                    document.getElementById('span_tooltip$i').innerHTML = "<div id=tooltip$i style='border:1px solid;'></div>";
+                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'height', '40px');
+                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'width', '100px');
+                    YAHOO.util.Dom.setStyle('tooltip$i', 'height', '40px');
+                    YAHOO.util.Dom.setStyle('tooltip$i', 'width', '100px');
+                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'display', 'block');
+                    YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');
+                    xy[1] += 40;
+                    YAHOO.util.Dom.setXY('span_tooltip$i', [$top_left]); 
+                    YAHOO.util.Dom.setXY('tooltip$i', [$top_left]); 
+
+                    YAHOO.namespace("img.container");
+                    YAHOO.img.container.tt$i = new YAHOO.widget.Tooltip("tt$i", { context:"tooltip$i", container:"tooltip$i", text:"test: $i" });
+                }
+                if (document.addEventListener) {
+                    document.addEventListener("DOMContentLoaded", on_load_$i, false);
+                }
+            </script>
+        );
+
 
 		push(@checkboxes, $f->checkbox(
 				-label=>$i18n->get('delete') . " '$note'",
@@ -471,55 +412,16 @@ sub www_annotate {
 			-name=>"annotates",
 			-value=>"$i"
 			);
+
+        # last;
 	}
 
-	my $imageMap = qq(
-		<div align="center" class="yui-skin-sam">
-		<dl id="imageMap" onmousedown="updateMouseCoordinates(event)">  
-		  <!-- <dt class="title">Shoes</dt> -->
-		  <!-- <dt id="shoe">My heel</dt> -->
-		  $notes
-		</dl>   
-		</div>
-	);
-
-	my $imageCss = qq(
-		<style type="text/css">
-		/* http://www.frankmanno.com/ideas/css-imagemap-redux/ Creative Commons */
-		/* ---------- hidden ONLY if CSS is enabled.  If disabled, image is rendered ---------- */
-		img.image{ display: none; }
-		/* 124 x 110 */
-		dl#imageMap{
-			id: yui-img;
-			class: "yui-skin-sam"
-			margin: 0;
-			padding: 0;
-			background: transparent url($imageLoc) top left no-repeat;
-			height: ${height}px;
-			width: ${width}px;
-			position: relative;
-		}
-
-		dt{ margin: 0; padding: 0; position: absolute; font-size: 85%; display: none; }
-		dd{ margin: 0; padding: 0; position: absolute;  font-size: 85%; }
-
-		dl#imageMap dt.title{
-			color: White;
-			display: block;
-			font-size: 115%;
-			padding: 5px 0 0 5px;
-		}
-
-		/* ---------- Hotspot Declarations ---------- */
-		$hotspots
-		</style>
-	);
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	$f->hidden(
 		-name=>"func",
 		-value=>"annotate"
 		);
-       	$f->text(
+    $f->text(
 		-label=>$i18n->get('annotate image'),
 		-value=>'',
 		-hoverHelp=>$i18n->get('annotate image description'),
@@ -546,7 +448,7 @@ sub www_annotate {
 		-value=>,
 		);
 	$f->submit;
-        return $self->getAdminConsole->render($f->print."$mouseCoord_js\n$crop_js\n$imageCss\n$image\n$imageMap",$i18n->get("annotate image"));
+    return $self->getAdminConsole->render($f->print."$hotspots$image$domMe",$i18n->get("annotate image"));
 }
 
 #-------------------------------------------------------------------
