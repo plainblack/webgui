@@ -32,8 +32,20 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addGroupToAddToMatrix( $session );
+
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub addGroupToAddToMatrix {
+    my $session = shift;
+    print "\tAdding groupToAdd to Matrix table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe Matrix groupToAdd');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table Matrix add column groupToAdd char(22) default 2");
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

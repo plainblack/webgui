@@ -58,6 +58,43 @@ sub addRevision {
 	return $newSelf;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canAdd ( )
+
+Override canAdd to ignore its permissions check. Permissions are handled
+by the parent Matrix.
+
+=cut
+
+sub canAdd {
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEdit (  )
+
+Returns true if the user can edit this asset. C<userId> is a WebGUI user ID. 
+
+Users can edit this Matrix listing if they are the owner, or if they can edit
+the parent Matrix.
+
+=cut
+
+sub canEdit {
+    my $self        = shift;
+
+    if ( $self->session->form->process("assetId") eq "new" ) {
+        return $self->getParent->canAddMatrixListing();
+    }
+    else {
+        return 1 if $self->session->user->userId eq $self->get("ownerUserId");
+
+        return $self->getParent->canEdit();
+    }
+}
+
 #-------------------------------------------------------------------
 
 =head2 definition ( session, definition )
@@ -327,7 +364,7 @@ sub getEditForm {
 
     $form->raw(
     '<tr><td COLSPAN=2>'.
-    WebGUI::Form::Button($session, {}).
+    WebGUI::Form::Submit($session, {}).
     WebGUI::Form::Button($session, {
         -value  => $i18n->get('cancel', 'WebGUI'),
         -extras => q|onclick="history.go(-1);" class="backwardButton"|
@@ -579,6 +616,14 @@ sub view {
 	my $var = $self->get;
     if ($emailSent){
     	$var->{emailSent}       = 1;
+    }
+
+    unless($self->hasBeenCommitted){
+        my $workflowInstanceId = $db->quickScalar("select workflowInstanceId from assetVersionTag where tagId =?"
+            ,[$self->get('tagId')]);
+        $var->{canApprove}          = $self->getParent->canEdit;
+        $var->{approveOrDenyUrl}    = $self->getUrl("op=manageRevisionsInTag;workflowInstanceId=".$workflowInstanceId
+            .";tagId=".$self->get('tagId'));
     }
     $var->{canEdit}             = $self->canEdit;
     $var->{editUrl}             = $self->getUrl("func=edit");
@@ -835,12 +880,14 @@ Web facing method which is the default edit page
 
 sub www_edit {
     my $self = shift;
-
-    return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
-
     my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+
+    if($self->session->form->process('func') eq 'add'){
+        return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
+    }else{
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    }
 
     my $var         = $self->get;
     my $matrix      = $self->getParent;
