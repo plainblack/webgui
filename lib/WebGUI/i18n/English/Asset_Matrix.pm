@@ -372,6 +372,11 @@ listing,|,
         lastUpdated => 0,
     },
 
+    'group to add description' => {
+        message => q|Select the group that is allowed to add listings to this matrix.|,
+        lastUpdated => 0,
+    },
+
     'ratings duration description' => {
         message => q|Select the interval after which old ratings are cleaned out.|,
         lastUpdated => 0,
@@ -484,6 +489,11 @@ listing,|,
 
     'submission approval workflow label' => {
         message => q|Submission Approval Workflow|,
+        lastUpdated => 0,
+    },
+
+    'group to add label' => {
+        message => q|Group To Add|,
         lastUpdated => 0,
     },
 
@@ -748,6 +758,12 @@ selectBox.</p>|
     'hide stickied button label' => {
         lastUpdated => 0,
         message => q|Hide/show stickied|,
+    },
+
+    'approve or deny label' => {
+        lastUpdated => 0,
+        message => q|Approve/Deny|,
+        context => q|Label for the approve or deny link on the matrix listing detail screen.|,
     },
 
     'matrix asset template variables title' => {

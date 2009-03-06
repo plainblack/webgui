@@ -4,6 +4,7 @@
    would cause images and albums to be uploaded as "admin" rather than the
    user that actually uploaded them.
  - Labeled Survey 2.0 as beta, per our quality policy.
+ - fixed #9836: Matrix: Group to Add Listings is missing 
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
