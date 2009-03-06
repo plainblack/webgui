@@ -58,16 +58,16 @@ sub definition {
 		purchaseTemplate      => {
 			tab             => "display",
 			fieldType       => "template",
-                        namespace       => "AdSku",
-			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',   #  TODO
+                        namespace       => "AdSku/Purchase",
+			defaultValue    => 'R5zzB-ElsYbbiaS7aS3Uxw',
 			label           => $i18n->get("property purchase template"),
 			hoverHelp       => $i18n->get("property purchase template help"),
 		},
 		manageTemplate      => {
 			tab             => "display",
 			fieldType       => "template",
-                        namespace       => "AdSku",
-			defaultValue    => 'eqb9sWjFEVq0yHunGV8IGw',   #  TODO
+                        namespace       => "AdSku/Manage",
+			defaultValue    => 'xZyizWwkApUyvpHL9mI-FQ',
 			label           => $i18n->get("property manage template"),
 			hoverHelp       => $i18n->get("property manage template help"),
 		},
@@ -78,6 +78,13 @@ sub definition {
             label           => $i18n->get("property ad space"),
             hoverHelp       => $i18n->get("property ad Space help"),
         },
+        priority => {
+            tab             => "properties",
+            defaultValue    => '1',
+		fieldType       => "integer",
+		label           => $i18n->get("property priority"),
+		hoverHelp       => $i18n->get("property priority help"),
+            },
         pricePerClick => {
             tab             => "properties",
             defaultValue    => '0.00',

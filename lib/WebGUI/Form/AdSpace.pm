@@ -63,17 +63,9 @@ The following additional parameters have been added via this sub class.
 
 How many rows should be displayed at once? Defaults to 1.
 
-=head4 multiple
-
-Set to "1" if multiple groups should be selectable. Defaults to 0.
-
-=head4 excludeGroups
-
-An array reference containing a list of groups to exclude from the list. Defaults to an empty array reference.
-
 =head4 defaultValue
 
-This will be used if no value is specified. Should be passed as an array reference. Defaults to 7 (Everyone).
+This will be used if no value is specified. Should be passed as an array reference. Defaults to 1.
 
 =cut
 
@@ -86,7 +78,7 @@ sub definition {
 			defaultValue=>1
 			},
 		defaultValue=>{
-			defaultValue=>[7]
+			defaultValue=>[1]
 			},
         });
         return $class->SUPER::definition($session, $definition);
@@ -114,7 +106,7 @@ Returns the human readable name of this control.
 
 sub getName {
     my ($self, $session) = @_;
-    return WebGUI::International->new($session, 'WebGUI')->get('Ad Space');
+    return WebGUI::International->new($session, 'WebGUI')->get('Ad Space control name');
 }
 
 #-------------------------------------------------------------------
@@ -127,9 +119,9 @@ Formats as a name.
 
 sub getValueAsHtml {
     my $self = shift;
-    my $group = WebGUI::Group->new($self->session, $self->getOriginalValue);
-    if (defined $group) {
-        return $group->name;
+    my $item = WebGUI::AdSpace->new($self->session, $self->getOriginalValue);
+    if (defined $item) {
+        return $item->name;
     }
     return undef;
 }
@@ -186,7 +178,7 @@ Renders the form field to HTML as a table row complete with labels, subtext, hov
 sub toHtmlWithWrapper {
         my $self = shift;
         if ($self->session->user->isAdmin) {
-                my $subtext = $self->session->icon->manage("op=listGroups");
+                my $subtext = $self->session->icon->manage("op=manageAdSpaces");
                 $self->set("subtext",$subtext . $self->get("subtext"));
         }
         return $self->SUPER::toHtmlWithWrapper;
