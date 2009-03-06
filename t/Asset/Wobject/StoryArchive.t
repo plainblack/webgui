@@ -59,7 +59,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 21
+plan tests => 22
             + $tests
             + $canPostMaker->plan
             ;
@@ -170,8 +170,8 @@ my ($tomorrowMorn,undef) = $session->datetime->dayStartEnd($tomorrow);
 
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released'});
 $session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
-$story = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
-$session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$story->getId]);
+my $futureStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
+$session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$futureStory->getId]);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -224,11 +224,14 @@ $archive->update({storiesPerPage => 3});
 $session->user({userId => 3});
 ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
 
+$story->update({keywords => "roger foxtrot echo"});
+
 $templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
     next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
     delete $templateVars->{$key};
 }
+
 
 cmp_deeply(
     $templateVars,
@@ -265,6 +268,33 @@ cmp_deeply(
 );
 
 
+################################################################
+#
+#  tagCloud template variable in view
+#
+################################################################
+
+$templateVars = $archive->viewTemplateVariables();
+my @anchors = simpleHrefParser($templateVars->{keywordCloud});
+cmp_bag(
+    \@anchors,
+    [
+        [
+            'echo',
+            '/home/mystories?func=search;keyword=echo',
+        ],
+        [
+            'foxtrot',
+            '/home/mystories?func=search;keyword=foxtrot',
+        ],
+        [
+            'roger',
+            '/home/mystories?func=search;keyword=roger',
+        ],
+    ],
+    'keywordCloud template variable has keywords and correct links',
+);
+
 }
 
 #----------------------------------------------------------------------------
@@ -283,3 +313,17 @@ END {
         $group->delete if defined $group;
     }
 }
+
+sub simpleHrefParser {
+	my ($text) = @_;
+	my $p = HTML::TokeParser->new(\$text);
+    my @anchors = ();
+    while (my $token = $p->get_tag('a')) {
+        my $url = $token->[1]{href} || "-";
+        my $label = $p->get_trimmed_text("/a");
+        push @anchors, [ $label, $url ];
+    }
+    return @anchors;
+}
+
+

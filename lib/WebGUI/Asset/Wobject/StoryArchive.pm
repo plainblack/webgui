@@ -19,6 +19,7 @@ use WebGUI::Utility;
 use WebGUI::Asset::Story;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Paginator;
+use WebGUI::Keyword;
 use base 'WebGUI::Asset::Wobject';
 
 use constant DATE_FORMAT => '%c_%D_%y';
@@ -310,6 +311,10 @@ sub viewTemplateVariables {
 
     $var->{addStoryUrl}    = $self->getUrl('func=add;class=WebGUI::Asset::Story');
     $var->{canPostStories} = $self->canPostStories;
+    $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud({
+        startAsset  => $self,
+        displayFunc => 'search',
+    });
     return $var;
 }
 
