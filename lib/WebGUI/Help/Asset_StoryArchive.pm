@@ -34,6 +34,10 @@ our $HELP = {
                     },
                 ]
             },
+            {   'name' => 'searchHeader' },
+            {   'name' => 'searchForm'   },
+            {   'name' => 'searchButton' },
+            {   'name' => 'searchFooter' },
         ],
         related => []
     },

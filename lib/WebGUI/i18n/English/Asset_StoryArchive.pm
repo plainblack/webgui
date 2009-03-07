@@ -171,6 +171,30 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'searchHeader' => {
+        message => q|HTML code for beginning the search form.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'searchForm' => {
+        message => q|The text field where users can enter in keywords for the search.|,
+        context => q|label for the URL to add a story to the archive.|,
+        lastUpdated => 0,
+    },
+
+    'searchButton' => {
+        message => q|Button with internationalized label for submitting the search form.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'searchFooter' => {
+        message => q|HTML code for ending the search form.|,
+        context => q|label for the URL to add a story to the archive.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

@@ -266,15 +266,20 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 viewTemplateVars ( )
+=head2 viewTemplateVars ( $mode )
 
 Make template variables for the view template.
+
+=head3 $mode
+
+Whether to get assets in view mode, by time, or search mode, by keywords.
 
 =cut
 
 sub viewTemplateVariables {
-    my ($self)  = @_;
-    my $session = $self->session;    
+    my ($self)   = @_;
+    my $session  = $self->session;    
+    my $keywords = $session->form->get('keywords');
     ##Only return assetIds,  we'll build data for the things that are actually displayed.
     my $storySql = $self->getLineageSql(['descendants'],{
         excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
@@ -315,6 +320,12 @@ sub viewTemplateVariables {
         startAsset  => $self,
         displayFunc => 'search',
     });
+    my $i18n = WebGUI::International->new($session, 'Asset');
+    $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
+                         . WebGUI::Form::hidden($session, { func   => 'view' });
+    $var->{searchFooter} = WebGUI::Form::formFooter($session);
+    $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
+    $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'keywords', value => $keywords});
     return $var;
 }
 
