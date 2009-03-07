@@ -21,7 +21,7 @@ use Test::Deep;
 use Data::Dumper;
 
 my $tests = 1;
-plan tests => 16
+plan tests => 23
             + $tests
             ;
 
@@ -32,6 +32,7 @@ my $session = WebGUI::Test->session;
 my $class  = 'WebGUI::Asset::Story';
 my $loaded = use_ok($class);
 my $story;
+my $wgBday;
 
 my $defaultNode = WebGUI::Asset->getDefault($session);
 my $archive     = $defaultNode->addChild({
@@ -126,6 +127,19 @@ cmp_deeply(
 
 ############################################################
 #
+# formatDuration
+#
+############################################################
+
+is($story->formatDuration(time() - (24*3600+15)), '1 Day(s)', 'formatDuration, 1 day');
+is($story->formatDuration(time() - (48*3600+15)), '2 Day(s)', 'formatDuration, 2 day');
+like($story->formatDuration(997966800), qr{Year.s.}, 'formatDuration: a long time ago');
+is($story->formatDuration(time() - (3600+5)), '1 Hour(s)', 'formatDuration: 1 hour');
+is($story->formatDuration(time() - (60+5)),   '1 Minute(s)', 'formatDuration: 1 minute');
+is($story->formatDuration(time() - (7200+120)), '2 Hour(s), 2 Minute(s)', 'formatDuration: 2 hours, 2 minutes');
+
+############################################################
+#
 # viewTemplateVariables
 #
 ############################################################
@@ -157,10 +171,13 @@ cmp_bag(
     'viewTemplateVariables: keywords_loop is okay'
 );
 
+is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTemplateVariables: updatedTimeEpoch');
+
 }
 
 END {
     $story->purge   if $story;
+    $wgBday->purge  if $wgBday;
     $archive->purge if $archive;
     WebGUI::VersionTag->getWorking($session)->rollback;
 }

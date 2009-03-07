@@ -34,6 +34,60 @@ our $HELP = {
         related => []
     },
 
+    'view template' => {
+        title => 'view template',
+        body  => '',
+        isa   => [
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
+        ],
+        fields    => [],
+        variables => [
+            { 'name'      => 'highlights_loop',
+              'variables' => [
+                { 'name'      => 'highlight', },
+              ],
+            },
+            { 'name'      => 'keywords_loop',
+              'variables' => [
+                { 'name'      => 'keyword', },
+                { 'name'      => 'url', },
+              ],
+            },
+            { 'name'      => 'updatedTime', },
+            { 'name'      => 'updatedTimeEpoch', },
+        ],
+        related => []
+    },
+
+    'story asset template variables' => {
+        private => 1,
+        title   => 'story asset template variables title',
+        body    => '',
+        isa     => [
+            {   namespace => "Asset",
+                tag       => "asset template variables"
+            },
+        ],
+        fields    => [],
+        variables => [
+            { 'name' => 'headline',
+              'description' => 'headline tmplvar',
+            },
+            { 'name' => 'subtitle',
+              'description' => 'subtitle tmplvar',
+            },
+            { 'name' => 'byline'
+              'description' => 'byline tmplvar',
+            },
+            { 'name' => 'location',
+              'description' => 'location tmplvar',
+            },
+        ],
+        related => []
+    },
+
 };
 
 1;

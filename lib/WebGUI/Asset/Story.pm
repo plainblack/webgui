@@ -180,6 +180,45 @@ sub exportAssetData {
 
 #-------------------------------------------------------------------
 
+=head2 formatDuration ( $lastUpdated )
+
+Format the time since this story was last updated.  If it is longer than 1 week, then
+return the date.
+
+=head3 $lastUpdated
+
+The date this was last updated.  If left blank, it uses the revisionDate.
+
+=cut
+
+sub formatDuration {
+    my ($self, $lastUpdated) = @_;
+    $lastUpdated = defined $lastUpdated ? $lastUpdated : $self->get('revisionDate');
+    my $session = $self->session;
+    my $datetime = $session->datetime;
+    my $duration = time() - $lastUpdated;
+    if ($duration > 86400) { ##1 day
+        return join ' ', $datetime->secondsToInterval($duration);
+    }
+    else {
+        my $formattedDuration = '';
+        my $hours = int($duration/3600) * 3600;
+        my @hours = $datetime->secondsToInterval($hours);
+        if ($hours[0]) {
+            $formattedDuration = join ' ', @hours;
+        }
+        my $minutes = round(($duration - $hours)/60)*60;
+        my @minutes = $datetime->secondsToInterval($minutes);
+        if ($minutes[0]) {
+            $formattedDuration .= ', ', if $formattedDuration;
+            $formattedDuration .= join ' ', @minutes;
+        }
+        return $formattedDuration;
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 getArchive (  )
 
 Returns the parent archive for this Story.  Cache the entry for speed.
@@ -566,6 +605,8 @@ sub viewTemplateVariables {
         };
     }
     ##TODO: publish time, calculated from revisionDate
+    $var->{updatedTime}      = $self->formatDuration();
+    $var->{updatedTimeEpoch} = $self->get('revisionDate');
     return $var;
 }
 

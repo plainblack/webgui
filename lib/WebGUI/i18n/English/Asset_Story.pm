@@ -21,6 +21,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'headline tmplvar' => {
+        message => q|The headline for the Story.|,
+        context => q|Template variable help.|,
+        lastUpdated => 0
+    },
+
     'subtitle' => {
         message => q|Subtitle|,
         context => q|Similar to headline, but usually contains more information. Label in the edit screen and template.|,
@@ -30,6 +36,12 @@ our $I18N = {
     'subtitle help' => {
         message => q|Similar to headline, but usually contains more information.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'subtitle tmplvar' => {
+        message => q|The subtitle from the Story.|,
+        context => q|Template variable help.|,
         lastUpdated => 0
     },
 
@@ -45,6 +57,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'byline tmplvar' => {
+        message => q|The byline from the Story.|,
+        context => q|Template variable help.|,
+        lastUpdated => 0
+    },
+
     'location' => {
         message => q|Location|,
         context => q|Where the story takes place. Label in the edit screen and template.|,
@@ -54,6 +72,12 @@ our $I18N = {
     'location help' => {
         message => q|Where the story takes place.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'location tmplvar' => {
+        message => q|The location from the Story.|,
+        context => q|Template variable help.|,
         lastUpdated => 0
     },
 
@@ -181,6 +205,46 @@ our $I18N = {
 
     'formFooter' => {
         message => q|HTML code to end the form for adding or editing a Story.|,
+        lastUpdated => 0,
+    },
+
+    'view template' => {
+        message => q|View Story Template.|,
+        lastUpdated => 0,
+    },
+
+    'highlights_loop' => {
+        message => q|A loop containing all the highlights from the story.|,
+        lastUpdated => 0,
+    },
+
+    'highlight' => {
+        message => q|One highlight, without formatting or extra HTML.|,
+        lastUpdated => 0,
+    },
+
+    'keywords_loop' => {
+        message => q|A loop containing all the keywords from the story.|,
+        lastUpdated => 0,
+    },
+
+    'keyword' => {
+        message => q|One keyword, with no formatting.|,
+        lastUpdated => 0,
+    },
+
+    'url' => {
+        message => q|A URL to view all stories in this archive.|,
+        lastUpdated => 0,
+    },
+
+    'updatedTime' => {
+        message => q|The time this Story was last updated, as a formatted duration, like 1 Hour(s) ago.|,
+        lastUpdated => 0,
+    },
+
+    'updatedTimeEpoch' => {
+        message => q|The time this Story was last updated, as an epoch.|,
         lastUpdated => 0,
     },
 
