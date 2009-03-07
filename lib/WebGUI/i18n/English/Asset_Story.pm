@@ -93,6 +93,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'highlights tmplvar' => {
+        message => q|All of the highlights from the Story.  Each highlight will be separated by a newline character.|,
+        context => q|Template variable help.|,
+        lastUpdated => 0
+    },
+
     'story' => {
         message => q|Story|,
         context => q|Label in the edit screen and template.|,
@@ -102,6 +108,12 @@ our $I18N = {
     'story help' => {
         message => q|The story.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'story tmplvar' => {
+        message => q|The story.  Note that it may contain embedded content from the Rich Text Editor.|,
+        context => q|Template variable help.|,
         lastUpdated => 0
     },
 
@@ -245,6 +257,16 @@ our $I18N = {
 
     'updatedTimeEpoch' => {
         message => q|The time this Story was last updated, as an epoch.|,
+        lastUpdated => 0,
+    },
+
+    'photo tmplvar' => {
+        message => q|The photo JSON blob from the Story asset.|,
+        lastUpdated => 0,
+    },
+
+    'storageId tmplvar' => {
+        message => q|The photo JSON blob from the Story asset.|,
         lastUpdated => 0,
     },
 
