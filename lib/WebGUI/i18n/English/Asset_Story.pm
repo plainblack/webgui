@@ -270,6 +270,17 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'ago' => {
+        message => q|ago|,
+        context => q|As in the phrase, Last updated 3 hours ago.|,
+        lastUpdated => 0,
+    },
+
+    'storageId tmplvar' => {
+        message => q|The photo JSON blob from the Story asset.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
