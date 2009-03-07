@@ -167,7 +167,7 @@ sub getKeywordsForAsset {
 
 =head2 getMatchingAssets ( { startAsset => $asset, keyword => $keyword } )
 
-Returns an array reference of asset ids matching the params.
+Returns an array reference of asset ids matching the params.  Assets are returned in order of creationDate.
 
 =head3 startAsset
 
