@@ -14,6 +14,10 @@ our $HELP = {
             },
         ],
         variables => [
+            { 'name' => 'canEdit' },
+            { 'name' => 'editUrl' },
+            { 'name' => 'canApprove' },
+            { 'name' => 'approveOrDenyUrl' },
             { 'name' => 'screenshots' },
             { 'name' => 'emailForm' },
             { 'name' => 'emailSent' },
