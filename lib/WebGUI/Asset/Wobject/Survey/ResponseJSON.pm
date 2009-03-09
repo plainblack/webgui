@@ -469,6 +469,9 @@ sub recordResponses {
     my $section   = $self->nextResponseSection();
     my @questions = $self->nextQuestions();
 
+    #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
+    my ($goto, $gotoExpression);
+
     # Handle terminal Section..
     my $terminalUrl;
     my $sTerminal = 0;
@@ -476,6 +479,15 @@ sub recordResponses {
         $sTerminal   = 1;
         $terminalUrl = $section->{terminalUrl};
     }
+    # ..and also gotos..
+    elsif ( $section->{goto} =~ /\w/ ) {
+        $goto = $section->{goto};
+    }
+    # .. and also gotoExpressions..
+    elsif ( $section->{gotoExpression} =~ /\w/ ) {
+        $gotoExpression = $section->{gotoExpression};
+    }
+
 
     # Handle empty Section..
     if ( !@questions ) {
@@ -487,7 +499,6 @@ sub recordResponses {
     # Process Questions in Section..
     my $terminal = 0;
     my $allRequiredQsAnswered = 1;
-    my ($goto, $gotoExpression);
     for my $question (@questions) {
         my $aAnswered = 0;
 
@@ -495,6 +506,14 @@ sub recordResponses {
         if ( $question->{terminal} ) {
             $terminal    = 1;
             $terminalUrl = $question->{terminalUrl};
+        }
+        # ..and also gotos..
+        elsif ( $question->{goto} =~ /\w/ ) {
+            $goto = $question->{goto};
+        }
+        # .. and also gotoExpressions..
+        elsif ( $question->{gotoExpression} =~ /\w/ ) {
+            $gotoExpression = $question->{gotoExpression};
         }
 
         # Record Question comment
@@ -896,7 +915,6 @@ sub nextQuestions {
     my $section = $self->nextResponseSection();
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
-
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
     my $recordedResponses = $self->recordedResponses();
 
@@ -907,6 +925,7 @@ sub nextQuestions {
     my @questions;
     for my $i (1 .. $questionsPerPage ) {
         my $address = $self->surveyOrder->[ $self->lastResponse + $i ];
+        last if(! defined $address);
         my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
 
         # Skip if this is a Section without a Question
@@ -1009,6 +1028,7 @@ equal to the number of sections in the survey order.
 
 sub surveyEnd {
     my $self = shift;
+    
     return 1 if ( $self->lastResponse >= $#{ $self->surveyOrder } );
     return 0;
 }

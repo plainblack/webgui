@@ -1065,7 +1065,7 @@ sub www_loadQuestions {
 
     my @questions;
     eval { @questions = $self->responseJSON->nextQuestions(); };
-
+    
     my $section = $self->responseJSON->nextResponseSection();
 
     #return $self->prepareShowSurveyTemplate($section,$questions);
@@ -1073,6 +1073,7 @@ sub www_loadQuestions {
     $section->{wasRestarted}    = $wasRestarted;
 
     my $text = $self->prepareShowSurveyTemplate( $section, \@questions );
+
     return $text;
 }
 
@@ -1695,6 +1696,33 @@ sub loadTempReportTable {
         }
     }
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editDefaultQuestions
+
+Allows a user to edit the *site wide* default multiple choice questions displayed when adding questions to a survey.
+
+=cut
+
+sub www_editDefaultQuestions{
+    my $self = shift;
+    my $warning = shift;
+    my $session = $self->session;
+    my ($output);
+    my $bundleId = $session->form->process("bundleId");
+
+    if($bundleId eq 'new'){
+
+
+
+    }
+
+    if($warning){$output .= "$warning";}
+#    $output .= $tabForm->print;
+    
+
 }
 
 1;

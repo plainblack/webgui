@@ -852,6 +852,7 @@ sub newSection {
         terminal               => 0,
         terminalUrl            => q{},
         goto                   => q{},
+        gotoExpression         => q{},
         timeLimit              => 0,
         type                   => 'section',
         questions              => [],
@@ -881,6 +882,8 @@ sub newQuestion {
         textInButton     => 0,
         type             => 'question',
         answers          => [],
+        goto             => q{},
+        gotoExpression   => q{},
     };
 }
 
