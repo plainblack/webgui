@@ -318,11 +318,9 @@ if (typeof Survey === "undefined") {
             var qs = params.questions;
             var s = params.section;
             sliders = [];
-			console.log("Can are farking at least get here?");	
             
             //What to show and where 
             document.getElementById('survey').innerHTML = params.html;
-			console.log("How about farking here");	
             //var te = document.createElement('span'); 
             //te.innerHTML = "<input type=button id=testB name='Reload Page' value='Reload Page'>";
             //document.getElementById('survey').appendChild(te);
@@ -335,7 +333,6 @@ if (typeof Survey === "undefined") {
                 if (lastSection !== s.id || s.everyPageText === '1') {
                     document.getElementById('headertext').style.display = 'block';
                 }
-			console.log(s.questionsOnSectionPage + " wtf");	
                 if (lastSection !== s.id && s.questionsOnSectionPage !== '1') {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
