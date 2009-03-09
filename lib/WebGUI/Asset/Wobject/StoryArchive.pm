@@ -264,8 +264,6 @@ sub view {
              : 'view';
 
     my $var = $self->viewTemplateVariables($mode);
-    use Data::Dumper;
-    $session->log->warn( Dumper $var );
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -342,7 +340,7 @@ sub viewTemplateVariables {
     });
     my $i18n = WebGUI::International->new($session, 'Asset');
     $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
-                         . WebGUI::Form::hidden($session, { func   => 'view' });
+                         . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
     $var->{searchFooter} = WebGUI::Form::formFooter($session);
     $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
     $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'keywords', value => $keywords});
