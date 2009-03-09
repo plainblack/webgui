@@ -194,6 +194,10 @@ A classname pattern to match. For example, if you provide 'WebGUI::Asset::Sku' t
 
 Instead of returning an array reference of assetId's, return a paginator object.
 
+=head3 rowsPerPage
+
+If usePaginator is passed, then this variable will set the number of rows per page that the paginator uses.
+
 =cut
 
 sub getMatchingAssets {
@@ -242,11 +246,11 @@ sub getMatchingAssets {
 
     # write the query
     my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
-        where '.join(' and ', @clauses).' order by creationDate desc';
+        where '.join(' and ', @clauses).' order by creationDate desc, lineage';
 
     # perform the search
     if ($options->{usePaginator}) {
-        my $p = WebGUI::Paginator->new($self->session);
+        my $p = WebGUI::Paginator->new($self->session, undef, $options->{rowsPerPage});
         $p->setDataByQuery($query, undef, undef, \@params);
         return $p;
     }
