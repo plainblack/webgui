@@ -20,6 +20,7 @@ use WebGUI::Asset::Story;
 use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Paginator;
 use WebGUI::Keyword;
+use WebGUI::Search;
 use base 'WebGUI::Asset::Wobject';
 
 use constant DATE_FORMAT => '%c_%D_%y';
@@ -259,7 +260,9 @@ sub view {
     my $session = $self->session;    
 
     #This automatically creates template variables for all of your wobject's properties.
-    my $mode = $session->form->hasParam('keywords') 
+    my $mode = $session->form->hasParam('keyword') 
+             ? 'keyword'
+             : $session->form->hasParam('search')
              ? 'search'
              : 'view';
 
@@ -283,9 +286,12 @@ Whether to get assets in view mode, by time, or search mode, by keywords.
 sub viewTemplateVariables {
     my ($self, $mode)   = @_;
     my $session         = $self->session;    
-    my $keywords        = $session->form->get('keywords');
+    my $keywords        = $session->form->get('keyword');
+    my $query           = $session->form->get('query'); 
     my $p;
-    if ($mode eq "search") {
+    my $var = $self->get;
+    if ($mode eq 'keyword') {
+        $var->{mode} = 'keyword';
         my $wordList = WebGUI::Keyword::string2list($keywords);
         my $key      = WebGUI::Keyword->new($session);
         $p           = $key->getMatchingAssets({
@@ -296,7 +302,18 @@ sub viewTemplateVariables {
             rowsPerPage  => $self->get('storiesPerPage'),
         });
     }
+    elsif ($mode eq 'search') {
+        $var->{mode} = 'search';
+        my $search   = WebGUI::Search->new($session);
+        $search->search({
+            keywords => $query,
+            lineage  => [ $self->get('lineage'),    ],
+            classes  => [ qw/WebGUI::Asset::Story/, ],
+        });
+        $p = $search->getPaginatorResultSet($self->getUrl, $self->get('storiesPerPage'));
+    }
     else {
+        $var->{mode} = 'view';
         ##Only return assetIds,  we'll build data for the things that are actually displayed.
         my $storySql = $self->getLineageSql(['descendants'],{
             excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
@@ -306,12 +323,12 @@ sub viewTemplateVariables {
         $p->setDataByQuery($storySql);
     }
     my $storyIds = $p->getPageData();
-    my $var = $self->get;
     $p->appendTemplateVars($var);
     $var->{date_loop} = [];
     my $lastStoryDate = '';
     my $datePointer = undef;
     ##Only build objects for the assets that we need
+    $session->log->warn(join ' ', map {$_->{assetId} } @{$storyIds});
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
@@ -343,7 +360,7 @@ sub viewTemplateVariables {
                          . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
     $var->{searchFooter} = WebGUI::Form::formFooter($session);
     $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
-    $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'keywords', value => $keywords});
+    $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'query',    value => $query});
     return $var;
 }
 

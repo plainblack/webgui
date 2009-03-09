@@ -59,7 +59,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 24
+plan tests => 27
             + $tests
             + $canPostMaker->plan
             ;
@@ -168,7 +168,7 @@ my $newFolder = $archive->getFolder($tomorrow);
 my ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
 my ($tomorrowMorn,undef) = $session->datetime->dayStartEnd($tomorrow);
 
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released'});
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger foxtrot echo'});
 $session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
 
 {
@@ -182,7 +182,7 @@ $session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
-    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop/);
+    next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop mode/);
     delete $templateVars->{$key};
 }
 
@@ -190,6 +190,7 @@ cmp_deeply(
     $templateVars,
     {
         canPostStories => 0,
+        mode           => 'view',
         addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
         date_loop      => [
             {
@@ -232,8 +233,6 @@ $archive->update({storiesPerPage => 3});
 ##Don't assume that Admin and Visitor have the same timezone.
 $session->user({userId => 3});
 ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
-
-$story->update({keywords => "roger foxtrot echo"});
 
 $templateVars = $archive->viewTemplateVariables();
 KEY: foreach my $key (keys %{ $templateVars }) {
@@ -281,10 +280,11 @@ cmp_deeply(
 #
 ################################################################
 
-$session->request->setup_body({ keywords => 'foxtrot' } );
+$session->request->setup_body({ keyword => 'foxtrot' } );
 $archive->update({storiesPerPage => 25});
 
-$templateVars = $archive->viewTemplateVariables('search');
+$templateVars = $archive->viewTemplateVariables('keyword');
+is($templateVars->{mode}, 'keyword', 'viewTemplateVariables mode == keyword');
 cmp_deeply(
     $templateVars->{date_loop},
     [
@@ -314,12 +314,56 @@ cmp_deeply(
             ],
         },
     ],
+    'viewTemplateVariables: keyword mode returns the correct assets in the same form as view mode'
+);
+
+$archive->update({storiesPerPage => 3});
+
+$session->request->setup_body({ } );
+
+################################################################
+#
+#  viewTemplateVariables, search mode
+#
+################################################################
+
+$session->request->setup_body({ query => 'echo' } );
+$archive->update({storiesPerPage => 25});
+$templateVars = $archive->viewTemplateVariables('search');
+is($templateVars->{mode}, 'search', 'viewTemplateVariables mode == search');
+
+cmp_bag(
+    $templateVars->{date_loop},
+    [
+        {
+            epochDate => ignore(),
+            story_loop => [
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'Story 3',
+                },
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'Story 4',
+                },
+            ],
+        },
+        {
+            epochDate => $wgBdayMorn,
+            story_loop => [
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'WebGUI is released',
+                },
+            ],
+        },
+    ],
     'viewTemplateVariables: search mode returns the correct assets in the same form as view mode'
 );
 
-$archive->update({storiesPerPage => 2});
-
-$session->request->setup_body({ } );
 
 ################################################################
 #
