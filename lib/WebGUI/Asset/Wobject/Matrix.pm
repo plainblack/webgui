@@ -130,6 +130,22 @@ sub definition {
             hoverHelp       =>$i18n->get('edit listing template description'),
             label           =>$i18n->get('edit listing template label'),
         },
+        screenshotsTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000006",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Screenshots",
+            hoverHelp       =>$i18n->get('screenshots template description'),
+            label           =>$i18n->get('screenshots template label'),
+        },
+        screenshotsConfigTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000007",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/ScreenshotsConfig",
+            hoverHelp       =>$i18n->get('screenshots config template description'),
+            label           =>$i18n->get('screenshots config template label'),
+        },
         defaultSort=>{
             fieldType       =>"selectBox",
             tab             =>"display",

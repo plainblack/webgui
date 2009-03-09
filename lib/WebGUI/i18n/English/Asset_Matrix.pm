@@ -481,6 +481,16 @@ listing,|,
         message => q|Select a template to be used to show the listing edit screen.|,
         lastUpdated => 0,
     },
+
+    'screenshots template description' => {
+        message => q|Select a template to be used to show a listing's screenshots.|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template description' => {
+        message => q|Select a template for a listing's screenshots configuration.|,
+        lastUpdated => 0,
+    },
 	
     'categories label' => {
 		message => q|Categories|,
@@ -611,6 +621,16 @@ listing,|,
 		message => q|Compare Template|,
 		lastUpdated => 0,
 	},
+
+    'screenshots template label' => {
+        message => q|Listing Screenshots Template|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template label' => {
+        message => q|Listing Screenshots Config Template|,
+        lastUpdated => 0,
+    },
 
     'edit listing template label' => {
         message => q|Edit Listing Template|,

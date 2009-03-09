@@ -692,33 +692,10 @@ sub view {
         my $storage = $file->getStorageLocation;
         my @files;
         @files = @{ $storage->getFiles } if (defined $storage);
-        
-        $var->{screenshots} = qq|
-<script type="text/javascript" src="/extras/ukplayer/swfobject.js"></script>
-<script type="text/javascript">
-    swfobject.registerObject("myFlashContent","9.0.0","/extras/ukplayer/expressInstall.swf");
-</script>
-<div>
-    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="400" height="300" id="myFlashContent">
-        <param name="movie" value="/extras/ukplayer/slideShow.swf" />
-        <param name="flashvars" value="config=?func=getScreenshotsConfig" />
-        <!--[if !IE]>-->
-        <object type="application/x-shockwave-flash" data="/extras/ukplayer/slideShow.swf" width="400"
-height="300">
-            <param name="flashvars" value="config=?func=getScreenshotsConfig" />
-        <!--<![endif]-->
-            <a href="http:/www.adobe.com/go/getflashplayer">
-                <img src="http:/www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe
-Flash player" />
-            </a>
-        <!--[if !IE]>-->
-        </object>
-        <!--<![endif]-->
-    </object>
-</div>
-|;
+        $var->{screenshotsUrl}      = $self->getUrl('func=viewScreenshots');
+        $var->{screenshotThumbnail} = $storage->getUrl('thumb-'.$files[0]);
     }
-
+        
     # Rating form
 
     my %rating;
@@ -977,9 +954,7 @@ sub www_getScreenshots {
             my $thumb = 'thumb-'.$file;
             $xml .= "
         <slide>
-            <width>400</width>
-            <height>300</height>
-            <title><![CDATA[<b>Slide</b> One]]></title>
+            <title></title>
             <description><![CDATA[ Screenshots ]]></description>
             <image_source>".$storage->getUrl($file)."</image_source>
             <duration>5</duration>
@@ -1007,56 +982,14 @@ Returns the xml config file for the ukplayer that displays the screenshots.
 =cut
 
 sub www_getScreenshotsConfig {
-    my $self = shift;
+    my $self    = shift;
+    my $var     = $self->get;
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
     $self->session->http->setMimeType('text/xml');
 
-    my $xml = qq|<?xml version="1.0" encoding="UTF-8"?>
-<config>
-
-    <content_url>?func=getScreenshots</content_url>
-    
-    <width>400</width><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
-useful for offline testing) -->
-    <height>300</height><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
-useful for offline testing) -->
-    <background_color>0xDDDDEE</background_color>
-    <default_duration>20</default_duration>
-    <default_slidewidth>100</default_slidewidth>
-    <default_slideheight>100</default_slideheight>
-    
-    <font>Verdana</font>
-    <font_size>12</font_size>
-    <font_color>0xCCCCCC</font_color>
-    <text_border_color>0xCCCCCC</text_border_color>
-    <text_bg_color>0x000000</text_bg_color>
-    <text_autohide>true</text_autohide>
-    
-    <controls_color>0xCCCCCC</controls_color>
-    <controls_border_color>0xCCCCCC</controls_border_color>
-    <controls_bg_color>0x000000</controls_bg_color>
-    <controls_autohide>false</controls_autohide>
-    
-    <thumbnail_width>48</thumbnail_width>
-    <thumbnail_height>36</thumbnail_height>
-    <thumbnail_border_color>0x000000</thumbnail_border_color>
-    <menu_autohide>true</menu_autohide>
-    <menu_dead_zone_width>100</menu_dead_zone_width>
-    <menu_gaps>5</menu_gaps>
-    
-    <mute_at_start>false</mute_at_start>
-    <autostart>true</autostart>
-    <autopause>false</autopause>
-    <loop>false</loop>
-    <error_message_content><![CDATA[XML not found: ]]></error_message_content>
-    <error_message_image><![CDATA[Image not found]]></error_message_image>
-    
-</config>
-|;
-
-    return $xml;
+    return $self->processTemplate($var,$self->getParent->get("screenshotsConfigTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -1164,7 +1097,24 @@ sub www_view {
 	return $self->view;
 }
 
+#-------------------------------------------------------------------
 
+=head2 www_viewScreenshots ( )
+
+Returns this listing's screenshots in a ukplayer.
+
+=cut
+
+sub www_viewScreenshots {
+    my $self    = shift;
+    my $var     = $self->get;
+    
+    $var->{configUrl} = 'config='.$self->getUrl("func=getScreenshotsConfig");
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+
+    return $self->processTemplate($var,$self->getParent->get("screenshotsTemplateId"));
+}
 1;
 
 #vim:ft=perl
