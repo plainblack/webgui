@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 addGroupToAddToMatrix( $session );
+addScreenshotTemplatesToMatrix( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,19 @@ sub addGroupToAddToMatrix {
     if (! defined $sth->hashRef) {
         $session->db->write("alter table Matrix add column groupToAdd char(22) default 2");
     }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addScreenshotTemplatesToMatrix {
+    my $session = shift;
+    print "\tAdding screenshot templates to Matrix table \n" unless $quiet;
+    
+    $session->db->write("alter table Matrix add screenshotsConfigTemplateId char(22);");
+    $session->db->write("update Matrix set screenshotsConfigTemplateId = 'matrixtmpl000000000007';");
+    $session->db->write("alter table Matrix add screenshotsTemplateId char(22);");
+    $session->db->write("update Matrix set screenshotsTemplateId = 'matrixtmpl000000000006';");
+    
     print "Done.\n" unless $quiet;
 }
 
