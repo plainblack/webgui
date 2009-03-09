@@ -60,6 +60,8 @@ sub addChild {
 
 Copy storage locations so that purging individual revisions works correctly.
 
+Request autocommit.
+
 =cut
 
 sub addRevision {
@@ -76,6 +78,7 @@ sub addRevision {
     }
 
     $newSelf->update($newProperties);
+    $newSelf->requestAutoCommit;
 
     return $newSelf;
 }
@@ -232,6 +235,27 @@ sub getArchive {
     }
     return $self->{_archive};
 }
+
+#-------------------------------------------------------------------
+
+=head2 getAutoCommitWorkflowId (  )
+
+Get the autocommit workflow from the archive containing this Story and
+use it.
+
+=cut
+
+sub getAutoCommitWorkflowId {
+	my $self    = shift;
+    my $archive = $self->getArchive;
+    if ($archive->hasBeenCommitted) {
+        $self->session->log->warn($archive->get('approvalWorkflowId'));
+        return $archive->get('approvalWorkflowId')
+            || $self->session->setting->get('defaultVersionTagWorkflow');
+    }
+    return undef;
+}
+
 
 #-------------------------------------------------------------------
 

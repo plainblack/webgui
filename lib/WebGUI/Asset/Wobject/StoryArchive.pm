@@ -259,7 +259,13 @@ sub view {
     my $session = $self->session;    
 
     #This automatically creates template variables for all of your wobject's properties.
-    my $var = $self->viewTemplateVariables();
+    my $mode = $session->form->hasParam('keywords') 
+             ? 'search'
+             : 'view';
+
+    my $var = $self->viewTemplateVariables($mode);
+    use Data::Dumper;
+    $session->log->warn( Dumper $var );
 
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
@@ -277,16 +283,30 @@ Whether to get assets in view mode, by time, or search mode, by keywords.
 =cut
 
 sub viewTemplateVariables {
-    my ($self)   = @_;
-    my $session  = $self->session;    
-    my $keywords = $session->form->get('keywords');
-    ##Only return assetIds,  we'll build data for the things that are actually displayed.
-    my $storySql = $self->getLineageSql(['descendants'],{
-        excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
-        orderByClause  => 'creationDate, lineage',
-    });
-    my $p = WebGUI::Paginator->new($session, $self->getUrl, $self->get('storiesPerPage'));
-    $p->setDataByQuery($storySql);
+    my ($self, $mode)   = @_;
+    my $session         = $self->session;    
+    my $keywords        = $session->form->get('keywords');
+    my $p;
+    if ($mode eq "search") {
+        my $wordList = WebGUI::Keyword::string2list($keywords);
+        my $key      = WebGUI::Keyword->new($session);
+        $p           = $key->getMatchingAssets({
+            startAsset   => $self,
+            keywords     => $wordList,
+            isa          => 'WebGUI::Asset::Story',
+            usePaginator => 1,
+            rowsPerPage  => $self->get('storiesPerPage'),
+        });
+    }
+    else {
+        ##Only return assetIds,  we'll build data for the things that are actually displayed.
+        my $storySql = $self->getLineageSql(['descendants'],{
+            excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
+            orderByClause  => 'creationDate desc, lineage',
+        });
+        $p = WebGUI::Paginator->new($session, $self->getUrl, $self->get('storiesPerPage'));
+        $p->setDataByQuery($storySql);
+    }
     my $storyIds = $p->getPageData();
     my $var = $self->get;
     $p->appendTemplateVars($var);
@@ -318,7 +338,7 @@ sub viewTemplateVariables {
     $var->{canPostStories} = $self->canPostStories;
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud({
         startAsset  => $self,
-        displayFunc => 'search',
+        displayFunc => 'view',
     });
     my $i18n = WebGUI::International->new($session, 'Asset');
     $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })

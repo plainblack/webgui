@@ -21,7 +21,7 @@ use Test::Deep;
 use Data::Dumper;
 
 my $tests = 1;
-plan tests => 23
+plan tests => 25
             + $tests
             ;
 
@@ -41,6 +41,8 @@ my $archive     = $defaultNode->addChild({
                  #1234567890123456789012
     assetId   => 'TestStoryArchiveAsset1',
 });
+my $archiveTag = WebGUI::VersionTag->getWorking($session);
+$archiveTag->commit;
 
 SKIP: {
 
@@ -72,9 +74,18 @@ $story = $archive->addChild({
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
 is($story->get('storageId'), '', 'by default, there is no storageId');
 is($story->get('photo'),   '{}', 'by default, photos is an empty JSON hash');
-is($story->get('isHidden'), 1, 'by default, photos are hidden');
+is($story->get('isHidden'), 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
-is($story->get('isHidden'), 1, 'photos cannot be set to not be hidden');
+is($story->get('isHidden'), 1, 'stories cannot be set to not be hidden');
+is($story->get('state'),    'published', 'Story is published');
+
+{
+    ##Version control does not alter the current object's status, fetch an updated copy from the
+    ##db.
+    my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
+    is($storyDB->get('status'),   'approved',  'Story is approved');
+}
+
 
 ############################################################
 #
@@ -179,5 +190,6 @@ END {
     $story->purge   if $story;
     $wgBday->purge  if $wgBday;
     $archive->purge if $archive;
+    $archiveTag->rollback;
     WebGUI::VersionTag->getWorking($session)->rollback;
 }

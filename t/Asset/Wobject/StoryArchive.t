@@ -59,7 +59,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 22
+plan tests => 24
             + $tests
             + $canPostMaker->plan
             ;
@@ -162,7 +162,7 @@ is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct c
 my $wgBday    = 997966800;
 my $oldFolder = $archive->getFolder($wgBday);
 
-my $tomorrow  = time()+24*3600;
+my $tomorrow  = $now+24*3600;
 my $newFolder = $archive->getFolder($tomorrow);
 
 my ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
@@ -170,6 +170,12 @@ my ($tomorrowMorn,undef) = $session->datetime->dayStartEnd($tomorrow);
 
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released'});
 $session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
+
+{
+    my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
+    is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
+}
+
 my $futureStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
 $session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$futureStory->getId]);
 
@@ -187,11 +193,11 @@ cmp_deeply(
         addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
         date_loop      => [
             {
-                epochDate => $wgBdayMorn,
-                story_loop => [ {
-                    creationDate => $wgBday,
-                    url          => '/home/mystories/august_16_2001/webgui-is-released',
-                    title        => 'WebGUI is released',
+                epochDate => $tomorrowMorn,
+                story_loop => [{
+                    creationDate => $tomorrow,
+                    url          => re('theres-always-tomorrow'),
+                    title        => "There's always tomorrow",
                 }, ],
             },
             {
@@ -203,11 +209,11 @@ cmp_deeply(
                 }, ],
             },
             {
-                epochDate => $tomorrowMorn,
-                story_loop => [{
-                    creationDate => $tomorrow,
-                    url          => re('theres-always-tomorrow'),
-                    title        => "There's always tomorrow",
+                epochDate => $wgBdayMorn,
+                story_loop => [ {
+                    creationDate => $wgBday,
+                    url          => '/home/mystories/august_16_2001/webgui-is-released',
+                    title        => 'WebGUI is released',
                 }, ],
             },
         ]
@@ -215,9 +221,12 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
 );
 
-$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2'});
-$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3'});
-$folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4'});
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger foxtrot"});
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot echo"});
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger echo"});
+foreach my $storilet ($story2, $story3, $story4) {
+    $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
+}
 $archive->update({storiesPerPage => 3});
 
 ##Don't assume that Admin and Visitor have the same timezone.
@@ -232,7 +241,6 @@ KEY: foreach my $key (keys %{ $templateVars }) {
     delete $templateVars->{$key};
 }
 
-
 cmp_deeply(
     $templateVars,
     {
@@ -240,11 +248,11 @@ cmp_deeply(
         addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
         date_loop      => [
             {
-                epochDate => $wgBdayMorn,
-                story_loop => [ {
-                    creationDate => $wgBday,
-                    url          => '/home/mystories/august_16_2001/webgui-is-released',
-                    title        => 'WebGUI is released',
+                epochDate => $tomorrowMorn,
+                story_loop => [{
+                    creationDate => $tomorrow,
+                    url          => re('theres-always-tomorrow'),
+                    title        => "There's always tomorrow",
                 }, ],
             },
             {
@@ -267,6 +275,51 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
 );
 
+################################################################
+#
+#  viewTemplateVariables, keywords search mode
+#
+################################################################
+
+$session->request->setup_body({ keywords => 'foxtrot' } );
+$archive->update({storiesPerPage => 25});
+
+$templateVars = $archive->viewTemplateVariables('search');
+cmp_deeply(
+    $templateVars->{date_loop},
+    [
+        {
+            epochDate => ignore(),
+            story_loop => [
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'Story 2',
+                },
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'Story 3',
+                },
+            ],
+        },
+        {
+            epochDate => $wgBdayMorn,
+            story_loop => [
+                {
+                    creationDate => ignore(),
+                    url          => ignore(),
+                    title        => 'WebGUI is released',
+                },
+            ],
+        },
+    ],
+    'viewTemplateVariables: search mode returns the correct assets in the same form as view mode'
+);
+
+$archive->update({storiesPerPage => 2});
+
+$session->request->setup_body({ } );
 
 ################################################################
 #
@@ -276,22 +329,13 @@ cmp_deeply(
 
 $templateVars = $archive->viewTemplateVariables();
 my @anchors = simpleHrefParser($templateVars->{keywordCloud});
+my @expectedAnchors = ();
+foreach my $keyword(qw/echo foxtrot roger/) {
+    push @expectedAnchors, [ $keyword, '/home/mystories?func=view;keyword='.$keyword ];
+}
 cmp_bag(
     \@anchors,
-    [
-        [
-            'echo',
-            '/home/mystories?func=search;keyword=echo',
-        ],
-        [
-            'foxtrot',
-            '/home/mystories?func=search;keyword=foxtrot',
-        ],
-        [
-            'roger',
-            '/home/mystories?func=search;keyword=roger',
-        ],
-    ],
+    \@expectedAnchors,
     'keywordCloud template variable has keywords and correct links',
 );
 
