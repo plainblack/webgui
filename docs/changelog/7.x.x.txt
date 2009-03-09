@@ -2,6 +2,7 @@
  - fixed: Template parser cannot be set
  - fixed #9836: Matrix: Group to Add Listings is missing
  - fixed #9873: third-> first in post template help
+ - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
