@@ -306,7 +306,8 @@ sub definition {
 	push(@fields, {
 		tab          => 'messaging',
 		fieldType    => 'template',
-		name         => 'inboxNotificationTemplateId',
+                        #1234567890123456789012
+		name         => 'inboxNotification00001',
 		label        => $i18n->get('inbox notification template',      'Message_Center'),
 		hoverHelp    => $i18n->get('inbox notification template help', 'Message_Center'),
 		defaultValue => $setting->get('inboxNotificationTemplateId'),
