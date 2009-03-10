@@ -34,7 +34,7 @@ our $I18N = {
 	},
 
 	'send inbox notifications only help' => {
-		message => q|Should WebGUI always just send notifications about Inbox messages, instead of the message itself?|,
+		message => q|Should WebGUI just send notifications about Inbox messages, instead of the message itself?|,
 		lastUpdated => 1235696295,
 	},
 
