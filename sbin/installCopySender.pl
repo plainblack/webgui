@@ -36,13 +36,15 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
 my $session = start( $webguiRoot, $configFile );
 # Do your work here
+installCopySender($session);
 finish($session);
 
 #----------------------------------------------------------------------------
 # Your sub here
 sub installCopySender {
     my $session = shift;
-    return if $session->setting->get('inboxCopySender');
+    return if $session->setting->has('inboxCopySender');
+    $session->setting->add('inboxCopySender',0);
 }
 
 #----------------------------------------------------------------------------
