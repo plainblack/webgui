@@ -333,6 +333,9 @@ sub getEditForm {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId', value => 'new' })
                            .  WebGUI::Form::hidden($session, { name => 'class',   value => $form->process('class', 'className') });
     }
+    else {
+        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'url',     value => $url});
+    }
     return $self->processTemplate($var, $archive->get('editStoryTemplateId'));
 
 }
