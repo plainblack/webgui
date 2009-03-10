@@ -721,6 +721,17 @@ our $I18N = {
          context      => "template variable for view inbox template",
      },
 
+    'inbox copy sender label' => {
+        message     => q|Copy Sender on Messages?|,
+        context     => q|Copy, as in receive a copy.  Label for Account/Inbox settings|,
+        lastUpdated => 0,
+    },
+
+    'inbox copy sender hoverHelp' => {
+        message     => q|If this setting is 'yes', users will receive a copy of messages that they send using the inbox.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
