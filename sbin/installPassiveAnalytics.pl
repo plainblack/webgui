@@ -138,7 +138,7 @@ sub installPassiveAnalyticsConfig {
     my $adminConsole = $session->config->get('adminConsole');
     if (!exists $adminConsole->{'passiveAnalytics'}) {
         $adminConsole->{'passiveAnalytics'} = {
-            "icon"         => "statistics.gif",
+            "icon"         => "passiveAnalytics.png",
             "uiLevel"      => 1,
             "url"          => "^PageUrl(\"\",op=passiveAnalytics;func=editRuleflow);",
             "title"        => "^International(Passive Analytics,PassiveAnalytics);",
