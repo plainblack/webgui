@@ -22,7 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::PassiveAnalytics::Rule;
+use WebGUI::Utility;
 
 my $toVersion = '7.7.0';
 my $quiet; # this line required
@@ -36,6 +37,14 @@ addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
+
+# Passive Analytics
+pa_installLoggingTables($session);
+pa_installPassiveAnalyticsRule($session);
+pa_installPassiveAnalyticsConfig($session);
+pa_installWorkflow($session);
+pa_addPassiveAnalyticsSettings($session);
+pa_addPassiveAnalyticsStatus($session);
 
 finish($session); # this line required
 
@@ -80,6 +89,162 @@ sub surveyRemoveResponseTemplate {
         $template->purge();
     }
     print "DONE!\n" unless $quiet;
+}
+
+sub pa_installLoggingTables {
+    my $session = shift;
+    print "\tInstall logging tables... ";
+    my $db = $session->db;
+    $db->write(<<EOT1);
+DROP TABLE IF EXISTS `passiveLog`
+EOT1
+$db->write(<<EOT1);
+CREATE TABLE `passiveLog` (
+    `userId`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `assetId`   varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `sessionId` varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `timeStamp` bigint(20),
+    `url`       varchar(255) character set utf8 collate utf8_bin NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT1
+    $db->write(<<EOT2);
+DROP TABLE IF EXISTS `deltaLog`
+EOT2
+    $db->write(<<EOT2);
+CREATE TABLE `deltaLog` (
+    `userId`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `assetId`   varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `delta`     integer,           
+    `timeStamp` bigint(20),
+    `url`       varchar(255) character set utf8 collate utf8_bin NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT2
+    $db->write(<<EOT3);
+DROP TABLE IF EXISTS `bucketLog`
+EOT3
+    $db->write(<<EOT3);
+CREATE TABLE `bucketLog` (
+    `userId`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `Bucket`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default '',
+    `duration`  integer,           
+    `timeStamp` datetime
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT3
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the PassiveAnalytics Rule table
+sub pa_installPassiveAnalyticsRule {
+    my $session = shift;
+    print "\tInstall Passive Analytics rule table, via Crud... ";
+    # and here's our code
+    WebGUI::PassiveAnalytics::Rule->crud_createTable($session);
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the PassiveAnalytics Settings
+sub pa_addPassiveAnalyticsSettings {
+    my $session = shift;
+    print "\tInstall Passive Analytics settings... ";
+    # and here's our code
+    $session->setting->add('passiveAnalyticsInterval', 300);
+    $session->setting->add('passiveAnalyticsDeleteDelta', 0);
+    $session->setting->add('passiveAnalyticsEnabled', 0);
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the PassiveAnalytics Rule table
+sub pa_addPassiveAnalyticsStatus {
+    my $session = shift;
+    my $db      = $session->db;
+    print "\tInstall Passive Analytics status table... ";
+    # and here's our code
+    $db->write(<<EOT2);
+DROP TABLE if exists passiveAnalyticsStatus;
+EOT2
+    $db->write(<<EOT3);
+CREATE TABLE `passiveAnalyticsStatus` (
+    `startDate` datetime,
+    `endDate`   datetime,
+    `running`   integer(2) DEFAULT 0,
+    `userId`    varchar(22)  character set utf8 collate utf8_bin NOT NULL default ''
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+EOT3
+    $db->write('insert into passiveAnalyticsStatus (userId) VALUES (3)');
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the Passive Analytics config file entry
+# for the adminConsole and the content handler
+sub pa_installPassiveAnalyticsConfig {
+    my $session = shift;
+    print "\tAdd Passive Analytics entry to the config file... ";
+    # Admin Bar/Console
+    my $adminConsole = $session->config->get('adminConsole');
+    if (!exists $adminConsole->{'passiveAnalytics'}) {
+        $adminConsole->{'passiveAnalytics'} = {
+            "icon"         => "passiveAnalytics.png",
+            "uiLevel"      => 1,
+            "url"          => "^PageUrl(\"\",op=passiveAnalytics;func=editRuleflow);",
+            "title"        => "^International(Passive Analytics,PassiveAnalytics);",
+            "groupSetting" => "3",
+        };
+        $session->config->set('adminConsole', $adminConsole);
+    }
+    # Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (!isIn('WebGUI::Content::PassiveAnalytics',@{ $contentHandlers} ) ) {
+        my $contentIndex = 0;
+        HANDLER: while ($contentIndex <= $#{ $contentHandlers } ) {
+            print $contentHandlers->[$contentIndex]."\n";
+            ##Insert before Operation
+            if($contentHandlers->[$contentIndex] eq 'WebGUI::Content::Operation') {
+                splice @{ $contentHandlers }, $contentIndex, 0, 'WebGUI::Content::PassiveAnalytics';
+                last HANDLER;
+            }
+            ++$contentIndex;
+        }
+        $session->config->set('contentHandlers', $contentHandlers);
+    }
+    # Workflow Activities
+    my $workflowActivities = $session->config->get('workflowActivities');
+    my @none = @{ $workflowActivities->{'None'} };
+    if (!isIn('WebGUI::Workflow::Activity::SummarizePassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::SummarizePassiveAnalytics';
+    }
+    if (!isIn('WebGUI::Workflow::Activity::BucketPassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::BucketPassiveAnalytics';
+    }
+    $workflowActivities->{'None'} = [ @none ];
+    $session->config->set('workflowActivities', $workflowActivities);
+    print "DONE!\n";
+}
+
+#----------------------------------------------------------------------------
+# Add the Passive Analytics Workflow
+sub pa_installWorkflow {
+    my $session = shift;
+    print "\tAdd Passive Analytics Workflow... ";
+    my $workflow = WebGUI::Workflow->create(
+        $session,
+        {
+            title   => 'Analyze Passive Analytics',
+            mode    => 'singleton',
+            type    => 'None',
+            description => 'Manual changes to this workflow will be lost.  Please only use the Passive Analytics screen to make changes',
+        },
+        'PassiveAnalytics000001',
+    );
+    my $summarize = $workflow->addActivity('WebGUI::Workflow::Activity::SummarizePassiveAnalytics');
+    my $bucket    = $workflow->addActivity('WebGUI::Workflow::Activity::BucketPassiveAnalytics');
+    $summarize->set('title', 'Perform duration analysis');
+    $bucket->set(   'title', 'Please log entries into buckets');
+    $workflow->set({enabled => 1});
+    print "DONE!\n";
 }
 
 
