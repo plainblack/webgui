@@ -155,7 +155,6 @@ a C<get> method to provide that information.
 
 sub dynamicForm {
 	my ($self, $formDefinition, $fieldList, $parent) = @_;
-    my $form = $self->session->form;
     foreach my $definition (reverse @{$formDefinition}) {
         my $properties = $definition->{$fieldList};
         foreach my $fieldname (keys %{$properties}) {
@@ -166,7 +165,7 @@ sub dynamicForm {
                     $params{$key} = $formDefinition->[0]{name};
                 }
             }
-            $params{value} = $form->get($fieldname) || $parent->get($fieldname);
+            $params{value} = $parent->get($fieldname);
             $params{name}  = $fieldname;
             $self->dynamicField(%params);
         }
