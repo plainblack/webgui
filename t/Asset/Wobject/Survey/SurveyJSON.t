@@ -2151,6 +2151,7 @@ sub getBareSkeletons {
            terminal               => 0,
            terminalUrl            => '',
            goto                   => '',
+           gotoExpression         => '',
            timeLimit              => 0,
            type                   => 'section',
            questions              => [],
@@ -2171,6 +2172,8 @@ sub getBareSkeletons {
            textInButton           => 0,
            type                   => 'question',
            answers                => [],
+           goto                   => '',
+           gotoExpression         => '',
         },
         {
            text                   => '',
