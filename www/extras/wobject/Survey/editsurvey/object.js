@@ -85,21 +85,11 @@ Survey.ObjectTemplate = (function(){
             dialog.callback = Survey.Comm.callback;
             dialog.render();
 
-//            if(type == 'question'){
-//                var resize = new YAHOO.util.Resize('resize_randomWords_formId');
-//                resize.on('resize', function(ev) {
-//                YAHOO.util.Dom.setStyle('randomWords_formId', 'width', (ev.width - 6) + "px");
-//                YAHOO.util.Dom.setStyle('randomWords_formId', 'height', (ev.height - 6) + "px");
-//                });
-//            }
-
-            if(type == 'answer'){
-                var resize = new YAHOO.util.Resize('resize_gotoExpression_formId');
-                resize.on('resize', function(ev) {
+            var resizeGotoExpression = new YAHOO.util.Resize('resize_gotoExpression_formId');
+            resizeGotoExpression.on('resize', function(ev) {
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'width', (ev.width - 6) + "px");
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'height', (ev.height - 6) + "px");
-                });
-            }
+            });
             
             var textareaId = type + 'Text';
             var textarea = YAHOO.util.Dom.get(textareaId);
