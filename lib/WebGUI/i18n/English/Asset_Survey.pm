@@ -535,16 +535,6 @@ the time limit for completing the survey. This message is in the 'take survey' t
         lastUpdated => 1233714385,
     },
     
-    'Max user responses' => {
-        message     => q|Max user responses|,
-        lastUpdated => 0,
-    },
-
-    'Max user responses help' => {
-        message     => q|The maximum number of times an individual user is allowed to complete the Survey.|,
-        lastUpdated => 0,
-    },
-    
     'Overview Report Template' => {
         message     => q|Overview Report Template|,
         lastUpdated => 0,
@@ -572,56 +562,6 @@ the time limit for completing the survey. This message is in the 'take survey' t
 
     'Survey Edit Template help' => {
         message     => q|The template used to display the Survey Edit screen.|,
-        lastUpdated => 0,
-    },
-    
-    'Take Survey Template' => {
-        message     => q|Take Survey Template|,
-        lastUpdated => 0,
-    },
-
-    'Take Survey Template help' => {
-        message     => q|The template used to control the initial Take Survey screen, from which responses are dynamically loaded into.|,
-        lastUpdated => 0,
-    },
-    
-    'Questions Template' => {
-        message     => q|Questions Template|,
-        lastUpdated => 0,
-    },
-
-    'Questions Template help' => {
-        message     => q|The template used to display individual questions, which are dynamically loaded into the Take Survey page.|,
-        lastUpdated => 0,
-    },
-    
-    'Section Edit Template' => {
-        message     => q|Section Edit Template|,
-        lastUpdated => 0,
-    },
-
-    'Section Edit Template help' => {
-        message     => q|The template used to display the Section Edit dialog on the Edit Survey page.|,
-        lastUpdated => 0,
-    },
-    
-    'Question Edit Template' => {
-        message     => q|Question Edit Template|,
-        lastUpdated => 0,
-    },
-
-    'Question Edit Template help' => {
-        message     => q|The template used to display the Question Edit dialog on the Edit Survey page.|,
-        lastUpdated => 0,
-    },
-    
-    'Answer Edit Template' => {
-        message     => q|Answer Edit Template|,
-        lastUpdated => 0,
-    },
-
-    'Answer Edit Template help' => {
-        message     => q|The template used to display the Answer Edit dialog on the Edit Survey page.|,
         lastUpdated => 0,
     },
 
@@ -658,17 +598,6 @@ the time limit for completing the survey. This message is in the 'take survey' t
         lastUpdated => 0
     },
 
-    'Response Template' => {
-        message => q|Response Template|,
-        context => q|The template for displaying responses to the survey.|,
-        lastUpdated => 0
-    },
-
-    'Response Template help' => {
-        message => q|The template for displaying responses to the survey.|,
-        lastUpdated => 0
-    },
-
     'Edit Survey Template' => {
         message => q|Edit Survey Template|,
         context => q|The template for displaying the screen for editing the survey.|,
@@ -687,7 +616,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Take Survey Template help' => {
-        message => q|The template for displaying the screen where a user takes the survey.|,
+        message => q|The template used to control the initial Take Survey screen, from which responses are dynamically loaded into.|,
         lastUpdated => 0
     },
 
@@ -698,7 +627,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Questions Template help' => {
-        message => q|The template for rendering questions in the survey.|,
+        message => q|The template used to display individual questions, which are dynamically loaded into the Take Survey page.|,
         lastUpdated => 0
     },
 
@@ -709,7 +638,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Section Edit Template help' => {
-        message => q|The template for adding or editing sections.|,
+        message => q|The template used to display the Section Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
@@ -720,7 +649,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Question Edit Template help' => {
-        message => q|The template for adding or editing questions.|,
+        message => q|The template used to display the Question Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
@@ -731,7 +660,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Answer Edit Template help' => {
-        message => q|The template for adding or editing answers.|,
+        message => q|The template used to display the Answer Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
