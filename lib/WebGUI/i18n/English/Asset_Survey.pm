@@ -31,6 +31,10 @@ our $I18N = {
 		message => q|View Grade Book|,
 		lastUpdated => 1224686319
 	},
+    'delete responses' => {
+        message => q|Delete Responses|,
+        lastUpdated => 0
+    },
 	'continue button' => {
 		message => q|Continue|,
 		lastUpdated => 1224686319
@@ -83,7 +87,7 @@ our $I18N = {
     },
 
 	'section name' => {
-		message => q|Section name:|,
+		message => q|Section title:|,
 		lastUpdated => 1224686319
 	},
     'section name description' => {
@@ -101,7 +105,7 @@ our $I18N = {
         lastUpdated => 0 
     },
 	'section custom variable name' => {
-		message => q|Section custom variable name:|,
+		message => q|Section variable name:|,
 		lastUpdated => 1224686319
 	},
     'section custom variable name description' => {
@@ -110,7 +114,7 @@ our $I18N = {
         lastUpdated => 0
     },
 	'section branch goto variable name' => {
-		message => q|Section branch goto variable name:|,
+		message => q|Jump to:|,
 		lastUpdated => 1224686319
 	},
     'section branch goto variable name description' => {
@@ -222,6 +226,10 @@ our $I18N = {
 		message => q|Question type:|,
 		lastUpdated => 1224686319
 	},
+	'randomized words' => {
+		message => q|Randomized words:|,
+		lastUpdated => 1224686319
+	},
     'question type description' => {
         message => q|Select this question's field type.|,
         context => q|Description of the 'question type' field, used as hoverhelp in the edit question dialog.|,
@@ -256,21 +264,21 @@ our $I18N = {
         context => q|Description of the 'allow comment' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'cols' => {
-		message => q|Cols:|,
+	'comment cols' => {
+		message => q|Comment Cols:|,
 		lastUpdated => 1224686319
 	},
     'cols description' => {
-        message => q|The number of columns of the textarea input.|,
+        message => q|The number of columns used for the comment TextArea input field.|,
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'rows' => {
-		message => q|Rows:|,
+	'comment rows' => {
+		message => q|Comment Rows:|,
 		lastUpdated => 1224686319
 	},
     'rows description' => {
-        message => q|The number of rows of the textarea input.|,
+        message => q|The number of rows shown for the comment TextArea input field.|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
@@ -325,11 +333,11 @@ our $I18N = {
         lastUpdated => 0
     },
 	'recorded answer' => {
-		message => q|Recorded answer:|,
+		message => q|Answer title:|,
 		lastUpdated => 1224686319
 	},
     'recorded answer description' => {
-        message => q|The answer that will be recorded in the database. The recorded answer will be displayed in a multiple choice question's buttons, only if the question's 'Show text in button' property is set to yes. Otherwise the multiple choice buttons will be empty. |,
+        message => q|Text to display inside multiple-choice answer buttons (only if 'Show text in button' is enabled for this question).|,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -337,13 +345,22 @@ our $I18N = {
 		message => q|Jump to:|,
 		lastUpdated => 1224686319
 	},
+	'jump expression' => {
+		message => q|Jump expression:|,
+		lastUpdated => 1229318805
+	},
     'jump to description' => {
         message => q|The section or question with this variable name will be the next to be displayed after this answer.|,
         context => q|Description of the 'jump to' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
+    'jump expression description' => {
+        message => q|An expression used to control complex branching based user responses to previous questions. A branch expression is made up of a list of rules, one per line, along with a branch target for each rule. |,
+        context => q|Description of the 'jump expression' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 0
+    },
 	'text answer' => {
-		message => q|Text answer|,
+		message => q|TextArea|,
 		lastUpdated => 1224686319
 	},
 	'is this the correct answer' => {
@@ -363,30 +380,30 @@ our $I18N = {
 		message => q|No|,
 		lastUpdated => 1224686319
 	},
-	'min' => {
-		message => q|Min|,
+	'min label' => {
+		message => q|Slider Min|,
 		lastUpdated => 1224686319
 	},
     'min description' => {
-        message => q|Set the min value of this answer for slider type questions.|,
+        message => q|The minimum value of this answer for slider type questions.|,
         context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
 	'max label' => {
-		message => q|Max|,
+		message => q|Slider Max|,
 		lastUpdated => 1224686319
 	},
     'max description' => {
-        message => q|Set the max value of this answer for slider type questions.|,
+        message => q|The maximum value of this answer for slider type questions.|,
         context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
 	'step label' => {
-		message => q|Step|,
+		message => q|Slider Step|,
 		lastUpdated => 1224686319
 	},
     'step description' => {
-        message => q|Set the step value of this answer for slider type questions.|,
+        message => q|The step value of this answer for slider type questions.|,
         context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -395,7 +412,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'verbatim description' => {
-        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text.|,
+        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
         context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -404,7 +421,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'answer value description' => {
-        message => q|Enter a value for this answer.|,
+        message => q|Assign a numeric scores to this answers. Used in question scoring and jump expressions.|,
         context => q|Description of the 'answer value' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -429,7 +446,35 @@ our $I18N = {
         message     => q|The template to display the main page of the survey.|,
         lastUpdated => 0,
     },
-
+    'do after timelimit label' => {
+        message => q|Do After Time Limit:|,
+        lastUpdated => 1224686319,
+        context => q|label for the 'do after timelimit' field on the Properties tab of the Survey's edit screen.|,
+    },
+    'do after timelimit hoverHelp' => {
+        message => q|Select what happens after the time limit for finishing the survey has expired.|,
+        lastUpdated => 1231193335,
+        context => q|description of the 'do after timelimit' field on the Properties tab of the Survey's edit
+screen|,
+    }, 
+    'exit url label' =>{
+        message => q|Exit URL|,
+        lastUpdated => 0,
+        context => q|Label for the 'exit url' option of the 'do after timelimit' field on the Properties tab of the
+Survey's edit screen|,
+    },
+    'restart survey label' =>{
+        message => q|Restart Survey|,
+        lastUpdated => 0,
+        context => q|Label for the 'restart survey' option of the 'do after timelimit' field on the Properties tab of the
+Survey's edit screen|,
+    },
+    'restart message' =>{
+        message => q|The survey was restarted because the time limit for completing the survey was reached.|,
+        lastUpdated => 0,
+        context => q|The message shown to the user taking the survey when the survey is restarted after reaching
+the time limit for completing the survey. This message is in the 'take survey' template.|,
+    },
     'Show user their progress' => {
         message     => q|Show user their progress?|,
         lastUpdated => 0,
@@ -489,6 +534,36 @@ our $I18N = {
         message     => q|When the user finishes the surevey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
         lastUpdated => 1233714385,
     },
+    
+    'Overview Report Template' => {
+        message     => q|Overview Report Template|,
+        lastUpdated => 0,
+    },
+
+    'Overview Report Template help' => {
+        message     => q|The template used to display the Overview Report.|,
+        lastUpdated => 0,
+    },
+    
+    'Grabebook Report Template' => {
+        message     => q|Grabebook Report Template|,
+        lastUpdated => 0,
+    },
+
+    'Grabebook Report Template help' => {
+        message     => q|The template used to display the Gradebook Report|,
+        lastUpdated => 0,
+    },
+    
+    'Survey Edit Template' => {
+        message     => q|Survey Edit Template|,
+        lastUpdated => 0,
+    },
+
+    'Survey Edit Template help' => {
+        message     => q|The template used to display the Survey Edit screen.|,
+        lastUpdated => 0,
+    },
 
     'Max user responses' => {
         message => q|Max user responses|,
@@ -523,17 +598,6 @@ our $I18N = {
         lastUpdated => 0
     },
 
-    'Response Template' => {
-        message => q|Response Template|,
-        context => q|The template for displaying responses to the survey.|,
-        lastUpdated => 0
-    },
-
-    'Response Template help' => {
-        message => q|The template for displaying responses to the survey.|,
-        lastUpdated => 0
-    },
-
     'Edit Survey Template' => {
         message => q|Edit Survey Template|,
         context => q|The template for displaying the screen for editing the survey.|,
@@ -552,7 +616,7 @@ our $I18N = {
     },
 
     'Take Survey Template help' => {
-        message => q|The template for displaying the screen where a user takes the survey.|,
+        message => q|The template used to control the initial Take Survey screen, from which responses are dynamically loaded into.|,
         lastUpdated => 0
     },
 
@@ -563,7 +627,7 @@ our $I18N = {
     },
 
     'Questions Template help' => {
-        message => q|The template for rendering questions in the survey.|,
+        message => q|The template used to display individual questions, which are dynamically loaded into the Take Survey page.|,
         lastUpdated => 0
     },
 
@@ -574,7 +638,7 @@ our $I18N = {
     },
 
     'Section Edit Template help' => {
-        message => q|The template for adding or editing sections.|,
+        message => q|The template used to display the Section Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
@@ -585,7 +649,7 @@ our $I18N = {
     },
 
     'Question Edit Template help' => {
-        message => q|The template for adding or editing questions.|,
+        message => q|The template used to display the Question Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
@@ -596,7 +660,7 @@ our $I18N = {
     },
 
     'Answer Edit Template help' => {
-        message => q|The template for adding or editing answers.|,
+        message => q|The template used to display the Answer Edit dialog on the Edit Survey page.|,
         lastUpdated => 0
     },
 
@@ -859,12 +923,6 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 0,
     },
 
-    'templateId' => {
-        message => q|The ID of the template to show the Survey.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168639537,
-    },
-
     'groupToTakeSurvey' => {
         message => q|The ID of the group that is allowed to take the Survey.|,
         context => q|Description of a template variable for a template Help page.|,
@@ -881,24 +939,6 @@ directly inside the answer_loop for other types of questions.|,
         message => q|The number of times the user can attempt to get the correct answer on each question. The default is 1.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1168643566,
-    },
-
-    'overviewTemplateId' => {
-        message => q|The ID of the template used to show the overview screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
-    },
-
-    'gradebookTemplateId' => {
-        message => q|The ID of the template used to show the gradebook screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
-    },
-
-    'responseTemplateId' => {
-        message => q|The ID of the template used to show the Survey Response screen.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643669,
     },
 
     'survey questions template title' => {
@@ -1227,18 +1267,6 @@ section/answer.|,
         lastUpdated => 0,
     },
 
-    'min' => {
-        message => q|The min value of this answer for slider type questions.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
-    },
-
-    'max' => {
-        message => q|The max value of this answer for slider type questions..|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
-    },
-
     'step' => {
         message => q|The step value of this answer for slider type questions..|,
         context => q|Description of a template variable for a template Help page.|,
@@ -1252,13 +1280,13 @@ section/answer.|,
     },
 
     'textCols' => {
-        message => q|The number of columns for textarea answers.|,
+        message => q|The number of columns for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'textRows' => {
-        message => q|The number of rows for textarea answers.|,
+        message => q|The number of rows for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },

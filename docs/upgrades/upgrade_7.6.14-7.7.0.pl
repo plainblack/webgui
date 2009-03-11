@@ -34,6 +34,8 @@ my $session = start(); # this line required
 
 addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
+surveyDoAfterTimeLimit($session);
+surveyRemoveResponseTemplate($session);
 
 finish($session); # this line required
 
@@ -60,6 +62,26 @@ sub addScreenshotTemplatesToMatrix {
     
     print "Done.\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub surveyDoAfterTimeLimit {
+    my $session = shift;
+    print "\tAdding column doAfterTimeLimit to Survey table... " unless $quiet;
+    $session->db->write('alter table Survey add doAfterTimeLimit char(22)');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub surveyRemoveResponseTemplate {
+    my $session = shift;
+    print "\tRemoving responseTemplate... " unless $quiet;
+    $session->db->write('alter table Survey drop responseTemplateId');
+    if (my $template = WebGUI::Asset->new($session, 'PBtmpl0000000000000064')) {
+        $template->purge();
+    }
+    print "DONE!\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Describe what our function does
