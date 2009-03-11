@@ -22,7 +22,6 @@ my $activities = $workflow->getActivities();
 ##Note, they're in order, and the order is known.
 $activities->[0]->set('deltaInterval', 100);
 $activities->[1]->set('userId',          0); ##To disable sending emails
-diag "Configured activities";
     
 my $instance = WebGUI::Workflow::Instance->create($session,
     {
@@ -56,30 +55,24 @@ my @ruleSets = (
 );
 
 my @url2 = @ruleSets;
-diag "Making rules";
 while (my $spec = shift @url2) {
     my ($bucket, undef, $regexp) = @{ $spec };
     WebGUI::PassiveAnalytics::Rule->create($session, { bucketName => $bucket, regexp => $regexp });
 }
 
 my @urls = map {$_->[1]} @ruleSets;
-diag "Making log data with " . scalar @urls . " urls";
 loadLogData($session, @urls);
-diag "Data logged";
 
 ##Build rulesets
 
 ##Now, run it and wait for it to finish
 my $counter = 0;
-diag time();
 #DB::enable_profile();
 PAUSE: while (my $retval = $instance->run()) {
-    diag $retval;
     last PAUSE if $retval eq 'done';
     last PAUSE if $counter++ >= 16;
 }
 #DB::disable_profile();
-diag time();
 
 ok(1, 'One test');
 
