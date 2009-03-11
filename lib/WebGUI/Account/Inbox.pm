@@ -1164,13 +1164,16 @@ sub www_sendMessageSave {
     return $self->www_sendMessage($errorMsg) if $hasError;
 
     foreach my $uid (@toUsers) {
-        $inbox->addMessage({
+        my $message = $inbox->addMessage({
             message => $message,
             subject => $subject,
             userId  => $uid,
             status  => 'unread',
             sentBy  => $fromUser->userId
         });
+        if ($uid eq $session->user->userId) {
+            $message->setRead;
+        }
     }
 
     $self->appendCommonVars($var,$inbox);
