@@ -7,6 +7,10 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+7.7.0
+--------------------------------------------------------------------
+   * WebGUI now requires Params::Validate version 0.81 or greater.
+
 7.6.11
 --------------------------------------------------------------------
    * If upgrading from WebGUI 7.5, you should upgrade to 7.5.40 first,
