@@ -124,6 +124,10 @@ our $HELP = {
                 name        => 'gallery_url',
                 description => 'helpvar gallery_url',
             },
+            {
+                name        => 'gallery_displayTitle',
+                description => 'helpvar gallery_displayTitle',
+            },
         ],
     },
 

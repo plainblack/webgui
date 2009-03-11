@@ -1,6 +1,57 @@
+7.7.0
+ - fixed: Template parser cannot be set
+ - fixed #9836: Matrix: Group to Add Listings is missing
+ - fixed #9873: third-> first in post template help
+ - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
+
+7.6.14
+ - fixed: IE6 shows Admin Bar over Asset Manager
+ - fixed #9808: Search i18n 
+ - fixed #9818: deleteAttachedFiles bug (THE REVENGE)
+ - fixed #9809: Pagination list up to 10/20: not working correctly on last pages.
+ - fixed #9820: Survey: political party spelled wrong
+ - fixed #9819: Survey: hoverhelp showing instead of field name
+ - fixed #9822: Matrix: Wrong field label
+ - fixed #9823: Matrix: no cancel button in add/edit listing
+
+7.6.13
+ - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
+ - fixed #9760: DataForm not working in demo.plainblack.com
+ - fixed #9759: Delete Entry Button missing in Data Form
+ - fixed #9767: FileAsset breaks 'null' rule for FileAsset table
+ - fixed defaultValues of undef cause mysql5.1 to complain about columns that are set to be NOT NULL.  5.0 doesn't care.
+ - International text retrieval has been optimized
+ - fixed #9766: Thingy Pagination Broken
+ - fixed #9779: Gallery: js for search (datepicker?) included in album view
+ - fixed #9783: payment methods are not added
+ - fixed #9785: Delete All button not working in Account/Inbox [TEMPLATE]
+ - fixed #9803: Survey 2.0- Gradebook spelled wrong
+ - fixed #9801: Survey 2.0- Template spelled wrong
+ - fixed #9802: Survey Template field names to be consistent
+ - fixed: HTMLForm generated forms have an extra double quote in the table tag.
+
+7.6.12
+ - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
+ - fixed: Do not show the Edit entry in the More menu in the asset manager if the asset is locked.
+ - fixed #9677: no output from form helper template variable sticky.form and stick.label
+ - fixed #9738: Gallery Title [TEMPLATE]
+ - fixed #9739: Gallery Delete Album Template [TEMPLATE]
+ - fixed #9737: Upgrade Missed a Config Option
+ - fixed #9169: E-mail to Collab System creates invalid asset
+ - fixed #9746: Shop: Add a new address unneeded extra click
+ - fixed #9747: Account Contributions: URLs are wrong.
+ - fixed #9749: Account Manager: AIM link
+ - fixed #9751: Account Manager: problem sorting in Contributions
+ - fixed #9750: Account Manager: Inbox Messages per Page [TEMPLATE]
+ - fixed: If the Get Credentials template is deleted for the ITransact PayDriver, it now gives you an error message instead of throwing an error.
+ - fixed: Collaboration groupToEditPost should not be blank
+ - fixed: WebGUI::User->isInGroup had bad default groupId
+ - fixed: Fix a layout problem in the Contributions, similar to the Inbox[TEMPLATE]
+
 7.6.11
- - Added a switch to allow the use of non-WebGUI objects with the Workflow
-   engine.
+ - fixed: Asset Manager can generate URLs that are too long
+ - fixed #9629: override stringify date format to use java default format.
+ - Added a switch to allow the use of non-WebGUI objects with the Workflow engine.
  - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
  - fixed #9596: caching now takes into account the correct parameter for pagination
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id

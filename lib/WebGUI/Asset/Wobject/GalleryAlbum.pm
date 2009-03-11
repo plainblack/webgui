@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::GalleryAlbum;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -537,7 +537,7 @@ sub getTemplateVars {
 
     # Add some specific vars from the Gallery
     my $galleryVar      = $gallery->getTemplateVars;
-    for my $key ( qw{ title menuTitle url } ) {
+    for my $key ( qw{ title menuTitle url displayTitle } ) {
         $var->{ "gallery_" . $key } = $galleryVar->{ $key };
     }
 
@@ -647,7 +647,8 @@ sub prepareView {
         = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
-    $self->{_viewTemplate} = $template;
+    $self->{_viewTemplate}  = $template;
+    $self->{_viewVariables} = $self->getTemplateVars;
 }
 
 #----------------------------------------------------------------------------
@@ -776,7 +777,7 @@ to be displayed within the page style.
 sub view {
     my $self        = shift;
     my $session     = $self->session;	
-    my $var         = $self->getTemplateVars;
+    my $var         = delete $self->{_viewVariables};
     
     my $p           = $self->getFilePaginator;
     $p->appendTemplateVars( $var );
@@ -1018,6 +1019,7 @@ sub www_addFileService {
         title           => $form->get('title','text'),
         description     => $form->get('synopsis','textarea'),
         synopsis        => $form->get('synopsis','textarea'),
+        ownerUserId     => $session->user->userId,
     });
 
     my $storage = $file->getStorageLocation;

@@ -3,7 +3,7 @@ package WebGUI::Session::Env;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -30,11 +30,73 @@ $env = WebGUI::Session::Env->new;
 
 $value = $env->get('REMOTE_ADDR');
 
+return 'not gonna see it' if $env->requestNotViewed() ;
+
 =head1 METHODS
 
 These methods are available from this package:
 
 =cut
+
+
+#-------------------------------------------------------------------
+
+=head2 callerIsSearchSite ( )
+
+returns true if the remote address matches a site which is a known indexer or spider.
+
+=cut
+
+sub callerIsSearchSite {
+
+    my $self = shift;
+    my $remoteAddress = $self->getIp;
+
+    return 1 if $remoteAddress =~ /203\.87\.123\.1../    # Blaiz Enterprise Rawgrunt search
+             || $remoteAddress =~ /123\.113\.184\.2../   # Unknown Yahoo Robot
+             || $remoteAddress == '';
+
+    return 0;
+
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 clientIsSpider ( )
+
+returns true is the client/agent is a spider/indexer or some other non-human interface
+
+=cut
+
+
+sub clientIsSpider {
+
+    my $self = shift;
+    my $userAgent = $self->get('HTTP_USER_AGENT');
+
+    return 1 if $userAgent eq ''
+             || $userAgent =~ m<(^wre\/|      # the WRE wget's http://localhost/ every 2-3 minutes 24 hours a day...
+                                 ^morpheus|
+                                 libwww|
+                                 s[pb]ider|
+                                 bot|
+                                 robo|
+                                 sco[ou]t|
+                                 crawl|
+                                 miner|
+                                 reaper|
+                                 finder|
+                                 search|
+                                 engine|
+                                 download|
+                                 fetch|
+                                 scan|
+                                 slurp)>ix;
+
+    return 0;
+
+}
 
 
 #-------------------------------------------------------------------
@@ -100,5 +162,22 @@ sub new {
 	bless {_env=>\%ENV}, $class;
 }
 
+#-------------------------------------------------------------------
+
+=head2 requestNotViewed ( )
+
+returns true is the client/agent is a spider/indexer or some other non-human interface
+
+=cut
+
+sub requestNotViewed {
+
+    my $self = shift;
+    return $self->clientIsSpider()
+        || $self->callerIsSearchSite();
+
+}
+
 
 1;
+

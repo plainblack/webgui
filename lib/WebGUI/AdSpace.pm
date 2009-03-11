@@ -3,7 +3,7 @@ package WebGUI::AdSpace;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -52,6 +52,7 @@ sub countClick {
 	my $session = shift;
 	my $id = shift;
 	my ($url) = $session->db->quickArray("select url from advertisement where adId=?",[$id]);
+        return $url if $session->env->requestNotViewed();
 	$session->db->write("update advertisement set clicks=clicks+1 where adId=?",[$id]);
 	return $url;
 }
@@ -131,6 +132,7 @@ A boolean that tells the ad system not to count this impression if true.
 sub displayImpression {
 	my $self = shift;
 	my $dontCount = shift;
+        return '' if $self->session->env->requestNotViewed();
 	my ($id, $ad, $priority, $clicks, $clicksBought, $impressions, $impressionsBought) = $self->session->db->quickArray("select adId, renderedAd, priority, clicks, clicksBought, impressions, impressionsBought from advertisement where adSpaceId=? and isActive=1 order by nextInPriority asc limit 1",[$self->getId]);
 	unless ($dontCount) {
 		my $isActive = 1;

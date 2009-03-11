@@ -1,7 +1,7 @@
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
-            elCell.innerHTML = "<a href='" + oRecord.getData("url") + "' target='_blank'>" + sData + "</a>";
+            elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
         };
 	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
 		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
@@ -23,6 +23,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
 	var uri = "func=getCompareFormData";
 		if(typeof(listingIds) != 'undefined'){
+		uri = uri + ';__listingId_isIn=1';
 		for (var i = 0; i < listingIds.length; i++) {
 			uri = uri+';listingId='+listingIds[i];
 		}
@@ -33,7 +34,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["title","views","clicks","compares","checked","lastUpdated","url","assetId"]
+            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked"},{key: "lastUpdated", parser: "number"},"url","assetId"]
         };
 
         this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,

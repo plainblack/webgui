@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -35,8 +35,7 @@ removeBrokenWorkflowInstances($session);
 undotBinaryExtensions($session);
 removeProcessRecurringPaymentsFromConfig($session);
 noSessionSwitch($session);
-surveyDoAfterTimeLimit($session);
-surveyRemoveResponseTemplate($session);
+addReCaptchaSettings($session);
 
 fixDottedAssetIds($session);  ##This one should run last
 finish($session); # this line required
@@ -62,6 +61,27 @@ sub removeProcessRecurringPaymentsFromConfig {
 }
 
 #----------------------------------------------------------------------------
+sub addReCaptchaSettings {
+    my $session = shift;
+    print "\tAdding settings for reCAPTCHA..." unless $quiet;
+    my $currentSetting;
+
+    $currentSetting = $session->setting->get('useRecaptcha');
+    $session->setting->remove('useRecaptcha');
+    $session->setting->add('useRecaptcha', $currentSetting);
+
+    $currentSetting = $session->setting->get('recaptchaPublicKey');
+    $session->setting->remove('recaptchaPublicKey');
+    $session->setting->add('recaptchaPublicKey', $currentSetting);
+
+    $currentSetting = $session->setting->get('recaptchaPrivateKey');
+    $session->setting->remove('recaptchaPrivateKey');
+    $session->setting->add('recaptchaPrivateKey', $currentSetting);
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub hideGalleryAlbums {
     my $session = shift;
     print "\tHiding all Gallery Albums from Navigation... " unless $quiet;
@@ -81,26 +101,6 @@ sub undotBinaryExtensions {
     my $extensions = $session->config->get('exportBinaryExtensions');
     my @newExtensions = map { s/\.//; $_ } @{ $extensions };
     $session->config->set('exportBinaryExtensions', \@newExtensions);
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-sub surveyDoAfterTimeLimit {
-    my $session = shift;
-    print "\tAdding column doAfterTimeLimit to Survey table... " unless $quiet;
-    $session->db->write('alter table Survey add doAfterTimeLimit char(22)');
-    print "DONE!\n" unless $quiet;
-    print "DONE!\n" unless $quiet;
-}
-
-#----------------------------------------------------------------------------
-sub surveyRemoveResponseTemplate {
-    my $session = shift;
-    print "\tRemoving responseTemplate... " unless $quiet;
-    $session->db->write('alter table Survey drop responseTemplateId');
-    if (my $template = WebGUI::Asset->new($session, 'PBtmpl0000000000000064')) {
-        $template->purge();
-    }
     print "DONE!\n" unless $quiet;
 }
 

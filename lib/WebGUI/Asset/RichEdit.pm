@@ -3,7 +3,7 @@ package WebGUI::Asset::RichEdit;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -561,7 +561,7 @@ sub getRichEditor {
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " )\n"
             . "</script>";
 }
 

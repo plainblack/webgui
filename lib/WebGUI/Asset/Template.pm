@@ -3,7 +3,7 @@ package WebGUI::Asset::Template;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -88,7 +88,7 @@ sub definition {
             },
             parser => {
                 noFormPost      => 1,
-                fieldType       => 'selectList',
+                fieldType       => 'selectBox',
                 defaultValue    => [$session->config->get("defaultTemplateParser")],
             },	
             namespace => {
@@ -144,6 +144,7 @@ sub processPropertiesFromFormPost {
     my %data;
     my $needsUpdate = 0;
 	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+        $needsUpdate = 1;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {

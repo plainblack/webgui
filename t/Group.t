@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -384,7 +384,7 @@ cmp_bag($everyUsers, $everyoneGroup->getUsers(), 'addUsers will not add a user t
 ##Database based user membership in groups
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-$session->db->dbh->do(q!CREATE TABLE myUserTable (userId varchar(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
+$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
 
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {

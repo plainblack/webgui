@@ -328,7 +328,7 @@ sub www_removeFriend {
 
 #-------------------------------------------------------------------
 
-=head2 www_removeFriend ( )
+=head2 www_removeFriendConfirm ( )
 
 This is a confirmation page of whether or not the user wishes to remove the selected user from friend 
 

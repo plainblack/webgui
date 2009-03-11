@@ -3,7 +3,7 @@ package WebGUI::HTML;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -441,6 +441,45 @@ sub splitTag {
 
     return @result if wantarray;
     return $result[0];
+}
+
+sub splitHeadBody {
+    my $html = shift;
+
+    my $parser = HTML::Parser->new(api_version => 3);
+
+    my $head = '';
+    my $body = '';
+    my $accum;
+    $parser->handler(start => sub {
+        my ($tag, $text) = @_;
+        if ($tag eq 'head') {
+            $accum = \$head;
+        }
+        elsif ($tag eq 'body') {
+            $accum = \$body;
+        }
+        elsif ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->handler(end => sub {
+        my ($tag, $text) = @_;
+        if ($tag eq 'head' || $tag eq 'body') {
+            $accum = undef;
+        }
+        elsif ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->handler(default => sub {
+        my ($tag, $text) = @_;
+        if ($accum) {
+            $$accum .= $text;
+        }
+    }, 'tagname, text');
+    $parser->parse($html);
+    return ($head, $body);
 }
 
 1;

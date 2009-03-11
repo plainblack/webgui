@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -287,8 +287,6 @@ my $tempStor = WebGUI::Storage->createTemp($session);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
 is (substr($tempStor->getPathFrag, 0, 5), 'temp/', 'createTemp puts stuff in the temp directory');
-use Data::Dumper;
-diag Dumper $tempStor->getErrors();
 ok (-e $tempStor->getPath(), 'createTemp: directory was created');
 
 ####################################################

@@ -44,6 +44,11 @@ fields below.|,
         lastUpdated => 0,
     },
 
+    'edit label' => {
+        message => q|Edit|,
+        lastUpdated => 0,
+    },
+
     'version description' => {
         message => q|Enter the version/edition/model number for the product.|,
         lastUpdated => 0,
@@ -219,6 +224,30 @@ it would be best to make sure the names are the same.|,
         message => q|The complete edit form.|,
         lastUpdated => 0,
     	context => q|Description of the form tmpl_var for the template help.|,
+    },
+
+    'canEdit' => {
+        message => q|A boolean indicating whether the user can edit this listing.|,
+        lastUpdated => 0,
+        context => q|Description of the screenshots tmpl_var for the template help.|,
+    },
+
+    'editUrl' => {
+        message => q|The url to this listing's edit screen.|,
+        lastUpdated => 0,
+        context => q|Description of the screenshots tmpl_var for the template help.|,
+    },
+
+    'canApprove' => {
+        message => q|A boolean indicating whether the user can approve or deny this listing.|,
+        lastUpdated => 0,
+        context => q|Description of the screenshots tmpl_var for the template help.|,
+    },
+
+    'approveOrDenyUrl' => {
+        message => q|The url to this listing's approve or deny screen.|,
+        lastUpdated => 0,
+        context => q|Description of the screenshots tmpl_var for the template help.|,
     },
 
     'screenshots' => {

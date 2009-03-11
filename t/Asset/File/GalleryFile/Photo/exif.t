@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -46,7 +46,10 @@ my $photo
     { skipAutoCommitWorkflows => 1 },
     );
 $versionTag->commit;
-my $exif    = ImageInfo( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+
+$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
+
+my $exif    = ImageInfo( $photo->getStorageLocation->getPath($photo->get('filename')) );
 # Sanitize Exif data by removing keys with references as values
 for my $key ( keys %$exif ) {
     if ( ref $exif->{$key} ) {
@@ -58,7 +61,6 @@ for my $key ( qw{ Directory } ) {
     delete $exif->{ $key };
 }
 
-$photo->setFile( WebGUI::Test->getTestCollateralPath("lamp.jpg") );
 
 #----------------------------------------------------------------------------
 # Cleanup

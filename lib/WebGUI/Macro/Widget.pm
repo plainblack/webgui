@@ -1,7 +1,7 @@
 package WebGUI::Macro::Widget;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -72,6 +72,11 @@ sub process {
         $wgWidgetPath       = $exportUrl . $extras . '/wgwidget.js';
         $scratch->delete('exportUrl');
         my $viewContent    = $asset->view;
+        if ($styleTemplateId ne '' && $styleTemplateId ne 'none') {
+            $viewContent = $session->style->process($viewContent,$styleTemplateId);
+        }
+        my ($headTags, $bodyContent) = WebGUI::HTML::splitHeadBody($viewContent);
+
         WebGUI::Macro::process($session, \$viewContent);
         my $containerCss    = $extras . '/yui/build/container/assets/container.css';
         my $containerJs     = $extras . '/yui/build/container/container-min.js';
@@ -95,9 +100,10 @@ sub process {
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
+        $headTags
     </head>
     <body id="widget$assetId">
-        $viewContent
+        $bodyContent
     </body>
 </html>
 OUTPUT

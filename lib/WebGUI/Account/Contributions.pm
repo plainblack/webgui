@@ -145,6 +145,7 @@ sub www_view {
     #Set the uid just in case;
     #$self->uid($userId);
 
+
     #Deal with sort order
     my $sortBy       = $session->form->get("sortBy") || "creationDate";
     my $sort_url     = ($sortBy)?";sortBy=$sortBy":"";
@@ -158,7 +159,7 @@ sub www_view {
     my $rpp_url      = ";rpp=$rpp";
     
     #Cache the base url
-    my $contribsUrl  =  $self->getUrl("module=contributions;do=view;uid=$userId");
+    my $contribsUrl  =  $self->getUrl(undef, 'appendUID');
 
     #Create sortBy headers
     $var->{'title_url'     } = $contribsUrl.";sortBy=title".$sortDir_url.$rpp_url;
@@ -198,6 +199,7 @@ sub www_view {
         my $assetId    = $row->{assetId};
         my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         my $props      = $asset->get;
+        $props->{url}  = $asset->getUrl;
         if (ref $asset eq "WebGUI::Asset::Post") {
             $asset = $asset->getThread;
             $props = $asset->get;

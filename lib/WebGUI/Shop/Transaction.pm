@@ -711,7 +711,7 @@ sub www_getTransactionsAsJson {
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------

@@ -13,6 +13,14 @@ our $I18N = {
 		lastUpdated => 1131394072,
 	},
 
+    'captcha failure' => {
+        message => q|You need to type in the six characters you see in the image to prove that you are human.|,
+    },
+
+    'recaptcha failure' => {
+        message => q|You need to correctly enter the words you see in the image to prove that you are human.|,
+    },
+
 };
 
 1;

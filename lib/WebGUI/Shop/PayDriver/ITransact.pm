@@ -663,12 +663,10 @@ sub www_getCredentials {
         $addressData    = $self->getCart->getShippingAddress->get;
     }
                    
-    my $output;
     my $var = {};
 
     # Process form errors
     $var->{errors} = [];
-    #### TODO: i18n
     if ($errors) {
         $var->{error_message} = $i18n->get('error occurred message');
         foreach my $error (@{ $errors} ) {
@@ -743,8 +741,16 @@ sub www_getCredentials {
     });
 
     my $template = WebGUI::Asset::Template->new($session, $self->get("credentialsTemplateId"));
-    $template->prepare;
-    return $session->style->userStyle($template->process($var));
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone');
+    }
+
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------
@@ -791,9 +797,6 @@ sub www_processRecurringTransactionPostback {
     # Fetch the original transaction
     my $baseTransaction = eval{WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId )};
 
-    #make sure the same user is used in this transaction as the last {mostly needed for reoccurring transactions
-    $self->session->user({userId=>$baseTransaction->get('userId')});
-
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
     if (WebGUI::Error->caught || !(defined $baseTransaction) ) {   
@@ -818,6 +821,9 @@ sub www_processRecurringTransactionPostback {
  #       return 'Check recurring postback: transaction check failed.';
 #    }
     #---- Passed all test, continue ---------------
+
+    #make sure the same user is used in this transaction as the last {mostly needed for reoccurring transactions
+    $self->session->user({userId=>$baseTransaction->get('userId')});
  
     # Create a new transaction for this term
     my $transaction     = $baseTransaction->duplicate( {

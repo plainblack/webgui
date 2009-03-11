@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -107,7 +107,10 @@ isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
 $session->user({userId => 3});
 my $json = $matrix->www_getCompareFormData('score');
 
-my $compareFormData = JSON->new->utf8->decode($json);
+my $compareFormData = JSON->new->decode($json);
+
+my $expectedAssetId = $matrixListing->getId;
+$expectedAssetId =~ s/-/_____/g;
 
 cmp_deeply(
         $compareFormData,
@@ -117,7 +120,7 @@ cmp_deeply(
                     lastUpdated=>$matrixListing->get('revisionDate'),
                     clicks=>"0",
                     compares=>"0",
-                    assetId=>$matrixListing->getId,
+                    assetId=>$expectedAssetId,
                     url=>'/'.$matrixListing->get('url'),
                     title=>$matrixListing->get('title')
                     }]

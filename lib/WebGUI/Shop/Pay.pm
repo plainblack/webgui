@@ -233,7 +233,7 @@ sub www_addPaymentGateway {
     my $className = $session->form->process('className') 
         || WebGUI::Error::InvalidParam->throw(error => 'No class name passed');
 
-    my $payDriver = $self->addPaymentGateway( $className, $className->getName( $session ), { enabled => 0 } );
+    my $payDriver = $self->addPaymentGateway( $className, { enabled => 0, label =>  $className->getName($session), } );
     return $payDriver->www_edit;
 }
 

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -43,7 +43,7 @@ foreach my $macro (qw/
 }
 $session->config->addToHash('macros', "Ex'tras", "Extras");
 
-plan tests => 33;
+plan tests => 35;
 
 my $macroText = "CompanyName: ^c;";
 my $companyName = $session->setting->get('companyName');
@@ -200,6 +200,23 @@ is(
 	"Carriage returns pass through as needed."
 );
 
+my $macroText = qq|^ReverseParams(1,'Single quoted parameters work properly',2);|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"2Single quoted parameters work properly1",
+	"Single quoted parameters work properly."
+);
+
+my $macroText = qq|^ReverseParams(1,'Escaped single\\' quotes work',2);|;
+WebGUI::Macro::process($session, \$macroText),
+is(
+	$macroText,
+	"2Escaped single' quotes work1",
+	"Escaped single quotes work."
+);
+
+
 tie my %quotingEdges, 'Tie::IxHash';
 %quotingEdges = (
     '^VisualMacro(text);'                           => '@MacroCall[`text`]:',
@@ -217,7 +234,7 @@ while (my ($inText, $outText) = each %quotingEdges) {
     is(
         $procText,
         $outText,
-        "Nesting edge case: $inText",
+        "Quoting/Nesting edge case: $inText",
     );
 }
 

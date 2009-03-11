@@ -3,7 +3,7 @@ package WebGUI::User;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -120,6 +120,7 @@ sub acceptsPrivateMessages {
     my $userId    = shift;
 
     return 0 if ($self->isVisitor);  #Visitor can't get private messages
+    return 0 if ($userId eq "1");    # Visitor can't send private messages
     return 0 if ($self->userId eq $userId);  #Can't send private messages to yourself
 
     my $pmSetting = $self->profileField('allowPrivateMessages');
@@ -636,7 +637,7 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 sub isInGroup {
    my (@data, $groupId);
    my ($self, $gid, $secondRun) = @_;
-   $gid = 3 unless (defined $gid);
+   $gid = 3 unless $gid;
    my $uid = $self->userId;
    ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
    #my $eh = $self->session->errorHandler;
@@ -650,8 +651,9 @@ sub isInGroup {
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
    my $group = WebGUI::Group->new($self->session,$gid);
-   # Cope with non-existant groups. Default to the admin group if the groupId is invalid.
-   $group = WebGUI::Group->new($self->session, 3) unless $group;
+   if ( !$group ) {
+       $group = WebGUI::Group->new($self->session,3);
+   }
    ### Check for groups of groups.
    my $users = $group->getAllUsers();
    foreach my $user (@{$users}) {

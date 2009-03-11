@@ -1,7 +1,7 @@
 package WebGUI::Operation::Spectre;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -97,7 +97,7 @@ sub www_spectreGetSiteData {
 		}
 		$siteData{cron} = \@schedules;
 	}
-	return JSON::encode_json(\%siteData);
+	return JSON::to_json(\%siteData);
 }
 
 #-------------------------------------------------------------------

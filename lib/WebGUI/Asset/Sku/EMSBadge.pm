@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSBadge;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -377,7 +377,7 @@ sub view {
                         . WebGUI::Form::hidden($session,
                             {
                                 name  => "callback",
-                                value => JSON->new->utf8->encode({ url => $self->getUrl})
+                                value => JSON->new->encode({ url => $self->getUrl})
                             })
                         . WebGUI::Form::submit($session, {value => $i18n->get("populate from address book")})
                         . WebGUI::Form::formFooter($session)

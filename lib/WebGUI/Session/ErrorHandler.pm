@@ -3,7 +3,7 @@ package WebGUI::Session::ErrorHandler;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,7 +17,7 @@ package WebGUI::Session::ErrorHandler;
 
 use strict;
 use Log::Log4perl;
-use Apache2::RequestUtil;
+#use Apache2::RequestUtil;
 use JSON;
 use HTML::Entities qw(encode_entities);
 
@@ -105,15 +105,28 @@ sub canShowBasedOnIP {
 =head2 canShowDebug ( )
 
 Returns true if the user meets the condition to see debugging information and debug mode is enabled.
+This method caches its value, so long processes may need to manually clear the cached in $self->{_canShowDebug}.
 
 =cut
 
 sub canShowDebug {
-	my $self = shift;
-	return 0 unless ($self->session->hasSettings);
-	return 0 unless ($self->session->setting->get("showDebug"));
-	return 0 unless (substr($self->session->http->getMimeType(),0,9) eq "text/html");
-	return $self->canShowBasedOnIP('debugIp');
+    my $self = shift;
+
+    # if we have a cached false value, we can use it
+    # true values need additional checks
+    if (exists $self->{_canShowDebug} && !$self->{_canShowDebug}) {
+        return 0;
+    }
+
+    ##This check prevents in infinite loop during startup.
+    return 0 unless ($self->session->hasSettings);
+
+    my $canShow = $self->session->setting->get("showDebug")
+        && $self->canShowBasedOnIP('debugIp');
+    $self->{_canShowDebug} = $canShow;
+
+    return $canShow
+        && substr($self->session->http->getMimeType(),0,9) eq "text/html";
 }
 
 #-------------------------------------------------------------------
@@ -207,7 +220,8 @@ sub fatal {
 
     local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1;
 	$self->session->http->setStatus("500","Server Error");
-	Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
+	#Apache2::RequestUtil->request->content_type('text/html') if ($self->session->request);
+	$self->session->request->content_type('text/html') if ($self->session->request);
 	$self->getLogger->fatal($message);
 	$self->getLogger->debug("Stack trace for FATAL ".$message."\n".$self->getStackTrace());
 	$self->session->http->sendHeader if ($self->session->request);

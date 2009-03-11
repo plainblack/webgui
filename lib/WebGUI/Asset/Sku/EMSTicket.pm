@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSTicket;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -17,7 +17,7 @@ package WebGUI::Asset::Sku::EMSTicket;
 use strict;
 use base 'WebGUI::Asset::Sku';
 use Tie::IxHash;
-use JSON;
+use JSON ();
 use WebGUI::Utility;
 
 =head1 NAME
@@ -293,7 +293,7 @@ If specified, returns a single value for the key specified.
 sub getEventMetaData {
 	my $self = shift;
 	my $key = shift;
-	my $metadata = JSON->new->utf8->decode($self->get("eventMetaData") || '{}');
+	my $metadata = JSON->new->decode($self->get("eventMetaData") || '{}');
 	if (defined $key) {
 		return $metadata->{$key};
 	}
@@ -438,7 +438,7 @@ sub processPropertiesFromFormPost {
     my $date = WebGUI::DateTime->new($self->session, time())->toDatabase;
     my $startDate = $form->process('startDate', "dateTime", $date, 
         { defaultValue => $date, timeZone => $self->getParent->get("timezone")});
-	$self->update({eventMetaData => JSON->new->utf8->encode(\%metadata), startDate => $startDate});
+	$self->update({eventMetaData => JSON->new->encode(\%metadata), startDate => $startDate});
 }
 
 #-------------------------------------------------------------------
@@ -470,7 +470,7 @@ A hash reference containing all the metadata properties to set.
 sub setEventMetaData {
 	my $self = shift;
 	my $properties = shift;
-	$self->update({eventMetaData => JSON->new->utf8->encode($properties)});
+	$self->update({eventMetaData => JSON->new->encode($properties)});
 }
 
 #-------------------------------------------------------------------

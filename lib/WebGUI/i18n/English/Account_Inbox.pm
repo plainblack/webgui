@@ -23,7 +23,7 @@ our $I18N = {
         message     => q|Edit Layout Template|,
         lastUpdated => 1119068809
 	},
-    
+
     'inbox layout template hoverHelp' => {
         message     => q{Choose a layout from the list to display the various account pluggins that are editable by the current user as well as the contents of the one currently chosen},
         lastUpdated => 1119068809
@@ -194,7 +194,7 @@ our $I18N = {
         message     => q|Subject|,
         lastUpdated => 1119068809
     },
-    
+
     'status label' => {
         message     => q{Status},
         lastUpdated => 1119068809
@@ -214,7 +214,7 @@ our $I18N = {
         message     => q{Add Recipients},
         lastUpdated => 1119068809
     },
-    
+
     'from label' => {
         message     => q{From},
         lastUpdated => 1119068809
@@ -224,7 +224,7 @@ our $I18N = {
         message     => q{To},
         lastUpdated => 1119068809
     },
-    
+
     'member since' => {
         message     => q{Member Since },
         lastUpdated => 1119068809
@@ -234,7 +234,7 @@ our $I18N = {
         message     => q{Delete},
         lastUpdated => 1119068809
     },
-    
+
     'view my profile' => {
         message     => q{view my profile as others see it},
         lastUpdated => 1119068809
@@ -546,6 +546,181 @@ our $I18N = {
         lastUpdated     => 0,
         context         => "Description of Inbox setting",
     },
+
+     'subject_url' => {
+         message         => q{The URL to sort the inbox by subject.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'status_url' => {
+         message         => q{The URL to sort the inbox by status.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'from_url' => {
+         message         => q{The URL to sort the inbox by who sent the messages.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'dateStamp_url' => {
+         message         => q{The URL to sort the inbox by when the message was sent.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'rpp_url' => {
+         message         => q{The current URL with sort, sort direction and user filtering params added.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'has_messages' => {
+         message         => q{A boolean which is true if the user has messages.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_total' => {
+         message         => q{The total number of messages the user has in their inbox.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'new_message_url' => {
+         message         => q{The URL to take the user to the screen where they can send new messages to other users.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'canSendMessages' => {
+         message         => q{A boolean which is true if the user has friends that he can send messages to.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_loop' => {
+         message         => q{A loop containing all messages, as determined by the sorting and number of messages per page options.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'view inbox template' => {
+         message         => q{View Inbox Template},
+         lastUpdated     => 1235421123,
+         context         => "The template that allows you to view the contents of the Inbox",
+     },
+
+     'message_rpp' => {
+         message         => q{A select box that allows the user to change the number of messages displayed per page},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'form_header' => {
+         message         => q{HTML elements to begin the form on this page},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'form_footer' => {
+         message         => q{HTML elements to end the form on this page},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_id' => {
+         message         => q{The unique identifier for this message.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'message_url' => {
+         message         => q{The URL to view the contents of this message.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'subject' => {
+         message         => q{The subject of this message.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'status' => {
+         message         => q{The status of this message, internationalized.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'status_class' => {
+         message         => q{The status of this message, raw.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'isRead' => {
+         message         => q{A boolean which will be true if this message has been read.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'isReplied' => {
+         message         => q{A boolean which will be true if this message has been replied to.},
+         lastUpdated     => 1235421123,
+         context         => "template variable for view inbox template",
+     },
+
+     'isPending' => {
+         message      => q{A boolean which will be true if this message represents an action by the user that is pending.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'isCompleted' => {
+         message      => q{A boolean which will be true if this message represents an action by the user that has been completed.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'from_id' => {
+         message      => q{The userId of the person who sent this message.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'from_url' => {
+         message      => q{The URL to view the profile of the user who sent this message.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'from' => {
+         message      => q{The name of the person who sent this message.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'dateStamp' => {
+         message      => q{The date the message was sent, as an epoch.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'dateStamp_formatted' => {
+         message      => q{The date the message was sent, using the user's preferred date and time format.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
+     'inbox_form_delete' => {
+         message      => q{A little checkbox for the user to check if they want to delete this message.},
+         lastUpdated  => 1235421123,
+         context      => "template variable for view inbox template",
+     },
+
 };
 
 1;

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Survey::SurveyJSON;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2008 Plain Black Corporation.
+WebGUI is Copyright 2001-2009 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -89,7 +89,7 @@ my %MULTI_CHOICE_BUNDLES = (
     Likelihood       => [ 'Not at all likely',    (q{}) x 9, 'Extremely likely' ],
     'Oppose/Support' => [ 'Strongly oppose',      (q{}) x 5, 'Strongly support' ],
     Party =>
-        [ 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' ],
+        [ 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)' ],
     Race =>
         [ 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' ],
     Risk         => [ 'No risk',              (q{}) x 9, 'Extreme risk' ],

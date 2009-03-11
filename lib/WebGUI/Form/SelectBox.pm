@@ -3,7 +3,7 @@ package WebGUI::Form::SelectBox;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -71,12 +71,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(255)".
+Returns "CHAR(255)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(255)";
+    return "CHAR(255)";
 }
 
 #-------------------------------------------------------------------

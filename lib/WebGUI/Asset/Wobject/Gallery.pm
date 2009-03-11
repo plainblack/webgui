@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Gallery;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -1104,6 +1104,7 @@ sub www_addAlbumService {
         description     => $form->get('synopsis','textarea'),
         synopsis        => $form->get('synopsis','textarea'),
         othersCanAdd    => $form->get('othersCanAdd','yesNo'),
+        ownerUserId     => $session->user->userId,
     });
     
     $album->requestAutoCommit;

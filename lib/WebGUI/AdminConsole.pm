@@ -3,7 +3,7 @@ package WebGUI::AdminConsole;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -215,17 +215,27 @@ A reference to the current session.
 
 If supplied, provides a list of defaults such as title and icons for the admin console.
 
+=head3 options
+
+A hash reference of options with the following keys
+
+=head4 showAdminBar
+
+If true, will show the admin bar on this admin console page
+
 =cut
 
 sub new {
 	my $class = shift;
 	my $session = shift;
 	my $id = shift;
+    my $options = shift;
 	my $self;
 	$self->{_session} = $session;
 	bless $self, $class;
 	$self->{_function} = {};
 	$self->{_functionId} = $id;
+    $self->{_options} = $options;
 	return $self;
 }
 
@@ -289,7 +299,17 @@ sub render {
 	}
 
     $var{"backtosite.url"} = $self->session->url->getBackToSiteURL();
-	return $self->session->style->process(WebGUI::Asset::Template->new($self->session,$self->session->setting->get("AdminConsoleTemplate"))->process(\%var),"PBtmpl0000000000000137");
+    my $template
+        = WebGUI::Asset::Template->new(
+            $self->session,
+            $self->session->setting->get("AdminConsoleTemplate")
+        );
+    if ( $self->{_options}->{showAdminBar} ) {
+        $var{adminBar}
+            = WebGUI::Macro::AdminBar::process($self->session);
+    }
+    my $output  = $template->process(\%var);
+    return $self->session->style->process($output,"PBtmpl0000000000000137");
 }
 
 #-------------------------------------------------------------------
