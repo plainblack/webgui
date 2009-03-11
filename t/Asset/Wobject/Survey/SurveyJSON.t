@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 96;
+my $tests = 132;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -126,10 +126,10 @@ skip $tests, "Unable to load SurveyJSON" unless $usedOk;
 #
 ####################################################
 
-$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new('{}', $session->log);
+$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, '{}');
 isa_ok($surveyJSON, 'WebGUI::Asset::Wobject::Survey::SurveyJSON');
 
-my $sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(undef, $session->log);
+my $sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session);
 isa_ok($sJSON2, 'WebGUI::Asset::Wobject::Survey::SurveyJSON', 'even with absolutely no JSON');
 undef $sJSON2;
 
@@ -173,9 +173,8 @@ cmp_deeply(
     'new: empty JSON in constructor causes 1 new, default section to be created',
 );
 
-$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
+$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, 
     '{ "sections" : [], "survey" : {} }',
-    $session->log,
 );
 
 cmp_deeply(
@@ -188,16 +187,14 @@ cmp_deeply(
 
 lives_ok
     {
-        my $foo = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
-            qq!{ "survey" : "on 16\x{201d} hand-crocheted Cord" }!,
-            $session->log
+        my $foo = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, 
+            encode_json({survey => "on 16\x{201d}" }),
         );
     }
     'new handles wide characters';
 
-$sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new(
+$sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, 
     '{ "sections" : [ { "type" : "section" } ], "survey" : {} }',
-    $session->log,
 );
 
 cmp_deeply(
@@ -276,7 +273,7 @@ cmp_deeply(
 #
 ####################################################
 
-$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new('{}', $session->log);
+$surveyJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, '{}');
 {
     my $section = $surveyJSON->section([0]);
     $section->{title} = 'Section 0';
@@ -2005,16 +2002,79 @@ cmp_deeply(
 
 ####################################################
 #
+# totalSections
+#
+####################################################
+{
+    my $s = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, '{}');
+    is($s->totalSections, 1, 'a');
+    is($s->totalQuestions, 0, 'a');
+    is($s->totalAnswers, 0, 'a');
+    
+    # Add a new section
+    my $address = $s->newObject([]);
+    is($s->totalSections, 2, 'Now there are 2 sections');
+    is($s->totalQuestions, 0, '..but still no questions');
+    is($s->totalAnswers, 0, '..and no answers');
+    
+    # Add a question to first section 
+    $address = $s->newObject([0]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 1, '..and now 1 question');
+    is($s->totalQuestions([0]), 1, '..in the intended section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add a question to second section 
+    $address = $s->newObject([1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 2, '..and now 2 questions overall');
+    is($s->totalQuestions([0]), 1, '..one in the first section');
+    is($s->totalQuestions([1]), 1, '..and one in the second section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add another question to second section 
+    $address = $s->newObject([1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and now 3 questions overall');
+    is($s->totalQuestions([0]), 1, '..one in the first section');
+    is($s->totalQuestions([1]), 2, '..and two in the second section');
+    is($s->totalAnswers, 0, '..but still no answers');
+    
+    # Add an answer to second section, first question
+    $address = $s->newObject([1,0]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 1, '..and now 1 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 0, '..0 in third question');
+    
+    # Add an answer to second section, second question
+    $address = $s->newObject([1,1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 2, '..and now 2 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 1, '..1 in third question');
+    
+    # Add a second answer to second section, second question
+    $address = $s->newObject([1,1]);
+    is($s->totalSections, 2, 'Still 2 sections');
+    is($s->totalQuestions, 3, '..and 3 questions');
+    is($s->totalAnswers, 3, '..and now 3 answer overall');
+    is($s->totalAnswers([0,0]), 0, '..0 in first question');
+    is($s->totalAnswers([1,0]), 1, '..1 in second question');
+    is($s->totalAnswers([1,1]), 2, '..2 in third question');
+}
+
+####################################################
+#
 # log
 #
 ####################################################
 
-WebGUI::Test->interceptLogging;
-
-my $logger = $surveyJSON->log("Everyone in here is innocent");
-is ($WebGUI::Test::logger_warns, undef, 'Did not log a warn');
-is ($WebGUI::Test::logger_info,  undef, 'Did not log an info');
-is ($WebGUI::Test::logger_error, "Everyone in here is innocent", 'Logged an error');
+isa_ok($surveyJSON->session, 'WebGUI::Session', 'session() accessor works');
 
 }
 
@@ -2030,7 +2090,7 @@ is ($WebGUI::Test::logger_error, "Everyone in here is innocent", 'Logged an erro
 sub summarizeSectionSkeleton {
     my ($skeleton) = @_;
     my $summary = [];
-    foreach my $section (@{ $skeleton->{sections} }) {
+    foreach my $section (@{ $skeleton->{_sections} }) {
         my $summarySection = {
             title     => $section->{title},
             questions => [],
@@ -2091,6 +2151,7 @@ sub getBareSkeletons {
            terminal               => 0,
            terminalUrl            => '',
            goto                   => '',
+           gotoExpression         => '',
            timeLimit              => 0,
            type                   => 'section',
            questions              => [],
@@ -2111,6 +2172,8 @@ sub getBareSkeletons {
            textInButton           => 0,
            type                   => 'question',
            answers                => [],
+           goto                   => '',
+           gotoExpression         => '',
         },
         {
            text                   => '',
@@ -2118,6 +2181,7 @@ sub getBareSkeletons {
            textCols               => 10,
            textRows               => 5,
            goto                   => '',
+           gotoExpression         => '',
            recordedAnswer         => '',
            isCorrect              => 1,
            min                    => 1,

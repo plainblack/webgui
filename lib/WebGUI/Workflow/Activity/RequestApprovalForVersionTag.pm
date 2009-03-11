@@ -342,8 +342,10 @@ sub setMessageCompleted {
 
     # Set all messages to completed
     for my $messageId ( split /,/, $instance->getScratch("messageId") ) { 
-        my $message = $inbox->getMessage( $messageId );
-        $message->setCompleted;
+        if($messageId){
+            my $message = $inbox->getMessage( $messageId );
+            $message->setCompleted;
+        }
     }
 
     $instance->deleteScratch( "messageId" );

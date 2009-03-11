@@ -30,10 +30,46 @@ Returns true if able to add MatrixListings.
 
 sub canAddMatrixListing {
     my $self    = shift;
+    my $user    = $self->session->user;
 
-    return 0 if $self->session->user->isVisitor;
+    # Users in the groupToAdd group can add listings
+    if ( $user->isInGroup( $self->get("groupToAdd") ) ) {
+        return 1;
+    }
+    # Users who can edit matrix can add listings
+    else {
+        return $self->canEdit;
+    }
 
-    return 1;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEdit ( [userId] )
+
+Returns true if the user can edit this Matrix. 
+
+Also checks if a user is adding a Matrix Listing and allows them to if they are
+part of the C<groupToAdd> group.
+
+=cut
+
+sub canEdit {
+    my $self        = shift;
+    my $userId = shift || $self->session->user->userId;
+
+    my $form        = $self->session->form;
+    if ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa(
+'WebGUI::Asset::MatrixListing' ) ) {
+        return $self->canAddMatrixListing();
+    }
+    else {
+        if ($userId eq $self->get("ownerUserId")) {
+            return 1;
+        }
+        my $user = WebGUI::User->new($self->session, $userId);
+        return $user->isInGroup($self->get("groupIdEdit"));
+    }
 }
 
 #-------------------------------------------------------------------
@@ -93,6 +129,22 @@ sub definition {
             namespace       =>"Matrix/EditListing",
             hoverHelp       =>$i18n->get('edit listing template description'),
             label           =>$i18n->get('edit listing template label'),
+        },
+        screenshotsTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000006",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Screenshots",
+            hoverHelp       =>$i18n->get('screenshots template description'),
+            label           =>$i18n->get('screenshots template label'),
+        },
+        screenshotsConfigTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000007",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/ScreenshotsConfig",
+            hoverHelp       =>$i18n->get('screenshots config template description'),
+            label           =>$i18n->get('screenshots config template label'),
         },
         defaultSort=>{
             fieldType       =>"selectBox",
@@ -163,6 +215,13 @@ sub definition {
             defaultValue    =>10,
             hoverHelp       =>$i18n->get('max comparisons privileged description'),
             label           =>$i18n->get('max comparisons privileged label'),
+        },
+        groupToAdd=>{
+            fieldType       =>"group",
+            tab             =>"security",
+            defaultValue    =>2,
+            hoverHelp       =>$i18n->get('group to add description'),
+            label           =>$i18n->get('group to add label'),
         },
         submissionApprovalWorkflowId=>{
             fieldType       =>"workflow",
@@ -543,7 +602,8 @@ sub view {
         }) };
     foreach my $pendingListing (@pendingListings){
         push (@{ $var->{pending_loop} }, {
-                        url     => $pendingListing->getUrl,
+                        url     => $pendingListing->getUrl
+                                   ."?func=view;revision=".$pendingListing->get('revisionDate'),
                         name    => $pendingListing->get('title'),
                     });
     }   
