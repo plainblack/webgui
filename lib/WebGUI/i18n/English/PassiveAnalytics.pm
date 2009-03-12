@@ -36,6 +36,12 @@ our $I18N = {
 		context => q|Meaning not like anything in a set.  This, that and the other one.  Also, a catch all.|
 	},
 
+	'Bucket Passive Analytics' => {
+		message => q|Bucket Passive Analytics|,
+		lastUpdated => 0,
+		context => q|Name of the activity that puts log entries into buckets for analysis.|
+	},
+
 	'Bucket Name' => {
 		message => q|Bucket Name|,
 		lastUpdated => 0,
