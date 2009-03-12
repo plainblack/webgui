@@ -234,7 +234,7 @@ my $outputBuffer;
 open my $outputHandle, '>', \$outputBuffer or die "Unable to create scalar filehandle: $!\n";
 $newSession->output->setHandle($outputHandle);
 WEBGUI_FATAL: {
-    $newSession->log->fatal();
+    $newSession->log->fatal('Bad things are happenning');
 }
 ok(1, 'fatal: recovered from fatal okay');
 TODO: {
