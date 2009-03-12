@@ -4,6 +4,7 @@
  - fixed #9924: WebGUI::Shop::Cart::readyForCheckout fails randomly (Henry Tang, Long Term Results B.v.)
  - fixed #9873: third-> first in post template help
  - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
+ - fixed #9826: Inbox messages sent by email don't include from username
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
