@@ -159,6 +159,18 @@ home\?func=match, or<br />
 		context => q|URL label to raw log data in CSV format|,
 	},
 
+	'confirm delete rule' => {
+		message => q|Are you sure that you want to delete this rule?|,
+		lastUpdated => 0,
+		context => q|Confirm label in deleting a rule.|,
+	},
+
+	'manage ruleset' => {
+		message => q|Manage Ruleset|,
+		lastUpdated => 0,
+		context => q|Admin console submenu label.  Ruleset is a set of rules.|,
+	},
+
 };
 
 1;
