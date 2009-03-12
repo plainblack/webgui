@@ -109,7 +109,7 @@ sub installAssetHistory {
     }
     ##Admin Console
     $session->config->addToHash('adminConsole', 'assetHistory', {
-      "icon" => "assets.gif",
+      "icon" => "assetHistory.gif",
       "groupSetting" => "groupIdAdminHistory",
       "uiLevel" => 5,
       "url" => "^PageUrl(\"\",op=assetHistory);",

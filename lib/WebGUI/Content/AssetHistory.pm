@@ -125,7 +125,7 @@ sub www_view {
     return $session->privilege->insufficient
         unless $session->user->isInGroup(12);
     ##YUI specific datatable CSS
-    my $ac = WebGUI::AdminConsole->new( $session, "assets", {
+    my $ac = WebGUI::AdminConsole->new( $session, "assetHistory", {
                showAdminBar        => 1
            } );
     my ($style, $url) = $session->quick(qw(style url));
