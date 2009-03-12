@@ -1,6 +1,7 @@
 7.7.0
  - fixed: Template parser cannot be set
  - fixed #9836: Matrix: Group to Add Listings is missing
+ - fixed #9924: WebGUI::Shop::Cart::readyForCheckout fails randomly (Henry Tang, Long Term Results B.v.)
  - fixed #9873: third-> first in post template help
  - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
 

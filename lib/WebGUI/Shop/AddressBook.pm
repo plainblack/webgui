@@ -147,7 +147,7 @@ An address object's unique id.
 
 sub getAddress {
     my ($self, $addressId) = @_;
-    my $id = ref $self;
+    my $id = id $self;
     unless (exists $addressCache{$id}{$addressId}) {
         $addressCache{$id}{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
     }
