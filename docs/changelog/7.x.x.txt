@@ -1,4 +1,5 @@
 7.7.0
+ - fixed: New Mail macro never returns any messages
  - fixed: Template parser cannot be set
  - fixed #9836: Matrix: Group to Add Listings is missing
  - fixed #9924: WebGUI::Shop::Cart::readyForCheckout fails randomly (Henry Tang, Long Term Results B.v.)
