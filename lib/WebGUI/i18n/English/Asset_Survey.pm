@@ -923,6 +923,30 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 0,
     },
 
+    'templateId' => {
+        message => q|The ID of the template to show the front page of the Survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1236891448,
+    },
+
+    'gradebookTemplateId' => {
+        message => q|The ID of the template used to show the gradebook screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
+
+    'responseTemplateId' => {
+        message => q|The ID of the template used to show the Survey Response screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
+
+    'overviewTemplateId' => {
+        message => q|The ID of the template used to show the overview screen.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 1168643669,
+    },
+
     'groupToTakeSurvey' => {
         message => q|The ID of the group that is allowed to take the Survey.|,
         context => q|Description of a template variable for a template Help page.|,
@@ -1306,6 +1330,18 @@ section/answer.|,
     'showProgress' => {
         message => q|A boolean that is true if the asset has been configured to show how much progess the user has made in completing this Survey.|,
         context => q|Template variable doc.|,
+        lastUpdated => 0,
+    },
+
+    'min' => {
+        message => q|The min value of this answer for slider type questions.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'max' => {
+        message => q|The max value of this answer for slider type questions..|,
+        context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
