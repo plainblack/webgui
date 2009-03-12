@@ -11,6 +11,7 @@ use Test::Deep;
 use Test::MockObject::Extends;
 use Test::Exception;
 use Data::Dumper;
+use List::Util qw/shuffle/;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
@@ -134,7 +135,9 @@ cmp_deeply(
     srand(42); # Make shuffle predictable
     $rJSON->initSurveyOrder();
     @question_order = map {$_->[1]} grep {$_->[0] == 0} @{$rJSON->surveyOrder};
-    cmp_deeply(\@question_order, [2,0,1], 'initSurveyOrder shuffled questions in first section');
+    srand(42);
+    my @expected_order = shuffle(0,1,2);
+    cmp_deeply(\@question_order, \@expected_order, 'initSurveyOrder shuffled questions in first section');
 
     $rJSON->survey->section([0])->{randomizeQuestions} = 0;
     $rJSON->survey->question([0,0])->{randomizeAnswers} = 0;
@@ -146,7 +149,9 @@ cmp_deeply(
     srand(42); # Make shuffle predictable
     $rJSON->initSurveyOrder();
     @answer_order = map {@{$_->[2]}} grep {$_->[0] == 3 && $_->[1] == 1} @{$rJSON->surveyOrder};
-    cmp_deeply(\@answer_order, [1,3,4,5,6,0,2], 'initSurveyOrder shuffled answers');
+    srand(42); # Make shuffle predictable
+    @expected_order = shuffle(0..6);
+    cmp_deeply(\@answer_order, \@expected_order, 'initSurveyOrder shuffled answers');
 }
 
 ####################################################
