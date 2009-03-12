@@ -17,6 +17,7 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
+use Scalar::Util qw/refaddr/;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
@@ -32,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 21;        # Increment this number for each test you create
+plan tests => 23;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -91,6 +92,23 @@ isa_ok($cart->getAddressBook, "WebGUI::Shop::AddressBook", "can get an address b
 $cart->empty;
 is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
 
+my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
+$session2->user({userId => 3});
+my $cart2 = WebGUI::Shop::Cart->newBySession($session2);
+isnt(
+    refaddr $cart->getAddressBook,
+    refaddr $cart2->getAddressBook,
+    'Different carts with different sessions have different AddressBooks'
+);
+$cart2->delete;
+
+my $cart3 = WebGUI::Shop::Cart->newBySession($session);
+isnt(
+    refaddr $cart->getAddressBook,
+    refaddr $cart3->getAddressBook,
+    'Different carts with same sessions will each have different AddressBooks since no book has been assigned yet.'
+);
+$cart3->delete;
 
 $cart->delete;
 is($cart->delete, undef, "Can destroy cart.");
@@ -101,5 +119,5 @@ $product->purge;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-
+    $session2->close;
 }
