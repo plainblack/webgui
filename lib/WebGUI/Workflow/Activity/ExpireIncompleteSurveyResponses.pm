@@ -83,7 +83,7 @@ sub definition {
                 },
             subject => {
                 fieldType=>"text",
-                label=>$i18n->get("subject", 'WebGUI'),
+                label=>$i18n->get("subject"),
                 defaultValue=>"Expired Survey",
                 hoverHelp=>$i18n->get("subject mouse over"),
                 },
