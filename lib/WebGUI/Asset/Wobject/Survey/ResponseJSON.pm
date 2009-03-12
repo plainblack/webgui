@@ -69,7 +69,7 @@ This data structure stores a snapshot of all question responses. Both question d
 is stored in this hash reference.
 
 Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
-Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<"aIndex">.
+Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
  
 Question entries only contain a comment field:
  {
@@ -114,7 +114,7 @@ survey.
 =head3 $json
 
 A JSON string used to construct a new Perl object. The string should represent 
-a JSON hash made up of L<"startTime">, L<"surveyOrder">, L<"responses">, L<"lastReponse">
+a JSON hash made up of L<"startTime">, L<"surveyOrder">, L<"responses">, L<"lastResponse">
 and L<"questionsAnswered"> keys, with appropriate values.
 
 =cut
@@ -617,7 +617,7 @@ sub processGoto {
         # See if our goto variable matches the section variable..
         if ( ref $section eq 'HASH' && $section->{variable} eq $goto ) {
 
-            # Fudge lastReponse so that the next response item will be our matching item 
+            # Fudge lastResponse so that the next response item will be our matching item 
             $self->lastResponse( $itemIndex - 1 );
             last;
         }
@@ -625,7 +625,7 @@ sub processGoto {
         # See if our goto variable matches the question variable..
         if ( ref $question eq 'HASH' && $question->{variable} eq $goto ) {
 
-            # Fudge lastReponse so that the next response item will be our matching item
+            # Fudge lastResponse so that the next response item will be our matching item
             $self->lastResponse( $itemIndex - 1 );
             last;
         }
