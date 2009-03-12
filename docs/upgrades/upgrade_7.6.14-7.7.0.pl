@@ -37,6 +37,7 @@ addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
+installAssetHistory($session);
 
 # Passive Analytics
 pa_installLoggingTables($session);
@@ -91,6 +92,35 @@ sub surveyRemoveResponseTemplate {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub installAssetHistory {
+    my $session = shift;
+    print "\tAdding Asset History content handler... \n" unless $quiet;
+    ##Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (! isIn('WebGUI::Content::Handler', @{ $contentHandlers }) ) {
+        my @newHandlers = ();
+        foreach my $handler (@{ $contentHandlers }) {
+            push @newHandlers, $handler;
+            push @newHandlers, 'WebGUI::Content::AssetHistory' if
+                $handler eq 'WebGUI::Content::Account';
+        }
+        $session->config->set('contentHandlers', \@newHandlers);
+    }
+    ##Admin Console
+    $session->config->addToHash('adminConsole', 'assetHistory', {
+      "icon" => "assets.gif",
+      "groupSetting" => "groupIdAdminHistory",
+      "uiLevel" => 5,
+      "url" => "^PageUrl(\"\",op=assetHistory);",
+      "title" => "^International(assetHistory,Asset);"
+    });
+    ##Setting for custom group
+    $session->setting->add('groupIdAdminHistory', 12);
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub pa_installLoggingTables {
     my $session = shift;
     print "\tInstall logging tables... ";

@@ -331,6 +331,13 @@
       "url" : "^PageUrl(\"\",op=assetManager);",
       "title" : "^International(assets,Asset);"
    },
+   "assetHistory" : {
+      "icon" : "assets.gif",
+      "groupSetting" : "groupIdAdminHistory",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=assetHistory);",
+      "title" : "^International(assetHistory,Asset);"
+   },
    "graphics" : {
       "icon" : "graphics.gif",
       "uiLevel" : 5,
@@ -895,6 +902,7 @@
     "WebGUI::Content::AssetDiscovery",
     "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Account",
+    "WebGUI::Content::AssetHistory",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
