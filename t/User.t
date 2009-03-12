@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 143; # increment this value for each test you create
+use Test::More tests => 144; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -577,7 +577,8 @@ undef $neighborClone;
 ################################################################
 
 $friend->profileField('allowPrivateMessages', 'all');
-is ($friend->acceptsPrivateMessages(1), 1, 'acceptsPrivateMessages: when allowPrivateMessages=all, anyone can send messages');
+is ($friend->acceptsPrivateMessages($neighbor->userId), 1, 'acceptsPrivateMessages: when allowPrivateMessages=all, anyone can send messages');
+is ($friend->acceptsPrivateMessages(1), 0, 'acceptsPrivateMessages: when allowPrivateMessages=all, visitor can\'t send messages');
 $friend->profileField('allowPrivateMessages', 'none');
 is ($friend->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=none, no one can send messages');
 
