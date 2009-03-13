@@ -51,7 +51,7 @@ sub setDefaultItransactCredentialTemplate {
     my $drivers = $pay->getPaymentGateways($session);
     DRIVER: foreach my $driver (@{ $drivers }) {
         ##Only work on ITransact drivers
-        next DRIVER unless $driver->className eq "WebGUI::Shop::PayDriver::ITransact";
+        next DRIVER unless $driver && $driver->className eq "WebGUI::Shop::PayDriver::ITransact";
         my $properties = $driver->get();
         ##And only ones that don't already have a template set
         next DRIVER if $properties->{credentialsTemplateId};
