@@ -4,6 +4,7 @@
  - fixed: Commit w/ approval workflow can crash under race conditions resulting in permanently locked content (Martin Kamerbeek / Oqapi )
  - fixed: Each textarea inserts identical JS that should be inserted only once ( Martin Kamerbeek / Oqapi )
  - fixed #9942: Upgrade script fails with ITransact driver (William McKee, Knowmad Technologies)
+ - fixed #9943: Upgrade script fails with Payment Gateways
 
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages
