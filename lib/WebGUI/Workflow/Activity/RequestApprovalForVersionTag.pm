@@ -344,7 +344,7 @@ sub setMessageCompleted {
     for my $messageId ( split /,/, $instance->getScratch("messageId") ) { 
         if($messageId){
             my $message = $inbox->getMessage( $messageId );
-            $message->setCompleted;
+            $message->setCompleted if $message;
         }
     }
 

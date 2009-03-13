@@ -7,6 +7,8 @@
  - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
  - fixed #9826: Inbox messages sent by email don't include from username
  - rfe: added Asset History browser (perlDreamer Consulting, LLC and Plain Black)
+ - fixed: Commit w/ approval workflow can crash under race conditions
+   resulting in permanently locked content (Martin Kamerbeek / Oqapi )
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
