@@ -159,11 +159,16 @@ sub toHtml {
         $url->extras( 'yui-webgui/build/form/textarea.js' ), 
         { type => 'text/javascript' }, 
     );
-    $style->setRawHeadTags( q|
-        <script type="text/javascript">
-            YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
-        </script>
-    | );
+
+    unless ( $self->session->stow->get( 'texareaHeadTagsLoaded' ) ) {
+        $style->setRawHeadTags( q|
+            <script type="text/javascript">
+                YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
+            </script>
+        | );
+
+        $self->session->stow->set( 'texareaHeadTagsLoaded', 1 )
+    }
 
 	if ($self->get("resizable")) {
         $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
