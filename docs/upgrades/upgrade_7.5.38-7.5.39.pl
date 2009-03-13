@@ -54,7 +54,8 @@ sub fixPayDriverLabels {
     print "\tGet rid of the duplicate label properties in the PayDrivers... " unless $quiet;
     my $pay = WebGUI::Shop::Pay->new($session);
     my $gateways = $pay->getPaymentGateways;
-    foreach my $gateway (@{ $gateways }) {
+    GATEWAY: foreach my $gateway (@{ $gateways }) {
+        next GATEWAY unless $gateway;
         my $gatewayId = $gateway->getId;
         my $jsonLabel = $gateway->get('label');
         next if $jsonLabel;
