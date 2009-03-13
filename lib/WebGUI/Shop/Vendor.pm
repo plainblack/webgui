@@ -409,6 +409,29 @@ sub www_manage {
 
 
 #-------------------------------------------------------------------
+
+=head2 getPayoutTotals ( )
+
+Returns a hash ref, containing the payout details for this vendor. The keys in the hash are:
+
+=head3 paid
+
+The amount of money already transfered to the vendor.
+
+=head3 scheduled
+
+The amount of money scheduled to be transfered to the vendor.
+
+=head3 notPaid
+
+The amount of money that is yet to be scheduled for payment to the vendor.
+
+=head3 total
+
+The sum of these three values.
+
+=cut
+
 sub getPayoutTotals {
     my $self    = shift;
 
@@ -428,6 +451,16 @@ sub getPayoutTotals {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_submitScheduledPayouts ()
+
+Sets the vendorPayoutStatus flag of scheduled payments to 'Paid'. 
+
+NOTE: This method does no payments at all. In the future this method should trigger some automated payout
+mechanism.
+
+=cut
+
 sub www_submitScheduledPayouts {
     my $class   = shift;
     my $session = shift;
@@ -443,6 +476,16 @@ sub www_submitScheduledPayouts {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_setPayoutStatus ( )
+
+Sets the vendorPayoutStatus flag for each transaction passed by the form param 'itemId'. The new status is passed
+by the form param 'status'. Status can either be 'NotPaid' or 'Scheduled' and may only be applied on items that do
+not have their vendorPayoutStatus set to 'Paid'.
+
+Returns the status to which the item(s) are set.
+=cut
+
 sub www_setPayoutStatus {
     my $class   = shift;
     my $session = shift;
@@ -466,6 +509,14 @@ sub www_setPayoutStatus {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_vendorTotalsAsJSON ( )
+
+Returns a JSON string containing all vendors and their payout details. If a vendor id is passed through form param
+'vendorId' only results for that vendor will be returned.
+
+=cut
+
 sub www_vendorTotalsAsJSON {
     my $class       = shift;
     my $session     = shift;
