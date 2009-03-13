@@ -291,27 +291,9 @@ sub definition {
 		tab          => 'messaging',
 		fieldType    => 'email',
 		name         => 'smsGateway',
-		label        => $i18n->get('sms gateway',      'Message_Center'),
-		hoverHelp    => $i18n->get('sms gateway help', 'Message_Center'),
+		label        => $i18n->get('sms gateway'),
+		hoverHelp    => $i18n->get('sms gateway help'),
 		defaultValue => $setting->get('smsGateway'),
-		});
-	push(@fields, {
-		tab          => 'messaging',
-		fieldType    => 'yesNo',
-		name         => 'sendInboxNotificationsOnly',
-		label        => $i18n->get('send inbox notifications only',      'Message_Center'),
-		hoverHelp    => $i18n->get('send inbox notifications only help', 'Message_Center'),
-		defaultValue => $setting->get('sendInboxNotificationsOnly'),
-		});
-	push(@fields, {
-		tab          => 'messaging',
-		fieldType    => 'template',
-                        #1234567890123456789012
-		name         => 'inboxNotification00001',
-		label        => $i18n->get('inbox notification template',      'Message_Center'),
-		hoverHelp    => $i18n->get('inbox notification template help', 'Message_Center'),
-		defaultValue => $setting->get('inboxNotificationTemplateId'),
-        namespace    => 'Account/Inbox/Notification',
 		});
 	# misc
 	push(@fields, {
