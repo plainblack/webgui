@@ -1,3 +1,7 @@
+7.5.40+
+These bug fixes have been added to SVN after the 7.5.40 bug release.
+ - fixed #9942: Upgrade script fails with ITransact driver (William McKee, Knowmad Technologies)
+
 7.5.40
  - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
