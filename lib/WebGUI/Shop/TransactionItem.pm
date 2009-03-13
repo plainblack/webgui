@@ -267,11 +267,14 @@ sub update {
     if (exists $newProperties->{item}) {
         my $item = $newProperties->{ item };
         my $sku = $item->getSku;
-        $newProperties->{ options           } = $sku->getOptions;
-        $newProperties->{ assetId           } = $sku->getId;       
-        $newProperties->{ price             } = $sku->getPrice;       
-        $newProperties->{ configuredTitle   } = $item->get('configuredTitle');
-        $newProperties->{ quantity          } = $item->get('quantity');
+        $newProperties->{ options               } = $sku->getOptions;
+        $newProperties->{ assetId               } = $sku->getId;       
+        $newProperties->{ price                 } = $sku->getPrice;       
+        $newProperties->{ configuredTitle       } = $item->get('configuredTitle');
+        $newProperties->{ quantity              } = $item->get('quantity');
+        $newProperties->{ vendorId              } = $sku->getVendorId;
+        $newProperties->{ vendorPayoutAmount    } = sprintf '%.2f', $sku->getVendorPayout * $item->get('quantity');
+
         my $address = $item->getShippingAddress;
         $newProperties->{ shippingAddressId     } = $address->getId;
         $newProperties->{ shippingAddressName   } = $address->get('name');
@@ -289,7 +292,8 @@ sub update {
     }
     my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber orderStatus
         shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
-        shippingCountry shippingCode shippingPhoneNumber quantity price vendorId));
+        shippingCountry shippingCode shippingPhoneNumber quantity price vendorId 
+        vendorPayoutStatus vendorPayoutAmount));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }

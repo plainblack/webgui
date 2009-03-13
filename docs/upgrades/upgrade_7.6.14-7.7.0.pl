@@ -47,6 +47,9 @@ pa_installWorkflow($session);
 pa_addPassiveAnalyticsSettings($session);
 pa_addPassiveAnalyticsStatus($session);
 
+# vendor payouts
+addTransactionItemFlags( $session );
+
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -277,6 +280,16 @@ sub pa_installWorkflow {
     print "DONE!\n";
 }
 
+#----------------------------------------------------------------------------
+sub addTransactionItemFlags {
+    my $session = shift;
+    print "\tAdding columns for vendor payout tracking to transaction items..." unless $quiet;
+    
+    $session->db->write('alter table transactionItem add column vendorPayoutStatus char(10) default \'NotPaid\'');
+    $session->db->write('alter table transactionItem add column vendorPayoutAmount float (6,2) default 0.00');
+
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
