@@ -49,6 +49,7 @@ pa_addPassiveAnalyticsStatus($session);
 
 # vendor payouts
 addTransactionItemFlags( $session );
+createShopAcccountPluginSettings( $session );
 
 finish($session); # this line required
 
@@ -287,6 +288,16 @@ sub addTransactionItemFlags {
     
     $session->db->write('alter table transactionItem add column vendorPayoutStatus char(10) default \'NotPaid\'');
     $session->db->write('alter table transactionItem add column vendorPayoutAmount float (6,2) default 0.00');
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub createShopAcccountPluginSettings {
+    my $session = shift;
+    print "Creating default settings for the account plugin..." unless $quiet;
+
+    $session->setting->add('shopMySalesTemplateId', '-zxyB-O50W8YnL39Ouoc4Q');
 
     print "Done.\n" unless $quiet;
 }

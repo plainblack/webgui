@@ -555,6 +555,12 @@ our $I18N = {
 		context => q|admin function label|
 	},
 
+    'vendor payouts' => {
+        message => q|Vendor payouts|,
+        lastUpdated => 0,
+        context => q|admin function label|
+    },
+
 	'update' => { 
 		message => q|Update|,
 		lastUpdated => 0,
