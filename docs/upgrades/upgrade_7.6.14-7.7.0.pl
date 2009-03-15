@@ -37,6 +37,7 @@ addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
+surveyEndWorkflow($session);
 installAssetHistory($session);
 
 # Passive Analytics
@@ -82,6 +83,14 @@ sub surveyDoAfterTimeLimit {
     my $session = shift;
     print "\tAdding column doAfterTimeLimit to Survey table... " unless $quiet;
     $session->db->write('alter table Survey add doAfterTimeLimit char(22)');
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub surveyEndWorkflow {
+    my $session = shift;
+    print "\tAdding column onSurveyEndWorkflowId to Survey table... " unless $quiet;
+    $session->db->write('alter table Survey add onSurveyEndWorkflowId varchar(22) character set utf8 collate utf8_bin');
     print "DONE!\n" unless $quiet;
 }
 

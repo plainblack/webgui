@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 10;
+my $tests = 11;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -60,6 +60,10 @@ $survey->surveyJSON_update([1,1], { variable => 'S1Q1' });
 $session->user( { userId =>3 } );
 $survey->responseIdCookies(0);
 
+my $responseId = $survey->responseId;
+my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
+is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
+
 #for my $address (@{ $survey->responseJSON->surveyOrder }) {
 #    diag (Dumper $address);
 #}
@@ -86,6 +90,7 @@ $survey->responseIdCookies(0);
         is($survey->responseJSON->nextResponse, $index, "jumpTo($id) sets nextResponse to $index");
     }
 }
+
 
 }
 
