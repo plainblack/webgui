@@ -1293,7 +1293,7 @@ sub responseIdCookies {
 
 #-------------------------------------------------------------------
 
-=head2 responseId
+=head2 responseId( [userId] )
 
 Accessor for the responseId property, which is the unique identifier for a single 
 L<WebGUI::Asset::Wobject::Survey::ResponseJSON> instance. See also L<"responseJSON">.
@@ -1301,15 +1301,20 @@ L<WebGUI::Asset::Wobject::Survey::ResponseJSON> instance. See also L<"responseJS
 The responseId of the current user is returned, or created if one does not already exist.
 If the user is anonymous, the IP is used. Or an emailed or linked code can be used.
 
+=head3 userId (optional)
+
+If specified, this user is used rather than the current user 
+
 =cut
 
 sub responseId {
     my $self = shift;
+    my ($userId) = validate_pos(@_, {type => SCALAR, optional => 1});
 
     if (!defined $self->{responseId}) {
     
         my $ip = $self->session->env->getIp;
-        my $id = $self->session->user->userId;
+        my $id = $userId || $self->session->user->userId;
         my $anonId = $self->session->form->process('userid');
         if ($self->responseIdCookies) {
             $anonId ||= $self->session->http->getCookies->{Survey2AnonId}; ## no critic
