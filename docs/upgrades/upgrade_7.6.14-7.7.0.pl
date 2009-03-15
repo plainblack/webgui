@@ -127,7 +127,7 @@ sub installAssetHistory {
 #----------------------------------------------------------------------------
 sub pa_installLoggingTables {
     my $session = shift;
-    print "\tInstall logging tables... ";
+    print "\tInstall logging tables... " unless $quiet;
     my $db = $session->db;
     $db->write(<<EOT1);
 DROP TABLE IF EXISTS `passiveLog`
@@ -164,29 +164,29 @@ CREATE TABLE `bucketLog` (
     `timeStamp` datetime
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT3
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
 # Add the PassiveAnalytics Rule table
 sub pa_installPassiveAnalyticsRule {
     my $session = shift;
-    print "\tInstall Passive Analytics rule table, via Crud... ";
+    print "\tInstall Passive Analytics rule table, via Crud... " unless $quiet;
     # and here's our code
     WebGUI::PassiveAnalytics::Rule->crud_createTable($session);
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
 # Add the PassiveAnalytics Settings
 sub pa_addPassiveAnalyticsSettings {
     my $session = shift;
-    print "\tInstall Passive Analytics settings... ";
+    print "\tInstall Passive Analytics settings... " unless $quiet;
     # and here's our code
     $session->setting->add('passiveAnalyticsInterval', 300);
     $session->setting->add('passiveAnalyticsDeleteDelta', 0);
     $session->setting->add('passiveAnalyticsEnabled', 0);
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ sub pa_addPassiveAnalyticsSettings {
 sub pa_addPassiveAnalyticsStatus {
     my $session = shift;
     my $db      = $session->db;
-    print "\tInstall Passive Analytics status table... ";
+    print "\tInstall Passive Analytics status table... " unless $quiet;
     # and here's our code
     $db->write(<<EOT2);
 DROP TABLE if exists passiveAnalyticsStatus;
@@ -208,7 +208,7 @@ CREATE TABLE `passiveAnalyticsStatus` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 EOT3
     $db->write('insert into passiveAnalyticsStatus (userId) VALUES (3)');
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ EOT3
 # for the adminConsole and the content handler
 sub pa_installPassiveAnalyticsConfig {
     my $session = shift;
-    print "\tAdd Passive Analytics entry to the config file... ";
+    print "\tAdd Passive Analytics entry to the config file... " unless $quiet;
     # Admin Bar/Console
     my $adminConsole = $session->config->get('adminConsole');
     if (!exists $adminConsole->{'passiveAnalytics'}) {
@@ -234,7 +234,6 @@ sub pa_installPassiveAnalyticsConfig {
     if (!isIn('WebGUI::Content::PassiveAnalytics',@{ $contentHandlers} ) ) {
         my $contentIndex = 0;
         HANDLER: while ($contentIndex <= $#{ $contentHandlers } ) {
-            print $contentHandlers->[$contentIndex]."\n";
             ##Insert before Operation
             if($contentHandlers->[$contentIndex] eq 'WebGUI::Content::Operation') {
                 splice @{ $contentHandlers }, $contentIndex, 0, 'WebGUI::Content::PassiveAnalytics';
@@ -255,14 +254,14 @@ sub pa_installPassiveAnalyticsConfig {
     }
     $workflowActivities->{'None'} = [ @none ];
     $session->config->set('workflowActivities', $workflowActivities);
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
 # Add the Passive Analytics Workflow
 sub pa_installWorkflow {
     my $session = shift;
-    print "\tAdd Passive Analytics Workflow... ";
+    print "\tAdd Passive Analytics Workflow... " unless $quiet;
     my $workflow = WebGUI::Workflow->create(
         $session,
         {
@@ -278,7 +277,7 @@ sub pa_installWorkflow {
     $summarize->set('title', 'Perform duration analysis');
     $bucket->set(   'title', 'Please log entries into buckets');
     $workflow->set({enabled => 1});
-    print "DONE!\n";
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
