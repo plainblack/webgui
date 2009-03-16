@@ -353,6 +353,7 @@ if (typeof Survey === "undefined") {
                 }
                 else {
                     document.getElementById('questions').style.display = 'inline';
+console.log(2);
                     Survey.Form.addWidgets(qs);
                 }
                 lastSection = s.id;
@@ -361,6 +362,7 @@ if (typeof Survey === "undefined") {
                 document.getElementById('headertitle').style.display = 'block';
                 document.getElementById('headertext').style.display = 'block';
                 document.getElementById('questions').style.display = 'inline';
+console.log(3);
                 Survey.Form.addWidgets(qs);
             }
         },

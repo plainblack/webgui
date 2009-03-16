@@ -6,6 +6,7 @@ Survey.Comm = new function(){
     var callMade = 0;
 
     var request = function(sUrl,callback,postData){
+        YAHOO.util.Dom.setStyle('mask-all','display','block');
         if(callMade == 1){
             alert("Waiting on previous request");
         }else{
@@ -15,6 +16,7 @@ Survey.Comm = new function(){
     }
     this.callback = {
         success:function(o){
+            YAHOO.util.Dom.setStyle('mask-all','display','none');
             callMade = 0;
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },

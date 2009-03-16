@@ -377,7 +377,6 @@ Loads the initial edit survey page. All other edit actions are ajax calls from t
 
 sub www_editSurvey {
     my $self = shift;
-
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
@@ -398,7 +397,7 @@ See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/sectionIndex>.
 
 sub www_submitObjectEdit {
     my $self = shift;
-
+    
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
@@ -674,7 +673,7 @@ If undef, the address is pulled form the form POST.
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
-
+sleep(2);
     my $address = defined $options->{address} ? $options->{address} : undef;
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process('data') ) {
