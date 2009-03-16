@@ -673,7 +673,6 @@ If undef, the address is pulled form the form POST.
 sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
-sleep(2);
     my $address = defined $options->{address} ? $options->{address} : undef;
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process('data') ) {
