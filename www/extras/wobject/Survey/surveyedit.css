@@ -22,7 +22,7 @@
 }
 
 #loading .loading-indicator {
-  background: url(/extras/yui/rel_interstitial_loading.gif) no-repeat;
+  background: url(/extras/wobject/Survey/rel_interstitial_loading.gif) no-repeat;
   color:      #555;
   font:       bold 13px tahoma,arial,helvetica;
   padding:    18px 80px;
