@@ -21,6 +21,7 @@ Survey.Comm = new function(){
             Survey.Data.loadData(YAHOO.lang.JSON.parse(o.responseText));
         },
         failure: function(o){
+            YAHOO.util.Dom.setStyle('mask-all','display','none')
             callMade = 0;
             alert("Last request failed");
             Survey.Data.loadLast();
