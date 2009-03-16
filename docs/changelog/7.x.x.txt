@@ -14,6 +14,7 @@
  - fixed #9942: Upgrade script fails with ITransact driver (William McKee, Knowmad Technologies)
  - fixed #9943: Upgrade script fails with Payment Gateways
  - fixed #9948: Data form cannot be deleted.
+ - fixed #9950: Wrong var in help for thread
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
