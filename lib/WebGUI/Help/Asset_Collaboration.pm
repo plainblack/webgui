@@ -153,7 +153,7 @@ our $HELP = {
             { 'name' => 'sortby.lastreply.url' },
             { 'name' => 'sortby.views.url' },
             { 'name' => 'sortby.replies.url' },
-            { 'name' => 'sortby.rating.url' }
+            { 'name' => 'sortby.rating.url' },
             { 'name' => 'collaborationAssetId' },
         ],
         related => [
