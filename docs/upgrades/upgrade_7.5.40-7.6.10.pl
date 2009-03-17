@@ -216,16 +216,9 @@ sub removeTemplateHeadBlock {
             $templateData->{revisionDate},
         );
         next TMPL unless defined $template;
-        if ($template->get('namespace') eq 'style') {
-            $template->update({
-                extraHeadTags => '',
-            });
-        }
-        else {
-            $template->update({
-                extraHeadTags => $template->getExtraHeadTags . $templateData->{headBlock},
-            });
-        }
+        $template->update({
+            extraHeadTags => $template->getExtraHeadTags . $templateData->{headBlock},
+        });
     }
     $session->db->write('ALTER TABLE template DROP COLUMN headBlock');
     # and here's our code
