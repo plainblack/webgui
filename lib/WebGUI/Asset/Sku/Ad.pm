@@ -159,7 +159,7 @@ Prepares the template.
 sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
-	my $templateId = $self->get("templateId");
+	my $templateId = $self->get("purchaseTemplate");
 	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
