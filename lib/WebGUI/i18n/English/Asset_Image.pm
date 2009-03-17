@@ -77,6 +77,12 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
+	'annotate' => {
+		message => q|Annotate|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
 	'annotate image' => {
 		message => q|Annotate Image|,
 		context => q|label to annotate the image|,

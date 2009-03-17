@@ -1197,14 +1197,15 @@ sub annotate {
     if ($imageAsset->{annotations} =~ /\n/) {
         $imageAsset->{annotations} .= "\n";
     }
+    warn("there: $imageAsset->{annotations}");
     $imageAsset->{annotations} .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
     warn("there: $imageAsset->{annotations}");
-    $self->{_data}{annotations} = $imageAsset->{annotations};
-    warn("there: $self->{_data}{annotations}");
-	$self->session->db->setRow("ImageAsset","assetId",$self->{_data});
+    # $self->{_data}{annotations} = $imageAsset->{annotations};
+    # warn("there: $self->{_data}{annotations}");
+    # $self->session->db->setRow("ImageAsset","assetId",$self->{_data});
 
     foreach my $k (sort keys %{ $self->{_data} }) {
-        warn("$k => $$self{_data}{$k}");
+        # warn("$k => $$self{_data}{$k}");
     }
 
     return 1;

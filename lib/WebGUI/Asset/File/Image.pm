@@ -348,13 +348,60 @@ sub www_annotate {
 	# http://www.kryogenix.org/code/browser/annimg/annimg.html (creative commons)
     # $style->setLink($url->extras('annotate/imageMap.css'), {rel=>'stylesheet', type=>'text/css'});
 
+	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+	$style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+
+	$style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
+	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+
 	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
 
 	warn("annotations: " . $self->{annotations});
 	my @pieces = split(/\n/, $imageAsset->{annotations});
 	# my ($top_left, $width_height, $note) = split(/\n/, $imageAsset->{annotations});
 	
-	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:1px;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
+	my $crop_js = qq(
+        <script type="text/javascript">
+        var crop;
+        function switchState() {
+            YAHOO.img.container.tt0 = null;
+            YAHOO.img.container.tt3 = null;
+
+            if (crop) {
+                crop.destroy();
+                crop = null;
+                YAHOO.util.Dom.setStyle('tooltip0', 'display', 'block');
+                YAHOO.util.Dom.setStyle('tooltip3', 'display', 'block');
+            }
+            else {
+                crop = new YAHOO.widget.ImageCropper('yui_img', { 
+                    initialXY: [20, 20], 
+                    keyTick: 5, 
+                    shiftKeyTick: 50 
+                }); 
+                crop.on('moveEvent', function() { 
+                    var region = crop.getCropCoords();
+                    element = document.getElementById('annotate_width_formId');
+                    element.value = region.width;
+                    element = document.getElementById('annotate_height_formId');
+                    element.value = region.height;
+                    element = document.getElementById('annotate_top_formId');
+                    element.value = region.top;
+                    element = document.getElementById('annotate_left_formId');
+                    element.value = region.left;
+                }); 
+                YAHOO.util.Dom.setStyle('tooltip0', 'display', 'none');
+                YAHOO.util.Dom.setStyle('tooltip3', 'display', 'none');
+            }
+        }
+		</script>
+    );
+    my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
+    # my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
 
 	my ($width, $height) = $self->getStorageLocation->getSize($self->get("filename"));
 
@@ -370,29 +417,29 @@ sub www_annotate {
 		my $width_height = $pieces[$i + 1];
 		my $note = $pieces[$i + 2];
 
-        $hotspots .= qq(
-            <span id=span_tooltip$i>
-            </span>
-        );
+        # next if 3 == $i;
 
         $domMe .= qq(
+            <style type="text/css">
+                div#tooltip$i { position: absolute; border:1px solid; }
+            </style>
+
+            <span id=span_tooltip$i>
+            </span>
+
             <script type="text/javascript" defer="defer">
                 function on_load_$i() {
                     var xy = YAHOO.util.Dom.getXY('yui_img'); 
 
                     document.getElementById('span_tooltip$i').innerHTML = "<div id=tooltip$i style='border:1px solid;'></div>";
-                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'height', '40px');
-                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'width', '100px');
+                    YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');
                     YAHOO.util.Dom.setStyle('tooltip$i', 'height', '40px');
                     YAHOO.util.Dom.setStyle('tooltip$i', 'width', '100px');
-                    YAHOO.util.Dom.setStyle('span_tooltip$i', 'display', 'block');
-                    YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');
-                    xy[1] += 40;
                     YAHOO.util.Dom.setXY('span_tooltip$i', [$top_left]); 
                     YAHOO.util.Dom.setXY('tooltip$i', [$top_left]); 
 
                     YAHOO.namespace("img.container");
-                    YAHOO.img.container.tt$i = new YAHOO.widget.Tooltip("tt$i", { context:"tooltip$i", container:"tooltip$i", text:"test: $i" });
+                    YAHOO.img.container.tt$i = new YAHOO.widget.Tooltip("tt$i", { showdelay: 0, visible: true, context:"tooltip$i", position:"relative", container:"tooltip$i", text:"test: $i" });
                 }
                 if (document.addEventListener) {
                     document.addEventListener("DOMContentLoaded", on_load_$i, false);
@@ -447,8 +494,12 @@ sub www_annotate {
 		-name=>"annotate_height",
 		-value=>,
 		);
+    $f->button(
+        -value=>$i18n->get('annotate'),
+        -extras=>'onclick="switchState();"',
+        );
 	$f->submit;
-    return $self->getAdminConsole->render($f->print."$hotspots$image$domMe",$i18n->get("annotate image"));
+    return $self->getAdminConsole->render($f->print."$image$crop_js$domMe",$i18n->get("annotate image"));
 }
 
 #-------------------------------------------------------------------
@@ -637,7 +688,6 @@ sub www_resize {
 }
 
 #-------------------------------------------------------------------
-# feel free to take over typing
 sub www_crop {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;

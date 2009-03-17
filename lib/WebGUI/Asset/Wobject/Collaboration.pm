@@ -861,6 +861,7 @@ SQL
 	my $datetime = $self->session->datetime;
 
     my @posts;
+    my $rssLimit = $self->get('rssCapableRssLimit') || 10;
     for my $postId (@postIds) {
 		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
 		my $postUrl = $siteUrl . $post->getUrl;
@@ -896,6 +897,8 @@ SQL
 			userDefined4 => $post->get("userDefined4"),
 			userDefined5 => $post->get("userDefined5"),
 		 };
+
+         last if $rssLimit <= scalar(@posts);
 	}
 
     return @posts;
