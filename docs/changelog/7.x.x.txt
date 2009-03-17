@@ -7,6 +7,8 @@
  - fixed #9943: Upgrade script fails with Payment Gateways
  - fixed #9948: Data form cannot be deleted.
  - fixed #9950: Wrong var in help for thread
+ - fixed #9956: Product Import
+ - added Survey now has a loading mask on Survey edit ajax calls.
 
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages
