@@ -56,7 +56,7 @@ if ($hasServer) {
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 9;        # Increment this number for each test you create
+plan tests => 13;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -194,6 +194,18 @@ $inboxUser->profileField('cellPhone', '55555');
 $oldSettings{smsGateway} = $session->setting->get('smsGateway');
 $session->setting->set('smsGateway', 'textme.com');
 
+my $emailUser = WebGUI::User->create($session);
+$emailUser->username('heywood');
+$emailUser->profileField('email', 'heywood@shawshank.gov');
+
+my $lonelyUser = WebGUI::User->create($session);
+$lonelyUser->profileField('receiveInboxEmailNotifications', 0);
+$lonelyUser->profileField('receiveInboxSmsNotifications',   0);
+$lonelyUser->profileField('email',   'jake@shawshank.gov');
+
+my $inboxGroup = WebGUI::Group->new($session, 'new');
+$inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
+
 SKIP: {
     my $numtests        = 1; # Number of tests in this block
 
@@ -249,8 +261,48 @@ SKIP: {
         'send, toUser with SMS and email addresses'
     );
 
-
 }
+
+#----------------------------------------------------------------------------
+#
+# Test sending an Inbox message to a group with various user profile settings
+#
+#----------------------------------------------------------------------------
+
+my @mailIds;
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+my $startingMessages = scalar @mailIds;
+
+$mail = WebGUI::Mail::Send->create( $session, { 
+        toGroup  => $inboxGroup->getId,
+        },
+        'fromInbox',
+);
+$mail->addText('Mail::Send test message');
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+is(scalar @mailIds, $startingMessages, 'creating a message does not queue a message');
+
+$mail->send;
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added two messages');
+
+@mailIds = $session->db->buildArray("select messageId from mailQueue where message like ?",['%Mail::Send test message%']);
+is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added the right two messages');
+
+my @emailAddresses = ();
+foreach my $mailId (@mailIds) {
+    my $mail = WebGUI::Mail::Send->retrieve($session, $mailId);
+    push @emailAddresses, $mail->getMimeEntity->head->get('to');
+}
+
+cmp_bag(
+    \@emailAddresses,
+    [
+        'heywood@shawshank.gov'."\n",
+        'ellis_boyd_redding@shawshank.gov,55555@textme.com'."\n",
+    ],
+    'send: when the original is sent, new messages are created for each user in the group, following their user profile settings'
+);
 
 # TODO: Test the emailToLog config setting
 
@@ -262,13 +314,16 @@ END {
         $session->setting->set( $name, $oldSettings{ $name } );
     }
 
-    if ($inboxUser) {
-        $inboxUser->delete;
-    }
+    $inboxUser->delete   if $inboxUser;
+    $emailUser->delete   if $emailUser;
+    $lonelyUser->delete  if $lonelyUser;
+    $inboxGroup->delete  if $inboxGroup;
 
     close MAIL 
         or die "Could not close pipe to SMTPD: $!";
     sleep 1;
+
+    $session->db->write('delete from mailQueue');
 }
 
 #----------------------------------------------------------------------------
