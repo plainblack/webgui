@@ -1281,6 +1281,11 @@ section/answer.|,
         lastUpdated => 0,
     },
 
+   'restart message' =>{
+        message => q|The survey was restarted because the time limit for completing the survey was reached.|,
+        lastUpdated => 0,
+        context => q|The message shown to the user taking the survey when the survey is restarted after reaching the time limit for completing the survey. This message is in the 'take survey' template.|,
+    },
 };
 
 1;
