@@ -317,8 +317,6 @@ sub exportAsHtml {
         # tell the user which asset we're exporting.
         unless ($quiet) {
             my $message = sprintf $i18n->get('exporting page'), $fullPath;
-            $exportSession->var->end;
-            $exportSession->close;
             $self->session->output->print($message);
         }
 
