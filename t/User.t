@@ -658,17 +658,17 @@ $inmate->profileField('email', 'andy@shawshank.com');
 is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: email address only');
 
 $inmate->profileField('receiveInboxSmsNotifications',   1);
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSmsNotifications=1 but no other profile info');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
 
 $inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSmsNotifications=1 and cell phone but no gateway');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
 
 $inmate->profileField('cellPhone', '');
 $session->setting->set('smsGateway', 'textme.com');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSmsNotifications=1 and gateway but no cell phone');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
 
 $inmate->profileField('cellPhone', '37927');
-is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSmsNotifications=1 and gateway but no cell phone');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
 
 $inmate->profileField('receiveInboxEmailNotifications', 0);
 is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get SMS and no email, even with email info present');

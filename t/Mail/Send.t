@@ -17,10 +17,13 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
+use Test::Deep;
 use File::Spec;
+use Data::Dumper;
 use WebGUI::Test;
 
 use WebGUI::Mail::Send;
+use WebGUI::User;
 
 #----------------------------------------------------------------------------
 # Init
@@ -43,13 +46,17 @@ my $SMTP_PORT        = '54921';
 if ($hasServer) {
     $oldSettings{ smtpServer } = $session->setting->get('smtpServer');
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
-    
+
+    my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
+    open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT 4 |"
+        or die "Could not open pipe to SMTPD: $!";
+    sleep 1; # Give the smtpd time to establish itself
 }
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 9;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -86,7 +93,7 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
 #----------------------------------------------------------------------------
 # Test addHtml
 $mail   = WebGUI::Mail::Send->create( $session );
-my $text = <<'EOF';
+$text = <<'EOF';
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Suspendisse eu lacus ut ligula fringilla elementum. Cras condimentum, velit commodo pretium semper, odio ante accumsan orci, a ultrices risus justo a nulla. Aliquam erat volutpat. 
 EOF
 
@@ -97,7 +104,7 @@ $mime   = $mail->getMimeEntity;
 # TODO: Test that addHtml creates a body with the right content type
 
 # addHtml should add newlines after 78 characters
-my $newlines    = length $text / 78;
+$newlines    = length $text / 78;
 is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtml should add newlines after 78 characters",
 );
@@ -107,7 +114,7 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
 #----------------------------------------------------------------------------
 # Test addHtmlRaw
 $mail   = WebGUI::Mail::Send->create( $session );
-my $text = <<'EOF';
+$text = <<'EOF';
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Suspendisse eu lacus ut ligula fringilla elementum. Cras condimentum, velit commodo pretium semper, odio ante accumsan orci, a ultrices risus justo a nulla. Aliquam erat volutpat. 
 EOF
 
@@ -117,12 +124,14 @@ $mime   = $mail->getMimeEntity;
 # TODO: Test that addHtmlRaw doesn't add an HTML wrapper
 
 # addHtmlRaw should add newlines after 78 characters
-my $newlines    = length $text / 78;
+$newlines    = length $text / 78;
 is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtmlRaw should add newlines after 78 characters",
 );
 
 # TODO: Test that addHtml creates a body with the right content type
+
+my $smtpServerOk = 0;
 
 #----------------------------------------------------------------------------
 # Test emailOverride
@@ -138,23 +147,25 @@ SKIP: {
     if ( !$hasServer ) {
         skip "Cannot test emailOverride: Module Net::SMTP::Server not loaded!", $numtests;
     }
-    
+
+    $smtpServerOk = 1;
+
     # Override the emailOverride
     my $oldEmailOverride   = $session->config->get('emailOverride');
     $session->config->set( 'emailOverride', 'dufresne@localhost' );
     my $oldEmailToLog      = $session->config->get('emailToLog');
     $session->config->set( 'emailToLog', 0 );
-    
+
     # Send the mail
     my $mail
         = WebGUI::Mail::Send->create( $session, { 
             to      => 'norton@localhost',
         } );
     $mail->addText( 'His judgement cometh and that right soon.' );
-    
+
     my $received = sendToServer( $mail );
-    
-    if (!$received) {
+
+    if ($received->{error}) {
         skip "Cannot test emailOverride: No response received from smtpd", $numtests;
     }
 
@@ -168,6 +179,79 @@ SKIP: {
     $session->config->set( 'emailToLog', $oldEmailToLog );
 }
 
+#----------------------------------------------------------------------------
+#
+# Test sending an Inbox message to a user who has various notifications configured
+#
+#----------------------------------------------------------------------------
+
+my $inboxUser = WebGUI::User->create($session);
+$inboxUser->username('red');
+$inboxUser->profileField('receiveInboxEmailNotifications', 1);
+$inboxUser->profileField('receiveInboxSmsNotifications',   0);
+$inboxUser->profileField('email',     'ellis_boyd_redding@shawshank.gov');
+$inboxUser->profileField('cellPhone', '55555');
+$oldSettings{smsGateway} = $session->setting->get('smsGateway');
+$session->setting->set('smsGateway', 'textme.com');
+
+SKIP: {
+    my $numtests        = 1; # Number of tests in this block
+
+    # Must be able to write the config, or we'll die
+    skip "Cannot test email notifications", $numtests unless $smtpServerOk;
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via email' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
+
+    $inboxUser->profileField('receiveInboxEmailNotifications', 0);
+    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via SMS' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    is($received->{to}->[0], '<55555@textme.com>', 'send, toUser with SMS address');
+
+    $inboxUser->profileField('receiveInboxEmailNotifications', 1);
+    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via SMS' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    cmp_bag(
+        $received->{to},
+        ['<55555@textme.com>', '<ellis_boyd_redding@shawshank.gov>',],
+        'send, toUser with SMS and email addresses'
+    );
+
+
+}
+
 # TODO: Test the emailToLog config setting
 
 
@@ -177,6 +261,14 @@ END {
     for my $name ( keys %oldSettings ) {
         $session->setting->set( $name, $oldSettings{ $name } );
     }
+
+    if ($inboxUser) {
+        $inboxUser->delete;
+    }
+
+    close MAIL 
+        or die "Could not close pipe to SMTPD: $!";
+    sleep 1;
 }
 
 #----------------------------------------------------------------------------
@@ -193,21 +285,17 @@ END {
 #                 by a MIME::Entity parser
 sub sendToServer {
     my $mail        = shift;
-
-    my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
-    open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT |"
-        or die "Could not open pipe to SMTPD: $!";
-    sleep 1; # Give the smtpd time to establish itself
-
-    $mail->send;
+    my $status = $mail->send;
     my $json;
-    while ( my $line = <MAIL> ) {
-        $json   .= $line; 
+    if ($status) {
+        $json = <MAIL>;
     }
-
-    close MAIL 
-        or die "Could not close pipe to SMTPD: $!";
-
+    else {
+        $json = ' { "error": "mail not sent" } ';
+    }
+    if (!$json) {
+        $json = ' { "error": "error in getting mail" } ';
+    }
     return from_json( $json );
 }
 

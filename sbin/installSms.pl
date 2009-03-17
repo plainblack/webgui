@@ -33,6 +33,7 @@ my $session = start( $webguiRoot, $configFile );
 
 installUserProfileFields($session);
 installSettings($session);
+upgradeMailQueue($session);
 
 # Do your work here
 finish($session);
@@ -58,7 +59,7 @@ sub installUserProfileFields {
     );
     WebGUI::ProfileField->create(
         $session,
-        'receiveInboxSMSNotifications',
+        'receiveInboxSmsNotifications',
         {
             label          => q!WebGUI::International::get('receive inbox sms','Message_Center')!,
             visible        => 1,
@@ -75,6 +76,11 @@ sub installUserProfileFields {
 sub installSettings {
     my $session = shift;
     $session->setting->add('smsGateway', '');
+}
+
+sub upgradeMailQueue {
+    my $session = shift;
+    $session->db->write('alter table mailQueue add column isInbox TINYINT(4) default 0');
 }
 
 #----------------------------------------------------------------------------

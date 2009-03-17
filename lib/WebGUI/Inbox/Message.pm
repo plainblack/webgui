@@ -151,16 +151,17 @@ sub create {
 
 	my $subject = (defined $properties->{emailSubject}) ? $properties->{emailSubject} : $self->{_properties}{subject};
 	my $mail = WebGUI::Mail::Send->create($session, {
-		toUser=>$self->{_properties}{userId},
-		toGroup=>$self->{_properties}{groupId},
-		subject=>$subject,
-		});
+		toUser  => $self->{_properties}{userId},
+		toGroup => $self->{_properties}{groupId},
+		subject => $subject,
+		},
+        'fromInbox',
+    );
 	if (defined $mail) {
         my $preface = "";
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
         #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
         unless ($fromUser->isVisitor || $fromUser->userId eq 3) {  #Can't use isAdmin because it will not send prefaces from normal users who in the admin group
-            my $i18n = WebGUI::International->new($session, 'Inbox_Message');
             $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
         }
         my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
