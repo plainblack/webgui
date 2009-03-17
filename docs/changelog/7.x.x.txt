@@ -17,6 +17,7 @@
  - fixed #9950: Wrong var in help for thread
  - fixed #9956: Product Import
  - added Survey now has a loading mask on Survey edit ajax calls.
+ - fixed: Sliders fixed.  Improved algorithm for determining pixel step size.
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager

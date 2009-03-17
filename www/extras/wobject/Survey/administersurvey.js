@@ -45,8 +45,10 @@ if (typeof Survey === "undefined") {
     function formsubmit(event){
         var submit = 1;//boolean for if all was good or not
         for (var i in toValidate) {
+console.log(toValidate);
             if (YAHOO.lang.hasOwnProperty(toValidate, i)) {
                 var answered = 0;
+console.log(toValidate[i].type);
                 if (toValidate[i].type === 'Multi Slider - Allocate') {
                     var total = 0;
                     for (var z in toValidate[i].answers) {
@@ -74,6 +76,7 @@ if (typeof Survey === "undefined") {
                     }
                 }
 				var node = document.getElementById(i + 'required');
+
 				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
@@ -209,7 +212,7 @@ if (typeof Survey === "undefined") {
                 var step = Math.round(q.answers[i].step);
                 var min = Math.round(parseFloat(q.answers[i].min));
                 var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
-                var scale = Math.round(sliderWidth / distance);
+                var scale = Math.floor(sliderWidth / distance);
                 var id = a.id;
                 var s = YAHOO.widget.Slider.getHorizSlider(id + 'slider-bg', id + 'slider-thumb', 0, sliderWidth, (scale * step));
                 s.scale = scale;
@@ -387,8 +390,9 @@ if (typeof Survey === "undefined") {
                     }
                 }
                 
-                //Check if this question should be validated
-                if (q.required) {
+                //Check if this question should be validated.
+                //Sliders can't really be not answered, so requiring them makes little sense.
+                if (q.required == true && q.questionType != 'Slider') {
                     toValidate[q.id] = [];
                     toValidate[q.id].type = q.questionType;
                     toValidate[q.id].answers = [];
