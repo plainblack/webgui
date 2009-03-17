@@ -485,6 +485,7 @@ sub definition {
         groupIdAdminGraphics
         groupIdAdminGroup
         groupIdAdminGroupAdmin
+        groupIdAdminHistory
         groupIdAdminHelp
         groupIdAdminLDAPLink
         groupIdAdminLoginHistory

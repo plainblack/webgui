@@ -48,8 +48,11 @@ sub appendCommonVars {
     my $user    = $session->user;
     my $method  = $session->form->get("do");
     
-    $var->{'manage_purchases_url'    } = $self->getUrl("module=shop;do=managePurchases");
-    $var->{'managesPurchasesIsActive'} = WebGUI::Utility::isIn($method,("","managePurchases","view","viewTransaction"));
+    $var->{ 'manage_purchases_url'      } = $self->getUrl("module=shop;do=managePurchases");
+    $var->{ 'managesPurchasesIsActive'  } = WebGUI::Utility::isIn($method,("","managePurchases","view","viewTransaction"));
+
+    $var->{ 'view_sales_url'            } = $self->getUrl( 'module=shop;do=viewSales' );
+    $var->{ 'viewSalesIsActive'         } = $method eq 'viewSales';
 }
 
 #-------------------------------------------------------------------
@@ -108,6 +111,13 @@ sub editSettingsForm {
 		label     => $shopi18n->get("my purchases detail template"),
         hoverHelp => $shopi18n->get("my purchases detail template help")
     );
+    $f->template(
+        name        => 'shopMySalesTemplateId',
+        value       => $self->session->setting->get('shopMySalesTemplateId'),
+        namespace   => 'Shop/MySales',
+        label       => $shopi18n->echo('my sales template'),
+        hoverHelp   => $shopi18n->echo('my sales template help'),
+    );
 
     return $f->printRowsOnly;
 }
@@ -130,6 +140,7 @@ sub editSettingsFormSave {
     $setting->set("shopLayoutTemplateId", $form->process("shopLayoutTemplateId","template"));
     $setting->set("shopMyPurchasesTemplateId", $form->process("shopMyPurchasesTemplateId","template"));
     $setting->set("shopMyPurchasesDetailTemplateId", $form->process("shopMyPurchasesDetailTemplateId","template"));
+    $setting->set("shopMySalesTemplateId", $form->process("shopMySalesTemplateId","template"));
 }
 
 #-------------------------------------------------------------------
@@ -204,6 +215,43 @@ sub www_view {
     #Use the view class as the driver for now. This will likely grow
     return $self->www_managePurchases();
 
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewSales ( )
+
+Page that show your earnings if you are a vendor.
+
+=cut
+
+sub www_viewSales {
+    my $self    = shift;
+    my $session = $self->session;
+    my $vendor  = WebGUI::Shop::Vendor->newByUserId( $session, $session->user->userId );
+
+    my $var         = $vendor->getPayoutTotals;
+    my $totalSales  = 0;
+    my @products;
+
+    my $sth = $session->db->read(
+        'select *, sum(quantity) as quantity, sum(vendorPayoutAmount) as payoutAmount from transactionItem '
+        .'where vendorId=? group by assetId order by quantity desc',
+        [ $vendor->getId ]
+    );
+    while (my $row = $sth->hashRef) {
+        push @products, $row;
+        $totalSales += $row->{quantity};
+    }
+    $sth->finish;
+
+    $var->{ product_loop   } = \@products;
+    $var->{ total_products  } = scalar @products;
+    $var->{ total_sales     } = $totalSales;
+    
+    $self->appendCommonVars( $var );
+
+    return $self->processTemplate( $var, $session->setting->get('shopMySalesTemplateId') ); 
 }
 
 #-------------------------------------------------------------------
@@ -291,6 +339,7 @@ sub www_viewTransaction {
     # render
     return $self->processTemplate(\%var,$session->setting->get("shopMyPurchasesDetailTemplateId"));
 }
+
 
 
 

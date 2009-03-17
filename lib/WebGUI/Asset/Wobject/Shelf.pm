@@ -210,7 +210,11 @@ sub importProducts {
             }
 
             if ($productRow{title} ne $product->getTitle) {
-                $product->update({ title => $product->fixTitle($productRow{title}) });
+                my $newTitle = $product->fixTitle($productRow{title});
+                $product->update({
+                    title     => $newTitle,
+                    menuTitle => $newTitle,
+                });
             }
 
             my $collaterals = $product->getAllCollateral('variantsJSON');
@@ -230,10 +234,12 @@ sub importProducts {
             ##Insert a new product;
             $session->log->warn("Making a new product: $productRow{sku}\n");
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
+            my $newTitle = $newProduct->fixTitle($productRow{title});
             $newProduct->update({
-                title => $newProduct->fixTitle($productRow{title}),
-                url   => $newProduct->fixUrl($productRow{title}),
-                sku   => $productRow{mastersku},
+                title     => $newTitle,
+                menuTitle => $newTitle,
+                url       => $newProduct->fixUrl($productRow{title}),
+                sku       => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
             $newProduct->commit;

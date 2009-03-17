@@ -391,12 +391,13 @@ sub _cacheFieldConfig {
         my $fieldData;
         if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
-            $self->{_fieldConfig} = {
-                map { $_->{name}, $_ } @{ $jsonData }
-            };
-            $self->{_fieldOrder} = [
-                map { $_->{name} } @{ $jsonData }
-            ];
+            $self->{_fieldConfig} = {};
+            $self->{_fieldOrder}  = [];
+            FIELD: foreach my $field (@{ $jsonData } ) {
+                next FIELD unless ref $field eq 'HASH';
+                $self->{_fieldConfig}->{$field->{name}} = $field;
+                push @{ $self->{_fieldOrder} }, $field->{name};
+            }
         }
         else {
             $self->{_fieldConfig} = {};

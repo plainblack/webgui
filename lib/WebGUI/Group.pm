@@ -543,7 +543,8 @@ sub getAllGroupsFor {
 =head2 getAllUsers ( [ withoutExpired ] )
 
 Returns an array reference containing a list of users that belong to this group
-and in any group that belongs to this group.
+and in any group that belongs to this group.  The list is unique, so that each
+userId is only in it one time.
 
 =head3 withoutExpired
 

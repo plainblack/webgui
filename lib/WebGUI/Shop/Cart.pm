@@ -260,7 +260,7 @@ Returns a reference to the address book for the user who's cart this is.
 
 sub getAddressBook {
     my $self = shift;
-    my $id = ref $self;
+    my $id = id $self;
     unless (exists $addressBookCache{$id}) {
         $addressBookCache{$id} = WebGUI::Shop::AddressBook->newBySession($self->session);
     }    
@@ -297,7 +297,6 @@ sub getItem {
     unless (defined $itemId && $itemId =~ m/^[A-Za-z0-9_-]{22}$/) {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
-    my $id = ref $self;
     my $item = WebGUI::Shop::CartItem->new($self, $itemId);
     return $item;
 }

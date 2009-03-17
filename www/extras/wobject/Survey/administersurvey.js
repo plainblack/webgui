@@ -8,49 +8,29 @@ if (typeof Survey === "undefined") {
 	var CLASS_INVALID = 'survey-invalid'; // For elements that fail input validation
 	var CLASS_INVALID_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
 	
-    var multipleChoice = {
-        'Multiple Choice': 1,
-        'Gender': 1,
-        'Yes/No': 1,
-        'True/False': 1,
-        'Ideology': 1,
-        'Race': 1,
-        'Party': 1,
-        'Education': 1,
-        'Scale': 1,
-        'Agree/Disagree': 1,
-        'Oppose/Support': 1,
-        'Importance': 1,
-        'Likelihood': 1,
-        'Certainty': 1,
-        'Satisfaction': 1,
-        'Confidence': 1,
-        'Effectiveness': 1,
-        'Concern': 1,
-        'Risk': 1,
-        'Threat': 1,
-        'Security': 1
-    };
-    var text = {
+    // All specially-handled question types are listed here
+    // (anything else is assumed to be a multi-choice bundle)
+    var TEXT_TYPES = {
         'Text': 1,
         'Email': 1,
         'Phone Number': 1,
         'Text Date': 1,
-        'Currency': 1
+        'Currency': 1,
+	    'TextArea': 1
     };
-    var slider = {
+    var SLIDER_TYPES = {
         'Slider': 1,
         'Dual Slider - Range': 1,
         'Multi Slider - Allocate': 1
     };
-    var dateType = {
+    var DATE_TYPES = {
         'Date': 1,
         'Date Range': 1
     };
-    var fileUpload = {
+    var UPLOAD_TYPES = {
         'File Upload': 1
     };
-    var hidden = {
+    var HIDDEN_TYPES = {
         'Hidden': 1
     };
     
@@ -65,8 +45,10 @@ if (typeof Survey === "undefined") {
     function formsubmit(event){
         var submit = 1;//boolean for if all was good or not
         for (var i in toValidate) {
+console.log(toValidate);
             if (YAHOO.lang.hasOwnProperty(toValidate, i)) {
                 var answered = 0;
+console.log(toValidate[i].type);
                 if (toValidate[i].type === 'Multi Slider - Allocate') {
                     var total = 0;
                     for (var z in toValidate[i].answers) {
@@ -94,6 +76,7 @@ if (typeof Survey === "undefined") {
                     }
                 }
 				var node = document.getElementById(i + 'required');
+
 				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
@@ -229,7 +212,7 @@ if (typeof Survey === "undefined") {
                 var step = Math.round(q.answers[i].step);
                 var min = Math.round(parseFloat(q.answers[i].min));
                 var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
-                var scale = Math.round(sliderWidth / distance);
+                var scale = Math.floor(sliderWidth / distance);
                 var id = a.id;
                 var s = YAHOO.widget.Slider.getHorizSlider(id + 'slider-bg', id + 'slider-thumb', 0, sliderWidth, (scale * step));
                 s.scale = scale;
@@ -353,7 +336,6 @@ if (typeof Survey === "undefined") {
                 if (lastSection !== s.id || s.everyPageText === '1') {
                     document.getElementById('headertext').style.display = 'block';
                 }
-				
                 if (lastSection !== s.id && s.questionsOnSectionPage !== '1') {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
@@ -385,11 +367,16 @@ if (typeof Survey === "undefined") {
                 Survey.Form.addWidgets(qs);
             }
         },
-        
+
         addWidgets: function(qs){
             hasFile = false;
             for (var i = 0; i < qs.length; i++) {
                 var q = qs[i];
+                if (!q || !q.answers) {
+                    // gracefully handle q with no answers
+                    continue;
+                }
+                
                 var verts = '';
                 for (var x in q.answers) {
                     if (YAHOO.lang.hasOwnProperty(q.answers, x)) {
@@ -403,106 +390,108 @@ if (typeof Survey === "undefined") {
                     }
                 }
                 
-                //Check if this question should be validated
-                if (q.required) {
+                //Check if this question should be validated.
+                //Sliders can't really be not answered, so requiring them makes little sense.
+                if (q.required == true && q.questionType != 'Slider') {
                     toValidate[q.id] = [];
                     toValidate[q.id].type = q.questionType;
                     toValidate[q.id].answers = [];
                 }
                 
                 
-                if (multipleChoice[q.questionType]) {
-                    var butts = [];
-                    verb = 0;
-                    for (var j = 0; j < q.answers.length; j++) {
-                        var a = q.answers[j];
+                if (DATE_TYPES[q.questionType]) {
+                    for (var k = 0; k < q.answers.length; k++) {
+                        var ans = q.answers[k];
                         if (toValidate[q.id]) {
-                            toValidate[q.id].answers[a.id] = 1;
+                            toValidate[q.id].answers[ans.id] = 1;
                         }
-                        var b = document.getElementById(a.id + 'button');
-                        /*
-                         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
-                         value: a.id,
-                         container: a.id+"container", checked: false });
-                         */
-                        //                    b.on("click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
-                        //                    YAHOO.util.Event.addListener(a.id+'button', "click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
-                        if (a.verbatim) {
-                            verb = 1;
-                        }
-                        YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, [b, a.id, q.maxAnswers, butts, qs.length, a.id]);
-                        b.hid = a.id;
-                        butts.push(b);
+                        var calid = ans.id + 'container';
+                        var c = new YAHOO.widget.Calendar(calid, {
+                            title: 'Choose a date:',
+                            close: true
+                        });
+                        c.selectEvent.subscribe(selectCalendar, [c, ans.id], true);
+                        c.render();
+                        c.hide();
+                        var btn = new YAHOO.widget.Button({
+                            label: "Select Date",
+                            id: "pushbutton" + ans.id,
+                            container: ans.id + 'button'
+                        });
+                        btn.on("click", showCalendar, [c]);
                     }
+                    continue;
                 }
-                else 
-                    if (dateType[q.questionType]) {
-                        for (var k = 0; k < q.answers.length; k++) {
-                            var ans = q.answers[k];
-                            if (toValidate[q.id]) {
-                                toValidate[q.id].answers[ans.id] = 1;
+                
+                if (SLIDER_TYPES[q.questionType]) {
+                    //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
+                    var max = 0;
+                    if (q.questionType === 'Dual Slider - Range') {
+                        handleDualSliders(q);
+                    }
+                    else {
+                        for (var s in q.answers) {
+                            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
+                                var a1 = q.answers[s];
+                                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
+                                if (a1.max - a1.min > max) {
+                                    max = a1.max - a1.min;
+                                }
                             }
-                            var calid = ans.id + 'container';
-                            var c = new YAHOO.widget.Calendar(calid, {
-                                title: 'Choose a date:',
-                                close: true
-                            });
-                            c.selectEvent.subscribe(selectCalendar, [c, ans.id], true);
-                            c.render();
-                            c.hide();
-                            var btn = new YAHOO.widget.Button({
-                                label: "Select Date",
-                                id: "pushbutton" + ans.id,
-                                container: ans.id + 'button'
-                            });
-                            btn.on("click", showCalendar, [c]);
                         }
+                    }
+                    if (q.questionType === 'Multi Slider - Allocate') {
+                        //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
+                        for (var x1 = 0; x1 < q.answers.length; x1++) {
+                            if (toValidate[q.id]) {
+                                toValidate[q.id].total = q.answers[x1].max;
+                                toValidate[q.id].answers[q.answers[x1].id] = 1;
+                            }
+                        }
+                        sliderManager(q, max);
                     }
                     else 
-                        if (slider[q.questionType]) {
-                            //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
-                            var max = 0;
-                            if (q.questionType === 'Dual Slider - Range') {
-                                handleDualSliders(q);
-                            }
-                            else {
-                                for (var s in q.answers) {
-                                    if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
-                                        var a1 = q.answers[s];
-                                        YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
-                                        if (a1.max - a1.min > max) {
-                                            max = a1.max - a1.min;
-                                        }
-                                    }
-                                }
-                            }
-                            if (q.questionType === 'Multi Slider - Allocate') {
-                                //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
-                                for (var x1 = 0; x1 < q.answers.length; x1++) {
-                                    if (toValidate[q.id]) {
-                                        toValidate[q.id].total = q.answers[x1].max;
-                                        toValidate[q.id].answers[q.answers[x1].id] = 1;
-                                    }
-                                }
-                                sliderManager(q, max);
-                            }
-                            else 
-                                if (q.questionType === 'Slider') {
-                                    handleSliders(q);
-                                }
+                        if (q.questionType === 'Slider') {
+                            handleSliders(q);
                         }
-                        
-                        else 
-                            if (fileUpload[q.questionType]) {
-                                hasFile = true;
-                            }
-                            
-                            else 
-                                if (text[q.questionType]) {
-                                    if (toValidate[q.id]) {
-                                        toValidate[q.id].answers[q.answers[x].id] = 1;
-                                    }
-                                }
+                    continue;
+                }
+                
+                if (UPLOAD_TYPES[q.questionType]) {
+                    hasFile = true;
+                    continue;
+                }
+                
+                if (TEXT_TYPES[q.questionType]) {
+                    if (toValidate[q.id]) {
+                        toValidate[q.id].answers[q.answers[x].id] = 1;
+                    }
+                    continue;
+                }
+                
+                // Must be a multi-choice bundle
+                var butts = [];
+                verb = 0;
+                for (var j = 0; j < q.answers.length; j++) {
+                    var a = q.answers[j];
+                    if (toValidate[q.id]) {
+                        toValidate[q.id].answers[a.id] = 1;
+                    }
+                    var b = document.getElementById(a.id + 'button');
+                    /*
+         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
+         value: a.id,
+         container: a.id+"container", checked: false });
+         */
+                    //                    b.on("click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+                    //                    YAHOO.util.Event.addListener(a.id+'button', "click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+                    if (a.verbatim) {
+                        verb = 1;
+                    }
+                    YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, [b, a.id, q.maxAnswers, butts, qs.length, a.id]);
+                    b.hid = a.id;
+                    butts.push(b);
+                }
             }
             YAHOO.util.Event.addListener("submitbutton", "click", formsubmit);
         }
