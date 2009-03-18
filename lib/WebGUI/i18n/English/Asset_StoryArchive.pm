@@ -45,6 +45,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'groupToPost' => {
+        message => q|The GUID of the group allowed to add stories to this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0
+    },
+
     'template' => {
         message => q|Story Archive Template|,
         context => q|Label in the edit screen and template.|,
@@ -54,6 +60,12 @@ our $I18N = {
     'template help' => {
         message => q|The Template used to display the Story Archive.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'templateId' => {
+        message => q|The GUID of the template used to display the Story Archive.|,
+        context => q|Template variable|,
         lastUpdated => 0
     },
 
@@ -69,6 +81,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'storyTemplateId' => {
+        message => q|The GUID of the template used to display the Story assets.|,
+        context => q|Template variable|,
+        lastUpdated => 0
+    },
+
     'edit story template' => {
         message => q|Edit Story Template|,
         context => q|Label in the edit screen and template.|,
@@ -78,6 +96,12 @@ our $I18N = {
     'edit story template help' => {
         message => q|The Template used to add or edit Story assets.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'editStoryTemplateId' => {
+        message => q|The GUID of the template used to add or edit Story assets.|,
+        context => q|Template variable|,
         lastUpdated => 0
     },
 
@@ -93,6 +117,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'archiveAfter' => {
+        message => q|Amount of time in seconds.  After this time, Stories will be archived.|,
+        context => q|Template variable|,
+        lastUpdated => 0
+    },
+
     'rich editor' => {
         message => q|Rich Editor|,
         context => q|Label in the edit screen and template.|,
@@ -105,6 +135,12 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'richEditorId' => {
+        message => q|The GUID of the WYSIWIG editor used to edit the content of Story assets.|,
+        context => q|Template variable|,
+        lastUpdated => 0
+    },
+
     'approval workflow' => {
         message => q|Story Approval Workflow|,
         context => q|Label in the edit screen and template.|,
@@ -114,6 +150,12 @@ our $I18N = {
     'approval workflow help' => {
         message => q|Choose a workflow to be executed on each Story as it gets submitted.|,
         context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0,
+    },
+
+    'approvalWorkflowId' => {
+        message => q|The GUID of the workflow to be executed on each Story as it gets submitted.|,
+        context => q|Template variable|,
         lastUpdated => 0,
     },
 
