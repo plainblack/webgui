@@ -10,6 +10,8 @@
  - fixed #9956: Product Import
  - added Survey now has a loading mask on Survey edit ajax calls.
  - fixed: Slider fixed and single slider type now ignores requried.
+ - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
+
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages
  - Fixed a bug with Gallery where using the web service (iphone or iPhoto)

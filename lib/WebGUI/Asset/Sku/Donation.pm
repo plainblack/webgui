@@ -169,11 +169,14 @@ Accepts the information from the donation form and adds it to the cart.
 =cut
 
 sub www_donate {
-    my $self = shift;
-    if ($self->canView) {
+    my $self    = shift;
+    my $price   = $self->session->form->get("price") || $self->getPrice;
+
+    if ($self->canView && $price > 0) {
         $self->{_hasAddedToCart} = 1;
-        $self->addToCart({price => ($self->session->form->get("price") || $self->getPrice) });
+        $self->addToCart( { price => $price } );
     }
+
     return $self->www_view;
 }
 
