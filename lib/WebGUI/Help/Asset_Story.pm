@@ -78,7 +78,7 @@ our $HELP = {
             { 'name' => 'subtitle',
               'description' => 'subtitle tmplvar',
             },
-            { 'name' => 'byline'
+            { 'name' => 'byline',
               'description' => 'byline tmplvar',
             },
             { 'name' => 'location',
