@@ -33,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 23;        # Increment this number for each test you create
+plan tests => 28;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -74,6 +74,7 @@ is(scalar(@{$cart->getItems}), 1, "Should have 1 item type in cart regardless of
 
 $item->update({shippingAddressId => "XXXX"});
 is($item->get("shippingAddressId"), "XXXX", "Can set values to the cart item properties.");
+$item->update({shippingAddressId => undef});
 
 like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
 
@@ -89,8 +90,49 @@ is($cart->get("shippingAddressId"), "XXXX", "Can set values to the cart properti
 
 isa_ok($cart->getAddressBook, "WebGUI::Shop::AddressBook", "can get an address book");
 
+#
+# readyForCheckout ( )
+#
+
+# Setup a checkout'able cart and verify that it is
+my $address = $cart->getAddressBook->addAddress( { firstName => 'C.D.', lastName => 'Murray'} );
+my $ship    = WebGUI::Shop::Ship->new( $session );
+my $shipper = $ship->addShipper( 'WebGUI::Shop::ShipDriver::FlatRate', {flatFee => 1 } );
+$cart->update( {
+    shippingAddressId   => $address->getId,
+    shipperId           => $shipper->getId,
+} );
+is($cart->readyForCheckout, 1, 'Cart is ready for checkout');
+
+# Check shipping address constraint
+$cart->update( {shippingAddressId   => 'Does Not Exist'} );
+is( $cart->readyForCheckout, 0, 'Cannot checkout cart without shipping address' );
+
+# Check shipper constraint
+$cart->update( { 
+    shippingAddressId   => $address->getId,
+    shipperId           => 'Does Not Exist',
+} );
+is( $cart->readyForCheckout, 0, 'Cannot checkout cart without shipper' );
+
+# Check minimum transaction amount
+$session->setting->set( 'shopCartCheckoutMinimum', 1000 );
+$cart->update( {
+    shippingAddressId   => $address->getId,
+    shipperId           => $shipper->getId,
+} );
+is( $cart->readyForCheckout, 0, 'Cannot checkout cart when cart total is lower than required' );
+$session->setting->set( 'shopCartCheckoutMinimum', 0 );
+
+# Check empty cart constraint
 $cart->empty;
-is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[$cart->getId]), 0, "Items are removed from cart.");
+is( $cart->readyForCheckout, 0, 'Cannot checkout an empty cart' );
+
+#
+# empty ( )
+#
+is($session->db->quickScalar("select count(*) from cartItem where cartId=?",[ $cart->getId ]), 0, "Items are removed from cart.");
+
 
 my $session2 = WebGUI::Session->open(WebGUI::Test->root, WebGUI::Test->file);
 $session2->user({userId => 3});
