@@ -328,7 +328,6 @@ sub viewTemplateVariables {
     my $lastStoryDate = '';
     my $datePointer = undef;
     ##Only build objects for the assets that we need
-    $session->log->warn(join ' ', map {$_->{assetId} } @{$storyIds});
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
