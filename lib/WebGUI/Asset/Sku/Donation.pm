@@ -174,8 +174,7 @@ sub www_donate {
 
     if ($self->canView && $price > 0) {
         $self->{_hasAddedToCart} = 1;
-        my $price = 
-        $self->addToCart({price => ($self->session->form->get("price") || $self->getPrice) });
+        $self->addToCart( { price => $price } );
     }
 
     return $self->www_view;
