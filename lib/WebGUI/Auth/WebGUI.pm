@@ -273,10 +273,13 @@ sub createAccountSave {
             to      => $profile->{email},
             subject => $i18n->get('email address validation email subject','AuthWebGUI')
         });
-        $mail->addText(
-            $i18n->get('email address validation email body','AuthWebGUI') . "\n\n"
-            . $session->url->page("op=auth;method=validateEmail;key=".$key, 'full') . "\n\n"
-        );
+        my $var;
+        $var->{newUser_username} = $username;
+        $var->{activationUrl} = $session->url->page("op=auth;method=validateEmail;key=".$key, 'full');
+        my $text =
+WebGUI::Asset::Template->new($self->session,$self->getSetting('accountActivationTemplate'))->process($var);
+        WebGUI::Macro::process($self->session,\$text);
+        $mail->addText($text);
         $mail->addFooter;
         $mail->send;
         $self->user->status("Deactivated");
@@ -574,7 +577,14 @@ sub editUserSettingsForm {
 		-label     => $i18n->get("password recovery template"),
 		-hoverHelp => $i18n->get("password recovery template help")
     );
-   return $f->printRowsOnly;
+    $f->template(
+        -name      => "webguiAccountActivationTemplate",
+        -value     => $self->session->setting->get("webguiAccountActivationTemplate"),
+        -namespace => "Auth/WebGUI/Activation",
+        -label     => $i18n->get("account activation template"),
+        -hoverHelp => $i18n->get("account activation template help")
+    );
+    return $f->printRowsOnly;
 }
 
 #-------------------------------------------------------------------
@@ -625,6 +635,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiExpiredPasswordTemplate", $f->process("webguiExpiredPasswordTemplate","template"));
 	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
 	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
+    $s->set("webguiAccountActivationTemplate", $f->process("webguiAccountActivationTemplate","template")); 
 
     if (@errors) {
         return \@errors;

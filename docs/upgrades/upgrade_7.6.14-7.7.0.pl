@@ -33,6 +33,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addAccountActivationTemplateToSettings( $session );
 addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
@@ -54,6 +55,16 @@ addTransactionItemFlags( $session );
 createShopAcccountPluginSettings( $session );
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+sub addAccountActivationTemplateToSettings {
+    my $session = shift;
+    print "\tAdding account activation template to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings (name, value) values ('webguiAccountActivationTemplate','PBtmpl0000000000000016')");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addGroupToAddToMatrix {
