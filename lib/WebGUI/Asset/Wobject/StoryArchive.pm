@@ -289,7 +289,7 @@ sub viewTemplateVariables {
     my $keywords        = $session->form->get('keyword');
     my $query           = $session->form->get('query'); 
     my $p;
-    my $var = $self->get;
+    my $var = $self->get();
     if ($mode eq 'keyword') {
         $var->{mode} = 'keyword';
         my $wordList = WebGUI::Keyword::string2list($keywords);
