@@ -6,7 +6,7 @@ sub install {
     print "inside install function\n";
     my $confg = $ARGV[0];
     my $home = $ARGV[1] || "/data/WebGUI";
-    my $className = "WebGUI::Asset::SKu::Ad";
+    my $className = "WebGUI::Asset::Sku::Ad";
     unless ($home && $confg) {
 	die "usage: Perl -M$className -e install yoursite.conf\n";
     }
@@ -40,11 +40,16 @@ sub install {
 		    #Create the templates
     print "create purchase Ad Template\n";
     my $purchaseAdTmpl = q|
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
 	<tmpl_if error_msg>
 	<div class="error"><tmpl_var error_msg></div>
 	</tmpl_if>
 	<h3><tmpl_var adsku_title></h3>
-	<h4>TODO:Manage my ads link</h4>
+	<h4><a href='<tmpl_var manageLink>'>^International("form manage link","Asset_AdSku");</a></h4>
 	<tmpl_var adsku_description>
 	<tmpl_var form_header>
 	<tmpl_var form_hidden>
@@ -64,13 +69,13 @@ sub install {
 	</tr>
 	<tr>
 	<td>number of clicks</td>
-	<td><tmpl_var form_clicks> @ <tmpl_var clicks_price> per click</td>
-	<td><tmpl_var click_discount></td>
+	<td><tmpl_var form_clicks> ^International("per click","Asset_AdSku", <tmpl_var click_price> );
+	<br>^International("click discount","Asset_AdSku",<tmpl_var click_discount>);</td>
 	</tr>
 	<tr>
 	<td>number of impressions</td>
-	<td><tmpl_var form_impressions> @ <tmpl_var clicks_price> per impression</td>
-	<td><tmpl_var impression_discount></td>
+	<td><tmpl_var form_impressions> ^International("per impression","Asset_AdSku", <tmpl_var impression_price> );
+	<br>^International("impression discount","Asset_AdSku",<tmpl_var impression_discount>);</td>
 	</tr>
 	<tr>
 	<td colspan="2" align="right"><tmpl_var form_submit></td>
@@ -81,24 +86,36 @@ sub install {
 	|;
     print "Manage Ads Template\n";
     my $manageAdTmpl = q|
-	<h3>Manage My Ads</h3>
-	<h4>TODO:Buy Ad Space link</h4>
+<a name="id<tmpl_var assetId>" id="id<tmpl_var assetId>"></a>
+
+<tmpl_if session.var.adminOn>
+	<p><tmpl_var controls></p>
+</tmpl_if>
+	<tmpl_if error_msg>
+	<div class="error"><tmpl_var error_msg></div>
+	</tmpl_if>
+	<h3>^International("form manage title","Asset_AdSku");</h3>
+	<h4><a href='<tmpl_var purchaseLink>'>^International("form purchase link","Asset_AdSku");</a></h4>
 	<br /><br />
 	<table border="0" cellpadding="3" cellspacing="0">
-	    <tbody>
-		<tr>Title<th>
-		<tr>Clicks<th>
-		<tr>impressions<th>
-		<tr>renew<th>
-	    </th>
-	    <loop my_ads>
+	    <tbody> <tr>
+                <th>^International("manage form table header title","Asset_AdSku");</th>
+		<th>^International("manage form table header clicks","Asset_AdSku");</th>
+		<th>^International("manage form table header impressions","Asset_AdSku");</th>
+		<th>^International("manage form table header renew","Asset_AdSku");</th>
+	    </tr>
+	    <tmpl_loop myAds>
 		</tr>
-		    <td><tmpl_var loop.title></td>
-		    <td><tmpl_var loop.clicks></td>
-		    <td><tmpl_var loop.impressions></td>
-		    <td><tmpl_var loop.renew></td>
+		    <td><tmpl_var rowTitle></td>
+		    <td><tmpl_var rowClicks></td>
+		    <td><tmpl_var rowImpressions></td>
+		    <td><tmpl_if rowDeleted>
+                        ^International("manage form table value deleted","Asset_AdSku");
+                    <tmpl_else>
+                        <a href="rowRenewLink">^International("manage form table value renew","Asset_AdSku");</a>
+                    </tmpl_if></td>
 		</tr>
-	    </loop>
+	    </tmpl_loop>
 	</tbody>
 	</table>
 	|;

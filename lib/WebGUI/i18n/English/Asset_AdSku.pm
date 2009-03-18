@@ -117,6 +117,114 @@ our $I18N = {
 		context => q|name for the Ad Space Sku|
 	},
 
+	'Ad Title' => {
+		message => q|Ad Title|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'Ad Link' => {
+		message => q|Ad Link|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'Image' => {
+		message => q|Image|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'number of clicks' => {
+		message => q|number of clicks|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'number of impressions' => {
+		message => q|number of impressions|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'click discount' => {
+		message => q|Discount at %s clicks|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'impression discount' => {
+		message => q|Discount at %s impressions|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'per click' => {
+		message => q|@ %f per click|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'per impression' => {
+		message => q|@ %f per impression|,
+		lastUpdated => 0,
+		context => q|TODO|
+	},
+
+	'form manage title' => {
+		message => q|Manage My Ads|,
+		lastUpdated => 0,
+		context => q|text for the title of the form where the user can manage previously purchased advertisements|
+	},
+
+	'form manage link' => {
+		message => q|Manage My Ads|,
+		lastUpdated => 0,
+		context => q|text for a link to the form where the user can manage previously purchased advertisements|
+	},
+
+	'form purchase link' => {
+		message => q|Purchase Ads|,
+		lastUpdated => 0,
+		context => q|text for a link to the form where the user can purchase advertisements|
+	},
+
+	'manage form table header title' => {
+		message => q|Title|,
+		lastUpdated => 0,
+		context => q|header for the adspace manage form: the title field|
+	},
+
+	'manage form table header clicks' => {
+		message => q|Clicks|,
+		lastUpdated => 0,
+		context => q|header for the adspace manage form: the clicks field|
+	},
+
+	'manage form table header impressions' => {
+		message => q|Impressions|,
+		lastUpdated => 0,
+		context => q|header for the adspace manage form: the impressions field|
+	},
+
+	'manage form table header renew' => {
+		message => q|Renew|,
+		lastUpdated => 0,
+		context => q|header for the adspace manage form: the renew field|
+	},
+
+	'manage form table value deleted' => {
+		message => q|Deleted|,
+		lastUpdated => 0,
+		context => q|contents for the renew field on the manage ads table: indicates a deleted item|
+	},
+
+	'manage form table value renew' => {
+		message => q|Renew|,
+		lastUpdated => 0,
+		context => q|contents for the renew field on the manage ads table: indicates a renewable item|
+	},
+
 	'TODO' => {
 		message => q|TODO|,
 		lastUpdated => 0,
