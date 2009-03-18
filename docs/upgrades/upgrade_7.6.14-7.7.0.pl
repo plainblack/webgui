@@ -39,6 +39,7 @@ surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
 surveyEndWorkflow($session);
 installAssetHistory($session);
+addMinimumCartCheckoutSetting( $session );
 
 # Passive Analytics
 pa_installLoggingTables($session);
@@ -303,9 +304,19 @@ sub addTransactionItemFlags {
 #----------------------------------------------------------------------------
 sub createShopAcccountPluginSettings {
     my $session = shift;
-    print "Creating default settings for the account plugin..." unless $quiet;
+    print "\tCreating default settings for the account plugin..." unless $quiet;
 
     $session->setting->add('shopMySalesTemplateId', '-zxyB-O50W8YnL39Ouoc4Q');
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addMinimumCartCheckoutSetting {
+    my $session = shift;
+    print "\tAdding setting for minimum cart checkout..." unless $quiet;
+
+    $session->setting->add( 'shopCartCheckoutMinimum', '0.00' );
 
     print "Done.\n" unless $quiet;
 }

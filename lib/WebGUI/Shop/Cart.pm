@@ -498,7 +498,7 @@ Returns whether all the required properties of the the cart are set.
 
 sub readyForCheckout {
     my $self    = shift;
-    
+
     # Check if the shipping address is set and correct
     my $address = eval{$self->getShippingAddress};
     return 0 if WebGUI::Error->caught;
@@ -512,6 +512,12 @@ sub readyForCheckout {
     
     # fail if there are multiple recurring items or if
     return 0 if ($self->hasMixedItems);
+
+    # Check minimum cart checkout requirement
+    my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
+    if ( $requiredAmount > 0 ) {
+        return 0 if $self->calculateTotal < $requiredAmount;
+    }
 
     # All checks passed so return true
     return 1;
@@ -801,6 +807,10 @@ sub www_view {
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
+        minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
+                                 ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
+                                 : 0
+                                 ,
         );
 
     # get the shipping address    
@@ -846,10 +856,11 @@ sub www_view {
     # calculate price adjusted for in-store credit
     $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
-    $var{inShopCreditAvailable} = $credit->getSum;
-    $var{inShopCreditDeduction} = $credit->calculateDeduction($var{totalPrice});
-    $var{totalPrice} = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
-    
+    $var{ inShopCreditAvailable } = $credit->getSum;
+    $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
+    $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
+    $var{ readyForCheckout      } = $self->readyForCheckout;
+
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     return $session->style->userStyle($template->process(\%var));

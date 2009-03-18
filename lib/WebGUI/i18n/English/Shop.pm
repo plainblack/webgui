@@ -1528,6 +1528,23 @@ our $I18N = {
         context => q|template variable for Cart template|,
     },
 
+    'cart checkout minimum' => {
+        message => q|Minimum checkout amount|,
+        lastUpdated => 0,
+        context => q|shop setting label|,
+    },
+
+    'cart checkout minimum help' => {
+        message => q|Use this setting to require a minimum cart value to allow users to check out.|,
+        lastUpdated => 0,
+        context => q|shop setting hover help|,
+    },
+
+    'required minimum order amount' => {
+        message => q|Minimum order:|,
+        lastUpdated => 0,
+        context => q|message that is displayed in the cart view screen|,
+    },
 };
 
 1;

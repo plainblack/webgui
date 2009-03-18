@@ -19,6 +19,7 @@
  - added Survey now has a loading mask on Survey edit ajax calls.
  - fixed: Sliders fixed.  Improved algorithm for determining pixel step size.
  - rfe #9355: Password Recovery email subject (SDH Consulting Group)
+ - added: Users can now set a minimum cart amount required for checkout. (Martin Kamerbeek / Oqapi )
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
