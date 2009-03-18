@@ -4202,10 +4202,10 @@ LongTruncOk=1</p>
         context     => q{Title of the template created by the Site Setup screen},
     },
 
-    'Password recovery' => {
-        message     => q{WebGUI password recovery},
+    'WebGUI password recovery' => {
+        message     => q{Password recovery},
         lastUpdated => 0,
-        context     => q{Title of the template created by the Site Setup screen},
+        context     => q{Subject of the email that is sent for password recovery},
     },
 
     'session length' => {
