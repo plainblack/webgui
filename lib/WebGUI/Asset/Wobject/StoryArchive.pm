@@ -344,7 +344,7 @@ sub viewTemplateVariables {
         push @{$datePointer->{story_loop}}, {
             url           => $story->getUrl,
             title         => $story->getTitle,
-            creationDate  => $creationDate
+            creationDate  => $creationDate,
         }
     }
 
