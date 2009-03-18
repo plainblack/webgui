@@ -58,7 +58,7 @@ sub definition {
             hoverHelp    => $i18n->get('story template help'),
             filter       => 'fixId',
             namespace    => 'Story',
-            defaultValue => '',
+            defaultValue => 'liNZSK4xWGyALU6nu_criw',
         },
     );
     push(@{$definition}, {
@@ -72,22 +72,6 @@ sub definition {
     return $class->SUPER::definition($session, $definition);
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 duplicate ( )
-
-duplicates a New Wobject.  This method is unnecessary, but if you have 
-auxiliary, ancillary, or "collateral" data or files related to your 
-wobject instances, you will need to duplicate them here.
-
-=cut
-
-sub duplicate {
-    my $self = shift;
-    my $newAsset = $self->SUPER::duplicate(@_);
-    return $newAsset;
-}
 
 #-------------------------------------------------------------------
 
@@ -127,24 +111,6 @@ sub view {
     
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
-
-#-------------------------------------------------------------------
-
-=head2 www_edit ( )
-
-Web facing method which is the default edit page.  This method is entirely
-optional.  Take it out unless you specifically want to set a submenu in your
-adminConsole views.
-
-=cut
-
-#sub www_edit {
-#   my $self = shift;
-#   return $self->session->privilege->insufficient() unless $self->canEdit;
-#   return $self->session->privilege->locked() unless $self->canEditIfLocked;
-#   my $i18n = WebGUI::International->new($self->session, "Asset_NewWobject");
-#   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
-#}
 
 
 1;
