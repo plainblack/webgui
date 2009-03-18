@@ -194,6 +194,26 @@ sub getVendors {
 
 #-------------------------------------------------------------------
 
+=head2 isVendorInfoComplete ( )
+
+Returns a boolean indicating whether the payoutinformation entered by the vendor is complete.
+
+=cut
+
+sub isVendorInfoComplete {
+    my $self = shift;
+
+    my $complete = 
+           defined $self->get( 'name' )
+        && defined $self->get( 'userId' )
+        && defined $self->get( 'preferredPaymentType' )
+        && defined $self->get( 'paymentInformation' );
+
+    return $complete
+}
+
+#-------------------------------------------------------------------
+
 =head2 new ( session, vendorId )
 
 Constructor.   Returns a WebGUI::Shop::Vendor object.
