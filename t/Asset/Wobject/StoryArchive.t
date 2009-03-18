@@ -59,7 +59,7 @@ $canPostMaker->prepare({
 });
 
 my $tests = 1;
-plan tests => 27
+plan tests => 28
             + $tests
             + $canPostMaker->plan
             ;
@@ -162,11 +162,11 @@ is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct c
 my $wgBday    = 997966800;
 my $oldFolder = $archive->getFolder($wgBday);
 
-my $tomorrow  = $now+24*3600;
-my $newFolder = $archive->getFolder($tomorrow);
+my $yesterday = $now-24*3600;
+my $newFolder = $archive->getFolder($yesterday);
 
-my ($wgBdayMorn,undef)   = $session->datetime->dayStartEnd($wgBday);
-my ($tomorrowMorn,undef) = $session->datetime->dayStartEnd($tomorrow);
+my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
+my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger foxtrot echo'});
 $session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
@@ -176,8 +176,8 @@ $session->db->write('update asset set creationDate=997966800 where assetId=?',[$
     is ($storyDB->get('status'), 'approved', 'addRevision always calls for an autocommit');
 }
 
-my $futureStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "There's always tomorrow" });
-$session->db->write("update asset set creationDate=$tomorrow where assetId=?",[$futureStory->getId]);
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" });
+$session->db->write("update asset set creationDate=$yesterday where assetId=?",[$pastStory->getId]);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
@@ -191,22 +191,22 @@ cmp_deeply(
     {
         canPostStories => 0,
         mode           => 'view',
-        addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
+        addStoryUrl    => '',
         date_loop      => [
-            {
-                epochDate => $tomorrowMorn,
-                story_loop => [{
-                    creationDate => $tomorrow,
-                    url          => re('theres-always-tomorrow'),
-                    title        => "There's always tomorrow",
-                }, ],
-            },
             {
                 epochDate => ignore(),
                 story_loop => [ {
                     creationDate => ignore(),
                     url          => re('first-story'),
                     title        => 'First Story',
+                }, ],
+            },
+            {
+                epochDate => $yesterdayMorn,
+                story_loop => [{
+                    creationDate => $yesterday,
+                    url          => re('yesterday-is-history'),
+                    title        => "Yesterday is history",
                 }, ],
             },
             {
@@ -247,14 +247,6 @@ cmp_deeply(
         addStoryUrl    => '/home/mystories?func=add;class=WebGUI::Asset::Story',
         date_loop      => [
             {
-                epochDate => $tomorrowMorn,
-                story_loop => [{
-                    creationDate => $tomorrow,
-                    url          => re('theres-always-tomorrow'),
-                    title        => "There's always tomorrow",
-                }, ],
-            },
-            {
                 epochDate => ignore(),
                 story_loop => [
                     {
@@ -267,12 +259,22 @@ cmp_deeply(
                         url          => ignore(),
                         title        => 'Story 2',
                     },
+                    {
+                        creationDate => ignore(),
+                        url          => ignore(),
+                        title        => 'Story 3',
+                    },
                 ],
             },
-        ]
+        ],
     },
-    'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
+    'viewTemplateVariables: returns expected template variables with several stories in 3 different folders'
 );
+
+TODO: {
+    local $TODO = "viewTemplateVariables code to write";
+    ok(0, 'Check that Stories from the future are not displayed unless the user canEdit this StoryArchive');
+}
 
 ################################################################
 #
