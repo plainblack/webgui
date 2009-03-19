@@ -11,6 +11,7 @@
  - added Survey now has a loading mask on Survey edit ajax calls.
  - fixed: Slider fixed and single slider type now ignores requried.
  - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
+ - fixed #9979: i18n labels for Gallery (serif, Knowmad Technologies)
 
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages

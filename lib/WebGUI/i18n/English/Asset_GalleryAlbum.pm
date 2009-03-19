@@ -574,6 +574,18 @@ our $I18N = {
         context     => q{template label in the Edit Album template.  To pick a thumbnail to use to represent the Album.},
     },
 
+    'template album thumbnail alt' => {
+        message     => 'Preview thumbnail for',
+        lastUpdated => 1237404629,
+        context     => 'Alt text for album thumbnail.',
+    },
+
+    'template url_addDescription' => {
+        message     => 'Add a Description',
+        lastUpdated => 1237405184,
+        context     => 'Label for URL to add an album Description.',
+    },
+
 };
 
 1;
