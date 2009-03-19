@@ -59,8 +59,8 @@ sub definition {
             label        => $i18n->get('template'),
             hoverHelp    => $i18n->get('template help'),
             filter       => 'fixId',
-            namespace    => 'Story',
-            defaultValue => 'liNZSK4xWGyALU6nu_criw',
+            namespace    => 'StoryTopic',
+            defaultValue => 'A16v-YjWAShXWvSACsraeg',
         },
         storyTemplateId => {
             tab          => 'display',
