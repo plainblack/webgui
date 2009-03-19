@@ -287,8 +287,6 @@ my $tempStor = WebGUI::Storage->createTemp($session);
 
 isa_ok( $tempStor, "WebGUI::Storage", "createTemp creates WebGUI::Storage object");
 is (substr($tempStor->getPathFrag, 0, 5), 'temp/', 'createTemp puts stuff in the temp directory');
-use Data::Dumper;
-diag Dumper $tempStor->getErrors();
 ok (-e $tempStor->getPath(), 'createTemp: directory was created');
 
 ####################################################

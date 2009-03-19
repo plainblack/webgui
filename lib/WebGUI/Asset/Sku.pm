@@ -293,6 +293,31 @@ sub getThumbnailUrl {
 }
 
 #-------------------------------------------------------------------
+=head2 getVendorId ( )
+
+Returns the vendorId of the vendor for this sku. Defaults to the default 
+vendor with id defaultvendor000000000.
+
+=cut
+
+sub getVendorId {
+    my $self = shift;
+    return 'defaultvendor000000000';
+}
+
+#-------------------------------------------------------------------
+
+=head2 getVendorPayout ( )
+
+Returns the amount that should be payed to the vendor for this sku.
+
+=cut
+
+sub getVendorPayout {
+    return 0;
+}
+
+#-------------------------------------------------------------------
 
 =head2 getWeight ( )
 

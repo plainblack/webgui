@@ -254,7 +254,7 @@ sub upgradeMatrix {
     my $session = shift;
     print "\tUpgrading matrix assets... \n" unless $quiet;
     my $db = $session->db;
-    $db->write("alter table Matrix drop column groupToRate, drop column groupToAdd, drop column privilegedGroup,
+    $db->write("alter table Matrix drop column groupToRate, drop column privilegedGroup,
         drop column ratingTimeout, drop column ratingTimeoutPrivileged, drop column ratingDetailTemplateId,
         drop column visitorCacheTimeout");
     $db->write("alter table Matrix add column defaultSort char(22) not null default 'score',
@@ -295,7 +295,8 @@ sub upgradeMatrix {
     $db->write("alter table Matrix_rating rename MatrixListing_rating");
     $db->write("alter table Matrix_ratingSummary rename MatrixListing_ratingSummary");
     $db->write("alter table Matrix_field rename Matrix_attribute");
-    $db->write("alter table Matrix_attribute drop column label");
+    $db->write("alter table Matrix_attribute drop column name");
+    $db->write("alter table Matrix_attribute change label name char(255)");
     $db->write("alter table Matrix_attribute add column options text");
     $db->write("alter table Matrix_attribute change fieldType fieldType char(255) not null default 'MatrixCompare'");
     $db->write("alter table Matrix_attribute change fieldId attributeId char(22) not null");
@@ -336,6 +337,7 @@ sub upgradeMatrix {
             $listing->{title}   = $listing->{productName};
             $listing->{version} = $listing->{versionNumber};
             $listing->{screenshots} = $listing->{storageId};
+            $listing->{ownerUserId} = $listing->{maintainerId};
         $listing->{productURL} = $listing->{productUrl};		
         $listing->{manufacturerURL} = $listing->{manufacturerUrl};
             my $newMatrixListing = $matrix->addChild($listing,undef,undef,{skipAutoCommitWorkflows=>1});

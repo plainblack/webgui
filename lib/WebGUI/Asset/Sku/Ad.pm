@@ -140,6 +140,25 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getDiscountAmount  -- class level function
+
+returns the amount of discount to apply to this purchase
+
+=cut
+
+sub getDiscountAmount {
+    my($discounts,$count) = @_;
+    my @discounts = parseDiscountText( $discounts );
+    my $previousDiscount = 0;
+    foreach my $discountSet ( @discounts ) {
+        last if $count < $discountSet->[1];
+	$previousDiscount = $discountSet->[0];
+    }
+    return $previousDiscount;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getDiscountText  -- class level function
 
 returns a string with a coma seperated list of counts fromt he discount text
@@ -177,6 +196,24 @@ sub getImpressionDiscountText {
     my $self = shift;
     return getDiscountText($self->i18n->get('impression discount'),
                               $self->get('impressionDiscounts'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPrice
+
+get the price for this purchase
+
+sub getPrice {
+    my $self = shift;
+    my $options = $self->getOptions;
+    my $impressionCount = $options->{impressions};
+    my $clickCount = $options->{clicks};
+    my $impressionDiscount = getDiscountAmount($self->get('impressionDiscounts'),$impressionCount );
+    my $clickDiscount = getDiscountAmount($self->get('clickDiscounts'),$clickCount );
+    my $impressionPrice = $self->get('pricePerImpression') - ( $impressionDiscount / 100 );
+    my $clickPrice = $self->get('pricePerClick') - ( $clickDiscount / 100 );
+    return sprintf "%.2f", $impressionPrice * $impressionCount + $clickPrice * $clickCount;
 }
 
 #-------------------------------------------------------------------
@@ -235,7 +272,7 @@ sub manage {
 
 =head2 onCompletePurchase
 
-Applies the first term of the subscription. This method is called when the payment is successful.
+inserts the ad intothe adspace...
 
 =cut
 
@@ -265,7 +302,7 @@ sub  parseDiscountText {
             push @discounts, [ $1, $2 ];
 	}
     }
-    return @discounts;
+    return sort { $a->[1] <=> $b->[1] } @discounts;
 }
 
 #-------------------------------------------------------------------
@@ -325,40 +362,40 @@ sub view {
         manageLink         => $self->getUrl("func=manage"),
         adSkuTitle         => $self->get('title'),
         adSkuDescription   => $self->get('description'),
-        form_title          => WebGUI::Form::text($session, {
-                                 -name=>"form_title",
+        formTitle          => WebGUI::Form::text($session, {
+                                 -name=>"formTitle",
                                  -value=>$self->{title},
                                  -size=>40
 				 -default=>'untitled',
                                 }),
-        form_link           => WebGUI::Form::Url($session, {
-                                 -name=>"form_link",
+        formLink           => WebGUI::Form::Url($session, {
+                                 -name=>"formLink",
                                  -value=>$self->{link},
                                  -size=>40
 				 -required=>1,
                                 }),
-        form_image          => WebGUI::Form::Image($session, {
-                                 -name=>"form_image",
+        formImage          => WebGUI::Form::Image($session, {
+                                 -name=>"formImage",
                                  -value=>$self->{image},
                                  -size=>40
-				 -required=>1,
+				 -forceImageOnly=>1,
                                 }),
-        form_clicks          => WebGUI::Form::Integer($session, {
-                                 -name=>"form_clicks",
+        formClicks          => WebGUI::Form::Integer($session, {
+                                 -name=>"formClicks",
                                  -value=>$self->{clicks},
                                  -size=>40
 				 -required=>1,
                                 }),
-        form_impressions          => WebGUI::Form::Integer($session, {
-                                 -name=>"form_impressions",
+        formImpressions          => WebGUI::Form::Integer($session, {
+                                 -name=>"formImpressions",
                                  -value=>$self->{impressions},
                                  -size=>40
 				 -required=>1,
                                 }),
-        click_price   => $self->get('pricePerClick'),
-        impression_price   => $self->get('pricePerImpression'),
-        click_discount   => $self->getClickDiscountText,
-        impression_discount   => $self->getImpressionDiscountText,
+        clickPrice   => $self->get('pricePerClick'),
+        impressionPrice   => $self->get('pricePerImpression'),
+        clickDiscount   => $self->getClickDiscountText,
+        impressionDiscount   => $self->getImpressionDiscountText,
     );
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -398,7 +435,14 @@ sub www_addToCart {
     my $self = shift;
     if ($self->canView) {
         $self->{_hasAddedToCart} = 1;
-        $self->addToCart({price => $self->getPrice});
+	my $form = $self->session->form;
+        $self->addToCart({
+              title => $form->get('formTitle'),
+	      link => $form->get('formLink','url'),
+	      image => $form->get('formImage'),
+	      clicks => $form->get('formClicks'),
+	      impressions => $form->get('formImpressions'),
+	             });
     }
     return $self->www_view;
 }

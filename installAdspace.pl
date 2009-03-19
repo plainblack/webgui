@@ -2,6 +2,7 @@ print "start of script\n";
 use lib '/data/WebGUI/lib';
 use WebGUI::Session;
 use WebGUI::Asset::Sku::Ad ;
+use WebGUI::AssetCollateral::Sku::Ad::Ad;
 sub install {
     print "inside install function\n";
     my $confg = $ARGV[0];
@@ -12,7 +13,10 @@ sub install {
     }
     print "Installing asset.\n";
     my $session = WebGUI::Session->open($home, $confg);
-    print "Add wobject to confg fle\n";
+    print "create crud table";
+    WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
+if(0) {
+    print "Add wobject to confg file\n";
     $session->config->addToHash("assets",$className => { category => 'shop' } );
      print "Create database tables\n";
     $session->db->write("CREATE TABLE AdSku (
@@ -112,7 +116,7 @@ sub install {
 		    <td><tmpl_if rowDeleted>
                         ^International("manage form table value deleted","Asset_AdSku");
                     <tmpl_else>
-                        <a href="rowRenewLink">^International("manage form table value renew","Asset_AdSku");</a>
+                        <a href="<tmpl_var rowRenewLink>">^International("manage form table value renew","Asset_AdSku");</a>
                     </tmpl_if></td>
 		</tr>
 	    </tmpl_loop>
@@ -142,6 +146,7 @@ sub install {
 	namespace=>"AdSku/manage",
 	template=>$manageAdTmpl,
     },'AdSku000000002');
+}
     print "Commit the working version tag\n";
     my $workingTag = WebGUI::VersionTag->getWorking($session);
     my $workingTagId = $workingTag->getId;

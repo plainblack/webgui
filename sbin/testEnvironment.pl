@@ -120,6 +120,7 @@ checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
 checkModule("Module::Find",                 "0.06"       );
 checkModule("Class::C3",                    "0.19"       );
+checkModule("Params::Validate",             "0.81"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

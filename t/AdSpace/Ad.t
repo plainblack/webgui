@@ -54,6 +54,10 @@ $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
 SKIP: {
 
     skip "Unable to load WebGUI::AdSpace::Ad", $numTests-1 unless $loaded;
+
+    local $ENV{REMOTE_ADDR} = '10.0.0.1';
+    local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+
     $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
     $ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type" => "text"});
     isa_ok($ad,"WebGUI::AdSpace::Ad");
@@ -119,7 +123,7 @@ SKIP: {
     like($href, qr/op=clickAd/,               'ad link has correct operation');
 
     my $adId = $textAd->getId;
-    like($href, qr/id=$adId/,                 'ad link has correct ad id');
+    like($href, qr/id=\Q$adId\E/,             'ad link has correct ad id');
 
     $style = $token->[1]{style};
     like($style, qr/background-color:white/,  'ad link background is white');
@@ -163,7 +167,7 @@ SKIP: {
     like($href, qr/op=clickAd/,               'ad link has correct operation, image');
 
     $adId = $imageAd->getId;
-    like($href, qr/id=$adId/,                 'ad link has correct ad id, image');
+    like($href, qr/id=\Q$adId\E/,             'ad link has correct ad id, image');
 
     $token = $textP->get_tag("img");
     $style = $token->[1]{src};

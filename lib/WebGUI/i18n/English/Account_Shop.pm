@@ -49,6 +49,11 @@ our $I18N = {
         lastUpdated => 1230867169,
     },
 
+    'my sales label' => {
+        message     => q{Sales},
+        lastUpdated => 0,
+    },
+
 };
 
 1;

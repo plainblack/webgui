@@ -372,6 +372,11 @@ listing,|,
         lastUpdated => 0,
     },
 
+    'group to add description' => {
+        message => q|Select the group that is allowed to add listings to this matrix.|,
+        lastUpdated => 0,
+    },
+
     'ratings duration description' => {
         message => q|Select the interval after which old ratings are cleaned out.|,
         lastUpdated => 0,
@@ -418,8 +423,8 @@ listing,|,
     },
 
     'max comparisons privileged description' => {
-        message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
-        lastUpdated => 0,
+        message => q|Specifies how many comparisons are allowed in searches and comparisons for users who have accounts on the site.|,
+        lastUpdated => 1235681965,
     },
 
         'rating timeout description' => {
@@ -476,6 +481,16 @@ listing,|,
         message => q|Select a template to be used to show the listing edit screen.|,
         lastUpdated => 0,
     },
+
+    'screenshots template description' => {
+        message => q|Select a template to be used to show a listing's screenshots.|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template description' => {
+        message => q|Select a template for a listing's screenshots configuration.|,
+        lastUpdated => 0,
+    },
 	
     'categories label' => {
 		message => q|Categories|,
@@ -484,6 +499,11 @@ listing,|,
 
     'submission approval workflow label' => {
         message => q|Submission Approval Workflow|,
+        lastUpdated => 0,
+    },
+
+    'group to add label' => {
+        message => q|Group To Add|,
         lastUpdated => 0,
     },
 
@@ -548,8 +568,8 @@ listing,|,
 	},
 
 	'max comparisons privileged label' => {
-		message => q|Maximum Comparisons (For Privileged Users)|,
-		lastUpdated => 0,
+		message => q|Maximum Comparisons (For Registered Users)|,
+		lastUpdated => 1235681967,
 	},
 
 	'rating timeout' => {
@@ -601,6 +621,16 @@ listing,|,
 		message => q|Compare Template|,
 		lastUpdated => 0,
 	},
+
+    'screenshots template label' => {
+        message => q|Listing Screenshots Template|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template label' => {
+        message => q|Listing Screenshots Config Template|,
+        lastUpdated => 0,
+    },
 
     'edit listing template label' => {
         message => q|Edit Listing Template|,
@@ -748,6 +778,12 @@ selectBox.</p>|
     'hide stickied button label' => {
         lastUpdated => 0,
         message => q|Hide/show stickied|,
+    },
+
+    'approve or deny label' => {
+        lastUpdated => 0,
+        message => q|Approve/Deny|,
+        context => q|Label for the approve or deny link on the matrix listing detail screen.|,
     },
 
     'matrix asset template variables title' => {

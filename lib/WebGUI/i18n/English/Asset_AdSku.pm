@@ -231,6 +231,36 @@ our $I18N = {
 		context => q|add the described item to the shopping cart|
 	},
 
+	'form purchase ad title' => {
+		message => q|Ad Title|,
+		lastUpdated => 0,
+		context => q|the title chosen by the buyer for the advertisement|
+	},
+
+	'form purchase ad link' => {
+		message => q|Ad Link|,
+		lastUpdated => 0,
+		context => q|the link the advertisement leads to|
+	},
+
+	'form purchase ad image' => {
+		message => q|Image|,
+		lastUpdated => 0,
+		context => q|the image to be displayed in the ad|
+	},
+
+	'form purchase number of clicks' => {
+		message => q|Number of Clicks|,
+		lastUpdated => 0,
+		context => q|the number of clicks the buyer wishes to purchase|
+	},
+
+	'form purchase number of impressions' => {
+		message => q|Number of Impressions|,
+		lastUpdated => 0,
+		context => q|the number of impressions the user wishes to purchase|
+	},
+
 	'TODO' => {
 		message => q|TODO|,
 		lastUpdated => 0,

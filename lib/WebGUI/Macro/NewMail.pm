@@ -53,7 +53,7 @@ sub process {
     
     my $db      = $session->db;
     my $i18n    = WebGUI::International->new($session);
-    my ($count) = $db->quickArray("select count(*) from inbox where userId=? and status='unread'",[$session->user->userId]);
+    my $count   = WebGUI::Inbox->new($session)->getUnreadMessageCount;
     my $output  = "";
     
     if($count > 0) {

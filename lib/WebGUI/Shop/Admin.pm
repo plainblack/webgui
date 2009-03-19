@@ -68,6 +68,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($url->page("shop=ship;method=manage"), $i18n->get("shipping methods"));
     $ac->addSubmenuItem($url->page("shop=transaction;method=manage"), $i18n->get("transactions"));
     $ac->addSubmenuItem($url->page("shop=vendor;method=manage"), $i18n->get("vendors"));
+    $ac->addSubmenuItem($url->page("shop=vendor;method=managePayouts"), $i18n->get("vendor payouts"));
     $ac->addSubmenuItem($url->page("shop=credit;method=manage"), $i18n->get("in shop credit"));
     return $ac;
 }
@@ -151,6 +152,13 @@ sub www_editSettings {
         label       => $i18n->get('who is a cashier'),
         hoverHelp   => $i18n->get('who is a cashier help'),
         );
+    $form->float(
+        name        => 'shopCartCheckoutMinimum',
+        value       => $setting->get('shopCartCheckoutMinimum'),
+        defaultValue=> '0.00',
+        label       => $i18n->get('cart checkout minimum'),
+        hoverHelp   => $i18n->get('cart checkout minimum help'),
+    );
     $form->template(
         name        => "shopCartTemplateId",
         value       => $setting->get("shopCartTemplateId"),
@@ -202,13 +210,21 @@ sub www_editSettingsSave {
     my $self = shift;
     return $self->session->privilege->adminOnly() unless ($self->session->user->isAdmin);
     my ($setting, $form) = $self->session->quick(qw(setting form));
+
+    # Save shop templates
     foreach my $template (qw(shopMyPurchasesDetailTemplateId shopMyPurchasesTemplateId
         shopCartTemplateId shopAddressBookTemplateId shopAddressTemplateId)) {
         $setting->set($template, $form->get($template, "template"));
     }
+
+    # Save group settings
     foreach my $group (qw(groupIdCashier groupIdAdminCommerce)) {
         $setting->set($group, $form->get($group, "group"));
     }
+
+    # Save mininmum cart checkout
+    $setting->set( 'shopCartCheckoutMinimum', $form->get( 'shopCartCheckoutMinimum', 'float' ) );
+
     return $self->www_editSettings();   
 }
 
