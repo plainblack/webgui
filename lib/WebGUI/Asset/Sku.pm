@@ -293,6 +293,7 @@ sub getThumbnailUrl {
 }
 
 #-------------------------------------------------------------------
+
 =head2 getVendorId ( )
 
 Returns the vendorId of the vendor for this sku. Defaults to the default 
