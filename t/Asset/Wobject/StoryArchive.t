@@ -159,7 +159,7 @@ is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct c
 #
 ################################################################
 
-my $wgBday    = 997966800;
+my $wgBday    = WebGUI::Test->webguiBirthday;
 my $oldFolder = $archive->getFolder($wgBday);
 
 my $yesterday = $now-24*3600;
@@ -168,8 +168,10 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
+my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+
 my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger foxtrot echo'});
-$session->db->write('update asset set creationDate=997966800 where assetId=?',[$story->getId]);
+$creationDateSth->execute([$wgBday, $story->getId]);
 
 {
     my $storyDB = WebGUI::Asset->newByUrl($session, $story->getUrl);
@@ -177,7 +179,7 @@ $session->db->write('update asset set creationDate=997966800 where assetId=?',[$
 }
 
 my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history" });
-$session->db->write("update asset set creationDate=$yesterday where assetId=?",[$pastStory->getId]);
+$creationDateSth->execute([$yesterday, $pastStory->getId]);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
