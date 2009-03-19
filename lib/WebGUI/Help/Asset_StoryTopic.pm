@@ -19,6 +19,7 @@ our $HELP = {
         ],
         fields    => [],
         variables => [
+            { name => 'standAlone' },
             { name => 'story_loop',
               variables => [
                 { name => 'url' },

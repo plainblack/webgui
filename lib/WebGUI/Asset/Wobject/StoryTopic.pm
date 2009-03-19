@@ -172,6 +172,7 @@ sub viewTemplateVariables {
         $var->{topStoryCreationDate}   = $topStory->get('creationDate');
         ##TODO: Photo variables
     }
+    $var->{standAlone} = $self->{_standAlone};
 
     return $var;
 }

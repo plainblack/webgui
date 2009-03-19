@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 8;
+my $tests = 10;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -119,6 +119,7 @@ ok(
  && ! exists $templateVars->{topStoryCreationDate},
     'topStory variables not present unless in standalone mode'
 );
+ok(! $templateVars->{standAlone}, 'viewTemplateVars: not in standalone mode');
 
 $topic->{_standAlone} = 1;
 $templateVars = $topic->viewTemplateVariables();
@@ -161,6 +162,7 @@ is(
     'viewTemplateVars in standalone mode, url'
 );
 is($templateVars->{topStoryCreationDate}, $now, 'viewTemplateVars in standalone mode, title');
+ok($templateVars->{standAlone}, 'viewTemplateVars: in standalone mode');
 
 $topic->update({
     storiesShort => 20,

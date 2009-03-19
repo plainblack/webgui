@@ -99,6 +99,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'standAlone' => {
+        message => q|This variable will be true if the Story Topic is being viewed directly, by its URL.  Otherwise, if it is viewed as part of a Page Layout or other Container, it will be false.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
     'view template' => {
         message => q|View Story Topic Template|,
         context => q|Template variable.|,
