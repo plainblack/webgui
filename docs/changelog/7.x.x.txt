@@ -30,7 +30,7 @@
  - rfe #9198: Turn Survey Edit Section/Question/Answer fields into RTEs (SDH Consulting Group)
  - rfe #9197: Survey timeout handling (SDH Consulting Group)
  - rfe #8862: Passive Analytics (SDH Consulting Group)
- - fixed #9979: i18n labels for Gallery (serif, Knowmad Technologies)
+ - fixed #9979: i18n labels for Gallery (Knowmad Technologies)
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
