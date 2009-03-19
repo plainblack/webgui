@@ -32,15 +32,16 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-installStoryManagerTables($session);
-upgradeConfigFiles($session);
-
 addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
 surveyEndWorkflow($session);
 installAssetHistory($session);
+
+# Story Manager
+installStoryManagerTables($session);
+upgradeConfigFiles($session);
 
 # Passive Analytics
 pa_installLoggingTables($session);
@@ -364,6 +365,7 @@ CREATE TABLE StoryTopic (
     revisionDate    BIGINT          NOT NULL,
     storiesPer      INTEGER,
     storiesShort    INTEGER,
+    templateId      CHAR(22) BINARY,
     storyTemplateId CHAR(22) BINARY,
     PRIMARY KEY ( assetId, revisionDate )
 )

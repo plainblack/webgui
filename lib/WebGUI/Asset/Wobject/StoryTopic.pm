@@ -53,6 +53,15 @@ sub definition {
             hoverHelp    => $i18n->get('stories short help'),
             defaultValue => 5,
         },
+        templateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => $i18n->get('template'),
+            hoverHelp    => $i18n->get('template help'),
+            filter       => 'fixId',
+            namespace    => 'Story',
+            defaultValue => 'liNZSK4xWGyALU6nu_criw',
+        },
         storyTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
@@ -146,12 +155,22 @@ sub viewTemplateVariables {
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
-        my $creationDate = $story->get('creationDate');
         push @{$var->{story_loop}}, {
             url           => $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}),
             title         => $story->getTitle,
-            creationDate  => $creationDate,
+            creationDate  => $story->get('creationDate'),
         }
+    }
+
+    if ($self->{_standAlone}) {
+        my $topStoryData = $storyIds->[0];
+        shift @{ $var->{story_loop} };
+        ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
+        my $topStory   = WebGUI::Asset->new($session, $topStoryData->{assetId}, $topStoryData->{className}, $topStoryData->{revisionDate});
+        $var->{topStoryTitle}          = $topStory->getTitle;
+        $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
+        $var->{topStoryCreationDate}   = $topStory->get('creationDate');
+        ##TODO: Photo variables
     }
 
     return $var;

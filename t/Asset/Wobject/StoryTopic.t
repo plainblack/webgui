@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 4;
+my $tests = 8;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -113,16 +113,18 @@ cmp_deeply(
     'viewTemplateVars has right number and contents in the story_loop'
 );
 
+ok(
+    ! exists $templateVars->{topStoryTitle}
+ && ! exists $templateVars->{topStoryUrl}
+ && ! exists $templateVars->{topStoryCreationDate},
+    'topStory variables not present unless in standalone mode'
+);
+
 $topic->{_standAlone} = 1;
 $templateVars = $topic->viewTemplateVariables();
 cmp_deeply(
     $templateVars->{story_loop},
     [
-        {
-            title        => 'bogs',
-            url          => $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'bogs'}->getId),
-            creationDate => $now,
-        },
         {
             title        => 'red',
             url          => $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'red'}->getId),
@@ -152,10 +154,19 @@ cmp_deeply(
     'viewTemplateVars has right number and contents in the story_loop in standalone mode'
 );
 
+is($templateVars->{topStoryTitle}, 'bogs', 'viewTemplateVars in standalone mode, title');
+is(
+    $templateVars->{topStoryUrl},
+    $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'bogs'}->getId),
+    'viewTemplateVars in standalone mode, url'
+);
+is($templateVars->{topStoryCreationDate}, $now, 'viewTemplateVars in standalone mode, title');
+
 $topic->update({
-    storiesPer   => 16,
-    storiesShort => 3,
+    storiesShort => 20,
 });
+
+$topic->{_standAlone} = 0;
 
 $templateVars = $topic->viewTemplateVariables;
 my @topicInmates = map { $_->{title} } @{ $templateVars->{story_loop} };
