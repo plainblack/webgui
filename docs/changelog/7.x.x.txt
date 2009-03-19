@@ -22,6 +22,14 @@
  - added: Users can now set a minimum cart amount required for checkout. ( Martin Kamerbeek / Oqapi )
  - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
  - rfe #9354: Account activation email template (SDH Consulting Group)
+ - rfe #9233: Survey branching expressions (Patrick Donelan, SDH Consulting Group)
+ - rfe #9202: Survey Jump-to combo box (Patrick Donelan, SDH Consulting Group)
+ - rfe #9201: Make Survey TextAreas YUI resizable (SDH Consulting Group)
+ - rfe #9200: Survey Text/TextArea handling (SDH Consulting Group)
+ - rfe #9199: Survey final page detection (SDH Consulting Group)
+ - rfe #9198: Turn Survey Edit Section/Question/Answer fields into RTEs (SDH Consulting Group)
+ - rfe #9197: Survey timeout handling (SDH Consulting Group)
+ - rfe #8862: Passive Analytics (SDH Consulting Group)
 
 7.6.14
  - fixed: IE6 shows Admin Bar over Asset Manager
