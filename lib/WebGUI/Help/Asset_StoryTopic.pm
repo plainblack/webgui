@@ -28,6 +28,7 @@ our $HELP = {
               ],
             },
             { name => 'topStoryTitle' },
+            { name => 'topStorySubtitle' },
             { name => 'topStoryUrl' },
             { name => 'topStoryCreationDate' },
         ],

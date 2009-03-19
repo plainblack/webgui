@@ -93,6 +93,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'topStorySubtitle' => {
+        message => q|The subtitle of the top story.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
     'topStoryCreationDate' => {
         message => q|The epoch date when the top story was created, or submitted, to its Story Archive.|,
         context => q|Template variable.|,

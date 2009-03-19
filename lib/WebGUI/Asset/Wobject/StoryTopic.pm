@@ -168,6 +168,7 @@ sub viewTemplateVariables {
         ##Note, this could have saved from the loop above, but this looks more clean and encapsulated to me.
         my $topStory   = WebGUI::Asset->new($session, $topStoryData->{assetId}, $topStoryData->{className}, $topStoryData->{revisionDate});
         $var->{topStoryTitle}          = $topStory->getTitle;
+        $var->{topStorySubtitle}       = $topStory->get('subtitle');
         $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
         $var->{topStoryCreationDate}   = $topStory->get('creationDate');
         ##TODO: Photo variables

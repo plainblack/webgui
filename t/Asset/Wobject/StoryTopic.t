@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 10;
+my $tests = 11;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -68,6 +68,8 @@ STORY: foreach my $name (@characters) {
     $storyHandler->{$name} = $namedStory;
     $creationDateSth->execute([$now, $namedStory->getId]);
 }
+
+$storyHandler->{bogs}->update({subtitle => 'drinking his food through a straw'});
 
 my $topic;
 
@@ -116,7 +118,8 @@ cmp_deeply(
 ok(
     ! exists $templateVars->{topStoryTitle}
  && ! exists $templateVars->{topStoryUrl}
- && ! exists $templateVars->{topStoryCreationDate},
+ && ! exists $templateVars->{topStoryCreationDate}
+ && ! exists $templateVars->{topStorySubtitle},
     'topStory variables not present unless in standalone mode'
 );
 ok(! $templateVars->{standAlone}, 'viewTemplateVars: not in standalone mode');
@@ -156,6 +159,11 @@ cmp_deeply(
 );
 
 is($templateVars->{topStoryTitle}, 'bogs', 'viewTemplateVars in standalone mode, title');
+is(
+    $templateVars->{topStorySubtitle},
+    'drinking his food through a straw',
+    'viewTemplateVars in standalone mode, subtitle'
+);
 is(
     $templateVars->{topStoryUrl},
     $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'bogs'}->getId),
