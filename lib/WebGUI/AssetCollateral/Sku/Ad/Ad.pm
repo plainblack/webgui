@@ -16,7 +16,7 @@ package WebGUI::AssetCollateral::Sku::Ad::Ad;
 
 
 use strict;
-use base WebGUI::Crud;
+use base 'WebGUI::Crud';
 
 #------------------------------------------------
 
@@ -24,14 +24,14 @@ use base WebGUI::Crud;
 
 defines the field this crud will contain
 
-userID => the id of the user that purchased the ad
-transactionItemid => the id if the transaction item that completes this purchase
-adId => th id if the ad purchased
-clicksPurchased => the number of clicks the user purchased
-impressionsPurchased => the number of impressions the user purchased
-storedImage => temp storage for the image
-isRenewal => indicates if this purchase is a renewal -- are the counts increased or just assigned
-isDeleted => boolean that indicates whether the ad has been deleted from the system
+userID = the id of the user that purchased the ad
+transactionItemid = the id if the transaction item that completes this purchase
+adId = th id if the ad purchased
+clicksPurchased = the number of clicks the user purchased
+impressionsPurchased = the number of impressions the user purchased
+storedImage = temp storage for the image
+isRenewal = indicates if this purchase is a renewal -- are the counts increased or just assigned
+isDeleted = boolean that indicates whether the ad has been deleted from the system
 
 =cut
 
@@ -45,7 +45,7 @@ sub crud_definition {
 	        fieldType	=> 'user',
 		defaultValue	=> undef,
 	    },
-	    transactionItemid => {
+	    transactionItemId => {
 		fieldType	=> 'guid',
 		defaultValue	=> undef,
 	    },
@@ -77,4 +77,5 @@ sub crud_definition {
 	return $definition;
 }
 
+1;
 

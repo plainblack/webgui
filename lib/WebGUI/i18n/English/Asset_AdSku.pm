@@ -225,6 +225,12 @@ our $I18N = {
 		context => q|contents for the renew field on the manage ads table: indicates a renewable item|
 	},
 
+	'purchase button' => {
+		message => q|Add To Cart|,
+		lastUpdated => 0,
+		context => q|add the described item to the shopping cart|
+	},
+
 	'TODO' => {
 		message => q|TODO|,
 		lastUpdated => 0,

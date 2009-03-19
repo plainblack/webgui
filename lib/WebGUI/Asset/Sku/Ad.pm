@@ -1,5 +1,8 @@
 package WebGUI::Asset::Sku::Ad;
 
+use lib '/root/pb/lib';
+use dav;
+
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -20,6 +23,7 @@ use base 'WebGUI::Asset::Sku';
 use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Shop::Pay;
+use WebGUI::AssetCollateral::Sku::Ad::Ad;
 
 =head1 NAME
 
@@ -136,6 +140,99 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getDiscountText  -- class level function
+
+returns a string with a coma seperated list of counts fromt he discount text
+
+=cut
+
+sub getDiscountText {
+    my($format,$discounts) = @_;
+    return sprintf( $format, join( ',', (map { $_->[1] } ( parseDiscountText( $discounts ) ) ) ) );
+}
+
+#-------------------------------------------------------------------
+
+=head2 getClickDiscountText
+
+returns the text to display the number of clicks purchasaed where discounts apply
+
+=cut
+
+sub getClickDiscountText {
+     my $self = shift;
+     return getDiscountText($self->i18n->get('click discount'),
+                             $self->get('clickDiscounts'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getImpressionDiscountText
+
+returns the text to display the number of impressions purchased where discounts apply
+
+=cut
+
+sub getImpressionDiscountText {
+    my $self = shift;
+    return getDiscountText($self->i18n->get('impression discount'),
+                              $self->get('impressionDiscounts'));
+}
+
+#-------------------------------------------------------------------
+
+=head2  i18n  
+
+returns an internationalization object for this class
+
+=cut
+
+sub i18n {
+    my $self = shift;
+    return WebGUI::International->new($self->session, "Asset_AdSku");
+}
+
+#-------------------------------------------------------------------
+
+=head2 manage
+
+generate template vars for manage page
+
+=cut
+
+sub manage {
+    my ($self) = @_;
+    my $session = $self->session;
+
+    my $i18n = WebGUI::International->new($session, "Asset_AdSku");
+    my %var;
+    $var{purchaseLink} = $self->getUrl;
+    #WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
+    my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($session,{
+	     constraints => [ { "adSkuPurchase.userId = ?" => $self->session->user->userId } ],
+	     joinUsing => [ { "advertisement" => "adId" }, ],
+	     'join' =>    [ "transactionItem on transactionItem.itemId = adSkuPurchase.transactionItemId", 
+	                    "transaction on transaction.transactionId = transactionItem.transactionId",
+			    ],
+	     orderBy => 'transaction.dateOfPurchase',
+             });
+    my %testHash;      # used to eliminate duplicate ads
+    while( my $object = $iterator->() ) {
+        next if exists $testHash{$object->get('adId')};
+	$testHash{$object->get('adId')} = 1;
+        push @{$var{myAds}}, {
+	              rowTitle => $object->get('title'),
+		      rowClicks => $object->get('clicks') . '/' . $object->get('clicksBought'),
+		      rowImpressions => $object->get('impressions') . '/' . $object->get('impressionsBought'),
+		      rowDeleted => $object->get('isDeleted'),
+		      rowRenewLink => $self->getUrl('renew=' . $object->get('adId') ),
+		  };
+    }
+    return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+}
+
+#-------------------------------------------------------------------
+
 =head2 onCompletePurchase
 
 Applies the first term of the subscription. This method is called when the payment is successful.
@@ -146,6 +243,46 @@ sub onCompletePurchase {
     my $self = shift;
 
     # $self->apply;
+}
+
+#-------------------------------------------------------------------
+
+=head2 parseDiscountText  -- class level function
+
+returns an array of array ref's that are extracted from the discount description text
+
+=cut
+
+sub  parseDiscountText {
+    my $discountDescription = shift;
+    dav::log $discountDescription;
+    my @lines = split "\n", $discountDescription;
+    my @discounts;
+    foreach my $line ( @lines ) {
+	dav::log $line;
+	if( $line =~ /^(\d+)\@(\d+)/ ) {
+	    dav::log 'match';
+            push @discounts, [ $1, $2 ];
+	}
+    }
+    return @discounts;
+}
+
+#-------------------------------------------------------------------
+
+=head2 prepareManage
+
+Prepares the template.
+
+=cut
+
+sub prepareManage {
+	my $self = shift;
+	$self->SUPER::prepareView();
+	my $templateId = $self->get("manageTemplate");
+	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
+	$template->prepare($self->getMetaDataAsTemplateVariables);
+	$self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------
@@ -167,19 +304,63 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
-=head2 prepareManage
+=head2 view
 
-Prepares the template.
+Displays the purchase adspace form
 
 =cut
 
-sub prepareManage {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $templateId = $self->get("manageTemplate");
-	my $template = WebGUI::Asset::Template->new($self->session, $templateId);
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+sub view {
+    my ($self) = @_;
+    my $session = $self->session;
+
+	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
+    my %var = (
+        formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
+            . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
+        formFooter          => WebGUI::Form::formFooter($session),
+        formSubmit          => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
+        hasAddedToCart      => $self->{_hasAddedToCart},
+        continueShoppingUrl => $self->getUrl,
+        manageLink         => $self->getUrl("func=manage"),
+        adSkuTitle         => $self->get('title'),
+        adSkuDescription   => $self->get('description'),
+        form_title          => WebGUI::Form::text($session, {
+                                 -name=>"form_title",
+                                 -value=>$self->{title},
+                                 -size=>40
+				 -default=>'untitled',
+                                }),
+        form_link           => WebGUI::Form::Url($session, {
+                                 -name=>"form_link",
+                                 -value=>$self->{link},
+                                 -size=>40
+				 -required=>1,
+                                }),
+        form_image          => WebGUI::Form::Image($session, {
+                                 -name=>"form_image",
+                                 -value=>$self->{image},
+                                 -size=>40
+				 -required=>1,
+                                }),
+        form_clicks          => WebGUI::Form::Integer($session, {
+                                 -name=>"form_clicks",
+                                 -value=>$self->{clicks},
+                                 -size=>40
+				 -required=>1,
+                                }),
+        form_impressions          => WebGUI::Form::Integer($session, {
+                                 -name=>"form_impressions",
+                                 -value=>$self->{impressions},
+                                 -size=>40
+				 -required=>1,
+                                }),
+        click_price   => $self->get('pricePerClick'),
+        impression_price   => $self->get('pricePerImpression'),
+        click_discount   => $self->getClickDiscountText,
+        impression_discount   => $self->getImpressionDiscountText,
+    );
+    return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
 
 #-------------------------------------------------------------------
@@ -207,141 +388,13 @@ sub www_manage {
 
 #-------------------------------------------------------------------
 
-=head2 manage
-
-generate template vars for manage page
-
-=cut
-
-sub manage {
-    my ($self) = @_;
-    my $session = $self->session;
-
-	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
-# TODO get the user id, get the asset collateral crud by uid, sort by purchase date descending, pull out unique adids
-    my %var = (
-        formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
-            . WebGUI::Form::hidden( $session, { name=>"func", value=>"purchaseAdSku" }),
-        formFooter          => WebGUI::Form::formFooter($session),
-        form_submit      => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
-        hasAddedToCart      => $self->{_hasAddedToCart},
-        continueShoppingUrl => $self->getUrl,
-        purchaseLink         => $self->getUrl,
-        myAds          => [
-# TODO foreach unique adis create a row here
-              { rowTitle => 'here is an ad', rowClicks => '5/200', rowImpressions => '100/2000', rowDeleted => 0, rowRenewLink => '' },
-              { rowTitle => 'yet another ad', rowClicks => '99/4000', rowImpressions => '10/200', rowDeleted => 1, rowRenewLink => '' },
-        ],
-    );
-    return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-}
-
-#-------------------------------------------------------------------
-
-=head2 view
-
-Displays the purchase adspace form
-
-=cut
-
-sub view {
-    my ($self) = @_;
-    my $session = $self->session;
-
-	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
-    my %var = (
-        formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
-            . WebGUI::Form::hidden( $session, { name=>"func", value=>"purchaseAdSku" }),
-        formFooter          => WebGUI::Form::formFooter($session),
-        form_submit      => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
-        hasAddedToCart      => $self->{_hasAddedToCart},
-        continueShoppingUrl => $self->getUrl,
-        manageLink         => $self->getUrl("func=manage"),
-        adSkuTitle         => $self->get('title'),
-        adSkuDescription   => $self->get('description'),
-        form_title          => WebGUI::Form::text($session, {
-                                 -name=>"form_title",
-                                 -value=>$self->{title},
-                                 -size=>40
-                                }),
-        form_link           => WebGUI::Form::Url($session, {
-                                 -name=>"form_link",
-                                 -value=>$self->{link},
-                                 -size=>40
-                                }),
-        form_image          => WebGUI::Form::Image($session, {
-                                 -name=>"form_image",
-                                 -value=>$self->{image},
-                                 -size=>40
-                                }),
-        form_clicks          => WebGUI::Form::Integer($session, {
-                                 -name=>"form_clicks",
-                                 -value=>$self->{clicks},
-                                 -size=>40
-                                }),
-        form_impressions          => WebGUI::Form::Integer($session, {
-                                 -name=>"form_impressions",
-                                 -value=>$self->{impressions},
-                                 -size=>40
-                                }),
-        click_price   => $self->get('pricePerClick'),
-        impression_price   => $self->get('pricePerImpression'),
-        click_discount   => $self->getClickDiscountText,
-        impression_discount   => $self->getImpressionDiscountText,
-    );
-    return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-}
-
-#-------------------------------------------------------------------
-
-=head2 getDiscountCountList  -- class level function
-
-returns a string with a coma seperated list of counts fromt he discount text
-
-=cut
-
-sub  getDiscountCountList {
-# TODO
-# parse the discount text -- for each line, get the first number
-# join all the number in a coma,list
-   return '500';
-}
-
-#-------------------------------------------------------------------
-
-=head2 getClickDiscountText
-
-returns the text to display the number of clicks purchasaed where discounts apply
-
-=cut
-
-sub getClickDiscountText {
-     my $self = shift;
-     return getDiscountCountList($self->get('ClickDiscounts'));
-}
-
-#-------------------------------------------------------------------
-
-=head2 getImpressionDiscountText
-
-returns the text to display the number of impressions purchased where discounts apply
-
-=cut
-
-sub getImpressionDiscountText {
-     my $self = shift;
-     return getDiscountCountList($self->get('impressionDiscounts'));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_purchaseAdSKu
+=head2 www_addToCart
 
 Add this subscription to the cart.
 
 =cut
 
-sub www_purchaseAdSku {
+sub www_addToCart {
     my $self = shift;
     if ($self->canView) {
         $self->{_hasAddedToCart} = 1;
