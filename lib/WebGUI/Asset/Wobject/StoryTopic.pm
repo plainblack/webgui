@@ -19,6 +19,8 @@ use WebGUI::Utility;
 use WebGUI::Asset::Story;
 use base 'WebGUI::Asset::Wobject';
 
+use constant DATE_FORMAT => '%c_%D_%y';
+
 #-------------------------------------------------------------------
 
 =head2 definition ( )
@@ -94,7 +96,7 @@ sub prepareView {
 
 =head2 view ( )
 
-method called by the www_view method.  Returns a processed template
+Method called by the www_view method.  Returns a processed template
 to be displayed within the page style.  
 
 =cut
@@ -104,12 +106,55 @@ sub view {
     my $session = $self->session;    
 
     #This automatically creates template variables for all of your wobject's properties.
-    my $var = $self->get;
-    
-    #This is an example of debugging code to help you diagnose problems.
-    #WebGUI::ErrorHandler::warn($self->get("templateId")); 
-    
+    my $var = $self->viewTemplateVariables;
+
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
+}
+
+sub www_view {
+    my $self = shift;
+    $self->{_standAlone} = 1;
+    return $self->SUPER::www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 viewTemplateVars ( )
+
+Make template variables for the view template.
+
+=cut
+
+sub viewTemplateVariables {
+    my ($self)          = @_;
+    my $session         = $self->session;    
+    my $numberOfStories = $self->{_standAlone}
+                        ? $self->get('storiesPer')
+                        : $self->get('storiesShort');
+    my $var = $self->get();
+    my $wordList = WebGUI::Keyword::string2list($self->get('keywords'));
+    my $key      = WebGUI::Keyword->new($session);
+    my $p        = $key->getMatchingAssets({
+        keywords     => $wordList,
+        isa          => 'WebGUI::Asset::Story',
+        usePaginator => 1,
+        rowsPerPage  => $numberOfStories,
+    });
+    my $storyIds = $p->getPageData();
+    $var->{story_loop} = [];
+    ##Only build objects for the assets that we need
+    STORY: foreach my $storyId (@{ $storyIds }) {
+        my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
+        next STORY unless $story;
+        my $creationDate = $story->get('creationDate');
+        push @{$var->{story_loop}}, {
+            url           => $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}),
+            title         => $story->getTitle,
+            creationDate  => $creationDate,
+        }
+    }
+
+    return $var;
 }
 
 

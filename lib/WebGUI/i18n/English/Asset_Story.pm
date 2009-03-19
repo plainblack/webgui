@@ -281,6 +281,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'story asset template variables title' => {
+        message => q|Story Asset Template Variables.|,
+        context => q|Title of a help page for asset level template variables.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
