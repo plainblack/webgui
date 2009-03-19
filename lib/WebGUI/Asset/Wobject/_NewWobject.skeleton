@@ -37,7 +37,6 @@ sub definition {
     my $session    = shift;
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, 'Asset_NewWobject' );
-    my %properties;
     tie my %properties, 'Tie::IxHash', (
         templateId => {
 
