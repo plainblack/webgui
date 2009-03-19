@@ -19,6 +19,13 @@ our $HELP = {
         ],
         fields    => [],
         variables => [
+            { 'name' => 'story_loop',
+              'variables' => [
+                { 'name' => 'url' },
+                { 'name' => 'title' },
+                { 'name' => 'creationDate' },
+              ],
+            },
         ],
         related => []
     },
