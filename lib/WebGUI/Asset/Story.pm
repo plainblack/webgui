@@ -684,7 +684,7 @@ sub viewTemplateVariables {
     foreach my $keyword (@{ $keywords }) {
         push @{ $var->{keyword_loop} }, {
             keyword => $keyword,
-            url     => $archive->getUrl("func=search;submit=1;keywords=".$session->url->escape($keyword)),
+            url     => $archive->getUrl("func=view;keywords=".$session->url->escape($keyword)),
         };
     }
     ##TODO: publish time, calculated from revisionDate

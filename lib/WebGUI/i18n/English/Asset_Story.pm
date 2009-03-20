@@ -245,8 +245,23 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'url' => {
-        message => q|A URL to view all stories in this archive.|,
+    'keyword_url' => {
+        message => q|A URL to view all stories in this archive related to this keyword.|,
+        lastUpdated => 0,
+    },
+
+    'crumb_loop' => {
+        message => q|A loop containing the crumbtrail.  The first element will be a link to the archive that contains the story.  The last element will be the story, with title and url.  If there are 3 elements, the middle element will be the topic.|,
+        lastUpdated => 0,
+    },
+
+    'crumb_title' => {
+        message => q|The title of a page in the crumb trail.|,
+        lastUpdated => 0,
+    },
+
+    'crumb_url' => {
+        message => q|The title of a page in the crumb trail.|,
         lastUpdated => 0,
     },
 

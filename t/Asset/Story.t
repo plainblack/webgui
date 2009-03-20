@@ -227,9 +227,9 @@ cmp_deeply(
 cmp_bag(
     $viewVariables->{keyword_loop},
     [
-        { keyword => "foxtrot", url => '/home/test-archive?func=search;submit=1;keywords=foxtrot', },
-        { keyword => "tango",   url => '/home/test-archive?func=search;submit=1;keywords=tango', },
-        { keyword => "whiskey", url => '/home/test-archive?func=search;submit=1;keywords=whiskey', },
+        { keyword => "foxtrot", url => '/home/test-archive?func=view;keywords=foxtrot', },
+        { keyword => "tango",   url => '/home/test-archive?func=view;keywords=tango', },
+        { keyword => "whiskey", url => '/home/test-archive?func=view;keywords=whiskey', },
     ],
     'viewTemplateVariables: keywords_loop is okay'
 );
