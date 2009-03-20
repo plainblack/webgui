@@ -363,6 +363,31 @@ sub getEditForm {
                             value => $i18n->get('save and add another photo'),
                           }),
     };
+    $var->{ photo_form_loop } = [];
+    ##Provide forms for the existing photos, if any
+    ##Existing photos get a delete Yes/No.
+    ##And a form for new ones
+    push @{ $var->{ photo_form_loop } }, {
+        imgUploadForm  => WebGUI::Form::image($session, {
+                             name           => 'newPhoto',
+                             maxAttachments => 1,
+                          }),
+        imgCaptionForm => WebGUI::Form::text($session, {
+                             name => 'newImgCaption',
+                          }),
+        imgByLineForm  => WebGUI::Form::text($session, {
+                             name => 'newImgByline',
+                          }),
+        imgAltForm     => WebGUI::Form::text($session, {
+                             name => 'newImgAlt',
+                          }),
+        imgTitleForm   => WebGUI::Form::text($session, {
+                             name => 'newImgTitle',
+                          }),
+        imgUrlForm     => WebGUI::Form::url($session, {
+                             name => 'newImgUrl',
+                          }),
+    };
     if ($isNew) {
         $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'assetId', value => 'new' })
                            .  WebGUI::Form::hidden($session, { name => 'class',   value => $form->process('class', 'className') });
@@ -448,15 +473,30 @@ sub prepareView {
 
 =head2 processPropertiesFromFormPost ( )
 
-Used to process properties from the form posted.  Do custom things with
-noFormPost fields here, or do whatever you want.  This method is called
-when /yourAssetUrl?func=editSave is requested/posted.
+Handle photos and photo metadata, like captions, etc.
 
 =cut
 
 sub processPropertiesFromFormPost {
     my $self = shift;
     $self->SUPER::processPropertiesFromFormPost;
+    my $session = $self->session;
+    my $form    = $session->form;
+    ##Handle old data first, to avoid iterating across a newly added photo.
+    my $photoData      = $self->getPhotoData;
+    my $numberOfPhotos = scalar @{ $photoData };
+    ##Post process photo data here.
+    my $newStorage = $form->process('newPhoto', 'image');
+    if ($newStorage) {
+        push @{ $photoData }, {
+            caption   => $form->process('newImgCaption', 'text'),
+            title     => $form->process('newImgTitle',   'text'),
+            byLine    => $form->process('newImgByline',  'text'),
+            url       => $form->process('newImgUrl',     'url'),
+            storageId => $newStorage,
+        };
+        $self->setPhotoData($photoData);
+    }
 }
 
 

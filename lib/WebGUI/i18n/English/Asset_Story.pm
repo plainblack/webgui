@@ -302,6 +302,48 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photo_form_loop' => {
+        message => q|A loop containing subforms for all photos that have been loaded, and a blank form for uploading new photos.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgUploadForm' => {
+        message => q|A form field to upload an image.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgCaptionForm' => {
+        message => q|A form field for the caption for this image.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgBylineForm' => {
+        message => q|A form field for a by-line for this image.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgAltForm' => {
+        message => q|A form field for alternate text for the image, for the IMG tag ALT field.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgTitleForm' => {
+        message => q|A form field for the title for the image, for the IMG tag TITLE field.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
+    'imgUrlForm' => {
+        message => q|A field for the URL for this image.  If present, then the image will be rendered as a link to this URL.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
