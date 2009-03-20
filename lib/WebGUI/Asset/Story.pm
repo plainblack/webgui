@@ -145,7 +145,7 @@ sub definition {
         },
         photo => {
             fieldType    => 'text',
-            defaultValue => '{}',
+            defaultValue => '[]',
         },
         storageId => {
             fieldType    => 'hidden',
@@ -249,7 +249,6 @@ sub getAutoCommitWorkflowId {
 	my $self    = shift;
     my $archive = $self->getArchive;
     if ($archive->hasBeenCommitted) {
-        $self->session->log->warn($archive->get('approvalWorkflowId'));
         return $archive->get('approvalWorkflowId')
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
@@ -490,6 +489,7 @@ sub processPropertiesFromFormPost {
     if ($newStorage) {
         push @{ $photoData }, {
             caption   => $form->process('newImgCaption', 'text'),
+            alt       => $form->process('newImgAlt',     'text'),
             title     => $form->process('newImgTitle',   'text'),
             byLine    => $form->process('newImgByline',  'text'),
             url       => $form->process('newImgUrl',     'url'),
@@ -538,9 +538,7 @@ sub purgeRevision {
 
 =head2 setPhotoData ( $perlStructure )
 
-Returns the storage location for this Story.  If it does not exist,
-then it creates it via setStorageLocation.  Subsequent lookups return
-an internally cached Storage object to save time.
+Sets the photo data from the JSON stored in the object.
 
 =head3 $perlStructure
 
@@ -577,7 +575,7 @@ want in there so there's no valid content checking.
 
 sub setPhotoData {
 	my $self      = shift;
-    my $photoData = shift || {};
+    my $photoData = shift || [];
     my $photo     = to_json($photoData);
     $self->update({photo => $photo});
     delete $self->{_photoData};

@@ -344,6 +344,36 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photo caption' => {
+        message => q|Photo Caption|,
+        context => q|Label in the edit story form.  Short for Photograph Caption.|,
+        lastUpdated => 0,
+    },
+
+    'photo byline' => {
+        message => q|Photo By Line|,
+        context => q|Label in the edit story form.  The person who took, or owns this photo.|,
+        lastUpdated => 0,
+    },
+
+    'photo alt' => {
+        message => q|Photo Alternate Text|,
+        context => q|Label in the edit story form.  Text for the ALT attribute of an IMG tag.|,
+        lastUpdated => 0,
+    },
+
+    'photo title' => {
+        message => q|Photo Alternate Title|,
+        context => q|Label in the edit story form.  Text for the TITLE attribute of an IMG tag.|,
+        lastUpdated => 0,
+    },
+
+    'photo url' => {
+        message => q|Photo URL|,
+        context => q|Label in the edit story form.  A link from the photo to more information about it, or referring to it.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
