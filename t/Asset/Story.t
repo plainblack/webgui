@@ -21,7 +21,7 @@ use Test::Deep;
 use Data::Dumper;
 
 my $tests = 1;
-plan tests => 25
+plan tests => 27
             + $tests
             ;
 
@@ -32,7 +32,7 @@ my $session = WebGUI::Test->session;
 my $class  = 'WebGUI::Asset::Story';
 my $loaded = use_ok($class);
 my $story;
-my $wgBday;
+my $wgBday = WebGUI::Test->webguiBirthday;
 
 my $defaultNode = WebGUI::Asset->getDefault($session);
 my $archive     = $defaultNode->addChild({
@@ -41,8 +41,16 @@ my $archive     = $defaultNode->addChild({
                  #1234567890123456789012
     assetId   => 'TestStoryArchiveAsset1',
 });
-my $archiveTag = WebGUI::VersionTag->getWorking($session);
+my $topic       = $defaultNode->addChild({
+    className => 'WebGUI::Asset::Wobject::StoryTopic',
+    title     => 'Test Topic',
+                 #1234567890123456789012
+    assetId   => 'TestStoryTopicAsset123',
+    keywords  => 'tango yankee',
+});
+my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
+
 
 SKIP: {
 
@@ -144,10 +152,54 @@ cmp_deeply(
 
 is($story->formatDuration(time() - (24*3600+15)), '1 Day(s)', 'formatDuration, 1 day');
 is($story->formatDuration(time() - (48*3600+15)), '2 Day(s)', 'formatDuration, 2 day');
-like($story->formatDuration(997966800), qr{Year.s.}, 'formatDuration: a long time ago');
+like($story->formatDuration($wgBday), qr{Year.s.}, 'formatDuration: a long time ago');
 is($story->formatDuration(time() - (3600+5)), '1 Hour(s)', 'formatDuration: 1 hour');
 is($story->formatDuration(time() - (60+5)),   '1 Minute(s)', 'formatDuration: 1 minute');
 is($story->formatDuration(time() - (7200+120)), '2 Hour(s), 2 Minute(s)', 'formatDuration: 2 hours, 2 minutes');
+
+############################################################
+#
+# getCrumbTrail
+#
+############################################################
+
+cmp_deeply(
+    $story->getCrumbTrail,
+    [
+        {
+            title => $archive->getTitle,
+            url   => $archive->getUrl,
+        },
+        {
+            title => $story->getTitle,
+            url   => $story->getUrl,
+        },
+    ],
+    'getCrumbTrail: with no topic set'
+);
+
+$story->topic($topic);
+
+cmp_deeply(
+    $story->getCrumbTrail,
+    [
+        {
+            title => $archive->getTitle,
+            url   => $archive->getUrl,
+        },
+        {
+            title => $topic->getTitle,
+            url   => $topic->getUrl,
+        },
+        {
+            title => $story->getTitle,
+            url   => $story->getUrl,
+        },
+    ],
+    'getCrumbTrail: with no topic set'
+);
+
+$story->topic('');
 
 ############################################################
 #
@@ -188,8 +240,8 @@ is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTempla
 
 END {
     $story->purge   if $story;
-    $wgBday->purge  if $wgBday;
     $archive->purge if $archive;
+    $topic->purge   if $topic;
     $archiveTag->rollback;
     WebGUI::VersionTag->getWorking($session)->rollback;
 }

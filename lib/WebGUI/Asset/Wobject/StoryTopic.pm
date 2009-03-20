@@ -120,12 +120,6 @@ sub view {
     return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
-sub www_view {
-    my $self = shift;
-    $self->{_standAlone} = 1;
-    return $self->SUPER::www_view;
-}
-
 #-------------------------------------------------------------------
 
 =head2 viewTemplateVars ( )
@@ -176,6 +170,48 @@ sub viewTemplateVariables {
     $var->{standAlone} = $self->{_standAlone};
 
     return $var;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_view ( )
+
+Overside the method inherited from Wobject to set the mode so template
+variables are set correctly in viewTemplateVars.
+
+=cut
+
+
+sub www_view {
+    my $self = shift;
+    $self->{_standAlone} = 1;
+    return $self->SUPER::www_view;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewStory ( )
+
+Display a story, set in the form variable assetId
+
+=cut
+
+
+sub www_viewStory {
+    my $self    = shift;
+    my $session = $self->session;
+    my $storyId = $session->form->get('assetId');
+    my $story;
+    if ($storyId) {
+        $story = WebGUI::Asset->new($session, $storyId);
+    }
+    if (! $story) {
+        my $notFound = WebGUI::Asset->getNotFound($session);
+        $session->asset($notFound);
+        return $notFound->www_view;
+    }
+    $story->topic($self);
+    return $story->www_view;
 }
 
 
