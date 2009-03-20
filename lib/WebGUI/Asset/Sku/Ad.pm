@@ -47,7 +47,7 @@ These methods are available from this class:
 
 =head2 definition
 
-Adds templateId, thankYouMessage, and defaultPrice fields.
+Adds purchaseTemplate, manageTemplate, adSpace, priority, pricePerClick, pricePerImpression, clickDiscounts, impresisonDiscounts
 
 =cut
 
@@ -140,6 +140,33 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getClickDiscountText
+
+returns the text to display the number of clicks purchasaed where discounts apply
+
+=cut
+
+sub getClickDiscountText {
+     my $self = shift;
+     return getDiscountText($self->i18n->get('click discount'),
+                             $self->get('clickDiscounts'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 getConfiguredTitle
+
+combines the adSKu title with the customers ad title
+
+=cut
+
+sub getConfiguredTitle {
+     my $self = shift;
+     return $self->get('title') . ' (' . $self->getOptions->{'adtitle'} . ')';
+}
+
+#-------------------------------------------------------------------
+
 =head2 getDiscountAmount  -- class level function
 
 returns the amount of discount to apply to this purchase
@@ -161,27 +188,13 @@ sub getDiscountAmount {
 
 =head2 getDiscountText  -- class level function
 
-returns a string with a coma seperated list of counts fromt he discount text
+returns a string with a coma seperated list of counts from the discount text
 
 =cut
 
 sub getDiscountText {
     my($format,$discounts) = @_;
     return sprintf( $format, join( ',', (map { $_->[1] } ( parseDiscountText( $discounts ) ) ) ) );
-}
-
-#-------------------------------------------------------------------
-
-=head2 getClickDiscountText
-
-returns the text to display the number of clicks purchasaed where discounts apply
-
-=cut
-
-sub getClickDiscountText {
-     my $self = shift;
-     return getDiscountText($self->i18n->get('click discount'),
-                             $self->get('clickDiscounts'));
 }
 
 #-------------------------------------------------------------------
@@ -204,15 +217,24 @@ sub getImpressionDiscountText {
 
 get the price for this purchase
 
+=cut
+
 sub getPrice {
     my $self = shift;
+dav::log 'getPrice';
     my $options = $self->getOptions;
-    my $impressionCount = $options->{impressions};
+    my $impressionCount = $options->{impressions} || $self->{formImpressions};
+dav::log 'getPrice::impressionCount=', $impressionCount;
     my $clickCount = $options->{clicks};
+dav::log 'getPrice::clickCount=', $clickCount;
     my $impressionDiscount = getDiscountAmount($self->get('impressionDiscounts'),$impressionCount );
+dav::log 'getPrice::impressionDiscount=', $impressionDiscount;
     my $clickDiscount = getDiscountAmount($self->get('clickDiscounts'),$clickCount );
-    my $impressionPrice = $self->get('pricePerImpression') - ( $impressionDiscount / 100 );
-    my $clickPrice = $self->get('pricePerClick') - ( $clickDiscount / 100 );
+dav::log 'getPrice::clickDiscount=', $clickDiscount;
+    my $impressionPrice = $self->get('pricePerImpression') * ( 100 - $impressionDiscount ) / 100 ;
+dav::log 'getPrice::impressionPrice=', $impressionPrice;
+    my $clickPrice = $self->get('pricePerClick') * ( 100 - $clickDiscount ) / 100 ;
+dav::log 'getPrice::clickPrice=', $clickPrice;
     return sprintf "%.2f", $impressionPrice * $impressionCount + $clickPrice * $clickCount;
 }
 
@@ -244,7 +266,6 @@ sub manage {
     my $i18n = WebGUI::International->new($session, "Asset_AdSku");
     my %var;
     $var{purchaseLink} = $self->getUrl;
-    #WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
     my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($session,{
 	     constraints => [ { "adSkuPurchase.userId = ?" => $self->session->user->userId } ],
 	     joinUsing => [ { "advertisement" => "adId" }, ],
@@ -278,8 +299,22 @@ inserts the ad intothe adspace...
 
 sub onCompletePurchase {
     my $self = shift;
+    my $options = $self->getOptions;
 
-    # $self->apply;
+    # TODO insert crud
+
+    WegGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
+           title =>  $options->{'adtitle'},
+	   clicksBought => $options->{'clicks'},
+	   impressionsBought => $options->{'impressions'},
+	   url =>   $options->{'link'},
+	   storageId =>  $options->{'image'},
+	   ownerUserId =>  $self->session->user->userId,
+	   isActive => 1,
+	   type =>  'image',
+	   priority => $self->get('priority'),
+	   });
+
 }
 
 #-------------------------------------------------------------------
@@ -292,13 +327,13 @@ returns an array of array ref's that are extracted from the discount description
 
 sub  parseDiscountText {
     my $discountDescription = shift;
-    dav::log $discountDescription;
+dav::log $discountDescription;
     my @lines = split "\n", $discountDescription;
     my @discounts;
     foreach my $line ( @lines ) {
-	dav::log $line;
+dav::log $line;
 	if( $line =~ /^(\d+)\@(\d+)/ ) {
-	    dav::log 'match';
+dav::log 'match';
             push @discounts, [ $1, $2 ];
 	}
     }
@@ -350,6 +385,7 @@ Displays the purchase adspace form
 sub view {
     my ($self) = @_;
     my $session = $self->session;
+my $options = $self->getOptions();
 
 	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
     my %var = (
@@ -364,31 +400,31 @@ sub view {
         adSkuDescription   => $self->get('description'),
         formTitle          => WebGUI::Form::text($session, {
                                  -name=>"formTitle",
-                                 -value=>$self->{title},
+                                 -value=>$options->{adtitle},
                                  -size=>40
 				 -default=>'untitled',
                                 }),
         formLink           => WebGUI::Form::Url($session, {
                                  -name=>"formLink",
-                                 -value=>$self->{link},
+                                 -value=>$options->{link},
                                  -size=>40
 				 -required=>1,
                                 }),
         formImage          => WebGUI::Form::Image($session, {
                                  -name=>"formImage",
-                                 -value=>$self->{image},
+                                 -value=>$options->{image},
                                  -size=>40
 				 -forceImageOnly=>1,
                                 }),
         formClicks          => WebGUI::Form::Integer($session, {
                                  -name=>"formClicks",
-                                 -value=>$self->{clicks},
+                                 -value=>$options->{clicks},
                                  -size=>40
 				 -required=>1,
                                 }),
         formImpressions          => WebGUI::Form::Integer($session, {
                                  -name=>"formImpressions",
-                                 -value=>$self->{impressions},
+                                 -value=>$options->{impressions},
                                  -size=>40
 				 -required=>1,
                                 }),
@@ -436,12 +472,18 @@ sub www_addToCart {
     if ($self->canView) {
         $self->{_hasAddedToCart} = 1;
 	my $form = $self->session->form;
+dav::log 'addToCart:data:',
+              'adtitle:' => $form->get('formTitle'),',',
+	      'link:' => $form->get('formLink','url'),',',
+	      'image:' => $form->get('formImage'),',',
+	      'clicks:' => $form->get('formClicks'),',',
+	      'impressions:' => $form->get('formImpressions');
         $self->addToCart({
-              title => $form->get('formTitle'),
-	      link => $form->get('formLink','url'),
+              adtitle => $form->get('formTitle'),
+	      link => $form->process('formLink','url'),
+	      clicks => $form->process('formClicks','integer'),
+	      impressions => $form->process('formImpressions','integer'),
 	      image => $form->get('formImage'),
-	      clicks => $form->get('formClicks'),
-	      impressions => $form->get('formImpressions'),
 	             });
     }
     return $self->www_view;
