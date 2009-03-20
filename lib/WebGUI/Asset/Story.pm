@@ -429,8 +429,15 @@ is passed, it will use that template instead.
 
 sub prepareView {
     my $self       = shift;
-    my $templateId = shift || $self->getArchive->get('storyTemplateId');
     $self->SUPER::prepareView();
+    my $templateId;
+    my $topic = $self->topic;
+    if ($topic) {
+        $templateId = $topic->get('storyTemplateId');
+    }
+    else {
+        $templateId = $self->getArchive->get('storyTemplateId');
+    }
     my $template = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare;
     $self->{_viewTemplate} = $template;
@@ -687,9 +694,10 @@ sub viewTemplateVariables {
             url     => $archive->getUrl("func=view;keywords=".$session->url->escape($keyword)),
         };
     }
-    ##TODO: publish time, calculated from revisionDate
     $var->{updatedTime}      = $self->formatDuration();
     $var->{updatedTimeEpoch} = $self->get('revisionDate');
+
+    $var->{crumb_loop}       = $self->getCrumbTrail();
     return $var;
 }
 
