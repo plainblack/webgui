@@ -1,3 +1,5 @@
+7.7.1
+
 7.7.0
  - fixed #9913: New Content Side Bar missing in Asset window
  - fixed: New Mail macro never returns any messages
