@@ -69,7 +69,7 @@ sub definition {
             hoverHelp    => $i18n->get('story template help'),
             filter       => 'fixId',
             namespace    => 'Story',
-            defaultValue => 'liNZSK4xWGyALU6nu_criw',
+            defaultValue => 'TbDcVLbbznPi0I0rxQf2CQ',
         },
     );
     push(@{$definition}, {
