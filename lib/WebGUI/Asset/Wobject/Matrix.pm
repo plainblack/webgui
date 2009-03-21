@@ -20,6 +20,8 @@ use WebGUI::Utility;
 use WebGUI::Asset::MatrixListing;
 use base 'WebGUI::Asset::Wobject';
 
+use Time::HiRes qw(gettimeofday tv_interval);
+
 #----------------------------------------------------------------------------
 
 =head2 canAddMatrixListing (  )
@@ -977,13 +979,30 @@ sub www_getCompareFormData {
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' desc';
-#    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
-#        $sortDirection = " desc";
-#    }
+    
     my @results;
     my @listingIds = $self->session->form->checkList("listingId");
     
     $self->session->http->setMimeType("application/json");
+
+    my (@searchParams,@searchParams_sorted,@searchParamList,$searchParamList);
+    if($form->process("search")){
+        foreach my $param ($form->param) {
+            if($param =~ m/^search_/){
+                my $parameter;
+                $parameter->{name}  = $param;
+                $parameter->{value} = $form->process($param);
+                my $attributeId = $param;
+                $attributeId =~ s/^search_//;
+                $attributeId =~ s/_____/-/g;
+                $parameter->{attributeId} = $attributeId;
+                push(@searchParamList,'"'.$parameter->{attributeId}.'"');
+                push(@searchParams,$parameter);
+            }
+        }
+        $searchParamList        = join(',',@searchParamList);
+        @searchParams_sorted    = sort { $b->{value} <=> $a->{value} } @searchParams;
+    }
 
     my $sql = "
         select
@@ -1005,31 +1024,18 @@ assetData.revisionDate
             and assetData.revisionDate = (SELECT max(revisionDate) from assetData where assetId=asset.assetId and status='approved')
             and status='approved'
         order by ".$sort.$sortDirection;
+    
+    my $sth = $self->session->db->read($sql,[$self->getId]);
+    my @results;
 
-    @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
-
-    my (@searchParams,@searchParams_sorted);
+    my $gateway = $self->session->config->get("gateway");
     if($form->process("search")){
-        foreach my $param ($form->param) {
-            if($param =~ m/^search_/){
-                my $parameter;
-                $parameter->{name}  = $param;
-                $parameter->{value} = $form->process($param);
-                my $attributeId = $param;
-                $attributeId =~ s/^search_//;
-                $attributeId =~ s/_____/-/g;
-                $parameter->{attributeId} = $attributeId;
-                push(@searchParams,$parameter);
-            }
-        }
-    }
-    @searchParams_sorted = sort { $b->{value} <=> $a->{value} } @searchParams;
-    foreach my $result (@results){
-            if($form->process("search")){
+        while (my $result = $sth->hashRef) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
-                            where listing.matrixListingId = ? order by value asc",
+                            where listing.matrixListingId = ? 
+                            and attributeId IN(".$searchParamList.")",
                             [$result->{assetId}],'attributeId');
                 PARAM: foreach my $param (@searchParams_sorted) {
                         my $fieldType       = $matrixListing_attributes->{$param->{attributeId}}->{fieldType};
@@ -1046,20 +1052,27 @@ assetData.revisionDate
                             $result->{checked} = 'checked';
                         }
                 }
-            }
-            else{
-                $result->{assetId}  =~ s/-/_____/g;
-                if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
-                    $result->{checked} = 'checked';
-                }
-            }
             $result->{assetId}  =~ s/-/_____/g;
-            $result->{url}      = $session->url->gateway($result->{url});
+            $result->{url}      = $gateway."/".$result->{url};
+            push @results, $result;
+        }
+    }else{
+        while (my $result = $sth->hashRef) {
+            $result->{assetId}  =~ s/-/_____/g;
+            if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
+                $result->{checked} = 'checked';
+            }
+            $result->{url}      = $gateway."/".$result->{url};
+            push @results, $result;
+        }
     }
+    $sth->finish;
+
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
     my $encodedOutput = JSON->new->encode($jsonOutput);
+
     return $encodedOutput;
 }
 
