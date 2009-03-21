@@ -20,8 +20,6 @@ use WebGUI::Utility;
 use WebGUI::Asset::MatrixListing;
 use base 'WebGUI::Asset::Wobject';
 
-use Time::HiRes qw(gettimeofday tv_interval);
-
 #----------------------------------------------------------------------------
 
 =head2 canAddMatrixListing (  )
