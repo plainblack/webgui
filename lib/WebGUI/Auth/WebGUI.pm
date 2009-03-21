@@ -497,7 +497,7 @@ sub editUserSettingsForm {
         -label     => $i18n->get(868,'WebGUI'),
         -hoverHelp => $i18n->get('868 help','WebGUI'),
     );
-    $f->textarea(
+    $f->HTMLArea(
         -name      => "webguiWelcomeMessage",
         -value     => $self->session->setting->get("webguiWelcomeMessage"),
         -label     => $i18n->get(869,'WebGUI'),
@@ -578,6 +578,13 @@ sub editUserSettingsForm {
 		-hoverHelp => $i18n->get("password recovery template help")
     );
     $f->template(
+        -name      => "webguiWelcomeMessageTemplate",
+        -value     => $self->session->setting->get("webguiWelcomeMessageTemplate"),
+        -namespace => "Auth/WebGUI/Welcome",
+        -label     => $i18n->get("welcome message template"),
+        -hoverHelp => $i18n->get("welcome message template help")
+    );
+    $f->template(
         -name      => "webguiAccountActivationTemplate",
         -value     => $self->session->setting->get("webguiAccountActivationTemplate"),
         -namespace => "Auth/WebGUI/Activation",
@@ -635,6 +642,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiExpiredPasswordTemplate", $f->process("webguiExpiredPasswordTemplate","template"));
 	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
 	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
+    $s->set("webguiWelcomeMessageTemplate", $f->process("webguiWelcomeMessageTemplate","template"));
     $s->set("webguiAccountActivationTemplate", $f->process("webguiAccountActivationTemplate","template")); 
 
     if (@errors) {

@@ -163,6 +163,18 @@ our $HELP = {
         related   => [],
     },
 
+    'webgui welcome message template' => {
+        title => 'welcome message template title',
+        body  => '',
+        variables => [
+            { 'name' => 'welcomeMessage' },
+            { 'name' => 'newUser_username' },
+            { 'name' => 'newUser_password' },
+        ],
+        fields  => [],
+        related => []
+    },
+
     'account activation template' => {
         title => 'account activation template title',
         body  => '',

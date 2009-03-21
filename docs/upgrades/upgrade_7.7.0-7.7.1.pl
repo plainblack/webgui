@@ -32,8 +32,17 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addWelcomeMessageTemplateToSettings( $session );
+
 finish($session); # this line required
 
+sub addWelcomeMessageTemplateToSettings {
+    my $session = shift;
+    print "\tAdding welcome message template to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings values ('webguiWelcomeMessageTemplate', 'PBtmpl0000000000000015');");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
