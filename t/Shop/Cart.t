@@ -161,5 +161,8 @@ $product->purge;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    if ($shipper) {
+        $shipper->delete;
+    }
     $session2->close;
 }

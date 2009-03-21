@@ -579,6 +579,7 @@ by the form param 'status'. Status can either be 'NotPaid' or 'Scheduled' and ma
 not have their vendorPayoutStatus set to 'Paid'.
 
 Returns the status to which the item(s) are set.
+
 =cut
 
 sub www_setPayoutStatus {

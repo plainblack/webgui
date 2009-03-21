@@ -127,6 +127,7 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Label for button to submit search form',
     },
+
     "templateIdAddArchive label" => {
         message     => "Template to Add Multiple",
         lastUpdated => 0,
@@ -741,6 +742,25 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Option label for 300 pixels-per-inch images, good for printing images},
     },
+
+    'template listAlbumsRss' => {
+        message     => 'Subscribe',
+        lastUpdated => 1237403207,
+        context     => 'Label for link to RSS feed.',
+    },
+
+    'template search basic title' => {
+        message     => 'Search Gallery',
+        lastUpdated => 1237403442,
+        context     => 'Title for basic search form in page.',
+    },
+
+    'template search basic term' => {
+        message     => 'Search Term',
+        lastUpdated => 1237403498,
+        context     => 'Title for basic search term field in page.',
+    },
+
 };
 
 1;
