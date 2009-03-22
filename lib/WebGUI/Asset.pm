@@ -2131,7 +2131,9 @@ sub processTemplate {
     }
 
     $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
+    warn("templateId: $templateId: template: $template");
     if (defined $template) {
+    warn("templateId: $templateId: template: $template: id: ", $template->getId());
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
         $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
         my %vars = (
@@ -2140,6 +2142,7 @@ sub processTemplate {
             'menuTitle' => $self->getMenuTitle,
             %{$var},
         );
+    warn("templateId: $templateId: template: $template");
         return $template->process(\%vars);
     }
     else {
@@ -2606,6 +2609,11 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
+    
+    my $annotations = "";
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $annotations = $self->get("annotations");
+    }
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
     return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
@@ -2644,6 +2652,12 @@ sub www_editSave {
         }
     }
     
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $object->update({ annotations => $annotations });
+    }
+
+    ### 
+
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves

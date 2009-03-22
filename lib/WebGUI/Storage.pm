@@ -1169,8 +1169,8 @@ Text to add.
 sub annotate { 
     my $self        = shift;
     my $filename    = shift;
+    my $asset       = shift;
     my $form        = shift;
-    warn("there");
     unless (defined $filename) {
         $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
         return 0;
@@ -1179,34 +1179,50 @@ sub annotate {
         $self->session->errorHandler->error("Can't rotate something that's not an image.");
         return 0;
     }
-    warn("there");
-    # form->process("degree")
+    # unless ($annotate_text) {
+    # $self->session->errorHandler->error("Can't annotate with no text.");
+    # return 0;
+    # }
+    # unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height) {
+    # $self->session->errorHandler->error("Can't annotate with no dimensions.");
+    # return 0;
+    # }
+
+    my $annotate = $asset->get('annotations');
+    my $save_annotate = "";
+	my @pieces = split(/\n/, $annotate);
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+		my $top_left = $pieces[$i];
+		my $width_height = $pieces[$i + 1];
+		my $note = $pieces[$i + 2];
+
+        # warn("i: $i: ", $form->process("delAnnotate$i"));
+        next if $form->process("delAnnotate$i");
+
+        if ($save_annotate) {
+            $save_annotate .= "\n";
+        }
+        $save_annotate .= "$top_left\n$width_height\n$note";
+    }
+
 	my $annotate_text   = $form->process("annotate_text");
 	my $annotate_top    = $form->process("annotate_top");
 	my $annotate_left   = $form->process("annotate_left");
 	my $annotate_width  = $form->process("annotate_width");
 	my $annotate_height = $form->process("annotate_height");
-    warn("there");
-    unless ($annotate_text) {
-        $self->session->errorHandler->error("Can't annotate with no text.");
-        return 0;
+    # warn(qq(unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height && $annotate_text !~ /^\s*$/)));
+    if ($annotate_top && $annotate_left && $annotate_width && $annotate_height && $annotate_text !~ /^\s*$/) {
+        if ($save_annotate) {
+            $save_annotate .= "\n";
+        }
+        # warn(qq($save_annotate .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n'$annotate_text'"));
+        $save_annotate .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
     }
-    warn("there");
+    # warn($save_annotate);
 
-	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
-    if ($imageAsset->{annotations} =~ /\n/) {
-        $imageAsset->{annotations} .= "\n";
-    }
-    warn("there: $imageAsset->{annotations}");
-    $imageAsset->{annotations} .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
-    warn("there: $imageAsset->{annotations}");
-    # $self->{_data}{annotations} = $imageAsset->{annotations};
-    # warn("there: $self->{_data}{annotations}");
-    # $self->session->db->setRow("ImageAsset","assetId",$self->{_data});
-
-    foreach my $k (sort keys %{ $self->{_data} }) {
-        # warn("$k => $$self{_data}{$k}");
-    }
+    $asset->update({ annotations => $save_annotate });
+    $save_annotate = $asset->get('annotations');
+    # warn($save_annotate);
 
     return 1;
 }

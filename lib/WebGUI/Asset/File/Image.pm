@@ -112,6 +112,10 @@ sub definition {
                 fieldType       => 'textarea',
                 defaultValue    => 'style="border-style:none;"',
             },
+            annotations => {
+                fieldType       => 'textarea',
+                defaultValue    => '',
+            },
         },
     };
     return $class->SUPER::definition($session,$definition);
@@ -236,16 +240,37 @@ sub view {
 		return $out if $out;
 	}
 	my %var = %{$self->get};
+    my ($crop_js, $domMe) = $self->annotate_js({ just_image => 1 });
+
+    if ($crop_js) {
+        my ($style, $url) = $self->session->quick(qw(style url));
+
+        $style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
+        $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
+        $style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
+
+        $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+    }
+
 	$var{controls} = $self->getToolbar;
 	$var{fileUrl} = $self->getFileUrl;
 	$var{fileIcon} = $self->getFileIconUrl;
 	$var{thumbnail} = $self->getThumbnailUrl;
-       	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
+	$var{annotateJs} = "$crop_js$domMe";
+    $var{parameters} = sprintf("id=%s", $self->getId());
+    warn("annotateJs: $var{annotateJs}");
+	my $form = $self->session->form;
+    my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
 }
+
 
 #----------------------------------------------------------------------------
 
@@ -288,31 +313,17 @@ sub www_undo {
     my $previous = (@{$self->getRevisions()})[1];
     # instantiate assetId 
     if ($previous) {
-	    warn("here");
 	    # my $session = $self->session;
-	    warn("here");
 
 	    # my $cache = WebGUI::Cache->new($self->session, ["asset",$self->getId,$self->getRevisionDate]);
-	    warn("here");
 	    # $cache->flush;
-	    warn("here");
 	    # my $cache = WebGUI::Cache->new($previous->session, ["asset",$previous->getId,$previous->getRevisionDate]);
-	    warn("here");
 	    # $cache->flush;
-	    warn("here");
 
-	    warn("$previous");
-  	    warn(ref $previous);
-	    warn($previous->getId);
 	    $self = $self->purgeRevision();
 	    # $self = undef;
-	    warn("here");
 	    # $self = WebGUI::Asset->new($previous->session, $previous->getId, ref $previous, $previous->getRevisionDate);
 	    $self = $previous;
-	    warn("$self");
-  	    warn(ref $self);
-	    warn($self->getId);
-	    warn($self->session->cache);
 	    $self->generateThumbnail;
     }
     return $self->www_edit();
@@ -330,22 +341,16 @@ sub www_annotate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	if ($self->session->form->process("annotate_text")) {
+	if (1) {
 		my $newSelf = $self->addRevision();
 		delete $newSelf->{_storageLocation};
-        warn("here");
-		$newSelf->getStorageLocation->annotate($newSelf->get("filename"),$newSelf->session->form);
-        warn("here");
+		$newSelf->getStorageLocation->annotate($newSelf->get("filename"),$newSelf,$newSelf->session->form);
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
-        warn("here");
 		$self = $newSelf;
-        warn("here");
 		$self->generateThumbnail;
-        warn("here");
 	}
 
     my ($style, $url) = $self->session->quick(qw(style url));
-	# http://www.kryogenix.org/code/browser/annimg/annimg.html (creative commons)
     # $style->setLink($url->extras('annotate/imageMap.css'), {rel=>'stylesheet', type=>'text/css'});
 
 	$style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
@@ -358,110 +363,27 @@ sub www_annotate {
 	$style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
 	$style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
 
-	my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
+    # my $imageAsset = $self->session->db->getRow("ImageAsset","assetId",$self->getId);
 
-	warn("annotations: " . $self->{annotations});
-	my @pieces = split(/\n/, $imageAsset->{annotations});
+	my @pieces = split(/\n/, $self->get('annotations'));
 	# my ($top_left, $width_height, $note) = split(/\n/, $imageAsset->{annotations});
 	
-	my $crop_js = qq(
-        <script type="text/javascript">
-        var crop;
-        function switchState() {
-            YAHOO.img.container.tt0 = null;
-            YAHOO.img.container.tt3 = null;
+    my ($img_null, $tooltip_block, $tooltip_none) = ('', '', '');
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+        $img_null .= "YAHOO.img.container.tt$i = null;\n";
+        $tooltip_block .= "YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');\n";
+        $tooltip_none .= "YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'none');\n";
+        my $j = $i + 2;
+        # warn("i: $i: ", $self->session->form->process("delAnnotate$i"));
+    }
 
-            if (crop) {
-                crop.destroy();
-                crop = null;
-                YAHOO.util.Dom.setStyle('tooltip0', 'display', 'block');
-                YAHOO.util.Dom.setStyle('tooltip3', 'display', 'block');
-            }
-            else {
-                crop = new YAHOO.widget.ImageCropper('yui_img', { 
-                    initialXY: [20, 20], 
-                    keyTick: 5, 
-                    shiftKeyTick: 50 
-                }); 
-                crop.on('moveEvent', function() { 
-                    var region = crop.getCropCoords();
-                    element = document.getElementById('annotate_width_formId');
-                    element.value = region.width;
-                    element = document.getElementById('annotate_height_formId');
-                    element.value = region.height;
-                    element = document.getElementById('annotate_top_formId');
-                    element.value = region.top;
-                    element = document.getElementById('annotate_left_formId');
-                    element.value = region.left;
-                }); 
-                YAHOO.util.Dom.setStyle('tooltip0', 'display', 'none');
-                YAHOO.util.Dom.setStyle('tooltip3', 'display', 'none');
-            }
-        }
-		</script>
-    );
     my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
-    # my $image = '<div align="center"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
 
 	my ($width, $height) = $self->getStorageLocation->getSize($self->get("filename"));
 
 	my @checkboxes = ();
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 	my $f = WebGUI::HTMLForm->new($self->session,-action=>$self->getUrl);
-
-    my $hotspots = '';
-    my $domMe = '';
-
-	for (my $i = 0; $i < $#pieces; $i += 3) {
-		my $top_left = $pieces[$i];
-		my $width_height = $pieces[$i + 1];
-		my $note = $pieces[$i + 2];
-
-        # next if 3 == $i;
-
-        $domMe .= qq(
-            <style type="text/css">
-                div#tooltip$i { position: absolute; border:1px solid; }
-            </style>
-
-            <span id=span_tooltip$i>
-            </span>
-
-            <script type="text/javascript" defer="defer">
-                function on_load_$i() {
-                    var xy = YAHOO.util.Dom.getXY('yui_img'); 
-
-                    document.getElementById('span_tooltip$i').innerHTML = "<div id=tooltip$i style='border:1px solid;'></div>";
-                    YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');
-                    YAHOO.util.Dom.setStyle('tooltip$i', 'height', '40px');
-                    YAHOO.util.Dom.setStyle('tooltip$i', 'width', '100px');
-                    YAHOO.util.Dom.setXY('span_tooltip$i', [$top_left]); 
-                    YAHOO.util.Dom.setXY('tooltip$i', [$top_left]); 
-
-                    YAHOO.namespace("img.container");
-                    YAHOO.img.container.tt$i = new YAHOO.widget.Tooltip("tt$i", { showdelay: 0, visible: true, context:"tooltip$i", position:"relative", container:"tooltip$i", text:"test: $i" });
-                }
-                if (document.addEventListener) {
-                    document.addEventListener("DOMContentLoaded", on_load_$i, false);
-                }
-            </script>
-        );
-
-
-		push(@checkboxes, $f->checkbox(
-				-label=>$i18n->get('delete') . " '$note'",
-				-checked=>0,
-				-name=>"delAnnotate$i",
-				-value=>"1"
-			)
-		);
-		$f->hidden(
-			-name=>"annotates",
-			-value=>"$i"
-			);
-
-        # last;
-	}
 
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
 	$f->hidden(
@@ -499,7 +421,114 @@ sub www_annotate {
         -extras=>'onclick="switchState();"',
         );
 	$f->submit;
+    my ($crop_js, $domMe) = $self->annotate_js();
     return $self->getAdminConsole->render($f->print."$image$crop_js$domMe",$i18n->get("annotate image"));
+}
+
+#-------------------------------------------------------------------
+sub annotate_js {
+    my $self = shift;
+    my $opts = shift;
+
+	my @pieces = split(/\n/, $self->get('annotations'));
+
+    warn("pieces: $#pieces: ". $self->getId());
+    return "" if !@pieces && $opts->{just_image};
+
+    my ($img_null, $tooltip_block, $tooltip_none) = ('', '', '');
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+        $img_null .= "YAHOO.img.container.tt$i = null;\n";
+        $tooltip_block .= "YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');\n";
+        $tooltip_none .= "YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'none');\n";
+        my $j = $i + 2;
+        # warn("i: $i: ", $self->session->form->process("delAnnotate$i"));
+    }
+
+    my $id = $$opts{just_image} ? $self->getId : "yui_img";
+
+	my $crop_js = qq(
+        <script type="text/javascript">
+        var crop;
+        function switchState() {
+            $img_null
+
+            if (crop) {
+                crop.destroy();
+                crop = null;
+                $tooltip_block
+            }
+            else {
+                crop = new YAHOO.widget.ImageCropper('$id', { 
+                    initialXY: [20, 20], 
+                    keyTick: 5, 
+                    shiftKeyTick: 50 
+                }); 
+                crop.on('moveEvent', function() { 
+                    var region = crop.getCropCoords();
+                    element = document.getElementById('annotate_width_formId');
+                    element.value = region.width;
+                    element = document.getElementById('annotate_height_formId');
+                    element.value = region.height;
+                    element = document.getElementById('annotate_top_formId');
+                    element.value = region.top;
+                    element = document.getElementById('annotate_left_formId');
+                    element.value = region.left;
+                }); 
+                $tooltip_none
+            }
+        }
+		</script>
+    );
+
+    my $hotspots = '';
+    my $domMe = '';
+
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+		my $top_left = $pieces[$i];
+		my $width_height = $pieces[$i + 1];
+		my $note = $pieces[$i + 2];
+
+        if ($top_left =~ /top: (\d+)px; left: (\d+)px;/) {
+            $top_left = "xy[0]+$1, xy[1]+$2";
+        }
+
+        my ($width, $height) = ("", "");
+        if ($width_height =~ /width: (\d+)px; height: (\d+)px;/) {
+            ($width, $height) = ("$1px", "$2px");
+        }
+
+        # next if 3 == $i;
+
+        $domMe .= qq(
+                <style type="text/css">
+                    div#tooltip$i { position: absolute; border:1px solid; }
+                </style>
+
+                <span id=span_tooltip$i>
+                </span>
+
+                <script type="text/javascript" defer="defer">
+                    function on_load_$i() {
+                        var xy = YAHOO.util.Dom.getXY('$id'); 
+
+                        document.getElementById('span_tooltip$i').innerHTML = "<div id=tooltip$i style='border:1px solid;'></div>";
+                        YAHOO.util.Dom.setStyle('tooltip$i', 'display', 'block');
+                        YAHOO.util.Dom.setStyle('tooltip$i', 'height', '$height');
+                        YAHOO.util.Dom.setStyle('tooltip$i', 'width', '$width');
+                        YAHOO.util.Dom.setXY('span_tooltip$i', [$top_left]); 
+                        YAHOO.util.Dom.setXY('tooltip$i', [$top_left]); 
+
+                        YAHOO.namespace("img.container");
+                        YAHOO.img.container.tt$i = new YAHOO.widget.Tooltip("tt$i", { showdelay: 0, visible: true, context:"tooltip$i", position:"relative", container:"tooltip$i", text:"$note" });
+                    }
+                    if (document.addEventListener) {
+                        document.addEventListener("DOMContentLoaded", on_load_$i, false);
+                    }
+                </script>
+        );
+    }
+
+    return($crop_js, $domMe);
 }
 
 #-------------------------------------------------------------------
@@ -797,7 +826,7 @@ sub www_crop {
 # Use superclass method for now.
 sub www_view {
 	my $self = shift;
-	$self->SUPER::www_view;
+	return($self->SUPER::www_view);
 }
 
 #sub www_view {
