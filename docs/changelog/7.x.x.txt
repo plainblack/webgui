@@ -1,6 +1,6 @@
 7.7.1
  - rfe #9353: Welcome message template
-
+ - rfe #10007: New Month and Year question type.  If required, Month must be selected and a 4 digit year must be entered.
 7.7.0
  - fixed #9913: New Content Side Bar missing in Asset window
  - fixed: New Mail macro never returns any messages

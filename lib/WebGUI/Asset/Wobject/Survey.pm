@@ -1219,8 +1219,10 @@ sub prepareShowSurveyTemplate {
     my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
     my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
     my %dateType    = ( 'Date',        1, 'Date Range', 1 );
+    my %dateShort   = ( 'Year Month', 1 );
     my %fileUpload  = ( 'File Upload', 1 );
     my %hidden      = ( 'Hidden',      1 );
+use Data::Dumper;
 
     foreach my $q (@$questions) {
         if    ( $fileUpload{ $q->{questionType} } ) { $q->{fileLoader}   = 1; }
@@ -1235,6 +1237,26 @@ sub prepareShowSurveyTemplate {
         }
         elsif ( $dateType{ $q->{questionType} } ) {
             $q->{dateType} = 1;
+        }
+        elsif ( $dateShort{ $q->{questionType} } ) {
+            $q->{dateShort} = 1;
+            foreach my $a(@{$q->{answers}}){
+                $a->{months} = [ 
+                             {'month' => ''},
+                             {'month' => 'January'},
+                             {'month' => 'February'},
+                             {'month' => 'March'},
+                             {'month' => 'April'},
+                             {'month' => 'May'},
+                             {'month' => 'June'},
+                             {'month' => 'July'},
+                             {'month' => 'August'},
+                             {'month' => 'September'},
+                             {'month' => 'October'},
+                             {'month' => 'November'},
+                             {'month' => 'December'}
+                            ];
+            }
         }
         elsif ( $slider{ $q->{questionType} } ) {
             $q->{slider} = 1;
