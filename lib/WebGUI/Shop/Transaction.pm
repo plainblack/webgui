@@ -162,7 +162,7 @@ sub create {
         $posUser = $cart->getPosUser;
     }
     $session->db->write('insert into transaction (transactionId, userId, username, cashierUserId, dateOfPurchase) values (?,?,?,?,now())',
-        [$transactionId, $posUser->userId, $posUser->username, $cashier->userId]);
+        [$transactionId, $posUser->userId, $posUser->username || 'noname', $cashier->userId]);
     my $self = $class->new($session, $transactionId);
     $self->update($properties);
     return $self;

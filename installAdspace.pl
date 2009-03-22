@@ -14,8 +14,8 @@ sub install {
     print "Installing asset.\n";
     my $session = WebGUI::Session->open($home, $confg);
     print "create crud table";
+    WebGUI::AssetCollateral::Sku::Ad::Ad->crud_dropTable($session);
     WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
-if(0) {
     print "Add wobject to confg file\n";
     $session->config->addToHash("assets",$className => { category => 'shop' } );
      print "Create database tables\n";
@@ -32,6 +32,7 @@ if(0) {
 	impressionDiscounts VARCHAR(1024) default '',
 	PRIMARY KEY (assetId,revisionDate)
     )");
+if(0) {
     print "Create a folder asset to store the default templates\n";
     my $importNode = WebGUI::Asset->getImportNode($session);
     my $newFolder = $importNode->addChild({

@@ -29,8 +29,8 @@ transactionItemid = the id if the transaction item that completes this purchase
 adId = th id if the ad purchased
 clicksPurchased = the number of clicks the user purchased
 impressionsPurchased = the number of impressions the user purchased
-storedImage = temp storage for the image
-isRenewal = indicates if this purchase is a renewal -- are the counts increased or just assigned
+dateOfPurchase = the date of purchase
+storedImage = storage for the image
 isDeleted = boolean that indicates whether the ad has been deleted from the system
 
 =cut
@@ -39,7 +39,7 @@ sub crud_definition {
 	my ($class, $session) = @_;
 	my $definition = $class->SUPER::crud_definition($session);
 	$definition->{tableName} = 'adSkuPurchase';
-	$definition->{tableKey} = 'userId';
+	$definition->{tableKey} = 'adSkuPurchaseId';
 	$definition->{properties} = {
             userId => {
 	        fieldType	=> 'user',
@@ -61,13 +61,13 @@ sub crud_definition {
 		fieldType	=> 'integer',
 		defaultValue	=> undef,
 	    },
+	    dateOfPurchase => {
+		fieldType	=> 'date',
+		defaultValue	=> undef,
+	    },
 	    storedImage => {
 		fieldType	=> 'guid',
 		defaultValue	=> undef,
-	    },
-	    isRenewal => {
-		fieldType	=> 'yesNo',
-		defaultValue	=> 0,
 	    },
 	    isDeleted => {
 		fieldType	=> 'yesNo',

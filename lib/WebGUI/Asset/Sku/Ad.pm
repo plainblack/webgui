@@ -24,6 +24,7 @@ use WebGUI::Asset::Template;
 use WebGUI::Form;
 use WebGUI::Shop::Pay;
 use WebGUI::AssetCollateral::Sku::Ad::Ad;
+use WebGUI::AdSpace::Ad;
 
 =head1 NAME
 
@@ -268,22 +269,18 @@ sub manage {
     $var{purchaseLink} = $self->getUrl;
     my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($session,{
 	     constraints => [ { "adSkuPurchase.userId = ?" => $self->session->user->userId } ],
-	     joinUsing => [ { "advertisement" => "adId" }, ],
-	     'join' =>    [ "transactionItem on transactionItem.itemId = adSkuPurchase.transactionItemId", 
-	                    "transaction on transaction.transactionId = transactionItem.transactionId",
-			    ],
-	     orderBy => 'transaction.dateOfPurchase',
+	     orderBy => 'dateOfPurchase',
              });
-    my %testHash;      # used to eliminate duplicate ads
+    my %ads;
     while( my $object = $iterator->() ) {
-        next if exists $testHash{$object->get('adId')};
-	$testHash{$object->get('adId')} = 1;
+        next if exists $ads{$object->get('adId')};
+	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
         push @{$var{myAds}}, {
-	              rowTitle => $object->get('title'),
-		      rowClicks => $object->get('clicks') . '/' . $object->get('clicksBought'),
-		      rowImpressions => $object->get('impressions') . '/' . $object->get('impressionsBought'),
+	              rowTitle => $ad->get('title'),
+		      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
+		      rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
 		      rowDeleted => $object->get('isDeleted'),
-		      rowRenewLink => $self->getUrl('renew=' . $object->get('adId') ),
+		      rowRenewLink => $self->getUrl('func=renew;adId=' . $object->get('adId') ),
 		  };
     }
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
@@ -299,11 +296,12 @@ inserts the ad intothe adspace...
 
 sub onCompletePurchase {
     my $self = shift;
+    my $item = shift;
     my $options = $self->getOptions;
 
-    # TODO insert crud
+# LATER: if we use Temp Storage for the image we need to move it to perm storage
 
-    WegGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
+    my $ad = WebGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
            title =>  $options->{'adtitle'},
 	   clicksBought => $options->{'clicks'},
 	   impressionsBought => $options->{'impressions'},
@@ -313,8 +311,49 @@ sub onCompletePurchase {
 	   isActive => 1,
 	   type =>  'image',
 	   priority => $self->get('priority'),
+	   adSpace => $self->get('adSpace'),
 	   });
 
+    WebGUI::AssetCollateral::Sku::Ad::Ad->create($self->session,{
+           userId => $item->transaction->get('userId'),
+	   transactionItemId => $item->getId,
+	   adId => $ad->getId,
+	   clicksPurchased => $options->{'clicks'},
+	   impressionsPurchased => $options->{'impressions'},
+	   dateOfPurchase => $item->transaction->get('dateOfPurchase'),
+	   storedImage =>  $options->{'image'},
+	   isDeleted => 0,
+        });
+
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRemoveFromCart
+
+deletes the image if it gets removed from the cart
+
+LATER: if we switch to using Temp Storage we do not need to do this.
+
+=cut
+
+sub  onRemoveFromCart {
+    my $self = shift;
+    my $item = shift;
+    my $options = $self->getOptions;
+    WebGUI::Storage->new($self->session,$options->{'image'})->delete;
+}
+
+#-------------------------------------------------------------------
+
+=head2 onRefund
+
+delete the add if it gets refunded
+
+=cut
+
+sub  onRefund {
+# TODO delete the ad...
 }
 
 #-------------------------------------------------------------------
@@ -438,6 +477,40 @@ my $options = $self->getOptions();
 
 #-------------------------------------------------------------------
 
+=head2 www_addToCart
+
+Add this subscription to the cart.
+
+=cut
+
+sub www_addToCart {
+    my $self = shift;
+    if ($self->canView) {
+        $self->{_hasAddedToCart} = 1;
+	my $form = $self->session->form;
+	my $imageStorage = WebGUI::Storage->create( $self->session);  # LATER should be createTemp
+	$imageStorage->addFileFromFormPost('formImage',1);
+	my $imageStorageId = $imageStorage->getId;
+        # TODO error in case image does not upload
+dav::log 'addToCart:data:',
+              'adtitle:' => $form->get('formTitle'),',',
+	      'link:' => $form->get('formLink','url'),',',
+	      'image:' => $imageStorageId,',',
+	      'clicks:' => $form->get('formClicks'),',',
+	      'impressions:' => $form->get('formImpressions');
+        $self->addToCart({
+              adtitle => $form->get('formTitle'),
+	      link => $form->process('formLink','url'),
+	      clicks => $form->process('formClicks','integer'),
+	      impressions => $form->process('formImpressions','integer'),
+	      image => $imageStorageId,
+	             });
+    }
+    return $self->www_view;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_manage
 
 manage previously purchased ads
@@ -461,32 +534,18 @@ sub www_manage {
 
 #-------------------------------------------------------------------
 
-=head2 www_addToCart
+=head2 www_renew
 
-Add this subscription to the cart.
+renew an ad
 
 =cut
 
-sub www_addToCart {
-    my $self = shift;
-    if ($self->canView) {
-        $self->{_hasAddedToCart} = 1;
-	my $form = $self->session->form;
-dav::log 'addToCart:data:',
-              'adtitle:' => $form->get('formTitle'),',',
-	      'link:' => $form->get('formLink','url'),',',
-	      'image:' => $form->get('formImage'),',',
-	      'clicks:' => $form->get('formClicks'),',',
-	      'impressions:' => $form->get('formImpressions');
-        $self->addToCart({
-              adtitle => $form->get('formTitle'),
-	      link => $form->process('formLink','url'),
-	      clicks => $form->process('formClicks','integer'),
-	      impressions => $form->process('formImpressions','integer'),
-	      image => $form->get('formImage'),
-	             });
-    }
-    return $self->www_view;
+sub www_renew {
+        my $self = shift;
+	my $adPurchaseId = ''; # TODO get the adPurchaseId param
+        my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($self->session,$adPurchaseId);
+	# TODO assign params for purchase form
+	return $self->www_view;
 }
 
 1;

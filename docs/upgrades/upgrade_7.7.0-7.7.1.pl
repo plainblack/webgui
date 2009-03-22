@@ -31,9 +31,36 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+adSkuInstall($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub adSkuInstall {
+    my $session = shift;
+    print "\tCreate AdSku database table\n" unless $quiet;
+    $session->db->write("CREATE TABLE AdSku (
+	assetId VARCHAR(22) BINARY NOT NULL,
+	revisionDate BIGINT NOT NULL,
+	purchaseTemplate VARCHAR(22) BINARY NOT NULL,
+	manageTemplate VARCHAR(22) BINARY NOT NULL,
+	adSpace VARCHAR(22) BINARY NOT NULL,
+	priority INTEGER DEFAULT '1',
+	pricePerClick Float DEFAULT '0',
+	pricePerImpression Float DEFAULT '0',
+	clickDiscounts VARCHAR(1024) default '',
+	impressionDiscounts VARCHAR(1024) default '',
+	PRIMARY KEY (assetId,revisionDate)
+    )");
+    print "\tCreate Adsku crud table\n" unless $quiet;
+    use WebGUI::AssetCollateral::Sku::Ad::Ad;
+    WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
+    print "\tinstall the AdSku Asset\n" unless $quiet;
+    $session->config->addToHash("assets", 'WebGUI::Asset::Sku::Ad' => { category => 'shop' } );
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
