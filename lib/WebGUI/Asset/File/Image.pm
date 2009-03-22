@@ -245,15 +245,10 @@ sub view {
     if ($crop_js) {
         my ($style, $url) = $self->session->quick(qw(style url));
 
-        $style->setLink($url->extras('yui/build/resize/assets/skins/sam/resize.css'), {rel=>'stylesheet', type=>'text/css'});
         $style->setLink($url->extras('yui/build/fonts/fonts-min.css'), {rel=>'stylesheet', type=>'text/css'});
-        $style->setLink($url->extras('yui/build/imagecropper/assets/skins/sam/imagecropper.css'), {rel=>'stylesheet', type=>'text/css'});
-
+        $style->setLink($url->extras('yui/container/assets/container.css'), {rel=>'stylesheet', type=>'text/css'});
         $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/element/element-beta-min.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/dragdrop/dragdrop-min.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/resize/resize-min.js'), {type=>'text/javascript'});
-        $style->setScript($url->extras('yui/build/imagecropper/imagecropper-beta-min.js'), {type=>'text/javascript'});
+        $style->setScript($url->extras('yui/build/container/container-min.js'), {type=>'text/javascript'});
     }
 
 	$var{controls} = $self->getToolbar;
@@ -262,7 +257,6 @@ sub view {
 	$var{thumbnail} = $self->getThumbnailUrl;
 	$var{annotateJs} = "$crop_js$domMe";
     $var{parameters} = sprintf("id=%s", $self->getId());
-    warn("annotateJs: $var{annotateJs}");
 	my $form = $self->session->form;
     my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
