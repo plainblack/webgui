@@ -493,6 +493,7 @@ sub annotate_js {
 
         # next if 3 == $i;
 
+        warn('next');
         $domMe .= qq(
                 <style type="text/css">
                     div#tooltip$i { position: absolute; border:1px solid; }
@@ -501,7 +502,7 @@ sub annotate_js {
                 <span id=span_tooltip$i>
                 </span>
 
-                <script type="text/javascript" defer="defer">
+                <script type="text/javascript">
                     function on_load_$i() {
                         var xy = YAHOO.util.Dom.getXY('$id'); 
 
@@ -518,6 +519,10 @@ sub annotate_js {
                     if (document.addEventListener) {
                         document.addEventListener("DOMContentLoaded", on_load_$i, false);
                     }
+                    else if (window.attachEvent){
+                        window.attachEvent('onload', on_load_$i);
+                    }
+
                 </script>
         );
     }
@@ -530,10 +535,11 @@ sub www_rotate {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;
     return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	if (defined $self->session->form->process("degree")) {
+    warn(sprintf("Rotate_formId: %s", $self->session->form->process("Rotate")));
+	if (defined $self->session->form->process("Rotate")) {
 		my $newSelf = $self->addRevision();
 		delete $newSelf->{_storageLocation};
-		$newSelf->getStorageLocation->rotate($newSelf->get("filename"),$newSelf->session->form->process("degree"));
+		$newSelf->getStorageLocation->rotate($newSelf->get("filename"),$newSelf->session->form->process("Rotate"));
 		$newSelf->setSize($newSelf->getStorageLocation->getFileSize($newSelf->get("filename")));
 		$self = $newSelf;
 		$self->generateThumbnail;
@@ -546,57 +552,7 @@ sub www_rotate {
 
 	my $img_name = $self->getStorageLocation->getUrl($self->get("filename"));
 	my $img_file = $self->get("filename");
-	my $rotate_js = qq(
-	    <canvas id="canvas"></canvas>
-
-	    <script type="text/javascript">
-		var can = document.getElementById('canvas');
-		var ctx = can.getContext('2d');
-		var deg = 0;
-
-		var img = new Image();
-		img.onload = function(){
-		    can.width = img.width;
-		    can.height = img.height;
-		    ctx.drawImage(img, 0, 0, img.width, img.height);
-		}
-		img.src = '$img_name';
-		img.alt = '$img_file';
-
-		can.onclick = function() {
-		    var ctx = can.getContext('2d');
-		    var deg = parseInt(document.forms[0].degree.value);
-		    deg += 90;
-		    if (270 < deg) {
-		       deg = 0;
-		    }
-		    document.forms[0].degree.value = deg;
-		    //alert(deg);
-		    ctx.clearRect(0, 0, img.width, img.height);
-		    can.setAttribute('width', img.width);
-    		    can.setAttribute('height', img.height);
-		    var width = 0;
-		    var height = 0;
-		    if (0 == deg) {
-			width = 0;
-			height = 0;
-		    } else if (90 == deg) {
-			width = 0;
-			height = -img.height;
-		    } else if (180 == deg) {
-			width = -img.width;
-			height = -img.height;
-		    } else if (270 == deg) {
-			width = -img.width;
-			height = 0;
-		    }
-
-		    ctx.rotate(deg * Math.PI / 180);
-		    ctx.drawImage(img, width, height);
-		    };
-	    </script>
-	);
-	my $image = qq(<div align="center" class="yui-skin-sam">$rotate_js</div>);
+	my $image = '<div align="center" class="yui-skin-sam"><img src="'.$self->getStorageLocation->getUrl($self->get("filename")).'" style="border-style:none;" alt="'.$self->get("filename").'" id="yui_img" /></div>';
 
 	my $i18n = WebGUI::International->new($self->session,"Asset_Image");
 	$self->getAdminConsole->addSubmenuItem($self->getUrl('func=edit'),$i18n->get("edit image"));
@@ -605,13 +561,18 @@ sub www_rotate {
 		-name=>"func",
 		-value=>"rotate"
 		);
-	$f->hidden(
-		-name=>"degree",
-		-value=>0
-		);
-       	$f->readOnly(
-		-value=>$i18n->get('rotate image label'),
-		-hoverHelp=>$i18n->get('rotate image description'),
+    $f->button(
+        -value=>"Left",
+        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) + 90; document.getElementById('Rotate_formId').value = deg;"),
+        );
+    $f->button(
+        -value=>"Right",
+        -extras=>qq(onclick="var deg = document.getElementById('Rotate_formId').value; deg = parseInt(deg) - 90; document.getElementById('Rotate_formId').value = deg;"),
+        );
+	$f->integer(
+		-label=>$i18n->get('degree'),
+		-name=>"Rotate",
+		-value=>0,
 		);
 	$f->submit;
         return $self->getAdminConsole->render($f->print.$image,$i18n->get("rotate image"));
