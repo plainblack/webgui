@@ -80,8 +80,8 @@ sub addRevision {
     my $photoData = $newSelf->getPhotoData;
     PHOTO: foreach my $photo (@{ $photoData }) {
         next PHOTO unless $photo->{storageId};
-        my $oldStorage = WebGUI::Storage->get($session, $photo->{storageId});
-        my $newStorage = $oldStorage->copy;
+        my $oldStorage      = WebGUI::Storage->get($session, $photo->{storageId});
+        my $newStorage      = $oldStorage->copy;
         $photo->{storageId} = $newStorage->getId;
     }
     $newSelf->setPhotoData($photoData);
@@ -154,6 +154,7 @@ sub definition {
         photo => {
             fieldType    => 'text',
             defaultValue => '[]',
+            noFormPost   => 1,
         },
     );
     push(@{$definition}, {
@@ -494,8 +495,8 @@ Handle photos and photo metadata, like captions, etc.
 
 sub processPropertiesFromFormPost {
     my $self = shift;
-    $self->SUPER::processPropertiesFromFormPost;
     my $session = $self->session;
+    $self->SUPER::processPropertiesFromFormPost;
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
@@ -504,7 +505,7 @@ sub processPropertiesFromFormPost {
     PHOTO: foreach my $photoIndex (1..$numberOfPhotos) {
         ##TODO: Deletion check and storage cleanup
         my $storageId = $photoData->[$photoIndex-1]->{storageId};
-        if ($form->process('deletePhoto'.$photoIndex)) {
+        if ($form->process('deletePhoto'.$photoIndex, 'yesNo')) {
             my $storage = WebGUI::Storage->get($session, $storageId);
             $storage->delete if $storage;
             splice @{ $photoData }, $photoIndex-1, 1;
@@ -586,9 +587,9 @@ as well via update.  This deletes the cached copy of the equivalent perl structu
 
 =head3 $perlStructure
 
-This should be a hash of hashes.  The keys will be names of photos in the
-storage location for this Story.  The values in the subhash will be
-metadata about the Photo.
+This should be an array of hashes.  Photos will be in the order uploaded.
+The values in the hash will be metadata about the Photo, and the storageId
+that holds the image.  Each storageId will hold only 1 file.
 
 =item *
 
