@@ -32,8 +32,17 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addStatisticsCacheTimeoutToMatrix( $session );
+
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub addStatisticsCacheTimeoutToMatrix{
+    my $session = shift;
+    print "\tAdding statisticsCacheTimeout setting to Matrix table... \n" unless $quiet;
+    $session->db->write("alter table Matrix add statisticsCacheTimeout int(11) not null default 3600");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

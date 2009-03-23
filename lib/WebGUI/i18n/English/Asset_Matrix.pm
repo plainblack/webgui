@@ -427,6 +427,17 @@ listing,|,
         lastUpdated => 1235681965,
     },
 
+    'statistics cache timeout label' => {
+        message => q|Statistics Cache Timeout|,
+        lastUpdated => 0,
+    },
+
+    'statistics cache timeout description' => {
+        message => q|Since all users will see the matrix statistics the same way, we can cache them for some time
+to increase performance. How long should we cache them?|,
+        lastUpdated => 0,
+    },
+
         'rating timeout description' => {
                 message => q|Set a timeout so that users are prevented from rating a given listing too often.|,
                 lastUpdated => 1135271460,
