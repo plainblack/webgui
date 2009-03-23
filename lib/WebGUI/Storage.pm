@@ -1211,7 +1211,7 @@ sub annotate {
 	my $annotate_width  = $form->process("annotate_width");
 	my $annotate_height = $form->process("annotate_height");
     # warn(qq(unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height && $annotate_text !~ /^\s*$/)));
-    if ($annotate_top && $annotate_left && $annotate_width && $annotate_height && $annotate_text !~ /^\s*$/) {
+    if (defined $annotate_top && defined $annotate_left && defined $annotate_width && defined $annotate_height && $annotate_text !~ /^\s*$/) {
         if ($save_annotate) {
             $save_annotate .= "\n";
         }
