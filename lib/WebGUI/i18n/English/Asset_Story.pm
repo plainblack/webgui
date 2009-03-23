@@ -344,6 +344,12 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'imgDeleteForm' => {
+        message => q|A field to delete the image, along with all data attached to it.|,
+        context => q|Template variable for edit form.|,
+        lastUpdated => 0,
+    },
+
     'photo caption' => {
         message => q|Photo Caption|,
         context => q|Label in the edit story form.  Short for Photograph Caption.|,
@@ -371,6 +377,54 @@ our $I18N = {
     'photo url' => {
         message => q|Photo URL|,
         context => q|Label in the edit story form.  A link from the photo to more information about it, or referring to it.|,
+        lastUpdated => 0,
+    },
+
+    'photo delete' => {
+        message => q|Delete Photo|,
+        context => q|Label in the edit story form.  Request that the photo be deleted, and all information with it.|,
+        lastUpdated => 0,
+    },
+
+    'photo_loop' => {
+        message => q|A loop containing photos and information about the photos.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageUrl' => {
+        message => q|The URL to the image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageCaption' => {
+        message => q|A caption for the image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageByline' => {
+        message => q|A byline for the image.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageAlt' => {
+        message => q|Alternate text for the image, suitable for use as the ALT parameter for an IMG tag.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageTitle' => {
+        message => q|Alternate text for the image, suitable for use as the TITLE parameter for an IMG tag.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageLink' => {
+        message => q|A URL for the image to link to.|,
+        context => q|Template variable|,
         lastUpdated => 0,
     },
 

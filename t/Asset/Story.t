@@ -21,7 +21,7 @@ use Test::Deep;
 use Data::Dumper;
 
 my $tests = 1;
-plan tests => 27
+plan tests => 28
             + $tests
             ;
 
@@ -50,6 +50,9 @@ my $topic       = $defaultNode->addChild({
 });
 my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
+
+my $storage1 = WebGUI::Storage->create($session);
+my $storage2 = WebGUI::Storage->create($session);
 
 
 SKIP: {
@@ -80,7 +83,6 @@ $story = $archive->addChild({
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
-is($story->get('storageId'), '', 'by default, there is no storageId');
 is($story->get('photo'),   '[]', 'by default, photos is an empty JSON array');
 is($story->get('isHidden'), 1, 'by default, stories are hidden');
 $story->update({isHidden => 0});
@@ -212,6 +214,30 @@ $story->update({
     keywords   => "foxtrot tango whiskey",
 });
 is($story->get('highlights'), "one\ntwo\nthree", 'highlights set correctly for template var check');
+
+$storage1->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+$storage2->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
+
+$story->setPhotoData([
+    {
+        storageId => $storage1->getId,
+        caption   => 'Mascot for a popular CMS',
+        byLine    => 'Darcy Gibson',
+        alt       => 'Gooey',
+        title     => 'Mascot',
+        url       => 'http://www.webgui.org',
+    },
+    {
+        storageId => $storage2->getId,
+        caption   => 'The Lamp',
+        byLine    => 'Aladdin',
+        alt       => 'Lamp',
+        title     => '',
+        url       => 'http://www.lamp.com',
+    },
+]);
+
+
 my $viewVariables = $story->viewTemplateVariables;
 #diag Dumper $viewVariables;
 cmp_deeply(
@@ -236,12 +262,56 @@ cmp_bag(
 
 is ($viewVariables->{updatedTimeEpoch}, $story->get('revisionDate'), 'viewTemplateVariables: updatedTimeEpoch');
 
+cmp_deeply(
+    $viewVariables->{photo_loop},
+    [
+        {
+            imageUrl     => re('gooey.jpg'),
+            imageCaption => 'Mascot for a popular CMS',
+            imageByline  => 'Darcy Gibson',
+            imageAlt     => 'Gooey',
+            imageTitle   => 'Mascot',
+            imageLink    => 'http://www.webgui.org',
+        },
+        {
+            imageUrl     => re('lamp.jpg'),
+            imageCaption => 'The Lamp',
+            imageByline  => 'Aladdin',
+            imageAlt     => 'Lamp',
+            imageTitle   => '',
+            imageLink    => 'http://www.lamp.com',
+        },
+    ],
+    'viewTemplateVariables: photo_loop is okay'
+);
+
+##Simulate someone deleting the file stored in the storage object.
+$storage2->deleteFile('lamp.jpg');
+$viewVariables = $story->viewTemplateVariables;
+
+cmp_deeply(
+    $viewVariables->{photo_loop},
+    [
+        {
+            imageUrl     => re('gooey.jpg'),
+            imageCaption => 'Mascot for a popular CMS',
+            imageByline  => 'Darcy Gibson',
+            imageAlt     => 'Gooey',
+            imageTitle   => 'Mascot',
+            imageLink    => 'http://www.webgui.org',
+        },
+    ],
+    'viewTemplateVariables: photo_loop: if the storage has no files, it is not shown'
+);
+
 }
 
 END {
     $story->purge   if $story;
     $archive->purge if $archive;
     $topic->purge   if $topic;
+    $storage1->delete if $storage1;
+    $storage2->delete if $storage2;
     $archiveTag->rollback;
     WebGUI::VersionTag->getWorking($session)->rollback;
 }

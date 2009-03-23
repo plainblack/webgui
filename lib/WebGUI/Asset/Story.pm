@@ -398,6 +398,10 @@ sub getEditForm {
                                  name  => 'imgUrl'.$photoIndex,
                                  value => $photo->{url},
                               }),
+            imgDeleteForm  => WebGUI::Form::yesNo($session, {
+                                 name  => 'deletePhoto'.$photoIndex,
+                                 value => 0,
+                              }),
         };
     }
     push @{ $var->{ photo_form_loop } }, {
@@ -617,6 +621,7 @@ sub setPhotoData {
     my $photo     = to_json($photoData);
     ##Update the db.
     $self->update({photo => $photo});
+    delete $self->{_photoData};
     return;
 }
 
@@ -751,6 +756,22 @@ sub viewTemplateVariables {
     $var->{updatedTimeEpoch} = $self->get('revisionDate');
 
     $var->{crumb_loop}       = $self->getCrumbTrail();
+    $var->{photo_loop}       = [];
+    PHOTO: foreach my $photo (@{ $self->getPhotoData}) {
+        next PHOTO unless $photo->{storageId};
+        my $storage  = WebGUI::Storage->get($session, $photo->{storageId});
+        my $file = $storage->getFiles->[0];
+        next PHOTO unless $file;
+        my $imageUrl = $storage->getUrl($file);
+        push @{ $var->{photo_loop} }, {
+            imageUrl     => $imageUrl,
+            imageCaption => $photo->{caption},
+            imageByline  => $photo->{byLine},
+            imageAlt     => $photo->{alt},
+            imageTitle   => $photo->{title},
+            imageLink    => $photo->{url},
+        }
+    }
     return $var;
 }
 
