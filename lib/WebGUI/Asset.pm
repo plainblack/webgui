@@ -2131,9 +2131,7 @@ sub processTemplate {
     }
 
     $template = WebGUI::Asset->new($self->session, $templateId,"WebGUI::Asset::Template") unless (defined $template);
-    warn("templateId: $templateId: template: $template");
     if (defined $template) {
-    warn("templateId: $templateId: template: $template: id: ", $template->getId());
         $var = { %{ $var }, %{ $self->getMetaDataAsTemplateVariables } };
         $var->{'controls'} = $self->getToolbar if $self->session->var->isAdminOn;
         my %vars = (
@@ -2142,7 +2140,6 @@ sub processTemplate {
             'menuTitle' => $self->getMenuTitle,
             %{$var},
         );
-    warn("templateId: $templateId: template: $template");
         return $template->process(\%vars);
     }
     else {
