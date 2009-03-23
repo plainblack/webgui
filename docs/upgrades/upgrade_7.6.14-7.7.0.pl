@@ -336,7 +336,6 @@ CREATE TABLE Story (
     location     CHAR(255),
     highlights   TEXT,
     story        MEDIUMTEXT,
-    storageId    CHAR(255),
     photo        LONGTEXT,
     PRIMARY KEY ( assetId, revisionDate )
 )

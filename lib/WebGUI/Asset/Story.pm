@@ -22,6 +22,7 @@ use WebGUI::Utility;
 use WebGUI::International;
 use JSON qw/from_json to_json/;
 use Storable qw/dclone/;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -65,19 +66,26 @@ Request autocommit.
 =cut
 
 sub addRevision {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
     my $newSelf = $self->next::method(@_);
 
     my $newProperties = {
         isHidden => 1,
     };
 
-    if ($newSelf->get("storageId") && $newSelf->get("storageId") eq $self->get('storageId')) {
-        my $newStorage = $self->getStorageClass->get($self->session,$self->get("storageId"))->copy;
-        $newProperties->{storageId} = $newStorage->getId;
-    }
-
     $newSelf->update($newProperties);
+
+    ##Make a copy of each storage location stored in the JSON for this new revision.
+    my $photoData = $newSelf->getPhotoData;
+    PHOTO: foreach my $photo (@{ $photoData }) {
+        next PHOTO unless $photo->{storageId};
+        my $oldStorage = WebGUI::Storage->get($session, $photo->{storageId});
+        my $newStorage = $oldStorage->copy;
+        $photo->{storageId} = $newStorage->getId;
+    }
+    $newSelf->setPhotoData($photoData);
+
     $newSelf->requestAutoCommit;
 
     return $newSelf;
@@ -147,11 +155,6 @@ sub definition {
             fieldType    => 'text',
             defaultValue => '[]',
         },
-        storageId => {
-            fieldType    => 'hidden',
-            defaultValue => '',
-            noFormPost   => 1,
-        },
     );
     push(@{$definition}, {
         assetName         => $i18n->get('assetName'),
@@ -177,7 +180,6 @@ Add the storage location to the export data.
 sub exportAssetData {
 	my $self = shift;
 	my $data = $self->SUPER::exportAssetData;
-	push(@{$data->{storage}}, $self->get("storageId")) if ($self->get("storageId") ne "");
 	return $data;
 }
 
@@ -366,6 +368,38 @@ sub getEditForm {
     ##Provide forms for the existing photos, if any
     ##Existing photos get a delete Yes/No.
     ##And a form for new ones
+    my $photoData      = $self->getPhotoData;
+    my $numberOfPhotos = scalar @{ $photoData };
+    foreach my $photoIndex (1..$numberOfPhotos) {
+        my $photo = $photoData->[$photoIndex-1];
+        push @{ $var->{ photo_form_loop } }, {
+            imgUploadForm  => WebGUI::Form::image($session, {
+                                 name           => 'photo'.$photoIndex,
+                                 maxAttachments => 1,
+                                 value          => $photo->{storageId},
+                              }),
+            imgCaptionForm => WebGUI::Form::text($session, {
+                                 name  => 'imgCaption'.$photoIndex,
+                                 value => $photo->{caption},
+                              }),
+            imgByLineForm  => WebGUI::Form::text($session, {
+                                 name  => 'imgByline'.$photoIndex,
+                                 value => $photo->{byLine},
+                              }),
+            imgAltForm     => WebGUI::Form::text($session, {
+                                 name  => 'imgAlt'.$photoIndex,
+                                 value => $photo->{alt},
+                              }),
+            imgTitleForm   => WebGUI::Form::text($session, {
+                                 name  => 'imgTitle'.$photoIndex,
+                                 value => $photo->{title},
+                              }),
+            imgUrlForm     => WebGUI::Form::url($session, {
+                                 name  => 'imgUrl'.$photoIndex,
+                                 value => $photo->{url},
+                              }),
+        };
+    }
     push @{ $var->{ photo_form_loop } }, {
         imgUploadForm  => WebGUI::Form::image($session, {
                              name           => 'newPhoto',
@@ -409,33 +443,11 @@ Returns the photo hash formatted as perl data.  See also L<setPhotoData>.
 sub getPhotoData {
 	my $self     = shift;
 	if (!exists $self->{_photoData}) {
-        $self->{_photoData} = from_json($self->get('photo'));
+        my $json = $self->get('photo');
+        $json ||= '[]';
+        $self->{_photoData} = from_json($json);
 	}
 	return dclone($self->{_photoData});
-}
-
-#-------------------------------------------------------------------
-
-=head2 getStorageLocation ( [$noCreate] )
-
-Returns the storage location for this Story.  If it does not exist,
-then it creates it via setStorageLocation.  Subsequent lookups return
-an internally cached Storage object to save time.
-
-=head3 $noCreate
-
-If $noCreate is true, then no storage location will be created, even
-if it does not exist.
-
-=cut
-
-sub getStorageLocation {
-	my $self     = shift;
-    my $noCreate = shift;
-	if (!exists $self->{_storageLocation} && !$noCreate) {
-		$self->setStorageLocation;
-	}
-	return $self->{_storageLocation};
 }
 
 #-------------------------------------------------------------------
@@ -485,6 +497,18 @@ sub processPropertiesFromFormPost {
     my $photoData      = $self->getPhotoData;
     my $numberOfPhotos = scalar @{ $photoData };
     ##Post process photo data here.
+    foreach my $photoIndex (1..$numberOfPhotos) {
+        ##TODO: Deletion check and storage cleanup
+        my $newPhoto = {
+            storageId => $form->process('photo'     .$photoIndex, 'image', $photoData->[$photoIndex-1]->{storageId}),
+            caption   => $form->process('imgCaption'.$photoIndex, 'text'),
+            alt       => $form->process('imgAlt'    .$photoIndex, 'text'),
+            title     => $form->process('imgTitle'  .$photoIndex, 'text'),
+            byLine    => $form->process('imgByline' .$photoIndex, 'text'),
+            url       => $form->process('imgUrl'    .$photoIndex, 'url' ),
+        };
+        splice @{ $photoData }, $photoIndex-1, 1, $newPhoto;
+    }
     my $newStorage = $form->process('newPhoto', 'image');
     if ($newStorage) {
         push @{ $photoData }, {
@@ -495,8 +519,8 @@ sub processPropertiesFromFormPost {
             url       => $form->process('newImgUrl',     'url'),
             storageId => $newStorage,
         };
-        $self->setPhotoData($photoData);
     }
+    $self->setPhotoData($photoData);
 }
 
 
@@ -504,17 +528,21 @@ sub processPropertiesFromFormPost {
 
 =head2 purge ( )
 
-Cleaning up storage objects in all revisions.
+Cleaning up all storage objects in all revisions.
 
 =cut
 
 sub purge {
     my $self = shift;
     ##Delete all storage locations from all revisions of the Asset
-    my $sth = $self->session->db->read("select storageId from Story where assetId=?",[$self->getId]);
-    STORAGE: while (my ($storageId) = $sth->array) {
-        next STORAGE unless $storageId;
-        WebGUI::Storage->get($self->session,$storageId)->delete;
+    my $sth = $self->session->db->read("select photo from Story where assetId=?",[$self->getId]);
+    STORAGE: while (my ($json) = $sth->array) {
+        my $photos = from_json($json);
+        PHOTO: foreach my $photo (@{ $photos }) {
+            next PHOTO unless $photo->{storageId};
+            my $storage = WebGUI::Storage->get($self->session,$photo->{storageId});
+            $storage->delete if $storage;
+        }
 	}
     $sth->finish;
     return $self->SUPER::purge;
@@ -524,13 +552,17 @@ sub purge {
 
 =head2 purgeRevision
 
-Remove the storage location for this revision of the Asset.
+Remove the storage locations for this revision of the Asset.
 
 =cut
 
 sub purgeRevision {
-	my $self = shift;
-	$self->getStorageLocation->delete;
+	my $self    = shift;
+    my $session = $self->session;
+    foreach my $photo ( @{ $self->getPhotoData} ) {
+        my $storage = WebGUI::Storage->get($session, $self-$photo->{storageId});
+        $storage->delete if $storage;
+    }
 	return $self->SUPER::purgeRevision;
 }
 
@@ -538,7 +570,8 @@ sub purgeRevision {
 
 =head2 setPhotoData ( $perlStructure )
 
-Sets the photo data from the JSON stored in the object.
+Update the JSON stored in the object from its perl equivalent, and update the database
+as well via update.  This deletes the cached copy of the equivalent perl structure.
 
 =head3 $perlStructure
 
@@ -566,19 +599,24 @@ title
 
 url
 
+=item *
+
+storageId
+
 =back
 
 subhash keys can be empty, or missing altogether.  Shoot, you can really put anything you
-want in there so there's no valid content checking.
+want in there as there's no valid content checking.
 
 =cut
 
 sub setPhotoData {
 	my $self      = shift;
     my $photoData = shift || [];
+    ##Convert to JSON
     my $photo     = to_json($photoData);
+    ##Update the db.
     $self->update({photo => $photo});
-    delete $self->{_photoData};
     return;
 }
 
@@ -595,38 +633,15 @@ the asset size.
 sub setSize {
     my $self        = shift;
     my $fileSize    = shift || 0;
-    my $storage     = $self->getStorageLocation('noCreate');
-    if (defined $storage) {	
+    my $session     = $self->session;
+    PHOTO: foreach my $photo (@{ $self->getPhotoData }) {
+        my $storage     = WebGUI::Storage->get($session, $photo->{storageId});
+        next PHOTO unless defined $storage;
         foreach my $file (@{$storage->getFiles}) {
             $fileSize += $storage->getFileSize($file);
         }
     }
     return $self->SUPER::setSize($fileSize);
-}
-
-#-------------------------------------------------------------------
-
-=head2 setStorageLocation ( [ $storage] )
-
-=head3 $storage
-
-A storage location to use for this Story.
-
-=cut
-
-sub setStorageLocation {
-    my $self    = shift;
-    my $storage = shift;
-    if (defined $storage) {
-        $self->{_storageLocation} = $storage;
-    }
-    elsif ($self->get("storageId") eq "") {
-        $self->{_storageLocation} = WebGUI::Storage->create($self->session);
-        $self->update({storageId=>$self->{_storageLocation}->getId});
-    }
-    else {
-        $self->{_storageLocation} = WebGUI::Storage->get($self->session,$self->get("storageId"));
-    }
 }
 
 #-------------------------------------------------------------------
