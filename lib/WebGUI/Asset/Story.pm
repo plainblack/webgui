@@ -763,8 +763,10 @@ sub viewTemplateVariables {
     $var->{updatedTimeEpoch} = $self->get('revisionDate');
 
     $var->{crumb_loop}       = $self->getCrumbTrail();
+    my $photoData = $self->getPhotoData;
     $var->{photo_loop}       = [];
-    PHOTO: foreach my $photo (@{ $self->getPhotoData}) {
+    my $photoCounter = 0;
+    PHOTO: foreach my $photo (@{ $photoData }) {
         next PHOTO unless $photo->{storageId};
         my $storage  = WebGUI::Storage->get($session, $photo->{storageId});
         my $file = $storage->getFiles->[0];
@@ -777,8 +779,11 @@ sub viewTemplateVariables {
             imageAlt     => $photo->{alt},
             imageTitle   => $photo->{title},
             imageLink    => $photo->{url},
-        }
+        };
+        ++$photoCounter;
     }
+    $var->{hasPhotos}   = $photoCounter;
+    $var->{singlePhoto} = $photoCounter == 1;
     return $var;
 }
 

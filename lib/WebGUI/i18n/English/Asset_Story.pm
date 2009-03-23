@@ -428,6 +428,24 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'hasPhotos' => {
+        message => q|This template variable will be true if the Story has photos uploaded to it.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'singlePhoto' => {
+        message => q|This template variable will be true if the Story has just 1 photo uploaded to it.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'imageLink' => {
+        message => q|A URL for the image to link to.|,
+        context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

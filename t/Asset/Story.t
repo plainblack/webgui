@@ -21,7 +21,7 @@ use Test::Deep;
 use Data::Dumper;
 
 my $tests = 1;
-plan tests => 28
+plan tests => 32
             + $tests
             ;
 
@@ -285,6 +285,9 @@ cmp_deeply(
     'viewTemplateVariables: photo_loop is okay'
 );
 
+ok(! $viewVariables->{singlePhoto}, 'viewVariables: singlePhoto: there is more than 1');
+ok(  $viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
+
 ##Simulate someone deleting the file stored in the storage object.
 $storage2->deleteFile('lamp.jpg');
 $viewVariables = $story->viewTemplateVariables;
@@ -303,6 +306,9 @@ cmp_deeply(
     ],
     'viewTemplateVariables: photo_loop: if the storage has no files, it is not shown'
 );
+
+ok($viewVariables->{singlePhoto}, 'viewVariables: singlePhoto: there is just 1');
+ok($viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
 
 }
 

@@ -80,6 +80,8 @@ our $HELP = {
                 },
               ],
             },
+            { name      => 'hasPhotos',   },
+            { name      => 'singlePhoto', },
             { name      => 'photo_loop',
               'variables' => [
                 { name      => 'imageUrl', },
