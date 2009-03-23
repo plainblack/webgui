@@ -77,6 +77,54 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
+	'annotate' => {
+		message => q|Annotate|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'annotate image' => {
+		message => q|Annotate Image|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'annotate image description' => {
+		message => q|Text Around the Image|,
+		context => q|label to annotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'degree' => {
+		message => q|Degrees to Rotate|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'rotate image label' => {
+		message => q|Please click to rotate image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'rotate image' => {
+		message => q|Rotate Image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'rotate image label' => {
+		message => q|Please click to rotate image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'crop image' => {
+		message => q|Crop Image|,
+		context => q|label to crop the image|,
+		lastUpdated => 1106765841
+	},
+
 	'new width' => {
 		message => q|New Width|,
 		context => q|label to resize the image|,
@@ -99,6 +147,42 @@ shown here.|,
 		message => q|New Height|,
 		context => q|Enter the new height for the Image in pixels.  If 0 is entered, a new height will be calculated using the width.|,
 		lastUpdated => 1130538987
+	},
+
+	'undo image' => {
+		message => q|Undo Image|,
+		context => q|undo editing operations|,
+		lastUpdated => 1106765841
+	},
+
+	'delete' => {
+		message => q|Delete|,
+		context => q|label to delete annotation|,
+		lastUpdated => 1106765841
+	},
+
+	'height' => {
+		message => q|Height|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+
+	'width' => {
+		message => q|Width|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+
+	'top' => {
+		message => q|Top|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
+	},
+
+	'left' => {
+		message => q|Left|,
+		context => q|label to resize the image|,
+		lastUpdated => 1106765841
 	},
 
 	'image template title' => {

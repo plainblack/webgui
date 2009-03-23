@@ -31,9 +31,14 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
-
 addWelcomeMessageTemplateToSettings( $session );
 addStatisticsCacheTimeoutToMatrix( $session );
+
+# image mods
+addImageAnnotation($session);
+
+# rss mods
+addRssLimit($session);
 
 finish($session); # this line required
 
@@ -42,6 +47,28 @@ sub addWelcomeMessageTemplateToSettings {
     print "\tAdding welcome message template to settings \n" unless $quiet;
 
     $session->db->write("insert into settings values ('webguiWelcomeMessageTemplate', 'PBtmpl0000000000000015');");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addRssLimit {
+    my $session = shift;
+    print "\tAdding rssLimit to RSSCapable table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe RSSCapable rssCableRssLimit');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table RSSCapable add column rssCableRssLimit integer");
+    }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addImageAnnotation {
+    my $session = shift;
+    print "\tAdding annotations to imageAsset table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe imageAsset annotations');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table imageAsset add column annotations mediumtext");
+    }
     print "Done.\n" unless $quiet;
 }
 
