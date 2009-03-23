@@ -501,10 +501,17 @@ sub processPropertiesFromFormPost {
     my $photoData      = $self->getPhotoData;
     my $numberOfPhotos = scalar @{ $photoData };
     ##Post process photo data here.
-    foreach my $photoIndex (1..$numberOfPhotos) {
+    PHOTO: foreach my $photoIndex (1..$numberOfPhotos) {
         ##TODO: Deletion check and storage cleanup
+        my $storageId = $photoData->[$photoIndex-1]->{storageId};
+        if ($form->process('deletePhoto'.$photoIndex)) {
+            my $storage = WebGUI::Storage->get($session, $storageId);
+            $storage->delete if $storage;
+            splice @{ $photoData }, $photoIndex-1, 1;
+            next PHOTO;
+        }
         my $newPhoto = {
-            storageId => $form->process('photo'     .$photoIndex, 'image', $photoData->[$photoIndex-1]->{storageId}),
+            storageId => $form->process('photo'     .$photoIndex, 'image', ),
             caption   => $form->process('imgCaption'.$photoIndex, 'text'),
             alt       => $form->process('imgAlt'    .$photoIndex, 'text'),
             title     => $form->process('imgTitle'  .$photoIndex, 'text'),

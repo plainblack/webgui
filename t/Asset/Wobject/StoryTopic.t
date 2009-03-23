@@ -191,9 +191,9 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $archive->purge if $archive;
-    $topic->purge   if $topic;
-    if ($versionTag) {
-        $versionTag->rollback;
-    }
+#    $archive->purge if $archive;
+#    $topic->purge   if $topic;
+#    if ($versionTag) {
+#        $versionTag->rollback;
+#    }
 }
