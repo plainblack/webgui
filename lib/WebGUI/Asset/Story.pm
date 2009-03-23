@@ -361,7 +361,7 @@ sub getEditForm {
                             extras => q|onclick="history.go(-1);" class="backwardButton"|,
                           }),
         saveAndAddButton  => WebGUI::Form::submit($session, {
-                            name  => 'saveAndAddPhoto',
+                            name  => 'saveAndReturn',
                             value => $i18n->get('save and add another photo'),
                           }),
     };
