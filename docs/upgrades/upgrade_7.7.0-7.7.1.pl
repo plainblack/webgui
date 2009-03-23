@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 addWelcomeMessageTemplateToSettings( $session );
+addStatisticsCacheTimeoutToMatrix( $session );
 
 finish($session); # this line required
 
@@ -41,6 +42,14 @@ sub addWelcomeMessageTemplateToSettings {
     print "\tAdding welcome message template to settings \n" unless $quiet;
 
     $session->db->write("insert into settings values ('webguiWelcomeMessageTemplate', 'PBtmpl0000000000000015');");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addStatisticsCacheTimeoutToMatrix{
+    my $session = shift;
+    print "\tAdding statisticsCacheTimeout setting to Matrix table... \n" unless $quiet;
+    $session->db->write("alter table Matrix add statisticsCacheTimeout int(11) not null default 3600");
     print "Done.\n" unless $quiet;
 }
 
