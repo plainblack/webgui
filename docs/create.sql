@@ -544,6 +544,7 @@ CREATE TABLE `ImageAsset` (
   `thumbnailSize` int(11) NOT NULL default '50',
   `parameters` text,
   `revisionDate` bigint(20) NOT NULL default '0',
+  `annotations` mediumtext,
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
