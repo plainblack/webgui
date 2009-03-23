@@ -95,6 +95,18 @@ shown here.|,
 		lastUpdated => 1106765841
 	},
 
+	'degree' => {
+		message => q|Degrees to Rotate|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
+	'rotate image label' => {
+		message => q|Please click to rotate image|,
+		context => q|label to rotate the image|,
+		lastUpdated => 1106765841
+	},
+
 	'rotate image' => {
 		message => q|Rotate Image|,
 		context => q|label to rotate the image|,
