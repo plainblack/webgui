@@ -512,7 +512,7 @@ sub processPropertiesFromFormPost {
             next PHOTO;
         }
         my $newPhoto = {
-            storageId => $form->process('photo'     .$photoIndex, 'image', ),
+            storageId => $form->process('photo'     .$photoIndex, 'image', $storageId),
             caption   => $form->process('imgCaption'.$photoIndex, 'text'),
             alt       => $form->process('imgAlt'    .$photoIndex, 'text'),
             title     => $form->process('imgTitle'  .$photoIndex, 'text'),
