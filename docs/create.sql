@@ -971,6 +971,7 @@ CREATE TABLE `RSSCapable` (
   `rssCapableRssEnabled` int(11) NOT NULL default '1',
   `rssCapableRssTemplateId` char(22) NOT NULL default 'PBtmpl0000000000000142',
   `rssCapableRssFromParentId` char(22) default NULL,
+  `rssCapableRssLimit` integer default '10',
   PRIMARY KEY  (`assetId`,`revisionDate`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;

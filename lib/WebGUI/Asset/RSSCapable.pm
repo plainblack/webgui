@@ -35,11 +35,11 @@ using the RSSFromParent asset.
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my %properties;
-	tie %properties, 'Tie::IxHash';
+my $class = shift;
+my $session = shift;
+my $definition = shift;
+my %properties;
+tie %properties, 'Tie::IxHash';
 	my $i18n = WebGUI::International->new($session, 'Asset_RSSCapable');
 
 	# We do this prefixing to avoid name collisions because properties aren't namespaced.
@@ -58,6 +58,13 @@ sub definition {
 					  label => $i18n->get('rssTemplateId label'),
 					  hoverHelp => $i18n->get('rssTemplateId hoverHelp')
 					},
+	     rssCapableRssLimit => { tab => 'display',
+					  fieldType => 'integer',
+					  defaultValue => 10,
+					  namespace => 'RSSCapable/RSS',
+					  label => $i18n->get('rssLimit label'),
+					  hoverHelp => $i18n->get('rssLimit hoverHelp')
+					},
 	     rssCapableRssFromParentId => { fieldType => 'hidden',
 					    noFormPost => 1,
 					    defaultValue => undef,
@@ -65,12 +72,12 @@ sub definition {
 	    );
 
 	push @$definition, { assetName => $i18n->get('assetName'),
-			     tableName => 'RSSCapable',
-			     autoGenerateForms => 1,
-			     className => 'WebGUI::Asset::RSSCapable',
-			     icon => 'rssCapable.gif',
-			     properties => \%properties
-			   };
+             tableName => 'RSSCapable',
+             autoGenerateForms => 1,
+             className => 'WebGUI::Asset::RSSCapable',
+             icon => 'rssCapable.gif',
+             properties => \%properties
+           };
 	return $class->NEXT::definition($session, $definition);
 }
 

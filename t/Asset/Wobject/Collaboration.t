@@ -32,7 +32,7 @@ use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 4; # increment this value for each test you create
+use Test::More tests => 8; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -60,6 +60,38 @@ ok(defined $collab->get('groupToEditPost'), 'groupToEditPost field is defined');
 
 # Verify sane defaults
 cmp_ok($collab->get('groupToEditPost'), 'eq', $collab->get('groupIdEdit'), 'groupToEditPost defaults to groupIdEdit correctly');
+is($collab->get('rssCapableRssLimit'), 10, 'rssCapableRssLimit is set to the default');
+
+# finally, add the post to the collaboration system
+my $props = {
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'hello, world!',
+};
+my $post = $collab->addChild($props,
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
+        });
+
+# Test for a sane object type
+isa_ok($post, 'WebGUI::Asset::Post::Thread');
+
+$props = {
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'jello, world!',
+};
+$post = $collab->addChild($props,
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
+        });
+
+my $rssitems = $collab->getRssItems();
+is($rssitems, 2, 'rssitems set to number of posts added');
+
+is($collab->get('rssCapableRssLimit'), 10, 'rssCapableRssLimit is set to the default');
 
 TODO: {
     local $TODO = "Tests to make later";
