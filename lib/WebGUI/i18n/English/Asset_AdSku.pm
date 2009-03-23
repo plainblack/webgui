@@ -10,162 +10,120 @@ our $I18N = {
 
 
 	'property purchase template' => {
-		message => q|property purchase template|,
+		message => q|purchase template|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the name of the template to use for purchasing ad space|
 	},
 
 	'property purchase template help' => {
-		message => q|property purchase template help|,
+		message => q|select a template to use for purchasing ad space|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|select a template to use for purchasing ad space|
 	},
 
 	'property manage template' => {
-		message => q|property manage template|,
+		message => q|manage template|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the name of the template to use for managing ad space|
 	},
 
 	'property manage template help' => {
-		message => q|property manage template help|,
+		message => q|select a template to use for managing ad space|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|select a template to use for managing ad space|
 	},
 
 	'property ad space' => {
-		message => q|property ad space|,
+		message => q|ad space|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the ad space being sold here|
 	},
 
 	'property ad Space help' => {
-		message => q|property ad Space help|,
+		message => q|select the ad space being sold by this SKU|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|select the ad space being sold by this SKU|
 	},
 
 	'property priority' => {
-		message => q|property priority|,
+		message => q|priority|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the priority of the ads sold by this SKU|
+	},
+
+	'property priority help' => {
+		message => q|indicate the priority of ads sold by this SKU.  you can use multiple SKU's to sell the same ad space at different rates by setting different priorities for each SKU|,
+		lastUpdated => 0,
+		context => q|help text for the priority field on the AdSku Edit page|
 	},
 
 	'property price per click' => {
-		message => q|property price per click|,
+		message => q|price per click|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the price charged per click|
 	},
 
 	'property price per click help' => {
-		message => q|property price per click help|,
+		message => q|indicate how much to charge for each click purchased|,
 		lastUpdated => 1165511641,
-		context => q|TODO|
+		context => q|help for the price per click field|
 	},
 
 	'property price per impression' => {
-		message => q|property price per impression|,
+		message => q|price per impression|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the price charged for each impression of this ad|
 	},
 
 	'property price per impression help' => {
-		message => q|property price per impression help|,
+		message => q|indicate how much to purchase for each impression purchased|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|help text fot the price per impression field|
 	},
 
 	'property click discounts' => {
-		message => q|property click discounts|,
+		message => q|click discounts|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the discounts offered based on number of clicks|
 	},
 
 	'property click discounts help' => {
-		message => q|property click discounts help|,
+		message => q|enter discounts one per line at the start of the line.  extra text is ignored so you can put comments.  each discount consists of two numbers seperated by '@' with no spaces.  the first number is the percent(no decimal point) the second number is the number of items purchased|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|help text for the click discounts field|
 	},
 
 	'property impression discounts' => {
-		message => q|property impression discounts|,
+		message => q|impression discounts|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the discounts offered based on number of impressions purchased|
 	},
 
 	'property impression discounts help' => {
-		message => q|property impression discounts help|,
+		message => q|enter discounts one per line at the start of the line.  extra text is ignored so you can put comments.  each discount consists of two numbers seperated by '@' with no spaces.  the first number is the percent(no decimal point) the second number is the number of items purchased|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|help text for the impresison discounts field|
 	},
 
 	'property adsku karma' => {
-		message => q|property adsku karma|,
+		message => q|karma|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|the karm field name|
 	},
 
 	'property adsku karma description' => {
-		message => q|property adsku karma description|,
+		message => q|how much karm dos this offer|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|description for the karma field|
 	},
 
-	'Ad Space' => {
-		message => q|Ad Space|,
-		lastUpdated => 0,
-		context => q|name for the Ad Space Sku|
-	},
-
-	'Ad Title' => {
-		message => q|Ad Title|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'Ad Link' => {
-		message => q|Ad Link|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'Image' => {
-		message => q|Image|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'number of clicks' => {
-		message => q|number of clicks|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'number of impressions' => {
-		message => q|number of impressions|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'click discount' => {
-		message => q|Discount at %s clicks|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'impression discount' => {
-		message => q|Discount at %s impressions|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
-
-	'per click' => {
+	'form purchase per click' => {
 		message => q|@ %f per click|,
 		lastUpdated => 0,
 		context => q|TODO|
 	},
 
-	'per impression' => {
+	'form purchase per impression' => {
 		message => q|@ %f per impression|,
 		lastUpdated => 0,
 		context => q|TODO|
@@ -189,43 +147,43 @@ our $I18N = {
 		context => q|text for a link to the form where the user can purchase advertisements|
 	},
 
-	'manage form table header title' => {
+	'form manage table header title' => {
 		message => q|Title|,
 		lastUpdated => 0,
 		context => q|header for the adspace manage form: the title field|
 	},
 
-	'manage form table header clicks' => {
+	'form manage table header clicks' => {
 		message => q|Clicks|,
 		lastUpdated => 0,
 		context => q|header for the adspace manage form: the clicks field|
 	},
 
-	'manage form table header impressions' => {
+	'form manage table header impressions' => {
 		message => q|Impressions|,
 		lastUpdated => 0,
 		context => q|header for the adspace manage form: the impressions field|
 	},
 
-	'manage form table header renew' => {
+	'form manage table header renew' => {
 		message => q|Renew|,
 		lastUpdated => 0,
 		context => q|header for the adspace manage form: the renew field|
 	},
 
-	'manage form table value deleted' => {
+	'form manage table value deleted' => {
 		message => q|Deleted|,
 		lastUpdated => 0,
 		context => q|contents for the renew field on the manage ads table: indicates a deleted item|
 	},
 
-	'manage form table value renew' => {
+	'form manage table value renew' => {
 		message => q|Renew|,
 		lastUpdated => 0,
 		context => q|contents for the renew field on the manage ads table: indicates a renewable item|
 	},
 
-	'purchase button' => {
+	'form purchase button' => {
 		message => q|Add To Cart|,
 		lastUpdated => 0,
 		context => q|add the described item to the shopping cart|
@@ -261,11 +219,11 @@ our $I18N = {
 		context => q|the number of impressions the user wishes to purchase|
 	},
 
-	'TODO' => {
-		message => q|TODO|,
-		lastUpdated => 0,
-		context => q|TODO|
-	},
+#	'TODO' => {
+#		message => q|TODO|,
+#		lastUpdated => 0,
+#		context => q|TODO|
+#	},
 
 };
 

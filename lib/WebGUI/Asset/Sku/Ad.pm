@@ -273,6 +273,7 @@ sub manage {
              });
     my %ads;
     while( my $object = $iterator->() ) {
+	next if $object->get('isDeleted');   # because the ad is deleted...  all we could show is the 'deleted' text...
         next if exists $ads{$object->get('adId')};
 	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
         push @{$var{myAds}}, {
@@ -431,7 +432,7 @@ my $options = $self->getOptions();
         formHeader          => WebGUI::Form::formHeader($session, { action=>$self->getUrl })
             . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
         formFooter          => WebGUI::Form::formFooter($session),
-        formSubmit          => WebGUI::Form::submit( $session,  { value => $i18n->get("purchase button") }),
+        formSubmit          => WebGUI::Form::submit( $session,  { value => $i18n->get("form purchase button") }),
         hasAddedToCart      => $self->{_hasAddedToCart},
         continueShoppingUrl => $self->getUrl,
         manageLink         => $self->getUrl("func=manage"),
@@ -449,7 +450,7 @@ my $options = $self->getOptions();
                                  -size=>40
 				 -required=>1,
                                 }),
-        formImage          => WebGUI::Form::Image($session, {
+        formImage          => WebGUI::Form::File($session, {
                                  -name=>"formImage",
                                  -value=>$options->{image},
                                  -size=>40
@@ -489,8 +490,7 @@ sub www_addToCart {
         $self->{_hasAddedToCart} = 1;
 	my $form = $self->session->form;
 	my $imageStorage = WebGUI::Storage->create( $self->session);  # LATER should be createTemp
-	$imageStorage->addFileFromFormPost('formImage',1);
-	my $imageStorageId = $imageStorage->getId;
+        my $imageStorageId = $form->process('formImage', 'image', $imageStorage->getId);
         # TODO error in case image does not upload
 dav::log 'addToCart:data:',
               'adtitle:' => $form->get('formTitle'),',',
