@@ -345,7 +345,7 @@ our $I18N = {
     },
 
     'imgDeleteForm' => {
-        message => q|A field to delete the image, along with all data attached to it.|,
+        message => q|A field to delete the image, along with all data attached to it.  This form will not be present in the set of variables in the loop for adding a new image.|,
         context => q|Template variable for edit form.|,
         lastUpdated => 0,
     },
@@ -443,6 +443,12 @@ our $I18N = {
     'imageLink' => {
         message => q|A URL for the image to link to.|,
         context => q|Template variable|,
+        lastUpdated => 0,
+    },
+
+    'Source' => {
+        message => q|Source|,
+        context => q|Label for story template.  Referring to who took, or who owns, a picture.|,
         lastUpdated => 0,
     },
 
