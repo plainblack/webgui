@@ -1,3 +1,8 @@
+7.6.17
+ - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
+ - fixed #9979: i18n labels for Gallery (Knowmad Technologies)
+ - fixed #10011: Wrong spelling of "Descendant" in Navigation Asset Help function (Rob Schipper/NFIA India)
+
 7.6.16
  - fixed #9913: New Content Side Bar missing in Asset window
  - fixed #9924: WebGUI::Shop::Cart::readyForCheckout fails randomly (Henry Tang, Long Term Results B.v.)
@@ -10,9 +15,6 @@
  - fixed #9956: Product Import
  - added Survey now has a loading mask on Survey edit ajax calls.
  - fixed: Slider fixed and single slider type now ignores requried.
- - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
- - fixed #9979: i18n labels for Gallery (Knowmad Technologies)
- - fixed #10011: Wrong spelling of "Descendant" in Navigation Asset Help function (Rob Schipper/NFIA India)
 
 7.6.15
  - fixed #9852: Users can accept private messages from Visitor, but Visitor cannot send messages
