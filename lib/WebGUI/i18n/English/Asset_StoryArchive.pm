@@ -112,7 +112,7 @@ our $I18N = {
     },
 
     'archive after help' => {
-        message => q|After this time, Story assets will be archived and no longer show up in the list of Stories or feeds.|,
+        message => q|After this time, Story assets will be archived and no longer show up in the list of Stories or feeds.  Set to 0 to disable archiving.|,
         context => q|Hoverhelp in the edit screen and template.|,
         lastUpdated => 0
     },
