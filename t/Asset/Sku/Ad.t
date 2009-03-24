@@ -24,6 +24,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use WebGUI::Asset;
 use WebGUI::Asset::Sku::Ad;
+use WebGUI::AdSpace;
 use WebGUI::Storage;
 
 #----------------------------------------------------------------------------
@@ -74,10 +75,11 @@ is( WebGUI::Asset::Sku::Ad::getDiscountAmount($discounts,1050),10,'10% discount'
 
 my $root = WebGUI::Asset->getRoot($session);
 
+
 my $sku = $root->addChild({
     className => "WebGUI::Asset::Sku::Ad",
     title     => "Ad Space For Sale",
-    adSpace   => 'qwerty',    # don't need this unless I test onCompletePurchase...
+    adSpace   => 'qwert',
     priority  => 1,
     pricePerClick => 0.01,
     pricePerImpression => 0.0001,
@@ -101,7 +103,8 @@ $sku->applyOptions({
 
 is($sku->getConfiguredTitle, 'Ad Space For Sale (Sold!)', 'configured title');
 is($sku->getPrice, '19.00', 'get Price');
-# onCompletePurchase   -- not sure how to test this
+# $sku->onCompletePurchase($item);  --> not really sure how to test the rest...
+# $sku->onRefund
 
 #----------------------------------------------------------------------------
 # Cleanup

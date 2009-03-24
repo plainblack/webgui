@@ -120,13 +120,13 @@ our $I18N = {
 	'form purchase per click' => {
 		message => q|@ %f per click|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|%f is the price charged for each click on the ad|
 	},
 
 	'form purchase per impression' => {
 		message => q|@ %f per impression|,
 		lastUpdated => 0,
-		context => q|TODO|
+		context => q|%f is the price charged for each impression of the ad|
 	},
 
 	'form manage title' => {

@@ -1,8 +1,5 @@
 package WebGUI::Asset::Sku::Ad;
 
-use lib '/root/pb/lib';
-use dav;
-
 =head1 LEGAL
 
  -------------------------------------------------------------------
@@ -222,20 +219,13 @@ get the price for this purchase
 
 sub getPrice {
     my $self = shift;
-dav::log 'getPrice';
     my $options = $self->getOptions;
     my $impressionCount = $options->{impressions} || $self->{formImpressions};
-dav::log 'getPrice::impressionCount=', $impressionCount;
     my $clickCount = $options->{clicks};
-dav::log 'getPrice::clickCount=', $clickCount;
     my $impressionDiscount = getDiscountAmount($self->get('impressionDiscounts'),$impressionCount );
-dav::log 'getPrice::impressionDiscount=', $impressionDiscount;
     my $clickDiscount = getDiscountAmount($self->get('clickDiscounts'),$clickCount );
-dav::log 'getPrice::clickDiscount=', $clickDiscount;
     my $impressionPrice = $self->get('pricePerImpression') * ( 100 - $impressionDiscount ) / 100 ;
-dav::log 'getPrice::impressionPrice=', $impressionPrice;
     my $clickPrice = $self->get('pricePerClick') * ( 100 - $clickDiscount ) / 100 ;
-dav::log 'getPrice::clickPrice=', $clickPrice;
     return sprintf "%.2f", $impressionPrice * $impressionCount + $clickPrice * $clickCount;
 }
 
@@ -355,7 +345,7 @@ sub  onRemoveFromCart {
     my $self = shift;
     my $item = shift;
     my $options = $self->getOptions;
-    # TODO figure this out WebGUI::Storage->new($self->session,$options->{'image'})->delete; 
+    WebGUI::Storage->new($self->session,$options->{'image'})->delete; 
 }
 
 #-------------------------------------------------------------------
@@ -367,7 +357,25 @@ delete the add if it gets refunded
 =cut
 
 sub  onRefund {
-# TODO delete the ad...
+    my $self = shift;
+    my $item = shift;
+    my $ad;
+
+    my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($self->session,{
+	     constraints => [ { "transactionItemId = ?" => $item->getId } ],
+             });
+    my $crud = $iterator->();
+
+    my $ad = WebGUI::AdSpace::Ad->new($self->session,$crud->get('adId'));
+    $ad = WebGUI::AdSpace::Ad->new($self->session,$crud->get('adId'));
+    my $clicks = $ad->get('clicksBought') - $crud->get('clicksPurchased');
+    my $impressions = $ad->get('impressionsBought') - $crud->get('impressionsPurchased') ;
+    $ad->set({
+	clicksBought => $clicks,
+	impressionsBought => $impressions,
+    });
+
+    $crud->delete;
 }
 
 #-------------------------------------------------------------------
@@ -380,13 +388,10 @@ returns an array of array ref's that are extracted from the discount description
 
 sub  parseDiscountText {
     my $discountDescription = shift;
-dav::log $discountDescription;
     my @lines = split "\n", $discountDescription;
     my @discounts;
     foreach my $line ( @lines ) {
-dav::log $line;
 	if( $line =~ /^(\d+)\@(\d+)/ ) {
-dav::log 'match';
             push @discounts, [ $1, $2 ];
 	}
     }
@@ -508,7 +513,6 @@ sub www_addToCart {
 	my $form = $self->session->form;
 	my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($self->session);  # LATER should be createTemp
         my $imageStorageId = $form->process('formImage', 'image', $imageStorage->getId);
-        # TODO error in case image does not upload
         my $cartInfo = {
               adtitle => $form->process('formTitle'),
 	      link => $form->process('formLink','url'),
@@ -517,7 +521,6 @@ sub www_addToCart {
 	      adId => $form->process('formAdId'),
 	      image => $imageStorageId,
 	             };
-dav::dump 'addToCart:data:', $cartInfo;
         $self->addToCart($cartInfo);
     }
     return $self->www_view;
@@ -558,7 +561,6 @@ sub www_renew {
         my $self = shift;
 	my $session = $self->session;
 	my $id = $session->form->get('Id');
-dav::log 'id=',$id;
         my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
 	my $ad = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
 	$self->applyOptions({
