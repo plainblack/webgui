@@ -123,12 +123,6 @@ our $I18N = {
         lastUpdated => 0
     },
 
-    'save and preview' => {
-        message => q|Save and Preview|,
-        context => q|Button label in the Edit Story form.|,
-        lastUpdated => 0
-    },
-
     'save and add another photo' => {
         message => q|Save and Add Another Photo|,
         context => q|Button label in the Edit Story form.|,
@@ -197,11 +191,6 @@ our $I18N = {
 
     'saveButton' => {
         message => q|Button for the user to save the form.|,
-        lastUpdated => 0,
-    },
-
-    'previewButton' => {
-        message => q|Button for the user to preview the story before saving.|,
         lastUpdated => 0,
     },
 

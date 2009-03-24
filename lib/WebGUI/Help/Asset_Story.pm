@@ -27,7 +27,6 @@ our $HELP = {
             { name      => 'highlightsForm', },
             { name      => 'storyForm', },
             { name      => 'saveButton', },
-            { name      => 'previewButton', },
             { name      => 'saveAndAddButton', },
             { name      => 'cancelButton', },
             { name      => 'photo_form_loop',

@@ -313,7 +313,8 @@ sub getEditForm {
     my $var     = {
         formHeader     => WebGUI::Form::formHeader($session, {action => $url})
                         . WebGUI::Form::hidden($session, { name => 'func',    value => 'editSave' })
-                        . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' }),
+                        . WebGUI::Form::hidden($session, { name => 'proceed', value => 'showConfirmation' })
+                        ,
         formFooter     => WebGUI::Form::formFooter($session),
         formTitle      => $isNew
                         ? $i18n->get('add a story','Asset_StoryArchive')
@@ -336,24 +337,20 @@ sub getEditForm {
                           } ),
         keywordsForm   => WebGUI::Form::text($session, {
                             name  => 'keywords',
-                            value => $form->get('keywords') || WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })
+                            value => $form->get('keywords')  || WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })
                          } ),
         highlightsForm => WebGUI::Form::textarea($session, {
                             name  => 'highlights',
-                            value => $form->get('highlights')  || $self->get('highlights')
+                            value => $form->get('highlights') || $self->get('highlights')
                           } ),
         storyForm      => WebGUI::Form::HTMLArea($session, {
                             name  => 'story',
-                            value => $form->get('story')       || $self->get('story'),
+                            value => $form->get('story')      || $self->get('story'),
                             richEditId => $archive->get('richEditorId')
                           }),
         saveButton     => WebGUI::Form::submit($session, {
                             name  => 'saveStory',
                             value => $i18n->get('save story'),
-                          }),
-        previewButton  => WebGUI::Form::submit($session, {
-                            name  => 'saveAndPreview',
-                            value => $i18n->get('save and preview'),
                           }),
         cancelButton   => WebGUI::Form::button($session, {
                             name   => 'cancel',
