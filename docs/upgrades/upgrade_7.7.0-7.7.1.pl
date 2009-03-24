@@ -64,10 +64,10 @@ sub addRssLimit {
 #----------------------------------------------------------------------------
 sub addImageAnnotation {
     my $session = shift;
-    print "\tAdding annotations to imageAsset table, if needed... \n" unless $quiet;
-    my $sth = $session->db->read('describe imageAsset annotations');
+    print "\tAdding annotations to ImageAsset table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe ImageAsset annotations');
     if (! defined $sth->hashRef) {
-        $session->db->write("alter table imageAsset add column annotations mediumtext");
+        $session->db->write("alter table ImageAsset add column annotations mediumtext");
     }
     print "Done.\n" unless $quiet;
 }
