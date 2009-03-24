@@ -81,8 +81,13 @@ Deletes this ad.
 
 sub delete {
 	my $self = shift;
+        my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($session,{
+             constraints => [ { "adSkuPurchase.adId = ?" => $self->getId } ],
+             });
+        while( my $object = $iterator->() ) {
+             $object->update('isDeleted' => 1);
+        }
 	my $storage = WebGUI::Storage->get($self->session, $self->get("storageId"));
-# dav TODO update WebGUI::AssetColateral::Sku::Ad::Ad set delete flag for this AdId
 	$storage->delete if defined $storage;
 	$self->session->db->deleteRow("advertisement","adId",$self->getId);
 	$self = undef;

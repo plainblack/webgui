@@ -273,17 +273,25 @@ sub manage {
              });
     my %ads;
     while( my $object = $iterator->() ) {
-	next if $object->get('isDeleted');   # because the ad is deleted...  all we could show is the 'deleted' text...
         next if exists $ads{$object->get('adId')};
 	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
-        next if undef $ad;   # TODO not sure why we get here...
-        push @{$var{myAds}}, {
+	if( $object->get('isDeleted') ) {
+            push @{$var{myAds}}, {
+	              rowTitle => '',
+		      rowClicks => '0/0',
+		      rowImpressions => '0/0',
+		      rowDeleted => 1,
+		      rowRenewLink => '',
+		  };
+	} else {
+            push @{$var{myAds}}, {
 	              rowTitle => $ad->get('title'),
 		      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
 		      rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
-		      rowDeleted => $object->get('isDeleted'),
-		      rowRenewLink => $self->getUrl('func=renew;adId=' . $object->get('adId') ),
+		      rowDeleted => 0,
+		      rowRenewLink => $self->getUrl('func=renew;Id=' . $object->get('adSkuPurchaseId') ),
 		  };
+	} 
     }
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -292,7 +300,7 @@ sub manage {
 
 =head2 onCompletePurchase
 
-inserts the ad intothe adspace...
+inserts the ad into the adspace...
 
 =cut
 
@@ -300,21 +308,35 @@ sub onCompletePurchase {
     my $self = shift;
     my $item = shift;
     my $options = $self->getOptions;
+    my $ad;
 
 # LATER: if we use Temp Storage for the image we need to move it to perm storage
 
-    my $ad = WebGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
-           title =>  $options->{'adtitle'},
-	   clicksBought => $options->{'clicks'},
-	   impressionsBought => $options->{'impressions'},
-	   url =>   $options->{'link'},
-	   storageId =>  $options->{'image'},
-	   ownerUserId =>  $self->session->user->userId,
-	   isActive => 1,
-	   type =>  'image',
-	   priority => $self->get('priority'),
-	   adSpace => $self->get('adSpace'),
-	   });
+    if( $options->{adId} ne '' ) {
+	$ad = WebGUI::AdSpace::Ad->new($self->session,$options->{adId});
+	my $clicks = $options->{clicks} + $ad->get('clicksBought');
+	my $impressions = $options->{impressions} + $ad->get('impressionsBought');
+	$ad->set({
+            title =>  $options->{'adtitle'},
+	    clicksBought => $clicks,
+	    impressionsBought => $impressions,
+	    url =>   $options->{'link'},
+	    storageId =>  $options->{'image'},
+	});
+    } else {
+        $ad = WebGUI::AdSpace::Ad->create($self->session,$self->get('adSpace'),{
+            title =>  $options->{'adtitle'},
+	    clicksBought => $options->{'clicks'},
+	    impressionsBought => $options->{'impressions'},
+	    url =>   $options->{'link'},
+	    storageId =>  $options->{'image'},
+	    ownerUserId =>  $self->session->user->userId,
+	    isActive => 1,
+	    type =>  'image',
+	    priority => $self->get('priority'),
+	    adSpace => $self->get('adSpace'),
+        });
+    }
 
     WebGUI::AssetCollateral::Sku::Ad::Ad->create($self->session,{
            userId => $item->transaction->get('userId'),
@@ -343,7 +365,7 @@ sub  onRemoveFromCart {
     my $self = shift;
     my $item = shift;
     my $options = $self->getOptions;
-    WebGUI::Storage->new($self->session,$options->{'image'})->delete;
+    # TODO figure this out WebGUI::Storage->new($self->session,$options->{'image'})->delete; 
 }
 
 #-------------------------------------------------------------------
@@ -426,7 +448,7 @@ Displays the purchase adspace form
 sub view {
     my ($self) = @_;
     my $session = $self->session;
-my $options = $self->getOptions();
+    my $options = $self->getOptions();
 
 	my $i18n = WebGUI::International->new($session, "Asset_AdSku");
     my %var = (
@@ -469,6 +491,10 @@ my $options = $self->getOptions();
                                  -size=>40
 				 -required=>1,
                                 }),
+        formAdId          => WebGUI::Form::Hidden($session, {
+                                 -name=>"formAdId",
+                                 -value=>$options->{adId} || '',
+                                }),
         clickPrice   => $self->get('pricePerClick'),
         impressionPrice   => $self->get('pricePerImpression'),
         clickDiscount   => $self->getClickDiscountText,
@@ -504,6 +530,7 @@ dav::log 'addToCart:data:',
 	      link => $form->process('formLink','url'),
 	      clicks => $form->process('formClicks','integer'),
 	      impressions => $form->process('formImpressions','integer'),
+	      adId => $form->process('formAdId'),
 	      image => $imageStorageId,
 	             });
     }
@@ -543,9 +570,19 @@ renew an ad
 
 sub www_renew {
         my $self = shift;
-	my $adPurchaseId = ''; # TODO get the adPurchaseId param
-        my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($self->session,$adPurchaseId);
-	# TODO assign params for purchase form
+	my $session = $self->session;
+	my $id = $session->form->get('Id');
+dav::log 'id=',$id;
+        my $crud = WebGUI::AssetCollateral::Sku::Ad::Ad->new($session,$id);
+	my $ad = WebGUI::AdSpace::Ad->new($session,$crud->get('adId'));
+	$self->applyOptions({
+                  adtitle =>  $ad->get('title'),
+		  clicks => $crud->get('clicksPurchased'),
+		  impressions => $crud->get('impressionsPurchased'),
+		  link => $ad->get('url'),
+		  image => $ad->get('storageId'),
+		  adId => $crud->get('adId'),
+             });
 	return $self->www_view;
 }
 

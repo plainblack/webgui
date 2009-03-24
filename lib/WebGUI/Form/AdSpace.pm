@@ -77,9 +77,6 @@ sub definition {
 		size=>{
 			defaultValue=>1
 			},
-		defaultValue=>{
-			defaultValue=>[]
-			},
         });
         return $class->SUPER::definition($session, $definition);
 }
@@ -149,7 +146,9 @@ Returns a group pull-down field. A group pull down provides a select list that p
 
 sub toHtml {
 	my $self = shift;
-	$self->set('options', { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) } );
+	my $options = { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) };
+	$self->set('defaultValue', ( keys %{$options} )[0] );
+	$self->set('options', $options );
 	return $self->SUPER::toHtml();
 }
 
@@ -163,7 +162,9 @@ Creates a series of hidden fields representing the data in the list.
 
 sub toHtmlAsHidden {
         my $self = shift;
-	$self->set('options', { map { $_->getId => $_->getName } ( WebGUI::AdSpace->getAdSpaces() ) } );
+	my $options = { map { $_->getId => $_->get('name') } ( @{ WebGUI::AdSpace->getAdSpaces($self->session) } ) };
+	$self->set('defaultValue', ( keys %{$options} )[0] );
+	$self->set('options', $options );
         return $self->SUPER::toHtmlAsHidden();
 }
 
