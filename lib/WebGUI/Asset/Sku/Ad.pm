@@ -273,25 +273,15 @@ sub manage {
              });
     my %ads;
     while( my $object = $iterator->() ) {
+	next if $object->get('isDeleted');
         next if exists $ads{$object->get('adId')};
 	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
-	if( $object->get('isDeleted') ) {
-            push @{$var{myAds}}, {
-	              rowTitle => '',
-		      rowClicks => '0/0',
-		      rowImpressions => '0/0',
-		      rowDeleted => 1,
-		      rowRenewLink => '',
-		  };
-	} else {
-            push @{$var{myAds}}, {
-	              rowTitle => $ad->get('title'),
-		      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
-		      rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
-		      rowDeleted => 0,
-		      rowRenewLink => $self->getUrl('func=renew;Id=' . $object->get('adSkuPurchaseId') ),
-		  };
-	} 
+        push @{$var{myAds}}, {
+	      rowTitle => $ad->get('title'),
+	      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
+	      rowImpressions => $ad->get('impressions') . '/' . $ad->get('impressionsBought'),
+	      rowRenewLink => $self->getUrl('func=renew;Id=' . $object->get('adSkuPurchaseId') ),
+	};
     }
     return $self->processTemplate(\%var,undef,$self->{_viewTemplate});
 }
@@ -516,23 +506,19 @@ sub www_addToCart {
     if ($self->canView) {
         $self->{_hasAddedToCart} = 1;
 	my $form = $self->session->form;
-	my $imageStorage = WebGUI::Storage->create( $self->session);  # LATER should be createTemp
+	my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($self->session);  # LATER should be createTemp
         my $imageStorageId = $form->process('formImage', 'image', $imageStorage->getId);
         # TODO error in case image does not upload
-dav::log 'addToCart:data:',
-              'adtitle:' => $form->get('formTitle'),',',
-	      'link:' => $form->get('formLink','url'),',',
-	      'image:' => $imageStorageId,',',
-	      'clicks:' => $form->get('formClicks'),',',
-	      'impressions:' => $form->get('formImpressions');
-        $self->addToCart({
-              adtitle => $form->get('formTitle'),
+        my $cartInfo = {
+              adtitle => $form->process('formTitle'),
 	      link => $form->process('formLink','url'),
 	      clicks => $form->process('formClicks','integer'),
 	      impressions => $form->process('formImpressions','integer'),
 	      adId => $form->process('formAdId'),
 	      image => $imageStorageId,
-	             });
+	             };
+dav::dump 'addToCart:data:', $cartInfo;
+        $self->addToCart($cartInfo);
     }
     return $self->www_view;
 }
