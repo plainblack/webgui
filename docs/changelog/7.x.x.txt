@@ -1,3 +1,5 @@
+7.6.18
+
 7.6.17
  - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
  - fixed #9979: i18n labels for Gallery (Knowmad Technologies)
