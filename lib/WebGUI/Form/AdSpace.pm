@@ -78,7 +78,7 @@ sub definition {
 			defaultValue=>1
 			},
 		defaultValue=>{
-			defaultValue=>[1]
+			defaultValue=>[]
 			},
         });
         return $class->SUPER::definition($session, $definition);

@@ -276,6 +276,7 @@ sub manage {
 	next if $object->get('isDeleted');   # because the ad is deleted...  all we could show is the 'deleted' text...
         next if exists $ads{$object->get('adId')};
 	my $ad = $ads{$object->get('adId')} = WebGUI::AdSpace::Ad->new($session,$object->get('adId'));
+        next if undef $ad;   # TODO not sure why we get here...
         push @{$var{myAds}}, {
 	              rowTitle => $ad->get('title'),
 		      rowClicks => $ad->get('clicks') . '/' . $ad->get('clicksBought'),
