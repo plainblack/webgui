@@ -375,7 +375,7 @@ EOTOPIC
 
 sub upgradeConfigFiles {
     my ($session) = @_;
-    print "\tAdding Story Manager assets to config file... " unless $quiet;
+    print "\tAdding Story Manager to config file... " unless $quiet;
     my $config = $session->config;
     $config->addToHash(
         'assets',
@@ -390,6 +390,12 @@ sub upgradeConfigFiles {
             "category" => "community"
         },
     );
+    my $activities = $config->get('workflowActivities');
+    my $none = $activities->{None};
+    if (!isIn('WebGUI::Workflow::Activity::ArchiveOldStories', @{ $none })) {
+        unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
+    }
+    $config->set('workflowActivities', $activities);
     print "DONE!\n" unless $quiet;
 }
 
