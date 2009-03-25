@@ -41,7 +41,8 @@ installAssetHistory($session);
 
 # Story Manager
 installStoryManagerTables($session);
-upgradeConfigFiles($session);
+sm_upgradeConfigFiles($session);
+sm_updateDailyWorkflow($session);
 
 # Passive Analytics
 pa_installLoggingTables($session);
@@ -373,7 +374,7 @@ EOTOPIC
     print "DONE!\n" unless $quiet;
 }
 
-sub upgradeConfigFiles {
+sub sm_upgradeConfigFiles {
     my ($session) = @_;
     print "\tAdding Story Manager to config file... " unless $quiet;
     my $config = $session->config;
@@ -396,6 +397,19 @@ sub upgradeConfigFiles {
         unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
     }
     $config->set('workflowActivities', $activities);
+    print "DONE!\n" unless $quiet;
+}
+
+sub sm_updateDailyWorkflow {
+    my ($session) = @_;
+    print "\tAdding Archive Old Stories to Daily Workflow... " unless $quiet;
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    foreach my $activity (@{ $workflow->getActivities }) {
+        return if $activity->getName() eq 'WebGUI::Workflow::Activity::ArchiveOldStories';
+    }
+    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
+    $activity->set('title',       'Archive Old Stories');
+    $activity->set('description', 'Archive old stories, based on the settings of the Story Archives that own them');
     print "DONE!\n" unless $quiet;
 }
 
