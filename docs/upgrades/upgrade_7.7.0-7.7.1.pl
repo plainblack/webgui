@@ -34,6 +34,7 @@ my $session = start(); # this line required
 adSkuInstall($session);
 addWelcomeMessageTemplateToSettings( $session );
 addStatisticsCacheTimeoutToMatrix( $session );
+changeThingyFieldsPreTextAndSubtext( $session );
 
 # image mods
 addImageAnnotation($session);
@@ -80,6 +81,15 @@ sub addStatisticsCacheTimeoutToMatrix{
     $session->db->write("alter table Matrix add statisticsCacheTimeout int(11) not null default 3600");
     print "Done.\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub changeThingyFieldsPreTextAndSubtext{
+    my $session = shift;
+    print "\tChanging pretext and subtext fields in Thingy_fields table... \n" unless $quiet;
+    $session->db->write("alter table Thingy_fields change subtext subtext text, change pretext pretext text;");
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Describe what our function does
