@@ -739,14 +739,12 @@ sub getEditFieldForm {
         -value=>$field->{pretext},
         -label=>$i18n->get('pretext label'),
         -hoverHelp=>$i18n->get('pretext description'),
-        -maxlength=>'1024', 
         );
     $f->text(
         -name=>"subtext",
         -value=>$field->{subtext},
         -label=>$i18n->get('subtext label'),
         -hoverHelp=>$i18n->get('subtext description'),
-        -maxlength=>'1024', 
         );
     $f->selectBox(
         -name=>"status",
