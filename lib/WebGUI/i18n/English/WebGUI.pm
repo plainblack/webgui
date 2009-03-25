@@ -4338,6 +4338,12 @@ Users may override this setting in their profile.
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
         },
+	'Ad Space control name' => {
+		message => q|Ad Space|,
+		lastUpdated => 0,
+		context => q|name for the Ad Space control|
+	},
+
 };
 
 1;
