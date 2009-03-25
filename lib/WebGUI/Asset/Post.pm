@@ -1424,8 +1424,6 @@ sub www_edit {
         richEditId=>$self->getThread->getParent->get("richEditor")
     });
     ##Edit variables just for Threads
-    $session->log->warn("className: $className");
-    $session->log->warn("canEdit parent: ". $self->getThread->getParent->canEdit);
     if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {
         $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
             name=>'isSticky',

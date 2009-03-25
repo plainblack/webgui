@@ -74,7 +74,11 @@ $oldSettings{ specialState  } = $session->setting->get( 'specialState' );
 $session->setting->set( 'specialState', '' );
 
 my ( $mech );
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
+my $config_port;
+if ($session->config->get('webServerPort')) {
+	$config_port = $session->config->get('webServerPort') || 80;
+}
+my $baseUrl         = 'http://' . $session->config->get('sitename')->[0] . ":$config_port";
 
 #----------------------------------------------------------------------------
 # Tests

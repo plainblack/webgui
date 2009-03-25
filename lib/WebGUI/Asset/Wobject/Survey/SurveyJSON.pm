@@ -115,6 +115,7 @@ my @SPECIAL_QUESTION_TYPES = (
     'File Upload',
     'Date',
     'Date Range',
+    'Year Month',
     'Hidden',
 );
 

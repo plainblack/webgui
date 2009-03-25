@@ -678,6 +678,32 @@ sub generateThumbnail {
 
 #-------------------------------------------------------------------
 
+=head2 getSize ( filename ) 
+
+Returns width and height of image.
+
+=head3 filename
+
+The file to generate a thumbnail for.
+
+=cut
+
+sub getSize {
+	my $self = shift;
+	my $filename = shift;
+        my $image = Image::Magick->new;
+        my $error = $image->Read($self->getPath($filename));
+	if ($error) {
+		$self->session->errorHandler->error("Couldn't read image for size reading: ".$error);
+		return 0;
+	}
+        my ($x, $y) = $image->Get('width','height');
+
+	return($x, $y);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getErrorCount ( )
 
 Returns the number of errors that have been generated on this object instance.
@@ -1050,6 +1076,203 @@ sub renameFile {
 	my $filename = shift;
 	my $newFilename = shift;
     rename $self->getPath($filename), $self->getPath($newFilename);
+}
+
+#-------------------------------------------------------------------
+
+=head2 crop ( filename [, width, height ] )
+
+Resizes the specified image by the specified height and width. If either is omitted the iamge will be scaleed proportionately to the non-omitted one.
+
+=head3 filename
+
+The name of the file to resize.
+
+=head3 width
+
+The new width of the image in pixels.
+
+=head3 height
+
+The new height of the image in pixels.
+
+=head3 x
+
+The top of the image in pixels.
+
+=head3 y
+
+The top of the image in pixels.
+
+=cut
+
+# TODO: Make this take a hash reference with width, height, and density keys.
+
+sub crop { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $width       = shift;
+    my $height      = shift;
+    my $x           = shift;
+    my $y           = shift;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't resize when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't resize something that's not an image.");
+        return 0;
+    }
+    unless ($width || $height || $x || $y) {
+        $self->session->errorHandler->error("Can't resize with no resizing parameters.");
+        return 0;
+    }
+    my $image = Image::Magick->new;
+    my $error = $image->Read($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        return 0;
+    }
+
+    # Next, resize dimensions
+    if ( $width || $height || $x || $y ) {
+        $self->session->errorHandler->info( "Resizing $filename to w:$width h:$height x:$x y:$y" );
+        $image->Crop( height => $height, width => $width, x => $x, y => $y );
+    }
+
+    # Write our changes to disk
+    $error = $image->Write($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't resize image: ".$error);
+        return 0;
+    }
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 annotate ( filename [ text ] )
+
+Adds annotation text to the image.
+
+=head3 filename
+
+The name of the file to annotate.
+
+=head3 text
+
+Text to add.
+
+=cut
+
+sub annotate { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $asset       = shift;
+    my $form        = shift;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        return 0;
+    }
+    # unless ($annotate_text) {
+    # $self->session->errorHandler->error("Can't annotate with no text.");
+    # return 0;
+    # }
+    # unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height) {
+    # $self->session->errorHandler->error("Can't annotate with no dimensions.");
+    # return 0;
+    # }
+
+    my $annotate = $asset->get('annotations');
+    my $save_annotate = "";
+	my @pieces = split(/\n/, $annotate);
+	for (my $i = 0; $i < $#pieces; $i += 3) {
+		my $top_left = $pieces[$i];
+		my $width_height = $pieces[$i + 1];
+		my $note = $pieces[$i + 2];
+
+        # warn("i: $i: ", $form->process("delAnnotate$i"));
+        next if $form->process("delAnnotate$i");
+
+        if ($save_annotate) {
+            $save_annotate .= "\n";
+        }
+        $save_annotate .= "$top_left\n$width_height\n$note";
+    }
+
+	my $annotate_text   = $form->process("annotate_text");
+	my $annotate_top    = $form->process("annotate_top");
+	my $annotate_left   = $form->process("annotate_left");
+	my $annotate_width  = $form->process("annotate_width");
+	my $annotate_height = $form->process("annotate_height");
+    # warn(qq(unless ($annotate_top && $annotate_left && $annotate_width && $annotate_height && $annotate_text !~ /^\s*$/)));
+    if (defined $annotate_top && defined $annotate_left && defined $annotate_width && defined $annotate_height && $annotate_text !~ /^\s*$/) {
+        if ($save_annotate) {
+            $save_annotate .= "\n";
+        }
+        # warn(qq($save_annotate .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n'$annotate_text'"));
+        $save_annotate .= "top: ${annotate_top}px; left: ${annotate_left}px;\nwidth: ${annotate_width}px; height: ${annotate_height}px;\n$annotate_text";
+    }
+    # warn($save_annotate);
+
+    $asset->update({ annotations => $save_annotate });
+    $save_annotate = $asset->get('annotations');
+    # warn($save_annotate);
+
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 rotate ( filename [ degrees ] )
+
+Rotates the image by the specified degrees.
+
+=head3 filename
+
+The name of the file to resize.
+
+=head3 width
+
+Number of degrees to rotate.
+
+=cut
+
+sub rotate { 
+    my $self        = shift;
+    my $filename    = shift;
+    my $degree      = shift || 0;
+    unless (defined $filename) {
+        $self->session->errorHandler->error("Can't rotate when you haven't specified a file.");
+        return 0;
+    }
+    unless ($self->isImage($filename)) {
+        $self->session->errorHandler->error("Can't rotate something that's not an image.");
+        return 0;
+    }
+    my $image = Image::Magick->new;
+    my $error = $image->Read($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't read image for resizing: ".$error);
+        return 0;
+    }
+
+    $self->session->errorHandler->info( "Rotating $filename by $degree degrees" );
+    $image->Rotate( $degree );
+
+    # Write our changes to disk
+    $error = $image->Write($self->getPath($filename));
+    if ($error) {
+        $self->session->errorHandler->error("Couldn't rotate image: ".$error);
+        return 0;
+    }
+
+    return 1;
 }
 
 #-------------------------------------------------------------------

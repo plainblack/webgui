@@ -23,6 +23,9 @@ if (typeof Survey === "undefined") {
         'Dual Slider - Range': 1,
         'Multi Slider - Allocate': 1
     };
+    var DATE_SHORT = {
+        'Year Month': 1
+    };
     var DATE_TYPES = {
         'Date': 1,
         'Date Range': 1
@@ -60,6 +63,16 @@ if (typeof Survey === "undefined") {
                     else {
                         var amountLeft = toValidate[i].total - total;
                         alert("Please allocate the remaining " + amountLeft + ".");
+                    }
+                }
+                else if (toValidate[i].type === 'Year Month') {
+                    answered = 1;//set to true, then let a single failure set it back to false.
+                    for (var z1 in toValidate[i].answers) {
+                        var m = document.getElementById(z1+'-month').value;
+                        var y = document.getElementById(z1+'-year').value;
+                        if(m == ''){ answered = 0; }
+                        if(y.length != 4) { answered = 0; }
+                        if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
                     }
                 }
                 else {
@@ -395,7 +408,17 @@ if (typeof Survey === "undefined") {
                     toValidate[q.id].type = q.questionType;
                     toValidate[q.id].answers = [];
                 }
-                
+               
+                if (DATE_SHORT[q.questionType]) {
+                    for (var k = 0; k < q.answers.length; k++) {
+                        var ans = q.answers[k];
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].type = q.questionType;
+                            toValidate[q.id].answers[ans.id] = 1;
+                        }
+                    }
+                    continue;
+                } 
                 
                 if (DATE_TYPES[q.questionType]) {
                     for (var k = 0; k < q.answers.length; k++) {

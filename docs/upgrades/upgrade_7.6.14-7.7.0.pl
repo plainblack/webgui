@@ -123,7 +123,7 @@ sub installAssetHistory {
     print "\tAdding Asset History content handler... \n" unless $quiet;
     ##Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
-    if (! isIn('WebGUI::Content::Handler', @{ $contentHandlers }) ) {
+    if (! isIn('WebGUI::Content::AssetHistory', @{ $contentHandlers }) ) {
         my @newHandlers = ();
         foreach my $handler (@{ $contentHandlers }) {
             push @newHandlers, $handler;

@@ -26,6 +26,8 @@ our $HELP = {
                     { 'name' => 'thing_deleteUrl' },
                     { 'name' => 'thing_searchUrl' },
                     { 'name' => 'thing_addUrl' },
+                    { 'name' => 'thing_copyUrl' },
+                    { 'name' => 'thing_copyIcon' },
                 ]
             },
         ],

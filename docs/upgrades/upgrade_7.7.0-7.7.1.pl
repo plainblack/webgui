@@ -32,9 +32,54 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 adSkuInstall($session);
+addWelcomeMessageTemplateToSettings( $session );
+addStatisticsCacheTimeoutToMatrix( $session );
+
+# image mods
+addImageAnnotation($session);
+
+# rss mods
+addRssLimit($session);
 
 finish($session); # this line required
 
+sub addWelcomeMessageTemplateToSettings {
+    my $session = shift;
+    print "\tAdding welcome message template to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings values ('webguiWelcomeMessageTemplate', 'PBtmpl0000000000000015');");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addRssLimit {
+    my $session = shift;
+    print "\tAdding rssLimit to RSSCapable table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe RSSCapable rssCableRssLimit');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table RSSCapable add column rssCableRssLimit integer");
+    }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addImageAnnotation {
+    my $session = shift;
+    print "\tAdding annotations to ImageAsset table, if needed... \n" unless $quiet;
+    my $sth = $session->db->read('describe ImageAsset annotations');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table ImageAsset add column annotations mediumtext");
+    }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addStatisticsCacheTimeoutToMatrix{
+    my $session = shift;
+    print "\tAdding statisticsCacheTimeout setting to Matrix table... \n" unless $quiet;
+    $session->db->write("alter table Matrix add statisticsCacheTimeout int(11) not null default 3600");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

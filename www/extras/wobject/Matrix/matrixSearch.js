@@ -55,7 +55,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		var attributeSelects = YAHOO.util.Dom.getElementsByClassName('attributeSelect','select');
 		var newUri = "func=getCompareFormData;search=1";
     		for (var i = attributeSelects.length; i--; ) {
-			if(attributeSelects[i].value != 'blank'){
+			var selectedIndex = attributeSelects[i].selectedIndex;
+			if(attributeSelects[i].value != 'blank' && !(attributeSelects[i].value == '0' && attributeSelects[i][selectedIndex].text == 'No')){
 				newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
 			}
         	}
