@@ -404,6 +404,7 @@ END {
     foreach my $group ($staff) {
         $group->delete if defined $group;
     }
+    $creationDateSth->finish;
 }
 
 sub simpleHrefParser {
