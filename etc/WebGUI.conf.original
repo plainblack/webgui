@@ -802,6 +802,7 @@
 
 "workflowActivities" : {
     "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
