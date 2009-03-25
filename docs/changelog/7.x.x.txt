@@ -1,4 +1,5 @@
 7.7.1
+ - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities
  - rfe #9353: Welcome message template (SDH Consulting Group)
  - rfe #10007: New Month and Year question type.  If required, Month must be selected and a 4 digit year must be entered.
  - fixed #10011: Wrong spelling of "Descendant" in Navigation Asset Help function (Rob Schipper/NFIA India)
