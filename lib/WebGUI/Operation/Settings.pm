@@ -482,6 +482,7 @@ sub definition {
         groupIdAdminCache
         groupIdAdminCron
         groupIdAdminDatabaseLink
+        groupIdAdminFriends
         groupIdAdminGraphics
         groupIdAdminGroup
         groupIdAdminGroupAdmin

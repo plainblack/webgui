@@ -3728,7 +3728,6 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
-
     'settings groupIdAdminAdSpace label' => {
         message     => q{AdSpace},
         lastUpdated => 0,
@@ -3769,6 +3768,15 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+
+    'settings groupIdAdminFriends label' => {
+        message     => q{Friends},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminFriends hoverHelp' => {
+        message     => q{Group to manage friends.},
+        lastUpdated => 0,
+    },
 
     'settings groupIdAdminGraphics label' => {
         message     => q{Graphics},

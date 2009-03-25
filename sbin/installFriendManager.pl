@@ -31,8 +31,7 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
 my $session = start( $webguiRoot, $configFile );
 
-installUserProfileFields($session);
-installSettings($session);
+installFriendManagerGroup($session);
 
 # Do your work here
 finish($session);
@@ -40,46 +39,9 @@ finish($session);
 #----------------------------------------------------------------------------
 # Your sub here
 
-sub installUserProfileFields {
+sub installFriendManagerGroup {
     my $session = shift;
-    WebGUI::ProfileField->create(
-        $session,
-        'receiveInboxEmailNotifications',
-        {
-            label          => q!WebGUI::International::get('receive inbox notifications','Message_Center')!,
-            visible        => 1,
-            required       => 0,
-            protected      => 1,
-            editable       => 1,
-            fieldType      => 'radioList',
-            dataDefault    => 0,
-            possibleValues => q!{
-message => WebGUI::International::get('full message','Message_Center'),
-note    => WebGUI::International::get('short notification','Message_Center'),
-}!,
-        },
-        4,
-    );
-    WebGUI::ProfileField->create(
-        $session,
-        'receiveInboxSMSNotifications',
-        {
-            label          => q!WebGUI::International::get('receive inbox sms','Message_Center')!,
-            visible        => 1,
-            required       => 0,
-            protected      => 1,
-            editable       => 1,
-            fieldType      => 'yesNo',
-            dataDefault    => 0,
-        },
-        4,
-    );
-}
-
-sub installSettings {
-    my $session = shift;
-    $session->setting->add('smsGateway', '');
-    $session->setting->add('sendInboxNotificationsOnly', '');
+    $session->setting->add('groupIdAdminFriends', 3);
 }
 
 #----------------------------------------------------------------------------
