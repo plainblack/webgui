@@ -48,7 +48,7 @@ finish($session); # this line required
 
 sub addSurveyQuestionTypes{
     my $session = shift;
-    print "\tAdding new survey table Survey_questionTypes \n" unless $quiet;
+    print "\tAdding new survey table Survey_questionTypes... " unless $quiet;
     $session->db->write("
 	CREATE TABLE `Survey_questionTypes` (
           `questionType` varchar(56) NOT NULL,
@@ -75,7 +75,7 @@ sub addRssLimit {
     print "\tAdding rssLimit to RSSCapable table, if needed... " unless $quiet;
     my $sth = $session->db->read('describe RSSCapable rssCapableRssLimit');
     if (! defined $sth->hashRef) {
-        $session->db->write("alter table RSSCapable add column rssCableRssLimit integer");
+        $session->db->write("alter table RSSCapable add column rssCapableRssLimit integer");
     }
     print "Done.\n" unless $quiet;
 }
@@ -104,7 +104,8 @@ sub addStatisticsCacheTimeoutToMatrix{
 # Describe what our function does
 sub adSkuInstall {
     my $session = shift;
-    print "\tCreate AdSku database table." unless $quiet;
+    print "\tInstalling the AdSku Asset...\n" unless $quiet;
+    print "\t\tCreate AdSku database table.\n" unless $quiet;
     $session->db->write("CREATE TABLE AdSku (
 	assetId VARCHAR(22) BINARY NOT NULL,
 	revisionDate BIGINT NOT NULL,
@@ -118,12 +119,12 @@ sub adSkuInstall {
 	impressionDiscounts VARCHAR(1024) default '',
 	PRIMARY KEY (assetId,revisionDate)
     )");
-    print "\tCreate Adsku crud table.\n" unless $quiet;
+    print "\t\tCreate Adsku crud table.\n" unless $quiet;
     use WebGUI::AssetCollateral::Sku::Ad::Ad;
     WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
-    print "\tInstalling the AdSku Asset.\n" unless $quiet;
+    print "\t\tAdding to config file.\n" unless $quiet;
     $session->config->addToHash("assets", 'WebGUI::Asset::Sku::Ad' => { category => 'shop' } );
-    print "DONE!\n" unless $quiet;
+    print "\tDone.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

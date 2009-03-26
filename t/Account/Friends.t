@@ -46,6 +46,7 @@ SKIP: { # Not everyone has Test::Exception yet
 
 my $friends;
 # ok() tests booleans. assignment evaluates to the value assigned (it's how '$a = $b = 4' works)
+my $account;
 ok( $account = WebGUI::Account->new( $session ), 
     "WebGUI::Account object created successfully" 
 );
