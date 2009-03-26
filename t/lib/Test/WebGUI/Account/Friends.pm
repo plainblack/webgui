@@ -27,6 +27,11 @@ sub class {
      return 'WebGUI::Account::Friends';
 }
 
+sub canView : Test(1) {
+    local $TODO = 'Write tests for canView for Friends';
+    ok(0,'Tests for canView for Friends');
+}
+
 1;
 
 #vim:ft=perl

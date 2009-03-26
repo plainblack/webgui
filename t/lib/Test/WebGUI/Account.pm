@@ -36,7 +36,7 @@ sub __useItFirst : Test(startup) {
     $test->{_session} = $session;
 }
 
-sub _new : Test(3) {
+sub _new : Test(5) {
     my $test    = shift;
     my $session = $test->{_session};
     my $class   = $test->class;
@@ -49,9 +49,11 @@ sub _new : Test(3) {
         "$class object created successfully" 
     );
     isa_ok( $account, $class, 'Blessed into the right class' );
+    is($account->uid, undef, 'new account objects have no uid');
+    is($account->method, 'view', 'default method is view');
 }
 
-sub getUrl : Test(3) {
+sub getUrl : Test(6) {
     my $test    = shift;
     my $session = $test->{_session};
     my $class   = $test->class;
@@ -68,6 +70,27 @@ sub getUrl : Test(3) {
         'getUrl doesnt add op=account if already exists'
     );
 
+    is( $account->getUrl('', 1), $session->url->page('op=account;module=;do='.$account->method), 
+        'getUrl does not add uid unless requested, unless uid is set' 
+    );
+
+    $account->uid(3);
+    is( $account->getUrl, $session->url->page('op=account;module=;do='.$account->method), 
+        'getUrl does not add uid unless requested, even when set' 
+    );
+
+    is( $account->getUrl('', 1), $session->url->page('op=account;module=;do='.$account->method.';uid=3'), 
+        'getUrl adds uid when requested, and uid is set' 
+    );
+
+}
+
+sub canView : Test(1) {
+    my $test    = shift;
+    my $session = $test->{_session};
+    my $class   = $test->class;
+    my $account = $class->new($session);
+    is($account->canView(), 1, 'default canView is 1');
 }
 
 1;
