@@ -59,69 +59,9 @@ use Storable qw/dclone/;
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
 
-my %MULTI_CHOICE_BUNDLES = (
-    'Agree/Disagree' => [ 'Strongly disagree',    (q{}) x 5, 'Strongly agree' ],
-    Certainty        => [ 'Not at all certain',   (q{}) x 9, 'Extremely certain' ],
-    Concern          => [ 'Not at all concerned', (q{}) x 9, 'Extremely concerned' ],
-    Confidence       => [ 'Not at all confident', (q{}) x 9, 'Extremely confident' ],
-    Education        => [
-        'Elementary or some high school',
-        'High school/GED',
-        'Some college/vocational school',
-        'College graduate',
-        'Some graduate work',
-        'Master\'s degree',
-        'Doctorate (of any type)',
-        'Other degree (verbatim)',
-    ],
-    Effectiveness => [ 'Not at all effective', (q{}) x 9, 'Extremely effective' ],
-    Gender        => [qw( Male Female )],
-    Ideology      => [
-        'Strongly liberal',
-        'Liberal',
-        'Somewhat liberal',
-        'Middle of the road',
-        'Slightly conservative',
-        'Conservative',
-        'Strongly conservative'
-    ],
-    Importance       => [ 'Not at all important', (q{}) x 9, 'Extremely important' ],
-    Likelihood       => [ 'Not at all likely',    (q{}) x 9, 'Extremely likely' ],
-    'Oppose/Support' => [ 'Strongly oppose',      (q{}) x 5, 'Strongly support' ],
-    Party =>
-        [ 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)' ],
-    Race =>
-        [ 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' ],
-    Risk         => [ 'No risk',              (q{}) x 9, 'Extreme risk' ],
-    Satisfaction => [ 'Not at all satisfied', (q{}) x 9, 'Extremely satisfied' ],
-    Security     => [ 'Not at all secure',    (q{}) x 9, 'Extremely secure' ],
-    Threat       => [ 'No threat',            (q{}) x 9, 'Extreme threat' ],
-    'True/False' => [qw( True False )],
-    'Yes/No'     => [qw( Yes No )],
-    Scale => [q{}],
-    'Multiple Choice' => [q{}],
-);
-
-my @SPECIAL_QUESTION_TYPES = (
-    'Dual Slider - Range',
-    'Multi Slider - Allocate',
-    'Slider',
-    'Currency',
-    'Email',
-    'Phone Number',
-    'Text',
-    'Text Date',
-    'TextArea',
-    'File Upload',
-    'Date',
-    'Date Range',
-    'Year Month',
-    'Hidden',
-);
-
-sub specialQuestionTypes {
-    return @SPECIAL_QUESTION_TYPES;
-}
+#sub specialQuestionTypes {
+#    return @SPECIAL_QUESTION_TYPES;
+#}
 
 =head2 new ( $session, json )
 
@@ -154,11 +94,86 @@ sub new {
 
     bless $self, $class;
 
+    #Load question types
+    $self->loadTypes();
+
     # Initialise the survey data structure if empty..
     if ( $self->totalSections == 0 ) {
         $self->newObject( [] );
     }
     return $self;
+}
+
+=head2 loadTypes
+
+Loads the Multiple Choice and Special Question types
+
+=cut
+
+sub loadTypes {
+    my $self = shift;
+    @{$self->{specialQuestionTypes}} = ( 
+        'Dual Slider - Range',
+        'Multi Slider - Allocate',
+        'Slider',
+        'Currency',
+        'Email',
+        'Phone Number',
+        'Text',
+        'Text Date',
+        'TextArea',
+        'File Upload',
+        'Date',
+        'Date Range',
+        'Year Month',
+        'Hidden',
+    );
+    my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes");
+    map($self->{multipleChoiceTypes}->{$_->{questionType}} = [split/,/,$_->{answers}], @$refs);
+}
+
+sub addType { 
+    my $self = shift;
+    my $name = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    my @answers;
+    for my $ans(@{$obj->{answers}}){
+        push(@answers,$ans->{text});
+    }
+    my $ansString = join(',',@answers);
+    $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$name,$ansString,$ansString]);
+    $self->question($address)->{questionType} = $name;
+}
+
+
+sub removeType {
+    my $self = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    $self->session->db->write("DELETE FROM Survey_questionTypes WHERE questionType = ?",[$obj->{questionType}]);
+}
+
+=head2 specialQuestionTypes
+
+Returns the arrayref to the special question types
+
+=cut 
+
+sub specialQuestionTypes {
+    my $self = shift;
+    return $self->{specialQuestionTypes};
+}
+
+=head2 multipleChoiceTypes
+
+Returns the hashref to the multiple choice types
+
+=cut
+
+sub multipleChoiceTypes {
+    my $self = shift;
+    return $self->{multipleChoiceTypes};
 }
 
 =head2 freeze
@@ -513,7 +528,6 @@ sub getQuestionEditVars {
 
     # Change questionType from a single element into an array of hashrefs which list the available 
     # question types and which one is currently selected for this question..
-    
     for my $qType ($self->getValidQuestionTypes) {
         push @{ $var{questionType} }, {
             text => $qType,
@@ -530,7 +544,8 @@ A convenience method.  Returns a list of question types.
 =cut
 
 sub getValidQuestionTypes {
-    return sort (@SPECIAL_QUESTION_TYPES, keys %MULTI_CHOICE_BUNDLES);
+    my $self = shift;
+    return sort (@{$self->{specialQuestionTypes}}, keys %{$self->{multipleChoiceTypes}});
 }
 
 =head2 getAnswerEditVars ( $address )
@@ -1003,7 +1018,7 @@ sub getMultiChoiceBundle {
     my $self = shift;
     my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
 
-    return $MULTI_CHOICE_BUNDLES{$type};
+    return $self->{multipleChoiceTypes}->{$type};
 }
 
 =head2 addAnswersToQuestion ($address, $answers, $verbatims)

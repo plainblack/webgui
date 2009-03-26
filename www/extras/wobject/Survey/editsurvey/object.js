@@ -73,7 +73,26 @@ Survey.ObjectTemplate = (function(){
                     }
                 }
             }];
-            
+            if(type === 'question'){
+                btns[btns.length] = {
+                    text: "Make Default Type",
+                        handler: function(){
+                            var name = prompt("Please change name to new type, or leave to update current type",document.forms[0].questionType.value);
+                            if(name != null){
+                                document.getElementById('addtype').value = name;
+                                this.submit();
+                        }
+                    }
+                }
+                btns[btns.length] = {
+                    text: "Remove Default Type",
+                        handler: function(){
+                                document.getElementById('removetype').value = 1;
+                                this.submit();
+                    }
+                }
+
+            } 
             dialog = new YAHOO.widget.Dialog(type, {
                 width: "600px",
                 context: [document.body, 'tr', 'tr'],

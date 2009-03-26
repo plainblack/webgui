@@ -35,6 +35,9 @@ adSkuInstall($session);
 addWelcomeMessageTemplateToSettings( $session );
 addStatisticsCacheTimeoutToMatrix( $session );
 
+#add Survey table
+addSurveyQuestionTypes($session);
+
 # image mods
 addImageAnnotation($session);
 
@@ -42,6 +45,21 @@ addImageAnnotation($session);
 addRssLimit($session);
 
 finish($session); # this line required
+
+sub addSurveyQuestionTypes{
+    my $session = shift;
+    print "\tAdding new survey table Survey_questionTypes \n" unless $quiet;
+    $session->db->write("
+	CREATE TABLE `Survey_questionTypes` (
+          `questionType` varchar(56) NOT NULL,
+          `answers` text NOT NULL,
+          PRIMARY KEY  (`questionType`))
+	");
+    $session->db->write("
+    INSERT INTO `Survey_questionTypes` VALUES ('Scale',''),('Gender','Male,Female'),('Education','Elementary or some high school,High school/GED,Some college/vocational school,College graduate,Some graduate work,Masters degree,Doctorate (of any type),Other degree (verbatim)'),('Importance','Not at all important,,,,,,,,,,Extremely important'),('Yes/No','Yes,No'),('Confidence','Not at all confident,,,,,,,,,,Extremely confident'),('Effectiveness','Not at all effective,,,,,,,,,,Extremely effective'),('Oppose/Support','Strongly oppose,,,,,,Strongly support'),('Certainty','Not at all certain,,,,,,,,,,Extremely certain'),('True/False','True,False'),('Concern','Not at all concerned,,,,,,,,,,Extremely concerned'),('Ideology','Strongly liberal,Liberal,Somewhat liberal,Middle of the road,Slightly conservative,Conservative,Strongly conservative'),('Security','Not at all secure,,,,,,,,,,Extremely secure'),('Risk','No risk,,,,,,,,,,Extreme risk'),('Agree/Disagree','Strongly disagree,,,,,,Strongly agree'),('Race','American Indian,Asian,Black,Hispanic,White non-Hispanic,Something else (verbatim)'),('Threat','No threat,,,,,,,,,,Extreme threat'),('Party','Democratic party,Republican party (or GOP),Independent party,Other party (verbatim)'),('Likelihood','Not at all likely,,,,,,,,,,Extremely likely'),('Multiple Choice',''),('Satisfaction','Not at all satisfied,,,,,,,,,,Extremely satisfied')
+	");
+    print "Done.\n" unless $quiet;
+}
 
 sub addWelcomeMessageTemplateToSettings {
     my $session = shift;

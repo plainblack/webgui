@@ -7,7 +7,7 @@
  - rfe #9099: Thingy field-copy function (SDH Consulting Group)
  - Keywords are now comma separated rather than space separated.
  - added Keywords form control with autocomplete
-
+ - Survey: Moved multiple choice questions to the data base, and they can now be edited globally from the Survey editor
 7.7.0
  - fixed #9913: New Content Side Bar missing in Asset window
  - fixed: New Mail macro never returns any messages
