@@ -18,6 +18,7 @@ use strict;
 use WebGUI::AdSpace;
 use WebGUI::Macro;
 use WebGUI::Storage;
+use WebGUI::AssetCollateral::Sku::Ad::Ad;
 
 =head1 NAME
 
