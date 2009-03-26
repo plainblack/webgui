@@ -22,11 +22,11 @@ use WebGUI::Keyword;
 
 =head1 NAME
 
-Package WebGUI::Form::Group
+Package WebGUI::Form::Keywords
 
 =head1 DESCRIPTION
 
-Creates a group chooser field.
+Creates a keywords chooser field with multiple select and autocomplete.
 
 =head1 SEE ALSO
 
@@ -79,7 +79,7 @@ sub isDynamicCompatible {
 
 =head2 toHtml ( )
 
-Returns a group pull-down field. A group pull down provides a select list that provides name value pairs for all the groups in the WebGUI system.  
+Returns a keyword pull-down field. A keyword pull down provides a select list that provides name value pairs for all the keywords in the WebGUI system.  
 
 =cut
 
