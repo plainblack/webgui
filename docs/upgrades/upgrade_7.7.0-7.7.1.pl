@@ -34,6 +34,7 @@ my $session = start(); # this line required
 adSkuInstall($session);
 addWelcomeMessageTemplateToSettings( $session );
 addStatisticsCacheTimeoutToMatrix( $session );
+removeOldSettings( $session );
 
 #add Survey table
 addSurveyQuestionTypes($session);
@@ -45,6 +46,25 @@ addImageAnnotation($session);
 addRssLimit($session);
 
 finish($session); # this line required
+
+# remove old settings that aren't used any more
+sub removeOldSettings {
+    my $session = shift;
+    print "\tRemoving old, unused settings... " unless $quiet;
+    my $setting = $session->setting;
+
+    $setting->remove('commerceCheckoutCanceledTemplateId');
+    $setting->remove('commerceConfirmCheckoutTemplateId');
+    $setting->remove('commerceEnableSalesTax');
+    $setting->remove('commercePaymentPlugin');
+    $setting->remove('commercePurchaseHistoryTemplateId');
+    $setting->remove('commerceSelectPaymentGatewayTemplateId');
+    $setting->remove('commerceSelectShippingMethodTemplateId');
+    $setting->remove('commerceSendDailyReportTo');
+    $setting->remove('commerceViewShoppingCartTemplateId');
+
+    print "Done.\n" unless $quiet;
+}
 
 sub addSurveyQuestionTypes{
     my $session = shift;
