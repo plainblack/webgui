@@ -1902,7 +1902,7 @@ cmp_deeply(
             'Some college/vocational school',
             'College graduate',
             'Some graduate work',
-            'Master\'s degree',
+            'Masters degree',
             'Doctorate (of any type)',
             'Other degree (verbatim)'
     ],
