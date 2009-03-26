@@ -1011,10 +1011,9 @@ sub www_getCompareFormData {
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' desc';
     
-    my @results;
-    my @listingIds = $self->session->form->checkList("listingId");
+    my @listingIds = $session->form->checkList("listingId");
     
-    $self->session->http->setMimeType("application/json");
+    $session->http->setMimeType("application/json");
 
     my (@searchParams,@searchParams_sorted,@searchParamList,$searchParamList);
     if($form->process("search")){
@@ -1056,10 +1055,9 @@ assetData.revisionDate
             and status='approved'
         order by ".$sort.$sortDirection;
     
-    my $sth = $self->session->db->read($sql,[$self->getId]);
+    my $sth = $session->db->read($sql,[$self->getId]);
     my @results;
 
-    my $gateway = $self->session->config->get("gateway");
     if($form->process("search")){
         while (my $result = $sth->hashRef) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
@@ -1084,7 +1082,7 @@ assetData.revisionDate
                         }
                 }
             $result->{assetId}  =~ s/-/_____/g;
-            $result->{url}      = $gateway."/".$result->{url};
+            $result->{url}      = $session->url->gateway($result->{url});
             push @results, $result;
         }
     }else{
@@ -1093,7 +1091,7 @@ assetData.revisionDate
             if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
                 $result->{checked} = 'checked';
             }
-            $result->{url}      = $gateway."/".$result->{url};
+            $result->{url}      = $session->url->gateway($result->{url});
             push @results, $result;
         }
     }

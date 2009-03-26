@@ -20,7 +20,7 @@ use base 'WebGUI::Crud';
 
 #------------------------------------------------
 
-=head  crud_definition
+=head1  crud_definition
 
 defines the field this crud will contain
 

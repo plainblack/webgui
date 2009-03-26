@@ -63,7 +63,7 @@ sub addSurveyQuestionTypes{
 
 sub addWelcomeMessageTemplateToSettings {
     my $session = shift;
-    print "\tAdding welcome message template to settings \n" unless $quiet;
+    print "\tAdding welcome message template to settings... " unless $quiet;
 
     $session->db->write("insert into settings values ('webguiWelcomeMessageTemplate', 'PBtmpl0000000000000015');");
     print "Done.\n" unless $quiet;
@@ -72,7 +72,7 @@ sub addWelcomeMessageTemplateToSettings {
 #----------------------------------------------------------------------------
 sub addRssLimit {
     my $session = shift;
-    print "\tAdding rssLimit to RSSCapable table, if needed... \n" unless $quiet;
+    print "\tAdding rssLimit to RSSCapable table, if needed... " unless $quiet;
     my $sth = $session->db->read('describe RSSCapable rssCableRssLimit');
     if (! defined $sth->hashRef) {
         $session->db->write("alter table RSSCapable add column rssCableRssLimit integer");
@@ -83,7 +83,7 @@ sub addRssLimit {
 #----------------------------------------------------------------------------
 sub addImageAnnotation {
     my $session = shift;
-    print "\tAdding annotations to ImageAsset table, if needed... \n" unless $quiet;
+    print "\tAdding annotations to ImageAsset table, if needed... " unless $quiet;
     my $sth = $session->db->read('describe ImageAsset annotations');
     if (! defined $sth->hashRef) {
         $session->db->write("alter table ImageAsset add column annotations mediumtext");
@@ -94,7 +94,7 @@ sub addImageAnnotation {
 #----------------------------------------------------------------------------
 sub addStatisticsCacheTimeoutToMatrix{
     my $session = shift;
-    print "\tAdding statisticsCacheTimeout setting to Matrix table... \n" unless $quiet;
+    print "\tAdding statisticsCacheTimeout setting to Matrix table... " unless $quiet;
     $session->db->write("alter table Matrix add statisticsCacheTimeout int(11) not null default 3600");
     print "Done.\n" unless $quiet;
 }
@@ -104,7 +104,7 @@ sub addStatisticsCacheTimeoutToMatrix{
 # Describe what our function does
 sub adSkuInstall {
     my $session = shift;
-    print "\tCreate AdSku database table\n" unless $quiet;
+    print "\tCreate AdSku database table." unless $quiet;
     $session->db->write("CREATE TABLE AdSku (
 	assetId VARCHAR(22) BINARY NOT NULL,
 	revisionDate BIGINT NOT NULL,
@@ -118,10 +118,10 @@ sub adSkuInstall {
 	impressionDiscounts VARCHAR(1024) default '',
 	PRIMARY KEY (assetId,revisionDate)
     )");
-    print "\tCreate Adsku crud table\n" unless $quiet;
+    print "\tCreate Adsku crud table.\n" unless $quiet;
     use WebGUI::AssetCollateral::Sku::Ad::Ad;
     WebGUI::AssetCollateral::Sku::Ad::Ad->crud_createTable($session);
-    print "\tinstall the AdSku Asset\n" unless $quiet;
+    print "\tInstalling the AdSku Asset.\n" unless $quiet;
     $session->config->addToHash("assets", 'WebGUI::Asset::Sku::Ad' => { category => 'shop' } );
     print "DONE!\n" unless $quiet;
 }

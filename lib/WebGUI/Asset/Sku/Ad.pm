@@ -359,7 +359,6 @@ delete the add if it gets refunded
 sub  onRefund {
     my $self = shift;
     my $item = shift;
-    my $ad;
 
     my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($self->session,{
 	     constraints => [ { "transactionItemId = ?" => $item->getId } ],
@@ -367,7 +366,6 @@ sub  onRefund {
     my $crud = $iterator->();
 
     my $ad = WebGUI::AdSpace::Ad->new($self->session,$crud->get('adId'));
-    $ad = WebGUI::AdSpace::Ad->new($self->session,$crud->get('adId'));
     my $clicks = $ad->get('clicksBought') - $crud->get('clicksPurchased');
     my $impressions = $ad->get('impressionsBought') - $crud->get('impressionsPurchased') ;
     $ad->set({
