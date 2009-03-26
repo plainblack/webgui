@@ -317,8 +317,6 @@ sub exportAsHtml {
         # tell the user which asset we're exporting.
         unless ($quiet) {
             my $message = sprintf $i18n->get('exporting page'), $fullPath;
-            $exportSession->var->end;
-            $exportSession->close;
             $self->session->output->print($message);
         }
 
@@ -541,7 +539,7 @@ sub exportGetUrlAsPath {
     my $fileTypes       = $config->get('exportBinaryExtensions');
 
     # get the asset's URL as a URI::URL object for easy parsing of components
-    my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
+    my $url             = URI::URL->new($self->session->url->getSiteURL . $self->getUrl);
     my @pathComponents  = $url->path_components;
     shift @pathComponents; # first item is the empty string
     my $filename        = pop @pathComponents; 

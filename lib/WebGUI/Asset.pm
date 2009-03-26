@@ -930,7 +930,7 @@ sub getEditForm {
 			label       => $i18n->get('keywords'),
 			hoverHelp   => $i18n->get('keywords help'),
 			value       => $self->get('keywords'),
-			fieldType	=> 'text',
+			fieldType	=> 'keywords',
 			tab			=> 'meta',
 		}
 	);
