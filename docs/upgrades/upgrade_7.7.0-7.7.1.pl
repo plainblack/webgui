@@ -73,7 +73,7 @@ sub addWelcomeMessageTemplateToSettings {
 sub addRssLimit {
     my $session = shift;
     print "\tAdding rssLimit to RSSCapable table, if needed... " unless $quiet;
-    my $sth = $session->db->read('describe RSSCapable rssCableRssLimit');
+    my $sth = $session->db->read('describe RSSCapable rssCapableRssLimit');
     if (! defined $sth->hashRef) {
         $session->db->write("alter table RSSCapable add column rssCableRssLimit integer");
     }
