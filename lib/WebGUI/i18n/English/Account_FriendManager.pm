@@ -1,14 +1,14 @@
-package WebGUI::i18n::English::FriendManager;
+package WebGUI::i18n::English::Account_FriendManager;
 use strict;
 
 our $I18N = {
 
-    'settings groupIdAdminFriends label' => {
+    'setting groupIdAdminFriends label' => {
         message     => q{Friends Manager},
         lastUpdated => 0,
     },
 
-    'settings groupIdAdminFriends hoverHelp' => {
+    'setting groupIdAdminFriends hoverHelp' => {
         message     => q{Group to manage friends, to assign people to one another and to view the interface for managing friends.},
         lastUpdated => 0,
     },

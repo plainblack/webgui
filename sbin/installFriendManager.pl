@@ -16,7 +16,7 @@ use strict;
 use Pod::Usage;
 use Getopt::Long;
 use WebGUI::Session;
-use WebGUI::ProfileField;
+use WebGUI::Utility;
 
 # Get parameters here, including $help
 GetOptions(
@@ -31,7 +31,8 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 
 my $session = start( $webguiRoot, $configFile );
 
-installFriendManagerGroup($session);
+installFriendManagerSettings($session);
+installFriendManagerConfig($session);
 
 # Do your work here
 finish($session);
@@ -39,9 +40,28 @@ finish($session);
 #----------------------------------------------------------------------------
 # Your sub here
 
-sub installFriendManagerGroup {
+sub installFriendManagerSettings {
     my $session = shift;
     $session->setting->add('groupIdAdminFriends', 3);
+    $session->setting->add('friendManagerViewTemplate', '');
+    $session->setting->add('groupsToManageFriends', '2');
+}
+
+sub installFriendManagerConfig {
+    my $session = shift;
+    my $config  = $session->config;
+    my $account = $config->get('account');
+    my @classes = map { $_->{className} } @{ $account };
+    return if isIn('WebGUI::Account::FriendManager', @classes);
+    print "Installing FriendManager\n";
+    push @{ $account },
+        {
+            identifier => 'friendManager',
+            title      => '^International(title,Account_FriendManager);',
+            className  => 'WebGUI::Account::FriendManager',
+        }
+    ;
+    $config->set('account', $account);
 }
 
 #----------------------------------------------------------------------------

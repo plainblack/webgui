@@ -59,24 +59,26 @@ sub editSettingsForm {
     my $f       = WebGUI::HTMLForm->new($session);
 
     $f->group(
-		name      => "groupIdAdminFriends",
-		value     => $session->setting->get('groupIdAdminFriends'),
-		label     => $i18n->get("setting groupIdAdminFriends label"),
-        hoverHelp => $i18n->get("setting groupIdAdminFriends hoverHelp")
+        name      => "groupIdAdminFriends",
+        value     => $session->setting->get('groupIdAdminFriends'),
+        label     => $i18n->get("setting groupIdAdminFriends label"),
+        hoverHelp => $i18n->get("setting groupIdAdminFriends hoverHelp"),
     );
     $f->group(
-		name      => "groupsToManageFriends",
-		value     => $session->setting->get('groupsToManageFriends'),
+        name      => "groupsToManageFriends",
+        value     => $session->setting->get('groupsToManageFriends'),
         multiple  => 1,
-		label     => $i18n->get("groupsToManageFriends label"),
-        hoverHelp => $i18n->get("groupsToManageFriends hoverHelp")
+        size      => 5,
+        label     => $i18n->get("groupsToManageFriends label"),
+        hoverHelp => $i18n->get("groupsToManageFriends hoverHelp"),
+        defaultValue => [2,3],
     );
     $f->template(
-		name      => "friendManagerViewTemplateId",
-		value     => $self->session->setting->get("friendManagerViewTemplateId"),
-		namespace => "Account/FriendManager/View",
-		label     => $i18n->get("view template label"),
-        hoverHelp => $i18n->get("view template hoverHelp")
+        name      => "friendManagerViewTemplateId",
+        value     => $self->session->setting->get("friendManagerViewTemplateId"),
+        namespace => "Account/FriendManager/View",
+        label     => $i18n->get("view template label"),
+        hoverHelp => $i18n->get("view template hoverHelp"),
     );
 
     return $f->printRowsOnly;
@@ -96,7 +98,10 @@ sub editSettingsFormSave {
     my $setting = $session->setting;
     my $form    = $session->form;
 
-    $setting->set("moduleViewTemplateId", $form->process("moduleViewTemplateId","template"));
+    $setting->set("moduleViewTemplateId",  $form->process("moduleViewTemplateId",  "template"));
+    my $groupsToManageFriends = $form->process("groupsToManageFriends", "group");
+    $setting->set("groupsToManageFriends", $groupsToManageFriends);
+    $setting->set("groupIdAdminFriends",   $form->process("groupIdAdminFriends",   "group"));
 }
 
 #-------------------------------------------------------------------
