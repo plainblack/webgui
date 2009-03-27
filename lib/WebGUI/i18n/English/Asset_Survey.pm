@@ -960,9 +960,9 @@ directly inside the answer_loop for other types of questions.|,
     },
 
     'maxResponsesPerUser' => {
-        message => q|The number of times the user can attempt to get the correct answer on each question. The default is 1.|,
+        message => q|The number of times the user can attempt to get the correct answer on each question. 0 means unlimited. The default is 1.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 1168643566,
+        lastUpdated => 1238131023,
     },
 
     'survey questions template title' => {
