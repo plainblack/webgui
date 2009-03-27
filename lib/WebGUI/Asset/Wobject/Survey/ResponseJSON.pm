@@ -462,8 +462,8 @@ sub recordResponses {
     my ($responses) = validate_pos( @_, { type => HASHREF } );
 
     # Build a lookup table of non-multiple choice question types
-    my %knownTypes = map {$_ => 1} $self->survey->specialQuestionTypes;
-
+    my %knownTypes = map {$_ => 1} @{$self->survey->specialQuestionTypes};
+    
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section   = $self->nextResponseSection();
