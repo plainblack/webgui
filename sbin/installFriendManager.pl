@@ -42,9 +42,11 @@ finish($session);
 
 sub installFriendManagerSettings {
     my $session = shift;
-    $session->setting->add('groupIdAdminFriends', 3);
-    $session->setting->add('friendManagerViewTemplate', '');
-    $session->setting->add('groupsToManageFriends', '2');
+    print "Installing FriendManager into settings...";
+    $session->setting->add('groupIdAdminFriends',       '3');
+    $session->setting->add('friendManagerViewTemplate', '64tqS80D53Z0JoAs2cX2VQ');
+    $session->setting->add('groupsToManageFriends',     '2');
+    print "\tDone";
 }
 
 sub installFriendManagerConfig {
@@ -53,7 +55,7 @@ sub installFriendManagerConfig {
     my $account = $config->get('account');
     my @classes = map { $_->{className} } @{ $account };
     return if isIn('WebGUI::Account::FriendManager', @classes);
-    print "Installing FriendManager\n";
+    print "Installing FriendManager into config file...";
     push @{ $account },
         {
             identifier => 'friendManager',
@@ -62,6 +64,7 @@ sub installFriendManagerConfig {
         }
     ;
     $config->set('account', $account);
+    print "\tDone";
 }
 
 #----------------------------------------------------------------------------

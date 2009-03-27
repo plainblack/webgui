@@ -8,6 +8,8 @@ use WebGUI::Pluggable;
 use WebGUI::Utility;
 use base qw/WebGUI::Account/;
 
+use JSON qw(from_json to_json);
+
 =head1 NAME
 
 Package WebGUI::Account::FriendManager
@@ -34,7 +36,7 @@ These methods are available from this class:
 
 =head2 canView ( )
 
-    Returns whether or not the user can view the the tab for this module
+Returns whether or not the user can view the the tab for this module
 
 =cut
 
@@ -88,7 +90,7 @@ sub editSettingsForm {
 
 =head2 editSettingsFormSave ( )
 
-  Creates form elements for the settings page custom to this account module
+Save
 
 =cut
 
@@ -98,7 +100,7 @@ sub editSettingsFormSave {
     my $setting = $session->setting;
     my $form    = $session->form;
 
-    $setting->set("moduleViewTemplateId",  $form->process("moduleViewTemplateId",  "template"));
+    $setting->set("friendManagerViewTemplateId",  $form->process("friendManagerViewTemplateId",  "template"));
     my $groupsToManageFriends = $form->process("groupsToManageFriends", "group");
     $setting->set("groupsToManageFriends", $groupsToManageFriends);
     $setting->set("groupIdAdminFriends",   $form->process("groupIdAdminFriends",   "group"));
@@ -116,8 +118,20 @@ sub www_view {
     my $self    = shift;
     my $session = $self->session;
     my $var     = {};
+    $var->{group_loop} = [];
 
-    return $self->processTemplate($var,$session->setting->get("moduleViewTemplateId"));
+    my $groupIds = $session->setting->get('groupsToManageFriends');
+    my @groupIds = split "\n", $groupIds;
+    GROUP: foreach my $groupId (@groupIds) {
+        my $group = WebGUI::Group->new($session, $groupId);
+        next GROUP unless $group->getId || $group->getId eq 'new';
+        push @{ $var->{group_loop} }, {
+            groupId   => $groupId,
+            groupName => $group->getName,
+        };
+    }
+
+    return $self->processTemplate($var,$session->setting->get("friendManagerViewTemplateId"));
 }
 
 
