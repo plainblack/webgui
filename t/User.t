@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 147; # increment this value for each test you create
+use Test::More tests => 149; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -671,6 +671,17 @@ is(
     "/home?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
     'getProfileUrl: uses session->url->page if no URL is passed in'
 );
+
+################################################################
+#
+# hasFriends
+#
+################################################################
+
+ok(! $neighbor->hasFriends, 'hasFriends, user has no friends');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(  $neighbor->hasFriends, 'hasFriends, user has a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
