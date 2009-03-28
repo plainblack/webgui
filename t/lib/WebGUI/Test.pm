@@ -2,6 +2,7 @@ package WebGUI::Test;
 
 use strict;
 use warnings;
+use Storable qw/dclone/;
 
 =head1 LEGAL
 
@@ -46,6 +47,8 @@ our $logger_warns;
 our $logger_debug;
 our $logger_info;
 our $logger_error;
+
+my %originalConfig = ();
 
 BEGIN {
 
@@ -134,6 +137,14 @@ END {
         $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
         $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
         $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+    }
+    while (my ($key, $value) = each %originalConfig) {
+        if (defined $value) {
+            $SESSION->config->set($key, $value);
+        }
+        else {
+            $SESSION->config->delete($key);
+        }
     }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
@@ -331,6 +342,24 @@ sub session {
     return $SESSION;
 }
 
+
+#----------------------------------------------------------------------------
+
+=head2 originalConfig ( $param )
+
+Stores the original data from the config file, to be restored
+automatically at the end of the test.  This is a class method.
+
+=cut
+
+sub originalConfig {
+    my ($class, $param) = @_;
+    my $safeValue = my $value = $SESSION->config->get($param);
+    if (ref $value) {
+        $safeValue = dclone $value;
+    }
+    $originalConfig{$param} = $safeValue;
+}
 
 #----------------------------------------------------------------------------
 
