@@ -304,6 +304,14 @@ sub getEditForm {
         -hoverHelp      =>$i18n->get("description description"),
         -value          =>$self->getValue('description'),
         );
+    if ($self->getParent->canEdit) {
+        $form->user(
+            name        =>"ownerUserId",
+            value       =>$self->getValue('ownerUserId'),
+            label       =>$i18n->get('maintainer label'),
+            hoverHelp   =>$i18n->get('maintainer description'),
+            );
+    }
     $form->text(        
         -name           =>'version',
         -defaultValue   =>undef,

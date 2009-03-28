@@ -6,6 +6,7 @@
    to place a small form next to each Sku that displays.  Sku's with complex
    forms (like the EMS sku's), simply display a button to take the user to the
    sku's view screen for the whole form. [TEMPLATE]
+ - fixed #9933: Matrix 2.0 - Unable to view/edit product maintainer account
 
 7.7.1
  - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities
