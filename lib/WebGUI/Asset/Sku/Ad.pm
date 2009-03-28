@@ -138,6 +138,18 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm
+
+Returns an empty string, since the add to cart form is complex.
+
+=cut
+
+sub getAddToCartForm {
+     return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 getClickDiscountText
 
 returns the text to display the number of clicks purchasaed where discounts apply

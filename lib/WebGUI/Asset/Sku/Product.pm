@@ -242,6 +242,37 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.  Overrode master class to add variant dropdown.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Product');
+    my %variants = ();
+    tie %variants, 'Tie::IxHash';
+    foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+        $variants{$collateral->{variantId}} = join ", ", $collateral->{shortdesc}, sprintf('%.2f',$collateral->{price});
+    }
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func',  value => 'buy'})
+      . WebGUI::Form::selectBox( $session, {
+                name    => 'vid',
+                options => \%variants,
+                value   => [0],
+        })
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('add to cart')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAllCollateral ( tableName )
 
 Returns an array reference to the translated JSON data for the

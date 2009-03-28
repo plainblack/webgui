@@ -161,6 +161,27 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Sku');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'addToCart'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('add to cart')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCart ( )
 
 Returns a reference to the current session's cart.

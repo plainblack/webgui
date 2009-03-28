@@ -2,6 +2,10 @@
  - fixed #9955: Matrix alpha sort is backwards
  - fixed #9934: Matrix 2.0 - Products should be listed alphabetically
  - fixed #9865: Matrix: Later added attributes are not detected in older listings
+ - added: Sku's now have a getAddToCartForm method, which is used by the Shelf
+   to place a small form next to each Sku that displays.  Sku's with complex
+   forms (like the EMS sku's), simply display a button to take the user to the
+   sku's view screen for the whole form. [TEMPLATE]
 
 7.7.1
  - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities

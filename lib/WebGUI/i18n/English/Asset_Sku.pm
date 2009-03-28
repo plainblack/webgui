@@ -93,6 +93,18 @@ our $I18N = {
 		context => q|help for tax rate override field|
 	},
 
+	'add to cart' => {
+		message => q|Add To Cart|,
+		lastUpdated => 0,
+		context => q|i18n label for the add to cart button|,
+	},
+
+	'see more' => {
+		message => q|See more|,
+		lastUpdated => 0,
+		context => q|alternate i18n label for the add to cart button|,
+	},
+
 	'Add a Variant' => {
 		message => q|Add a Variant|,
 		lastUpdated => 0,
