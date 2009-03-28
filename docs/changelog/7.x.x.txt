@@ -2,6 +2,7 @@
  - fixed #9955: Matrix alpha sort is backwards
  - fixed #9934: Matrix 2.0 - Products should be listed alphabetically
  - fixed #9865: Matrix: Later added attributes are not detected in older listings
+ - fixed #9933: Matrix 2.0 - Unable to view/edit product maintainer account
 
 7.6.17
  - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
