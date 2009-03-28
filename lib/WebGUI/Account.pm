@@ -242,7 +242,9 @@ sub editSettingsFormSave {
 
 =head2 getLayoutTemplateId ( )
 
-Override this method to return the template Id for the account layout.
+Override this method to return the template Id for the account layout.  The default
+account layout draws a tabbed interface to the different account plugins, and displays
+the content from a particular screen from the account plugin.
 
 =cut
 
@@ -255,7 +257,8 @@ sub getLayoutTemplateId {
 
 =head2 getStyleTemplate ( )
 
-Override this method to return the template for the main style.
+Override this method to return the template for the main style.  The style would
+be for the page that the account layout template is embedded in.
 
 =cut
 
