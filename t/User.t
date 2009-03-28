@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 144; # increment this value for each test you create
+use Test::More tests => 147; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -623,8 +623,13 @@ cmp_bag(
 );
 
 
-#----------------------------------------------------------------------------
-# Test the new create() method
+
+################################################################
+#
+# create
+#
+################################################################
+
 SKIP: {
     eval{ require Test::Exception; import Test::Exception };
     skip 1, 'Test::Exception not found' if $@;
@@ -639,6 +644,33 @@ ok( my $newCreateUser = WebGUI::User->create( $session ),
 );
 isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 
+################################################################
+#
+# getProfileUrl
+#
+################################################################
+
+WebGUI::Test->originalConfig('profileModuleIdentifier');
+my $profileModuleId = $session->config->get('profileModuleIdentifier');
+is(
+    $newFish->getProfileUrl('cellblock'),
+    "cellblock?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
+    'getProfileUrl: passing a page'
+);
+$session->config->set('profileModuleIdentifier', 'someOtherThing');
+is(
+    $newFish->getProfileUrl('cellblock'),
+    "cellblock?op=account;module=someOtherThing;do=view;uid=".$newFish->userId,
+    'getProfileUrl: uses profileModuleIdentifier to pick the right Account module'
+);
+$session->config->set('profileModuleIdentifier', $profileModuleId);
+
+$session->asset(WebGUI::Asset->getDefault($session));
+is(
+    $newFish->getProfileUrl(),
+    "/home?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
+    'getProfileUrl: uses session->url->page if no URL is passed in'
+);
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
