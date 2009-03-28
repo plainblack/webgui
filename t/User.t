@@ -314,6 +314,7 @@ $dude->deleteFromGroups([12]);
 my $origEnvHash = $session->env->{_env};
 my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
 $session->env->{_env} = \%newEnv;
+WebGUI::Test->originalConfig('adminModeSubnets');
 $session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
@@ -650,10 +651,7 @@ END {
         }
     }
 
-    (defined $expiredGroup  and ref $expiredGroup  eq 'WebGUI::Group') and $expiredGroup->delete;
-
     ##Note, do not delete the visitor account.  That would be really bad
-    $session->config->delete('adminModeSubnets');
 
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
@@ -661,7 +659,7 @@ END {
     $evalProfileField->delete;
     $visitor->profileField('email', $originalVisitorEmail);
 
-    $newProfileField->delete();
+    $newProfileField->delete() if $newProfileField;
 
 	$testCache->flush;
     my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');
