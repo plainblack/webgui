@@ -155,7 +155,7 @@ sub definition {
                                 lineage         => $i18n->get('sort by asset rank label'),
                                 lastUpdated     => $i18n->get('sort by last updated label'),
                               },
-            defaultValue    =>"score",
+            defaultValue    =>"title",
             hoverHelp       =>$i18n->get('default sort description'),
             label           =>$i18n->get('default sort label'),
         },
@@ -1010,6 +1010,9 @@ sub www_getCompareFormData {
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' desc';
+    if ($sort eq 'title'){
+        $sortDirection = ' asc';
+    }
     
     my @listingIds = $session->form->checkList("listingId");
     
