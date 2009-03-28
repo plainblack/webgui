@@ -335,21 +335,17 @@ sub getEditForm {
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
         $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
-        my $attributes;
-        if ($session->form->process('func') eq 'add'){
-            $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
-                [$category,$matrixId]);
-        }
-        else{
-            $attributes = $db->read("select * from Matrix_attribute as attribute 
-                left join MatrixListing_attribute as listing using(attributeId) 
-                where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
-                [$self->getId,$category,$matrixId]);
-        }
+        my $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
+            [$category,$matrixId]);
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label}     = $attribute->{name};
             $attribute->{subtext}   = $attribute->{description};
             $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
+            unless($session->form->process('func') eq 'add'){
+                $attribute->{value} = $db->quickScalar("select value from MatrixListing_attribute 
+                    where attributeId = ? and matrixId = ? and matrixListingId = ?",
+                    [$attribute->{attributeId},$matrixId,$self->getId]);
+            }
             if($attribute->{fieldType} eq 'Combo'){
                 my %options;
                 tie %options, 'Tie::IxHash';

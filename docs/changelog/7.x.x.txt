@@ -1,6 +1,7 @@
 7.7.2
  - fixed #9955: Matrix alpha sort is backwards
  - fixed #9934: Matrix 2.0 - Products should be listed alphabetically
+ - fixed #9865: Matrix: Later added attributes are not detected in older listings
 
 7.7.1
  - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities
