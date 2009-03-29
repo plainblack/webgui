@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 149; # increment this value for each test you create
+use Test::More tests => 157; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -682,6 +682,26 @@ ok(! $neighbor->hasFriends, 'hasFriends, user has no friends');
 $friend->addToGroups([$neighbor->friends->getId]);
 ok(  $neighbor->hasFriends, 'hasFriends, user has a friend');
 $friend->deleteFromGroups([$neighbor->friends->getId]);
+
+################################################################
+#
+# acceptsFriendsRequests
+#
+################################################################
+
+ok(! $neighbor->acceptsFriendsRequests(), 'acceptsFriendsRequests: returns 0 unless you give it an object');
+ok(! $neighbor->acceptsFriendsRequests($session), '... returns 0 unless you give it a user object');
+ok(! $visitor->acceptsFriendsRequests($neighbor), '... visitor cannot have friends');
+ok(! $neighbor->acceptsFriendsRequests($visitor), '... visitor cannot be a friend');
+ok(! $neighbor->acceptsFriendsRequests($neighbor), '... cannot be your own friend');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(! $neighbor->acceptsFriendsRequests($friend), '... cannot accept requests if you are already a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+$neighbor->profileField('ableToBeFriend', 0);
+ok(! $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=0');
+$neighbor->profileField('ableToBeFriend', 1);
+ok(  $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=1');
+
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
