@@ -161,9 +161,9 @@ sub acceptsFriendsRequests {
     return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
 
     my $me     = WebGUI::Friends->new($session,$self);
-    my $friend = WebGUI::Friends->new($session,$user);
-
     return 0 if ($me->isFriend($user->userId));  #Already a friend
+
+    my $friend = WebGUI::Friends->new($session,$user);
     return 0 if ($me->isInvited($user->userId) || $friend->isInvited($self->userId)); #Invitation sent by one or the other
 
     return $self->profileField('ableToBeFriend'); #Return profile setting
