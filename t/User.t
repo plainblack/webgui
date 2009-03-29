@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 157; # increment this value for each test you create
+use Test::More tests => 167; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -702,6 +702,33 @@ ok(! $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=0')
 $neighbor->profileField('ableToBeFriend', 1);
 ok(  $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=1');
 
+################################################################
+#
+# profileIsViewable
+#
+################################################################
+
+ok(  $visitor->can('profileIsViewable'), 'profileIsViewable: is a WebGUI::User method');
+my $originalVisitorPublicProfile = $visitor->profileField('publicProfile');
+$visitor->profileField('publicProfile', 'all');
+ok(! $visitor->profileIsViewable, '... visitors profile is not viewable, even if publicProfile=all');
+ok(! $visitor->profileIsViewable($visitor), '... visitor cannot see his own profile');
+
+my $originalNeighborPublicProfile = $neighbor->profileField('publicProfile');
+$neighbor->profileField('publicProfile', 'none');
+ok(  $neighbor->profileIsViewable($neighbor), '... you may always see your own profile field');
+ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=none');
+ok(! $neighbor->profileIsViewable($admin), '... visitor permission follows publicProfile=none, even admin');
+$neighbor->profileField('publicProfile', 'all');
+ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=all');
+ok(  $neighbor->profileIsViewable($visitor), '... visitor permission follows publicProfile=all, even visitor');
+$neighbor->profileField('publicProfile', 'friends');
+ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, not a friend');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, now a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+
+$neighbor->profileField('publicProfile', $originalNeighborPublicProfile);
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
@@ -720,7 +747,8 @@ END {
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
     $evalProfileField->delete;
-    $visitor->profileField('email', $originalVisitorEmail);
+    $visitor->profileField('email',         $originalVisitorEmail);
+    $visitor->profileField('publicProfile', $originalVisitorPublicProfile);
 
     $newProfileField->delete() if $newProfileField;
 
