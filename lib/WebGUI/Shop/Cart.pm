@@ -503,10 +503,6 @@ sub readyForCheckout {
     my $address = eval{$self->getShippingAddress};
     return 0 if WebGUI::Error->caught;
 
-    # Check if the ship driver is chosen and existant
-    my $ship = eval {$self->getShipper};
-    return 0 if WebGUI::Error->caught;
-
     # Check if the cart has items
     return 0 unless scalar @{ $self->getItems };
     
