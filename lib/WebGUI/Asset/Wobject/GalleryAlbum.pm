@@ -11,7 +11,8 @@ package WebGUI::Asset::Wobject::GalleryAlbum;
 #-------------------------------------------------------------------
 
 use strict;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use Carp qw( croak );
 use File::Find;
 use File::Spec;
@@ -77,7 +78,7 @@ sub definition {
         properties          => \%properties,
     };
 
-    return $class->SUPER::definition($session, $definition);
+    return $class->next::method($session, $definition);
 }
 
 #----------------------------------------------------------------------------
@@ -174,7 +175,7 @@ sub addChild {
         return undef;
     }
 
-    return $self->SUPER::addChild( $properties, @_ );
+    return $self->next::method( $properties, @_ );
 }
 
 #----------------------------------------------------------------------------
@@ -400,7 +401,7 @@ sub getCurrentRevisionDate {
         return $revisionDate;
     }
     else {
-        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+        return $class->next::method( $session, $assetId );
     }
 }
 
@@ -495,6 +496,41 @@ sub getPreviousAlbum {
     return undef unless $previousId;
     $self->{_previousAlbum} = WebGUI::Asset->newByDynamicClass( $self->session, $previousId );
     return $self->{_previousAlbum};
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRssFeedItems ()
+
+Returns an array reference of hash references. Each hash reference has a title,
+description, link, and date field. The date field can be either an epoch date, an RFC 1123
+date, or a ISO date in the format of YYYY-MM-DD HH:MM::SS. Optionally specify an
+author, and a guid field.
+
+=cut
+
+sub getRssFeedItems {
+    my $self        = shift;
+
+    my $p
+        = $self->getFilePaginator( { 
+            perpage     => $self->get('itemsPerFeed'),
+        } );
+    
+    my $var = [];
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $self->session, $assetId );
+        push @{ $var }, {
+            'link'          => $asset->getUrl,
+            'guid'          => $asset->{_properties}->{ 'assetId' },
+            'title'         => $asset->getTitle,
+            'description'   => $asset->{_properties}->{ 'description' },
+            'date'          => $asset->{_properties}->{ 'creationDate' },
+            'author'        => WebGUI::User->new($self->session, $asset->{_properties}->{ 'ownerUserId' })->username
+        };
+    }
+    
+    return $var;
 }
 
 #----------------------------------------------------------------------------
@@ -639,7 +675,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->SUPER::prepareView();
+    $self->next::method();
 
     my $templateId  = $self->getParent->get("templateIdViewAlbum");
 
@@ -719,7 +755,7 @@ approval workflow.
 sub processPropertiesFromFormPost {
     my $self        = shift;
     my $form        = $self->session->form;
-    my $errors      = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors      = $self->next::method || [];
 
     # Return if error
     return $errors  if @$errors;
@@ -762,7 +798,7 @@ Override update to force isHidden=1 on all albums.
 sub update {
     my $self        = shift;
     my $properties  = shift;
-    return $self->SUPER::update({ %{ $properties }, isHidden=>1 });
+    return $self->next::method({ %{ $properties }, isHidden=>1 });
 }
 
 #----------------------------------------------------------------------------

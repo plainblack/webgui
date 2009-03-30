@@ -330,7 +330,12 @@ sub exportAsHtml {
             $exportSession->close;
             return ($returnCode, $message);
         }
-
+        
+        # Stash the current session and i18n into the asset so that exportAssetCollateral can
+        #   also write informative messages to the output terminal. :)
+        $asset->{ '_masterSession' } = $self->session;
+        $asset->{ '_masteri18n' } = $i18n;
+        
         # next, tell the asset that we're exporting, so that it can export any
         # of its collateral or other extra data.
         eval { $asset->exportAssetCollateral($asset->exportGetUrlAsPath, $args) };

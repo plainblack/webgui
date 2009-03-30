@@ -10,6 +10,13 @@
    sku's view screen for the whole form. [TEMPLATE]
  - fixed #9933: Matrix 2.0 - Unable to view/edit product maintainer account
  - fixed #9951: Matrix 2.0: Median not calculated correctly
+ - added new AssetAspect::RssFeed (Matthew Wilson) - to convert an asset to use it (see
+   Collaboration.pm as an example), inherit from Class::C3 as in Collaboration
+   and you'll need to remove all your ->SUPER::xxxxx invocations - usually replace it
+   with ->next::method, but when your SUPER was previously calling a method with
+   a name different from your current method, you'll need to specify the parent/super
+   module name explicity (e.g.  ->WebGUI::Asset::Wobject::canEdit()).  You'll also
+   need to implement the getRssFeedItems method as explained in AssetAspect/RssFeed.pm
 
 7.7.1
  - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities

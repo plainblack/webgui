@@ -17,7 +17,8 @@ use WebGUI::Cache;
 use WebGUI::Exception;
 use WebGUI::HTML;
 use WebGUI::International;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use WebGUI::Macro;
 use XML::FeedPP;
 
@@ -116,7 +117,7 @@ sub definition {
                 className=>'WebGUI::Asset::Wobject::SyndicatedContent',
                 properties=>\%properties
 		});
-        return $class->SUPER::definition($session, $definition);
+        return $class->next::method($session, $definition);
 }
 
 #-------------------------------------------------------------------
@@ -129,6 +130,7 @@ Combines all feeds into a single XML::FeedPP object.
 
 sub generateFeed {
 	my $self = shift;
+    my $limit = shift || $self->get('maxHeadlines');
 	my $feed = XML::FeedPP::Atom->new();
 	my $log = $self->session->log;
 	
@@ -173,13 +175,60 @@ sub generateFeed {
 	# sort them by date
 	$feed->sort_item();
 	
-	# limit the feed to the maxium number of headlines
-	$feed->limit_item($self->get('maxHeadlines'));
+	# limit the feed to the maximum number of headlines (or the feed generator limit).
+	$feed->limit_item($limit);
 	
 	# mark this asset as updated
 	$self->update({}) if ($newlyCached);
 	
 	return $feed;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getFeed ()
+
+Override the one in the parent...
+
+=cut
+
+sub getFeed {
+    my $self = shift;
+    my $feed = shift;
+    foreach my $item ($self->generateFeed( $self->get('itemsPerFeed') )->get_item) {
+        my $set_permalink_false = 0;
+        my $new_item = $feed->add_item( $item );
+        warn "creating item !";
+        if (!$new_item->guid) {
+            if ($new_item->link) {
+                $new_item->guid( $new_item->link );
+            } else {
+                $new_item->guid( $self->session->id->generate );
+                $set_permalink_false = 1;
+            }
+        }
+        $new_item->guid( $new_item->guid, isPermaLink => 0 ) if $set_permalink_false;
+    }
+    $feed->title( $self->get('feedTitle') || $self->get('title') );
+    $feed->description( $self->get('feedDescription') || $self->get('synopsis') );
+    $feed->pubDate( $self->getContentLastModified );
+    $feed->copyright( $self->get('feedCopyright') );
+    $feed->link( $self->getUrl );
+    # $feed->language( $lang );
+    if ($self->get('feedImage')) {
+        my $storage = WebGUI::Storage->get($self->session, $self->get('feedImage'));
+        my @files = @{ $storage->getFiles };
+        if (scalar @files) {
+            $feed->image(
+                $storage->getUrl( $files[0] ),
+                $self->get('feedImageDescription') || $self->getTitle,
+                $self->get('feedImageUrl') || $self->getUrl,
+                $self->get('feedImageDescription') || $self->getTitle,
+                ( $storage->getSizeInPixels( $files[0] ) ) # expands to width and height
+            );
+        }
+    }
+    return $feed;
 }
 
 #-------------------------------------------------------------------
@@ -256,7 +305,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	$self->next::method;
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
@@ -279,7 +328,7 @@ See WebGUI::Asset::purgeCache() for details.
 sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
-	$self->SUPER::purgeCache;
+	$self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -318,59 +367,7 @@ See WebGUI::Asset::Wobject::www_view() for details.
 sub www_view {
 	my $self = shift;
 	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	$self->SUPER::www_view(@_);
-}
-
-
-#-------------------------------------------------------------------
-
-=head2 www_viewAtom ( )
-
-Emit an Atom 0.3 feed.
-
-=cut
-
-sub www_viewAtom {
-	my $self = shift;
-	my $feed = $self->generateFeed;
-	my $atom = XML::FeedPP::Atom->new;
-	$atom->merge($feed);
-	$self->session->http->setMimeType('application/atom+xml');
-	return $atom->to_string;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRdf ( )
-
-Emit an RSS 1.0 / RDF feed. 
-
-=cut
-
-sub www_viewRdf {
-	my $self = shift;
-	my $feed = $self->generateFeed;
-	my $rdf = XML::FeedPP::RDF->new;
-	$rdf->merge($feed);
-	$self->session->http->setMimeType('application/rdf+xml');
-	return $rdf->to_string;
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_viewRss ( )
-
-Emit an RSS 2.0 feed.
-
-=cut
-
-sub www_viewRss {
-	my $self = shift;
-	my $feed = $self->generateFeed;
-	my $rss = XML::FeedPP::RSS->new;
-	$rss->merge($feed);
-	$self->session->http->setMimeType('application/rss+xml');
-	return $rss->to_string;
+	$self->next::method(@_);
 }
 
 #-------------------------------------------------------------------

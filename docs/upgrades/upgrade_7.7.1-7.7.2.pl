@@ -33,6 +33,9 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 recalculateMatrixListingMedianValue( $session );
+addRssFeedAspect($session);
+addRssFeedAspectToAssets($session);
+removeRssCapableAsset($session);
 
 finish($session); # this line required
 
@@ -67,6 +70,49 @@ category = ?",[$medianValue,$listing->{listingId},$category]);
     }
     print "Done.\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub addRssFeedAspect {
+    my $session = shift;
+    print "\tAdding RssFeed asset aspect..." unless $quiet;
+    $session->db->write("create table assetAspectRssFeed (
+        assetId char(22) binary not null,
+        revisionDate bigint not null,
+        itemsPerFeed int(11) default 25,
+        feedCopyright text,
+        feedTitle text,
+        feedDescription mediumtext,
+        feedImage char(22) binary,
+        feedImageLink text,
+        feedImageDescription mediumtext,
+        primary key (assetId, revisionDate)
+        )");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addRssFeedAspectToAssets {
+    my $session = shift;
+    foreach my $asset_class (qw( WikiMaster Collaboration SyndicatedContent Gallery GalleryAlbum )) {
+        print "\tAdding RssFeed aspect to $asset_class table..." unless $quiet;
+        my $db = $session->db;
+        my $pages = $db->read("select assetId,revisionDate from $asset_class");
+        while (my ($id, $rev) = $pages->array) {
+            $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,25,'','',NULL,'','')",[$id,$rev]);
+        }
+        print "Done.\n" unless $quiet;
+    }
+}
+
+#----------------------------------------------------------------------------
+sub removeRssCapableAsset {
+    my $session = shift;
+    print "\tRemoving prior RssCapable asset..." unless $quiet;
+    $session->db->write("drop table RSSCapable");
+    $session->db->write("drop table RSSFromParent");
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Describe what our function does
