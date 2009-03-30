@@ -32,8 +32,45 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+recalculateMatrixListingMedianValue( $session );
+
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub recalculateMatrixListingMedianValue{
+    my $session = shift;
+    print "\tRecalculating median value for Matrix Listing ratings... \n" unless $quiet;
+    my $matrices   = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
+        {
+            statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
+            statusToInclude     => ['pending','approved','deleted','archived'],
+            includeOnlyClasses  => ['WebGUI::Asset::Wobject::Matrix'],
+            returnObjects       => 1,
+        });
+
+    for my $matrix (@{$matrices})
+    {
+        next unless defined $matrix;
+        print 'upgrading matrix: '.$matrix->get('title')."\n";
+    my %categories = keys %{$matrix->getCategories};
+    my $listings = $session->db->read("select distinct listingId from MatrixListing_rating where assetId = ?"
+        ,[$matrix->getId]);
+        while (my $listing= $listings->hashRef){
+        print 'upgrading listing: '.$listing->{listingId}."\n";
+        foreach my $category (%categories) {
+            print 'category: '.$category;
+            my $half = $session->db->quickScalar("select round((select count(*) from MatrixListing_rating where
+listingId = ? and category = ?)/2)",[$listing->{listingId},$category]);
+            my $medianValue = $session->db->quickScalar("select rating from MatrixListing_rating where listingId =?
+and category =? order by rating limit $half,1;",[$listing->{listingId},$category]);
+            print ', medianValue: '.$medianValue."\n";
+            $session->db->write("update MatrixListing_ratingSummary set medianValue = ? where listingId = ? and
+category = ?",[$medianValue,$listing->{listingId},$category]);
+        }
+    }
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does

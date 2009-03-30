@@ -563,7 +563,7 @@ sub setRatings {
         
         my $half    = round($count/2);
         my $mean    = $sum / ($count || 1);
-        my $median  = $db->quickScalar("select rating $sql limit $half,$half",[$self->getId,$category]);
+        my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$self->getId,$category]);
         
         $db->write("replace into MatrixListing_ratingSummary 
             (listingId, category, meanValue, medianValue, countValue, assetId) 
