@@ -45,8 +45,6 @@ plan tests => $numTests;
 my $macro = 'WebGUI::Macro::L_loginBox';
 my $loaded = use_ok($macro);
 
-my $originalEncryptLogin = $session->setting->get('encryptLogin');
-
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
@@ -245,5 +243,4 @@ END { ##Clean-up after yourself, always
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}
-	$session->setting->set("encryptLogin", $originalEncryptLogin);
 }

@@ -149,8 +149,6 @@ is($eh->canShowBasedOnIP(''), 0, 'canShowBasedOnIP: must send IP setting');
 #
 ####################################################
 
-my $origDebugIp   = $session->setting->get('debugIp');
-my $origShowDebug = $session->setting->get('showDebug');
 
 $session->setting->set('showDebug', 0);
 delete $eh->{_canShowDebug};
@@ -182,8 +180,6 @@ ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address 
 # canShowPerformanceIndicators
 #
 ####################################################
-
-my $origShowPerf = $session->setting->get('showPerformanceIndicators');
 
 $session->setting->set('showPerformanceIndicators', 0);
 is($eh->canShowPerformanceIndicators, 0, 'canShowPerformanceIndicators: returns 0 if not enabled');
@@ -243,8 +239,4 @@ TODO: {
 }
 
 END {
-	$session->setting->set('debugIp',   $origDebugIp);
-	$session->setting->set('showDebug', $origShowDebug);
-
-	$session->setting->set('showPerformanceIndicators', $origShowPerf);
 }

@@ -48,7 +48,8 @@ our $logger_debug;
 our $logger_info;
 our $logger_error;
 
-my %originalConfig = ();
+my %originalConfig;
+my $originalSetting;
 
 BEGIN {
 
@@ -128,6 +129,8 @@ BEGIN {
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
     $SESSION->{_request} = $pseudoRequest;
 
+    $originalSetting = clone $SESSION->setting;
+
 }
 
 END {
@@ -145,6 +148,10 @@ END {
         else {
             $SESSION->config->delete($key);
         }
+    }
+    my $settings = $originalSetting->get();
+    while (my ($param, $value) = each %{ $settings }) {
+        $SESSION->setting->set($param, $value);
     }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;

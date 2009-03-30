@@ -558,8 +558,6 @@ sub setup_assets {
 }
 
 END {
-	$session->setting->set('preventProxyCache', $origPreventProxyCache);
-	$session->setting->set('userFunctionStyleId', $origUserStyle);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}

@@ -115,5 +115,4 @@ foreach my $testSession (@sessions) {
 
 END {
     $workflow->delete;
-    $session->setting->set('sessionTimeout', $origSessionTimeout );
 }
