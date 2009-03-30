@@ -51,10 +51,7 @@ use JSON;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-# N.B. We're currently using Storable::dclone instead of Clone::clone
-# because Colin uncovered some Clone bugs in Perl 5.10
-#use Clone qw/clone/;
-use Storable qw/dclone/;
+use Clone qw/clone/;
 
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
@@ -366,13 +363,13 @@ sub getObject {
     return if !$count;
     
     if ( $count == 1 ) {
-        return dclone $self->sections->[ sIndex($address) ];
+        return clone $self->sections->[ sIndex($address) ];
     }
     elsif ( $count == 2 ) {
-        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
             ->[ aIndex($address) ];
     }
 }
@@ -777,14 +774,14 @@ sub copy {
     
     if ( $count == 1 ) {
         # Clone the indexed section onto the end of the list of sections..
-        push @{ $self->sections }, dclone $self->section($address);
+        push @{ $self->sections }, clone $self->section($address);
 
         # Update $address with the index of the newly created section
         $address->[0] = $self->lastSectionIndex;
     }
     elsif ( $count == 2 ) {
         # Clone the indexed question onto the end of the list of questions..
-        push @{ $self->questions($address) }, dclone $self->question($address);
+        push @{ $self->questions($address) }, clone $self->question($address);
 
         # Update $address with the index of the newly created question
         $address->[1] = $self->lastQuestionIndex($address);

@@ -2,7 +2,7 @@ package WebGUI::Test;
 
 use strict;
 use warnings;
-use Storable qw/dclone/;
+use Clone qw/clone/;
 
 =head1 LEGAL
 
@@ -356,7 +356,7 @@ sub originalConfig {
     my ($class, $param) = @_;
     my $safeValue = my $value = $SESSION->config->get($param);
     if (ref $value) {
-        $safeValue = dclone $value;
+        $safeValue = clone $value;
     }
     $originalConfig{$param} = $safeValue;
 }
