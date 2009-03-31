@@ -1235,6 +1235,9 @@ sub validateSurvey{
             if(! $self->validateGotoExpression($question,$goodTargets)){
                 push(@messages,"Section $s Question $q does not have a valid GOTO Expression target.");
             }
+            if(! $self->validateExpressionSyntax($question)){
+                push(@messages,"Section $s Question $q does not appear to have valid GOTO Expression syntax.");
+            }
             if($#{$question->{answers}} < 0){
                 push(@messages,"Section $s Question $q does not have any answers.");
             }
@@ -1263,6 +1266,16 @@ sub validateSurvey{
     }
  
    return \@messages; 
+}
+
+sub validateExpressionSyntax{
+    my $self = shift;
+    my $object = shift;
+    if($object->{gotoExpression} =~ /\w/){
+        my ( $target, $rest ) = $object->{gotoExpression} =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
+        return 0 if(! defined $target or ! defined $rest);
+    }
+    return 1;
 }
 
 sub validateInfLoop{
