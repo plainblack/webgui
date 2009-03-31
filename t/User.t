@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 167; # increment this value for each test you create
+use Test::More tests => 190; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -576,21 +576,23 @@ undef $neighborClone;
 # acceptsPrivateMessages
 #
 ################################################################
+is ($visitor->acceptsPrivateMessages($visitor->userId), 0, 'acceptsPrivateMessages: visitor cannot receive private messages');
+is ($friend->acceptsPrivateMessages($friend->userId), 0, '... never accept private messages from yourself');
 
 $friend->profileField('allowPrivateMessages', 'all');
-is ($friend->acceptsPrivateMessages($neighbor->userId), 1, 'acceptsPrivateMessages: when allowPrivateMessages=all, anyone can send messages');
+is ($friend->acceptsPrivateMessages($neighbor->userId), 1, '... when allowPrivateMessages=all, anyone can send messages');
 is ($friend->acceptsPrivateMessages(1), 0, 'acceptsPrivateMessages: when allowPrivateMessages=all, visitor can\'t send messages');
 $friend->profileField('allowPrivateMessages', 'none');
-is ($friend->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=none, no one can send messages');
+is ($friend->acceptsPrivateMessages($neighbor->userId), 0, '... when allowPrivateMessages=none, no one can send messages');
 
 $neighbor->profileField('allowPrivateMessages', 'friends');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=friends, only friends can send me messages');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, '... when allowPrivateMessages=friends, only friends can send me messages');
 $friend->addToGroups([$neighbor->friends->getId]);
-is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: add $friend to $neighbor friendsGroup, now he can send me messages');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 1, '... add $friend to $neighbor friendsGroup, now he can send me messages');
 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: illegal profile field doesn\'t allow messages to be received from anyone');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, '... illegal profile field doesn\'t allow messages to be received from anyone');
 
 ################################################################
 #
@@ -730,6 +732,56 @@ $friend->deleteFromGroups([$neighbor->friends->getId]);
 
 $neighbor->profileField('publicProfile', $originalNeighborPublicProfile);
 
+################################################################
+#
+# setProfileFieldPrivacySetting, getProfileFieldPrivacySetting
+#
+################################################################
+
+isa_ok($neighbor->getProfileFieldPrivacySetting, 'HASH', 'getProfileFieldPrivacySetting: returns a HASH if called with no params');
+is($neighbor->setProfileFieldPrivacySetting(), undef, '...with no argument, it returns undef');
+is($neighbor->setProfileFieldPrivacySetting({}), undef, '...with an empty hashref, it returns undef');
+isa_ok($neighbor->setProfileFieldPrivacySetting({email => 'none'}), 'HASH', 'setProfileFieldPrivacySetting: returns a HASH if called with valid params');
+is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...get and set 1 profile field privacy setting');
+$neighbor->setProfileFieldPrivacySetting({email => 'only Tony'});
+is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not set invalid profile settings');
+
+################################################################
+#
+# updateProfileFields
+#
+################################################################
+
+$neighbor->updateProfileFields({ firstName => 'Andy', lastName => 'Dufresne'});
+is($neighbor->profileField('firstName'), 'Andy', 'updateProfileFields: set firstName');
+is($neighbor->profileField('lastName'), 'Dufresne', '... set lastName, too');
+
+################################################################
+#
+# canViewField
+#
+################################################################
+
+ok(! $neighbor->canViewField(), 'canViewField: returns 0 unless you pass it a fieldName and user object');
+ok(  $neighbor->canViewField('email', $neighbor), '... user can always view their own fields');
+ok(  $neighbor->canViewField('toilet', $neighbor), '... even if they do not exist');
+$friend->addToGroups([$neighbor->friends->getId]);
+$neighbor->setProfileFieldPrivacySetting({email => 'only Red'});
+ok(! $neighbor->canViewField('email', $friend), '... returns 0 unless the field has a valid privacy setting');
+$neighbor->setProfileFieldPrivacySetting({email => 'all'});
+ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is all");
+ok(  $neighbor->canViewField('email', $visitor), "... returns 1 when the field's privacy setting is all, even for visitor");
+ok(  $neighbor->canViewField('email', $buster), "... returns 1 when the field's privacy setting is all, even for some other user");
+$neighbor->setProfileFieldPrivacySetting({email => 'none'});
+ok(! $neighbor->canViewField('email', $friend), "... returns 0 when the field's privacy setting is none for a friend");
+ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's privacy setting is none, even for admin");
+ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is none, even for some other user");
+$neighbor->setProfileFieldPrivacySetting({email => 'friends'});
+ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is friends, for a friend");
+ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's privacy setting is friends, even for admin");
+ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is friends, even for some other user");
+
+$friend->deleteFromGroups([$neighbor->friends->getId]);
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
