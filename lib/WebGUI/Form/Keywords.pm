@@ -99,9 +99,9 @@ sub toHtml {
     my $autocompleteDiv = $self->privateName('autocomplete');
     my $pageUrl = $url->page;
     my $output
-        = '<div class="yui-skin-sam webgui-keywords-autocomplete">' . $self->SUPER::toHtml
+        = '<div class="yui-skin-sam webgui-keywords-autocomplete"><div>' . $self->SUPER::toHtml
         . '<div id="' . $autocompleteDiv . '"></div>'
-        . '<script type="text/javascript">' . <<"END_SCRIPT" . '</script></div>';
+        . '<script type="text/javascript">' . <<"END_SCRIPT" . '</script></div></div>';
 (function() {
     var oDS = new YAHOO.util.XHRDataSource('$pageUrl');
     oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
