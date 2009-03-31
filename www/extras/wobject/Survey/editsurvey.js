@@ -54,6 +54,11 @@ Survey.Data = (function(){
 
         loadData: function(d){
             focus = d.address;//What is the current highlighted item.
+            var warnings = ""; 
+            for(var w in d.warnings){
+                warnings = warnings + "<br>" + d.warnings[w]; 
+            }
+            document.getElementById('warnings').innerHTML = warnings;
             var showEdit = 1;
             if (lastId.toString() === d.address.toString()) {
                 showEdit = 0;

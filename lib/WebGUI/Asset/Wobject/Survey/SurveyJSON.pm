@@ -1278,7 +1278,6 @@ sub validateGotoExpression{
     my $goodTargets = shift;
     if($object->{gotoExpression} =~ /\w/ and $object->{gotoExpression} =~ /\s*?(\w*)/){
         my $tar = $1;
-        $self->session->log->error("expre targ was $tar");
         return 0 if(! exists $goodTargets->{$1});
     }
     return 1;
