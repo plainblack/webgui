@@ -1224,6 +1224,9 @@ sub validateSurvey{
         if(! $self->validateInfLoop($section)){
             push(@messages,"Section $s jumps to itself.");
         }
+        if(! $self->validateExpressionSyntax($section)){
+            push(@messages,"Section $s does not appear to have valid GOTO Expression syntax.");
+        }
 
         #step through each question validating it. 
         my $questions = $self->questions([$s]);
@@ -1254,6 +1257,9 @@ sub validateSurvey{
                 my $answer = $self->answer([$s,$q,$a]);
                 if(! $self->validateGoto($answer,$goodTargets)){
                     push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO target.");
+                }
+                if(! $self->validateExpressionSyntax($answer)){
+                    push(@messages,"Section $s Question $q Answer $a does not appear to have valid GOTO Expression syntax.");
                 }
                 if(! $self->validateGotoExpression($answer,$goodTargets)){
                     push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO Expression target.");
