@@ -997,11 +997,12 @@ sub session {
 
 =head2 setProfileFieldPrivacySetting ( settings ) 
 
-Sets the profile field privacy settings
+Sets the profile field privacy settings.  This updates the the db and
+the internally cached settings.  Valid settings are "all", "none" or "friends".
 
 =head3 settings
 
-hash ref containing the field and it's corresponding privacy setting
+Hash ref containing fields and their corresponding privacy settings
 
 =cut
 
