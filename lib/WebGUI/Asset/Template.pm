@@ -144,6 +144,7 @@ sub processPropertiesFromFormPost {
     my %data;
     my $needsUpdate = 0;
 	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+        $needsUpdate = 1;
 		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
 			%data = ( parser => $self->session->form->process("parser","className") );
 		} else {
