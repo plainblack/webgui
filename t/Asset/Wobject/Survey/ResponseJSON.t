@@ -468,7 +468,6 @@ $rJSON->recordResponses({
     '1-0-0'        => 'First answer',
     '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
 });
-
 cmp_deeply(
     $rJSON->responses,
     {
@@ -486,7 +485,6 @@ cmp_deeply(
     },
     'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
 );
-
 $rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice'; # revert change
 
 $rJSON->survey->question([1,0,0])->{terminal}    = 1;
