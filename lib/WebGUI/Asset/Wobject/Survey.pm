@@ -734,8 +734,8 @@ sub www_loadSurvey {
     }
 
     # Generate the list of valid goto targets
-    my @gotoTargets = $self->surveyJSON->getGotoTargets;
-
+    my $gotoTargets = $self->surveyJSON->getGotoTargets;
+    
     my %buttons;
     $buttons{question} = $address->[0];
     if ( @{$address} == 2 or @{$address} == 3 ) {
@@ -782,7 +782,9 @@ sub www_loadSurvey {
             $lastType = 'answer';
         }
     }
-
+    
+    my $warnings = $self->surveyJSON->validateSurvey();
+    
     my $return = {
         address  => $address,                    # the address of the focused object
         buttons  => \%buttons,                   # the data to create the Add buttons
@@ -790,7 +792,8 @@ sub www_loadSurvey {
         ddhtml   => $html,                       # the html to create the draggable html divs
         ids      => \@ids,                       # list of all ids passed in which are draggable (for adding events)
         type     => $var->{type},                # the object type
-        gotoTargets => \@gotoTargets,
+        gotoTargets => $gotoTargets,
+        warnings => $warnings                    #List of warnings to display to the user
     };
 
     $self->session->http->setMimeType('application/json');

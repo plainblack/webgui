@@ -48,6 +48,7 @@ likely operate on the question indexed by:
 
 use strict;
 use JSON;
+use Data::Dumper;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -416,12 +417,14 @@ sub getGotoTargets {
 
     # Valid goto targets are all of the section variable names..
     my @section_vars = map {$_->{variable}} @{$self->sections};
-
+    
     # ..and all of the question variable names..
     my @question_vars = map {$_->{variable}} @{$self->questions};
-
+    
     # ..excluding the ones that are empty
-    return grep { $_ ne q{} } (@section_vars, @question_vars);
+    my @grep =  grep { $_ ne q{} } (@section_vars, @question_vars);
+    return \@grep;
+    #return grep { $_ ne q{} } (@section_vars, @question_vars);
 }
 
 =head2 getSectionEditVars ( $address )
@@ -1187,6 +1190,106 @@ sub totalAnswers {
         }
         return $count;
     }
+}
+
+=head2 validateSurvey ()
+
+Returns an array of messages to inform a user what is logically wrong with the Survey
+
+=cut
+
+sub validateSurvey{
+    my $self = shift;
+    #check all goto's
+    #bad goto expressions
+    #check that all survey is able to be seen
+
+    my @messages;   
+   
+    #set up valid goto targets 
+    my $gotoTargets = $self->getGotoTargets();
+    my $goodTargets;
+    for my $g(@$gotoTargets){ $$goodTargets{$g} = 1; } 
+
+    #step through each section validating it. 
+    my $sections = $self->sections();
+    for(my $s = 0; $s <= $#$sections; $s++){
+        my $section = $self->section([$s]);
+        if(! $self->validateGoto($section,$goodTargets)){
+            push(@messages,"Section $s does not have a valid GOTO target.");
+        }
+        if(! $self->validateGotoExpression($section,$goodTargets)){
+            push(@messages,"Section $s does not have a valid GOTO Expression target.");
+        }
+        if(! $self->validateInfLoop($section)){
+            push(@messages,"Section $s jumps to itself.");
+        }
+
+        #step through each question validating it. 
+        my $questions = $self->questions([$s]);
+        for(my $q = 0; $q <= $#$questions; $q++){
+            my $question = $self->question([$s,$q]);
+            if(! $self->validateGoto($question,$goodTargets)){
+                push(@messages,"Section $s Question $q does not have a valid GOTO target.");
+            }
+            if(! $self->validateGotoExpression($question,$goodTargets)){
+                push(@messages,"Section $s Question $q does not have a valid GOTO Expression target.");
+            }
+            if($#{$question->{answers}} < 0){
+                push(@messages,"Section $s Question $q does not have any answers.");
+            }
+            if(! $question->{text} =~ /\w/){
+                push(@messages,"Section $s Question $q does not have any text.");
+            }
+            if(! $self->validateInfLoop($question)){
+                push(@messages,"Section $s Question $q jumps to itself.");
+            }
+            
+            #step through each answer validating it. 
+            my $answers = $self->answers([$s,$q]);
+            for(my $a = 0; $a <= $#$answers; $a++){
+                my $answer = $self->answer([$s,$q,$a]);
+                if(! $self->validateGoto($answer,$goodTargets)){
+                    push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO target.");
+                }
+                if(! $self->validateGotoExpression($answer,$goodTargets)){
+                    push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO Expression target.");
+                }
+                if(! $self->validateInfLoop($answer)){
+                    push(@messages,"Section $s Question $q Answer $a jumps to itself.");
+                }
+            }
+        }
+    }
+ 
+   return \@messages; 
+}
+
+sub validateInfLoop{
+    my $self = shift;
+    my $object = shift;
+    return 0 if($object->{goto} =~ /\w/ and $object->{goto} eq $object->{variable});
+    return 1;
+}
+
+sub validateGotoExpression{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    if($object->{gotoExpression} =~ /\w/ and $object->{gotoExpression} =~ /\s*?(\w*)/){
+        my $tar = $1;
+        $self->session->log->error("expre targ was $tar");
+        return 0 if(! exists $goodTargets->{$1});
+    }
+    return 1;
+}
+
+sub validateGoto{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    return 0 if($object->{goto} =~ /\w/ && ! exists($goodTargets->{$object->{goto}}));
+    return 1;
 }
 
 =head2 section ($address)
