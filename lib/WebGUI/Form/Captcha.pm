@@ -182,6 +182,12 @@ sub toHtml {
     return $self->SUPER::toHtml.'<p style="display:inline;vertical-align:middle;"><img src="'.$storage->getUrl($filename).'" style="border-style:none;vertical-align:middle;" alt="captcha" /></p>';
 }
 
+=head2 getErrorMessage ( )
+
+Returns an internationalized error message based on which kind of captcha is being used.
+
+=cut
+
 sub getErrorMessage {
     my $self = shift;
     my $session = $self->session;
