@@ -493,6 +493,9 @@
    "WebGUI::Asset::Wobject::DataForm" : {
       "category" : "basic"
    },
+   "WebGUI::Asset::Sku::Ad" : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
