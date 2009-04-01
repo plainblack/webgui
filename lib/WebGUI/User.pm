@@ -594,7 +594,13 @@ sub hasFriends {
 }
 
 #-------------------------------------------------------------------
-# This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=head2 identifier
+
+This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=cut
+
 sub identifier {
         my ($self, $value);
         $self = shift;
