@@ -20,12 +20,15 @@ use File::Spec;
 
 plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
 
-my $threshold = $ENV{POD_COVERAGE} ? 0.75 : 0;
+my $threshold = $ENV{POD_COVERAGE}      ? 0.75
+              : $ENV{POD_COVERAGE} == 2 ? 0.9999
+              : 0;
 
 my @modules = ();
 find(\&countModules, File::Spec->catdir( WebGUI::Test->lib, 'WebGUI' ) );
 my $moduleCount = scalar(@modules);
 plan tests => $moduleCount;
+use Data::Dumper;
 foreach my $package (sort @modules) {
 	my $pc = Pod::Coverage->new(
         package=>$package,
@@ -36,6 +39,9 @@ foreach my $package (sort @modules) {
     SKIP: {
         skip "No subroutines found by Devel::Symdump for $package", 1 if $goodReason;
         ok($coverage, sprintf "%s has %d%% POD coverage", $package, $pc->coverage*100);
+        if (!$coverage && $ENV{POD_COVERAGE} ==2) {
+            diag Dumper [$pc->naked];
+        }
     }
 }
 
