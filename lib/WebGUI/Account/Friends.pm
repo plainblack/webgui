@@ -232,7 +232,7 @@ sub getLayoutTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getConfirmTemplateId ( )
+=head2 getRemoveConfirmTemplateId ( )
 
 This method returns the template ID for the confirmation screen.
 

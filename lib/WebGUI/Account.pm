@@ -255,7 +255,7 @@ sub getLayoutTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getStyleTemplate ( )
+=head2 getStyleTemplateId ( )
 
 Override this method to return the template for the main style.  The style would
 be for the page that the account layout template is embedded in.
