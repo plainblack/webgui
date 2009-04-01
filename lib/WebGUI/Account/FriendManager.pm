@@ -143,10 +143,14 @@ sub www_getFriendsAsJson  {
             friends  => $friendsCount,
         };
     }
+    @records = map { $_->[1] }
+              sort { $a->[0] cmp $b->[0] }
+               map { [ $_->{username}, $_ ] } @records;
     my %results;
     $results{totalRecords} = scalar @records;
     $results{records}      = \@records;
-    #$results{'sort'}       = undef;
+    $results{'sort'}       = 'username';
+    $self->bare(1);
     $session->http->setMimeType('application/json');
     my $json = JSON::to_json(\%results);
     return $json;
