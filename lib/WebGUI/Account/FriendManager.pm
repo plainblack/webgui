@@ -108,10 +108,30 @@ sub editSettingsFormSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_editFriends ( )
+
+Edit the friends for a user.  Uses the form variable userId, to determine which user.
+
+=cut
+
+sub www_editFriends {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $userId  = $form->get('userId');
+
+    ##List users in my friends group.   Each friend gets a delete link.
+    ##List users in all administrated groups.  Friends are added one at a time.
+
+    return $self->processTemplate($var,$session->setting->get("friendManagerViewTemplateId"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_getFriendsAsJson ( )
 
 For each user in a group, count how many friends they have and return that data
-as JSON.
+as JSON.  Uses the form variable, groupId, to return users for that group.
 
 =cut
 
@@ -143,6 +163,7 @@ sub www_getFriendsAsJson  {
             friends  => $friendsCount,
         };
     }
+    ##Sort by username to make the datatable happy
     @records = map { $_->[1] }
               sort { $a->[0] cmp $b->[0] }
                map { [ $_->{username}, $_ ] } @records;
