@@ -20,8 +20,9 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 190; # increment this value for each test you create
+use Test::More tests => 196; # increment this value for each test you create
 use Test::Deep;
+use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
@@ -85,6 +86,10 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 ##Check for valid profileField access, even if it is not cached in the user object.
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
+
+is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be retrieved');
+$user->profileField('wg_privacySettings', '{"email"=>"all"}');
+is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be set');
 
 ################################################################
 #
@@ -639,6 +644,11 @@ SKIP: {
     throws_ok( sub{ WebGUI::User->create }, 'WebGUI::Error::InvalidObject', 
         'create() throws if no session passed'
     );
+
+    throws_ok( sub{ WebGUI::User->create($user) }, 'WebGUI::Error::InvalidObject', 
+        '... and if an object other than a Session is passed'
+    );
+
 };
 
 ok( my $newCreateUser = WebGUI::User->create( $session ),
@@ -746,6 +756,9 @@ is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...get and set 1 
 $neighbor->setProfileFieldPrivacySetting({email => 'only Tony'});
 is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not set invalid profile settings');
 
+is($admin->getProfileFieldPrivacySetting('publicEmail'), 'all', '...get on a user with existing settings');
+is($neighbor->getProfileFieldPrivacySetting('wg_privacySettings'), 'none', '...the privacy field always returns "none"');
+
 ################################################################
 #
 # updateProfileFields
@@ -762,12 +775,13 @@ is($neighbor->profileField('lastName'), 'Dufresne', '... set lastName, too');
 #
 ################################################################
 
-ok(! $neighbor->canViewField(), 'canViewField: returns 0 unless you pass it a fieldName and user object');
+ok(! $neighbor->canViewField(), 'canViewField: returns 0 unless you pass it nothing');
+ok(! $neighbor->canViewField('email'), '... returns 0 unless you pass it a fieldName and no user object');
 ok(  $neighbor->canViewField('email', $neighbor), '... user can always view their own fields');
 ok(  $neighbor->canViewField('toilet', $neighbor), '... even if they do not exist');
 $friend->addToGroups([$neighbor->friends->getId]);
 $neighbor->setProfileFieldPrivacySetting({email => 'only Red'});
-ok(! $neighbor->canViewField('email', $friend), '... returns 0 unless the field has a valid privacy setting');
+ok(! $neighbor->canViewField('toilet', $friend), '... returns 0 unless the field has a valid privacy setting');
 $neighbor->setProfileFieldPrivacySetting({email => 'all'});
 ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is all");
 ok(  $neighbor->canViewField('email', $visitor), "... returns 1 when the field's privacy setting is all, even for visitor");
@@ -780,8 +794,8 @@ $neighbor->setProfileFieldPrivacySetting({email => 'friends'});
 ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is friends, for a friend");
 ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's privacy setting is friends, even for admin");
 ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is friends, even for some other user");
-
 $friend->deleteFromGroups([$neighbor->friends->getId]);
+
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
         (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
