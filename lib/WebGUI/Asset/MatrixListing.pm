@@ -574,7 +574,7 @@ sub setRatings {
 
 #-------------------------------------------------------------------
 
-=head2 view ( hasRated )
+=head2 updateScore ( )
 
 Updates the score of a MatrixListing. 
 

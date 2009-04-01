@@ -58,7 +58,7 @@ sub www_switchOffAdmin {
 
 #-------------------------------------------------------------------
 
-=head2 www_adminConsole ( )
+=head2 www_switchOnAdmin ( )
 
 If the current user is in the Turn On Admin Group, then allow them to turn on Admin mode.
 
