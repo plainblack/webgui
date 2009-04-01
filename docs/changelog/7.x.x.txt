@@ -20,6 +20,8 @@
    need to implement the getRssFeedItems method as explained in AssetAspect/RssFeed.pm
  - Survey now shows warnings if bad goto, bad gotoExpressions, no question text, survey looping,
    or no question answers are found.
+ - fixed: Gateway problem with VendorPayout.
+
 7.7.1
  - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities
  - rfe #9353: Welcome message template (SDH Consulting Group)

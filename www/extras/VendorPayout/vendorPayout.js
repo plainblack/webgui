@@ -30,7 +30,7 @@ WebGUI.VendorPayout = function ( containerId ) {
     this.container.appendChild( this.payoutDetails );
 
 
-    this.itemBaseUrl = '/?shop=vendor;method=payoutDataAsJSON;';
+    this.itemBaseUrl = '?shop=vendor;method=payoutDataAsJSON;';
 
     // Initialise tables
     this.initialize();
