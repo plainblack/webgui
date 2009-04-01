@@ -34,7 +34,9 @@ readonly module  => my %module;
 public   method  => my %method;
 public   uid     => my %uid;
 public   store   => my %store;  #This is an all purpose hash to store stuff in: $self->store->{something} = "something"
-
+public   bare    => my %bare;   #This flag indicates that neither the layout nor style template should be applied
+                                #to the output of the method.  Think JSON/XML, etc.
+                                
 #-------------------------------------------------------------------
 
 =head2 appendCommonVars ( var )
@@ -138,6 +140,9 @@ sub displayContent {
     my $content = shift;
     my $noStyle = shift;
     my $session = $self->session;
+
+    ##Don't do any templating if we're sending back data like JSON or XML.
+    return $content if $self->bare;
 
     #Wrap content into the layout
     my $var         = {};
@@ -344,6 +349,7 @@ sub new {
     $store   { $id      } = {};
     $method  { $id      } = "view";
     $uid     { $id      } = undef;
+    $bare    { $id      } = 0;
 
     return $self;
 }

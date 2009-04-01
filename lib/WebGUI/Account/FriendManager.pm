@@ -108,6 +108,52 @@ sub editSettingsFormSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_getFriendsAsJson ( )
+
+For each user in a group, count how many friends they have and return that data
+as JSON.
+
+=cut
+
+sub www_getFriendsAsJson  {
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient
+        unless $session->user->isInGroup($session->setting->get('groupIdAdminFriends'));
+    my $form    = $session->form;
+    my $groupId = $form->get('groupId');
+    if (! $groupId) {;
+        $session->log->warn("No groupId: >$groupId<");
+        return '{}';
+    }
+    my $group   = WebGUI::Group->new($session, $groupId);
+    return '{}' if $group->getId eq 'new';
+    if ($group->getId eq 'new') {;
+        $session->log->warn("New group created");
+        return '{}';
+    }
+    my @records = ();
+    USER: foreach my $userId (@{ $group->getUsers} ) {
+        my $user = WebGUI::User->new($session, $userId);
+        next USER unless $user;
+        my $friendsCount = scalar $user->friends->getUsers();
+        push @records, {
+            userId   => $userId,
+            username => $user->username,
+            friends  => $friendsCount,
+        };
+    }
+    my %results;
+    $results{totalRecords} = scalar @records;
+    $results{records}      = \@records;
+    #$results{'sort'}       = undef;
+    $session->http->setMimeType('application/json');
+    my $json = JSON::to_json(\%results);
+    return $json;
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_view ( )
 
 The main view page for editing the user's profile.
@@ -127,7 +173,7 @@ sub www_view {
         next GROUP unless $group->getId || $group->getId eq 'new';
         push @{ $var->{group_loop} }, {
             groupId   => $groupId,
-            groupName => $group->getName,
+            groupName => $group->name,
         };
     }
 
