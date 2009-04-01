@@ -88,6 +88,34 @@ sub deleteKeyword {
     $self->session->db->write("delete from assetKeyword where keyword=?", [$options->{keyword}]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 findKeywords ( $options )
+
+Find keywords.
+
+=head3 $options
+
+A hashref of options to change the behavior of the method.
+
+=head4 asset
+
+Find all keywords for all assets below an asset, providing a WebGUI::Asset object.
+
+=head4 assetId
+
+Find all keywords for all assets below an asset, providing an assetId.
+
+=head4 search
+
+Find all keywords using the SQL clause LIKE.  This can be used in tandem with asset or assetId.
+
+=head4 limit
+
+Limit the number of keywords that are returned.
+
+=cut
+
 sub findKeywords {
     my $self = shift;
     my $options = shift;
