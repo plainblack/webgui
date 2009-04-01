@@ -385,7 +385,7 @@ sub sortHash {
 
 #-------------------------------------------------------------------
 
-=head2 sortHashDecending ( hash )
+=head2 sortHashDescending ( hash )
 
 Sorts a hash in decending order by its values.  Returns a Tie::IxHash.
 You must assign this to a similarly tied hash to preserve the order.
@@ -395,7 +395,6 @@ You must assign this to a similarly tied hash to preserve the order.
 A hash to be sorted.
 
 =cut
-
 
 sub sortHashDescending {
 	my %hash = @_;
@@ -408,5 +407,3 @@ sub sortHashDescending {
 
 
 1;
-
-
