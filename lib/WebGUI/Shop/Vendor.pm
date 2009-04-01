@@ -485,21 +485,25 @@ sub www_managePayouts {
     return $session->privilege->adminOnly() unless ($admin->canManage);
     
     # Load the required YUI stuff.
-    $session->style->setLink('/extras/yui/build/paginator/assets/skins/sam/paginator.css', {type=>'text/css', rel=>'stylesheet'});
-    $session->style->setLink('/extras/yui/build/datatable/assets/skins/sam/datatable.css', {type=>'text/css', rel=>'stylesheet'});
-    $session->style->setLink('/extras/yui/build/button/assets/skins/sam/button.css', {type=>'text/css', rel=>'stylesheet'});
-    $session->style->setScript('/extras/yui/build/yahoo-dom-event/yahoo-dom-event.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/element/element-beta-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/connection/connection-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/json/json-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/paginator/paginator-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/datasource/datasource.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/datatable/datatable-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/yui/build/button/button-min.js', {type=>'text/javascript'});
-    $session->style->setScript('/extras/VendorPayout/vendorPayout.js', {type=>'text/javascript'});
+    my $style = $session->style;
+    my $url = $session->url;
+
+    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
+
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-beta-min.js'),        {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'),       {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'),         {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource.js'),           {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
+    $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
 
     # Add css for scheduled payout highlighting
-    $session->style->setRawHeadTags(<<CSS);
+    $style->setRawHeadTags(<<CSS);
         <style type="text/css">
             .yui-skin-sam .yui-dt tr.scheduled,
             .yui-skin-sam .yui-dt tr.scheduled td.yui-dt-asc,
@@ -516,7 +520,8 @@ CSS
         .q{<script type="text/javascript">var vp = new WebGUI.VendorPayout( 'vendorPayoutContainer' );</script>};
 
     my $console = WebGUI::Shop::Admin->new($session)->getAdminConsole;
-    return $console->render($output, 'Vendor payout'); #$i18n->get("vendors"));
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    return $console->render($output, $i18n->get('vendor payouts'));
 }
 
 #-------------------------------------------------------------------
