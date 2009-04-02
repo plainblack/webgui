@@ -684,7 +684,7 @@ sub processGotoExpression {
 
     # Parse gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split /\n/, $expression) {
-        my $processed = $self->parseGotoExpression($line, $responses);
+        my $processed = WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $line, $responses);
 
         next if !$processed;
         
@@ -770,22 +770,22 @@ Replace each "$questionName" with its response value (from the $responses hashre
 =cut
 
 sub parseGotoExpression {
-    my $self       = shift;
-    my ($expression, $responses) = validate_pos(@_, { type => SCALAR }, { type => HASHREF, default => {} });
+    my $class       = shift;
+    my ($session, $expression, $responses) = validate_pos(@_, { isa => 'WebGUI::Session'}, { type => SCALAR }, { type => HASHREF, default => {} });
 
-    $self->session->log->debug("Parsing gotoExpression: $expression");
+    $session->log->debug("Parsing gotoExpression: $expression");
 
     my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
 
-    $self->session->log->debug("Parsed as Target: [$target], Expression: [$rest]");
+    $session->log->debug("Parsed as Target: [$target], Expression: [$rest]");
 
     if ( !defined $target ) {
-        $self->session->log->warn('Target undefined');
+        $session->log->warn('Target undefined');
         return;
     }
 
     if ( !defined $rest || $rest eq q{} ) {
-        $self->session->log->warn('Expression undefined');
+        $session->log->warn('Expression undefined');
         return;
     }
     
@@ -794,7 +794,7 @@ sub parseGotoExpression {
         $rest =~ s/\$$questionName/$response/g;
     }
 
-    $self->session->log->debug("Processed as: $rest");
+    $session->log->debug("Processed as: $rest");
 
     return {
         target => $target,

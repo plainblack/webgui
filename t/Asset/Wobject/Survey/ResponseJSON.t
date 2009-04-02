@@ -326,28 +326,29 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 # parseGotoExpression
 #
 ####################################################
-throws_ok { $rJSON->parseGotoExpression() } 'WebGUI::Error::InvalidParam', 'processGotoExpression takes exception to empty arguments';
-is($rJSON->parseGotoExpression(q{}),
+my $c = 'WebGUI::Asset::Wobject::Survey::ResponseJSON';
+throws_ok { $c->parseGotoExpression($session, ) } 'WebGUI::Error::InvalidParam', 'processGotoExpression takes exception to empty arguments';
+is($c->parseGotoExpression($session, q{}),
     undef, '.. and undef with empty expression');
-is($rJSON->parseGotoExpression('blah-dee-blah-blah'),
+is($c->parseGotoExpression($session, 'blah-dee-blah-blah'),
     undef, '.. and undef with duff expression');
-is($rJSON->parseGotoExpression(':'),
+is($c->parseGotoExpression($session, ':'),
     undef, '.. and undef with missing target');
-is($rJSON->parseGotoExpression('t1:'),
+is($c->parseGotoExpression($session, 't1:'),
     undef, '.. and undef with missing expression');
-cmp_deeply($rJSON->parseGotoExpression('t1: 1'),
+cmp_deeply($c->parseGotoExpression($session, 't1: 1'),
     { target => 't1', expression => '1'}, 'works for simple numeric expression');
-cmp_deeply($rJSON->parseGotoExpression('t1: 1 - 23 + 456 * (78 / 9.0)'),
+cmp_deeply($c->parseGotoExpression($session, 't1: 1 - 23 + 456 * (78 / 9.0)'),
     { target => 't1', expression => '1 - 23 + 456 * (78 / 9.0)'}, 'works for expression using all algebraic tokens');
-cmp_deeply($rJSON->parseGotoExpression('t1: 1 != 3 <= 4 >= 5'),
+cmp_deeply($c->parseGotoExpression($session, 't1: 1 != 3 <= 4 >= 5'),
     { target => 't1', expression => '1 != 3 <= 4 >= 5'}, q{..works with other ops too});
-cmp_deeply($rJSON->parseGotoExpression('t1: $q1 + $q2 * $q3 - 4', { q1 => 11, q2 => 22, q3 => 33}),
+cmp_deeply($c->parseGotoExpression($session, 't1: $q1 + $q2 * $q3 - 4', { q1 => 11, q2 => 22, q3 => 33}),
     { target => 't1', expression => '11 + 22 * 33 - 4'}, 'substitues q for value');
-cmp_deeply($rJSON->parseGotoExpression('t1: $a silly var name * 10 + $another var name', { 'a silly var name' => 345, 'another var name' => 456}),
+cmp_deeply($c->parseGotoExpression($session, 't1: $a silly var name * 10 + $another var name', { 'a silly var name' => 345, 'another var name' => 456}),
     { target => 't1', expression => '345 * 10 + 456'}, '..it even works for vars with spaces in their names');
-cmp_deeply($rJSON->parseGotoExpression('t1: ($A < 4) and ($B < 4) or ($B > 6) && 1 || 1', { A => 2, B => 3}),
+cmp_deeply($c->parseGotoExpression($session, 't1: ($A < 4) and ($B < 4) or ($B > 6) && 1 || 1', { A => 2, B => 3}),
     { target => 't1', expression => '(2 < 4) and (3 < 4) or (3 > 6) && 1 || 1'}, 'Boolean expressions ok');
-cmp_deeply($rJSON->parseGotoExpression('t1: $a = 1; $a++; $a > 1'),
+cmp_deeply($c->parseGotoExpression($session, 't1: $a = 1; $a++; $a > 1'),
     { target => 't1', expression => '$a = 1; $a++; $a > 1'}, 'Assignment and compound statements ok too');
 
 ####################################################

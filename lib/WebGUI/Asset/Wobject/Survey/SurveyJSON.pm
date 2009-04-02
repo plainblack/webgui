@@ -1209,63 +1209,72 @@ sub validateSurvey{
     #set up valid goto targets 
     my $gotoTargets = $self->getGotoTargets();
     my $goodTargets;
-    for my $g(@$gotoTargets){ $$goodTargets{$g} = 1; } 
+    my $duplicateTargets;
+    for my $g (@{$gotoTargets}) { 
+        $goodTargets->{$g}++; 
+        $duplicateTargets->{$g}++ if $goodTargets->{$g} > 1;
+    }
 
     #step through each section validating it. 
     my $sections = $self->sections();
+    
     for(my $s = 0; $s <= $#$sections; $s++){
+        my $sNum = $s + 1;
         my $section = $self->section([$s]);
         if(! $self->validateGoto($section,$goodTargets)){
-            push(@messages,"Section $s does not have a valid GOTO target.");
+            push @messages,"Section $sNum does not have a valid Jump target.";
+        }
+        if(! $self->validateGotoInfiniteLoop($section)){
+            push(@messages,"Section $sNum jumps to itself.");
         }
         if(! $self->validateGotoExpression($section,$goodTargets)){
-            push(@messages,"Section $s does not have a valid GOTO Expression target.");
+            push(@messages,"Section $sNum does not have a valid Jump Expression.");
         }
-        if(! $self->validateInfLoop($section)){
-            push(@messages,"Section $s jumps to itself.");
-        }
-        if(! $self->validateExpressionSyntax($section)){
-            push(@messages,"Section $s does not appear to have valid GOTO Expression syntax.");
+        if (my $var = $section->{variable}) {
+            if (my $count = $duplicateTargets->{$var}) {
+                push @messages, "Section $sNum variable name $var is re-used in $count other place(s).";
+            }
         }
 
         #step through each question validating it. 
         my $questions = $self->questions([$s]);
         for(my $q = 0; $q <= $#$questions; $q++){
+            my $qNum = $q + 1;
             my $question = $self->question([$s,$q]);
             if(! $self->validateGoto($question,$goodTargets)){
-                push(@messages,"Section $s Question $q does not have a valid GOTO target.");
+                push(@messages,"Section $sNum Question $qNum does not have a valid Jump target.");
+            }
+            if(! $self->validateGotoInfiniteLoop($question)){
+                push(@messages,"Section $sNum Question $qNum jumps to itself.");
             }
             if(! $self->validateGotoExpression($question,$goodTargets)){
-                push(@messages,"Section $s Question $q does not have a valid GOTO Expression target.");
-            }
-            if(! $self->validateExpressionSyntax($question)){
-                push(@messages,"Section $s Question $q does not appear to have valid GOTO Expression syntax.");
+                push(@messages,"Section $sNum Question $qNum does not have a valid Jump Expression.");
             }
             if($#{$question->{answers}} < 0){
-                push(@messages,"Section $s Question $q does not have any answers.");
+                push(@messages,"Section $sNum Question $qNum does not have any answers.");
             }
             if(! $question->{text} =~ /\w/){
-                push(@messages,"Section $s Question $q does not have any text.");
+                push(@messages,"Section $sNum Question $qNum does not have any text.");
             }
-            if(! $self->validateInfLoop($question)){
-                push(@messages,"Section $s Question $q jumps to itself.");
+            if (my $var = $question->{variable}) {
+                if (my $count = $duplicateTargets->{$var}) {
+                    push @messages, "Section $sNum Question $qNum variable name $var is re-used in $count other place(s).";
+                }
             }
             
             #step through each answer validating it. 
             my $answers = $self->answers([$s,$q]);
             for(my $a = 0; $a <= $#$answers; $a++){
+                my $aNum = $a + 1;
                 my $answer = $self->answer([$s,$q,$a]);
                 if(! $self->validateGoto($answer,$goodTargets)){
-                    push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO target.");
+                    push(@messages,"Section $sNum Question $qNum Answer $aNum does not have a valid Jump target.");
                 }
-                if(! $self->validateExpressionSyntax($answer)){
-                    push(@messages,"Section $s Question $q Answer $a does not appear to have valid GOTO Expression syntax.");
+                if(! $self->validateGotoInfiniteLoop($answer)){
+                    push(@messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.");
                 }
                 if(! $self->validateGotoExpression($answer,$goodTargets)){
-                    push(@messages,"Section $s Question $q Answer $a does not have a valid GOTO Expression target.");
-                }
-                if(! $self->validateInfLoop($answer)){
-                    push(@messages,"Section $s Question $q Answer $a jumps to itself.");
+                    push(@messages,"Section $sNum Question $qNum Answer $aNum does not have a valid Jump Expression.");
                 }
             }
         }
@@ -1274,17 +1283,15 @@ sub validateSurvey{
    return \@messages; 
 }
 
-sub validateExpressionSyntax{
+sub validateGoto{
     my $self = shift;
     my $object = shift;
-    if($object->{gotoExpression} =~ /\w/){
-        my ( $target, $rest ) = $object->{gotoExpression} =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
-        return 0 if(! defined $target or ! defined $rest);
-    }
+    my $goodTargets = shift;
+    return 0 if($object->{goto} =~ /\w/ && ! exists($goodTargets->{$object->{goto}}));
     return 1;
 }
 
-sub validateInfLoop{
+sub validateGotoInfiniteLoop{
     my $self = shift;
     my $object = shift;
     return 0 if($object->{goto} =~ /\w/ and $object->{goto} eq $object->{variable});
@@ -1294,20 +1301,10 @@ sub validateInfLoop{
 sub validateGotoExpression{
     my $self = shift;
     my $object = shift;
-    my $goodTargets = shift;
-    if($object->{gotoExpression} =~ /\w/ and $object->{gotoExpression} =~ /\s*?(\w*)/){
-        my $tar = $1;
-        return 0 if(! exists $goodTargets->{$1});
-    }
-    return 1;
-}
-
-sub validateGoto{
-    my $self = shift;
-    my $object = shift;
-    my $goodTargets = shift;
-    return 0 if($object->{goto} =~ /\w/ && ! exists($goodTargets->{$object->{goto}}));
-    return 1;
+    return 1 unless $object->{gotoExpression} =~ /\w/;
+    
+    # The best we can do is return true/false on whether the gotoExpression parses
+    return WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $object->{gotoExpression});
 }
 
 =head2 section ($address)
