@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 79;
+my $tests = 87;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -323,7 +323,7 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 ####################################################
 #
-# processGotoExpression
+# parseGotoExpression
 #
 ####################################################
 throws_ok { $rJSON->parseGotoExpression() } 'WebGUI::Error::InvalidParam', 'processGotoExpression takes exception to empty arguments';
@@ -339,7 +339,7 @@ cmp_deeply($rJSON->parseGotoExpression('t1: 1'),
     { target => 't1', expression => '1'}, 'works for simple numeric expression');
 cmp_deeply($rJSON->parseGotoExpression('t1: 1 - 23 + 456 * (78 / 9.0)'),
     { target => 't1', expression => '1 - 23 + 456 * (78 / 9.0)'}, 'works for expression using all algebraic tokens');
-is($rJSON->parseGotoExpression('t1: 1 + &'), undef, '.. but disallows expression containing non-whitelisted token');
+is($rJSON->parseGotoExpression('t1: 1 + $'), undef, '.. but disallows expression containing non-whitelisted token');
 cmp_deeply($rJSON->parseGotoExpression('t1: 1 = 3'),
     { target => 't1', expression => '1 == 3'}, 'converts single = to ==');
 cmp_deeply($rJSON->parseGotoExpression('t1: 1 != 3 <= 4 >= 5'),
@@ -350,6 +350,10 @@ cmp_deeply($rJSON->parseGotoExpression('t1: a silly var name * 10 + another var 
     { target => 't1', expression => '345 * 10 + 456'}, '..it even works for vars with spaces in their names');
 is($rJSON->parseGotoExpression('t1: qX + 3', { q1 => '7'}),
     undef, q{..but doesn't like invalid var names});
+cmp_deeply($rJSON->parseGotoExpression('t1: (A < 4) AND (B < 4)', { A => 2, B => 3}),
+    { target => 't1', expression => '(2 < 4) && (3 < 4)'}, 'Boolean AND');
+cmp_deeply($rJSON->parseGotoExpression('t1: (A < 4) OR (B < 4)', { A => 2, B => 3}),
+    { target => 't1', expression => '(2 < 4) || (3 < 4)'}, 'Boolean OR');
 
 ####################################################
 #
@@ -376,7 +380,13 @@ ok(!$rJSON->processGotoExpression('s0: s1q0 != 3'), '3 != 3 is false');
 ok($rJSON->processGotoExpression('s0: s1q0 > 2'), '3 > 2 is true');
 ok($rJSON->processGotoExpression('s0: s1q0 < 4'), '3 < 2 is true');
 ok(!$rJSON->processGotoExpression('s0: s1q0 >= 4'), '3 >= 4 is false');
-ok(!$rJSON->processGotoExpression('s0: s1q0 <= 2'), '3 >= 4 is false');
+ok(!$rJSON->processGotoExpression('s0: s1q0 <= 2'), '3 <= 2 is false');
+ok(!$rJSON->processGotoExpression('s0: s1q0 < 2 or s1q0 < 1'), '3 < 2 || 3 < 1 is false');
+ok($rJSON->processGotoExpression('s0: s1q0 < 2 or s1q0 < 5'), '3 < 2 || 3 < 5 is true');
+ok(!$rJSON->processGotoExpression('s0: s1q0 = 4 and 1 = 1'), '3 == 4 && 1 == 1 is false');
+ok($rJSON->processGotoExpression('s0: s1q0 = 3 and 1 = 1'), '3 == 3 && 1 == 1 is true');
+ok(!$rJSON->processGotoExpression('s0: (s1q0 > 1 ? 10 : 11) = 11'), '(3 > 1 ? 10 : 11) == 11 is false');
+ok($rJSON->processGotoExpression('s0: (s1q0 > 1 ? 10 : 11) = 10'), '(3 > 1 ? 10 : 11) == 10 is true');
 
 cmp_deeply($rJSON->processGotoExpression(<<"END_EXPRESSION"), {target => 's2', expression => '3 == 3'}, 'first true expression wins');
 s0: s1q0 <= 2

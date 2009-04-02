@@ -98,6 +98,7 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 use List::Util qw(shuffle);
+use Safe;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
@@ -660,7 +661,7 @@ The expression is a simple subset of the formula language used in spreadsheet pr
 such as Excel, OpenOffice, Google Docs etc..
 
 Here is an example using section variables S1 and S2 as jump targets and question 
-variables Q1-3 in the expression. It  jumps to S1 if the user's answer to Q1 has a value 
+variables Q1-3 in the expression. It jumps to S1 if the user's answer to Q1 has a value 
 of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
 S1: Q1 = 3
 S2: Q2 + Q3 < 10
@@ -714,9 +715,12 @@ sub processGotoExpression {
         my $processed = $self->parseGotoExpression($line, $responses);
 
         next if !$processed;
+        
+        # Eval expression in a safe compartment
+        # N.B. Expression does not need access to any variables
+        my $compartment = Safe->new();
+        my $result = $compartment->reval($processed->{expression});
 
-        # (ab)use perl's eval to evaluate the processed expression
-        my $result = eval "$processed->{expression}";   ## no critic
         $self->session->log->warn($@) if $@;            ## no critic
 
         if ($result) {
@@ -805,7 +809,7 @@ sub parseGotoExpression {
     $self->session->log->debug("Parsing gotoExpression: $expression");
 
     # Valid gotoExpression tokens are..
-    my $tokens = qr{\s|[-0-9=!<>+*/.()]};
+    my $tokens = qr{\s|[-0-9=!<>+*/.()&|:?]};
 
     my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
 
@@ -820,7 +824,11 @@ sub parseGotoExpression {
         $self->session->log->warn('Expression undefined');
         return;
     }
-
+    
+    # convert 'and' and 'or' to '&&' and '||'
+    $rest =~ s/\band\b/&&/ig;
+    $rest =~ s/\bor\b/||/ig;
+    
     # Replace each questionName with its response value
     while ( my ( $questionName, $response ) = each %{$responses} ) {
         $rest =~ s/$questionName/$response/g;
