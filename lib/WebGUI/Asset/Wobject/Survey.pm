@@ -501,6 +501,16 @@ sub www_jumpTo {
 
 #-------------------------------------------------------------------
 
+=head2 removeType ( $address )
+
+Remove the requested questionType, and then reloads the Survey.
+
+=head3 $address
+
+Specifies which questionType to delete.
+
+=cut
+
 sub removeType{
     my $self = shift;
     my $address = shift;
@@ -510,6 +520,20 @@ sub removeType{
 }
 
 #-------------------------------------------------------------------
+
+=head2 addType ( $name, $address )
+
+Adds a new questionType, and then reloads the Survey.
+
+=head3 $name
+
+The name of the new question type.
+
+=head3 $address
+
+Specifies where to add the question.
+
+=cut
 
 sub addType{
     my $self = shift;
@@ -1384,7 +1408,7 @@ sub persistResponseJSON {
 
 #-------------------------------------------------------------------
 
-=head2 responseId
+=head2 responseIdCookies
 
 Mutator for the responseIdCookies that determines whether cookies are used as
 part of the L<"responseId"> lookup process.
@@ -1696,6 +1720,13 @@ sub www_viewStatisticalOverview {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_exportTransposedResults ()
+
+Exports transposed results in a tab deliniated file.
+
+=cut
+
 sub www_exportSimpleResults {
     my $self = shift;
 
@@ -1714,7 +1745,7 @@ sub www_exportSimpleResults {
 
 #-------------------------------------------------------------------
 
-=head2 www_exportTransposedResults (){
+=head2 www_exportTransposedResults ()
 
 Returns transposed results as a tabbed file.
 

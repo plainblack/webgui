@@ -206,6 +206,14 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+See WebGUI::Asset::view for details.  Generate template variables and
+render the template.  Also handles caching.
+
+=cut
+
 sub view {
 	my $self    = shift;
 	
