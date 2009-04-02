@@ -954,7 +954,7 @@ sub www_listSubscriptionCodes {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_purchaseSubscription
+=head2 www_purchaseSubscription
 
 Add this subscription to the cart.
 

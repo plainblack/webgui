@@ -1046,7 +1046,7 @@ sub aIndexes {
 
 #-------------------------------------------------------------------
 
-=head2 returnResponsesForReporting
+=head2 returnResponseForReporting
 
 Used to extract JSON responses for use in reporting results.
 
