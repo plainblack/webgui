@@ -33,7 +33,7 @@ This is an aspect which exposes an asset's items as an RSS or Atom feed.
 
  use Class::C3;
  use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset);
- 
+
 And then wherever you would call $self->SUPER::someMethodName call $self->next::method instead.
 
 =head1 METHODS
@@ -141,7 +141,7 @@ particular asset.
 =head3 params
 
 A hashref with the quiet, userId, depth, and indexFileName parameters from
-L</exportAsHtml>.
+L<exportAsHtml>.
 
 =cut
 
