@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 132;
+my $tests = 139;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -2002,7 +2002,30 @@ cmp_deeply(
 
 ####################################################
 #
-# totalSections
+# questions
+#
+####################################################
+{
+    my $s = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, '{}');
+    # Add a new section
+    my $address = $s->newObject([]);
+    cmp_deeply($s->questions, [], 'Initially no questions');
+    # Add a question to first section 
+    $address = $s->newObject([0]);
+    is(scalar @{$s->questions}, 1, '..now 1 question');
+    is(scalar @{$s->questions([0])}, 1, '..in the first section');
+    is($s->questions([2]), undef, '..and none in the second section (which doesnt even exist)');
+
+    # Add a question to second section 
+    $address = $s->newObject([1]);
+    is(scalar @{$s->questions}, 2, '..now 2 question2');
+    is(scalar @{$s->questions([0])}, 1, '..1 in the first section');
+    is(scalar @{$s->questions([1])}, 1, '..1 in the second section');
+}
+
+####################################################
+#
+# totalSections, totalQuestions, totalAnswers
 #
 ####################################################
 {

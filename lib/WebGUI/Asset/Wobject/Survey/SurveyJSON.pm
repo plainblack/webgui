@@ -1339,9 +1339,9 @@ sub session {
 
 Returns a reference to all the questions from a particular section.
 
-=head3 $address
+=head3 $address (optional)
 
-See L<"Address Parameter">.
+See L<"Address Parameter">. If not defined, returns all questions.
 
 =cut
 
@@ -1349,7 +1349,13 @@ sub questions {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
     
-    return $self->sections->[ $address->[0] ]->{questions};
+    if ($address) {
+        return $self->sections->[ $address->[0] ]->{questions};
+    } else {
+        my $questions;
+        push @$questions, @{$_->{questions} || []} for @{$self->sections};
+        return $questions;
+    }
 }
 
 =head2 question ($address)
