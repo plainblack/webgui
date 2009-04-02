@@ -184,7 +184,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_donate
+=head2 www_donate
 
 Accepts the information from the donation form and adds it to the cart.
 
