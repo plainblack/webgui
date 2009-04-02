@@ -198,7 +198,6 @@ sub getFeed {
     foreach my $item ($self->generateFeed( $self->get('itemsPerFeed') )->get_item) {
         my $set_permalink_false = 0;
         my $new_item = $feed->add_item( $item );
-        warn "creating item !";
         if (!$new_item->guid) {
             if ($new_item->link) {
                 $new_item->guid( $new_item->link );
