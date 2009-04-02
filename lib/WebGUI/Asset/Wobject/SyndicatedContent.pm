@@ -246,11 +246,11 @@ sub getTemplateVariables {
 	my ($self, $feed) = @_;
 	my @items = $feed->get_item;
 	my %var;
-	$var{channel_title} = WebGUI::HTML::filter($feed->title, 'javascript');
+	$var{channel_title} = WebGUI::HTML::filter(scalar $feed->title, 'javascript');
 	$var{channel_description} = WebGUI::HTML::filter(scalar($feed->description), 'javascript');
 	$var{channel_date} = WebGUI::HTML::filter(scalar($feed->get_pubDate_epoch), 'javascript');
 	$var{channel_copyright} = WebGUI::HTML::filter(scalar($feed->copyright), 'javascript');
-	$var{channel_link} = WebGUI::HTML::filter($feed->link, 'javascript');
+	$var{channel_link} = WebGUI::HTML::filter(scalar $feed->link, 'javascript');
 	my @image = $feed->image;
 	$var{channel_image_url} = WebGUI::HTML::filter($image[0], 'javascript');
 	$var{channel_image_title} = WebGUI::HTML::filter($image[1], 'javascript');
@@ -260,12 +260,12 @@ sub getTemplateVariables {
 	$var{channel_image_height} = WebGUI::HTML::filter($image[5], 'javascript');
 	foreach my $object (@items) {
 		my %item;
-        $item{title} = WebGUI::HTML::filter($object->title, 'javascript');
-        $item{date} = WebGUI::HTML::filter($object->get_pubDate_epoch, 'javascript');
-        $item{category} = WebGUI::HTML::filter($object->category, 'javascript');
-        $item{author} = WebGUI::HTML::filter($object->author, 'javascript');
-        $item{guid} = WebGUI::HTML::filter($object->guid, 'javascript');
-        $item{link} = WebGUI::HTML::filter($object->link, 'javascript');
+        $item{title} = WebGUI::HTML::filter(scalar $object->title, 'javascript');
+        $item{date} = WebGUI::HTML::filter(scalar $object->get_pubDate_epoch, 'javascript');
+        $item{category} = WebGUI::HTML::filter(scalar $object->category, 'javascript');
+        $item{author} = WebGUI::HTML::filter(scalar $object->author, 'javascript');
+        $item{guid} = WebGUI::HTML::filter(scalar $object->guid, 'javascript');
+        $item{link} = WebGUI::HTML::filter(scalar $object->link, 'javascript');
         $item{description} = WebGUI::HTML::filter(scalar($object->description), 'javascript');
         $item{descriptionFirst100words} = $item{description};
         $item{descriptionFirst100words} =~ s/(((\S+)\s+){100}).*/$1/s;

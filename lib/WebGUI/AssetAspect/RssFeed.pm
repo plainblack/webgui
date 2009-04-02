@@ -141,7 +141,7 @@ particular asset.
 =head3 params
 
 A hashref with the quiet, userId, depth, and indexFileName parameters from
-L<exportAsHtml>.
+L<WebGUI::Asset/exportAsHtml>.
 
 =cut
 
@@ -151,11 +151,14 @@ sub exportAssetCollateral {
     my $self = shift;
     my $basepath = shift;
     my $args = shift;
-    
+    my $reportSession = shift;
+
+    my $reporti18n = WebGUI::International->new($self->session, 'Asset');
+
     my $basename = $basepath->basename;
     my $filedir;
     my $filenameBase;
-    
+
     # We want our .rss and .atom files to "appear" at the same level as the asset.
     if ($basename eq 'index.html') {
         # Get the 2nd ancestor, since the asset url had no dot in it (and it therefore
@@ -171,59 +174,60 @@ sub exportAssetCollateral {
         # just use the basename.
         $filenameBase = $basename;
     }
-    
-    $self->{ '_masterSession' }->output->print('<br />') unless ($args->{quiet});
-    
+
+    if ( $reportSession && !$args->{quiet} ) {
+        $reportSession->output->print('<br />');
+    }
+
     foreach my $ext (qw( rss atom )) {
         my $dest = Path::Class::File->new($filedir, $filenameBase . '.' . $ext);
-        
+
         # tell the user which asset we're exporting.
-        unless ($args->{quiet}) {
-            my $message = sprintf $self->{ '_masteri18n' }->get('exporting page'), $dest->absolute->stringify;
-            $self->{ '_masterSession' }->output->print('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$message);
+        if ( $reportSession && !$args->{quiet} ) {
+            my $message = sprintf $reporti18n->get('exporting page'), $dest->absolute->stringify;
+            $reportSession->output->print(
+                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $message . '<br />');
         }
-        
+        my $exportSession = WebGUI::Session->open(
+            $self->session->config->getWebguiRoot,
+            $self->session->config->getFilename,
+            undef,
+            undef,
+            $self->session->getId,
+        );
+
         # open another session as the user doing the exporting...
-        my $tempSession = WebGUI::Session->open($self->session->config->getWebguiRoot,$self->session->config->getFilename);
-        $tempSession->user( { userId => $self->session->user->userId } );
-        
-        my $selfdupe = WebGUI::Asset->newByDynamicClass( $tempSession, $self->getId );
-        
-        
+        my $selfdupe = WebGUI::Asset->newByDynamicClass( $exportSession, $self->getId );
+
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };
         if($@) {
             WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
+            $exportSession->close;
         }
-        my $previousHandle = $selfdupe->session->{_handle};
-        my $previousDefaultAsset = $selfdupe->session->asset;
-        $selfdupe->session->asset($selfdupe);
-        $selfdupe->session->output->setHandle($fh);
+        $exportSession->asset($selfdupe);
+        $exportSession->output->setHandle($fh);
         my $contents;
         if ($ext eq 'rss') {
             $contents = $selfdupe->www_viewRss;
-        } else {
+        }
+        else {
             $contents = $selfdupe->www_viewAtom;
         } # add more for more extensions.
 
         # chunked content is already printed, no need to print it again
         unless($contents eq 'chunked') {
-            $tempSession->output->print($contents);
+            $exportSession->output->print($contents);
         }
 
-        $tempSession->output->setHandle($previousHandle);
-        
-        # properly close the temp session
-        $tempSession->var->end;
-        $tempSession->close;
-        
+        $exportSession->close;
+
         # tell the user we did this asset collateral correctly
-        unless( $args->{quiet} ) {
-            $self->{ '_masterSession' }->output->print($self->{ '_masteri18n' }->get('done'));
+        if ( $reportSession && !$args->{quiet} ) {
+            $reportSession->output->print($reporti18n->get('done'));
         }
-        
     }
-    return $self->next::method($basepath, $args);
+    return $self->next::method($basepath, $args, $reportSession);
 }
 
 #-------------------------------------------------------------------
@@ -247,7 +251,7 @@ sub getRssFeedItems {
 
 =head2 getAtomFeedUrl ()
 
-Returns $self->getUrl(“func=viewAtom”).
+Returns $self->getUrl('func=viewAtom').
 
 =cut
 
@@ -259,7 +263,7 @@ sub getAtomFeedUrl {
 
 =head2 getRssFeedUrl ()
 
-Returns $self->getUrl(“func=viewRss”).
+Returns $self->getUrl('func=viewRss').
 
 =cut
 

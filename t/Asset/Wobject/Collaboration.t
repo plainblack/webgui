@@ -89,7 +89,9 @@ $post = $collab->addChild($props,
         });
 
 my $rssitems = $collab->getRssFeedItems();
-is(scalar@{ $rssitems }, 2, 'rssitems set to number of posts added');
+is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
+
+is($collab->get('itemsPerFeed'), 25, 'itemsPerFeed is set to the default');
 
 TODO: {
     local $TODO = "Tests to make later";
