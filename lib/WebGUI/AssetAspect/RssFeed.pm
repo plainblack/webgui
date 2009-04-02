@@ -363,7 +363,7 @@ Return Rdf view of the syndicated items.
 sub www_viewRdf {
     my $self = shift;
     $self->session->http->setMimeType('application/rdf+xml');
-    return $self->getFeed( XML::FeedPP::Rdf->new )->to_string;
+    return $self->getFeed( XML::FeedPP::RDF->new )->to_string;
 }
 
 #-------------------------------------------------------------------
