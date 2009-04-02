@@ -7,6 +7,7 @@
  - fixed #9933: Matrix 2.0 - Unable to view/edit product maintainer account
  - fixed #9951: Matrix 2.0: Median not calculated correctly
  - fixed #10065: Template.pm missing a setting of needsUpdate in processPropertiesFromFormPost
+ - fixed #9976: carts not cleaned up
 
 7.6.17
  - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
