@@ -123,8 +123,8 @@ sub removeRssCapableAsset {
     print "\tRemoving prior RssCapable asset..." unless $quiet;
     $session->db->write("drop table RSSCapable");
     $session->db->write("drop table RSSFromParent");
-    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSCapable.pm' ) if -e $webguiRoot . '/lib/WebGUI/Asset/Wobject/RSSCapable.pm';
-    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSFromParent.pm' ) if -e $webguiRoot . '/lib/WebGUI/Asset/Wobject/RSSFromParent.pm';
+    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSCapable.pm' );
+    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSFromParent.pm' );
     print "Done.\n" unless $quiet;
 }
 
