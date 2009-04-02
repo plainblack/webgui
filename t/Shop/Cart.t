@@ -33,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 28;        # Increment this number for each test you create
+plan tests => 27;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -108,18 +108,10 @@ is($cart->readyForCheckout, 1, 'Cart is ready for checkout');
 $cart->update( {shippingAddressId   => 'Does Not Exist'} );
 is( $cart->readyForCheckout, 0, 'Cannot checkout cart without shipping address' );
 
-# Check shipper constraint
-$cart->update( { 
-    shippingAddressId   => $address->getId,
-    shipperId           => 'Does Not Exist',
-} );
-is( $cart->readyForCheckout, 0, 'Cannot checkout cart without shipper' );
-
 # Check minimum transaction amount
 $session->setting->set( 'shopCartCheckoutMinimum', 1000 );
-$cart->update( {
+$cart->update( { 
     shippingAddressId   => $address->getId,
-    shipperId           => $shipper->getId,
 } );
 is( $cart->readyForCheckout, 0, 'Cannot checkout cart when cart total is lower than required' );
 $session->setting->set( 'shopCartCheckoutMinimum', 0 );
