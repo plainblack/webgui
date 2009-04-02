@@ -1222,13 +1222,13 @@ sub validateSurvey{
         my $sNum = $s + 1;
         my $section = $self->section([$s]);
         if(! $self->validateGoto($section,$goodTargets)){
-            push @messages,"Section $sNum does not have a valid Jump target.";
+            push @messages,"Section $sNum has invalid Jump target: $section->{goto}";
         }
         if(! $self->validateGotoInfiniteLoop($section)){
             push(@messages,"Section $sNum jumps to itself.");
         }
         if(! $self->validateGotoExpression($section,$goodTargets)){
-            push(@messages,"Section $sNum does not have a valid Jump Expression.");
+            push(@messages,"Section $sNum has invalid Jump Expression: $section->{gotoExpression}");
         }
         if (my $var = $section->{variable}) {
             if (my $count = $duplicateTargets->{$var}) {
@@ -1242,13 +1242,13 @@ sub validateSurvey{
             my $qNum = $q + 1;
             my $question = $self->question([$s,$q]);
             if(! $self->validateGoto($question,$goodTargets)){
-                push(@messages,"Section $sNum Question $qNum does not have a valid Jump target.");
+                push(@messages,"Section $sNum Question $qNum has invalid Jump target: $question->{goto}");
             }
             if(! $self->validateGotoInfiniteLoop($question)){
                 push(@messages,"Section $sNum Question $qNum jumps to itself.");
             }
             if(! $self->validateGotoExpression($question,$goodTargets)){
-                push(@messages,"Section $sNum Question $qNum does not have a valid Jump Expression.");
+                push(@messages,"Section $sNum Question $qNum has invalid Jump Expression: $question->{gotoExpression}");
             }
             if($#{$question->{answers}} < 0){
                 push(@messages,"Section $sNum Question $qNum does not have any answers.");
@@ -1268,13 +1268,13 @@ sub validateSurvey{
                 my $aNum = $a + 1;
                 my $answer = $self->answer([$s,$q,$a]);
                 if(! $self->validateGoto($answer,$goodTargets)){
-                    push(@messages,"Section $sNum Question $qNum Answer $aNum does not have a valid Jump target.");
+                    push(@messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump target: $answer->{goto}");
                 }
                 if(! $self->validateGotoInfiniteLoop($answer)){
                     push(@messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.");
                 }
                 if(! $self->validateGotoExpression($answer,$goodTargets)){
-                    push(@messages,"Section $sNum Question $qNum Answer $aNum does not have a valid Jump Expression.");
+                    push(@messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump Expression: $answer->{gotoExpression}");
                 }
             }
         }
