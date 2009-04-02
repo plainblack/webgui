@@ -112,7 +112,7 @@ sub addRssFeedAspectToCollaboration {
     my $db = $session->db;
     my $pages = $db->read("select assetId,revisionDate,rssCapableRssLimit from RSSCapable");
     while (my ($id, $rev, $limit) = $pages->array) {
-        $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,?,'','',NULL,'','')",[$id,$rev,$limit]);
+        $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,?,'','',NULL,'','')",[$id,$rev,$limit || 25]);
     }
     print "Done.\n" unless $quiet;
 }
