@@ -35,6 +35,7 @@ my $session = start(); # this line required
 recalculateMatrixListingMedianValue( $session );
 addRssFeedAspect($session);
 addRssFeedAspectToAssets($session);
+addRssFeedAspectToCollaboration($session);
 removeRssCapableAsset($session);
 
 finish($session); # this line required
@@ -93,7 +94,7 @@ sub addRssFeedAspect {
 #----------------------------------------------------------------------------
 sub addRssFeedAspectToAssets {
     my $session = shift;
-    foreach my $asset_class (qw( WikiMaster Collaboration SyndicatedContent Gallery GalleryAlbum )) {
+    foreach my $asset_class (qw( WikiMaster SyndicatedContent Gallery GalleryAlbum )) {
         print "\tAdding RssFeed aspect to $asset_class table..." unless $quiet;
         my $db = $session->db;
         my $pages = $db->read("select assetId,revisionDate from $asset_class");
@@ -105,11 +106,25 @@ sub addRssFeedAspectToAssets {
 }
 
 #----------------------------------------------------------------------------
+sub addRssFeedAspectToCollaboration {
+    my $session = shift;
+    print "\tAdding RssFeed aspect to Collaboration, (porting rssCapableRssLimit to itemsPerFeed)..." unless $quiet;
+    my $db = $session->db;
+    my $pages = $db->read("select assetId,revisionDate,rssCapableRssLimit from RSSCapable");
+    while (my ($id, $rev, $limit) = $pages->array) {
+        $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,?,'','',NULL,'','')",[$id,$rev,$limit]);
+    }
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub removeRssCapableAsset {
     my $session = shift;
     print "\tRemoving prior RssCapable asset..." unless $quiet;
     $session->db->write("drop table RSSCapable");
     $session->db->write("drop table RSSFromParent");
+    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSCapable.pm' ) if -e $webguiRoot . '/lib/WebGUI/Asset/Wobject/RSSCapable.pm';
+    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSFromParent.pm' ) if -e $webguiRoot . '/lib/WebGUI/Asset/Wobject/RSSFromParent.pm';
     print "Done.\n" unless $quiet;
 }
 
