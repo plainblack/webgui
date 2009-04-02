@@ -175,7 +175,7 @@ sub create {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $cartId = $session->id->generate;
-    $session->db->write('insert into cart (cartId, sessionId) values (?,?)', [$cartId, $session->getId]);
+    $session->db->write('insert into cart (cartId, sessionId, creationDate) values (?,?,UNIX_TIMESTAMP())', [$cartId, $session->getId]);
     return $class->new($session, $cartId);
 }
 
@@ -561,6 +561,10 @@ The unique id of the configured shipping driver that will be used to ship these 
 
 The ID of a user being checked out, if they're being checked out by a cashier.
 
+=head4 creationDate
+
+The date the cart was created.
+
 =cut
 
 sub update {
@@ -569,7 +573,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(shippingAddressId posUserId shipperId)) {
+    foreach my $field (qw(shippingAddressId posUserId shipperId creationDate)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});

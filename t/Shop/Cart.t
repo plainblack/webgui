@@ -33,7 +33,7 @@ my $i18n = WebGUI::International->new($session, "Shop");
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 27;        # Increment this number for each test you create
+plan tests => 29;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -52,6 +52,7 @@ my $cart = WebGUI::Shop::Cart->newBySession($session);
 
 isa_ok($cart, "WebGUI::Shop::Cart");
 isa_ok($cart->session, "WebGUI::Session");
+ok($cart->get('creationDate'), 'creationDate set on cart creation');
 
 my $message = $i18n->get('empty cart') . "\n";
 like($cart->www_view, qr/There are no items currently in your cart./, 'Display empty cart message');
@@ -73,8 +74,12 @@ is($item->get("quantity"), 3, "Should have 3 of these in the cart.");
 is(scalar(@{$cart->getItems}), 1, "Should have 1 item type in cart regardless of quanity.");
 
 $item->update({shippingAddressId => "XXXX"});
-is($item->get("shippingAddressId"), "XXXX", "Can set values to the cart item properties.");
+is($item->get("shippingAddressId"), "XXXX", "Can set shippingAddressId in the cart item properties.");
 $item->update({shippingAddressId => undef});
+
+my $now = time();
+$cart->update({creationDate => $now});
+is($cart->get('creationDate'), $now, 'update: set creationDate');
 
 like($cart->getId, qr/[A-Za-z0-9\_\-]{22}/, "Id looks like a guid.");
 

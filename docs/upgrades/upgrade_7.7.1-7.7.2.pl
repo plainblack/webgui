@@ -22,7 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::Workflow;
+use WebGUI::Utility;
 
 my $toVersion = '7.7.2';
 my $quiet; # this line required
@@ -37,6 +38,9 @@ addRssFeedAspect($session);
 addRssFeedAspectToAssets($session);
 addRssFeedAspectToCollaboration($session);
 removeRssCapableAsset($session);
+addCreationTimeToCart($session);
+addCartKillerActivityToConfig($session);
+addCartKillerActivityToWorkflow($session);
 
 finish($session); # this line required
 
@@ -125,6 +129,38 @@ sub removeRssCapableAsset {
     $session->db->write("drop table RSSFromParent");
     unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSCapable.pm' );
     unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSFromParent.pm' );
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addCreationTimeToCart {
+    my $session = shift;
+    print "\tAdding creation time to cart..." unless $quiet;
+    $session->db->write("alter table cart add column creationDate int(20)");
+    $session->db->write('update cart set creationDate=NOW()');
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addCartKillerActivityToConfig {
+    my $session = shift;
+    print "\tAdding Remove Old Carts workflow activity to config files..." unless $quiet;
+    my $activities = $session->config->get('workflowActivities');
+    my $none = $activities->{'None'};
+    if (!isIn('WebGUI::Workflow::Activity::RemoveOldCarts', @{ $none })) {
+        push @{ $none }, 'WebGUI::Workflow::Activity::RemoveOldCarts';
+    }
+    $session->config->set('workflowActivities', $activities);
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addCartKillerActivityToWorkflow {
+    my $session = shift;
+    print "\tAdding Remove Old Carts workflow activity to Daily Workflow..." unless $quiet;
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    my $removeCarts = $workflow->addActivity('WebGUI::Workflow::Activity::RemoveOldCarts');
+    $removeCarts->set('title', 'Remove old carts');
     print "Done.\n" unless $quiet;
 }
 

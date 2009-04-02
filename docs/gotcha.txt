@@ -10,6 +10,8 @@ save you many hours of grief.
 7.7.2
 --------------------------------------------------------------------
    * WebGUI now requires Clone version 0.31 or greater.
+   * You must upgrade to WebGUI 7.7.2 before going on to higher versions of WebGUI due
+     to changes in the database table for the Cart.
 
 7.7.1
 --------------------------------------------------------------------
