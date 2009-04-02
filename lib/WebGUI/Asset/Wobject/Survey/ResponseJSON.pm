@@ -649,58 +649,30 @@ indicates that we should branch.
 The gotoExpression.
 
 A gotoExpression is a string representing a list of expressions (one per line) of the form:
+
  target: expression
  target: expression
  ...
 
 This subroutine iterates through the list, processing each line and, all things being
 well, evaluates the expression. The first expression to evaluate to true triggers a
-call to goto($target).
+call to L<"processGoto">.
 
-The expression is a simple subset of the formula language used in spreadsheet programs 
-such as Excel, OpenOffice, Google Docs etc..
+The expression should be valid perl. Any section/question variables that you refer to
+should be written as $var, as if your perl code had access to that variable. In reality,
+those variables don't exist - they're substituted in via L<"parseGotoExpression"> and 
+then the expression is evaluated in a safe compartment.
 
 Here is an example using section variables S1 and S2 as jump targets and question 
 variables Q1-3 in the expression. It jumps to S1 if the user's answer to Q1 has a value 
 of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
-S1: Q1 = 3
-S2: Q2 + Q3 < 10
 
-Arguments are evaluated as follows:
+ S1: $Q1 == 3
+ S2: $Q2 + $Q3 < 10
 
-Numeric arguments evaluate as numbers
-
-=over 4
-
-=item * No support for strings (and hence no string matching)
-
-=item * Question variable names (e.g. Q1) evaluate to the numeric value associated with 
-user's answer to that question, or undefined if the user has not answered that question
-
-=back
-
-Binary comparisons operators: = != < <= >= >
-
-=over 4
-
-=item * return boolean values based on perl's equivalent numeric comparison operators
-
-=back
-
-Simple math operators: + - * /
-
-=over 4
-
-=item * return numeric values
-
-=back
-
-Later we may add Boolean operators: AND( x; y; z; ... ), OR( x; y; z; ... ), NOT( x ), with args separated by 
-semicolons (presumably because spreadsheet formulas use commas to indicate cell ranges)
-
-Later still you may be able to say AVG(section1) or SUM(section3) and have those functions automatically 
-compute their result over the set of all questions in the given section.
-But for now those things can be done manually using the limited subset defined.
+You can do advanced branching by creating your own variables within the expression, for
+example, to branch when the average of 3 questions is greater than 5: 
+ S1: $avg = ($Q1 + $Q2 + $Q3) / 3; $avg > 5   
 
 =cut
 
@@ -793,12 +765,7 @@ Uses the following simple strategy:
 First, parse the expression as:
  target: expression
 
-Replace each questionName with its response value (from the $responses hashref)
-
-Massage the expression into valid perl
-
-Check that only valid tokens remain. This last step ensures that any invalid questionNames in
-the expression generate an error because our list of valid tokens doesn't include a-z
+Replace each "$questionName" with its response value (from the $responses hashref)
 
 =cut
 
@@ -807,9 +774,6 @@ sub parseGotoExpression {
     my ($expression, $responses) = validate_pos(@_, { type => SCALAR }, { type => HASHREF, default => {} });
 
     $self->session->log->debug("Parsing gotoExpression: $expression");
-
-    # Valid gotoExpression tokens are..
-    my $tokens = qr{\s|[-0-9=!<>+*/.()&|:?]};
 
     my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
 
@@ -825,21 +789,9 @@ sub parseGotoExpression {
         return;
     }
     
-    # convert 'and' and 'or' to '&&' and '||'
-    $rest =~ s/\band\b/&&/ig;
-    $rest =~ s/\bor\b/||/ig;
-    
-    # Replace each questionName with its response value
+    # Replace each "$questionName" with its response value
     while ( my ( $questionName, $response ) = each %{$responses} ) {
-        $rest =~ s/$questionName/$response/g;
-    }
-
-    # convert '=' to '==' but don't touch '!=', '<=' or '>='
-    $rest =~ s/(?<![!<>])=(?!=)/==/g;
-
-    if ( $rest !~ /^$tokens+$/ ) {
-        $self->session->log->warn("Contains invalid tokens: $rest");
-        return;
+        $rest =~ s/\$$questionName/$response/g;
     }
 
     $self->session->log->debug("Processed as: $rest");
