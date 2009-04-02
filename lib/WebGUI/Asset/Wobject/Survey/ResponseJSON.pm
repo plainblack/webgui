@@ -28,7 +28,7 @@ As a whole, this class represents the complete state of a user's response to a S
 At the heart of this class is a perl hash that can be serialized
 as JSON to the database to allow for storage and retrieval of the complete state
 of a survey response.
- 
+
 Survey instances that allow users to record multiple responses will persist multiple
 instances of this class to the database (one per distinct user response).
 
@@ -40,7 +40,7 @@ number of questions answered (L<"questionsAnswered">) and the Survey start time 
 This package is not intended to be used by any other Asset in WebGUI.
 
 =head2 surveyOrder
- 
+
 This data strucutre is an array (reference) of Survey addresses (see  
 L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
 in which items are presented to the user.
@@ -70,7 +70,7 @@ is stored in this hash reference.
 
 Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
 Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
- 
+
 Question entries only contain a comment field:
  {
      ...
@@ -79,7 +79,7 @@ Question entries only contain a comment field:
      }
      ...
  }
-          
+
 Answers entries contain: value (the recorded value), time and comment fields.
 
  {
@@ -660,7 +660,7 @@ call to L<"processGoto">.
 
 The expression should be valid perl. Any section/question variables that you refer to
 should be written as $var, as if your perl code had access to that variable. In reality,
-those variables don't exist - they're substituted in via L<"parseGotoExpression"> and 
+those variables don't exist - they're substituted in via L<parseGotoExpression> and 
 then the expression is evaluated in a safe compartment.
 
 Here is an example using section variables S1 and S2 as jump targets and question 
