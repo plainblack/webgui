@@ -331,6 +331,13 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit (  )
+
+Override the superclass to add import and exprt items to the AdminConsole submenu.
+
+=cut
+
 sub www_edit {
     my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Shelf');
