@@ -125,8 +125,10 @@ sub convertCollaborationToRssAspect {
         $db->write("INSERT INTO assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription, feedHeaderLinks) VALUES (?,?,?,'','',NULL,'','',?)",[$id,$rev,$limit || 25, $headerLinks]);
     }
     for my $assetId (@rssFromParents) {
-        my $asset = WebGUI::Asset->newPending($session, $assetId);
-        $asset->purge;
+        my $asset = eval { WebGUI::Asset->newPending($session, $assetId) };
+        if ($asset) {
+            $asset->purge;
+        }
     }
     $db->write("DELETE FROM RSSCapable WHERE assetId IN (SELECT assetId FROM Collaboration GROUP BY assetId)");
     print "Done.\n" unless $quiet;
