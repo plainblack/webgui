@@ -137,7 +137,7 @@ sub toHtml {
 	my $output  = "";
     
     # Do our superclass's job
- 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
+    my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
 	my ($style, $url) = $self->session->quick(qw(style url));
