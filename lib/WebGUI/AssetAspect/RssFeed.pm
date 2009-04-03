@@ -99,7 +99,7 @@ sub definition {
 			},
 		feedImageLink => {
 			noFormPost		=> 0,
-			fieldType       => "text",
+			fieldType       => "url",
 			defaultValue    => "",
     		tab             => "rss",
     		label           => $i18n->get('feedImageLink'),
