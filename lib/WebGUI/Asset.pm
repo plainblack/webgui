@@ -2340,7 +2340,7 @@ sub update {
 #			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
             # skip a property unless it was specified to be set by the properties field
 			next unless (exists $properties->{$property});
-            my $propertyDefinition = $definition->{property}{$property};
+            my $propertyDefinition = $definition->{properties}{$property};
             # skip a property if it has the display only flag set
             next if ($propertyDefinition->{displayOnly});
 

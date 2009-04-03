@@ -196,6 +196,9 @@ sub definition {
 		idPrefix=>{
 			defaultValue=>undef
 			},
+        allowEmpty=>{
+            defaultValue => 0,
+        },
     });
 	return $definition;
 }

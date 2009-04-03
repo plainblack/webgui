@@ -115,6 +115,7 @@ sub definition {
 			},
         feedHeaderLinks => {
             fieldType       => "checkList",
+            allowEmpty      => 1,
             defaultValue    => "rss\natom",
             tab             => "rss",
             options         => do {
