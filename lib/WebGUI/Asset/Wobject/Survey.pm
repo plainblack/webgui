@@ -193,6 +193,13 @@ sub definition {
             #            hoverHelp       => $i18n->get('editForm workflowIdAddEntry description'),
             none => 1,
         },
+        quizModeSummary => {
+            fieldType    => 'yesNo',
+            defaultValue => 0,
+            tab          => 'properties',
+            label        => $i18n->get('Quiz mode summaries'),
+            hoverHelp    => $i18n->get('Quiz mode summaries help'),
+        }
     );
 
     #my $defaultMC = $session->  
@@ -1166,6 +1173,13 @@ sub www_loadQuestions {
 
     if ( $self->responseJSON->surveyEnd() ) {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
+        if ( $self->get('quizModeSummary') ) {
+            if(! $self->session->form->param('shownsummary')){
+                my $summary = $self->responseJSON->showSummary();
+                my $out = $self->processTemplate( $summary, $self->get('surveyQuestionsId') );
+#                return $out;
+            }
+        }
         return $self->surveyEnd();
     }
 
