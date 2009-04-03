@@ -1,4 +1,5 @@
 7.7.3
+ - fixed #10094: double explanation in thread help
 
 7.7.2
  - fixed #10056: YUI javascripts included while adminOff (BNC)
