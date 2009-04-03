@@ -1,3 +1,5 @@
+7.7.3
+
 7.7.2
  - fixed #10056: YUI javascripts included while adminOff (BNC)
  - fixed a bug that required you to hit "update cart" before the checkout
