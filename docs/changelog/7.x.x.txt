@@ -1,5 +1,6 @@
 7.6.19
  - fixed #9976: carts not cleaned up
+ - fixed #10094: double explanation in thread help
 
 7.6.18
  - fixed #9955: Matrix alpha sort is backwards
