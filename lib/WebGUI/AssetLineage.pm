@@ -829,7 +829,6 @@ sub setParent {
 	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
     my $oldLineage = $self->get("lineage");
-    return 0 unless $newParent->canEdit;
     my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
     return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
     $self->session->db->beginTransaction;
