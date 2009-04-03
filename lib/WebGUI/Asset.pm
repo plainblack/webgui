@@ -2340,9 +2340,9 @@ sub update {
 #			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
             # skip a property unless it was specified to be set by the properties field
 			next unless (exists $properties->{$property});
-
+            my $propertyDefinition = $definition->{property}{$property};
             # skip a property if it has the display only flag set
-            next if ($definition->{properties}{$property}{displayOnly});
+            next if ($propertyDefinition->{displayOnly});
 
             # skip properties that aren't yet in the table
             if (!exists $tableFields{$property}) {
@@ -2358,14 +2358,16 @@ sub update {
             }
 
             # apply filter logic on a property to validate or fix it's value
-			if (exists $definition->{properties}{$property}{filter}) {
-				my $filter = $definition->{properties}{$property}{filter};
-				$value = $self->$filter($value, $property);
-			}
+            if (exists $propertyDefinition->{filter}) {
+                my $filter = $propertyDefinition->{filter};
+                $value = $self->$filter($value, $property);
+            }
 
-            # use the default value because default and update were both undef
-            if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
-                $value = $definition->{properties}{$property}{defaultValue};
+            # if the value is undefined, use the default if possible
+            # unless allowEmpty has been set, do this for empty strings as well
+            if ( ( !defined $value || ( $value eq q{} && ! $propertyDefinition->{allowEmpty} ) )
+                 && exists $propertyDefinition->{defaultValue} ) {
+                $value = $propertyDefinition->{defaultValue};
                 if (ref($value) eq 'ARRAY') {
                     $value = $value->[0];
                 }

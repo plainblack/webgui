@@ -13,6 +13,11 @@ save you many hours of grief.
    * You must upgrade to WebGUI 7.7.2 before going on to higher versions of WebGUI due
      to changes in the database table for the Cart.
 
+   * The RSSCapable class and RSSFromParent asset have been removed.
+     Any custom assets using those are recommended to switch to the new
+     RssFeed AssetAspect.  If not used by custom assets, the tables
+     used by them will be removed from the database.
+
 7.7.1
 --------------------------------------------------------------------
    * Keywords are now comma separated rather than space separated.  Quotes are

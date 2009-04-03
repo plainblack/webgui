@@ -92,7 +92,22 @@ our $I18N = {
 		lastUpdated => 1236820473,
 		context => q|The title of the RSS tab on the asset's edit form.|
 	},
-    
+
+    'feedHeaderLinks' => {
+        message => q|HTML Header Feed Links|,
+    },
+    'feedHeaderLinks hoverHelp' => {
+        message => q|Select which feed types to include in the HTML headers, which many browsers will offer as options to users.|,
+    },
+    'rssLinkOption' => {
+        message => q|RSS 2.0|,
+    },
+    'atomLinkOption' => {
+        message => 'Atom',
+    },
+    'rdfLinkOption' => {
+        message => 'RDF/RSS 1.0',
+    },
 };
 
 1;

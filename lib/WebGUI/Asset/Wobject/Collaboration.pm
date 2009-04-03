@@ -63,16 +63,6 @@ sub _visitorCacheOk {
 }
 
 #-------------------------------------------------------------------
-# encode a string to include in xml (for RSS export)
-sub _xml_encode {
-	my $text = shift;
-        $text =~ s/&/&amp;/g;
-        $text =~ s/</&lt;/g;
-        $text =~ s/\]\]>/\]\]&gt;/g;
-        return $text;
-}
-
-#-------------------------------------------------------------------
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
@@ -1174,7 +1164,6 @@ sub prepareView {
 	my $self = shift;
 	$self->next::method;
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
-    $self->session->style->setLink($self->getRssFeedUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }

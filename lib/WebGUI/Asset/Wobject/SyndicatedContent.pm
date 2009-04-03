@@ -308,11 +308,6 @@ sub prepareView {
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
-	my $title = $self->get("title");
-	my $style = $self->session->style;
-	$style->setLink($self->getUrl("func=viewRss"), { rel=>'alternate', type=>'application/rss+xml', title=>$title.' (RSS)' });
-	$style->setLink($self->getUrl("func=viewRdf"), { rel=>'alternate', type=>'application/rdf+xml', title=>$title.' (RDF)' });
-	$style->setLink($self->getUrl("func=viewAtom"), { rel=>'alternate', type=>'application/atom+xml', title=>$title.' (Atom)' });
 }
 
 
@@ -407,6 +402,20 @@ sub www_viewRSS10 {
 	my $self = shift;
 	return $self->www_viewRdf;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS ( )
+
+Deprecated. Use www_viewRss() instead.
+
+=cut
+
+sub www_viewRSS {
+	my $self = shift;
+	return $self->www_viewRss;
+}
+
 
 #-------------------------------------------------------------------
 

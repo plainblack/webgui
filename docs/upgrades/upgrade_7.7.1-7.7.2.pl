@@ -36,7 +36,7 @@ my $session = start(); # this line required
 recalculateMatrixListingMedianValue( $session );
 addRssFeedAspect($session);
 addRssFeedAspectToAssets($session);
-addRssFeedAspectToCollaboration($session);
+convertCollaborationToRssAspect($session);
 removeRssCapableAsset($session);
 addCreationTimeToCart($session);
 addCartKillerActivityToConfig($session);
@@ -47,7 +47,7 @@ finish($session); # this line required
 #----------------------------------------------------------------------------
 sub recalculateMatrixListingMedianValue{
     my $session = shift;
-    print "\tRecalculating median value for Matrix Listing ratings... \n" unless $quiet;
+    print "\tRecalculating median value for Matrix Listing ratings... " unless $quiet;
     my $matrices   = WebGUI::Asset->getRoot($session)->getLineage(['descendants'],
         {
             statesToInclude     => ['published','trash','clipboard','clipboard-limbo','trash-limbo'],
@@ -80,7 +80,7 @@ category = ?",[$medianValue,$listing->{listingId},$category]);
 sub addRssFeedAspect {
     my $session = shift;
     print "\tAdding RssFeed asset aspect..." unless $quiet;
-    $session->db->write("create table assetAspectRssFeed (
+    $session->db->write(q{create table assetAspectRssFeed (
         assetId char(22) binary not null,
         revisionDate bigint not null,
         itemsPerFeed int(11) default 25,
@@ -90,46 +90,73 @@ sub addRssFeedAspect {
         feedImage char(22) binary,
         feedImageLink text,
         feedImageDescription mediumtext,
+        feedHeaderLinks char(32) default 'rss\natom',
         primary key (assetId, revisionDate)
-        )");
+        )});
     print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
 sub addRssFeedAspectToAssets {
     my $session = shift;
+    my $db = $session->db;
     foreach my $asset_class (qw( WikiMaster SyndicatedContent Gallery GalleryAlbum )) {
         print "\tAdding RssFeed aspect to $asset_class table..." unless $quiet;
-        my $db = $session->db;
         my $pages = $db->read("select assetId,revisionDate from $asset_class");
         while (my ($id, $rev) = $pages->array) {
-            $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,25,'','',NULL,'','')",[$id,$rev]);
+            $db->write("INSERT INTO assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) VALUES (?,?,25,'','',NULL,'','')",[$id,$rev]);
         }
         print "Done.\n" unless $quiet;
     }
 }
 
 #----------------------------------------------------------------------------
-sub addRssFeedAspectToCollaboration {
+sub convertCollaborationToRssAspect {
     my $session = shift;
     print "\tAdding RssFeed aspect to Collaboration, (porting rssCapableRssLimit to itemsPerFeed)..." unless $quiet;
     my $db = $session->db;
-    my $pages = $db->read("select assetId,revisionDate,rssCapableRssLimit from RSSCapable");
-    while (my ($id, $rev, $limit) = $pages->array) {
-        $db->write("insert into assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription) values (?,?,?,'','',NULL,'','')",[$id,$rev,$limit || 25]);
+    my @rssFromParents;
+    my $pages = $db->read("SELECT Collaboration.assetId, Collaboration.revisionDate, RSSCapable.rssCapableRssLimit, RSSCapable.rssCapableRssFromParentId, RSSCapable.rssCapableRssEnabled FROM Collaboration INNER JOIN RSSCapable ON Collaboration.assetId=RSSCapable.assetId AND Collaboration.revisionDate=RSSCapable.revisionDate");
+    while (my ($id, $rev, $limit, $fromParent, $enabled) = $pages->array) {
+        if ($fromParent) {
+            push @rssFromParents, $fromParent;
+        }
+        my $headerLinks = $enabled ? "rss\natom" : q{};
+        $db->write("INSERT INTO assetAspectRssFeed (assetId, revisionDate, itemsPerFeed, feedTitle, feedDescription, feedImage, feedImageLink, feedImageDescription, feedHeaderLinks) VALUES (?,?,?,'','',NULL,'','',?)",[$id,$rev,$limit || 25, $headerLinks]);
     }
+    for my $assetId (@rssFromParents) {
+        my $asset = WebGUI::Asset->newPending($session, $assetId);
+        $asset->purge;
+    }
+    $db->write("DELETE FROM RSSCapable WHERE assetId IN (SELECT assetId FROM Collaboration GROUP BY assetId)");
     print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
 sub removeRssCapableAsset {
     my $session = shift;
-    print "\tRemoving prior RssCapable asset..." unless $quiet;
-    $session->db->write("drop table RSSCapable");
-    $session->db->write("drop table RSSFromParent");
-    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSCapable.pm' );
-    unlink ( $webguiRoot . '/lib/WebGUI/Asset/RSSFromParent.pm' );
-    print "Done.\n" unless $quiet;
+    print "\tChecking for uses of RSSCapable...\n" unless $quiet;
+    my @rssCapableClasses = $session->db->buildArray('SELECT className FROM RSSCapable INNER JOIN asset ON RSSCapable.assetId=asset.assetId GROUP BY className');
+    if (@rssCapableClasses) {
+        warn "\t\tThis site is using the assets\n\t\t\t" . join(', ', @rssCapableClasses) . "\n\t\twhich use the RSSCapable class!  Support RSSCapable has been dropped and it will no longer be maintained.\n";
+    }
+    else {
+        print "\t\tNot used, removing.\n" unless $quiet;
+        $session->db->write("DROP TABLE RSSCapable");
+        $session->db->write("DROP TABLE RSSFromParent");
+        my $rssCapableTemplates = WebGUI::Asset->getRoot($session)->getLineage(['descendants'], {
+            statesToInclude     => [qw(published clipboard clipboard-limbo trash-limbo)],
+            statusToInclude     => [qw(approved pending archived)],
+            returnObjects       => 1,
+            includeOnlyClasses  => ['WebGUI::Asset::Template'],
+            joinClass           => 'WebGUI::Asset::Template',
+            whereClause         => q{template.namespace = 'RSSCapable/RSS'},
+        });
+        for my $template (@{$rssCapableTemplates}) {
+            $template->trash;
+        }
+    }
+    print "\tDone.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

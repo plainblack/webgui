@@ -113,6 +113,23 @@ sub definition {
     		label           => $i18n->get('feedImageDescription'),
     		hoverHelp       => $i18n->get('feedImageDescription hoverHelp')
 			},
+        feedHeaderLinks => {
+            fieldType       => "checkList",
+            defaultValue    => "rss\natom",
+            tab             => "rss",
+            options         => do {
+                my %headerLinksOptions;
+                tie %headerLinksOptions, 'Tie::IxHash';
+                %headerLinksOptions = (
+                    rss  => $i18n->get('rssLinkOption'),
+                    atom => $i18n->get('atomLinkOption'),
+                    rdf  => $i18n->get('rdfLinkOption'),
+                );
+                \%headerLinksOptions;
+            },
+            label           => $i18n->get('feedHeaderLinks'),
+            hoverHelp       => $i18n->get('feedHeaderLinks hoverHelp')
+        },
 	    );
 	push(@{$definition}, {
 		autoGenerateForms   => 1,
@@ -261,6 +278,18 @@ sub getAtomFeedUrl {
 
 #-------------------------------------------------------------------
 
+=head2 getRdfFeedUrl ()
+
+Returns $self->getUrl('func=viewRdf').
+
+=cut
+
+sub getRdfFeedUrl {
+    shift->getUrl("func=viewRdf");
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRssFeedUrl ()
 
 Returns $self->getUrl('func=viewRss').
@@ -280,7 +309,33 @@ Returns the current asset's URL with .atom concatenated onto it.
 =cut
 
 sub getStaticAtomFeedUrl {
-    shift->getUrl() . '.atom';
+    my $self = shift;
+    my $url = $self->get("url") . '.atom';
+    $url = $self->session->url->gateway($url);
+    if ($self->get("encryptPage")) {
+        $url = $self->session->url->getSiteURL . $url;
+        $url =~ s/^http:/https:/;
+    }
+    return $url;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getStaticRdfFeedUrl ()
+
+Returns the current asset's URL with .rdf concatenated onto it.
+
+=cut
+
+sub getStaticRdfFeedUrl {
+    my $self = shift;
+    my $url = $self->get("url") . '.rdf';
+    $url = $self->session->url->gateway($url);
+    if ($self->get("encryptPage")) {
+        $url = $self->session->url->getSiteURL . $url;
+        $url =~ s/^http:/https:/;
+    }
+    return $url;
 }
 
 #-------------------------------------------------------------------
@@ -292,7 +347,14 @@ Returns the current asset's URL with .rss concatenated onto it.
 =cut
 
 sub getStaticRssFeedUrl {
-    shift->getUrl() . '.rss';
+    my $self = shift;
+    my $url = $self->get("url") . '.rss';
+    $url = $self->session->url->gateway($url);
+    if ($self->get("encryptPage")) {
+        $url = $self->session->url->getSiteURL . $url;
+        $url =~ s/^http:/https:/;
+    }
+    return $url;
 }
 
 #-------------------------------------------------------------------
@@ -340,6 +402,41 @@ sub getFeed {
         }
     }
     return $feed;
+}
+
+sub prepareView {
+    my $self = shift;
+    $self->addHeaderLinks;
+    return $self->next::method(@_);
+}
+
+sub addHeaderLinks {
+    my $self = shift;
+    my $style = $self->session->style;
+    my $title = $self->get('feedTitle') || $self->get("title");
+    my %feeds = map { $_ => 1 } split /\n/, $self->get('feedHeaderLinks');
+    my $addType = keys %feeds > 1;
+    if ($feeds{rss}) {
+        $style->setLink($self->getRssFeedUrl, {
+            rel   => 'alternate',
+            type  => 'application/rss+xml',
+            title => $title . ( $addType ? ' (RSS)' : ''),
+        });
+    }
+    if ($feeds{atom}) {
+        $style->setLink($self->getAtomFeedUrl, {
+            rel   => 'alternate',
+            type  => 'application/atom+xml',
+            title => $title . ( $addType ? ' (Atom)' : ''),
+        });
+    }
+    if ($feeds{rdf}) {
+        $style->setLink($self->getRdfFeedUrl, {
+            rel   => 'alternate',
+            type  => 'application/rdf+xml',
+            title => $title . ( $addType ? ' (RDF)' : ''),
+        });
+    }
 }
 
 #-------------------------------------------------------------------
