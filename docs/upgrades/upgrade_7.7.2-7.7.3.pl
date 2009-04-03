@@ -32,6 +32,8 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addSurveyQuizModeColumns($session);
+
 finish($session); # this line required
 
 
@@ -44,6 +46,13 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub addSurveyQuizModeColumns{
+    my $session = shift;
+    print "\tAdding columns to Survey table... " unless $quiet;
+    $session->db->write("alter table Survey add column `quizModeSummary` TINYINT(3)");
+    $session->db->write("alter table Survey add column `surveySummaryTemplateId` char(22)");
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
