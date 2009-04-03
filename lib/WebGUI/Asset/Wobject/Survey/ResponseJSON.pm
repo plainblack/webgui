@@ -680,7 +680,7 @@ sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
 
-    my $responses = $self->recordedResponses();
+    my $responses = $self->recordedNamedResponses();
 
     # Parse gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split /\n/, $expression) {
@@ -711,13 +711,53 @@ sub processGotoExpression {
 
 =head2 recordedResponses
 
+Returns an array or response information in this response's survey order.
+
+=cut
+
+sub recordedResponses{
+    my $self = shift;
+    my $responses= [
+        # {answer info hash}
+    ];
+    # Populate @$responses with the user's data..
+    for my $address ( @{ $self->surveyOrder } ) {
+        my $question = $self->survey->question( $address );
+        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
+        for my $aIndex (aIndexes($address)) {
+            my $question = $self->survey->question([$sIndex,$qIndex]);
+            my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
+            if ( defined $self->responses->{$answerId} ) {
+                my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
+                push(@$responses, {
+                    value => $answer->{value} =~ /\w/  ? $answer->{value} : $question->{value},
+                    recordedAnswer => $answer->{recordedAnswer},
+                    isCorrect => $answer->{isCorrect},
+                    answerText => $answer->{text},
+                    address => [$sIndex,$qIndex,$aIndex],
+                    questionText => $question->{text},
+                    questionValue => $question->{value},
+                    questionType => $question->{questionType}
+                    }
+                );
+            }
+        }
+    }
+    return $responses;
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 recordedNamedResponses
+
 Returns a hash (reference) of question responses. The hash keys are
 question variable names. The hash values are the corresponding answer
 values selected by the user. 
 
 =cut
 
-sub recordedResponses {
+sub recordedNamedResponses {
     my $self = shift;
     
     my $responses= {
@@ -876,7 +916,7 @@ sub nextQuestions {
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $recordedResponses = $self->recordedResponses();
+    my $recordedResponses = $self->recordedNamedResponses();
 
     # Do text replacement
     $section->{text} = $self->getTemplatedText($section->{text}, $recordedResponses);
@@ -1046,6 +1086,103 @@ sub aIndexes {
 
 #-------------------------------------------------------------------
 
+=head2 showSummary ( [$sectionAddresses] )
+
+showSummary returns the current responses summary for the entire response, if 
+no address is passed in, or just the sections addressed by $sectionAddresses.
+
+For each section, the total correct, wrong, time taken, and points are returned.  And each 
+question is listed with the text, given score, user response, and if it was correct.
+This list is meant for a template and only what is needed should be shown.
+
+A summary of the entire suvey, 
+
+=cut
+
+sub showSummary{
+    my $self = shift;
+    my $sectionAddies = shift;#array of section addresses
+
+    my $all = 0;
+    $all = 1 if(! $sectionAddies);
+
+    my ($summaries);
+
+    my $responses = $self->recordedResponses();
+    my %goodSection;
+    map{$goodSection{$_} = 1} @$sectionAddies;
+    
+    return if(! $responses);
+
+    my ($sectionIndex, $questionIndex, $answerIndex) = (-1, -1, -1);
+    my ($currentSection,$currentQuestion) = (-1, -1); 
+
+    for my $response (@$responses){
+        if(! $all and ! $goodSection{$response->{address}->[0]}){next;}
+
+        if($currentSection != $response->{address}->[0]){
+            $sectionIndex++;
+            $questionIndex = -1;
+            $answerIndex = -1;
+            $currentQuestion = -1;
+            $currentSection = $response->{address}->[0];
+            _loadSectionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]},$response);
+        }
+        if($currentQuestion != $response->{address}->[1]){
+            $questionIndex++;
+            $answerIndex = -1;
+            $currentQuestion = $response->{address}->[1];
+            _loadQuestionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]},$response);
+        }
+        $answerIndex++;
+        _loadAnswerIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]->{answers}->[$answerIndex]},
+            $response,
+            $self->survey->{multipleChoiceTypes});
+    }
+    return $summaries;
+}
+sub _loadAnswerIntoSummary{
+    my $node = shift;
+    my $response = shift;
+    my $types = shift;
+    if($response->{isCorrect}){
+        $node->{iscorrect} = 1;
+        $node->{score} = $response->{value};
+    }else{   
+        $node->{score} = 0;
+    }
+    $node->{text} = $response->{answerText};
+
+    #test if it is a multiple choide type
+    if($types->{$response->{questionType}}){
+        $node->{value} = $response->{value};
+    }else{
+        $node->{value} = $response->{recordedValue};
+    }
+}
+sub _loadQuestionIntoSummary{
+    my $node = shift;
+    my $response = shift;
+    $node->{id} = $response->{address}->[1];
+    $node->{text} = $response->{questionText};
+}
+sub _loadSectionIntoSummary{
+    my $node = shift; 
+    my $response = shift;
+    $node->{id} = $response->{address}->[0];
+    if($response->{isCorrect}){
+        $node->{score} = 0 if(!defined $node->{section}->{score});
+        $node->{correct} = 0 if(!defined $node->{section}->{correct});
+        $node->{score} += $response->{value};
+        $node->{correct}++;
+    }else{
+        $node->{incorrect} = 0 if(!defined $node->{section}->{incorrect});
+        $node->{incorrect}++;
+    }
+
+}
+#-------------------------------------------------------------------
+
 =head2 returnResponseForReporting
 
 Used to extract JSON responses for use in reporting results.
@@ -1056,7 +1193,7 @@ recorded value, and the id of the answer.
 
 =cut
 
-# TODO: This sub should make use of recordedResponses
+# TODO: This sub should make use of recordedNamedResponses
 
 sub returnResponseForReporting {
     my $self      = shift;
