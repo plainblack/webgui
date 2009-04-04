@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (144 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (147 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -142,6 +142,22 @@ is($g->dbQuery(), 'select userId from someOtherDatabase', 'dbQuery set and get c
 
 $g->isAdHocMailGroup(1); 
 is($g->isAdHocMailGroup(),  1, 'isAdHocMailGroup set and get correctly');
+
+$g->databaseLinkId('newDbLinkId'); 
+is($g->databaseLinkId(),  'newDbLinkId', 'databaseLinkId set and get correctly');
+$g->databaseLinkId(0); 
+is($g->databaseLinkId(),  0,             'databaseLinkId set and get correctly (0)');
+
+################################################################
+#
+# options for new
+#
+################################################################
+
+my $optionGroup = WebGUI::Group->new($session, 'new', undef, 'noAdmin');
+my $getGroupsIn = $optionGroup->getGroupsIn();
+cmp_deeply($getGroupsIn, [], 'new: noAdmin prevents the admin group from being added to this group');
+$optionGroup->delete;
 
 ################################################################
 #
