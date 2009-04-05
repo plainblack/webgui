@@ -475,6 +475,14 @@ Survey's edit screen|,
         context => q|The message shown to the user taking the survey when the survey is restarted after reaching
 the time limit for completing the survey. This message is in the 'take survey' template.|,
     },
+    'Quiz mode summaries' => {
+        message     => q|Show quiz mode summaries?|,
+        lastUpdated => 0,
+    },
+    'Quiz mode summaries help' => {
+        message     => q|When set, summaries are shown to users giving their quiz results?|,
+        lastUpdated => 0,
+    },
     'Show user their progress' => {
         message     => q|Show user their progress?|,
         lastUpdated => 0,
@@ -606,6 +614,18 @@ the time limit for completing the survey. This message is in the 'take survey' t
 
     'Edit Survey Template help' => {
         message => q|The template for displaying the screen for editing the survey.|,
+        lastUpdated => 0
+    },
+    
+    'Survey Summary Template' => {
+        message => q|Survey Summary Template|,
+        context => q|The template for displaying the summary page to users.|,
+        lastUpdated => 0
+    },
+    
+    'Survey Summary Template help' => {
+        message => q|This is the template shown to users in quiz mode to summarize their results.|,
+        context => q|The template for displaying the summary page to users.|,
         lastUpdated => 0
     },
 

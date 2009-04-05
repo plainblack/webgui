@@ -327,6 +327,11 @@ if (typeof Survey === "undefined") {
     
     // Public API
     Survey.Form = {
+        showSummary: function(html){
+            var html = html;
+            document.getElementById('survey').innerHTML = html;
+            YAHOO.util.Event.addListener("submitbutton", "click", function(){ Survey.Comm.submitSummary(); });
+        },
         displayQuestions: function(params){
             toValidate = [];
             var qs = params.questions;

@@ -1117,10 +1117,18 @@ sub showSummary{
     my ($sectionIndex, $questionIndex, $answerIndex) = (-1, -1, -1);
     my ($currentSection,$currentQuestion) = (-1, -1); 
 
+    ($summaries->{totalCorrect},$summaries->{totalIncorrect}) = (0,0);
+
     for my $response (@$responses){
         if(! $all and ! $goodSection{$response->{address}->[0]}){next;}
-
+        if($response->{isCorrect}){
+            $summaries->{totalCorrect}++;
+        }else{
+            $summaries->{totalIncorrect}++;
+        }
+        $summaries->{totalAnswers}++;
         if($currentSection != $response->{address}->[0]){
+            $summaries->{totalSections}++;
             $sectionIndex++;
             $questionIndex = -1;
             $answerIndex = -1;
@@ -1129,6 +1137,7 @@ sub showSummary{
             _loadSectionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]},$response);
         }
         if($currentQuestion != $response->{address}->[1]){
+            $summaries->{totalQuestions}++;
             $questionIndex++;
             $answerIndex = -1;
             $currentQuestion = $response->{address}->[1];
@@ -1145,10 +1154,13 @@ sub _loadAnswerIntoSummary{
     my $node = shift;
     my $response = shift;
     my $types = shift;
+
+    $node->{id} = $response->{address}->[2] + 1;
     if($response->{isCorrect}){
         $node->{iscorrect} = 1;
         $node->{score} = $response->{value};
     }else{   
+        $node->{iscorrect} = 0;
         $node->{score} = 0;
     }
     $node->{text} = $response->{answerText};
@@ -1163,21 +1175,21 @@ sub _loadAnswerIntoSummary{
 sub _loadQuestionIntoSummary{
     my $node = shift;
     my $response = shift;
-    $node->{id} = $response->{address}->[1];
+    $node->{id} = $response->{address}->[1] + 1;
     $node->{text} = $response->{questionText};
 }
 sub _loadSectionIntoSummary{
     my $node = shift; 
     my $response = shift;
-    $node->{id} = $response->{address}->[0];
+    $node->{id} = $response->{address}->[0] + 1;
+    $node->{inCorrect} = 0 if(!defined $node->{section}->{inCorrect});
+    $node->{score} = 0 if(!defined $node->{section}->{score});
+    $node->{correct} = 0 if(!defined $node->{section}->{correct});
     if($response->{isCorrect}){
-        $node->{score} = 0 if(!defined $node->{section}->{score});
-        $node->{correct} = 0 if(!defined $node->{section}->{correct});
         $node->{score} += $response->{value};
         $node->{correct}++;
     }else{
-        $node->{incorrect} = 0 if(!defined $node->{section}->{incorrect});
-        $node->{incorrect}++;
+        $node->{inCorrect}++;
     }
 
 }

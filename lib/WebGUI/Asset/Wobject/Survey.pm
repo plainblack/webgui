@@ -112,6 +112,14 @@ sub definition {
             label        => $i18n->get('Max user responses'),
             hoverHelp    => $i18n->get('Max user responses help'),
         },
+        surveySummaryTemplateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => $i18n->get('Survey Summary Template'),
+            hoverHelp    => $i18n->get('Survey Summary Template help'),
+            defaultValue => '7F-BuEHi7t9bPi008H8xZQ',
+            namespace    => 'Survey/Summary',
+        },
         surveyTakeTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
@@ -1145,6 +1153,14 @@ sub www_submitQuestions {
 }
 
 #-------------------------------------------------------------------
+sub getSummary{
+    my $self = shift;
+    my $summary = $self->responseJSON->showSummary();
+    my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
+    return $out;
+#    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+}
+#-------------------------------------------------------------------
 
 =head2 www_loadQuestions
 
@@ -1155,7 +1171,7 @@ Determines which questions to display to the survey taker next, loads and return
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
-
+    
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
@@ -1175,9 +1191,8 @@ sub www_loadQuestions {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
         if ( $self->get('quizModeSummary') ) {
             if(! $self->session->form->param('shownsummary')){
-                my $summary = $self->responseJSON->showSummary();
-                my $out = $self->processTemplate( $summary, $self->get('surveyQuestionsId') );
-#                return $out;
+                my $json = to_json( { type => 'summary', summary => $self->getSummary() });
+                return $json;
             }
         }
         return $self->surveyEnd();
@@ -1261,7 +1276,7 @@ sub surveyEnd {
             }
         }
     }
-    $url = $self->session->url->gateway($url);
+    $url = $self->session->url->gateway($url) if($url !~ /^http:/i);
     #$self->session->http->setRedirect($url);
     #$self->session->http->setMimeType('application/json');
     my $json = to_json( { type => 'forward', url => $url } );
