@@ -44,6 +44,36 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Description of the item ID field, used as hover help.|
     },
+
+    'carousel template help title' => {
+        message => q|Carousel Template Variables|,
+        lastUpdated => 0,
+        context => q|Title of a template help page.|
+    },
+
+    'item_loop' => {
+        message => q|A loop containing this carousel's items.|,
+        lastUpdated => 0,
+        context => q|Description of the item_loop tmpl_loop for the template help.|
+    },
+
+    'itemId' => {
+        message => q|This carousel item's id.|,
+        lastUpdated => 0,
+        context => q|Description of the itemId tmpl_var for the template help.|
+    },
+
+    'text' => {
+        message => q|This carousel item's text.|,
+        lastUpdated => 0,
+        context => q|Description of the text tmpl_var for the template help.|
+    },
+
+    'sequenceNumber' => {
+        message => q|This carousel item's sequenceNumber.|,
+        lastUpdated => 0,
+        context => q|Description of the sequenceNumber tmpl_var for the template help.|
+    }
 };
 
 1;
