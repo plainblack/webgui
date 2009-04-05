@@ -40,7 +40,7 @@ sub definition {
 	%properties = (
 		templateId =>{
 			fieldType       =>"template",  
-			defaultValue    =>'CarouselTmpl0000000001',
+			defaultValue    =>'CarouselTmpl0000000002',
 			tab             =>"display",
 			noFormPost      =>0,  
 			namespace       =>"Carousel", 
@@ -91,8 +91,9 @@ This method is optional if you set autoGenerateForms=1 in the definition.
 =cut
 
 sub getEditForm {
-	my $self = shift;
+	my $self    = shift;
 	my $tabform = $self->SUPER::getEditForm();
+    my $i18n    = WebGUI::International->new($self->session, "Asset_Carousel");
 
     $self->session->style->setScript($self->session->url->extras('yui/build/editor/editor-min.js'), {type =>
     'text/javascript'});
@@ -101,12 +102,12 @@ sub getEditForm {
     $self->session->style->setScript($self->session->url->extras('wobject/Carousel/carousel.js'), {type =>
     'text/javascript'});
 
-    my $tableRowStart = qq|
-        <tr id="items_row">
-            <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">Items</label></td>
-            <td id="items_td" valign="top" class="tableData">
-            <input type="button" value="Add item" onClick="javascript:addItem()"></button><br /><br />
-    |;
+    my $tableRowStart = 
+        '<tr id="items_row">'
+        .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
+              .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
+        .'    <td id="items_td" valign="top" class="tableData">'
+        .'    <input type="button" value="Add item" onClick="javascript:addItem()"></button><br /><br />';
 
     $tabform->getTab("properties")->raw($tableRowStart);
 
@@ -114,7 +115,8 @@ sub getEditForm {
         my @items = @{JSON->new->decode($self->getValue('items'))->{items}};
 
         foreach my $item (@items){
-            my $itemHTML = 'ID: <input type="text" id="itemId'.$item->{sequenceNumber}.'" '
+            my $itemHTML = $i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
+                .'<input type="text" id="itemId'.$item->{sequenceNumber}.'" '
                 .'name="itemId_'.$item->{sequenceNumber}.'" value="'.$item->{itemId}.'">'
                 .'<textarea id="item'.$item->{sequenceNumber}.'" name="item_'.$item->{sequenceNumber}.'" '
                 .'class="carouselItemText" rows="#" cols="#" '
@@ -180,6 +182,7 @@ sub processPropertiesFromFormPost {
     my $self    = shift;
     my $form    = $self->session->form;
     my (@items,$items);
+    $self->SUPER::processPropertiesFromFormPost(@_);
 
     foreach my $param ($form->param) {
         if ($param =~ m/^item_/){

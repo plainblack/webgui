@@ -21,16 +21,28 @@ our $I18N = {
         context => q|Description of the carousel template field, used as hover help.|
     },
 
-    'payload label' => {
-        message => q|Payload|,
+    'items label' => {
+        message => q|Items|,
         lastUpdated => 0,
-        context => q|Label of the payload field on the edit screen.|
+        context => q|Label of the items field on the edit screen.|
     },
 
-    'payload description' => {
-        message => q|Enter a javacript script tag, flash object html, etc to process this carousel's items.|,
+    'items description' => {
+        message => q|Enter this carousel's items.|,
         lastUpdated => 0,
-        context => q|Description of the payload field, used as hover help.|
+        context => q|Description of the items field, used as hover help.|
+    },
+
+    'id label' => {
+        message => q|ID|,
+        lastUpdated => 0,
+        context => q|Label of the item ID field on the edit screen.|
+    },
+
+    'id description' => {
+        message => q|Enter a unique ID for this carousel item.|,
+        lastUpdated => 0,
+        context => q|Description of the item ID field, used as hover help.|
     },
 };
 
