@@ -23,6 +23,16 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'edit template label' => {
+        message     => q{Edit Friends Template},
+        lastUpdated => 0,
+    },
+
+    'edit template hoverHelp' => {
+        message     => q{This template renders the interface for adding or removing friends for a user.},
+        lastUpdated => 0,
+    },
+
     'groupsToManageFriends label' => {
         message     => q{Groups to Manage as Friends},
         lastUpdated => 0,

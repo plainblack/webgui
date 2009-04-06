@@ -8,6 +8,7 @@ use WebGUI::Pluggable;
 use WebGUI::Utility;
 use base qw/WebGUI::Account/;
 
+use List::MoreUtils qw/uniq/;
 use JSON qw(from_json to_json);
 
 =head1 NAME
@@ -76,11 +77,18 @@ sub editSettingsForm {
         defaultValue => [2,3],
     );
     $f->template(
-        name      => "friendManagerViewTemplateId",
-        value     => $self->session->setting->get("friendManagerViewTemplateId"),
+        name      => "fmViewTemplateId",
+        value     => $self->session->setting->get("fmViewTemplateId"),
         namespace => "Account/FriendManager/View",
         label     => $i18n->get("view template label"),
         hoverHelp => $i18n->get("view template hoverHelp"),
+    );
+    $f->template(
+        name      => "fmEditTemplateId",
+        value     => $self->session->setting->get("fmEditTemplateId"),
+        namespace => "Account/FriendManager/Edit",
+        label     => $i18n->get("edit template label"),
+        hoverHelp => $i18n->get("edit template hoverHelp"),
     );
 
     return $f->printRowsOnly;
@@ -100,7 +108,8 @@ sub editSettingsFormSave {
     my $setting = $session->setting;
     my $form    = $session->form;
 
-    $setting->set("friendManagerViewTemplateId",  $form->process("friendManagerViewTemplateId",  "template"));
+    $setting->set("fmViewTemplateId",  $form->process("fmViewTemplateId",  "template"));
+    $setting->set("fmEditTemplateId",  $form->process("fmEditTemplateId",  "template"));
     my $groupsToManageFriends = $form->process("groupsToManageFriends", "group");
     $setting->set("groupsToManageFriends", $groupsToManageFriends);
     $setting->set("groupIdAdminFriends",   $form->process("groupIdAdminFriends",   "group"));
@@ -111,6 +120,8 @@ sub editSettingsFormSave {
 =head2 www_editFriends ( )
 
 Edit the friends for a user.  Uses the form variable userId, to determine which user.
+Only users in the managed groups are shown.  Group inheritance is supported, but
+only for WebGUI defined groups.
 
 =cut
 
@@ -119,11 +130,40 @@ sub www_editFriends {
     my $session = $self->session;
     my $form    = $session->form;
     my $userId  = $form->get('userId');
+    my $user    = WebGUI::User->new($session, $userId);
 
     ##List users in my friends group.   Each friend gets a delete link.
+    my $friendsList = $user->friends->getUserList();
     ##List users in all administrated groups.  Friends are added one at a time.
+    my @manageableUsers = ();
+    my $groupIds = $session->setting->get('groupsToManageFriends');
+    my @groupIds = split "\n", $groupIds;
+    foreach my $groupId (@groupIds) {
+        my $group = WebGUI::Group->new($session, $groupId);
+        next GROUP unless $group->getId || $group->getId eq 'new';
+        push @manageableUsers, @{ $group->getUsersNotIn($user->get('friendsGroup'), 'withoutExpired') };
+    }
+    @manageableUsers = uniq @manageableUsers;
+    my %usersToAdd = ();
+    my $manager = $session->user;
+    foreach my $userId (@manageableUsers) {
+        my $user = WebGUI::User->new($session, $userId);
+        ##We don't use acceptsFriendsRequests here because it's overkill.
+        ##No need to check invitations, since friends are managed.
+        ##Existing friends are already filtered out.
+        next unless $user->profileField('ableToBeFriend');
+        $usersToAdd{$userId} = $user->username;
+    }
 
-    return $self->processTemplate($var,$session->setting->get("friendManagerViewTemplateId"));
+    my $var;
+    $var->{formHeader}  = WebGUI::Form::header($session);
+    $var->{addUserForm} = WebGUI::Form::selectBox($session, {
+        name        => 'userToAdd',
+        options     => \%usersToAdd,
+        sortByValue => 1,
+    });
+    $var->{formFooter} = WebGUI::Form::footer($session);;
+    return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -202,7 +242,7 @@ sub www_view {
         };
     }
 
-    return $self->processTemplate($var,$session->setting->get("friendManagerViewTemplateId"));
+    return $self->processTemplate($var,$session->setting->get("fmViewTemplateId"));
 }
 
 
