@@ -92,7 +92,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				checkedCompareBoxes[compareCheckBoxes[i].value] = true;
 			}
     		}
-		if (checked < 1){
+		if (checked < 2){
 			alert(tooFewMessage);
 		}else if (checked > maxComparisons){
 			alert(tooManyMessage);
