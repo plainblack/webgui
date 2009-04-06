@@ -55,7 +55,7 @@ sub definition {
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'Carousel.gif',
+		icon=>'Carousel.png',
 		autoGenerateForms=>1,
 		tableName=>'Carousel',
 		className=>'WebGUI::Asset::Wobject::Carousel',
