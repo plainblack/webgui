@@ -19,8 +19,10 @@ use Tie::IxHash;
 use base 'WebGUI::Asset::Sku';
 use WebGUI::Asset::Template;
 use WebGUI::Form;
+use WebGUI::Storage;
 use WebGUI::Shop::Pay;
 use WebGUI::AssetCollateral::Sku::Ad::Ad;
+use WebGUI::AdSpace;
 use WebGUI::AdSpace::Ad;
 
 =head1 NAME
@@ -359,7 +361,7 @@ sub  onRemoveFromCart {
     my $self = shift;
     my $item = shift;
     my $options = $self->getOptions;
-    WebGUI::Storage->new($self->session,$options->{'image'})->delete; 
+    WebGUI::Storage->get($self->session,$options->{'image'})->delete; 
 }
 
 #-------------------------------------------------------------------
@@ -463,6 +465,7 @@ sub view {
             . WebGUI::Form::hidden( $session, { name=>"func", value=>"addToCart" }),
         formFooter          => WebGUI::Form::formFooter($session),
         formSubmit          => WebGUI::Form::submit( $session,  { value => $i18n->get("form purchase button") }),
+	error_msg           => $options->{error_msg},
         hasAddedToCart      => $self->{_hasAddedToCart},
         continueShoppingUrl => $self->getUrl,
         manageLink         => $self->getUrl("func=manage"),
@@ -520,20 +523,65 @@ Add this subscription to the cart.
 
 sub www_addToCart {
     my $self = shift;
+    my $session = $self->session;
+    my $i18n = $self->i18n;
     if ($self->canView) {
-        $self->{_hasAddedToCart} = 1;
-	my $form = $self->session->form;
-	my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($self->session);  # LATER should be createTemp
-        my $imageStorageId = $form->process('formImage', 'image', $imageStorage->getId);
-        my $cartInfo = {
-              adtitle => $form->process('formTitle'),
-	      link => $form->process('formLink','url'),
-	      clicks => $form->process('formClicks','integer'),
-	      impressions => $form->process('formImpressions','integer'),
-	      adId => $form->process('formAdId'),
-	      image => $imageStorageId,
-	             };
-        $self->addToCart($cartInfo);
+	my $form = $session->form;
+        my @errors;
+	#my $imageStorage = $self->getOptions->{image} || WebGUI::Storage->create($session);  # LATER should be createTemp
+        my $imageStorageId = $form->process('formImage', 'image'); # , $self->getOptions->{image});
+	my $imageStorage = WebGUI::Storage->get($session,$imageStorageId);
+	my $code;
+	if( not defined $imageStorage ) { $code = 1; }
+	elsif( $imageStorage->getErrorCount > 0 ) { $code = 2; }
+        elsif( scalar(@{$imageStorage->getFiles}) == 0 ) { $code = 3; }
+        elsif( $imageStorage->isImage((@{$imageStorage->getFiles})[0]) ) {  $code = 4; }
+	if( not defined $imageStorage
+	or $imageStorage->getErrorCount > 0
+        or scalar(@{$imageStorage->getFiles}) == 0
+        # or $imageStorage->isImage((@{$imageStorage->getFiles})[0])  # not currently working
+                   ) { 
+	    push @errors, $i18n->get('form error no image') . $code . eval { (@{$imageStorage->getFiles})[0] } ;
+	}
+	my $title = $form->process('formTitle');
+	if($title eq '' ) {
+	    push @errors, $i18n->get('form error no title');
+	}
+	my $link = $form->process('formLink','url');
+	if($link eq '' ) {
+	    push @errors, $i18n->get('form error no link');
+	}
+	my $adId = $self->get('adSpace');
+	my $adSpace = WebGUI::AdSpace->new($session,$adId);
+	my $clicks = $form->process('formClicks','integer');
+	if($clicks < $adSpace->get('minimumClicks') ) {
+	    push @errors, sprintf($i18n->get('form error min clicks'), $adSpace->get('minimumClicks'));
+	}
+	my $impressions = $form->process('formImpressions','integer');
+	if($impressions < $adSpace->get('minimumImpressions') ) {
+	    push @errors, sprintf($i18n->get('form error min impressions'), $adSpace->get('minimumImpressions'));
+	}
+	if( @errors == 0 ) {
+	    $self->{_hasAddedToCart} = 1;
+	    $self->addToCart({
+		  adtitle => $title,
+		  link => $link,
+		  clicks => $clicks,
+		  impressions => $impressions,
+		  adId => $adId,
+		  image => $imageStorageId,
+			 });
+	} else {
+	    $self->applyOptions({
+		  adtitle => $title,
+		  link => $link,
+		  clicks => $clicks,
+		  impressions => $impressions,
+		  adId => $adId,
+		  image => $imageStorageId,
+		  error_msg => join( '<br>', @errors ),
+	    });
+	}
     }
     return $self->www_view;
 }

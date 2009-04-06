@@ -225,6 +225,36 @@ our $I18N = {
 		context => q|Thank the customer after adding the item to the cart.|
 	},
 
+	'form error no image' => {
+		message => q|Please assign an image for this ad.|,
+		lastUpdated => 0,
+		context => q|remind the user to upload an image for the ad.|
+	},
+
+	'form error no title' => {
+		message => q|Please enter the title for this ad.|,
+		lastUpdated => 0,
+		context => q|Remind the user to enter a title for the ad.|
+	},
+
+	'form error no link' => {
+		message => q|Please enter a valid URL for this ad.|,
+		lastUpdated => 0,
+		context => q|Remind the user to enter a valid URL for the ad.|
+	},
+
+	'form error min clicks' => {
+		message => q|You must purchase at least %d clicks for this adSpace.|,
+		lastUpdated => 0,
+		context => q|Remind the user to that they must purchase a minimum number of clicks, use '%d' to indicate the minimum number of clicks.|
+	},
+
+	'form error min impressions' => {
+		message => q|You must purchase at least %d impressions for this adSpace.|,
+		lastUpdated => 0,
+		context => q|Remind the user to that they must purchase a minimum number of impressions, use '%d' to indicate the minimum number of impressions.|
+	},
+
 #	'TODO' => {
 #		message => q|TODO|,
 #		lastUpdated => 0,
