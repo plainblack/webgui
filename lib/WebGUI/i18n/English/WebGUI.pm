@@ -4346,6 +4346,12 @@ Users may override this setting in their profile.
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
         },
+
+        'Select One' => {
+            message => q|Select One|,
+            context => q|Label in dropdown lists, indicating that the user should use the list to select 1 entry.  It is implied that if nothing is chosen, that nothing will happen.|,
+            lastUpdated => 1239057119,
+        },
 };
 
 1;
