@@ -45,7 +45,7 @@ sub installFriendManagerSettings {
     print "Installing FriendManager into settings...";
     $session->setting->add('groupIdAdminFriends',         '3');
     $session->setting->add('fmViewTemplateId', '64tqS80D53Z0JoAs2cX2VQ');
-    $session->setting->add('fmEditTemplateId', '64tqS80D53Z0JoAs2cX2VQ');
+    $session->setting->add('fmEditTemplateId', 'lG2exkH9FeYvn4pA63idNg');
     $session->setting->add('groupsToManageFriends',       '2');
     print "\tDone";
 }

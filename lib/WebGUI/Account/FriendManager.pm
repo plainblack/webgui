@@ -129,11 +129,23 @@ sub www_editFriends {
     my $self    = shift;
     my $session = $self->session;
     my $form    = $session->form;
-    my $userId  = $form->get('userId');
+    my $userId  = shift || $form->get('userId', 'guid');
     my $user    = WebGUI::User->new($session, $userId);
 
     ##List users in my friends group.   Each friend gets a delete link.
     my $friendsList = $user->friends->getUserList();
+    my @friends_loop = ();
+    while (my ($userId, $username) = each %{ $friendsList }) {
+        push @friends_loop, {
+            userId => $userId,
+            username => $username,
+            checkForm => WebGUI::Form::checkbox($session, {
+                name  => 'friendToAxe',
+                value => $userId,
+            }),
+        };
+    }
+
     ##List users in all administrated groups.  Friends are added one at a time.
     my @manageableUsers = ();
     my $groupIds = $session->setting->get('groupsToManageFriends');
@@ -141,29 +153,78 @@ sub www_editFriends {
     foreach my $groupId (@groupIds) {
         my $group = WebGUI::Group->new($session, $groupId);
         next GROUP unless $group->getId || $group->getId eq 'new';
-        push @manageableUsers, @{ $group->getUsersNotIn($user->get('friendsGroup'), 'withoutExpired') };
+        push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
     }
     @manageableUsers = uniq @manageableUsers;
     my %usersToAdd = ();
+    tie %usersToAdd, 'Tie::IxHash';
     my $manager = $session->user;
-    foreach my $userId (@manageableUsers) {
-        my $user = WebGUI::User->new($session, $userId);
+    my $i18n = WebGUI::International->new($session);
+    $usersToAdd{0} = $i18n->get('Select One');
+    my @usersToAdd = ();
+    USERID: foreach my $newFriendId (@manageableUsers) {
+        next USERID if $newFriendId eq $userId;
+        my $user = WebGUI::User->new($session, $newFriendId);
         ##We don't use acceptsFriendsRequests here because it's overkill.
         ##No need to check invitations, since friends are managed.
         ##Existing friends are already filtered out.
-        next unless $user->profileField('ableToBeFriend');
-        $usersToAdd{$userId} = $user->username;
+        next USERID unless $user->profileField('ableToBeFriend');
+        push @usersToAdd, [ $newFriendId, $user->username ];
+    }
+
+    @usersToAdd = sort { $a->[1] cmp $b->[1] } @usersToAdd;
+    foreach my $newFriend (@usersToAdd) {
+        $usersToAdd{$newFriend->[0]} = $newFriend->[1];
     }
 
     my $var;
-    $var->{formHeader}  = WebGUI::Form::header($session);
+    $var->{formHeader}  = WebGUI::Form::formHeader($session, {
+                            action => $self->getUrl('module=friendManager;do=editFriendsSave'),
+                          })
+                        . WebGUI::Form::hidden($session, { name => 'userId', value => $userId } );
     $var->{addUserForm} = WebGUI::Form::selectBox($session, {
         name        => 'userToAdd',
         options     => \%usersToAdd,
-        sortByValue => 1,
     });
-    $var->{formFooter} = WebGUI::Form::footer($session);;
+    $var->{friends_loop} = \@friends_loop;
+    $var->{has_friends}  = scalar @friends_loop;
+    $var->{submit}       = WebGUI::Form::submit($session);
+    $var->{formFooter}   = WebGUI::Form::formFooter($session);
+    $var->{username}     = $user->username;
+    $var->{userId}       = $user->userId;
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editFriendsSave ( )
+
+Handle adding and removing people from a user's friend group.  The userId of
+the user to modify will be in the userId from variable.  One userId to add will be
+in userToAdd.
+
+Users to delete will be listed in checkboxes with the name, friendToAxe
+
+=cut
+
+sub www_editFriendsSave () {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
+    my $userId    = $form->process('userId', 'guid');
+    my $user      = WebGUI::User->new($session, $userId);
+    my $userToAdd = $form->process('userToAdd', 'guid');
+
+    if ($userToAdd) {
+        $user->friends->addUsers([$userToAdd]);
+    }
+
+    my @usersToRemove = $form->process('friendToAxe', 'checkList');
+    if (scalar @usersToRemove) {
+        $user->friends->deleteUsers(\@usersToRemove);
+    }
+
+    return $self->www_editFriends($userId);
 }
 
 #-------------------------------------------------------------------
@@ -196,7 +257,7 @@ sub www_getFriendsAsJson  {
     USER: foreach my $userId (@{ $group->getUsers} ) {
         my $user = WebGUI::User->new($session, $userId);
         next USER unless $user;
-        my $friendsCount = scalar $user->friends->getUsers();
+        my $friendsCount = scalar @{ $user->friends->getUsers() };
         push @records, {
             userId   => $userId,
             username => $user->username,
