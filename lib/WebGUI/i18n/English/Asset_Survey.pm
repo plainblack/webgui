@@ -480,7 +480,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         lastUpdated => 0,
     },
     'Quiz mode summaries help' => {
-        message     => q|When set, summaries are shown to users giving their quiz results?|,
+        message     => q|When set, summaries are shown to users giving their quiz results.|,
         lastUpdated => 0,
     },
     'Show user their progress' => {
