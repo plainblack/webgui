@@ -138,6 +138,17 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'removeAll' => {
+        message     => q{A checkbox to remove all friends from this user.},
+        lastUpdated => 0,
+    },
+
+    'remove all' => {
+        message     => q{Remove all},
+        context     => q{Template label.  To remove all members of a set, to emtpy it.},
+        lastUpdated => 0,
+    },
+
     'submit' => {
         message     => q{A button with internationalized label to submit the form.},
         lastUpdated => 0,

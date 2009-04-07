@@ -44,6 +44,7 @@ our $HELP = {
                  { name     => 'checkForm',       },
                ],
              },
+             { name     => 'removeAll',  },
              { name     => 'submit',
                required => 1,        },
              { name     => 'formFooter',
