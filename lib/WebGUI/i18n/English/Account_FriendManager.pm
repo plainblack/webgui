@@ -48,6 +48,36 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'remove friends' => {
+        message     => q{Remove Friends},
+        lastUpdated => 0,
+    },
+
+    'add new friends' => {
+        message     => q{Add New Friends},
+        lastUpdated => 0,
+    },
+
+    'Friend Manager View Template' => {
+        message     => q{Friend Manager View Template},
+        lastUpdated => 0,
+    },
+
+    'group_loop' => {
+        message     => q{A loop containing 1 entry for each group that is set to be managed.},
+        lastUpdated => 0,
+    },
+
+    'groupId' => {
+        message     => q{The GUID of the group.},
+        lastUpdated => 0,
+    },
+
+    'groupName' => {
+        message     => q{The name of the group.},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
