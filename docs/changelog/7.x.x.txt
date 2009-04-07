@@ -4,6 +4,7 @@
  - rfe #9965: matrix/pls reverse dropped event variables
  - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
  - fixed #9816: Syndicated Content asset fails to process feeds which include a UTF-8 BOM
+ - fixed #10056: YUI javascripts included while adminOff (BNC)
 
 7.6.18
  - fixed #9955: Matrix alpha sort is backwards
