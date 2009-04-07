@@ -51,7 +51,7 @@ sub appendCommonVars {
     my $self    = shift;
     my $var     = shift;
     my $session = $self->session;
-    my $user    = $session->user;
+    my $user    = $self->getUser;
 
     $var->{'user_full_name'   } = $user->getWholeName;
     $var->{'user_member_since'} = $user->dateCreated;
@@ -281,8 +281,8 @@ the current module and do values will be used.
 
 =head3 appendUID
 
-If this flag is set and uid is passed along the url, the uid passed in will be
-appended to the end of it to the end of the url
+If this flag is set and uid is passed as a URL param, that uid will be
+appended to the end of the url.
 
 =cut
 
@@ -292,8 +292,8 @@ sub getUrl {
     my $appendUID = shift;
 
     my $session   = $self->session;
-    my $form      = $session->form;
     
+    my $uid = $self->uid;
     if($pairs) {
         #Append op=account to the url if it doesn't already exist
         unless ($pairs =~ m/op=account/){
@@ -304,10 +304,28 @@ sub getUrl {
         $pairs = q{op=account;module=}.$self->module.q{;do=}.$self->method;
     }
 
-    my $uid = $self->uid;
     $pairs .= ";uid=".$uid if($appendUID && $uid);
 
     return $session->url->page($pairs);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUser
+
+Gets the user, either specified by the uid URL parameter, or the
+session user.
+
+=cut
+
+sub getUser {
+    my $self      = shift;
+    if ($self->uid) {
+        return WebGUI::User->new($self->session, $self->uid);
+    }
+    else {
+        return $self->session->user;
+    }
 }
 
 #-------------------------------------------------------------------

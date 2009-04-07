@@ -484,16 +484,12 @@ sub www_view {
     my $var      = {};
 
     my $uid      = $self->uid;
-    my $user     = ($uid) ? WebGUI::User->new($session,$uid) : $session->user;
+    my $user     = $self->getUser;
 
     $self->appendCommonVars($var);
     
     my $displayView           = $uid ne "";
     $var->{'display_message'} = $msg;
-
-    #Override these
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
 
     unless ($user->profileField('ableToBeFriend') && $user->profileIsViewable($session->user)) {
         my $i18n = WebGUI::International->new($session,"Account_Friends");
