@@ -3,6 +3,7 @@ package WebGUI::Account::FriendManager;
 use strict;
 
 use WebGUI::Exception;
+use WebGUI::Friends;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
@@ -192,6 +193,7 @@ sub www_editFriends {
     $var->{formFooter}   = WebGUI::Form::formFooter($session);
     $var->{username}     = $user->username;
     $var->{userId}       = $user->userId;
+    $var->{manageUrl}    = $self->getUrl('module=friendManager;do=view');
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
@@ -213,15 +215,16 @@ sub www_editFriendsSave () {
     my $form    = $session->form;
     my $userId    = $form->process('userId', 'guid');
     my $user      = WebGUI::User->new($session, $userId);
-    my $userToAdd = $form->process('userToAdd', 'guid');
+    my $ufriend   = WebGUI::Friends->new($session, $user);
 
+    my $userToAdd = $form->process('userToAdd', 'guid');
     if ($userToAdd) {
-        $user->friends->addUsers([$userToAdd]);
+        $ufriend->add([$userToAdd]);
     }
 
     my @usersToRemove = $form->process('friendToAxe', 'checkList');
     if (scalar @usersToRemove) {
-        $user->friends->deleteUsers(\@usersToRemove);
+        $ufriend->delete(\@usersToRemove);
     }
 
     return $self->www_editFriends($userId);
