@@ -2,6 +2,7 @@
  - fixed #9976: carts not cleaned up
  - fixed #10094: double explanation in thread help
  - rfe #9965: matrix/pls reverse dropped event variables
+ - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
 
 7.6.18
  - fixed #9955: Matrix alpha sort is backwards

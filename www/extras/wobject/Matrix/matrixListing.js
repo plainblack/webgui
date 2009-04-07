@@ -44,6 +44,10 @@ YAHOO.util.Event.addListener(window, "load", function() {
         };
 
 	var uri = "func=getAttributes";
+	if(typeof(revision) != 'undefined'){
+		uri = uri + ';revision=' + revision;
+	}
+	alert(uri);
 
 	var initAttributeHoverHelp = function() {
 		initHoverHelp('attributes');
