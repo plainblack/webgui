@@ -150,6 +150,8 @@ sub generateFeed {
         # an HTTP Content-Encoding header.  In the second case, XML::FeedPP will take
         # care of any encoding specified in the XML prolog
         utf8::downgrade($value, 1);
+        # XML::FeedPP does not yet support a UTF-8 BOM in a string.
+        $value =~ s/^\s*\xEF\xBB\xBF//s;
         eval {
             my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1);
             $feed->merge($singleFeed);
