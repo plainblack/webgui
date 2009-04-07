@@ -641,8 +641,7 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 =cut
 
 sub isInGroup {
-   my (@data, $groupId);
-   my ($self, $gid, $secondRun) = @_;
+   my ($self, $gid) = @_;
    $gid = 3 unless $gid;
    my $uid = $self->userId;
    ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
