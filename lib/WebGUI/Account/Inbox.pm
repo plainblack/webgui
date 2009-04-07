@@ -49,16 +49,16 @@ sub appendCommonVars {
     my $session = $self->session;
     my $var     = shift;
     my $inbox   = shift || WebGUI::Inbox->new($session);
-    my $user    = $session->user;
+    my $user    = $self->getUser;
     my $method  = $self->method;
 
     $self->SUPER::appendCommonVars($var);
 
-    $var->{'view_inbox_url'          } = $self->getUrl("module=inbox;do=view");
+    $var->{'view_inbox_url'          } = $self->getUrl("module=inbox;do=view", 'useUid');
     $var->{'view_invitations_url'    } = $self->getUrl("module=inbox;do=manageInvitations");
-    $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount;
+    $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount($user->userId);
     $var->{'invitation_count'        } = $self->getInvitationCount;
-    $var->{'invitations_enabled'     } = $session->user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'     } = $user->profileField('ableToBeFriend');
     $var->{'user_invitations_enabled'} = $session->setting->get("inboxInviteUserEnabled");
     $var->{'invite_friend_url'       } = $self->getUrl("module=inbox;do=inviteUser");
 
@@ -1180,7 +1180,8 @@ The main view page for editing the user's profile.
 sub www_view {
     my $self    = shift;
     my $session = $self->session;
-    my $user    = $session->user;
+    my $user    = $self->getUser;
+
     my $var     = {};
 
     $self->store->{tab} = "inbox";
@@ -1198,7 +1199,7 @@ sub www_view {
     my $rpp_url      = ";rpp=$rpp";
     
     #Cache the base url
-    my $inboxUrl     =  $self->getUrl;
+    my $inboxUrl     =  $self->getUrl('', 'useUid');
 
     #Create sortBy headers
     $var->{'subject_url'   } = $inboxUrl.";sortBy=subject".$sortDir_url.$rpp_url;
@@ -1209,7 +1210,7 @@ sub www_view {
     
     #Create the paginator
     my $inbox     = WebGUI::Inbox->new($session);
-    my $p         = $inbox->getMessagesPaginator($session->user,{
+    my $p         = $inbox->getMessagesPaginator($user,{
         sortBy        => $sortBy,
         sortDir       => $sortDir,
         baseUrl       => $inboxUrl.$sort_url.";sortDir=".$sortDir.$rpp_url,
@@ -1224,7 +1225,7 @@ sub www_view {
 
         my $hash                       = {};
         $hash->{'message_id'         } = $message->getId;
-        $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewMessage;messageId=".$message->getId);
+        $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewMessage;messageId=".$message->getId,'useUid');
         $hash->{'subject'            } = $message->get("subject");
         $hash->{'status_class'       } = $message->get("status");
         $hash->{'status'             } = $message->getStatus;
@@ -1261,7 +1262,7 @@ sub www_view {
     });
 
     $var->{'form_header'} = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=inbox;do=deleteMessages")
+        action => $self->getUrl("module=inbox;do=deleteMessages"),
     });
     $var->{'form_footer'} = WebGUI::Form::formFooter($session);
 
@@ -1377,7 +1378,7 @@ The page on which users view their messages
 sub www_viewMessage {
     my $self      = shift;
     my $session   = $self->session;
-    my $user      = $session->user;
+    my $user      = $self->getUser;
 
     my $var       = {};
     my $messageId = shift || $session->form->get("messageId");
