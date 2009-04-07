@@ -149,6 +149,17 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'addManagers' => {
+        message     => q{A checkbox to add all users in the Friend Manager group to this users's list of Friends.},
+        lastUpdated => 0,
+    },
+
+    'Add Friend Managers' => {
+        message     => q{Add Friend Managers},
+        context     => q{Template label.  To add all Friend Managers to this list of friends.},
+        lastUpdated => 0,
+    },
+
     'submit' => {
         message     => q{A button with internationalized label to submit the form.},
         lastUpdated => 0,

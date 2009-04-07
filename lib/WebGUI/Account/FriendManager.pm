@@ -195,6 +195,7 @@ sub www_editFriends {
     $var->{userId}       = $user->userId;
     $var->{manageUrl}    = $self->getUrl('module=friendManager;do=view');
     $var->{removeAll}    = WebGUI::Form::checkbox($session, { name => 'removeAllFriends', value => 'all', });
+    $var->{addManagers}  = WebGUI::Form::checkbox($session, { name => 'addManagers', value => 'addManagers', });
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
@@ -221,6 +222,11 @@ sub www_editFriendsSave () {
     my $userToAdd = $form->process('userToAdd', 'guid');
     if ($userToAdd) {
         $ufriend->add([$userToAdd]);
+    }
+    my $addManagers = $form->process('addManagers', 'checkbox');
+    if ($addManagers eq 'addManagers') {
+        my $managerGroup = WebGUI::Group->new($session, $session->setting->get('groupIdAdminFriends'));
+        $ufriend->add($managerGroup->getUsers());
     }
 
     ##Remove all has priority, that way we don't delete friends twice.
