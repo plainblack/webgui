@@ -78,6 +78,76 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'Friend Manager Edit Template' => {
+        message     => q{Friend Manager Edit Template},
+        lastUpdated => 0,
+    },
+
+    'formHeader' => {
+        message     => q{HTML code to begin the form for editing a user's list of friends.},
+        lastUpdated => 0,
+    },
+
+    'username' => {
+        message     => q{The name of the user whose friends you are managing.},
+        lastUpdated => 0,
+    },
+
+    'userId' => {
+        message     => q{The GUID of the user whose friends you are managing.},
+        lastUpdated => 0,
+    },
+
+    'manageUrl' => {
+        message     => q{The GUID of the user whose friends you are managing.},
+        lastUpdated => 0,
+    },
+
+    'back to friend manager' => {
+        message     => q{Back to the Friend Manager.},
+        lastUpdated => 0,
+    },
+
+    'addUserForm' => {
+        message     => q{A dropdown box with a list of users who can be added to this user's Friends.},
+        lastUpdated => 0,
+    },
+
+    'hasFriends' => {
+        message     => q{A boolean which is true if the user currently has friends.},
+        lastUpdated => 0,
+    },
+
+    'friend_loop' => {
+        message     => q{A loop containing a list of the this user's current friends.},
+        lastUpdated => 0,
+    },
+
+    'new userId' => {
+        message     => q{The GUID of a user.},
+        lastUpdated => 0,
+    },
+
+    'new username' => {
+        message     => q{The username of a user.},
+        lastUpdated => 0,
+    },
+
+    'checkForm' => {
+        message     => q{A checkbox for this user.  If set when the form is submitted, this user will be removed from the user's list of friends.},
+        lastUpdated => 0,
+    },
+
+    'submit' => {
+        message     => q{A button with internationalized label to submit the form.},
+        lastUpdated => 0,
+    },
+
+    'formFooter' => {
+        message     => q{HTML code to end the form.},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
