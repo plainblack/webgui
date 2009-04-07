@@ -53,7 +53,7 @@ sub appendCommonVars {
     my $self    = shift;
     my $var     = shift;
     my $session = $self->session;
-    my $user    = $session->user;
+    my $user    = $self->getUser;
 
     $var->{'user_full_name'   } = $user->getWholeName;
     $var->{'user_member_since'} = $user->dateCreated;
@@ -310,6 +310,25 @@ sub getUrl {
     $pairs .= ";uid=".$uid if($appendUID && $uid);
 
     return $session->url->page($pairs);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUser
+
+Gets the user, either specified by the uid URL parameter, or the
+session user.
+
+=cut
+
+sub getUser {
+    my $self      = shift;
+    if ($self->uid) {
+        return WebGUI::User->new($self->session, $self->uid);
+    }
+    else {
+        return $self->session->user;
+    }
 }
 
 #-------------------------------------------------------------------
