@@ -1063,7 +1063,7 @@ sub addAnswersToQuestion {
         $self->update(
             \@address_copy,
             {   text           => $answers->[$answer_index],
-                recordedAnswer => $answer_index + 1,
+                recordedAnswer => $answer_index + 1, # 1-indexed
                 verbatim       => $verbatims->{$answer_index},
             }
         );

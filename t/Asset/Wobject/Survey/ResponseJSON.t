@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 90;
+my $tests = 91;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -357,15 +357,15 @@ cmp_deeply($c->parseGotoExpression($session, 't1: $a = 1; $a++; $a > 1'),
 #
 ####################################################
 
-$rJSON->survey->section([0])->{variable} = 's0';
-$rJSON->survey->section([2])->{variable} = 's2';
-$rJSON->survey->question([1,0])->{variable} = 's1q0';
-$rJSON->survey->answer([1,0,0])->{value} = 3;
+$rJSON->survey->section([0])->{variable} = 's0'; # our first test jump target
+$rJSON->survey->section([2])->{variable} = 's2'; # our second test jump target
+$rJSON->survey->question([1,0])->{variable} = 's1q0'; # a question variable to use in our expressions
+$rJSON->survey->answer([1,0,0])->{recordedAnswer} = 3; # value recorded in responses hash for multi-choice answer
 
 $rJSON->lastResponse(2);
 $rJSON->recordResponses({
     '1-0comment'   => 'Section 1, question 0 comment',
-    '1-0-0'        => 'First answer',
+    '1-0-0'        => 'My chosen answer',
     '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
 });
 is($rJSON->processGotoExpression('blah-dee-blah-blah'), undef, 'invalid gotoExpression is false');
@@ -405,8 +405,66 @@ is($rJSON->lastResponse(), -1, '.. lastResponse changed to -1 due to processGoto
 $rJSON->processGotoExpression('s2: $s1q0 == 3');
 is($rJSON->lastResponse(), 4, '.. lastResponse changed to 4 due to processGoto(s2)');
 
+$rJSON->survey->question([1,0])->{questionType} = 'Text';
+$rJSON->lastResponse(2);
+$rJSON->recordResponses({
+    '1-0-0'        => 'My text answer',
+});
+is( $rJSON->responses->{'1-0-0'}->{value}, 'My text answer', 'Text type uses entered text' );
+
+# Coming soon.
+#ok($rJSON->processGotoExpression('s0: $s1q0 eq "Text answer"; print "hola!\n"'), 'text match');
+#ok(!$rJSON->processGotoExpression('s0: $s1q0 eq "Not the right text answer"'), 'negative text match');
+
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
+
+####################################################
+#
+# recordedNamedResponses (coming soon)
+#
+####################################################
+#    {
+#
+#        #    $rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice';
+#        #    $rJSON->survey->answer([1,0,0])->{value} = 5;
+#        #    cmp_deeply($rJSON->recordedNamedResponses, {}, 'recordedNamedResponses initially empty');
+#        #    $rJSON->lastResponse(2);
+#        #    $rJSON->recordResponses({
+#        #        '1-0comment'   => 'Section 1, question 0 comment',
+#        #        '1-0-0'        => 'My chosen answer',
+#        #        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+#        #    });
+#        #    cmp_deeply($rJSON->recordedNamedResponses, { s1q0 => 5 }, '..now shows multi-choice answer value');
+#        #    $rJSON->survey->answer([1,0,0])->{value} = 'blah';
+#        #    cmp_deeply($rJSON->recordedNamedResponses, { s1q0 => 'blah' }, '..also works with string value');
+#        #    $rJSON->survey->loadTypes;
+#        #    my $a =
+#        #    diag(Dumper ($rJSON->survey->multipleChoiceTypes));
+#        
+#        $rJSON->survey->question([1,0])->{variable} = 's1q0';
+#
+#        # First try with generic Multi Choice
+#        $rJSON->survey->question( [ 1, 0 ] )->{questionType} = 'Multiple Choice';
+#        $rJSON->survey->answer( [ 1, 0, 0 ] )->{recordedAnswer} = 'My recordedAnswer';
+#        $rJSON->lastResponse(2);
+#        $rJSON->recordResponses( { '1-0-0' => 'My chosen answer', } );
+#        is( $rJSON->responses->{'1-0-0'}->{value}, 'My recordedAnswer', 'Multi-choice uses recordedAnswer' );
+#
+#        # Then with Yes/No bundle
+#        $rJSON->survey->question( [ 1, 0 ] )->{questionType} = 'Yes/No';
+#        $rJSON->lastResponse(2);
+#        $rJSON->recordResponses( { '1-0-0' => 'My chosen answer', } );
+#        is( $rJSON->responses->{'1-0-0'}->{value}, 'My recordedAnswer', 'Multi-choice bundle also uses recordedAnswer' );
+#
+#        # Then with Text
+#        $rJSON->survey->question( [ 1, 0 ] )->{questionType} = 'Text';
+#        $rJSON->lastResponse(2);
+#        $rJSON->recordResponses( { '1-0-0' => 'My entered text', } );
+#        is( $rJSON->responses->{'1-0-0'}->{value}, 'My entered text', 'Text type uses entered text' );
+#        diag( Dumper( $rJSON->responses ) );
+#        diag( Dumper( $rJSON->recordedNamedResponses ) );
+#    }
 
 ####################################################
 #
@@ -414,6 +472,7 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 #
 ####################################################
 
+$rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice';
 $rJSON->lastResponse(4);
 my $terminals;
 cmp_deeply(
@@ -438,6 +497,7 @@ $rJSON->survey->question([1,0])->{terminal}    = 1;
 $rJSON->survey->question([1,0])->{terminalUrl} = 'question 1-0 terminal';
 
 $rJSON->lastResponse(2);
+$rJSON->survey->answer([1,0,0])->{recordedAnswer} = 1; # Set recordedAnswer
 cmp_deeply(
     $rJSON->recordResponses({
         '1-0comment'   => 'Section 1, question 0 comment',

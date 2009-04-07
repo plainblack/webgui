@@ -431,9 +431,9 @@ Processes and records submitted survey responses in the L<"responses"> data stru
 Does terminal handling, and branch processing, and advances the L<"lastResponse"> index 
 if all required questions have been answered.
 
-=head3 $responses
+=head3 $submittedResponses
 
-A hash ref of form param data. Each element should look like:
+A hash ref of submitted form param data. Each element should look like:
 
     {
         "questionId-comment"    => "question comment",
@@ -460,7 +460,7 @@ gotoExpression in the set of questions wins.
 
 sub recordResponses {
     my $self = shift;
-    my ($responses) = validate_pos( @_, { type => HASHREF } );
+    my ($submittedResponses) = validate_pos( @_, { type => HASHREF } );
 
     # Build a lookup table of non-multiple choice question types
     my %knownTypes = map {$_ => 1} @{$self->survey->specialQuestionTypes};
@@ -518,37 +518,40 @@ sub recordResponses {
         }
 
         # Record Question comment
-        $self->responses->{ $question->{id} }->{comment} = $responses->{ $question->{id} . 'comment' };
+        $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
 
         # Process Answers in Question..
         for my $answer ( @{ $question->{answers} } ) {
 
             # Pluck the values out of the responses hash that we want to record..
-            my $answerValue = $responses->{ $answer->{id} };
-            my $answerComment = $responses->{ $answer->{id} . 'comment' };
+            my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
+            my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
 
-            # Proceed if we're satisfied that response is valid..
-            if ( defined $answerValue && $answerValue =~ /\S/ ) {
+            # Proceed if we're satisfied that the submitted answer response is valid..
+            if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
                 $aAnswered = 1;
-                if ($knownTypes{$question->{questionType}}) {
-                    $self->responses->{ $answer->{id} }->{value} = $answerValue;
-                } else {
-                    # Unknown type, must be a multi-choice bundle
-                    # For Multi-choice, use recordedAnswer instead of answerValue
-                    $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
-                }
-                $self->responses->{ $answer->{id} }->{time} = time;
-                $self->responses->{ $answer->{id} }->{comment} = $answerComment;
+
+                # Now, decide what to record. For multi-choice questions, use recordedAnswer.
+                # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
+                $self->responses->{ $answer->{id} }->{value}
+                    = $knownTypes{ $question->{questionType} }
+                    ? $submittedAnswerResponse
+                    : $answer->{recordedAnswer};
+
+                $self->responses->{ $answer->{id} }->{time}    = time;
+                $self->responses->{ $answer->{id} }->{comment} = $submittedAnswerComment;
 
                 # Handle terminal Answers..
                 if ( $answer->{terminal} ) {
                     $terminal    = 1;
                     $terminalUrl = $answer->{terminalUrl};
                 }
+
                 # ..and also gotos..
                 elsif ( $answer->{goto} =~ /\w/ ) {
                     $goto = $answer->{goto};
                 }
+
                 # .. and also gotoExpressions..
                 elsif ( $answer->{gotoExpression} =~ /\w/ ) {
                     $gotoExpression = $answer->{gotoExpression};
@@ -680,11 +683,11 @@ sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
 
-    my $responses = $self->recordedNamedResponses();
+    my $responsesByVariableName = $self->responsesByVariableName();
 
     # Parse gotoExpressions one after the other (first one that's true wins)
     foreach my $line (split /\n/, $expression) {
-        my $processed = WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $line, $responses);
+        my $processed = WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $line, $responsesByVariableName);
 
         next if !$processed;
         
@@ -749,37 +752,38 @@ sub recordedResponses{
 
 #-------------------------------------------------------------------
 
-=head2 recordedNamedResponses
+=head2 responsesByVariableName
 
-Returns a hash (reference) of question responses. The hash keys are
-question variable names. The hash values are the corresponding answer
-values selected by the user. 
+Returns a lookup table to question variable names and recorded response values.
+
+Only questions with a defined variable name set are included. Values come from
+the L<responses> hash.
 
 =cut
 
-sub recordedNamedResponses {
+sub responsesByVariableName {
     my $self = shift;
     
-    my $responses= {
-        # questionName => response answer value
-    };
-
-    # Populate %responses with the user's data..
-    for my $address ( @{ $self->surveyOrder } ) {
-        my $question = $self->survey->question( $address );
-        my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
-        for my $aIndex (aIndexes($address)) {
-            my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
-            if ( defined $self->responses->{$answerId} ) {
-                my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
-                $responses->{$question->{variable}}
-                    = $answer->{value} =~ /\w/  ? $answer->{value}
-                                                : $question->{value}
-                    ;
-            }
-        }
+    my %lookup;
+    while (my ($address, $response) = each %{$self->responses}) {
+        next if (!$response || !$address);
+        
+        # Turn responses s-q-a string into an address array
+        my @address = split /-/, $address;
+        
+        # Filter out the non-answer entries
+        next unless @address == 3;
+        
+        # Grab the corresponding question
+        my $question = $self->survey->question([@address]);
+        
+        # Filter out questions without defined variable names
+        next if !$question || !defined $question->{variable};
+        
+        # Add variable => value to our hash
+        $lookup{$question->{variable}} = $response->{value};
     }
-    return $responses;
+    return \%lookup;
 }
 
 #-------------------------------------------------------------------
@@ -915,11 +919,12 @@ sub nextQuestions {
     my $section = $self->nextResponseSection();
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
+    
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $recordedResponses = $self->recordedNamedResponses();
+    my $responsesByVariableName = $self->responsesByVariableName();
 
     # Do text replacement
-    $section->{text} = $self->getTemplatedText($section->{text}, $recordedResponses);
+    $section->{text} = $self->getTemplatedText($section->{text}, $responsesByVariableName);
 
     # Collect all the questions to be shown on the next page..
     my @questions;
@@ -942,7 +947,7 @@ sub nextQuestions {
         my %questionCopy = %{$self->survey->question( $address )};
 
         # Do text replacement
-        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $recordedResponses);
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responsesByVariableName);
 
         # Add any extra fields we want..
         $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
@@ -954,7 +959,7 @@ sub nextQuestions {
             my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
             # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $recordedResponses);
+            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responsesByVariableName);
 
             # Add any extra fields we want..
             $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
@@ -1205,7 +1210,7 @@ recorded value, and the id of the answer.
 
 =cut
 
-# TODO: This sub should make use of recordedNamedResponses
+# TODO: This sub should make use of responsesByVariableName
 
 sub returnResponseForReporting {
     my $self      = shift;
