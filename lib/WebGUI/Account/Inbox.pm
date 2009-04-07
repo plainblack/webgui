@@ -77,7 +77,9 @@ Returns whether or not the user can view the inbox tab
 
 sub canView {
     my $self    = shift;
-    return ($self->uid eq ""); 
+    my $session = $self->session;
+    return $self->uid eq ""
+        || $self->uid ne "" && $session->user->isInGroup($session->setting->get('groupIdAdminUser'));
 }
 
 #-------------------------------------------------------------------
