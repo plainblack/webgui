@@ -52,7 +52,7 @@ my $newFolder = $archive->getFolder($yesterday);
 
 my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
 
-my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy norton'});
+my $pastStory = $newFolder->addChild({ className => 'WebGUI::Asset::Story', title => "Yesterday is history", keywords => 'andy,norton'});
 $creationDateSth->execute([$yesterday, $pastStory->getId]);
 
 my @staff       = qw/norton hadley mert trout/;
@@ -77,7 +77,7 @@ SKIP: {
 
     skip "Unable to load module $class", $tests unless $loaded;
 
-$topic = WebGUI::Asset->getDefault($session)->addChild({ className => 'WebGUI::Asset::Wobject::StoryTopic', title => 'Popular inmates in Shawshank Prison', keywords => join(' ', @inmates)});
+$topic = WebGUI::Asset->getDefault($session)->addChild({ className => 'WebGUI::Asset::Wobject::StoryTopic', title => 'Popular inmates in Shawshank Prison', keywords => join(',', @inmates)});
 
 isa_ok($topic, 'WebGUI::Asset::Wobject::StoryTopic', 'made a Story Topic');
 $topic->update({
