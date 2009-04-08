@@ -259,8 +259,6 @@ foreach my $testImage (@testImages) {
     );
 }
 
-use Data::Dumper;
-
 $session->setting->set('maxImageSize', $resizeTarget );
 foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
@@ -286,5 +284,4 @@ END {
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
-    $session->setting->set('maxImageSize', $origMaxImageSize );
 }

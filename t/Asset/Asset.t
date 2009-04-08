@@ -810,10 +810,6 @@ END {
         if defined $origExtras;
     $session->config->set( 'uploadsURL',   $origUploads)
         if defined $origUploads;
-    $session->setting->set('urlExtension', $origUrlExtension)
-        if defined $origUrlExtension;
-    $session->setting->set('notFoundPage', $origNotFoundPage)
-        if defined $origNotFoundPage;
     if (defined $originalAssetOverrides) {
         $session->config->set('assets', $originalAssetOverrides);
     }

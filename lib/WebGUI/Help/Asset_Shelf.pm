@@ -21,8 +21,11 @@ our $HELP = {
 		variables => [
 			{	name => "shelves" , required=>1},
 			{	name => "products" , required=>1, variables => [
+					{ name => "url",
+                      description => 'product_url', },
 					{ name => "thumbnailUrl" },
 					{ name => "price" },
+					{ name => "addToCartForm" },
 					],
 				},
 			{	name => "templateId", description=>"shelf template help" },

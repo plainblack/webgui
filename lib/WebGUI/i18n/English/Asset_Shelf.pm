@@ -33,6 +33,18 @@ our $I18N = {
 		context		=> q|a template variable|,
 	},
 
+	'product_url' => {
+		message 	=> q|The URL to this sku.|,
+		lastUpdated => 0,
+		context		=> q|a template variable|,
+	},
+
+	'addToCartForm' => {
+		message 	=> q|If this product supports it, the form to add this product to the cart.  It will contain a submit button and all required form elements needed to add the product to the cart.|,
+		lastUpdated => 0,
+		context		=> q|a template variable|,
+	},
+
 	'shelves' => {
 		message 	=> q|A loop containing the list of shelves that are children of this one in the asset tree. Each record in the loop contains all the properties of a shelf.|,
 		lastUpdated => 0,

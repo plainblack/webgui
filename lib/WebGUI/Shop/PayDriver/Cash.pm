@@ -9,7 +9,7 @@ use base qw/WebGUI::Shop::PayDriver/;
 
 #-------------------------------------------------------------------
 
-=head2 canCheckOutCart ( )
+=head2 canCheckoutCart ( )
 
 Returns whether the cart can be checked out by this plugin.
 
@@ -81,12 +81,6 @@ Returns (1, undef, 1, 'Success'), meaning that the payments whith this plugin al
 
 sub processPayment {
     return (1, undef, 1, 'Success');
-}
-
-#-------------------------------------------------------------------
-
-sub www_displayStatus {
-
 }
 
 #-------------------------------------------------------------------

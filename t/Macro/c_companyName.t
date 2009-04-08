@@ -43,5 +43,4 @@ is($output, q|Gooey&#39;s Consulting&#44; LLC|, "Testing companyName with embedd
 }
 
 END {
-	$session->setting->set('companyName', $originalCompanyName);
 }

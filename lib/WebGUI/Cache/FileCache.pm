@@ -137,7 +137,7 @@ sub getFolder {
 
 #-------------------------------------------------------------------
 
-=head2 getNamepsaceRoot ( )
+=head2 getNamespaceRoot ( )
 
 Figures out what the cache root for this namespace should be. A class method.
 

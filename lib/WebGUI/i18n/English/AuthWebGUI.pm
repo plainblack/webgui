@@ -62,6 +62,55 @@ our $I18N = {
 		lastUpdated => 1227210876,
 	},
 
+    'account activation template title' => {
+        message => q|WebGUI Authentication Account Activation Mail Template|,
+        lastUpdated => 1230600500,
+        context => q|The title of the help page for the webgui auth account activition mail template.|,
+    },
+
+    'account activation template' => {
+        message => q|Account Activation Mail Template|,
+        lastUpdated => 1230600500,
+        context => q|The label for the 'account activation template' field on the Authentication tab of the Settings screen.|,
+    },
+
+    'account activation template help' => {
+        message => q|Select a template for the account activation mail that is sent to new users.|,
+        lastUpdated => 1230600500,
+        context => q|The description of the 'account activation template' field on the Authentication tab of the Settings screen, displayed as hoverhelp.|,
+    },
+
+    'activationUrl' => {
+        message => q|The url to activate the newly created account.|,
+        lastUpdated => 1230600500,
+    },
+
+    'welcome message template title' => {
+        message => q|WebGUI Authentication Welcome Message Template|,
+        lastUpdated => 0,
+        context => q|The title of the help page for the webgui auth welcome message template.|,
+    },
+
+    'welcome message template' => {
+        message => q|Welcome Message Template|,
+        lastUpdated => 0,
+        context => q|The label for the 'welcome message template' field on the Authentication tab of the Settings
+screen.|,
+    },
+
+    'welcome message template help' => {
+        message => q|Select a template for the welcome message that is sent to new users.|,
+        lastUpdated => 0,
+        context => q|The description of the 'welcome message template' field on the Authentication tab of the
+Settings screen, displayed as hoverhelp.|,
+    },
+
+    'welcomeMessage' => {
+        message => q|The welcome message as defined in the authentication settings.|,
+        lastUpdated => 0,
+        context => q|Description of the welcomeMessage tmpl_var for the template help.|,
+    },
+
 	'use captcha' => {
 		message => q|Use captcha image?|,
 		lastUpdated => 1078852836
@@ -735,6 +784,16 @@ our $I18N = {
         message     => q{There is no email address registered for this account.  Password recovery via email is not possible.},
         lastUpdated => 1229391388,
         context     => q{Error message when a user tries to recover password and they don't have an email address},
+    },
+
+    'newUser_username' => {
+        message     => 'Username of registering user',
+    },
+
+    'newUser_password' => {
+        message => q|The password for the newly created account.|,
+        lastUpdated => 0,
+        context => q|Description of the newUser_password tmpl_var for the template help.|,
     },
 
 };

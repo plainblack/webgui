@@ -112,6 +112,14 @@ sub definition {
             label        => $i18n->get('Max user responses'),
             hoverHelp    => $i18n->get('Max user responses help'),
         },
+        surveySummaryTemplateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => $i18n->get('Survey Summary Template'),
+            hoverHelp    => $i18n->get('Survey Summary Template help'),
+            defaultValue => '7F-BuEHi7t9bPi008H8xZQ',
+            namespace    => 'Survey/Summary',
+        },
         surveyTakeTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
@@ -193,7 +201,18 @@ sub definition {
             #            hoverHelp       => $i18n->get('editForm workflowIdAddEntry description'),
             none => 1,
         },
+        quizModeSummary => {
+            fieldType    => 'yesNo',
+            defaultValue => 0,
+            tab          => 'properties',
+            label        => $i18n->get('Quiz mode summaries'),
+            hoverHelp    => $i18n->get('Quiz mode summaries help'),
+        }
     );
+
+    #my $defaultMC = $session->  
+
+    #%properties = ();
 
     push @{$definition}, {
             assetName         => $i18n->get('assetName'),
@@ -412,6 +431,10 @@ sub www_submitObjectEdit {
     }
     elsif ( $params->{copy} ) {
         return $self->copyObject( \@address );
+    }elsif( $params->{removetype} ){
+        return $self->removeType(\@address);        
+    }elsif( $params->{addtype} ){
+        return $self->addType($params->{addtype},\@address);        
     }
 
     # Update the addressed object
@@ -489,6 +512,51 @@ sub www_jumpTo {
     # Search failed, so return the Edit Survey page instead.
     $self->session->log->debug("Unable to find id: $id");
     return $self->www_editSurvey;
+}
+
+#-------------------------------------------------------------------
+
+=head2 removeType ( $address )
+
+Remove the requested questionType, and then reloads the Survey.
+
+=head3 $address
+
+Specifies which questionType to delete.
+
+=cut
+
+sub removeType{
+    my $self = shift;
+    my $address = shift;
+    $self->surveyJSON->removeType($address);
+    return $self->www_loadSurvey( { address => $address } );
+    
+}
+
+#-------------------------------------------------------------------
+
+=head2 addType ( $name, $address )
+
+Adds a new questionType, and then reloads the Survey.
+
+=head3 $name
+
+The name of the new question type.
+
+=head3 $address
+
+Specifies where to add the question.
+
+=cut
+
+sub addType{
+    my $self = shift;
+    my $name = shift;
+    my $address = shift;
+    $self->surveyJSON->addType($name,$address);
+    $self->persistSurveyJSON();
+    return $self->www_loadSurvey( { address => $address } );
 }
 
 #-------------------------------------------------------------------
@@ -705,8 +773,8 @@ sub www_loadSurvey {
     }
 
     # Generate the list of valid goto targets
-    my @gotoTargets = $self->surveyJSON->getGotoTargets;
-
+    my $gotoTargets = $self->surveyJSON->getGotoTargets;
+    
     my %buttons;
     $buttons{question} = $address->[0];
     if ( @{$address} == 2 or @{$address} == 3 ) {
@@ -753,7 +821,9 @@ sub www_loadSurvey {
             $lastType = 'answer';
         }
     }
-
+    
+    my $warnings = $self->surveyJSON->validateSurvey();
+    
     my $return = {
         address  => $address,                    # the address of the focused object
         buttons  => \%buttons,                   # the data to create the Add buttons
@@ -761,7 +831,8 @@ sub www_loadSurvey {
         ddhtml   => $html,                       # the html to create the draggable html divs
         ids      => \@ids,                       # list of all ids passed in which are draggable (for adding events)
         type     => $var->{type},                # the object type
-        gotoTargets => \@gotoTargets,
+        gotoTargets => $gotoTargets,
+        warnings => $warnings                    #List of warnings to display to the user
     };
 
     $self->session->http->setMimeType('application/json');
@@ -883,8 +954,8 @@ sub getResponseInfoForView {
 
     my ( $code, $taken );
 
-    my $maxTakes = $self->getValue('maxResponsesPerUser');
-    my $id       = $self->session->user->userId();
+    my $maxResponsesPerUser = $self->getValue('maxResponsesPerUser');
+    my $userId              = $self->session->user->userId();
     my $anonId 
         = $self->session->form->process('userid')
         || $self->session->http->getCookies->{Survey2AnonId}
@@ -894,45 +965,45 @@ sub getResponseInfoForView {
     my $string;
 
     #if there is an anonid or id is for a WG user
-    if ( $anonId or $id != 1 ) {
+    if ( $anonId or $userId != 1 ) {
         $string = 'userId';
         if ($anonId) {
             $string = 'anonId';
-            $id     = $anonId;
+            $userId = $anonId;
         }
         my $responseId
             = $self->session->db->quickScalar(
             "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-            [ $id, $self->getId() ] );
+            [ $userId, $self->getId() ] );
         if ( !$responseId ) {
             $code = $self->session->db->quickScalar(
                 "select isComplete from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
-                [ $id, $self->getId() ]
+                [ $userId, $self->getId() ]
             );
         }
         $taken
             = $self->session->db->quickScalar(
             "select count(*) from Survey_response where $string = ? and assetId = ? and isComplete > 0",
-            [ $id, $self->getId() ] );
+            [ $userId, $self->getId() ] );
 
     }
-    elsif ( $id == 1 ) {
+    elsif ( $userId == 1 ) {
         my $responseId = $self->session->db->quickScalar(
             'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
-            [ $id, $ip, $self->getId() ]
+            [ $userId, $ip, $self->getId() ]
         );
         if ( !$responseId ) {
             $code = $self->session->db->quickScalar(
                 'select isComplete from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
-                [ $id, $ip, $self->getId() ]
+                [ $userId, $ip, $self->getId() ]
             );
         }
         $taken = $self->session->db->quickScalar(
             'select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0',
-            [ $id, $ip, $self->getId() ]
+            [ $userId, $ip, $self->getId() ]
         );
     }
-    return ( $code, $taken >= $maxTakes );
+    return ( $code, $maxResponsesPerUser > 0 && $taken >= $maxResponsesPerUser );
 }
 
 #-------------------------------------------------------------------
@@ -1082,6 +1153,14 @@ sub www_submitQuestions {
 }
 
 #-------------------------------------------------------------------
+sub getSummary{
+    my $self = shift;
+    my $summary = $self->responseJSON->showSummary();
+    my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
+    return $out;
+#    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+}
+#-------------------------------------------------------------------
 
 =head2 www_loadQuestions
 
@@ -1092,7 +1171,7 @@ Determines which questions to display to the survey taker next, loads and return
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
-
+    
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
@@ -1110,6 +1189,12 @@ sub www_loadQuestions {
 
     if ( $self->responseJSON->surveyEnd() ) {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
+        if ( $self->get('quizModeSummary') ) {
+            if(! $self->session->form->param('shownsummary')){
+                my $json = to_json( { type => 'summary', summary => $self->getSummary() });
+                return $json;
+            }
+        }
         return $self->surveyEnd();
     }
 
@@ -1191,7 +1276,7 @@ sub surveyEnd {
             }
         }
     }
-    $url = $self->session->url->gateway($url);
+    $url = $self->session->url->gateway($url) if($url !~ /^http:/i);
     #$self->session->http->setRedirect($url);
     #$self->session->http->setMimeType('application/json');
     my $json = to_json( { type => 'forward', url => $url } );
@@ -1208,17 +1293,18 @@ Sends the processed template and questions structure to the client
 
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
-    my %multipleChoice = (
-        'Multiple Choice', 1, 'Gender',        1, 'Yes/No',     1, 'True/False', 1, 'Ideology',       1,
-        'Race',            1, 'Party',         1, 'Education',  1, 'Scale',      1, 'Agree/Disagree', 1,
-        'Oppose/Support',  1, 'Importance',    1, 'Likelihood', 1, 'Certainty',  1, 'Satisfaction',   1,
-        'Confidence',      1, 'Effectiveness', 1, 'Concern',    1, 'Risk',       1, 'Threat',         1,
-        'Security',        1
-    );
+#    my %multipleChoice = (
+#        'Multiple Choice', 1, 'Gender',        1, 'Yes/No',     1, 'True/False', 1, 'Ideology',       1,
+#        'Race',            1, 'Party',         1, 'Education',  1, 'Scale',      1, 'Agree/Disagree', 1,
+#        'Oppose/Support',  1, 'Importance',    1, 'Likelihood', 1, 'Certainty',  1, 'Satisfaction',   1,
+#        'Confidence',      1, 'Effectiveness', 1, 'Concern',    1, 'Risk',       1, 'Threat',         1,
+#        'Security',        1
+#    );
     my %textArea    = ( 'TextArea', 1 );
     my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
     my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
     my %dateType    = ( 'Date',        1, 'Date Range', 1 );
+    my %dateShort   = ( 'Year Month', 1 );
     my %fileUpload  = ( 'File Upload', 1 );
     my %hidden      = ( 'Hidden',      1 );
 
@@ -1227,7 +1313,7 @@ sub prepareShowSurveyTemplate {
         elsif ( $text{ $q->{questionType} } )       { $q->{textType}     = 1; }
         elsif ( $textArea{ $q->{questionType} } )   { $q->{textAreaType} = 1; }
         elsif ( $hidden{ $q->{questionType} } )     { $q->{hidden}       = 1; }
-        elsif ( $multipleChoice{ $q->{questionType} } ) {
+        elsif ( $self->surveyJSON->multipleChoiceTypes->{ $q->{questionType} } ) {
             $q->{multipleChoice} = 1;
             if ( $q->{maxAnswers} > 1 ) {
                 $q->{maxMoreOne} = 1;
@@ -1235,6 +1321,26 @@ sub prepareShowSurveyTemplate {
         }
         elsif ( $dateType{ $q->{questionType} } ) {
             $q->{dateType} = 1;
+        }
+        elsif ( $dateShort{ $q->{questionType} } ) {
+            $q->{dateShort} = 1;
+            foreach my $a(@{$q->{answers}}){
+                $a->{months} = [ 
+                             {'month' => ''},
+                             {'month' => 'January'},
+                             {'month' => 'February'},
+                             {'month' => 'March'},
+                             {'month' => 'April'},
+                             {'month' => 'May'},
+                             {'month' => 'June'},
+                             {'month' => 'July'},
+                             {'month' => 'August'},
+                             {'month' => 'September'},
+                             {'month' => 'October'},
+                             {'month' => 'November'},
+                             {'month' => 'December'}
+                            ];
+            }
         }
         elsif ( $slider{ $q->{questionType} } ) {
             $q->{slider} = 1;
@@ -1331,7 +1437,7 @@ sub persistResponseJSON {
 
 #-------------------------------------------------------------------
 
-=head2 responseId
+=head2 responseIdCookies
 
 Mutator for the responseIdCookies that determines whether cookies are used as
 part of the L<"responseId"> lookup process.
@@ -1412,7 +1518,7 @@ sub responseId {
         }
     
         if ( !$responseId ) {
-            my $allowedTakes = $self->get('maxResponsesPerUser');
+            my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
             my $haveTaken;
     
             if ( $id == 1 ) {
@@ -1428,7 +1534,7 @@ sub responseId {
                     [ $id, $self->getId() ] );
             }
     
-            if ( $haveTaken < $allowedTakes ) {
+            if ( $maxResponsesPerUser == 0 || $haveTaken < $maxResponsesPerUser ) {
                 $responseId = $self->session->db->setRow(
                     'Survey_response',
                     'Survey_responseId', {
@@ -1450,7 +1556,7 @@ sub responseId {
                 $self->persistResponseJSON();
             }
             else {
-                $self->session->log->debug("haveTaken ($haveTaken) >= allowedTakes ($allowedTakes)");
+                $self->session->log->debug("haveTaken ($haveTaken) >= maxResponsesPerUser ($maxResponsesPerUser)");
             }
         }
         $self->{responseId} = $responseId;
@@ -1475,25 +1581,26 @@ sub canTakeSurvey {
         return 0;
     }
 
-    my $maxTakes   = $self->getValue('maxResponsesPerUser');
-    my $ip         = $self->session->env->getIp;
-    my $id         = $self->session->user->userId();
-    my $takenCount = 0;
+    my $maxResponsesPerUser = $self->getValue('maxResponsesPerUser');
+    my $ip                  = $self->session->env->getIp;
+    my $userId              = $self->session->user->userId();
+    my $takenCount          = 0;
 
-    if ( $id == 1 ) {
+    if ( $userId == 1 ) {
         $takenCount = $self->session->db->quickScalar(
             'select count(*) from Survey_response where userId = ? and ipAddress = ? '
-            . 'and assetId = ? and isComplete > ?', [ $id, $ip, $self->getId(), 0 ]
+            . 'and assetId = ? and isComplete > ?', [ $userId, $ip, $self->getId(), 0 ]
         );
     }
     else {
         $takenCount
             = $self->session->db->quickScalar(
             'select count(*) from Survey_response where userId = ? and assetId = ? and isComplete > ?',
-            [ $id, $self->getId(), 0 ] );
+            [ $userId, $self->getId(), 0 ] );
     }
 
-    if ( $takenCount >= $maxTakes ) {
+    # A maxResponsesPerUser value of 0 implies unlimited
+    if ( $maxResponsesPerUser > 0 && $takenCount >= $maxResponsesPerUser ) {
         $self->{canTake} = 0;
     }
     else {
@@ -1642,6 +1749,13 @@ sub www_viewStatisticalOverview {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_exportTransposedResults ()
+
+Exports transposed results in a tab deliniated file.
+
+=cut
+
 sub www_exportSimpleResults {
     my $self = shift;
 
@@ -1660,7 +1774,7 @@ sub www_exportSimpleResults {
 
 #-------------------------------------------------------------------
 
-=head2 www_exportTransposedResults (){
+=head2 www_exportTransposedResults ()
 
 Returns transposed results as a tabbed file.
 

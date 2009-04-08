@@ -173,8 +173,11 @@ returns true is the client/agent is a spider/indexer or some other non-human int
 sub requestNotViewed {
 
     my $self = shift;
-    return $self->clientIsSpider()
-        || $self->callerIsSearchSite();
+    return $self->clientIsSpider();
+        # || $self->callerIsSearchSite();   # this part is currently left out because
+                                            # it has minimal effect and does not manage
+                                            # IPv6 addresses.  it may be useful in the 
+                                            # future though
 
 }
 

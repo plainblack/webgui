@@ -18,6 +18,7 @@ use strict;
 use WebGUI::AdSpace;
 use WebGUI::Macro;
 use WebGUI::Storage;
+use WebGUI::AssetCollateral::Sku::Ad::Ad;
 
 =head1 NAME
 
@@ -81,6 +82,12 @@ Deletes this ad.
 
 sub delete {
 	my $self = shift;
+        my $iterator = WebGUI::AssetCollateral::Sku::Ad::Ad->getAllIterator($self->session,{
+             constraints => [ { "adSkuPurchase.adId = ?" => $self->getId } ],
+             });
+        while( my $object = $iterator->() ) {
+             $object->update({'isDeleted' => 1});
+        }
 	my $storage = WebGUI::Storage->get($self->session, $self->get("storageId"));
 	$storage->delete if defined $storage;
 	$self->session->db->deleteRow("advertisement","adId",$self->getId);

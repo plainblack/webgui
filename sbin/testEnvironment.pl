@@ -65,6 +65,8 @@ checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.61,      1 );
 checkModule("Test::MockObject",             1.02,      1 );
 checkModule("Test::Deep",                   0.095,     1 );
+checkModule("Test::Exception",              0.27,      1 );
+checkModule("Test::Class",                  0.30,      1 );
 checkModule("Pod::Coverage",                0.17,      2 );
 checkModule("Text::Balanced",               1.95,      1 );
 checkModule("Digest::MD5",                  2.20         );
@@ -121,6 +123,7 @@ checkModule("File::Path",                   "2.04"       );
 checkModule("Module::Find",                 "0.06"       );
 checkModule("Class::C3",                    "0.19"       );
 checkModule("Params::Validate",             "0.81"       );
+checkModule("Clone",                        "0.31"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

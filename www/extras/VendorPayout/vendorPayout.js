@@ -19,7 +19,7 @@ WebGUI.VendorPayout = function ( containerId ) {
     // Submit button
     this.submitPayoutsButton    = new YAHOO.widget.Button({ label: 'Submit Scheduled Payouts', container: this.buttonDiv });
     this.submitPayoutsButton.on( 'click', function () { 
-        YAHOO.util.Connect.asyncRequest( 'GET', '/?shop=vendor;method=submitScheduledPayouts', { 
+        YAHOO.util.Connect.asyncRequest( 'GET', '?shop=vendor;method=submitScheduledPayouts', { 
             success: obj.initialize, 
             scope: obj
         } );
@@ -30,7 +30,7 @@ WebGUI.VendorPayout = function ( containerId ) {
     this.container.appendChild( this.payoutDetails );
 
 
-    this.itemBaseUrl = '/?shop=vendor;method=payoutDataAsJSON;';
+    this.itemBaseUrl = '?shop=vendor;method=payoutDataAsJSON;';
 
     // Initialise tables
     this.initialize();
@@ -56,7 +56,7 @@ WebGUI.VendorPayout.prototype.initVendorList = function () {
     ];
 
     // setup data source
-    var url = '/?shop=vendor;method=vendorTotalsAsJSON;';
+    var url = '?shop=vendor;method=vendorTotalsAsJSON;';
     this.vendorDataSource = new YAHOO.util.DataSource( url );
     this.vendorDataSource.responseType      = YAHOO.util.DataSource.TYPE_JSON;
     this.vendorDataSource.responseSchema    = {
@@ -186,7 +186,7 @@ WebGUI.VendorPayout.prototype.initPayoutDetails = function () {
         };
     
         var status = record.getData( 'vendorPayoutStatus' ) === 'NotPaid' ? 'Scheduled' : 'NotPaid';
-        var url = '/?shop=vendor;method=setPayoutStatus' + ';itemId=' + record.getData( 'itemId' ) + ';status=' + status;
+        var url = '?shop=vendor;method=setPayoutStatus' + ';itemId=' + record.getData( 'itemId' ) + ';status=' + status;
         YAHOO.util.Connect.asyncRequest( 'post', url, callback );
     } );  
 }
@@ -204,7 +204,7 @@ WebGUI.VendorPayout.prototype.initButtons = function () {
         }
         
         var postdata = itemIds.join('&');
-        var url      = '/?shop=vendor&method=setPayoutStatus&status=' + status;
+        var url      = '?shop=vendor&method=setPayoutStatus&status=' + status;
         var callback = {
             success: function (o) {
                 this.refreshItemDataTable();

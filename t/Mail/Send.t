@@ -37,11 +37,10 @@ BEGIN {
 }
 
 # See if we have an SMTP server to use
-my ( $smtpd, %oldSettings );
+my ( $smtpd );
 my $SMTP_HOST        = 'localhost';
 my $SMTP_PORT        = '54921';
 if ($hasServer) {
-    $oldSettings{ smtpServer } = $session->setting->get('smtpServer');
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
     
 }
@@ -174,9 +173,6 @@ SKIP: {
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    for my $name ( keys %oldSettings ) {
-        $session->setting->set( $name, $oldSettings{ $name } );
-    }
 }
 
 #----------------------------------------------------------------------------

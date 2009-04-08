@@ -269,6 +269,27 @@ sub generateSubscriptionCodeBatch {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.  Override master class to add different form.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Subscription');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'purchaseSubscription'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('purchase button')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAdminConsoleWithSubmenu ( )
 
 Returns an admin console with management links added to the submenu.
@@ -933,7 +954,7 @@ sub www_listSubscriptionCodes {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_purchaseSubscription
+=head2 www_purchaseSubscription
 
 Add this subscription to the cart.
 

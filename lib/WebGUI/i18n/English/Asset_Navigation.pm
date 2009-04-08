@@ -136,10 +136,10 @@ all of the classes of pages that should be included:<br />
 <dd>The current page.</dd>
 <dt>Siblings</dt>
 <dd>Pages at the same level as the current URL.</dd>
-<dt>Descendents</dt>
+<dt>Descendants</dt>
 <dd>Pages lower than the current page in the tree.</dd>
 <dt>Pedigree</dt>
-<dd>When using a different start page, this option selects the Ancestors, Siblings and Descendents of that page.</dd>
+<dd>When using a different start page, this option selects the Ancestors, Siblings and Descendants of that page.</dd>
 </dl>|,
                 lastUpdated => 1146456217,
         },
@@ -372,7 +372,7 @@ the Navigation Template to determine who can see them in the menu.</p>
 		lastUpdated => 1163720148,
 	},
 
-	'page.isDescendent' => {
+	'page.isDescendant' => {
 		message => q|A conditional indicating whether this page is a descendant of the current page.|,
 		lastUpdated => 1163720154,
 	},
@@ -393,7 +393,7 @@ the Navigation Template to determine who can see them in the menu.</p>
 	},
 
 	'page.inBranch' => {
-		message => q|A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSibling</strong>, <strong>isBasepage</strong> and <strong>isDescendent</strong>.|,
+		message => q|A conditional that is the logical OR of <strong>isAncestor</strong>, <strong>isSibling</strong>, <strong>isBasepage</strong> and <strong>isDescendant</strong>.|,
 		lastUpdated => 1157647394,
 	},
 

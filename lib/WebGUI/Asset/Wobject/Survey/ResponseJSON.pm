@@ -28,7 +28,7 @@ As a whole, this class represents the complete state of a user's response to a S
 At the heart of this class is a perl hash that can be serialized
 as JSON to the database to allow for storage and retrieval of the complete state
 of a survey response.
- 
+
 Survey instances that allow users to record multiple responses will persist multiple
 instances of this class to the database (one per distinct user response).
 
@@ -40,7 +40,7 @@ number of questions answered (L<"questionsAnswered">) and the Survey start time 
 This package is not intended to be used by any other Asset in WebGUI.
 
 =head2 surveyOrder
- 
+
 This data strucutre is an array (reference) of Survey addresses (see  
 L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
 in which items are presented to the user.
@@ -70,7 +70,7 @@ is stored in this hash reference.
 
 Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
 Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
- 
+
 Question entries only contain a comment field:
  {
      ...
@@ -79,7 +79,7 @@ Question entries only contain a comment field:
      }
      ...
  }
-          
+
 Answers entries contain: value (the recorded value), time and comment fields.
 
  {
@@ -98,6 +98,7 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 use List::Util qw(shuffle);
+use Safe;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
@@ -430,9 +431,9 @@ Processes and records submitted survey responses in the L<"responses"> data stru
 Does terminal handling, and branch processing, and advances the L<"lastResponse"> index 
 if all required questions have been answered.
 
-=head3 $responses
+=head3 $submittedResponses
 
-A hash ref of form param data. Each element should look like:
+A hash ref of submitted form param data. Each element should look like:
 
     {
         "questionId-comment"    => "question comment",
@@ -459,11 +460,11 @@ gotoExpression in the set of questions wins.
 
 sub recordResponses {
     my $self = shift;
-    my ($responses) = validate_pos( @_, { type => HASHREF } );
+    my ($submittedResponses) = validate_pos( @_, { type => HASHREF } );
 
     # Build a lookup table of non-multiple choice question types
-    my %knownTypes = map {$_ => 1} $self->survey->specialQuestionTypes;
-
+    my %knownTypes = map {$_ => 1} @{$self->survey->specialQuestionTypes};
+    
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section   = $self->nextResponseSection();
@@ -517,37 +518,40 @@ sub recordResponses {
         }
 
         # Record Question comment
-        $self->responses->{ $question->{id} }->{comment} = $responses->{ $question->{id} . 'comment' };
+        $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
 
         # Process Answers in Question..
         for my $answer ( @{ $question->{answers} } ) {
 
             # Pluck the values out of the responses hash that we want to record..
-            my $answerValue = $responses->{ $answer->{id} };
-            my $answerComment = $responses->{ $answer->{id} . 'comment' };
+            my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
+            my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
 
-            # Proceed if we're satisfied that response is valid..
-            if ( defined $answerValue && $answerValue =~ /\S/ ) {
+            # Proceed if we're satisfied that the submitted answer response is valid..
+            if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
                 $aAnswered = 1;
-                if ($knownTypes{$question->{questionType}}) {
-                    $self->responses->{ $answer->{id} }->{value} = $answerValue;
-                } else {
-                    # Unknown type, must be a multi-choice bundle
-                    # For Multi-choice, use recordedAnswer instead of answerValue
-                    $self->responses->{ $answer->{id} }->{value} = $answer->{recordedAnswer};
-                }
-                $self->responses->{ $answer->{id} }->{time} = time;
-                $self->responses->{ $answer->{id} }->{comment} = $answerComment;
+
+                # Now, decide what to record. For multi-choice questions, use recordedAnswer.
+                # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
+                $self->responses->{ $answer->{id} }->{value}
+                    = $knownTypes{ $question->{questionType} }
+                    ? $submittedAnswerResponse
+                    : $answer->{recordedAnswer};
+
+                $self->responses->{ $answer->{id} }->{time}    = time;
+                $self->responses->{ $answer->{id} }->{comment} = $submittedAnswerComment;
 
                 # Handle terminal Answers..
                 if ( $answer->{terminal} ) {
                     $terminal    = 1;
                     $terminalUrl = $answer->{terminalUrl};
                 }
+
                 # ..and also gotos..
                 elsif ( $answer->{goto} =~ /\w/ ) {
                     $goto = $answer->{goto};
                 }
+
                 # .. and also gotoExpressions..
                 elsif ( $answer->{gotoExpression} =~ /\w/ ) {
                     $gotoExpression = $answer->{gotoExpression};
@@ -645,89 +649,26 @@ indicates that we should branch.
 
 =head3 $gotoExpression
 
-The gotoExpression.
-
-A gotoExpression is a string representing a list of expressions (one per line) of the form:
- target: expression
- target: expression
- ...
-
-This subroutine iterates through the list, processing each line and, all things being
-well, evaluates the expression. The first expression to evaluate to true triggers a
-call to goto($target).
-
-The expression is a simple subset of the formula language used in spreadsheet programs 
-such as Excel, OpenOffice, Google Docs etc..
-
-Here is an example using section variables S1 and S2 as jump targets and question 
-variables Q1-3 in the expression. It  jumps to S1 if the user's answer to Q1 has a value 
-of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
-S1: Q1 = 3
-S2: Q2 + Q3 < 10
-
-Arguments are evaluated as follows:
-
-Numeric arguments evaluate as numbers
-
-=over 4
-
-=item * No support for strings (and hence no string matching)
-
-=item * Question variable names (e.g. Q1) evaluate to the numeric value associated with 
-user's answer to that question, or undefined if the user has not answered that question
-
-=back
-
-Binary comparisons operators: = != < <= >= >
-
-=over 4
-
-=item * return boolean values based on perl's equivalent numeric comparison operators
-
-=back
-
-Simple math operators: + - * /
-
-=over 4
-
-=item * return numeric values
-
-=back
-
-Later we may add Boolean operators: AND( x; y; z; ... ), OR( x; y; z; ... ), NOT( x ), with args separated by 
-semicolons (presumably because spreadsheet formulas use commas to indicate cell ranges)
-
-Later still you may be able to say AVG(section1) or SUM(section3) and have those functions automatically 
-compute their result over the set of all questions in the given section.
-But for now those things can be done manually using the limited subset defined.
+The gotoExpression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
 
 =cut
-
+    
 sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
-
-    my $responses = $self->recordedResponses();
-
-    # Parse gotoExpressions one after the other (first one that's true wins)
-    foreach my $line (split /\n/, $expression) {
-        my $processed = $self->parseGotoExpression($line, $responses);
-
-        next if !$processed;
-
-        # (ab)use perl's eval to evaluate the processed expression
-        my $result = eval "$processed->{expression}";   ## no critic
-        $self->session->log->warn($@) if $@;            ## no critic
-
-        if ($result) {
-            $self->session->log->debug("Truthy, goto [$processed->{target}]");
-             $self->processGoto($processed->{target});
-             return $processed;
-        } else {
-            $self->session->log->debug('Falsy, not branching');
-            next;
-        }
+    
+    # Prepare the ingredients..
+    my $values = $self->responseValuesByVariableName;
+    my $scores = $self->responseScoresByVariableName;
+    my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
+    
+    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
+    my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+    if (my $jump = $engine->run($self->session, $expression, { values => $values, scores => $scores, validTargets => \%validTargets} )) {
+        $self->session->log->debug("Hit. Jumping to [$jump]");
+        $self->processGoto($jump);
     }
+    $self->session->log->debug("No hits, falling through");
     return;
 }
 
@@ -735,111 +676,129 @@ sub processGotoExpression {
 
 =head2 recordedResponses
 
-Returns a hash (reference) of question responses. The hash keys are
-question variable names. The hash values are the corresponding answer
-values selected by the user. 
+Returns an array or response information in this response's survey order.
 
 =cut
 
-sub recordedResponses {
+sub recordedResponses{
     my $self = shift;
-    
-    my $responses= {
-        # questionName => response answer value
-    };
-
-    # Populate %responses with the user's data..
+    my $responses= [
+        # {answer info hash}
+    ];
+    # Populate @$responses with the user's data..
     for my $address ( @{ $self->surveyOrder } ) {
         my $question = $self->survey->question( $address );
         my ($sIndex, $qIndex) = (sIndex($address), qIndex($address));
         for my $aIndex (aIndexes($address)) {
+            my $question = $self->survey->question([$sIndex,$qIndex]);
             my $answerId = $self->answerId($sIndex, $qIndex, $aIndex);
             if ( defined $self->responses->{$answerId} ) {
                 my $answer = $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] );
-                $responses->{$question->{variable}}
-                    = $answer->{value} =~ /\w/  ? $answer->{value}
-                                                : $question->{value}
-                    ;
+                push(@$responses, {
+                    value => $answer->{value} =~ /\w/  ? $answer->{value} : $question->{value},
+                    recordedAnswer => $answer->{recordedAnswer},
+                    isCorrect => $answer->{isCorrect},
+                    answerText => $answer->{text},
+                    address => [$sIndex,$qIndex,$aIndex],
+                    questionText => $question->{text},
+                    questionValue => $question->{value},
+                    questionType => $question->{questionType}
+                    }
+                );
             }
         }
     }
     return $responses;
 }
 
+
 #-------------------------------------------------------------------
 
-=head2 parseGotoExpression( ( $expression, $responses)
+=head2 responseValuesByVariableName
 
-Parses a single gotoExpression. Returns undef if processing fails, or the following hashref
-if things work out well:
- { target => $target, expression => $expression }
+Returns a lookup table to question variable names and recorded response values.
 
-=head3 $expression
-
-The expression to process
-
-=head3 $responses
-
-Hashref that maps questionNames to response values
-
-=head3 Explanation:
-
-Uses the following simple strategy:
-
-First, parse the expression as:
- target: expression
-
-Replace each questionName with its response value (from the $responses hashref)
-
-Massage the expression into valid perl
-
-Check that only valid tokens remain. This last step ensures that any invalid questionNames in
-the expression generate an error because our list of valid tokens doesn't include a-z
+Only questions with a defined variable name set are included. Values come from
+the L<responses> hash.
 
 =cut
 
-sub parseGotoExpression {
-    my $self       = shift;
-    my ($expression, $responses) = validate_pos(@_, { type => SCALAR }, { type => HASHREF, default => {} });
-
-    $self->session->log->debug("Parsing gotoExpression: $expression");
-
-    # Valid gotoExpression tokens are..
-    my $tokens = qr{\s|[-0-9=!<>+*/.()]};
-
-    my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
-
-    $self->session->log->debug("Parsed as Target: [$target], Expression: [$rest]");
-
-    if ( !defined $target ) {
-        $self->session->log->warn('Target undefined');
-        return;
+sub responseValuesByVariableName {
+    my $self = shift;
+    
+    my %lookup;
+    while (my ($address, $response) = each %{$self->responses}) {
+        next if (!$response || !$address);
+        
+        # Turn responses s-q-a string into an address array
+        my @address = split /-/, $address;
+        
+        # Filter out the non-answer entries
+        next unless @address == 3;
+        
+        # Grab the corresponding question
+        my $question = $self->survey->question([@address]);
+        
+        # Filter out questions without defined variable names
+        next if !$question || !defined $question->{variable};
+        
+        # Add variable => value to our hash
+        $lookup{$question->{variable}} = $response->{value};
     }
+    return \%lookup;
+}
 
-    if ( !defined $rest || $rest eq q{} ) {
-        $self->session->log->warn('Expression undefined');
-        return;
+#-------------------------------------------------------------------
+
+=head2 responseScoresByVariableName
+
+Returns a lookup table to question variable names and recorded response values.
+
+Only questions with a defined variable name set are included. Scores come from
+the L<responses> hash.
+
+=cut
+
+sub responseScoresByVariableName {
+    my $self = shift;
+    
+    my %lookup;
+    while (my ($address, $response) = each %{$self->responses}) {
+        next if (!$response || !$address);
+        
+        # Turn responses s-q-a string into an address array
+        my @address = split /-/, $address;
+        
+        # Filter out the non-answer entries
+        next unless @address == 3;
+        
+        # Grab the corresponding question
+        my $question = $self->survey->question([@address]);
+        
+        # Filter out questions without defined variable names
+        next if !$question || !defined $question->{variable};
+        
+        # Grab the corresponding answer
+        my $answer = $self->survey->answer([@address]);
+        
+        # Add variable => score to our hash
+        $lookup{$question->{variable}} = $answer->{value};
     }
-
-    # Replace each questionName with its response value
-    while ( my ( $questionName, $response ) = each %{$responses} ) {
-        $rest =~ s/$questionName/$response/g;
+    
+    # Add section score totals
+    for my $s (@{$self->survey->sections}) {
+        next unless $s->{variable};
+        
+        my $score = 0;
+        for my $q (@{$s->{questions}}) {
+            next unless $q->{variable};
+            next unless exists $lookup{$q->{variable}};
+            
+            $lookup{$s->{variable}} += $lookup{$q->{variable}};
+        }
     }
-
-    # convert '=' to '==' but don't touch '!=', '<=' or '>='
-    $rest =~ s/(?<![!<>])=(?!=)/==/g;
-
-    if ( $rest !~ /^$tokens+$/ ) {
-        $self->session->log->warn("Contains invalid tokens: $rest");
-        return;
-    }
-
-    $self->session->log->debug("Processed as: $rest");
-
-    return {
-        target => $target,
-        expression => $rest,
-    };
+    
+    return \%lookup;
 }
 
 #-------------------------------------------------------------------
@@ -915,11 +874,12 @@ sub nextQuestions {
     my $section = $self->nextResponseSection();
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
+    
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $recordedResponses = $self->recordedResponses();
+    my $responseValuesByVariableName = $self->responseValuesByVariableName();
 
     # Do text replacement
-    $section->{text} = $self->getTemplatedText($section->{text}, $recordedResponses);
+    $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);
 
     # Collect all the questions to be shown on the next page..
     my @questions;
@@ -942,7 +902,7 @@ sub nextQuestions {
         my %questionCopy = %{$self->survey->question( $address )};
 
         # Do text replacement
-        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $recordedResponses);
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responseValuesByVariableName);
 
         # Add any extra fields we want..
         $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
@@ -954,7 +914,7 @@ sub nextQuestions {
             my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
             # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $recordedResponses);
+            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responseValuesByVariableName);
 
             # Add any extra fields we want..
             $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
@@ -1086,7 +1046,116 @@ sub aIndexes {
 
 #-------------------------------------------------------------------
 
-=head2 returnResponsesForReporting
+=head2 showSummary ( [$sectionAddresses] )
+
+showSummary returns the current responses summary for the entire response, if 
+no address is passed in, or just the sections addressed by $sectionAddresses.
+
+For each section, the total correct, wrong, time taken, and points are returned.  And each 
+question is listed with the text, given score, user response, and if it was correct.
+This list is meant for a template and only what is needed should be shown.
+
+A summary of the entire suvey, 
+
+=cut
+
+sub showSummary{
+    my $self = shift;
+    my $sectionAddies = shift;#array of section addresses
+
+    my $all = 0;
+    $all = 1 if(! $sectionAddies);
+
+    my ($summaries);
+
+    my $responses = $self->recordedResponses();
+    my %goodSection;
+    map{$goodSection{$_} = 1} @$sectionAddies;
+    
+    return if(! $responses);
+
+    my ($sectionIndex, $questionIndex, $answerIndex) = (-1, -1, -1);
+    my ($currentSection,$currentQuestion) = (-1, -1); 
+
+    ($summaries->{totalCorrect},$summaries->{totalIncorrect}) = (0,0);
+
+    for my $response (@$responses){
+        if(! $all and ! $goodSection{$response->{address}->[0]}){next;}
+        if($response->{isCorrect}){
+            $summaries->{totalCorrect}++;
+        }else{
+            $summaries->{totalIncorrect}++;
+        }
+        $summaries->{totalAnswers}++;
+        if($currentSection != $response->{address}->[0]){
+            $summaries->{totalSections}++;
+            $sectionIndex++;
+            $questionIndex = -1;
+            $answerIndex = -1;
+            $currentQuestion = -1;
+            $currentSection = $response->{address}->[0];
+            _loadSectionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]},$response);
+        }
+        if($currentQuestion != $response->{address}->[1]){
+            $summaries->{totalQuestions}++;
+            $questionIndex++;
+            $answerIndex = -1;
+            $currentQuestion = $response->{address}->[1];
+            _loadQuestionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]},$response);
+        }
+        $answerIndex++;
+        _loadAnswerIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]->{answers}->[$answerIndex]},
+            $response,
+            $self->survey->{multipleChoiceTypes});
+    }
+    return $summaries;
+}
+sub _loadAnswerIntoSummary{
+    my $node = shift;
+    my $response = shift;
+    my $types = shift;
+
+    $node->{id} = $response->{address}->[2] + 1;
+    if($response->{isCorrect}){
+        $node->{iscorrect} = 1;
+        $node->{score} = $response->{value};
+    }else{   
+        $node->{iscorrect} = 0;
+        $node->{score} = 0;
+    }
+    $node->{text} = $response->{answerText};
+
+    #test if it is a multiple choide type
+    if($types->{$response->{questionType}}){
+        $node->{value} = $response->{value};
+    }else{
+        $node->{value} = $response->{recordedValue};
+    }
+}
+sub _loadQuestionIntoSummary{
+    my $node = shift;
+    my $response = shift;
+    $node->{id} = $response->{address}->[1] + 1;
+    $node->{text} = $response->{questionText};
+}
+sub _loadSectionIntoSummary{
+    my $node = shift; 
+    my $response = shift;
+    $node->{id} = $response->{address}->[0] + 1;
+    $node->{inCorrect} = 0 if(!defined $node->{section}->{inCorrect});
+    $node->{score} = 0 if(!defined $node->{section}->{score});
+    $node->{correct} = 0 if(!defined $node->{section}->{correct});
+    if($response->{isCorrect}){
+        $node->{score} += $response->{value};
+        $node->{correct}++;
+    }else{
+        $node->{inCorrect}++;
+    }
+
+}
+#-------------------------------------------------------------------
+
+=head2 returnResponseForReporting
 
 Used to extract JSON responses for use in reporting results.
 
@@ -1096,7 +1165,7 @@ recorded value, and the id of the answer.
 
 =cut
 
-# TODO: This sub should make use of recordedResponses
+# TODO: This sub should make use of responseValuesByVariableName
 
 sub returnResponseForReporting {
     my $self      = shift;

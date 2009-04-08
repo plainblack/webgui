@@ -13,8 +13,8 @@ use Data::Dumper;
 use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
-#use Clone qw/clone/;
-use Storable qw/dclone/;
+use Clone qw/clone/;
+#use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 132;
+my $tests = 139;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -2002,7 +2002,30 @@ cmp_deeply(
 
 ####################################################
 #
-# totalSections
+# questions
+#
+####################################################
+{
+    my $s = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session, '{}');
+    # Add a new section
+    my $address = $s->newObject([]);
+    cmp_deeply($s->questions, [], 'Initially no questions');
+    # Add a question to first section 
+    $address = $s->newObject([0]);
+    is(scalar @{$s->questions}, 1, '..now 1 question');
+    is(scalar @{$s->questions([0])}, 1, '..in the first section');
+    is($s->questions([2]), undef, '..and none in the second section (which doesnt even exist)');
+
+    # Add a question to second section 
+    $address = $s->newObject([1]);
+    is(scalar @{$s->questions}, 2, '..now 2 question2');
+    is(scalar @{$s->questions([0])}, 1, '..1 in the first section');
+    is(scalar @{$s->questions([1])}, 1, '..1 in the second section');
+}
+
+####################################################
+#
+# totalSections, totalQuestions, totalAnswers
 #
 ####################################################
 {
@@ -2123,13 +2146,13 @@ sub buildSectionSkeleton {
     my $sections = [];
     my ($bareSection, $bareQuestion, $bareAnswer) = getBareSkeletons();
     foreach my $questionSpec ( @{ $spec } ) {
-        my $section = dclone $bareSection;
+        my $section = clone $bareSection;
         push @{ $sections }, $section;
         foreach my $answers ( @{$questionSpec} ) {
-            my $question = dclone $bareQuestion;
+            my $question = clone $bareQuestion;
             push @{ $section->{questions} }, $question;
             while ($answers-- > 0) {
-                my $answer = dclone $bareAnswer;
+                my $answer = clone $bareAnswer;
                 push @{ $question->{answers} }, $answer;
             }
         }

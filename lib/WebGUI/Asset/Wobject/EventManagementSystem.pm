@@ -359,6 +359,14 @@ sub prepareView {
 
 #------------------------------------------------------------------
 
+=head2 purge ( )
+
+See WebGUI::Asset::purge() for details.  Extend SUPERclass
+to handle deleting tickets, tokens, ribbons, registrants, badge groups
+and event meta data.
+
+=cut
+
 sub purge {
     my $self = shift;
     my $db = $self->session->db;

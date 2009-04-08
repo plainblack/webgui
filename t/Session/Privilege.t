@@ -77,7 +77,6 @@ my ($versionTag, $userTemplate) = setup_assets($session);
 isa_ok($privilege, 'WebGUI::Session::Privilege', 'session has correct object type');
 
 ##Override the original user style template to make verification easier
-my $origUserStyle = $session->setting->get('userFunctionStyleId');
 $session->setting->set('userFunctionStyleId', $userTemplate->getId);
 
 #One of the tests has different behavior depending on how it is called.
@@ -147,7 +146,6 @@ sub setup_assets {
 
 
 END {
-	$session->setting->set('userFunctionStyleId', $origUserStyle);
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}

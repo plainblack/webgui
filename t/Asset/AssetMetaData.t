@@ -195,7 +195,6 @@ cmp_deeply(
 #
 ####################################################
 
-my $origMetaEnabled = $session->setting->get("metaDataEnabled");
 $session->setting->set("metaDataEnabled", 1);
 
 # add another field for comparison
@@ -236,6 +235,5 @@ END {
             $tag->rollback;
         }
     }
-    $session->setting->set("metaDataEnabled", $origMetaEnabled);
 
 }

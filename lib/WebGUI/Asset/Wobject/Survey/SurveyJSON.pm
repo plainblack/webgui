@@ -48,79 +48,18 @@ likely operate on the question indexed by:
 
 use strict;
 use JSON;
+use Data::Dumper;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-# N.B. We're currently using Storable::dclone instead of Clone::clone
-# because Colin uncovered some Clone bugs in Perl 5.10
-#use Clone qw/clone/;
-use Storable qw/dclone/;
+use Clone qw/clone/;
 
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
 
-my %MULTI_CHOICE_BUNDLES = (
-    'Agree/Disagree' => [ 'Strongly disagree',    (q{}) x 5, 'Strongly agree' ],
-    Certainty        => [ 'Not at all certain',   (q{}) x 9, 'Extremely certain' ],
-    Concern          => [ 'Not at all concerned', (q{}) x 9, 'Extremely concerned' ],
-    Confidence       => [ 'Not at all confident', (q{}) x 9, 'Extremely confident' ],
-    Education        => [
-        'Elementary or some high school',
-        'High school/GED',
-        'Some college/vocational school',
-        'College graduate',
-        'Some graduate work',
-        'Master\'s degree',
-        'Doctorate (of any type)',
-        'Other degree (verbatim)',
-    ],
-    Effectiveness => [ 'Not at all effective', (q{}) x 9, 'Extremely effective' ],
-    Gender        => [qw( Male Female )],
-    Ideology      => [
-        'Strongly liberal',
-        'Liberal',
-        'Somewhat liberal',
-        'Middle of the road',
-        'Slightly conservative',
-        'Conservative',
-        'Strongly conservative'
-    ],
-    Importance       => [ 'Not at all important', (q{}) x 9, 'Extremely important' ],
-    Likelihood       => [ 'Not at all likely',    (q{}) x 9, 'Extremely likely' ],
-    'Oppose/Support' => [ 'Strongly oppose',      (q{}) x 5, 'Strongly support' ],
-    Party =>
-        [ 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)' ],
-    Race =>
-        [ 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)' ],
-    Risk         => [ 'No risk',              (q{}) x 9, 'Extreme risk' ],
-    Satisfaction => [ 'Not at all satisfied', (q{}) x 9, 'Extremely satisfied' ],
-    Security     => [ 'Not at all secure',    (q{}) x 9, 'Extremely secure' ],
-    Threat       => [ 'No threat',            (q{}) x 9, 'Extreme threat' ],
-    'True/False' => [qw( True False )],
-    'Yes/No'     => [qw( Yes No )],
-    Scale => [q{}],
-    'Multiple Choice' => [q{}],
-);
-
-my @SPECIAL_QUESTION_TYPES = (
-    'Dual Slider - Range',
-    'Multi Slider - Allocate',
-    'Slider',
-    'Currency',
-    'Email',
-    'Phone Number',
-    'Text',
-    'Text Date',
-    'TextArea',
-    'File Upload',
-    'Date',
-    'Date Range',
-    'Hidden',
-);
-
-sub specialQuestionTypes {
-    return @SPECIAL_QUESTION_TYPES;
-}
+#sub specialQuestionTypes {
+#    return @SPECIAL_QUESTION_TYPES;
+#}
 
 =head2 new ( $session, json )
 
@@ -153,11 +92,86 @@ sub new {
 
     bless $self, $class;
 
+    #Load question types
+    $self->loadTypes();
+
     # Initialise the survey data structure if empty..
     if ( $self->totalSections == 0 ) {
         $self->newObject( [] );
     }
     return $self;
+}
+
+=head2 loadTypes
+
+Loads the Multiple Choice and Special Question types
+
+=cut
+
+sub loadTypes {
+    my $self = shift;
+    @{$self->{specialQuestionTypes}} = ( 
+        'Dual Slider - Range',
+        'Multi Slider - Allocate',
+        'Slider',
+        'Currency',
+        'Email',
+        'Phone Number',
+        'Text',
+        'Text Date',
+        'TextArea',
+        'File Upload',
+        'Date',
+        'Date Range',
+        'Year Month',
+        'Hidden',
+    );
+    my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes");
+    map($self->{multipleChoiceTypes}->{$_->{questionType}} = [split/,/,$_->{answers}], @$refs);
+}
+
+sub addType { 
+    my $self = shift;
+    my $name = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    my @answers;
+    for my $ans(@{$obj->{answers}}){
+        push(@answers,$ans->{text});
+    }
+    my $ansString = join(',',@answers);
+    $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$name,$ansString,$ansString]);
+    $self->question($address)->{questionType} = $name;
+}
+
+
+sub removeType {
+    my $self = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    $self->session->db->write("DELETE FROM Survey_questionTypes WHERE questionType = ?",[$obj->{questionType}]);
+}
+
+=head2 specialQuestionTypes
+
+Returns the arrayref to the special question types
+
+=cut 
+
+sub specialQuestionTypes {
+    my $self = shift;
+    return $self->{specialQuestionTypes};
+}
+
+=head2 multipleChoiceTypes
+
+Returns the hashref to the multiple choice types
+
+=cut
+
+sub multipleChoiceTypes {
+    my $self = shift;
+    return $self->{multipleChoiceTypes};
 }
 
 =head2 freeze
@@ -350,13 +364,13 @@ sub getObject {
     return if !$count;
     
     if ( $count == 1 ) {
-        return dclone $self->sections->[ sIndex($address) ];
+        return clone $self->sections->[ sIndex($address) ];
     }
     elsif ( $count == 2 ) {
-        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return dclone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
             ->[ aIndex($address) ];
     }
 }
@@ -403,12 +417,14 @@ sub getGotoTargets {
 
     # Valid goto targets are all of the section variable names..
     my @section_vars = map {$_->{variable}} @{$self->sections};
-
+    
     # ..and all of the question variable names..
     my @question_vars = map {$_->{variable}} @{$self->questions};
-
+    
     # ..excluding the ones that are empty
-    return grep { $_ ne q{} } (@section_vars, @question_vars);
+    my @grep =  grep { $_ ne q{} } (@section_vars, @question_vars);
+    return \@grep;
+    #return grep { $_ ne q{} } (@section_vars, @question_vars);
 }
 
 =head2 getSectionEditVars ( $address )
@@ -512,7 +528,6 @@ sub getQuestionEditVars {
 
     # Change questionType from a single element into an array of hashrefs which list the available 
     # question types and which one is currently selected for this question..
-    
     for my $qType ($self->getValidQuestionTypes) {
         push @{ $var{questionType} }, {
             text => $qType,
@@ -529,7 +544,8 @@ A convenience method.  Returns a list of question types.
 =cut
 
 sub getValidQuestionTypes {
-    return sort (@SPECIAL_QUESTION_TYPES, keys %MULTI_CHOICE_BUNDLES);
+    my $self = shift;
+    return sort (@{$self->{specialQuestionTypes}}, keys %{$self->{multipleChoiceTypes}});
 }
 
 =head2 getAnswerEditVars ( $address )
@@ -761,14 +777,14 @@ sub copy {
     
     if ( $count == 1 ) {
         # Clone the indexed section onto the end of the list of sections..
-        push @{ $self->sections }, dclone $self->section($address);
+        push @{ $self->sections }, clone $self->section($address);
 
         # Update $address with the index of the newly created section
         $address->[0] = $self->lastSectionIndex;
     }
     elsif ( $count == 2 ) {
         # Clone the indexed question onto the end of the list of questions..
-        push @{ $self->questions($address) }, dclone $self->question($address);
+        push @{ $self->questions($address) }, clone $self->question($address);
 
         # Update $address with the index of the newly created question
         $address->[1] = $self->lastQuestionIndex($address);
@@ -1002,7 +1018,7 @@ sub getMultiChoiceBundle {
     my $self = shift;
     my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
 
-    return $MULTI_CHOICE_BUNDLES{$type};
+    return $self->{multipleChoiceTypes}->{$type};
 }
 
 =head2 addAnswersToQuestion ($address, $answers, $verbatims)
@@ -1047,7 +1063,7 @@ sub addAnswersToQuestion {
         $self->update(
             \@address_copy,
             {   text           => $answers->[$answer_index],
-                recordedAnswer => $answer_index + 1,
+                recordedAnswer => $answer_index + 1, # 1-indexed
                 verbatim       => $verbatims->{$answer_index},
             }
         );
@@ -1176,6 +1192,123 @@ sub totalAnswers {
     }
 }
 
+=head2 validateSurvey ()
+
+Returns an array of messages to inform a user what is logically wrong with the Survey
+
+=cut
+
+sub validateSurvey{
+    my $self = shift;
+    #check all goto's
+    #bad goto expressions
+    #check that all survey is able to be seen
+
+    my @messages;   
+   
+    #set up valid goto targets 
+    my $gotoTargets = $self->getGotoTargets();
+    my $goodTargets;
+    my $duplicateTargets;
+    for my $g (@{$gotoTargets}) { 
+        $goodTargets->{$g}++; 
+        $duplicateTargets->{$g}++ if $goodTargets->{$g} > 1;
+    }
+
+    #step through each section validating it. 
+    my $sections = $self->sections();
+    
+    for(my $s = 0; $s <= $#$sections; $s++){
+        my $sNum = $s + 1;
+        my $section = $self->section([$s]);
+        if(! $self->validateGoto($section,$goodTargets)){
+            push @messages,"Section $sNum has invalid Jump target: \"$section->{goto}\"";
+        }
+        if(! $self->validateGotoInfiniteLoop($section)){
+            push @messages,"Section $sNum jumps to itself.";
+        }
+        if(my $error = $self->validateGotoExpression($section,$goodTargets)){
+            push @messages,"Section $sNum has invalid Jump Expression: \"$section->{gotoExpression}\". Error: $error";
+        }
+        if (my $var = $section->{variable}) {
+            if (my $count = $duplicateTargets->{$var}) {
+                push @messages, "Section $sNum variable name $var is re-used in $count other place(s).";
+            }
+        }
+
+        #step through each question validating it. 
+        my $questions = $self->questions([$s]);
+        for(my $q = 0; $q <= $#$questions; $q++){
+            my $qNum = $q + 1;
+            my $question = $self->question([$s,$q]);
+            if(! $self->validateGoto($question,$goodTargets)){
+                push @messages,"Section $sNum Question $qNum has invalid Jump target: \"$question->{goto}\"";
+            }
+            if(! $self->validateGotoInfiniteLoop($question)){
+                push @messages,"Section $sNum Question $qNum jumps to itself.";
+            }
+            if(my $error = $self->validateGotoExpression($question,$goodTargets)){
+                push @messages,"Section $sNum Question $qNum has invalid Jump Expression: \"$question->{gotoExpression}\". Error: $error";
+            }
+            if($#{$question->{answers}} < 0){
+                push @messages,"Section $sNum Question $qNum does not have any answers.";
+            }
+            if(! $question->{text} =~ /\w/){
+                push @messages,"Section $sNum Question $qNum does not have any text.";
+            }
+            if (my $var = $question->{variable}) {
+                if (my $count = $duplicateTargets->{$var}) {
+                    push @messages, "Section $sNum Question $qNum variable name $var is re-used in $count other place(s).";
+                }
+            }
+            
+            #step through each answer validating it. 
+            my $answers = $self->answers([$s,$q]);
+            for(my $a = 0; $a <= $#$answers; $a++){
+                my $aNum = $a + 1;
+                my $answer = $self->answer([$s,$q,$a]);
+                if(! $self->validateGoto($answer,$goodTargets)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump target: \"$answer->{goto}\"";
+                }
+                if(! $self->validateGotoInfiniteLoop($answer)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.";
+                }
+                if(my $error = $self->validateGotoExpression($answer,$goodTargets)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump Expression: \"$answer->{gotoExpression}\". Error: $error";
+                }
+            }
+        }
+    }
+ 
+   return \@messages; 
+}
+
+sub validateGoto{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    return 0 if($object->{goto} =~ /\w/ && ! exists($goodTargets->{$object->{goto}}));
+    return 1;
+}
+
+sub validateGotoInfiniteLoop{
+    my $self = shift;
+    my $object = shift;
+    return 0 if($object->{goto} =~ /\w/ and $object->{goto} eq $object->{variable});
+    return 1;
+}
+
+sub validateGotoExpression{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    return unless $object->{gotoExpression}; 
+    
+    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
+    my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+    return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
+}
+
 =head2 section ($address)
 
 Returns a reference to one section.
@@ -1208,9 +1341,9 @@ sub session {
 
 Returns a reference to all the questions from a particular section.
 
-=head3 $address
+=head3 $address (optional)
 
-See L<"Address Parameter">.
+See L<"Address Parameter">. If not defined, returns all questions.
 
 =cut
 
@@ -1218,7 +1351,13 @@ sub questions {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
     
-    return $self->sections->[ $address->[0] ]->{questions};
+    if ($address) {
+        return $self->sections->[ $address->[0] ]->{questions};
+    } else {
+        my $questions;
+        push @$questions, @{$_->{questions} || []} for @{$self->sections};
+        return $questions;
+    }
 }
 
 =head2 question ($address)

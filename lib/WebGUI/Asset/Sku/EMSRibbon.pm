@@ -85,6 +85,26 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm
+
+Returns a button to take the user to the view screen.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Sku');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'view'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('see more')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getConfiguredTitle
 
 Return title + badge holder name.

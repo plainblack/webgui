@@ -87,16 +87,25 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 get ( )
+=head2 get ( $param )
 
 Returns a hash reference containing all the settings.
+
+=head3 $param
+
+If $param is defined, then it will return only the setting for that param.
 
 =cut
 
 sub get {
-	my $self = shift;
-	my $param = shift;
-	return $self->{_settings}{$param};
+    my $self = shift;
+    my $param = shift;
+    if (defined $param) {
+        return $self->{_settings}{$param};
+    }
+    else {
+        return $self->{_settings};
+    }
 }
 
 

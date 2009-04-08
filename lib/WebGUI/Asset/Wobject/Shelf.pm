@@ -308,10 +308,11 @@ sub view {
 	foreach my $id (@{$p->getPageData}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		if (defined $asset) {
-			my $sku = $asset->get;
-			$sku->{url} = $asset->getUrl;
-            $sku->{thumbnailUrl} = $asset->getThumbnailUrl;
-            $sku->{price} = sprintf("%.2f", $asset->getPrice);
+			my $sku               = $asset->get;
+			$sku->{url}           = $asset->getUrl;
+            $sku->{thumbnailUrl}  = $asset->getThumbnailUrl;
+            $sku->{price}         = sprintf("%.2f", $asset->getPrice);
+            $sku->{addToCartForm} = $asset->getAddToCartForm;
 			push @skus, $sku;
 		}
 		else {
@@ -330,6 +331,13 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit (  )
+
+Override the superclass to add import and exprt items to the AdminConsole submenu.
+
+=cut
+
 sub www_edit {
     my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Shelf');

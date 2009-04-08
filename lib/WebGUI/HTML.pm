@@ -442,6 +442,18 @@ sub splitTag {
     return @result if wantarray;
     return $result[0];
 }
+#-------------------------------------------------------------------
+
+=head2 WebGUI::HTML::splitHeadBody($html);
+
+splits an block of HTML into a HEAD and a BODY section 
+
+=head3 html
+
+The block of HTML text that will be disected
+
+=cut
+
 
 sub splitHeadBody {
     my $html = shift;

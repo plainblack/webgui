@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 11;
+my $tests = 19;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -63,10 +63,31 @@ $survey->responseIdCookies(0);
 my $responseId = $survey->responseId;
 my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
 is($s->getId, $survey->getId, 'newByResponseId returns same Survey');
+is($s->get('maxResponsesPerUser'), 1, 'maxResponsesPerUser defaults to 1');
+ok($s->canTakeSurvey, '..which means user can take survey');
 
-#for my $address (@{ $survey->responseJSON->surveyOrder }) {
-#    diag (Dumper $address);
-#}
+# Complete Survey
+$s->surveyEnd();
+
+# Uncache canTake
+delete $s->{canTake};
+delete $s->{responseId};
+$s->responseIdCookies(0);
+ok(!$s->canTakeSurvey, 'Cannot take survey a second time (maxResponsesPerUser=1)');
+cmp_deeply($s->responseId, undef, '..and similarly cannot get responseId');
+
+# Change maxResponsesPerUser to 2
+$s->update({maxResponsesPerUser => 2});
+delete $s->{canTake};
+ok($s->canTakeSurvey, '..but can take when maxResponsesPerUser increased to 2');
+ok($s->responseId, '..and similarly can get responseId');
+
+# Change maxResponsesPerUser to 0
+$s->update({maxResponsesPerUser => 0});
+delete $s->{canTake};
+delete $s->{responseId};
+ok($s->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
+ok($s->responseId, '..(and similarly for responseId)');
 
 # www_jumpTo
 {

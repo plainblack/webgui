@@ -44,14 +44,23 @@ if (typeof Survey === "undefined") {
                 if (response.type === 'displayquestions') {
                     Survey.Form.displayQuestions(response);
                 }
-                else 
+                else{ 
                     if (response.type === 'forward') {
-                        //YAHOO.log("going to "+response.url);
-                        location.href = response.url;
+                        var url;
+                        if(response.url.match(/http/)){
+                            url = response.url;
+                        }else{
+                            url = location.protocol+"//"+location.host+"/"+response.url;
+                        }
+                        window.location = url;
+                    }
+                    else if(response.type === 'summary'){
+                        Survey.Form.showSummary(response.summary);    
                     }
                     else {
                         alert("bad response");
                     }
+                }
             },
             failure: function(o){
                 callMade = 0;
@@ -62,6 +71,10 @@ if (typeof Survey === "undefined") {
                     alert("Last request failed " + o.statusText);
                 }
             }
+        },
+        submitSummary: function(data,functionName){
+            var sUrl = "?func=loadQuestions&shownSummary=1";
+            request(sUrl, this.callback, null, null, null);
         },
         callServer: function(data, functionName, form, hasFile){
             var postData;

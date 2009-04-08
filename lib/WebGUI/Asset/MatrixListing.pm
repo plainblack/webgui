@@ -304,6 +304,14 @@ sub getEditForm {
         -hoverHelp      =>$i18n->get("description description"),
         -value          =>$self->getValue('description'),
         );
+    if ($self->getParent->canEdit) {
+        $form->user(
+            name        =>"ownerUserId",
+            value       =>$self->getValue('ownerUserId'),
+            label       =>$i18n->get('maintainer label'),
+            hoverHelp   =>$i18n->get('maintainer description'),
+            );
+    }
     $form->text(        
         -name           =>'version',
         -defaultValue   =>undef,
@@ -335,21 +343,17 @@ sub getEditForm {
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
         $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
-        my $attributes;
-        if ($session->form->process('func') eq 'add'){
-            $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
-                [$category,$matrixId]);
-        }
-        else{
-            $attributes = $db->read("select * from Matrix_attribute as attribute 
-                left join MatrixListing_attribute as listing using(attributeId) 
-                where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
-                [$self->getId,$category,$matrixId]);
-        }
+        my $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
+            [$category,$matrixId]);
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label}     = $attribute->{name};
             $attribute->{subtext}   = $attribute->{description};
             $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
+            unless($session->form->process('func') eq 'add'){
+                $attribute->{value} = $db->quickScalar("select value from MatrixListing_attribute 
+                    where attributeId = ? and matrixId = ? and matrixListingId = ?",
+                    [$attribute->{attributeId},$matrixId,$self->getId]);
+            }
             if($attribute->{fieldType} eq 'Combo'){
                 my %options;
                 tie %options, 'Tie::IxHash';
@@ -559,7 +563,7 @@ sub setRatings {
         
         my $half    = round($count/2);
         my $mean    = $sum / ($count || 1);
-        my $median  = $db->quickScalar("select rating $sql limit $half,$half",[$self->getId,$category]);
+        my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$self->getId,$category]);
         
         $db->write("replace into MatrixListing_ratingSummary 
             (listingId, category, meanValue, medianValue, countValue, assetId) 
@@ -570,7 +574,7 @@ sub setRatings {
 
 #-------------------------------------------------------------------
 
-=head2 view ( hasRated )
+=head2 updateScore ( )
 
 Updates the score of a MatrixListing. 
 

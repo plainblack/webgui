@@ -88,6 +88,17 @@ sub handler {
 }
     
 #-------------------------------------------------------------------    
+
+=head2 formatXML ( content ) 
+
+Escape XML entities, &, <, >, ' and ".
+
+=head3 content
+
+The content that will have XML entities escaped.
+
+=cut
+
 sub formatXML {
 	my $content = shift;
 	$content =~ s/&/&amp;/g;

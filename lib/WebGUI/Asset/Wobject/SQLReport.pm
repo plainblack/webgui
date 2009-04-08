@@ -311,7 +311,7 @@ sub getEditForm {
 		);
 	
 	# javascript
-	$self->session->style->setScript("/extras/wobject/SQLReport/editFormDownload.js");
+	$self->session->style->setScript($self->session->url->extras("wobject/SQLReport/editFormDownload.js"), {type => 'text/javascript',});
 	
 	### /DOWNLOAD
 	

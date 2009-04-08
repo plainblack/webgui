@@ -448,6 +448,18 @@ sub getToolbar {
 
 
 #-------------------------------------------------------------------
+
+=head2 getRichEditor ( $nameId )
+
+Return the javascript needed to make the Rich Editor.
+
+=head3 $nameId
+
+The id for the rich editor, should be unique enough to be used as the id parameter
+for a HTML tag.
+
+=cut
+
 sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor'));
@@ -582,6 +594,13 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Override the method from Asset.pm to change the title of the screen.
+
+=cut
+
 sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;

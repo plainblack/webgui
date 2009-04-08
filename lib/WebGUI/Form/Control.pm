@@ -196,6 +196,9 @@ sub definition {
 		idPrefix=>{
 			defaultValue=>undef
 			},
+        allowEmpty=>{
+            defaultValue => 0,
+        },
     });
 	return $definition;
 }
@@ -686,7 +689,7 @@ Renders the form field to HTML as a hidden field rather than whatever field type
 sub toHtmlAsHidden {
 	my $self = shift;
         return '<input type="hidden" name="'.$self->get("name").'" value="'.
-            $self->fixQuotes($self->fixMacros($self->fixSpecialCharacters($self->getOriginalValue()))).'" />'."\n";
+            $self->fixQuotes($self->fixMacros($self->fixSpecialCharacters(scalar $self->getOriginalValue()))).'" />'."\n";
 }
 
 #-------------------------------------------------------------------

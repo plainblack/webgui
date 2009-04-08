@@ -161,9 +161,9 @@ sub acceptsFriendsRequests {
     return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
 
     my $me     = WebGUI::Friends->new($session,$self);
-    my $friend = WebGUI::Friends->new($session,$user);
-
     return 0 if ($me->isFriend($user->userId));  #Already a friend
+
+    my $friend = WebGUI::Friends->new($session,$user);
     return 0 if ($me->isInvited($user->userId) || $friend->isInvited($self->userId)); #Invitation sent by one or the other
 
     return $self->profileField('ableToBeFriend'); #Return profile setting
@@ -594,7 +594,13 @@ sub hasFriends {
 }
 
 #-------------------------------------------------------------------
-# This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=head2 identifier
+
+This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=cut
+
 sub identifier {
         my ($self, $value);
         $self = shift;
@@ -635,8 +641,7 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 =cut
 
 sub isInGroup {
-   my (@data, $groupId);
-   my ($self, $gid, $secondRun) = @_;
+   my ($self, $gid) = @_;
    $gid = 3 unless $gid;
    my $uid = $self->userId;
    ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
@@ -997,11 +1002,12 @@ sub session {
 
 =head2 setProfileFieldPrivacySetting ( settings ) 
 
-Sets the profile field privacy settings
+Sets the profile field privacy settings.  This updates the the db and
+the internally cached settings.  Valid settings are "all", "none" or "friends".
 
 =head3 settings
 
-hash ref containing the field and it's corresponding privacy setting
+Hash ref containing fields and their corresponding privacy settings
 
 =cut
 

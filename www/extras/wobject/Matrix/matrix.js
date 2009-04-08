@@ -1,7 +1,7 @@
 YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
         this.formatUrl = function(elCell, oRecord, oColumn, sData) {
-            elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
+	     elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
         };
 	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
 		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
@@ -45,51 +45,43 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(4)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(5)); 
 
+	if(document.getElementById("sortByViews")){
 	var btnSortByViews = new YAHOO.widget.Button("sortByViews");
         btnSortByViews.on("click", function(e) {
 		this.myDataTable.sortColumn(this.myDataTable.getColumn(2)); 
 		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=views");
         },this,true);
+	}
 
+	if(document.getElementById("sortByClicks")){
 	var btnSortByClicks = new YAHOO.widget.Button("sortByClicks");
         btnSortByClicks.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(3)); 
 		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=clicks");
         },this,true);
-
+	}
+	
+	if(document.getElementById("sortByCompares")){
 	var btnSortByCompares = new YAHOO.widget.Button("sortByCompares");
         btnSortByCompares.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(4)); 
 		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=compares");
         },this,true);
+	}
 
+	if(document.getElementById("sortByUpdated")){
 	var btnSortByUpdated = new YAHOO.widget.Button("sortByUpdated");
         btnSortByUpdated.on("click", function(e) {
 	    this.myDataTable.sortColumn(this.myDataTable.getColumn(5)); 
 		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=lastUpdated");
         },this,true);
+	}
 
         var myCallback = function() {
             this.set("sortedBy", null);
             this.onDataReturnAppendRows.apply(this,arguments);
         };
 	
-	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
-        btnCompare.on("click", function(e) {
-		window.document.forms['doCompare'].submit();
-        },this,true);
-	var btnCompare2 = new YAHOO.widget.Button("compare2",{disabled:true,id:"compareButton2"});
-        btnCompare2.on("click", function(e) {
-		window.document.forms['doCompare'].submit();
-        },this,true);
-
-	var btnSearch = new YAHOO.widget.Button("search");
-        btnSearch.on("click", function(e) {
-		window.location.href = matrixUrl + '?func=search';
-	},this,true);
-
-	window.compareDataTable = this.myDataTable;
-
 	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
@@ -117,6 +109,30 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			}
 		}
 	}
+	
+	if(document.getElementById("compare")){
+	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
+        btnCompare.on("click", function(e) {
+		window.document.forms['doCompare'].submit();
+        },this,true);
+	}
+
+	if(document.getElementById("compare2")){
+	var btnCompare2 = new YAHOO.widget.Button("compare2",{disabled:true,id:"compareButton2"});
+        btnCompare2.on("click", function(e) {
+		window.document.forms['doCompare'].submit();
+        },this,true);
+	}
+
+	if(document.getElementById("search")){
+	var btnSearch = new YAHOO.widget.Button("search");
+        btnSearch.on("click", function(e) {
+		window.location.href = matrixUrl + '?func=search';
+	},this,true);
+	}
+
+	window.compareDataTable = this.myDataTable;
+
     };
 });
 

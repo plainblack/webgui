@@ -23,12 +23,12 @@ use WebGUI::Inbox;
 
 =head1 NAME
 
-Package WebGUI::Workflow::Activity::NotifyAboutUser
+Package WebGUI::Workflow::Activity::NotifyAboutLowStock
 
 =head1 DESCRIPTION
 
-Takes a user object and sends out a message. Can use macros in message, to and subject
-fields.
+Notify group about users when Products fall below a configurable amount of stock
+in inventory.
 
 =head1 SYNOPSIS
 

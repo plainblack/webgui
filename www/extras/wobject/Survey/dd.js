@@ -93,7 +93,7 @@ YAHOO.extend(Survey.DDList, YAHOO.util.DDProxy, {
         // notifications for the list.
         if (destEl.nodeName.toLowerCase() == "li") {
 currentDest = destEl;
-console.log(destEl);
+YAHOO.log(destEl);
             var orig_p = srcEl.parentNode;
             var p = destEl.parentNode;
 

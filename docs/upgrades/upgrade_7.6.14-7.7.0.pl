@@ -32,17 +32,14 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addAccountActivationTemplateToSettings( $session );
 addGroupToAddToMatrix( $session );
 addScreenshotTemplatesToMatrix( $session );
 surveyDoAfterTimeLimit($session);
 surveyRemoveResponseTemplate($session);
 surveyEndWorkflow($session);
 installAssetHistory($session);
-
-# Story Manager
-installStoryManagerTables($session);
-sm_upgradeConfigFiles($session);
-sm_updateDailyWorkflow($session);
+addMinimumCartCheckoutSetting( $session );
 
 # Passive Analytics
 pa_installLoggingTables($session);
@@ -57,6 +54,16 @@ addTransactionItemFlags( $session );
 createShopAcccountPluginSettings( $session );
 
 finish($session); # this line required
+
+
+#----------------------------------------------------------------------------
+sub addAccountActivationTemplateToSettings {
+    my $session = shift;
+    print "\tAdding account activation template to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings (name, value) values ('webguiAccountActivationTemplate','PBtmpl0000000000000016')");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addGroupToAddToMatrix {
@@ -115,7 +122,7 @@ sub installAssetHistory {
     print "\tAdding Asset History content handler... \n" unless $quiet;
     ##Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
-    if (! isIn('WebGUI::Content::Handler', @{ $contentHandlers }) ) {
+    if (! isIn('WebGUI::Content::AssetHistory', @{ $contentHandlers }) ) {
         my @newHandlers = ();
         foreach my $handler (@{ $contentHandlers }) {
             push @newHandlers, $handler;
@@ -307,9 +314,19 @@ sub addTransactionItemFlags {
 #----------------------------------------------------------------------------
 sub createShopAcccountPluginSettings {
     my $session = shift;
-    print "Creating default settings for the account plugin..." unless $quiet;
+    print "\tCreating default settings for the account plugin..." unless $quiet;
 
     $session->setting->add('shopMySalesTemplateId', '-zxyB-O50W8YnL39Ouoc4Q');
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addMinimumCartCheckoutSetting {
+    my $session = shift;
+    print "\tAdding setting for minimum cart checkout..." unless $quiet;
+
+    $session->setting->add( 'shopCartCheckoutMinimum', '0.00' );
 
     print "Done.\n" unless $quiet;
 }
@@ -322,97 +339,6 @@ sub createShopAcccountPluginSettings {
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
-
-sub installStoryManagerTables {
-    my ($session) = @_;
-    print "\tAdding Story Manager tables... " unless $quiet;
-    my $db = $session->db;
-    $db->write(<<EOSTORY);
-CREATE TABLE Story (
-    assetId      CHAR(22) BINARY NOT NULL,
-    revisionDate BIGINT          NOT NULL,
-    headline     CHAR(255),
-    subtitle     CHAR(255),
-    byline       CHAR(255),
-    location     CHAR(255),
-    highlights   TEXT,
-    story        MEDIUMTEXT,
-    photo        LONGTEXT,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOSTORY
-
-    $db->write(<<EOARCHIVE);
-CREATE TABLE StoryArchive (
-    assetId             CHAR(22) BINARY NOT NULL,
-    revisionDate        BIGINT          NOT NULL,
-    storiesPerFeed      INTEGER,
-    storiesPerPage      INTEGER,
-    groupToPost         CHAR(22) BINARY,
-    templateId          CHAR(22) BINARY,
-    storyTemplateId     CHAR(22) BINARY,
-    editStoryTemplateId CHAR(22) BINARY,
-    archiveAfter        INT(11),
-    richEditorId        CHAR(22) BINARY,
-    approvalWorkflowId  CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOARCHIVE
-
-    $db->write(<<EOTOPIC);
-CREATE TABLE StoryTopic (
-    assetId         CHAR(22) BINARY NOT NULL,
-    revisionDate    BIGINT          NOT NULL,
-    storiesPer      INTEGER,
-    storiesShort    INTEGER,
-    templateId      CHAR(22) BINARY,
-    storyTemplateId CHAR(22) BINARY,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOTOPIC
-
-    print "DONE!\n" unless $quiet;
-}
-
-sub sm_upgradeConfigFiles {
-    my ($session) = @_;
-    print "\tAdding Story Manager to config file... " unless $quiet;
-    my $config = $session->config;
-    $config->addToHash(
-        'assets',
-        'WebGUI::Asset::Wobject::StoryTopic' => {
-            'category' => 'community'
-        },
-    );
-    $config->addToHash(
-        'assets',
-        "WebGUI::Asset::Wobject::StoryArchive" => {
-            "isContainer" => 1,
-            "category" => "community"
-        },
-    );
-    my $activities = $config->get('workflowActivities');
-    my $none = $activities->{None};
-    if (!isIn('WebGUI::Workflow::Activity::ArchiveOldStories', @{ $none })) {
-        unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
-    }
-    $config->set('workflowActivities', $activities);
-    print "DONE!\n" unless $quiet;
-}
-
-sub sm_updateDailyWorkflow {
-    my ($session) = @_;
-    print "\tAdding Archive Old Stories to Daily Workflow... " unless $quiet;
-    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
-    foreach my $activity (@{ $workflow->getActivities }) {
-        return if $activity->getName() eq 'WebGUI::Workflow::Activity::ArchiveOldStories';
-    }
-    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
-    $activity->set('title',       'Archive Old Stories');
-    $activity->set('description', 'Archive old stories, based on the settings of the Story Archives that own them');
-    print "DONE!\n" unless $quiet;
-}
-
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

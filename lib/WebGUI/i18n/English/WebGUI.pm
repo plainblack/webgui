@@ -4203,9 +4203,9 @@ LongTruncOk=1</p>
     },
 
     'WebGUI password recovery' => {
-        message     => q{WebGUI password recovery},
+        message     => q{Password recovery},
         lastUpdated => 0,
-        context     => q{Title of the template created by the Site Setup screen},
+        context     => q{Subject of the email that is sent for password recovery},
     },
 
     'session length' => {
@@ -4338,6 +4338,12 @@ Users may override this setting in their profile.
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
         },
+	'Ad Space control name' => {
+		message => q|Ad Space|,
+		lastUpdated => 0,
+		context => q|name for the Ad Space control|
+	},
+
 };
 
 1;

@@ -11,7 +11,8 @@ package WebGUI::Asset::Wobject::Gallery;
 #-------------------------------------------------------------------
 
 use strict;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use JSON;
 use Tie::IxHash;
 use WebGUI::International;
@@ -338,7 +339,7 @@ sub definition {
         properties          => \%properties,
     };
 
-    return $class->SUPER::definition($session, $definition);
+    return $class->next::method($session, $definition);
 }
 
 #----------------------------------------------------------------------------
@@ -366,7 +367,7 @@ sub addChild {
         return undef;
     }
 
-    return $self->SUPER::addChild( $properties, @_ );
+    return $self->next::method( $properties, @_ );
 }
 
 #----------------------------------------------------------------------------
@@ -740,6 +741,41 @@ sub getPreviousAlbumId {
     }
 }
 
+#-------------------------------------------------------------------
+
+=head2 getRssFeedItems ()
+
+Returns an array reference of hash references. Each hash reference has a title,
+description, link, and date field. The date field can be either an epoch date, an RFC 1123
+date, or a ISO date in the format of YYYY-MM-DD HH:MM::SS. Optionally specify an
+author, and a guid field.
+
+=cut
+
+sub getRssFeedItems {
+    my $self        = shift;
+
+    my $p
+        = $self->getAlbumPaginator( { 
+            perpage     => $self->get('itemsPerFeed'),
+        } );
+    
+    my $var = [];
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $self->session, $assetId );
+        push @{ $var }, {
+            'link'          => $asset->getUrl,
+            'guid'          => $asset->{_properties}->{ 'assetId' },
+            'title'         => $asset->getTitle,
+            'description'   => $asset->{_properties}->{ 'description' },
+            'date'          => $asset->{_properties}->{ 'creationDate' },
+            'author'        => WebGUI::User->new($self->session, $asset->{_properties}->{ 'ownerUserId' })->username
+        };
+    }
+    
+    return $var;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 getSearchPaginator ( rules )
@@ -934,7 +970,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->SUPER::prepareView();
+    $self->next::method();
 
     if ( $self->get("viewDefault") eq "album" && $self->get("viewAlbumAssetId") && $self->get("viewAlbumAssetId")
 ne 'PBasset000000000000001') {
@@ -1042,7 +1078,7 @@ sub www_add {
         return $self->processStyle($i18n->get("error add uncommitted"));
     }
 
-    return $self->SUPER::www_add( @_ );
+    return $self->next::method( @_ );
 }
 
 #----------------------------------------------------------------------------

@@ -139,7 +139,7 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
+ 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
 	my ($style, $url) = $self->session->quick(qw(style url));
@@ -194,6 +194,14 @@ sub toHtml {
 	}
 	return $out;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml
+
+Returns the form value as text, encoding HTML entities.
+
+=cut
 
 sub getValueAsHtml {
     my $self = shift;

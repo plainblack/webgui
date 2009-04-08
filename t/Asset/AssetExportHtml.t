@@ -770,6 +770,10 @@ $exportPath->rmtree;
 );
 
 my $numberCreatedAll = scalar @createdFiles;
+push @createdFiles,
+    [ qw/ the_latest_news the_latest_news.atom /],
+    [ qw/ the_latest_news the_latest_news.rss /],
+;
 
 # turn them into Path::Class::File objects
 my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
@@ -870,6 +874,11 @@ $gettingStarted->update({ isExportable => 0 });
     [ qw/ documentation  free-documentation       index.html /],
 );
 my $numberCreated = scalar @createdFiles;
+push @createdFiles,
+    [ qw/ the_latest_news the_latest_news.atom /],
+    [ qw/ the_latest_news the_latest_news.rss /],
+;
+    
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );

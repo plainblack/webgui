@@ -245,7 +245,6 @@ sub getEditFormUploadControl {
     return $html;
 }
 
-
 #-------------------------------------------------------------------
 sub getFileUrl {
 	my $self = shift;
@@ -559,10 +558,11 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	
+
 	# Check to make sure it's not in the trash or some other weird place
 	if ($self->get("state") ne "published") {
 		my $i18n = WebGUI::International->new($self->session,'Asset_File');

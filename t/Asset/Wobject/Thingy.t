@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::PseudoRequest;
-use Test::More tests => 16; # increment this value for each test you create
+use Test::More tests => 17; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Thingy;
@@ -191,6 +191,14 @@ my ($fieldLabel, $columnType, $Null, $Key, $Default, $Extra) = $session->db->qui
 
 is($fieldLabel,"field_".$fieldId,"A column for the new field Field_$fieldId exists.");
 is($columnType,"longtext","The columns is the right type");
+
+# Test duplicating a Thing
+
+my $copyThingId = $thingy->duplicateThing($thingId);
+
+$isValidId = $session->id->valid($copyThingId);
+
+is($isValidId,1,"duplicating a Thing: duplicateThing returned a valid id: ".$copyThingId);
 
 # Test adding, editing, getting and deleting thing data
 

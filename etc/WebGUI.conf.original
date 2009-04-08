@@ -493,6 +493,9 @@
    "WebGUI::Asset::Wobject::DataForm" : {
       "category" : "basic"
    },
+   "WebGUI::Asset::Sku::Ad" : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
@@ -819,6 +822,7 @@
         "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags",
         "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
         "WebGUI::Workflow::Activity::PurgeOldTrash",
+        "WebGUI::Workflow::Activity::RemoveOldCarts",
         "WebGUI::Workflow::Activity::SendQueuedMailMessages",
         "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
         "WebGUI::Workflow::Activity::SyncProfilesToLdap",

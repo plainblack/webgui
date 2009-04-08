@@ -652,47 +652,68 @@ Braces, quotes and all.  You simply replace "key1"/"value1" with your own name/v
     'canEditThings' => {
         message => q|Is true if the current user can view the Things that are defined for this Thingy Asset|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'things_loop' => {
         message => q|A loop containing the Things that are defined for this Thingy Asset, with links to management
 functions for those Things|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'thing_editIcon' => {
         message => q|An icon with a link to the edit screen for this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_editUrl' => {
         message => q|A link to the edit screen for this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'thing_copyIcon' => {
+        message => q|An icon with a link to copy this Thing|,
+        lastUpdated => 0,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'thing_copyUrl' => {
+        message => q|A link to copy this Thing|,
+        lastUpdated => 0,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_viewIcon' => {
         message => q|An icon with a link to default screen for this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_searchUrl' => {
         message => q|A link to the search screen for this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_addUrl' => {
         message => q|A link to the add screen for this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_deleteIcon' => {
         message => q|An icon with a link to delete this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_deleteUrl' => {
         message => q|A link to delete this Thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'thing_label' => {
@@ -708,31 +729,37 @@ functions for those Things|,
     'manage_url' => {
         message => q|This Url will lead to a screen to manage the Things in this Thingy Asset.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'addThing_url' => {
         message => q|This Url leads to the screen to add a new Thing to this Thingy Asset.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'delete_url' => {
         message => q|The Url to delete the current thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'delete_confirm' => {
         message => q|This contains an onclick property for the delete link that adds a javascript confirmation|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'search_url' => {
         message => q|Url that leads to the search screen|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'add_url' => {
         message => q|Url to the add screen for this thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'editScreenTitle' => {
@@ -749,16 +776,19 @@ functions for those Things|,
         message => q|A loop containing error information, for instance if someone doesn't fill out a required
 field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'error_message' => {
         message => q|An error message indicating what the user might have done wrong.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_loop' => {
         message => q|A loop containing the visible fields for this thing|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'listOfThings' => {
@@ -788,73 +818,87 @@ field.|,
     'field_isHidden' => {
         message => q|A conditional indicating whether this field is supposed to be hidden.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_isRequired' => {
         message => q|A conditional indicating whether this field is required.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_isVisible' => {
         message => q|A conditional indicating whether this field is supposed to be visible but not editable.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_form' => {
         message => q|The form element for this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_name' => {
         message => q|The name of the form element for this field|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_label' => {
         message => q|The label of this field|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_url' => {
         message => q|An optional url that this field should link to, used i.e. for fields in other things.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_value' => {
         message => q|The value of this field|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_pretext' => {
         message => q|An extra description of the field so that users know what to put in the field. To be
 displayed above/before the form element.|,
         lastUpdated => 1224518799,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'field_subtext' => {
         message => q|A description of the field so that users know what to put in the field. To be displayed
 below/after the form element.|,
         lastUpdated => 1224518799,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'form_start' => {
         message => q|The start tag of the form|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'form_submit' => {
         message => q|A form button to submit the form data.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'form_end' => {
         message => q|The end of the form|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'edit_url' => {
         message => q|Url to the current things edit screen.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'viewScreenTitle' => {
@@ -865,12 +909,14 @@ below/after the form element.|,
     'import_url' => {
         message => q|Url to import data into this Thing from a csv file|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'export_url' => {
         message => q|Url to export the data in a search result into a csv file. This is only available after a
 search has been done.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchScreenTitle' => {
@@ -886,86 +932,103 @@ search has been done.|,
     'searchFields_loop' => {
         message => q|A loop that contains the fields that are searchable|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'searchFields_label' => {
         message => q|The label of a searchable field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchFields_fieldId' => {
         message => q|The fieldId of a searchable field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchFields_form' => {
         message => q|A form element corresponding to this fields fieldType to search this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchFields_textForm' => {
         message => q|A text input to search this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchFields_is__fieldType__' => {
         message => q|A boolean indicating wether this field is of type __fieldType__. The first letter of __fieldType__ is always uppercase. Example: for a select box the value of &lt;tmpl_var searchFields_isSelectBox&gt; is true.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'displayInSearchFields_loop' => {
         message => q|A loop containing the fields that are displayed in the search results.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'displayInSearchFields_orderByUrl' => {
         message => q|Url to order the search results by this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'displayInSearchFields_label' => {
         message => q|The label of this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'displayInSearchFields_fieldId' => {
         message => q|The fieldId of this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchResult_loop' => {
         message => q|A loop containing the search results.|,
         lastUpdated => 1206472126,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'searchResult_id' => {
         message => q|The id of a search result.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchResult_view_url' => {
         message => q|Url to the view screen of this search result|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchResult_edit_icon' => {
         message => q|Edit icon that links to the edit screen of this search result.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchResult_delete_icon' => {
         message => q|Delete icon to delete this search result.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'searchResult_field_loop' => {
         message => q|A loop containing the fields that are to be displayed for this search result.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_loop for the template help.|,
     },
 
     'field_id' => {
         message => q|The id of this field.|,
         lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'no field values message' => {
@@ -1011,6 +1074,7 @@ search has been done.|,
     'view_url' => {
         message => q|The URL that will take the user back to the Thingy default view.|,
         lastUpdated => 1227737813,
+        context => q|Description of a tmpl_var for the template help.|,
     },
 
     'other thing field missing message' => {
