@@ -807,6 +807,17 @@ selectBox.</p>|
         message => q|Matrix Fieldtype|,
     },
 
+    'too many message' => {
+        lastUpdated => 0,
+        message => q|You tried to compare more than your maximum number of listings.|,
+        context => q|A message shown to the user when they have selected too many listings to compare.|,
+    },
+
+    'too few message' => {
+        lastUpdated => 0,
+        message => q|You tried to compare only one listing. If you want to view just one listing, click on its name.|,
+        context => q|A message shown to the user when they have selected only one listing to compare.|,
+    }
 };
 
 1;
