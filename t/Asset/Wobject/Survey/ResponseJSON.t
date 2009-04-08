@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 91;
+my $tests = 59;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -323,36 +323,6 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 ####################################################
 #
-# parseGotoExpression
-#
-####################################################
-my $c = 'WebGUI::Asset::Wobject::Survey::ResponseJSON';
-throws_ok { $c->parseGotoExpression($session, ) } 'WebGUI::Error::InvalidParam', 'processGotoExpression takes exception to empty arguments';
-is($c->parseGotoExpression($session, q{}),
-    undef, '.. and undef with empty expression');
-is($c->parseGotoExpression($session, 'blah-dee-blah-blah'),
-    undef, '.. and undef with duff expression');
-is($c->parseGotoExpression($session, ':'),
-    undef, '.. and undef with missing target');
-is($c->parseGotoExpression($session, 't1:'),
-    undef, '.. and undef with missing expression');
-cmp_deeply($c->parseGotoExpression($session, 't1: 1'),
-    { target => 't1', expression => '1'}, 'works for simple numeric expression');
-cmp_deeply($c->parseGotoExpression($session, 't1: 1 - 23 + 456 * (78 / 9.0)'),
-    { target => 't1', expression => '1 - 23 + 456 * (78 / 9.0)'}, 'works for expression using all algebraic tokens');
-cmp_deeply($c->parseGotoExpression($session, 't1: 1 != 3 <= 4 >= 5'),
-    { target => 't1', expression => '1 != 3 <= 4 >= 5'}, q{..works with other ops too});
-cmp_deeply($c->parseGotoExpression($session, 't1: $q1 + $q2 * $q3 - 4', { q1 => 11, q2 => 22, q3 => 33}),
-    { target => 't1', expression => '11 + 22 * 33 - 4'}, 'substitues q for value');
-cmp_deeply($c->parseGotoExpression($session, 't1: $a silly var name * 10 + $another var name', { 'a silly var name' => 345, 'another var name' => 456}),
-    { target => 't1', expression => '345 * 10 + 456'}, '..it even works for vars with spaces in their names');
-cmp_deeply($c->parseGotoExpression($session, 't1: ($A < 4) and ($B < 4) or ($B > 6) && 1 || 1', { A => 2, B => 3}),
-    { target => 't1', expression => '(2 < 4) and (3 < 4) or (3 > 6) && 1 || 1'}, 'Boolean expressions ok');
-cmp_deeply($c->parseGotoExpression($session, 't1: $a = 1; $a++; $a > 1'),
-    { target => 't1', expression => '$a = 1; $a++; $a > 1'}, 'Assignment and compound statements ok too');
-
-####################################################
-#
 # processGotoExpression
 #
 ####################################################
@@ -368,53 +338,22 @@ $rJSON->recordResponses({
     '1-0-0'        => 'My chosen answer',
     '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
 });
-is($rJSON->processGotoExpression('blah-dee-blah-blah'), undef, 'invalid gotoExpression is false');
-ok($rJSON->processGotoExpression('s0: $s1q0 == 3'), '3 == 3 is true');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 == 4'), '3 == 4 is false');
-ok($rJSON->processGotoExpression('s0: $s1q0 != 2'), '3 != 2 is true');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 != 3'), '3 != 3 is false');
-ok($rJSON->processGotoExpression('s0: $s1q0 > 2'), '3 > 2 is true');
-ok($rJSON->processGotoExpression('s0: $s1q0 < 4'), '3 < 2 is true');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 >= 4'), '3 >= 4 is false');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 <= 2'), '3 <= 2 is false');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 < 2 or $s1q0 < 1'), '3 < 2 || 3 < 1 is false');
-ok($rJSON->processGotoExpression('s0: $s1q0 < 2 or $s1q0 < 5'), '3 < 2 || 3 < 5 is true');
-ok(!$rJSON->processGotoExpression('s0: $s1q0 == 4 and 1 == 1'), '3 == 4 && 1 == 1 is false');
-ok($rJSON->processGotoExpression('s0: $s1q0 == 3 and 1 == 1'), '3 == 3 && 1 == 1 is true');
-ok(!$rJSON->processGotoExpression('s0: ($s1q0 > 1 ? 10 : 11) == 11'), '(3 > 1 ? 10 : 11) == 11 is false');
-ok($rJSON->processGotoExpression('s0: ($s1q0 > 1 ? 10 : 11) == 10'), '(3 > 1 ? 10 : 11) == 10 is true');
-ok($rJSON->processGotoExpression('s0: $a=1; $a++; $a++; $a *= 2; $a == 6'), 'Assignment and compound statements ok');
-ok(!$rJSON->processGotoExpression('s0: $a=1; $a++; $a++; $a *= 2; $a == 7'), '..negative ones too');
-ok($rJSON->processGotoExpression('s0: @a = (1..10); $a[0] == 1 && @a == 10'), 'arrays work too');
-ok($rJSON->processGotoExpression('s0: if ($s1q0 == 3) { 1 } else { 0 }'), 'if statements work');
-ok(!$rJSON->processGotoExpression('s0: if (time) { 1 } else { 1 }'), 'time and other things not allowed');
-ok($rJSON->processGotoExpression('s0: $q2 = 5; $avg = ($s1q0 + $q2) / 2; $avg == 4'), 'look ma, averages!');
+is($rJSON->lastResponse, 4, 'lastResponse at 4 before any gotoExpressions processed');
 
-cmp_deeply($rJSON->processGotoExpression(<<'END_EXPRESSION'), {target => 's2', expression => '3 == 3'}, 'first true expression wins');
-s0: $s1q0 <= 2
-s2: $s1q0 == 3
-END_EXPRESSION
+$rJSON->processGotoExpression('blah-dee-blah-blah {');
+is($rJSON->lastResponse, 4, '..unchanged after duff expression');
 
-ok(!$rJSON->processGotoExpression(<<'END_EXPRESSION'), 'but multiple false expressions still false');
-s0: $s1q0 <= 2
-s2: $s1q0 == 345
-END_EXPRESSION
+$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0');
+is($rJSON->lastResponse, 4, '..unchanged after false expression');
 
-$rJSON->processGotoExpression('s0: $s1q0 == 3');
-is($rJSON->lastResponse(), -1, '.. lastResponse changed to -1 due to processGoto(s0)');
-$rJSON->processGotoExpression('s2: $s1q0 == 3');
-is($rJSON->lastResponse(), 4, '.. lastResponse changed to 4 due to processGoto(s2)');
+$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0; jump { var(s1q0) == 5} s0;');
+is($rJSON->lastResponse, 4, '..similarly for multi-statement false expression');
 
-$rJSON->survey->question([1,0])->{questionType} = 'Text';
-$rJSON->lastResponse(2);
-$rJSON->recordResponses({
-    '1-0-0'        => 'My text answer',
-});
-is( $rJSON->responses->{'1-0-0'}->{value}, 'My text answer', 'Text type uses entered text' );
+$rJSON->processGotoExpression('jump { var(s1q0) == 3} s0');
+is($rJSON->lastResponse, -1, '..but updated to s0 after true expression');
 
-# Coming soon.
-#ok($rJSON->processGotoExpression('s0: $s1q0 eq "Text answer"; print "hola!\n"'), 'text match');
-#ok(!$rJSON->processGotoExpression('s0: $s1q0 eq "Not the right text answer"'), 'negative text match');
+$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0; jump { var(s1q0) == 3} s2');
+is($rJSON->lastResponse, 4, '..changed again for multi-statement true expression');
 
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);

@@ -1222,13 +1222,13 @@ sub validateSurvey{
         my $sNum = $s + 1;
         my $section = $self->section([$s]);
         if(! $self->validateGoto($section,$goodTargets)){
-            push @messages,"Section $sNum has invalid Jump target: $section->{goto}";
+            push @messages,"Section $sNum has invalid Jump target: \"$section->{goto}\"";
         }
         if(! $self->validateGotoInfiniteLoop($section)){
-            push(@messages,"Section $sNum jumps to itself.");
+            push @messages,"Section $sNum jumps to itself.";
         }
-        if(! $self->validateGotoExpression($section,$goodTargets)){
-            push(@messages,"Section $sNum has invalid Jump Expression: $section->{gotoExpression}");
+        if(my $error = $self->validateGotoExpression($section,$goodTargets)){
+            push @messages,"Section $sNum has invalid Jump Expression: \"$section->{gotoExpression}\". Error: $error";
         }
         if (my $var = $section->{variable}) {
             if (my $count = $duplicateTargets->{$var}) {
@@ -1242,19 +1242,19 @@ sub validateSurvey{
             my $qNum = $q + 1;
             my $question = $self->question([$s,$q]);
             if(! $self->validateGoto($question,$goodTargets)){
-                push(@messages,"Section $sNum Question $qNum has invalid Jump target: $question->{goto}");
+                push @messages,"Section $sNum Question $qNum has invalid Jump target: \"$question->{goto}\"";
             }
             if(! $self->validateGotoInfiniteLoop($question)){
-                push(@messages,"Section $sNum Question $qNum jumps to itself.");
+                push @messages,"Section $sNum Question $qNum jumps to itself.";
             }
-            if(! $self->validateGotoExpression($question,$goodTargets)){
-                push(@messages,"Section $sNum Question $qNum has invalid Jump Expression: $question->{gotoExpression}");
+            if(my $error = $self->validateGotoExpression($question,$goodTargets)){
+                push @messages,"Section $sNum Question $qNum has invalid Jump Expression: \"$question->{gotoExpression}\". Error: $error";
             }
             if($#{$question->{answers}} < 0){
-                push(@messages,"Section $sNum Question $qNum does not have any answers.");
+                push @messages,"Section $sNum Question $qNum does not have any answers.";
             }
             if(! $question->{text} =~ /\w/){
-                push(@messages,"Section $sNum Question $qNum does not have any text.");
+                push @messages,"Section $sNum Question $qNum does not have any text.";
             }
             if (my $var = $question->{variable}) {
                 if (my $count = $duplicateTargets->{$var}) {
@@ -1268,13 +1268,13 @@ sub validateSurvey{
                 my $aNum = $a + 1;
                 my $answer = $self->answer([$s,$q,$a]);
                 if(! $self->validateGoto($answer,$goodTargets)){
-                    push(@messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump target: $answer->{goto}");
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump target: \"$answer->{goto}\"";
                 }
                 if(! $self->validateGotoInfiniteLoop($answer)){
-                    push(@messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.");
+                    push @messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.";
                 }
-                if(! $self->validateGotoExpression($answer,$goodTargets)){
-                    push(@messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump Expression: $answer->{gotoExpression}");
+                if(my $error = $self->validateGotoExpression($answer,$goodTargets)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump Expression: \"$answer->{gotoExpression}\". Error: $error";
                 }
             }
         }
@@ -1301,10 +1301,12 @@ sub validateGotoInfiniteLoop{
 sub validateGotoExpression{
     my $self = shift;
     my $object = shift;
-    return 1 unless $object->{gotoExpression} =~ /\w/;
+    my $goodTargets = shift;
+    return unless $object->{gotoExpression}; 
     
-    # The best we can do is return true/false on whether the gotoExpression parses
-    return WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $object->{gotoExpression});
+    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
+    my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+    return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
 }
 
 =head2 section ($address)

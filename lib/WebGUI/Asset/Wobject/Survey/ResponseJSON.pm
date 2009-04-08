@@ -649,64 +649,21 @@ indicates that we should branch.
 
 =head3 $gotoExpression
 
-The gotoExpression.
-
-A gotoExpression is a string representing a list of expressions (one per line) of the form:
-
- target: expression
- target: expression
- ...
-
-This subroutine iterates through the list, processing each line and, all things being
-well, evaluates the expression. The first expression to evaluate to true triggers a
-call to L<"processGoto">.
-
-The expression should be valid perl. Any section/question variables that you refer to
-should be written as $var, as if your perl code had access to that variable. In reality,
-those variables don't exist - they're substituted in via L<parseGotoExpression> and 
-then the expression is evaluated in a safe compartment.
-
-Here is an example using section variables S1 and S2 as jump targets and question 
-variables Q1-3 in the expression. It jumps to S1 if the user's answer to Q1 has a value 
-of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
-
- S1: $Q1 == 3
- S2: $Q2 + $Q3 < 10
-
-You can do advanced branching by creating your own variables within the expression, for
-example, to branch when the average of 3 questions is greater than 5: 
- S1: $avg = ($Q1 + $Q2 + $Q3) / 3; $avg > 5   
+The gotoExpression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
 
 =cut
-
+    
 sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
-
-    my $responsesByVariableName = $self->responsesByVariableName();
-
-    # Parse gotoExpressions one after the other (first one that's true wins)
-    foreach my $line (split /\n/, $expression) {
-        my $processed = WebGUI::Asset::Wobject::Survey::ResponseJSON->parseGotoExpression($self->session, $line, $responsesByVariableName);
-
-        next if !$processed;
-        
-        # Eval expression in a safe compartment
-        # N.B. Expression does not need access to any variables
-        my $compartment = Safe->new();
-        my $result = $compartment->reval($processed->{expression});
-
-        $self->session->log->warn($@) if $@;            ## no critic
-
-        if ($result) {
-            $self->session->log->debug("Truthy, goto [$processed->{target}]");
-             $self->processGoto($processed->{target});
-             return $processed;
-        } else {
-            $self->session->log->debug('Falsy, not branching');
-            next;
-        }
+    
+    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
+    my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+    if (my $jump = $engine->run($self->session, $expression, { vars => $self->responsesByVariableName} )) {
+        $self->session->log->debug("Hit. Jumping to [$jump]");
+        $self->processGoto($jump);
     }
+    $self->session->log->debug("No hits, falling through");
     return;
 }
 
@@ -784,66 +741,6 @@ sub responsesByVariableName {
         $lookup{$question->{variable}} = $response->{value};
     }
     return \%lookup;
-}
-
-#-------------------------------------------------------------------
-
-=head2 parseGotoExpression( ( $expression, $responses)
-
-Parses a single gotoExpression. Returns undef if processing fails, or the following hashref
-if things work out well:
- { target => $target, expression => $expression }
-
-=head3 $expression
-
-The expression to process
-
-=head3 $responses
-
-Hashref that maps questionNames to response values
-
-=head3 Explanation:
-
-Uses the following simple strategy:
-
-First, parse the expression as:
- target: expression
-
-Replace each "$questionName" with its response value (from the $responses hashref)
-
-=cut
-
-sub parseGotoExpression {
-    my $class       = shift;
-    my ($session, $expression, $responses) = validate_pos(@_, { isa => 'WebGUI::Session'}, { type => SCALAR }, { type => HASHREF, default => {} });
-
-    $session->log->debug("Parsing gotoExpression: $expression");
-
-    my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
-
-    $session->log->debug("Parsed as Target: [$target], Expression: [$rest]");
-
-    if ( !defined $target ) {
-        $session->log->warn('Target undefined');
-        return;
-    }
-
-    if ( !defined $rest || $rest eq q{} ) {
-        $session->log->warn('Expression undefined');
-        return;
-    }
-    
-    # Replace each "$questionName" with its response value
-    while ( my ( $questionName, $response ) = each %{$responses} ) {
-        $rest =~ s/\$$questionName/$response/g;
-    }
-
-    $session->log->debug("Processed as: $rest");
-
-    return {
-        target => $target,
-        expression => $rest,
-    };
 }
 
 #-------------------------------------------------------------------
