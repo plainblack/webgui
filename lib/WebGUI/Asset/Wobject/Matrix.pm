@@ -86,8 +86,16 @@ sub definition {
 	my $definition = shift;
 	my $i18n = WebGUI::International->new($session, 'Asset_Matrix');
 
+    my @groups = $session->db->buildArray("select groupId from groups order by groupId");
+    my @names = $session->db->buildArray("select groupName from groups order by groupId");
+    
+    tie my %maxGroup, 'Tie::IxHash';
+    for (my $i = 0; $i < scalar(@groups); ++$i) {
+        $maxGroup{$groups[$i]} = $names[$i];
+    }
+
 	my %properties;
-	tie %properties, 'Tie::IxHash';
+    tie my %properties, 'Tie::IxHash';
 	%properties = (
 	    templateId =>{
 		    fieldType       =>"template",  
@@ -194,14 +202,6 @@ sub definition {
             hoverHelp       =>$i18n->get('compare color yes description'),
             label           =>$i18n->get('compare color yes label'),
         },
-        categories=>{
-            fieldType       =>"textarea",
-            tab             =>"properties",
-            defaultValue    =>$i18n->get('categories default value'),
-            hoverHelp       =>$i18n->get('categories description'),
-            label           =>$i18n->get('categories label'),
-            subtext         =>$i18n->get('categories subtext'),
-        },
         maxComparisons=>{
             fieldType       =>"integer",
             tab             =>"properties",
@@ -216,8 +216,22 @@ sub definition {
             hoverHelp       =>$i18n->get('max comparisons privileged description'),
             label           =>$i18n->get('max comparisons privileged label'),
         },
+        maxComparisonsGroup=>{
+            fieldType       =>"selectBox",
+            tab             =>"properties",
+            options         =>\%maxGroup,
+            hoverHelp       =>$i18n->get('maxgroup description'),
+            label           =>$i18n->get('maxgroup label'),
+        },
+        maxComparisonsGroupInt=>{
+            fieldType       =>"integer",
+            tab             =>"properties",
+            defaultValue    =>25,
+            hoverHelp       =>$i18n->get('maxgroup per description'),
+            label           =>$i18n->get('maxgroup per label'),
+        },
         groupToAdd=>{
-            fieldType       =>"group",
+            fieldType       =>"selectBox",
             tab             =>"security",
             defaultValue    =>2,
             hoverHelp       =>$i18n->get('group to add description'),
@@ -432,9 +446,13 @@ sub getCompareForm {
     if($self->session->user->isVisitor){
         $maxComparisons = $self->get('maxComparisons');
     }
+    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
+        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    }
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }        
+    # warn(sprintf("maxComparisons: $maxComparisons: %d: %d: %d: %d", $self->session->user->isVisitor, $self->getId, $self->get('maxComparisonsGroupInt'), $self->get('maxComparisonsPrivileged')));
     $form .=  "\n<script type='text/javascript'>\n".
         'var maxComparisons = '.$maxComparisons.";\n".
         "var matrixUrl = '".$self->getUrl."';\n".
@@ -765,9 +783,13 @@ sub www_compare {
     if($self->session->user->isVisitor){
         $maxComparisons = $self->get('maxComparisons');
     }
+    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
+        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    }
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }
+    # warn(sprintf("maxComparisons: $maxComparisons: %d", $self->session->user->isVisitor));
 
     foreach my $listingId (@listingIds){
         my $listingId_safe = $listingId;

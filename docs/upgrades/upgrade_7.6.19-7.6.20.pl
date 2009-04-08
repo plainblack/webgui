@@ -31,9 +31,9 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addMatrixMaxGroup($session);
 
 finish($session); # this line required
-
 
 #----------------------------------------------------------------------------
 # Describe what our function does
@@ -44,6 +44,14 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+#----------------------------------------------------------------------------
+sub addMatrixMaxGroup {
+    my $session = shift;
+    print "\tAdding maxComparisonsGroup to Matrix..." unless $quiet;
+    $session->db->write("alter table Matrix add column maxComparisonsGroup integer;");
+    $session->db->write("alter table Matrix add column maxComparisonsGroupInt integer;");
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

@@ -417,6 +417,16 @@ listing,|,
                 lastUpdated => 1135271460,
         },
 
+    'maxgroup per description' => {
+        message => q|Specifies how many comparisons are allowed per group.|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup description' => {
+        message => q|Specifies which group is restricted.|,
+        lastUpdated => 0,
+    },
+
     'max comparisons description' => {
         message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
         lastUpdated => 0,
@@ -573,6 +583,21 @@ to increase performance. How long should we cache them?|,
         lastUpdated => 0,
     },
     
+    'maxgroup per label' => {
+		message => q|Maximum per Group|,
+		lastUpdated => 0,
+	},
+    
+    'maxgroup label' => {
+		message => q|Maximum Group|,
+		lastUpdated => 0,
+	},
+    
+    'maxgroup label' => {
+		message => q|Maximum Group|,
+		lastUpdated => 0,
+	},
+
     'max comparisons label' => {
 		message => q|Maximum Comparisons|,
 		lastUpdated => 0,
