@@ -116,7 +116,7 @@ sub isDynamicCompatible {
 
 #----------------------------------------------------------------------------
 
-=head2 new
+=head2 getOptions
 
 Create a new WebGUI::Form::SelectRichEditor object and populate it with all 
 the available Rich Text Editor assets.

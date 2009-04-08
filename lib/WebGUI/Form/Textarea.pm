@@ -195,6 +195,14 @@ sub toHtml {
 	return $out;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml
+
+Returns the form value as text, encoding HTML entities.
+
+=cut
+
 sub getValueAsHtml {
     my $self = shift;
     my $value = $self->SUPER::getValueAsHtml(@_);
