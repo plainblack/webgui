@@ -34,6 +34,7 @@ my $session = start(); # this line required
 
 addSurveyQuizModeColumns($session);
 addSurveyExpressionEngineConfigFlag($session);
+addCarouselWobject($session);
 
 finish($session); # this line required
 
@@ -46,6 +47,22 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addCarouselWobject{
+    my $session = shift;
+    print "\tAdding Carousel wobject... " unless $quiet;
+    $session->db->write("create table Carousel (
+        assetId         char(22) binary not null,
+        revisionDate    bigint      not null,
+        items           mediumtext,
+        templateId      char(22),
+        primary key (assetId, revisionDate)
+        )");
+    my $assets  = $session->config->get( "assets" );
+    $assets->{ "WebGUI::Asset::Wobject::Carousel" } = { category => "utilities" };
+    $session->config->set( "assets", $assets );
+    print "Done.\n" unless $quiet;
+}
 
 sub addSurveyQuizModeColumns{
     my $session = shift;

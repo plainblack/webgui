@@ -40,7 +40,7 @@ sub definition {
 	%properties = (
 		templateId =>{
 			fieldType       =>"template",  
-			defaultValue    =>'CarouselTmpl0000000002',
+			defaultValue    =>'CarouselTmpl0000000001',
 			tab             =>"display",
 			noFormPost      =>0,  
 			namespace       =>"Carousel", 
@@ -272,67 +272,6 @@ adminConsole views.
 #   my $i18n = WebGUI::International->new($self->session, "Asset_Carousel");
 #   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
 #}
-
-
-
-#-------------------------------------------------------------------
-# Everything below here is to make it easier to install your custom
-# wobject, but has nothing to do with wobjects in general
-#-------------------------------------------------------------------
-# cd /data/WebGUI/lib
-# perl -MWebGUI::Asset::Wobject::Carousel -e install www.example.com.conf [ /path/to/WebGUI ]
-# 	- or -
-# perl -MWebGUI::Asset::Wobject::Carousel -e uninstall www.example.com.conf [ /path/to/WebGUI ]
-#-------------------------------------------------------------------
-
-
-use base 'Exporter';
-our @EXPORT = qw(install uninstall);
-use WebGUI::Session;
-
-#-------------------------------------------------------------------
-sub install {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::Carousel -e install www.example.com.conf\n" unless ($home && $config);
-	print "Installing asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-
-    my $assets  = $session->config->get( "assets" );
-    $assets->{ "WebGUI::Asset::Wobject::Carousel" } = { category => "utilities" };
-    $session->config->set( "assets", $assets );
-	#$session->config->addToArray("assets","WebGUI::Asset::Wobject::Carousel");
-	$session->db->write("create table Carousel (
-		assetId         char(22) binary not null,
-		revisionDate    bigint      not null,
-        items           mediumtext,
-        templateId      char(22),
-		primary key (assetId, revisionDate)
-		)");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
-#-------------------------------------------------------------------
-sub uninstall {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::Carousel -e uninstall www.example.com.conf\n" unless ($home && $config);
-	print "Uninstalling asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::Carousel");
-	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::Carousel'");
-	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::Carousel");
-		$asset->purge if defined $asset;
-	}
-	$session->db->write("drop table Carousel");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
 
 1;
 #vim:ft=perl
