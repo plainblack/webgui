@@ -210,6 +210,30 @@ sub getFolder {
 
 #-------------------------------------------------------------------
 
+=head2 getRssFeedItems ( )
+
+Returns an arrayref of hashrefs, containing information on stories
+for generating an RSS and Atom feeds.
+
+=cut
+
+sub getRssFeedItems {
+    my $self    = shift;
+    my $stories = $self->getLineageIterator(['descendants'],{
+        excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
+        orderByClause  => 'creationDate desc, lineage',
+        returnObjects  => 1,
+        limit          => $self->get('itemsPerFeed'),
+    });
+    my $storyData = [];
+    while (my $story = $stories->()) {
+        push @{ $storyData }, $story->getRssData;
+    }
+    return $storyData;
+}
+
+#-------------------------------------------------------------------
+
 =head2 folderDateFormat ( $epoch )
 
 Returns the date in the format for folders.  Encapsulated in this method

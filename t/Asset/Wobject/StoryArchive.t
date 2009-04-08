@@ -58,11 +58,11 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 1;
-plan tests => 28
-            + $tests
-            + $canPostMaker->plan
-            ;
+my $tests = 31
+          + $canPostMaker->plan
+          ;
+plan tests => 1
+            + $tests;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -385,6 +385,45 @@ cmp_bag(
     \@anchors,
     \@expectedAnchors,
     'keywordCloud template variable has keywords and correct links',
+);
+
+################################################################
+#
+#  RSS and Atom checks
+#
+################################################################
+
+is($archive->getRssFeedUrl,  '/home/mystories?func=viewRss',  'RSS Feed Url');
+is($archive->getAtomFeedUrl, '/home/mystories?func=viewAtom', 'Atom Feed Url');
+
+$archive->update({itemsPerFeed => 3});
+
+cmp_deeply(
+    $archive->getRssFeedItems(),
+    [
+        {
+            title => 'First Story',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+        {
+            title => 'Story 2',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+        {
+            title => 'Story 3',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+    ],
+    'rssFeedItems'
 );
 
 }
