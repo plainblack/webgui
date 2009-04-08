@@ -252,12 +252,35 @@ sub exportAssetCollateral {
 
 =head2 getRssFeedItems ()
 
-This method should throw an exception if it's not overridden. Its intention is
-to be overridden by whatever class is using it and should return an array
-reference of hash references. Each hash reference should contain at minimum a title,
-description, link, and date field. The date field can be either an epoch date, an RFC 1123
-date, or a ISO date in the format of YYYY-MM-DD HH:MM::SS. Optionally specify an
-author, and a guid field.
+This method needs to be overridden by any class that is using it.  To ensure
+this, it will throw an exception.
+
+It returns an array reference of hash references.  The list below shows
+which ones are required, along with some common keys which are optional.
+Other keys may be added, as well.
+
+=head3 Hash reference keys
+
+=head4 title
+
+=head4 description
+
+=head4 link
+
+This is a url to the item.
+
+=head4 date
+
+An epoch date, an RFC 1123 date, or a date in ISO format (referred to as MySQL format
+inside WebGUI)
+
+=head4 author
+
+This is optional.
+
+=head4 guid
+
+This is optional.  A unique descriptor for this item.
 
 =cut
 
