@@ -405,11 +405,28 @@ sub getFeed {
     return $feed;
 }
 
+#-------------------------------------------------------------------
+
+=head2 prepareView ()
+
+Extend the master class to insert head links via addHeaderLinks.
+
+=cut
+
 sub prepareView {
     my $self = shift;
     $self->addHeaderLinks;
     return $self->next::method(@_);
 }
+
+#-------------------------------------------------------------------
+
+=head2 addHeaderLinks ()
+
+Add RSS, Atom, or RDF links in the HEAD block of the Asset, depending
+on how the Asset has configured feedHeaderLinks.
+
+=cut
 
 sub addHeaderLinks {
     my $self = shift;
