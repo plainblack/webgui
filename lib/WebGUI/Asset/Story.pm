@@ -335,7 +335,7 @@ sub getEditForm {
                              name  => 'location',
                              value => $form->get('location') || $self->get('location')
                           } ),
-        keywordsForm   => WebGUI::Form::text($session, {
+        keywordsForm   => WebGUI::Form::keywords($session, {
                             name  => 'keywords',
                             value => $form->get('keywords')  || WebGUI::Keyword->new($session)->getKeywordsForAsset({ asset => $self })
                          } ),

@@ -46,7 +46,7 @@ my $topic       = $defaultNode->addChild({
     title     => 'Test Topic',
                  #1234567890123456789012
     assetId   => 'TestStoryTopicAsset123',
-    keywords  => 'tango yankee',
+    keywords  => 'tango,yankee',
 });
 my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
@@ -211,7 +211,7 @@ $story->topic('');
 
 $story->update({
     highlights => "one\ntwo\nthree",
-    keywords   => "foxtrot tango whiskey",
+    keywords   => "foxtrot,tango,whiskey",
 });
 is($story->get('highlights'), "one\ntwo\nthree", 'highlights set correctly for template var check');
 
