@@ -22,22 +22,41 @@ Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidPar
 # We need these as semi-globals so that utility subs (which are shared with the safe compartment)
 # can access them.
 my $session;
-my $vars;
+my $values;
+my $scores;
 my $jump_count;
 my $validate;
 my $validTargets;
  
-=head2 var
+=head2 value
 
-Utility sub shared with Safe compartment so that expressions can access allowed vars.
+Utility sub that gives expressions access to recorded response values
+
+value(question_variable) returns the recorded response value for the answer to question_variable
 
 =cut
 
-sub var($) {
+sub value($) {
     my $key   = shift;
-    my $value = $vars->{$key};
+    my $value = $values->{$key};
     $session->log->debug("[$key] resolves to [$value]");
     return $value; # scalar variable, so no need to clone
+}
+
+=head2 score
+
+Utility sub that gives expressions access to recorded response scores.
+
+score(question_variable) returns the score for the answer selected for question_variable
+score(section_variable) returns the summed score for the answers to all the questions in section_variable
+
+=cut
+
+sub score($) {
+    my $key   = shift;
+    my $score = $scores->{$key};
+    $session->log->debug("[$key] resolves to [$score]");
+    return $score; # scalar variable, so no need to clone
 }
 
 =head2 jump
@@ -74,8 +93,7 @@ sub jump(&$) {
 
 =head2 avg
 
-Utility sub shared with Safe compartment to allows expressions to easily compute the average
-of a number of values
+Utility sub shared with Safe compartment to allows expressions to easily compute the average of a list
 
 =cut
 
@@ -88,7 +106,7 @@ sub avg {
 
 Class method.
 
-Evaluates the given expression in a Safe compartment, giving the expression access to vars.
+Evaluates the given expression in a Safe compartment.
 
 =head3 session
 
@@ -100,19 +118,20 @@ The expression to run.
 
 A gotoExpression is essentially a perl expression that gets evaluated in a Safe compartment.
 
-To access Section/Question response values, the expression calls L<var>.
+To access Section/Question recorded response values, the expression calls L<value>.
+To access Section/Question recorded response scores, the expression calls L<score>.
 To trigger a jump, the expression calls L<jump>. The first truthy jump succeeds.
 We also give expressions access to some useful utility subs such as avg(), and all of the 
 handy subs from List::Util (min, max, sum, etc..).
 
 A very simple expression that checks if the response to s1q1 is 0 might look like:
  
- jump { var(s1q1) == 0 } target
+ jump { value(s1q1) == 0 } target
 
 A more complicated gotoExpression with two possible jumps might look like:
 
- jump { var('my_var') > 5 and var('my_var2') =~ m/textmatch/ } target1;
- jump { $avg = (var(q1) + var(q2) + var(q3)) / 3; return $avg > 10 } target2;
+ jump { value(q1) > 5 and value(s2q1) =~ m/textmatch/ } target1;
+ jump { avg(value(q1), value(q2), value(q3)) > 10 } target2;
 
 =head3 opts (optional)
 
@@ -120,9 +139,18 @@ Supported options are:
 
 =over 3
 
-=item * vars
+=item * values
 
-Hashref of vars to make available to the expression via the L<var> utility sub
+Hashref of values to make available to the expression via the L<value> utility sub
+
+=item * scores
+
+Hashref of scores to make available to the expression via the L<score> utility sub
+
+=item* validTargets
+
+A hashref of valid jump targets. If this is provided, all L<jump> calls will fail unless
+the specified target is a key in the hashref.
 
 =item * validate
 
@@ -138,13 +166,19 @@ sub run {
         = validate_pos( @_, { isa => 'WebGUI::Session' }, { type => SCALAR }, { type => HASHREF, default => {} } );
 
     # Init package globals
-    ( $session, $vars, $jump_count, $validate, $validTargets ) = ( $s, $opts->{vars}, 0, $opts->{validate}, $opts->{validTargets} );
+    ( $session, $values, $scores, $jump_count, $validate, $validTargets ) = ( $s, $opts->{values}, $opts->{scores}, 0, $opts->{validate}, $opts->{validTargets} );
+    
+    if (!$session->config->get('enableSurveyExpressionEngine')) {
+        $session->log->debug('enableSurveyExpressionEngine config option disabled, skipping');
+        return;
+    }
 
     # Create the Safe compartment
     my $compartment = Safe->new();
 
     # Share our utility subs with the compartment
-    $compartment->share('&var');
+    $compartment->share('&value');
+    $compartment->share('&score');
     $compartment->share('&jump');
     $compartment->share('&avg');
     

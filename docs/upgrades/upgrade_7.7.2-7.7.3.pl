@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 addSurveyQuizModeColumns($session);
+addSurveyExpressionEngineConfigFlag($session);
 
 finish($session); # this line required
 
@@ -51,6 +52,13 @@ sub addSurveyQuizModeColumns{
     print "\tAdding columns to Survey table... " unless $quiet;
     $session->db->write("alter table Survey add column `quizModeSummary` TINYINT(3)");
     $session->db->write("alter table Survey add column `surveySummaryTemplateId` char(22)");
+    print "Done.\n" unless $quiet;
+}
+
+sub addSurveyExpressionEngineConfigFlag{
+    my $session = shift;
+    print "\tAdding enableSurveyExpressionEngine config option... " unless $quiet;
+    $session->config->set('enableSurveyExpressionEngine', 0);
     print "Done.\n" unless $quiet;
 }
 

@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 59;
+my $tests = 64;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -323,10 +323,35 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 ####################################################
 #
-# processGotoExpression
+# responseScoresByVariableName
 #
 ####################################################
 
+$rJSON->survey->section([0])->{variable} = 's0';
+$rJSON->survey->section([1])->{variable} = 's1';
+$rJSON->survey->section([2])->{variable} = 's2';
+$rJSON->survey->section([3])->{variable} = 's3';
+$rJSON->survey->question([1,0])->{variable} = 's1q0';
+$rJSON->survey->question([1,1])->{variable} = 's1q1';
+$rJSON->survey->answer([1,0,0])->{value} = 100; # set answer score
+$rJSON->survey->answer([1,1,0])->{value} = 200; # set answer score
+cmp_deeply($rJSON->responseScoresByVariableName, {}, 'scores initially empty');
+
+$rJSON->lastResponse(2);
+$rJSON->recordResponses({
+    '1-0-0'        => 'My chosen answer',
+    '1-1-0'        => 'My chosen answer',
+});
+cmp_deeply($rJSON->responseScoresByVariableName, { s1q0 => 100, s1q1 => 200, s1 => 300}, 'scores now reflect q answers and section totals');
+
+####################################################
+#
+# processGotoExpression
+#
+####################################################
+# Turn on the survey Expression Engine
+WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
+$session->config->set('enableSurveyExpressionEngine', 1);
 $rJSON->survey->section([0])->{variable} = 's0'; # our first test jump target
 $rJSON->survey->section([2])->{variable} = 's2'; # our second test jump target
 $rJSON->survey->question([1,0])->{variable} = 's1q0'; # a question variable to use in our expressions
@@ -343,17 +368,26 @@ is($rJSON->lastResponse, 4, 'lastResponse at 4 before any gotoExpressions proces
 $rJSON->processGotoExpression('blah-dee-blah-blah {');
 is($rJSON->lastResponse, 4, '..unchanged after duff expression');
 
-$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0');
+$rJSON->processGotoExpression('jump { value(s1q0) == 4} s0');
 is($rJSON->lastResponse, 4, '..unchanged after false expression');
 
-$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0; jump { var(s1q0) == 5} s0;');
+$rJSON->processGotoExpression('jump { value(s1q0) == 4} s0; jump { value(s1q0) == 5} s0;');
 is($rJSON->lastResponse, 4, '..similarly for multi-statement false expression');
 
-$rJSON->processGotoExpression('jump { var(s1q0) == 3} s0');
+$rJSON->processGotoExpression('jump { value(s1q0) == 3} DUFF_TARGET');
+is($rJSON->lastResponse, 4, '..similarly for expression with invalid target');
+
+$rJSON->processGotoExpression('jump { value(s1q0) == 3} s0');
 is($rJSON->lastResponse, -1, '..but updated to s0 after true expression');
 
-$rJSON->processGotoExpression('jump { var(s1q0) == 4} s0; jump { var(s1q0) == 3} s2');
+$rJSON->processGotoExpression('jump { value(s1q0) == 4} s0; jump { value(s1q0) == 3} s2');
 is($rJSON->lastResponse, 4, '..changed again for multi-statement true expression');
+
+$rJSON->processGotoExpression('jump { score(s1q0) == 100} s0');
+is($rJSON->lastResponse, -1, '..and again when score used');
+
+$rJSON->processGotoExpression('jump { score("s1") == 300} s2');
+is($rJSON->lastResponse, 4, '..and again when section score total used');
 
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);

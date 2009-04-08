@@ -657,9 +657,14 @@ sub processGotoExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
     
+    # Prepare the ingredients..
+    my $values = $self->responseValuesByVariableName;
+    my $scores = $self->responseScoresByVariableName;
+    my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
+    
     use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
-    if (my $jump = $engine->run($self->session, $expression, { vars => $self->responsesByVariableName} )) {
+    if (my $jump = $engine->run($self->session, $expression, { values => $values, scores => $scores, validTargets => \%validTargets} )) {
         $self->session->log->debug("Hit. Jumping to [$jump]");
         $self->processGoto($jump);
     }
@@ -709,7 +714,7 @@ sub recordedResponses{
 
 #-------------------------------------------------------------------
 
-=head2 responsesByVariableName
+=head2 responseValuesByVariableName
 
 Returns a lookup table to question variable names and recorded response values.
 
@@ -718,7 +723,7 @@ the L<responses> hash.
 
 =cut
 
-sub responsesByVariableName {
+sub responseValuesByVariableName {
     my $self = shift;
     
     my %lookup;
@@ -740,6 +745,59 @@ sub responsesByVariableName {
         # Add variable => value to our hash
         $lookup{$question->{variable}} = $response->{value};
     }
+    return \%lookup;
+}
+
+#-------------------------------------------------------------------
+
+=head2 responseScoresByVariableName
+
+Returns a lookup table to question variable names and recorded response values.
+
+Only questions with a defined variable name set are included. Scores come from
+the L<responses> hash.
+
+=cut
+
+sub responseScoresByVariableName {
+    my $self = shift;
+    
+    my %lookup;
+    while (my ($address, $response) = each %{$self->responses}) {
+        next if (!$response || !$address);
+        
+        # Turn responses s-q-a string into an address array
+        my @address = split /-/, $address;
+        
+        # Filter out the non-answer entries
+        next unless @address == 3;
+        
+        # Grab the corresponding question
+        my $question = $self->survey->question([@address]);
+        
+        # Filter out questions without defined variable names
+        next if !$question || !defined $question->{variable};
+        
+        # Grab the corresponding answer
+        my $answer = $self->survey->answer([@address]);
+        
+        # Add variable => score to our hash
+        $lookup{$question->{variable}} = $answer->{value};
+    }
+    
+    # Add section score totals
+    for my $s (@{$self->survey->sections}) {
+        next unless $s->{variable};
+        
+        my $score = 0;
+        for my $q (@{$s->{questions}}) {
+            next unless $q->{variable};
+            next unless exists $lookup{$q->{variable}};
+            
+            $lookup{$s->{variable}} += $lookup{$q->{variable}};
+        }
+    }
+    
     return \%lookup;
 }
 
@@ -818,10 +876,10 @@ sub nextQuestions {
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $responsesByVariableName = $self->responsesByVariableName();
+    my $responseValuesByVariableName = $self->responseValuesByVariableName();
 
     # Do text replacement
-    $section->{text} = $self->getTemplatedText($section->{text}, $responsesByVariableName);
+    $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);
 
     # Collect all the questions to be shown on the next page..
     my @questions;
@@ -844,7 +902,7 @@ sub nextQuestions {
         my %questionCopy = %{$self->survey->question( $address )};
 
         # Do text replacement
-        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responsesByVariableName);
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responseValuesByVariableName);
 
         # Add any extra fields we want..
         $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
@@ -856,7 +914,7 @@ sub nextQuestions {
             my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
             # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responsesByVariableName);
+            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responseValuesByVariableName);
 
             # Add any extra fields we want..
             $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
@@ -1107,7 +1165,7 @@ recorded value, and the id of the answer.
 
 =cut
 
-# TODO: This sub should make use of responsesByVariableName
+# TODO: This sub should make use of responseValuesByVariableName
 
 sub returnResponseForReporting {
     my $self      = shift;
