@@ -20,8 +20,8 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 1;
-plan tests => 32
+my $tests = 34;
+plan tests => 1
             + $tests
             ;
 
@@ -80,6 +80,8 @@ ok(  WebGUI::Asset::Story->validParent($session), 'validParent: StoryArchive is 
 $story = $archive->addChild({
     className => 'WebGUI::Asset::Story',
     title     => 'Story 1',
+    subtitle  => 'The story of a CMS',
+    byline    => 'JT Smith',
 });
 
 isa_ok($story, 'WebGUI::Asset::Story', 'Created a Story asset');
@@ -198,10 +200,30 @@ cmp_deeply(
             url   => $story->getUrl,
         },
     ],
-    'getCrumbTrail: with no topic set'
+    'getCrumbTrail: with topic set'
 );
 
 $story->topic('');
+
+############################################################
+#
+# getRssData
+#
+############################################################
+
+can_ok($story, 'getRssData');
+
+cmp_deeply(
+    $story->getRssData,
+    {
+        title       => 'Story 1',
+        description => 'The story of a CMS',
+        'link'      => re('story-1$'),
+        author      => 'JT Smith',
+        date        => $story->get('lastModified'),
+    },
+    'getRssData: returns correct data'
+);
 
 ############################################################
 #

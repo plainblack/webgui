@@ -454,6 +454,27 @@ sub getPhotoData {
 
 #-------------------------------------------------------------------
 
+=head2 getRssData (  )
+
+Returns RSS data for this Story.  The date of the RSS item is the lastModified
+property of the Asset.
+
+=cut
+
+sub getRssData {
+	my $self = shift;
+    my $data = {
+        title       => $self->get('headline') || $self->getTitle,
+        description => $self->get('subtitle'),
+        'link'      => $self->getUrl,
+        author      => $self->get('byline'),
+        date        => $self->get('lastModified'),
+    };
+	return $data;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( $templateId )
 
 See WebGUI::Asset::prepareView() for details.
