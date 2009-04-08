@@ -91,7 +91,6 @@ EOSTORY
 CREATE TABLE StoryArchive (
     assetId             CHAR(22) BINARY NOT NULL,
     revisionDate        BIGINT          NOT NULL,
-    storiesPerFeed      INTEGER,
     storiesPerPage      INTEGER,
     groupToPost         CHAR(22) BINARY,
     templateId          CHAR(22) BINARY,

@@ -9,18 +9,6 @@ our $I18N = {
         lastUpdated => 0
     },
 
-    'stories per feed' => {
-        message => q|Stories Per Feed|,
-        context => q|Label in the edit screen and template.|,
-        lastUpdated => 0
-    },
-
-    'stories per feed help' => {
-        message => q|The number of stories displayed in RSS and Atom feeds from this StoryArchive.|,
-        context => q|Hoverhelp in the edit screen and template.|,
-        lastUpdated => 0
-    },
-
     'stories per page' => {
         message => q|Stories Per Page|,
         context => q|Label in the edit screen and template.|,

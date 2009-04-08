@@ -21,7 +21,8 @@ use WebGUI::Asset::Wobject::Folder;
 use WebGUI::Paginator;
 use WebGUI::Keyword;
 use WebGUI::Search;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
 
 use constant DATE_FORMAT => '%c_%D_%y';
 
@@ -84,13 +85,6 @@ sub definition {
     my %properties;
     tie %properties, 'Tie::IxHash';
     %properties = (
-        storiesPerFeed => {
-            tab          => 'display',  
-            fieldType    => 'integer',  
-            label        => $i18n->get('stories per feed'),
-            hoverHelp    => $i18n->get('stories per feed help'),
-            defaultValue => 25,
-        },
         storiesPerPage => {
             tab          => 'display',  
             fieldType    => 'integer',  

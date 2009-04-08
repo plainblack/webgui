@@ -53,9 +53,6 @@ our $HELP = {
         ],
         fields    => [],
         variables => [
-                    { 'name' => 'storesPerFeed',
-                      'description' => 'stories per feed help',
-                    },
                     { 'name' => 'storesPerPage',
                       'description' => 'stories per page help',
                     },
