@@ -73,6 +73,8 @@ my $loaded = use_ok($class);
 my $storage;
 my $versionTag;
 
+my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
+
 SKIP: {
 
 skip "Unable to load module $class", $tests unless $loaded;
@@ -168,9 +170,7 @@ my $newFolder = $archive->getFolder($yesterday);
 my ($wgBdayMorn,undef)    = $session->datetime->dayStartEnd($wgBday);
 my ($yesterdayMorn,undef) = $session->datetime->dayStartEnd($yesterday);
 
-my $creationDateSth = $session->db->prepare('update asset set creationDate=? where assetId=?');
-
-my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger foxtrot echo'});
+my $story = $oldFolder->addChild({ className => 'WebGUI::Asset::Story', title => 'WebGUI is released', keywords => 'roger,foxtrot,echo'});
 $creationDateSth->execute([$wgBday, $story->getId]);
 
 {
@@ -224,9 +224,9 @@ cmp_deeply(
     'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
 );
 
-my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger foxtrot"});
-my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot echo"});
-my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger echo"});
+my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"});
+my $story3 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 3', keywords => "foxtrot,echo"});
+my $story4 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 4', keywords => "roger,echo"});
 foreach my $storilet ($story2, $story3, $story4) {
     $session->db->write("update asset set creationDate=$now where assetId=?",[$storilet->getId]);
 }
