@@ -2,6 +2,8 @@
  - fixed #10094: double explanation in thread help
  - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)
  - Survey summaries now added.  In the Survey edit, select quiz mode, and a summary will be shown to the user at the end of the survey.
+ - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
+
 7.7.2
  - fixed #10056: YUI javascripts included while adminOff (BNC)
  - fixed a bug that required you to hit "update cart" before the checkout
