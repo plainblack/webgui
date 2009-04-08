@@ -1157,7 +1157,8 @@ sub getSummary{
     my $self = shift;
     my $summary = $self->responseJSON->showSummary();
     my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
-    return $out;
+
+    return ($summary,$out);
 #    return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 #-------------------------------------------------------------------
@@ -1191,7 +1192,8 @@ sub www_loadQuestions {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
         if ( $self->get('quizModeSummary') ) {
             if(! $self->session->form->param('shownsummary')){
-                my $json = to_json( { type => 'summary', summary => $self->getSummary() });
+                my ($summary,$html) = $self->getSummary();
+                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
                 return $json;
             }
         }

@@ -1074,9 +1074,8 @@ sub showSummary{
     
     return if(! $responses);
 
-    my ($sectionIndex, $questionIndex, $answerIndex) = (-1, -1, -1);
-    my ($currentSection,$currentQuestion) = (-1, -1); 
-
+    my ($sectionIndex, $responseIndex) = (-1, 1);
+    my ($currentSection,$currentQuestion) = (-1,-1); 
     ($summaries->{totalCorrect},$summaries->{totalIncorrect}) = (0,0);
 
     for my $response (@$responses){
@@ -1090,62 +1089,54 @@ sub showSummary{
         if($currentSection != $response->{address}->[0]){
             $summaries->{totalSections}++;
             $sectionIndex++;
-            $questionIndex = -1;
-            $answerIndex = -1;
-            $currentQuestion = -1;
+            $responseIndex = -1;
             $currentSection = $response->{address}->[0];
-            _loadSectionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]},$response);
         }
         if($currentQuestion != $response->{address}->[1]){
             $summaries->{totalQuestions}++;
-            $questionIndex++;
-            $answerIndex = -1;
-            $currentQuestion = $response->{address}->[1];
-            _loadQuestionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]},$response);
         }
-        $answerIndex++;
-        _loadAnswerIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{questions}->[$questionIndex]->{answers}->[$answerIndex]},
+        _loadSectionIntoSummary(\%{$summaries->{sections}->[$sectionIndex]}, $response);
+        $responseIndex++;
+        _loadResponseIntoSummary(\%{$summaries->{sections}->[$sectionIndex]->{responses}->[$responseIndex]},
             $response,
             $self->survey->{multipleChoiceTypes});
     }
     return $summaries;
 }
-sub _loadAnswerIntoSummary{
+sub _loadResponseIntoSummary{
     my $node = shift;
     my $response = shift;
     my $types = shift;
 
-    $node->{id} = $response->{address}->[2] + 1;
+    $node->{"Question ID"} = $response->{address}->[1] + 1;
+    $node->{"Question Text"} = $response->{questionText};
+    $node->{"Answer ID"} = $response->{address}->[2] + 1;
     if($response->{isCorrect}){
-        $node->{iscorrect} = 1;
-        $node->{score} = $response->{value};
+        $node->{Correct} = "Y";
+        $node->{Score} = $response->{value};
     }else{   
-        $node->{iscorrect} = 0;
-        $node->{score} = 0;
+        $node->{Correct} = "N";
+        $node->{Score} = 0;
     }
-    $node->{text} = $response->{answerText};
+    $node->{"Answer Text"} = $response->{answerText};
 
     #test if it is a multiple choide type
     if($types->{$response->{questionType}}){
-        $node->{value} = $response->{value};
+        $node->{Value} = $response->{value};
     }else{
-        $node->{value} = $response->{recordedValue};
+        $node->{Value} = $response->{recordedValue};
     }
-}
-sub _loadQuestionIntoSummary{
-    my $node = shift;
-    my $response = shift;
-    $node->{id} = $response->{address}->[1] + 1;
-    $node->{text} = $response->{questionText};
 }
 sub _loadSectionIntoSummary{
     my $node = shift; 
     my $response = shift;
     $node->{id} = $response->{address}->[0] + 1;
-    $node->{inCorrect} = 0 if(!defined $node->{section}->{inCorrect});
-    $node->{score} = 0 if(!defined $node->{section}->{score});
-    $node->{correct} = 0 if(!defined $node->{section}->{correct});
-    if($response->{isCorrect}){
+    $node->{inCorrect} = 0 if(!defined $node->{inCorrect});
+    $node->{score} = 0 if(!defined $node->{score});
+    $node->{correct} = 0 if(!defined $node->{correct});
+    $node->{total} = 0 if(!defined $node->{total});
+    $node->{total}++;
+    if($response->{isCorrect} == 1){
         $node->{score} += $response->{value};
         $node->{correct}++;
     }else{

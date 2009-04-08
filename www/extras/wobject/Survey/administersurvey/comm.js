@@ -55,7 +55,7 @@ if (typeof Survey === "undefined") {
                         window.location = url;
                     }
                     else if(response.type === 'summary'){
-                        Survey.Form.showSummary(response.summary);    
+                        Survey.Form.showSummary(response.summary,response.html);    
                     }
                     else {
                         alert("bad response");

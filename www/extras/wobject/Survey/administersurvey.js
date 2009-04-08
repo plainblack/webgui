@@ -324,14 +324,125 @@ if (typeof Survey === "undefined") {
          }
          */
     }
-    
+
+    YAHOO.widget.Chart.SWFURL = "/extras/yui/build/charts/assets/charts.swf"; 
     // Public API
     Survey.Form = {
-        showSummary: function(html){
+        globalSummaryDataTip: function(item, index, series){
+                    var toolTipText =  "hello";
+                    //var toolTipText = series.displayName + " for " + item.section;
+                    //toolTipText += "\n" + item[series.yField];
+                    return toolTipText;
+        },
+        showSummary: function(summary,html){
             var html = html;
             document.getElementById('survey').innerHTML = html;
+
+
+            //Add totoal summary pie chart
+            totalSummary =
+            [
+                { correct: "Correct", count: summary.totalCorrect },
+                { correct: "Incorrect", count: summary.totalIncorrect }
+            ]
+
+            var totalSummaryDS = new YAHOO.util.DataSource( totalSummary );
+            totalSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            totalSummaryDS.responseSchema = { fields: [ "correct", "count" ] };
+
+            new YAHOO.widget.PieChart( "chart", totalSummaryDS,
+            {
+                dataField: "count",
+                categoryField: "correct",
+                style:
+                {
+                    padding: 10,
+                    legend:
+                    {
+                        display: "left",
+                        padding: 10,
+                        spacing: 2,
+                        font:
+                        {
+                            family: "Arial",
+                            size: 13
+                        }
+                    }
+                },
+                //only needed for flash player express install
+                expressInstall: "/extras/yui/build/charts/assets/charts.swf" 
+            });
+
+            //define section datatable columns
+            var myColumnDefs = [ 
+                {key:"Question ID", sortable:true, resizeable:true}, 
+                {key:"Question Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true}, 
+                {key:"Answer ID", sortable:true, resizeable:true}, 
+                {key:"Correct", sortable:true, resizeable:true}, 
+                {key:"Answer Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true},
+                {key:"Score", sortable:true, resizeable:true}, 
+                {key:"Value", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true} 
+            ];
+            var sectionSummary = [];
+            //Load up datatables and create section data for bar chart
+            for(var i = 0; i < summary.sections.length; i++){
+                var temp = summary.sections[i];
+                sectionSummary[sectionSummary.length] = {"Total Responses": temp.total, "Correct": temp.correct, "Incorrect": temp.inCorrect, "section": (i+1)};
+                var myDataSource = new YAHOO.util.DataSource(summary.sections[i].responses);
+//These needs to be put in a destroy call list for when the html dom is recreated, if summaries are going to be uses with page reloads, else memory leak.
+                myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+                myDataSource.responseSchema = { 
+                   fields: ["Question ID","Question Text","Answer ID","Correct","Answer Text","Score","Value"] 
+                };
+                var tempText = "section"+ (i+1) + "datatable";
+                new YAHOO.widget.DataTable(tempText, myColumnDefs, myDataSource, {caption:"Section "+(i+1)});
+            }
+
+            //Now create section summary bar charts
+            var sectionSummaryDS = new YAHOO.util.DataSource( sectionSummary ); 
+            sectionSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
+            sectionSummaryDS.responseSchema = 
+            { 
+                fields: [ "Total Responses", "Correct", "Incorrect", "section" ] 
+            };
+            var sectionSummarySeriesDef =
+                [
+                    {
+                        displayName: "Total Responses",
+                        yField: "Total Responses",
+                        style:{size:10}
+                    },
+                    {
+                        displayName: "Correct",
+                        yField: "Correct",
+                        style:{size:10}
+                    },
+                    {
+                        displayName: "Incorrect",
+                        yField: "Incorrect",
+                        style:{size:10}
+                    }
+                ];
+            //create a Numeric Axis for displaying dollars
+            var responseAxis = new YAHOO.widget.NumericAxis();
+            responseAxis.title = "Responses";
+            //create Category Axis to specify a title for the months
+            var sectionAxis = new YAHOO.widget.CategoryAxis();
+            sectionAxis.title = "Sections";
+            //create the Chart
+            var mychart = new YAHOO.widget.ColumnChart( "summarychart", sectionSummaryDS,
+            {
+                series: sectionSummarySeriesDef,
+                xField: "section",
+                xAxis: sectionAxis,
+                yAxis: responseAxis,
+//                dataTipFunction: Survey.Form.globalSummaryDataTip,      //try again in 2.7
+                expressInstall: "/extras/yui/build/charts/assets/charts.swf" 
+            });
+
             YAHOO.util.Event.addListener("submitbutton", "click", function(){ Survey.Comm.submitSummary(); });
         },
+
         displayQuestions: function(params){
             toValidate = [];
             var qs = params.questions;
@@ -530,3 +641,11 @@ YAHOO.util.Event.onDOMReady(function(){
     // Survey.Comm.setUrl('/' + document.getElementById('assetPath').value);
     Survey.Comm.callServer('', 'loadQuestions');
 });
+
+YAHOO.example.getDataTipText = function( item, index, series )
+{
+    var toolTipText = series.displayName + " for " + item.month;
+//    toolTipText += "\n" + YAHOO.example.formatCurrencyAxisLabel( item[series.yField] );
+    return toolTipText;
+}
+
