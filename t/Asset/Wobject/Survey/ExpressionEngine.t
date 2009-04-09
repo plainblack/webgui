@@ -22,23 +22,24 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 36;
+my $tests = 41;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ExpressionEngine');
-
+my ($user, $survey);
 SKIP: {
 
     skip $tests, "Unable to load ExpressionEngine" unless $usedOk;
 
     my $e = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
 
+    WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
+    $session->config->set( 'enableSurveyExpressionEngine', 0 );
     is( $e->run( $session, 'jump { 1 } target' ),
         undef, "Nothing happens unless we turn on enableSurveyExpressionEngine in config" );
-    WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
     $session->config->set( 'enableSurveyExpressionEngine', 1 );
     is( $e->run( $session, 'jump { 1 } target' ), 'target', "..now we're in business!" );
 
@@ -109,8 +110,61 @@ SKIP: {
         undef, 'target is not valid' );
     is( $e->run( $session, q{jump {1} target}, { values => \%values, validTargets => { target => 1 } } ),
         'target', '..whereas now it is ok' );
+    
+    
+    # Create a test user
+    my $user = WebGUI::User->new( $session, 'new' );
+    
+    # Create a Survey
+    my $survey = WebGUI::Asset->getImportNode($session)->addChild(
+        {   className                => 'WebGUI::Asset::Wobject::Survey',
+        },
+    );
+    isa_ok($survey, 'WebGUI::Asset::Wobject::Survey');
+    my $url = $survey->get('url');
+    my $id = $survey->getId;
+    
+    $survey->surveyJSON->newObject([]); # s0
+    $survey->surveyJSON->newObject([0]); # s0q0
+    $survey->surveyJSON->newObject([0,0]); # s0q0a0
+    $survey->surveyJSON->newObject([0]); # s0q1
+    $survey->surveyJSON->newObject([0,1]); # s0q1a0
+    
+    $survey->surveyJSON->section([0])->{variable} = 'ext_s0';
+    $survey->surveyJSON->question([0,0])->{variable} = 'ext_s0q0';
+    $survey->surveyJSON->question([0,1])->{variable} = 'ext_s0q1';
+    $survey->surveyJSON->answer([0,0,0])->{recordedAnswer} = 'ext_s0q0a0';
+    $survey->surveyJSON->answer([0,0,0])->{value} = 150; # worth 150 points
+    $survey->surveyJSON->answer([0,1,0])->{recordedAnswer} = 'ext_s0q1a0';
+    $survey->surveyJSON->answer([0,1,0])->{value} = 50; # worth 50 points
+    
+    $survey->responseIdCookies(0);    # disable cookies so that test code doesn't die
+    my $responseId = $survey->responseId($user->userId);
+    
+    my $rJSON = $survey->responseJSON(undef, $responseId);
+    $rJSON->recordResponses({
+        '0-0-0'        => 'My ext_s0q0a0 answer',
+        '0-1-0'        => 'My ext_s0q1a0 answer',
+    });
+    
+    # Remember to persist our changes..
+    $survey->persistSurveyJSON();
+    $survey->persistResponseJSON();
+    $survey->surveyEnd;
+    
+    is( $e->run( $session, qq{jump {value('$id', ext_s0q0) eq 'ext_s0q0a0'} target}, {userId => $user->userId} ),
+        'target', 'external value resolves ok when id used' );
+    is( $e->run( $session, qq{jump {value('$url', ext_s0q0) eq 'ext_s0q0a0'} target}, {userId => $user->userId} ),
+        'target', 'external value resolves ok when url used' );
+    is( $e->run( $session, qq{jump {score('$url', ext_s0q0) == 150} target}, {userId => $user->userId} ),
+        'target', 'external score resolves ok too' );
+    is( $e->run( $session, qq{jump {score('$url', ext_s0) == 200} target}, {userId => $user->userId} ),
+        'target', 'external score section totals work too' );
 }
 
 #----------------------------------------------------------------------------
 # Cleanup
-END { }
+END { 
+    $user->delete if $user;
+    $survey->purge if $survey;
+}
