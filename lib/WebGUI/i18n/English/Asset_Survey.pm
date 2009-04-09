@@ -67,6 +67,10 @@ our $I18N = {
 		message => q|Delete|,
 		lastUpdated => 1224686319
 	},
+	'warnings' => {
+        message => q|Warnings|,
+        lastUpdated => 0
+    },
 	'section number' => {
 		message => q|Section Number:|,
 		lastUpdated => 1224686319
@@ -355,9 +359,9 @@ our $I18N = {
         lastUpdated => 0
     },
     'jump expression description' => {
-        message => q|An expression used to control complex branching based user responses to previous questions.|,
+        message => q|An expression used to control complex branching based user responses to previous questions. Ignored unless enableSurveyExpressionEngine enabled in your site config file.|,
         context => q|Description of the 'jump expression' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1239259550
     },
 	'text answer' => {
 		message => q|TextArea|,

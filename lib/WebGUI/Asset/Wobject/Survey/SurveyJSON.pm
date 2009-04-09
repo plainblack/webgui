@@ -1200,15 +1200,12 @@ Returns an array of messages to inform a user what is logically wrong with the S
 
 sub validateSurvey{
     my $self = shift;
-    #check all goto's
-    #bad goto expressions
-    #check that all survey is able to be seen
 
     my @messages;   
    
     #set up valid goto targets 
     my $gotoTargets = $self->getGotoTargets();
-    my $goodTargets;
+    my $goodTargets = {};
     my $duplicateTargets;
     for my $g (@{$gotoTargets}) { 
         $goodTargets->{$g}++; 

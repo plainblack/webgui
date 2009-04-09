@@ -171,3 +171,13 @@ li.newAnswer {
     width:15em;
     margin-top:0.5em;
 }
+
+#warnings-outer {
+    margin: 5px;
+    padding: 0 5px;
+    border: 1px solid;
+    color: red;
+}
+#warnings {
+    color: red;
+}
