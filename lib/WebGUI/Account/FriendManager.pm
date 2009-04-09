@@ -133,6 +133,8 @@ sub www_editFriends {
     my $userId  = shift || $form->get('userId', 'guid');
     my $user    = WebGUI::User->new($session, $userId);
 
+    my $groupName = shift || $form->get('groupName');
+
     ##List users in my friends group.   Each friend gets a delete link.
     my $friendsList = $user->friends->getUserList();
     my @friends_loop = ();
@@ -149,14 +151,20 @@ sub www_editFriends {
 
     ##List users in all administrated groups.  Friends are added one at a time.
     my @manageableUsers = ();
-    my $groupIds = $session->setting->get('groupsToManageFriends');
-    my @groupIds = split "\n", $groupIds;
-    foreach my $groupId (@groupIds) {
-        my $group = WebGUI::Group->new($session, $groupId);
-        next GROUP unless $group->getId || $group->getId eq 'new';
+    if ($groupName) {
+        my $group = WebGUI::Group->find($session, $groupName);
         push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
     }
-    @manageableUsers = uniq @manageableUsers;
+    else {
+        my $groupIds = $session->setting->get('groupsToManageFriends');
+        my @groupIds = split "\n", $groupIds;
+        foreach my $groupId (@groupIds) {
+            my $group = WebGUI::Group->new($session, $groupId);
+            next GROUP unless $group->getId || $group->getId eq 'new';
+            push @manageableUsers, @{ $group->getUsersNotIn($user->{_user}->{'friendsGroup'}, 'withoutExpired') };
+        }
+        @manageableUsers = uniq @manageableUsers;
+    }
     my %usersToAdd = ();
     tie %usersToAdd, 'Tie::IxHash';
     my $manager = $session->user;
@@ -195,7 +203,9 @@ sub www_editFriends {
     $var->{userId}       = $user->userId;
     $var->{manageUrl}    = $self->getUrl('module=friendManager;do=view');
     $var->{removeAll}    = WebGUI::Form::checkbox($session, { name => 'removeAllFriends', value => 'all', });
-    $var->{addManagers}  = WebGUI::Form::checkbox($session, { name => 'addManagers', value => 'addManagers', });
+    if (! $groupName) {
+        $var->{addManagers}  = WebGUI::Form::checkbox($session, { name => 'addManagers', value => 'addManagers', });
+    }
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
