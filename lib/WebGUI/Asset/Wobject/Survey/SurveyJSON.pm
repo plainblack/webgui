@@ -1299,7 +1299,11 @@ sub validateGotoExpression{
     my $self = shift;
     my $object = shift;
     my $goodTargets = shift;
-    return unless $object->{gotoExpression}; 
+    return unless $object->{gotoExpression};
+    
+    if (!$self->session->config->get('enableSurveyExpressionEngine')) {
+        return 'enableSurveyExpressionEngine is disabled in your site config!';
+    }
     
     use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
