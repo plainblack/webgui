@@ -182,7 +182,7 @@ sub www_editFriends {
     $var->{formHeader}  = WebGUI::Form::formHeader($session, {
                             action => $self->getUrl('module=friendManager;do=editFriendsSave'),
                           })
-                        . WebGUI::Form::hidden($session, { name => 'userId', value => $userId } );
+                        . WebGUI::Form::hidden($session, { name => 'userId', value => $user->userId } );
     $var->{addUserForm} = WebGUI::Form::selectBox($session, {
         name        => 'userToAdd',
         options     => \%usersToAdd,
@@ -269,14 +269,36 @@ sub www_getFriendsAsJson  {
         return '{}';
     }
     my @records = ();
+    my $groups = $session->setting->get('groupsToManageFriends');
+    my @groupIds = split "\n", $groups;
+    @groupIds = grep { $_ ne $groupId } @groupIds;
+    my $groupNames = join "\n",
+                        map { $_->name }
+                        map { WebGUI::Group->new($session, $_) }
+                        @groupIds;
     USER: foreach my $userId (@{ $group->getUsers} ) {
         my $user = WebGUI::User->new($session, $userId);
         next USER unless $user;
-        my $friendsCount = scalar @{ $user->friends->getUsers() };
+        my $friendsList = $user->friends->getUserList();
+        my $friendsCount = scalar keys %{ $friendsList };
+        my $friends = '';
+        NAME: foreach my $name ( values %{ $friendsList }) {
+            if (length $friends + length $name < 45) {
+                if ($friends) {
+                    $friends .= ', ';
+                }
+                $friends .= $name;
+            }
+            else {
+                last NAME;
+            }
+        }
         push @records, {
-            userId   => $userId,
-            username => $user->username,
-            friends  => $friendsCount,
+            userId        => $userId,
+            username      => $user->username,
+            friendsCount  => $friendsCount,
+            friends       => $friends,
+            groups        => $groupNames,
         };
     }
     ##Sort by username to make the datatable happy

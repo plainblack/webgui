@@ -40,9 +40,11 @@ WebGUI.FriendManager.responseSchema
     = {
         resultsList: 'records',
         fields: [
-            { key: 'userId',      parser: 'string' },
-            { key: 'username',    parser: 'string' },
-            { key: 'friends',     parser: 'number' },
+            { key: 'userId',       parser: 'string' },
+            { key: 'username',     parser: 'string' },
+            { key: 'friendsCount', parser: 'number' },
+            { key: 'friends',      parser: 'string' },
+            { key: 'groups',       parser: 'string' },
         ],
         metaFields: {
             totalRecords: "recordsReturned" // Access to value in the server response
@@ -50,27 +52,29 @@ WebGUI.FriendManager.responseSchema
     };
 
 WebGUI.FriendManager.formatUsername = function ( el, oRecord, oColumn, oData ) {
-//    var link  = document.createElement('a');
-//    var myId  = YAHOO.util.Dom.generateId();
-//    elCell.innerHTML = '<span id="'+myId+'" class="yui-button"><span class="first-child"><button type="link">edit</button></span></span>';
-//    var editButton = new YAHOO.widget.Button( myId,
-//        {
-//            type : "link",
-//            href : "?op=account;module=friendManager;do=editFriends;uid="+oRecord.getData('userId'),
-//            label : "EDIT",
-//        }
-//    );
     var userId = oRecord.getData('userId');
-    el.innerHTML  = '<a href="?op=account;module=friendManager;do=editFriends;userId=' + userId + '">edit</a> ';
-    el.innerHTML += '<a href="?op=account;module=inbox;uid=' + userId + '">' + oData + '</a>';
+    el.innerHTML = '<a href="?op=account;module=inbox;uid=' + userId + '">' + oData + '</a>';
+}
+
+WebGUI.FriendManager.formatGroups = function ( el, oRecord, oColumn, oData ) {
+    var userId = oRecord.getData('userId');
+    el.innerHTML = '<a href="?op=account;module=friendManager;do=editFriends;userId=' + userId + '">Edit all</a>';
+    var groups = oData.split("\n");
+    for (var idx=0; idx < groups.length; idx++) {
+        var group = groups[idx];
+        el.innerHTML += ' ';
+        el.innerHTML += '<a href="?op=account;module=friendManager;do=editFriends;userId=' + userId + ';groupName='+group+'">'+group+'</a>';
+    }
 }
 
 WebGUI.FriendManager.ColumnDefs = [ // sortable:true enables sorting
     //{key:"username",    label:WebGUI.FriendManager.i18n.get('WebGUI', '50' ),             sortable: true},
     //{key:"friends",     label:WebGUI.FriendManager.i18n.get('Account_Friends', 'title' ), sortable: true},
-    {key:"username",    label:"username", sortable: true, formatter: WebGUI.FriendManager.formatUsername },
-    {key:"friends",     label:"friends",  sortable: true},
-    {key:"userId",      label:"userId",   sortable: true},
+    {key:"groups",       label:"groups",       sortable: false, formatter: WebGUI.FriendManager.formatGroups },
+    {key:"username",     label:"username",     sortable: true, formatter: WebGUI.FriendManager.formatUsername },
+    {key:"friendsCount", label:"friendsCount", sortable: true},
+    {key:"friends",      label:"friends",      sortable: false},
+    {key:"userId",       label:"userId",       sortable: true},
 ];
 
 //Per object code
