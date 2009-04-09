@@ -191,6 +191,9 @@ sub www_editFriends {
                             action => $self->getUrl('module=friendManager;do=editFriendsSave'),
                           })
                         . WebGUI::Form::hidden($session, { name => 'userId', value => $user->userId } );
+    if ($groupName) {
+        $var->{formHeader} .= WebGUI::Form::hidden($session, { name => 'groupName', value => $groupName });
+    }
     $var->{addUserForm} = WebGUI::Form::selectBox($session, {
         name        => 'userToAdd',
         options     => \%usersToAdd,
@@ -249,7 +252,8 @@ sub www_editFriendsSave () {
         $ufriend->delete(\@usersToRemove);
     }
 
-    return $self->www_editFriends($userId);
+    my $groupName = $form->process('groupName');
+    return $self->www_editFriends($userId, $groupName);
 }
 
 #-------------------------------------------------------------------
