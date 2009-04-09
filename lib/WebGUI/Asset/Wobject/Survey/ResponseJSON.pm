@@ -85,7 +85,7 @@ Answers entries contain: value (the recorded value), time and comment fields.
  {
      ...
      answerId => {
-         value   => "answer value",
+         value   => "recorded answer value",
          time    => time(),
          comment => "answer comment",
     },

@@ -251,9 +251,9 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'show text in button description' => {
-        message => q|Select if the buttons of a multiple choice question display the answer values or not.|,
+        message => q|By default multiple choice answer buttons show the answer text above each button. Change this to have the text appear inside of the buttons.|,
         context => q|Description of the 'show text in button' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1239251986
     },
 	'allow comment' => {
 		message => q|Allow comment:|,
@@ -333,13 +333,13 @@ our $I18N = {
         lastUpdated => 0
     },
 	'recorded answer' => {
-		message => q|Answer title:|,
+		message => q|Recorded Answer:|,
 		lastUpdated => 1224686319
 	},
     'recorded answer description' => {
-        message => q|Text to display inside multiple-choice answer buttons (only if 'Show text in button' is enabled for this question).|,
+        message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1239251436
     },
 	'jump to' => {
 		message => q|Jump to:|,
@@ -355,7 +355,7 @@ our $I18N = {
         lastUpdated => 0
     },
     'jump expression description' => {
-        message => q|An expression used to control complex branching based user responses to previous questions. A branch expression is made up of a list of rules, one per line, along with a branch target for each rule. |,
+        message => q|An expression used to control complex branching based user responses to previous questions.|,
         context => q|Description of the 'jump expression' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -416,14 +416,14 @@ our $I18N = {
         context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'answer value' => {
-		message => q|Answer value:|,
-		lastUpdated => 1224686319
+	'answer score' => {
+		message => q|Answer score:|,
+		lastUpdated => 1239251986
 	},
-    'answer value description' => {
-        message => q|Assign a numeric scores to this answers. Used in question scoring and jump expressions.|,
-        context => q|Description of the 'answer value' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
+    'answer score description' => {
+        message => q|Assign a numeric score to this answer. Used in question scoring and jump expressions.|,
+        context => q|Description of the 'answer score' field, used as hoverhelp in the edit answer dialog.|,
+        lastUpdated => 1239251986
     },
 	'checked' => {
 		message => q|Checked|,
@@ -1282,7 +1282,7 @@ section/answer.|,
     },
 
     'textInButton' => {
-        message => q|A boolean indicating whether the buttons for answers to multiple choice questions should display the answer's text.|,
+        message => q|A boolean indicating whether the buttons for answers to multiple choice questions should display the answer's text inside or above.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
@@ -1318,7 +1318,7 @@ section/answer.|,
     },
 
     'recordedAnswer' => {
-        message => q|The value that gets recorded for this answer in the database.|,
+        message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
