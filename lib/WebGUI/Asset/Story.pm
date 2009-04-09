@@ -319,11 +319,15 @@ sub getEditForm {
         formTitle      => $isNew
                         ? $i18n->get('add a story','Asset_StoryArchive')
                         : $i18n->get('editing','Asset_WikiPage').' '.$title,
+        headlineForm   => WebGUI::Form::text($session, {
+                             name  => 'headline',
+                             value => $form->get('headline') || $self->get('headline'),
+                          } ),
         titleForm      => WebGUI::Form::text($session, {
                              name  => 'title',
                              value => $form->get('title')    || $self->get('title'),
                           } ),
-        subTitleForm   => WebGUI::Form::textarea($session, {
+        subtitleForm   => WebGUI::Form::textarea($session, {
                              name  => 'subtitle',
                              value => $form->get('subtitle') || $self->get('subtitle')
                           } ),

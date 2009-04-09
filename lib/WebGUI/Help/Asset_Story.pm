@@ -19,6 +19,7 @@ our $HELP = {
             { name      => 'formFooter',
               required  => 1 },
             { name      => 'titleForm', },
+            { name      => 'headlineForm', },
             { name      => 'subtitleForm', },
             { name      => 'bylineForm', },
             { name      => 'locationForm', },

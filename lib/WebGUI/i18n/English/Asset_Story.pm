@@ -154,6 +154,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'headlineForm' => {
+        message => q|Form for the user to enter a headline for this story.|,
+        lastUpdated => 0,
+    },
+
     'subtitleForm' => {
         message => q|Form for the user to enter a subtitle for this story.|,
         lastUpdated => 0,
