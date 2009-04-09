@@ -781,8 +781,11 @@ sub responseScoresByVariableName {
         # Grab the corresponding answer
         my $answer = $self->survey->answer([@address]);
         
+        # Use question score if answer score undefined
+        my $score = (exists $answer->{value} && length $answer->{value} > 0) ? $answer->{value} : $question->{value};
+        
         # Add variable => score to our hash
-        $lookup{$question->{variable}} = $answer->{value};
+        $lookup{$question->{variable}} = $score;
     }
     
     # Add section score totals

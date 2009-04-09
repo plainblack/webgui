@@ -300,14 +300,14 @@ our $I18N = {
         context => q|Description of the 'required' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'question value' => {
-		message => q|Question value:|,
+	'question score' => {
+		message => q|Question score:|,
 		lastUpdated => 1224686319
 	},
-    'question value description' => {
-        message => q|Enter a value for this question.|,
+    'question score description' => {
+        message => q|Default score to use for answers in this question that don't have an answer score value set.|,
         context => q|Description of the 'question value' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1239255403
     },
 	'please enter answer information' => {
 		message => q|Please enter answer information:|,
@@ -421,7 +421,7 @@ our $I18N = {
 		lastUpdated => 1239251986
 	},
     'answer score description' => {
-        message => q|Assign a numeric score to this answer. Used in question scoring and jump expressions.|,
+        message => q|Assign a numeric score to this answer. If blank, the question score value will used instead. Used in question scoring and jump expressions.|,
         context => q|Description of the 'answer score' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 1239251986
     },
