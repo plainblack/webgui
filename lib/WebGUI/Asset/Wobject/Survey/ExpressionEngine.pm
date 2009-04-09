@@ -191,7 +191,7 @@ Hashref of values to make available to the expression via the L<value> utility s
 
 Hashref of scores to make available to the expression via the L<score> utility sub
 
-=item* validTargets
+=item * validTargets
 
 A hashref of valid jump targets. If this is provided, all L<jump> calls will fail unless
 the specified target is a key in the hashref.
