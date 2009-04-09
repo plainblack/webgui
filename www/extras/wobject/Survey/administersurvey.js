@@ -327,7 +327,7 @@ if (typeof Survey === "undefined") {
 
     YAHOO.widget.Chart.SWFURL = "/extras/yui/build/charts/assets/charts.swf"; 
     // Public API
-    Survey.Form = {
+    Survey.Summary = {
         globalSummaryDataTip: function(item, index, series){
                     var toolTipText =  "hello";
                     //var toolTipText = series.displayName + " for " + item.section;
@@ -441,8 +441,10 @@ if (typeof Survey === "undefined") {
             });
 
             YAHOO.util.Event.addListener("submitbutton", "click", function(){ Survey.Comm.submitSummary(); });
-        },
+        }
+    };
 
+    Survey.Form = {
         displayQuestions: function(params){
             toValidate = [];
             var qs = params.questions;
