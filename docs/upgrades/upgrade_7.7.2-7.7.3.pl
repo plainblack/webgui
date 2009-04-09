@@ -22,7 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::PassiveAnalytics::Rule;
+use WebGUI::Utility;
 
 my $toVersion = '7.7.3';
 my $quiet; # this line required
@@ -35,6 +36,7 @@ my $session = start(); # this line required
 addSurveyQuizModeColumns($session);
 addSurveyExpressionEngineConfigFlag($session);
 addCarouselWobject($session);
+reInstallPassiveAnalyticsConfig($session);
 
 finish($session); # this line required
 
@@ -77,6 +79,53 @@ sub addSurveyExpressionEngineConfigFlag{
     print "\tAdding enableSurveyExpressionEngine config option... " unless $quiet;
     $session->config->set('enableSurveyExpressionEngine', 0);
     print "Done.\n" unless $quiet;
+}
+
+
+#----------------------------------------------------------------------------
+# Conditionally re-add passive analytics config because it wasn't added to WebGUI.conf.original
+# in version 7.7.0.
+sub reInstallPassiveAnalyticsConfig {
+    my $session = shift;
+    print "\tAdd Passive Analytics entry to the config file... " unless $quiet;
+    # Admin Bar/Console
+    my $adminConsole = $session->config->get('adminConsole');
+    if (!exists $adminConsole->{'passiveAnalytics'}) {
+        $adminConsole->{'passiveAnalytics'} = {
+            "icon"         => "passiveAnalytics.png",
+            "uiLevel"      => 1,
+            "url"          => "^PageUrl(\"\",op=passiveAnalytics;func=editRuleflow);",
+            "title"        => "^International(Passive Analytics,PassiveAnalytics);",
+            "groupSetting" => "3",
+        };
+        $session->config->set('adminConsole', $adminConsole);
+    }
+    # Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (!isIn('WebGUI::Content::PassiveAnalytics',@{ $contentHandlers} ) ) {
+        my $contentIndex = 0;
+        HANDLER: while ($contentIndex <= $#{ $contentHandlers } ) {
+            ##Insert before Operation
+            if($contentHandlers->[$contentIndex] eq 'WebGUI::Content::Operation') {
+                splice @{ $contentHandlers }, $contentIndex, 0, 'WebGUI::Content::PassiveAnalytics';
+                last HANDLER;
+            }
+            ++$contentIndex;
+        }
+        $session->config->set('contentHandlers', $contentHandlers);
+    }
+    # Workflow Activities
+    my $workflowActivities = $session->config->get('workflowActivities');
+    my @none = @{ $workflowActivities->{'None'} };
+    if (!isIn('WebGUI::Workflow::Activity::SummarizePassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::SummarizePassiveAnalytics';
+    }
+    if (!isIn('WebGUI::Workflow::Activity::BucketPassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::BucketPassiveAnalytics';
+    }
+    $workflowActivities->{'None'} = [ @none ];
+    $session->config->set('workflowActivities', $workflowActivities);
+    print "DONE!\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
