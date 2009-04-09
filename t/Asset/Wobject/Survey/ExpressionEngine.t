@@ -29,7 +29,7 @@ plan tests => $tests + 1;
 # put your tests here
 
 my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey::ExpressionEngine');
-my ($user, $survey);
+my ($user, $survey, $versionTag);
 SKIP: {
 
     skip $tests, "Unable to load ExpressionEngine" unless $usedOk;
@@ -116,6 +116,7 @@ SKIP: {
     my $user = WebGUI::User->new( $session, 'new' );
     
     # Create a Survey
+    $versionTag = WebGUI::VersionTag->getWorking($session);
     my $survey = WebGUI::Asset->getImportNode($session)->addChild(
         {   className                => 'WebGUI::Asset::Wobject::Survey',
         },
@@ -167,4 +168,5 @@ SKIP: {
 END { 
     $user->delete if $user;
     $survey->purge if $survey;
+    $versionTag->rollback if $versionTag;
 }
