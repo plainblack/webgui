@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 34;
+my $tests = 37;
 plan tests => 1
             + $tests
             ;
@@ -225,6 +225,10 @@ cmp_deeply(
     'getRssData: returns correct data'
 );
 
+$story->update({headline  => 'WebGUI, Web Done Right'});
+
+is($story->getRssData->{title}, 'WebGUI, Web Done Right', '... headline preferred over title if present');
+
 ############################################################
 #
 # viewTemplateVariables
@@ -271,6 +275,9 @@ cmp_deeply(
     ],
     'viewTemplateVariables: highlights_loop is okay'
 );
+
+is($viewVariables->{title},    'Story 1',                '... title is okay');
+is($viewVariables->{headline}, 'WebGUI, Web Done Right', '... headline is okay');
 
 cmp_bag(
     $viewVariables->{keyword_loop},
