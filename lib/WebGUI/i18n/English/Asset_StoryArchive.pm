@@ -209,7 +209,7 @@ our $I18N = {
 
     'searchForm' => {
         message => q|The text field where users can enter in keywords for the search.|,
-        context => q|label for the URL to add a story to the archive.|,
+        context => q|Template variable.|,
         lastUpdated => 0,
     },
 
@@ -221,7 +221,37 @@ our $I18N = {
 
     'searchFooter' => {
         message => q|HTML code for ending the search form.|,
-        context => q|label for the URL to add a story to the archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'canPostStories' => {
+        message => q|A boolean which is true if the user can post stories.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'addStoryUrl' => {
+        message => q|The URL for the user to add a Story.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'rssUrl' => {
+        message => q|The URL for the RSS feed for this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'atomUrl' => {
+        message => q|The URL for the Atom feed for this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'keywordCloud' => {
+        message => q|The tag cloud for the keywords for stories in this Story Archive.|,
+        context => q|Template variable.|,
         lastUpdated => 0,
     },
 

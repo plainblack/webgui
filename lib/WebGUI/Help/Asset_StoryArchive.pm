@@ -38,6 +38,11 @@ our $HELP = {
             {   'name' => 'searchForm'   },
             {   'name' => 'searchButton' },
             {   'name' => 'searchFooter' },
+            {   'name' => 'canPostStories' },
+            {   'name' => 'addStoryUrl' },
+            {   'name' => 'rssUrl' },
+            {   'name' => 'atomUrl' },
+            {   'name' => 'keywordCloud' },
         ],
         related => []
     },

@@ -370,6 +370,8 @@ sub viewTemplateVariables {
     $var->{addStoryUrl}    = $var->{canPostStories}
                            ? $self->getUrl('func=add;class=WebGUI::Asset::Story')
                            : '';
+    $var->{rssUrl}         = $self->getUrl('func=viewRss');
+    $var->{atomUrl}        = $self->getUrl('func=viewAtom');
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud({
         startAsset  => $self,
         displayFunc => 'view',
