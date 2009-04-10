@@ -11,6 +11,9 @@ if ( typeof WebGUI == "undefined" ) {
 if ( typeof WebGUI.FriendManager == "undefined" ) {
     WebGUI.FriendManager = {};
 }
+if ( typeof WebGUI.FriendManager.tables == "undefined" ) {
+    WebGUI.FriendManager.tables = {};
+}
 
 /*---------------------------------------------------------------------------
     WebGUI.FriendManager.initManager ( )

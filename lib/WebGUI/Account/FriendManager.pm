@@ -91,6 +91,12 @@ sub editSettingsForm {
         label     => $i18n->get("edit template label"),
         hoverHelp => $i18n->get("edit template hoverHelp"),
     );
+    $f->yesNo(
+        name      => "overrideAbleToBeFriend",
+        value     => $self->session->setting->get("overrideAbleToBeFriend"),
+        label     => $i18n->get("override abletobefriend label"),
+        hoverHelp => $i18n->get("override abletobefriend hoverHelp"),
+    );
 
     return $f->printRowsOnly;
 }
@@ -112,8 +118,9 @@ sub editSettingsFormSave {
     $setting->set("fmViewTemplateId",  $form->process("fmViewTemplateId",  "template"));
     $setting->set("fmEditTemplateId",  $form->process("fmEditTemplateId",  "template"));
     my $groupsToManageFriends = $form->process("groupsToManageFriends", "group");
-    $setting->set("groupsToManageFriends", $groupsToManageFriends);
-    $setting->set("groupIdAdminFriends",   $form->process("groupIdAdminFriends",   "group"));
+    $setting->set("groupsToManageFriends",  $groupsToManageFriends);
+    $setting->set("groupIdAdminFriends",    $form->process("groupIdAdminFriends",    "group"));
+    $setting->set("overrideAbleToBeFriend", $form->process("overrideAbleToBeFriend", "yesNo"));
 }
 
 #-------------------------------------------------------------------
@@ -171,13 +178,14 @@ sub www_editFriends {
     my $i18n = WebGUI::International->new($session);
     $usersToAdd{0} = $i18n->get('Select One');
     my @usersToAdd = ();
+    my $overrideProfile = $session->setting->get('overrideAbleToBeFriend');
     USERID: foreach my $newFriendId (@manageableUsers) {
         next USERID if $newFriendId eq $userId;
         my $user = WebGUI::User->new($session, $newFriendId);
         ##We don't use acceptsFriendsRequests here because it's overkill.
         ##No need to check invitations, since friends are managed.
         ##Existing friends are already filtered out.
-        next USERID unless $user->profileField('ableToBeFriend');
+        next USERID unless $user->profileField('ableToBeFriend') || $overrideProfile;
         push @usersToAdd, [ $newFriendId, $user->username ];
     }
 

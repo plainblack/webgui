@@ -43,6 +43,16 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'override abletobefriend label' => {
+        message     => q{Override ableToBeFriend profile setting?},
+        lastUpdated => 0,
+    },
+
+    'override abletobefriend hoverHelp' => {
+        message     => q{If a user has set their ableToBeFriend profile option to 'No', then the Friend Manager will not display them as a friend to be added.  If this option is set to Yes, then the Friend Manager will allow managing them.},
+        lastUpdated => 0,
+    },
+
     'title' => {
         message     => q{Friend Manager},
         lastUpdated => 0,

@@ -47,6 +47,7 @@ sub installFriendManagerSettings {
     $session->setting->add('fmViewTemplateId', '64tqS80D53Z0JoAs2cX2VQ');
     $session->setting->add('fmEditTemplateId', 'lG2exkH9FeYvn4pA63idNg');
     $session->setting->add('groupsToManageFriends',       '2');
+    $session->setting->add('overrideAbleToBeFriend',       0);
     print "\tDone";
 }
 
