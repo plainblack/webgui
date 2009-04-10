@@ -1153,7 +1153,15 @@ sub www_submitQuestions {
 }
 
 #-------------------------------------------------------------------
-sub getSummary{
+
+=head2 getSummary
+
+Returns a copy of the summary stored in JSON, and the output of
+the survey summary template.
+
+=cut
+
+sub getSummary {
     my $self = shift;
     my $summary = $self->responseJSON->showSummary();
     my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
@@ -1161,6 +1169,7 @@ sub getSummary{
     return ($summary,$out);
 #    return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
+
 #-------------------------------------------------------------------
 
 =head2 www_loadQuestions
@@ -1752,7 +1761,7 @@ sub www_viewStatisticalOverview {
 
 #-------------------------------------------------------------------
 
-=head2 www_exportTransposedResults ()
+=head2 www_exportSimpleResults ()
 
 Exports transposed results in a tab deliniated file.
 

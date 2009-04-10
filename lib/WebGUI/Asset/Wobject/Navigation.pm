@@ -84,6 +84,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Manually build the edit form due to javascript elements.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
@@ -340,7 +347,7 @@ sub getToolbar {
 
 =head2 prepareView ( )
 
-See WebGUI::Asset::prepareView() for details.
+Extend the superclass to add metadata and to preprocess the template.
 
 =cut
 
@@ -354,6 +361,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+See WebGUI::Asset::view() for details.
+
+=cut
+
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
@@ -512,6 +526,13 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_goBackToPage ( )
+
+Do a redirect to the form parameter returnUrl if it exists.
+
+=cut
+
 sub www_goBackToPage {
 	my $self = shift;
 	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));
