@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::User;
 
 use WebGUI::Asset;
-use Test::More tests => 92; # increment this value for each test you create
+use Test::More tests => 90; # increment this value for each test you create
 use Test::Deep;
 
 # Test the methods in WebGUI::AssetLineage
@@ -195,12 +195,10 @@ is(
 #
 ####################################################
 
-ok(!$snippet2->setParent($folder),   'setParent: user must be in group 4 to do this');
 $session->user({userId => $editor->userId});
 ok(!$snippet2->setParent(),          'setParent: new parent must be passed in');
 ok(!$snippet2->setParent($snippet2), 'setParent: cannot be your own parent');
 ok(!$snippet2->setParent($folder2),  'setParent: will not move self to current parent');
-ok(!$snippet2->setParent($folder),   'setParent: user cannot edit parent');
 
 $session->user({userId => 3});
 ok(!$folder2->setParent($snippet2),  'setParent: will not move self to my child');
