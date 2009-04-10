@@ -1,6 +1,7 @@
 7.7.4
  - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.
  - Survey [[question variable]] now returns the shown answer text for multiple choice questions, and the recorded value for non-multiple choice questions.
+ - fixed #10142: Matrix 2.0 - Search screen compare button not functional
 
 7.7.3
  - fixed #10094: double explanation in thread help
