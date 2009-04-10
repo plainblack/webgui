@@ -1,4 +1,5 @@
 7.7.4
+ - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.
 
 7.7.3
  - fixed #10094: double explanation in thread help

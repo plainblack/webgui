@@ -110,6 +110,7 @@ Loads the Multiple Choice and Special Question types
 
 sub loadTypes {
     my $self = shift;
+
     @{$self->{specialQuestionTypes}} = ( 
         'Dual Slider - Range',
         'Multi Slider - Allocate',
@@ -125,9 +126,11 @@ sub loadTypes {
         'Date Range',
         'Year Month',
         'Hidden',
-    );
-    my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes");
-    map($self->{multipleChoiceTypes}->{$_->{questionType}} = [split/,/,$_->{answers}], @$refs);
+    ) if(! defined $self->{specialQuestionTypes});
+    if(! defined $self->{multipleChoiceTypes}){
+        my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes"); 
+        map($self->{multipleChoiceTypes}->{$_->{questionType}} = $_->{answers} ? from_json($_->{answers}) : {}, @$refs);
+    }
 }
 
 sub addType { 
@@ -135,11 +138,7 @@ sub addType {
     my $name = shift;
     my $address = shift;
     my $obj = $self->getObject($address);
-    my @answers;
-    for my $ans(@{$obj->{answers}}){
-        push(@answers,$ans->{text});
-    }
-    my $ansString = join(',',@answers);
+    my $ansString = $obj->{answers} ? to_json $obj->{answers} : {};
     $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$name,$ansString,$ansString]);
     $self->question($address)->{questionType} = $name;
 }
@@ -391,7 +390,6 @@ sections, questions, or answers.
 sub getEditVars {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
     
@@ -988,16 +986,8 @@ sub updateQuestionAnswers {
     }
     elsif ( my $answerBundle = $self->getMultiChoiceBundle($type) ) {
         # We found a known multi-choice bundle. 
-
-        # Mark any answer containing the string "verbatim" as verbatim
-        my $verbatims = {};
-        for my $answerIndex (0 .. $#$answerBundle) {
-            if ($answerBundle->[$answerIndex] =~ /\(verbatim\)/) {
-                $verbatims->{$answerIndex} = 1;
-            }
-        }
-        # Add the bundle of multi-choice answers, along with the verbatims hash
-        $self->addAnswersToQuestion( \@address_copy, $answerBundle, $verbatims );
+        # Add the bundle of multi-choice answers
+        $self->addAnswersToQuestion( \@address_copy, $answerBundle );
     } else {
         # Default action is to add a single, default answer to the question
         push @{ $question->{answers} }, $self->newAnswer();
@@ -1021,7 +1011,7 @@ sub getMultiChoiceBundle {
     return $self->{multipleChoiceTypes}->{$type};
 }
 
-=head2 addAnswersToQuestion ($address, $answers, $verbatims)
+=head2 addAnswersToQuestion ($address, $answers)
 
 Helper routine for updateQuestionAnswers.  Adds an array of answers to a question.
 
@@ -1034,39 +1024,21 @@ See L<"Address Parameter">. The address of the question to add answers to.
 An array reference of answers to add.  Each element will be assigned to the text field of
 the answer that is created.
 
-=head3 $verbatims
-
-An hash reference.  Each key is an index into the answers array.  The value is a placeholder
-for doing existance lookups.  For each requested index, the verbatim flag in the answer is
-set to true.
-
 =cut
 
 sub addAnswersToQuestion {
     my $self = shift;
-    my ( $address, $answers, $verbatims )
-        = validate_pos( @_, { type => ARRAYREF }, { type => ARRAYREF }, { type => HASHREF } );
+    my ( $address, $answers )
+        = validate_pos( @_, { type => ARRAYREF }, { type => ARRAYREF } );
 
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy = @{$address};
-
+    
     for my $answer_index ( 0 .. $#{$answers} ) {
-
+        
         # Add a new answer to question
-        push @{ $self->question( \@address_copy )->{answers} }, $self->newAnswer();
-
-        # Update address to point at newly created answer (so that we can update it)
-        $address_copy[2] = $answer_index;
-
-        # Update the answer appropriately
-        $self->update(
-            \@address_copy,
-            {   text           => $answers->[$answer_index],
-                recordedAnswer => $answer_index + 1, # 1-indexed
-                verbatim       => $verbatims->{$answer_index},
-            }
-        );
+        push @{ $self->question( \@address_copy )->{answers} }, $answers->[$answer_index];
     }
     
     return;

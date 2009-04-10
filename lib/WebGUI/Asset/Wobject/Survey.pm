@@ -396,6 +396,7 @@ Loads the initial edit survey page. All other edit actions are ajax calls from t
 
 sub www_editSurvey {
     my $self = shift;
+    
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
@@ -742,6 +743,7 @@ sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
     my $address = defined $options->{address} ? $options->{address} : undef;
+    
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process('data') ) {
             if ( $inAddress eq q{-} ) {
@@ -760,7 +762,7 @@ sub www_loadSurvey {
         = defined $options->{var}
         ? $options->{var}
         : $self->surveyJSON->getEditVars($address);
-
+    
     my $editHtml;
     if ( $var->{type} eq 'section' ) {
         $editHtml = $self->processTemplate( $var, $self->get('sectionEditTemplateId') );
@@ -903,7 +905,7 @@ returns the output.
 sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
-
+    
     my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
     
     $var->{lastResponseCompleted} = $code;
@@ -1181,7 +1183,6 @@ Determines which questions to display to the survey taker next, loads and return
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
-    
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
