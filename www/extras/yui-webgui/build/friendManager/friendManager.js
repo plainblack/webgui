@@ -1,7 +1,5 @@
-/*** The WebGUI Asset History Viewer 
+/*** The WebGUI Friend Manager
  * Requires: YAHOO, Dom, Event
- * With all due credit to Doug Bell, who wrote the AssetManager.  FriendManager
- * is a blatant copy/paste/modify of it.
  */
 
 //Container for functions used by many datatables.
@@ -17,24 +15,29 @@ if ( typeof WebGUI.FriendManager.tables == "undefined" ) {
 
 /*---------------------------------------------------------------------------
     WebGUI.FriendManager.initManager ( )
-    Initialize the i18n interface
-WebGUI.FriendManager.initManager = function (o) {
-    WebGUI.FriendManager.i18n
-    = new WebGUI.i18n( { 
-            namespaces  : {
-                'WebGUI' : [
-                    "50",
-                ],
-                'Account_Friends' : [
-                    "title",
-                ]
-            },
-            onpreload   : {
-                fn       : WebGUI.FriendManager.init
-            }
-        } );
-};
+    Initialize the i18n interface, and then call the function to build
+    the DataTables.
 */
+WebGUI.FriendManager.initI18N = function (o) {
+    WebGUI.FriendManager.i18n
+        = new WebGUI.i18n( { 
+                namespaces  : {
+                    "WebGUI" : [
+                        "50",
+                        "89",
+                    ],
+                    "Account_Friends" : [
+                        "title",
+                    ],
+                    "Account_FriendManager" : [
+                        "friends count",
+                    ]
+                },
+                onpreload   : {
+                    fn       : WebGUI.FriendManager.initTables
+                }
+            } );
+};
 
 /*---------------------------------------------------------------------------
     Initialize objects that are shared across many datatables.
@@ -73,20 +76,24 @@ WebGUI.FriendManager.formatGroups = function ( el, oRecord, oColumn, oData ) {
     }
 }
 
-WebGUI.FriendManager.ColumnDefs = [ // sortable:true enables sorting
-    //{key:"username",    label:WebGUI.FriendManager.i18n.get('WebGUI', '50' ),             sortable: true},
-    //{key:"friends",     label:WebGUI.FriendManager.i18n.get('Account_Friends', 'title' ), sortable: true},
-    {key:"groups",       label:"groups",       sortable: false, formatter: WebGUI.FriendManager.formatGroups },
-    {key:"username",     label:"username",     sortable: true, formatter: WebGUI.FriendManager.formatUsername },
-    {key:"friendsCount", label:"friendsCount", sortable: true},
-    {key:"friends",      label:"friends",      sortable: false},
-    {key:"userId",       label:"userId",       sortable: true},
-];
-
 //Per object code
 
 WebGUI.FriendManager.MakeTable = function (groupId, containerId) {
     var that = this;
+
+    if (typeof WebGUI.FriendManager.ColumnDefs == "undefined" ) {
+        WebGUI.FriendManager.ColumnDefs = [ // sortable:true enables sorting
+            { key:"groups",       sortable: false, formatter: WebGUI.FriendManager.formatGroups,
+              label:WebGUI.FriendManager.i18n.get('WebGUI', '89' ), },
+            { key:"username",     sortable: true,  formatter: WebGUI.FriendManager.formatUsername,
+              label:WebGUI.FriendManager.i18n.get('WebGUI', '50' ), },
+            { key:"friendsCount", sortable: true,
+              label:WebGUI.FriendManager.i18n.get('Account_FriendManager', 'friends count' ), },
+            { key:"friends",      sortable: false,
+              label:WebGUI.FriendManager.i18n.get('Account_Friends', 'title' ), },
+            { key:"userId",       label:"userId",       sortable: true},
+        ];
+    }
 
     // Initialize the data table
     var myPaginator = new YAHOO.widget.Paginator({

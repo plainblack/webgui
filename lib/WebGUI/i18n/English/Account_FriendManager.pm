@@ -185,6 +185,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'friends count' => {
+        message     => q{Friends Count},
+        lastUpdated => 0,
+    },
+
 };
 
 1;
