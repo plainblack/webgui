@@ -113,11 +113,11 @@ SKIP: {
     
     
     # Create a test user
-    my $user = WebGUI::User->new( $session, 'new' );
+    $user = WebGUI::User->new( $session, 'new' );
     
     # Create a Survey
     $versionTag = WebGUI::VersionTag->getWorking($session);
-    my $survey = WebGUI::Asset->getImportNode($session)->addChild(
+    $survey = WebGUI::Asset->getImportNode($session)->addChild(
         {   className                => 'WebGUI::Asset::Wobject::Survey',
         },
     );
