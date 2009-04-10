@@ -168,6 +168,8 @@ sub viewTemplateVariables {
         ##TODO: Photo variables
     }
     $var->{standAlone} = $self->{_standAlone};
+    $var->{rssUrl}     = $self->getUrl('func=viewRss');
+    $var->{atomUrl}    = $self->getUrl('func=viewAtom');
 
     return $var;
 }

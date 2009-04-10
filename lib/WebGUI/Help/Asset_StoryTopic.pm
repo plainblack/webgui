@@ -31,6 +31,8 @@ our $HELP = {
             { name => 'topStorySubtitle' },
             { name => 'topStoryUrl' },
             { name => 'topStoryCreationDate' },
+            { name => 'rssUrl' },
+            { name => 'atomUrl' },
         ],
         related => []
     },

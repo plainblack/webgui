@@ -123,6 +123,18 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'rssUrl' => {
+        message => q|The URL for the RSS feed for this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'atomUrl' => {
+        message => q|The URL for the Atom feed for this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;
