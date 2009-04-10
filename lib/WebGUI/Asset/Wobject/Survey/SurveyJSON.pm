@@ -725,15 +725,18 @@ sub insertObject {
     # Use splice to rearrange the relevant array of objects..
     if ( $count == 1 ) {
         splice @{ $self->sections($address) }, sIndex($address) +1, 0, $object;
+        $address->[0]++;
     }
     elsif ( $count == 2 ) {
         splice @{ $self->questions($address) }, qIndex($address) + 1, 0, $object;
+        $address->[1]++;
     }
     elsif ( $count == 3 ) {
         splice @{ $self->answers($address) }, aIndex($address) + 1, 0, $object;
+        $address->[2]++;
     }
     
-    return;
+    return $address;
 }
 
 =head2 copy ( $address )

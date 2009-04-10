@@ -677,7 +677,7 @@ sub www_dragDrop {
         #If target is being moved down, then before has just moved up do to the target being deleted
         $bid[0]-- if($tid[0] < $bid[0]);
 
-        $self->surveyJSON->insertObject( $target, [ $bid[0] ] );
+        $address = $self->surveyJSON->insertObject( $target, [ $bid[0] ] );
     }
     elsif ( @tid == 2 ) {    #questions can be moved to any section, but a pushed to the end of a new section.
         if ( $bid[0] !~ /\d/ ) {
@@ -701,21 +701,21 @@ sub www_dragDrop {
         else{   #Moved within the same section
             $bid[1]-- if($tid[1] < $bid[1]);
         }
-        $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1] ] );
+        $address  = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1] ] );
     } ## end elsif ( @tid == 2 )
     elsif ( @tid == 3 ) {    #answers can only be rearranged in the same question
         if ( @bid == 2 and $bid[1] == $tid[1] ) {#moved to the top of the question
             $bid[2] = -1;
-            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $address = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         elsif ( @bid == 3 ) {
             #If target is being moved down, then before has just moved up do to the target being deleted
             $bid[2]-- if($tid[2] < $bid[2]);
-            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $address = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
             #else put it back where it was
-            $self->surveyJSON->insertObject( $target, \@tid );
+            $address = $self->surveyJSON->insertObject( $target, \@tid );
         }
     }
 
