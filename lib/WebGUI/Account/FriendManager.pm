@@ -293,7 +293,9 @@ sub www_getFriendsAsJson  {
     my @records = ();
     my $groups = $session->setting->get('groupsToManageFriends');
     my @groupIds = split "\n", $groups;
-    @groupIds = grep { $_ ne $groupId } @groupIds;
+    if (scalar @groupIds > 1) {
+        @groupIds = grep { $_ ne $groupId } @groupIds;
+    }
     my $groupNames = join "\n",
                         map { $_->name }
                         map { WebGUI::Group->new($session, $_) }
@@ -341,7 +343,7 @@ sub www_getFriendsAsJson  {
 
 =head2 www_view ( )
 
-The main view page for editing the user's profile.
+The main view page for editing the user's friends.
 
 =cut
 

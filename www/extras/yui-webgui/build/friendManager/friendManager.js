@@ -61,12 +61,14 @@ WebGUI.FriendManager.formatUsername = function ( el, oRecord, oColumn, oData ) {
 
 WebGUI.FriendManager.formatGroups = function ( el, oRecord, oColumn, oData ) {
     var userId = oRecord.getData('userId');
-    el.innerHTML = '<a href="?op=account;module=friendManager;do=editFriends;userId=' + userId + '">Edit all</a>';
+    el.innerHTML = '';
     var groups = oData.split("\n");
     for (var idx=0; idx < groups.length; idx++) {
         var group     = groups[idx];
         var groupUri  = encodeURI(group);
-        el.innerHTML += ' ';
+        if (el.innerHTML) {
+            el.innerHTML += ' ';
+        }
         el.innerHTML += '<a href="?op=account;module=friendManager;do=editFriends;userId=' + userId + ';groupName='+groupUri+'">'+group+'</a>';
     }
 }
