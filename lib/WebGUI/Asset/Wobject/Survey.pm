@@ -1920,4 +1920,21 @@ sub www_editDefaultQuestions{
 
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_downloadDefaulQuestions
+
+Sends the user a json file of the default question types, which can be imported to other WebGUI instances.
+
+=cut
+
+sub www_downloadDefaultQuestionTypes{
+    my $self = shift;
+    return $self->session->privilege->insufficient()
+        if !$self->session->user->isInGroup( $self->get('groupToViewReports') );
+    my $content = to_json($self->surveyJSON->{multipleChoiceTypes});
+    return $self->export( "WebGUI-Survey-DefaultQuestionTypes.json", $content );
+}
+
 1;
