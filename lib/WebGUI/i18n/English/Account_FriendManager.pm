@@ -180,6 +180,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'view users from all groups' => {
+        message     => q{View users from all groups.},
+        lastUpdated => 0,
+    },
+
 };
 
 1;

@@ -217,6 +217,10 @@ sub www_editFriends {
     if (! $groupName) {
         $var->{addManagers}  = WebGUI::Form::checkbox($session, { name => 'addManagers', value => 'addManagers', });
     }
+    if ($groupName) {
+        $var->{groupName}  = $groupName;
+        $var->{viewAllUrl} = $self->getUrl('module=friendManager;do=editFriends;userId='.$userId);
+    }
     return $self->processTemplate($var,$session->setting->get("fmEditTemplateId"));
 }
 
