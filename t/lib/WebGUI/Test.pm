@@ -129,7 +129,7 @@ BEGIN {
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
     $SESSION->{_request} = $pseudoRequest;
 
-    $originalSetting = clone $SESSION->setting;
+    $originalSetting = clone $SESSION->setting->get;
 
 }
 
@@ -149,8 +149,7 @@ END {
             $SESSION->config->delete($key);
         }
     }
-    my $settings = $originalSetting->get();
-    while (my ($param, $value) = each %{ $settings }) {
+    while (my ($param, $value) = each %{ $originalSetting }) {
         $SESSION->setting->set($param, $value);
     }
     $SESSION->var->end;
