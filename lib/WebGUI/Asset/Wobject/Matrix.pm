@@ -202,6 +202,14 @@ sub definition {
             hoverHelp       =>$i18n->get('compare color yes description'),
             label           =>$i18n->get('compare color yes label'),
         },
+        categories=>{
+            fieldType       =>"textarea",
+            tab             =>"properties",
+            defaultValue    =>$i18n->get('categories default value'),
+            hoverHelp       =>$i18n->get('categories description'),
+            label           =>$i18n->get('categories label'),
+            subtext         =>$i18n->get('categories subtext'),
+        },
         maxComparisons=>{
             fieldType       =>"integer",
             tab             =>"properties",
