@@ -998,9 +998,7 @@ sub updateQuestionAnswers {
 
 =head2 getMultiChoiceBundle
 
-Returns a list of answers for each multi-choice bundle.
-
-Currently these are hard-coded but soon they will live in the database.
+Returns a list of answer objects for each multi-choice bundle.
 
 =cut
 

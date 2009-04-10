@@ -738,12 +738,18 @@ sub responseValuesByVariableName {
         
         # Grab the corresponding question
         my $question = $self->survey->question([@address]);
-        
+
         # Filter out questions without defined variable names
         next if !$question || !defined $question->{variable};
         
+        #Test if question is a multiple choice type so we can use the answer text instead
+        my $answerText;
+        if($self->survey->getMultiChoiceBundle($question->{questionType})){
+            $answerText = $self->survey->answer([@address])->{text};
+        }
+        
         # Add variable => value to our hash
-        $lookup{$question->{variable}} = $response->{value};
+        $lookup{$question->{variable}} = $answerText ? $answerText : $response->{value};
     }
     return \%lookup;
 }
