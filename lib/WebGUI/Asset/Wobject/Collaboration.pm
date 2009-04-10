@@ -1452,5 +1452,18 @@ sub www_view {
 	return $self->next::method(@_);
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS ( )
+
+Deprecated. Use www_viewRss() instead.
+
+=cut
+
+sub www_viewRSS {
+	my $self = shift;
+	return $self->www_viewRss;
+}
+
 1;
 
