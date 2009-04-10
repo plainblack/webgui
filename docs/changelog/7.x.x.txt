@@ -4,7 +4,9 @@
  - Survey summaries now added.  In the Survey edit, select quiz mode, and a summary will be shown to the user at the end of the survey.
  - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
  - rfe #9965: matrix/pls reverse dropped event variables 
- - fixed install of Passive Analytics settings for new sites
+ - fixed install of Passive Analytics settings for new sites (SDH Consulting Group)
+ - Survey Expression Engine upgraded (SDH Consulting Group)
+ 
 7.7.2
  - fixed #10056: YUI javascripts included while adminOff (BNC)
  - fixed a bug that required you to hit "update cart" before the checkout
