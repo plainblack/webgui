@@ -1302,7 +1302,7 @@ sub www_search {
                 $options{'blank'}       = 'blank';
                 $attribute->{options}   = \%options;
                 $attribute->{value}     = 'blank';
-                $attribute->{extras}    = "style='width:120px'";
+                $attribute->{extras}    .= " style='width:120px'";
             }
             $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
             push(@attribute_loop,$attribute);
