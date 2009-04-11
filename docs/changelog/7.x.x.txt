@@ -1,4 +1,5 @@
 7.7.4
+ - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
  - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.
  - Survey [[question variable]] now returns the shown answer text for multiple choice questions, and the recorded value for non-multiple choice questions.
  - fixed #10142: Matrix 2.0 - Search screen compare button not functional
