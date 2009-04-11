@@ -3260,10 +3260,16 @@ sequenceNumber');
             $templateVars{canEditThingData} = 1;
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            $templateVars{searchResult_delete_url} = $session->url->append($url,
+                'func=deleteThingDataConfirm;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_edit_url} = $session->url->append($url, 
+                'func=editThingData;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_copy_icon} = $session->icon->copy('func=copyThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_copy_url} = $session->url->append($url, 
+                'func=copyThingData;thingId='.$thingId.';thingDataId='.$thingDataId,);
         }
         push(@searchResult_loop,\%templateVars);
     }

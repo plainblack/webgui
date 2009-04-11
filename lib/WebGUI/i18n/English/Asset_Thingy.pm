@@ -1013,10 +1013,33 @@ search has been done.|,
         context => q|Description of a tmpl_var for the template help.|,
     },
 
+    'searchResult_edit_url' => {
+        message => q|Url to the edit screen of this search result.|,
+        lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
     'searchResult_delete_icon' => {
         message => q|Delete icon to delete this search result.|,
         lastUpdated => 1104630516,
         context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'searchResult_delete_url' => {
+        message => q|Url to delete this search result.|,
+        lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'searchResult_copy_icon' => {
+        message => q|Copy icon to copy this search result.|,
+        lastUpdated => 1104630516,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
+    'searchResult_copy_url' => {
+        message => q|Url to copy this search result.|,
+        lastUpdated => 1104630516,
     },
 
     'searchResult_field_loop' => {
