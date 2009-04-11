@@ -42,7 +42,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myCallback = function() {
 		this.set("sortedBy", null);
             	this.onDataReturnAppendRows.apply(this,arguments);
-		compareFormButton();
         };
 
 	var callback2 = {
