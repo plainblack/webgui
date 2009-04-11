@@ -1,6 +1,7 @@
 7.6.20
  - fixed #10140: matrix error func=getAttributes
  - fixed #10142: Matrix 2.0 - Search screen compare button not functional
+ - fixed #10141: Matrix 2.0 - Search does not check matching products
 
 7.6.19
  - fixed #9976: carts not cleaned up
