@@ -5,6 +5,7 @@
  - Survey [[question variable]] now returns the shown answer text for multiple choice questions, and the recorded value for non-multiple choice questions.
  - fixed #10142: Matrix 2.0 - Search screen compare button not functional
  - fixed #10141: Matrix 2.0 - Search does not check matching products
+ - fixed #10077: after matrix sort can't return to alphanumeric sort
 
 7.7.3
  - fixed #10094: double explanation in thread help

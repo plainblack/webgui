@@ -567,6 +567,8 @@ sub view {
         $varStatistics = JSON->new->decode($varStatisticsEncoded);
     }
     else{
+        $varStatistics->{alphanumeric_sortButton}   = "<span id='sortByName'><button type='button'>Sort by name</button></span><br />";
+
         # Get the MatrixListing with the most views as an object using getLineage.
         my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
@@ -629,7 +631,7 @@ sub view {
                         lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
         }
-        $var->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+        $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
 
         # For each category, get the MatrixListings with the best ratings.
 
