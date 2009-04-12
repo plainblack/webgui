@@ -77,6 +77,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
         },this,true);
 	}
 
+	if(document.getElementById("sortByName")){
+	var btnSortByName = new YAHOO.widget.Button("sortByName");
+        btnSortByName.on("click", function(e) {
+	    this.myDataTable.sortColumn(this.myDataTable.getColumn(1)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=lastUpdated");
+        },this,true);
+	}
+
+
         var myCallback = function() {
             this.set("sortedBy", null);
             this.onDataReturnAppendRows.apply(this,arguments);
