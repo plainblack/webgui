@@ -53,6 +53,9 @@ $archiveTag->commit;
 
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage1, $storage2);
+diag $storage1->getId;
+diag $session->id->toHex($storage1->getId);
 
 
 SKIP: {
@@ -359,8 +362,7 @@ cmp_deeply(
 isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and storage 0 is duplicated');
 isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
-WebGUI::Storage->get($session, $newPhotoData->[0]->{storageId})->delete;
-WebGUI::Storage->get($session, $newPhotoData->[1]->{storageId})->delete;
+WebGUI::Test->storagesToDelete( map { $_->{storageId} } @{ $newPhotoData } );
 
 }
 
@@ -368,8 +370,6 @@ END {
     $story->purge   if $story;
     $archive->purge if $archive;
     $topic->purge   if $topic;
-    $storage1->delete if $storage1;
-    $storage2->delete if $storage2;
     $archiveTag->rollback;
     WebGUI::VersionTag->getWorking($session)->rollback;
 }
