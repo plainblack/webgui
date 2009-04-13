@@ -51,6 +51,8 @@ our $logger_error;
 my %originalConfig;
 my $originalSetting;
 
+my @groupsToDelete;
+
 BEGIN {
 
     STDERR->autoflush(1);
@@ -135,6 +137,9 @@ BEGIN {
 
 END {
     my $Test = Test::Builder->new;
+    foreach my $group (@groupsToDelete) {
+        $group->delete;
+    }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
         $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
@@ -365,6 +370,20 @@ sub originalConfig {
         $safeValue = clone $value;
     }
     $originalConfig{$param} = $safeValue;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 groupsToDelete ( $group, [$group ] )
+
+Push a list of group objects onto the stack of groups to be automatically deleted
+at the end of the test.
+
+=cut
+
+sub groupsToDelete {
+    my $class = shift;
+    push @groupsToDelete, @_;
 }
 
 #----------------------------------------------------------------------------
