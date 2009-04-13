@@ -76,16 +76,8 @@ sub addRevision {
 
     $newSelf->update($newProperties);
 
-    ##Make a copy of each storage location stored in the JSON for this new revision.
-    my $photoData = $newSelf->getPhotoData;
-    PHOTO: foreach my $photo (@{ $photoData }) {
-        next PHOTO unless $photo->{storageId};
-        my $oldStorage      = WebGUI::Storage->get($session, $photo->{storageId});
-        my $newStorage      = $oldStorage->copy;
-        $photo->{storageId} = $newStorage->getId;
-    }
-    $newSelf->setPhotoData($photoData);
-
+    my $newPhotoData = $newSelf->duplicatePhotoData;
+    $newSelf->setPhotoData($newPhotoData);
     $newSelf->requestAutoCommit;
 
     return $newSelf;
@@ -165,9 +157,47 @@ sub definition {
         properties        => \%properties,
         autoGenerateForms => 0,
     });
-    return $class->SUPER::definition($session, $definition);
+    return $class->next::method($session, $definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Extent the method from Asset to handle duplicating storage locations.
+
+=cut
+
+sub duplicate {
+	my $self = shift;
+	my $newSelf = $self->next::method(@_);
+    my $newPhotoData = $newSelf->duplicatePhotoData;
+    $newSelf->setPhotoData($newPhotoData);
+	return $newSelf;
+}
+
+#-------------------------------------------------------------------
+
+=head2 duplicatePhotoData ( )
+
+Duplicate photo data, particularly storage locations.  Returns the duplicated
+perl structure.
+
+=cut
+
+sub duplicatePhotoData {
+	my $self      = shift;
+    my $session   = $self->session;
+    my $photoData = $self->getPhotoData;
+    PHOTO: foreach my $photo (@{ $photoData }) {
+        next PHOTO unless $photo->{storageId};
+        my $oldStorage      = WebGUI::Storage->get($session, $photo->{storageId});
+        my $newStorage      = $oldStorage->copy;
+        $photo->{storageId} = $newStorage->getId;
+    }
+	return $photoData;
+}
 
 #-------------------------------------------------------------------
 
@@ -180,7 +210,7 @@ Add the storage location to the export data.
 
 sub exportAssetData {
 	my $self = shift;
-	my $data = $self->SUPER::exportAssetData;
+	my $data = $self->next::method;
 	return $data;
 }
 
@@ -492,7 +522,7 @@ is passed, it will use that template instead.
 
 sub prepareView {
     my $self       = shift;
-    $self->SUPER::prepareView();
+    $self->next::method();
     my $templateId;
     my $topic = $self->topic;
     if ($topic) {
@@ -518,7 +548,7 @@ Handle photos and photo metadata, like captions, etc.
 sub processPropertiesFromFormPost {
     my $self = shift;
     my $session = $self->session;
-    $self->SUPER::processPropertiesFromFormPost;
+    $self->next::method;
     my $form    = $session->form;
     ##Handle old data first, to avoid iterating across a newly added photo.
     my $photoData      = $self->getPhotoData;
@@ -579,7 +609,7 @@ sub purge {
         }
 	}
     $sth->finish;
-    return $self->SUPER::purge;
+    return $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -597,7 +627,7 @@ sub purgeRevision {
         my $storage = WebGUI::Storage->get($session, $self-$photo->{storageId});
         $storage->delete if $storage;
     }
-	return $self->SUPER::purgeRevision;
+	return $self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -676,7 +706,7 @@ sub setSize {
             $fileSize += $storage->getFileSize($file);
         }
     }
-    return $self->SUPER::setSize($fileSize);
+    return $self->next::method($fileSize);
 }
 
 #-------------------------------------------------------------------
@@ -712,7 +742,7 @@ Extend the superclass to make sure that the asset always stays hidden from navig
 sub update {
     my $self   = shift;
     my $properties = shift;
-    return $self->SUPER::update({%$properties, isHidden => 1});
+    return $self->next::method({%$properties, isHidden => 1});
 }
 
 #-------------------------------------------------------------------

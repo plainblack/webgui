@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 37;
+my $tests = 38;
 plan tests => 1
             + $tests
             ;
@@ -338,6 +338,26 @@ cmp_deeply(
 
 ok($viewVariables->{singlePhoto}, 'viewVariables: singlePhoto: there is just 1');
 ok($viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
+
+############################################################
+#
+# duplicatePhotoData
+#
+############################################################
+
+$photoData = $story->getPhotoData;
+$photoData->[0]->{storageId} = ignore();
+$photoData->[1]->{storageId} = ignore();
+my $newPhotoData = $story->duplicatePhotoData;
+
+cmp_deeply(
+    $newPhotoData,
+    $photoData,
+    'duplicatePhotoData: checking JSON data minus storage locations'
+);
+
+WebGUI::Storage->get($session, $newPhotoData->[0]->{storageId})->delete;
+WebGUI::Storage->get($session, $newPhotoData->[1]->{storageId})->delete;
 
 }
 
