@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 38;
+my $tests = 40;
 plan tests => 1
             + $tests
             ;
@@ -355,6 +355,9 @@ cmp_deeply(
     $photoData,
     'duplicatePhotoData: checking JSON data minus storage locations'
 );
+
+isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and storage 0 is duplicated');
+isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
 WebGUI::Storage->get($session, $newPhotoData->[0]->{storageId})->delete;
 WebGUI::Storage->get($session, $newPhotoData->[1]->{storageId})->delete;
