@@ -503,9 +503,11 @@ Disconnects from the database. And destroys the object.
 =cut
 
 sub disconnect {
-	my $self = shift;
-	$self->dbh->disconnect;
-	undef $self;
+    my $self = shift;
+    my $dbh = delete $self->{_dbh};
+    if ($dbh) {
+        $dbh->disconnect;
+    }
 }
 
 

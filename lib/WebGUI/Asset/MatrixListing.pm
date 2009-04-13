@@ -640,6 +640,13 @@ sub view {
     $var->{manufacturerUrl_click}  = $self->getUrl("func=click;manufacturer=1");
     $var->{productUrl_click}       = $self->getUrl("func=click");
 
+    if($self->get('status') eq 'pending'){
+        my $revisionDate                = $self->get('revisionDate');
+        $var->{revision}                = $revisionDate;
+        $var->{manufacturerUrl_click}   .= ';revision='.$revisionDate;
+        $var->{productUrl_click}        .= ';revision='.$revisionDate;
+    }
+
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
         {type => 'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/dom/dom-min.js'),

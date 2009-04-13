@@ -43,6 +43,14 @@ use WebGUI::DateTime;
 
 =cut
 
+####################################################################
+
+=head2 addRevision ( )
+
+Extent the method from the super class to handle iCalSequenceNumbers.
+
+=cut
+
 sub addRevision {
     my $self = shift;
     my $newRev = $self->SUPER::addRevision(@_);
@@ -1698,6 +1706,12 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extent the method from the super class to delete all storage locations.
+
+=cut
+
 sub purge {
     my $self = shift;
     my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
@@ -1710,6 +1724,12 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Extent the method from the super class to delete the storage location for this revision.
+
+=cut
 
 sub purgeRevision {
     my $self = shift;
@@ -1908,6 +1928,13 @@ sub view  {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFile ( )
+
+Delete a file given in the form variable "filename" from the storage location.
+
+=cut
+
 sub www_deleteFile {
     my $self = shift;
     $self->getStorageLocation->deleteFile($self->session->form->process("filename")) if $self->canEdit;

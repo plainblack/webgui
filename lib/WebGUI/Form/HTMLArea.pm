@@ -132,6 +132,14 @@ sub getValue {
 	return WebGUI::HTML::cleanSegment($self->SUPER::getValue(@_));
 }
 
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml (  )
+
+Calls getValueAsHtml from WebGUI::Form::Control
+
+=cut
+
 sub getValueAsHtml {
     my $self = shift;
     return $self->WebGUI::Form::Control::getValueAsHtml(@_);

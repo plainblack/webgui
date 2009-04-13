@@ -405,20 +405,6 @@ sub www_viewRSS10 {
 
 #-------------------------------------------------------------------
 
-=head2 www_viewRSS ( )
-
-Deprecated. Use www_viewRss() instead.
-
-=cut
-
-sub www_viewRSS {
-	my $self = shift;
-	return $self->www_viewRss;
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_viewRSS20 ( )
 
 Deprecated. Use www_viewRss() instead.

@@ -56,9 +56,17 @@ Survey.Data = (function(){
             focus = d.address;//What is the current highlighted item.
             var warnings = ""; 
             for(var w in d.warnings){
-                warnings = warnings + "<br>" + d.warnings[w]; 
+                warnings += "<div class='warning'>" + d.warnings[w] + "</div>"; 
             }
-            document.getElementById('warnings').innerHTML = warnings;
+            if (document.getElementById('warnings')) {
+                if (warnings !== "") {
+                    document.getElementById('warnings').innerHTML = warnings;
+                    YAHOO.util.Dom.setStyle('warnings-outer', 'display', 'block');
+                }
+                else {
+                    YAHOO.util.Dom.setStyle('warnings-outer', 'display', 'none');
+                }
+            }
             var showEdit = 1;
             if (lastId.toString() === d.address.toString()) {
                 showEdit = 0;

@@ -8,7 +8,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
 			innerHTML = innerHTML + " checked='checked'";
 		}
-		innerHTML = innerHTML + " onchange='javascript:compareFormButton()' class='compareCheckBox'>";
+		innerHTML = innerHTML + " class='compareCheckBox'>";
 		elCell.innerHTML = innerHTML;
 	};
 
@@ -77,12 +77,21 @@ YAHOO.util.Event.addListener(window, "load", function() {
         },this,true);
 	}
 
+	if(document.getElementById("sortByName")){
+	var btnSortByName = new YAHOO.widget.Button("sortByName");
+        btnSortByName.on("click", function(e) {
+	    this.myDataTable.sortColumn(this.myDataTable.getColumn(1)); 
+		var request = YAHOO.util.Connect.asyncRequest('POST', matrixUrl + "?func=setSort;sort=lastUpdated");
+        },this,true);
+	}
+
+
         var myCallback = function() {
             this.set("sortedBy", null);
             this.onDataReturnAppendRows.apply(this,arguments);
         };
 	
-	window.compareFormButton = function() {
+	var compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
 		var checkedCompareBoxes = new Object();
@@ -92,12 +101,12 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				checkedCompareBoxes[compareCheckBoxes[i].value] = true;
 			}
     		}
-		if (checked > 1 && checked < maxComparisons){
-			btnCompare.set("disabled",false);
-			btnCompare2.set("disabled",false);
+		if (checked < 2){
+			alert(tooFewMessage);
+		}else if (checked > maxComparisons){
+			alert(tooManyMessage);
 		}else{
-			btnCompare.set("disabled",true);
-			btnCompare2.set("disabled",true);
+			window.document.forms['doCompare'].submit();
 		}
 		var elements = window.compareDataTable.getRecordSet().getRecords();
 		for(j=0; j<elements.length; j++){
@@ -109,21 +118,17 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			}
 		}
 	}
-	
+
 	if(document.getElementById("compare")){
-	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
-        btnCompare.on("click", function(e) {
-		window.document.forms['doCompare'].submit();
-        },this,true);
+	    var btnCompare = new YAHOO.widget.Button("compare",{id:"compareButton"});
+	    btnCompare.on("click", compareFormButton);
 	}
 
 	if(document.getElementById("compare2")){
-	var btnCompare2 = new YAHOO.widget.Button("compare2",{disabled:true,id:"compareButton2"});
-        btnCompare2.on("click", function(e) {
-		window.document.forms['doCompare'].submit();
-        },this,true);
+	    var btnCompare2 = new YAHOO.widget.Button("compare2",{id:"compareButton2"});
+	    btnCompare2.on("click", compareFormButton);
 	}
-
+	
 	if(document.getElementById("search")){
 	var btnSearch = new YAHOO.widget.Button("search");
         btnSearch.on("click", function(e) {

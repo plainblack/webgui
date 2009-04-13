@@ -223,8 +223,10 @@ function dragable_init(url) {
         }else {        
             for (i = 0; i< children.length;i++) {
                 draggableObjectList[draggableObjectList.length] = children[i];
-                new YAHOO.webgui.DDList(document.getElementById(children[i].id + "_div"));
-                new YAHOO.util.DDTarget(document.getElementById(children[i].id + "_div"));
+                dragDropElement = document.getElementById(children[i].id + "_div");
+                dragDrop = new YAHOO.webgui.DDList(dragDropElement);
+                new YAHOO.util.DDTarget(dragDropElement);
+                dragDrop.setHandleElId(children[i].id + "_handle");
             }       
         }
         obj = document.getElementById("position" + contentCount);

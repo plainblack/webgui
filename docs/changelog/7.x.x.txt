@@ -1,7 +1,23 @@
+7.7.4
+ - fixed #9989: thing-search template won't include data-save params in the url for pagination
+ - fixed #10122: fixed date object to not change the value in 'toHtml' function.
+ - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
+ - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.
+ - Survey [[question variable]] now returns the shown answer text for multiple choice questions, and the recorded value for non-multiple choice questions.
+ - fixed #10142: Matrix 2.0 - Search screen compare button not functional
+ - fixed #10141: Matrix 2.0 - Search does not check matching products
+ - fixed #10077: after matrix sort can't return to alphanumeric sort
+ - fixed #10138: Matrix 2.0 Links in Product Listing are broken
+
 7.7.3
  - fixed #10094: double explanation in thread help
  - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)
  - Survey summaries now added.  In the Survey edit, select quiz mode, and a summary will be shown to the user at the end of the survey.
+ - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
+ - rfe #9965: matrix/pls reverse dropped event variables 
+ - fixed install of Passive Analytics settings for new sites (SDH Consulting Group)
+ - Survey Expression Engine upgraded (SDH Consulting Group)
+
 7.7.2
  - fixed #10056: YUI javascripts included while adminOff (BNC)
  - fixed a bug that required you to hit "update cart" before the checkout

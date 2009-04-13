@@ -32,7 +32,7 @@ use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 7; # increment this value for each test you create
+use Test::More tests => 10; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -50,7 +50,10 @@ my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout'});
 $session->asset($layout);
 
 # finally, add the collab
-my $collab  = $layout->addChild({className => 'WebGUI::Asset::Wobject::Collaboration'});
+my $collab  = $layout->addChild({
+    className => 'WebGUI::Asset::Wobject::Collaboration',
+    url       => 'collab',
+});
 
 # Test for a sane object type
 isa_ok($collab, 'WebGUI::Asset::Wobject::Collaboration');
@@ -90,6 +93,11 @@ $post = $collab->addChild($props,
 
 my $rssitems = $collab->getRssFeedItems();
 is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
+
+diag "AssetAspect tests";
+is($collab->getRssFeedUrl,  '/collab?func=viewRss',  'getRssFeedUrl');
+is($collab->getRdfFeedUrl,  '/collab?func=viewRdf',  'getRdfFeedUrl');
+is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');
 
 TODO: {
     local $TODO = "Tests to make later";

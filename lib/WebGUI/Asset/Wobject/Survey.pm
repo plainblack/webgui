@@ -396,6 +396,7 @@ Loads the initial edit survey page. All other edit actions are ajax calls from t
 
 sub www_editSurvey {
     my $self = shift;
+    
     return $self->session->privilege->insufficient()
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
@@ -676,7 +677,7 @@ sub www_dragDrop {
         #If target is being moved down, then before has just moved up do to the target being deleted
         $bid[0]-- if($tid[0] < $bid[0]);
 
-        $self->surveyJSON->insertObject( $target, [ $bid[0] ] );
+        $address = $self->surveyJSON->insertObject( $target, [ $bid[0] ] );
     }
     elsif ( @tid == 2 ) {    #questions can be moved to any section, but a pushed to the end of a new section.
         if ( $bid[0] !~ /\d/ ) {
@@ -700,21 +701,21 @@ sub www_dragDrop {
         else{   #Moved within the same section
             $bid[1]-- if($tid[1] < $bid[1]);
         }
-        $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1] ] );
+        $address  = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1] ] );
     } ## end elsif ( @tid == 2 )
     elsif ( @tid == 3 ) {    #answers can only be rearranged in the same question
         if ( @bid == 2 and $bid[1] == $tid[1] ) {#moved to the top of the question
             $bid[2] = -1;
-            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $address = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         elsif ( @bid == 3 ) {
             #If target is being moved down, then before has just moved up do to the target being deleted
             $bid[2]-- if($tid[2] < $bid[2]);
-            $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
+            $address = $self->surveyJSON->insertObject( $target, [ $bid[0], $bid[1], $bid[2] ] );
         }
         else {
             #else put it back where it was
-            $self->surveyJSON->insertObject( $target, \@tid );
+            $address = $self->surveyJSON->insertObject( $target, \@tid );
         }
     }
 
@@ -742,6 +743,7 @@ sub www_loadSurvey {
     my ( $self, $options ) = @_;
     my $editflag = 1;
     my $address = defined $options->{address} ? $options->{address} : undef;
+    
     if ( !defined $address ) {
         if ( my $inAddress = $self->session->form->process('data') ) {
             if ( $inAddress eq q{-} ) {
@@ -760,7 +762,7 @@ sub www_loadSurvey {
         = defined $options->{var}
         ? $options->{var}
         : $self->surveyJSON->getEditVars($address);
-
+    
     my $editHtml;
     if ( $var->{type} eq 'section' ) {
         $editHtml = $self->processTemplate( $var, $self->get('sectionEditTemplateId') );
@@ -903,7 +905,7 @@ returns the output.
 sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
-
+    
     my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
     
     $var->{lastResponseCompleted} = $code;
@@ -1153,13 +1155,23 @@ sub www_submitQuestions {
 }
 
 #-------------------------------------------------------------------
-sub getSummary{
+
+=head2 getSummary
+
+Returns a copy of the summary stored in JSON, and the output of
+the survey summary template.
+
+=cut
+
+sub getSummary {
     my $self = shift;
     my $summary = $self->responseJSON->showSummary();
     my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
-    return $out;
+
+    return ($summary,$out);
 #    return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
+
 #-------------------------------------------------------------------
 
 =head2 www_loadQuestions
@@ -1171,7 +1183,6 @@ Determines which questions to display to the survey taker next, loads and return
 sub www_loadQuestions {
     my $self            = shift;
     my $wasRestarted    = shift;
-    
     if ( !$self->canTakeSurvey() ) {
         $self->session->log->debug('canTakeSurvey false, surveyEnd');
         return $self->surveyEnd();
@@ -1191,7 +1202,8 @@ sub www_loadQuestions {
         $self->session->log->debug('Response surveyEnd, so calling surveyEnd');
         if ( $self->get('quizModeSummary') ) {
             if(! $self->session->form->param('shownsummary')){
-                my $json = to_json( { type => 'summary', summary => $self->getSummary() });
+                my ($summary,$html) = $self->getSummary();
+                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
                 return $json;
             }
         }
@@ -1750,7 +1762,7 @@ sub www_viewStatisticalOverview {
 
 #-------------------------------------------------------------------
 
-=head2 www_exportTransposedResults ()
+=head2 www_exportSimpleResults ()
 
 Exports transposed results in a tab deliniated file.
 
@@ -1906,6 +1918,23 @@ sub www_editDefaultQuestions{
 #    $output .= $tabForm->print;
     
 
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_downloadDefaulQuestions
+
+Sends the user a json file of the default question types, which can be imported to other WebGUI instances.
+
+=cut
+
+sub www_downloadDefaultQuestionTypes{
+    my $self = shift;
+    return $self->session->privilege->insufficient()
+        if !$self->session->user->isInGroup( $self->get('groupToViewReports') );
+    my $content = to_json($self->surveyJSON->{multipleChoiceTypes});
+    return $self->export( "WebGUI-Survey-DefaultQuestionTypes.json", $content );
 }
 
 1;

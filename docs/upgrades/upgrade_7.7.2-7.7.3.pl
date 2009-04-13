@@ -23,7 +23,8 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::Utility;
-
+use WebGUI::PassiveAnalytics::Rule;
+use WebGUI::Utility;
 
 my $toVersion = '7.7.3';
 my $quiet; # this line required
@@ -35,11 +36,8 @@ my $session = start(); # this line required
 
 addSurveyQuizModeColumns($session);
 addSurveyExpressionEngineConfigFlag($session);
-
-# Story Manager
-installStoryManagerTables($session);
-sm_upgradeConfigFiles($session);
-sm_updateDailyWorkflow($session);
+addCarouselWobject($session);
+reInstallPassiveAnalyticsConfig($session);
 
 finish($session); # this line required
 
@@ -52,6 +50,22 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addCarouselWobject{
+    my $session = shift;
+    print "\tAdding Carousel wobject... " unless $quiet;
+    $session->db->write("create table Carousel (
+        assetId         char(22) binary not null,
+        revisionDate    bigint      not null,
+        items           mediumtext,
+        templateId      char(22),
+        primary key (assetId, revisionDate)
+        )");
+    my $assets  = $session->config->get( "assets" );
+    $assets->{ "WebGUI::Asset::Wobject::Carousel" } = { category => "utilities" };
+    $session->config->set( "assets", $assets );
+    print "Done.\n" unless $quiet;
+}
 
 sub addSurveyQuizModeColumns{
     my $session = shift;
@@ -68,96 +82,51 @@ sub addSurveyExpressionEngineConfigFlag{
     print "Done.\n" unless $quiet;
 }
 
-sub installStoryManagerTables {
-    my ($session) = @_;
-    print "\tAdding Story Manager tables... " unless $quiet;
-    my $db = $session->db;
-    $db->write(<<EOSTORY);
-CREATE TABLE Story (
-    assetId      CHAR(22) BINARY NOT NULL,
-    revisionDate BIGINT          NOT NULL,
-    headline     CHAR(255),
-    subtitle     CHAR(255),
-    byline       CHAR(255),
-    location     CHAR(255),
-    highlights   TEXT,
-    story        MEDIUMTEXT,
-    photo        LONGTEXT,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOSTORY
-
-    $db->write(<<EOARCHIVE);
-CREATE TABLE StoryArchive (
-    assetId             CHAR(22) BINARY NOT NULL,
-    revisionDate        BIGINT          NOT NULL,
-    storiesPerPage      INTEGER,
-    groupToPost         CHAR(22) BINARY,
-    templateId          CHAR(22) BINARY,
-    storyTemplateId     CHAR(22) BINARY,
-    editStoryTemplateId CHAR(22) BINARY,
-    archiveAfter        INT(11),
-    richEditorId        CHAR(22) BINARY,
-    approvalWorkflowId  CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOARCHIVE
-
-    $db->write(<<EOTOPIC);
-CREATE TABLE StoryTopic (
-    assetId         CHAR(22) BINARY NOT NULL,
-    revisionDate    BIGINT          NOT NULL,
-    storiesPer      INTEGER,
-    storiesShort    INTEGER,
-    templateId      CHAR(22) BINARY,
-    storyTemplateId CHAR(22) BINARY,
-    PRIMARY KEY ( assetId, revisionDate )
-)
-EOTOPIC
-
-    print "DONE!\n" unless $quiet;
-}
-
-sub sm_upgradeConfigFiles {
-    my ($session) = @_;
-    print "\tAdding Story Manager to config file... " unless $quiet;
-    my $config = $session->config;
-    $config->addToHash(
-        'assets',
-        'WebGUI::Asset::Wobject::StoryTopic' => {
-            'category' => 'community'
-        },
-    );
-    $config->addToHash(
-        'assets',
-        "WebGUI::Asset::Wobject::StoryArchive" => {
-            "isContainer" => 1,
-            "category" => "community"
-        },
-    );
-    my $activities = $config->get('workflowActivities');
-    my $none = $activities->{None};
-    if (!isIn('WebGUI::Workflow::Activity::ArchiveOldStories', @{ $none })) {
-        unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
+#----------------------------------------------------------------------------
+# Conditionally re-add passive analytics config because it wasn't added to WebGUI.conf.original
+# in version 7.7.0.
+sub reInstallPassiveAnalyticsConfig {
+    my $session = shift;
+    print "\tAdd Passive Analytics entry to the config file... " unless $quiet;
+    # Admin Bar/Console
+    my $adminConsole = $session->config->get('adminConsole');
+    if (!exists $adminConsole->{'passiveAnalytics'}) {
+        $adminConsole->{'passiveAnalytics'} = {
+            "icon"         => "passiveAnalytics.png",
+            "uiLevel"      => 1,
+            "url"          => "^PageUrl(\"\",op=passiveAnalytics;func=editRuleflow);",
+            "title"        => "^International(Passive Analytics,PassiveAnalytics);",
+            "groupSetting" => "3",
+        };
+        $session->config->set('adminConsole', $adminConsole);
     }
-    $config->set('workflowActivities', $activities);
-    print "DONE!\n" unless $quiet;
-}
-
-sub sm_updateDailyWorkflow {
-    my ($session) = @_;
-    print "\tAdding Archive Old Stories to Daily Workflow... " unless $quiet;
-    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
-    foreach my $activity (@{ $workflow->getActivities }) {
-        return if $activity->getName() eq 'WebGUI::Workflow::Activity::ArchiveOldStories';
+    # Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    if (!isIn('WebGUI::Content::PassiveAnalytics',@{ $contentHandlers} ) ) {
+        my $contentIndex = 0;
+        HANDLER: while ($contentIndex <= $#{ $contentHandlers } ) {
+            ##Insert before Operation
+            if($contentHandlers->[$contentIndex] eq 'WebGUI::Content::Operation') {
+                splice @{ $contentHandlers }, $contentIndex, 0, 'WebGUI::Content::PassiveAnalytics';
+                last HANDLER;
+            }
+            ++$contentIndex;
+        }
+        $session->config->set('contentHandlers', $contentHandlers);
     }
-    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
-    $activity->set('title',       'Archive Old Stories');
-    $activity->set('description', 'Archive old stories, based on the settings of the Story Archives that own them');
+    # Workflow Activities
+    my $workflowActivities = $session->config->get('workflowActivities');
+    my @none = @{ $workflowActivities->{'None'} };
+    if (!isIn('WebGUI::Workflow::Activity::SummarizePassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::SummarizePassiveAnalytics';
+    }
+    if (!isIn('WebGUI::Workflow::Activity::BucketPassiveAnalytics', @none)) {
+        push  @none, 'WebGUI::Workflow::Activity::BucketPassiveAnalytics';
+    }
+    $workflowActivities->{'None'} = [ @none ];
+    $session->config->set('workflowActivities', $workflowActivities);
     print "DONE!\n" unless $quiet;
 }
-
-
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
