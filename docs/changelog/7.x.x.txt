@@ -1,4 +1,5 @@
 7.7.4
+ - fixed #9989: thing-search template won't include data-save params in the url for pagination
  - fixed #10122: fixed date object to not change the value in 'toHtml' function.
  - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
  - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.

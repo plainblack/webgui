@@ -3152,6 +3152,9 @@ sub getSearchTemplateVars {
 
     $currentUrl = $self->getUrl();
     foreach ($self->session->form->param) {
+                                 # if we just saved data from an edit, we do not want to keep any of the params
+        last if $_ eq 'func' and $self->session->form->process($_) eq 'editThingDataSave';
+
         unless ($_ eq "pn" || $_ eq "op" || $_ =~ /identifier/xi || $_ =~ /password/xi || $_ eq "orderBy" ||
 $self->session->form->process($_) eq "") {
             $currentUrl = $self->session->url->append($currentUrl,$self->session->url->escape($_)
