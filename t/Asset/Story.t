@@ -20,7 +20,7 @@ use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 40;
+my $tests = 42;
 plan tests => 1
             + $tests
             ;
@@ -54,8 +54,6 @@ $archiveTag->commit;
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($storage1, $storage2);
-diag $storage1->getId;
-diag $session->id->toHex($storage1->getId);
 
 
 SKIP: {
@@ -363,6 +361,24 @@ isnt($newPhotoData->[0]->{storageId}, $photoData->[0]->{storageId}, '... and sto
 isnt($newPhotoData->[1]->{storageId}, $photoData->[1]->{storageId}, '... and storage 1 is duplicated');
 
 WebGUI::Test->storagesToDelete( map { $_->{storageId} } @{ $newPhotoData } );
+
+############################################################
+#
+# exportAssetData
+#
+############################################################
+
+my $exportData = $story->exportAssetData;
+isa_ok($exportData, 'HASH', 'exportAssetData');
+
+cmp_bag(
+    $exportData->{storage},
+    [
+        $storage1->getId,
+        $storage2->getId,
+    ],
+    '...asset package data has the storage locations in it'
+);
 
 }
 

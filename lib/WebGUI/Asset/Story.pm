@@ -204,14 +204,18 @@ sub duplicatePhotoData {
 =head2 exportAssetData ( )
 
 See WebGUI::AssetPackage::exportAssetData() for details.
-Add the storage location to the export data.
+Adds all storage locations to the package data.
 
 =cut
 
 sub exportAssetData {
 	my $self = shift;
-	my $data = $self->next::method;
-	return $data;
+	my $exportData = $self->next::method;
+    PHOTO: foreach my $photo (@{ $self->getPhotoData }) {
+        next PHOTO unless $photo->{storageId};
+        push @{ $exportData->{storage} }, $photo->{storageId};
+    }
+    return $exportData;
 }
 
 #-------------------------------------------------------------------
