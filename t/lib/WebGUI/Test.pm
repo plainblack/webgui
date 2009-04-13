@@ -52,6 +52,7 @@ my %originalConfig;
 my $originalSetting;
 
 my @groupsToDelete;
+my @storagesToDelete;
 
 BEGIN {
 
@@ -139,6 +140,15 @@ END {
     my $Test = Test::Builder->new;
     foreach my $group (@groupsToDelete) {
         $group->delete;
+    }
+    foreach my $stor (@storagesToDelete) {
+        if ($SESSION->id->valid($stor)) {
+            my $storage = WebGUI::Storage->get($SESSION, $stor);
+            $storage->delete if $storage;
+        }
+        else {
+            $stor->delete;
+        }
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
@@ -379,11 +389,29 @@ sub originalConfig {
 Push a list of group objects onto the stack of groups to be automatically deleted
 at the end of the test.
 
+This is a class method.
+
 =cut
 
 sub groupsToDelete {
     my $class = shift;
     push @groupsToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 storagesToDelete ( $storage, [$storageId ] )
+
+Push a list of storage objects or storageIds onto the stack of storage locaitons
+at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub storagesToDelete {
+    my $class = shift;
+    push @storagesToDelete, @_;
 }
 
 #----------------------------------------------------------------------------
