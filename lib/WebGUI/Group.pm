@@ -256,7 +256,7 @@ sub dateCreated {
 
 =head2 delete ( )
 
-Deletes this group and all references to it.
+Deletes this group from the group related tables in the database and calls clearCaches.
 
 =cut
 
