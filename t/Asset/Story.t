@@ -346,8 +346,8 @@ ok($viewVariables->{hasPhotos},   'viewVariables: hasPhotos: it has photos');
 ############################################################
 
 $photoData = $story->getPhotoData;
-$photoData->[0]->{storageId} = ignore();
-$photoData->[1]->{storageId} = ignore();
+$photoData->[0]->{storageId} = re('^[A-Za-z0-9_-]{22}$');
+$photoData->[1]->{storageId} = re('^[A-Za-z0-9_-]{22}$');
 my $newPhotoData = $story->duplicatePhotoData;
 
 cmp_deeply(
