@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 11;
+my $tests = 14;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -58,7 +58,6 @@ $creationDateSth->execute([$yesterday, $pastStory->getId]);
 my @staff       = qw/norton hadley mert trout/;
 my @inmates     = qw/bogs red brooks andy heywood tommy jake skeet/;
 my @characters  = (@staff, @inmates, );
-my $storiesToMake = 16;
 
 my @stories = ();
 my $storyHandler = {};
@@ -158,19 +157,61 @@ cmp_deeply(
     'viewTemplateVars has right number and contents in the story_loop in standalone mode'
 );
 
-is($templateVars->{topStoryTitle}, 'bogs', 'viewTemplateVars in standalone mode, title');
+is($templateVars->{topStoryTitle}, 'bogs', '... topStoryTitle');
 is(
     $templateVars->{topStorySubtitle},
     'drinking his food through a straw',
-    'viewTemplateVars in standalone mode, subtitle'
+    '... topStorySubtitle'
 );
 is(
     $templateVars->{topStoryUrl},
     $session->url->append($topic->getUrl, 'func=viewStory;assetId='.$storyHandler->{'bogs'}->getId),
-    'viewTemplateVars in standalone mode, url'
+    '... topStoryUrl'
 );
-is($templateVars->{topStoryCreationDate}, $now, 'viewTemplateVars in standalone mode, title');
-ok($templateVars->{standAlone}, 'viewTemplateVars: in standalone mode');
+is($templateVars->{topStoryCreationDate}, $now, '... topStoryCreationDate');
+ok($templateVars->{standAlone}, '... standAlone mode=1');
+
+my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
+$storyHandler->{bogs}->setPhotoData([{
+    caption   => "Octopus seen at the scene of Mrs. Dufresne's murder.",
+    byLine    => 'Elmo Blatch',
+    alt       => 'The suspect',
+}]);
+
+$templateVars = $topic->viewTemplateVariables();
+ok(
+    ! exists $templateVars->{topStoryImageUrl}
+ && ! exists $templateVars->{topStoryImageByLine}
+ && ! exists $templateVars->{topStoryImageAlt}
+ && ! exists $templateVars->{topStoryImageCaption},
+    '... no photo template variables, since there is no storage location'
+);
+my $bogsData = $storyHandler->{bogs}->getPhotoData();
+$bogsData->[0]->{storageId} = $storage->getId;
+$storyHandler->{bogs}->setPhotoData($bogsData);
+$templateVars = $topic->viewTemplateVariables();
+ok(
+    ! exists $templateVars->{topStoryImageUrl}
+ && ! exists $templateVars->{topStoryImageByLine}
+ && ! exists $templateVars->{topStoryImageAlt}
+ && ! exists $templateVars->{topStoryImageCaption},
+    '... no photo template variables, since there is no file in the storage location'
+);
+
+$storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+$templateVars = $topic->viewTemplateVariables();
+cmp_deeply(
+    [ @{ $templateVars }{qw/topStoryImageUrl topStoryImageByline topStoryImageAlt topStoryImageCaption/} ],
+    [
+       $storage->getUrl('gooey.jpg'), 
+       'Elmo Blatch',
+       'The suspect',
+       "Octopus seen at the scene of Mrs. Dufresne's murder.",
+    ],
+    '... photo template variables set'
+);
+
 
 $topic->update({
     storiesShort => 20,
@@ -191,9 +232,9 @@ cmp_deeply(
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-#    $archive->purge if $archive;
-#    $topic->purge   if $topic;
-#    if ($versionTag) {
-#        $versionTag->rollback;
-#    }
+    $archive->purge if $archive;
+    $topic->purge   if $topic;
+    if ($versionTag) {
+        $versionTag->rollback;
+    }
 }

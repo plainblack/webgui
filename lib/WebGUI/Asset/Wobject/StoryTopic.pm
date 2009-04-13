@@ -166,6 +166,22 @@ sub viewTemplateVariables {
         $var->{topStoryUrl}            = $session->url->append($self->getUrl, 'func=viewStory;assetId='.$topStoryData->{assetId}),
         $var->{topStoryCreationDate}   = $topStory->get('creationDate');
         ##TODO: Photo variables
+        my $photoData = $topStory->getPhotoData;
+        PHOTO: foreach my $photo (@{ $photoData }) {
+            next PHOTO unless $photo->{storageId};
+            my $storage  = WebGUI::Storage->get($session, $photo->{storageId});
+            my $file     = $storage->getFiles->[0];
+            warn $storage->getId;
+            next PHOTO unless $file;
+            my $imageUrl = $storage->getUrl($file);
+            $var->{topStoryImageUrl}     = $imageUrl;
+            $var->{topStoryImageCaption} = $photo->{caption};
+            $var->{topStoryImageByline}  = $photo->{byLine};
+            $var->{topStoryImageAlt}     = $photo->{alt};
+            $var->{topStoryImageTitle}   = $photo->{title};
+            $var->{topStoryImageLink}    = $photo->{url};
+            last PHOTO;
+        }
     }
     $var->{standAlone} = $self->{_standAlone};
     $var->{rssUrl}     = $self->getUrl('func=viewRss');

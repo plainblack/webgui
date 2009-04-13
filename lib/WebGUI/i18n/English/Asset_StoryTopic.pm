@@ -105,6 +105,42 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'topStoryImageCaption' => {
+        message => q|The Caption of the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'topStoryImageByline' => {
+        message => q|The Byline of the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'topStoryImageAlt' => {
+        message => q|The alternate image text for the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'topStoryImageTitle' => {
+        message => q|The image title for the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'topStoryImageLink' => {
+        message => q|The link for the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'topStoryImageUrl' => {
+        message => q|The URL to the first photo for the top story, if it exists.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
     'standAlone' => {
         message => q|This variable will be true if the Story Topic is being viewed directly, by its URL.  Otherwise, if it is viewed as part of a Page Layout or other Container, it will be false.|,
         context => q|Template variable.|,
