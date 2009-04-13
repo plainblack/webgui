@@ -509,14 +509,10 @@ sub getRssData {
 
 #-------------------------------------------------------------------
 
-=head2 prepareView ( $templateId )
+=head2 prepareView ( )
 
-See WebGUI::Asset::prepareView() for details.
-
-=head3 $templateId
-
-By default, the Story looks in its parent Story Archive to get a template.  If $templateId
-is passed, it will use that template instead.
+Extent the default method to handle the case when a Story Topic is rendering
+this Story.
 
 =cut
 
@@ -879,7 +875,8 @@ sub www_showConfirmation {
 
 =head2 www_view
 
-Override www_view from asset because assets (vs wobjects) do not have style templates.
+Override www_view from asset because Stories inherit a style template from
+the Story Archive that contains them.
 
 =cut
 
