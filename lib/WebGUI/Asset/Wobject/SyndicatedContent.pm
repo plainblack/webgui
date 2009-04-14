@@ -153,7 +153,7 @@ sub generateFeed {
         # care of any encoding specified in the XML prolog
         utf8::downgrade($value, 1);
         eval {
-            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1);
+            my $singleFeed = XML::FeedPP->new($value, utf8_flag => 1, -type => 'string');
             $feed->merge($singleFeed);
         };
         if ($@) {

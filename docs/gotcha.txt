@@ -7,6 +7,12 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+7.7.4
+--------------------------------------------------------------------
+   * WebGUI now requires XML::FeedPP version 0.40 or greater.
+
+
 7.7.2
 --------------------------------------------------------------------
    * WebGUI now requires Clone version 0.31 or greater.

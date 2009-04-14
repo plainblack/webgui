@@ -95,7 +95,7 @@ checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              0.07         );
 checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.05,      2 );
-checkModule("XML::FeedPP",                  0.37         );
+checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.04         );
 checkModule("Config::JSON",                 "1.1.2"      );
 checkModule("Text::CSV_XS",                 "0.52"       );
