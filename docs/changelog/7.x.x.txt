@@ -15,6 +15,7 @@
  - fixed #10138: Matrix 2.0 Links in Product Listing are broken
  - fixed #10163: User List - alphabet search field broken
  - fixed #9039: Synopsis not output as a meta field
+ - fixed #9939: checkout error with any payment method
 
 7.7.3
  - fixed #10094: double explanation in thread help
