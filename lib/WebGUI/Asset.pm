@@ -2165,7 +2165,15 @@ The content to wrap up.
 
 sub processStyle {
 	my ($self, $output) = @_;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
+    my $session = $self->session;
+    my $style   = $session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags);
+    if ($self->get('synopsis')) {
+        $style->setMeta({
+            name    => 'Description',
+            content => $self->get('synopsis'),
+        });
+    }
 	return $output;
 }
 
@@ -2739,12 +2747,6 @@ sub www_view {
 	return $check if (defined $check);
 
     # if all else fails 
-    if ($self->get('synopsis')) {
-        $self->session->style->setMeta({
-                name    => 'Description',
-                content => $self->get('synopsis'),
-        });
-    }
     $self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;
