@@ -32,8 +32,22 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 addMatrixMaxGroup($session);
+extendSchedulerFields($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub extendSchedulerFields {
+    my $session = shift;
+    print "\tExtending scheduler fields" unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table WorkflowSchedule change minuteOfHour minuteOfHour char(255) not null default '0'");
+    $db->write("alter table WorkflowSchedule change hourOfDay hourOfDay char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change dayOfMonth dayOfMonth char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change monthOfYear monthOfYear char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change dayOfWeek dayOfWeek char(255) not null default '*'");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Describe what our function does
