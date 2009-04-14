@@ -13,6 +13,7 @@ use WebGUI::Macro;
 use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
+use Scalar::Util qw/blessed/;
 
 =head1 NAME
 
@@ -616,11 +617,13 @@ sub processTransaction {
     # determine object type
     my $transaction;
     my $paymentAddress;
-    if ($object->isa('WebGUI::Shop::Transaction')) {
-        $transaction = $object;
-    }
-    elsif ($object->isa('WebGUI::Shop::Address')) {
-        $paymentAddress = $object;
+    if (blessed $object) {
+        if ($object->isa('WebGUI::Shop::Transaction')) {
+            $transaction = $object;
+        }
+        elsif ($object->isa('WebGUI::Shop::Address')) {
+            $paymentAddress = $object;
+        }
     }
 
     # Setup dynamic transaction
