@@ -1,4 +1,9 @@
 7.7.4
+ - fixed: Spam in the wiki  (#10050)
+ - fixed: maintenance tasks in parallel  (#9921)
+ - fixed: Schedular Fields Too Short  (#9889)
+ - fixed: Can't invite friends  (#10112)
+ - Added missing POD docs for WebGUI::Account
  - fixed #9989: thing-search template won't include data-save params in the url for pagination
  - fixed #10122: fixed date object to not change the value in 'toHtml' function.
  - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
