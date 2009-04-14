@@ -105,6 +105,7 @@ sub appendCommonVars {
     my $session = $self->session;
     my $user    = $self->getUser;
 
+    $var->{'profile_user_id'  } = $user->userId;
     $var->{'user_full_name'   } = $user->getWholeName;
     $var->{'user_member_since'} = $user->dateCreated;
     $var->{'view_profile_url' } = $user->getProfileUrl;
