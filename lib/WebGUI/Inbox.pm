@@ -424,7 +424,7 @@ A where clause to use
 
 =head4 limit
 
-Column
+A full limit clause, not just the number to limit.
 
 =cut
 
