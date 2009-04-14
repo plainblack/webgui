@@ -49,6 +49,7 @@ my $ad;
 my ($richAd, $textAd, $imageAd, $nonAd, $setAd);
 my $adSpace;
 my $imageStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($imageStorage);
 $imageStorage->addFileFromScalar('foo.bmp', 'This is not really an image');
 
 SKIP: {
@@ -218,8 +219,5 @@ END {
         }
         if (defined $adSpace and ref $adSpace eq 'WebGUI::AdSpace') {
                 $adSpace->delete;
-        }
-        if (defined $imageStorage and ref $imageStorage eq 'WebGUI::Storage') {
-                $imageStorage->delete;
         }
 }

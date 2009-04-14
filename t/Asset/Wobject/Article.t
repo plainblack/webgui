@@ -70,6 +70,7 @@ my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
 my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
