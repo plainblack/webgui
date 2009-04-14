@@ -1,5 +1,6 @@
 7.7.4
  - fixed: Spam in the wiki  (#10050)
+ - fixed: Apply button applies but reloads old content in editor  (#9827)
  - fixed: maintenance tasks in parallel  (#9921)
  - fixed: Schedular Fields Too Short  (#9889)
  - fixed: Can't invite friends  (#10112)

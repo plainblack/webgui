@@ -2682,12 +2682,7 @@ sub www_editSave {
 
     # Handle "saveAndReturn" button
     if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
-        if ($isNewAsset) {
-            return $object->www_edit;
-        }
-        else {
-            return $self->www_edit;
-        }
+        return $object->www_edit;
     }
 
     # Handle "proceed" form parameter
