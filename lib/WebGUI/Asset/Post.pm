@@ -970,6 +970,7 @@ sub postProcess {
     my $spamStopWords = $self->session->config->get('spamStopWords');
     if (ref $spamStopWords eq 'ARRAY') {
         my $spamRegex = join('|',@{$spamStopWords});
+        $spamRegex =~ s/\s/\\ /g;
         if ($data{content} =~ m/$spamRegex/xmsi) {
             $data{skipNotification} = 1;
             $self->trash;
