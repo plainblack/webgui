@@ -69,7 +69,13 @@ sub _loadValues{
     for my $value(@$values){
         my $answer = _getAnswer();
         $answer->{text} = $value->[0];
-        $answer->{recordedAnswer} = $value->[1];
+        if($answer->{text} eq 'No'){
+            $answer->{recordedAnswer} = 0;
+        }elsif($answer->{text} eq 'Yes'){
+            $answer->{recordedAnswer} = 1;
+        }else{
+            $answer->{recordedAnswer} = $value->[1];
+        }
         $answer->{verbatim} = $value->[2];
         push @$answers,$answer;
     }
