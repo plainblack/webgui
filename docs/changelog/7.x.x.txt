@@ -1,5 +1,6 @@
 7.6.20
  - fixed: Spam in the wiki  (#10050)
+ - fixed: maintenance tasks in parallel  (#9921)
  - fixed: Schedular Fields Too Short  (#9889)
  - fixed: Can't invite friends  (#10112)
  - Added missing POD docs for WebGUI::Account

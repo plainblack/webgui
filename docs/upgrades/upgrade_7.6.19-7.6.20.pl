@@ -33,8 +33,17 @@ my $session = start(); # this line required
 # upgrade functions go here
 addMatrixMaxGroup($session);
 extendSchedulerFields($session);
+allMaintenanceSingleton($session);
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub allMaintenanceSingleton {
+    my $session = shift;
+    print "\tMaking all maintenance workflows singletons." unless $quiet;
+    $session->db->write("update Workflow set mode='singleton' where workflowId in ('pbworkflow000000000001','pbworkflow000000000002','pbworkflow000000000004','AuthLDAPworkflow000001')");
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub extendSchedulerFields {
