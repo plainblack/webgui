@@ -1,4 +1,5 @@
 7.7.4
+ - fixed: 7.6 upgrade left some default content marked as packages
  - fixed #9816: Syndicated content asset fails on feeds including a UTF8 BOM
  - fixed: Spam in the wiki  (#10050)
  - fixed: Apply button applies but reloads old content in editor  (#9827)

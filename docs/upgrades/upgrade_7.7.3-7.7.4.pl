@@ -34,7 +34,38 @@ my $session = start(); # this line required
 updateSurveyQuestionTypes($session);
 extendSchedulerFields($session);
 allMaintenanceSingleton($session);
+unsetPackageFlags($session);
+
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub unsetPackageFlags {
+    my $session = shift;
+    print "\tTurning off package flag on default assets...\n" unless $quiet;
+    my @assetIds = qw(
+        PBtmpl0000000000000004 PBtmpl0000000000000010
+        TEId5V-jEvUULsZA0wuRuA _9_eiaPgxzF_x_upt6-PNQ
+        LdiozcIUciWuvt3Z-na5Ww PBtmpl0000000000000011
+        PBtmpl0000000000000063 PBtmpl0000000000000062
+        1oBRscNIcFOI-pETrCOspA wAc4azJViVTpo-2NYOXWvg
+        AjhlNO3wZvN5k4i4qioWcg GRUNFctldUgop-qRLuo_DA
+        ThingyTmpl000000000004 UserListTmpl0000000001
+        UserListTmpl0000000002 UserListTmpl0000000003
+        WikiPageTmpl0000000001 QHn6T9rU7KsnS3Y70KCNTg
+        THQhn1C-ooj-TLlEP7aIJQ ThingyTmpl000000000003
+        stevestyle000000000003 UL-ItI4L1Z6-WSuhuXVvsQ
+        QpmlAiYZz6VsKBM-_0wXaw
+    );
+    for my $assetId (@assetIds) {
+        my $asset = WebGUI::Asset->new($session, $assetId);
+        if (!$asset) {
+            warn "\tUnable to instantiate default asset $assetId.\n";
+            next;
+        }
+        $asset->update({isPackage => 0});
+    }
+    print "\tDone.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub allMaintenanceSingleton {
