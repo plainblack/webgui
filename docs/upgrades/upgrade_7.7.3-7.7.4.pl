@@ -32,17 +32,22 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 updateSurveyQuestionTypes($session);
+extendSchedulerFields($session);
 finish($session); # this line required
 
-
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub extendSchedulerFields {
+    my $session = shift;
+    print "\tExtending scheduler fields" unless $quiet;
+    my $db = $session->db;
+    $db->write("alter table WorkflowSchedule change minuteOfHour minuteOfHour char(255) not null default '0'");
+    $db->write("alter table WorkflowSchedule change hourOfDay hourOfDay char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change dayOfMonth dayOfMonth char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change monthOfYear monthOfYear char(255) not null default '*'");
+    $db->write("alter table WorkflowSchedule change dayOfWeek dayOfWeek char(255) not null default '*'");
+    print "DONE!\n" unless $quiet;
+}
+
 sub updateSurveyQuestionTypes{
     my $session = shift;
     my $refs = $session->db->buildArrayRefOfHashRefs("SELECT * FROM Survey_questionTypes");
