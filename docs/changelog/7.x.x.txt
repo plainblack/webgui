@@ -19,6 +19,7 @@
  - fixed #10163: User List - alphabet search field broken
  - fixed #9039: Synopsis not output as a meta field
  - fixed #9939: checkout error with any payment method
+ - fixed #10162: Inbox Failing
 
 7.7.3
  - fixed #10094: double explanation in thread help
