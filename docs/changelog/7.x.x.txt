@@ -16,6 +16,7 @@
  - fixed #10163: User List - alphabet search field broken
  - fixed #9039: Synopsis not output as a meta field
  - fixed #9939: checkout error with any payment method
+ - fixed #10162: Inbox Failing (Eric Kennedy)
 
 7.6.19
  - fixed #9976: carts not cleaned up
