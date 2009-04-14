@@ -29,10 +29,62 @@ These subroutines are available from this package:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 session ()
+
+Returns a reference to the current WebGUI::Session object.
+
+=cut
+
 readonly session => my %session;
+
+#-------------------------------------------------------------------
+
+=head2 module ()
+
+Returns the string representation of the name of the last Account module called.
+
+=cut
+
 readonly module  => my %module;
+
+#-------------------------------------------------------------------
+
+=head2 method ()
+
+Returns the string representation of the name of the last method called on the module().
+
+=cut
+
 public   method  => my %method;
+
+#-------------------------------------------------------------------
+
+=head2 uid ( [ userId ] )
+
+Returns the userId of the WebGUI::User who's account is being interacted with.
+
+=head3 userId
+
+Optionally set the userId. Normally this is never needed, but is provided for completeness.
+
+=cut
+
 public   uid     => my %uid;
+
+#-------------------------------------------------------------------
+
+=head2 store ( [ hashRef ] )
+
+Returns a hash reference attached to this account object that contains arbitrary data.
+
+=head2 hashRef
+
+A hash reference of data to store.
+
+=cut
+
 public   store   => my %store;  #This is an all purpose hash to store stuff in: $self->store->{something} = "something"
 
 #-------------------------------------------------------------------
