@@ -66,7 +66,6 @@ sub _isValidLDAPUser {
     # Create an LDAP object
     if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
 
-        my $uri  = $ldapLink->getURI;
         # Bind as a proxy user to search for the user trying to login
         if($connection->{connectDn}) {
             $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});
