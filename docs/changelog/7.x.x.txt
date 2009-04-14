@@ -8,6 +8,7 @@
  - fixed #10141: Matrix 2.0 - Search does not check matching products
  - fixed #10077: after matrix sort can't return to alphanumeric sort
  - fixed #10138: Matrix 2.0 Links in Product Listing are broken
+ - fixed #10163: User List - alphabet search field broken
 
 7.7.3
  - fixed #10094: double explanation in thread help
