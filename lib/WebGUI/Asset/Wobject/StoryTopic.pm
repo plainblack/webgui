@@ -171,7 +171,6 @@ sub viewTemplateVariables {
             next PHOTO unless $photo->{storageId};
             my $storage  = WebGUI::Storage->get($session, $photo->{storageId});
             my $file     = $storage->getFiles->[0];
-            warn $storage->getId;
             next PHOTO unless $file;
             my $imageUrl = $storage->getUrl($file);
             $var->{topStoryImageUrl}     = $imageUrl;
