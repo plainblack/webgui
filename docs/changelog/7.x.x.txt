@@ -1,4 +1,5 @@
 7.6.20
+ - fixed: 7.6 upgrade left some default content marked as packages
  - fixed: Spam in the wiki  (#10050)
  - fixed: maintenance tasks in parallel  (#9921)
  - fixed: Apply button applies but reloads old content in editor  (#9827)
