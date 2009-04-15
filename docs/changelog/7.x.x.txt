@@ -1,3 +1,5 @@
+7.6.21
+
 7.6.20
  - fixed: 7.6 upgrade left some default content marked as packages
  - fixed: Spam in the wiki  (#10050)
