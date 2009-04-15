@@ -95,7 +95,7 @@ sub definition {
     }
 
 	my %properties;
-    tie my %properties, 'Tie::IxHash';
+    tie %properties, 'Tie::IxHash';
 	%properties = (
 	    templateId =>{
 		    fieldType       =>"template",  
