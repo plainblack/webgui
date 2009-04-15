@@ -6,6 +6,7 @@ var Event = YAHOO.util.Event;
 var DDM = YAHOO.util.DragDropMgr;
 
 var currentDest;
+var started = 0;
 
 Survey.DDList = function(id, sGroup, config) {
 
@@ -20,8 +21,9 @@ Survey.DDList = function(id, sGroup, config) {
 };
 
 YAHOO.extend(Survey.DDList, YAHOO.util.DDProxy, {
-
+    
     startDrag: function(x, y) {
+        started +=2;
         this.logger.log(this.id + " startDrag");
 
         // make the proxy look like the source element
@@ -65,8 +67,11 @@ YAHOO.extend(Survey.DDList, YAHOO.util.DDProxy, {
 
     onInvalidDrop: function(e, id) {
         Survey.Data.dragDrop(this.getEl());
+        started += -2;
     },
     onDragDrop: function(e, id) {
+        started--;
+        if(started != 1){return;}
         Survey.Data.dragDrop(this.getEl());
     },
 
@@ -74,7 +79,15 @@ YAHOO.extend(Survey.DDList, YAHOO.util.DDProxy, {
 
         // Keep track of the direction of the drag for use during onDragOver
         var y = Event.getPageY(e);
-
+        var temp = Survey.Data.ddContainer.body;
+        var dy = YAHOO.util.Dom.getY(temp);
+        var scrollOffset = 30;
+        if((y - scrollOffset) < dy){
+            Survey.Data.ddContainer.body.scrollTop -= 20;
+        }
+        else if((y + scrollOffset) > (dy + temp.offsetHeight)){
+            Survey.Data.ddContainer.body.scrollTop += 20;
+        }
         if (y < this.lastY) {
             this.goingUp = true;
         } else if (y > this.lastY) {
@@ -92,12 +105,13 @@ YAHOO.extend(Survey.DDList, YAHOO.util.DDProxy, {
         // We are only concerned with list items, we ignore the dragover
         // notifications for the list.
         if (destEl.nodeName.toLowerCase() == "li") {
-currentDest = destEl;
-YAHOO.log(destEl);
+            currentDest = destEl;
+            YAHOO.log(destEl);
             var orig_p = srcEl.parentNode;
             var p = destEl.parentNode;
 
             if (this.goingUp) {
+                Survey.Data.ddContainer
                 p.insertBefore(srcEl, destEl); // insert above
             } else {
                 p.insertBefore(srcEl, destEl.nextSibling); // insert below

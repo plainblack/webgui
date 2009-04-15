@@ -15,8 +15,8 @@ Survey.Data = (function(){
 	var sButton, qButton, aButton;
 
     return {
+        ddContainer:null,
         dragDrop: function(did){
-
             YAHOO.log('In drag drop');
 			var type = did.className.match("section")  ? 'section'
                      : did.className.match("question") ? 'question'
@@ -80,7 +80,23 @@ Survey.Data = (function(){
 			YAHOO.util.Event.purgeElement('sections', true);
 
 			// Now we can re-write its innerHTML without fear of memory leaks
-            document.getElementById('sections').innerHTML = d.ddhtml;
+//            document.getElementById('sections').innerHTML = d.ddhtml;
+
+            if(! Survey.Data.ddContainer){
+                Survey.Data.ddContainer = 
+                    new YAHOO.widget.Panel("sections",  
+                        { width:"440px",
+                          height: "420px", 
+                          draggable:true, 
+                          visible:true
+                
+                        } 
+                    );
+            }
+            Survey.Data.ddContainer.setHeader("Survey Objects...");
+            Survey.Data.ddContainer.setBody(d.ddhtml);
+            Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
+            Survey.Data.ddContainer.render();//document.body);
 
             //add event handlers for if a tag is clicked
             for (var x in d.ids) {
