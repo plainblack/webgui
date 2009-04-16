@@ -363,7 +363,7 @@ sub getMessagesPaginator {
         $sortBy  = qq{ibox.$sortBy};
     }
     else {
-        $sortBy  = q{messageStatus DESC, dateStamp DESC};
+        $sortBy  = q{messageStatus='pending' DESC, dateStamp DESC};
         $sortDir = q{};
     }
     
