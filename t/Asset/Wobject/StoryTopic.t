@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 15;
+my $tests = 17;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -94,6 +94,15 @@ $versionTag->commit;
 
 my $templateVars;
 $templateVars = $topic->viewTemplateVariables();
+
+cmp_deeply(
+    $templateVars,
+    superhashof({
+        rssUrl  => $topic->getRssFeedUrl,
+        atomUrl => $topic->getAtomFeedUrl,
+    }),
+    'viewTemplateVars: RSS and Atom feed template variables'
+);
 cmp_deeply(
     $templateVars->{story_loop},
     [
@@ -254,6 +263,15 @@ cmp_deeply(
     ],
     '... export mode, URLs are the regular story URLs'
 );
+cmp_deeply(
+    $templateVars,
+    superhashof({
+        rssUrl  => $topic->getStaticRssFeedUrl,
+        atomUrl => $topic->getStaticAtomFeedUrl,
+    }),
+    '... export mode, RSS and Atom feed template variables show the static url'
+);
+$topic->{_exportMode} = 0;
 
 }
 

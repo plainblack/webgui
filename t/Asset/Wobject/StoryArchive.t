@@ -58,7 +58,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 33
+my $tests = 35
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -193,6 +193,15 @@ cmp_deeply(
         searchFooter => ignore(),
     }),
     'viewTemplateVars: search variables present'
+);
+
+cmp_deeply(
+    $templateVars,
+    superhashof({
+        rssUrl  => $archive->getRssFeedUrl,
+        atomUrl => $archive->getAtomFeedUrl,
+    }),
+    'viewTemplateVars: RSS and Atom feed template variables'
 );
 
 KEY: foreach my $key (keys %{ $templateVars }) {
@@ -380,6 +389,25 @@ cmp_bag(
     'viewTemplateVariables: search mode returns the correct assets in the same form as view mode'
 );
 
+$archive->{_exportMode} = 1;
+$templateVars = $archive->viewTemplateVariables();
+ok( (  !exists $templateVars->{searchHeader}
+    && !exists $templateVars->{searchForm}
+    && !exists $templateVars->{searchButton}
+    && !exists $templateVars->{searchForm}
+    ),
+    '... export mode, no search variables present'
+);
+
+cmp_deeply(
+    $templateVars,
+    superhashof({
+        rssUrl  => $archive->getStaticRssFeedUrl,
+        atomUrl => $archive->getStaticAtomFeedUrl,
+    }),
+    '... export mode, RSS and Atom feed template variables show the static url'
+);
+$archive->{_exportMode} = 0;
 
 ################################################################
 #
@@ -398,17 +426,6 @@ cmp_bag(
     \@expectedAnchors,
     'keywordCloud template variable has keywords and correct links',
 );
-
-$archive->{_exportMode} = 1;
-$templateVars = $archive->viewTemplateVariables();
-ok( (  !exists $templateVars->{searchHeader}
-    && !exists $templateVars->{searchForm}
-    && !exists $templateVars->{searchButton}
-    && !exists $templateVars->{searchForm}
-    ),
-    '... export mode, no search variables present'
-);
-$archive->{_exportMode} = 0;
 
 ################################################################
 #

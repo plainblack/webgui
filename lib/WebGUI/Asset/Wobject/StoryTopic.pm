@@ -17,7 +17,8 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Asset::Story;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
 
 use constant DATE_FORMAT => '%c_%D_%y';
 
@@ -201,8 +202,8 @@ sub viewTemplateVariables {
         }
     }
     $var->{standAlone} = $self->{_standAlone};
-    $var->{rssUrl}     = $self->getUrl('func=viewRss');
-    $var->{atomUrl}    = $self->getUrl('func=viewAtom');
+    $var->{rssUrl}     = $self->{_exportMode} ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
+    $var->{atomUrl}    = $self->{_exportMode} ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
 
     return $var;
 }

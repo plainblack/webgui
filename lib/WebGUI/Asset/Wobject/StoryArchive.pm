@@ -388,12 +388,13 @@ sub viewTemplateVariables {
     $var->{addStoryUrl}    = $var->{canPostStories}
                            ? $self->getUrl('func=add;class=WebGUI::Asset::Story')
                            : '';
-    $var->{rssUrl}         = $self->getUrl('func=viewRss');
-    $var->{atomUrl}        = $self->getUrl('func=viewAtom');
-    $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud({
+    $var->{rssUrl}         = $self->{_exportMode} ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
+    $var->{atomUrl}        = $self->{_exportMode} ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
+    my $cloudOptions       = {
         startAsset  => $self,
         displayFunc => 'view',
-    });
+    };
+    $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
     if (! $self->{_exportMode}) {
         my $i18n = WebGUI::International->new($session, 'Asset');
         $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
