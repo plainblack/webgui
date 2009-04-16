@@ -23,6 +23,7 @@
  - fixed #10162: Inbox Failing (Eric Kennedy)
  - Survey editor now keeps survey objects in a scrollable panel to keep buttons always in view.
  - fixed #10198: Cannot drag assets to new positions on page
+ - fixed #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
 
 7.7.3
  - fixed #10094: double explanation in thread help
