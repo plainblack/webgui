@@ -58,7 +58,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 31
+my $tests = 33
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -183,6 +183,18 @@ $creationDateSth->execute([$yesterday, $pastStory->getId]);
 
 my $templateVars;
 $templateVars = $archive->viewTemplateVariables();
+
+cmp_deeply(
+    $templateVars,
+    superhashof({
+        searchHeader => ignore(),
+        searchForm   => ignore(),
+        searchButton => ignore(),
+        searchFooter => ignore(),
+    }),
+    'viewTemplateVars: search variables present'
+);
+
 KEY: foreach my $key (keys %{ $templateVars }) {
     next KEY if isIn($key, qw/canPostStories addStoryUrl date_loop mode/);
     delete $templateVars->{$key};
@@ -386,6 +398,17 @@ cmp_bag(
     \@expectedAnchors,
     'keywordCloud template variable has keywords and correct links',
 );
+
+$archive->{_exportMode} = 1;
+$templateVars = $archive->viewTemplateVariables();
+ok( (  !exists $templateVars->{searchHeader}
+    && !exists $templateVars->{searchForm}
+    && !exists $templateVars->{searchButton}
+    && !exists $templateVars->{searchForm}
+    ),
+    '... export mode, no search variables present'
+);
+$archive->{_exportMode} = 0;
 
 ################################################################
 #

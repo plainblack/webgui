@@ -160,6 +160,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 exportHtml_view ( )
+
+Extend the base method to change how the tag cloud works and the search
+interface.
+
+Sets an internal flag to indicate that it is exporting to signal viewTemplateVars
+to make those changes.
+
+=cut
+
+sub exportHtml_view {
+    my $self = shift;
+    $self->{_exportMode} = 1;
+    return $self->next::method(@_);
+}
+
+#-------------------------------------------------------------------
+
 =head2 getFolder ( date )
 
 Stories are stored in Folders under the Story Archive to prevent lineage issues.
@@ -376,12 +394,14 @@ sub viewTemplateVariables {
         startAsset  => $self,
         displayFunc => 'view',
     });
-    my $i18n = WebGUI::International->new($session, 'Asset');
-    $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
-                         . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
-    $var->{searchFooter} = WebGUI::Form::formFooter($session);
-    $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
-    $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'query',    value => $query});
+    if (! $self->{_exportMode}) {
+        my $i18n = WebGUI::International->new($session, 'Asset');
+        $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
+                             . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
+        $var->{searchFooter} = WebGUI::Form::formFooter($session);
+        $var->{searchButton} = WebGUI::Form::submit($session, { name => 'search',   value => $i18n->get('search')});
+        $var->{searchForm}   = WebGUI::Form::text($session,   { name => 'query',    value => $query});
+    }
     return $var;
 }
 
