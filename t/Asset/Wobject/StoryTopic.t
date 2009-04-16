@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 14;
+my $tests = 15;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -83,6 +83,8 @@ $topic->update({
     storiesPer   => 6,
     storiesShort => 3,
 });
+
+$versionTag->commit;
 
 ################################################################
 #
@@ -154,7 +156,7 @@ cmp_deeply(
             creationDate => $now,
         },
     ],
-    'viewTemplateVars has right number and contents in the story_loop in standalone mode'
+    'viewTemplateVars has right number and contents in the story_loop in standalone mode.  Top story not present in story_loop'
 );
 
 is($templateVars->{topStoryTitle}, 'bogs', '... topStoryTitle');
@@ -212,7 +214,6 @@ cmp_deeply(
     '... photo template variables set'
 );
 
-
 $topic->update({
     storiesShort => 20,
 });
@@ -225,6 +226,33 @@ cmp_deeply(
     \@topicInmates,
     [@inmates, 'Yesterday is history'], #extra for pastStory
     'viewTemplateVariables: is only finding things with its keywords'
+);
+
+$topic->{_exportMode} = 1;
+$topic->update({
+    storiesShort => 3,
+});
+$templateVars = $topic->viewTemplateVariables;
+cmp_deeply(
+    $templateVars->{story_loop},
+    [
+        {
+            title        => 'bogs',
+            url          => $storyHandler->{'bogs'}->getUrl,
+            creationDate => $now,
+        },
+        {
+            title        => 'red',
+            url          => $storyHandler->{'red'}->getUrl,
+            creationDate => $now,
+        },
+        {
+            title        => 'brooks',
+            url          => $storyHandler->{'brooks'}->getUrl,
+            creationDate => $now,
+        },
+    ],
+    '... export mode, URLs are the regular story URLs'
 );
 
 }

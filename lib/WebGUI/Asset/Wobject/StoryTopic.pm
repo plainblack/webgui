@@ -83,6 +83,22 @@ sub definition {
     return $class->SUPER::definition($session, $definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 exportHtml_view ( )
+
+Extend the base method to change how stories are linked to.
+
+Sets an internal flag to indicate that it is exporting to signal viewTemplateVars
+to make those changes.
+
+=cut
+
+sub exportHtml_view {
+    my $self = shift;
+    $self->{_exportMode} = 1;
+    return $self->next::method(@_);
+}
 
 #-------------------------------------------------------------------
 
@@ -150,7 +166,9 @@ sub viewTemplateVariables {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
         push @{$var->{story_loop}}, {
-            url           => $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}),
+            url           => ( $self->{_exportMode}
+                               ? $story->getUrl
+                               : $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}) ),
             title         => $story->getTitle,
             creationDate  => $story->get('creationDate'),
         }
