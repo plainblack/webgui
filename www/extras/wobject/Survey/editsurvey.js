@@ -75,29 +75,38 @@ Survey.Data = (function(){
             else {
                 lastId = d.address;
             }
-
+            
 			// First purge any event handlers bound to sections node..
-			YAHOO.util.Event.purgeElement('sections', true);
+            YAHOO.util.Event.purgeElement('sections', true);
 
-			// Now we can re-write its innerHTML without fear of memory leaks
-//            document.getElementById('sections').innerHTML = d.ddhtml;
-
-            if(! Survey.Data.ddContainer){
-                Survey.Data.ddContainer = 
-                    new YAHOO.widget.Panel("sections",  
-                        { width:"440px",
-                          height: "420px", 
-                          draggable:true, 
-                          visible:true
+            if (!Survey.Data.ddContainer) {
+                Survey.Data.ddContainer = new YAHOO.widget.Panel("sections", {
+                    width: "400px",
+                    height: "600px",
+                    draggable: true,
+                    visible: true,
+                    bodyStyle: { 'margin-right' : '5px' }
+                });
                 
-                        } 
-                    );
+                Survey.Data.ddContainer.setHeader("Survey Objects...");
+                Survey.Data.ddContainer.setBody(d.ddhtml);
+                Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
+                Survey.Data.ddContainer.render();//document.body);
             }
-            Survey.Data.ddContainer.setHeader("Survey Objects...");
-            Survey.Data.ddContainer.setBody(d.ddhtml);
-            Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
-            Survey.Data.ddContainer.render();//document.body);
-
+            else {
+                Survey.Data.ddContainer.setBody(d.ddhtml);
+                Survey.Data.ddContainer.setFooter(document.getElementById("buttons"));
+            }
+            
+            // (re)Add resize handler
+            Survey.Data.ddContainerResize && Survey.Data.ddContainerResize.destroy();
+            Survey.Data.ddContainerResize = new YAHOO.util.Resize('sections', {
+                proxy: true
+            });
+            Survey.Data.ddContainerResize.on('resize', function(args){
+                Survey.Data.ddContainer.cfg.setProperty("height", args.height + "px");
+            });
+            
             //add event handlers for if a tag is clicked
             for (var x in d.ids) {
 				if (YAHOO.lang.hasOwnProperty(d.ids, x)) {
@@ -105,6 +114,11 @@ Survey.Data = (function(){
 	                YAHOO.util.Event.addListener(d.ids[x], "click", this.clicked);
 	                var _s = new Survey.DDList(d.ids[x], "sections");
 				}
+            }
+            var selectedId = focus.join('-');
+            selectedId = selectedId === 'undefined' ? "0" : selectedId;
+            if (document.getElementById(selectedId)) {
+                YAHOO.util.Dom.addClass(selectedId, 'selected');
             }
 
 			sButton && sButton.destroy();

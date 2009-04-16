@@ -800,7 +800,7 @@ sub www_loadSurvey {
             elsif ( $lastType eq 'question' ) {
                 $q = 1;
             }
-            $html .= "<li id='$scount' class='section'>S" . ( $scount + 1 ) . ": $_->{text}<\/li><br>\n";
+            $html .= "<li id='$scount' class='section'>S" . ( $scount + 1 ) . ": $_->{text}<\/li>\n";
             push( @ids, $scount );
         }
         elsif ( $_->{type} eq 'question' ) {
@@ -808,7 +808,7 @@ sub www_loadSurvey {
             if ( $lastType eq 'answer' ) {
                 $a = 1;
             }
-            $html .= "<li id='$scount-$qcount' class='question'>Q" . ( $qcount + 1 ) . ": $_->{text}<\/li><br>\n";
+            $html .= "<li id='$scount-$qcount' class='question'>Q" . ( $qcount + 1 ) . ": $_->{text}<\/li>\n";
             push @ids, "$scount-$qcount";
             $lastType = 'question';
             $acount   = -1;
@@ -818,7 +818,7 @@ sub www_loadSurvey {
             $html
                 .= "<li id='$scount-$qcount-$acount' class='answer'>A"
                 . ( $acount + 1 )
-                . ": $_->{text}<\/li><br>\n";
+                . ": $_->{text}<\/li>\n";
             push @ids, "$scount-$qcount-$acount";
             $lastType = 'answer';
         }
