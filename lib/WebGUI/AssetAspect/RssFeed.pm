@@ -161,6 +161,10 @@ particular asset.
 A hashref with the quiet, userId, depth, and indexFileName parameters from
 L<WebGUI::Asset/exportAsHtml>.
 
+=head3 session
+
+The session doing the full export.  Can be used to report status messages.
+
 =cut
 
 sub exportAssetCollateral {
