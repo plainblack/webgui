@@ -178,6 +178,11 @@ site.
 
 The maximum number of keywords to display in the cloud. Defaults to 50. Valid range between 1 and 50, inclusive.
 
+=head3 urlCallback
+
+This is a subroutine reference that will be called to get the URL for a keyword.  The callback
+will get the keyword as its first, and only argument.
+
 =cut
 
 sub generateCloud {
