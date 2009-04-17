@@ -117,6 +117,7 @@ sub loadTypes {
         'Slider',
         'Currency',
         'Email',
+        'Number',
         'Phone Number',
         'Text',
         'Text Date',

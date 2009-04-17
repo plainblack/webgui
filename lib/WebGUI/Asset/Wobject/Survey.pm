@@ -1313,7 +1313,7 @@ sub prepareShowSurveyTemplate {
 #        'Security',        1
 #    );
     my %textArea    = ( 'TextArea', 1 );
-    my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1 );
+    my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1, 'Number', 1 );
     my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
     my %dateType    = ( 'Date',        1, 'Date Range', 1 );
     my %dateShort   = ( 'Year Month', 1 );

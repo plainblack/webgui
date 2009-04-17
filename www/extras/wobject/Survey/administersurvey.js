@@ -18,6 +18,9 @@ if (typeof Survey === "undefined") {
         'Currency': 1,
 	    'TextArea': 1
     };
+    var NUMBER_TYPES = {
+        'Number':1
+    };
     var SLIDER_TYPES = {
         'Slider': 1,
         'Dual Slider - Range': 1,
@@ -63,6 +66,17 @@ if (typeof Survey === "undefined") {
                     else {
                         var amountLeft = toValidate[i].total - total;
                         alert("Please allocate the remaining " + amountLeft + ".");
+                    }
+                }
+                else if (toValidate[i].type === 'Number') {
+                    answered = 1;
+                    for (var z1 in toValidate[i].answers) {
+                        var m = document.getElementById(z1).value;
+                        var ansValues = toValidate[i].answers[z1];
+                        if(m > ansValues.max || m < ansValues.min || m % ansValues.step != 0){
+                            answered = 0;
+                            break;
+                        }
                     }
                 }
                 else if (toValidate[i].type === 'Year Month') {
@@ -604,6 +618,12 @@ if (typeof Survey === "undefined") {
                 if (TEXT_TYPES[q.questionType]) {
                     if (toValidate[q.id]) {
                         toValidate[q.id].answers[q.answers[x].id] = 1;
+                    }
+                    continue;
+                }
+                if (NUMBER_TYPES[q.questionType]) {
+                    if (toValidate[q.id]) {
+                        toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
                     }
                     continue;
                 }
