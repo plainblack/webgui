@@ -12,17 +12,6 @@ save you many hours of grief.
 --------------------------------------------------------------------
    * WebGUI now requires XML::FeedPP version 0.40 or greater.
 
-   * Due to a change in the way that assets are dragged in Page Layouts,
-     custom layout templates need to be changed to add another div:
-
-        before:
-            <div class="content"><tmpl_var dragger.icon><tmpl_var content></div>
-        after:
-            <div class="content"><div id="td<tmpl_var id>_handle" class="dragable"><tmpl_var dragger.icon></div><tmpl_var content></div>
-
-     All default WebGUI Page Layout templates have already been updated.
-
-
 7.7.2
 --------------------------------------------------------------------
    * WebGUI now requires Clone version 0.31 or greater.
