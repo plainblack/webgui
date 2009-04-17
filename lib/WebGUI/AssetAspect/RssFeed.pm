@@ -224,8 +224,8 @@ sub exportAssetCollateral {
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };
         if($@) {
-            WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
             $exportSession->close;
+            WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
         }
         $exportSession->asset($selfdupe);
         $exportSession->output->setHandle($fh);
