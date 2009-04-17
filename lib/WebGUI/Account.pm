@@ -75,6 +75,22 @@ public   uid     => my %uid;
 
 #-------------------------------------------------------------------
 
+=head2 bare ( [ flag ] )
+
+Returns whether or not the Account system should return a method's content
+without the layout and style templates.  This would normally be used for
+returning JSON or XML data out of the account system.
+
+=head3 flag
+
+Optionally set bare to be true, or false.
+
+=cut
+
+public   bare     => my %bare;
+
+#-------------------------------------------------------------------
+
 =head2 store ( [ hashRef ] )
 
 Returns a hash reference attached to this account object that contains arbitrary data.
@@ -191,6 +207,9 @@ sub displayContent {
     my $content = shift;
     my $noStyle = shift;
     my $session = $self->session;
+
+    ##Don't do any templating if we're sending back data like JSON or XML.
+    return $content if $self->bare;
 
     #Wrap content into the layout
     my $var         = {};
