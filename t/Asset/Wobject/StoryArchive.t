@@ -58,7 +58,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 36
+my $tests = 37
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -154,6 +154,17 @@ my $folder = $archive->getFirstChild();
 isa_ok($folder, 'WebGUI::Asset::Wobject::Folder', 'Folder was added to Archive');
 is($folder->getChildCount, 1, 'The folder has 1 child...');
 is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct child');
+
+################################################################
+#
+#  getKeywordStaticUrl
+#
+################################################################
+
+##Note, this method depends heavily on the default installed language pack.
+##Because of that, we'll only test for whether or not url->urlize is called.
+
+is ($archive->getKeywordStaticUrl('camelCase'), 'keyword_camelcase.html', 'getKeywordStaticUrl returns a lower case keyword with _keyword.html appended');
 
 ################################################################
 #
