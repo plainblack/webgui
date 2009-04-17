@@ -27,6 +27,7 @@
  - rfe: #10073: Account system to be able to return XML/JSON (perlDreamer Consulting)
  - Replaced the tax system with a pluggable one. Included are a Generic plugin
    (which works the same as the old system) and a plugin for EU merchants ( Martin Kamerbeek / Oqapi )
+ - fixed #10213: RssFeed aspect now checks canView and gives HTTP Basic Auth box to login
 
 7.7.3
  - fixed #10094: double explanation in thread help

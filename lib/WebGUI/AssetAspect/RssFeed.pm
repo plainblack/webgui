@@ -143,6 +143,24 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 _httpBasicLogin ( )
+
+Set header values and content to show the HTTP Basic Auth login box.
+
+=cut
+
+sub _httpBasicLogin {
+    my ( $self ) = @_;
+    $self->session->request->headers_out->set(
+        'WWW-Authenticate' => 'Basic realm="'.$self->session->setting->get('companyName').'"'
+    );
+    $self->session->http->setStatus(401,'Unauthorized');
+    $self->session->http->sendHeader;
+    return '';
+}
+
+#-------------------------------------------------------------------
+
 =head2 exportAssetCollateral ()
 
 Extended from WebGUI::Asset and exports the www_viewRss() and
@@ -494,6 +512,7 @@ Return Atom view of the syndicated items.
 
 sub www_viewAtom {
     my $self = shift;
+    return $self->_httpBasicLogin unless $self->canView;
     $self->session->http->setMimeType('application/atom+xml');
     return $self->getFeed( XML::FeedPP::Atom->new )->to_string;
 }
@@ -508,6 +527,7 @@ Return Rdf view of the syndicated items.
 
 sub www_viewRdf {
     my $self = shift;
+    return $self->_httpBasicLogin unless $self->canView;
     $self->session->http->setMimeType('application/rdf+xml');
     return $self->getFeed( XML::FeedPP::RDF->new )->to_string;
 }
@@ -522,6 +542,7 @@ Return RSS view of the syndicated items.
 
 sub www_viewRss {
     my $self = shift;
+    return $self->_httpBasicLogin unless $self->canView;
     $self->session->http->setMimeType('application/rss+xml');
     return $self->getFeed( XML::FeedPP::RSS->new )->to_string;
 }
