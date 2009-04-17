@@ -1,6 +1,7 @@
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
  - Reverted fix for #10162, which changed how the Inbox sorts.
+ - fixed #10198: Cannot drag assets to new positions on page
 
 7.6.20
  - fixed: 7.6 upgrade left some default content marked as packages
