@@ -53,6 +53,9 @@ sub appendCommonVars {
 
     $var->{ 'view_sales_url'            } = $self->getUrl( 'module=shop;do=viewSales' );
     $var->{ 'viewSalesIsActive'         } = $method eq 'viewSales';
+
+    $var->{ 'manage_tax_url'            } = $self->getUrl( 'module=shop;do=manageTaxData' );
+    $var->{ 'manageTaxIsActive'         } = $method eq 'manageTaxData';
 }
 
 #-------------------------------------------------------------------
@@ -199,6 +202,17 @@ sub www_managePurchases {
     $self->appendCommonVars($var);
 
     return $self->processTemplate($var,$session->setting->get("shopMyPurchasesTemplateId"));
+}
+
+#-------------------------------------------------------------------
+sub www_manageTaxData {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $userScreen = WebGUI::Shop::Tax->new( $session )->getDriver->getUserScreen;
+
+
+    return $userScreen;
 }
 
 #-------------------------------------------------------------------

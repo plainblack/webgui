@@ -20,7 +20,7 @@ use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
-
+use JSON qw{ from_json to_json };
 
 =head1 NAME
 
@@ -102,6 +102,7 @@ sub definition {
 	my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
+
 	my $i18n = WebGUI::International->new($session, "Asset_Sku");
 	%properties = (
 		description => {
@@ -125,20 +126,6 @@ sub definition {
 			label			=> $i18n->get("display title"),
 			hoverHelp		=> $i18n->get("display title help")
 			},
-		overrideTaxRate => {
-			tab				=> "shop",
-			fieldType		=> "yesNo",
-			defaultValue	=> 0,
-			label			=> $i18n->get("override tax rate"),
-			hoverHelp		=> $i18n->get("override tax rate help")
-			},
-		taxRateOverride => {
-			tab				=> "shop",
-			fieldType		=> "float",
-			defaultValue	=> 0.00,
-			label			=> $i18n->get("tax rate override"),
-			hoverHelp		=> $i18n->get("tax rate override help")
-			},
 		vendorId => {
 			tab				=> "shop",
 			fieldType		=> "vendor",
@@ -146,6 +133,11 @@ sub definition {
 			label			=> $i18n->get("vendor"),
 			hoverHelp		=> $i18n->get("vendor help")
 			},
+        taxConfiguration => {
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+            defaultValue    => '{}',
+        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -206,6 +198,31 @@ sub getConfiguredTitle {
     return $self->getTitle;
 }
 
+#-------------------------------------------------------------------
+sub getEditForm {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $tabform = $self->SUPER::getEditForm;
+    
+    # Let the tax system add the form fields that are required by the active tax plugin for configuring the sku tax.
+    # WebGUI::Shop::Tax->new( $session )->appendSkuForm( $self->getId, $tabform->getTab('shop') );
+
+    my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
+    my $definition  = $taxDriver->skuFormDefinition;
+    my $config      = $self->getTaxConfiguration( $taxDriver->className );
+    my $shop        = $tabform->getTab( 'shop' );
+
+    foreach my $fieldName ( keys %{ $definition } ) {
+        $shop->dynamicField(
+            %{ $definition->{ $fieldName } },
+            name    => $fieldName,
+            value   => $config->{ $fieldName },
+        );
+    }
+
+    return $tabform;
+}
 
 #-------------------------------------------------------------------
 
@@ -285,6 +302,20 @@ Returns the recur interval, which must be one of the following: 'Weekly', 'BiWee
 
 sub getRecurInterval {
     return undef;
+}
+
+#-------------------------------------------------------------------
+sub getTaxConfiguration {
+    my $self        = shift;
+    my $namespace   = shift;
+
+    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    if ($@) {
+        $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' appears to be corrupt. :' . $@ );
+        return undef;
+    }
+
+    return $configs->{ $namespace }
 }
 
 #-------------------------------------------------------------------
@@ -529,6 +560,20 @@ sub onRemoveFromCart {
 }
 
 #-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+    my $self = shift;
+
+    my $output = $self->SUPER::processPropertiesFromFormPost( @_ );
+
+    my $taxDriver = WebGUI::Shop::Tax->new( $self->session )->getDriver;
+    $self->session->log->fatal( 'Could not instanciate tax driver.' ) unless $taxDriver;
+
+    $self->setTaxConfiguration( $taxDriver->className, $taxDriver->processSkuFormPost );
+
+    return $output;
+}
+
+#-------------------------------------------------------------------
 
 =head2 processStyle ( output )
 
@@ -544,6 +589,28 @@ sub processStyle {
 	my $self = shift;
 	my $output = shift;
 	return $self->getParent->processStyle($output);
+}
+
+#-------------------------------------------------------------------
+sub setTaxConfiguration {
+    my $self            = shift;
+    my $namespace       = shift;
+    my $configuration   = shift;
+
+    # Fetch current tax configurations
+    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    if ($@) {
+        $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' is corrupt.' );
+        return undef;
+    }
+
+    # Apply the new configuration for the given driver...
+    $configs->{ $namespace } = $configuration;
+    
+    # ...and persist it to the db.
+    $self->update( {
+        taxConfiguration    => to_json( $configs ),
+    } );
 }
 
 #-------------------------------------------------------------------

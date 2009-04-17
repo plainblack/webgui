@@ -25,6 +25,8 @@
  - fixed #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
  - rfe: #10002: User Manager, view User's Profile (perlDreamer Consulting)
  - rfe: #10073: Account system to be able to return XML/JSON (perlDreamer Consulting)
+ - Replaced the tax system with a pluggable one. Included are a Generic plugin
+   (which works the same as the old system) and a plugin for EU merchants ( Martin Kamerbeek / Oqapi )
 
 7.7.3
  - fixed #10094: double explanation in thread help

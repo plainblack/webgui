@@ -36,6 +36,9 @@ extendSchedulerFields($session);
 allMaintenanceSingleton($session);
 unsetPackageFlags($session);
 
+installPluggableTax( $session );
+
+
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -149,6 +152,60 @@ sub _getAnswer{
     return $answer;
 }
 
+#----------------------------------------------------------------------------
+sub installPluggableTax {
+    my $session = shift;
+    my $db      = $session->db;
+    print "\tInstall tables for pluggable tax system..." unless $quiet;
+
+    # Rename table for the Generic tax plugin
+    $db->write( 'alter table tax rename tax_generic_rates' );
+
+    # Create tax driver table
+    $db->write( 'create table taxDriver (className char(255) not null primary key, options mediumtext)' );
+
+    # Table for storing EU VAT numbers.
+    $db->write( <<EOSQL2 );
+        create table tax_eu_vatNumbers (
+            userId      char(22)    binary  not null, 
+            countryCode char(3)             not null, 
+            vatNumber   char(20)            not null, 
+            approved    tinyint(1)          not null default 0, 
+            primary key( userId, vatNumber )
+        );
+EOSQL2
+
+    # Add the Generic and EU taxdrivers to the config file.
+    $session->config->set( 'taxDrivers', [
+        'WebGUI::Shop::TaxDriver::Generic',
+        'WebGUI::Shop::TaxDriver::EU',
+    ] );
+
+    # Add a setting to store the active tax plugin.
+    $session->setting->add( 'activeTaxPlugin', 'WebGUI::Shop::TaxDriver::Generic' );
+
+    # Add column to sku for storing each sku's tax configuration.
+    $db->write( "alter table sku add column taxConfiguration mediumtext " );
+
+    # Migrate the tax overrides of skus into the tax configuration column.
+    # Don't use getLineage because this has to be done for each revision.
+    my $sth = $db->read( "select assetId, revisionDate, overrideTaxRate, taxRateOverride from sku" );
+    while (my $row = $sth->hashRef) {
+        my $config = {
+            overrideTaxRate => $row->{ overrideTaxRate } || 0,
+            taxRateOverride => $row->{ taxRateOverride } || 0,
+        };
+
+        $db->write( 'update sku set taxConfiguration=? where assetId=? and revisionDate=?', [
+            to_json( $config ),
+            $row->{ assetId },
+            $row->{ revisionDate },
+        ]);
+    }
+    $sth->finish;
+
+    print "Done.\n" unless $quiet;
+}
 
 
 

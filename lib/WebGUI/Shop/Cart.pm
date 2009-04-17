@@ -820,7 +820,7 @@ sub www_view {
         $self->update({shippingAddressId=>''});
         
     }
-    
+   
     # if there is no shipping address we can't check out
     if (WebGUI::Error->caught) {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
@@ -830,7 +830,6 @@ sub www_view {
     else {
         $var{hasShippingAddress} = 1;
         $var{shippingAddress} = $address->getHtmlFormatted;
-        $var{tax} = $self->calculateTaxes;
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my %formOptions = ();
@@ -843,7 +842,10 @@ sub www_view {
         $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
         $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
     }
-    
+  
+    # Tax variables
+    $var{tax} = $self->calculateTaxes;
+
     # POS variables
     $var{isCashier} = WebGUI::Shop::Admin->new($session)->isCashier;
     $var{posLookupForm} = WebGUI::Form::email($session, {name=>"posEmail"})
