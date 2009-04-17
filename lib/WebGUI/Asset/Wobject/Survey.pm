@@ -823,7 +823,7 @@ sub www_loadSurvey {
             $lastType = 'answer';
         }
     }
-    
+    $html = "<ul class='draglist'>$html</ul>";
     my $warnings = $self->surveyJSON->validateSurvey();
     
     my $return = {

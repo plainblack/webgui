@@ -49,11 +49,6 @@ div.trashcan {
     width: 175px; 
     height: 50px; 
 }
-div.workarea { 
-	padding:10px; 
-	padding-top:40px; 
-	float:left 
-}
 
 div.editarea { 
 	margin-top:40px;
@@ -79,18 +74,13 @@ div.entry {
 }
 
 ul.draglist { 
-    position: relative;
-    width: 340px; 
-    background: #f7f7f7;
-    border: 1px solid gray;
     list-style: none;
     margin:0;
     padding:0;
-    padding-bottom:20px;
 }
 
 ul.draglist li {
-    margin: 5px;
+    margin: 1px;
 }
 
 ul.questionList {
@@ -109,12 +99,6 @@ li.section {
     cursor: move; 
     min-height: 10px;
 }
-li.ssection {
-    
-    border:1px solid #7EA6B2;
-    cursor: move; 
-    min-height: 10px;
-}
 li.question {
     background-color: #D1E6EC;
     border:1px solid #7EA6B2;
@@ -129,8 +113,11 @@ li.answer {
 	padding-left:15px; 
     min-height: 10px;
 }
-#sections li.selected {
-    background: #68FFBC url(/extras/versionDotOn.gif) no-repeat scroll 99% center;
+#sections-panel li.selected {
+    background-image: url(/extras/toolbar/bullet/moveRight.gif);
+    background-position:99% center;
+    background-repeat: no-repeat;
+    font-weight:bold;
 }
 
 #goto-yui-ac {
@@ -147,9 +134,17 @@ li.answer {
 #warnings {
     color: red;
 }
-#sections_c .yui-resize .yui-resize-handle-r {
-    right: -6px;
+#sections-panel .bd {
+    overflow: auto;
+    background-color:#fff;
+    padding:10px;
 }
-#sections_c .yui-resize .yui-resize-handle-b {
-    bottom: -6px;
+#buttons {
+    height: 30px; 
+}
+#sections-panel_c .yui-resize .yui-resize-handle-r {
+    right: -6px; /* make room for the scroll-bars */
+}
+#sections-panel div.ft {
+    font-size: 100%;
 }
