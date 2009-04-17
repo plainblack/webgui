@@ -87,8 +87,6 @@ Survey.Data = (function(){
                 // Calculate the bottom of the viewport (with a little padding)
                 var viewPortBottom = YAHOO.util.Dom.getViewportHeight() - 10;
                 
-                console.log(warningsBottom, viewPortBottom);
-                
                 // Panel has height from bottom of warnings div to bottom of viewport,
                 // but no smaller than 400
                 var panelHeight = viewPortBottom - warningsBottom;
