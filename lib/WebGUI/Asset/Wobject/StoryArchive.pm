@@ -160,6 +160,108 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 exportAssetCollateral (basePath, params, session)
+
+Extended the master method in order to produce keyword files.
+
+=cut
+
+sub exportAssetCollateral {
+    # Lots of copy/paste here from AssetExportHtml.pm, since none of the methods there were
+    #   directly useful without ginormous refactoring.
+    my $self = shift;
+    my $basepath = shift;
+    my $args = shift;
+    my $reportSession = shift;
+    my $session = $self->session;
+
+    my $reporti18n = WebGUI::International->new($session, 'Asset');
+
+    my $basename = $basepath->basename;
+    my $filedir;
+    my $filenameBase;
+
+    # We want our keyword files to "appear" at the same level as the asset.
+    if ($basename eq 'index.html') {
+        # Get the 2nd ancestor, since the asset url had no dot in it (and it therefore
+        #   had its own directory created for it).
+        $filedir = $basepath->parent->parent->absolute->stringify;
+        # Get the parent dir's *path* (essentially the name of the dir) relative to
+        #   its own parent dir.
+        $filenameBase = $basepath->parent->relative( $basepath->parent->parent )->stringify;
+    }
+    else {
+        # Get the 1st ancestor, since the asset is a file recognized by apache, so
+        #   we want our files in the same dir.
+        $filedir = $basepath->parent->absolute->stringify;
+        # just use the basename.
+        $filenameBase = $basename;
+    }
+
+    if ( $reportSession && !$args->{quiet} ) {
+        $reportSession->output->print('<br />');
+    }
+
+    my $keywordObj = WebGUI::Keyword->new($session);
+    my $keywords = $keywordObj->findKeywords({
+        asset => $self,
+        limit => 50, ##This is based on the tagcloud setting
+    });
+
+##export session: do we need it?
+##Need to find 50 assets per keyword and make a link list.
+##In export mode, tagCloud should call the callback instead of using the func
+
+    foreach my $keyword (@{ $keywords }) {
+        ##Keywords may not be URL safe, so urlize them
+        my $keyword_url = $self->getKeywordStaticUrl($keyword);
+        my $dest = Path::Class::File->new($filedir, $keyword_url);
+
+        # tell the user which asset we're exporting.
+        if ( $reportSession && !$args->{quiet} ) {
+            my $message = sprintf $reporti18n->get('exporting page'), $dest->absolute->stringify;
+            $reportSession->output->print(
+                '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $message . '<br />');
+        }
+
+        # open another session as the user doing the exporting...
+        my $exportSession = WebGUI::Session->open(
+            $self->session->config->getWebguiRoot,
+            $self->session->config->getFilename,
+            undef,
+            undef,
+            $self->session->getId,
+        );
+
+        my $selfdupe = WebGUI::Asset->newByDynamicClass( $exportSession, $self->getId );
+
+        # next, get the contents, open the file, and write the contents to the file.
+        my $fh = eval { $dest->open('>:utf8') };
+        if($@) {
+            WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
+            $exportSession->close;
+        }
+        $exportSession->asset($selfdupe);
+        $exportSession->output->setHandle($fh);
+        my $contents;
+
+        # chunked content is already printed, no need to print it again
+        unless($contents eq 'chunked') {
+            $exportSession->output->print($contents);
+        }
+
+        $exportSession->close;
+
+        # tell the user we did this asset collateral correctly
+        if ( $reportSession && !$args->{quiet} ) {
+            $reportSession->output->print($reporti18n->get('done'));
+        }
+    }
+    return $self->next::method($basepath, $args, $reportSession);
+}
+
+#-------------------------------------------------------------------
+
 =head2 exportHtml_view ( )
 
 Extend the base method to change how the tag cloud works and the search
@@ -228,6 +330,24 @@ sub getFolder {
 
 #-------------------------------------------------------------------
 
+=head2 getKeywordStaticUrl ( $keyword )
+
+Returns the URL for the file containing stories that match this keyword.  Used
+in exportAssetCollateral, and in viewTemplateVariables.
+
+=head3 $keyword
+
+The keyword to generate a URL for.
+
+=cut
+
+sub getKeywordStaticUrl {
+    my ($self,$keyword) = @_;
+    return $self->session->url->urlize('keyword_'.$keyword.'.html');
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRssFeedItems ( )
 
 Returns an arrayref of hashrefs, containing information on stories
@@ -248,21 +368,6 @@ sub getRssFeedItems {
         push @{ $storyData }, $story->getRssData;
     }
     return $storyData;
-}
-
-#-------------------------------------------------------------------
-
-=head2 folderDateFormat ( $epoch )
-
-Returns the date in the format for folders.  Encapsulated in this method
-so that it can be used everywhere in the sa
-
-=head $epoch
-
-
-=cut
-
-sub prepareView {
 }
 
 #-------------------------------------------------------------------
@@ -317,6 +422,24 @@ Make template variables for the view template.
 
 Whether to get assets in view mode, by time, or search mode, by keywords.
 
+If the asset is being exported for HTML, the following changes are mode:
+
+=over 4
+
+=item *
+
+The search form template variables are not generated.
+
+=item *
+
+The pagination variables are not generated.
+
+=item *
+
+The pagination size is set to 10 standard pages.
+
+=back
+
 =cut
 
 sub viewTemplateVariables {
@@ -355,11 +478,17 @@ sub viewTemplateVariables {
             excludeClasses => ['WebGUI::Asset::Wobject::Folder'],
             orderByClause  => 'creationDate desc, lineage',
         });
-        $p = WebGUI::Paginator->new($session, $self->getUrl, $self->get('storiesPerPage'));
+        my $storiesPerPage = $self->get('storiesPerPage');
+        if ($self->{_exportMode}) {
+            $storiesPerPage *= 10;
+        }
+        $p = WebGUI::Paginator->new($session, $self->getUrl, $storiesPerPage);
         $p->setDataByQuery($storySql);
     }
     my $storyIds = $p->getPageData();
-    $p->appendTemplateVars($var);
+    if (! $self->{_exportMode} ) {
+        $p->appendTemplateVars($var);
+    }
     $var->{date_loop} = [];
     my $lastStoryDate = '';
     my $datePointer = undef;

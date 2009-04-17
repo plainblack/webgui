@@ -16,7 +16,7 @@ our $I18N = {
     },
 
     'stories per page help' => {
-        message => q|The number of stories displayed on a page.|,
+        message => q|The number of stories displayed on a page.  If the asset is exported as HTML, then the generated page will have 10 standard pages of stories.|,
         context => q|Hoverhelp in the edit screen and template.|,
         lastUpdated => 0
     },
@@ -202,25 +202,25 @@ our $I18N = {
     },
 
     'searchHeader' => {
-        message => q|HTML code for beginning the search form.|,
+        message => q|HTML code for beginning the search form. This variable is empty when the Story Archive is being exported as HTML.|,
         context => q|Template variable.|,
         lastUpdated => 0,
     },
 
     'searchForm' => {
-        message => q|The text field where users can enter in keywords for the search.|,
+        message => q|The text field where users can enter in keywords for the search. This variable is empty when the Story Archive is being exported as HTML.|,
         context => q|Template variable.|,
         lastUpdated => 0,
     },
 
     'searchButton' => {
-        message => q|Button with internationalized label for submitting the search form.|,
+        message => q|Button with internationalized label for submitting the search form. This variable is empty when the Story Archive is being exported as HTML.|,
         context => q|Template variable.|,
         lastUpdated => 0,
     },
 
     'searchFooter' => {
-        message => q|HTML code for ending the search form.|,
+        message => q|HTML code for ending the search form. This variable is empty when the Story Archive is being exported as HTML.|,
         context => q|Template variable.|,
         lastUpdated => 0,
     },

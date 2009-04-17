@@ -58,7 +58,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 35
+my $tests = 36
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -389,7 +389,14 @@ cmp_bag(
     'viewTemplateVariables: search mode returns the correct assets in the same form as view mode'
 );
 
+################################################################
+#
+#  viewTemplateVariables, export mode
+#
+################################################################
+
 $archive->{_exportMode} = 1;
+$archive->update({ storiesPerPage => 3, });
 $templateVars = $archive->viewTemplateVariables();
 ok( (  !exists $templateVars->{searchHeader}
     && !exists $templateVars->{searchForm}
@@ -407,6 +414,14 @@ cmp_deeply(
     }),
     '... export mode, RSS and Atom feed template variables show the static url'
 );
+
+my $storyCount = 0;
+foreach my $date_loop (@{ $templateVars->{date_loop} }) {
+    $storyCount += scalar @{ $date_loop->{story_loop} };
+}
+
+cmp_ok($storyCount, '>', 3, '... export mode, pagination increased beyond storiesPerPage');
+
 $archive->{_exportMode} = 0;
 
 ################################################################
