@@ -312,6 +312,19 @@ sub getEditForm {
             hoverHelp   =>$i18n->get('maintainer description'),
             );
     }
+    else{
+        my $userId;
+        if ($func eq "add"){
+            $userId = $session->user->userId;
+        }
+        else{
+            $userId = $self->get('ownerUserId');
+        }
+        $form->hidden(
+            -name           =>'ownerUserId',
+            -value          =>$userId,
+        );
+    }
     $form->text(        
         -name           =>'version',
         -defaultValue   =>undef,

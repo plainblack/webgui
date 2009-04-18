@@ -23,6 +23,7 @@
  - Survey editor now keeps survey objects in a scrollable panel to keep buttons always in view.
  - fixed #10198: Cannot drag assets to new positions on page
  - fixed #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
+ - fixed #10143: Matrix 2.0 - Product maintainer accounts changed during upgrade
  - rfe: #10002: User Manager, view User's Profile (perlDreamer Consulting)
  - rfe: #10073: Account system to be able to return XML/JSON (perlDreamer Consulting)
  - Replaced the tax system with a pluggable one. Included are a Generic plugin
