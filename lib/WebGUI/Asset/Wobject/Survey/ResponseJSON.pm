@@ -529,6 +529,15 @@ sub recordResponses {
 
             # Proceed if we're satisfied that the submitted answer response is valid..
             if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
+
+                #Validate answers met question criteria
+                if($question->{questionType} eq 'Number'){
+                    if($submittedAnswerResponse > $answer->{max} or $submittedAnswerResponse < $answer->{min} or
+                        $submittedAnswerResponse % $answer->{step} != 0){
+                        next;
+                    }
+                }
+            
                 $aAnswered = 1;
 
                 # Now, decide what to record. For multi-choice questions, use recordedAnswer.

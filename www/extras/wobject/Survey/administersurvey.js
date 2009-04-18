@@ -78,6 +78,7 @@ if (typeof Survey === "undefined") {
                             break;
                         }
                     }
+
                 }
                 else if (toValidate[i].type === 'Year Month') {
                     answered = 1;//set to true, then let a single failure set it back to false.
@@ -191,6 +192,26 @@ if (typeof Survey === "undefined") {
         }
     }
     
+    function numberHandler(event, objs){
+        
+        var keycode = event.keyCode;
+        var value = parseFloat(this.value);
+        if(!value){this.value = objs.min;} 
+        if(value % objs.step > 0){this.value = value*1 + value % objs.step;}
+
+        if(value < objs.min){this.value = objs.min;}
+        else if(value > objs.max){this.value = objs.max;}
+        else if(keycode == 40){//key down
+            if((value - objs.step) >= objs.min){
+                this.value = value - objs.step;
+            }  
+        }else if(keycode == 38){//key up
+            if(((value*1) + (objs.step*1)) <= objs.max){
+                this.value = (value*1) + (objs.step*1);
+            }
+        }
+    }
+
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
 		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
@@ -622,12 +643,15 @@ if (typeof Survey === "undefined") {
                     continue;
                 }
                 if (NUMBER_TYPES[q.questionType]) {
-                    if (toValidate[q.id]) {
-                        toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
+                    for (var x in q.answers) {
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
+                        }
+                        YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
+                        document.getElementById(q.answers[x].id).value = q.answers[x].min;
                     }
                     continue;
                 }
-                
                 // Must be a multi-choice bundle
                 var butts = [];
                 verb = 0;
