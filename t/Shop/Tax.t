@@ -36,20 +36,20 @@ my $session         = WebGUI::Test->session;
 
 my $addExceptions = getAddExceptions($session);
 
-my $tests = 80 + 2*scalar(@{$addExceptions});
+my $tests = 78 + 2*scalar(@{$addExceptions});
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
-my $loaded = use_ok('WebGUI::Shop::Tax');
+my $loaded = use_ok('WebGUI::Shop::TaxDriver::Generic');
 
 my $storage;
 my ($taxableDonation, $taxFreeDonation);
 
 SKIP: {
 
-    skip 'Unable to load module WebGUI::Shop::Tax', $tests unless $loaded;
+    skip 'Unable to load module WebGUI::Shop::TaxDriver::Generic', $tests unless $loaded;
 
     #######################################################################
     #
@@ -57,9 +57,9 @@ SKIP: {
     #
     #######################################################################
 
-    my $taxer = WebGUI::Shop::Tax->new($session);
+    my $taxer = WebGUI::Shop::TaxDriver::Generic->new($session);
 
-    isa_ok($taxer, 'WebGUI::Shop::Tax');
+    isa_ok($taxer, 'WebGUI::Shop::TaxDriver::Generic');
 
     isa_ok($taxer->session, 'WebGUI::Session', 'session method returns a session object');
 
@@ -534,18 +534,18 @@ SKIP: {
     #
     #######################################################################
 
-    eval { $taxer->calculate(); };
+    eval { $taxer->getTaxRate(); };
     $e = Exception::Class->caught();
-    isa_ok($e, 'WebGUI::Error::InvalidParam', 'calculate: error handling for not sending a cart');
-    is($e->error, 'Must pass in a WebGUI::Shop::Cart object', 'calculate: error handling for not sending a cart');
+    isa_ok($e, 'WebGUI::Error::InvalidParam', 'getTaxRate: error handling for not sending a sku');
+    is($e->error, 'Must pass in a WebGUI::Asset::Sku object', 'getTaxRate: error handling for not sending a sku');
 
     ##Build a cart, add some Donation SKUs to it.  Set one to be taxable.
 
     my $cart = WebGUI::Shop::Cart->newBySession($session);
 
-    is($taxer->calculate($cart), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
+#    is($taxer->calculate($cart), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
 
-    $cart->update({ shippingAddressId => $taxingAddress->getId});
+#    $cart->update({ shippingAddressId => $taxingAddress->getId});
 
     ##Set up the tax information
     $taxer->importTaxData(
@@ -558,47 +558,52 @@ SKIP: {
         defaultPrice => 100.00,
     });
 
-    $cart->addItem($taxableDonation);
+    is($taxer->getTaxRate($taxableDonation), 0, 'calculate returns 0 if there is no shippingAddressId in the cart');
 
-    foreach my $item (@{ $cart->getItems }) {
-        $item->setQuantity(1);
-    }
 
-    my $tax = $taxer->calculate($cart);
+#    $cart->addItem($taxableDonation);
+
+#   foreach my $item (@{ $cart->getItems }) {
+#        $item->setQuantity(1);
+#    }
+
+    my $tax = $taxer->getTaxRate( $taxableDonation, $taxingAddress );
     is($tax, 5.5, 'calculate: simple tax calculation on 1 item in the cart');
 
     $cart->update({ shippingAddressId => $taxFreeAddress->getId});
-    is($taxer->calculate($cart), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
+    is($taxer->getTaxRate( $taxableDonation, $taxFreeAddress ), 0, 'calculate: simple tax calculation on 1 item in the cart, tax free location');
 
-    foreach my $item (@{ $cart->getItems }) {
-        $item->setQuantity(2);
-    }
-
-    $cart->update({ shippingAddressId => $taxingAddress->getId});
-    is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
+#    foreach my $item (@{ $cart->getItems }) {
+#        $item->setQuantity(2);
+#    }
+#
+#    $cart->update({ shippingAddressId => $taxingAddress->getId});
+#    is($taxer->calculate($cart), 11, 'calculate: simple tax calculation on 1 item in the cart, qty 2');
 
     $taxFreeDonation = WebGUI::Asset->getRoot($session)->addChild({
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Tax Free Donation',
         defaultPrice => 100.00,
+    });
+    $taxFreeDonation->setTaxConfiguration( 'WebGUI::Shop::TaxDriver::Generic', {
         overrideTaxRate => 1,
         taxRateOverride => 0,
     });
 
-    $cart->addItem($taxFreeDonation);
+#    $cart->addItem($taxFreeDonation);
 
-    foreach my $item (@{ $cart->getItems }) {
-        $item->setQuantity(1);
-    }
-    is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes');
+#    foreach my $item (@{ $cart->getItems }) {
+#        $item->setQuantity(1);
+#    }
+    is($taxer->getTaxRate( $taxFreeDonation, $taxingAddress), 0, 'getTaxRate: tax rate override should override tax derived from address');
 
-    my $remoteItem = $cart->addItem($taxableDonation);
-    $remoteItem->update({shippingAddressId => $taxFreeAddress->getId});
-
-    foreach my $item (@{ $cart->getItems }) {
-        $item->setQuantity(1);
-    }
-    is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes, 1 shipped to a location with no taxes');
+#    my $remoteItem = $cart->addItem($taxableDonation);
+#    $remoteItem->update({shippingAddressId => $taxFreeAddress->getId});
+#
+#    foreach my $item (@{ $cart->getItems }) {
+#        $item->setQuantity(1);
+#    }
+#    is($taxer->calculate($cart), 5.5, 'calculate: simple tax calculation on 2 items in the cart, 1 without taxes, 1 shipped to a location with no taxes');
 
     #######################################################################
     #
@@ -684,7 +689,7 @@ sub getAddExceptions {
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $session->db->write('delete from tax');
+    $session->db->write('delete from tax_generic_rates');
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');

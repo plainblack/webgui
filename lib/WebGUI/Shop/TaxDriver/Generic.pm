@@ -108,15 +108,15 @@ sub getTaxRate {
     my $sku     = shift;
     my $address = shift;
     my $session = $self->session;
-    my $config  = $sku->getTaxConfiguration( $self->className );
 
     # Check params
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Asset::Sku object')
-        unless $sku->isa( 'WebGUI::Asset::Sku' );
+        unless $sku && $sku->isa( 'WebGUI::Asset::Sku' );
     WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Address object')
         if $address && !$address->isa( 'WebGUI::Shop::Address' );
-    
+
     # Check if the sku has a tax rate override, and return that if it has.
+    my $config  = $sku->getTaxConfiguration( $self->className );
     if ( $config->{ overrideTaxRate } ) {
         return $config->{ taxRateOverride };
     }
