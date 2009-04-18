@@ -278,6 +278,11 @@ Instead of returning an array reference of assetId's, return a paginator object.
 
 If usePaginator is passed, then this variable will set the number of rows per page that the paginator uses.
 
+=head3 limit
+
+Limit the number of assetIds that are returned.  This should not be used in conjunction
+with usePaginator.
+
 =cut
 
 sub getMatchingAssets {
@@ -328,6 +333,9 @@ sub getMatchingAssets {
     my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
         where '.join(' and ', @clauses).' order by creationDate desc, lineage';
 
+    if ($options->{limit}) {
+        $query .= ' limit '. $options->{limit};
+    }
     # perform the search
     if ($options->{usePaginator}) {
         my $p = WebGUI::Paginator->new($self->session, undef, $options->{rowsPerPage});
