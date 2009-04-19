@@ -281,6 +281,22 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 getPostPurchaseActions ( item )
+
+Get a hash reference of LABEL => URL pairs of actions we can do on
+this Sku after it is purchased. These will show up in the Transaction
+screen. C<item> is the WebGUI::Shop::TransactionItem that was 
+purchased.
+
+=cut
+
+sub getPostPurchaseActions {
+    my ( $self, $item ) = @_;
+    return {};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getQuantityAvailable ( )
 
 Returns 99999999. Needs to be overriden by subclasses. Tells the commerce system how many of this item is on hand.
