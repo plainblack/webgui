@@ -338,12 +338,24 @@ sub www_viewTransaction {
                             phoneNumber => $item->get('shippingPhoneNumber'),
                             });
         }
+
+        # Post purchase actions
+        my $actionsLoop = [];
+        my $actions     = $item->getSku->getPostPurchaseActions( $item );
+        for my $label ( keys %{$actions} ) {
+            push @{$actionsLoop}, {
+                label       => $label,
+                url         => $actions->{$label},
+            }
+        }
+
         push @items, {
             %{$item->get},
             viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
             price               => sprintf("%.2f", $item->get('price')),
             itemShippingAddress => $address,
             orderStatus         => $i18n->get($item->get('orderStatus')),
+            actionsLoop         => $actionsLoop,
         };
     }
     $var{items} = \@items;

@@ -35,7 +35,7 @@ updateSurveyQuestionTypes($session);
 extendSchedulerFields($session);
 allMaintenanceSingleton($session);
 unsetPackageFlags($session);
-
+installThingyRecord( $session );
 installPluggableTax( $session );
 
 
@@ -207,9 +207,45 @@ EOSQL2
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+# Add the ThingyRecord sku
+sub installThingyRecord {
+    my ( $session ) = shift;
+    print "\tInstalling ThingyRecord sku... " unless $quiet;
+    
+    $session->config->addToHash('assets','WebGUI::Asset::Sku::ThingyRecord', {
+        category        => "shop",
+    });
+    
+    # Install ThingyRecord
+    $session->db->write( <<'ENDSQL' );
+    CREATE TABLE IF NOT EXISTS ThingyRecord (
+        assetId CHAR(22) BINARY NOT NULL,
+        revisionDate BIGINT NOT NULL,
+        templateIdView CHAR(22) BINARY,
+        thingId CHAR(22) BINARY,
+        thingFields LONGTEXT,
+        thankYouText LONGTEXT,
+        price FLOAT,
+        duration BIGINT,
+        PRIMARY KEY (assetId, revisionDate)
+    );
+ENDSQL
 
+    # Install collateral
+    use WebGUI::AssetCollateral::Sku::ThingyRecord::Record;
+    WebGUI::AssetCollateral::Sku::ThingyRecord::Record->crud_createTable($session);
 
+    # Update workflow
+    my $activityClass   = 'WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords';
+    $session->config->addToArray( 'workflow/None', $activityClass );
+    my $workflow    = WebGUI::Workflow->new( $session, 'pbworkflow000000000004' );
+    my $activity    = $workflow->addActivity( $activityClass );
+    $activity->set('title', "Expire Purchased Thingy Records");
+    $activity->set('description', "Expire any expired thingy records. Send notifications of imminent expiration.");
 
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
