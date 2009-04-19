@@ -247,7 +247,11 @@ By specifying this method, you activate this feature.
 
 sub getAutoCommitWorkflowId {
     my $self = shift;
-    return $self->getParent->get("submissionApprovalWorkflowId");
+    
+    if($self->session->form->process("assetId") eq "new"){
+        return $self->getParent->get("submissionApprovalWorkflowId");
+    }
+    return undef;
 }
 
 #-------------------------------------------------------------------
