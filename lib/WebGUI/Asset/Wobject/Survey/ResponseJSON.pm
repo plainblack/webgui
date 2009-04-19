@@ -532,8 +532,11 @@ sub recordResponses {
 
                 #Validate answers met question criteria
                 if($question->{questionType} eq 'Number'){
-                    if($submittedAnswerResponse > $answer->{max} or $submittedAnswerResponse < $answer->{min} or
-                        $submittedAnswerResponse % $answer->{step} != 0){
+                    if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
+                        next;
+                    }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
+                        next;
+                    }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
                         next;
                     }
                 }

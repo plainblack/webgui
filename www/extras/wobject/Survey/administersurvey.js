@@ -71,9 +71,11 @@ if (typeof Survey === "undefined") {
                 else if (toValidate[i].type === 'Number') {
                     answered = 1;
                     for (var z1 in toValidate[i].answers) {
-                        var m = document.getElementById(z1).value;
+                        var m = parseFloat(document.getElementById(z1).value);
                         var ansValues = toValidate[i].answers[z1];
-                        if(m > ansValues.max || m < ansValues.min || m % ansValues.step != 0){
+                        if((ansValues.max != '' && m > ansValues.max) ||
+                           (ansValues.min != '' && m < ansValues.min) ||
+                           (ansValues.step != '' && ( (m % ansValues.step) != 0) )){
                             answered = 0;
                             break;
                         }
@@ -195,19 +197,36 @@ if (typeof Survey === "undefined") {
     function numberHandler(event, objs){
         
         var keycode = event.keyCode;
-        var value = parseFloat(this.value);
-        if(!value){this.value = objs.min;} 
-        if(value % objs.step > 0){this.value = value*1 + value % objs.step;}
+        var value = this.value;
+        
+        //if starting a negative number, don't do anything
+        if(value == '' || value == "-"){return;}
 
-        if(value < objs.min){this.value = objs.min;}
-        else if(value > objs.max){this.value = objs.max;}
+        var step = objs.step ? objs.step : 1;
+
+        if(!value){this.value = objs.min ? objs.min : 0;} 
+        if(value % step > 0){
+            this.value = value*1 + value % step;
+        }
+            
+        if(objs.min != '' && value*1 < objs.min*1){
+            this.value = objs.min;
+        }
+
+        else if(objs.max != '' && value*1 > objs.max){this.value = objs.max;}
         else if(keycode == 40){//key down
-            if((value - objs.step) >= objs.min){
-                this.value = value - objs.step;
+            if(objs.min == ''){
+                this.value = value - step;
+            }
+            else if((value - step) >= objs.min*1){
+                this.value = value - step;
             }  
         }else if(keycode == 38){//key up
-            if(((value*1) + (objs.step*1)) <= objs.max){
-                this.value = (value*1) + (objs.step*1);
+            if(objs.max == ''){
+                this.value = (value*1) + step*1;
+            }
+            if(((value*1) + step) <= objs.max*1){
+                this.value = (value*1) + step*1;
             }
         }
     }
@@ -648,7 +667,7 @@ if (typeof Survey === "undefined") {
                             toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
                         }
                         YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
-                        document.getElementById(q.answers[x].id).value = q.answers[x].min;
+                        document.getElementById(q.answers[x].id).value = q.answers[x].min ? q.answers[x].min : 0;
                     }
                     continue;
                 }
