@@ -87,8 +87,26 @@ our $I18N = {
         lastUpdated => 0
     },
 
+    'keyword list template' => {
+        message => q|Keyword List Template|,
+        context => q|Label in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
+    'keyword list template help' => {
+        message => q|The Template used to render the list of assets matching a keyword when this StoryArchive is exported.|,
+        context => q|Hoverhelp in the edit screen and template.|,
+        lastUpdated => 0
+    },
+
     'editStoryTemplateId' => {
         message => q|The GUID of the template used to add or edit Story assets.|,
+        context => q|Template variable|,
+        lastUpdated => 0
+    },
+
+    'keywordListTemplateId' => {
+        message => q|The GUID of the template used to render list of assets matching a keyword when this StoryArchive is exported.|,
         context => q|Template variable|,
         lastUpdated => 0
     },
@@ -251,6 +269,30 @@ our $I18N = {
 
     'keywordCloud' => {
         message => q|The tag cloud for the keywords for stories in this Story Archive.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'asset_loop' => {
+        message => q|A loop containing up to the first 50 assets that match the keyword.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'asset title' => {
+        message => q|The title of this asset.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'asset url' => {
+        message => q|The title of this url.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'keyword' => {
+        message => q|The keyword for this list of assets.|,
         context => q|Template variable.|,
         lastUpdated => 0,
     },

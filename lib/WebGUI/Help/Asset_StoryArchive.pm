@@ -65,6 +65,7 @@ our $HELP = {
                     { 'name' => 'templateId', },
                     { 'name' => 'storyTemplateId', },
                     { 'name' => 'editStoryTemplateId', },
+                    { 'name' => 'keywordListTemplateId', },
                     { 'name' => 'archiveAfter', },
                     { 'name' => 'richEditorId', },
                     { 'name' => 'approvalWorkflowId', },
@@ -72,6 +73,29 @@ our $HELP = {
         related => []
     },
 
+
+    'keyword list template' => {
+        title => 'view template',
+        body  => '',
+        isa   => [
+            {   namespace => "Asset_Template",
+                tag       => "template variables"
+            },
+        ],
+        fields    => [],
+        variables => [
+            {   'name'      => 'asset_loop',
+                'variables' => [
+                    { 'name' => 'title',
+                      description => 'asset title' },
+                    { 'name' => 'url',
+                      description => 'asset url' },
+                ]
+            },
+            {   'name' => 'keyword' },
+        ],
+        related => []
+    },
 
 };
 

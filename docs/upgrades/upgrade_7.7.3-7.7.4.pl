@@ -126,16 +126,17 @@ EOSTORY
 
     $db->write(<<EOARCHIVE);
 CREATE TABLE StoryArchive (
-    assetId             CHAR(22) BINARY NOT NULL,
-    revisionDate        BIGINT          NOT NULL,
-    storiesPerPage      INTEGER,
-    groupToPost         CHAR(22) BINARY,
-    templateId          CHAR(22) BINARY,
-    storyTemplateId     CHAR(22) BINARY,
-    editStoryTemplateId CHAR(22) BINARY,
-    archiveAfter        INT(11),
-    richEditorId        CHAR(22) BINARY,
-    approvalWorkflowId  CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
+    assetId               CHAR(22) BINARY NOT NULL,
+    revisionDate          BIGINT          NOT NULL,
+    storiesPerPage        INTEGER,
+    groupToPost           CHAR(22) BINARY,
+    templateId            CHAR(22) BINARY,
+    storyTemplateId       CHAR(22) BINARY,
+    editStoryTemplateId   CHAR(22) BINARY,
+    keywordListTemplateId CHAR(22) BINARY,
+    archiveAfter          INT(11),
+    richEditorId          CHAR(22) BINARY,
+    approvalWorkflowId    CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
     PRIMARY KEY ( assetId, revisionDate )
 )
 EOARCHIVE

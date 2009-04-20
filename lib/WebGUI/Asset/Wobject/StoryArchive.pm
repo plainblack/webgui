@@ -123,6 +123,14 @@ sub definition {
             namespace    => 'Story/Edit',
             defaultValue => 'E3tzZjzhmYoNlAyP2VW33Q',
         },
+        keywordListTemplateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => $i18n->get('keyword list template'),
+            hoverHelp    => $i18n->get('keyword list template help'),
+            namespace    => 'StoryArchive/KeywordList',
+            defaultValue => '0EAJ9EYb9ap2XwfrcXfdLQ',
+        },
         archiveAfter => {
             tab          => 'display',  
             fieldType    => 'interval',  
@@ -202,16 +210,23 @@ sub exportAssetCollateral {
         $reportSession->output->print('<br />');
     }
 
-    my $keywordObj = WebGUI::Keyword->new($session);
+    # open another session as the user doing the exporting...
+    my $exportSession = WebGUI::Session->open(
+        $self->session->config->getWebguiRoot,
+        $self->session->config->getFilename,
+        undef,
+        undef,
+        $self->session->getId,
+    );
+
+
+    my $keywordObj = WebGUI::Keyword->new($exportSession);
     my $keywords = $keywordObj->findKeywords({
         asset => $self,
         limit => 50, ##This is based on the tagcloud setting
     });
 
-##export session: do we need it?
-##Need to find 50 assets per keyword and make a link list.
-##In export mode, tagCloud should call the callback instead of using the func
-
+    my $listTemplate = WebGUI::Asset->new($session, $self->get('keywordListTemplateId'), 'WebGUI::Asset::Template');
     foreach my $keyword (@{ $keywords }) {
         ##Keywords may not be URL safe, so urlize them
         my $keyword_url = $self->getKeywordStaticUrl($keyword);
@@ -224,39 +239,45 @@ sub exportAssetCollateral {
                 '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $message . '<br />');
         }
 
-        # open another session as the user doing the exporting...
-        my $exportSession = WebGUI::Session->open(
-            $self->session->config->getWebguiRoot,
-            $self->session->config->getFilename,
-            undef,
-            undef,
-            $self->session->getId,
-        );
-
-        my $selfdupe = WebGUI::Asset->newByDynamicClass( $exportSession, $self->getId );
-
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };
         if($@) {
-            WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
             $exportSession->close;
+            WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
         }
-        $exportSession->asset($selfdupe);
         $exportSession->output->setHandle($fh);
-        my $contents;
 
-        # chunked content is already printed, no need to print it again
-        unless($contents eq 'chunked') {
-            $exportSession->output->print($contents);
+        my $storyIds = $keywordObj->getMatchingAssets({
+            startAsset  => $self,
+            keyword     => $keyword,
+            isa         => 'WebGUI::Asset::Story',
+            rowsPerPage => 50,
+        });
+        my $listOfStories = [];
+        STORYID: foreach my $storyId (@{ $storyIds }) {
+            my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+            next STORYID unless $story;
+            push @{ $listOfStories }, {
+                title => $story->getTitle,
+                url   => $story->getUrl,
+            };
         }
-
-        $exportSession->close;
+        my $var = {
+            asset_loop => $listOfStories,
+            keyword    => $keyword,
+        };
+        my $output = $listTemplate->process($var);
+        my $contents = $self->processStyle($output);
+        $exportSession->output->print($contents);
 
         # tell the user we did this asset collateral correctly
         if ( $reportSession && !$args->{quiet} ) {
             $reportSession->output->print($reporti18n->get('done'));
         }
+        $fh->flush;
+        $fh->close;
     }
+    $exportSession->close;
     return $self->next::method($basepath, $args, $reportSession);
 }
 

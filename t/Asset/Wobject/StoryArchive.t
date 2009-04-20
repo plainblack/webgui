@@ -18,7 +18,10 @@ use strict;
 use lib "$FindBin::Bin/../../lib";
 use Test::More;
 use Test::Deep;
+use File::Copy qw/mv/;
+use File::Path;
 use Data::Dumper;
+use Path::Class;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Test::Maker::Permission;
@@ -58,7 +61,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 37
+my $tests = 38
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -490,6 +493,33 @@ cmp_deeply(
         },
     ],
     'rssFeedItems'
+);
+
+################################################################
+#
+#  export Collateral tests
+#
+################################################################
+
+my $exportStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($exportStorage);
+my $basedir = Path::Class::Dir->new($exportStorage->getPath);
+$exportStorage->addFileFromScalar('index', 'export story archive content');
+my $assetDir  = $basedir->subdir('mystories');
+my $assetFile = $assetDir->file('index.html');
+mkpath($assetDir->stringify);
+mv($exportStorage->getPath('index'), $assetFile->stringify);
+$archive->exportAssetCollateral($assetFile, {}, $session);
+
+my $exportedFiles = $exportStorage->getFiles();
+cmp_bag(
+    $exportedFiles,
+    [qw/
+        keyword_roger.html        mystories.rss        mystories
+        keyword_foxtrot.html      mystories.atom
+        keyword_echo.html
+    /],
+    'exportAssetCollateral: correct files exported, including dummy directory'
 );
 
 }
