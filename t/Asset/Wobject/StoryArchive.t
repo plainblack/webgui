@@ -61,7 +61,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 38
+my $tests = 41
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -522,6 +522,42 @@ cmp_bag(
     'exportAssetCollateral: correct files exported, including dummy directory'
 );
 
+my $roger = $exportStorage->getFileContentsAsScalar('keyword_roger.html');
+my @rogerStories = map { $_->[0] } fetchKeywordAssetList($roger);
+cmp_bag(
+    \@rogerStories,
+    [
+        'Story 2',
+        'Story 4',
+        'WebGUI is released',
+    ],
+    '... contents of roger keyword file'
+);
+
+my $foxtrot = $exportStorage->getFileContentsAsScalar('keyword_foxtrot.html');
+my @foxtrotStories = map { $_->[0] } fetchKeywordAssetList($foxtrot);
+cmp_bag(
+    \@foxtrotStories,
+    [
+        'Story 2',
+        'Story 3',
+        'WebGUI is released',
+    ],
+    '... contents of foxtrot keyword file'
+);
+
+my $echo = $exportStorage->getFileContentsAsScalar('keyword_echo.html');
+my @echoStories = map { $_->[0] } fetchKeywordAssetList($echo);
+cmp_bag(
+    \@echoStories,
+    [
+        'Story 3',
+        'Story 4',
+        'WebGUI is released',
+    ],
+    '... contents of echo keyword file'
+);
+
 }
 
 #----------------------------------------------------------------------------
@@ -551,6 +587,23 @@ sub simpleHrefParser {
         my $label = $p->get_trimmed_text("/a");
         push @anchors, [ $label, $url ];
     }
+    return @anchors;
+}
+
+sub fetchKeywordAssetList {
+	my ($text) = @_;
+    my @anchors = ();
+	my $p = HTML::TokeParser->new(\$text);
+    TOKEN: while (my $token = $p->get_tag('ul')) {
+        next TOKEN unless $token->[1]->{class} eq 'keywordAssetList';
+        while (my $token = $p->get_tag('/ul', 'a')) {
+            last TOKEN if $token->[0] eq '/ul';
+            my $url = $token->[1]{href} || "-";
+            my $label = $p->get_trimmed_text("/a");
+            push @anchors, [ $label, $url ];
+        }
+    }
+
     return @anchors;
 }
 
