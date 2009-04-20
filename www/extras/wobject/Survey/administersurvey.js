@@ -206,27 +206,27 @@ if (typeof Survey === "undefined") {
 
         if(!value){this.value = objs.min ? objs.min : 0;} 
         if(value % step > 0){
-            this.value = value*1 + value % step;
+            this.value = +value + value % step;
         }
             
-        if(objs.min != '' && value*1 < objs.min*1){
+        if(objs.min != '' && +value < +objs.min){
             this.value = objs.min;
         }
 
-        else if(objs.max != '' && value*1 > objs.max){this.value = objs.max;}
-        else if(keycode == 40){//key down
+        else if(objs.max != '' && +value > objs.max){this.value = objs.max;}
+        else if(+keycode == 40){//key down
             if(objs.min == ''){
                 this.value = value - step;
             }
-            else if((value - step) >= objs.min*1){
+            else if((value - step) >= +objs.min){
                 this.value = value - step;
             }  
-        }else if(keycode == 38){//key up
+        }else if(+keycode == 38){//key up
             if(objs.max == ''){
-                this.value = (value*1) + step*1;
+                this.value = +value + +step;
             }
-            if(((value*1) + step) <= objs.max*1){
-                this.value = (value*1) + step*1;
+            if(+value + +step <= +objs.max){
+                this.value = +value + +step;
             }
         }
     }
@@ -667,7 +667,6 @@ if (typeof Survey === "undefined") {
                             toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
                         }
                         YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
-                        document.getElementById(q.answers[x].id).value = q.answers[x].min ? q.answers[x].min : 0;
                     }
                     continue;
                 }
