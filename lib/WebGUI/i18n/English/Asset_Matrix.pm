@@ -387,6 +387,16 @@ listing,|,
         lastUpdated => 0,
     },
 
+    'max screenshot width description' => {
+        message => q|Select the maximum width of the screenshots in this matrix. Screenshots that are larger will be resized.|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot height description' => {
+        message => q|Select the maximum height of the screenshots in this matrix. Screenshots that are larger will be resized.|,
+        lastUpdated => 0,
+    },
+
     'compare color no description' => {
         message => q|Select the color for compare result 'No'  in the compare display.|,
         lastUpdated => 0,
@@ -525,6 +535,16 @@ to increase performance. How long should we cache them?|,
 
     'default sort label' => {
         message => q|Default Sort|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot height label' => {
+        message => q|Maximum Screenshot Height|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot width label' => {
+        message => q|Maximum Screenshot Width|,
         lastUpdated => 0,
     },
 

@@ -37,9 +37,20 @@ allMaintenanceSingleton($session);
 unsetPackageFlags($session);
 installThingyRecord( $session );
 installPluggableTax( $session );
+addMatrixMaxScreenshotWidthHeight($session);
 addSurveyBackButtonColumn( $session );
 
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addMatrixMaxScreenshotWidthHeight {
+    my $session = shift;
+    print "\tAdding maximum screenshot width and height property to the Matrix." unless $quiet;
+    $session->db->write("alter table Matrix add maxScreenshotWidth int(11), add maxScreenshotHeight int(11);");
+    $session->db->write("update Matrix set maxScreenshotWidth = 800, maxScreenshotHeight = 600;");
+    print "DONE!\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 sub unsetPackageFlags {

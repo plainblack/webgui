@@ -509,6 +509,34 @@ sub processPropertiesFromFormPost {
     }
     $self->update({score => $score});    
 
+    if ( $self->get('screenshots') ) {
+        my $fileObject = WebGUI::Form::File->new($self->session,{ value=>$self->get('screenshots') });
+        my $storage = $fileObject->getStorageLocation;
+        my @files;
+        @files = @{ $storage->getFiles } if (defined $storage);
+        foreach my $file (@files) {
+            unless ($file =~ m/^thumb-/){
+                my ($resizeWidth,$resizeHeight);
+                my ($width, $height) = $storage->getSizeInPixels($file);
+                my $maxWidth    = $self->getParent->get('maxScreenshotWidth');
+                my $maxHeight   = $self->getParent->get('maxScreenshotHeight');
+                if ($width > $maxWidth){
+                    my $newHeight = $height * ($maxWidth / $width);
+                    if ($newHeight > $maxHeight){
+                        # Heigth requires more resizing so use maxHeight
+                        $storage->resize($file, 0, $maxHeight);
+                    }
+                    else{
+                        $storage->resize($file, $maxWidth);
+                    }
+                }
+                elsif($height > $maxHeight){
+                    $storage->resize($file, 0, $maxHeight);
+                }
+            }
+        }
+    }
+
     $self->requestAutoCommit;
     return undef;
 }
@@ -979,6 +1007,7 @@ sub www_getScreenshots {
         @files = @{ $storage->getFiles } if (defined $storage);
         foreach my $file (@files) {
         unless ($file =~ m/^thumb-/){
+            my ($width, $height) = $storage->getSizeInPixels($file);
             my $thumb = 'thumb-'.$file;
             $xml .= "
         <slide>
@@ -987,6 +1016,8 @@ sub www_getScreenshots {
             <image_source>".$storage->getUrl($file)."</image_source>
             <duration>5</duration>
             <thumb_source>".$storage->getUrl($thumb)."</thumb_source>
+            <width>".$width."</width>
+            <height>".$height."</height>
         </slide>            
             ";
             }
