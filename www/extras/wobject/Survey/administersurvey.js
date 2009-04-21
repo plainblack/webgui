@@ -129,6 +129,11 @@ if (typeof Survey === "undefined") {
         }
     }
     
+    function goBack(event){
+        YAHOO.log("Going back");
+        Survey.Comm.callServer('', 'goBack');
+    }
+    
     //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
     function sliderManager(q, t){
         var total = sliderWidth;
@@ -527,6 +532,7 @@ if (typeof Survey === "undefined") {
                     span.style.display = 'block';
                     
                     document.getElementById('survey-header').appendChild(span);
+                    
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
                         if (s.everyPageTitle !== '1') {
@@ -696,6 +702,7 @@ if (typeof Survey === "undefined") {
                     butts.push(b);
                 }
             }
+            YAHOO.util.Event.addListener("backbutton", "click", goBack);
             YAHOO.util.Event.addListener("submitbutton", "click", formsubmit);
         }
     };

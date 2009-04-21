@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 64;
+my $tests = 74;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -561,9 +561,103 @@ cmp_deeply(
     'recordResponses: if the answer is all whitespace, it is skipped over'
 );
 is($rJSON->questionsAnswered, 0, 'question was all whitespace, not answered');
-#delete $rJSON->{_session};
-#delete $rJSON->survey->{_session};
-#diag(Dumper($rJSON));
+
+####################################################
+#
+# pop
+#
+####################################################
+$rJSON->responses({});
+$rJSON->lastResponse(2);
+is($rJSON->pop, undef, 'pop with no responses returns undef');
+cmp_deeply($rJSON->responses, {}, 'initially no responses');
+$rJSON->recordResponses({
+    '1-0comment'   => 'Section 1, question 0 comment',
+    '1-0-0'        => 'First answer',
+    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    '1-1comment'   => 'Section 1, question 1 comment',
+    '1-1-0'        => 'Second answer',
+    '1-1-0comment' => 'Section 1, question 1, answer 0 comment',
+    
+});
+my $popped = $rJSON->pop;
+cmp_deeply($popped, {
+    # the first q answer
+    '1-0-0'        => { 
+        value => 1,
+        comment => 'Section 1, question 0, answer 0 comment',
+        time => num(time(), 3),
+    },
+    # the second q answer
+    '1-1-0'        => { 
+        value => 0,
+        comment => 'Section 1, question 1, answer 0 comment',
+        time => num(time(), 3),
+    },
+    # the first question comment
+    '1-0' => {
+        comment   => 'Section 1, question 0 comment',
+    },
+    # the second question comment
+    '1-1' => {
+        comment   => 'Section 1, question 1 comment',
+    }
+}, 'pop removes only existing response');
+cmp_deeply($rJSON->responses, {}, 'and now back to no responses');
+is($rJSON->pop, undef, 'additional pop has no effect');
+
+$rJSON->responses({});
+$rJSON->lastResponse(2);
+$rJSON->recordResponses({
+    '1-0comment'   => 'Section 1, question 0 comment',
+    '1-0-0'        => 'First answer',
+    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    '1-1comment'   => 'Section 1, question 1 comment',
+    '1-1-0'        => 'Second answer',
+    '1-1-0comment' => 'Section 1, question 1, answer 0 comment',
+});
+
+# fake time so that pop thinks first response happened earlier
+$rJSON->responses->{'1-0-0'}->{time} -= 1;
+cmp_deeply($rJSON->pop, {
+    # the second q answer
+    '1-1-0'        => { 
+        value => 0,
+        comment => 'Section 1, question 1, answer 0 comment',
+        time => num(time(), 3),
+    },
+    # the second question comment
+    '1-1' => {
+        comment   => 'Section 1, question 1 comment',
+    }
+}, 'pop now only removes the most recent response');
+cmp_deeply($rJSON->responses, {
+    # the first q answer
+    '1-0-0'        => { 
+        value => 1,
+        comment => 'Section 1, question 0, answer 0 comment',
+        time => num(time(), 3),
+    },
+    # the first question comment
+    '1-0' => {
+        comment   => 'Section 1, question 0 comment',
+    },
+   }, 'and first response left in tact');
+cmp_deeply($rJSON->pop, {
+    # the first q answer
+    '1-0-0'        => { 
+        value => 1,
+        comment => 'Section 1, question 0, answer 0 comment',
+        time => num(time(), 3),
+    },
+    # the first question comment
+    '1-0' => {
+        comment   => 'Section 1, question 0 comment',
+    },
+}, 'second pop removes first response');
+cmp_deeply($rJSON->responses, {}, '..and now responses hash empty again');
+   
+is($rJSON->pop, undef, 'additional pop has no effect');
 
 }
 

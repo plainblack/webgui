@@ -37,7 +37,7 @@ allMaintenanceSingleton($session);
 unsetPackageFlags($session);
 installThingyRecord( $session );
 installPluggableTax( $session );
-
+addSurveyBackButtonColumn( $session );
 
 finish($session); # this line required
 
@@ -247,6 +247,12 @@ ENDSQL
     print "DONE!\n" unless $quiet;
 }
 
+sub addSurveyBackButtonColumn{
+    my $session = shift;
+    print "\tAdding allowBackBtn column to Survey table... " unless $quiet;
+    $session->db->write("alter table Survey add column `allowBackBtn` TINYINT(3)");
+    print "Done.\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

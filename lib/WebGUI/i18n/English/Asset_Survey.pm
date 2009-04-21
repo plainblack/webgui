@@ -576,6 +576,16 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Survey Edit screen.|,
         lastUpdated => 0,
     },
+    
+    'Allow back button' => {
+        message     => q|Allow back button|,
+        lastUpdated => 0,
+    },
+
+    'Allow back button help' => {
+        message     => q|Allow the user to navigate backwards in a Survey.|,
+        lastUpdated => 0,
+    },
 
     'Max user responses' => {
         message => q|Max user responses|,
@@ -1378,6 +1388,24 @@ section/answer.|,
     'month' => {
         message => q|Month:|,
         context => q|Sub-label for "Year Month" question type|,
+        lastUpdated => 0,
+    },
+    
+    'back' => {
+        message => q|Back|,
+        context => q|Back button label on Take Survey page|,
+        lastUpdated => 0,
+    },
+    
+    'continue' => {
+        message => q|Continue|,
+        context => q|Continue button label on Take Survey page|,
+        lastUpdated => 0,
+    },
+    
+    'finish' => {
+        message => q|Finish|,
+        context => q|Finish button label on Take Survey page|,
         lastUpdated => 0,
     },
 

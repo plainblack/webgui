@@ -34,6 +34,7 @@
  - added: ThingyRecord allows you to sell records in a Thingy (like a classified ad)
  - fixed: #10109: Matrix 2.0 - Updates to product listing by maintainer account require admin approval
  - fixed #10146: Thingy duplicate errors
+ - Added Survey back button
 
 7.7.3
  - fixed #10094: double explanation in thread help

@@ -197,8 +197,6 @@ sub definition {
             fieldType    => 'workflow',
             label        => 'Survey End Workflow',
             hoverHelp    => 'Workflow to run when user completes the Survey',
-            #            label           => $i18n->get('editForm workflowIdAddEntry label'),
-            #            hoverHelp       => $i18n->get('editForm workflowIdAddEntry description'),
             none => 1,
         },
         quizModeSummary => {
@@ -207,12 +205,15 @@ sub definition {
             tab          => 'properties',
             label        => $i18n->get('Quiz mode summaries'),
             hoverHelp    => $i18n->get('Quiz mode summaries help'),
-        }
+        },
+        allowBackBtn => {
+            fieldType    => 'yesNo',
+            defaultValue => 0,
+            tab          => 'properties',
+            label        => $i18n->get('Allow back button'),
+            hoverHelp    => $i18n->get('Allow back button help'),
+        },
     );
-
-    #my $defaultMC = $session->  
-
-    #%properties = ();
 
     push @{$definition}, {
             assetName         => $i18n->get('assetName'),
@@ -1154,6 +1155,41 @@ sub www_submitQuestions {
 
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 www_goBack
+
+Handles the Survey back button
+
+=cut
+
+sub www_goBack {
+    my $self = shift;
+
+    if ( !$self->canTakeSurvey() ) {
+        $self->session->log->debug('canTakeSurvey false, surveyEnd');
+        return $self->surveyEnd();
+    }
+    
+    my $responseId = $self->responseId();
+    if ( !$responseId ) {
+        $self->session->log->debug('No response id, surveyEnd');
+        return $self->surveyEnd();
+    }
+    
+    if ( !$self->get('allowBackBtn') ) {
+        $self->session->log->debug('allowBackBtn false, delegating to www_loadQuestions');
+        return $self->www_loadQuestions();
+    }
+
+    $self->responseJSON->pop;
+    $self->persistResponseJSON;
+
+    return $self->www_loadQuestions();
+
+}
+
 #-------------------------------------------------------------------
 
 =head2 getSummary
@@ -1305,13 +1341,6 @@ Sends the processed template and questions structure to the client
 
 sub prepareShowSurveyTemplate {
     my ( $self, $section, $questions ) = @_;
-#    my %multipleChoice = (
-#        'Multiple Choice', 1, 'Gender',        1, 'Yes/No',     1, 'True/False', 1, 'Ideology',       1,
-#        'Race',            1, 'Party',         1, 'Education',  1, 'Scale',      1, 'Agree/Disagree', 1,
-#        'Oppose/Support',  1, 'Importance',    1, 'Likelihood', 1, 'Certainty',  1, 'Satisfaction',   1,
-#        'Confidence',      1, 'Effectiveness', 1, 'Concern',    1, 'Risk',       1, 'Threat',         1,
-#        'Security',        1
-#    );
     my %textArea    = ( 'TextArea', 1 );
     my %text        = ( 'Text', 1, 'Email', 1, 'Phone Number', 1, 'Text Date', 1, 'Currency', 1, 'Number', 1 );
     my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
@@ -1379,6 +1408,7 @@ sub prepareShowSurveyTemplate {
     if(scalar @{$questions} == ($section->{totalQuestions} - $section->{questionsAnswered})){
         $section->{isLastPage} = 1
     }
+    $section->{allowBackBtn} = $self->get('allowBackBtn');
 
     my $out = $self->processTemplate( $section, $self->get('surveyQuestionsId') );
 

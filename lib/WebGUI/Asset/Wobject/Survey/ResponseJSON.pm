@@ -39,59 +39,6 @@ number of questions answered (L<"questionsAnswered">) and the Survey start time 
 
 This package is not intended to be used by any other Asset in WebGUI.
 
-=head2 surveyOrder
-
-This data strucutre is an array (reference) of Survey addresses (see  
-L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
-in which items are presented to the user.
-
-By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
-arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
-
-For example:
-
- # Access sections in order..
- for my $address (@{ $self->surveyOrder }) {
-        my $section  = $self->survey->section( $address );
-        # etc..
- }
-
-In general, the surveyOrder data structure looks like:
-
-    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
-
-There is one array element for every section and address in the survey. If there are 
-no questions, or no addresses, those array elements will not be present.
-
-=head2 responses
-
-This data structure stores a snapshot of all question responses. Both question data and answer data
-is stored in this hash reference.
-
-Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
-Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
-
-Question entries only contain a comment field:
- {
-     ...
-     questionId => {
-         comment => "question comment",
-     }
-     ...
- }
-
-Answers entries contain: value (the recorded value), time and comment fields.
-
- {
-     ...
-     answerId => {
-         value   => "recorded answer value",
-         time    => time(),
-         comment => "answer comment",
-    },
-     ...
- }
-
 =cut
 
 use strict;
@@ -252,7 +199,7 @@ sub hasTimedOut{
 
 =head2 lastResponse ([ $responseIndex ])
 
-Mutator. The lastResponse property represents the index of the most recent surveyOrder entry shown. 
+Mutator. The lastResponse property represents the surveyOrder index of the most recent item shown. 
 
 This method returns (and optionally sets) the value of lastResponse.
 
@@ -325,8 +272,29 @@ sub startTime {
 
 =head2 surveyOrder
 
-Accessor for surveyOrder (see L<"surveyOrder">). 
-Initialized on first access via L<"initSurveyOrder">.
+Accessor. Initialized on first access via L<"initSurveyOrder">.
+
+This data strucutre is an array (reference) of Survey addresses (see  
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
+in which items are presented to the user.
+
+In general, the surveyOrder data structure looks like:
+
+    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
+
+There is one array element for every section and address in the survey. If there are 
+no questions, or no addresses, those array elements will not be present.
+
+By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
+arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
+
+For example:
+
+ # Access sections in order..
+ for my $address (@{ $self->surveyOrder }) {
+        my $section  = $self->survey->section( $address );
+        # etc..
+ }
 
 =cut
 
@@ -1242,11 +1210,32 @@ sub response {
     return $self->{_response};
 }
 
+#-------------------------------------------------------------------
+
 =head2 responses
 
-Mutator for the L<"responses"> property. 
+Mutator. Note, this is an unsafe reference.
 
-Note, this is an unsafe reference.
+This data structure stores a snapshot of all question responses. Both question data and answer data
+is stored in this hash reference.
+
+Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
+Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
+
+ {
+     # Question entries only contain a comment field, e.g.
+     '0-0' => {
+         comment => "question comment",
+     },
+     # ...
+     # Answers entries contain: value (the recorded value), time and comment fields.
+     '0-0-0' => {
+         value   => "recorded answer value",
+         time    => time(),
+         comment => "answer comment",
+    },
+    # ...
+ }
 
 =cut
 
@@ -1257,6 +1246,62 @@ sub responses {
         $self->response->{responses} = $responses;
     }
     return $self->response->{responses};
+}
+
+=head2 pop
+
+=cut
+
+sub pop {
+    my $self      = shift;
+    my %responses = %{ $self->responses };
+    
+    # Iterate over responses first time to determine time of most recent response(s)
+    my $lastResponseTime;
+    for my $r ( values %responses ) {
+        if ( $r->{time} ) {
+            $lastResponseTime 
+                = !$lastResponseTime || $r->{time} > $lastResponseTime  
+                ? $r->{time} 
+                : $lastResponseTime
+                ;
+        }
+    }
+    
+    return unless $lastResponseTime;
+    
+    my $popped;
+    my $poppedQuestions;
+    # Iterate again, removing most recent responses
+    while (my ($address, $r) = each %responses ) {
+        if ( $r->{time} == $lastResponseTime) {
+            $popped->{$address} = $r;
+            delete $self->responses->{$address};
+            
+            # Remove associated question/comment entry
+            my ($sIndex, $qIndex, $aIndex) = split /-/, $address;
+            my $qAddress = "$sIndex-$qIndex";
+            $popped->{$qAddress} = $responses{$qAddress};
+            delete $self->responses->{$qAddress};
+            
+            # while we're here, build lookup table of popped question ids
+            $poppedQuestions->{$qAddress} = 1;
+        }
+    }
+    
+    # Now, nextResponse should be set to index of the first popped question we can find in surveyOrder
+    my $nextResponse = 0;
+    for my $address (@{ $self->surveyOrder }) {
+        my $questionId = "$address->[0]-$address->[1]";
+        if ($poppedQuestions->{$questionId} ) {
+            $self->session->log->debug("setting nextResponse to $nextResponse");
+            $self->nextResponse($nextResponse);
+            last;
+        }
+        $nextResponse++;
+    }
+    
+    return $popped;
 }
 
 #-------------------------------------------------------------------
