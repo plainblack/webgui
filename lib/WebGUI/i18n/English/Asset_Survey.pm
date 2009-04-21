@@ -1370,7 +1370,7 @@ section/answer.|,
     },
     
     'year' => {
-        message => q|Year:|,
+        message => q|Year (YYYY):|,
         context => q|Sub-label for "Year Month" question type|,
         lastUpdated => 0,
     },

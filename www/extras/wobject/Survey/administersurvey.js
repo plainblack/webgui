@@ -88,7 +88,9 @@ if (typeof Survey === "undefined") {
                         var m = document.getElementById(z1+'-month').value;
                         var y = document.getElementById(z1+'-year').value;
                         if(m == ''){ answered = 0; }
-                        if(y.length != 4) { answered = 0; }
+                        var yInt = parseInt(y, 10);
+                        if(!yInt) { answered = 0; }
+                        if(yInt < 1000 || yInt > 3000) { answered = 0; }
                         if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
                     }
                 }
