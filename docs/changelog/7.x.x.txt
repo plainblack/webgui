@@ -5,6 +5,7 @@
  - fixed #10143: Matrix 2.0 - Product maintainer accounts changed during upgrade
  - fixed: #10109: Matrix 2.0 - Updates to product listing by maintainer account require admin approval
  - fixed #10146: Thingy duplicate errors
+ - fixed #10158: Matrix 2.0 - Screenshots rendering poorly
 
 7.6.20
  - fixed: 7.6 upgrade left some default content marked as packages

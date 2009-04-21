@@ -32,7 +32,17 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 
+addMatrixMaxScreenshotWidthHeight($session);
+
 finish($session); # this line required
+
+#----------------------------------------------------------------------------
+sub addMatrixMaxScreenshotWidthHeight {
+    my $session = shift;
+    print "\tAdding maximum screenshot width and height property to the Matrix." unless $quiet;
+    $session->db->write("alter table Matrix add maxScreenshotWidth int(11), add maxScreenshotHeight int(11);");
+    print "DONE!\n" unless $quiet;
+}
 
 
 #----------------------------------------------------------------------------
