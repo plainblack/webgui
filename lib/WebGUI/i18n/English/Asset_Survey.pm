@@ -1368,6 +1368,18 @@ section/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
+    
+    'year' => {
+        message => q|Year:|,
+        context => q|Sub-label for "Year Month" question type|,
+        lastUpdated => 0,
+    },
+    
+    'month' => {
+        message => q|Month:|,
+        context => q|Sub-label for "Year Month" question type|,
+        lastUpdated => 0,
+    },
 
 };
 
