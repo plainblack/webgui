@@ -180,8 +180,8 @@ The maximum number of keywords to display in the cloud. Defaults to 50. Valid ra
 
 =head3 urlCallback
 
-This is a subroutine reference that will be called to get the URL for a keyword.  The callback
-will get the keyword as its first, and only argument.
+This is the name of a method that will be called on the displayAsset, or the startAsset to get the URL
+that elements in the tag cloud will link to.  The method will be passed the keyword as its first, and only argument.
 
 =head3 includeOnlyKeywords
 
