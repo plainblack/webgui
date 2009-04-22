@@ -124,15 +124,11 @@ li.answer {
     width:15em;
     margin-top:0.5em;
 }
-
-#warnings-outer {
-    margin: 5px;
-    padding: 0 5px;
-    border: 1px solid;
-    color: red;
-}
-#warnings {
-    color: red;
+.wGwarning {
+    background-color:#FF6666;
+    border:1px solid red;
+    margin:5px;
+    padding:10px;
 }
 #sections-panel .bd {
     overflow: auto;

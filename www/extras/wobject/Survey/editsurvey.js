@@ -81,7 +81,7 @@ Survey.Data = (function(){
             if (!Survey.Data.ddContainer) {
                 
                 // Calculate the bottom of the warnings div (with a little padding)
-                var warningsBottom = YAHOO.util.Dom.getRegion('warnings').bottom + 5;
+                var warningsBottom = YAHOO.util.Dom.getRegion('warnings-outer').bottom + 5;
                 warningsBottom = YAHOO.lang.isValue(warningsBottom) ? warningsBottom : 50;
                 
                 // Calculate the bottom of the viewport (with a little padding)
