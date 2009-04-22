@@ -501,6 +501,7 @@ sub viewTemplateVariables {
         });
         my $storiesPerPage = $self->get('storiesPerPage');
         if ($self->{_exportMode}) {
+            ##10 pages worth of data on 1 page in export mode
             $storiesPerPage *= 10;
         }
         $p = WebGUI::Paginator->new($session, $self->getUrl, $storiesPerPage);
@@ -508,6 +509,7 @@ sub viewTemplateVariables {
     }
     my $storyIds = $p->getPageData();
     if (! $self->{_exportMode} ) {
+        ##Pagination variables aren't useful in export mode
         $p->appendTemplateVars($var);
     }
     $var->{date_loop} = [];
@@ -544,6 +546,11 @@ sub viewTemplateVariables {
         startAsset  => $self,
         displayFunc => 'view',
     };
+    ##In export mode, tags should link to the pages generated during the collateral export
+    if($self->{_exportMode}) {
+        $cloudOptions->{urlCallback} = 'getKeywordStaticUrl';
+        $cloudOptions->{displayFunc} = '';
+    }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
     if (! $self->{_exportMode}) {
         my $i18n = WebGUI::International->new($session, 'Asset');

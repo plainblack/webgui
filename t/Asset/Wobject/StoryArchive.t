@@ -40,6 +40,7 @@ use DateTime;
 my $session         = WebGUI::Test->session;
 
 my $staff = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($staff);
 $staff->name('Reporting Staff');
 
 my $reporter = WebGUI::User->new($session, 'new');
@@ -61,7 +62,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 41
+my $tests = 42
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -458,6 +459,28 @@ cmp_bag(
 
 ################################################################
 #
+#  tagCloud template variable in view, exportMode
+#
+################################################################
+
+$archive->{_exportMode} = 1;
+
+$templateVars = $archive->viewTemplateVariables();
+@anchors = simpleHrefParser($templateVars->{keywordCloud});
+@expectedAnchors = ();
+foreach my $keyword(qw/echo foxtrot roger/) {
+    push @expectedAnchors, [ $keyword, 'keyword_'.$keyword.'.html' ];
+}
+cmp_bag(
+    \@anchors,
+    \@expectedAnchors,
+    'keywordCloud template variable has keywords and correct links in export mode',
+);
+
+$archive->{_exportMode} = 0;
+
+################################################################
+#
 #  RSS and Atom checks
 #
 ################################################################
@@ -519,7 +542,7 @@ cmp_bag(
         keyword_foxtrot.html      mystories.atom
         keyword_echo.html
     /],
-    'exportAssetCollateral: correct files exported, including dummy directory'
+    'exportAssetCollateral: keyword and feed files exported'
 );
 
 my $roger = $exportStorage->getFileContentsAsScalar('keyword_roger.html');
@@ -571,9 +594,6 @@ END {
     }
     foreach my $user ($editor, $reporter, $reader) {
         $user->delete if defined $user;
-    }
-    foreach my $group ($staff) {
-        $group->delete if defined $group;
     }
     $creationDateSth->finish;
 }
