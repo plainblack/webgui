@@ -274,16 +274,19 @@ sub startTime {
 
 Accessor. Initialized on first access via L<"initSurveyOrder">.
 
-This data strucutre is an array (reference) of Survey addresses (see  
-L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
-in which items are presented to the user.
+This data strucutre represents the list of items that are shown to the user, in the order
+that they will be shown (ignoring jumps and jump expressions).
 
-In general, the surveyOrder data structure looks like:
+Typically each item will correspond to a question, and contains enough information to look
+up both the corresponding section and all contained answers (if any).
+
+Empty sections also appear in the list.
+
+Each element of the array is an address, similar in structure to 
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>,
+except that instead of an answerIndex in the third slot, we have a sub-array of all contained answer indicies.
 
     [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
-
-There is one array element for every section and address in the survey. If there are 
-no questions, or no addresses, those array elements will not be present.
 
 By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
 arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
@@ -590,6 +593,23 @@ A variable name to match against all section and question variable names.
 sub processGoto {
     my $self = shift;
     my ($goto) = validate_pos(@_, {type => SCALAR});
+    
+    if ($goto eq 'NEXT_SECTION') {
+        $self->session->log->debug("NEXT_SECTION jump target encountered");
+        my $lastResponseSectionIndex = $self->lastResponseSectionIndex;
+        
+        # Increment lastRepsonse until nextResponseSectionIndex moves
+        while ($self->nextResponseSectionIndex == $lastResponseSectionIndex) {
+            $self->lastResponse( $self->lastResponse + 1);
+        }
+        return;
+    }
+    
+    if ($goto eq 'END_SURVEY') {
+        $self->session->log->debug("END_SURVEY jump target encountered");
+        $self->lastResponse( scalar( @{ $self->surveyOrder} ) - 1 );
+        return;
+    }
 
     # Iterate over items in order..
     my $itemIndex = 0;

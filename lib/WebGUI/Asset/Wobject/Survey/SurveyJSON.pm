@@ -414,16 +414,17 @@ Generates the list of valid goto targets
 sub getGotoTargets {
     my $self = shift;
 
-    # Valid goto targets are all of the section variable names..
-    my @section_vars = map {$_->{variable}} @{$self->sections};
+    # Valid goto targets are all of the non-empty section variable names..
+    my @section_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->sections};
     
-    # ..and all of the question variable names..
-    my @question_vars = map {$_->{variable}} @{$self->questions};
+    # ..and all of the non-empty question variable names..
+    my @question_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->questions};
     
-    # ..excluding the ones that are empty
-    my @grep =  grep { $_ ne q{} } (@section_vars, @question_vars);
-    return \@grep;
-    #return grep { $_ ne q{} } (@section_vars, @question_vars);
+    # ..plus some special vars
+    my @special_vars = qw(NEXT_SECTION END_SURVEY);
+    
+    # ..all combined
+    return [ @section_vars, @question_vars, @special_vars ];
 }
 
 =head2 getSectionEditVars ( $address )
