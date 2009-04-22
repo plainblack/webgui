@@ -182,11 +182,11 @@ if (typeof Survey === "undefined") {
         var min = Math.round(parseFloat(q.answers[0].min));
 
         //The number of values in between the max and min values
-        //var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
         var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min));
        
         //Number of pixels each bug step takes
         var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step));
+
         //redefine number of pixels to round number of steps
         total = distance * bugSteps / step;
 
