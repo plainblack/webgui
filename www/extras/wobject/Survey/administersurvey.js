@@ -134,73 +134,6 @@ if (typeof Survey === "undefined") {
         Survey.Comm.callServer('', 'goBack');
     }
     
-    //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
-    function sliderManager(q, t){
-        var total = sliderWidth;
-        var step = Math.round(parseFloat(q.answers[0].step));
-        var min = Math.round(parseFloat(q.answers[0].min));
-        var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
-        var scale = Math.round(sliderWidth / distance);
-        for (var i in q.answers) {
-            if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
-                var a = q.answers[i];
-                var Event = YAHOO.util.Event;
-                var lang = YAHOO.lang;
-                var id = a.id + 'slider-bg';
-                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, sliderWidth, scale * step);
-                s.animate = false;
-                if (YAHOO.lang.isUndefined(sliders[q.id])) {
-                    sliders[q.id] = [];
-                }
-                sliders[q.id][a.id] = s;
-                s.input = a.id;
-                s.lastValue = 0;
-                var check = function(){
-                    var t = 0;
-                    for (var x in sliders[q.id]) {
-                        if (YAHOO.lang.hasOwnProperty(sliders[q.id], x)) {
-                            t += sliders[q.id][x].getValue();
-                        }
-                    }
-                    if (t > total) {
-                        t -= this.getValue();
-                        t = Math.round(t);
-                        this.setValue(total - t);// + (scale*step));
-                        document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
-                    }
-                    else {
-                        this.lastValue = this.getValue();
-                        document.getElementById(this.input).value = this.getRealValue();
-                    }
-                };
-                s.subscribe("change", check);
-                s.subscribe("slideEnd", check);
-                var manualEntry = function(e){
-                    // set the value when the 'return' key is detected 
-                    if (Event.getCharCode(e) === 13 || e.type === 'blur') {
-                        var v = parseFloat(this.value, 10);
-                        v = (lang.isNumber(v)) ? v : 0;
-                        //                  v *= scale;
-                        v = (((v - min) / distance)) * total;
-                        // convert the real value into a pixel offset 
-                        for (var sl in sliders[q.id]) {
-                            if (sliders[q.id][sl].input === this.id) {
-                                sliders[q.id][sl].setValue(Math.round(v));
-                            }
-                        }
-                    }
-                };
-                Event.on(document.getElementById(s.input), "blur", manualEntry);
-                Event.on(document.getElementById(s.input), "keypress", manualEntry);
-                
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
-                };
-                document.getElementById(s.input).value = s.getRealValue();
-            }
-        }
-    }
-    
     function numberHandler(event, objs){
         
         var keycode = event.keyCode;
@@ -237,11 +170,117 @@ if (typeof Survey === "undefined") {
             }
         }
     }
+    
+    function sliderManager(q){
+        //total number of pixels in the slider.
+        var total = sliderWidth;
+
+        //steps must be integers
+        var step = Math.round(parseFloat(q.answers[0].step));
+
+        //the starting value for the left side of the slider
+        var min = Math.round(parseFloat(q.answers[0].min));
+
+        //The number of values in between the max and min values
+        //var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
+        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min));
+       
+        //Number of pixels each bug step takes
+        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step));
+        //redefine number of pixels to round number of steps
+        total = distance * bugSteps / step;
+
+        var scale = Math.round(total / distance);
+        
+        //max is just the max value, used for determining allocation sliders. 
+        var max = 0;         
+        var type = 'slider';
+
+        //find the maximum difference between an answers max and min
+        for (var s in q.answers) {
+            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
+                var a1 = q.answers[s];
+                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
+                if (a1.max - a1.min > max) {
+                    max = a1.max - a1.min;
+                }
+            }
+        }
+
+        //Only validate allocation types which must allocate all their points
+        if (q.questionType === 'Multi Slider - Allocate') {
+            type = 'multi';
+            for (var x1 = 0; x1 < q.answers.length; x1++) {
+                if (toValidate[q.id]) {
+                    toValidate[q.id].total = q.answers[x1].max;
+                    toValidate[q.id].answers[q.answers[x1].id] = 1;
+                }
+            }
+        }
+        for (var i in q.answers) {
+            if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
+                var a = q.answers[i];
+                var Event = YAHOO.util.Event;
+                var lang = YAHOO.lang;
+                var id = a.id + 'slider-bg';
+                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, total, scale * step);
+                s.animate = true;
+                if (YAHOO.lang.isUndefined(sliders[q.id])) {
+                    sliders[q.id] = [];
+                }
+                sliders[q.id][a.id] = s;
+                s.input = a.id;
+                s.lastValue = 0;
+                var check = function(){
+                    var t = 0;
+                    for (var x in sliders[q.id]) {
+                        if (YAHOO.lang.hasOwnProperty(sliders[q.id], x)) {
+                            t += sliders[q.id][x].getRealValue();
+                        }
+                    }
+                    if (t > max && type === 'multi') {
+                        t -= +this.getRealValue();
+                        var newVal = (max-t);
+                        this.setValue(newVal*bugSteps/step);
+                        //document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
+                        document.getElementById(this.input).value = newVal;
+                    }
+                    else {
+                        this.lastValue = this.getValue();
+                        document.getElementById(this.input).value = this.getRealValue();
+                    }
+                };
+                s.subscribe("change", check);
+                var manualEntry = function(e){
+                    // set the value when the 'return' key is detected 
+                    if (Event.getCharCode(e) === 13 || e.type === 'blur') {
+                        var v = parseFloat(this.value, 10);
+                        v = (lang.isNumber(v)) ? v : 0;
+                        //                  v *= scale;
+                        v = (((v - min) / distance)) * total;
+                        // convert the real value into a pixel offset 
+                        for (var sl in sliders[q.id]) {
+                            if (sliders[q.id][sl].input === this.id) {
+                                sliders[q.id][sl].setValue(Math.round(v));
+                            }
+                        }
+                    }
+                };
+                Event.on(document.getElementById(s.input), "blur", manualEntry);
+                Event.on(document.getElementById(s.input), "keypress", manualEntry);
+                var getRealValue = function(){ 
+                    return parseInt((this.getValue() / bugSteps * step) + +min);
+                };
+                s.getRealValue = getRealValue;
+                document.getElementById(s.input).value = s.getRealValue();
+            }
+        }
+
+    }
 
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
 		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
-        sliders[this.id].setValue(Math.round(this.value * sliders[this.id].scale));
     }
     
     function handleDualSliders(q){
@@ -274,35 +313,6 @@ if (typeof Survey === "undefined") {
         //           s.subscribe('ready', updateUI); 
         //s.subscribe('change', updateUI);  
         s.subscribe('slideEnd', updateUI);
-    }
-    
-    function handleSliders(q){
-        var total = sliderWidth;
-        for (var i in q.answers) {
-            if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
-                var a = q.answers[i];
-                var step = Math.round(q.answers[i].step);
-                var min = Math.round(parseFloat(q.answers[i].min));
-                var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
-                var scale = Math.floor(sliderWidth / distance);
-                var id = a.id;
-                var s = YAHOO.widget.Slider.getHorizSlider(id + 'slider-bg', id + 'slider-thumb', 0, sliderWidth, (scale * step));
-                s.scale = scale;
-                sliders[q.Survey_questionid] = [];
-                sliders[q.Survey_questionid][id] = s;
-                s.input = a.id;
-                s.scale = scale;
-                document.getElementById(id).value = a.min;
-                var check = function(){
-                    var t = document.getElementById(this.input);
-                    t.value = this.getRealValue();
-                };
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
-                };
-                s.subscribe("slideEnd", check);
-            }
-        }
     }
     
     function showCalendar(event, objs){
@@ -631,30 +641,8 @@ if (typeof Survey === "undefined") {
                         handleDualSliders(q);
                     }
                     else {
-                        for (var s in q.answers) {
-                            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
-                                var a1 = q.answers[s];
-                                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
-                                if (a1.max - a1.min > max) {
-                                    max = a1.max - a1.min;
-                                }
-                            }
-                        }
+                        sliderManager(q);
                     }
-                    if (q.questionType === 'Multi Slider - Allocate') {
-                        //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
-                        for (var x1 = 0; x1 < q.answers.length; x1++) {
-                            if (toValidate[q.id]) {
-                                toValidate[q.id].total = q.answers[x1].max;
-                                toValidate[q.id].answers[q.answers[x1].id] = 1;
-                            }
-                        }
-                        sliderManager(q, max);
-                    }
-                    else 
-                        if (q.questionType === 'Slider') {
-                            handleSliders(q);
-                        }
                     continue;
                 }
                 
