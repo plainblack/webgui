@@ -1037,10 +1037,9 @@ sub addAnswersToQuestion {
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy = @{$address};
     
-    for my $answer_index ( 0 .. $#{$answers} ) {
-        
+    for my $answer (@$answers) {
         # Add a new answer to question
-        push @{ $self->question( \@address_copy )->{answers} }, $answers->[$answer_index];
+        push @{ $self->question( \@address_copy )->{answers} }, $answer;
     }
     
     return;

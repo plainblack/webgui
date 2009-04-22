@@ -457,7 +457,6 @@ sub recordResponses {
         $gotoExpression = $section->{gotoExpression};
     }
 
-
     # Handle empty Section..
     if ( !@questions ) {
         # No questions to process, so increment lastResponse and return
@@ -494,6 +493,7 @@ sub recordResponses {
             # Pluck the values out of the responses hash that we want to record..
             my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
             my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
+            my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
 
             # Proceed if we're satisfied that the submitted answer response is valid..
             if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
@@ -517,9 +517,10 @@ sub recordResponses {
                     = $knownTypes{ $question->{questionType} }
                     ? $submittedAnswerResponse
                     : $answer->{recordedAnswer};
-
-                $self->responses->{ $answer->{id} }->{time}    = time;
-                $self->responses->{ $answer->{id} }->{comment} = $submittedAnswerComment;
+                
+                $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
+                $self->responses->{ $answer->{id} }->{time}     = time;
+                $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
 
                 # Handle terminal Answers..
                 if ( $answer->{terminal} ) {
@@ -694,17 +695,31 @@ sub recordedResponses{
 
 #-------------------------------------------------------------------
 
-=head2 responseValuesByVariableName
+=head2 responseValuesByVariableName ( $options )
 
 Returns a lookup table to question variable names and recorded response values.
 
 Only questions with a defined variable name set are included. Values come from
 the L<responses> hash.
 
+=head3 options
+
+The following options are supported:
+
+=over 3
+
+=item * useText
+
+For multiple choice questions, use the answer text instead of the recorded value
+(useful for doing [[var]] text substitution
+
+=back
+
 =cut
 
 sub responseValuesByVariableName {
     my $self = shift;
+    my %options = validate(@_, { useText => 0 });
     
     my %lookup;
     while (my ($address, $response) = each %{$self->responses}) {
@@ -722,14 +737,23 @@ sub responseValuesByVariableName {
         # Filter out questions without defined variable names
         next if !$question || !defined $question->{variable};
         
-        #Test if question is a multiple choice type so we can use the answer text instead
-        my $answerText;
-        if($self->survey->getMultiChoiceBundle($question->{questionType})){
-            $answerText = $self->survey->answer([@address])->{text};
+        my $value = $response->{value};
+        if ($options{useText}) {
+            # Test if question is a multiple choice type so we can use the answer text instead
+            if($self->survey->getMultiChoiceBundle($question->{questionType})){
+                my $answer = $self->survey->answer([@address]);
+                my $answerText = $answer->{text};
+                
+                # For verbatim mc answers, combine answer text and recorded value
+                if ($answer->{verbatim}) {
+                    $answerText = "$answerText - \"$response->{verbatim}\"";
+                }
+                $value = $answerText ? $answerText : $value;
+            }
         }
         
         # Add variable => value to our hash
-        $lookup{$question->{variable}} = $answerText ? $answerText : $response->{value};
+        $lookup{$question->{variable}} = $value;
     }
     return \%lookup;
 }
@@ -865,7 +889,7 @@ sub nextQuestions {
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $responseValuesByVariableName = $self->responseValuesByVariableName();
+    my $responseValuesByVariableName = $self->responseValuesByVariableName( { useText => 1 } );
 
     # Do text replacement
     $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);

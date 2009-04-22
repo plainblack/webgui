@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 74;
+my $tests = 75;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -475,6 +475,7 @@ cmp_deeply(
     $rJSON->recordResponses({
         '1-0comment'   => 'Section 1, question 0 comment',
         '1-0-0'        => 'First answer',
+        '1-0-0verbatim' => 'First answer verbatim', # ignored
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
     }),
     [ 1, 'question 1-0 terminal' ],
@@ -494,6 +495,7 @@ cmp_deeply(
             comment => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
             value   => 1, # 'recordedAnswer' value used because question is multi-choice
+            verbatim => undef,
         },
         '1-1'   => {
             comment => undef,
@@ -502,11 +504,42 @@ cmp_deeply(
     'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
 );
 
+# Check that raw input is recorded for verbatim mc answers
+$rJSON->survey->answer([1,0,0])->{verbatim} = 1;
+$rJSON->lastResponse(2);
+$rJSON->responses({});
+$rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
+$rJSON->recordResponses({
+    '1-0comment'   => 'Section 1, question 0 comment',
+    '1-0-0'        => 'First answer',
+    '1-0-0verbatim'        => 'First answer verbatim',
+    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+});
+cmp_deeply(
+    $rJSON->responses,
+    {
+        '1-0'   => {
+            comment => 'Section 1, question 0 comment',
+        },
+        '1-0-0' => {
+            comment => 'Section 1, question 0, answer 0 comment',
+            'time'    => num(time(), 3),
+            value   => 1, # 'recordedAnswer' value used because question is multi-choice
+            verbatim => 'First answer verbatim',
+        },
+        '1-1'   => {
+            comment => undef,
+        }
+    },
+    'recordResponses: verbatim answer recorded responses correctly'
+);
+$rJSON->survey->answer([1,0,0])->{verbatim} = 0; # revert change
 
 # Repeat with non multi-choice question, to check that submitted answer value is used
 # instead of recordedValue
 $rJSON->survey->question([1,0])->{questionType} = 'Text';
 $rJSON->lastResponse(2);
+$rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->recordResponses({
     '1-0comment'   => 'Section 1, question 0 comment',
@@ -523,6 +556,7 @@ cmp_deeply(
             comment => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
             value   => 'First answer', # submitted answer value used this time because non-mc
+            verbatim => undef,
         },
         '1-1'   => {
             comment => undef,
@@ -587,12 +621,14 @@ cmp_deeply($popped, {
         value => 1,
         comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
+        verbatim => undef,
     },
     # the second q answer
     '1-1-0'        => { 
         value => 0,
         comment => 'Section 1, question 1, answer 0 comment',
         time => num(time(), 3),
+        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
@@ -625,6 +661,7 @@ cmp_deeply($rJSON->pop, {
         value => 0,
         comment => 'Section 1, question 1, answer 0 comment',
         time => num(time(), 3),
+        verbatim => undef,
     },
     # the second question comment
     '1-1' => {
@@ -637,6 +674,7 @@ cmp_deeply($rJSON->responses, {
         value => 1,
         comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
+        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
@@ -649,6 +687,7 @@ cmp_deeply($rJSON->pop, {
         value => 1,
         comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
+        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
