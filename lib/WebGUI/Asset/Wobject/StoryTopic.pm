@@ -103,6 +103,34 @@ sub exportHtml_view {
 
 #-------------------------------------------------------------------
 
+=head2 getRssFeedItems ( )
+
+Returns an arrayref of hashrefs, containing information on stories
+for generating an RSS and Atom feeds.
+
+=cut
+
+sub getRssFeedItems {
+    my ($self)   = @_;
+    my $session  = $self->session;    
+    my $wordList = WebGUI::Keyword::string2list($self->get('keywords'));
+    my $key      = WebGUI::Keyword->new($session);
+    my $storyIds = $key->getMatchingAssets({
+        keywords     => $wordList,
+        isa          => 'WebGUI::Asset::Story',
+        rowsPerPage  => $self->get('storiesPer'),
+    });
+    my $storyData = [];
+    STORY: foreach my $storyId (@{ $storyIds }) {
+        my $story = WebGUI::Asset->newByDynamicClass($session, $storyId);
+        next STORY unless $story;
+        push @{ $storyData }, $story->getRssData;
+    }
+    return $storyData;
+}
+
+#-------------------------------------------------------------------
+
 =head2 prepareView ( )
 
 See WebGUI::Asset::prepareView() for details.

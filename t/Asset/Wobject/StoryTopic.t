@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 17;
+my $tests = 18;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -272,6 +272,43 @@ cmp_deeply(
     '... export mode, RSS and Atom feed template variables show the static url'
 );
 $topic->{_exportMode} = 0;
+
+################################################################
+#
+#  getRssFeedItems
+#
+################################################################
+
+$topic->update({
+    storiesPer   => 3,
+});
+cmp_deeply(
+    $topic->getRssFeedItems(),
+    [
+        {
+            title => 'bogs',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+        {
+            title => 'red',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+        {
+            title => 'brooks',
+            description => ignore(),
+            'link'      => ignore(),
+            date        => ignore(),
+            author      => ignore(),
+        },
+    ],
+    'rssFeedItems'
+);
 
 }
 
