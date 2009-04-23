@@ -117,7 +117,7 @@ sub execute {
     }
 
     ### Delete expired
-    my $iter 
+    $iter 
         = WebGUI::AssetCollateral::Sku::ThingyRecord::Record->getAllIterator(
             $self->session,
             {
