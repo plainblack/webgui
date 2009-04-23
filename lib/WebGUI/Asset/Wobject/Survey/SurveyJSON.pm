@@ -667,14 +667,30 @@ sub update {
         }
     }
 
+    $self->_handleSpecialAnswerUpdates($address,$properties); 
+
     # Update $object with all of the data in $properties
     while (my ($key, $value) = each %{$properties}) {
         if (defined $value) {
             $object->{$key} = $value;
         }
     }
-    
+
     return;
+}
+
+sub _handleSpecialAnswerUpdates{
+    my $self = shift;
+    my $address = shift;
+    my $properties = shift;
+    my $question = $self->question($address);
+    if($question->{questionType} =~ /^Slider|Multi Slider - Allocate|Dual Slider - Range$/){
+        for my $answer(@{$self->answers($address)}){
+            $answer->{max} = $properties->{max};
+            $answer->{min} = $properties->{min};
+            $answer->{step} = $properties->{step};
+        }
+    }
 }
 
 =head2 insertObject ( $object, $address )
