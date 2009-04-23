@@ -21,13 +21,13 @@ Package WebGUI::Shop::PayDriver
 
 =head1 DESCRIPTION
 
-This package is the base class for all modules which implement a pyament driver.
+This package is the base class for all modules which implement a payment driver.
 
 =head1 SYNOPSIS
 
  use WebGUI::Shop::PayDriver;
 
- my $tax = WebGUI::Shop::PayDriver->new($session);
+ my $payDriver = WebGUI::Shop::PayDriver->new($session);
 
 =head1 METHODS
 

@@ -1,5 +1,25 @@
 package WebGUI::Shop::TaxDriver;
 
+=head1 NAME
+
+Package WebGUI::Shop::TaxDriver
+
+=head1 DESCRIPTION
+
+This package is the base class for all modules which implement a tax driver.
+
+=head1 SYNOPSIS
+
+ use WebGUI::Shop::TaxDriver;
+
+ my $taxDriver = WebGUI::Shop::TaxDriver->new($session);
+
+=head1 METHODS
+
+These subroutines are available from this package:
+
+=cut
+
 use strict;
 
 use Class::InsideOut qw{ :std };
@@ -97,8 +117,6 @@ The sku for which the tax rate must be determined. Should be a WebGUI::Asset::Sk
 =head3 address
 
 Optional, the shipping address for which to calculate the tax. Must be an instance of WebGUI::Shop::Address.
-
-=head
 
 =cut
 
