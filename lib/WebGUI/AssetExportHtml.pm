@@ -350,6 +350,8 @@ sub exportAsHtml {
         $session->db->write( "UPDATE asset SET lastExportedAs = ? WHERE assetId = ?",
             [ $fullPath, $asset->getId ] );
 
+        $self->updateHistory("exported");
+
         # tell the user we did this asset correctly
         unless( $quiet ) {
             $session->output->print($i18n->get('done'));
