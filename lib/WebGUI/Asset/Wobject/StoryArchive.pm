@@ -218,8 +218,6 @@ sub exportAssetCollateral {
         undef,
         $self->session->getId,
     );
-    $printSession->scratch->set('isExporting', 1);
-
 
     my $keywordObj = WebGUI::Keyword->new($printSession);
     my $keywords = $keywordObj->findKeywords({

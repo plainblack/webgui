@@ -191,7 +191,6 @@ sub exportAsHtml {
     my $self                = shift;
     my $session             = $self->session;
     # set a scratch variable for Assets to know we're exporting
-    $session->scratch->set('isExporting', 1);
     my ($returnCode, $message);
 
     # get the i18n object
