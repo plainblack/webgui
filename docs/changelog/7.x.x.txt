@@ -1,3 +1,5 @@
+7.7.5
+
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
  - fixed: 7.6 upgrade left some default content marked as packages
