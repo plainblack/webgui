@@ -98,8 +98,6 @@ SKIP: {
     isa_ok( $e, 'WebGUI::Error::InvalidParam', 'getDriver throws error when no session object is passed in class context' );
     is( $e->error, 'Need a session.', 'getDriver passes correct message for ommitted session object' );
 
-
-
     TODO: {
         local $TODO = 'test www_ methods';
         #######################################################################

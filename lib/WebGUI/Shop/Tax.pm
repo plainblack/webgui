@@ -128,6 +128,9 @@ A WebGUI::Session object. Required in class context, optional in instance contex
 sub getDriver {
     my $self    = shift;
     my $session = shift || $self->session;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
     
     my $className   = $session->setting->get( 'activeTaxPlugin' );
     my $driver      = eval {
@@ -152,6 +155,9 @@ Constructor for the WebGUI::Shop::Tax.  Returns a WebGUI::Shop::Tax object.
 sub new {
     my $class   = shift;
     my $session = shift;
+    unless (defined $session && $session->isa("WebGUI::Session")) {
+        WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
+    }
     my $self    = {};
     bless $self, $class;
     register $self;
