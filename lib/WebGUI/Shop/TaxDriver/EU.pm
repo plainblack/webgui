@@ -1,5 +1,19 @@
 package WebGUI::Shop::TaxDriver::EU;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 use strict;
 
 use SOAP::Lite;
@@ -8,6 +22,27 @@ use WebGUI::TabForm;
 use WebGUI::Utility qw{ isIn };
 
 use base qw{ WebGUI::Shop::TaxDriver };
+
+=head1 NAME
+
+Package WebGUI::Shop::TaxDriver::EU
+
+=head1 DESCRIPTION
+
+This package manages tax information, and calculates taxes on a shopping cart specifically handling
+European Union VAT taxes.
+
+=head1 SYNOPSIS
+
+ use WebGUI::Shop::Tax;
+
+ my $tax = WebGUI::Shop::Tax->new($session);
+
+=head1 METHODS
+
+These subroutines are available from this package:
+
+=cut
 
 my $EU_COUNTRIES = {
     AT => 'Austria',
@@ -40,11 +75,25 @@ my $EU_COUNTRIES = {
 };
 
 #-------------------------------------------------------------------
+
+=head2 className
+
+Returns the name of this class.
+
+=cut
+
 sub className {
     return 'WebGUI::Shop::TaxDriver::EU';
 }
 
-#-------------------------------------------------------------------
+#-----------------------------------------------------------
+
+=head2 getConfigurationScreen ( )
+
+Returns the form that contains the configuration options for this plugin in the admin console.
+
+=cut
+
 sub getConfigurationScreen {
     my $self    = shift;
     my $session = $self->session;
@@ -138,6 +187,17 @@ EOHTML
 }
 
 #-------------------------------------------------------------------
+
+=head2 getCountryCode ($countryName)
+
+Given a country name, return a 2 character country code.
+
+=head3 $countryName
+
+The name of the country to look up.
+
+=cut
+
 sub getCountryCode {
     my $self = shift;
     my $countryName = shift;
@@ -147,6 +207,17 @@ sub getCountryCode {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getCountryName ($countryCode)
+
+Given a 2 character country code, return the name of the country.
+
+=head3 $countryCode
+
+The code of the country to look up.
+
+=cut
+
 sub getCountryName {
     my $self = shift;
     my $countryCode = shift;
@@ -155,6 +226,13 @@ sub getCountryName {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getGroupRate ($taxGroupId)
+
+=head3 $taxGroupId
+
+=cut
+
 sub getGroupRate {
     my $self        = shift;
     my $taxGroupId  = shift;
@@ -166,10 +244,16 @@ sub getGroupRate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getUserScreen ( )
+
+Returns the screen for entering per user configuration for this tax driver.
+
+=cut
+
 sub getUserScreen {
     my $self    = shift;
     my $url     = $self->session->url;
-
 
     my $output  = '<b>VAT Numbers</b><br />'
         . '<table><thead><tr><th>Country</th><th>VAT Number</th></tr></thead><tbody>';
@@ -218,6 +302,14 @@ sub getUserScreen {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getTaxRate ( sku, [ address ] )
+
+Returns the tax rate in percents (eg. 19 for a rate of 19%) for the given sku and shipping address.  Implements
+EU VAT taxes and group rates.
+
+=cut
+
 sub getTaxRate {
     my $self    = shift;
     my $sku     = shift;
@@ -247,6 +339,13 @@ sub getTaxRate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getVATNumbers ($countryCode)
+
+=head3 $countryCode
+
+=cut
+
 sub getVATNumbers {
     my $self        = shift;
     my $countryCode = shift;
@@ -266,6 +365,13 @@ sub getVATNumbers {
 }
 
 #-------------------------------------------------------------------
+
+=head2 hasVATNumber ($countrycode)
+
+=head3 $countryCode
+
+=cut
+
 sub hasVATNumber {
     my $self        = shift;
     my $countryCode = shift;
@@ -277,6 +383,13 @@ sub hasVATNumber {
 }
 
 #-------------------------------------------------------------------
+
+=head2 skuFormDefinition ( )
+
+Returns a hash ref containing the form defintion for the per sku options for this tax driver.
+
+=cut
+
 sub skuFormDefinition {
     my $self = shift;
 
@@ -301,6 +414,11 @@ sub skuFormDefinition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addGroup
+
+=cut
+
 sub www_addGroup {
     my $self = shift;
     my $form = $self->session->form;
@@ -324,6 +442,11 @@ sub www_addGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_addVATNumber
+
+=cut
+
 sub www_addVATNumber {
     my $self        = shift;
     my $session     = $self->session;
@@ -356,6 +479,11 @@ sub www_addVATNumber {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteGroup
+
+=cut
+
 sub www_deleteGroup {
     my $self = shift;
     my $form = $self->session->form;
@@ -372,6 +500,11 @@ sub www_deleteGroup {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteVATNumber
+
+=cut
+
 sub www_deleteVATNumber {
     my $self    = shift;
     my $session = $self->session;
@@ -388,6 +521,11 @@ sub www_deleteVATNumber {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_saveConfiguration
+
+=cut
+
 sub www_saveConfiguration {
     my $self = shift;
     my $form = $self->session->form;
@@ -402,6 +540,11 @@ sub www_saveConfiguration {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_setDefaultGroup
+
+=cut
+
 sub www_setDefaultGroup {
     my $self = shift;
     my $form = $self->session->form;

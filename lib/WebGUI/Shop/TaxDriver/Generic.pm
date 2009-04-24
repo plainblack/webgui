@@ -140,6 +140,13 @@ sub getTaxRate {
 }
 
 #-------------------------------------------------------------------
+
+=head2 className
+
+Returns the name of this class.
+
+=cut
+
 sub className {
     return 'WebGUI::Shop::TaxDriver::Generic';
 }
@@ -348,6 +355,13 @@ sub importTaxData {
 }
 
 #-------------------------------------------------------------------
+
+=head2 skuFormDefinition ( )
+
+Returns a hash ref containing the form defintion for the per sku options for this tax driver.
+
+=cut
+
 sub skuFormDefinition {
     my $self = shift;
     my $i18n = WebGUI::International->new( $self->session, 'Tax' );
@@ -520,17 +534,11 @@ sub www_importTax {
     return '';
 }
 
-#-------------------------------------------------------------------
+#-----------------------------------------------------------
 
-=head2 www_manage ( $status_message )
+=head2 getConfigurationScreen ( )
 
-User interface to manage taxes.  Provides a list of current taxes, and forms for adding
-new tax info, exporting and importing sets of taxes, and deleting individual tax data.
-
-=head3 $status_message
-
-A message to display to the user.  This is usually a problem that was found during
-import.
+Returns the form that contains the configuration options for this plugin in the admin console.
 
 =cut
 

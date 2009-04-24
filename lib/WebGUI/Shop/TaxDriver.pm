@@ -1,5 +1,19 @@
 package WebGUI::Shop::TaxDriver;
 
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
 =head1 NAME
 
 Package WebGUI::Shop::TaxDriver
@@ -25,11 +39,38 @@ use strict;
 use Class::InsideOut qw{ :std };
 use JSON qw{ from_json to_json };
 
+=head1 NAME
+
+Package WebGUI::Shop::TaxDriver
+
+=head1 DESCRIPTION
+
+Base class for all modules which do tax calculations in the Shop.
+
+=head1 SYNOPSIS
+
+ use base WebGUI::Shop::TaxDriver;
+
+ my $driver = WebGUI::Shop::TaxDriver->new($session);
+
+=head1 METHODS
+
+These subroutines are available from this package:
+
+=cut
+
 readonly session    => my %session;
 readonly messages   => my %messages;
 private  options    => my %options;
 
 #-----------------------------------------------------------
+
+=head2 appendTaxDetailVars ($var)
+
+=head3 $var
+
+=cut
+
 sub appendTaxDetailVars {
     my $self    = shift;
     my $var     = shift;
@@ -38,6 +79,13 @@ sub appendTaxDetailVars {
 }
 
 #-----------------------------------------------------------
+
+=head2 canManage
+
+Returns true if the current user can manage taxes.
+
+=cut
+
 sub canManage {
     my $self    = shift;
     my $admin   = WebGUI::Shop::Admin->new( $self->session );
@@ -235,4 +283,3 @@ sub update {
 }
 
 1;
-
