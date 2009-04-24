@@ -526,7 +526,7 @@ cmp_deeply(
 ################################################################
 
 my $exportStorage = WebGUI::Storage->create($session);
-#WebGUI::Test->storagesToDelete($exportStorage);
+WebGUI::Test->storagesToDelete($exportStorage);
 my $basedir = Path::Class::Dir->new($exportStorage->getPath);
 $exportStorage->addFileFromScalar('index', 'export story archive content');
 my $assetDir  = $basedir->subdir('mystories');
