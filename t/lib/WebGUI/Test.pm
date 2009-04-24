@@ -35,6 +35,7 @@ use Cwd        qw[];
 use Test::MockObject::Extends;
 use WebGUI::PseudoRequest;
 use Scalar::Util qw( blessed );
+use List::MoreUtils qw/ any /;
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -52,6 +53,7 @@ my %originalConfig;
 my $originalSetting;
 
 my @groupsToDelete;
+my @usersToDelete;
 my @storagesToDelete;
 
 BEGIN {
@@ -138,8 +140,13 @@ BEGIN {
 
 END {
     my $Test = Test::Builder->new;
-    foreach my $group (@groupsToDelete) {
+    GROUP: foreach my $group (@groupsToDelete) {
         $group->delete;
+    }
+    USER: foreach my $user (@usersToDelete) {
+        my $userId = $user->userId;
+        next USER if any { $userId eq $_ } (1,3);
+        $user->delete;
     }
     foreach my $stor (@storagesToDelete) {
         if ($SESSION->id->valid($stor)) {
@@ -412,6 +419,22 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 usersToDelete ( $user, [$user, ...] )
+
+Push a list of user objects onto the stack of groups to be automatically deleted
+at the end of the test.  If found in the stack, the Admin and Visitor users will not be deleted.
+
+This is a class method.
+
+=cut
+
+sub usersToDelete {
+    my $class = shift;
+    push @usersToDelete, @_;
 }
 
 #----------------------------------------------------------------------------
