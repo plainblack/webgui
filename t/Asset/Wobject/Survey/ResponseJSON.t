@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 81;
+my $tests = 82;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -411,6 +411,10 @@ is($rJSON->nextResponse, 3, '..we can also use the NEXT_SECTION target');
 $rJSON->lastResponse(3); # pretend we just finished s1q0
 $rJSON->processGotoExpression('jump { value(s0q0) == 3} NEXT_SECTION');
 is($rJSON->nextResponse, 5, '..try that again from a different starting point');
+
+$rJSON->lastResponse(8); # pretend we just finished s3q2
+$rJSON->processGotoExpression('jump { value(s0q0) == 3} NEXT_SECTION');
+is($rJSON->nextResponse, 9, '..NEXT_SECTION on the last section is ok, it just ends the survey');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
 $rJSON->processGotoExpression('jump { value(s0q0) == 3} END_SURVEY');
