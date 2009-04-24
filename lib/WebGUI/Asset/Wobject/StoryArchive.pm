@@ -550,7 +550,7 @@ sub viewTemplateVariables {
     };
     ##In export mode, tags should link to the pages generated during the collateral export
     if($exporting) {
-        $cloudOptions->{urlCallback} = 'getKeywordFilename';
+        $cloudOptions->{urlCallback} = 'getKeywordStaticURL';
         $cloudOptions->{displayFunc} = '';
     }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
