@@ -17,8 +17,6 @@ our $HELP = {
             { 'name' => 'sku', description=>'sku help'},
             { 'name' => 'description', description=>'description help' },
             { 'name' => 'displayTitle', description=>'display title help' },
-            { 'name' => 'overrideTaxRate', description=>'override tax rate help' },
-            { 'name' => 'taxRateOverride', description=>'tax rate override help' },
             { 'name' => 'vendorId', description=>'vendor help' },
         ],
         related => []

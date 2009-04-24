@@ -1,4 +1,15 @@
+7.7.5
+
 7.7.4
+ - rfe: Extend DateTime for Week-Nrs  (#9151)
+ - fixed: 7.6 upgrade left some default content marked as packages
+ - fixed #9816: Syndicated content asset fails on feeds including a UTF8 BOM
+ - fixed: Spam in the wiki  (#10050)
+ - fixed: Apply button applies but reloads old content in editor  (#9827)
+ - fixed: maintenance tasks in parallel  (#9921)
+ - fixed: Schedular Fields Too Short  (#9889)
+ - fixed: Can't invite friends  (#10112)
+ - Added missing POD docs for WebGUI::Account
  - fixed #9989: thing-search template won't include data-save params in the url for pagination
  - fixed #10122: fixed date object to not change the value in 'toHtml' function.
  - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
@@ -8,7 +19,27 @@
  - fixed #10141: Matrix 2.0 - Search does not check matching products
  - fixed #10077: after matrix sort can't return to alphanumeric sort
  - fixed #10138: Matrix 2.0 Links in Product Listing are broken
-
+ - fixed #10163: User List - alphabet search field broken
+ - fixed #9039: Synopsis not output as a meta field
+ - fixed #9939: checkout error with any payment method
+ - Survey editor now keeps survey objects in a scrollable panel to keep buttons always in view.
+ - fixed #10198: Cannot drag assets to new positions on page
+ - fixed #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
+ - fixed #10143: Matrix 2.0 - Product maintainer accounts changed during upgrade
+ - rfe: #10002: User Manager, view User's Profile (perlDreamer Consulting)
+ - rfe: #10073: Account system to be able to return XML/JSON (perlDreamer Consulting)
+ - Replaced the tax system with a pluggable one. Included are a Generic plugin
+   (which works the same as the old system) and a plugin for EU merchants ( Martin Kamerbeek / Oqapi )
+ - fixed #10213: RssFeed aspect now checks canView and gives HTTP Basic Auth box to login
+ - added Survey Number type. Text number entry that uses slider restrictions as constraints (server and client side). You can also use the arrow keys
+	to increment or decrement the number enter. If slider constraints are blank, no rules applied.
+ - added: ThingyRecord allows you to sell records in a Thingy (like a classified ad)
+ - fixed: #10109: Matrix 2.0 - Updates to product listing by maintainer account require admin approval
+ - fixed #10146: Thingy duplicate errors
+ - Added Survey back button
+ - fixed #10158: Matrix 2.0 - Screenshots rendering poorly
+ - administer.js now has a much improved handling of the slider algorithm, plus some refactored code.  Users will not notice anything.
+ - Survey slider answer updates, now update all the answers for max,min,step settings since only the first answers values are used anyways.
 7.7.3
  - fixed #10094: double explanation in thread help
  - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)

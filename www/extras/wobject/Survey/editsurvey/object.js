@@ -8,8 +8,7 @@ Survey.ObjectTemplate = (function(){
 
 	// Keep references to widgets here so that we can destory any instances before
 	// creating new ones (to avoid memory leaks)
-    var dialog;
-    var editor;
+    var dialog, editor, resizeGotoExpression, gotoAutoComplete;
 
     return {
     
@@ -25,11 +24,38 @@ Survey.ObjectTemplate = (function(){
 				dialog.destroy();
 				dialog = null;
 			}
+            
+            // remove the goto expression resizer
+            if (resizeGotoExpression) {
+                resizeGotoExpression.destroy();
+                resizeGotoExpression = null;
+            }
+            
+            if (gotoAutoComplete) {
+                gotoAutoComplete.destroy();
+                gotoAutoComplete = null;
+            }
+            
+            // Remove all hover-help
+            var hovers = document.getElementsByClassName('wg-hoverhelp');
+            for (i = 0; i < hovers.length; i++) {
+                var hover = hovers[i];
+                if (!hover) {
+                    continue;
+                }
+                YAHOO.util.Event.purgeElement(hover, true);
+                hover.parentNode.removeChild(hover);
+            }
+            
+            // Finally, purge everything from the edit node
+            YAHOO.util.Event.purgeElement('edit', true);
+            
         },
 
-        loadObject: function(html, type){
-            // Make sure we purge any event listeners before overwrite innerHTML..
-            YAHOO.util.Event.purgeElement('edit', true);
+        loadObject: function(html, type, gotoTargets){
+            // First unload everything that already exists
+            this.unloadObject();
+            
             document.getElementById('edit').innerHTML = html;
             
             var btns = [{
@@ -97,18 +123,23 @@ Survey.ObjectTemplate = (function(){
                 width: "600px",
                 context: [document.body, 'tr', 'tr'],
                 visible: false,
-                constraintoviewport: true,
                 buttons: btns
             });
             
             dialog.callback = Survey.Comm.callback;
             dialog.render();
 
-            var resizeGotoExpression = new YAHOO.util.Resize('resize_gotoExpression_formId');
+            resizeGotoExpression = new YAHOO.util.Resize('resize_gotoExpression_formId');
             resizeGotoExpression.on('resize', function(ev) {
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'width', (ev.width - 6) + "px");
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'height', (ev.height - 6) + "px");
             });
+            
+            // build the goto auto-complete widget
+            if (gotoTargets && document.getElementById('goto')) {
+                var ds =  new YAHOO.util.LocalDataSource(gotoTargets);
+                gotoAutoComplete = new YAHOO.widget.AutoComplete('goto', 'goto-yui-ac-container', ds);
+            }
             
             var textareaId = type + 'Text';
             var textarea = YAHOO.util.Dom.get(textareaId);

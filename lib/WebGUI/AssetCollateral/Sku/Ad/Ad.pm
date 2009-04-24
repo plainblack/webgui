@@ -12,17 +12,29 @@ package WebGUI::AssetCollateral::Sku::Ad::Ad;
   http://www.plainblack.com                     info@plainblack.com
  -------------------------------------------------------------------
 
-=cut
+=head1 NAME
 
+Package WebGUI::AssetCollateral::Sku::Ad::Ad
+
+=head1 DESCRIPTION
+
+Package to manipulate collateral for WebGUI::Asset::Sku::Ad.
+
+=head1 METHODS
+
+This packages is a subclass of L<WebGUI::Crud>.  Please refer to that module
+for a list of base methods that are available.
+
+=cut
 
 use strict;
 use base 'WebGUI::Crud';
 
 #------------------------------------------------
 
-=head1  crud_definition
+=head1 crud_definition ($session)
 
-defines the field this crud will contain
+Defines the fields this CRUD will contain.
 
 userID = the id of the user that purchased the ad
 transactionItemid = the id if the transaction item that completes this purchase
@@ -78,4 +90,3 @@ sub crud_definition {
 }
 
 1;
-

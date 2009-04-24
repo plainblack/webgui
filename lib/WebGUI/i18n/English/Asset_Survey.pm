@@ -372,7 +372,7 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'is this the correct answer description' => {
-        message => q|Select wether this is the correct answer or not.|,
+        message => q|Select whether this is the correct answer or not.|,
         context => q|Description of the 'is this the correct answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
@@ -574,6 +574,16 @@ the time limit for completing the survey. This message is in the 'take survey' t
 
     'Survey Edit Template help' => {
         message     => q|The template used to display the Survey Edit screen.|,
+        lastUpdated => 0,
+    },
+    
+    'Allow back button' => {
+        message     => q|Allow back button|,
+        lastUpdated => 0,
+    },
+
+    'Allow back button help' => {
+        message     => q|Allow the user to navigate backwards in a Survey.|,
         lastUpdated => 0,
     },
 
@@ -876,37 +886,37 @@ directly inside the answer_loop for other types of questions.|,
     },
 
     'lastResponseCompleted' => {
-        message => q|A boolean indicating wether the current user's last response was completed.|,
+        message => q|A boolean indicating whether the current user's last response was completed.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'lastResponseTimedOut' => {
-        message => q|A boolean indicating wether the current user's last response timed out.|,
+        message => q|A boolean indicating whether the current user's last response timed out.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'maxResponsesSubmitted' => {
-        message => q|A boolean indicating wether the current user has reached the maximum number of responses.|,
+        message => q|A boolean indicating whether the current user has reached the maximum number of responses.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'user_canTakeSurvey' => {
-        message => q|A boolean indicating wether the current user can take the survey.|,
+        message => q|A boolean indicating whether the current user can take the survey.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'user_canViewReports' => {
-        message => q|A boolean indicating wether the current user can view the survey reports.|,
+        message => q|A boolean indicating whether the current user can view the survey reports.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'user_canEditSurvey' => {
-        message => q|A boolean indicating wether the current user can edit the survey.|,
+        message => q|A boolean indicating whether the current user can edit the survey.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
@@ -1008,15 +1018,25 @@ directly inside the answer_loop for other types of questions.|,
     },
 
     'totalQuestions' => {
-        message => q|A boolean indicating wether the user should see the total number of answers and the number of questions that have already been answered.|,
+        message => q|A boolean indicating whether the user should see the total number of answers and the number of questions that have already been answered.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
 
     'showTimeLimit' => {
-        message => q|A boolean indicating wether the number of minutes until the survey times out should be displayed.|,
+        message => q|A boolean indicating whether the number of minutes until the survey times out should be displayed.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
+    },
+
+    'isLastPage' => {
+        message => q|A boolean indicating whether this is the last page of the survey.|,
+        context => q|Description of a template variable for a template Help page.|,
+    },
+
+    'allowBackBtn' => {
+        message => q|A boolean indicating whether the back button is allowed.|,
+        context => q|Description of a template variable for a template Help page.|,
     },
 
     'minutesLeft' => {
@@ -1238,7 +1258,7 @@ section/answer.|,
     },
 
     'randomizeAnswers' => {
-        message => q|A boolean indicating wether this question's answers should be randomized.|,
+        message => q|A boolean indicating whether this question's answers should be randomized.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
@@ -1366,6 +1386,36 @@ section/answer.|,
     'max' => {
         message => q|The max value of this answer for slider type questions..|,
         context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    'year' => {
+        message => q|Year (YYYY):|,
+        context => q|Sub-label for "Year Month" question type|,
+        lastUpdated => 0,
+    },
+    
+    'month' => {
+        message => q|Month:|,
+        context => q|Sub-label for "Year Month" question type|,
+        lastUpdated => 0,
+    },
+    
+    'back' => {
+        message => q|Back|,
+        context => q|Back button label on Take Survey page|,
+        lastUpdated => 0,
+    },
+    
+    'continue' => {
+        message => q|Continue|,
+        context => q|Continue button label on Take Survey page|,
+        lastUpdated => 0,
+    },
+    
+    'finish' => {
+        message => q|Finish|,
+        context => q|Finish button label on Take Survey page|,
         lastUpdated => 0,
     },
 

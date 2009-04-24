@@ -53,6 +53,9 @@ sub appendCommonVars {
 
     $var->{ 'view_sales_url'            } = $self->getUrl( 'module=shop;do=viewSales' );
     $var->{ 'viewSalesIsActive'         } = $method eq 'viewSales';
+
+    $var->{ 'manage_tax_url'            } = $self->getUrl( 'module=shop;do=manageTaxData' );
+    $var->{ 'manageTaxIsActive'         } = $method eq 'manageTaxData';
 }
 
 #-------------------------------------------------------------------
@@ -202,6 +205,17 @@ sub www_managePurchases {
 }
 
 #-------------------------------------------------------------------
+sub www_manageTaxData {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $userScreen = WebGUI::Shop::Tax->new( $session )->getDriver->getUserScreen;
+
+
+    return $userScreen;
+}
+
+#-------------------------------------------------------------------
 
 =head2 www_view ( )
 
@@ -324,12 +338,24 @@ sub www_viewTransaction {
                             phoneNumber => $item->get('shippingPhoneNumber'),
                             });
         }
+
+        # Post purchase actions
+        my $actionsLoop = [];
+        my $actions     = $item->getSku->getPostPurchaseActions( $item );
+        for my $label ( keys %{$actions} ) {
+            push @{$actionsLoop}, {
+                label       => $label,
+                url         => $actions->{$label},
+            }
+        }
+
         push @items, {
             %{$item->get},
             viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
             price               => sprintf("%.2f", $item->get('price')),
             itemShippingAddress => $address,
             orderStatus         => $i18n->get($item->get('orderStatus')),
+            actionsLoop         => $actionsLoop,
         };
     }
     $var{items} = \@items;

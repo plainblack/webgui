@@ -961,6 +961,12 @@ to add or remove users from their groups.
 		lastUpdated => 1036864905
 	},
 
+	'view profile' => {
+		message => q|View user's profile.|,
+		context => q|Label for a URL to view the profile for the user. Used in Operation/User.pm|,
+		lastUpdated => 1239926712
+	},
+
 	'60' => {
 		message => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
 		lastUpdated => 1031514049

@@ -379,7 +379,7 @@ sub www_sendFriendsRequest {
     my $self     = shift;
     my $session  = $self->session;
     my $var      = {};
-    my $uid      = $self->uid;
+    my $uid      = $self->uid || $session->form->get('uid');
 
     my $user     = WebGUI::User->new($session,$uid);
     my $i18n     = WebGUI::International->new($session,'Account_Friends');
@@ -538,7 +538,7 @@ sub www_view {
         # TODO Move this into a sub that can be more easily overridden
         $hash->{'friend_full_name'         } = $friend->getWholeName;
         $hash->{'isViewable'               } = $friend->profileIsViewable;
-        $hash->{'friend_id'                } = $friend->userId;
+        $hash->{'friend_id'                } = $friendId;
         $hash->{'friend_member_since'      } = $friend->dateCreated;
         $hash->{'friend_member_since_human'} = $session->datetime->epochToHuman($friend->dateCreated);
         $hash->{'friend_isOnline'          } = $friend->isOnline;

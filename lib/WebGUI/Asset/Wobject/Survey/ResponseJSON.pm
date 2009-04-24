@@ -39,59 +39,6 @@ number of questions answered (L<"questionsAnswered">) and the Survey start time 
 
 This package is not intended to be used by any other Asset in WebGUI.
 
-=head2 surveyOrder
-
-This data strucutre is an array (reference) of Survey addresses (see  
-L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>), stored in the order
-in which items are presented to the user.
-
-By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
-arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
-
-For example:
-
- # Access sections in order..
- for my $address (@{ $self->surveyOrder }) {
-        my $section  = $self->survey->section( $address );
-        # etc..
- }
-
-In general, the surveyOrder data structure looks like:
-
-    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
-
-There is one array element for every section and address in the survey. If there are 
-no questions, or no addresses, those array elements will not be present.
-
-=head2 responses
-
-This data structure stores a snapshot of all question responses. Both question data and answer data
-is stored in this hash reference.
-
-Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
-Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
-
-Question entries only contain a comment field:
- {
-     ...
-     questionId => {
-         comment => "question comment",
-     }
-     ...
- }
-
-Answers entries contain: value (the recorded value), time and comment fields.
-
- {
-     ...
-     answerId => {
-         value   => "recorded answer value",
-         time    => time(),
-         comment => "answer comment",
-    },
-     ...
- }
-
 =cut
 
 use strict;
@@ -252,7 +199,7 @@ sub hasTimedOut{
 
 =head2 lastResponse ([ $responseIndex ])
 
-Mutator. The lastResponse property represents the index of the most recent surveyOrder entry shown. 
+Mutator. The lastResponse property represents the surveyOrder index of the most recent item shown. 
 
 This method returns (and optionally sets) the value of lastResponse.
 
@@ -325,8 +272,32 @@ sub startTime {
 
 =head2 surveyOrder
 
-Accessor for surveyOrder (see L<"surveyOrder">). 
-Initialized on first access via L<"initSurveyOrder">.
+Accessor. Initialized on first access via L<"initSurveyOrder">.
+
+This data strucutre represents the list of items that are shown to the user, in the order
+that they will be shown (ignoring jumps and jump expressions).
+
+Typically each item will correspond to a question, and contains enough information to look
+up both the corresponding section and all contained answers (if any).
+
+Empty sections also appear in the list.
+
+Each element of the array is an address, similar in structure to 
+L<WebGUI::Asset::Wobject::Survey::SurveyJSON/Address Parameter>,
+except that instead of an answerIndex in the third slot, we have a sub-array of all contained answer indicies.
+
+    [ $sectionIndex, $questionIndex, [ $answerIndex1, $answerIndex2, ....]
+
+By making use of L<WebGUI::Asset::Wobject::Survey::SurveyJSON> methods which expect address params as
+arguments, you can access Section/Question/Answer items in order by iterating over surveyOrder.
+
+For example:
+
+ # Access sections in order..
+ for my $address (@{ $self->surveyOrder }) {
+        my $section  = $self->survey->section( $address );
+        # etc..
+ }
 
 =cut
 
@@ -489,7 +460,6 @@ sub recordResponses {
         $gotoExpression = $section->{gotoExpression};
     }
 
-
     # Handle empty Section..
     if ( !@questions ) {
         # No questions to process, so increment lastResponse and return
@@ -526,9 +496,22 @@ sub recordResponses {
             # Pluck the values out of the responses hash that we want to record..
             my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
             my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
+            my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
 
             # Proceed if we're satisfied that the submitted answer response is valid..
             if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
+
+                #Validate answers met question criteria
+                if($question->{questionType} eq 'Number'){
+                    if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
+                        next;
+                    }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
+                        next;
+                    }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
+                        next;
+                    }
+                }
+            
                 $aAnswered = 1;
 
                 # Now, decide what to record. For multi-choice questions, use recordedAnswer.
@@ -537,9 +520,10 @@ sub recordResponses {
                     = $knownTypes{ $question->{questionType} }
                     ? $submittedAnswerResponse
                     : $answer->{recordedAnswer};
-
-                $self->responses->{ $answer->{id} }->{time}    = time;
-                $self->responses->{ $answer->{id} }->{comment} = $submittedAnswerComment;
+                
+                $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
+                $self->responses->{ $answer->{id} }->{time}     = time;
+                $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
 
                 # Handle terminal Answers..
                 if ( $answer->{terminal} ) {
@@ -609,6 +593,23 @@ A variable name to match against all section and question variable names.
 sub processGoto {
     my $self = shift;
     my ($goto) = validate_pos(@_, {type => SCALAR});
+    
+    if ($goto eq 'NEXT_SECTION') {
+        $self->session->log->debug("NEXT_SECTION jump target encountered");
+        my $lastResponseSectionIndex = $self->lastResponseSectionIndex;
+        
+        # Increment lastRepsonse until nextResponseSectionIndex moves
+        while ($self->nextResponseSectionIndex == $lastResponseSectionIndex) {
+            $self->lastResponse( $self->lastResponse + 1);
+        }
+        return;
+    }
+    
+    if ($goto eq 'END_SURVEY') {
+        $self->session->log->debug("END_SURVEY jump target encountered");
+        $self->lastResponse( scalar( @{ $self->surveyOrder} ) - 1 );
+        return;
+    }
 
     # Iterate over items in order..
     my $itemIndex = 0;
@@ -714,17 +715,31 @@ sub recordedResponses{
 
 #-------------------------------------------------------------------
 
-=head2 responseValuesByVariableName
+=head2 responseValuesByVariableName ( $options )
 
 Returns a lookup table to question variable names and recorded response values.
 
 Only questions with a defined variable name set are included. Values come from
 the L<responses> hash.
 
+=head3 options
+
+The following options are supported:
+
+=over 3
+
+=item * useText
+
+For multiple choice questions, use the answer text instead of the recorded value
+(useful for doing [[var]] text substitution
+
+=back
+
 =cut
 
 sub responseValuesByVariableName {
     my $self = shift;
+    my %options = validate(@_, { useText => 0 });
     
     my %lookup;
     while (my ($address, $response) = each %{$self->responses}) {
@@ -742,14 +757,23 @@ sub responseValuesByVariableName {
         # Filter out questions without defined variable names
         next if !$question || !defined $question->{variable};
         
-        #Test if question is a multiple choice type so we can use the answer text instead
-        my $answerText;
-        if($self->survey->getMultiChoiceBundle($question->{questionType})){
-            $answerText = $self->survey->answer([@address])->{text};
+        my $value = $response->{value};
+        if ($options{useText}) {
+            # Test if question is a multiple choice type so we can use the answer text instead
+            if($self->survey->getMultiChoiceBundle($question->{questionType})){
+                my $answer = $self->survey->answer([@address]);
+                my $answerText = $answer->{text};
+                
+                # For verbatim mc answers, combine answer text and recorded value
+                if ($answer->{verbatim}) {
+                    $answerText = "$answerText - \"$response->{verbatim}\"";
+                }
+                $value = $answerText ? $answerText : $value;
+            }
         }
         
         # Add variable => value to our hash
-        $lookup{$question->{variable}} = $answerText ? $answerText : $response->{value};
+        $lookup{$question->{variable}} = $value;
     }
     return \%lookup;
 }
@@ -885,7 +909,7 @@ sub nextQuestions {
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
-    my $responseValuesByVariableName = $self->responseValuesByVariableName();
+    my $responseValuesByVariableName = $self->responseValuesByVariableName( { useText => 1 } );
 
     # Do text replacement
     $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);
@@ -1230,11 +1254,32 @@ sub response {
     return $self->{_response};
 }
 
+#-------------------------------------------------------------------
+
 =head2 responses
 
-Mutator for the L<"responses"> property. 
+Mutator. Note, this is an unsafe reference.
 
-Note, this is an unsafe reference.
+This data structure stores a snapshot of all question responses. Both question data and answer data
+is stored in this hash reference.
+
+Questions keys are constructed by hypenating the relevant L<"sIndex"> and L<"qIndex">.
+Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> and L<aIndex|"aIndexes">.
+
+ {
+     # Question entries only contain a comment field, e.g.
+     '0-0' => {
+         comment => "question comment",
+     },
+     # ...
+     # Answers entries contain: value (the recorded value), time and comment fields.
+     '0-0-0' => {
+         value   => "recorded answer value",
+         time    => time(),
+         comment => "answer comment",
+    },
+    # ...
+ }
 
 =cut
 
@@ -1245,6 +1290,62 @@ sub responses {
         $self->response->{responses} = $responses;
     }
     return $self->response->{responses};
+}
+
+=head2 pop
+
+=cut
+
+sub pop {
+    my $self      = shift;
+    my %responses = %{ $self->responses };
+    
+    # Iterate over responses first time to determine time of most recent response(s)
+    my $lastResponseTime;
+    for my $r ( values %responses ) {
+        if ( $r->{time} ) {
+            $lastResponseTime 
+                = !$lastResponseTime || $r->{time} > $lastResponseTime  
+                ? $r->{time} 
+                : $lastResponseTime
+                ;
+        }
+    }
+    
+    return unless $lastResponseTime;
+    
+    my $popped;
+    my $poppedQuestions;
+    # Iterate again, removing most recent responses
+    while (my ($address, $r) = each %responses ) {
+        if ( $r->{time} == $lastResponseTime) {
+            $popped->{$address} = $r;
+            delete $self->responses->{$address};
+            
+            # Remove associated question/comment entry
+            my ($sIndex, $qIndex, $aIndex) = split /-/, $address;
+            my $qAddress = "$sIndex-$qIndex";
+            $popped->{$qAddress} = $responses{$qAddress};
+            delete $self->responses->{$qAddress};
+            
+            # while we're here, build lookup table of popped question ids
+            $poppedQuestions->{$qAddress} = 1;
+        }
+    }
+    
+    # Now, nextResponse should be set to index of the first popped question we can find in surveyOrder
+    my $nextResponse = 0;
+    for my $address (@{ $self->surveyOrder }) {
+        my $questionId = "$address->[0]-$address->[1]";
+        if ($poppedQuestions->{$questionId} ) {
+            $self->session->log->debug("setting nextResponse to $nextResponse");
+            $self->nextResponse($nextResponse);
+            last;
+        }
+        $nextResponse++;
+    }
+    
+    return $popped;
 }
 
 #-------------------------------------------------------------------

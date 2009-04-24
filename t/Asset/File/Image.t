@@ -39,6 +39,7 @@ $rectangle->setBackgroundColor('#0000FF');
 
 ##Create a storage location
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
 
 ##Save the image to the location
 $rectangle->saveToStorageLocation($storage, 'blue.png');

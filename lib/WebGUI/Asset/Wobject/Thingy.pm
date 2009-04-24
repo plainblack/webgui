@@ -292,18 +292,43 @@ sub duplicate {
     my $assetId = $self->get("assetId");
     my $fields;
 
+    my $otherThingFields = $db->buildHashRefOfHashRefs(
+        "select fieldType, fieldId, right(fieldType,22) as otherThingId, fieldInOtherThingId from Thingy_fields
+        where fieldType like 'otherThing_%' and assetId = ?",
+        [$assetId],'fieldInOtherThingId'
+    );
+
     my $things = $self->getThings;
     while ( my $thing = $things->hashRef) {
-        my $oldThingId = $thing->{thingId};
-        my $newThingId = $newAsset->addThing($thing,0);
+        my $oldSortBy   = $thing->{sortBy};
+        my $oldThingId  = $thing->{thingId};
+        my $newThingId  = $newAsset->addThing($thing,0);
         $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
             ,[$assetId,$oldThingId]);
         foreach my $field (@$fields) {
             # set thingId to newly created thing's id.
             $field->{thingId} = $newThingId;
+        
+            my $originalFieldId = $field->{fieldId};
 
-            $newAsset->addField($field,0);
+            my $newFieldId = $newAsset->addField($field,0);
+            if ($originalFieldId eq $oldSortBy){
+                $self->session->db->write( "update Thingy_things set sortBy = ? where thingId = ?",
+                    [ $newFieldId, $newThingId ] );
+            }
+
+            if ($otherThingFields->{$originalFieldId}){
+                $otherThingFields->{$originalFieldId}->{newFieldType}   = 'otherThing_'.$newThingId;
+                $otherThingFields->{$originalFieldId}->{newFieldId}     = $newFieldId;
+            }
         }
+    }
+    foreach my $otherThingField (keys %$otherThingFields){
+        $db->write('update Thingy_fields set fieldType = ?, fieldInOtherThingId = ?
+                    where fieldInOtherThingId = ? and assetId = ?',
+                    [$otherThingFields->{$otherThingField}->{newFieldType},
+                    $otherThingFields->{$otherThingField}->{newFieldId},
+                    $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->get('assetId')]);
     }
     return $newAsset;
 }

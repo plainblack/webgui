@@ -58,6 +58,24 @@ my $testBlock = [
 		expected  => 0,
 		comment   => 'rejects float',
 	},
+	{
+		key => 'Int6',
+		testValue => '0',
+		expected  => 0,
+		comment   => 'zero passes',
+	},
+	{
+		key => 'Int7',
+		testValue => '',
+		expected  => 0,
+		comment   => 'empty string returns 0',
+	},
+	{
+		key => 'Int8',
+		testValue => undef,
+		expected  => 0,
+		comment   => 'undef returns 0',
+	},
 ];
 
 my $formClass = 'WebGUI::Form::Integer';

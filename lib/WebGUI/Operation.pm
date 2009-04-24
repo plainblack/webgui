@@ -111,6 +111,7 @@ sub getOperations {
 		'listDatabaseLinks' => 'DatabaseLink',
 
 		'formHelper' => 'FormHelpers',
+		'activityHelper' => 'Workflow',
 
 		'addGroupsToGroupSave' => 'Group',
 		'addUsersToGroupSave' => 'Group',

@@ -176,7 +176,16 @@ site.
 
 =head3 maxKeywords
 
-The maximum number of keywords to display in the cloud. Defaults to 50. Valid range between 1 and 50, inclusive.
+The maximum number of keywords to display in the cloud. Defaults to 50. Valid range between 1 and 100, inclusive.
+
+=head3 urlCallback
+
+This is the name of a method that will be called on the displayAsset, or the startAsset to get the URL
+that elements in the tag cloud will link to.  The method will be passed the keyword as its first, and only argument.
+
+=head3 includeOnlyKeywords
+
+This is an arrayref of keywords.  The generated cloud will only contain these keywords.
 
 =cut
 

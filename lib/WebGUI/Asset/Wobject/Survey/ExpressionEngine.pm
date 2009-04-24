@@ -54,7 +54,7 @@ sub value {
         if (my $other_instance = $other_instances->{$asset_spec}) {
             my $values = $other_instance->{values};
             my $value  = $values->{$key};
-            $session->log->debug("[$asset_spec, $key] resolves to [$value]");
+            $session->log->debug("value($asset_spec, $key) resolves to [$value]");
             return $value;
         } else {
             # Throw an exception, triggering run() to resolve the external reference and re-run
@@ -63,7 +63,7 @@ sub value {
     }
     my $key   = shift;
     my $value = $values->{$key};
-    $session->log->debug("[$key] resolves to [$value]");
+    $session->log->debug("value($key) resolves to [$value]");
     return $value;    # scalar variable, so no need to clone
 }
 
@@ -85,7 +85,7 @@ sub score {
         if (my $other_instance = $other_instances->{$asset_spec}) {
             my $scores = $other_instance->{scores};
             my $score  = $scores->{$key};
-            $session->log->debug("[$asset_spec, $key] resolves to [$score]");
+            $session->log->debug("score($asset_spec, $key) resolves to [$score]");
             return $score;
         } else {
             # Throw an exception, triggering run() to resolve the external reference and re-run
@@ -94,7 +94,7 @@ sub score {
     }
     my $key   = shift;
     my $score = $scores->{$key};
-    $session->log->debug("[$key] resolves to [$score]");
+    $session->log->debug("score($key) resolves to [$score]");
     return $score;    # scalar variable, so no need to clone
 }
 

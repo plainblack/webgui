@@ -18,6 +18,9 @@ if (typeof Survey === "undefined") {
         'Currency': 1,
 	    'TextArea': 1
     };
+    var NUMBER_TYPES = {
+        'Number':1
+    };
     var SLIDER_TYPES = {
         'Slider': 1,
         'Dual Slider - Range': 1,
@@ -65,13 +68,29 @@ if (typeof Survey === "undefined") {
                         alert("Please allocate the remaining " + amountLeft + ".");
                     }
                 }
+                else if (toValidate[i].type === 'Number') {
+                    answered = 1;
+                    for (var z1 in toValidate[i].answers) {
+                        var m = parseFloat(document.getElementById(z1).value);
+                        var ansValues = toValidate[i].answers[z1];
+                        if((ansValues.max != '' && m > ansValues.max) ||
+                           (ansValues.min != '' && m < ansValues.min) ||
+                           (ansValues.step != '' && ( (m % ansValues.step) != 0) )){
+                            answered = 0;
+                            break;
+                        }
+                    }
+
+                }
                 else if (toValidate[i].type === 'Year Month') {
                     answered = 1;//set to true, then let a single failure set it back to false.
                     for (var z1 in toValidate[i].answers) {
                         var m = document.getElementById(z1+'-month').value;
                         var y = document.getElementById(z1+'-year').value;
                         if(m == ''){ answered = 0; }
-                        if(y.length != 4) { answered = 0; }
+                        var yInt = parseInt(y, 10);
+                        if(!yInt) { answered = 0; }
+                        if(yInt < 1000 || yInt > 3000) { answered = 0; }
                         if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
                     }
                 }
@@ -110,21 +129,102 @@ if (typeof Survey === "undefined") {
         }
     }
     
-    //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
-    function sliderManager(q, t){
+    function goBack(event){
+        YAHOO.log("Going back");
+        Survey.Comm.callServer('', 'goBack');
+    }
+    
+    function numberHandler(event, objs){
+        
+        var keycode = event.keyCode;
+        var value = this.value;
+        
+        //if starting a negative number, don't do anything
+        if(value == '' || value == "-"){return;}
+
+        var step = objs.step ? objs.step : 1;
+
+        if(!value){this.value = objs.min ? objs.min : 0;} 
+        if(value % step > 0){
+            this.value = +value + value % step;
+        }
+            
+        if(objs.min != '' && +value < +objs.min){
+            this.value = objs.min;
+        }
+
+        else if(objs.max != '' && +value > objs.max){this.value = objs.max;}
+        else if(+keycode == 40){//key down
+            if(objs.min == ''){
+                this.value = value - step;
+            }
+            else if((value - step) >= +objs.min){
+                this.value = value - step;
+            }  
+        }else if(+keycode == 38){//key up
+            if(objs.max == ''){
+                this.value = +value + +step;
+            }
+            if(+value + +step <= +objs.max){
+                this.value = +value + +step;
+            }
+        }
+    }
+    
+    function sliderManager(q){
+        //total number of pixels in the slider.
         var total = sliderWidth;
+
+        //steps must be integers
         var step = Math.round(parseFloat(q.answers[0].step));
+
+        //the starting value for the left side of the slider
         var min = Math.round(parseFloat(q.answers[0].min));
-        var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
-        var scale = Math.round(sliderWidth / distance);
+
+        //The number of values in between the max and min values
+        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min));
+       
+        //Number of pixels each bug step takes
+        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step));
+
+        //redefine number of pixels to round number of steps
+        total = distance * bugSteps / step;
+
+        var scale = Math.round(total / distance);
+        
+        //max is just the max value, used for determining allocation sliders. 
+        var max = 0;         
+        var type = 'slider';
+
+        //find the maximum difference between an answers max and min
+        for (var s in q.answers) {
+            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
+                var a1 = q.answers[s];
+                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
+                if (a1.max - a1.min > max) {
+                    max = a1.max - a1.min;
+                }
+            }
+        }
+
+        //Only validate allocation types which must allocate all their points
+        if (q.questionType === 'Multi Slider - Allocate') {
+            type = 'multi';
+            for (var x1 = 0; x1 < q.answers.length; x1++) {
+                if (toValidate[q.id]) {
+                    toValidate[q.id].total = q.answers[x1].max;
+                    toValidate[q.id].answers[q.answers[x1].id] = 1;
+                }
+            }
+        }
         for (var i in q.answers) {
             if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
                 var a = q.answers[i];
                 var Event = YAHOO.util.Event;
                 var lang = YAHOO.lang;
                 var id = a.id + 'slider-bg';
-                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, sliderWidth, scale * step);
-                s.animate = false;
+                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, total, scale * step);
+                s.animate = true;
                 if (YAHOO.lang.isUndefined(sliders[q.id])) {
                     sliders[q.id] = [];
                 }
@@ -135,14 +235,15 @@ if (typeof Survey === "undefined") {
                     var t = 0;
                     for (var x in sliders[q.id]) {
                         if (YAHOO.lang.hasOwnProperty(sliders[q.id], x)) {
-                            t += sliders[q.id][x].getValue();
+                            t += sliders[q.id][x].getRealValue();
                         }
                     }
-                    if (t > total) {
-                        t -= this.getValue();
-                        t = Math.round(t);
-                        this.setValue(total - t);// + (scale*step));
-                        document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
+                    if (t > max && type === 'multi') {
+                        t -= +this.getRealValue();
+                        var newVal = (max-t);
+                        this.setValue(newVal*bugSteps/step);
+                        //document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
+                        document.getElementById(this.input).value = newVal;
                     }
                     else {
                         this.lastValue = this.getValue();
@@ -150,7 +251,6 @@ if (typeof Survey === "undefined") {
                     }
                 };
                 s.subscribe("change", check);
-                s.subscribe("slideEnd", check);
                 var manualEntry = function(e){
                     // set the value when the 'return' key is detected 
                     if (Event.getCharCode(e) === 13 || e.type === 'blur') {
@@ -168,19 +268,19 @@ if (typeof Survey === "undefined") {
                 };
                 Event.on(document.getElementById(s.input), "blur", manualEntry);
                 Event.on(document.getElementById(s.input), "keypress", manualEntry);
-                
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
+                var getRealValue = function(){ 
+                    return parseInt((this.getValue() / bugSteps * step) + +min);
                 };
+                s.getRealValue = getRealValue;
                 document.getElementById(s.input).value = s.getRealValue();
             }
         }
+
     }
-    
+
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
 		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
-        sliders[this.id].setValue(Math.round(this.value * sliders[this.id].scale));
     }
     
     function handleDualSliders(q){
@@ -213,35 +313,6 @@ if (typeof Survey === "undefined") {
         //           s.subscribe('ready', updateUI); 
         //s.subscribe('change', updateUI);  
         s.subscribe('slideEnd', updateUI);
-    }
-    
-    function handleSliders(q){
-        var total = sliderWidth;
-        for (var i in q.answers) {
-            if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
-                var a = q.answers[i];
-                var step = Math.round(q.answers[i].step);
-                var min = Math.round(parseFloat(q.answers[i].min));
-                var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
-                var scale = Math.floor(sliderWidth / distance);
-                var id = a.id;
-                var s = YAHOO.widget.Slider.getHorizSlider(id + 'slider-bg', id + 'slider-thumb', 0, sliderWidth, (scale * step));
-                s.scale = scale;
-                sliders[q.Survey_questionid] = [];
-                sliders[q.Survey_questionid][id] = s;
-                s.input = a.id;
-                s.scale = scale;
-                document.getElementById(id).value = a.min;
-                var check = function(){
-                    var t = document.getElementById(this.input);
-                    t.value = this.getRealValue();
-                };
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
-                };
-                s.subscribe("slideEnd", check);
-            }
-        }
     }
     
     function showCalendar(event, objs){
@@ -471,6 +542,7 @@ if (typeof Survey === "undefined") {
                     span.style.display = 'block';
                     
                     document.getElementById('survey-header').appendChild(span);
+                    
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
                         if (s.everyPageTitle !== '1') {
@@ -569,30 +641,8 @@ if (typeof Survey === "undefined") {
                         handleDualSliders(q);
                     }
                     else {
-                        for (var s in q.answers) {
-                            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
-                                var a1 = q.answers[s];
-                                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
-                                if (a1.max - a1.min > max) {
-                                    max = a1.max - a1.min;
-                                }
-                            }
-                        }
+                        sliderManager(q);
                     }
-                    if (q.questionType === 'Multi Slider - Allocate') {
-                        //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
-                        for (var x1 = 0; x1 < q.answers.length; x1++) {
-                            if (toValidate[q.id]) {
-                                toValidate[q.id].total = q.answers[x1].max;
-                                toValidate[q.id].answers[q.answers[x1].id] = 1;
-                            }
-                        }
-                        sliderManager(q, max);
-                    }
-                    else 
-                        if (q.questionType === 'Slider') {
-                            handleSliders(q);
-                        }
                     continue;
                 }
                 
@@ -607,7 +657,15 @@ if (typeof Survey === "undefined") {
                     }
                     continue;
                 }
-                
+                if (NUMBER_TYPES[q.questionType]) {
+                    for (var x in q.answers) {
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
+                        }
+                        YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
+                    }
+                    continue;
+                }
                 // Must be a multi-choice bundle
                 var butts = [];
                 verb = 0;
@@ -632,6 +690,7 @@ if (typeof Survey === "undefined") {
                     butts.push(b);
                 }
             }
+            YAHOO.util.Event.addListener("backbutton", "click", goBack);
             YAHOO.util.Event.addListener("submitbutton", "click", formsubmit);
         }
     };

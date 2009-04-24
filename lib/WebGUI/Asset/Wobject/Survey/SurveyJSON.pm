@@ -117,6 +117,7 @@ sub loadTypes {
         'Slider',
         'Currency',
         'Email',
+        'Number',
         'Phone Number',
         'Text',
         'Text Date',
@@ -413,16 +414,17 @@ Generates the list of valid goto targets
 sub getGotoTargets {
     my $self = shift;
 
-    # Valid goto targets are all of the section variable names..
-    my @section_vars = map {$_->{variable}} @{$self->sections};
+    # Valid goto targets are all of the non-empty section variable names..
+    my @section_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->sections};
     
-    # ..and all of the question variable names..
-    my @question_vars = map {$_->{variable}} @{$self->questions};
+    # ..and all of the non-empty question variable names..
+    my @question_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->questions};
     
-    # ..excluding the ones that are empty
-    my @grep =  grep { $_ ne q{} } (@section_vars, @question_vars);
-    return \@grep;
-    #return grep { $_ ne q{} } (@section_vars, @question_vars);
+    # ..plus some special vars
+    my @special_vars = qw(NEXT_SECTION END_SURVEY);
+    
+    # ..all combined
+    return [ @section_vars, @question_vars, @special_vars ];
 }
 
 =head2 getSectionEditVars ( $address )
@@ -665,14 +667,30 @@ sub update {
         }
     }
 
+    $self->_handleSpecialAnswerUpdates($address,$properties); 
+
     # Update $object with all of the data in $properties
     while (my ($key, $value) = each %{$properties}) {
         if (defined $value) {
             $object->{$key} = $value;
         }
     }
-    
+
     return;
+}
+
+sub _handleSpecialAnswerUpdates{
+    my $self = shift;
+    my $address = shift;
+    my $properties = shift;
+    my $question = $self->question($address);
+    if($question->{questionType} =~ /^Slider|Multi Slider - Allocate|Dual Slider - Range$/){
+        for my $answer(@{$self->answers($address)}){
+            $answer->{max} = $properties->{max};
+            $answer->{min} = $properties->{min};
+            $answer->{step} = $properties->{step};
+        }
+    }
 }
 
 =head2 insertObject ( $object, $address )
@@ -1036,10 +1054,9 @@ sub addAnswersToQuestion {
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy = @{$address};
     
-    for my $answer_index ( 0 .. $#{$answers} ) {
-        
+    for my $answer (@$answers) {
         # Add a new answer to question
-        push @{ $self->question( \@address_copy )->{answers} }, $answers->[$answer_index];
+        push @{ $self->question( \@address_copy )->{answers} }, $answer;
     }
     
     return;

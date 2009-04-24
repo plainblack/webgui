@@ -194,6 +194,20 @@ sub definition {
             hoverHelp       =>$i18n->get('compare color yes description'),
             label           =>$i18n->get('compare color yes label'),
         },
+        maxScreenshotWidth=>{
+            fieldType       =>"integer",
+            tab             =>"display",
+            defaultValue    =>"800",
+            hoverHelp       =>$i18n->get('max screenshot width description'),
+            label           =>$i18n->get('max screenshot width label'),
+        },
+        maxScreenshotHeight=>{
+            fieldType       =>"integer",
+            tab             =>"display",
+            defaultValue    =>"600",
+            hoverHelp       =>$i18n->get('max screenshot height description'),
+            label           =>$i18n->get('max screenshot height label'),
+        },
         categories=>{
             fieldType       =>"textarea",
             tab             =>"properties",

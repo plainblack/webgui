@@ -639,6 +639,10 @@ Here's an example of this structure:
 	{ "color=? or color=?" 	=> ['blue','black'] },
  ]
 
+would yield
+
+ ( price <= 44 ) AND ( color = 'blue' OR color = 'black' )
+
 =head4 join
 
 An array reference containing the tables you wish to join with this one, and the mechanisms to join them. Here's an example.

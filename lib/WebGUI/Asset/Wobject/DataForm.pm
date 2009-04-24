@@ -1532,11 +1532,26 @@ sub www_process {
         my $default = $field->{defaultValue};
         WebGUI::Macro::process($self->session, \$default);
         my $value = $entry->field( $field->{name} ) || $default;
+
+        # WebGUI::Form::Integer::getValue() returns 0 even if no number is passed in.
+        # Not really a suitable default if we want to trigger the error message
+
         if ($field->{status} eq "required" || $field->{status} eq "editable") {
+
+            # get the raw value (by sending field type as blank)
+            my $rawValue = $session->form->process($field->{name}, '');
+
             $value = $session->form->process($field->{name}, $field->{type}, undef, {
                 defaultValue    => $default,
                 value           => $value,
             });
+
+            # this is a hack, but it's better than changing the default getValue() of Integer, which
+            # could have massive effects downstream in other uses.
+            if(($field->{type} =~ /integer/i) && defined($rawValue) && ($rawValue eq '') && ($value eq "0")) {
+                $value = $rawValue;
+            }
+
             WebGUI::Macro::filter(\$value);
         }
         if ($field->{status} eq "required" && (! defined($value) || $value =~ /^\s*$/)) {

@@ -309,7 +309,7 @@ Properties which can be set to determine how many rows are returned, etc
 =head4 sortBy
 
 Column to sort the inbox by.  Valid values are subject, sentBy, and dateStamp.  Defaults to
-dateStamp if value is invalid.  Defaults to status="pending" DESC, dateStamp DESC if value not set.
+dateStamp if value is invalid.  Defaults to status DESC, dateStamp DESC if value not set.
 
 =head4 sortDir
 
@@ -424,7 +424,7 @@ A where clause to use
 
 =head4 limit
 
-Column
+A full limit clause, not just the number to limit.
 
 =cut
 

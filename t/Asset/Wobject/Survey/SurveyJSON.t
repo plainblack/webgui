@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 139;
+my $tests = 137;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -1384,15 +1384,15 @@ cmp_deeply(
 
 ####################################################
 #
-# addAnswersToQuestion
+# addAnswersToQuestion, getMultiChoiceBundle
 #
 ####################################################
 
 #We'll work exclusively with Question 3-0
 
+my $answerBundle = $surveyJSON->getMultiChoiceBundle('Yes/No');
 $surveyJSON->addAnswersToQuestion( [3,0],
-    [ qw[ one two three ] ],
-    {}
+    $answerBundle,
 );
 
 cmp_deeply(
@@ -1400,85 +1400,20 @@ cmp_deeply(
     superhashof({
         answers => [
             superhashof({
-                text     => 'one',
+                text     => 'Yes',
                 verbatim => 0,
                 recordedAnswer => 1,
+                value => 1,
             }),
             superhashof({
-                text     => 'two',
+                text     => 'No',
                 verbatim => 0,
-                recordedAnswer => 2,
-            }),
-            superhashof({
-                text     => 'three',
-                verbatim => 0,
-                recordedAnswer => 3,
+                recordedAnswer => 0,
+                value => 1,
             }),
         ],
     }),
-    'addAnswersToQuestion: setup three answers, no verbatims'
-);
-
-$surveyJSON->question([3,0])->{answers} = [];
-
-$surveyJSON->addAnswersToQuestion( [3,0],
-    [ qw[ one two three ] ],
-    { 1 => 1, 2 => 1 }
-);
-
-cmp_deeply(
-    $surveyJSON->question([3,0]),
-    superhashof({
-        answers => [
-            superhashof({
-                text     => 'one',
-                verbatim => 0,
-                recordedAnswer => 1,
-            }),
-            superhashof({
-                text     => 'two',
-                verbatim => 1,
-                recordedAnswer => 2,
-            }),
-            superhashof({
-                text     => 'three',
-                verbatim => 1,
-                recordedAnswer => 3,
-            }),
-        ],
-    }),
-    'addAnswersToQuestion: setup verbatims on two answers'
-);
-
-$surveyJSON->question([3,0])->{answers} = [];
-
-$surveyJSON->addAnswersToQuestion( [3,0],
-    [ qw[ one two three ] ],
-    { 1 => 0 }
-);
-
-cmp_deeply(
-    $surveyJSON->question([3,0]),
-    superhashof({
-        answers => [
-            superhashof({
-                text     => 'one',
-                verbatim => 0,
-                recordedAnswer => 1,
-            }),
-            superhashof({
-                text     => 'two',
-                verbatim => 0,
-                recordedAnswer => 2,
-            }),
-            superhashof({
-                text     => 'three',
-                verbatim => 0,
-                recordedAnswer => 3,
-            }),
-        ],
-    }),
-    'addAnswersToQuestion: verbatims have to exist, and be true'
+    'addAnswersToQuestion: Yes/No bundle created'
 );
 
 ####################################################
@@ -1507,12 +1442,12 @@ cmp_deeply(
         superhashof({
             text     => 'Male',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         superhashof({
             text     => 'Female',
             verbatim => 0,
-            recordedAnswer => 2,
+            recordedAnswer => 1,
         }),
     ],
     'updateQuestionAnswers: Gender type'
@@ -1530,7 +1465,7 @@ cmp_deeply(
         superhashof({
             text     => 'No',
             verbatim => 0,
-            recordedAnswer => 2,
+            recordedAnswer => 0,
         }),
     ],
     'updateQuestionAnswers: Yes/No type'
@@ -1548,10 +1483,10 @@ cmp_deeply(
         superhashof({
             text     => 'False',
             verbatim => 0,
-            recordedAnswer => 2,
+            recordedAnswer => 0,
         }),
     ],
-    'updateQuestionAnswers: Yes/No type'
+    'updateQuestionAnswers: True/False type'
 );
 
 $surveyJSON->updateQuestionAnswers([3,0], 'Agree/Disagree');
@@ -1561,7 +1496,7 @@ cmp_deeply(
         superhashof({
             text     => 'Strongly disagree',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1571,7 +1506,7 @@ cmp_deeply(
         superhashof({
             text     => 'Strongly agree',
             verbatim => 0,
-            recordedAnswer => 7,
+            recordedAnswer => 6,
         }),
     ],
     'updateQuestionAnswers: Agree/Disagree type'
@@ -1584,7 +1519,7 @@ cmp_deeply(
         superhashof({
             text     => 'Strongly oppose',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1594,7 +1529,7 @@ cmp_deeply(
         superhashof({
             text     => 'Strongly support',
             verbatim => 0,
-            recordedAnswer => 7,
+            recordedAnswer => 6,
         }),
     ],
     'updateQuestionAnswers: Agree/Disagree type'
@@ -1607,7 +1542,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all important',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1617,7 +1552,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely important',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Importance type'
@@ -1630,7 +1565,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all likely',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1640,7 +1575,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely likely',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Likelihood type'
@@ -1653,7 +1588,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all certain',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1663,7 +1598,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely certain',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Certainty type'
@@ -1676,7 +1611,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all satisfied',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1686,7 +1621,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely satisfied',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Satisfaction type'
@@ -1699,7 +1634,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all confident',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1709,7 +1644,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely confident',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Confidence type'
@@ -1722,7 +1657,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all effective',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1732,7 +1667,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely effective',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Effectiveness type'
@@ -1745,7 +1680,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all concerned',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1755,7 +1690,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely concerned',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Concern type'
@@ -1768,7 +1703,7 @@ cmp_deeply(
         superhashof({
             text     => 'No risk',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1778,7 +1713,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extreme risk',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Risk type'
@@ -1791,7 +1726,7 @@ cmp_deeply(
         superhashof({
             text     => 'No threat',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1801,7 +1736,7 @@ cmp_deeply(
         superhashof({
             text     => 'Extreme threat',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Threat type'
@@ -1814,7 +1749,7 @@ cmp_deeply(
         superhashof({
             text     => 'Not at all secure',
             verbatim => 0,
-            recordedAnswer => 1,
+            recordedAnswer => 0,
         }),
         ( superhashof({
             text     => '',
@@ -1824,14 +1759,14 @@ cmp_deeply(
         superhashof({
             text     => 'Extremely secure',
             verbatim => 0,
-            recordedAnswer => 11,
+            recordedAnswer => 10,
         }),
     ],
     'updateQuestionAnswers: Security type'
 );
 
 $surveyJSON->updateQuestionAnswers([3,0], 'Ideology');
-my $index = 1;
+my $index = 0;
 cmp_deeply(
     $surveyJSON->question([3,0])->{answers},
     [
@@ -1854,14 +1789,14 @@ cmp_deeply(
 );
 
 $surveyJSON->updateQuestionAnswers([3,0], 'Race');
-$index = 1;
+$index = 0;
 cmp_deeply(
     $surveyJSON->question([3,0])->{answers},
     [
         map {
             superhashof({
                 text     => $_,
-                verbatim => $index == 6 ? 1 : 0,
+                verbatim => $index == 5 ? 1 : 0,
                 recordedAnswer => $index++,
             })
         } 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic', 'Something else (verbatim)',
@@ -1870,14 +1805,14 @@ cmp_deeply(
 );
 
 $surveyJSON->updateQuestionAnswers([3,0], 'Party');
-$index = 1;
+$index = 0;
 cmp_deeply(
     $surveyJSON->question([3,0])->{answers},
     [
         map {
             superhashof({
                 text     => $_,
-                verbatim => $index == 4 ? 1 : 0,
+                verbatim => $index == 3 ? 1 : 0,
                 recordedAnswer => $index++,
             })
         } 'Democratic party', 'Republican party (or GOP)', 'Independent party', 'Other party (verbatim)',
@@ -1886,14 +1821,14 @@ cmp_deeply(
 );
 
 $surveyJSON->updateQuestionAnswers([3,0], 'Education');
-$index = 1;
+$index = 0;
 cmp_deeply(
     $surveyJSON->question([3,0])->{answers},
     [
         map {
             superhashof({
                 text     => $_,
-                verbatim => $index == 8 ? 1 : 0,
+                verbatim => $index == 7 ? 1 : 0,
                 recordedAnswer => $index++,
             })
         }
