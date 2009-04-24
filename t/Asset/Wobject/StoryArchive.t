@@ -161,14 +161,14 @@ is($folder->getFirstChild->getTitle, 'First Story', '... and it is the correct c
 
 ################################################################
 #
-#  getKeywordStaticUrl
+#  getKeywordFilename
 #
 ################################################################
 
 ##Note, this method depends heavily on the default installed language pack.
 ##Because of that, we'll only test for whether or not url->urlize is called.
 
-is ($archive->getKeywordStaticUrl('camelCase'), 'keyword_camelcase.html', 'getKeywordStaticUrl returns a lower case keyword with _keyword.html appended');
+is ($archive->getKeywordFilename('camelCase'), 'keyword_camelcase.html', 'getKeywordFilename returns a lower case keyword with _keyword.html appended');
 
 ################################################################
 #
@@ -410,7 +410,8 @@ cmp_bag(
 #
 ################################################################
 
-$archive->{_exportMode} = 1;
+
+$session->scratch->set('isExporting', 1);
 $archive->update({ storiesPerPage => 3, });
 $templateVars = $archive->viewTemplateVariables();
 ok( (  !exists $templateVars->{searchHeader}
@@ -437,7 +438,7 @@ foreach my $date_loop (@{ $templateVars->{date_loop} }) {
 
 cmp_ok($storyCount, '>', 3, '... export mode, pagination increased beyond storiesPerPage');
 
-$archive->{_exportMode} = 0;
+$session->scratch->delete('isExporting');
 
 ################################################################
 #
@@ -463,7 +464,7 @@ cmp_bag(
 #
 ################################################################
 
-$archive->{_exportMode} = 1;
+$session->scratch->set('isExporting', 1);
 
 $templateVars = $archive->viewTemplateVariables();
 @anchors = simpleHrefParser($templateVars->{keywordCloud});
@@ -477,7 +478,7 @@ cmp_bag(
     'keywordCloud template variable has keywords and correct links in export mode',
 );
 
-$archive->{_exportMode} = 0;
+$session->scratch->delete('isExporting');
 
 ################################################################
 #

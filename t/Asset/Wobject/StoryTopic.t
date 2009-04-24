@@ -237,7 +237,7 @@ cmp_deeply(
     'viewTemplateVariables: is only finding things with its keywords'
 );
 
-$topic->{_exportMode} = 1;
+$session->scratch->set('isExporting', 1);
 $topic->update({
     storiesShort => 3,
 });
@@ -271,7 +271,7 @@ cmp_deeply(
     }),
     '... export mode, RSS and Atom feed template variables show the static url'
 );
-$topic->{_exportMode} = 0;
+$session->scratch->delete('isExporting');
 
 ################################################################
 #

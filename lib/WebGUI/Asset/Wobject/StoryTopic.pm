@@ -86,23 +86,6 @@ sub definition {
 
 #-------------------------------------------------------------------
 
-=head2 exportHtml_view ( )
-
-Extend the base method to change how stories are linked to.
-
-Sets an internal flag to indicate that it is exporting to signal viewTemplateVars
-to make those changes.
-
-=cut
-
-sub exportHtml_view {
-    my $self = shift;
-    $self->{_exportMode} = 1;
-    return $self->next::method(@_);
-}
-
-#-------------------------------------------------------------------
-
 =head2 getRssFeedItems ( )
 
 Returns an arrayref of hashrefs, containing information on stories
@@ -176,6 +159,7 @@ Make template variables for the view template.
 sub viewTemplateVariables {
     my ($self)          = @_;
     my $session         = $self->session;    
+    my $exporting       = $session->scratch->get('isExporting');
     my $numberOfStories = $self->{_standAlone}
                         ? $self->get('storiesPer')
                         : $self->get('storiesShort');
@@ -195,7 +179,7 @@ sub viewTemplateVariables {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
         next STORY unless $story;
         push @{$var->{story_loop}}, {
-            url           => ( $self->{_exportMode}
+            url           => ( $exporting
                                ? $story->getUrl
                                : $session->url->append($self->getUrl, 'func=viewStory;assetId='.$storyId->{assetId}) ),
             title         => $story->getTitle,
@@ -230,8 +214,8 @@ sub viewTemplateVariables {
         }
     }
     $var->{standAlone} = $self->{_standAlone};
-    $var->{rssUrl}     = $self->{_exportMode} ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
-    $var->{atomUrl}    = $self->{_exportMode} ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
+    $var->{rssUrl}     = $exporting ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
+    $var->{atomUrl}    = $exporting ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
 
     return $var;
 }

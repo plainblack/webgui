@@ -23,6 +23,7 @@ use WebGUI::Keyword;
 use WebGUI::Search;
 use Class::C3;
 use base qw/WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject/;
+use File::Path;
 
 use constant DATE_FORMAT => '%c_%D_%y';
 
@@ -187,40 +188,40 @@ sub exportAssetCollateral {
 
     my $basename = $basepath->basename;
     my $filedir;
-    my $filenameBase;
 
-    # We want our keyword files to "appear" at the same level as the asset.
+    # We want our keyword files to "appear" as children of the asset to avoid
+    # clashing with multiple story archives.
     if ($basename eq 'index.html') {
-        # Get the 2nd ancestor, since the asset url had no dot in it (and it therefore
-        #   had its own directory created for it).
-        $filedir = $basepath->parent->parent->absolute->stringify;
-        # Get the parent dir's *path* (essentially the name of the dir) relative to
-        #   its own parent dir.
-        $filenameBase = $basepath->parent->relative( $basepath->parent->parent )->stringify;
+        # Get the parent of the file index.html, which is the asset's directory.
+        $filedir = $basepath->parent->absolute->stringify;
     }
     else {
-        # Get the 1st ancestor, since the asset is a file recognized by apache, so
-        #   we want our files in the same dir.
-        $filedir = $basepath->parent->absolute->stringify;
-        # just use the basename.
-        $filenameBase = $basename;
+        ##Create a directory that has the same base
+        my $dirname = $basename;
+        $dirname =~ s/\.\w+$//;
+        $filedir = $basepath->parent->subdir($dirname)->absolute->stringify;
+        eval { File::Path::mkpath($filedir) };
+        if($@) {
+            WebGUI::Error->throw(error => "could not make directory " . $filedir);
+        }
     }
 
     if ( $reportSession && !$args->{quiet} ) {
         $reportSession->output->print('<br />');
     }
 
-    # open another session as the user doing the exporting...
-    my $exportSession = WebGUI::Session->open(
+    # open another session to handle printing...
+    my $printSession = WebGUI::Session->open(
         $self->session->config->getWebguiRoot,
         $self->session->config->getFilename,
         undef,
         undef,
         $self->session->getId,
     );
+    $printSession->scratch->set('isExporting', 1);
 
 
-    my $keywordObj = WebGUI::Keyword->new($exportSession);
+    my $keywordObj = WebGUI::Keyword->new($printSession);
     my $keywords = $keywordObj->findKeywords({
         asset => $self,
         limit => 50, ##This is based on the tagcloud setting
@@ -229,7 +230,7 @@ sub exportAssetCollateral {
     my $listTemplate = WebGUI::Asset->new($session, $self->get('keywordListTemplateId'), 'WebGUI::Asset::Template');
     foreach my $keyword (@{ $keywords }) {
         ##Keywords may not be URL safe, so urlize them
-        my $keyword_url = $self->getKeywordStaticUrl($keyword);
+        my $keyword_url = $self->getKeywordFilename($keyword);
         my $dest = Path::Class::File->new($filedir, $keyword_url);
 
         # tell the user which asset we're exporting.
@@ -242,10 +243,10 @@ sub exportAssetCollateral {
         # next, get the contents, open the file, and write the contents to the file.
         my $fh = eval { $dest->open('>:utf8') };
         if($@) {
-            $exportSession->close;
+            $printSession->close;
             WebGUI::Error->throw(error => "can't open " . $dest->absolute->stringify . " for writing: $!");
         }
-        $exportSession->output->setHandle($fh);
+        $printSession->output->setHandle($fh);
 
         my $storyIds = $keywordObj->getMatchingAssets({
             startAsset  => $self,
@@ -268,7 +269,7 @@ sub exportAssetCollateral {
         };
         my $output = $listTemplate->process($var);
         my $contents = $self->processStyle($output);
-        $exportSession->output->print($contents);
+        $printSession->output->print($contents);
 
         # tell the user we did this asset collateral correctly
         if ( $reportSession && !$args->{quiet} ) {
@@ -277,26 +278,8 @@ sub exportAssetCollateral {
         $fh->flush;
         $fh->close;
     }
-    $exportSession->close;
+    $printSession->close;
     return $self->next::method($basepath, $args, $reportSession);
-}
-
-#-------------------------------------------------------------------
-
-=head2 exportHtml_view ( )
-
-Extend the base method to change how the tag cloud works and the search
-interface.
-
-Sets an internal flag to indicate that it is exporting to signal viewTemplateVars
-to make those changes.
-
-=cut
-
-sub exportHtml_view {
-    my $self = shift;
-    $self->{_exportMode} = 1;
-    return $self->next::method(@_);
 }
 
 #-------------------------------------------------------------------
@@ -351,9 +334,9 @@ sub getFolder {
 
 #-------------------------------------------------------------------
 
-=head2 getKeywordStaticUrl ( $keyword )
+=head2 getKeywordFilename ( $keyword )
 
-Returns the URL for the file containing stories that match this keyword.  Used
+Returns the name for the file containing stories that match this keyword.  Used
 in exportAssetCollateral, and in viewTemplateVariables.
 
 =head3 $keyword
@@ -362,9 +345,27 @@ The keyword to generate a URL for.
 
 =cut
 
-sub getKeywordStaticUrl {
+sub getKeywordFilename {
     my ($self,$keyword) = @_;
     return $self->session->url->urlize('keyword_'.$keyword.'.html');
+}
+
+#-------------------------------------------------------------------
+
+=head2 getKeywordStaticURL ( $keyword )
+
+Returns the whole URL for the file containing stories that match this keyword.  Used
+in exportAssetCollateral.
+
+=head3 $keyword
+
+The keyword to generate a URL for.
+
+=cut
+
+sub getKeywordStaticURL {
+    my ($self,$keyword) = @_;
+    return join '/', $self->getUrl, $self->getKeywordFilename($keyword);
 }
 
 #-------------------------------------------------------------------
@@ -468,6 +469,7 @@ sub viewTemplateVariables {
     my $session         = $self->session;    
     my $keywords        = $session->form->get('keyword');
     my $query           = $session->form->get('query'); 
+    my $exporting       = $session->scratch->get('isExporting');
     my $p;
     my $var = $self->get();
     if ($mode eq 'keyword') {
@@ -500,7 +502,7 @@ sub viewTemplateVariables {
             orderByClause  => 'creationDate desc, lineage',
         });
         my $storiesPerPage = $self->get('storiesPerPage');
-        if ($self->{_exportMode}) {
+        if ($exporting) {
             ##10 pages worth of data on 1 page in export mode
             $storiesPerPage *= 10;
         }
@@ -508,7 +510,7 @@ sub viewTemplateVariables {
         $p->setDataByQuery($storySql);
     }
     my $storyIds = $p->getPageData();
-    if (! $self->{_exportMode} ) {
+    if (! $exporting ) {
         ##Pagination variables aren't useful in export mode
         $p->appendTemplateVars($var);
     }
@@ -540,19 +542,19 @@ sub viewTemplateVariables {
     $var->{addStoryUrl}    = $var->{canPostStories}
                            ? $self->getUrl('func=add;class=WebGUI::Asset::Story')
                            : '';
-    $var->{rssUrl}         = $self->{_exportMode} ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
-    $var->{atomUrl}        = $self->{_exportMode} ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
+    $var->{rssUrl}         = $exporting ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
+    $var->{atomUrl}        = $exporting ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
     my $cloudOptions       = {
         startAsset  => $self,
         displayFunc => 'view',
     };
     ##In export mode, tags should link to the pages generated during the collateral export
-    if($self->{_exportMode}) {
-        $cloudOptions->{urlCallback} = 'getKeywordStaticUrl';
+    if($exporting) {
+        $cloudOptions->{urlCallback} = 'getKeywordFilename';
         $cloudOptions->{displayFunc} = '';
     }
     $var->{keywordCloud}   = WebGUI::Keyword->new($session)->generateCloud($cloudOptions);
-    if (! $self->{_exportMode}) {
+    if (! $exporting) {
         my $i18n = WebGUI::International->new($session, 'Asset');
         $var->{searchHeader} = WebGUI::Form::formHeader($session, { action => $self->getUrl })
                              . WebGUI::Form::hidden($session, { name   => 'func',   value => 'view' });
