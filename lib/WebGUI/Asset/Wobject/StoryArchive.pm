@@ -357,15 +357,27 @@ sub getKeywordFilename {
 Returns the whole URL for the file containing stories that match this keyword.  Used
 in exportAssetCollateral.
 
+The goal of this method is to create a "safe" URL where all the keyword files can
+reside with no clashes.  The best place is based on the URL for the StoryArchive.
+
 =head3 $keyword
 
-The keyword to generate a URL for.
+Generates a specific URL for $keyword.
 
 =cut
 
 sub getKeywordStaticURL {
     my ($self,$keyword) = @_;
-    return join '/', $self->getUrl, $self->getKeywordFilename($keyword);
+    my $url = $self->getUrl;
+    my @parts = split /\//, $url;
+    my $lastPart = pop @parts;
+    if (index $lastPart, '.' == -1) {
+        return join '/', $self->getUrl, $self->getKeywordFilename($keyword);
+    }
+    else {
+        $lastPart =~ s/\.[^.]*$//;
+        return join '/', @parts, $lastPart, $self->getKeywordFilename($keyword);
+    }
 }
 
 #-------------------------------------------------------------------

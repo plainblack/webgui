@@ -62,7 +62,7 @@ $canPostMaker->prepare({
     fail     => [1, $reader            ],
 });
 
-my $tests = 42
+my $tests = 45
           + $canPostMaker->plan
           ;
 plan tests => 1
@@ -470,12 +470,12 @@ $templateVars = $archive->viewTemplateVariables();
 @anchors = simpleHrefParser($templateVars->{keywordCloud});
 @expectedAnchors = ();
 foreach my $keyword(qw/echo foxtrot roger/) {
-    push @expectedAnchors, [ $keyword, 'keyword_'.$keyword.'.html' ];
+    push @expectedAnchors, [ $keyword, '/home/mystories/keyword_'.$keyword.'.html' ];
 }
 cmp_bag(
     \@anchors,
     \@expectedAnchors,
-    'keywordCloud template variable has keywords and correct links in export mode',
+    '... keywordCloud template variable has keywords and correct links in export mode',
 );
 
 $session->scratch->delete('isExporting');
@@ -526,7 +526,7 @@ cmp_deeply(
 ################################################################
 
 my $exportStorage = WebGUI::Storage->create($session);
-WebGUI::Test->storagesToDelete($exportStorage);
+#WebGUI::Test->storagesToDelete($exportStorage);
 my $basedir = Path::Class::Dir->new($exportStorage->getPath);
 $exportStorage->addFileFromScalar('index', 'export story archive content');
 my $assetDir  = $basedir->subdir('mystories');
@@ -539,14 +539,24 @@ my $exportedFiles = $exportStorage->getFiles();
 cmp_bag(
     $exportedFiles,
     [qw/
-        keyword_roger.html        mystories.rss        mystories
-        keyword_foxtrot.html      mystories.atom
-        keyword_echo.html
+        mystories.rss        mystories
+        mystories.atom
     /],
-    'exportAssetCollateral: keyword and feed files exported'
+    'exportAssetCollateral: feed files exported'
 );
 
-my $roger = $exportStorage->getFileContentsAsScalar('keyword_roger.html');
+cmp_bag(
+    [ map { $_->relative($assetDir)->stringify } $assetDir->children ],
+    [qw/
+        keyword_echo.html
+        keyword_roger.html
+        keyword_foxtrot.html
+        index.html
+    /],
+    'exportAssetCollateral: keyword files exported into correct dir (below the asset)'
+);
+
+my $roger = $exportStorage->getFileContentsAsScalar('mystories/keyword_roger.html');
 my @rogerStories = map { $_->[0] } fetchKeywordAssetList($roger);
 cmp_bag(
     \@rogerStories,
@@ -558,7 +568,7 @@ cmp_bag(
     '... contents of roger keyword file'
 );
 
-my $foxtrot = $exportStorage->getFileContentsAsScalar('keyword_foxtrot.html');
+my $foxtrot = $exportStorage->getFileContentsAsScalar('mystories/keyword_foxtrot.html');
 my @foxtrotStories = map { $_->[0] } fetchKeywordAssetList($foxtrot);
 cmp_bag(
     \@foxtrotStories,
@@ -570,7 +580,7 @@ cmp_bag(
     '... contents of foxtrot keyword file'
 );
 
-my $echo = $exportStorage->getFileContentsAsScalar('keyword_echo.html');
+my $echo = $exportStorage->getFileContentsAsScalar('mystories/keyword_echo.html');
 my @echoStories = map { $_->[0] } fetchKeywordAssetList($echo);
 cmp_bag(
     \@echoStories,
@@ -582,6 +592,18 @@ cmp_bag(
     '... contents of echo keyword file'
 );
 
+################################################################
+#
+#  getKeywordStaticURL
+#
+################################################################
+
+is($archive->getKeywordStaticURL('foo'), '/home/mystories/keyword_foo.html', 'getKeywordStaticURL: returns absolute URL to keyword file');
+
+$archive->update({ url => '/home/mystories.arch' });
+is($archive->getKeywordStaticURL('bar'), '/home/mystories/keyword_bar.html', '... correct URL with file extension');
+
+$archive->update({ url => '/home/mystories' });
 }
 
 #----------------------------------------------------------------------------
