@@ -30,6 +30,8 @@ our $HELP = {
             { name => 'isPrototype', },
             { name => 'status', },
             { name => 'assetSize', },
+            { name => 'keywords',
+              description => 'keywords template var' },
         ],
         fields  => [],
         related => []

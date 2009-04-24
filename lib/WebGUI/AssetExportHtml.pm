@@ -128,7 +128,24 @@ sub exportCheckPath {
 Main logic hub for export functionality. This method calls most of the rest of
 the methods that handle exporting. Any exceptions thrown by the called methods
 are returned as strings to the caller. Returns a status description upon
-completion. Takes a hashref of arguments, containing the following keys:
+completion.
+
+Internally, it sets two scratch variables in private sessions that it creates
+for exporting.
+
+=over 4
+
+=item exportMode
+
+If this scratch variable exists, and is true, then the Asset is being exported.
+
+=item exportUrl
+
+This scratch variable is used by the Widget Macro.
+
+=back
+
+Takes a hashref of arguments, containing the following keys:
 
 =head3 quiet
 
@@ -173,6 +190,8 @@ false will do nothing.
 sub exportAsHtml {
     my $self                = shift;
     my $session             = $self->session;
+    # set a scratch variable for Assets to know we're exporting
+    $session->scratch->set('isExporting', 1);
     my ($returnCode, $message);
 
     # get the i18n object
@@ -287,8 +306,9 @@ sub exportAsHtml {
         my $exportSession = WebGUI::Session->open($self->session->config->getWebguiRoot, $self->session->config->getFilename);
         $exportSession->user( { userId => $userId } );
 
-        # set a scratch variable for widgets to know we're exporting
-        $exportSession->scratch->set('exportUrl', $exportUrl);
+        # set a scratch variable for Assets and widgets to know we're exporting
+        $exportSession->scratch->set('isExporting', 1);
+        $exportSession->scratch->set('exportUrl',   $exportUrl);
 
         my $asset       = WebGUI::Asset->newByDynamicClass($exportSession, $assetId);
         my $fullPath    = $asset->exportGetUrlAsPath; 
@@ -518,6 +538,8 @@ sub exportGetDescendants {
 Translates a URL into an appropriate path and filename for exporting. For
 example, given C<'/foo/bar/baz'>, will return C<'/foo/bar/baz/index.html'>
 provided the value of indexFile as given to exportAsHtml was C<'index.html'>.
+
+Returns a Path::Class::File object.
 
 =head3 url 
 

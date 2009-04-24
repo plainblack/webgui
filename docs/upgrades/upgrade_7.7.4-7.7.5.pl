@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility qw/isIn/;
 
 
 my $toVersion = '7.7.5';
@@ -31,6 +32,11 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+
+# Story Manager
+installStoryManagerTables($session);
+sm_upgradeConfigFiles($session);
+sm_updateDailyWorkflow($session);
 
 finish($session); # this line required
 
@@ -44,6 +50,95 @@ finish($session); # this line required
 #    print "DONE!\n" unless $quiet;
 #}
 
+sub installStoryManagerTables {
+    my ($session) = @_;
+    print "\tAdding Story Manager tables... " unless $quiet;
+    my $db = $session->db;
+    $db->write(<<EOSTORY);
+CREATE TABLE Story (
+    assetId      CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT          NOT NULL,
+    headline     CHAR(255),
+    subtitle     CHAR(255),
+    byline       CHAR(255),
+    location     CHAR(255),
+    highlights   TEXT,
+    story        MEDIUMTEXT,
+    photo        LONGTEXT,
+    PRIMARY KEY ( assetId, revisionDate )
+)
+EOSTORY
+
+    $db->write(<<EOARCHIVE);
+CREATE TABLE StoryArchive (
+    assetId               CHAR(22) BINARY NOT NULL,
+    revisionDate          BIGINT          NOT NULL,
+    storiesPerPage        INTEGER,
+    groupToPost           CHAR(22) BINARY,
+    templateId            CHAR(22) BINARY,
+    storyTemplateId       CHAR(22) BINARY,
+    editStoryTemplateId   CHAR(22) BINARY,
+    keywordListTemplateId CHAR(22) BINARY,
+    archiveAfter          INT(11),
+    richEditorId          CHAR(22) BINARY,
+    approvalWorkflowId    CHAR(22) BINARY DEFAULT 'pbworkflow000000000003',
+    PRIMARY KEY ( assetId, revisionDate )
+)
+EOARCHIVE
+
+    $db->write(<<EOTOPIC);
+CREATE TABLE StoryTopic (
+    assetId         CHAR(22) BINARY NOT NULL,
+    revisionDate    BIGINT          NOT NULL,
+    storiesPer      INTEGER,
+    storiesShort    INTEGER,
+    templateId      CHAR(22) BINARY,
+    storyTemplateId CHAR(22) BINARY,
+    PRIMARY KEY ( assetId, revisionDate )
+)
+EOTOPIC
+
+    print "DONE!\n" unless $quiet;
+}
+
+sub sm_upgradeConfigFiles {
+    my ($session) = @_;
+    print "\tAdding Story Manager to config file... " unless $quiet;
+    my $config = $session->config;
+    $config->addToHash(
+        'assets',
+        'WebGUI::Asset::Wobject::StoryTopic' => {
+            'category' => 'community'
+        },
+    );
+    $config->addToHash(
+        'assets',
+        "WebGUI::Asset::Wobject::StoryArchive" => {
+            "isContainer" => 1,
+            "category" => "community"
+        },
+    );
+    my $activities = $config->get('workflowActivities');
+    my $none = $activities->{None};
+    if (!isIn('WebGUI::Workflow::Activity::ArchiveOldStories', @{ $none })) {
+        unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
+    }
+    $config->set('workflowActivities', $activities);
+    print "DONE!\n" unless $quiet;
+}
+
+sub sm_updateDailyWorkflow {
+    my ($session) = @_;
+    print "\tAdding Archive Old Stories to Daily Workflow... " unless $quiet;
+    my $workflow = WebGUI::Workflow->new($session, 'pbworkflow000000000001');
+    foreach my $activity (@{ $workflow->getActivities }) {
+        return if $activity->getName() eq 'WebGUI::Workflow::Activity::ArchiveOldStories';
+    }
+    my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
+    $activity->set('title',       'Archive Old Stories');
+    $activity->set('description', 'Archive old stories, based on the settings of the Story Archives that own them');
+    print "DONE!\n" unless $quiet;
+}
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

@@ -26,6 +26,12 @@ our $I18N = {
 		context => q|help for the keywords property|
 	},
 
+	'keywords template var' => {
+		message => q|This will be a string with the keywords for this asset.  Individual keywords will be joined with spaces, unless the keyword contains spaces, in which case it will be quoted.|,
+		lastUpdated => 0,
+		context => q|help for the keywords template variable|
+	},
+
 	'add the missing page' => {
 		message => q|Add the missing page.|,
 		lastUpdated => 0,

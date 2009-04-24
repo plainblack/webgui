@@ -519,6 +519,13 @@
       "isContainer" : 1,
       "category" : "community"
    },
+   "WebGUI::Asset::Wobject::StoryArchive" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryTopic" : {
+      "category" : "community"
+   },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
    },
@@ -805,6 +812,7 @@
 
 "workflowActivities" : {
     "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
