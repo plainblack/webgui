@@ -132,6 +132,10 @@ sub _loadValues{
             $answer->{recordedAnswer} = 0;
         }elsif($answer->{text} eq 'Yes'){
             $answer->{recordedAnswer} = 1;
+        }elsif($answer->{text} eq 'True'){
+            $answer->{recordedAnswer} = 1;
+        }elsif($answer->{text} eq 'False'){
+            $answer->{recordedAnswer} = 0;
         }else{
             $answer->{recordedAnswer} = $value->[1];
         }
