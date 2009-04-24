@@ -41,7 +41,6 @@ use WebGUI::Asset::Sku;
  $hashRef = $self->getOptions;
  $integer = $self->getMaxAllowedInCart;
  $float = $self->getPrice;
- $float = $self->getTaxRate;
  $boolean = $self->isShippingRequired;
  $html = $self->processStyle($output);
 
@@ -332,19 +331,6 @@ sub getTaxConfiguration {
     }
 
     return $configs->{ $namespace }
-}
-
-#-------------------------------------------------------------------
-
-=head2 getTaxRate ( )
-
-Returns undef unless the "Override tax rate?" switch is set to yes. If it is, then it returns the value of the "Tax Rate Override" field.
-
-=cut
-
-sub getTaxRate {
-    my $self = shift;
-    return ($self->get("overrideTaxRate")) ? $self->get("taxRateOverride") : undef;
 }
 
 #-------------------------------------------------------------------

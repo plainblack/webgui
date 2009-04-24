@@ -69,8 +69,6 @@ our $I18N = {
 		context => q|help for vendor field|
 	},
 
-
-
 	'add to cart' => {
 		message => q|Add To Cart|,
 		lastUpdated => 0,
