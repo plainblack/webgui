@@ -1240,6 +1240,7 @@ sub www_loadQuestions {
             if(! $self->session->form->param('shownsummary')){
                 my ($summary,$html) = $self->getSummary();
                 my $json = to_json( { type => 'summary', summary => $summary, html => $html });
+                $self->session->http->setMimeType('application/json');
                 return $json;
             }
         }
@@ -1328,6 +1329,7 @@ sub surveyEnd {
     #$self->session->http->setRedirect($url);
     #$self->session->http->setMimeType('application/json');
     my $json = to_json( { type => 'forward', url => $url } );
+    $self->session->http->setMimeType('application/json');
     return $json;
 }
 
