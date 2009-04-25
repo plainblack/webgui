@@ -62,7 +62,6 @@ return [
     {
         title       => 'another title',
         description => 'another description',
-        'link'      => 'another link',
         author      => 'another author',
         date        => 'another date',
     },

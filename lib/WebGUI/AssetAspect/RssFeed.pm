@@ -207,7 +207,8 @@ sub exportAssetCollateral {
         # Get the parent dir's *path* (essentially the name of the dir) relative to
         #   its own parent dir.
         $filenameBase = $basepath->parent->relative( $basepath->parent->parent )->stringify;
-    } else {
+    }
+    else {
         # Get the 1st ancestor, since the asset is a file recognized by apache, so
         #   we want our files in the same dir.
         $filedir = $basepath->parent->absolute->stringify;
@@ -429,7 +430,8 @@ sub getFeed {
         if (!$new_item->guid) {
             if ($new_item->link) {
                 $new_item->guid( $new_item->link );
-            } else {
+            }
+            else {
                 $new_item->guid( $self->session->id->generate );
                 $set_permalink_false = 1;
             }

@@ -18,6 +18,7 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
+use File::Path;
 use Data::Dumper;
 
 use WebGUI::Test; # Must use this before any other WebGUI modules
@@ -30,11 +31,12 @@ use WebGUI::Asset::RssAspectDummy;
 # Init
 my $session         = WebGUI::Test->session;
 
+WebGUI::Test->originalConfig('exportPath');
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 18;        # Increment this number for each test you create
+plan tests => 21;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -92,11 +94,12 @@ is($newFeed, $feed, 'getFeed returns the same object');
 cmp_deeply(
     $feed,
     methods(
-        title       => 'Dummy Title',
-        description => 'Dummy Synopsis',  ##Not description
-        link        => '/home/shawshank',
+        title        => 'Dummy Title',
+        description  => 'Dummy Synopsis',  ##Not description
+        link         => '/home/shawshank',
+        copyright    => '',
     ),
-    '... title, description, link inherit from asset by default'
+    '... title, description, link inherit from asset by default, copyright unset'
 );
 cmp_bag(
     [ $feed->get_item() ],
@@ -104,15 +107,80 @@ cmp_bag(
         methods(
             title       => 'this title',
             description => 'this description',
+            'link'      => 'this link',
+            guid        => 'this link',
         ),
         methods(
             title       => 'another title',
-            description => 'another description',  ##Not description
+            description => 'another description',     ##Not description
+            guid        => re('^[a-zA-Z0-9\-_]{22}'), ##GUID is a GUID since there's no link
         ),
         
     ],
     '... contains 2 feed items with the correct contents'
 );
+
+$dummy->update({
+    feedCopyright   => 'copyright 2009 Plain Black Corporation',
+    feedTitle       => 'Rita Hayworth and the Shawshank Redemption',
+    feedDescription => 'A good movie, providing loads of testing collateral',
+});
+$feed = $dummy->getFeed(XML::FeedPP::RSS->new());
+
+cmp_deeply(
+    $feed,
+    methods(
+        title        => 'Rita Hayworth and the Shawshank Redemption',
+        description  => 'A good movie, providing loads of testing collateral',
+        link         => '/home/shawshank',
+        copyright    => 'copyright 2009 Plain Black Corporation',
+    ),
+    '... feed settings override asset defaults, copyright'
+);
+
+#####################################################
+#
+# exportAssetCollateral
+#
+#####################################################
+
+my $exportStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($exportStorage);
+my $basedir = Path::Class::Dir->new($exportStorage->getPath);
+my $assetdir = $basedir->subdir('shawshank');
+my $indexfile = $assetdir->file('index.html');
+mkpath($assetdir->stringify);
+$dummy->exportAssetCollateral($indexfile, {}, $session);
+
+cmp_bag(
+    $exportStorage->getFiles(),
+    [qw/
+        shawshank.rss        shawshank
+        shawshank.atom
+    /],
+    'exportAssetCollateral: feed files exported, index.html file'
+);
+
+$exportStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($exportStorage);
+$basedir   = Path::Class::Dir->new($exportStorage->getPath);
+my $assetfile = $basedir->file('shawshank.html');
+$dummy->exportAssetCollateral($assetfile, {}, $session);
+
+cmp_bag(
+    $exportStorage->getFiles(),
+    [qw/
+        shawshank.html.rss
+        shawshank.html.atom
+    /],
+    'exportAssetCollateral: feed files exported, shawshank.html file'
+);
+
+#####################################################
+#
+# exportAssetCollateral
+#
+#####################################################
 
 #----------------------------------------------------------------------------
 # Cleanup
