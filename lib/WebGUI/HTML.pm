@@ -227,7 +227,7 @@ my $text = "";
 my $inside = {};
 
 sub html2text {
-	my $html = shift . " ";
+	my $html = shift() . " ";
 	$text = "";
 	$inside = {};
 	my $tagHandler = sub {
