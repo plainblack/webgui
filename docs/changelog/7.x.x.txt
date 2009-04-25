@@ -1,4 +1,5 @@
 7.6.22
+ - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
 
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
