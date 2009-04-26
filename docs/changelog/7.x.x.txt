@@ -3,6 +3,7 @@
  - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
  - fixed #10226: html2text dropping text
  - fixed #10210: Generated Message-Id invalid (patch basis from tektek)
+ - fixed #10209: Changing existing user profile field type doesn't change underlying database column type
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)

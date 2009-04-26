@@ -828,8 +828,19 @@ sub set {
     }
     $properties->{fieldName} = $self->getId;
 
+    ##Save the fieldType now.  It can't be chacked against getFormControlClass now
+    ##because it will return the OLD formControlClass, not the new one that we need
+    ##to check against.
+    my $originalFieldType = $self->get('fieldType');
+
+    # Update the record
+    $db->setRow("userProfileField","fieldName",$properties);
+    foreach my $key (keys %{$properties}) {
+        $self->{_properties}{$key} = $properties->{$key};
+    }
+
     # If the fieldType has changed, modify the userProfileData column
-    if ($properties->{fieldType} ne $self->get("fieldType")) {
+    if ($properties->{fieldType} ne $originalFieldType) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = $self->getFormControlClass;
         eval "use $fieldClass;";
@@ -845,11 +856,6 @@ sub set {
         $db->write($sql);
     }
 
-    # Update the record
-    $db->setRow("userProfileField","fieldName",$properties);
-    foreach my $key (keys %{$properties}) {
-        $self->{_properties}{$key} = $properties->{$key};
-    }
 }
 
 #-------------------------------------------------------------------
