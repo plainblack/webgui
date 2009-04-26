@@ -436,7 +436,7 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_creationDate_after }
         = WebGUI::Form::dateTime( $session, {
             name        => "creationDate_after",
-            value       => $form->get("creationDate_after","dateTime") || $oneYearAgo,
+            value       => $form->get("creationDate_after") || $oneYearAgo,
         });
     $var->{ searchForm_creationDate_before }
         = WebGUI::Form::dateTime( $session, {
@@ -1333,8 +1333,9 @@ search and display the results if necessary.
 
 sub www_search {
     my $self        = shift;
-    my $form        = $self->session->form;
-    my $db          = $self->session->db;
+    my $session     = $self->session;
+    my $form        = $session->form;
+    my $db          = $session->db;
 
     my $var         = $self->getTemplateVars;
     # NOTE: Search form is added as part of getTemplateVars()
@@ -1377,7 +1378,8 @@ sub www_search {
                         ;
         }
 
-        my $dateAfter  = $form->get("creationDate_after", "dateTime");
+        my $oneYearAgo = WebGUI::DateTime->new( $session, time )->add( years => -1 )->epoch;
+        my $dateAfter  = $form->get("creationDate_after") || $oneYearAgo;
         my $dateBefore = $form->get("creationDate_before", "dateTime");
         my $creationDate = {};
         if ($dateAfter) {
@@ -1427,7 +1429,7 @@ sub www_search {
 
         $p->appendTemplateVars( $var );
         for my $result ( @{ $p->getPageData } ) {
-            my $asset   = WebGUI::Asset->newByDynamicClass( $self->session, $result->{assetId} );
+            my $asset   = WebGUI::Asset->newByDynamicClass( $session, $result->{assetId} );
             push @{ $var->{search_results} }, {
                 %{ $asset->getTemplateVars },
                 isAlbum     => $asset->isa( 'WebGUI::Asset::Wobject::GalleryAlbum' ),
