@@ -4,6 +4,7 @@
  - fixed #10226: html2text dropping text
  - fixed #10210: Generated Message-Id invalid (patch basis from tektek)
  - fixed #10209: Changing existing user profile field type doesn't change underlying database column type
+ - fixed #10047: SQLReport Debug doesn't catch when bind variables are incorrect
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)

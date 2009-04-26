@@ -713,7 +713,7 @@ sub setDataByQuery {
 	my $sth;
 	if ($unconditional) {
 		$sth = $dbh->unconditionalRead($sql,$placeholders);
-		return $sth->errorMessage if ($sth->errorCode > 0);
+		return $sth->errorMessage if (defined $sth->errorCode);
 	} else {
 		$sth = $dbh->read($sql,$placeholders);
 	}
