@@ -206,30 +206,6 @@ sub lastResponse {
 
 #-------------------------------------------------------------------
 
-=head2 questionsAnswered ([ $questionsAnswered ])
-
-Mutator for the number of questions answered.  With no arguments,
-does a set.
-
-=head3 $questionsAnswered.
-
-If defined, increments the number of questions by $questionsAnswered
-
-=cut
-
-sub questionsAnswered {
-    my $self      = shift;
-    my $answered  = shift;
-    if ( defined $answered ) {
-        $self->{questionsAnswered} += $answered;
-    }
-    else {
-        return $self->{questionsAnswered};
-    }
-}
-
-#-------------------------------------------------------------------
-
 =head2 startTime ([ $newStartTime ])
 
 Mutator for the time the user began the survey.  With no arguments,
@@ -321,57 +297,7 @@ sub currentSection {
 
 #-------------------------------------------------------------------
 
-=head2 recordResponses ($session, $responses)
-
-Takes survey responses and puts them into the response hash of this object.  Does terminal
-handling for sections and questions, and goto processing.  Advances the survey page if
-all required questions have been answered.
-
-=head3 $session
-
-A WebGUI session object
-
-=head3 $responses
-
-A hash ref of form param data.  Each element will look like:
-
-    {
-        "__qid__comment" => "question comment",
-        "__aid__"        => "answer",
-        "__aid__comment" => "answer comment",
-    }
-
-where __qid__ is a question id, as described in L<nextQuestions>, and __aid__ is an
-answer id, also described there.
-
-=head3 terminal processing
-
-Terminal processing for a section and its questions and answers are handled in
-order.  The terminalUrl setting in a question overrides the terminalUrl setting
-for its section.  Similarly, with questions and answers, the last terminalUrl
-setting of the set of questions is what is returned for the page, with the questions
-and answers being answered in surveyOrder.
-
-=head3 goto processing
-
-gotos are handled similarly as with terminalUrls.  The last goto in the set of questions
-wins.
-
-=head3 responses data structure
-
-This method also builds an internal data structure with the users' responses.  It
-is set up like this:
-
-    responses => {
-        __qid__ => {
-            comment => "question comment",
-        },
-        __aid__ => {
-            time    => time(),
-            comment => "answer comment",
-            value   => "answer value",
-        },
-    }
+=head2 recordResponses
 
 =cut
 
@@ -400,7 +326,6 @@ sub recordResponses {
     my $terminal  = 0;
     my $terminalUrl;
     my $goto;
-    my $gotoExpression;
 
     my $section = $self->nextSection();#which gets the current section for the just submitted questions.  IE, current response pointer has not moved forward for these questions
 
@@ -412,7 +337,7 @@ sub recordResponses {
     #There were no questions in the section just displayed, so increment the lastResponse by one
     if ( ref $questions ne 'ARRAY' ) {
         $self->lastResponse( $self->lastResponse + 1 );
-        return [ $sterminal, $terminalUrl ];
+        return [ $terminal, $terminalUrl ];
     }
 
     for my $question (@$questions) {
@@ -445,22 +370,16 @@ sub recordResponses {
                 elsif ( $answer->{goto} =~ /\w/ ) {
                     $goto = $answer->{goto};
                 }
-                elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                    $gotoExpression = $answer->{gotoExpression};
-                }
             } ## end if ( defined( $responses...
         } ## end for my $answer ( @{ $question...
         $qAnswered = 0 if ( !$aAnswered and $question->{required} );
-        if ($aAnswered) {
-            $self->questionsAnswered( +1 );
-        }
+        $self->{questionsAnswered}++ if($aAnswered);
     } ## end for my $question (@$questions)
 
     #if all responses completed, move the lastResponse index to the last question shown
     if ($qAnswered) {
         $self->lastResponse( $self->lastResponse + @$questions );
         $self->goto($goto) if ( defined $goto );
-        $self->gotoExpression($gotoExpression) if ( defined $gotoExpression );
     }
     else {
         $terminal = 0;
@@ -503,164 +422,6 @@ sub goto {
         }
     }
 } ## end sub goto
-
-#-------------------------------------------------------------------
-
-=head2 gotoExpression ( $gotoExpression )
-
-=head3 $gotoExpression
-
-The gotoExpression (one expression per line)
-
-=head3 Explanation
-
-A gotoExpression is a list of expressions (one per line) of the form:
- target: expression
- target: expression
-
-This subroutine iterates through the list, processing each line and, all things being
-well, evaluates the expression. The first expression to evaluate to true triggers a
-call to goto($target).
-
-The expression is a simple subset of the formula language used in spreadsheet programs such as Excel, OpenOffice, Google Docs etc..
-
-Here is an example using section variables S1 and S2 as jump targets and question variables Q1-3 in the expression. 
-It  jumps to S1 if the user's answer to Q1 has a value of 3, jumps to S2 if Q2 + Q3 < 10, and otherwise doesn't branch at all (the default).
-S1: Q1 = 3
-S2: Q2 + Q3 < 10
-
-=head3 Arguments are evaluated as follows:
-
-Numeric arguments evaluate as numbers
-* No support for strings (and hence no string matching)
-* Question variable names (e.g. Q1) evaluate to the numeric value associated with user's answer to that question, or undefined if the user has not answered that question
-
-Binary comparisons operators: = != < <= >= >
-* return boolean values based on perl's equivalent numeric comparison operators
-
-Simple math operators: + - * /
-* return numeric values
-
-Later we may add Boolean operators: AND( x; y; z; ... ), OR( x; y; z; ... ), NOT( x )
-* args separated by semicolons (presumably because spreadsheet formulas use commas to indicate cell ranges)
-
-Later still you may be able to say AVG(section1) or SUM(section3) and have those functions automatically compute their result over the set of all questions in the given section.
-But for now those things can be done manually using the limited subset defined.
-
-=cut
-
-sub gotoExpression {
-    my $self = shift;
-    my $expression = shift;
-    
-    my %responses = (
-        # questionName => response answer value
-    );
-    
-    # Populate %responses with the user's data..
-    foreach my $q (@{ $self->returnResponseForReporting() }) {
-        if ($q->{questionName} =~ /\w/) {
-            my $value = $q->{answers}[0]{value};
-            $responses{$q->{questionName}} = $value if defined $value;
-        }
-    }
-    
-    # Process gotoExpressions one after the other (first one that's true wins)
-    foreach my $line (split '\n', $expression) {
-        my $processed = $self->processGotoExpression($line, \%responses);
-        
-        next unless $processed;
-        
-        # (ab)use perl's eval to evaluate the processed expression
-        my $result = eval "$processed->{expression}";
-        $self->warn($@) if $@;
-        
-        if ($result) {
-            $self->debug("Truthy, goto [$processed->{target}]");
-             $self->goto($processed->{target});
-             return $processed;
-        } else {
-            $self->debug("Falsy, not branching");
-            next;
-        }
-    }
-    return;
-}
-
-=head2 processGotoExpression ( $expression, $responses)
-
-Parses a single gotoExpression. Returns undef if processing fails, or the following hashref
-if things work out well: 
- { target => $target, expression => $expression }
-
-=head3 $expression
-
-The expression to process
-
-=head3 $responses
-
-Hashref that maps questionNames to response values
-
-=head3 Explanation:
-
-Uses the following simple strategy:
-
-First, parse the expression as: 
- target: expression
-
-Replace each questionName with its response value (from the $responses hashref)
-
-Massage the expression into valid perl
-
-Check that only valid tokens remain. This last step ensures that any invalid questionNames in 
-the expression generate an error because our list of valid tokens doesn't include a-z
-
-=cut
-
-sub processGotoExpression {
-    my $self       = shift;
-    my $expression = shift;
-    my $responses      = shift;
-
-    $self->debug("Processing gotoExpression: $expression");
-
-    # Valid gotoExpression tokens are.. 
-    my $tokens = qr{\s|[-0-9=!<>+*/.()]};
-    
-    my ( $target, $rest ) = $expression =~ /\s* ([^:]+?) \s* : \s* (.*)/x;
-
-    $self->debug("Parsed as Target: [$target], Expression: [$rest]");
-
-    if ( !defined $target ) {
-        $self->warn('Target undefined');
-        return;
-    }
-
-    if ( !defined $rest || $rest eq '' ) {
-        $self->warn('Expression undefined');
-        return;
-    }
-
-    # Replace each questionName with its response value
-    while ( my ( $questionName, $response ) = each %$responses ) {
-        $rest =~ s/$questionName/$response/g;
-    }
-
-    # convert '=' to '==' but don't touch '!=', '<=' or '>='
-    $rest =~ s/(?<![!<>])=(?!=)/==/g;
-
-    if ( $rest !~ /^$tokens+$/ ) {
-        $self->warn("Contains invalid tokens: $rest");
-        return;
-    }
-    
-    $self->debug("Processed as: $rest");
-    
-    return {
-        target => $target,
-        expression => $rest,
-    };
-}
 
 #-------------------------------------------------------------------
 
@@ -854,23 +615,9 @@ Logs an error to the webgui log file, using the session logger.
 =cut
 
 sub log {
-    my ( $self, $message) = @_;
+    my ( $self, $message ) = @_;
     if ( defined $self->{log} ) {
         $self->{log}->error($message);
-    }
-}
-
-sub debug {
-    my ( $self, $message) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->debug($message);
-    }
-}
-
-sub warn {
-    my ( $self, $message) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->warn($message);
     }
 }
 1;
