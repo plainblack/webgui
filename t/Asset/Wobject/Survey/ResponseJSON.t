@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 32;
+my $tests = 36;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ ok(   $rJSON->surveyEnd(), 'surveyEnd, with 9 elements, 20 >= end of survey');
 
 ####################################################
 #
-# nextSectionId, nextSection
+# nextSectionId, nextSection, currentSection
 #
 ####################################################
 
@@ -215,6 +215,82 @@ cmp_deeply(
 $rJSON->lastResponse(20);
 is($rJSON->nextSectionId(), undef, 'nextSectionId, lastResponse > surveyEnd, nextSectionId=undef');
 
+####################################################
+#
+# nextQuestions
+#
+####################################################
+
+$rJSON->lastResponse(20);
+ok($rJSON->surveyEnd, 'nextQuestions: lastResponse indicates end of survey');
+is_deeply($rJSON->nextQuestions, [], 'nextQuestions returns an empty array ref if there are no questions available');
+$rJSON->survey->section([0])->{questionsPerPage} = 2;
+$rJSON->survey->section([1])->{questionsPerPage} = 2;
+$rJSON->survey->section([2])->{questionsPerPage} = 2;
+$rJSON->survey->section([3])->{questionsPerPage} = 2;
+$rJSON->lastResponse(-1);
+cmp_deeply(
+    $rJSON->nextQuestions(),
+    [
+        superhashof({
+            sid  => 0,
+            id   => '0-0',
+            text => 'Question 0-0',
+            type => 'question',
+            answers => [
+                superhashof({
+                    type => 'answer',
+                    id   => '0-0-0',
+                }),
+            ],
+        }),
+        superhashof({
+            sid  => 0,
+            id   => '0-1',
+            text => 'Question 0-1',
+            type => 'question',
+            answers => [
+                superhashof({
+                    type => 'answer',
+                    id   => '0-1-0',
+                }),
+            ],
+        }),
+    ],
+    'nextQuestions returns the correct data structre, amounts and members'
+);
+
+$rJSON->lastResponse(1);
+cmp_deeply(
+    $rJSON->nextQuestions(),
+    [
+        superhashof({
+            sid  => 0,
+            id   => '0-2',
+            text => 'Question 0-2',
+            type => 'question',
+            answers => [
+                superhashof({
+                    type => 'answer',
+                    id   => '0-2-0',
+                }),
+                superhashof({
+                    type => 'answer',
+                    id   => '0-2-1',
+                }),
+            ],
+        }),
+    ],
+    'nextQuestions obeys questionPerPage'
+);
+
+$rJSON->lastResponse(4);
+cmp_deeply(
+    $rJSON->nextQuestions(),
+    undef,
+    'nextQuestions: returns undef if the next section is empty'
+);
+
 }
 
 ####################################################
@@ -254,14 +330,14 @@ sub buildSurveyJSON {
     $sjson->section([1])->{title} = "Section 1";
     $sjson->section([2])->{title} = "Section 2";
     $sjson->section([3])->{title} = "Section 3";
-    $sjson->question([0,0])->{title} = "Question 0-0";
-    $sjson->question([0,1])->{title} = "Question 0-1";
-    $sjson->question([0,2])->{title} = "Question 0-2";
-    $sjson->question([1,0])->{title} = "Question 1-0";
-    $sjson->question([1,1])->{title} = "Question 1-1";
-    $sjson->question([3,0])->{title} = "Question 3-0";
-    $sjson->question([3,1])->{title} = "Question 3-1";
-    $sjson->question([3,2])->{title} = "Question 3-2";
+    $sjson->question([0,0])->{text} = "Question 0-0";
+    $sjson->question([0,1])->{text} = "Question 0-1";
+    $sjson->question([0,2])->{text} = "Question 0-2";
+    $sjson->question([1,0])->{text} = "Question 1-0";
+    $sjson->question([1,1])->{text} = "Question 1-1";
+    $sjson->question([3,0])->{text} = "Question 3-0";
+    $sjson->question([3,1])->{text} = "Question 3-1";
+    $sjson->question([3,2])->{text} = "Question 3-2";
     return $sjson;
 }
 
