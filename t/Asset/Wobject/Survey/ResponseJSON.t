@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 52;
+my $tests = 77;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -318,6 +318,80 @@ $rJSON->goto('goto 0-1');
 is($rJSON->lastResponse(), 0, 'goto: works on existing question');
 $rJSON->goto('goto 3-0');
 is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
+
+####################################################
+#
+# processGotoExpression
+#
+####################################################
+is($rJSON->processGotoExpression(), 
+    undef, 'processGotoExpression undef with empty arguments');
+is($rJSON->processGotoExpression('blah-dee-blah-blah'), 
+    undef, '.. and undef with duff expression');
+is($rJSON->processGotoExpression(':'), 
+    undef, '.. and undef with missing target');
+is($rJSON->processGotoExpression('t1:'), 
+    undef, '.. and undef with missing expression');
+cmp_deeply($rJSON->processGotoExpression('t1: 1'), 
+    { target => 't1', expression => '1'}, 'works for simple numeric expression');
+cmp_deeply($rJSON->processGotoExpression('t1: 1 - 23 + 456 * (78 / 9.0)'), 
+    { target => 't1', expression => '1 - 23 + 456 * (78 / 9.0)'}, 'works for expression using all algebraic tokens');
+is($rJSON->processGotoExpression('t1: 1 + &'), undef, '.. but disallows expression containing non-whitelisted token');
+cmp_deeply($rJSON->processGotoExpression('t1: 1 = 3'), 
+    { target => 't1', expression => '1 == 3'}, 'converts single = to ==');
+cmp_deeply($rJSON->processGotoExpression('t1: 1 != 3 <= 4 >= 5'), 
+    { target => 't1', expression => '1 != 3 <= 4 >= 5'}, q{..but doesn't mess with other ops containing =});
+cmp_deeply($rJSON->processGotoExpression('t1: q1 + q2 * q3 - 4', { q1 => 11, q2 => 22, q3 => 33}), 
+    { target => 't1', expression => '11 + 22 * 33 - 4'}, 'substitues q for value');
+cmp_deeply($rJSON->processGotoExpression('t1: a silly var name * 10 + another var name', { 'a silly var name' => 345, 'another var name' => 456}), 
+    { target => 't1', expression => '345 * 10 + 456'}, '..it even works for vars with spaces in their names');
+is($rJSON->processGotoExpression('t1: qX + 3', { q1 => '7'}),
+    undef, q{..but doesn't like invalid var names});
+
+####################################################
+#
+# gotoExpression
+#
+####################################################
+
+$rJSON->survey->section([0])->{variable} = 's0';
+$rJSON->survey->section([2])->{variable} = 's2';
+$rJSON->survey->question([1,0])->{variable} = 's1q0';
+$rJSON->survey->answer([1,0,0])->{value} = 3;
+
+$rJSON->lastResponse(2);
+$rJSON->recordResponses($session, {
+    '1-0comment'   => 'Section 1, question 0 comment',
+    '1-0-0'        => 'First answer',
+    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+});
+is($rJSON->gotoExpression('blah-dee-blah-blah'), undef, 'invalid gotoExpression is false');
+ok($rJSON->gotoExpression('s0: s1q0 = 3'), '3 == 3 is true');
+ok(!$rJSON->gotoExpression('s0: s1q0 = 4'), '3 == 4 is false');
+ok($rJSON->gotoExpression('s0: s1q0 != 2'), '3 != 2 is true');
+ok(!$rJSON->gotoExpression('s0: s1q0 != 3'), '3 != 3 is false');
+ok($rJSON->gotoExpression('s0: s1q0 > 2'), '3 > 2 is true');
+ok($rJSON->gotoExpression('s0: s1q0 < 4'), '3 < 2 is true');
+ok(!$rJSON->gotoExpression('s0: s1q0 >= 4'), '3 >= 4 is false');
+ok(!$rJSON->gotoExpression('s0: s1q0 <= 2'), '3 >= 4 is false');
+
+cmp_deeply($rJSON->gotoExpression(<<"END_EXPRESSION"), {target => 's2', expression => '3 == 3'}, 'first true expression wins');
+s0: s1q0 <= 2
+s2: s1q0 = 3
+END_EXPRESSION
+
+ok(!$rJSON->gotoExpression(<<"END_EXPRESSION"), 'but multiple false expressions still false');
+s0: s1q0 <= 2
+s2: s1q0 = 345
+END_EXPRESSION
+
+$rJSON->gotoExpression('s0: s1q0 = 3');
+is($rJSON->lastResponse(), -1, '.. lastResponse changed to -1 due to goto(s0)');
+$rJSON->gotoExpression('s2: s1q0 = 3');
+is($rJSON->lastResponse(), 4, '.. lastResponse changed to 4 due to goto(s2)');
+
+$rJSON->{responses} = {};
+$rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 
 ####################################################
 #
