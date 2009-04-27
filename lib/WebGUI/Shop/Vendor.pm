@@ -5,7 +5,9 @@ use Class::InsideOut qw{ :std };
 use WebGUI::Shop::Admin;
 use WebGUI::Exception::Shop;
 use WebGUI::International;
-
+use WebGUI::Utility qw{ isIn };
+use List::Util qw{ sum };
+use JSON qw{ encode_json };
 
 =head1 NAME
 
@@ -117,6 +119,48 @@ sub getId {
 
 #-------------------------------------------------------------------
 
+=head2 getPayoutTotals ( )
+
+Returns a hash ref, containing the payout details for this vendor. The keys in the hash are:
+
+=head3 paid
+
+The amount of money already transfered to the vendor.
+
+=head3 scheduled
+
+The amount of money scheduled to be transfered to the vendor.
+
+=head3 notPaid
+
+The amount of money that is yet to be scheduled for payment to the vendor.
+
+=head3 total
+
+The sum of these three values.
+
+=cut
+
+sub getPayoutTotals {
+    my $self    = shift;
+
+    my %totals = $self->session->db->buildHash(
+        'select vendorPayoutStatus, sum(vendorPayoutAmount) as amount from transactionItem '
+        .'where vendorId=? group by vendorPayoutStatus ',
+        [ $self->getId ]
+    );
+
+    # Format the payout categories and calc the total those.
+    %totals          = 
+        map     { lcfirst $_ => sprintf '%.2f', $totals{ $_ } } 
+                qw( Paid Scheduled NotPaid );
+    $totals{ total } = sprintf '%.2f', sum values %totals;
+
+    return \%totals;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getVendors ( session, options )
 
 Class method. Returns an array reference of WebGUI::Shop::Vendor objects.
@@ -146,6 +190,26 @@ sub getVendors {
         push @vendors, $class->new($session, $id);
     }
     return \@vendors;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isVendorInfoComplete ( )
+
+Returns a boolean indicating whether the payoutinformation entered by the vendor is complete.
+
+=cut
+
+sub isVendorInfoComplete {
+    my $self = shift;
+
+    my $complete = 
+           defined $self->get( 'name' )
+        && defined $self->get( 'userId' )
+        && defined $self->get( 'preferredPaymentType' )
+        && defined $self->get( 'paymentInformation' );
+
+    return $complete
 }
 
 #-------------------------------------------------------------------
@@ -405,5 +469,221 @@ sub www_manage {
     return $console->render($output, $i18n->get("vendors"));
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_managePayouts ( )
+
+Displays the payout manager.
+
+=cut
+
+sub www_managePayouts {
+    my $class   = shift;
+    my $session = shift;
+
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
+    
+    # Load the required YUI stuff.
+    my $style = $session->style;
+    my $url = $session->url;
+
+    $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
+    $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
+
+    $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'), {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/element/element-beta-min.js'),        {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/connection/connection-min.js'),       {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/json/json-min.js'),                   {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/paginator/paginator-min.js'),         {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datasource/datasource.js'),           {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
+    $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
+
+    # Add css for scheduled payout highlighting
+    $style->setRawHeadTags(<<CSS);
+        <style type="text/css">
+            .yui-skin-sam .yui-dt tr.scheduled,
+            .yui-skin-sam .yui-dt tr.scheduled td.yui-dt-asc,
+            .yui-skin-sam .yui-dt tr.scheduled td.yui-dt-desc,
+            .yui-skin-sam .yui-dt tr.scheduled td.yui-dt-asc,
+            .yui-skin-sam .yui-dt tr.scheduled td.yui-dt-desc {
+                background-color    : #080;
+                color               : #fff;
+            }
+        </style>
+CSS
+
+    my $output = q{<div id="vendorPayoutContainer" class="yui-skin-sam"></div>}
+        .q{<script type="text/javascript">var vp = new WebGUI.VendorPayout( 'vendorPayoutContainer' );</script>};
+
+    my $console = WebGUI::Shop::Admin->new($session)->getAdminConsole;
+    my $i18n = WebGUI::International->new($session, 'Shop');
+    return $console->render($output, $i18n->get('vendor payouts'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_payoutDataAsJSON ( )
+
+Returns a JSON string containing paginated payout data for a specific vendor. 
+The following form params should be passed:
+
+=head3 vendorId
+
+The vendorId of the vendor you want the payout data for.
+
+=head3 results
+
+The number of results to be returned. Defaults to 100.
+
+=head3 startIndex
+
+The index of the record at which the payout data should start.
+
+=cut
+
+sub www_payoutDataAsJSON {
+    my $class   = shift;
+    my $session = shift;
+
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
+
+    my $vendorId    = $session->form->process('vendorId');
+    my $startIndex  = $session->form->process('startIndex');
+    my $rowsPerPage = $session->form->process('results') || 100;
+    my $pageNumber  = int( $startIndex / $rowsPerPage ) + 1;
+    
+    my $sql         = 
+        "select t1.* from transactionItem as t1 join transaction as t2 on t1.transactionId=t2.transactionId "
+        ." where vendorId=? and vendorPayoutAmount > 0 and vendorPayoutStatus <> 'Paid' order by t2.orderNumber";
+    my $placeholders =  [ $vendorId ];
+
+    my $paginator   = WebGUI::Paginator->new( $session, '', $rowsPerPage, '', $pageNumber ); 
+    $paginator->setDataByQuery( $sql, undef, 0, $placeholders );
+
+    my $data = {
+        totalRecords    => $paginator->getRowCount,
+        results         => $paginator->getPageData,
+    };
+
+    $session->http->setMimeType( 'application/json' );
+
+    return JSON::to_json( $data );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_setPayoutStatus ( )
+
+Sets the vendorPayoutStatus flag for each transaction passed by the form param 'itemId'. The new status is passed
+by the form param 'status'. Status can either be 'NotPaid' or 'Scheduled' and may only be applied on items that do
+not have their vendorPayoutStatus set to 'Paid'.
+
+Returns the status to which the item(s) are set.
+
+=cut
+
+sub www_setPayoutStatus {
+    my $class   = shift;
+    my $session = shift;
+
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
+
+    my @itemIds = $session->form->process('itemId');
+    my $status  = $session->form->process('status');
+    return "error: wrong status [$status]" unless isIn( $status, qw{ NotPaid Scheduled } );
+
+    foreach  my $itemId (@itemIds) {
+       my $item = WebGUI::Shop::TransactionItem->newByDynamicTransaction( $session, $itemId );
+       return "error: invalid transactionItemId [$itemId]" unless $item;
+       return "error: cannot change status of a Paid item" if $item->get('vendorPayoutStatus') eq 'Paid';
+    
+       $item->update({ vendorPayoutStatus => $status });
+    }
+
+    return $status;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_submitScheduledPayouts ()
+
+Sets the vendorPayoutStatus flag of scheduled payments to 'Paid'. 
+
+NOTE: This method does no payments at all. In the future this method should trigger some automated payout
+mechanism.
+
+=cut
+
+sub www_submitScheduledPayouts {
+    my $class   = shift;
+    my $session = shift;
+
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
+
+    $session->db->write(
+        q{ update transactionItem set vendorPayoutStatus = 'Paid' where vendorPayoutStatus = 'Scheduled' }
+    );
+
+    return $class->www_managePayouts( $session );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_vendorTotalsAsJSON ( )
+
+Returns a JSON string containing all vendors and their payout details. The following
+form parameters can be passed:
+
+=head3 vendorId
+
+If passed, the results will include only the totals of this vendor.
+
+=cut
+
+sub www_vendorTotalsAsJSON {
+    my $class       = shift;
+    my $session     = shift;
+
+    my $admin   = WebGUI::Shop::Admin->new($session);
+    return $session->privilege->adminOnly() unless ($admin->canManage);
+
+    my $vendorId    = $session->form->process('vendorId');
+    my ($vendorPayoutData, @placeholders);
+  
+    my @sql;
+    push @sql,
+        'select vendorId, vendorPayoutStatus, sum(vendorPayoutAmount) as total from transactionItem';
+    push @sql, ' where vendorId=? ' if $vendorId;
+    push @sql, ' group by vendorId, vendorPayoutStatus ';
+
+    push @placeholders, $vendorId if $vendorId;
+
+    my $sth = $session->db->read( join( ' ', @sql) , \@placeholders );
+    while (my $row = $sth->hashRef) {
+        $vendorPayoutData->{ $row->{vendorId} }->{ $row->{vendorPayoutStatus} } = $row->{total};
+    }
+    $sth->finish;
+
+    my @dataset;
+    foreach my $vendorId (keys %{ $vendorPayoutData }) {
+        my $vendor = WebGUI::Shop::Vendor->new( $session, $vendorId );
+
+        push @dataset, {
+            %{ $vendor->get },
+            %{ $vendorPayoutData->{ $vendorId } },
+        }
+    }
+
+    $session->http->setMimeType( 'application/json' );
+    return JSON::to_json( { vendors => \@dataset } );
+}
 
 1;
+

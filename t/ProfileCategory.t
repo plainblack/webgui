@@ -31,7 +31,10 @@ my $categories = WebGUI::ProfileCategory->getCategories($session);
 
 my @labels = map { $_->getLabel } @{ $categories };
 
-$categories->[0]->set({ visible => 0});
+my %originalProperties = %{ $categories->[0]->get };
+my %properties = %originalProperties;
+$properties{visible} = 0;
+$categories->[0]->set(\%properties);
 
 my $newCategories = WebGUI::ProfileCategory->getCategories($session);
 my @newLabels     = map { $_->getLabel } @{ $newCategories };
@@ -39,4 +42,5 @@ my @newLabels     = map { $_->getLabel } @{ $newCategories };
 cmp_bag(\@newLabels, \@labels, 'Setting a category to not be visible does not change its availability through getCategories, with no options');
 
 END {
+    $categories->[0]->set(\%originalProperties);
 }

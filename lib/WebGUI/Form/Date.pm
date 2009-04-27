@@ -221,7 +221,7 @@ sub toHtml {
         || !$self->get("value")     
         || $self->get("value") =~ m/^\d+$/) {
 		# Epoch format
-		$value = $self->set("value",$self->session->datetime->epochToSet($self->getOriginalValue));
+		$value = $self->session->datetime->epochToSet($self->getOriginalValue);
 	} 
     else {
 		# MySQL format

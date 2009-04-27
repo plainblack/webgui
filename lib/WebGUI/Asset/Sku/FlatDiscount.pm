@@ -242,7 +242,7 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_addToCart
+=head2 www_addToCart
 
 Accepts the information from the form and adds it to the cart.
 

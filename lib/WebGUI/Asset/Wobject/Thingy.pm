@@ -292,21 +292,82 @@ sub duplicate {
     my $assetId = $self->get("assetId");
     my $fields;
 
+    my $otherThingFields = $db->buildHashRefOfHashRefs(
+        "select fieldType, fieldId, right(fieldType,22) as otherThingId, fieldInOtherThingId from Thingy_fields
+        where fieldType like 'otherThing_%' and assetId = ?",
+        [$assetId],'fieldInOtherThingId'
+    );
+
     my $things = $self->getThings;
     while ( my $thing = $things->hashRef) {
-        my $oldThingId = $thing->{thingId};
-        my $newThingId = $newAsset->addThing($thing,0);
+        my $oldSortBy   = $thing->{sortBy};
+        my $oldThingId  = $thing->{thingId};
+        my $newThingId  = $newAsset->addThing($thing,0);
         $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
             ,[$assetId,$oldThingId]);
         foreach my $field (@$fields) {
             # set thingId to newly created thing's id.
             $field->{thingId} = $newThingId;
+        
+            my $originalFieldId = $field->{fieldId};
 
-            $newAsset->addField($field,0);
+            my $newFieldId = $newAsset->addField($field,0);
+            if ($originalFieldId eq $oldSortBy){
+                $self->session->db->write( "update Thingy_things set sortBy = ? where thingId = ?",
+                    [ $newFieldId, $newThingId ] );
+            }
+
+            if ($otherThingFields->{$originalFieldId}){
+                $otherThingFields->{$originalFieldId}->{newFieldType}   = 'otherThing_'.$newThingId;
+                $otherThingFields->{$originalFieldId}->{newFieldId}     = $newFieldId;
+            }
         }
+    }
+    foreach my $otherThingField (keys %$otherThingFields){
+        $db->write('update Thingy_fields set fieldType = ?, fieldInOtherThingId = ?
+                    where fieldInOtherThingId = ? and assetId = ?',
+                    [$otherThingFields->{$otherThingField}->{newFieldType},
+                    $otherThingFields->{$otherThingField}->{newFieldId},
+                    $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->get('assetId')]);
     }
     return $newAsset;
 }
+
+#-------------------------------------------------------------------
+
+=head2 duplicateThing ( thingId )
+
+Duplicates a thing.
+
+=head3 thingId
+
+The id of the Thing that will be duplicated.
+
+=cut
+
+sub duplicateThing {
+
+    my $self        = shift;
+    my $oldThingId  = shift;
+    my $db          = $self->session->db;
+
+    my $thingProperties = $self->getThing($oldThingId);
+    $thingProperties->{thingId} = 'new';
+    $thingProperties->{label}   = $thingProperties->{label}.' (copy)';
+
+    my $newThingId = $self->addThing($thingProperties);
+    my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
+            ,[$self->getId,$oldThingId]);
+    foreach my $field (@$fields) {
+        # set thingId to newly created thing's id.
+        $field->{thingId} = $newThingId;
+        $self->addField($field,0);
+    }
+
+    return $newThingId;
+
+}
+
 
 #-------------------------------------------------------------------
 
@@ -641,7 +702,10 @@ sub getEditFieldForm {
     }
     
     my $dialogPrefix;
-    if ($fieldId eq "new"){
+    if ($field->{oldFieldId}){
+        $dialogPrefix = "edit_".$field->{oldFieldId}."_Dialog_copy";
+    }
+    elsif($fieldId eq "new"){
         $dialogPrefix = "addDialog";
     }
     else{
@@ -1436,6 +1500,26 @@ sub www_deleteFieldConfirm {
 
     return 1;
 }
+
+#-------------------------------------------------------------------
+
+=head2 www_duplicateThing ( )
+
+Duplicates a Thing.
+
+=cut
+
+sub www_duplicateThing {
+    my $self = shift;
+    my $session = $self->session;
+    my $thingId = $session->form->process("thingId");
+    return $session->privilege->insufficient() unless $self->canEdit;
+
+    $self->duplicateThing($thingId);
+
+    return $self->www_manage;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_copyThingData( )
@@ -1714,7 +1798,10 @@ sub www_editThing {
             ."  <td style='width:100px;' valign='top' class='formDescription'>".$field->{label}."</td>\n"
             ."  <td style='width:370px;'>".$formElement."</td>\n"
             ."  <td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='".$i18n->get('Edit','Icon')."' type='button'>" 
+            ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>"
+            ." <input onClick=\"editListItem('".$self->session->url->page()
+            ."?func=editField;copy=1;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}
+            ."','copy')\" value='Copy' type='button'>"
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
             ."value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
@@ -2055,12 +2142,19 @@ Returns the html for a pop-up dialog to add or edit a field.
 
 sub www_editField {
 
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
     my (%properties,$thingId,$fieldId,$dialogBody);
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    $fieldId = $self->session->form->process("fieldId");
-    $thingId = $self->session->form->process("thingId");
-    %properties = $self->session->db->quickHash("select * from Thingy_fields where thingId=".$self->session->db->quote($thingId)." and fieldId = ".$self->session->db->quote($fieldId)." and assetId = ".$self->session->db->quote($self->get("assetId")));
+    return $session->privilege->insufficient() unless $self->canEdit;
+    $fieldId = $session->form->process("fieldId");
+    $thingId = $session->form->process("thingId");
+    %properties = $session->db->quickHash("select * from Thingy_fields where thingId=? and fieldId=? and assetId=?",
+        [$thingId,$fieldId,$self->get("assetId")]);
+    if($session->form->process("copy")){
+        $properties{oldFieldId} = $properties{fieldId};
+        $properties{fieldId}    = 'new';
+        $properties{label}      = $properties{label}.' (copy)';
+    }
     $dialogBody = $self->getEditFieldForm(\%properties);
     $self->session->output->print($dialogBody->print);
     return "chunked";
@@ -2868,6 +2962,8 @@ sub www_manage {
                 "",$i18n->get('delete thing warning')),
             'thing_editUrl' => $session->url->append($url, 'func=editThing;thingId='.$thing->{thingId}),
             'thing_editIcon' => $session->icon->edit('func=editThing;thingId='.$thing->{thingId}),
+            'thing_copyUrl' => $session->url->append($url, 'func=duplicateThing;thingId='.$thing->{thingId}),
+            'thing_copyIcon' => $session->icon->copy('func=duplicateThing;thingId='.$thing->{thingId}),
             'thing_addUrl' => $session->url->append($url,
                 'func=editThingData;thingId='.$thing->{thingId}.';thingDataId=new'),
             'thing_searchUrl' => $session->url->append($url, 'func=search;thingId='.$thing->{thingId}), 
@@ -3081,6 +3177,9 @@ sub getSearchTemplateVars {
 
     $currentUrl = $self->getUrl();
     foreach ($self->session->form->param) {
+                                 # if we just saved data from an edit, we do not want to keep any of the params
+        last if $_ eq 'func' and $self->session->form->process($_) eq 'editThingDataSave';
+
         unless ($_ eq "pn" || $_ eq "op" || $_ =~ /identifier/xi || $_ =~ /password/xi || $_ eq "orderBy" ||
 $self->session->form->process($_) eq "") {
             $currentUrl = $self->session->url->append($currentUrl,$self->session->url->escape($_)
@@ -3189,10 +3288,16 @@ sequenceNumber');
             $templateVars{canEditThingData} = 1;
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            $templateVars{searchResult_delete_url} = $session->url->append($url,
+                'func=deleteThingDataConfirm;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_edit_url} = $session->url->append($url, 
+                'func=editThingData;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_copy_icon} = $session->icon->copy('func=copyThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_copy_url} = $session->url->append($url, 
+                'func=copyThingData;thingId='.$thingId.';thingDataId='.$thingDataId,);
         }
         push(@searchResult_loop,\%templateVars);
     }

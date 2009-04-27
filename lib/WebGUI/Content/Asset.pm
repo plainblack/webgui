@@ -18,6 +18,7 @@ use strict;
 use LWP::MediaTypes qw(guess_media_type);
 use Time::HiRes;
 use WebGUI::Asset;
+use WebGUI::PassiveAnalytics::Logging;
 
 use Apache2::Const -compile => qw(OK);
 
@@ -170,6 +171,9 @@ sub page {
 				$method = "view";
 			}
 		}
+        ##Passive Analytics Logging
+        WebGUI::PassiveAnalytics::Logging::log($session, $asset);
+
 		$output = tryAssetMethod($session,$asset,$method);
 		$output = tryAssetMethod($session,$asset,"view") unless ($output || ($method eq "view"));
 	}

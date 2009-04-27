@@ -451,6 +451,17 @@ sub www_commitVersionTagConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_leaveVersionTag ( session )
+
+Clears the current working version tag, and returns the user to www_manageVersions.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
 sub www_leaveVersionTag {
     my $session = shift;
     WebGUI::VersionTag->getWorking($session)->clearWorking;

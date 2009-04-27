@@ -961,6 +961,12 @@ to add or remove users from their groups.
 		lastUpdated => 1036864905
 	},
 
+	'view profile' => {
+		message => q|View user's profile.|,
+		context => q|Label for a URL to view the profile for the user. Used in Operation/User.pm|,
+		lastUpdated => 1239926712
+	},
+
 	'60' => {
 		message => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
 		lastUpdated => 1031514049
@@ -4203,9 +4209,9 @@ LongTruncOk=1</p>
     },
 
     'WebGUI password recovery' => {
-        message     => q{WebGUI password recovery},
+        message     => q{Password recovery},
         lastUpdated => 0,
-        context     => q{Title of the template created by the Site Setup screen},
+        context     => q{Subject of the email that is sent for password recovery},
     },
 
     'session length' => {
@@ -4338,6 +4344,12 @@ Users may override this setting in their profile.
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
         },
+	'Ad Space control name' => {
+		message => q|Ad Space|,
+		lastUpdated => 0,
+		context => q|name for the Ad Space control|
+	},
+
 };
 
 1;

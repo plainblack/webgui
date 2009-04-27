@@ -144,6 +144,12 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate ( )
+
+Extend the super class to duplicate the storage location.
+
+=cut
+
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(@_);
@@ -169,6 +175,14 @@ sub exportAssetData {
 
 
 #-------------------------------------------------------------------
+
+=head2 getStorageLocation ( )
+
+Fetches the storage location for this asset.  If it does not have one,
+then make one.  Build an internal cache of the storage object.
+
+=cut
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -223,6 +237,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost ( )
+
+Extend the super class to calculate total asset size from
+any files stored in the storage location.
+
+=cut
+
 sub processPropertiesFromFormPost {
     my $self = shift;
     $self->SUPER::processPropertiesFromFormPost(@_);
@@ -235,6 +256,15 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 update ( )
+
+Extend the super class to handle the storage location.  Sets
+the correct privileges and deletes the internally cached
+Storage object.
+
+=cut
+
 sub update {
     my $self = shift;
     my $previousStorageId = $self->get('storageId');
@@ -252,6 +282,12 @@ sub update {
 
 
 #-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Extend the super class to delete all storage locations.
+
+=cut
 
 sub purge {
         my $self = shift;
@@ -279,6 +315,12 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Extend the super class to delete the storage location for this revision.
+
+=cut
 
 sub purgeRevision {
         my $self = shift;

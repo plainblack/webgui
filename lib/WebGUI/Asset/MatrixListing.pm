@@ -58,6 +58,43 @@ sub addRevision {
 	return $newSelf;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 canAdd ( )
+
+Override canAdd to ignore its permissions check. Permissions are handled
+by the parent Matrix.
+
+=cut
+
+sub canAdd {
+    return 1;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEdit (  )
+
+Returns true if the user can edit this asset. C<userId> is a WebGUI user ID. 
+
+Users can edit this Matrix listing if they are the owner, or if they can edit
+the parent Matrix.
+
+=cut
+
+sub canEdit {
+    my $self        = shift;
+
+    if ( $self->session->form->process("assetId") eq "new" ) {
+        return $self->getParent->canAddMatrixListing();
+    }
+    else {
+        return 1 if $self->session->user->userId eq $self->get("ownerUserId");
+
+        return $self->getParent->canEdit();
+    }
+}
+
 #-------------------------------------------------------------------
 
 =head2 definition ( session, definition )
@@ -210,7 +247,11 @@ By specifying this method, you activate this feature.
 
 sub getAutoCommitWorkflowId {
     my $self = shift;
-    return $self->getParent->get("submissionApprovalWorkflowId");
+    
+    if($self->session->form->process("assetId") eq "new"){
+        return $self->getParent->get("submissionApprovalWorkflowId");
+    }
+    return undef;
 }
 
 #-------------------------------------------------------------------
@@ -267,6 +308,27 @@ sub getEditForm {
         -hoverHelp      =>$i18n->get("description description"),
         -value          =>$self->getValue('description'),
         );
+    if ($self->getParent->canEdit) {
+        $form->user(
+            name        =>"ownerUserId",
+            value       =>$self->getValue('ownerUserId'),
+            label       =>$i18n->get('maintainer label'),
+            hoverHelp   =>$i18n->get('maintainer description'),
+            );
+    }
+    else{
+        my $userId;
+        if ($func eq "add"){
+            $userId = $session->user->userId;
+        }
+        else{
+            $userId = $self->get('ownerUserId');
+        }
+        $form->hidden(
+            -name           =>'ownerUserId',
+            -value          =>$userId,
+        );
+    }
     $form->text(        
         -name           =>'version',
         -defaultValue   =>undef,
@@ -298,21 +360,17 @@ sub getEditForm {
 
     foreach my $category (keys %{$self->getParent->getCategories}) {
         $form->raw('<tr><td colspan="2"><b>'.$category.'</b></td></tr>');
-        my $attributes;
-        if ($session->form->process('func') eq 'add'){
-            $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
-                [$category,$matrixId]);
-        }
-        else{
-            $attributes = $db->read("select * from Matrix_attribute as attribute 
-                left join MatrixListing_attribute as listing using(attributeId) 
-                where listing.matrixListingId = ? and category =? and attribute.assetId = ?",
-                [$self->getId,$category,$matrixId]);
-        }
+        my $attributes = $db->read("select * from Matrix_attribute where category = ? and assetId = ?",
+            [$category,$matrixId]);
         while (my $attribute = $attributes->hashRef) {
             $attribute->{label}     = $attribute->{name};
             $attribute->{subtext}   = $attribute->{description};
             $attribute->{name}      = 'attribute_'.$attribute->{attributeId}; 
+            unless($session->form->process('func') eq 'add'){
+                $attribute->{value} = $db->quickScalar("select value from MatrixListing_attribute 
+                    where attributeId = ? and matrixId = ? and matrixListingId = ?",
+                    [$attribute->{attributeId},$matrixId,$self->getId]);
+            }
             if($attribute->{fieldType} eq 'Combo'){
                 my %options;
                 tie %options, 'Tie::IxHash';
@@ -327,7 +385,7 @@ sub getEditForm {
 
     $form->raw(
     '<tr><td COLSPAN=2>'.
-    WebGUI::Form::Button($session, {}).
+    WebGUI::Form::Submit($session, {}).
     WebGUI::Form::Button($session, {
         -value  => $i18n->get('cancel', 'WebGUI'),
         -extras => q|onclick="history.go(-1);" class="backwardButton"|
@@ -451,6 +509,34 @@ sub processPropertiesFromFormPost {
     }
     $self->update({score => $score});    
 
+    if ( $self->get('screenshots') ) {
+        my $fileObject = WebGUI::Form::File->new($self->session,{ value=>$self->get('screenshots') });
+        my $storage = $fileObject->getStorageLocation;
+        my @files;
+        @files = @{ $storage->getFiles } if (defined $storage);
+        foreach my $file (@files) {
+            unless ($file =~ m/^thumb-/){
+                my ($resizeWidth,$resizeHeight);
+                my ($width, $height) = $storage->getSizeInPixels($file);
+                my $maxWidth    = $self->getParent->get('maxScreenshotWidth');
+                my $maxHeight   = $self->getParent->get('maxScreenshotHeight');
+                if ($width > $maxWidth){
+                    my $newHeight = $height * ($maxWidth / $width);
+                    if ($newHeight > $maxHeight){
+                        # Heigth requires more resizing so use maxHeight
+                        $storage->resize($file, 0, $maxHeight);
+                    }
+                    else{
+                        $storage->resize($file, $maxWidth);
+                    }
+                }
+                elsif($height > $maxHeight){
+                    $storage->resize($file, 0, $maxHeight);
+                }
+            }
+        }
+    }
+
     $self->requestAutoCommit;
     return undef;
 }
@@ -522,7 +608,7 @@ sub setRatings {
         
         my $half    = round($count/2);
         my $mean    = $sum / ($count || 1);
-        my $median  = $db->quickScalar("select rating $sql limit $half,$half",[$self->getId,$category]);
+        my $median  = $db->quickScalar("select rating $sql order by rating limit $half,1",[$self->getId,$category]);
         
         $db->write("replace into MatrixListing_ratingSummary 
             (listingId, category, meanValue, medianValue, countValue, assetId) 
@@ -533,7 +619,7 @@ sub setRatings {
 
 #-------------------------------------------------------------------
 
-=head2 view ( hasRated )
+=head2 updateScore ( )
 
 Updates the score of a MatrixListing. 
 
@@ -580,6 +666,14 @@ sub view {
     if ($emailSent){
     	$var->{emailSent}       = 1;
     }
+
+    unless($self->hasBeenCommitted){
+        my $workflowInstanceId = $db->quickScalar("select workflowInstanceId from assetVersionTag where tagId =?"
+            ,[$self->get('tagId')]);
+        $var->{canApprove}          = $self->getParent->canEdit;
+        $var->{approveOrDenyUrl}    = $self->getUrl("op=manageRevisionsInTag;workflowInstanceId=".$workflowInstanceId
+            .";tagId=".$self->get('tagId'));
+    }
     $var->{canEdit}             = $self->canEdit;
     $var->{editUrl}             = $self->getUrl("func=edit");
     $var->{controls}            = $self->getToolbar;
@@ -590,6 +684,13 @@ sub view {
 
     $var->{manufacturerUrl_click}  = $self->getUrl("func=click;manufacturer=1");
     $var->{productUrl_click}       = $self->getUrl("func=click");
+
+    if($self->get('status') eq 'pending'){
+        my $revisionDate                = $self->get('revisionDate');
+        $var->{revision}                = $revisionDate;
+        $var->{manufacturerUrl_click}   .= ';revision='.$revisionDate;
+        $var->{productUrl_click}        .= ';revision='.$revisionDate;
+    }
 
     $self->session->style->setScript($self->session->url->extras('yui/build/yahoo/yahoo-min.js'),
         {type => 'text/javascript'});
@@ -647,33 +748,10 @@ sub view {
         my $storage = $file->getStorageLocation;
         my @files;
         @files = @{ $storage->getFiles } if (defined $storage);
-        
-        $var->{screenshots} = qq|
-<script type="text/javascript" src="/extras/ukplayer/swfobject.js"></script>
-<script type="text/javascript">
-    swfobject.registerObject("myFlashContent","9.0.0","/extras/ukplayer/expressInstall.swf");
-</script>
-<div>
-    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="400" height="300" id="myFlashContent">
-        <param name="movie" value="/extras/ukplayer/slideShow.swf" />
-        <param name="flashvars" value="config=?func=getScreenshotsConfig" />
-        <!--[if !IE]>-->
-        <object type="application/x-shockwave-flash" data="/extras/ukplayer/slideShow.swf" width="400"
-height="300">
-            <param name="flashvars" value="config=?func=getScreenshotsConfig" />
-        <!--<![endif]-->
-            <a href="http:/www.adobe.com/go/getflashplayer">
-                <img src="http:/www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe
-Flash player" />
-            </a>
-        <!--[if !IE]>-->
-        </object>
-        <!--<![endif]-->
-    </object>
-</div>
-|;
+        $var->{screenshotsUrl}      = $self->getUrl('func=viewScreenshots');
+        $var->{screenshotThumbnail} = $storage->getUrl('thumb-'.$files[0]);
     }
-
+        
     # Rating form
 
     my %rating;
@@ -835,12 +913,14 @@ Web facing method which is the default edit page
 
 sub www_edit {
     my $self = shift;
-
-    return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
-
     my $i18n = WebGUI::International->new($self->session, "Asset_MatrixListing");
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
+
+    if($self->session->form->process('func') eq 'add'){
+        return $self->session->privilege->noAccess() unless $self->getParent->canAddMatrixListing();
+    }else{
+        return $self->session->privilege->insufficient() unless $self->canEdit;
+        return $self->session->privilege->locked() unless $self->canEditIfLocked;
+    }
 
     my $var         = $self->get;
     my $matrix      = $self->getParent;
@@ -927,16 +1007,17 @@ sub www_getScreenshots {
         @files = @{ $storage->getFiles } if (defined $storage);
         foreach my $file (@files) {
         unless ($file =~ m/^thumb-/){
+            my ($width, $height) = $storage->getSizeInPixels($file);
             my $thumb = 'thumb-'.$file;
             $xml .= "
         <slide>
-            <width>400</width>
-            <height>300</height>
-            <title><![CDATA[<b>Slide</b> One]]></title>
+            <title></title>
             <description><![CDATA[ Screenshots ]]></description>
             <image_source>".$storage->getUrl($file)."</image_source>
             <duration>5</duration>
             <thumb_source>".$storage->getUrl($thumb)."</thumb_source>
+            <width>".$width."</width>
+            <height>".$height."</height>
         </slide>            
             ";
             }
@@ -960,56 +1041,14 @@ Returns the xml config file for the ukplayer that displays the screenshots.
 =cut
 
 sub www_getScreenshotsConfig {
-    my $self = shift;
+    my $self    = shift;
+    my $var     = $self->get;
 
     return $self->session->privilege->noAccess() unless $self->canView;
 
     $self->session->http->setMimeType('text/xml');
 
-    my $xml = qq|<?xml version="1.0" encoding="UTF-8"?>
-<config>
-
-    <content_url>?func=getScreenshots</content_url>
-    
-    <width>400</width><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
-useful for offline testing) -->
-    <height>300</height><!-- this value is overwritten by the flashVars but the tag needs to be here (and it is
-useful for offline testing) -->
-    <background_color>0xDDDDEE</background_color>
-    <default_duration>20</default_duration>
-    <default_slidewidth>100</default_slidewidth>
-    <default_slideheight>100</default_slideheight>
-    
-    <font>Verdana</font>
-    <font_size>12</font_size>
-    <font_color>0xCCCCCC</font_color>
-    <text_border_color>0xCCCCCC</text_border_color>
-    <text_bg_color>0x000000</text_bg_color>
-    <text_autohide>true</text_autohide>
-    
-    <controls_color>0xCCCCCC</controls_color>
-    <controls_border_color>0xCCCCCC</controls_border_color>
-    <controls_bg_color>0x000000</controls_bg_color>
-    <controls_autohide>false</controls_autohide>
-    
-    <thumbnail_width>48</thumbnail_width>
-    <thumbnail_height>36</thumbnail_height>
-    <thumbnail_border_color>0x000000</thumbnail_border_color>
-    <menu_autohide>true</menu_autohide>
-    <menu_dead_zone_width>100</menu_dead_zone_width>
-    <menu_gaps>5</menu_gaps>
-    
-    <mute_at_start>false</mute_at_start>
-    <autostart>true</autostart>
-    <autopause>false</autopause>
-    <loop>false</loop>
-    <error_message_content><![CDATA[XML not found: ]]></error_message_content>
-    <error_message_image><![CDATA[Image not found]]></error_message_image>
-    
-</config>
-|;
-
-    return $xml;
+    return $self->processTemplate($var,$self->getParent->get("screenshotsConfigTemplateId"));
 }
 
 #-------------------------------------------------------------------
@@ -1117,7 +1156,24 @@ sub www_view {
 	return $self->view;
 }
 
+#-------------------------------------------------------------------
 
+=head2 www_viewScreenshots ( )
+
+Returns this listing's screenshots in a ukplayer.
+
+=cut
+
+sub www_viewScreenshots {
+    my $self    = shift;
+    my $var     = $self->get;
+    
+    $var->{configUrl} = 'config='.$self->getUrl("func=getScreenshotsConfig");
+
+    return $self->session->privilege->noAccess() unless $self->canView;
+
+    return $self->processTemplate($var,$self->getParent->get("screenshotsTemplateId"));
+}
 1;
 
 #vim:ft=perl

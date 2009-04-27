@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 44;
+my $tests = 49;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -282,6 +282,27 @@ cmp_deeply(
     [ $fence, $defaultVendor, ],
     'delete removed the correct vendor'
 );
+
+#######################################################################
+#
+# isVendorInfoComplete
+#
+#######################################################################
+
+my %completeProps = (
+    name                    => 'Esquerita',
+    userId                  => $fenceUser->userId,
+    preferredPaymentType    => 'PayPal',
+    paymentInformation      => 'esquerita@example.com',
+);
+$fence->update( { %completeProps } );
+is( $fence->isVendorInfoComplete, 1, 'Vendor information is complete' );
+
+foreach (keys %completeProps ) {
+    $fence->update( { %completeProps, $_ => undef } );
+    ok( !$fence->isVendorInfoComplete, "Vendor information is not complete without $_" );
+}
+
 
 undef $guard;
 

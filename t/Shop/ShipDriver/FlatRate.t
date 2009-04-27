@@ -41,6 +41,7 @@ my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 my $storage;
 my ($driver, $cart, $car);
+my $versionTag;
 
 SKIP: {
 
@@ -285,6 +286,9 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
+$versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->commit;
+
 $options = {
     label   => 'flat rate, ship weight',
     enabled => 1,
@@ -296,7 +300,7 @@ $options = {
 
 $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
-my $cart = WebGUI::Shop::Cart->newBySession($session);
+$cart = WebGUI::Shop::Cart->newBySession($session);
 
 $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
 is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
@@ -329,8 +333,7 @@ END {
     if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
     }
-    my $tag = WebGUI::VersionTag->getWorking($session, 'nocreate');
-    if (defined $tag) {
-        $tag->rollback;
+    if (defined $versionTag) {
+        $versionTag->rollback;
     }
 }

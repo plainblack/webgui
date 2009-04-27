@@ -49,6 +49,17 @@ our $I18N = {
         lastUpdated => 1230867169,
     },
 
+    'my sales label' => {
+        message     => q{Sales},
+        lastUpdated => 0,
+    },
+
+    'manage tax label' => {
+        message     => q{Manage Tax Settings},
+        lastUpdated => 0,
+        context     => q{Label for the manage tax tab},
+    },
+
 };
 
 1;

@@ -125,6 +125,22 @@ sub getAutoCommitWorkflowId {
 	my $self = shift;
     my $wiki = $self->getWiki;
     if ($wiki->hasBeenCommitted) {
+
+        # delete spam
+        my $spamStopWords = $self->session->config->get('spamStopWords');
+        if (ref $spamStopWords eq 'ARRAY') {
+            my $spamRegex = join('|',@{$spamStopWords});
+            $spamRegex =~ s/\s/\\ /g;
+            if ($self->get('content') =~ m{$spamRegex}xmsi) {
+                my $tag = WebGUI::VersionTag->new($self->session, $self->get('tagId'));
+                $self->purgeRevision;
+                if ($tag->getAssetCount == 0) {
+                    $tag->rollback;
+                }
+                return undef;
+            }
+        }
+
         return $wiki->get('approvalWorkflow')
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
@@ -151,7 +167,7 @@ sub getEditForm {
 		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }) ,
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
-        formKeywords => WebGUI::Form::text($session, {
+        formKeywords => WebGUI::Form::keywords($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
             }),
@@ -276,7 +292,6 @@ sub processPropertiesFromFormPost {
             }
         }
     }
-
 }
 
 #-------------------------------------------------------------------

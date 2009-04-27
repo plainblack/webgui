@@ -29,12 +29,9 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
 # Override some settings to make things easier to test
-my %oldSettings;
 # userFunctionStyleId 
-$oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
 # specialState
-$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
 $session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
@@ -180,8 +177,4 @@ END {
     }
 
     $user->delete;
-
-    for my $key ( keys %oldSettings ) {
-        $session->setting->set( $key, $oldSettings{ $key } );
-    }
 }

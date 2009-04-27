@@ -10,7 +10,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
 			innerHTML = innerHTML + " checked='checked'";
 		}
-		innerHTML = innerHTML + " onchange='javascript:compareFormButton()' class='compareCheckBox'>";
+		innerHTML = innerHTML + " class='compareCheckBox'>";
 		elCell.innerHTML = innerHTML;
 	};
 
@@ -42,7 +42,6 @@ YAHOO.util.Event.addListener(window, "load", function() {
         var myCallback = function() {
 		this.set("sortedBy", null);
             	this.onDataReturnAppendRows.apply(this,arguments);
-		compareFormButton();
         };
 
 	var callback2 = {
@@ -55,7 +54,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		var attributeSelects = YAHOO.util.Dom.getElementsByClassName('attributeSelect','select');
 		var newUri = "func=getCompareFormData;search=1";
     		for (var i = attributeSelects.length; i--; ) {
-			if(attributeSelects[i].value != 'blank'){
+			var selectedIndex = attributeSelects[i].selectedIndex;
+			if(attributeSelects[i].value != 'blank' && !(attributeSelects[i].value == '0' && attributeSelects[i][selectedIndex].text == 'No')){
 				newUri = newUri + ';search_' + attributeSelects[i].id + '=' + attributeSelects[i].value;
 			}
         	}
@@ -71,12 +71,8 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		attributeSelects[i].onchange = reloadCompareForm;
     	}
 	
-	var btnCompare = new YAHOO.widget.Button("compare",{disabled:true,id:"compareButton"});
+	var btnCompare = new YAHOO.widget.Button("compare",{id:"compareButton"});
         btnCompare.on("click", function(e) {
-		window.document.forms['doCompare'].submit();
-        },this,true);
-
-	window.compareFormButton = function() {
 		var compareCheckBoxes = YAHOO.util.Dom.getElementsByClassName('compareCheckBox','input');
 		var checked = 0;
 		for (var i = compareCheckBoxes.length; i--; ) {
@@ -84,12 +80,15 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				checked++;
 			}
     		}
-		if (checked > 1 && checked < maxComparisons){
-			btnCompare.set("disabled",false);
+		if (checked < 2){
+			alert(tooFewMessage);
+		}else if (checked > maxComparisons){
+			alert(tooManyMessage);
 		}else{
-			btnCompare.set("disabled",true);
+			window.document.forms['doCompare'].submit();
 		}
-	}
+        },this,true);
+
     };
 });
 

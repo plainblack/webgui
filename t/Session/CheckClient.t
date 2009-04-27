@@ -54,12 +54,6 @@ my @testArray = (
            comment => "s.also Privoxy/3.0 (Anonymous)"
     },
     {
-           agent => "*/Nutch-0.9-dev",
-           address => "123.113.184.232",
-           output => 1,
-           comment => "Unknown Yahoo robot"
-    },
-    {
            agent => "123spider-Bot (Version: 1.02&#44; powered by www.123spider.de",
            output => 1,
            comment => "123spider.de (Germany) web directory link checking"

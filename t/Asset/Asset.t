@@ -63,12 +63,14 @@ $testGroups{'canEdit asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canEdit group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canEdit group user'}->addToGroups([$testGroups{'canEdit asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Edit Group User');
+WebGUI::Test->groupsToDelete($testGroups{'canEdit asset'});
 
 ##A group and user for groupIdEdit
 $testGroups{'canAdd asset'}     = WebGUI::Group->new($session, 'new');
 $testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Can Add Group User');
+WebGUI::Test->groupsToDelete($testGroups{'canAdd asset'});
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
@@ -810,10 +812,6 @@ END {
         if defined $origExtras;
     $session->config->set( 'uploadsURL',   $origUploads)
         if defined $origUploads;
-    $session->setting->set('urlExtension', $origUrlExtension)
-        if defined $origUrlExtension;
-    $session->setting->set('notFoundPage', $origNotFoundPage)
-        if defined $origNotFoundPage;
     if (defined $originalAssetOverrides) {
         $session->config->set('assets', $originalAssetOverrides);
     }
@@ -822,9 +820,6 @@ END {
     }
     foreach my $user (values %testUsers) {
         $user->delete;
-    }
-    foreach my $group (values %testUsers) {
-        $group->delete;
     }
 }
 

@@ -82,6 +82,7 @@ ok ($uploadUrl, "uploadDir defined in config");
 ####################################################
 
 my $imageStore = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($imageStore);
 my $expectedFiles = ['.', '..'];
 cmp_bag($imageStore->getFiles(1), $expectedFiles, 'Starting with an empty storage object, no files in here except for . and ..');
 $imageStore->addFileFromScalar('.dotfile', 'dot file');
@@ -118,6 +119,7 @@ foreach my $extTest ( @{ $extensionTests } ) {
 WebGUI::Test->interceptLogging();
 
 my $thumbStore = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($thumbStore);
 my $square = WebGUI::Image->new($session, 500, 500);
 $square->setBackgroundColor('#FF0000');
 $square->saveToStorageLocation($thumbStore, 'square.png');
@@ -168,6 +170,7 @@ like($WebGUI::Test::logger_error, qr/^Couldn't read image to check the size of i
 ####################################################
 
 my $imageCopy = $thumbStore->copy();
+WebGUI::Test->storagesToDelete($imageCopy);
 isa_ok($imageCopy, 'WebGUI::Storage', 'copy returns an object');
 cmp_bag(
     $imageCopy->getFiles(),
@@ -216,6 +219,7 @@ is($thumbStore->getThumbnailUrl('square.png'), $thumbStore->getUrl('thumb-square
 my $origMaxImageSize = $session->setting->get('maxImageSize');
 
 my $sizeTest = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($sizeTest);
 
 my $resizeTarget = 80;
 $session->setting->set('maxImageSize', 200 );
@@ -259,8 +263,6 @@ foreach my $testImage (@testImages) {
     );
 }
 
-use Data::Dumper;
-
 $session->setting->set('maxImageSize', $resizeTarget );
 foreach my $testImage (@testImages) {
     my $filename = $testImage->{ filename };
@@ -281,10 +283,4 @@ TODO: {
 }
 
 END {
-	foreach my $stor (
-        $imageStore, $thumbStore, $imageCopy, $sizeTest,
-    ) {
-		ref $stor eq "WebGUI::Storage" and $stor->delete;
-	}
-    $session->setting->set('maxImageSize', $origMaxImageSize );
 }

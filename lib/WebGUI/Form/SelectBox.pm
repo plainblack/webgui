@@ -165,13 +165,28 @@ sub toHtml {
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').'>';
     my $options = $self->getOptions;
 	my $value = $self->getOriginalValue();
-    foreach my $key (keys %{$options}) {
-		$output .= '<option value="'.$key.'"';
-		if ($value eq $key) {
-			$output .= ' selected="selected"';
-		}
-		$output .= '>'.$options->{$key}.'</option>';
-    }
+
+    # Recurse for <optgroups>
+    my $buildOptionsHtml;
+    $buildOptionsHtml = sub {
+        my $options = shift;
+        foreach my $key (keys %{$options}) {
+            if ( ref $options->{$key} eq 'HASH' ) {
+                $output .= qq{<optgroup label="$key">};
+                $buildOptionsHtml->($options->{$key});
+                $output .= qq{</optgroup>};
+            }
+            else {
+                $output .= '<option value="'.$key.'"';
+                if ($value eq $key) {
+                    $output .= ' selected="selected"';
+                }
+                $output .= '>'.$options->{$key}.'</option>';
+            }
+        }
+    };
+    $buildOptionsHtml->($options);
+
 	$output .= '</select>'."\n";
 	return $output;
 }

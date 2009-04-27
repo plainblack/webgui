@@ -930,7 +930,7 @@ sub getEditForm {
 			label       => $i18n->get('keywords'),
 			hoverHelp   => $i18n->get('keywords help'),
 			value       => $self->get('keywords'),
-			fieldType	=> 'text',
+			fieldType	=> 'keywords',
 			tab			=> 'meta',
 		}
 	);
@@ -2165,7 +2165,15 @@ The content to wrap up.
 
 sub processStyle {
 	my ($self, $output) = @_;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
+    my $session = $self->session;
+    my $style   = $session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags);
+    if ($self->get('synopsis')) {
+        $style->setMeta({
+            name    => 'Description',
+            content => $self->get('synopsis'),
+        });
+    }
 	return $output;
 }
 
@@ -2340,9 +2348,9 @@ sub update {
 #			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
             # skip a property unless it was specified to be set by the properties field
 			next unless (exists $properties->{$property});
-
+            my $propertyDefinition = $definition->{properties}{$property};
             # skip a property if it has the display only flag set
-            next if ($definition->{properties}{$property}{displayOnly});
+            next if ($propertyDefinition->{displayOnly});
 
             # skip properties that aren't yet in the table
             if (!exists $tableFields{$property}) {
@@ -2358,14 +2366,16 @@ sub update {
             }
 
             # apply filter logic on a property to validate or fix it's value
-			if (exists $definition->{properties}{$property}{filter}) {
-				my $filter = $definition->{properties}{$property}{filter};
-				$value = $self->$filter($value, $property);
-			}
+            if (exists $propertyDefinition->{filter}) {
+                my $filter = $propertyDefinition->{filter};
+                $value = $self->$filter($value, $property);
+            }
 
-            # use the default value because default and update were both undef
-            if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
-                $value = $definition->{properties}{$property}{defaultValue};
+            # if the value is undefined, use the default if possible
+            # unless allowEmpty has been set, do this for empty strings as well
+            if ( ( !defined $value || ( $value eq q{} && ! $propertyDefinition->{allowEmpty} ) )
+                 && exists $propertyDefinition->{defaultValue} ) {
+                $value = $propertyDefinition->{defaultValue};
                 if (ref($value) eq 'ARRAY') {
                     $value = $value->[0];
                 }
@@ -2606,6 +2616,11 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
+    
+    my $annotations = "";
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $annotations = $self->get("annotations");
+    }
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
     return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
@@ -2644,6 +2659,12 @@ sub www_editSave {
         }
     }
     
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $object->update({ annotations => $annotations });
+    }
+
+    ### 
+
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
@@ -2661,12 +2682,7 @@ sub www_editSave {
 
     # Handle "saveAndReturn" button
     if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
-        if ($isNewAsset) {
-            return $object->www_edit;
-        }
-        else {
-            return $self->www_edit;
-        }
+        return $object->www_edit;
     }
 
     # Handle "proceed" form parameter
@@ -2726,12 +2742,6 @@ sub www_view {
 	return $check if (defined $check);
 
     # if all else fails 
-    if ($self->get('synopsis')) {
-        $self->session->style->setMeta({
-                name    => 'Description',
-                content => $self->get('synopsis'),
-        });
-    }
     $self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;

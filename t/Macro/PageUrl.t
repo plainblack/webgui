@@ -25,8 +25,6 @@ $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
 
-my $preventProxyCache = $session->setting->get('preventProxyCache');
-
 my $macro = 'WebGUI::Macro::PageUrl';
 my $loaded = use_ok($macro);
 
@@ -34,7 +32,7 @@ SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
-$session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
+$session->setting->set('preventProxyCache', 0);
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
@@ -70,5 +68,4 @@ like($output, qr{/sub/page\?noCache=\d+:\d+;query=this$}, 'checking that the que
 
 END {
 	# See note in the Slash_gateway macro test about this.
-	$session->setting->set("preventProxyCache", $preventProxyCache);
 }

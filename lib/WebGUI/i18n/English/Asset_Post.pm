@@ -487,8 +487,8 @@ editing an existing Post, and a thread containing the Post exists.|,
 	},
 
 	'userDefined3' => {
-		message => q|The value contained in the first user defined variable.|,
-		lastUpdated => 1150167057,
+		message => q|The value contained in the third user defined variable.|,
+		lastUpdated => 1236354498,
 	},
 
 	'userDefined4' => {

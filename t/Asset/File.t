@@ -32,6 +32,7 @@ my $session = WebGUI::Test->session;
 
 ##Create a storage location
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
 
 ##Save the image to the location
 my $filename = "someScalarFile.txt";
@@ -84,6 +85,7 @@ $versionTag->commit;
 ############################################
 
 my $fileStorage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($fileStorage);
 $mocker->set_always('getValue', $fileStorage->getId);
 my $fileFormStorage = $asset->getStorageFromPost();
 isa_ok($fileFormStorage, 'WebGUI::Storage', 'Asset::File::getStorageFromPost');

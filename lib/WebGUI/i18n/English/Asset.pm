@@ -1190,6 +1190,12 @@ Couldn't open %-s because %-s <br />
         context     => q{Asset Manager label, as in "locked by admin"},
     },
 
+    'assetHistory' => {
+        message     => q{Asset History},
+        lastUpdated => 0,
+        context     => q{Admin Console label.  Shows the history of assets in this site.},
+    },
+
 };
 
 1;

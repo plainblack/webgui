@@ -269,6 +269,7 @@ is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->
 
 # now let's get tricky and test different file extensions
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage->getId);
 my $filename = 'somePerlFile_pl.txt';
 $storage->addFileFromScalar($filename, $filename);
 $session->user({userId=>3});
@@ -299,6 +300,7 @@ is($fileAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)
 
 # test a different extension, the .foobar extension
 $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage->getId);
 $filename = 'someFoobarFile.foobar';
 $storage->addFileFromScalar($filename, $filename);
 $properties = {
@@ -770,6 +772,10 @@ $exportPath->rmtree;
 );
 
 my $numberCreatedAll = scalar @createdFiles;
+push @createdFiles,
+    [ qw/ the_latest_news the_latest_news.atom /],
+    [ qw/ the_latest_news the_latest_news.rss /],
+;
 
 # turn them into Path::Class::File objects
 my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
@@ -870,6 +876,11 @@ $gettingStarted->update({ isExportable => 0 });
     [ qw/ documentation  free-documentation       index.html /],
 );
 my $numberCreated = scalar @createdFiles;
+push @createdFiles,
+    [ qw/ the_latest_news the_latest_news.atom /],
+    [ qw/ the_latest_news the_latest_news.rss /],
+;
+    
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );

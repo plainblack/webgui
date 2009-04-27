@@ -28,11 +28,11 @@ isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);
 isa_ok($keyword, "WebGUI::Keyword");
 
-$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key word foo bar"});
+$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key, word, foo bar"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);
-is($count, 5, "setKeywordsForAsset() create");
+is($count, 3, "setKeywordsForAsset() create");
 
-$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"webgui rules"});
+$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"webgui, rules"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);
 is($count, 2, "setKeywordsForAsset() update");
 

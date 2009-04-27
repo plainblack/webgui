@@ -163,14 +163,9 @@ sub create {
             $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
         }
         my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
-		if ($msg =~ m/\<.*\>/) {
-            $msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
-			$mail->addHtml($msg);
-		} else {
-            $msg = $preface."\n\n".$msg if($preface ne "");
-			$mail->addText($msg);
-		}
-		$mail->addFooter;
+		$msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
+        $mail->addHtml($msg);
+        $mail->addFooter;
 		$mail->queue;
 	}
 	$self->{_session} = $session;

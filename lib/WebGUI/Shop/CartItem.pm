@@ -173,10 +173,9 @@ Returns an instanciated WebGUI::Asset::Sku object for this cart item.
 
 sub getSku {
     my ($self) = @_;
-    my $id = ref $self;
     my $asset = '';
     $asset = WebGUI::Asset->newByDynamicClass($self->cart->session, $self->get("assetId"));
-    $asset->applyOptions($self->get("options"));
+    $asset->applyOptions($self->get("options")) if $asset;
     return $asset;
 }
 
@@ -230,7 +229,8 @@ Removes this item from the cart and calls $sku->onRemoveFromCart. See also delet
 
 sub remove {
     my $self = shift;
-    $self->getSku->onRemoveFromCart($self);
+    my $sku = $self->getSku;
+    $sku->onRemoveFromCart($self) if $sku;
     return $self->delete;
 }
 

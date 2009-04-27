@@ -970,6 +970,7 @@ sub postProcess {
     my $spamStopWords = $self->session->config->get('spamStopWords');
     if (ref $spamStopWords eq 'ARRAY') {
         my $spamRegex = join('|',@{$spamStopWords});
+        $spamRegex =~ s/\s/\\ /g;
         if ($data{content} =~ m/$spamRegex/xmsi) {
             $data{skipNotification} = 1;
             $self->trash;
@@ -1424,8 +1425,6 @@ sub www_edit {
         richEditId=>$self->getThread->getParent->get("richEditor")
     });
     ##Edit variables just for Threads
-    $session->log->warn("className: $className");
-    $session->log->warn("canEdit parent: ". $self->getThread->getParent->canEdit);
     if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {
         $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
             name=>'isSticky',

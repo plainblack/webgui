@@ -125,6 +125,15 @@ Imports the data exported by the exportAssetData method. If the asset already ex
 
 A hash reference containing the exported data.
 
+=head3 options
+
+A hash reference of options to change how the import works
+
+=head4 inheritPermissions
+
+Forces the all assets in the package to inherit ownerUserId, groupIdView and groupIdEdit
+from the asset where it is deployed.
+
 =cut
 
 sub importAssetData {
@@ -212,13 +221,17 @@ sub importAssetCollateralData {
 
 #-------------------------------------------------------------------
 
-=head2 importPackage ( storageLocation )
+=head2 importPackage ( storageLocation, options )
 
 Imports the data from a webgui package file.
 
 =head3 storageLocation
 
 A reference to a WebGUI::Storage object that contains a webgui package file.
+
+=head3 options
+
+A hashref of options that are passed onto importAssetData.
 
 =cut
 

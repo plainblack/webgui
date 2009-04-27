@@ -199,7 +199,6 @@ $session->{_asset} = $sessionAsset;
 ####################################################
 
 ##Force settings
-my $origPreventProxyCache = $session->setting->get('preventProxyCache');
 $session->setting->set('preventProxyCache', 0);
 
 ##Clear request object for next two tests
@@ -432,5 +431,4 @@ sub deltaHttpTimes {
 
 
 END {
-	$session->setting->set('preventProxyCache', $origPreventProxyCache);
 }

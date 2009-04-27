@@ -30,10 +30,46 @@ Returns true if able to add MatrixListings.
 
 sub canAddMatrixListing {
     my $self    = shift;
+    my $user    = $self->session->user;
 
-    return 0 if $self->session->user->isVisitor;
+    # Users in the groupToAdd group can add listings
+    if ( $user->isInGroup( $self->get("groupToAdd") ) ) {
+        return 1;
+    }
+    # Users who can edit matrix can add listings
+    else {
+        return $self->canEdit;
+    }
 
-    return 1;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 canEdit ( [userId] )
+
+Returns true if the user can edit this Matrix. 
+
+Also checks if a user is adding a Matrix Listing and allows them to if they are
+part of the C<groupToAdd> group.
+
+=cut
+
+sub canEdit {
+    my $self        = shift;
+    my $userId = shift || $self->session->user->userId;
+
+    my $form        = $self->session->form;
+    if ( $form->get('func') eq "editSave" && $form->get('assetId') eq "new" && $form->get( 'class' )->isa(
+'WebGUI::Asset::MatrixListing' ) ) {
+        return $self->canAddMatrixListing();
+    }
+    else {
+        if ($userId eq $self->get("ownerUserId")) {
+            return 1;
+        }
+        my $user = WebGUI::User->new($self->session, $userId);
+        return $user->isInGroup($self->get("groupIdEdit"));
+    }
 }
 
 #-------------------------------------------------------------------
@@ -94,6 +130,22 @@ sub definition {
             hoverHelp       =>$i18n->get('edit listing template description'),
             label           =>$i18n->get('edit listing template label'),
         },
+        screenshotsTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000006",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/Screenshots",
+            hoverHelp       =>$i18n->get('screenshots template description'),
+            label           =>$i18n->get('screenshots template label'),
+        },
+        screenshotsConfigTemplateId=>{
+            defaultValue    =>"matrixtmpl000000000007",
+            fieldType       =>"template",
+            tab             =>"display",
+            namespace       =>"Matrix/ScreenshotsConfig",
+            hoverHelp       =>$i18n->get('screenshots config template description'),
+            label           =>$i18n->get('screenshots config template label'),
+        },
         defaultSort=>{
             fieldType       =>"selectBox",
             tab             =>"display",
@@ -103,7 +155,7 @@ sub definition {
                                 lineage         => $i18n->get('sort by asset rank label'),
                                 lastUpdated     => $i18n->get('sort by last updated label'),
                               },
-            defaultValue    =>"score",
+            defaultValue    =>"title",
             hoverHelp       =>$i18n->get('default sort description'),
             label           =>$i18n->get('default sort label'),
         },
@@ -142,6 +194,20 @@ sub definition {
             hoverHelp       =>$i18n->get('compare color yes description'),
             label           =>$i18n->get('compare color yes label'),
         },
+        maxScreenshotWidth=>{
+            fieldType       =>"integer",
+            tab             =>"display",
+            defaultValue    =>"800",
+            hoverHelp       =>$i18n->get('max screenshot width description'),
+            label           =>$i18n->get('max screenshot width label'),
+        },
+        maxScreenshotHeight=>{
+            fieldType       =>"integer",
+            tab             =>"display",
+            defaultValue    =>"600",
+            hoverHelp       =>$i18n->get('max screenshot height description'),
+            label           =>$i18n->get('max screenshot height label'),
+        },
         categories=>{
             fieldType       =>"textarea",
             tab             =>"properties",
@@ -164,6 +230,13 @@ sub definition {
             hoverHelp       =>$i18n->get('max comparisons privileged description'),
             label           =>$i18n->get('max comparisons privileged label'),
         },
+        groupToAdd=>{
+            fieldType       =>"group",
+            tab             =>"security",
+            defaultValue    =>2,
+            hoverHelp       =>$i18n->get('group to add description'),
+            label           =>$i18n->get('group to add label'),
+        },
         submissionApprovalWorkflowId=>{
             fieldType       =>"workflow",
             tab             =>"security",
@@ -178,6 +251,14 @@ sub definition {
             defaultValue    =>7776000, # 3 months 3*30*24*60*60
             hoverHelp       =>$i18n->get('ratings duration description'),
             label           =>$i18n->get('ratings duration label'),
+        },
+        statisticsCacheTimeout => {
+            tab             => "display",
+            fieldType       => "interval",
+            defaultValue    => 3600,
+            uiLevel         => 8,
+            label           => $i18n->get("statistics cache timeout label"),
+            hoverHelp       => $i18n->get("statistics cache timeout description")
         },
 	);
 	push(@{$definition}, {
@@ -461,6 +542,7 @@ sub view {
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
     'text/javascript'});
     
+    my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
@@ -468,89 +550,106 @@ sub view {
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
-    
-    # Get the MatrixListing with the most views as an object using getLineage.
-    my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
+   
+    if ($self->canEdit){
+        # Get all the MatrixListings that are still pending.
+        my @pendingListings = @{ $self->getLineage(['descendants'], {
+                includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
+                orderByClause       => "revisionDate asc",
+                returnObjects       => 1,
+                statusToInclude     => ['pending'],
+            }) };
+        foreach my $pendingListing (@pendingListings){
+            push (@{ $var->{pending_loop} }, {
+                            url     => $pendingListing->getUrl
+                                       ."?func=view;revision=".$pendingListing->get('revisionDate'),
+                            name    => $pendingListing->get('title'),
+                        });
+        }
+    } 
+   
+    my $versionTag = WebGUI::VersionTag->getWorking($session, 1); 
+    my $noCache =
+        $session->var->isAdminOn
+        || $self->get("statisticsCacheTimeout") <= 10
+        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+    unless ($noCache) {
+        $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$self->getId)->get;
+    }
+
+    if ($varStatisticsEncoded){
+        $varStatistics = JSON->new->decode($varStatisticsEncoded);
+    }
+    else{
+        $varStatistics->{alphanumeric_sortButton}   = "<span id='sortByName'><button type='button'>Sort by name</button></span><br />";
+
+        # Get the MatrixListing with the most views as an object using getLineage.
+        my ($bestViews_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
             joinClass           => "WebGUI::Asset::MatrixListing",
             orderByClause       => "views desc",
             limit               => 1,
             returnObjects       => 1,
         }) };
-    if($bestViews_listing){
-        $var->{bestViews_url}           = $bestViews_listing->getUrl;
-        $var->{bestViews_count}         = $bestViews_listing->get('views');
-        $var->{bestViews_name}          = $bestViews_listing->get('title');
-        $var->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
-    }
+        if($bestViews_listing){
+            $varStatistics->{bestViews_url}           = $bestViews_listing->getUrl;
+            $varStatistics->{bestViews_count}         = $bestViews_listing->get('views');
+            $varStatistics->{bestViews_name}          = $bestViews_listing->get('title');
+            $varStatistics->{bestViews_sortButton}    = "<span id='sortByViews'><button type='button'>Sort by views</button></span><br />";
+        }
 
-    # Get the MatrixListing with the most compares as an object using getLineage.
+        # Get the MatrixListing with the most compares as an object using getLineage.
 
-    my ($bestCompares_listing) = @{ $self->getLineage(['descendants'], {
+        my ($bestCompares_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
             joinClass           => "WebGUI::Asset::MatrixListing",
             orderByClause       => "compares desc",
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    if($bestCompares_listing){
-        $var->{bestCompares_url}        = $bestCompares_listing->getUrl;
-        $var->{bestCompares_count}      = $bestCompares_listing->get('compares');
-        $var->{bestCompares_name}       = $bestCompares_listing->get('title');
-        $var->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
-    }
+        if($bestCompares_listing){
+            $varStatistics->{bestCompares_url}        = $bestCompares_listing->getUrl;
+            $varStatistics->{bestCompares_count}      = $bestCompares_listing->get('compares');
+            $varStatistics->{bestCompares_name}       = $bestCompares_listing->get('title');
+            $varStatistics->{bestCompares_sortButton} = "<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />";
+        }
 
-    # Get the MatrixListing with the most clicks as an object using getLineage.
-    my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
+        # Get the MatrixListing with the most clicks as an object using getLineage.
+        my ($bestClicks_listing) = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
             joinClass           => "WebGUI::Asset::MatrixListing",
             orderByClause       => "clicks desc",
             limit               => 1,   
             returnObjects       => 1,   
         }) };   
-    if($bestClicks_listing){
-        $var->{bestClicks_url}          = $bestClicks_listing->getUrl;
-        $var->{bestClicks_count}        = $bestClicks_listing->get('clicks');
-        $var->{bestClicks_name}         = $bestClicks_listing->get('title');
-        $var->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
-    }
-    # Get the 5 MatrixListings that were last updated as objects using getLineage.
+        if($bestClicks_listing){
+            $varStatistics->{bestClicks_url}          = $bestClicks_listing->getUrl;
+            $varStatistics->{bestClicks_count}        = $bestClicks_listing->get('clicks');
+            $varStatistics->{bestClicks_name}         = $bestClicks_listing->get('title');
+            $varStatistics->{bestClicks_sortButton}   = "<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />";
+        }
 
-    my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
+        # Get the 5 MatrixListings that were last updated as objects using getLineage.
+
+        my @lastUpdatedListings = @{ $self->getLineage(['descendants'], {
             includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
             joinClass           => "WebGUI::Asset::MatrixListing",
             orderByClause       => "lastUpdated desc",
             limit               => 5,
             returnObjects       => 1,
         }) };
-    foreach my $lastUpdatedListing (@lastUpdatedListings){
-        push (@{ $var->{last_updated_loop} }, {
+        foreach my $lastUpdatedListing (@lastUpdatedListings){
+            push (@{ $varStatistics->{last_updated_loop} }, {
                         url         => $lastUpdatedListing->getUrl,
                         name        => $lastUpdatedListing->get('title'),
                         lastUpdated => $self->session->datetime->epochToHuman($lastUpdatedListing->get('lastUpdated'),"%z")
                     });
-    }
-    $var->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
+        }
+        $varStatistics->{lastUpdated_sortButton}  = "<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />";
 
+        # For each category, get the MatrixListings with the best ratings.
 
-    # Get all the MatrixListings that are still pending.
-
-    my @pendingListings = @{ $self->getLineage(['descendants'], {
-            includeOnlyClasses  => ['WebGUI::Asset::MatrixListing'],
-            orderByClause       => "revisionDate asc",
-            returnObjects       => 1,
-            statusToInclude     => ['pending'],
-        }) };
-    foreach my $pendingListing (@pendingListings){
-        push (@{ $var->{pending_loop} }, {
-                        url     => $pendingListing->getUrl,
-                        name    => $pendingListing->get('title'),
-                    });
-    }   
- 
-    # For each category, get the MatrixListings with the best ratings.
-
-    foreach my $category (keys %{$self->getCategories}) {
+        foreach my $category (keys %{$self->getCategories}) {
         my $data;
         my $sql = "
         select 
@@ -581,7 +680,7 @@ sub view {
         order by rating.meanValue ";
         
         $data = $db->quickHashRef($sql." desc limit 1",[$category,$self->getId]);
-        push(@{ $var->{best_rating_loop} },{
+        push(@{ $varStatistics->{best_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,
             name=>$data->{productName},
@@ -590,7 +689,7 @@ sub view {
             count=>$data->{countValue}
             });
         $data = $db->quickHashRef($sql." asc limit 1",[$category,$self->getId]);
-        push(@{ $var->{worst_rating_loop} },{
+        push(@{ $varStatistics->{worst_rating_loop} },{
             url=>'/'.$data->{url},
             category=>$category,
             name=>$data->{productName},
@@ -598,9 +697,9 @@ sub view {
             median=>$data->{medianValue},
             count=>$data->{countValue}
             });
-    }
+        }
 
-    $var->{listingCount} = scalar $db->buildArray("
+        $varStatistics->{listingCount} = scalar $db->buildArray("
         select  * 
         from    asset, assetData
         where   asset.assetId=assetData.assetId
@@ -610,7 +709,17 @@ sub view {
                 and assetData.status='approved'
         group by asset.assetId",
         [$self->getId]);
-	
+
+        $varStatisticsEncoded = JSON->new->encode($varStatistics);
+        WebGUI::Cache->new($session,"matrixStatistics_".$self->getId)->set(
+            $varStatisticsEncoded,$self->get("statisticsCacheTimeout")
+        );
+    }
+
+    foreach my $statistic (keys %{$varStatistics}) {
+        $var->{$statistic} = $varStatistics->{$statistic};
+    }
+
 	return $self->processTemplate($var, undef, $self->{_viewTemplate});
 }
 
@@ -917,13 +1026,32 @@ sub www_getCompareFormData {
     my $form            = $session->form;
     my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
     my $sortDirection   = ' desc';
-#    if ( WebGUI::Utility::isIn($sort, qw(revisionDate score)) ) {
-#        $sortDirection = " desc";
-#    }
-    my @results;
-    my @listingIds = $self->session->form->checkList("listingId");
+    if ($sort eq 'title'){
+        $sortDirection = ' asc';
+    }
     
-    $self->session->http->setMimeType("application/json");
+    my @listingIds = $session->form->checkList("listingId");
+    
+    $session->http->setMimeType("application/json");
+
+    my (@searchParams,@searchParams_sorted,@searchParamList,$searchParamList);
+    if($form->process("search")){
+        foreach my $param ($form->param) {
+            if($param =~ m/^search_/){
+                my $parameter;
+                $parameter->{name}  = $param;
+                $parameter->{value} = $form->process($param);
+                my $attributeId = $param;
+                $attributeId =~ s/^search_//;
+                $attributeId =~ s/_____/-/g;
+                $parameter->{attributeId} = $attributeId;
+                push(@searchParamList,'"'.$parameter->{attributeId}.'"');
+                push(@searchParams,$parameter);
+            }
+        }
+        $searchParamList        = join(',',@searchParamList);
+        @searchParams_sorted    = sort { $b->{value} <=> $a->{value} } @searchParams;
+    }
 
     my $sql = "
         select
@@ -945,31 +1073,17 @@ assetData.revisionDate
             and assetData.revisionDate = (SELECT max(revisionDate) from assetData where assetId=asset.assetId and status='approved')
             and status='approved'
         order by ".$sort.$sortDirection;
+    
+    my $sth = $session->db->read($sql,[$self->getId]);
+    my @results;
 
-    @results = @{ $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]) };
-
-    my (@searchParams,@searchParams_sorted);
     if($form->process("search")){
-        foreach my $param ($form->param) {
-            if($param =~ m/^search_/){
-                my $parameter;
-                $parameter->{name}  = $param;
-                $parameter->{value} = $form->process($param);
-                my $attributeId = $param;
-                $attributeId =~ s/^search_//;
-                $attributeId =~ s/_____/-/g;
-                $parameter->{attributeId} = $attributeId;
-                push(@searchParams,$parameter);
-            }
-        }
-    }
-    @searchParams_sorted = sort { $b->{value} <=> $a->{value} } @searchParams;
-    foreach my $result (@results){
-            if($form->process("search")){
+        while (my $result = $sth->hashRef) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
-                            where listing.matrixListingId = ? order by value asc",
+                            where listing.matrixListingId = ? 
+                            and attributeId IN(".$searchParamList.")",
                             [$result->{assetId}],'attributeId');
                 PARAM: foreach my $param (@searchParams_sorted) {
                         my $fieldType       = $matrixListing_attributes->{$param->{attributeId}}->{fieldType};
@@ -986,20 +1100,27 @@ assetData.revisionDate
                             $result->{checked} = 'checked';
                         }
                 }
-            }
-            else{
-                $result->{assetId}  =~ s/-/_____/g;
-                if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
-                    $result->{checked} = 'checked';
-                }
-            }
             $result->{assetId}  =~ s/-/_____/g;
             $result->{url}      = $session->url->gateway($result->{url});
+            push @results, $result;
+        }
+    }else{
+        while (my $result = $sth->hashRef) {
+            $result->{assetId}  =~ s/-/_____/g;
+            if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
+                $result->{checked} = 'checked';
+            }
+            $result->{url}      = $session->url->gateway($result->{url});
+            push @results, $result;
+        }
     }
+    $sth->finish;
+
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};
 
     my $encodedOutput = JSON->new->encode($jsonOutput);
+
     return $encodedOutput;
 }
 
@@ -1197,7 +1318,7 @@ sub www_search {
                 $options{'blank'}       = 'blank';
                 $attribute->{options}   = \%options;
                 $attribute->{value}     = 'blank';
-                $attribute->{extras}    = "style='width:120px'";
+                $attribute->{extras}    .= " style='width:120px'";
             }
             $attribute->{form} = WebGUI::Form::DynamicField->new($self->session,%{$attribute})->toHtml;
             push(@attribute_loop,$attribute);

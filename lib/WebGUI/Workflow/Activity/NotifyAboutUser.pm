@@ -92,6 +92,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $user = shift;
+	my $previousUser = $self->session->user;
 	$self->session->user({user=>$user});
 	my $message = $self->get("message");
 	WebGUI::Macro::process($self->session, \$message);
@@ -105,6 +106,7 @@ sub execute {
 		});
 	$mail->addText($message);
 	$mail->addFooter;
+	$self->session->user({user=>$previousUser});
 	return $mail->send ? $self->COMPLETE : $self->ERROR;
 }
 

@@ -65,16 +65,13 @@ for my $i ( 0 .. 5 ) {
 $versionTag->commit;
 
 # Override some settings to make things easier to test
-my %oldSettings;
 # userFunctionStyleId 
-$oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
 # specialState
-$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
 $session->setting->set( 'specialState', '' );
 
 my ( $mech );
-my $baseUrl         = 'http://' . $session->config->get('sitename')->[0];
+my $baseUrl         = $session->url->getSiteURL;
 
 #----------------------------------------------------------------------------
 # Tests
@@ -122,7 +119,4 @@ cmp_deeply(
 # Cleanup
 END {
     $versionTag->rollback();
-    for my $key ( keys %oldSettings ) {
-        $session->setting->set( $key, $oldSettings{ $key } );
-    }
 }
