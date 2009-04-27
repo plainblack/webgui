@@ -299,13 +299,54 @@ sub currentSection {
 
 =head2 recordResponses ($session, $responses)
 
+Takes survey responses and puts them into the response hash of this object.  Does terminal
+handling for sections and questions, and goto processing.  Advances the survey page if
+all required questions have been answered.
+
 =head3 $session
 
 A WebGUI session object
 
 =head3 $responses
 
-A hash ref.  More news at 6 o'clock.
+A hash ref of form param data.  Each element will look like:
+
+    {
+        "__qid__comment" => "question comment",
+        "__aid__"        => "answer",
+        "__aid__comment" => "answer comment",
+    }
+
+where __qid__ is a question id, as described in L<nextQuestions>, and __aid__ is an
+answer id, also described there.
+
+=head3 terminal processing
+
+Terminal processing for a section and its question are handled in order.  The terminalUrl
+setting in a question overrides the terminalUrl setting for its section.  Similarly, with
+questions, the last terminalUrl setting of the set of questions is what is returned for
+the page.
+
+=head3 goto processing
+
+gotos are handled similarly as with terminalUrls.  The last goto in the set of questions
+wins.
+
+=head3 responses data structure
+
+This method also builds an internal data structure with the users' responses.  It
+is set up like this:
+
+    responses => {
+        __qid__ => {
+            comment => "question comment",
+        },
+        __aid__ => {
+            time    => time(),
+            comment => "answer comment",
+            value   => "answer value",
+        },
+    }
 
 =cut
 
