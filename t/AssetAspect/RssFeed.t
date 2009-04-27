@@ -36,7 +36,7 @@ WebGUI::Test->originalConfig('exportPath');
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 21;        # Increment this number for each test you create
+plan tests => 24;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -67,6 +67,13 @@ is($dummy->getStaticAtomFeedUrl, '/home/shawshank.atom', 'getStaticAtomFeedUrl')
 is($dummy->getStaticRssFeedUrl,  '/home/shawshank.rss',  'getStaticRssFeedUrl');
 is($dummy->getStaticRdfFeedUrl,  '/home/shawshank.rdf',  'getStaticRdfFeedUrl');
 
+$session->scratch->set('isExporting', 1);
+
+is($dummy->getAtomFeedUrl, '/home/shawshank.atom', 'export mode, getAtomFeedUrl');
+is($dummy->getRssFeedUrl,  '/home/shawshank.rss',  '... getRssFeedUrl');
+is($dummy->getRdfFeedUrl,  '/home/shawshank.rdf',  '... getRdfFeedUrl');
+
+$session->scratch->delete('isExporting');
 $dummy->update({ url => 'dot.extension', });
 
 is($dummy->getAtomFeedUrl, '/dot.extension?func=viewAtom', 'getAtomFeedUrl, url with extension');
