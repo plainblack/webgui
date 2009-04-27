@@ -16,6 +16,9 @@ use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
 
+# Include helper
+require "$FindBin::Bin/crypt.pl";
+
 #----------------------------------------------------------------------------
 # Init
 my $session = WebGUI::Test->session;
@@ -23,11 +26,10 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 13;
+plan tests => 8;
 
 #----------------------------------------------------------------------------
 # put your tests here
-
 use_ok('WebGUI::Crypt');
 
 #######################################################################
@@ -61,8 +63,8 @@ use_ok('WebGUI::Crypt');
     isa_ok($e, 'WebGUI::Error::Pluggable::RunFailed', 'new takes exception to invalid provider');
 }
 {
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => 'x' } );
-    test_provider($crypt, 'keep me secret');
+    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(10) + 1) } );
+    test_provider($crypt, make_string(rand(50) + 1));
 }
 
 #######################################################################
@@ -70,22 +72,9 @@ use_ok('WebGUI::Crypt');
 # session->crypt
 #
 #######################################################################
-{
-    # This test requires that your webgui site config file contains crypt settings
-    my $crypt = $session->crypt;
-    isa_ok( $crypt, 'WebGUI::Crypt', 'session contructor works too' );
-    test_provider($crypt, "don't say nothing");
-}
-
-# Carbon copy from Crypt.t
-sub test_provider {
-    my ($crypt, $plaintext) = @_;
-    isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
-    my $encrypted_hex = $crypt->encrypt_hex($plaintext);
-    isnt($encrypted_hex, $plaintext, "$plaintext encrypted is: $encrypted_hex");
-    my $decrypted = $crypt->decrypt_hex($encrypted_hex);
-    is($decrypted, $plaintext, "got back our original text: $decrypted");
-}
-
-END {
-}
+#{
+#    # This test requires that your webgui site config file contains crypt settings
+#    my $crypt = $session->crypt;
+#    isa_ok( $crypt, 'WebGUI::Crypt', 'session contructor works too' );
+#    test_provider($crypt, "don't say nothing");
+#}

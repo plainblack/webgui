@@ -142,7 +142,7 @@ sub config {
 
 #-------------------------------------------------------------------
 
-=head2 crypt ( [ skipFatal ] ) 
+=head2 crypt ( [ skipFatal ] )
 
 Returns the WebGUI::Crypt object
 
@@ -164,13 +164,14 @@ sub crypt {
 			if ($skipFatal) {
 				return undef;
 			}
-			else { 	
+			else {
 				$self->errorHandler->fatal("Couldn't connect to WebGUI Crypt provider, and can't continue without it.");
 			}
 		}
 	}
 	return $self->{_crypt};
 }
+
 
 #-------------------------------------------------------------------
 

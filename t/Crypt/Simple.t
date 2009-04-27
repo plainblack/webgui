@@ -16,6 +16,8 @@ use WebGUI::Text;
 use WebGUI::Workflow;
 use WebGUI::Group;
 use WebGUI::Crypt;
+use File::Spec;
+use Cwd;
 
 #----------------------------------------------------------------------------
 # Init
@@ -24,10 +26,11 @@ my $session = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 WebGUI::Error->Trace(1);    # Turn on tracing of uncaught Exception::Class exceptions
-plan tests => 12;
+plan tests => 11;
 
 #----------------------------------------------------------------------------
 # put your tests here
+require_ok( File::Spec->catfile( cwd(), qw( t Crypt crypt.pl ) ) );
 
 #######################################################################
 #
@@ -45,29 +48,16 @@ plan tests => 12;
     isa_ok( $e, 'WebGUI::Error::Pluggable::RunFailed', 'new takes exception to empty key in config' );
 }
 {
-    # Try with default cipher
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => 'x' } );
+    # Try with default cipher, random key approx 20 chars long
+    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(20)+1) } );
     isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
     isa_ok( $crypt->provider, 'WebGUI::Crypt::Simple', 'provider was created' );
     test_provider($crypt, 'oh hai!');
 }
 {
     # Try with a different cipher
-    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => 'x', cipher => 'Crypt::DES' } );
+    my $crypt = WebGUI::Crypt->new( $session, { provider => 'WebGUI::Crypt::Simple', key => make_string(rand(20)+1), cipher => 'Crypt::DES' } );
     isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
     isa_ok( $crypt->provider, 'WebGUI::Crypt::Simple', 'provider was created' );
     test_provider($crypt, 'kimiwa sekushi des');
-}
-
-# Carbon copy from Crypt.t
-sub test_provider {
-    my ($crypt, $plaintext) = @_;
-    isa_ok( $crypt, 'WebGUI::Crypt', 'constructor works' );
-    my $encrypted_hex = $crypt->encrypt_hex($plaintext);
-    isnt($encrypted_hex, $plaintext, "$plaintext encrypted is: $encrypted_hex");
-    my $decrypted = $crypt->decrypt_hex($encrypted_hex);
-    is($decrypted, $plaintext, "got back our original text: $decrypted");
-}
-
-END {
 }

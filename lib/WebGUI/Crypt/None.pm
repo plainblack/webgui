@@ -1,14 +1,14 @@
-package WebGUI::Crypt::Simple;
+package WebGUI::Crypt::None;
 use Class::InsideOut qw{ :std };
 use Crypt::CBC;
 
 =head1 NAME
 
-Package WebGUI::Crypt::Simple
+Package WebGUI::Crypt::None
 
 =head1 DESCRIPTION
 
-Simple Crypt provider for WebGUI
+Pass-thru Crypt provider for people who don't need WebGUI database encryption
 
 =head1 SYNOPSIS
  
@@ -20,8 +20,6 @@ These methods are available from this package:
 
 # InsideOut object properties
 readonly session => my %session;    # WebGUI::Session object
-public provider  => my %provider;
-private cipher   => my %cipher;
 
 #-------------------------------------------------------------------
 
@@ -54,27 +52,13 @@ sub new {
             error => 'Need a valid WebGUI::Crypt config.'
         );
     }
-    if ( !$arg_ref->{key} ) {
-        WebGUI::Error::InvalidParam->throw(
-            param => $arg_ref,
-            error => 'WebGUI::Crypt::Simple needs a key in the config'
-        );
-    }
-
-    my $cipher_class = $arg_ref->{cipher} || 'Crypt::Rijndael';
 
     # Register Class::InsideOut object..
-    my $self = register 'WebGUI::Crypt::Simple';
+    my $self = register 'WebGUI::Crypt::None';
 
     # Initialise object properties..
     my $id = id $self;
     $session{$id} = $session;
-    $cipher{$id}  = Crypt::CBC->new(
-        -key    => $arg_ref->{key},
-        -cipher => $cipher_class,
-        -header => 'salt',
-        -salt   => 1,
-    );
     return $self;
 }
 
@@ -82,52 +66,48 @@ sub new {
 
 =head2 encrypt ( $plaintext )
 
-Encrypt some plaintext
+Pretend to encrypt some plaintext
 
 =cut
 
 sub encrypt {
-    my ( $self, $plaintext ) = @_;
-    return $cipher{ id $self}->encrypt($plaintext);
+    return $_[1];
 }
 
 #-------------------------------------------------------------------
 
 =head2 encrypt_hex ( $plaintext )
 
-Encrypt some plaintext
+Pretend to encrypt some plaintext
 
 =cut
 
 sub encrypt_hex {
-    my ( $self, $plaintext ) = @_;
-    return $cipher{ id $self}->encrypt_hex($plaintext);
+    return $_[1];
 }
 
 #-------------------------------------------------------------------
 
 =head2 decrypt ( $ciphertext )
 
-Decrypt some ciphertext
+Pretend to decrypt some ciphertext
 
 =cut
 
 sub decrypt {
-    my ( $self, $ciphertext ) = @_;
-    return $cipher{ id $self}->decrypt($ciphertext);
+    return $_[1];
 }
 
 #-------------------------------------------------------------------
 
 =head2 decrypt_hex ( $ciphertext )
 
-Decrypt some ciphertext
+Pretend to decrypt some ciphertext
 
 =cut
 
 sub decrypt_hex {
-    my ( $self, $ciphertext ) = @_;
-    return $cipher{ id $self}->decrypt_hex($ciphertext);
+    $_[1];
 }
 
 1;

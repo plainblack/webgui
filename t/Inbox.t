@@ -17,7 +17,7 @@ use WebGUI::Session;
 use WebGUI::Inbox;
 use WebGUI::User;
 
-use Test::More tests => 10; # increment this value for each test you create
+use Test::More tests => 8; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -47,10 +47,6 @@ ok($message->{_properties}{message} eq $message_body, 'Message body set');
 
 my $messageId = $message->getId;
 ok($messageId, 'messageId retrieved');
-
-my $encrypted_message = $session->db->quickScalar('select message from inbox where messageId = ?', [$messageId]);
-isnt($encrypted_message, $message_body, "message is encrypted in db: $encrypted_message");
-is($session->crypt->decrypt_hex($encrypted_message), $message_body, 'decrypted message matches original text');
 
 ####################################
 # get a message based on messageId #
