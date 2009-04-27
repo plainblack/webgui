@@ -157,6 +157,7 @@ cmp_bag(
     [qw/
         shawshank.rss        shawshank
         shawshank.atom
+        shawshank.rdf
     /],
     'exportAssetCollateral: feed files exported, index.html file'
 );
@@ -172,6 +173,7 @@ cmp_bag(
     [qw/
         shawshank.html.rss
         shawshank.html.atom
+        shawshank.html.rdf
     /],
     'exportAssetCollateral: feed files exported, shawshank.html file'
 );
