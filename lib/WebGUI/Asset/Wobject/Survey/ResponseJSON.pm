@@ -206,6 +206,30 @@ sub lastResponse {
 
 #-------------------------------------------------------------------
 
+=head2 questionsAnswered ([ $questionsAnswered ])
+
+Mutator for the number of questions answered.  With no arguments,
+does a set.
+
+=head3 $questionsAnswered.
+
+If defined, increments the number of questions by $questionsAnswered
+
+=cut
+
+sub questionsAnswered {
+    my $self      = shift;
+    my $answered  = shift;
+    if ( defined $answered ) {
+        $self->{questionsAnswered} += $answered;
+    }
+    else {
+        return $self->{questionsAnswered};
+    }
+}
+
+#-------------------------------------------------------------------
+
 =head2 startTime ([ $newStartTime ])
 
 Mutator for the time the user began the survey.  With no arguments,
@@ -322,10 +346,11 @@ answer id, also described there.
 
 =head3 terminal processing
 
-Terminal processing for a section and its question are handled in order.  The terminalUrl
-setting in a question overrides the terminalUrl setting for its section.  Similarly, with
-questions, the last terminalUrl setting of the set of questions is what is returned for
-the page.
+Terminal processing for a section and its questions and answers are handled in
+order.  The terminalUrl setting in a question overrides the terminalUrl setting
+for its section.  Similarly, with questions and answers, the last terminalUrl
+setting of the set of questions is what is returned for the page, with the questions
+and answers being answered in surveyOrder.
 
 =head3 goto processing
 
@@ -422,7 +447,9 @@ sub recordResponses {
             } ## end if ( defined( $responses...
         } ## end for my $answer ( @{ $question...
         $qAnswered = 0 if ( !$aAnswered and $question->{required} );
-        $self->{questionsAnswered}++ if($aAnswered);
+        if ($aAnswered) {
+            $self->questionsAnswered( +1 );
+        }
     } ## end for my $question (@$questions)
 
     #if all responses completed, move the lastResponse index to the last question shown

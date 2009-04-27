@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 44;
+my $tests = 52;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -343,6 +343,71 @@ cmp_deeply(
     [ 1, '/terminal' ],
     'recordResponses, if section has no questions, returns terminal info in the section.',
 );
+is($rJSON->questionsAnswered, 0, 'questionsAnswered=0, no questions answered');
+
+$rJSON->survey->question([1,0])->{terminal}    = 1;
+$rJSON->survey->question([1,0])->{terminalUrl} = 'question 1-0 terminal';
+
+$rJSON->lastResponse(2);
+cmp_deeply(
+    $rJSON->recordResponses($session, {
+        '1-0comment'   => 'Section 1, question 0 comment',
+        '1-0-0'        => 'First answer',
+        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    }),
+    [ 1, 'question 1-0 terminal' ],
+    'recordResponses: question terminal overrides section terminal',
+);
+is($rJSON->lastResponse(), 4, 'lastResponse advanced to next page of questions');
+is($rJSON->questionsAnswered, 1, 'questionsAnswered=1, answered one question');
+
+cmp_deeply(
+    $rJSON->responses,
+    {
+        '1-0'   => {
+            comment => 'Section 1, question 0 comment',
+        },
+        '1-0-0' => {
+            comment => 'Section 1, question 0, answer 0 comment',
+            'time'    => num(time(), 3),
+            value   => 1,
+        },
+        '1-1'   => {
+            comment => undef,
+        }
+    },
+    'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
+);
+
+$rJSON->survey->question([1,0,0])->{terminal}    = 1;
+$rJSON->survey->question([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
+$rJSON->{responses} = {};
+$rJSON->lastResponse(2);
+$rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
+
+cmp_deeply(
+    $rJSON->recordResponses($session, {
+        '1-0comment'   => 'Section 1, question 0 comment',
+        '1-0-0'        => "\t\t\t\n\n\n\t\t\t", #SOS in whitespace
+        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    }),
+    [ 1, 'answer 1-0-0 terminal' ],
+    'recordResponses: answer terminal overrides question and section terminals',
+);
+
+cmp_deeply(
+    $rJSON->responses,
+    {
+        '1-0'   => {
+            comment => 'Section 1, question 0 comment',
+        },
+        '1-1'   => {
+            comment => undef,
+        }
+    },
+    'recordResponses: if the answer is all whitespace, it is skipped over'
+);
+is($rJSON->questionsAnswered, 0, 'question was all whitespace, not answered');
 
 }
 
