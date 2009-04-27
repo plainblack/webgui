@@ -3,7 +3,7 @@ package WebGUI::User;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -120,6 +120,7 @@ sub acceptsPrivateMessages {
     my $userId    = shift;
 
     return 0 if ($self->isVisitor);  #Visitor can't get private messages
+    return 0 if ($userId eq "1");    # Visitor can't send private messages
     return 0 if ($self->userId eq $userId);  #Can't send private messages to yourself
 
     my $pmSetting = $self->profileField('allowPrivateMessages');
@@ -160,9 +161,9 @@ sub acceptsFriendsRequests {
     return 0 if($self->userId eq $user->userId);  #Can't be your own friend (why would you want to be?)
 
     my $me     = WebGUI::Friends->new($session,$self);
-    my $friend = WebGUI::Friends->new($session,$user);
-
     return 0 if ($me->isFriend($user->userId));  #Already a friend
+
+    my $friend = WebGUI::Friends->new($session,$user);
     return 0 if ($me->isInvited($user->userId) || $friend->isInvited($self->userId)); #Invitation sent by one or the other
 
     return $self->profileField('ableToBeFriend'); #Return profile setting
@@ -593,7 +594,13 @@ sub hasFriends {
 }
 
 #-------------------------------------------------------------------
-# This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=head2 identifier
+
+This method is depricated and is provided only for reverse compatibility. See WebGUI::Auth instead.
+
+=cut
+
 sub identifier {
         my ($self, $value);
         $self = shift;
@@ -634,9 +641,8 @@ The group that you wish to verify against the user. Defaults to group with Id 3 
 =cut
 
 sub isInGroup {
-   my (@data, $groupId);
-   my ($self, $gid, $secondRun) = @_;
-   $gid = 3 unless (defined $gid);
+   my ($self, $gid) = @_;
+   $gid = 3 unless $gid;
    my $uid = $self->userId;
    ### The following several checks are to increase performance. If this section were removed, everything would continue to work as normal. 
    #my $eh = $self->session->errorHandler;
@@ -650,8 +656,9 @@ sub isInGroup {
    return $isInGroup->{$uid}{$gid} if exists $isInGroup->{$uid}{$gid};
    ### Lookup the actual groupings.
    my $group = WebGUI::Group->new($self->session,$gid);
-   # Cope with non-existant groups. Default to the admin group if the groupId is invalid.
-   $group = WebGUI::Group->new($self->session, 3) unless $group;
+   if ( !$group ) {
+       $group = WebGUI::Group->new($self->session,3);
+   }
    ### Check for groups of groups.
    my $users = $group->getAllUsers();
    foreach my $user (@{$users}) {
@@ -995,11 +1002,12 @@ sub session {
 
 =head2 setProfileFieldPrivacySetting ( settings ) 
 
-Sets the profile field privacy settings
+Sets the profile field privacy settings.  This updates the the db and
+the internally cached settings.  Valid settings are "all", "none" or "friends".
 
 =head3 settings
 
-hash ref containing the field and it's corresponding privacy setting
+Hash ref containing fields and their corresponding privacy settings
 
 =cut
 
@@ -1170,13 +1178,11 @@ sub validateProfileDataFromForm {
     my $errorFields = [];
     my $warnFields  = [];
     
-	foreach my $field (@{$fields}) {
+	FIELD: foreach my $field (@{$fields}) {
         my $fieldId       = $field->getId;
         my $fieldLabel    = $field->getLabel;
     	my $fieldValue    = $field->formProcess;
         my $isValid       = $field->isValid($fieldValue);
-
-        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
 
         if(!$isValid) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
@@ -1184,9 +1190,9 @@ sub validateProfileDataFromForm {
             push(@{$errorFields},$fieldId);
         }
         #The language field is special and must be always be valid or WebGUI will croak
-        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$data->{$fieldId}})) {
+        elsif($fieldId eq "language" && !(exists $i18n->getLanguages()->{$fieldValue})) {
             $errorCat = $field->get("profileCategoryId") unless (defined $errorCat);
-            push (@{$errors}, sprintf($i18n->get("language not available error"),$data->{$fieldId}));
+            push (@{$errors}, sprintf($i18n->get("language not available error"),$fieldValue));
             push(@{$errorFields},$fieldId);
         }
         #Duplicate emails throw warnings
@@ -1195,6 +1201,11 @@ sub validateProfileDataFromForm {
             push (@{$warnings},$i18n->get(1072));
             push(@{$warnFields},$fieldId);
         }
+
+        ##Do not return data unless the form field was actually in the posted data.
+        next FIELD unless $field->isInRequest;
+        $data->{$fieldId} = (ref $fieldValue eq "ARRAY") ? $fieldValue->[0] : $fieldValue;
+
     }
 
 	return {

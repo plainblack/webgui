@@ -1,7 +1,7 @@
 package WebGUI::Auth::LDAP;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -66,7 +66,6 @@ sub _isValidLDAPUser {
     # Create an LDAP object
     if ($ldap = Net::LDAP->new($uri->host, (port=>$uri->port))) {
 
-        my $uri  = $ldapLink->getURI;
         # Bind as a proxy user to search for the user trying to login
         if($connection->{connectDn}) {
             $auth = $ldap->bind(dn=>$connection->{connectDn}, password=>$connection->{identifier});

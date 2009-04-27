@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -32,7 +32,7 @@ use WebGUI::Asset::Wobject::Collaboration;
 use WebGUI::Asset::Post;
 use WebGUI::Asset::Wobject::Layout;
 use Data::Dumper;
-use Test::More tests => 4; # increment this value for each test you create
+use Test::More tests => 10; # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 
@@ -50,7 +50,10 @@ my $layout  = $node->addChild({className => 'WebGUI::Asset::Wobject::Layout'});
 $session->asset($layout);
 
 # finally, add the collab
-my $collab  = $layout->addChild({className => 'WebGUI::Asset::Wobject::Collaboration'});
+my $collab  = $layout->addChild({
+    className => 'WebGUI::Asset::Wobject::Collaboration',
+    url       => 'collab',
+});
 
 # Test for a sane object type
 isa_ok($collab, 'WebGUI::Asset::Wobject::Collaboration');
@@ -60,6 +63,41 @@ ok(defined $collab->get('groupToEditPost'), 'groupToEditPost field is defined');
 
 # Verify sane defaults
 cmp_ok($collab->get('groupToEditPost'), 'eq', $collab->get('groupIdEdit'), 'groupToEditPost defaults to groupIdEdit correctly');
+is($collab->get('itemsPerFeed'), 25, 'itemsPerFeed is set to the default');
+
+# finally, add the post to the collaboration system
+my $props = {
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'hello, world!',
+};
+my $post = $collab->addChild($props,
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
+        });
+
+# Test for a sane object type
+isa_ok($post, 'WebGUI::Asset::Post::Thread');
+
+$props = {
+    className   => 'WebGUI::Asset::Post::Thread',
+    content     => 'jello, world!',
+};
+$post = $collab->addChild($props,
+        undef,
+        undef,
+        {
+            skipAutoCommitWorkflows => 1,
+        });
+
+my $rssitems = $collab->getRssFeedItems();
+is(scalar @{ $rssitems }, 2, 'rssitems set to number of posts added');
+
+diag "AssetAspect tests";
+is($collab->getRssFeedUrl,  '/collab?func=viewRss',  'getRssFeedUrl');
+is($collab->getRdfFeedUrl,  '/collab?func=viewRdf',  'getRdfFeedUrl');
+is($collab->getAtomFeedUrl, '/collab?func=viewAtom', 'getAtomFeedUrl');
 
 TODO: {
     local $TODO = "Tests to make later";

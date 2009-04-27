@@ -1,7 +1,7 @@
 package WebGUI::Asset::Sku::Product;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -239,6 +239,37 @@ sub duplicate {
 
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.  Overrode master class to add variant dropdown.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Product');
+    my %variants = ();
+    tie %variants, 'Tie::IxHash';
+    foreach my $collateral ( @{ $self->getAllCollateral('variantsJSON')} ) {
+        $variants{$collateral->{variantId}} = join ", ", $collateral->{shortdesc}, sprintf('%.2f',$collateral->{price});
+    }
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func',  value => 'buy'})
+      . WebGUI::Form::selectBox( $session, {
+                name    => 'vid',
+                options => \%variants,
+                value   => [0],
+        })
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('add to cart')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
 
 #-------------------------------------------------------------------
 

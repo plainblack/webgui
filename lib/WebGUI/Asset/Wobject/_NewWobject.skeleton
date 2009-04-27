@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::NewWobject;
 $VERSION = "1.0.0";
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,10 @@ use WebGUI::International;
 use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 
+# To get an installer for your wobject, add the Installable AssetAspect
+# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
+# details
+
 #-------------------------------------------------------------------
 
 =head2 definition ( )
@@ -29,46 +33,43 @@ getEditForm method is unnecessary/redundant/useless.
 =cut
 
 sub definition {
-	my $class = shift;
-	my $session = shift;
-	my $definition = shift;
-	my $i18n = WebGUI::International->new($session, 'Asset_NewWobject');
-	my %properties;
-	tie %properties, 'Tie::IxHash';
-	%properties = (
-		templateId =>{
-			
-			#See the list of field/control types in /lib/WebGUI/Form/
-			fieldType=>"template",  
-			
-			defaultValue=>'NewWobjectTmpl00000001',
-			tab=>"display",
-			
-			#www_editSave will ignore anyone's attempts to update this field if this is set to 1
-			noFormPost=>0,  
-			
-			#This is an option specific to the template fieldType.
-			namespace=>"NewWobject", 
-			
-			#This is what will appear when the user hovers the mouse over the label 
-			# of your form field.
-			hoverHelp=>$i18n->get('templateId label description'),
-			
-			# This is the text that will appear to the left of your form field.
-			label=>$i18n->get('templateId label'),
-		}
-	);
-	push(@{$definition}, {
-		assetName=>$i18n->get('assetName'),
-		icon=>'newWobject.gif',
-		autoGenerateForms=>1,
-		tableName=>'NewWobject',
-		className=>'WebGUI::Asset::Wobject::NewWobject',
-		properties=>\%properties
-		});
-        return $class->SUPER::definition($session, $definition);
-}
+    my $class      = shift;
+    my $session    = shift;
+    my $definition = shift;
+    my $i18n       = WebGUI::International->new( $session, 'Asset_NewWobject' );
+    tie my %properties, 'Tie::IxHash', (
+        templateId => {
 
+            #See the list of field/control types in /lib/WebGUI/Form/
+            fieldType => "template",
+
+            defaultValue => 'NewWobjectTmpl00000001',
+            tab          => "display",
+
+            #www_editSave will ignore anyone's attempts to update this field if this is set to 1
+            noFormPost => 0,
+
+            #This is an option specific to the template fieldType.
+            namespace => "NewWobject",
+
+            #This is what will appear when the user hovers the mouse over the label
+            # of your form field.
+            hoverHelp => $i18n->get('templateId label description'),
+
+            # This is the text that will appear to the left of your form field.
+            label => $i18n->get('templateId label'),
+        }
+    );
+    push @{$definition}, {
+        assetName         => $i18n->get('assetName'),
+        icon              => 'newWobject.gif',
+        autoGenerateForms => 1,
+        tableName         => 'NewWobject',
+        className         => 'WebGUI::Asset::Wobject::NewWobject',
+        properties        => \%properties
+        };
+    return $class->SUPER::definition( $session, $definition );
+} ## end sub definition
 
 #-------------------------------------------------------------------
 
@@ -81,9 +82,9 @@ wobject instances, you will need to duplicate them here.
 =cut
 
 sub duplicate {
-	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
-	return $newAsset;
+    my $self     = shift;
+    my $newAsset = $self->SUPER::duplicate(@_);
+    return $newAsset;
 }
 
 #-------------------------------------------------------------------
@@ -96,16 +97,16 @@ This method is optional if you set autoGenerateForms=1 in the definition.
 =cut
 
 sub getEditForm {
-	my $self = shift;
-	my $tabform = $self->SUPER::getEditForm();
+    my $self    = shift;
+    my $tabform = $self->SUPER::getEditForm();
 
-	$tabform->getTab("display")->template(
-		-value=>$self->getValue("templateId"),
-		-label=>WebGUI::International::get("template_label","Asset_NewWobject"),
-		-namespace=>"NewWobject"
-	);
-	
-	return $tabform;
+    $tabform->getTab("display")->template(
+        value     => $self->getValue("templateId"),
+        label     => WebGUI::International::get( "template_label", "Asset_NewWobject" ),
+        namespace => "NewWobject"
+    );
+
+    return $tabform;
 }
 
 #-------------------------------------------------------------------
@@ -117,13 +118,12 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare;
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateId") );
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
-
 
 #-------------------------------------------------------------------
 
@@ -137,10 +137,11 @@ wobject instances, you will need to purge them here.
 =cut
 
 sub purge {
-	my $self = shift;
-	#purge your wobject-specific data here.  This does not include fields 
-	# you create for your NewWobject asset/wobject table.
-	return $self->SUPER::purge;
+    my $self = shift;
+
+    #purge your wobject-specific data here.  This does not include fields
+    # you create for your NewWobject asset/wobject table.
+    return $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------
@@ -153,16 +154,16 @@ to be displayed within the page style.
 =cut
 
 sub view {
-	my $self = shift;
-	my $session = $self->session;	
+    my $self    = shift;
+    my $session = $self->session;
 
-	#This automatically creates template variables for all of your wobject's properties.
-	my $var = $self->get;
-	
-	#This is an example of debugging code to help you diagnose problems.
-	#WebGUI::ErrorHandler::warn($self->get("templateId")); 
-	
-	return $self->processTemplate($var, undef, $self->{_viewTemplate});
+    #This automatically creates template variables for all of your wobject's properties.
+    my $var = $self->get;
+
+    #This is an example of debugging code to help you diagnose problems.
+    #$session->log->warn($self->get("templateId"));
+
+    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 #-------------------------------------------------------------------
@@ -183,60 +184,6 @@ adminConsole views.
 #   return $self->getAdminConsole->render($self->getEditForm->print, $i18n->get("edit title"));
 #}
 
-
-
-#-------------------------------------------------------------------
-# Everything below here is to make it easier to install your custom
-# wobject, but has nothing to do with wobjects in general
-#-------------------------------------------------------------------
-# cd /data/WebGUI/lib
-# perl -MWebGUI::Asset::Wobject::NewWobject -e install www.example.com.conf [ /path/to/WebGUI ]
-# 	- or -
-# perl -MWebGUI::Asset::Wobject::NewWobject -e uninstall www.example.com.conf [ /path/to/WebGUI ]
-#-------------------------------------------------------------------
-
-
-use base 'Exporter';
-our @EXPORT = qw(install uninstall);
-use WebGUI::Session;
-
-#-------------------------------------------------------------------
-sub install {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::NewWobject -e install www.example.com.conf\n" unless ($home && $config);
-	print "Installing asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->addToArray("assets","WebGUI::Asset::Wobject::NewWobject");
-	$session->db->write("create table NewWobject (
-		assetId varchar(22) binary not null,
-		revisionDate bigint not null,
-		primary key (assetId, revisionDate)
-		)");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
-#-------------------------------------------------------------------
-sub uninstall {
-	my $config = $ARGV[0];
-	my $home = $ARGV[1] || "/data/WebGUI";
-	die "usage: perl -MWebGUI::Asset::Wobject::NewWobject -e uninstall www.example.com.conf\n" unless ($home && $config);
-	print "Uninstalling asset.\n";
-	my $session = WebGUI::Session->open($home, $config);
-	$session->config->deleteFromArray("assets","WebGUI::Asset::Wobject::NewWobject");
-	my $rs = $session->db->read("select assetId from asset where className='WebGUI::Asset::Wobject::NewWobject'");
-	while (my ($id) = $rs->array) {
-		my $asset = WebGUI::Asset->new($session, $id, "WebGUI::Asset::Wobject::NewWobject");
-		$asset->purge if defined $asset;
-	}
-	$session->db->write("drop table NewWobject");
-	$session->var->end;
-	$session->close;
-	print "Done. Please restart Apache.\n";
-}
-
-
 1;
+
 #vim:ft=perl

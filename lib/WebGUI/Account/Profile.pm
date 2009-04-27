@@ -107,13 +107,13 @@ sub appendCommonVars {
     my $self          = shift;
     my $var           = shift;
     my $session       = $self->session;
-    my $user          = $session->user;
+    my $user          = $self->getUser;
     my $pageUrl       = $session->url->page;
 
     $self->SUPER::appendCommonVars($var);
 
     $var->{'edit_profile_url'     } = $self->getUrl("module=profile;do=edit");
-    $var->{'invitations_enabled'  } = $session->user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'  } = $user->profileField('ableToBeFriend');
     $var->{'profile_category_loop'} = [];
 
     #Append the categories
@@ -475,10 +475,6 @@ sub www_view {
 
     $self->appendCommonVars($var);
 
-    #Overwrite these
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
-    $var->{'profile_user_id'   } = $user->userId;
     $var->{'can_edit_profile'  } = $uid eq $session->user->userId;
 
     #Check user privileges

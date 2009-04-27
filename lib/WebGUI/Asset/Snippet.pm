@@ -3,7 +3,7 @@ package WebGUI::Asset::Snippet;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -191,6 +191,18 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( $calledAsWebMethod )
+
+Override the base class to implement caching, template and macro processing.
+
+=head3 $calledAsWebMethod
+
+If this is true, then change the cache method, and do not display the
+toolbar if in adminMode.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
@@ -217,15 +229,6 @@ sub view {
 }
 
 #-------------------------------------------------------------------
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	return $self->getAdminConsole->render($self->getEditForm->print,$self->addEditLabel);
-
-}
-
-#-------------------------------------------------------------------
 
 =head2 www_view
 
@@ -234,12 +237,12 @@ A web accessible version of the view method.
 =cut
 
 sub www_view {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canView;
-	my $mimeType=$self->getValue('mimeType');
-	$self->session->http->setMimeType($mimeType || 'text/html');
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	return $self->view(1);
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+    my $mimeType=$self->getValue('mimeType');
+    $self->session->http->setMimeType($mimeType || 'text/html');
+    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    return $self->view(1);
 }
 
 

@@ -123,9 +123,8 @@ be ignored. The User List will show every users profile.|,
 
 
         'alphabet' => {
-                message => q|The alphabet that is used for the alphabet search. This is a string of comma
-seperated values|,
-                lastUpdated => 1081514049
+                message => q|The alphabet that is used for the alphabet search. This is a string of comma seperated values.|,
+                lastUpdated => 1239725937
         },
 
         'alphabet label' => {
@@ -134,9 +133,8 @@ seperated values|,
         },
 
         'alphabet description' => {
-                message => q|The alphabet that is used for the alphabet search. Has to be a string of comma
-seperated values|,
-                lastUpdated => 1081514049
+                message => q|The set of characters that are used for the alphabet search.  This allows foreign character sets to be used. Has to be a string of comma seperated values.|,
+                lastUpdated => 1239725940
         },
 
         'alphabetSearchField' => {
@@ -151,9 +149,9 @@ seperated values|,
 
         'alphabetSearchField description' => {
                 message => q|Select the profile field in which the alphabet search will be done. You can disable
-the aplhapbet search function by selecting 'Disable Alphabet Search'. This will improve the performance of the
+the alphabet search function by selecting 'Disable Alphabet Search'. This will improve the performance of the
 User List.|,
-                lastUpdated => 1223651066
+                lastUpdated => 1239726022
         },
 
         'Profile not public message' => {

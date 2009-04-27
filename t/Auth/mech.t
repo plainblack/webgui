@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -34,12 +34,9 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
 # Override some settings to make things easier to test
-my %oldSettings;
 # userFunctionStyleId 
-$oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
 # specialState
-$oldSettings{ specialState  } = $session->setting->get( 'specialState' );
 $session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
@@ -280,8 +277,4 @@ $mech->base_is( $assetUrl, "We don't get redirected" );
 # Cleanup
 END {
     $user->delete;
-
-    for my $key ( keys %oldSettings ) {
-        $session->setting->set( $key, $oldSettings{ $key } );
-    }
 }

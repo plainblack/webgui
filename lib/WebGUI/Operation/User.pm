@@ -1,7 +1,7 @@
 package WebGUI::Operation::User;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -79,6 +79,8 @@ sub _submenu {
 			|| $userId eq "new") {
 			$ac->addSubmenuItem($session->url->page("op=editUser;uid=$userId"), $i18n->get(457));
 			$ac->addSubmenuItem($session->url->page("op=becomeUser;uid=$userId"), $i18n->get(751));
+            my $user = WebGUI::User->new($session, $userId);
+			$ac->addSubmenuItem($user->getProfileUrl(), $i18n->get('view profile'));
 			$ac->addConfirmedSubmenuItem($session->url->page("op=deleteUser;uid=$userId"), $i18n->get(750), $i18n->get(167));
 			if ($session->setting->get("useKarma")) {
 				$ac->addSubmenuItem($session->url->page("op=editUserKarma;uid=$userId"), $i18n->get(555));

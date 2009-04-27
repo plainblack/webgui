@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -21,6 +21,7 @@ use Test::More;
 use Test::Deep;
 use Scalar::Util;
 use WebGUI::Asset::File::GalleryFile::Photo;
+use WebGUI::International;
 
 #----------------------------------------------------------------------------
 # Init
@@ -268,7 +269,7 @@ like(
     "www_editCommentSave -- Permission denied if not Gallery->canAddComment",
 );
 
-my $i18n    = $photo->i18n($session);
+my $i18n    = WebGUI::International->new($session, 'Asset_Photo');
 my $errorMessage;
 
 # Required: commentId

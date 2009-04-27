@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -54,7 +54,8 @@ sub fixPayDriverLabels {
     print "\tGet rid of the duplicate label properties in the PayDrivers... " unless $quiet;
     my $pay = WebGUI::Shop::Pay->new($session);
     my $gateways = $pay->getPaymentGateways;
-    foreach my $gateway (@{ $gateways }) {
+    GATEWAY: foreach my $gateway (@{ $gateways }) {
+        next GATEWAY unless $gateway;
         my $gatewayId = $gateway->getId;
         my $jsonLabel = $gateway->get('label');
         next if $jsonLabel;

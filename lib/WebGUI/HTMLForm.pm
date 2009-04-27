@@ -3,7 +3,7 @@ package WebGUI::HTMLForm;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -186,7 +186,7 @@ sub fieldSetEnd {
 	my $legend = shift;
 	$self->{_data} .= "</tbody></table>\n"
 		."</fieldset>\n"
-		."<table ".$self->{_tableExtras}.'" style="width: 100%;"><tbody>'
+		."<table ".$self->{_tableExtras}.' style="width: 100%;"><tbody>'
 		."\n";
 }
 
@@ -208,7 +208,7 @@ sub fieldSetStart {
 	my $legend = shift;
 	$self->{_data} .= "</tbody></table>\n"
 		."<fieldset>\n<legend>".$legend."</legend>\n"
-		."<table ".$self->{_tableExtras}.'" style="width: 100%;"><tbody>'
+		."<table ".$self->{_tableExtras}.' style="width: 100%;"><tbody>'
 		."\n";
 }
 

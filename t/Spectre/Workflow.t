@@ -1,6 +1,6 @@
 # vim: syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -15,20 +15,7 @@ use warnings;
 
 use Test::More;
 
-if (!-e "$FindBin::Bin/../../../wre/lib") {
-    plan skip_all => 'No WRE libraries available';
-}
-else {
-    plan tests => 19;
-    eval <<'EOEVAL';  ##Delay compiling since it causes the test die
-    use WRE::Config;
-    use WRE::Modperl;
-    use WRE::Modproxy;
-    use WRE::Spectre;
-EOEVAL
-}
-
-use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../../../wre/lib";
+use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
@@ -40,14 +27,14 @@ use WebGUI::Workflow::Instance;
 use POE::Component::IKC::ClientLite;
 use JSON;
 use Config::JSON;
+use Carp qw(croak);
+plan tests => 20;
+
+
 
 $|++;
 
 my $session             = WebGUI::Test->session;
-my $wreConfig           = WRE::Config->new;
-my $isModPerlRunning    = WRE::Modperl->new (   wreConfig=>$wreConfig)->ping;
-my $isModProxyRunning   = WRE::Modproxy->new(   wreConfig=>$wreConfig)->ping;
-my $isSpectreRunning    = WRE::Spectre->new (   wreConfig=>$wreConfig)->ping;
 my $spectreConfigFile   = WebGUI::Test->root . '/etc/spectre.conf';
 my $spectreConfig       = Config::JSON->new($spectreConfigFile);
 my $ip                  = $spectreConfig->get('ip');
@@ -59,7 +46,9 @@ $sitename = $session->config->get('sitename')->[0];
 
 # tests for retrieving more than one site, the default
 SKIP: {
-    skip "need modperl, modproxy, and spectre running to test", 8 unless ($isModPerlRunning && $isModProxyRunning && $isSpectreRunning);
+    if (! eval { spectre_ping($spectreConfig) } ) {
+        skip "Spectre doesn't seem to be running: $@", 8;
+    }
     # XXX kinda evil kludge to put an activity in the scheduler so that the
     # below calls return data; suggestions on a better way to do this welcomed.
     my $taskId = 'pbcron0000000000000001'; # hopefully people don't delete daily maintenance
@@ -112,3 +101,28 @@ TODO: {
         isa_ok($oneSiteStructure->{$key}, 'ARRAY', "$key is an arrayref in the $sitename hash in one site structure");
     }
 }
+
+sub spectre_ping {
+    my $spectreConfig = shift;
+    my $remote = create_ikc_client(
+        port    => $spectreConfig->get("port"),
+        ip      => $spectreConfig->get("ip"),
+        name    => rand(100000),
+        timeout => 10
+    );
+    unless ($remote) {
+        croak "Couldn't connect to Spectre because ".$POE::Component::IKC::ClientLite::error;
+    }
+    my $result = $remote->post_respond('admin/ping');
+    $remote->disconnect;
+    unless (defined $result) {
+        croak "Didn't get a response from Spectre because ".$POE::Component::IKC::ClientLite::error;
+    }
+    undef $remote;
+    if ($result eq "pong") {
+        return 1;
+    } else {
+        croak "Received '".$result."' when we expected 'pong'.";
+    }
+}
+

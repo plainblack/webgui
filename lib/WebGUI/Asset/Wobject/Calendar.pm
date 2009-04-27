@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Calendar;
 use strict;
 
 #----------------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #----------------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -24,7 +24,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
-use JSON qw/encode_json/;
+use JSON;
 
 =head1 NAME
 

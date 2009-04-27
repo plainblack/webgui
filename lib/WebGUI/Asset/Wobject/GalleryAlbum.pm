@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::GalleryAlbum;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,8 @@ package WebGUI::Asset::Wobject::GalleryAlbum;
 #-------------------------------------------------------------------
 
 use strict;
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use Carp qw( croak );
 use File::Find;
 use File::Spec;
@@ -44,7 +45,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
 
     tie my %properties, 'Tie::IxHash', (
         allowComments   => {
@@ -77,7 +78,7 @@ sub definition {
         properties          => \%properties,
     };
 
-    return $class->SUPER::definition($session, $definition);
+    return $class->next::method($session, $definition);
 }
 
 #----------------------------------------------------------------------------
@@ -174,7 +175,7 @@ sub addChild {
         return undef;
     }
 
-    return $self->SUPER::addChild( $properties, @_ );
+    return $self->next::method( $properties, @_ );
 }
 
 #----------------------------------------------------------------------------
@@ -352,27 +353,6 @@ sub DESTROY {
 
 #----------------------------------------------------------------------------
 
-=head2 i18n ( session )
-
-Get a WebGUI::International object for this class. 
-
-Can be called as a class method, in which case a WebGUI::Session object
-must be passed in.
-
-NOTE: This method can NOT be inherited, due to a current limitation 
-in the i18n system. You must ALWAYS call this with C<__PACKAGE__>
-
-=cut
-
-sub i18n {
-    my $self    = shift;
-    my $session = shift;
-    
-    return WebGUI::International->new($session, "Asset_GalleryAlbum");
-}
-
-#----------------------------------------------------------------------------
-
 =head2 getAutoCommitWorkflowId ( )
 
 Returns the workflowId of the Gallery's approval workflow.
@@ -421,7 +401,7 @@ sub getCurrentRevisionDate {
         return $revisionDate;
     }
     else {
-        return $class->SUPER::getCurrentRevisionDate( $session, $assetId );
+        return $class->next::method( $session, $assetId );
     }
 }
 
@@ -518,6 +498,41 @@ sub getPreviousAlbum {
     return $self->{_previousAlbum};
 }
 
+#-------------------------------------------------------------------
+
+=head2 getRssFeedItems ()
+
+Returns an array reference of hash references. Each hash reference has a title,
+description, link, and date field. The date field can be either an epoch date, an RFC 1123
+date, or a ISO date in the format of YYYY-MM-DD HH:MM::SS. Optionally specify an
+author, and a guid field.
+
+=cut
+
+sub getRssFeedItems {
+    my $self        = shift;
+
+    my $p
+        = $self->getFilePaginator( { 
+            perpage     => $self->get('itemsPerFeed'),
+        } );
+    
+    my $var = [];
+    for my $assetId ( @{ $p->getPageData } ) {
+        my $asset       = WebGUI::Asset::Wobject::GalleryAlbum->newPending( $self->session, $assetId );
+        push @{ $var }, {
+            'link'          => $asset->getUrl,
+            'guid'          => $asset->{_properties}->{ 'assetId' },
+            'title'         => $asset->getTitle,
+            'description'   => $asset->{_properties}->{ 'description' },
+            'date'          => $asset->{_properties}->{ 'creationDate' },
+            'author'        => WebGUI::User->new($self->session, $asset->{_properties}->{ 'ownerUserId' })->username
+        };
+    }
+    
+    return $var;
+}
+
 #----------------------------------------------------------------------------
 
 =head2 getTemplateVars ( )
@@ -558,7 +573,7 @@ sub getTemplateVars {
 
     # Add some specific vars from the Gallery
     my $galleryVar      = $gallery->getTemplateVars;
-    for my $key ( qw{ title menuTitle url } ) {
+    for my $key ( qw{ title menuTitle url displayTitle } ) {
         $var->{ "gallery_" . $key } = $galleryVar->{ $key };
     }
 
@@ -660,7 +675,7 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
     my $self = shift;
-    $self->SUPER::prepareView();
+    $self->next::method();
 
     my $templateId  = $self->getParent->get("templateIdViewAlbum");
 
@@ -668,7 +683,8 @@ sub prepareView {
         = WebGUI::Asset::Template->new($self->session, $templateId);
     $template->prepare($self->getMetaDataAsTemplateVariables);
 
-    $self->{_viewTemplate} = $template;
+    $self->{_viewTemplate}  = $template;
+    $self->{_viewVariables} = $self->getTemplateVars;
 }
 
 #----------------------------------------------------------------------------
@@ -739,7 +755,7 @@ approval workflow.
 sub processPropertiesFromFormPost {
     my $self        = shift;
     my $form        = $self->session->form;
-    my $errors      = $self->SUPER::processPropertiesFromFormPost || [];
+    my $errors      = $self->next::method || [];
 
     # Return if error
     return $errors  if @$errors;
@@ -773,6 +789,20 @@ sub sendChunkedContent {
 
 #----------------------------------------------------------------------------
 
+=head2 update ( )
+
+Override update to force isHidden=1 on all albums.
+
+=cut
+
+sub update {
+    my $self        = shift;
+    my $properties  = shift;
+    return $self->next::method({ %{ $properties }, isHidden=>1 });
+}
+
+#----------------------------------------------------------------------------
+
 =head2 view ( )
 
 method called by the www_view method.  Returns a processed template
@@ -783,7 +813,7 @@ to be displayed within the page style.
 sub view {
     my $self        = shift;
     my $session     = $self->session;	
-    my $var         = $self->getTemplateVars;
+    my $var         = delete $self->{_viewVariables};
     
     my $p           = $self->getFilePaginator;
     $p->appendTemplateVars( $var );
@@ -937,7 +967,7 @@ sub www_addArchiveSave {
 
     my $session     = $self->session;
     my $form        = $self->session->form;
-    my $i18n        = __PACKAGE__->i18n( $session );
+    my $i18n        = WebGUI::International->new( $session, 'Asset_GalleryAlbum' );
     my $properties  = {
         keywords        => $form->get("keywords"),
         friendsOnly     => $form->get("friendsOnly"),
@@ -1025,6 +1055,7 @@ sub www_addFileService {
         title           => $form->get('title','text'),
         description     => $form->get('synopsis','textarea'),
         synopsis        => $form->get('synopsis','textarea'),
+        ownerUserId     => $session->user->userId,
     });
 
     my $storage = $file->getStorageLocation;
@@ -1093,7 +1124,7 @@ sub www_deleteConfirm {
     return $self->session->privilege->insufficient unless $self->canEdit;
 
     my $gallery     = $self->getParent;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_GalleryAlbum' );
 
     $self->purge;
     
@@ -1119,7 +1150,7 @@ sub www_edit {
     my $session     = $self->session;
     my $form        = $self->session->form;
     my $var         = $self->getTemplateVars;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_GalleryAlbum');
 
     return $session->privilege->insufficient unless $self->canEdit;
 
@@ -1299,7 +1330,7 @@ Provides links to view the album.
 
 sub www_showConfirmation {
     my $self        = shift;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_GalleryAlbum' );
 
     my $output      = '<p>' . sprintf( $i18n->get('save message'), $self->getUrl ) . '</p>'
                     . '<p>' . $i18n->get('what next') . '</p>'

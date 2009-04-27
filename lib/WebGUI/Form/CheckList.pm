@@ -3,7 +3,7 @@ package WebGUI::Form::CheckList;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -18,6 +18,7 @@ use strict;
 use base 'WebGUI::Form::List';
 use WebGUI::Form::Checkbox;
 use WebGUI::Form::Button;
+use WebGUI::Form::Hidden;
 use WebGUI::International;
 
 =head1 NAME
@@ -129,6 +130,18 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+=cut
+
+sub isInRequest {
+    my $self = shift;
+    my $form = $self->session->form;
+    return $form->hasParam($self->privateName('isIn'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a series of checkboxes.
@@ -136,8 +149,10 @@ Renders a series of checkboxes.
 =cut
 
 sub toHtml {
-	my $self        = shift;
+	my $self    = shift;
+    my $session = $self->session;
     my $output = '<fieldset style="border:none;margin:0;padding:0">';
+    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
 	my $alignment   = $self->alignmentSeparator;
 
     # Add the select all button
@@ -153,7 +168,7 @@ sub toHtml {
                     ? 1
                     : 0
                     ;
-        $output .= WebGUI::Form::Checkbox->new($self->session, {
+        $output .= WebGUI::Form::Checkbox->new($session, {
                 name    => $self->get('name'),
                 value   => $key,
                 extras  => $self->get('extras'),

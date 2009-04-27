@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Shelf;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -210,7 +210,11 @@ sub importProducts {
             }
 
             if ($productRow{title} ne $product->getTitle) {
-                $product->update({ title => $product->fixTitle($productRow{title}) });
+                my $newTitle = $product->fixTitle($productRow{title});
+                $product->update({
+                    title     => $newTitle,
+                    menuTitle => $newTitle,
+                });
             }
 
             my $collaterals = $product->getAllCollateral('variantsJSON');
@@ -230,10 +234,12 @@ sub importProducts {
             ##Insert a new product;
             $session->log->warn("Making a new product: $productRow{sku}\n");
             my $newProduct = $node->addChild({className => 'WebGUI::Asset::Sku::Product'});
+            my $newTitle = $newProduct->fixTitle($productRow{title});
             $newProduct->update({
-                title => $newProduct->fixTitle($productRow{title}),
-                url   => $newProduct->fixUrl($productRow{title}),
-                sku   => $productRow{mastersku},
+                title     => $newTitle,
+                menuTitle => $newTitle,
+                url       => $newProduct->fixUrl($productRow{title}),
+                sku       => $productRow{mastersku},
             });
             $newProduct->setCollateral('variantsJSON', 'variantId', 'new', \%productCollateral);
             $newProduct->commit;
@@ -302,10 +308,11 @@ sub view {
 	foreach my $id (@{$p->getPageData}) {
 		my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
 		if (defined $asset) {
-			my $sku = $asset->get;
-			$sku->{url} = $asset->getUrl;
-            $sku->{thumbnailUrl} = $asset->getThumbnailUrl;
-            $sku->{price} = sprintf("%.2f", $asset->getPrice);
+			my $sku               = $asset->get;
+			$sku->{url}           = $asset->getUrl;
+            $sku->{thumbnailUrl}  = $asset->getThumbnailUrl;
+            $sku->{price}         = sprintf("%.2f", $asset->getPrice);
+            $sku->{addToCartForm} = $asset->getAddToCartForm;
 			push @skus, $sku;
 		}
 		else {
@@ -324,6 +331,13 @@ sub view {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit (  )
+
+Override the superclass to add import and exprt items to the AdminConsole submenu.
+
+=cut
+
 sub www_edit {
     my $self = shift;
 	my $i18n = WebGUI::International->new($self->session, 'Asset_Shelf');

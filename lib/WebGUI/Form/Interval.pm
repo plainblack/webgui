@@ -3,7 +3,7 @@ package WebGUI::Form::Interval;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -139,6 +139,20 @@ A class method that returns a boolean indicating whether this control is compati
 
 sub isDynamicCompatible {
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 isInRequest ( )
+
+=cut
+
+sub isInRequest {
+    my $self = shift;
+    my $form = $self->session->form;
+    my $name = $self->get('name');
+    return $form->hasParam($name.'_interval')
+        || $form->hasParam($name.'_units');
 }
 
 #-------------------------------------------------------------------

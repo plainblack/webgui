@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -51,7 +51,7 @@ sub setDefaultItransactCredentialTemplate {
     my $drivers = $pay->getPaymentGateways($session);
     DRIVER: foreach my $driver (@{ $drivers }) {
         ##Only work on ITransact drivers
-        next DRIVER unless $driver->className eq "WebGUI::Shop::PayDriver::ITransact";
+        next DRIVER unless $driver && $driver->className eq "WebGUI::Shop::PayDriver::ITransact";
         my $properties = $driver->get();
         ##And only ones that don't already have a template set
         next DRIVER if $properties->{credentialsTemplateId};

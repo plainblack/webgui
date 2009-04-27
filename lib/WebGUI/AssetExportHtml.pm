@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -317,8 +317,6 @@ sub exportAsHtml {
         # tell the user which asset we're exporting.
         unless ($quiet) {
             my $message = sprintf $i18n->get('exporting page'), $fullPath;
-            $exportSession->var->end;
-            $exportSession->close;
             $self->session->output->print($message);
         }
 
@@ -335,7 +333,7 @@ sub exportAsHtml {
 
         # next, tell the asset that we're exporting, so that it can export any
         # of its collateral or other extra data.
-        eval { $asset->exportAssetCollateral($asset->exportGetUrlAsPath, $args) };
+        eval { $asset->exportAssetCollateral($asset->exportGetUrlAsPath, $args, $session) };
         if($@) {
             $returnCode = 0;
             $message    = $@;
@@ -351,6 +349,8 @@ sub exportAsHtml {
         # track when this asset was last exported for external caching and the like
         $session->db->write( "UPDATE asset SET lastExportedAs = ? WHERE assetId = ?",
             [ $fullPath, $asset->getId ] );
+
+        $self->updateHistory("exported");
 
         # tell the user we did this asset correctly
         unless( $quiet ) {
@@ -389,7 +389,7 @@ sub exportAsHtml {
 
 #-------------------------------------------------------------------
 
-=head2 exportAssetCollateral ( basePath, params )
+=head2 exportAssetCollateral ( basePath, params, [ session ] )
 
 Plug in point for complicated assets (like the CS, the Calendar) to manage
 exporting their collateral data like other views, children threads and posts,
@@ -409,6 +409,10 @@ particular asset.
 
 A hashref with the quiet, userId, depth, and indexFileName parameters from
 L</exportAsHtml>.
+
+=head3 session
+
+The session doing the full export.  Can be used to report status messages.
 
 =cut
 
@@ -541,7 +545,7 @@ sub exportGetUrlAsPath {
     my $fileTypes       = $config->get('exportBinaryExtensions');
 
     # get the asset's URL as a URI::URL object for easy parsing of components
-    my $url             = URI::URL->new($config->get("sitename")->[0] . $self->getUrl);
+    my $url             = URI::URL->new($self->session->url->getSiteURL . $self->getUrl);
     my @pathComponents  = $url->path_components;
     shift @pathComponents; # first item is the empty string
     my $filename        = pop @pathComponents; 

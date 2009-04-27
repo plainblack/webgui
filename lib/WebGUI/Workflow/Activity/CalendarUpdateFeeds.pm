@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::CalendarUpdateFeeds;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -80,7 +80,8 @@ sub execute {
     
     my $object = shift;
     my $instance = shift;
-    $self->session->user({userId => 3});
+    my $previousUser = $session->user;
+    $session->user({userId => 3});
     
     ### TODO: If we take more than a minute, return WAITING so that some
     # other activity can run
@@ -381,6 +382,7 @@ sub execute {
             if ($currentVersionTag) {
                 $currentVersionTag->setWorking;
             }
+            $session->user({user => $previousUser});
             return $self->WAITING(1);
         }
         my $eventData = shift @$eventList;
@@ -431,6 +433,7 @@ sub execute {
     }
     $instance->deleteScratch('events');
     $instance->deleteScratch('feeds');
+    $session->user({user => $previousUser});
     return $self->COMPLETE;
 }
 

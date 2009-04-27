@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::NotifyAboutUser;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -92,6 +92,7 @@ See WebGUI::Workflow::Activity::execute() for details.
 sub execute {
 	my $self = shift;
 	my $user = shift;
+	my $previousUser = $self->session->user;
 	$self->session->user({user=>$user});
 	my $message = $self->get("message");
 	WebGUI::Macro::process($self->session, \$message);
@@ -105,6 +106,7 @@ sub execute {
 		});
 	$mail->addText($message);
 	$mail->addFooter;
+	$self->session->user({user=>$previousUser});
 	return $mail->send ? $self->COMPLETE : $self->ERROR;
 }
 

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -19,35 +19,26 @@ use WebGUI::International;
 use WebGUI::Session;
 use Data::Dumper;
 use WebGUI::Asset::Template;
+use WebGUI::Macro::Callback;
 
 #The goal of this test is to locate all of the international labels that it
 #can and verify that they exist in all loaded language models
 
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
-plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
 my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;
 
-##Find the name of the International macro in the user's config file.
-my $configFileMacros = $session->config->get('macros');
-my %macroNameLookup = reverse %{ $configFileMacros };
-my $international;
-$international = (exists $macroNameLookup{'International'}) ? $macroNameLookup{'International'} : 'International';
-
-#diag "International macro name = $international";
-
-##Regexp setup for parsing out the Macro calls.
-my $bareword  = qr/([^,)]+)/;  ##Anything that's not a comma
-my $quotelike = qr/((['])([^'\s\$]+\s*)+([']))/;
-my $sub_args  = qr/(($quotelike|$bareword)(?:,\s*)?)+/;  ##Don't really need spaces
-my $macro     = qr/
-			  \^$international
-			  \(			##Opening paren
-			    ($sub_args)
-			  \);			##Closing paren and semicolon
-		    /xo;
+## Remove all macros but International, and set them to call WebGUI::Macro::Callback
+my $originalMacros = $session->config->get('macros');
+my $configFileMacros = {};
+for my $macro (keys %$originalMacros) {
+    if ($originalMacros->{$macro} eq 'International') {
+        $configFileMacros->{$macro} = 'Callback';
+    }
+}
+$session->config->set('macros', $configFileMacros);
 
 # put your tests here
 
@@ -65,10 +56,8 @@ while (my $templateAsset = $getATemplate->()) {
             title      => $templateAsset->getTitle,
         };
     }
-    while ($template =~ /$macro/msgc) {
-        my ($label, $namespace) = split /,/, $1;
-        $label     =~ tr/'//d;
-        $namespace =~ tr/'//d;
+    WebGUI::Macro::Callback::setCallback(sub {
+        my ($session, $label, $namespace) = @_;
         push @templateLabels, {
             label      => $label,
             namespace  => $namespace,
@@ -76,10 +65,11 @@ while (my $templateAsset = $getATemplate->()) {
             id         => $templateAsset->getId,
             title      => $templateAsset->getTitle,
         };
-    }
+    });
+    WebGUI::Macro::process($session, \$template);
 }
 
-$numTests = scalar @templateLabels | scalar @questionableTemplates;
+$numTests = scalar @templateLabels + scalar @questionableTemplates;
 
 plan tests => $numTests;
 
@@ -95,3 +85,9 @@ foreach my $label ( @questionableTemplates ) {
         sprintf "Empty template:  %s, id: %s, url: %s", @{ $label }{qw/title id url/}
     );
 }
+
+END {
+    defined $session &&
+    $session->config->set('macros', $originalMacros);
+}
+

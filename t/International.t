@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 my $numTests  = 1; ##For conditional load check
 my $langTests = 4; ##For language look-up tests
-$numTests    += 11 + $langTests;
+$numTests    += 12 + $langTests;
 
 plan tests => $numTests;
 
@@ -35,7 +35,7 @@ my $i18n = WebGUI::International->new($session, undef, 'English');
 
 isa_ok($i18n, 'WebGUI::International', 'object of correct type created');
 
-is($i18n->getNamespace(), undef, 'getNamespace: default namespace is undef');
+is($i18n->getNamespace(), 'WebGUI', 'getNamespace: default namespace is undef');
 is($i18n->get('topicName'), 'WebGUI', 'get: get English label for topicName with default namespace: WebGUI');
 
 $i18n->setNamespace('WebGUI');
@@ -73,8 +73,13 @@ SKIP: {
 	);
 	is(
 		$i18n->get('neverAValidKey','notAValidFile','PigLatin'),
-		'',
+		undef,
 		'Language check: key from non-existant file returns an empty string'
+	);
+	is(
+		$i18n->get('key with spaces in it','WebGUI','PigLatin'),
+		'Key Contained Spaces',
+		'keys with spaces work'
 	);
 
 }

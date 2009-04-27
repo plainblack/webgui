@@ -3,7 +3,7 @@ package WebGUI::Group;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -256,7 +256,7 @@ sub dateCreated {
 
 =head2 delete ( )
 
-Deletes this group and all references to it.
+Deletes this group from the group related tables in the database and calls clearCaches.
 
 =cut
 
@@ -543,7 +543,8 @@ sub getAllGroupsFor {
 =head2 getAllUsers ( [ withoutExpired ] )
 
 Returns an array reference containing a list of users that belong to this group
-and in any group that belongs to this group.
+and in any group that belongs to this group.  The list is unique, so that each
+userId is only in it one time.
 
 =head3 withoutExpired
 
@@ -857,7 +858,7 @@ EOQ
 
 =head2 getUserList ( [ withoutExpired ] )
 
-Returns a hash reference with key of userId and value of username for users in the group
+Returns a hash reference with key of userId and value of username for users in the group, sorted by username.
 
 =head3 withoutExpired
 

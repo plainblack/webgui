@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Collaboration;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -20,9 +20,9 @@ use WebGUI::Paginator;
 use WebGUI::Utility;
 use WebGUI::Asset::Wobject;
 use WebGUI::Workflow::Cron;
-use WebGUI::Asset::RSSCapable;
-use base 'WebGUI::Asset::RSSCapable';
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
+
 
 #-------------------------------------------------------------------
 sub _computePostCount {
@@ -63,26 +63,15 @@ sub _visitorCacheOk {
 }
 
 #-------------------------------------------------------------------
-# encode a string to include in xml (for RSS export)
-sub _xml_encode {
-	my $text = shift;
-        $text =~ s/&/&amp;/g;
-        $text =~ s/</&lt;/g;
-        $text =~ s/\]\]>/\]\]&gt;/g;
-        return $text;
-}
-
-#-------------------------------------------------------------------
 sub addChild {
 	my $self = shift;
 	my $properties = shift;
 	my @other = @_;
-	if ($properties->{className} ne "WebGUI::Asset::Post::Thread"
-	    and $properties->{className} ne 'WebGUI::Asset::RSSFromParent') {
+	if ($properties->{className} ne "WebGUI::Asset::Post::Thread") {
 		$self->session->errorHandler->security("add a ".$properties->{className}." to a ".$self->get("className"));
 		return undef;
 	}
-	return $self->SUPER::addChild($properties, @other);
+	return $self->next::method($properties, @other);
 }
 
 
@@ -263,7 +252,7 @@ sub canEdit {
 			) && 
 			$self->canStartThread( $userId )
 		) || # account for new threads
-		$self->SUPER::canEdit( $userId )
+		$self->next::method( $userId )
 	);
 }
 
@@ -271,7 +260,7 @@ sub canEdit {
 sub canModerate {
     my $self    = shift;
     my $userId  = shift     || $self->session->user->userId;
-    return $self->SUPER::canEdit( $userId );
+    return $self->WebGUI::Asset::Wobject::canEdit( $userId );
 }
 
 #-------------------------------------------------------------------
@@ -294,7 +283,7 @@ sub canPost {
     }
     # Users who can edit the collab can post
     else {
-        return $self->SUPER::canEdit( $userId );
+        return $self->WebGUI::Asset::Wobject::canEdit( $userId );
     }
 }
 
@@ -322,7 +311,7 @@ sub canStartThread {
                 ;
     return (
         $user->isInGroup($self->get("canStartThreadGroupId")) 
-        || $self->SUPER::canEdit( $userId )
+        || $self->WebGUI::Asset::Wobject::canEdit( $userId )
     );
 }
 
@@ -331,13 +320,13 @@ sub canStartThread {
 sub canView {
 	my $self = shift;
         my $userId  = shift     || $self->session->user->userId;
-	return $self->SUPER::canView( $userId ) || $self->canPost( $userId );
+	return $self->next::method( $userId ) || $self->canPost( $userId );
 }
 
 #-------------------------------------------------------------------
 sub commit {
     my $self = shift;
-    $self->SUPER::commit;
+    $self->next::method;
     my $cron = undef;
     if ($self->get("getMailCronId")) {
         $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
@@ -799,13 +788,13 @@ sub definition {
                 className=>'WebGUI::Asset::Wobject::Collaboration',
                 properties=>\%properties,
 		});
-        return $class->SUPER::definition($session, $definition);
+        return $class->next::method($session, $definition);
 }
 
 #-------------------------------------------------------------------
 sub duplicate {
 	my $self = shift;
-	my $newAsset = $self->SUPER::duplicate(@_);
+	my $newAsset = $self->next::method(@_);
 	$newAsset->createSubscriptionGroup;
 	return $newAsset;
 }
@@ -821,7 +810,7 @@ Add a tab for the mail interface.
 sub getEditTabs {
 	my $self = shift;
 	my $i18n = WebGUI::International->new($self->session,"Asset_Collaboration");
-	return ($self->SUPER::getEditTabs(), ['mail', $i18n->get('mail'), 9]);
+	return ($self->next::method, ['mail', $i18n->get('mail'), 9]);
 }
 
 #-------------------------------------------------------------------
@@ -838,7 +827,7 @@ sub getNewThreadUrl {
 }
 
 #-------------------------------------------------------------------
-sub getRssItems {
+sub getRssFeedItems {
 	my $self = shift;
 
 	# XXX copied and reformatted this query from www_viewRSS, but why is it constructed like this?
@@ -861,6 +850,7 @@ SQL
 	my $datetime = $self->session->datetime;
 
     my @posts;
+    my $rssLimit = $self->get('itemsPerFeed');
     for my $postId (@postIds) {
 		my $post = WebGUI::Asset->new($self->session, $postId, 'WebGUI::Asset::Post::Thread');
 		my $postUrl = $siteUrl . $post->getUrl;
@@ -881,24 +871,26 @@ SQL
             }
         }
         
-        push @posts, { 
+        push @posts, {
             author          => $post->get('username'),
 		    title           => $post->get('title'),
-		    'link'          => $postUrl, 
+		    'link'          => $postUrl,
             guid            => $postUrl,
 		    description     => $post->get('synopsis'),
             epochDate       => $post->get('creationDate'),
 		    pubDate         => $datetime->epochToMail($post->get('creationDate')),
-		    attachmentLoop  => $attachmentLoop, 
+		    attachmentLoop  => $attachmentLoop,
 			userDefined1 => $post->get("userDefined1"),
 			userDefined2 => $post->get("userDefined2"),
 			userDefined3 => $post->get("userDefined3"),
 			userDefined4 => $post->get("userDefined4"),
 			userDefined5 => $post->get("userDefined5"),
 		 };
+
+         last if $rssLimit <= scalar(@posts);
 	}
 
-    return @posts;
+    return \@posts;
 }
 
 #-------------------------------------------------------------------
@@ -1064,7 +1056,7 @@ sub getViewTemplateVars {
 	$var{'user.canPost'} = $self->canPost;
 	$var{'user.canStartThread'} = $self->canStartThread;
         $var{"add.url"} = $self->getNewThreadUrl;
-        $var{"rss.url"} = $self->getRssUrl;
+        $var{"rss.url"} = $self->getRssFeedUrl;
         $var{'user.isModerator'} = $self->canModerate;
         $var{'user.isVisitor'} = ($self->session->user->isVisitor);
 	$var{'user.isSubscribed'} = $self->isSubscribed;
@@ -1170,11 +1162,8 @@ See WebGUI::Asset::prepareView() for details.
 
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView();
+	$self->next::method;
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("collaborationTemplateId")) or die "no good: ".$self->get("collaborationTemplateId");
-    if ($self->get('rssCapableRssEnabled')) {
-        $self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
-    }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
@@ -1184,7 +1173,7 @@ sub prepareView {
 sub processPropertiesFromFormPost {
 	my $self = shift;
         my $updatePrivs = ($self->session->form->process("groupIdView") ne $self->get("groupIdView") || $self->session->form->process("groupIdEdit") ne $self->get("groupIdEdit"));
-	$self->SUPER::processPropertiesFromFormPost;
+	$self->next::method;
 	if ($self->get("subscriptionGroupId") eq "") {
 		$self->createSubscriptionGroup;
 	}
@@ -1212,7 +1201,7 @@ sub purge {
 		my $cron = WebGUI::Workflow::Cron->new($self->session, $self->get("getMailCronId"));
 		$cron->delete if defined $cron;
 	}
-	$self->SUPER::purge;
+	$self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -1227,7 +1216,7 @@ sub purgeCache {
 	my $self = shift;
 	WebGUI::Cache->new($self->session,"view_".$self->getId)->delete;
 	WebGUI::Cache->new($self->session,$self->_visitorCacheKey)->delete;
-	$self->SUPER::purgeCache;
+	$self->next::method;
 }
 
 #-------------------------------------------------------------------
@@ -1460,7 +1449,20 @@ sub www_view {
 	my $self = shift;
 	my $disableCache = ($self->session->form->process("sortBy") ne "");
 	$self->session->http->setCacheControl($self->get("visitorCacheTimeout")) if ($self->session->user->isVisitor && !$disableCache);
-	return $self->SUPER::www_view(@_);
+	return $self->next::method(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_viewRSS ( )
+
+Deprecated. Use www_viewRss() instead.
+
+=cut
+
+sub www_viewRSS {
+	my $self = shift;
+	return $self->www_viewRss;
 }
 
 1;

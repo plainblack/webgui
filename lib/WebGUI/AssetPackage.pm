@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -125,6 +125,15 @@ Imports the data exported by the exportAssetData method. If the asset already ex
 
 A hash reference containing the exported data.
 
+=head3 options
+
+A hash reference of options to change how the import works
+
+=head4 inheritPermissions
+
+Forces the all assets in the package to inherit ownerUserId, groupIdView and groupIdEdit
+from the asset where it is deployed.
+
 =cut
 
 sub importAssetData {
@@ -149,13 +158,20 @@ sub importAssetData {
     }
     if ($revisionExists) { # update an existing revision
         $asset = WebGUI::Asset->new($self->session, $id, $class, $version);
+
+        ##If the existing asset is not committed, do not allow the new package data to 
+        ##change the version control status.
+        if (  $asset->get('status') eq 'pending'
+           && $properties{'status'} ne 'pending' ) {
+           delete $properties{status};
+        }
         $error->info("Updating an existing revision of asset $id");	
-        $asset->update($data->{properties});
+        $asset->update(\%properties);
         ##Pending assets are assigned a new version tag
-        if ($data->{properties}->{status} eq 'pending') {
+        if ($properties{status} eq 'pending') {
             $self->session->db->write(
-                'update assetData set tagId=? where assetId=? and revisionDate='.$data->{properties}->{revisionDate},
-                [WebGUI::VersionTag->getWorking($self->session)->getId, $data->{properties}->{assetId}]
+                'update assetData set tagId=? where assetId=? and revisionDate=?',
+                [WebGUI::VersionTag->getWorking($self->session)->getId, $properties{assetId}, $properties{revisionDate},]
             );
         }
     }
@@ -205,13 +221,17 @@ sub importAssetCollateralData {
 
 #-------------------------------------------------------------------
 
-=head2 importPackage ( storageLocation )
+=head2 importPackage ( storageLocation, options )
 
 Imports the data from a webgui package file.
 
 =head3 storageLocation
 
 A reference to a WebGUI::Storage object that contains a webgui package file.
+
+=head3 options
+
+A hashref of options that are passed onto importAssetData.
 
 =cut
 

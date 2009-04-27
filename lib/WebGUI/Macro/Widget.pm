@@ -1,7 +1,7 @@
 package WebGUI::Macro::Widget;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -13,6 +13,11 @@ package WebGUI::Macro::Widget;
 use strict;
 
 #-------------------------------------------------------------------
+
+=head2 process 
+
+=cut
+
 sub process {
 
     # get passed parameters
@@ -21,6 +26,7 @@ sub process {
     my $width           = shift || 600;
     my $height          = shift || 400;
     my $templateId      = shift || 'none';
+    my $styleTemplateId = shift || 'none';
 
     # Get location for CSS and JS files
     my $conf            = $session->config;
@@ -66,6 +72,11 @@ sub process {
         $wgWidgetPath       = $exportUrl . $extras . '/wgwidget.js';
         $scratch->delete('exportUrl');
         my $viewContent    = $asset->view;
+        if ($styleTemplateId ne '' && $styleTemplateId ne 'none') {
+            $viewContent = $session->style->process($viewContent,$styleTemplateId);
+        }
+        my ($headTags, $bodyContent) = WebGUI::HTML::splitHeadBody($viewContent);
+
         WebGUI::Macro::process($session, \$viewContent);
         my $containerCss    = $extras . '/yui/build/container/assets/container.css';
         my $containerJs     = $extras . '/yui/build/container/container-min.js';
@@ -85,13 +96,14 @@ sub process {
         <script type='text/javascript'>
             function setupPage() {
                 WebGUI.widgetBox.retargetLinksAndForms();
-                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+                WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId', 'styleTemplateId' : $styleTemplateId } );
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
+        $headTags
     </head>
     <body id="widget$assetId">
-        $viewContent
+        $bodyContent
     </body>
 </html>
 OUTPUT
@@ -108,7 +120,7 @@ OUTPUT
     my $output          = <<EOHTML;
 <a href="#$assetId" id="show$assetId" name="show$assetId"><img src="$imgSrc" /></a>
 <script type="text/javascript">
-YAHOO.util.Event.addListener(window, 'load', WebGUI.widgetBox.initButton, { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
+YAHOO.util.Event.addListener(window, 'load', WebGUI.widgetBox.initButton, { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId', 'styleTemplateId' : '$styleTemplateId' } );
 </script>
 EOHTML
 

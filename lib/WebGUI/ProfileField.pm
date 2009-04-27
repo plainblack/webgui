@@ -4,7 +4,7 @@ package WebGUI::ProfileField;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -120,7 +120,7 @@ sub create {
     
     # Get the field's data type
     $properties->{fieldType} ||= "ReadOnly";
-    my $formClass   = 'WebGUI::Form::' . ucfirst $properties->{fieldType};
+    my $formClass   = $self->getFormControlClass;
     eval "use $formClass;";
     my $dbDataType = $formClass->getDatabaseFieldType;
 
@@ -547,6 +547,25 @@ sub isEditable {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+Returns a boolean indicating whether this field was in the posted data.
+
+=cut
+
+sub isInRequest {
+    my $self    = shift;
+    my $session = $self->session;
+    my $form = WebGUI::Form::DynamicField->new($session, 
+       fieldType => $self->get('fieldType'),
+       name      => $self->getId,
+    );
+    return $form->isInRequest;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 isProtected ( )
 
 Returns a boolean indicating whether this field may be deleted.
@@ -812,7 +831,7 @@ sub set {
     # If the fieldType has changed, modify the userProfileData column
     if ($properties->{fieldType} ne $self->get("fieldType")) {
         # Create a copy of the new properties so we don't mess them up
-        my $fieldClass  = "WebGUI::Form::".ucfirst($properties->{fieldType});
+        my $fieldClass  = $self->getFormControlClass;
         eval "use $fieldClass;";
         my $dbDataType 
         = $fieldClass->new($session, $self->formProperties($properties))->getDatabaseFieldType;

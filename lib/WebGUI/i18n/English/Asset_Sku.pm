@@ -69,28 +69,16 @@ our $I18N = {
 		context => q|help for vendor field|
 	},
 
-	'override tax rate' => {
-		message => q|Override tax rate?|,
+	'add to cart' => {
+		message => q|Add To Cart|,
 		lastUpdated => 0,
-		context => q|A yes/no field asking whether to override tax rate.|
+		context => q|i18n label for the add to cart button|,
 	},
 
-	'override tax rate help' => {
-		message => q|Would you like to override the default tax rate for this item? Usually used in locales that have special or no tax on life essential items like food and clothing.|,
+	'see more' => {
+		message => q|See more|,
 		lastUpdated => 0,
-		context => q|help for override tax rate field|
-	},
-
-	'tax rate override' => {
-		message => q|Tax Rate Override|,
-		lastUpdated => 0,
-		context => q|a field containing the percentage to use to calculate tax for this item|
-	},
-
-	'tax rate override help' => {
-		message => q|What is the new percentage that should be used to calculate tax on this item?|,
-		lastUpdated => 0,
-		context => q|help for tax rate override field|
+		context => q|alternate i18n label for the add to cart button|,
 	},
 
 	'Add a Variant' => {

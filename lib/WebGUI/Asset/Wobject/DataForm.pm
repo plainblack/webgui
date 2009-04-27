@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::DataForm;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2008 Plain Black Corporation.
+WebGUI is Copyright 2001-2009 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -391,12 +391,13 @@ sub _cacheFieldConfig {
         my $fieldData;
         if ($jsonData && eval { $jsonData = JSON::from_json($jsonData) ; 1 }) {
             # jsonData is an array in the order the fields should be
-            $self->{_fieldConfig} = {
-                map { $_->{name}, $_ } @{ $jsonData }
-            };
-            $self->{_fieldOrder} = [
-                map { $_->{name} } @{ $jsonData }
-            ];
+            $self->{_fieldConfig} = {};
+            $self->{_fieldOrder}  = [];
+            FIELD: foreach my $field (@{ $jsonData } ) {
+                next FIELD unless ref $field eq 'HASH';
+                $self->{_fieldConfig}->{$field->{name}} = $field;
+                push @{ $self->{_fieldOrder} }, $field->{name};
+            }
         }
         else {
             $self->{_fieldConfig} = {};
@@ -484,7 +485,7 @@ sub deleteAttachedFiles {
             my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
             if ($form->can('getStorageLocation')) {
                 my $storage = $form->getStorageLocation;
-                $storage->delete;
+                $storage->delete if $storage;
             }
         }
     }
@@ -496,7 +497,7 @@ sub deleteAttachedFiles {
                 my $form = $self->_createForm($fieldConfig->{$field}, $entryData->{$field});
                 if ($form->can('getStorageLocation')) {
                     my $storage = $form->getStorageLocation;
-                    $storage->delete;
+                    $storage->delete if $storage;
                 }
             }
         }
@@ -510,7 +511,7 @@ sub getAttachedFiles {
     my $fieldConfig = $self->getFieldConfig;
     my @paths;
     for my $field ( values %{$fieldConfig} ) {
-        my $form = $self->_createForm($field, $entryData->{$field->{name}});
+        my $form = $self->_createForm($field, $entryData->field($field->{name}));
         if ($form->can('getStorageLocation')) {
             my $storage = $form->getStorageLocation;
             if ($storage) {
@@ -646,6 +647,7 @@ sub getRecordTemplateVars {
         $var->{'edit.URL'       } = $self->getFormUrl('entryId=' . $entryId);
         $var->{'delete.url'     } = $self->getUrl('func=deleteEntry;entryId=' . $entryId);
         $var->{'delete.label'   } = $i18n->get(90);
+        $var->{'entryId'        } = $entryId;
     }
     my $func = $session->form->process('func');
     my $ignoreForm = $func eq 'editSave' || $func eq 'editFieldSave';
@@ -1519,8 +1521,8 @@ sub www_process {
         unless $self->canView;
     my $session = $self->session;
     my $i18n    = WebGUI::International->new($session,"Asset_DataForm");
-    my $entryId = $self->session->form->process('entryId');
-    my $entry = $self->entryClass->new($self, ( $entryId ? $entryId : () ) );
+    my $entryId = $session->form->process('entryId');
+    my $entry   = $self->entryClass->new($self, ( $entryId ? $entryId : () ) );
 
     my $var = $self->getTemplateVars;
 
@@ -1530,11 +1532,26 @@ sub www_process {
         my $default = $field->{defaultValue};
         WebGUI::Macro::process($self->session, \$default);
         my $value = $entry->field( $field->{name} ) || $default;
+
+        # WebGUI::Form::Integer::getValue() returns 0 even if no number is passed in.
+        # Not really a suitable default if we want to trigger the error message
+
         if ($field->{status} eq "required" || $field->{status} eq "editable") {
+
+            # get the raw value (by sending field type as blank)
+            my $rawValue = $session->form->process($field->{name}, '');
+
             $value = $session->form->process($field->{name}, $field->{type}, undef, {
                 defaultValue    => $default,
                 value           => $value,
             });
+
+            # this is a hack, but it's better than changing the default getValue() of Integer, which
+            # could have massive effects downstream in other uses.
+            if(($field->{type} =~ /integer/i) && defined($rawValue) && ($rawValue eq '') && ($value eq "0")) {
+                $value = $rawValue;
+            }
+
             WebGUI::Macro::filter(\$value);
         }
         if ($field->{status} eq "required" && (! defined($value) || $value =~ /^\s*$/)) {

@@ -1,7 +1,7 @@
 package WebGUI::Operation::SpellCheck;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -200,7 +200,7 @@ sub www_spellCheck {
     # work around TinyMCE JSON encoding bug
     $data =~ s/([^\\](?:\\\\)*)\\'/$1'/g;
 
-    my $params = JSON->new->utf8->decode($data);
+    my $params = JSON->new->decode($data);
 
     my $result;
     # dispatch to different subs based on the 'method' in the JSON data

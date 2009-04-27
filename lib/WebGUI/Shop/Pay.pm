@@ -226,6 +226,18 @@ Returns a reference to the current session.
 =cut
 
 #-------------------------------------------------------------------
+
+=head2 www_addPaymentGateway ( $session ) 
+
+Add a new payment gateway, based on the className form variable.  It will throw
+an error, WebGUI::Error::InvalidParram if no className is passed.
+
+=head3 $session
+
+A reference to the current session object.
+
+=cut
+
 sub www_addPaymentGateway {
     my $self    = shift;
     my $session = $self->session;
@@ -233,7 +245,7 @@ sub www_addPaymentGateway {
     my $className = $session->form->process('className') 
         || WebGUI::Error::InvalidParam->throw(error => 'No class name passed');
 
-    my $payDriver = $self->addPaymentGateway( $className, $className->getName( $session ), { enabled => 0 } );
+    my $payDriver = $self->addPaymentGateway( $className, { enabled => 0, label =>  $className->getName($session), } );
     return $payDriver->www_edit;
 }
 

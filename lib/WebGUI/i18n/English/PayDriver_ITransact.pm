@@ -292,6 +292,11 @@ our $I18N = {
 		lastUpdated => 0,
 		context => q|The default description of purchase of users.|
 	},
+	'template gone' => {
+		message => q|The template for entering in credentials has been deleted.  Please notify the site administrator.|,
+		lastUpdated => 0,
+		context => q|Error message when the getCredentials template cannot be accessed.|
+	},
 	'show terminal' => {
 		message => q|Click here to use your virtual terminal.|,
 		lastUpdated => 0,

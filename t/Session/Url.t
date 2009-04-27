@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -62,7 +62,7 @@ $session->{_request} = $pseudoRequest;
 #disable caching
 my $preventProxyCache = $session->setting->get('preventProxyCache');
 
-$session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
+$session->setting->set('preventProxyCache', 0);
 
 #######################################
 #
@@ -461,9 +461,6 @@ END {  ##Always clean-up
     $session->config->set('gateway',            $gateway);
     $session->config->set('extrasURL',          $origExtras);
     $session->config->set('sslEnabled',         $origSSLEnabled) if defined $origSSLEnabled;
-
-	$session->setting->set('hostToUse',         $setting_hostToUse);
-	$session->setting->set('preventProxyCache', $preventProxyCache);
 
 	if ($config_port) {
 		$session->config->set($config_port);

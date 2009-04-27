@@ -3,7 +3,7 @@ package WebGUI::Form::List;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -220,7 +220,7 @@ sub getValue {
             @values = $self->session->form->param($self->get("name"));
         }
     }
-    if (scalar @values < 1) {
+    if (scalar @values < 1 && ! $self->get('allowEmpty')) {
         @values = $self->getDefaultValue;
     }
 	return wantarray ? @values : join("\n",@values);
@@ -262,33 +262,21 @@ Returns the either the "value" ore "defaultValue" passed in to the object in tha
 sub getOriginalValue {
     my $self = shift;
     my @values = ();
-    foreach my $value ($self->get("value")) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
+    my $value = $self->get("value");
+    if (defined $value) {
+        if (ref $value eq "ARRAY") {
+            @values = @{$value};
+        }
+        else {
+            $value =~ s/\r//g;
+            @values = split "\n", $value;
         }
     }
-    if(@values){
-    	return wantarray ? @values : join("\n",@values);
+    if (@values || ($self->get('allowEmpty') && defined $value) ) {
+        return wantarray ? @values : join("\n",@values);
     }
-    
-    foreach my $value ($self->getDefaultValue()) {
-        if (scalar @values < 1 && defined $value) {
-            if (ref $value eq "ARRAY") {
-                @values = @{$value};
-            }
-            else {
-				$value =~ s/\r//g;
-                @values = split "\n", $value;
-            }
-        }
-    }
-	return wantarray ? @values : join("\n",@values);
+
+    return $self->getDefaultValue;
 }
 
 #-------------------------------------------------------------------

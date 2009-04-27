@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -48,6 +48,7 @@ my $product = $node->addChild({
 is($product->getThumbnailUrl(), '', 'Product with no image1 property returns the empty string');
 
 my $image = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($image);
 $image->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('lamp.jpg'));
 
 my $imagedProduct = $node->addChild({
@@ -61,6 +62,7 @@ ok($imagedProduct->getThumbnailUrl(), 'getThumbnailUrl is not empty');
 is($imagedProduct->getThumbnailUrl(), $image->getThumbnailUrl('lamp.jpg'), 'getThumbnailUrl returns the right path to the URL');
 
 my $otherImage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($otherImage);
 $otherImage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('gooey.jpg'));
 
 ok($imagedProduct->getThumbnailUrl($otherImage), 'getThumbnailUrl with an explicit storageId returns something');
@@ -89,8 +91,6 @@ is($imagedProduct->getConfiguredTitle, 'Bible - English', 'getConfiguredTitle is
 END {
     $product->purge;
     $imagedProduct->purge;
-    $image->delete;
-    $otherImage->delete;
 }
 
 1;

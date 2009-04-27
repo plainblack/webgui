@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::SQLReport;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -220,6 +220,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Manually make the edit form due to javascript for adding more queries.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm();
@@ -311,7 +318,7 @@ sub getEditForm {
 		);
 	
 	# javascript
-	$self->session->style->setScript("/extras/wobject/SQLReport/editFormDownload.js");
+	$self->session->style->setScript($self->session->url->extras("wobject/SQLReport/editFormDownload.js"), {type => 'text/javascript',});
 	
 	### /DOWNLOAD
 	
@@ -495,6 +502,14 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+See WebGUI::Asset::view() for details.  This method also performs content caching
+if the user is not in Admin Mode.
+
+=cut
+
 sub view {
 	my $self = shift;
 	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {

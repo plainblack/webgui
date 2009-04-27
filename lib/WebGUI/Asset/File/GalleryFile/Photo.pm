@@ -3,7 +3,7 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -22,7 +22,6 @@ use Image::ExifTool qw( :Public );
 use JSON qw/ to_json from_json /;
 use URI::Escape;
 use Tie::IxHash;
-use List::MoreUtils;
 
 use WebGUI::DateTime;
 use WebGUI::Friends;
@@ -71,7 +70,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_Photo');
 
     tie my %properties, 'Tie::IxHash', (
         exifData => {
@@ -318,27 +317,6 @@ sub getThumbnailUrl {
 
 #----------------------------------------------------------------------------
 
-=head2 i18n ( [ session ] )
-
-Get a WebGUI::International object for this class. 
-
-Can be called as a class method, in which case a WebGUI::Session object
-must be passed in.
-
-NOTE: This method can NOT be inherited, due to a current limitation 
-in the i18n system. You must ALWAYS call this with C<__PACKAGE__>
-
-=cut
-
-sub i18n {
-    my $self    = shift;
-    my $session = shift;
-    
-    return WebGUI::International->new($session, "Asset_Photo");
-}
-
-#----------------------------------------------------------------------------
-
 =head2 makeResolutions ( [resolutions] )
 
 Create the specified resolutions for this Photo. If resolutions is not 
@@ -361,19 +339,14 @@ sub makeResolutions {
     my $storage     = $self->getStorageLocation;
     $self->session->errorHandler->info(" Making resolutions for '" . $self->get("filename") . q{'});
 
-    my $filename = $self->get('filename');
-    RESOLUTION: for my $res ( @$resolutions ) {
+    for my $res ( @$resolutions ) {
         # carp if resolution is bad
         if ( $res !~ /^\d+$/ && $res !~ /^\d*x\d*/ ) {
             carp "Geometry '$res' is invalid. Skipping.";
-            next RESOLUTION;
+            next;
         }
-        ##Only resize images if the image is too big!
-        my ($imageX, $imageY) = $storage->getSizeInPixels($filename);
-        my @resolutions = split /x/, $res;
-        next RESOLUTION if List::MoreUtils::any { $imageX < $_ && $imageY < $_ } @resolutions;
         my $newFilename     = $res . ".jpg";
-        $storage->copyFile( $filename, $newFilename );
+        $storage->copyFile( $self->get("filename"), $newFilename );
         $storage->resize( $newFilename, $res, undef, $self->getGallery->get( 'imageDensity' ) );
     }
 }
@@ -623,7 +596,7 @@ Provides links to view the photo and add more photos.
 
 sub www_showConfirmation {
     my $self        = shift;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_Photo' );
 
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 

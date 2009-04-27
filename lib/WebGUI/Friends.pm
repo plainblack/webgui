@@ -3,7 +3,7 @@ package WebGUI::Friends;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -105,7 +105,7 @@ sub approveAddRequest {
 
 =head2 delete ( \@userIds )
 
-Remove friends.
+Remove friends.  Also removes the reciprocal relationship.
 
 =head3 userIds
 
@@ -116,7 +116,13 @@ An array reference of userIds to remove from friends list.
 sub delete {
     my $self = shift;
     my $userIds = shift;
-    $self->user->friends->deleteUsers($userIds);
+    my $me = $self->user;
+
+    $me->friends->deleteUsers($userIds);
+    foreach my $userId (@{$userIds}) {
+        my $friend = WebGUI::User->new($self->session, $userId);
+        $friend->friends->deleteUsers([$me->userId]);
+    }
 }
 
 #-------------------------------------------------------------------

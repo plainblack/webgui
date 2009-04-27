@@ -3,7 +3,7 @@ package WebGUI::Form::SelectBox;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -71,12 +71,12 @@ sub definition {
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(255)".
+Returns "CHAR(255)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(255)";
+    return "CHAR(255)";
 }
 
 #-------------------------------------------------------------------
@@ -165,13 +165,28 @@ sub toHtml {
 	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').'>';
     my $options = $self->getOptions;
 	my $value = $self->getOriginalValue();
-    foreach my $key (keys %{$options}) {
-		$output .= '<option value="'.$key.'"';
-		if ($value eq $key) {
-			$output .= ' selected="selected"';
-		}
-		$output .= '>'.$options->{$key}.'</option>';
-    }
+
+    # Recurse for <optgroups>
+    my $buildOptionsHtml;
+    $buildOptionsHtml = sub {
+        my $options = shift;
+        foreach my $key (keys %{$options}) {
+            if ( ref $options->{$key} eq 'HASH' ) {
+                $output .= qq{<optgroup label="$key">};
+                $buildOptionsHtml->($options->{$key});
+                $output .= qq{</optgroup>};
+            }
+            else {
+                $output .= '<option value="'.$key.'"';
+                if ($value eq $key) {
+                    $output .= ' selected="selected"';
+                }
+                $output .= '>'.$options->{$key}.'</option>';
+            }
+        }
+    };
+    $buildOptionsHtml->($options);
+
 	$output .= '</select>'."\n";
 	return $output;
 }

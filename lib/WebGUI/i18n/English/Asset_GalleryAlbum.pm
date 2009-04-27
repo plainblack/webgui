@@ -225,7 +225,7 @@ our $I18N = {
         lastUpdated => 0,
     },
 
-    'helpvar file_' => {
+    'helpvar file_*' => {
         message     => 'The current file being viewed in the thumbnails page. All the 
                         common variables for this file are available by prefixing "file_".',
         lastUpdated => 0,
@@ -490,6 +490,12 @@ our $I18N = {
         context     => q{Description of template variable},
     },
 
+    'helpvar gallery_displayTitle' => {
+        message     => q{Whether the Gallery containing this File is set to display its title, or not.},
+        lastUpdated => 0,
+        context     => q{Description of template variable},
+    },
+
     'helpvar isPending' => {
         message     => q{A flag to set if the GalleryAlbum is not yet approved. Users who can edit the GalleryAlbum are allowed to see them before they are approved.},
         lastUpdated => 0,
@@ -566,6 +572,18 @@ our $I18N = {
         message     => q{Use as Album Thumbnail},
         lastUpdated => 0,
         context     => q{template label in the Edit Album template.  To pick a thumbnail to use to represent the Album.},
+    },
+
+    'template album thumbnail alt' => {
+        message     => 'Preview thumbnail for',
+        lastUpdated => 1237404629,
+        context     => 'Alt text for album thumbnail.',
+    },
+
+    'template url_addDescription' => {
+        message     => 'Add a Description',
+        lastUpdated => 1237405184,
+        context     => 'Label for URL to add an album Description.',
     },
 
 };

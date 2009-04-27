@@ -372,6 +372,11 @@ listing,|,
         lastUpdated => 0,
     },
 
+    'group to add description' => {
+        message => q|Select the group that is allowed to add listings to this matrix.|,
+        lastUpdated => 0,
+    },
+
     'ratings duration description' => {
         message => q|Select the interval after which old ratings are cleaned out.|,
         lastUpdated => 0,
@@ -379,6 +384,16 @@ listing,|,
 
     'default sort description' => {
         message => q|Select the default sort order for the listings in the compare box.|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot width description' => {
+        message => q|Select the maximum width of the screenshots in this matrix. Screenshots that are larger will be resized.|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot height description' => {
+        message => q|Select the maximum height of the screenshots in this matrix. Screenshots that are larger will be resized.|,
         lastUpdated => 0,
     },
 
@@ -418,7 +433,18 @@ listing,|,
     },
 
     'max comparisons privileged description' => {
-        message => q|Specifies how many comparisons are allowed in searches and comparisons for users in the privileged group.|,
+        message => q|Specifies how many comparisons are allowed in searches and comparisons for users who have accounts on the site.|,
+        lastUpdated => 1235681965,
+    },
+
+    'statistics cache timeout label' => {
+        message => q|Statistics Cache Timeout|,
+        lastUpdated => 0,
+    },
+
+    'statistics cache timeout description' => {
+        message => q|Since all users will see the matrix statistics the same way, we can cache them for some time
+to increase performance. How long should we cache them?|,
         lastUpdated => 0,
     },
 
@@ -476,6 +502,16 @@ listing,|,
         message => q|Select a template to be used to show the listing edit screen.|,
         lastUpdated => 0,
     },
+
+    'screenshots template description' => {
+        message => q|Select a template to be used to show a listing's screenshots.|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template description' => {
+        message => q|Select a template for a listing's screenshots configuration.|,
+        lastUpdated => 0,
+    },
 	
     'categories label' => {
 		message => q|Categories|,
@@ -487,6 +523,11 @@ listing,|,
         lastUpdated => 0,
     },
 
+    'group to add label' => {
+        message => q|Group To Add|,
+        lastUpdated => 0,
+    },
+
     'ratings duration label' => {
         message => q|Ratings Duration|,
         lastUpdated => 0,
@@ -494,6 +535,16 @@ listing,|,
 
     'default sort label' => {
         message => q|Default Sort|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot height label' => {
+        message => q|Maximum Screenshot Height|,
+        lastUpdated => 0,
+    },
+
+    'max screenshot width label' => {
+        message => q|Maximum Screenshot Width|,
         lastUpdated => 0,
     },
 
@@ -548,8 +599,8 @@ listing,|,
 	},
 
 	'max comparisons privileged label' => {
-		message => q|Maximum Comparisons (For Privileged Users)|,
-		lastUpdated => 0,
+		message => q|Maximum Comparisons (For Registered Users)|,
+		lastUpdated => 1235681967,
 	},
 
 	'rating timeout' => {
@@ -601,6 +652,16 @@ listing,|,
 		message => q|Compare Template|,
 		lastUpdated => 0,
 	},
+
+    'screenshots template label' => {
+        message => q|Listing Screenshots Template|,
+        lastUpdated => 0,
+    },
+
+    'screenshots config template label' => {
+        message => q|Listing Screenshots Config Template|,
+        lastUpdated => 0,
+    },
 
     'edit listing template label' => {
         message => q|Edit Listing Template|,
@@ -750,11 +811,33 @@ selectBox.</p>|
         message => q|Hide/show stickied|,
     },
 
+    'approve or deny label' => {
+        lastUpdated => 0,
+        message => q|Approve/Deny|,
+        context => q|Label for the approve or deny link on the matrix listing detail screen.|,
+    },
+
     'matrix asset template variables title' => {
         lastUpdated => 0,
         message => q|Matrix Asset Template Variables|,
     },
 
+    'matrix fieldtype' => {
+        lastUpdated => 0,
+        message => q|Matrix Fieldtype|,
+    },
+
+    'too many message' => {
+        lastUpdated => 0,
+        message => q|You tried to compare more than your maximum number of listings.|,
+        context => q|A message shown to the user when they have selected too many listings to compare.|,
+    },
+
+    'too few message' => {
+        lastUpdated => 0,
+        message => q|You tried to compare only one listing. If you want to view just one listing, click on its name.|,
+        context => q|A message shown to the user when they have selected only one listing to compare.|,
+    }
 };
 
 1;

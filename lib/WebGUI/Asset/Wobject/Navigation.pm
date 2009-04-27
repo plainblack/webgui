@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Navigation;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -84,6 +84,13 @@ sub definition {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getEditForm ( )
+
+Manually build the edit form due to javascript elements.
+
+=cut
+
 sub getEditForm {
 	my $self = shift;
 	my $tabform = $self->SUPER::getEditForm;
@@ -297,8 +304,8 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
 	my $self = shift;
-	return
-	    unless $self->canEdit;
+    return undef
+        unless $self->canEdit && $self->session->var->isAdminOn;
 	if ($self->getToolbarState) {
         my $toolbar = '';
         if ($self->canEditIfLocked) {
@@ -340,7 +347,7 @@ sub getToolbar {
 
 =head2 prepareView ( )
 
-See WebGUI::Asset::prepareView() for details.
+Extend the superclass to add metadata and to preprocess the template.
 
 =cut
 
@@ -354,6 +361,13 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+See WebGUI::Asset::view() for details.
+
+=cut
+
 sub view {
 	my $self = shift;
 	# we've got to determine what our start point is based upon user conditions
@@ -512,6 +526,13 @@ sub view {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_goBackToPage ( )
+
+Do a redirect to the form parameter returnUrl if it exists.
+
+=cut
+
 sub www_goBackToPage {
 	my $self = shift;
 	$self->session->http->setRedirect($self->session->form->process("returnUrl")) if ($self->session->form->process("returnUrl"));

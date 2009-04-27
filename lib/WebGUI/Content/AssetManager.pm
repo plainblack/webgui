@@ -287,7 +287,7 @@ sub www_ajaxGetManagerPage {
             revisionDate    => $asset->get( "revisionDate" ),
             childCount      => $asset->getChildCount,
             assetSize       => $asset->get( 'assetSize' ),
-            lockedBy        => $asset->get( 'isLockedBy' ),
+            lockedBy        => ($asset->get( 'isLockedBy' ) ? $asset->lockedBy->username : ''),
             actions         => $asset->canEdit && $asset->canEditIfLocked,
         );
 
@@ -323,7 +323,9 @@ JavaScript that will take over if the browser has the cojones.
 
 sub www_manage {
     my ( $session ) = @_;
-    my $ac              = WebGUI::AdminConsole->new( $session, "assets" );
+    my $ac              = WebGUI::AdminConsole->new( $session, "assets", {
+                            showAdminBar        => 1
+                        } );
     my $currentAsset    = getCurrentAsset( $session );
     my $i18n            = WebGUI::International->new( $session, "Asset" );
 
@@ -413,7 +415,7 @@ sub www_manage {
         YAHOO.util.Event.onDOMReady( WebGUI.AssetManager.initManager );
     </script>
 ENDHTML
-    my $output          = WebGUI::Macro::AdminBar::process($session).'<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
+    my $output          = '<div class="yui-skin-sam" id="assetManager">' . getHeader( $session );
 
     ### Crumbtrail
     my $crumb_markup    = '<li><a href="%s">%s</a> &gt;</li>';
@@ -428,15 +430,16 @@ ENDHTML
     }
 
     # And ourself
-    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink'); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
+    $output .= sprintf q{<li><a href="#" onclick="WebGUI.AssetManager.showMoreMenu('%s','crumbMoreMenuLink', %s); return false;"><span id="crumbMoreMenuLink">%s</span></a></li>},
             $currentAsset->getUrl,
+            ($currentAsset->canEdit && $currentAsset->canEditIfLocked ? 1 : 0),
             $currentAsset->get( "menuTitle" ),
             ;
     $output .= '</ol>';
     
     ### The page of assets
     $output         .= q{<div>}
-                    . q{<form>}
+                    . q{<form method="post" enctype="multipart/form-data">}
                     . q{<input type="hidden" name="op" value="assetManager" />}
                     . q{<input type="hidden" name="method" value="manage" />}
                     . q{<div id="dataTableContainer">}
@@ -620,7 +623,7 @@ sub www_search {
         }
         else {
             ### Display the search results 
-            $output         .= q{<form>}
+            $output         .= q{<form method="post" enctype="multipart/form-data">}
                             . q{<input type="hidden" name="op" value="assetManager" />}
                             . q{<input type="hidden" name="method" value="search" />}
                             . q{<input type="hidden" name="pn" value="} . $session->form->get('pn') . q{" />}

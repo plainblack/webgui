@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -37,11 +37,10 @@ BEGIN {
 }
 
 # See if we have an SMTP server to use
-my ( $smtpd, %oldSettings );
+my ( $smtpd );
 my $SMTP_HOST        = 'localhost';
 my $SMTP_PORT        = '54921';
 if ($hasServer) {
-    $oldSettings{ smtpServer } = $session->setting->get('smtpServer');
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
     
 }
@@ -86,7 +85,7 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
 #----------------------------------------------------------------------------
 # Test addHtml
 $mail   = WebGUI::Mail::Send->create( $session );
-my $text = <<'EOF';
+$text = <<'EOF';
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Suspendisse eu lacus ut ligula fringilla elementum. Cras condimentum, velit commodo pretium semper, odio ante accumsan orci, a ultrices risus justo a nulla. Aliquam erat volutpat. 
 EOF
 
@@ -97,7 +96,7 @@ $mime   = $mail->getMimeEntity;
 # TODO: Test that addHtml creates a body with the right content type
 
 # addHtml should add newlines after 78 characters
-my $newlines    = length $text / 78;
+$newlines    = length $text / 78;
 is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtml should add newlines after 78 characters",
 );
@@ -107,7 +106,7 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
 #----------------------------------------------------------------------------
 # Test addHtmlRaw
 $mail   = WebGUI::Mail::Send->create( $session );
-my $text = <<'EOF';
+$text = <<'EOF';
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Suspendisse eu lacus ut ligula fringilla elementum. Cras condimentum, velit commodo pretium semper, odio ante accumsan orci, a ultrices risus justo a nulla. Aliquam erat volutpat. 
 EOF
 
@@ -117,7 +116,7 @@ $mime   = $mail->getMimeEntity;
 # TODO: Test that addHtmlRaw doesn't add an HTML wrapper
 
 # addHtmlRaw should add newlines after 78 characters
-my $newlines    = length $text / 78;
+$newlines    = length $text / 78;
 is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
     "addHtmlRaw should add newlines after 78 characters",
 );
@@ -174,9 +173,6 @@ SKIP: {
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    for my $name ( keys %oldSettings ) {
-        $session->setting->set( $name, $oldSettings{ $name } );
-    }
 }
 
 #----------------------------------------------------------------------------

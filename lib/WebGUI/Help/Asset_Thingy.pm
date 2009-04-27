@@ -26,6 +26,8 @@ our $HELP = {
                     { 'name' => 'thing_deleteUrl' },
                     { 'name' => 'thing_searchUrl' },
                     { 'name' => 'thing_addUrl' },
+                    { 'name' => 'thing_copyUrl' },
+                    { 'name' => 'thing_copyIcon' },
                 ]
             },
         ],
@@ -219,7 +221,11 @@ our $HELP = {
                     { 'name' => 'searchResult_id' },
                     { 'name' => 'searchResult_view_url' },
                     { 'name' => 'searchResult_edit_icon' },
+                    { 'name' => 'searchResult_edit_url' },
                     { 'name' => 'searchResult_delete_icon' },
+                    { 'name' => 'searchResult_delete_url' },
+                    { 'name' => 'searchResult_copy_icon' },
+                    { 'name' => 'searchResult_copy_url' },
                     {   'name' => 'searchResult_field_loop',
                         'variables' => [
                         { 'name' => 'field_id' },

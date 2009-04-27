@@ -232,7 +232,7 @@ sub getLayoutTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getConfirmTemplateId ( )
+=head2 getRemoveConfirmTemplateId ( )
 
 This method returns the template ID for the confirmation screen.
 
@@ -328,7 +328,7 @@ sub www_removeFriend {
 
 #-------------------------------------------------------------------
 
-=head2 www_removeFriend ( )
+=head2 www_removeFriendConfirm ( )
 
 This is a confirmation page of whether or not the user wishes to remove the selected user from friend 
 
@@ -379,7 +379,7 @@ sub www_sendFriendsRequest {
     my $self     = shift;
     my $session  = $self->session;
     my $var      = {};
-    my $uid      = $self->uid;
+    my $uid      = $self->uid || $session->form->get('uid');
 
     my $user     = WebGUI::User->new($session,$uid);
     my $i18n     = WebGUI::International->new($session,'Account_Friends');
@@ -484,16 +484,12 @@ sub www_view {
     my $var      = {};
 
     my $uid      = $self->uid;
-    my $user     = ($uid) ? WebGUI::User->new($session,$uid) : $session->user;
+    my $user     = $self->getUser;
 
     $self->appendCommonVars($var);
     
     my $displayView           = $uid ne "";
     $var->{'display_message'} = $msg;
-
-    #Override these
-    $var->{'user_full_name'    } = $user->getWholeName;
-    $var->{'user_member_since' } = $user->dateCreated;
 
     unless ($user->profileField('ableToBeFriend') && $user->profileIsViewable($session->user)) {
         my $i18n = WebGUI::International->new($session,"Account_Friends");
@@ -539,9 +535,10 @@ sub www_view {
         next if($displayView && !$friend->profileField('ableToBeFriend'));
         
         my $hash     = {};
+        # TODO Move this into a sub that can be more easily overridden
         $hash->{'friend_full_name'         } = $friend->getWholeName;
         $hash->{'isViewable'               } = $friend->profileIsViewable;
-        $hash->{'friend_id'                } = $friend->userId;
+        $hash->{'friend_id'                } = $friendId;
         $hash->{'friend_member_since'      } = $friend->dateCreated;
         $hash->{'friend_member_since_human'} = $session->datetime->epochToHuman($friend->dateCreated);
         $hash->{'friend_isOnline'          } = $friend->isOnline;

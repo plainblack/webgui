@@ -3,7 +3,7 @@ package WebGUI::Paginator;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -350,18 +350,18 @@ Returns a link to the next page's data.
 =cut
 
 sub getNextPageLink {
-	my ($self) = @_;
-        my ($text, $pn, $ctext);
-	$pn = $self->getPageNumber;
-	my $i18n = WebGUI::International->new($self->session);
-        $ctext = $i18n->get(92);
-        $text = $ctext.'&raquo;';
-        if ($pn < $self->getNumberOfPages) {
-                my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
-                return wantarray ? ($url,$ctext,'<span id="nextPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
-        } else {
-                return wantarray ? (undef,$ctext,$text) : $text;
-        }
+    my ($self) = @_;
+    my ($text, $pn, $ctext);
+    $pn = $self->getPageNumber;
+    my $i18n = WebGUI::International->new($self->session);
+    $ctext = $i18n->get(92);
+    $text = $ctext.'&raquo;';
+    my $url = undef;
+    if ($pn < $self->getNumberOfPages) {
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn+1)));
+        $text = '<span id="nextPageLink"><a href="'.$url.'">' . $text . '</a></span>';
+    }
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
@@ -504,6 +504,10 @@ sub getPageLinks {
 		my $start = ($minPage > 0) ? $minPage : 1;
 		my $maxPage = $start + $limit - 1;
 		my $end = ($maxPage < $self->getPageNumber) ? $self->getPageNumber : $maxPage;
+        if ($maxPage > $self->getNumberOfPages) {
+            $end = $self->getNumberOfPages;
+            $start = $self->getNumberOfPages - $limit + 1;
+        }
 		my @temp;
 		foreach my $page (@pages) {
 			if ($i <= $end && $i >= $start) {
@@ -528,18 +532,18 @@ Returns a link to the previous page's data.
 =cut
 
 sub getPreviousPageLink {
-	my ($self) = @_;
-	my ($text, $pn, $ctext);
-	$pn = $self->getPageNumber;
-	my $i18n = WebGUI::International->new($self->session);
-	$ctext = $i18n->get(91);
-	$text = '&laquo;'.$ctext;
-	if ($pn > 1) {
-		my $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
-		return wantarray ? ($url,$ctext,'<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a>') : '<a href="'.$url.'">'.$text.'</a></span>';
-        } else {
-            return wantarray ? (undef,$ctext,$text) : $text;
-        }
+    my ($self) = @_;
+    my ($text, $pn, $ctext);
+    $pn = $self->getPageNumber;
+    my $i18n = WebGUI::International->new($self->session);
+    $ctext = $i18n->get(91);
+    $text = '&laquo;'.$ctext;
+    my $url = undef;
+    if ($pn > 1) {
+        $url = $self->session->url->append($self->{_url},($self->{_formVar}.'='.($pn-1)));
+        $text = '<span id="previousPageLink"><a href="'.$url.'">'.$text.'</a></span>';
+    }
+    return wantarray ? ($url, $ctext, $text) : $text;
 }
 
 
@@ -752,6 +756,25 @@ sub setAlphabeticalKey {
 	$self->{abKey} = shift;
 	$self->{abInitialOnly} = shift;
 	return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setPageNumber ( pageNumber )
+
+Sets the page number.  This is really a convenience method for testing.
+Returns the page number that was set.
+
+=head3 pageNumber
+
+Sets the pageNumber.  Setting the pageNumber outside of the set of
+pages would cause the Paginator to behave poorly.
+
+=cut
+
+sub setPageNumber {
+	my $self = shift;
+    $self->{_pn} = shift;
 }
 
 1;

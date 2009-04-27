@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -20,8 +20,9 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 143; # increment this value for each test you create
+use Test::More tests => 196; # increment this value for each test you create
 use Test::Deep;
+use Data::Dumper;
 
 my $session = WebGUI::Test->session;
 
@@ -85,6 +86,10 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 ##Check for valid profileField access, even if it is not cached in the user object.
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
+
+is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be retrieved');
+$user->profileField('wg_privacySettings', '{"email"=>"all"}');
+is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be set');
 
 ################################################################
 #
@@ -314,6 +319,7 @@ $dude->deleteFromGroups([12]);
 my $origEnvHash = $session->env->{_env};
 my %newEnv = ( REMOTE_ADDR => '194.168.0.2' );
 $session->env->{_env} = \%newEnv;
+WebGUI::Test->originalConfig('adminModeSubnets');
 $session->config->set('adminModeSubnets', ['194.168.0.0/24']);
 
 ok(!$dude->isInGroup(12), 'user is not in group 12');
@@ -575,20 +581,23 @@ undef $neighborClone;
 # acceptsPrivateMessages
 #
 ################################################################
+is ($visitor->acceptsPrivateMessages($visitor->userId), 0, 'acceptsPrivateMessages: visitor cannot receive private messages');
+is ($friend->acceptsPrivateMessages($friend->userId), 0, '... never accept private messages from yourself');
 
 $friend->profileField('allowPrivateMessages', 'all');
-is ($friend->acceptsPrivateMessages(1), 1, 'acceptsPrivateMessages: when allowPrivateMessages=all, anyone can send messages');
+is ($friend->acceptsPrivateMessages($neighbor->userId), 1, '... when allowPrivateMessages=all, anyone can send messages');
+is ($friend->acceptsPrivateMessages(1), 0, 'acceptsPrivateMessages: when allowPrivateMessages=all, visitor can\'t send messages');
 $friend->profileField('allowPrivateMessages', 'none');
-is ($friend->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=none, no one can send messages');
+is ($friend->acceptsPrivateMessages($neighbor->userId), 0, '... when allowPrivateMessages=none, no one can send messages');
 
 $neighbor->profileField('allowPrivateMessages', 'friends');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: when allowPrivateMessages=friends, only friends can send me messages');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, '... when allowPrivateMessages=friends, only friends can send me messages');
 $friend->addToGroups([$neighbor->friends->getId]);
-is ($neighbor->acceptsPrivateMessages($friend->userId), 1, 'acceptsPrivateMessages: add $friend to $neighbor friendsGroup, now he can send me messages');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 1, '... add $friend to $neighbor friendsGroup, now he can send me messages');
 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 $neighbor->profileField('allowPrivateMessages', 'not a valid choice');
-is ($neighbor->acceptsPrivateMessages($friend->userId), 0, 'acceptsPrivateMessages: illegal profile field doesn\'t allow messages to be received from anyone');
+is ($neighbor->acceptsPrivateMessages($friend->userId), 0, '... illegal profile field doesn\'t allow messages to be received from anyone');
 
 ################################################################
 #
@@ -621,8 +630,13 @@ cmp_bag(
 );
 
 
-#----------------------------------------------------------------------------
-# Test the new create() method
+
+################################################################
+#
+# create
+#
+################################################################
+
 SKIP: {
     eval{ require Test::Exception; import Test::Exception };
     skip 1, 'Test::Exception not found' if $@;
@@ -630,6 +644,11 @@ SKIP: {
     throws_ok( sub{ WebGUI::User->create }, 'WebGUI::Error::InvalidObject', 
         'create() throws if no session passed'
     );
+
+    throws_ok( sub{ WebGUI::User->create($user) }, 'WebGUI::Error::InvalidObject', 
+        '... and if an object other than a Session is passed'
+    );
+
 };
 
 ok( my $newCreateUser = WebGUI::User->create( $session ),
@@ -637,6 +656,145 @@ ok( my $newCreateUser = WebGUI::User->create( $session ),
 );
 isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 
+################################################################
+#
+# getProfileUrl
+#
+################################################################
+
+WebGUI::Test->originalConfig('profileModuleIdentifier');
+my $profileModuleId = $session->config->get('profileModuleIdentifier');
+is(
+    $newFish->getProfileUrl('cellblock'),
+    "cellblock?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
+    'getProfileUrl: passing a page'
+);
+$session->config->set('profileModuleIdentifier', 'someOtherThing');
+is(
+    $newFish->getProfileUrl('cellblock'),
+    "cellblock?op=account;module=someOtherThing;do=view;uid=".$newFish->userId,
+    'getProfileUrl: uses profileModuleIdentifier to pick the right Account module'
+);
+$session->config->set('profileModuleIdentifier', $profileModuleId);
+
+$session->asset(WebGUI::Asset->getDefault($session));
+is(
+    $newFish->getProfileUrl(),
+    "/home?op=account;module=$profileModuleId;do=view;uid=".$newFish->userId,
+    'getProfileUrl: uses session->url->page if no URL is passed in'
+);
+
+################################################################
+#
+# hasFriends
+#
+################################################################
+
+ok(! $neighbor->hasFriends, 'hasFriends, user has no friends');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(  $neighbor->hasFriends, 'hasFriends, user has a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+
+################################################################
+#
+# acceptsFriendsRequests
+#
+################################################################
+
+ok(! $neighbor->acceptsFriendsRequests(), 'acceptsFriendsRequests: returns 0 unless you give it an object');
+ok(! $neighbor->acceptsFriendsRequests($session), '... returns 0 unless you give it a user object');
+ok(! $visitor->acceptsFriendsRequests($neighbor), '... visitor cannot have friends');
+ok(! $neighbor->acceptsFriendsRequests($visitor), '... visitor cannot be a friend');
+ok(! $neighbor->acceptsFriendsRequests($neighbor), '... cannot be your own friend');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(! $neighbor->acceptsFriendsRequests($friend), '... cannot accept requests if you are already a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+$neighbor->profileField('ableToBeFriend', 0);
+ok(! $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=0');
+$neighbor->profileField('ableToBeFriend', 1);
+ok(  $neighbor->acceptsFriendsRequests($friend), '... follows ableToBeFriend=1');
+
+################################################################
+#
+# profileIsViewable
+#
+################################################################
+
+ok(  $visitor->can('profileIsViewable'), 'profileIsViewable: is a WebGUI::User method');
+my $originalVisitorPublicProfile = $visitor->profileField('publicProfile');
+$visitor->profileField('publicProfile', 'all');
+ok(! $visitor->profileIsViewable, '... visitors profile is not viewable, even if publicProfile=all');
+ok(! $visitor->profileIsViewable($visitor), '... visitor cannot see his own profile');
+
+my $originalNeighborPublicProfile = $neighbor->profileField('publicProfile');
+$neighbor->profileField('publicProfile', 'none');
+ok(  $neighbor->profileIsViewable($neighbor), '... you may always see your own profile field');
+ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=none');
+ok(! $neighbor->profileIsViewable($admin), '... visitor permission follows publicProfile=none, even admin');
+$neighbor->profileField('publicProfile', 'all');
+ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=all');
+ok(  $neighbor->profileIsViewable($visitor), '... visitor permission follows publicProfile=all, even visitor');
+$neighbor->profileField('publicProfile', 'friends');
+ok(! $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, not a friend');
+$friend->addToGroups([$neighbor->friends->getId]);
+ok(  $neighbor->profileIsViewable($friend), '... visitor permission follows publicProfile=friend, now a friend');
+$friend->deleteFromGroups([$neighbor->friends->getId]);
+
+$neighbor->profileField('publicProfile', $originalNeighborPublicProfile);
+
+################################################################
+#
+# setProfileFieldPrivacySetting, getProfileFieldPrivacySetting
+#
+################################################################
+
+isa_ok($neighbor->getProfileFieldPrivacySetting, 'HASH', 'getProfileFieldPrivacySetting: returns a HASH if called with no params');
+is($neighbor->setProfileFieldPrivacySetting(), undef, '...with no argument, it returns undef');
+is($neighbor->setProfileFieldPrivacySetting({}), undef, '...with an empty hashref, it returns undef');
+isa_ok($neighbor->setProfileFieldPrivacySetting({email => 'none'}), 'HASH', 'setProfileFieldPrivacySetting: returns a HASH if called with valid params');
+is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...get and set 1 profile field privacy setting');
+$neighbor->setProfileFieldPrivacySetting({email => 'only Tony'});
+is($neighbor->getProfileFieldPrivacySetting('email'), 'none', '...set will not set invalid profile settings');
+
+is($admin->getProfileFieldPrivacySetting('publicEmail'), 'all', '...get on a user with existing settings');
+is($neighbor->getProfileFieldPrivacySetting('wg_privacySettings'), 'none', '...the privacy field always returns "none"');
+
+################################################################
+#
+# updateProfileFields
+#
+################################################################
+
+$neighbor->updateProfileFields({ firstName => 'Andy', lastName => 'Dufresne'});
+is($neighbor->profileField('firstName'), 'Andy', 'updateProfileFields: set firstName');
+is($neighbor->profileField('lastName'), 'Dufresne', '... set lastName, too');
+
+################################################################
+#
+# canViewField
+#
+################################################################
+
+ok(! $neighbor->canViewField(), 'canViewField: returns 0 unless you pass it nothing');
+ok(! $neighbor->canViewField('email'), '... returns 0 unless you pass it a fieldName and no user object');
+ok(  $neighbor->canViewField('email', $neighbor), '... user can always view their own fields');
+ok(  $neighbor->canViewField('toilet', $neighbor), '... even if they do not exist');
+$friend->addToGroups([$neighbor->friends->getId]);
+$neighbor->setProfileFieldPrivacySetting({email => 'only Red'});
+ok(! $neighbor->canViewField('toilet', $friend), '... returns 0 unless the field has a valid privacy setting');
+$neighbor->setProfileFieldPrivacySetting({email => 'all'});
+ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is all");
+ok(  $neighbor->canViewField('email', $visitor), "... returns 1 when the field's privacy setting is all, even for visitor");
+ok(  $neighbor->canViewField('email', $buster), "... returns 1 when the field's privacy setting is all, even for some other user");
+$neighbor->setProfileFieldPrivacySetting({email => 'none'});
+ok(! $neighbor->canViewField('email', $friend), "... returns 0 when the field's privacy setting is none for a friend");
+ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's privacy setting is none, even for admin");
+ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is none, even for some other user");
+$neighbor->setProfileFieldPrivacySetting({email => 'friends'});
+ok(  $neighbor->canViewField('email', $friend), "... returns 1 when the field's privacy setting is friends, for a friend");
+ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's privacy setting is friends, even for admin");
+ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is friends, even for some other user");
+$friend->deleteFromGroups([$neighbor->friends->getId]);
 
 END {
     foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
@@ -649,18 +807,16 @@ END {
         }
     }
 
-    (defined $expiredGroup  and ref $expiredGroup  eq 'WebGUI::Group') and $expiredGroup->delete;
-
     ##Note, do not delete the visitor account.  That would be really bad
-    $session->config->delete('adminModeSubnets');
 
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
     $listProfileField->delete;
     $evalProfileField->delete;
-    $visitor->profileField('email', $originalVisitorEmail);
+    $visitor->profileField('email',         $originalVisitorEmail);
+    $visitor->profileField('publicProfile', $originalVisitorPublicProfile);
 
-    $newProfileField->delete();
+    $newProfileField->delete() if $newProfileField;
 
 	$testCache->flush;
     my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');

@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -73,7 +73,7 @@ sub addChild {
 	# Check if it is possible to add a child to this asset. If not add it as a sibling of this asset.
 	if (length($self->get("lineage")) >= 252) {
 		$self->session->errorHandler->warn('Tried to add child to asset "'.$self->getId.'" which is already on the deepest level. Adding it as a sibling instead.');
-		return $self->getParent->addChild($properties, $id, $now);
+		return $self->getParent->addChild($properties, $id, $now, $options);
 	}
 	my $lineage = $self->get("lineage").$self->getNextChildRank;
 	$self->{_hasChildren} = 1;
@@ -829,7 +829,6 @@ sub setParent {
 	return 0 if ($newParent->getId eq $self->get("parentId")); # don't move it to where it already is
 	return 0 if ($newParent->getId eq $self->getId); # don't move it to itself
     my $oldLineage = $self->get("lineage");
-    return 0 unless $newParent->canEdit;
     my $lineage = $newParent->get("lineage").$newParent->getNextChildRank; 
     return 0 if ($lineage =~ m/^$oldLineage/); # can't move it to its own child
     $self->session->db->beginTransaction;

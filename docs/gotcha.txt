@@ -7,6 +7,44 @@ upgrading from one version to the next, or even between multiple
 versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
+
+7.7.4
+--------------------------------------------------------------------
+   * WebGUI now requires XML::FeedPP version 0.40 or greater.
+
+7.7.2
+--------------------------------------------------------------------
+   * WebGUI now requires Clone version 0.31 or greater.
+   * You must upgrade to WebGUI 7.7.2 before going on to higher versions of WebGUI due
+     to changes in the database table for the Cart.
+
+   * The RSSCapable class and RSSFromParent asset have been removed.
+     Any custom assets using those are recommended to switch to the new
+     RssFeed AssetAspect.  If not used by custom assets, the tables
+     used by them will be removed from the database.
+
+7.7.1
+--------------------------------------------------------------------
+   * Keywords are now comma separated rather than space separated.  Quotes are
+     no longer treated specially and will become part of keywords.  Keywords
+     cannot contain commas.  Keyword searching is still case insensitive, but
+     keyword will preserve the case of what is entered.
+
+
+7.7.0
+--------------------------------------------------------------------
+   * WebGUI now requires Params::Validate version 0.81 or greater.
+
+7.6.11
+--------------------------------------------------------------------
+   * If upgrading from WebGUI 7.5, you should upgrade to 7.5.40 first,
+     then you can upgrade to WebGUI 7.6.11 and beyond.
+
+7.6.10
+--------------------------------------------------------------------
+   * The Survey JSON fields (Survey.surveyJSON and Survey_response.responseJSON)
+     will alter to longText from LongBlob's.
+
 7.6.9
 --------------------------------------------------------------------
    * The ukplayer example, slideshow.html in /extras/ukplayer, used
@@ -65,12 +103,10 @@ save you many hours of grief.
  * WebGUI now requires XML::FeedPP version 0.36 or greater.
 
  * The Syndicated Content asset has been heavily modified. Your templates
-	and settings should automatically migrate, but in less than 1% of cases
-	there will be problems that the migration cannot handle. Check your
-	Syndicated Content assets after upgrade to ensure they are still
-	working as expected.
-	
-  * You must upgrade to 7.6.2 before you can upgrade to 7.6.3.
+    and settings should automatically migrate, but in less than 1% of cases
+    there will be problems that the migration cannot handle. Check your
+    Syndicated Content assets after upgrade to ensure they are still
+    working as expected.
 
 7.6.1
 --------------------------------------------------------------------

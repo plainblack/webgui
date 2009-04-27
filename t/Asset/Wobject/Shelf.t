@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 53;
+my $tests = 55;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -149,6 +149,7 @@ SKIP: {
     isa_ok($soda, 'WebGUI::Asset::Sku::Product');
     is($soda->getTitle(), 'Sweet Soda-bottled in Oregon', 'Title set correctly for soda');
     is($soda->get('url'), 'sweet-soda-bottled-in-oregon', 'URL for new product from the title');
+    is($soda->get('menuTitle'), $soda->getTitle, 'menuTitle is the same as title');
     my $sodaCollateral = $soda->getAllCollateral('variantsJSON');
     cmp_deeply(
         $sodaCollateral,
@@ -317,7 +318,8 @@ SKIP: {
     is($count, 3, 'still have 3 products, nothing new added');
 
     $soda = WebGUI::Asset::Sku->newBySku($session, 'soda');
-    is($soda->getTitle(), 'Sweet Soda-totally organic',   'Title updated correctly for soda');
+    is($soda->getTitle(),       'Sweet Soda-totally organic',   'Title updated correctly for soda');
+    is($soda->get('menuTitle'), 'Sweet Soda-totally organic',   'menuTitle updated correctly for soda');
     is($soda->get('url'), 'sweet-soda-bottled-in-oregon', 'URL for updated product from the original title, not the updated title');
     $shirt = WebGUI::Asset::Sku->newBySku($session, 't-shirt');
     $shirtCollateral = $shirt->getAllCollateral('variantsJSON');

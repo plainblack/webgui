@@ -3,7 +3,7 @@ package WebGUI::Asset::File;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -116,12 +116,12 @@ sub definition {
 			filename=>{
 				noFormPost=>1,
 				fieldType=>'hidden',
-				defaultValue=>undef
+				defaultValue=>'',
 			},
 			storageId=>{
 				noFormPost=>1,
 				fieldType=>'hidden',
-				defaultValue=>undef
+				defaultValue=>'',
 			},
 			templateId=>{
 				fieldType=>'template',
@@ -244,7 +244,6 @@ sub getEditFormUploadControl {
 
     return $html;
 }
-
 
 #-------------------------------------------------------------------
 sub getFileUrl {
@@ -559,10 +558,11 @@ sub www_edit {
 
 #-------------------------------------------------------------------
 
+
 sub www_view {
 	my $self = shift;
 	return $self->session->privilege->noAccess() unless $self->canView;
-	
+
 	# Check to make sure it's not in the trash or some other weird place
 	if ($self->get("state") ne "published") {
 		my $i18n = WebGUI::International->new($self->session,'Asset_File');

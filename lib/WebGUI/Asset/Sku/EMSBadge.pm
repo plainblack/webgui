@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSBadge;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -164,6 +164,26 @@ sub drawRelatedBadgeGroupsField {
 		});
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getAddToCartForm
+
+Returns a button to take the user to the view screen.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Sku');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'view'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('see more')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
 
 #-------------------------------------------------------------------
 
@@ -377,7 +397,7 @@ sub view {
                         . WebGUI::Form::hidden($session,
                             {
                                 name  => "callback",
-                                value => JSON->new->utf8->encode({ url => $self->getUrl})
+                                value => JSON->new->encode({ url => $self->getUrl})
                             })
                         . WebGUI::Form::submit($session, {value => $i18n->get("populate from address book")})
                         . WebGUI::Form::formFooter($session)
@@ -463,10 +483,10 @@ sub www_addToCart {
 	foreach my $field (qw(name address1 address2 address3 city state organization)) {
 		$badgeInfo{$field} = $form->get($field, "text");
 	}
-	$badgeInfo{'phoneNumber'} = $form->get('phoneNumber', 'phone');
-	$badgeInfo{'email'} = $form->get('email', 'email');
-	$badgeInfo{'country'} = $form->get('country', 'country');
-	$badgeInfo{'zipcode'} = $form->get('zipcode', 'zipcode');
+	$badgeInfo{'phoneNumber'} = $form->get('phone',   'phone');
+	$badgeInfo{'email'}       = $form->get('email',   'email');
+	$badgeInfo{'country'}     = $form->get('country', 'country');
+	$badgeInfo{'zipcode'}     = $form->get('zipcode', 'zipcode');
 	
 
 	# check for required fields

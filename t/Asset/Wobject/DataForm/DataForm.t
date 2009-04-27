@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -70,6 +70,7 @@ my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
 my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
@@ -87,6 +88,7 @@ isa_ok($duplicateArticle, 'WebGUI::Asset::Wobject::Article');
 
 my $duplicateStorageId = $duplicateArticle->get("storageId");
 my $duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
+WebGUI::Test->storagesToDelete($duplicateStorage);
 my $duplicateFilename = $duplicateStorage->getFiles->[0];
 
 is ($duplicateFilename, $filename, "duplicate method copies collateral");

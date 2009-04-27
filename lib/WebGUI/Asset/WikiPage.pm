@@ -1,7 +1,7 @@
 package WebGUI::Asset::WikiPage;
 
 # -------------------------------------------------------------------
-#  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+#  WebGUI is Copyright 2001-2009 Plain Black Corporation.
 # -------------------------------------------------------------------
 #  Please read the legal notices (docs/legal.txt) and the license
 #  (docs/license.txt) that came with this distribution before using
@@ -51,18 +51,24 @@ sub addRevision {
 
 #-------------------------------------------------------------------
 sub canAdd {
-	my $class = shift;
-	my $session = shift;
-	$class->next::method($session, undef, '7');
+    my $class = shift;
+    my $session = shift;
+    return $class->next::method($session, undef, '7');
 }
 
 #-------------------------------------------------------------------
 sub canEdit {
 	my $self = shift;
-	my $form = $self->session->form;
-	return (($form->process("func") eq "add" || ($form->process("assetId") eq "new" && $form->process("func") eq "editSave" && $form->process("class","className") eq "WebGUI::Asset::WikiPage")) && $self->getWiki->canEditPages) # account for new pages
-		|| (!$self->isProtected && $self->getWiki->canEditPages)  # account for normal editing
-		|| $self->getWiki->canAdminister; # account for admins
+    my $wiki = $self->getWiki;
+    return undef unless defined $wiki;
+
+	my $form      = $self->session->form;
+    my $addNew    = $form->process("func"              ) eq "add";
+    my $editSave  = $form->process("assetId"           ) eq "new"
+                 && $form->process("func"              ) eq "editSave"
+                 && $form->process("class","className" ) eq "WebGUI::Asset::WikiPage";
+    return $wiki->canAdminister
+        || ( $wiki->canEditPages && ( $addNew || $editSave || !$self->isProtected) );
 }
 
 #-------------------------------------------------------------------
@@ -90,13 +96,13 @@ sub definition {
 			},
 		actionTaken => {
 			fieldType => "text",
-			defaultValue => undef,
-			noFormPost => 1
+			defaultValue => '',
+			noFormPost => 1,
 			},
 		actionTakenBy => {
 			fieldType => "user",
-			defaultValue => undef,
-			noFormPost => 1
+			defaultValue => '',
+			noFormPost => 1,
 			},
 	    );
 
@@ -119,6 +125,22 @@ sub getAutoCommitWorkflowId {
 	my $self = shift;
     my $wiki = $self->getWiki;
     if ($wiki->hasBeenCommitted) {
+
+        # delete spam
+        my $spamStopWords = $self->session->config->get('spamStopWords');
+        if (ref $spamStopWords eq 'ARRAY') {
+            my $spamRegex = join('|',@{$spamStopWords});
+            $spamRegex =~ s/\s/\\ /g;
+            if ($self->get('content') =~ m{$spamRegex}xmsi) {
+                my $tag = WebGUI::VersionTag->new($self->session, $self->get('tagId'));
+                $self->purgeRevision;
+                if ($tag->getAssetCount == 0) {
+                    $tag->rollback;
+                }
+                return undef;
+            }
+        }
+
         return $wiki->get('approvalWorkflow')
             || $self->session->setting->get('defaultVersionTagWorkflow');
     }
@@ -145,7 +167,7 @@ sub getEditForm {
 		formContent => WebGUI::Form::HTMLArea($session, { name => 'content', richEditId => $wiki->get('richEditor'), value => $self->get('content') }) ,
 		formSubmit => WebGUI::Form::submit($session, { value => 'Save' }),
 		formProtect => WebGUI::Form::yesNo($session, { name => "isProtected", value=>$self->getValue("isProtected")}),
-        formKeywords => WebGUI::Form::text($session, {
+        formKeywords => WebGUI::Form::keywords($session, {
             name    => "keywords",
             value   => WebGUI::Keyword->new($session)->getKeywordsForAsset({asset=>$self}),
             }),
@@ -270,7 +292,6 @@ sub processPropertiesFromFormPost {
             }
         }
     }
-
 }
 
 #-------------------------------------------------------------------
@@ -311,6 +332,22 @@ sub update {
     my $properties = shift;
 	$properties->{isHidden} = 1;
     return $self->next::method($properties);
+}
+
+#-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a WikiMaster for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Wobject::WikiMaster');
 }
 
 #-------------------------------------------------------------------

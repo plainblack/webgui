@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::EMSRibbon;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -82,6 +82,26 @@ sub definition {
 	return $class->SUPER::definition($session, $definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getAddToCartForm
+
+Returns a button to take the user to the view screen.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Sku');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'view'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('see more')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
 
 #-------------------------------------------------------------------
 

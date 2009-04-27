@@ -4,6 +4,11 @@ use strict;
 use WebGUI::Storage;
 
 #-------------------------------------------------------------------
+
+=head2 canDelete 
+
+=cut
+
 sub canDelete {
 	my $self = shift;
 
@@ -12,6 +17,11 @@ sub canDelete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 delete 
+
+=cut
+
 sub delete {
 	my $self = shift;
 
@@ -26,6 +36,11 @@ sub delete {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getId 
+
+=cut
+
 sub getId {
 	my $self = shift;
 
@@ -33,6 +48,11 @@ sub getId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFontList 
+
+=cut
+
 sub getFontList {
 	my $self = shift;
 	my $session = shift || $self->session;
@@ -41,6 +61,11 @@ sub getFontList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFile 
+
+=cut
+
 sub getFile {
 	my $self = shift;
 
@@ -52,6 +77,11 @@ sub getFile {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getFilename 
+
+=cut
+
 sub getFilename {
 	my $self = shift;
 
@@ -59,6 +89,11 @@ sub getFilename {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getName 
+
+=cut
+
 sub getName {
 	my $self = shift;
 
@@ -66,6 +101,11 @@ sub getName {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getStorageId 
+
+=cut
+
 sub getStorageId {
 	my $self = shift;
 
@@ -73,6 +113,11 @@ sub getStorageId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 new 
+
+=cut
+
 sub new {
 	my $class = shift;
 	my $session = shift;
@@ -102,6 +147,11 @@ sub new {
 }
 
 #-------------------------------------------------------------------
+
+=head2 session 
+
+=cut
+
 sub session {
 	my $self = shift;
 
@@ -109,6 +159,11 @@ sub session {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setFilename 
+
+=cut
+
 sub setFilename {
 	my $self = shift;
 	my $filename = shift;
@@ -122,6 +177,11 @@ sub setFilename {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setName 
+
+=cut
+
 sub setName {
 	my $self = shift;
 	my $name = shift;
@@ -135,6 +195,11 @@ sub setName {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setStorageId 
+
+=cut
+
 sub setStorageId {
 	my $self = shift;
 	my $storageId = shift;

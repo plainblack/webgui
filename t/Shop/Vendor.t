@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 44;
+my $tests = 49;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -282,6 +282,27 @@ cmp_deeply(
     [ $fence, $defaultVendor, ],
     'delete removed the correct vendor'
 );
+
+#######################################################################
+#
+# isVendorInfoComplete
+#
+#######################################################################
+
+my %completeProps = (
+    name                    => 'Esquerita',
+    userId                  => $fenceUser->userId,
+    preferredPaymentType    => 'PayPal',
+    paymentInformation      => 'esquerita@example.com',
+);
+$fence->update( { %completeProps } );
+is( $fence->isVendorInfoComplete, 1, 'Vendor information is complete' );
+
+foreach (keys %completeProps ) {
+    $fence->update( { %completeProps, $_ => undef } );
+    ok( !$fence->isVendorInfoComplete, "Vendor information is not complete without $_" );
+}
+
 
 undef $guard;
 

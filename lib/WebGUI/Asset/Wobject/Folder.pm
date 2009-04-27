@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Folder;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -206,6 +206,14 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( )
+
+See WebGUI::Asset::view for details.  Generate template variables and
+render the template.  Also handles caching.
+
+=cut
+
 sub view {
 	my $self    = shift;
 	
@@ -235,6 +243,7 @@ sub view {
 				url          => $child->getUrl,
 				title        => $child->get("title"),
 				menuTitle    => $child->get("menuTitle"),
+				synopsis     => $child->get("synopsis") || '',
 				canView      => $child->canView(),
 				"icon.small" => $child->getIcon(1),
 				"icon.big"   => $child->getIcon,

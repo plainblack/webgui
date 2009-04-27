@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -57,6 +57,24 @@ my $testBlock = [
 		testValue => '123.456',
 		expected  => 0,
 		comment   => 'rejects float',
+	},
+	{
+		key => 'Int6',
+		testValue => '0',
+		expected  => 0,
+		comment   => 'zero passes',
+	},
+	{
+		key => 'Int7',
+		testValue => '',
+		expected  => 0,
+		comment   => 'empty string returns 0',
+	},
+	{
+		key => 'Int8',
+		testValue => undef,
+		expected  => 0,
+		comment   => 'undef returns 0',
 	},
 ];
 

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -380,10 +380,17 @@ An HTML blob to be parsed into the current style.
 =cut
 
 sub processStyle {
-	my $self = shift;
-	my $output = shift;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
-	return $self->session->style->process($output,$self->get("styleTemplateId"));
+	my ($self, $output) = @_;
+    my $session = $self->session;
+    my $style   = $session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags);
+    if ($self->get('synopsis')) {
+        $style->setMeta({
+            name    => 'Description',
+            content => $self->get('synopsis'),
+        });
+    }
+	return $style->process($output,$self->get("styleTemplateId"));
 }
 
 
