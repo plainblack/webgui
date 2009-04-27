@@ -36,12 +36,19 @@ sub handler {
     my ($session) = @_;
     my $output = undef;
     return undef unless $session->form->get('op') eq 'crypt';
-    my $function = "www_".$session->form->get('func');
-    if ($function ne "www_" && (my $sub = WebGUI::Crypt::Admin->can($function))) {
+    my $function = "www_" . $session->form->get('func');
+    
+    # default to www_providers
+    $function = $function eq 'www_' ? 'www_providers' : $function;
+    
+    if ( my $sub = WebGUI::Crypt::Admin->can($function) ) {
         $output = $sub->($session);
     }
     else {
-        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $function inside Crypt", method=>$function);
+        WebGUI::Error::MethodNotFound->throw(
+            error  => "Couldn't call non-existant method $function inside Crypt",
+            method => $function
+        );
     }
     return $output;
 }

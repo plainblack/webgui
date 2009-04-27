@@ -16,24 +16,43 @@ our $I18N = {
 	},
 
 	'Enable?' => {
-		message => q|Enable Encryption?|,
+		message => q|Enable Crypt?|,
 		lastUpdated => 0,
 		context => q||
 	},
 
 	'Enable? help' => {
-		message => q|Encryption will be completely turned off until enabled.<br/>
-N.B. You can only turn off Encryption when no Field Providers are being actively used.
+		message => q|Crypt will be completely disabled if you turn it off here.<br/>
+N.B. You cannot disable Crypt when Providers are active.
 		|,
 		lastUpdated => 0,
 		context => q||
 	},
 
-    'Providers' => {
-        message => q|Providers|,
+    'Manage Providers' => {
+        message => q|Manage Providers|,
         lastUpdated => 0,
         context => q||
     },
+    
+    'Add a provider' => {
+        message => q|Add a provider|,
+        lastUpdated => 0,
+        context => q||
+    },
+    
+    'Start UpdateProviders Workflow' => {
+        message => q|Start UpdateProviders Workflow|,
+        lastUpdated => 0,
+        context => q||
+    },
+    
+    'confirm delete provider' => {
+        message => q|Are you sure that you want to delete this Provider?|,
+        lastUpdated => 0,
+        context => q|Confirm label in deleting a Provider.|,
+    },
+    
 };
 
 1;
