@@ -1021,7 +1021,6 @@ sub www_getCompareListData {
     my $self        = shift;
     my @listingIds  = @_;
     my $session     = $self->session;
-    my $i18n        = WebGUI::International->new($session,'Asset_Matrix');
     my (@results,@columnDefs);
 
     unless (scalar(@listingIds)) {
@@ -1035,16 +1034,10 @@ sub www_getCompareListData {
         $listing->incrementCounter("compares");
         my $listingId_safe = $listingId;
         $listingId_safe =~ s/-/_____/g;
-        push(@columnDefs,{
-            key         =>$listingId_safe,
-            label       =>$listing->get('title').' '.$listing->get('version'),
-            formatter   =>"formatColors",
-            url         =>$listing->getUrl,
-            lastUpdated =>$session->datetime->epochToHuman( $listing->get('revisonDate'),"%z" ),
-        });
+        push(@columnDefs,{key=>$listingId_safe,label=>$listing->get('title'),formatter=>"formatColors",
+            url=>$listing->getUrl});
     }
-    push(@results,{name=>$i18n->get('last updated label'),fieldType=>'lastUpdated'});
-    
+
     my $jsonOutput;
     $jsonOutput->{ColumnDefs} = \@columnDefs;
 
@@ -1067,18 +1060,7 @@ sub www_getCompareListData {
         ) });
     }
     foreach my $result (@results){
-        if($result->{fieldType} eq 'category'){
-            # Row starting with a category label shows the listing name in each column
-            foreach my $columnDef (@columnDefs) {
-                $result->{$columnDef->{key}} = $columnDef->{label}; 
-            }
-        }
-        elsif($result->{fieldType} eq 'lastUpdated'){
-            foreach my $columnDef (@columnDefs) {
-                $result->{$columnDef->{key}} = $columnDef->{lastUpdated};
-            }
-        }
-        else{
+        unless($result->{fieldType} eq 'category'){
             foreach my $listingId (@listingIds) {
                 $result->{attributeId} =~ s/-/_____/g;
                 my $listingId_safe = $listingId;

@@ -81,7 +81,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		
 		for (var i = 0; i < len; i++) {
 		var c = oFullResponse.ColumnDefs[i];
-		oFullResponse.ColumnDefs[i].label = oFullResponse.ColumnDefs[i].label + "<a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
+		oFullResponse.ColumnDefs[i].label = "<a href='"+ oFullResponse.ColumnDefs[i].url +"'>" + oFullResponse.ColumnDefs[i].label + "</a> <a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
 		myDataTable.insertColumn(c);
 		}
 	    }
