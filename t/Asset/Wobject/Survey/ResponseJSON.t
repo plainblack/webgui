@@ -20,7 +20,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 36;
+my $tests = 41;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -290,6 +290,34 @@ cmp_deeply(
     undef,
     'nextQuestions: returns undef if the next section is empty'
 );
+
+####################################################
+#
+# goto
+#
+####################################################
+$rJSON->survey->section([0])->{variable} = 'goto 0';
+$rJSON->survey->question([0,0])->{variable} = 'goto 0-0';
+$rJSON->survey->question([0,1])->{variable} = 'goto 0-1';
+$rJSON->survey->question([0,2])->{variable} = 'goto 0-2';
+$rJSON->survey->section([1])->{variable} = 'goto 1';
+$rJSON->survey->question([1,0])->{variable} = 'goto 1-0';
+$rJSON->survey->question([1,1])->{variable} = 'goto 1-1';
+$rJSON->survey->section([2])->{variable} = 'goto 2';
+$rJSON->survey->section([3])->{variable} = 'goto 2';
+$rJSON->survey->question([3,0])->{variable} = 'goto 3-0';
+$rJSON->survey->question([3,1])->{variable} = 'goto 3-0';  ##Intentional duplicate
+$rJSON->survey->question([3,2])->{variable} = 'goto 3-2';
+
+$rJSON->lastResponse(0);
+$rJSON->goto('goto 80');
+is($rJSON->lastResponse(), 0, 'goto: no change in lastResponse if the variable cannot be found');
+$rJSON->goto('goto 1');
+is($rJSON->lastResponse(), 2, 'goto: works on existing section');
+$rJSON->goto('goto 0-1');
+is($rJSON->lastResponse(), 0, 'goto: works on existing question');
+$rJSON->goto('goto 3-0');
+is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 }
 
