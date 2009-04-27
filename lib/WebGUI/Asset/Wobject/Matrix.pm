@@ -1060,7 +1060,12 @@ sub www_getCompareListData {
         ) });
     }
     foreach my $result (@results){
-        unless($result->{fieldType} eq 'category'){
+        if($result->{fieldType} eq 'category'){
+            foreach my $columnDef (@columnDefs) {
+                $result->{$columnDef->{key}} = $columnDef->{label}; 
+            }
+        }
+        else{
             foreach my $listingId (@listingIds) {
                 $result->{attributeId} =~ s/-/_____/g;
                 my $listingId_safe = $listingId;

@@ -22,13 +22,18 @@ YAHOO.util.Event.addListener(window, "load", function() {
 				Dom.setStyle(elCell.parentNode, "background-color", color);
 			}
 			elCell.innerHTML = sData;
+		}else{
+			elCell.innerHTML = sData;
 		}
         };
 	this.formatLabel = function(elCell, oRecord, oColumn, sData) {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
-			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
+			elCell.innerHTML = sData; 
+			if(oRecord.getData("description")){
+				elCell.innerHTML = elCell.innerHTML + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
+			}
 		}
         };
 
