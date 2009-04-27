@@ -9,19 +9,19 @@ our $I18N = {
 		context => q||
 	},
 
-	'Crypt Settings' => {
-		message => q|Encryption Settings|,
+	'Settings' => {
+		message => q|Settings|,
 		lastUpdated => 0,
 		context => q||
 	},
 
-	'Enabled?' => {
+	'Enable?' => {
 		message => q|Enable Encryption?|,
 		lastUpdated => 0,
 		context => q||
 	},
 
-	'Enabled? help' => {
+	'Enable? help' => {
 		message => q|Encryption will be completely turned off until enabled.<br/>
 N.B. You can only turn off Encryption when no Field Providers are being actively used.
 		|,
@@ -29,6 +29,11 @@ N.B. You can only turn off Encryption when no Field Providers are being actively
 		context => q||
 	},
 
+    'Providers' => {
+        message => q|Providers|,
+        lastUpdated => 0,
+        context => q||
+    },
 };
 
 1;
