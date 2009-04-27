@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::Donation;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -94,6 +94,28 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.  Overrode master class to add price form.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Donation');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func',  value => 'donate'})
+      . WebGUI::Form::float(     $session, {name => 'price', defaultValue => $self->getPrice })
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('donate button')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getConfiguredTitle
 
 Returns title + price
@@ -162,18 +184,21 @@ sub view {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_donate
+=head2 www_donate
 
 Accepts the information from the donation form and adds it to the cart.
 
 =cut
 
 sub www_donate {
-    my $self = shift;
-    if ($self->canView) {
+    my $self    = shift;
+    my $price   = $self->session->form->get("price") || $self->getPrice;
+
+    if ($self->canView && $price > 0) {
         $self->{_hasAddedToCart} = 1;
-        $self->addToCart({price => ($self->session->form->get("price") || $self->getPrice) });
+        $self->addToCart( { price => $price } );
     }
+
     return $self->www_view;
 }
 

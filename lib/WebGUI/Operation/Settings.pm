@@ -1,7 +1,7 @@
 package WebGUI::Operation::Settings;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -240,6 +240,28 @@ sub definition {
 		namespace=>"AdminConsole",
 		defaultValue=>$setting->get("AdminConsoleTemplate")
 		});
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "yesNo",
+        name            => "useRecaptcha",
+        label           => $i18n->get('use recaptcha'),
+        hoverHelp       => $i18n->get('use recaptcha description'),
+        defaultValue    => $setting->get('useRecaptcha'),
+    });
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "text",
+        name            => "recaptchaPublicKey",
+        label           => $i18n->get('recaptcha public key'),
+        defaultValue    => $setting->get('recaptchaPublicKey'),
+    });
+    push(@fields, {
+        tab             => "ui",
+        fieldType       => "text",
+        name            => "recaptchaPrivateKey",
+        label           => $i18n->get('recaptcha private key'),
+        defaultValue    => $setting->get('recaptchaPrivateKey'),
+    });
 	# messaging settings
 	push(@fields, {
 		tab=>"messaging",
@@ -463,6 +485,7 @@ sub definition {
         groupIdAdminGraphics
         groupIdAdminGroup
         groupIdAdminGroupAdmin
+        groupIdAdminHistory
         groupIdAdminHelp
         groupIdAdminLDAPLink
         groupIdAdminLoginHistory

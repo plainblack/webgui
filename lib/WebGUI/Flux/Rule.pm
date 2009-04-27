@@ -147,6 +147,8 @@ sub create {
     # Work out the next highest sequence number
     my $sequenceNumber = $session->db->quickScalar('select max(sequenceNumber) from fluxRule');
     $sequenceNumber = $sequenceNumber ? $sequenceNumber + 1 : 1;
+    
+    my @expressions = $properties_ref->{expressions} ? @{delete $properties_ref->{expressions}} : ();
 
     # Create a bare-minimum entry in the db..
     my $id = $session->db->setRow(
@@ -157,8 +159,16 @@ sub create {
 
     delete $properties_ref->{fluxRuleId};    # doesn't need to be passed to update (below)
 
-    # (re-)retrieve entry and apply user-supplied properties..
+    # (re-)retrieve entry
     my $rule = $class->new( $session, $id );
+    
+    # add any supplied Expressions (do this before calling update so that the user can
+    # specify combinedExpressions in the same call and not have an exception thrown)
+    for my $expression (@expressions) {
+        $rule->addExpression($expression);
+    }
+    
+    # and finally, update with any user-supplied options
     $rule->update($properties_ref);
 
     return $rule;
@@ -786,15 +796,17 @@ sub _updateDataAndTriggerWorkflows {
     if ($is_access) {
         $db_write_required = 1;
 
+        # N.B. dateAccessMostRecentlyTrue/False currently disabled
+        # - may not be needed by anyone and causes extra db writes
         if ($success) {
-            $field_updates{dateAccessMostRecentlyTrue} = $dt;
+#            $field_updates{dateAccessMostRecentlyTrue} = $dt;
+#            $self->session->log->debug('Updating dateAccessMostRecentlyTrue');
             $trigger_workflow{AccessTrue}              = 1;
-            $self->session->log->debug('Updating dateAccessMostRecentlyTrue');
         }
         else {
-            $field_updates{dateAccessMostRecentlyFalse} = $dt;
+#            $field_updates{dateAccessMostRecentlyFalse} = $dt;
+#            $self->session->log->debug('Updating dateAccessMostRecentlyFalse');
             $trigger_workflow{AccessFalse}              = 1;
-            $self->session->log->debug('Updating dateAccessMostRecentlyFalse');
         }
 
         # First direct access attempt?

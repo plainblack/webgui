@@ -3,7 +3,7 @@ package WebGUI::Form::MatrixFieldType;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -79,7 +79,7 @@ sub definition {
 	my $i18n = WebGUI::International->new($session);
 	push(@{$definition}, {
 		label=>{
-			defaultValue=>$i18n->get("matrix fieldtype","WebGUI")
+			defaultValue=>$i18n->get("matrix fieldtype","Asset_Matrix")
 			},
         });
 	return $class->SUPER::definition($session, $definition);
@@ -95,7 +95,7 @@ Returns the human readable name of this control.
 
 sub getName {
     my ($self, $session) = @_;
-    return WebGUI::International->new($session, 'WebGUI')->get('matrix fieldtype');
+    return WebGUI::International->new($session, 'Asset_Matrix')->get('matrix fieldtype');
 }
 
 #-------------------------------------------------------------------

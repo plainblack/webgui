@@ -1,36 +1,35 @@
 package EnableFlux;
 
 use strict;
-use Readonly;
+use warnings;
 use WebGUI::Session;
 use Carp;
-use Tie::IxHash;
 use List::MoreUtils qw(none insert_after_string);
-use File::Slurp;
+
+=head1 EnableFlux
+
+Utility class for flux-enabling a site.
+
+If Flux ever hits the core this will become the upgrade script.
+
+=cut
 
 #----------------------------------------------------------------------------
 sub apply {
-    my ( $class, $session, $demo ) = @_;
+    my ( $class, $session, $quiet) = @_;
 
-    say("# Running EnableFlux..");
-
-    modify_db_schema_for_flux($session);
-    modify_config_files_for_flux($session);
-    create_demo_data($session) if $demo;
-}
-
-sub say {
-    local $\ = "\n";
-    print @_ if $ENV{VERBOSE};
+    update_db($session, $quiet);
+    update_config($session, $quiet);
 }
 
 #----------------------------------------------------------------------------
-sub modify_db_schema_for_flux {
+sub update_db {
     my $session = shift;
+    my $quiet = shift;
 
     # Each command comes in a pair, first reset change (if it has already been applied), second apply change fresh
 
-    say("Modifying db schema..");
+    print "Updating db for flux.. " unless $quiet;
 
     $session->db->write("DELETE FROM settings WHERE name = 'fluxEnabled'");
     $session->db->write("INSERT INTO settings VALUES ('fluxEnabled', '0')");
@@ -111,12 +110,15 @@ CREATE TABLE `fluxExpression` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8
 ~
     );
+    
+    print "DONE.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
-sub modify_config_files_for_flux {
+sub update_config {
     my $session = shift;
-    say("# Examining wg config file..");
+    my $quiet = shift;
+    print "Updating config file for flux.. " unless $quiet;
 
     # Add Flux to the list of Content Handlers
     my @content_handlers = @{ $session->config->get('contentHandlers') };
@@ -144,22 +146,8 @@ sub modify_config_files_for_flux {
             groupSetting => "groupIdAdminFlux"
         }
     );
-}
-
-#----------------------------------------------------------------------------
-sub create_demo_data {
-    my $session = shift;
-    say("Creating flux demo data..");
-    $session->db->write(
-        q~
-INSERT INTO `fluxRule` (`fluxRuleId`, `name`, `sequenceNumber`, `sticky`, `onRuleFirstTrueWorkflowId`, `onRuleFirstFalseWorkflowId`, `onAccessFirstTrueWorkflowId`, `onAccessFirstFalseWorkflowId`, `onAccessTrueWorkflowId`, `onAccessFalseWorkflowId`, `combinedExpression`) VALUES ('2wKj6EkpLrmU1f6ZVfxzOA','Dependent Rule',2,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('M8EjDc89Q8iqBYb4UTRalA','Simple Rule',1,0,NULL,NULL,NULL,NULL,NULL,NULL,'not e1 or e2'),('Yztbug94AbqQkOKhyOT4NQ','Yet Another Rule',3,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('NgRW4dh2sDSNEwJPGCtWBg','My empty Rule',4,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),('VVGkA5gBRlNYd6DrFV5anQ','Another Rule',5,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL)
-~
-    );
-    $session->db->write(
-        q~
-INSERT INTO `fluxExpression` (`fluxExpressionId`, `fluxRuleId`, `name`, `sequenceNumber`, `operand1`, `operand1Args`, `operand1AssetId`, `operand1Modifier`, `operand1ModifierArgs`, `operand2`, `operand2Args`, `operand2AssetId`, `operand2Modifier`, `operand2ModifierArgs`, `operator`) VALUES ('z3ddMvVUkGx07FeblgFWuw','M8EjDc89Q8iqBYb4UTRalA','Test First Thing',1,'TextValue','{\"value\":  \"test value\"}',NULL,NULL,NULL,'TextValue','{\"value\":  \"test value\"}',NULL,NULL,NULL,'IsEqualTo'),('YiQToMcxB7RUYvmt3CSS-Q','M8EjDc89Q8iqBYb4UTRalA','Test Second Thing',2,'TextValue','{\"value\":  \"boring dry everyday value\"}',NULL,NULL,NULL,'TextValue','{\"value\":  \"super lucky crazy value\"}',NULL,NULL,NULL,'IsEqualTo'),('jNDjhNzuqxinj3r2JG7lXQ','2wKj6EkpLrmU1f6ZVfxzOA','Check Simple Rule',1,'FluxRule','{\"fluxRuleId\":  \"M8EjDc89Q8iqBYb4UTRalA\"}',NULL,NULL,NULL,'TruthValue','{\"value\":  \"1\"}',NULL,NULL,NULL,'IsEqualTo'),('s8wVvTYZyjBt7JqUOs4Urw','2wKj6EkpLrmU1f6ZVfxzOA','Test Something Else',2,'TextValue','{\"value\":  \"test value\"}',NULL,NULL,NULL,'TextValue','{\"value\":  \"test value\"}',NULL,NULL,NULL,'IsEqualTo'),('j9XB0vivxoHYSjuIDIRAEA','Yztbug94AbqQkOKhyOT4NQ','Check Simple Rule',1,'FluxRule','{\"fluxRuleId\":  \"M8EjDc89Q8iqBYb4UTRalA\"}',NULL,NULL,NULL,'TruthValue','{\"value\":  \"1\"}',NULL,NULL,NULL,'IsEqualTo'),('9l9E97tyeuN4HovVDEsKPw','Yztbug94AbqQkOKhyOT4NQ','Check Dependent Rule',2,'FluxRule','{\"fluxRuleId\":  \"2wKj6EkpLrmU1f6ZVfxzOA\"}',NULL,NULL,NULL,'TruthValue','{\"value\":  \"1\"}',NULL,NULL,NULL,'IsEqualTo'),('m5maTmnA55JQW1N-_sOwLg','VVGkA5gBRlNYd6DrFV5anQ','Check the empty Rule',1,'TruthValue','{\"value\":  \"1\"}',NULL,NULL,NULL,'FluxRule','{\"fluxRuleId\":  \"NgRW4dh2sDSNEwJPGCtWBg\"}',NULL,NULL,NULL,'IsEqualTo');
-~
-    );
+    
+    print "DONE.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

@@ -3,7 +3,7 @@ package WebGUI::Form::TimeZone;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -24,7 +24,7 @@ Package WebGUI::Form::TimeZone
 
 =head1 DESCRIPTION
 
-Creates a template chooser control.
+Creates a time zone chooser control.
 
 =head1 SEE ALSO
 

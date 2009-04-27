@@ -3,7 +3,7 @@ package WebGUI::Inbox::Message;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -67,11 +67,11 @@ May be "unread", "pending", or "completed". Defaults to "pending".
 
 You should set this to "pending" if the message requires an action which will later be completed.
 
-WebGUI::Inbox->create( $session, { status => "pending"} )
+WebGUI::Inbox::Message->create( $session, { status => "pending"} )
 
 You should set this to "unread" if this is a message without an action, such as a notification.
 
-WebGUI::Inbox->create( $session, { status => "unread" } );
+WebGUI::Inbox::Message->create( $session, { status => "unread" } );
 
 You should only set this to "completed" if this is an action that would normally be "pending" but for some reason
 requries no further action.  For instance, if the user submitting some content is also the approver you may choose
@@ -109,10 +109,12 @@ sub create {
 	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
 	$self->{_properties}{message}   = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
-	$self->{_properties}{userId}    = $properties->{userId} || $session->user->userId;
+	$self->{_properties}{userId}    = $properties->{userId};
 	$self->{_properties}{groupId}   = $properties->{groupId};
     $self->{_properties}{sentBy}    = $properties->{sentBy} || 3;
-
+        unless ( $self->{_properties}{userId} || $self->{_properties}{groupId} ) {
+             $self->{_properties}{userId} = $session->user->userId;
+         }
     my $status = $self->{_properties}{status};
     
 	if ($status eq "completed") {
@@ -161,9 +163,9 @@ sub create {
             $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
         }
         my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
-        $msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
-		$mail->addHtml($msg);
-		$mail->addFooter;
+		$msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
+        $mail->addHtml($msg);
+        $mail->addFooter;
 		$mail->queue;
 	}
 	$self->{_session} = $session;

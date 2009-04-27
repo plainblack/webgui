@@ -923,6 +923,36 @@ our $I18N = {
         lastUpdated => 1229311001,
     },
 
+    'UP' => {
+        message => q{UP},
+        context => q{template label,  referring to the previous week, up.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
+    'DN' => {
+        message => q{DN},
+        context => q{template label,  referring to the next week, down.  Should be an abbreviation with 2 characters},
+        lastUpdated => 1230356830,
+    },
+
+    'Add a feed' => {
+        message => q{Add a feed},
+        context => q{feed refers to an iCalendar/iCal feed},
+        lastUpdated => 1230931579,
+    },
+
+    'Add' => {
+        message => q{Add},
+        context => q{to add, or append to a list},
+        lastUpdated => 1230931579,
+    },
+
+    'Feed URL' => {
+        message => q{Feed URL},
+        context => q{},
+        lastUpdated => 1230931579,
+    },
+
 };
 
 1;

@@ -3,7 +3,7 @@ package WebGUI::Asset::RichEdit;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -448,6 +448,18 @@ sub getToolbar {
 
 
 #-------------------------------------------------------------------
+
+=head2 getRichEditor ( $nameId )
+
+Return the javascript needed to make the Rich Editor.
+
+=head3 $nameId
+
+The id for the rich editor, should be unique enough to be used as the id parameter
+for a HTML tag.
+
+=cut
+
 sub getRichEditor {
 	my $self = shift;
 	return '' if ($self->getValue('disableRichEditor'));
@@ -561,7 +573,7 @@ sub getRichEditor {
     while (my ($plugin, $path) = each %loadPlugins) {
         $out .= "tinymce.PluginManager.load('$plugin', '$path');\n";
     }
-    $out    .= "\ttinyMCE.init(" . JSON->new->utf8->pretty->encode(\%config) . " )\n"
+    $out    .= "\ttinyMCE.init(" . JSON->new->pretty->encode(\%config) . " )\n"
             . "</script>";
 }
 
@@ -582,6 +594,13 @@ sub indexContent {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_edit ( )
+
+Override the method from Asset.pm to change the title of the screen.
+
+=cut
+
 sub www_edit {
     my $self = shift;
     return $self->session->privilege->insufficient() unless $self->canEdit;

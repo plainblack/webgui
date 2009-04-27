@@ -3,7 +3,7 @@ package WebGUI::Session::DateTime;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -287,6 +287,7 @@ A string representing the output format for the date. Defaults to '%z %Z'. You c
  %P = An upper-case AM/PM.
  %s = A two digit second.
  %t = Time zone name.
+ %V = week number.
  %w = Day of the week. 
  %W = Day of the week abbreviated. 
  %y = A four digit year.
@@ -331,6 +332,7 @@ sub epochToHuman {
 		"p" => "P",
 		"P" => "p",
 		"s" => "S",
+		"V" => "V",
 		"w" => "A",
 		"W" => "a",
 		"y" => "Y",
@@ -810,7 +812,7 @@ sub new {
 
 =head2 secondsToInterval ( seconds )
 
-Returns an interval and units derived the number of seconds.
+Returns an interval and internationalized units derived the number of seconds.
 
 =head3 seconds
 
@@ -825,31 +827,31 @@ sub secondsToInterval {
 	my ($interval, $units);
 	if ($seconds >= 31536000) {
 		$interval = round($seconds/31536000);
-		$units = $i18n->get("years");
+		$units = $i18n->get("703");
 	}
     elsif ($seconds >= 2592000) {
         $interval = round($seconds/2592000);
-        $units = $i18n->get("months");
+        $units = $i18n->get("702");
 	}
     elsif ($seconds >= 604800) {
         $interval = round($seconds/604800);
-        $units = $i18n->get("weeks");
+        $units = $i18n->get("701");
 	}
     elsif ($seconds >= 86400) {
         $interval = round($seconds/86400);
-        $units = $i18n->get("days");
+        $units = $i18n->get("700");
     }
     elsif ($seconds >= 3600) {
         $interval = round($seconds/3600);
-        $units = $i18n->get("hours");
+        $units = $i18n->get("706");
     }
     elsif ($seconds >= 60) {
         $interval = round($seconds/60);
-        $units = $i18n->get("minutes");
+        $units = $i18n->get("705");
     }
     else {
         $interval = $seconds;
-        $units = $i18n->get("seconds");
+        $units = $i18n->get("704");
 	}
 	return ($interval, $units);
 }

@@ -3,7 +3,7 @@ package WebGUI::Asset::File::GalleryFile::Photo;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -19,7 +19,7 @@ use base 'WebGUI::Asset::File::GalleryFile';
 
 use Carp qw( carp croak );
 use Image::ExifTool qw( :Public );
-use JSON qw/ encode_json decode_json /;
+use JSON qw/ to_json from_json /;
 use URI::Escape;
 use Tie::IxHash;
 
@@ -70,7 +70,7 @@ sub definition {
     my $class       = shift;
     my $session     = shift;
     my $definition  = shift;
-    my $i18n        = __PACKAGE__->i18n($session);
+    my $i18n        = WebGUI::International->new($session, 'Asset_Photo');
 
     tie my %properties, 'Tie::IxHash', (
         exifData => {
@@ -220,7 +220,7 @@ sub getExifData {
 
     # Our processing and eliminating of bad / unparsable keys
     # isn't perfect, so handle errors gracefully
-    my $exif    = eval { decode_json( $self->get('exifData') ) };
+    my $exif    = eval { from_json( $self->get('exifData') ) };
     if ( $@ ) {
         $self->session->errorHandler->warn( 
             "Could not parse JSON data for EXIF in Photo '" . $self->get('title') 
@@ -313,27 +313,6 @@ sub getThumbnailUrl {
     return $self->getStorageLocation->getThumbnailUrl(
         $self->get("filename")
     );
-}
-
-#----------------------------------------------------------------------------
-
-=head2 i18n ( [ session ] )
-
-Get a WebGUI::International object for this class. 
-
-Can be called as a class method, in which case a WebGUI::Session object
-must be passed in.
-
-NOTE: This method can NOT be inherited, due to a current limitation 
-in the i18n system. You must ALWAYS call this with C<__PACKAGE__>
-
-=cut
-
-sub i18n {
-    my $self    = shift;
-    my $session = shift;
-    
-    return WebGUI::International->new($session, "Asset_Photo");
 }
 
 #----------------------------------------------------------------------------
@@ -455,7 +434,7 @@ sub updateExifDataFromFile {
     }
 
     $self->update({
-        exifData    => encode_json( $info ),
+        exifData    => to_json( $info ),
     });
 }
 
@@ -617,7 +596,7 @@ Provides links to view the photo and add more photos.
 
 sub www_showConfirmation {
     my $self        = shift;
-    my $i18n        = __PACKAGE__->i18n( $self->session );
+    my $i18n        = WebGUI::International->new( $self->session, 'Asset_Photo' );
 
     return $self->processStyle(
         sprintf( $i18n->get('save message'), 

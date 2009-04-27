@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -46,6 +46,9 @@ my ($jokerAd, $penguinAd, $twoFaceAd);
 SKIP: {
 
 	skip "Unable to load WebGUI::AdSpace", $numTests-1 unless $loaded;
+
+    local $ENV{REMOTE_ADDR} = '10.0.0.1';
+    local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
 
 	$adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
 

@@ -1,3 +1,276 @@
+7.7.4
+ - rfe: Extend DateTime for Week-Nrs  (#9151)
+ - fixed: 7.6 upgrade left some default content marked as packages
+ - fixed #9816: Syndicated content asset fails on feeds including a UTF8 BOM
+ - fixed: Spam in the wiki  (#10050)
+ - fixed: Apply button applies but reloads old content in editor  (#9827)
+ - fixed: maintenance tasks in parallel  (#9921)
+ - fixed: Schedular Fields Too Short  (#9889)
+ - fixed: Can't invite friends  (#10112)
+ - Added missing POD docs for WebGUI::Account
+ - fixed #9989: thing-search template won't include data-save params in the url for pagination
+ - fixed #10122: fixed date object to not change the value in 'toHtml' function.
+ - fixed #9764: drag drop now uses the handle for 'pickup' rather than the whole object.
+ - Default Survey Question bundles now store full answer information in json. Everything configured in an answer will be saved in a default configuration.
+ - Survey [[question variable]] now returns the shown answer text for multiple choice questions, and the recorded value for non-multiple choice questions.
+ - fixed #10142: Matrix 2.0 - Search screen compare button not functional
+ - fixed #10141: Matrix 2.0 - Search does not check matching products
+ - fixed #10077: after matrix sort can't return to alphanumeric sort
+ - fixed #10138: Matrix 2.0 Links in Product Listing are broken
+ - fixed #10163: User List - alphabet search field broken
+ - fixed #9039: Synopsis not output as a meta field
+ - fixed #9939: checkout error with any payment method
+ - Survey editor now keeps survey objects in a scrollable panel to keep buttons always in view.
+ - fixed #10198: Cannot drag assets to new positions on page
+ - fixed #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
+ - fixed #10143: Matrix 2.0 - Product maintainer accounts changed during upgrade
+ - rfe: #10002: User Manager, view User's Profile (perlDreamer Consulting)
+ - rfe: #10073: Account system to be able to return XML/JSON (perlDreamer Consulting)
+ - Replaced the tax system with a pluggable one. Included are a Generic plugin
+   (which works the same as the old system) and a plugin for EU merchants ( Martin Kamerbeek / Oqapi )
+ - fixed #10213: RssFeed aspect now checks canView and gives HTTP Basic Auth box to login
+ - added Survey Number type. Text number entry that uses slider restrictions as constraints (server and client side). You can also use the arrow keys
+	to increment or decrement the number enter. If slider constraints are blank, no rules applied.
+ - added: ThingyRecord allows you to sell records in a Thingy (like a classified ad)
+ - fixed: #10109: Matrix 2.0 - Updates to product listing by maintainer account require admin approval
+ - fixed #10146: Thingy duplicate errors
+ - Added Survey back button
+ - fixed #10158: Matrix 2.0 - Screenshots rendering poorly
+ - administer.js now has a much improved handling of the slider algorithm, plus some refactored code.  Users will not notice anything.
+ - Survey slider answer updates, now update all the answers for max,min,step settings since only the first answers values are used anyways.
+7.7.3
+ - fixed #10094: double explanation in thread help
+ - rfe #9612: Carousel Wobject (was Widget Wobject) (SDH Consulting Group)
+ - Survey summaries now added.  In the Survey edit, select quiz mode, and a summary will be shown to the user at the end of the survey.
+ - fixed #10110: Matrix 2.0 - "Data Error" on Pending Product Listing Updates
+ - rfe #9965: matrix/pls reverse dropped event variables 
+ - fixed install of Passive Analytics settings for new sites (SDH Consulting Group)
+ - Survey Expression Engine upgraded (SDH Consulting Group)
+
+7.7.2
+ - fixed #10056: YUI javascripts included while adminOff (BNC)
+ - fixed a bug that required you to hit "update cart" before the checkout
+   button would appear
+ - fixed #9955: Matrix alpha sort is backwards
+ - fixed #9934: Matrix 2.0 - Products should be listed alphabetically
+ - fixed #9865: Matrix: Later added attributes are not detected in older listings
+ - added: Sku's now have a getAddToCartForm method, which is used by the Shelf
+   to place a small form next to each Sku that displays.  Sku's with complex
+   forms (like the EMS sku's), simply display a button to take the user to the
+   sku's view screen for the whole form. [TEMPLATE]
+ - fixed #9933: Matrix 2.0 - Unable to view/edit product maintainer account
+ - fixed #9951: Matrix 2.0: Median not calculated correctly
+ - added new AssetAspect::RssFeed (Matthew Wilson) - to convert an asset to use it (see
+   Collaboration.pm as an example), inherit from Class::C3 as in Collaboration
+   and you'll need to remove all your ->SUPER::xxxxx invocations - usually replace it
+   with ->next::method, but when your SUPER was previously calling a method with
+   a name different from your current method, you'll need to specify the parent/super
+   module name explicity (e.g.  ->WebGUI::Asset::Wobject::canEdit()).  You'll also
+   need to implement the getRssFeedItems method as explained in AssetAspect/RssFeed.pm
+ - Survey now shows warnings if bad goto, bad gotoExpressions, no question text, survey looping,
+   or no question answers are found.
+ - fixed: Gateway problem with VendorPayout.
+ - fixed #9976: carts not cleaned up
+ - fixed Problems with displaying the wrong name and/or creation in the Account, and all plugins.
+
+7.7.1
+ - the AdSku project: create a Sku that allows buyers to purchase advertising in select AdSpaces at selected priorities
+ - rfe #9353: Welcome message template (SDH Consulting Group)
+ - rfe #10007: New Month and Year question type.  If required, Month must be selected and a 4 digit year must be entered.
+ - fixed #10011: Wrong spelling of "Descendant" in Navigation Asset Help function (Rob Schipper/NFIA India)
+ - rfe #9098: Thingy Thing-copy function (SDH Consulting Group)
+ - rfe #9099: Thingy field-copy function (SDH Consulting Group)
+ - Keywords are now comma separated rather than space separated.
+ - added Keywords form control with autocomplete
+ - Survey: Moved multiple choice questions to the data base, and they can now be edited globally from the Survey editor
+
+7.7.0
+ - fixed #9913: New Content Side Bar missing in Asset window
+ - fixed: New Mail macro never returns any messages
+ - fixed: Template parser cannot be set
+ - fixed #9836: Matrix: Group to Add Listings is missing
+ - fixed #9924: WebGUI::Shop::Cart::readyForCheckout fails randomly (Henry Tang, Long Term Results B.v.)
+ - fixed #9873: third-> first in post template help
+ - fixed #9892: Typo in "Default Gallery View Album" Template [TEMPLATE]
+ - fixed #9826: Inbox messages sent by email don't include from username
+ - rfe: added Asset History browser (perlDreamer Consulting, LLC and Plain Black)
+ - fixed: Commit w/ approval workflow can crash under race conditions resulting in permanently locked content (Martin Kamerbeek / Oqapi )
+ - fixed: Each textarea inserts identical JS that should be inserted only once ( Martin Kamerbeek / Oqapi )
+ - added: Vendor payout system ( Martin Kamerbeek / Oqapi )
+ - fixed #9942: Upgrade script fails with ITransact driver (William McKee, Knowmad Technologies)
+ - fixed #9943: Upgrade script fails with Payment Gateways
+ - fixed #9948: Data form cannot be deleted.
+ - fixed #9950: Wrong var in help for thread
+ - fixed #9956: Product Import
+ - added Survey now has a loading mask on Survey edit ajax calls.
+ - fixed: Sliders fixed.  Improved algorithm for determining pixel step size.
+ - rfe #9355: Password Recovery email subject (SDH Consulting Group)
+ - added: Users can now set a minimum cart amount required for checkout. ( Martin Kamerbeek / Oqapi )
+ - fixed validation issue in the donation asset ( Martin kamerbeek / Oqapi )
+ - rfe #9354: Account activation email template (SDH Consulting Group)
+ - rfe #9233: Survey branching expressions (Patrick Donelan, SDH Consulting Group)
+ - rfe #9202: Survey Jump-to combo box (Patrick Donelan, SDH Consulting Group)
+ - rfe #9201: Make Survey TextAreas YUI resizable (SDH Consulting Group)
+ - rfe #9200: Survey Text/TextArea handling (SDH Consulting Group)
+ - rfe #9199: Survey final page detection (SDH Consulting Group)
+ - rfe #9198: Turn Survey Edit Section/Question/Answer fields into RTEs (SDH Consulting Group)
+ - rfe #9197: Survey timeout handling (SDH Consulting Group)
+ - rfe #8862: Passive Analytics (SDH Consulting Group)
+ - fixed #9979: i18n labels for Gallery (Knowmad Technologies)
+
+7.6.14
+ - fixed: IE6 shows Admin Bar over Asset Manager
+ - fixed #9808: Search i18n 
+ - fixed #9818: deleteAttachedFiles bug (THE REVENGE)
+ - fixed #9809: Pagination list up to 10/20: not working correctly on last pages.
+ - fixed #9820: Survey: political party spelled wrong
+ - fixed #9819: Survey: hoverhelp showing instead of field name
+ - fixed #9822: Matrix: Wrong field label
+ - fixed #9823: Matrix: no cancel button in add/edit listing
+
+7.6.13
+ - fixed AdSpace bug: impressions and clicks for most non-human web clients will not be counted.
+ - fixed #9760: DataForm not working in demo.plainblack.com
+ - fixed #9759: Delete Entry Button missing in Data Form
+ - fixed #9767: FileAsset breaks 'null' rule for FileAsset table
+ - fixed defaultValues of undef cause mysql5.1 to complain about columns that are set to be NOT NULL.  5.0 doesn't care.
+ - International text retrieval has been optimized
+ - fixed #9766: Thingy Pagination Broken
+ - fixed #9779: Gallery: js for search (datepicker?) included in album view
+ - fixed #9783: payment methods are not added
+ - fixed #9785: Delete All button not working in Account/Inbox [TEMPLATE]
+ - fixed #9803: Survey 2.0- Gradebook spelled wrong
+ - fixed #9801: Survey 2.0- Template spelled wrong
+ - fixed #9802: Survey Template field names to be consistent
+ - fixed: HTMLForm generated forms have an extra double quote in the table tag.
+
+7.6.12
+ - fixed: During postback on a recurring transaction, the routine could error out instead of catching an error.
+ - fixed: Do not show the Edit entry in the More menu in the asset manager if the asset is locked.
+ - fixed #9677: no output from form helper template variable sticky.form and stick.label
+ - fixed #9738: Gallery Title [TEMPLATE]
+ - fixed #9739: Gallery Delete Album Template [TEMPLATE]
+ - fixed #9737: Upgrade Missed a Config Option
+ - fixed #9169: E-mail to Collab System creates invalid asset
+ - fixed #9746: Shop: Add a new address unneeded extra click
+ - fixed #9747: Account Contributions: URLs are wrong.
+ - fixed #9749: Account Manager: AIM link
+ - fixed #9751: Account Manager: problem sorting in Contributions
+ - fixed #9750: Account Manager: Inbox Messages per Page [TEMPLATE]
+ - fixed: If the Get Credentials template is deleted for the ITransact PayDriver, it now gives you an error message instead of throwing an error.
+ - fixed: Collaboration groupToEditPost should not be blank
+ - fixed: WebGUI::User->isInGroup had bad default groupId
+ - fixed: Fix a layout problem in the Contributions, similar to the Inbox[TEMPLATE]
+
+7.6.11
+ - fixed: Asset Manager can generate URLs that are too long
+ - fixed #9629: override stringify date format to use java default format.
+ - Added a switch to allow the use of non-WebGUI objects with the Workflow engine.
+ - fixed #9579: initialize keyword field because get fills it in now due to a recent code change
+ - fixed #9596: caching now takes into account the correct parameter for pagination
+ - fixed #9596: Articles now use a semi-unique pagination variable based on asset id
+ - fixed: Syndicated Content asset doesn't work with feeds that specify their encodings via HTTP headers
+ - fixed #9375: Syndicated Content asset improperly decodes wide XML entities
+ - fixed #9592: DataForm deleteAttachedFiles method can crash
+ - fixed #9580: Gallery: albums shown in navigation
+ - fixed #9578: Use of "quotes" in badge name causes error
+ - fixed #9603: moving wiki page
+ - fixed #9302: Spectre Problem...
+ - fixed #9635: Matrix - Add attributes not working
+ - fixed #9597: Survey 2.0 Help not complete
+ - fixed: Many child assets, including WikiPage, Post and Event, will no longer let you add or paste them in places where they do not belong.
+ - fixed: Hardcoded extras url in templates and in extra head tags in assets were replaced with the Extras macro.
+ - fixed: Fixed bad gateway macros in the Matrix templates.
+ - fixed #9535: Bad characters in dom element ids when generated from assetId
+ - fixed #9542: Default WebGUI config contains invalid workflow activity
+ - fixed #9623: preload.custom paths not included during upgrade
+ - fixed #9638: Survey - Submit of survey creates new demo
+ - fixed #9669: Folder: synopsis var of a subfolder broken
+ - fixed #9658: gallery advanced search dates do not work
+ - fixed #8965: Dashboard update profile url wrong
+ - fixed #9050: Safari Hover Help Hosed (and funny survey hover help in Firefox)
+ - fixed #9675: gallary search list displays wrong date for pictures
+ - fixed: Added survey.css as a snippet.  Had been left out.
+ - fixed: Permissions aren't correctly applied to Article attachments
+ - fixed #9681: Form-related template errors in gallery
+ - fixed #9683: Problem with EMS related workflow
+ - fixed #9611: Transaction Manage View, no go in ie6 (Henry Tang, Long Term Results B.v.)
+ - fixed #9686: Importing a package twice locks assets forever.
+ - fixed #9671: Survey - breaks admin bar
+ - fixed #9702: Phone number on EMS badges not saving
+ - fixed: Email address is not filled in for ITransact credentials.
+
+7.6.10
+ - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
+ - added test for splitTag function recently added to HTML module
+ - fixed #9455: fixed synopsis to pick out html paragraphs, fixed FeedPP fields to scalar when blank
+ - fixed: With autocommit and no comments on, making a shortcut of an asset takes you to that asset's view.
+ - fixed #9506: Choose billing address
+ - fixed #9541: assets with uncommitted parent.
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
+ - fixed #9236: Survey 2.0 missing hoverhelp
+ - added: Widget Macro now uses a style, defaulting to the users.
+ - added ability to select which rich editor is used to compose messages in the inbox
+ - removed random questions display from Survey Questions Edit template until
+   that feature is added.
+ - fixed #9115: WebGUI::ProfileField->formField doesn't always show the submitted value
+ - fixed: utf8 issues with Survey should be correct.  JSON fields are now longText instead of longBlob.
+ - fixed #9522: Time tracker does not display
+ - fixed #9215: Survey 2.0 results screens missing
+ - fixed #9018: orphan workflows from upgrade.
+
+7.6.9
+ - fixed: ukplayer example is now loaded with swfobject.js released under the MIT licence, see gotcha's and /extras/ukplayer
+ - fixed #9264: new slideShow.swf uploaded in extras/ukplayer (United Knowledge/Arjan Widlak)
+ - fixed #9428: added code to ASSET::get to include keywords when no property name is requested
+ - marked sbin scripts as executable
+ - fixed #9492: Problem in passing form variables to Macro SQL inside a snippet
+ - fixed #9404: Head tags for admin user with admin mode off
+ - fixed #9507: Navigation: relDepth is calculated with starting point, instead of the first displayed page
+ - fixed a bug where no Payment Gateway labels show up when checking out.
+ - fixed #9511: Subcategories displayed incorrectly (Henry Tang, Long Term Results B.v.)
+ - fixed #4137: Calendar Search page has head tags in body
+ - reverted #9386: Gallery: "Image resolutions" issue.  This is a feature of the Galley.
+ - fixed: HTTP Proxy doesn't serve new content to visitors
+ - fixed: Exporting to static files can leak large amounts of memory
+ - fixed: Paginator generates bad markup for next page links
+
+7.6.8
+ - added #!/usr/bin/env perl to all utility scripts
+ - Updated captcha images to be more legible.
+ - fixed #9285: modifing template prevents edit of syncontent
+ - fixed #8886: Search button in Asset manager
+ - fixed #9410: Wrong help text
+ - fixed #9154: WebGUI Shop - Checkout Caching Problem
+ - fixed a bug where clicking the apply button when func=add would return the
+   edit screen of the parent asset rather than that of the new asset. (Martin
+   Kamerbeek / Oqapi).
+ - fixed: Make sure that Form subclasses are found by WebGUI::Form::FieldType
+ - fixed #9356: Data Form Mail Fields
+ - fixed #9365: Account: when viewing another person's contribution, it displays my name
+ - fixed #9351: Cannot translate phrase
+ - fixed #9368: Gallery: All children included into navigation
+ - fixed #9349: CS archival broken after update (Bernd Kalbfuß-Zimmermann)
+ - fixed Display of Interval form control in Thingy and User profiling did not show units, only seconds.
+ - fixed #9374: Subscription Asset: Redeem subscription template not documented, or user selectable
+ - fixed #9366: Gallery: Missing i18n
+ - fixed #9367: Gallery: Errors in templates
+ - fixed #9352: Account activation message MIA
+ - fixed #9046: Wiki tabs all combined (David Delikat)
+ - refixed #9147: Misspellings in Account
+ - fixed #9348: Required Upgrade Step Not Documented - 7.6.0
+ - fixed #8993: Gallery Image Details Overlap Image
+ - fixed #9380: CoolMenus template - invalid markup affecting page layouts
+ - fixed #9387: Asset Manager breaks navigating into a Gallery Album
+ - fixed #9001: Thingy add image broken
+ - fixed #9386: Gallery: "Image resolutions" issue
+ - fixed #9342: Thingy - Cannot edit a thing
+ - fixed #9033: Deleting Linked Thing Field Crashes Thingy
+ - fixed #9400: Form.captcha should be form_capcha in dataform help
+ - fixed #9402: i18n confusion
+ - fixed #9403: i18n survey
+ - fixed: Syndicated Content corrupts wide characters
+
 7.6.7
  - fixed #9263: Thingy possibleValues processing, and List type autodetection.
  - fixed: Alter WebGUI::Asset::Template's update method so that it can import packages that use the old, deprecated headBlock property.  The update method change is deprecatd.
@@ -15,10 +288,11 @@
  - fixed #8898: versioning problem
  - fixed #9315: Password Recovery
  - fixed #9298: Inconsistent date formats
- - fixed #9296: Thingy View template not recognising field_isVisible (SDH
-   Consulting Group)
+ - fixed #9296: Thingy View template not recognising field_isVisible (SDH Consulting Group)
+ - fixed #4196: update button doesn't work in IE
 
 7.6.6
+ - fixed #9217: Survey 2.0 - "Cancel" button not working as expected(David Delikat)
  - fixed #8792: Image Preview gives ERROR in Collateral Manager
  - fixed #8774: Forum Rich Edit no longer supports indent/outdent
  - fixed #4173: fieldnames in profilefields can contain spaces

@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::RunCommandAsUser;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -79,12 +79,15 @@ sub execute {
 	my $self = shift;
 	my $user = shift;
 	my $cmd = $self->get("command");
+    my $previousUser = $self->session->user;
 	$self->session->user({user=>$user});
 	WebGUI::Macro::process($self->session, \$cmd);
 	if (system($cmd)) {
 		$self->session->errorHandler->error("Workflow: RunCommandAsUser failed because: $!");
+        $self->session->user({user=>$previousUser});
 		return $self->ERROR;
 	} else {
+        $self->session->user({user=>$previousUser});
 		return $self->COMPLETE;
 	}
 }

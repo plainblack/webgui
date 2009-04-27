@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::HttpProxy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -177,6 +177,12 @@ sub definition {
 		});
         return $class->SUPER::definition($session, $definition);
 }
+
+#-------------------------------------------------------------------
+sub getContentLastModified {
+    return time;
+}
+
 
 #-------------------------------------------------------------------
 sub getCookieJar {

@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,7 +20,7 @@ use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Inbox;
 use WebGUI::Shop::Cart;
-
+use JSON qw{ from_json to_json };
 
 =head1 NAME
 
@@ -41,7 +41,6 @@ use WebGUI::Asset::Sku;
  $hashRef = $self->getOptions;
  $integer = $self->getMaxAllowedInCart;
  $float = $self->getPrice;
- $float = $self->getTaxRate;
  $boolean = $self->isShippingRequired;
  $html = $self->processStyle($output);
 
@@ -102,6 +101,7 @@ sub definition {
 	my $definition = shift;
 	my %properties;
 	tie %properties, 'Tie::IxHash';
+
 	my $i18n = WebGUI::International->new($session, "Asset_Sku");
 	%properties = (
 		description => {
@@ -125,20 +125,6 @@ sub definition {
 			label			=> $i18n->get("display title"),
 			hoverHelp		=> $i18n->get("display title help")
 			},
-		overrideTaxRate => {
-			tab				=> "shop",
-			fieldType		=> "yesNo",
-			defaultValue	=> 0,
-			label			=> $i18n->get("override tax rate"),
-			hoverHelp		=> $i18n->get("override tax rate help")
-			},
-		taxRateOverride => {
-			tab				=> "shop",
-			fieldType		=> "float",
-			defaultValue	=> 0.00,
-			label			=> $i18n->get("tax rate override"),
-			hoverHelp		=> $i18n->get("tax rate override help")
-			},
 		vendorId => {
 			tab				=> "shop",
 			fieldType		=> "vendor",
@@ -146,6 +132,11 @@ sub definition {
 			label			=> $i18n->get("vendor"),
 			hoverHelp		=> $i18n->get("vendor help")
 			},
+        taxConfiguration => {
+            noFormPost      => 1,
+            fieldType       => 'hidden',
+            defaultValue    => '{}',
+        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -158,6 +149,27 @@ sub definition {
 	return $class->SUPER::definition($session, $definition);
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Sku');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'addToCart'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('add to cart')})
+      . WebGUI::Form::formFooter($session)
+      ;
+}
 
 #-------------------------------------------------------------------
 
@@ -185,6 +197,31 @@ sub getConfiguredTitle {
     return $self->getTitle;
 }
 
+#-------------------------------------------------------------------
+sub getEditForm {
+    my $self    = shift;
+    my $session = $self->session;
+
+    my $tabform = $self->SUPER::getEditForm;
+    
+    # Let the tax system add the form fields that are required by the active tax plugin for configuring the sku tax.
+    # WebGUI::Shop::Tax->new( $session )->appendSkuForm( $self->getId, $tabform->getTab('shop') );
+
+    my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
+    my $definition  = $taxDriver->skuFormDefinition;
+    my $config      = $self->getTaxConfiguration( $taxDriver->className );
+    my $shop        = $tabform->getTab( 'shop' );
+
+    foreach my $fieldName ( keys %{ $definition } ) {
+        $shop->dynamicField(
+            %{ $definition->{ $fieldName } },
+            name    => $fieldName,
+            value   => $config->{ $fieldName },
+        );
+    }
+
+    return $tabform;
+}
 
 #-------------------------------------------------------------------
 
@@ -243,6 +280,22 @@ sub getPrice {
 
 #-------------------------------------------------------------------
 
+=head2 getPostPurchaseActions ( item )
+
+Get a hash reference of LABEL => URL pairs of actions we can do on
+this Sku after it is purchased. These will show up in the Transaction
+screen. C<item> is the WebGUI::Shop::TransactionItem that was 
+purchased.
+
+=cut
+
+sub getPostPurchaseActions {
+    my ( $self, $item ) = @_;
+    return {};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getQuantityAvailable ( )
 
 Returns 99999999. Needs to be overriden by subclasses. Tells the commerce system how many of this item is on hand.
@@ -267,16 +320,17 @@ sub getRecurInterval {
 }
 
 #-------------------------------------------------------------------
+sub getTaxConfiguration {
+    my $self        = shift;
+    my $namespace   = shift;
 
-=head2 getTaxRate ( )
+    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    if ($@) {
+        $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' appears to be corrupt. :' . $@ );
+        return undef;
+    }
 
-Returns undef unless the "Override tax rate?" switch is set to yes. If it is, then it returns the value of the "Tax Rate Override" field.
-
-=cut
-
-sub getTaxRate {
-    my $self = shift;
-    return ($self->get("overrideTaxRate")) ? $self->get("taxRateOverride") : undef;
+    return $configs->{ $namespace }
 }
 
 #-------------------------------------------------------------------
@@ -290,6 +344,32 @@ Returns undef. Should be overridden by any skus that have images.
 sub getThumbnailUrl {
     my $self = shift;
     return undef;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getVendorId ( )
+
+Returns the vendorId of the vendor for this sku. Defaults to the default 
+vendor with id defaultvendor000000000.
+
+=cut
+
+sub getVendorId {
+    my $self = shift;
+    return 'defaultvendor000000000';
+}
+
+#-------------------------------------------------------------------
+
+=head2 getVendorPayout ( )
+
+Returns the amount that should be payed to the vendor for this sku.
+
+=cut
+
+sub getVendorPayout {
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -482,6 +562,20 @@ sub onRemoveFromCart {
 }
 
 #-------------------------------------------------------------------
+sub processPropertiesFromFormPost {
+    my $self = shift;
+
+    my $output = $self->SUPER::processPropertiesFromFormPost( @_ );
+
+    my $taxDriver = WebGUI::Shop::Tax->new( $self->session )->getDriver;
+    $self->session->log->fatal( 'Could not instanciate tax driver.' ) unless $taxDriver;
+
+    $self->setTaxConfiguration( $taxDriver->className, $taxDriver->processSkuFormPost );
+
+    return $output;
+}
+
+#-------------------------------------------------------------------
 
 =head2 processStyle ( output )
 
@@ -497,6 +591,28 @@ sub processStyle {
 	my $self = shift;
 	my $output = shift;
 	return $self->getParent->processStyle($output);
+}
+
+#-------------------------------------------------------------------
+sub setTaxConfiguration {
+    my $self            = shift;
+    my $namespace       = shift;
+    my $configuration   = shift;
+
+    # Fetch current tax configurations
+    my $configs = eval { from_json( $self->getValue('taxConfiguration') ) };
+    if ($@) {
+        $self->session->log->error( 'Tax configuration of asset ' . $self->getId . ' is corrupt.' );
+        return undef;
+    }
+
+    # Apply the new configuration for the given driver...
+    $configs->{ $namespace } = $configuration;
+    
+    # ...and persist it to the db.
+    $self->update( {
+        taxConfiguration    => to_json( $configs ),
+    } );
 }
 
 #-------------------------------------------------------------------

@@ -961,6 +961,12 @@ to add or remove users from their groups.
 		lastUpdated => 1036864905
 	},
 
+	'view profile' => {
+		message => q|View user's profile.|,
+		context => q|Label for a URL to view the profile for the user. Used in Operation/User.pm|,
+		lastUpdated => 1239926712
+	},
+
 	'60' => {
 		message => q|Are you certain you want to deactivate your account. If you proceed your account information will be lost permanently.|,
 		lastUpdated => 1031514049
@@ -2873,8 +2879,8 @@ or are under your current version tag.</p>
 	},
 
 	'318' => {
-		message => q|<a href="http://www.aol.com/aim/homenew.adp">AIM</a> Id|,
-		lastUpdated => 1031514049
+		message => q|<a href="http://www.aim.com/">AIM</a> Id|,
+		lastUpdated => 1234829971,
 	},
 
 	'972' => {
@@ -4290,48 +4296,6 @@ Users may override this setting in their profile.
             context     => q{i18n label for YUI paginator},
         },
 
-        'years' => {
-            message => q{years},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'months' => {
-            message => q{months},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'weeks' => {
-            message => q{weeks},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'days' => {
-            message => q{days},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'hours' => {
-            message => q{hours},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'minutes' => {
-            message => q{minutes},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
-        'seconds' => {
-            message => q{seconds},
-            lastUpdated => 1226706547,
-            context     => q{i18n label for time duration in WebGUI::DateTime},
-        },
-
         'profile privacy settings' =>  {
             message     => q{Privacy Settings},
             lastUpdated => 1226706547,
@@ -4343,6 +4307,48 @@ Users may override this setting in their profile.
             lastUpdated => 1229013268,
             context => q|Template label.  Used to indicate that a shortened version of the content is currently displayed and that more can be read by clicking a link.|
         },
+
+        'For' => {
+            message => q|For|,
+            lastUpdated => 1230269893,
+        },
+
+        'rss' => {
+            message => q|RSS|,
+            lastUpdated => 1230584702,
+            context => q|Abbreviation for Really Simple Syndication, and other similar terms.|,
+        },
+
+        'Upload an attachment' => {
+            message => q|Upload an attachment|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
+
+        'Upload attachments here. Copy and paste attachments into the editor.' => {
+            message => q|Upload attachments here. Copy and paste attachments into the editor.|,
+            context => q|Label in the Attachments form control.|,
+            lastUpdated => 1230930518,
+        },
+
+        'use recaptcha' => {
+            message     => q{Use reCAPTCHA?}
+        },
+        'use recaptcha description' => {
+            message     => q{reCAPTCHA is a free CAPTCHA service that helps to digitize books.  It requires a key set generated for your domain, available from <a href="http://recaptcha.net/">http://recaptcha.net/</a>.}
+        },
+
+        'recaptcha private key' => {
+            message     => 'reCAPTCHA Private Key'
+        },
+        'recaptcha public key' => {
+            message     => 'reCAPTCHA Public Key'
+        },
+	'Ad Space control name' => {
+		message => q|Ad Space|,
+		lastUpdated => 0,
+		context => q|name for the Ad Space control|
+	},
 
 };
 

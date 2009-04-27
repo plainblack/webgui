@@ -29,10 +29,78 @@ These subroutines are available from this package:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 session ()
+
+Returns a reference to the current WebGUI::Session object.
+
+=cut
+
 readonly session => my %session;
+
+#-------------------------------------------------------------------
+
+=head2 module ()
+
+Returns the string representation of the name of the last Account module called.
+
+=cut
+
 readonly module  => my %module;
+
+#-------------------------------------------------------------------
+
+=head2 method ()
+
+Returns the string representation of the name of the last method called on the module().
+
+=cut
+
 public   method  => my %method;
+
+#-------------------------------------------------------------------
+
+=head2 uid ( [ userId ] )
+
+Returns the userId of the WebGUI::User who's account is being interacted with.
+
+=head3 userId
+
+Optionally set the userId. Normally this is never needed, but is provided for completeness.
+
+=cut
+
 public   uid     => my %uid;
+
+#-------------------------------------------------------------------
+
+=head2 bare ( [ flag ] )
+
+Returns whether or not the Account system should return a method's content
+without the layout and style templates.  This would normally be used for
+returning JSON or XML data out of the account system.
+
+=head3 flag
+
+Optionally set bare to be true, or false.
+
+=cut
+
+public   bare     => my %bare;
+
+#-------------------------------------------------------------------
+
+=head2 store ( [ hashRef ] )
+
+Returns a hash reference attached to this account object that contains arbitrary data.
+
+=head2 hashRef
+
+A hash reference of data to store.
+
+=cut
+
 public   store   => my %store;  #This is an all purpose hash to store stuff in: $self->store->{something} = "something"
 
 #-------------------------------------------------------------------
@@ -51,8 +119,9 @@ sub appendCommonVars {
     my $self    = shift;
     my $var     = shift;
     my $session = $self->session;
-    my $user    = $session->user;
+    my $user    = $self->getUser;
 
+    $var->{'profile_user_id'  } = $user->userId;
     $var->{'user_full_name'   } = $user->getWholeName;
     $var->{'user_member_since'} = $user->dateCreated;
     $var->{'view_profile_url' } = $user->getProfileUrl;
@@ -138,6 +207,9 @@ sub displayContent {
     my $content = shift;
     my $noStyle = shift;
     my $session = $self->session;
+
+    ##Don't do any templating if we're sending back data like JSON or XML.
+    return $content if $self->bare;
 
     #Wrap content into the layout
     my $var         = {};
@@ -242,7 +314,9 @@ sub editSettingsFormSave {
 
 =head2 getLayoutTemplateId ( )
 
-Override this method to return the template Id for the account layout.
+Override this method to return the template Id for the account layout.  The default
+account layout draws a tabbed interface to the different account plugins, and displays
+the content from a particular screen from the account plugin.
 
 =cut
 
@@ -253,9 +327,10 @@ sub getLayoutTemplateId {
 
 #-------------------------------------------------------------------
 
-=head2 getStyleTemplate ( )
+=head2 getStyleTemplateId ( )
 
-Override this method to return the template for the main style.
+Override this method to return the template for the main style.  The style would
+be for the page that the account layout template is embedded in.
 
 =cut
 
@@ -278,8 +353,8 @@ the current module and do values will be used.
 
 =head3 appendUID
 
-If this flag is set and uid is passed along the url, the uid passed in will be
-appended to the end of it to the end of the url
+If this flag is set and uid is passed as a URL param, that uid will be
+appended to the end of the url.
 
 =cut
 
@@ -289,8 +364,8 @@ sub getUrl {
     my $appendUID = shift;
 
     my $session   = $self->session;
-    my $form      = $session->form;
     
+    my $uid = $self->uid;
     if($pairs) {
         #Append op=account to the url if it doesn't already exist
         unless ($pairs =~ m/op=account/){
@@ -301,10 +376,28 @@ sub getUrl {
         $pairs = q{op=account;module=}.$self->module.q{;do=}.$self->method;
     }
 
-    my $uid = $self->uid;
     $pairs .= ";uid=".$uid if($appendUID && $uid);
 
     return $session->url->page($pairs);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getUser
+
+Gets the user, either specified by the uid URL parameter, or the
+session user.
+
+=cut
+
+sub getUser {
+    my $self      = shift;
+    if ($self->uid) {
+        return WebGUI::User->new($self->session, $self->uid);
+    }
+    else {
+        return $self->session->user;
+    }
 }
 
 #-------------------------------------------------------------------
@@ -432,6 +525,16 @@ sub showError {
     
     return $self->processTemplate($var,$templateId)
 }
+
+#-------------------------------------------------------------------
+
+=head2 store ( )
+
+This method returns an internal hash where you can store things for your Account Plugin.
+The store is private to your plugin, to each user's copy of the plugin, and only lasts as
+long as the session does.
+
+=cut
 
 
 1;

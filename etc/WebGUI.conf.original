@@ -331,12 +331,26 @@
       "url" : "^PageUrl(\"\",op=assetManager);",
       "title" : "^International(assets,Asset);"
    },
+   "assetHistory" : {
+      "icon" : "assetHistory.gif",
+      "groupSetting" : "groupIdAdminHistory",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=assetHistory);",
+      "title" : "^International(assetHistory,Asset);"
+   },
    "graphics" : {
       "icon" : "graphics.gif",
       "uiLevel" : 5,
       "url" : "^PageUrl(\"\",op=listGraphicsOptions);",
       "title" : "^International(manage graphics,Graphics);",
       "groupSetting" : "groupIdAdminGraphics"
+   },
+   "passiveAnalytics" : {
+      "icon" : "passiveAnalytics.png",
+      "uiLevel" : 1,
+      "url" : "^PageUrl(\"\",op=passiveAnalytics;func=editRuleflow);",
+      "title" : "^International(Passive Analytics,PassiveAnalytics);",
+      "groupSetting" : "3"
    },
    "shop" : {
       "icon" : "shop.gif",
@@ -486,6 +500,9 @@
    "WebGUI::Asset::Wobject::DataForm" : {
       "category" : "basic"
    },
+   "WebGUI::Asset::Sku::Ad" : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
@@ -533,7 +550,6 @@
       "category" : "utilities"
    },
    "WebGUI::Asset::Sku::Product" : {
-      "isContainer" : 1,
       "category" : "shop"
    },
    "WebGUI::Asset::Wobject::WeatherData" : {
@@ -803,14 +819,16 @@
         "WebGUI::Workflow::Activity::ExpireSubscriptionCodes",
         "WebGUI::Workflow::Activity::GetSyndicatedContent",
         "WebGUI::Workflow::Activity::NotifyAdminsWithOpenVersionTags",
-        "WebGUI::Workflow::Activity::ProcessRecurringPayments",
         "WebGUI::Workflow::Activity::PurgeOldAssetRevisions",
         "WebGUI::Workflow::Activity::PurgeOldTrash",
+        "WebGUI::Workflow::Activity::RemoveOldCarts",
         "WebGUI::Workflow::Activity::SendQueuedMailMessages",
         "WebGUI::Workflow::Activity::SummarizePassiveProfileLog",
         "WebGUI::Workflow::Activity::SyncProfilesToLdap",
         "WebGUI::Workflow::Activity::TrashClipboard",
-        "WebGUI::Workflow::Activity::TrashExpiredEvents"
+        "WebGUI::Workflow::Activity::TrashExpiredEvents",
+        "WebGUI::Workflow::Activity::SummarizePassiveAnalytics",
+        "WebGUI::Workflow::Activity::BucketPassiveAnalytics"
     ],
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
@@ -895,8 +913,10 @@
     "WebGUI::Content::Referral",
     "WebGUI::Content::AssetManager",
     "WebGUI::Content::AssetDiscovery",
+    "WebGUI::Content::PassiveAnalytics",
     "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Account",
+    "WebGUI::Content::AssetHistory",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",

@@ -4,7 +4,7 @@ package WebGUI::Workflow::Instance;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -66,7 +66,7 @@ sub create {
 	my ($isSingleton) = $session->db->quickArray("select count(*) from Workflow where workflowId=? and mode='singleton'",$placeHolders);
     my $sql = "select count(*) from WorkflowInstance where workflowId=?";
 	if (exists $properties->{parameters}) {
-        push @{ $placeHolders }, JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
+        push @{ $placeHolders }, JSON->new->canonical->encode({parameters => $properties->{parameters}});
         $sql .= ' and parameters=?';
     }
     else {
@@ -310,6 +310,8 @@ Executes the next iteration in this workflow. Returns a status code based upon w
  complete	The activity completed successfully, you may run the next one.
  waiting	The activity is waiting on an external event such as user input.
 
+B>NOTE:> You should normally never run this method. The workflow engine will use it instead. When you're ready to kick off a workflow you've created, use start() instead.
+
 =cut
 
 sub run {
@@ -341,11 +343,15 @@ sub run {
 	$self->session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
 	my $class = $self->get("className");
 	my $method = $self->get("methodName");
-	my $params = $self->get("parameters");
 	my $status = "";
     my $object = undef;
+    my @params;
+    unless ($self->get('noSession')) {
+        push @params, $self->session;
+    }
+    push @params, $self->get("parameters");
 	if ($class && $method) {
-        $object = eval { WebGUI::Pluggable::instanciate($class, $method, [$self->session, $params]) };
+        $object = eval { WebGUI::Pluggable::instanciate($class, $method, \@params) };
         if ($@) {
 			$self->session->errorHandler->error(
                             q{Error on workflow instance '} . $self->getId . q{': }. $@
@@ -432,6 +438,10 @@ be constructed unless both className and methodName are true.
 
 A hashref of parameters to be passed into the constructor for className. Note that the system will always pass in the session as the first argument.
 
+=head4 noSession
+
+Normally a reference to the session is the first property passed into methodName(), and then the parameters are passed in. If you're using an object that doesn't need/want a WebGUI::Session object then set noSession to 1. Defaults to 0.
+
 =head4 currentActivityId
 
 The unique id of the activity in the workflow that needs to be executed next. If blank, it will execute the first activity in the workflow.
@@ -449,13 +459,14 @@ A boolean, that if set to 1 will not inform Spectre of the change in settings.
 sub set {
 	my ($self, $properties, $skipNotify) = @_;
 	$self->{_data}{lastUpdate} = time();
+	$self->{_data}{noSession} = (exists $properties->{noSession}) ? $properties->{noSession} : $self->{_data}{noSession}; 
 	$self->{_data}{priority} = $properties->{priority} || $self->{_data}{priority} || 2;
 	$self->{_data}{lastStatus} = $properties->{lastStatus} || $self->{_data}{lastStatus};
 	$self->{_data}{workflowId} = $properties->{workflowId} || $self->{_data}{workflowId};
 	$self->{_data}{className} = (exists $properties->{className}) ? $properties->{className} : $self->{_data}{className};
 	$self->{_data}{methodName} = (exists $properties->{methodName}) ? $properties->{methodName} : $self->{_data}{methodName};
 	if (exists $properties->{parameters}) {
-		$self->{_data}{parameters} = JSON->new->utf8->canonical->encode({parameters => $properties->{parameters}});
+		$self->{_data}{parameters} = JSON->new->canonical->encode({parameters => $properties->{parameters}});
 	}
 	$self->{_data}{currentActivityId} = (exists $properties->{currentActivityId}) ? $properties->{currentActivityId} : $self->{_data}{currentActivityId};
 	$self->session->db->setRow("WorkflowInstance","instanceId",$self->{_data});

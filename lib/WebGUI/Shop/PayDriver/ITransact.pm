@@ -232,7 +232,7 @@ sub cancelRecurringPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generateCancelRecurXml( $transaction );
-    $session->errorHandler->info("XML Request: $xml");
+    $session->errorHandler->debug("XML Request: $xml");
 
     # Post the xml to ITransact 
     my $response = $self->doXmlRequest( $xml, 1 );
@@ -368,10 +368,11 @@ sub definition {
             hoverHelp   => $i18n->get('use cvv2 help'),
         },
         credentialsTemplateId  => {
-            fieldType   => 'template',
-            label       => $i18n->get('credentials template'),
-            hoverHelp   => $i18n->get('credentials template help'),
-            namespace   => 'Shop/Credentials',
+            fieldType    => 'template',
+            label        => $i18n->get('credentials template'),
+            hoverHelp    => $i18n->get('credentials template help'),
+            namespace    => 'Shop/Credentials',
+            defaultValue => 'itransact_credentials1',	
         },
         emailMessage    => {
             fieldType   => 'textarea',
@@ -423,8 +424,8 @@ sub doXmlRequest {
     
     # Create a request and stuff the xml in it
     my $request = HTTP::Request->new( POST => $xmlTransactionScript );
-	$request->content_type( 'application/x-www-form-urlencoded' );
-	$request->content( 'xml='.$xml );
+	$request->content_type( 'text/xml' );
+	$request->content( $xml );
 
     # Do the request
     my $response = $userAgent->request($request);
@@ -486,31 +487,71 @@ sub processCredentials {
     push @error, $i18n->get('invalid expiration date') unless $expires =~ m{^\d{6}$};
     push @error, $i18n->get('expired expiration date') unless $expires >= $now;
 
+	return \@error if scalar @error;
     # Everything ok process the actual data
-	unless (@error) {
-		$self->{ _cardData } = {
-			acct		=> $form->integer( 'cardNumber' ),
-			expMonth	=> $form->integer( 'expMonth'   ),
-			expYear		=> $form->integer( 'expYear'    ),
-			cvv2		=> $form->integer( 'cvv2'       ),
-		};	
-		
-		$self->{ _billingAddress } = {
-			address1	=> $form->process( 'address'    ),
-			code	    => $form->zipcode( 'zipcode'    ),
-			city		=> $form->process( 'city'       ),
-			firstName	=> $form->process( 'firstName'  ),
-			lastName	=> $form->process( 'lastName'   ),
-			email		=> $form->email  ( 'email'      ),
-			state		=> $form->process( 'state'      ),
-			country		=> $form->process( 'country'    ),
-			phoneNumber => $form->process( 'phone'      ),
-		};
+    $self->{ _cardData } = {
+        acct		=> $form->integer( 'cardNumber' ),
+        expMonth	=> $form->integer( 'expMonth'   ),
+        expYear		=> $form->integer( 'expYear'    ),
+        cvv2		=> $form->integer( 'cvv2'       ),
+    };	
+    
+    $self->{ _billingAddress } = {
+        address1	=> $form->process( 'address'    ),
+        code	    => $form->zipcode( 'zipcode'    ),
+        city		=> $form->process( 'city'       ),
+        firstName	=> $form->process( 'firstName'  ),
+        lastName	=> $form->process( 'lastName'   ),
+        email		=> $form->email  ( 'email'      ),
+        state		=> $form->process( 'state'      ),
+        country		=> $form->process( 'country'    ),
+        phoneNumber => $form->process( 'phone'      ),
+    };
 
-		return;
-	}
-			
-	return \@error;
+    return;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getBillingAddress ( $addressId )
+
+The billing address is not handled by WebGUI::Shop::Address, it comes from
+www_getCredentials.  However, WebGUI::Shop::Transaction requires an
+WebGUI::Shop::Address object.  The billing address is seeded with information
+from the shipping address.  If this address info is different, then create
+a new address to hand to Transaction.
+
+=head3 $addressId
+
+The id of a WebGUI::Shop::Address.  If not present, then use the shipping
+address instead.
+
+=cut
+
+sub getBillingAddress {
+    my ($self, $addressId) = @_;
+
+    my $address     = $addressId
+                    ? $self->getAddress( $addressId )
+                    : $self->getCart->getShippingAddress
+                    ;
+    
+    ##If the user made any changes to the default address, create a new billing address
+    ##and use it instead
+    if( $address->get('firstName'   ) ne $self->{_billingAddress}->{ 'firstName'    }
+     || $address->get('lastName'    ) ne $self->{_billingAddress}->{ 'lastName'     }
+     || $address->get('address1'    ) ne $self->{_billingAddress}->{ 'address1'     }
+     || $address->get('city'        ) ne $self->{_billingAddress}->{ 'city'         }
+     || $address->get('state'       ) ne $self->{_billingAddress}->{ 'state'        }
+     || $address->get('code'        ) ne $self->{_billingAddress}->{ 'code'         }
+     || $address->get('country'     ) ne $self->{_billingAddress}->{ 'country'      }
+     || $address->get('phoneNumber' ) ne $self->{_billingAddress}->{ 'phoneNumber'  }
+     || $address->get('email'       ) ne $self->{_billingAddress}->{ 'email'        }
+    ) {
+        my $billingAddress = $self->getCart->getAddressBook->addAddress( $self->{_billingAddress} );
+        return $billingAddress;
+    }
+    return $address;
 }
 
 #-------------------------------------------------------------------
@@ -521,7 +562,7 @@ sub processPayment {
 
     # Get the payment definition XML
     my $xml = $self->_generatePaymentRequestXML( $transaction );
-    $session->errorHandler->info("XML Request: $xml");
+    $session->errorHandler->debug("XML Request: $xml");
 
     # Send the xml to ITransact
     my $response = $self->doXmlRequest( $xml );
@@ -622,12 +663,10 @@ sub www_getCredentials {
         $addressData    = $self->getCart->getShippingAddress->get;
     }
                    
-    my $output;
     my $var = {};
 
     # Process form errors
     $var->{errors} = [];
-    #### TODO: i18n
     if ($errors) {
         $var->{error_message} = $i18n->get('error occurred message');
         foreach my $error (@{ $errors} ) {
@@ -636,7 +675,6 @@ sub www_getCredentials {
     }
     
     $var->{getSelectAddressButton} = $self->getSelectAddressButton( 'getCredentials' );
-    $self->session->log->warn("selectAddressButton: ".$var->{getSelectAddressButton});
 
     $var->{formHeader} = WebGUI::Form::formHeader($session)
                        . $self->getDoFormTags('pay');
@@ -646,8 +684,6 @@ sub www_getCredentials {
     }
 
     $var->{formFooter} = WebGUI::Form::formFooter();
-    $self->session->log->warn("formHeader: ".$var->{formHeader});
-
    
     # Address data form
     $var->{firstNameField} = WebGUI::Form::text($session, {
@@ -684,7 +720,7 @@ sub www_getCredentials {
     });
     $var->{emailField} = WebGUI::Form::email($session, {
         name  => 'email',
-        value => $self->session->form->process("email") || $u->profileField('email'),
+        value => $form->process('email', 'email') || $addressData->{ email } || $u->profileField('email'),
     });
 
     # Credit card information
@@ -705,28 +741,38 @@ sub www_getCredentials {
     });
 
     my $template = WebGUI::Asset::Template->new($session, $self->get("credentialsTemplateId"));
-    $template->prepare;
-    return $session->style->userStyle($template->process($var));
+    my $output;
+    if (defined $template) {
+        $template->prepare;
+        $output = $template->process($var);
+    }
+    else {
+        $output = $i18n->get('template gone');
+    }
+
+    return $session->style->userStyle($output);
 }
 
 #-------------------------------------------------------------------
 sub www_pay {
     my $self        = shift;
     my $session     = $self->session;
-    my $addressId   = $session->form->process( 'addressId' );
-    my $address     = $addressId
-                    ? $self->getAddress( $addressId )
-                    : $self->getCart->getShippingAddress
-                    ;
-
     # Check whether the user filled in the checkout form and process those.
     my $credentialsErrors = $self->processCredentials;
 
     # Go back to checkout form if credentials are not ok
     return $self->www_getCredentials( $credentialsErrors ) if $credentialsErrors;
 
+    my $addressId      = $session->form->process( 'addressId' );
+    my $billingAddress = $self->getBillingAddress($addressId);
+
     # Payment time!
-    my $transaction = $self->processTransaction( $address );
+    my $transaction = $self->processTransaction( $billingAddress );
+    ## The billing address object is temporary, just to send to the transaction.
+    ## Delete it if we don't need it.
+    if ($billingAddress->getId ne $addressId) {
+        $billingAddress->delete;
+    }
 	if ($transaction->get('isSuccessful')) {
 	    return $transaction->thankYou();
 	}
@@ -750,9 +796,6 @@ sub www_processRecurringTransactionPostback {
 
     # Fetch the original transaction
     my $baseTransaction = eval{WebGUI::Shop::Transaction->newByGatewayId( $session, $originatingXid, $self->getId )};
-
-    #make sure the same user is used in this transaction as the last {mostly needed for reoccurring transactions
-    $self->session->user({userId=>$baseTransaction->get('userId')});
 
     #---- Check the validity of the request -------
     # First check whether the original transaction actualy exists
@@ -778,6 +821,9 @@ sub www_processRecurringTransactionPostback {
  #       return 'Check recurring postback: transaction check failed.';
 #    }
     #---- Passed all test, continue ---------------
+
+    #make sure the same user is used in this transaction as the last {mostly needed for reoccurring transactions
+    $self->session->user({userId=>$baseTransaction->get('userId')});
  
     # Create a new transaction for this term
     my $transaction     = $baseTransaction->duplicate( {

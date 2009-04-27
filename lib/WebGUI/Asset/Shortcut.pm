@@ -1,7 +1,7 @@
 package WebGUI::Asset::Shortcut;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -804,8 +804,9 @@ sub www_getUserPrefsForm {
 	}
 	$f->submit({extras=>'className="nothing"'});
 	$f->raw('</table>');
-	my $tags = join "", values %{ $self->session->style->{_javascript} };
+	my $tags = $self->session->style->generateAdditionalHeadTags();
 	$output .= $tags.$f->print;
+
 	return $output;
 }
 
@@ -855,7 +856,7 @@ sub www_saveUserPrefs {
 		}
 		$u->profileField($field->getId,$data{$field->getId});
 	}
-	return $self->www_view;
+	return $self->getParent->www_view;
 }
 
 #-------------------------------------------------------------------

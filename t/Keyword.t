@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -28,11 +28,11 @@ isa_ok($home, "WebGUI::Asset");
 my $keyword = WebGUI::Keyword->new($session);
 isa_ok($keyword, "WebGUI::Keyword");
 
-$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key word foo bar"});
+$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"test key, word, foo bar"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);
-is($count, 5, "setKeywordsForAsset() create");
+is($count, 3, "setKeywordsForAsset() create");
 
-$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"webgui rules"});
+$keyword->setKeywordsForAsset({ asset=>$home, keywords=>"webgui, rules"});
 my ($count) = $session->db->quickArray("select count(*) from assetKeyword where assetId=?", [$home->getId]);
 is($count, 2, "setKeywordsForAsset() update");
 

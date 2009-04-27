@@ -13,6 +13,7 @@ use WebGUI::Macro;
 use WebGUI::User;
 use WebGUI::Shop::Cart;
 use JSON;
+use Scalar::Util qw/blessed/;
 
 =head1 NAME
 
@@ -20,13 +21,13 @@ Package WebGUI::Shop::PayDriver
 
 =head1 DESCRIPTION
 
-This package is the base class for all modules which implement a pyament driver.
+This package is the base class for all modules which implement a payment driver.
 
 =head1 SYNOPSIS
 
  use WebGUI::Shop::PayDriver;
 
- my $tax = WebGUI::Shop::PayDriver->new($session);
+ my $payDriver = WebGUI::Shop::PayDriver->new($session);
 
 =head1 METHODS
 
@@ -38,7 +39,6 @@ readonly session            => my %session;
 readonly className          => my %className;
 readonly paymentGatewayId   => my %paymentGatewayId;
 readonly options            => my %options;
-readonly label              => my %label;
 
 #-------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ Private method used to build objects, shared by new and create.
 =cut
 
 sub _buildObj {
-    my ($class, $session, $requestedClass, $paymentGatewayId, $label, $options) = @_;
+    my ($class, $session, $requestedClass, $paymentGatewayId, $options) = @_;
     my $self    = {};
     bless $self, $requestedClass;
     register $self;
@@ -57,10 +57,9 @@ sub _buildObj {
     my $id                      = id $self;
 
     $session{ $id }             = $session;
-    $paymentGatewayId{ $id }    = $paymentGatewayId;
-    $label{ $id }               = $label;
     $options{ $id }             = $options;
     $className{ $id }           = $requestedClass;
+    $paymentGatewayId{ $id }    = $paymentGatewayId;
 
     return $self;
 }
@@ -137,7 +136,7 @@ to do calculations.
 
 #-------------------------------------------------------------------
 
-=head2 create ( $session, $label, $options )
+=head2 create ( $session, $options )
 
 Constructor for new WebGUI::Shop::PayDriver objects.  Returns a WebGUI::Shop::PayDriver object.
 To access driver objects that have already been configured, use C<new>.
@@ -145,10 +144,6 @@ To access driver objects that have already been configured, use C<new>.
 =head3 $session
 
 A WebGUI::Session object.
-
-=head4 $label
-
-A human readable label for this payment.
 
 =head4 $options
 
@@ -161,23 +156,21 @@ sub create {
     my $session = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a session variable})
         unless ref $session eq 'WebGUI::Session';
-    my $label   = shift;
-    WebGUI::Error::InvalidParam->throw(error => q{Must provide a human readable label in the hashref of options})
-        unless $label;
     my $options = shift;
     WebGUI::Error::InvalidParam->throw(error => q{Must provide a hashref of options})
         unless ref $options eq 'HASH' and scalar keys %{ $options };
+    WebGUI::Error::InvalidParam->throw(error => q{Must provide a human readable label in the hashref of options})
+        unless exists $options->{label} && $options->{label};
 
     # Generate a unique id for this payment
     my $paymentGatewayId = $session->id->generate;
 
     # Build object
-    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $label, $options);
+    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
 
     # and persist this instance in the db
-    $session->db->write('insert into paymentGateway (paymentGatewayId, label, className) VALUES (?,?,?)', [
+    $session->db->write('insert into paymentGateway (paymentGatewayId, className) VALUES (?,?)', [
         $paymentGatewayId, 
-        $label,
         $class,
     ]);
     
@@ -550,7 +543,7 @@ sub new {
 
     my $options = from_json($properties->{options});
 
-    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $properties->{ label }, $options);
+    my $self = WebGUI::Shop::PayDriver->_buildObj($session, $class, $paymentGatewayId, $options);
 
     return $self;
 }
@@ -600,7 +593,7 @@ sub processPropertiesFromFormPost {
             );
         }
     }
-    $properties{title} = $fullDefinition->[0]{name} if ($properties{title} eq "" || lc($properties{title}) eq "untitled");
+    $properties{label} = $fullDefinition->[0]{name} if ($properties{label} eq "" || lc($properties{label}) eq "untitled");
     $self->update(\%properties);
 }
 
@@ -624,11 +617,13 @@ sub processTransaction {
     # determine object type
     my $transaction;
     my $paymentAddress;
-    if ($object->isa('WebGUI::Shop::Transaction')) {
-        $transaction = $object;
-    }
-    elsif ($object->isa('WebGUI::Shop::Address')) {
-        $paymentAddress = $object;
+    if (blessed $object) {
+        if ($object->isa('WebGUI::Shop::Transaction')) {
+            $transaction = $object;
+        }
+        elsif ($object->isa('WebGUI::Shop::Address')) {
+            $paymentAddress = $object;
+        }
     }
 
     # Setup dynamic transaction

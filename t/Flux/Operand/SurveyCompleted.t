@@ -51,9 +51,7 @@ my $responses = {
 
 my @address = split /-/, $responses->{id};
 
-$survey->loadSurveyJSON();
-$survey->survey->update( \@address, $responses );
-$survey->saveSurveyJSON();
+$survey->surveyJSON_update( \@address, $responses );
 
 {
     my $rule = WebGUI::Flux::Rule->create($session);

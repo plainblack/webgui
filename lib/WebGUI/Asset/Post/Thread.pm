@@ -1,7 +1,7 @@
 package WebGUI::Asset::Post::Thread;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -118,12 +118,12 @@ sub definition {
 			subscriptionGroupId => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>'',
 				},
 			replies => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>0,
 				},
 			isSticky => {
 				fieldType=>"yesNo",
@@ -131,12 +131,12 @@ sub definition {
 				},
 			isLocked => {
 				fieldType=>"yesNo",
-				defaultValue=>0
+				defaultValue=>0,
 				},
 			lastPostId => {
 				noFormPost=>1,
 				fieldType=>"hidden",
-				defaultValue=>undef
+				defaultValue=>'',
 				},
 			lastPostDate => {
 				noFormPost=>1,
@@ -867,6 +867,22 @@ sub updateThreadRating {
     }    
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a CS for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Wobject::Collaboration');
+}
 
 #-------------------------------------------------------------------
 sub view {

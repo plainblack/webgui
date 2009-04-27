@@ -132,16 +132,17 @@ function initOptionalFields(prefix,fieldId) {
 function editListItem(url,fieldId,copy) {
 
 	var handleGetFormSuccess = function(o){
+		
 		var handleSuccess = function(o) {
 			var response = o.responseText;
 			var listItemId = response.slice(0,22); 
 			var newInnerHTML = response.slice(22);
 			var label = editFieldDialog.getData().label;
-
-			if(copy){
-				addListItemHTML(listItemId, newInnerHTML,label);
-			}
 			
+            if(copy){
+                addListItemHTML(listItemId, newInnerHTML,label);
+            }
+
 			var li = new YAHOO.util.Element(listItemId);
 			li.set('innerHTML',newInnerHTML);
 			var search_label = new YAHOO.util.Element("search_label_"+listItemId);
@@ -166,27 +167,27 @@ function editListItem(url,fieldId,copy) {
 		}
 
 		var dialogId = "edit_"+fieldId+"_Dialog";
-		if(copy){
-			dialogId = dialogId + '_copy';
-		}
+        if(copy){
+            dialogId = dialogId + '_copy';
+        }
 
-		editFieldDialog = new YAHOO.widget.Dialog(dialogId, { width:"460px", visible:false, draggable:true, close:true, fixedcenter:true, zIndex:11001, height: "420px",
-		autofillheight:false,
+        editFieldDialog = new YAHOO.widget.Dialog(dialogId, { width:"460px", visible:false, draggable:true,close:true, fixedcenter:true, zIndex:11001, height: "420px",
+        autofillheight:false,
 		buttons : [ { text:"Submit", handler:handleSubmit, isDefault:true }, 
 				{ text:"Cancel", handler:handleCancel } ]
 		} );
-		
-		if(copy){	
-			editFieldDialog.setHeader("Copy Field");
-		}else{
-			editFieldDialog.setHeader("Edit Field");
-		}
-		editFieldDialog.setBody(o.responseText);
+			
+		if(copy){
+            editFieldDialog.setHeader("Copy Field");
+        }else{
+            editFieldDialog.setHeader("Edit Field");
+        }
+        editFieldDialog.setBody(o.responseText);
 		editFieldDialog.render(document.body);
 		editFieldDialog.callback = { success: handleSuccess, failure: handleFailure };
 		editFieldDialog.show();
-		YAHOO.util.Event.onContentReady(dialogId, optionalFields);
-		initHoverHelp(dialogId);
+        YAHOO.util.Event.onContentReady(dialogId, optionalFields);
+        initHoverHelp(dialogId);
 
 	};
 
@@ -205,7 +206,7 @@ function editListItem(url,fieldId,copy) {
 }
 
 function addListItemHTML(listItemId, newInnerHTML,label){
-	var ul1 = new YAHOO.util.Element('ul1');
+    var ul1 = new YAHOO.util.Element('ul1');
 		var li = document.createElement('li');
 		li.id = listItemId;
 		li.className = 'list1';
@@ -285,13 +286,13 @@ function addListItemHTML(listItemId, newInnerHTML,label){
 
 function initAddFieldDialog() {
 
-	var handleSuccess = function(o) {
-		var response = o.responseText;
-		var listItemId = response.slice(0,22); 
-		var newInnerHTML = response.slice(22);	
-		var label = addFieldDialog.getData().label;
-		addListItemHTML(listItemId, newInnerHTML,label);
-		
+    var handleSuccess = function(o) {
+        var response = o.responseText;
+        var listItemId = response.slice(0,22);
+        var newInnerHTML = response.slice(22);
+        var label = addFieldDialog.getData().label;
+        addListItemHTML(listItemId, newInnerHTML,label);
+      
 	};
 	
 	var handleFailure = function(o) {

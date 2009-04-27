@@ -175,7 +175,7 @@ sub create {
         WebGUI::Error::InvalidObject->throw(expected=>"WebGUI::Session", got=>(ref $session), error=>"Need a session.");
     }
     my $cartId = $session->id->generate;
-    $session->db->write('insert into cart (cartId, sessionId) values (?,?)', [$cartId, $session->getId]);
+    $session->db->write('insert into cart (cartId, sessionId, creationDate) values (?,?,UNIX_TIMESTAMP())', [$cartId, $session->getId]);
     return $class->new($session, $cartId);
 }
 
@@ -260,7 +260,7 @@ Returns a reference to the address book for the user who's cart this is.
 
 sub getAddressBook {
     my $self = shift;
-    my $id = ref $self;
+    my $id = id $self;
     unless (exists $addressBookCache{$id}) {
         $addressBookCache{$id} = WebGUI::Shop::AddressBook->newBySession($self->session);
     }    
@@ -297,7 +297,6 @@ sub getItem {
     unless (defined $itemId && $itemId =~ m/^[A-Za-z0-9_-]{22}$/) {
         WebGUI::Error::InvalidParam->throw(error=>"Need an itemId.");
     }
-    my $id = ref $self;
     my $item = WebGUI::Shop::CartItem->new($self, $itemId);
     return $item;
 }
@@ -499,13 +498,9 @@ Returns whether all the required properties of the the cart are set.
 
 sub readyForCheckout {
     my $self    = shift;
-    
+
     # Check if the shipping address is set and correct
     my $address = eval{$self->getShippingAddress};
-    return 0 if WebGUI::Error->caught;
-
-    # Check if the ship driver is chosen and existant
-    my $ship = eval {$self->getShipper};
     return 0 if WebGUI::Error->caught;
 
     # Check if the cart has items
@@ -513,6 +508,12 @@ sub readyForCheckout {
     
     # fail if there are multiple recurring items or if
     return 0 if ($self->hasMixedItems);
+
+    # Check minimum cart checkout requirement
+    my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
+    if ( $requiredAmount > 0 ) {
+        return 0 if $self->calculateTotal < $requiredAmount;
+    }
 
     # All checks passed so return true
     return 1;
@@ -560,6 +561,10 @@ The unique id of the configured shipping driver that will be used to ship these 
 
 The ID of a user being checked out, if they're being checked out by a cashier.
 
+=head4 creationDate
+
+The date the cart was created.
+
 =cut
 
 sub update {
@@ -568,7 +573,7 @@ sub update {
         WebGUI::Error::InvalidParam->throw(error=>"Need a properties hash ref.");
     }
     my $id = id $self;
-    foreach my $field (qw(shippingAddressId posUserId shipperId)) {
+    foreach my $field (qw(shippingAddressId posUserId shipperId creationDate)) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }
     $self->session->db->setRow("cart","cartId",$properties{$id});
@@ -802,6 +807,10 @@ sub www_view {
         shipToButton    => WebGUI::Form::submit($session, {value=>$i18n->get("ship to button"), 
             extras=>q|onclick="setCallbackForAddressChooser(this.form);"|}),
         subtotalPrice           => $self->formatCurrency($self->calculateSubtotal()),
+        minimumCartAmount       => $session->setting->get( 'shopCartCheckoutMinimum' ) > 0
+                                 ? sprintf( '%.2f', $session->setting->get( 'shopCartCheckoutMinimum' ) )
+                                 : 0
+                                 ,
         );
 
     # get the shipping address    
@@ -811,7 +820,7 @@ sub www_view {
         $self->update({shippingAddressId=>''});
         
     }
-    
+   
     # if there is no shipping address we can't check out
     if (WebGUI::Error->caught) {
        $var{shippingPrice} = $var{tax} = $self->formatCurrency(0); 
@@ -821,7 +830,6 @@ sub www_view {
     else {
         $var{hasShippingAddress} = 1;
         $var{shippingAddress} = $address->getHtmlFormatted;
-        $var{tax} = $self->calculateTaxes;
         my $ship = WebGUI::Shop::Ship->new($self->session);
         my $options = $ship->getOptions($self);
         my %formOptions = ();
@@ -834,7 +842,10 @@ sub www_view {
         $var{shippingPrice} = ($self->get("shipperId") ne "") ? $options->{$self->get("shipperId")}{price} : $options->{$defaultOption}{price};
         $var{shippingPrice} = $self->formatCurrency($var{shippingPrice});
     }
-    
+  
+    # Tax variables
+    $var{tax} = $self->calculateTaxes;
+
     # POS variables
     $var{isCashier} = WebGUI::Shop::Admin->new($session)->isCashier;
     $var{posLookupForm} = WebGUI::Form::email($session, {name=>"posEmail"})
@@ -847,10 +858,11 @@ sub www_view {
     # calculate price adjusted for in-store credit
     $var{totalPrice} = $var{subtotalPrice} + $var{shippingPrice} + $var{tax};
     my $credit = WebGUI::Shop::Credit->new($session, $posUser->userId);
-    $var{inShopCreditAvailable} = $credit->getSum;
-    $var{inShopCreditDeduction} = $credit->calculateDeduction($var{totalPrice});
-    $var{totalPrice} = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
-    
+    $var{ inShopCreditAvailable } = $credit->getSum;
+    $var{ inShopCreditDeduction } = $credit->calculateDeduction($var{totalPrice});
+    $var{ totalPrice            } = $self->formatCurrency($var{totalPrice} + $var{inShopCreditDeduction});
+    $var{ readyForCheckout      } = $self->readyForCheckout;
+
     # render the cart
     my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopCartTemplateId"));
     return $session->style->userStyle($template->process(\%var));

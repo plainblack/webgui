@@ -29,7 +29,7 @@ $ENV{FLUX_REALTIME_WORKFLOWS} = 1;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 83;
+plan tests => 85;
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -131,7 +131,28 @@ $session->db->write('delete from fluxRuleUserData');
 
 #######################################################################
 #
-# getExpressiones / getExpressionCount
+# create (with optional 'expressions' param
+#
+#######################################################################
+{
+    my $rule = WebGUI::Flux::Rule->create(
+        $session,
+        {   expressions => [
+                {   name     => 'DUMMY',
+                    operand1 => 'DUMMY_OPERAND_1',
+                    operator => 'DUMMY_OPERATOR',
+                    operand2 => 'DUMMY_OPERAND_2',
+                }
+            ]
+        }
+    );
+    is( $rule->getExpressionCount(),               1,       'Rule has 1 expression' );
+    is( $rule->getExpressions()->[0]->get('name'), 'DUMMY', 'Our expression was added' );
+}
+
+#######################################################################
+#
+# getExpressione / getExpressionCount
 #
 #######################################################################
 {
@@ -400,7 +421,7 @@ $session->db->write('delete from fluxRuleUserData');
 
 }
 
-# Explicitly test for a bug I found during early development: 
+# Explicitly test for a bug I found during early development:
 # Rule that was initiallly false wouldn't update dateRuleFirstTrue when it became true
 {
     my $rule   = WebGUI::Flux::Rule->create($session);
@@ -465,9 +486,9 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     my $rule = WebGUI::Flux::Rule->create($session);
     $rule->update( { onRuleFirstTrueWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
-    
-    wait_for_workflow($session, $test_workflow->getId());
-    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
+
+    wait_for_workflow( $session, $test_workflow->getId() );
+    $test_group->clearCaches();    # Group modified by spectre so need to re-retreive from db
 
     # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
@@ -490,9 +511,9 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     my $rule = WebGUI::Flux::Rule->create($session);
     $rule->update( { onAccessTrueWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
-    
-    wait_for_workflow($session, $test_workflow->getId());
-    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
+
+    wait_for_workflow( $session, $test_workflow->getId() );
+    $test_group->clearCaches();    # Group modified by spectre so need to re-retreive from db
 
     # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
@@ -523,9 +544,9 @@ use WebGUI::Workflow::Activity::AddUserToGroup;
     );
     $rule->update( { onAccessFirstFalseWorkflowId => $test_workflow->getId() } );
     $rule->evaluateFor( { user => $user, } );
-    
-    wait_for_workflow($session, $test_workflow->getId());
-    $test_group->clearCaches(); # Group modified by spectre so need to re-retreive from db
+
+    wait_for_workflow( $session, $test_workflow->getId() );
+    $test_group->clearCaches();    # Group modified by spectre so need to re-retreive from db
 
     # Workflow should have now completed and user should be a member of the new group
     ok( $user->isInGroup( $test_group->getId() ), 'User added to group by Workflow' );
@@ -587,15 +608,15 @@ sub _secondsFromNow {
 }
 
 sub wait_for_workflow {
-    my $session = shift;
+    my $session     = shift;
     my $workflow_id = shift;
-    my $wf = WebGUI::Workflow->new($session, $workflow_id);
-    my $maxwait = 50;
-    my $ctr = 0;
-    
-    while (my @instances = @{$wf->getInstances()}) {
+    my $wf          = WebGUI::Workflow->new( $session, $workflow_id );
+    my $maxwait     = 50;
+    my $ctr         = 0;
+
+    while ( my @instances = @{ $wf->getInstances() } ) {
         my $status = $instances[0]->get('lastStatus') || 'undefined';
-        diag("Waiting for workflow: $workflow_id. Status $status. " . ($maxwait - $ctr) . " tries remaining.");
+        diag( "Waiting for workflow: $workflow_id. Status $status. " . ( $maxwait - $ctr ) . " tries remaining." );
         last if $ctr++ > $maxwait;
         sleep 1;
     }

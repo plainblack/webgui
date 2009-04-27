@@ -3,7 +3,7 @@ package WebGUI::Form::Textarea;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -139,7 +139,7 @@ Renders an input tag of type text.
 
 sub toHtml {
 	my $self = shift;
- 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters($self->getOriginalValue)));
+ 	my $value = $self->fixMacros($self->fixTags($self->fixSpecialCharacters(scalar $self->getOriginalValue)));
 	my $width = $self->get('width') || 400;
 	my $height = $self->get('height') || 150;
 	my ($style, $url) = $self->session->quick(qw(style url));
@@ -159,11 +159,16 @@ sub toHtml {
         $url->extras( 'yui-webgui/build/form/textarea.js' ), 
         { type => 'text/javascript' }, 
     );
-    $style->setRawHeadTags( q|
-        <script type="text/javascript">
-            YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
-        </script>
-    | );
+
+    unless ( $self->session->stow->get( 'texareaHeadTagsLoaded' ) ) {
+        $style->setRawHeadTags( q|
+            <script type="text/javascript">
+                YAHOO.util.Event.onDOMReady( function () { WebGUI.Form.Textarea.setMaxLength() } );
+            </script>
+        | );
+
+        $self->session->stow->set( 'texareaHeadTagsLoaded', 1 )
+    }
 
 	if ($self->get("resizable")) {
         $style->setLink($url->extras("resize.css"), {type=>"text/css", rel=>"stylesheet"});
@@ -189,6 +194,14 @@ sub toHtml {
 	}
 	return $out;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getValueAsHtml
+
+Returns the form value as text, encoding HTML entities.
+
+=cut
 
 sub getValueAsHtml {
     my $self = shift;

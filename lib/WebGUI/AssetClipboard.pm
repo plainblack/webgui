@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -40,6 +40,20 @@ These methods are available from this class:
 
 #-------------------------------------------------------------------
 
+=head2 canPaste ( )
+
+Allows assets to have a say if they can be pasted.  For example, it makes no sense to
+paste a wiki page anywhere else but a wiki master.
+
+=cut
+
+sub canPaste {
+    my $self = shift;
+    return $self->validParent($self->session);  ##Lazy call to a class method
+}
+
+#-------------------------------------------------------------------
+
 =head2 cut ( )
 
 Removes asset from lineage, places it in clipboard state. The "gap" in the lineage is changed in state to clipboard-limbo.
@@ -47,12 +61,13 @@ Removes asset from lineage, places it in clipboard state. The "gap" in the linea
 =cut
 
 sub cut {
-	my $self = shift;
-	return undef if ($self->getId eq $self->session->setting->get("defaultPage") || $self->getId eq $self->session->setting->get("notFoundPage"));
-	$self->session->db->beginTransaction;
-	$self->session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
-	$self->session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$self->session->user->userId, $self->session->datetime->time(), $self->getId]);
-	$self->session->db->commit;
+	my $self    = shift;
+    my $session = $self->session;
+	return undef if ($self->getId eq $session->setting->get("defaultPage") || $self->getId eq $session->setting->get("notFoundPage"));
+	$session->db->beginTransaction;
+	$session->db->write("update asset set state='clipboard-limbo' where lineage like ? and state='published'",[$self->get("lineage").'%']);
+	$session->db->write("update asset set state='clipboard', stateChangedBy=?, stateChanged=? where assetId=?", [$session->user->userId, $session->datetime->time(), $self->getId]);
+	$session->db->commit;
 	$self->updateHistory("cut");
 	$self->{_properties}{state} = "clipboard";
 	$self->purgeCache;
@@ -172,6 +187,7 @@ sub paste {
 	my $assetId = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
+    return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
     # Don't allow a shortcut to create an endless loop
 	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
@@ -261,11 +277,12 @@ sub www_copyList {
 =cut
 
 sub www_createShortcut {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
+	my $self    = shift;
+    my $session = $self->session;
+	return $session->privilege->insufficient() unless ($self->session->user->isInGroup(4));	
 	my $isOnDashboard = $self->getParent->isa('WebGUI::Asset::Wobject::Dashboard');
 
-	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($self->session);
+	my $shortcutParent = $isOnDashboard? $self->getParent : WebGUI::Asset->getImportNode($session);
 	my $child = $shortcutParent->addChild({
 		className=>'WebGUI::Asset::Shortcut',
 		shortcutToAssetId=>$self->getId,
@@ -283,11 +300,11 @@ sub www_createShortcut {
     if (! $isOnDashboard) {
         $child->cut;
     }
-    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($session, {
         allowComments   => 1,
         returnUrl       => $self->getUrl,
-    })) {
-        return undef;
+    }) eq 'redirect') {
+        return 'redirect';
     };
 
     if ($isOnDashboard) {
@@ -467,11 +484,12 @@ Returns "". Pastes an asset. If canEdit is False, returns an insufficient privil
 =cut
 
 sub www_paste {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    my $pasteAssetId = $self->session->form->process('assetId');
-    my $pasteAsset = WebGUI::Asset->newPending($self->session, $pasteAssetId);
-    return $self->session->privilege->insufficient() unless $pasteAsset->canEdit;
+    my $self    = shift;
+    my $session = $self->session;
+    return $session->privilege->insufficient() unless $self->canEdit;
+    my $pasteAssetId = $session->form->process('assetId');
+    my $pasteAsset   = WebGUI::Asset->newPending($session, $pasteAssetId);
+    return $session->privilege->insufficient() unless $pasteAsset->canEdit;
     $self->paste($pasteAssetId);
     return "";
 }
@@ -487,10 +505,9 @@ Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is
 sub www_pasteList {
 	my $self = shift;
 	return $self->session->privilege->insufficient() unless $self->canEdit;
-	foreach my $clipId ($self->session->form->param("assetId")) {
+	ASSET: foreach my $clipId ($self->session->form->param("assetId")) {
         my $pasteAsset = WebGUI::Asset->newPending($self->session, $clipId);
-        next
-            unless $pasteAsset->canEdit;
+        next ASSET unless $pasteAsset->canEdit;
 		$self->paste($clipId);
 	}
 	return $self->www_manageAssets();

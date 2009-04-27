@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -41,6 +41,7 @@ my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 my $storage;
 my ($driver, $cart, $car);
+my $versionTag;
 
 SKIP: {
 
@@ -126,7 +127,7 @@ cmp_deeply(
 #
 #######################################################################
 
-my $driver;
+$driver;
 
 my $options = {
                 label   => 'flat rate, ship weight, items in the cart',
@@ -285,6 +286,9 @@ my $reallyNiceCar = $car->setCollateral('variantsJSON', 'variantId', 'new',
     }
 );
 
+$versionTag = WebGUI::VersionTag->getWorking($session);
+$versionTag->commit;
+
 $options = {
     label   => 'flat rate, ship weight',
     enabled => 1,
@@ -296,7 +300,7 @@ $options = {
 
 $driver = WebGUI::Shop::ShipDriver::FlatRate->create($session, $options);
 
-my $cart = WebGUI::Shop::Cart->newBySession($session);
+$cart = WebGUI::Shop::Cart->newBySession($session);
 
 $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $crappyCar));
 is($driver->calculate($cart), 1511, 'calculate by weight, perItem and flat fee work');
@@ -320,13 +324,16 @@ is($driver->calculate($cart), 30_200, 'calculate by percentage of price');
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    if (defined $driver and ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
+    if (defined $driver && ref $driver eq 'WebGUI::Shop::ShipDriver::FlatRate') {
         $driver->delete;
     }
-    if (defined $cart and ref $cart eq 'WebGUI::Shop::Cart') {
+    if (defined $cart && ref $cart eq 'WebGUI::Shop::Cart') {
         $cart->delete;
     }
-    if (defined $car and (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
+    if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
+    }
+    if (defined $versionTag) {
+        $versionTag->rollback;
     }
 }

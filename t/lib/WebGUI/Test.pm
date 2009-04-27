@@ -2,11 +2,12 @@ package WebGUI::Test;
 
 use strict;
 use warnings;
+use Clone qw/clone/;
 
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -34,6 +35,7 @@ use Cwd        qw[];
 use Test::MockObject::Extends;
 use WebGUI::PseudoRequest;
 use Scalar::Util qw( blessed );
+use List::MoreUtils qw/ any /;
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -46,6 +48,13 @@ our $logger_warns;
 our $logger_debug;
 our $logger_info;
 our $logger_error;
+
+my %originalConfig;
+my $originalSetting;
+
+my @groupsToDelete;
+my @usersToDelete;
+my @storagesToDelete;
 
 BEGIN {
 
@@ -125,15 +134,45 @@ BEGIN {
     $SESSION = WebGUI::Session->open( $WEBGUI_ROOT, $CONFIG_FILE );
     $SESSION->{_request} = $pseudoRequest;
 
+    $originalSetting = clone $SESSION->setting->get;
+
 }
 
 END {
     my $Test = Test::Builder->new;
+    GROUP: foreach my $group (@groupsToDelete) {
+        $group->delete;
+    }
+    USER: foreach my $user (@usersToDelete) {
+        my $userId = $user->userId;
+        next USER if any { $userId eq $_ } (1,3);
+        $user->delete;
+    }
+    foreach my $stor (@storagesToDelete) {
+        if ($SESSION->id->valid($stor)) {
+            my $storage = WebGUI::Storage->get($SESSION, $stor);
+            $storage->delete if $storage;
+        }
+        else {
+            $stor->delete;
+        }
+    }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
         $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
         $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
         $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+    }
+    while (my ($key, $value) = each %originalConfig) {
+        if (defined $value) {
+            $SESSION->config->set($key, $value);
+        }
+        else {
+            $SESSION->config->delete($key);
+        }
+    }
+    while (my ($param, $value) = each %{ $originalSetting }) {
+        $SESSION->setting->set($param, $value);
     }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
@@ -331,6 +370,72 @@ sub session {
     return $SESSION;
 }
 
+
+#----------------------------------------------------------------------------
+
+=head2 originalConfig ( $param )
+
+Stores the original data from the config file, to be restored
+automatically at the end of the test.  This is a class method.
+
+=cut
+
+sub originalConfig {
+    my ($class, $param) = @_;
+    my $safeValue = my $value = $SESSION->config->get($param);
+    if (ref $value) {
+        $safeValue = clone $value;
+    }
+    $originalConfig{$param} = $safeValue;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 groupsToDelete ( $group, [$group ] )
+
+Push a list of group objects onto the stack of groups to be automatically deleted
+at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub groupsToDelete {
+    my $class = shift;
+    push @groupsToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 storagesToDelete ( $storage, [$storageId ] )
+
+Push a list of storage objects or storageIds onto the stack of storage locaitons
+at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub storagesToDelete {
+    my $class = shift;
+    push @storagesToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 usersToDelete ( $user, [$user, ...] )
+
+Push a list of user objects onto the stack of groups to be automatically deleted
+at the end of the test.  If found in the stack, the Admin and Visitor users will not be deleted.
+
+This is a class method.
+
+=cut
+
+sub usersToDelete {
+    my $class = shift;
+    push @usersToDelete, @_;
+}
 
 #----------------------------------------------------------------------------
 

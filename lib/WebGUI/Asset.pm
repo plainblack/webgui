@@ -3,7 +3,7 @@ package WebGUI::Asset;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -183,7 +183,8 @@ sub assetExists {
 
 =head2 canAdd ( session, [userId, groupId] )
 
-Verifies that the user has the privileges necessary to add this type of asset. Return a boolean.
+Verifies that the user has the privileges necessary to add this type of asset and that the requested asset
+can be added as a child of this asset. Return a boolean.
 
 A class method.
 
@@ -225,7 +226,8 @@ sub canAdd {
     my $subclassGroupId = shift;
     my $addPrivsGroup = $session->config->get("assets/".$className."/addGroup");
     my $groupId = $addPrivsGroup || $subclassGroupId || '12';
-    return $user->isInGroup($groupId);
+    my $validParent = $className->validParent($session);
+    return $user->isInGroup($groupId) && $validParent;
 }
 
 
@@ -245,7 +247,7 @@ sub canEdit {
     my $self = shift;
     my $userId = shift || $self->session->user->userId;
     my $user = WebGUI::User->new($self->session, $userId);
-    
+
     # See if we should delegate to Flux..
     if ($self->get('fluxEnabled') && $self->session->setting->get('fluxEnabled')) {
         if ($user->isInGroup(3)) {
@@ -254,12 +256,12 @@ sub canEdit {
         }
         $self->session->log->debug('Delegating to Flux for canEdit on asset: ' . $self->getUrl . ' (' . $self->getId . ')');
         return WebGUI::Flux->evaluateFor({
-            user => $user, 
-            assetId => $self->getId(), 
+            user => $user,
+            assetId => $self->getId(),
             fluxRuleId => $self->get('fluxRuleIdEdit')
         });
     }
-    
+
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
@@ -293,7 +295,7 @@ sub canView {
         $user =  $self->session->user;
         $userId = $user->userId();
     }
-    
+
     # See if we should delegate to Flux..
     if ($self->get('fluxEnabled') && $self->session->setting->get('fluxEnabled')) {
         if ($user->isInGroup(3)) {
@@ -302,12 +304,12 @@ sub canView {
         }
         $self->session->log->debug('Delegating to Flux for canView on asset: ' . $self->getTitle . ' (' . $self->getId . ')');
         return WebGUI::Flux->evaluateFor({
-            user => $user, 
-            assetId => $self->getId(), 
+            user => $user,
+            assetId => $self->getId(),
             fluxRuleId => $self->get('fluxRuleIdView')
         });
     }
-    
+
     if ($userId eq $self->get("ownerUserId")) {
         return 1;
     }
@@ -805,6 +807,8 @@ sub get {
 		return $self->{_properties}{$propertyName};
 	}
 	my %copyOfHashRef = %{$self->{_properties}};
+        my $keywords = WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset => $self});
+        if( $keywords ne '' ) { $copyOfHashRef{ keywords } = $keywords ; }
 	return \%copyOfHashRef;
 }
 
@@ -978,7 +982,7 @@ sub getEditForm {
 			label       => $i18n->get('keywords'),
 			hoverHelp   => $i18n->get('keywords help'),
 			value       => $self->get('keywords'),
-			fieldType	=> 'text',
+			fieldType	=> 'keywords',
 			tab			=> 'meta',
 		}
 	);
@@ -1383,7 +1387,7 @@ Returns a toolbar with a set of icons that hyperlink to functions that delete, e
 
 sub getToolbar {
     my $self = shift;
-    return undef unless $self->canEdit;
+    return undef unless $self->canEdit && $self->session->var->isAdminOn;
     return $self->{_toolbar}
         if (exists $self->{_toolbar});
     my $userUiLevel = $self->session->user->profileField("uiLevel");
@@ -1482,6 +1486,7 @@ sub getToolbar {
             . $self->getUrl("op=assetManager") . '">' . $i18n->get("manage") . '</a></li>';
     }
     $output .= '</ul></div></div>' . $toolbar . '</div>';
+    $self->{_toolbar} = $output;
     return $output;
 }
 
@@ -1906,7 +1911,7 @@ sub newPending {
 
 #-------------------------------------------------------------------
 
-=head2 outputWidgetMarkup ( width, height, templateId )
+=head2 outputWidgetMarkup ( width, height, templateId, [styleTemplateId] )
 
 Output the markup required for the widget view. Includes markup to handle the
 widget macro in the iframe holding the widgetized asset. This does the following: 
@@ -1958,12 +1963,20 @@ widget-in-widget function properly.
 
 =cut
 
+=head3 styleTemplateId
+
+The style templateId for this widgetized asset to use. Not required for making
+widget-in-widget function properly.
+
+=cut
+
 sub outputWidgetMarkup {
     # get our parameters.
-    my $self            = shift;
-    my $width           = shift;
-    my $height          = shift;
-    my $templateId      = shift;
+    my $self                = shift;
+    my $width               = shift;
+    my $height              = shift;
+    my $templateId          = shift;
+    my $styleTemplateId     = shift;
 
     # construct / retrieve the values we'll use later.
     my $assetId         = $self->getId;
@@ -1987,8 +2000,12 @@ sub outputWidgetMarkup {
     # we'll be serializing the content of the asset which is being widgetized. 
     my $storage         = WebGUI::Storage->get($session, $assetId);
     my $content         = $self->view;
+    if($styleTemplateId ne '' && $styleTemplateId ne 'none'){
+        $content = $self->session->style->process($content,$styleTemplateId); 
+    }
     WebGUI::Macro::process($session, \$content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $content } } );
+    my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
+    my $jsonContent     = to_json( { "asset$assetId" => { content => $body } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
     my $jsonUrl         = $storage->getUrl("$assetId.js");
 
@@ -2019,6 +2036,7 @@ sub outputWidgetMarkup {
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
+        $headTags
     </head>
     <body id="widget$assetId">
         \${asset$assetId.content}
@@ -2038,9 +2056,8 @@ Executes what is necessary to make the view() method work with content chunking.
 
 sub prepareView {
 	my $self = shift;
-    if ($self->session->var->isAdminOn) {
-        $self->{_toolbar} = $self->getToolbar;
-    }
+    ##Make the toolbar now and stick it in the cache.
+    $self->getToolbar;
     my $style = $self->session->style;
     my @keywords = @{WebGUI::Keyword->new($self->session)->getKeywordsForAsset({asset=>$self, asArrayRef=>1})};
     if (scalar @keywords) {
@@ -2200,7 +2217,15 @@ The content to wrap up.
 
 sub processStyle {
 	my ($self, $output) = @_;
-    $self->session->style->setRawHeadTags($self->getExtraHeadTags);
+    my $session = $self->session;
+    my $style   = $session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags);
+    if ($self->get('synopsis')) {
+        $style->setMeta({
+            name    => 'Description',
+            content => $self->get('synopsis'),
+        });
+    }
 	return $output;
 }
 
@@ -2375,9 +2400,9 @@ sub update {
 #			next unless (exists $properties->{$property} || exists $definition->{properties}{$property}{defaultValue});
             # skip a property unless it was specified to be set by the properties field
 			next unless (exists $properties->{$property});
-
+            my $propertyDefinition = $definition->{properties}{$property};
             # skip a property if it has the display only flag set
-            next if ($definition->{properties}{$property}{displayOnly});
+            next if ($propertyDefinition->{displayOnly});
 
             # skip properties that aren't yet in the table
             if (!exists $tableFields{$property}) {
@@ -2393,14 +2418,16 @@ sub update {
             }
 
             # apply filter logic on a property to validate or fix it's value
-			if (exists $definition->{properties}{$property}{filter}) {
-				my $filter = $definition->{properties}{$property}{filter};
-				$value = $self->$filter($value, $property);
-			}
+            if (exists $propertyDefinition->{filter}) {
+                my $filter = $propertyDefinition->{filter};
+                $value = $self->$filter($value, $property);
+            }
 
-            # use the default value because default and update were both undef
-            if ($value eq "" && exists $definition->{properties}{$property}{defaultValue}) {
-                $value = $definition->{properties}{$property}{defaultValue};
+            # if the value is undefined, use the default if possible
+            # unless allowEmpty has been set, do this for empty strings as well
+            if ( ( !defined $value || ( $value eq q{} && ! $propertyDefinition->{allowEmpty} ) )
+                 && exists $propertyDefinition->{defaultValue} ) {
+                $value = $propertyDefinition->{defaultValue};
                 if (ref($value) eq 'ARRAY') {
                     $value = $value->[0];
                 }
@@ -2470,6 +2497,22 @@ sub urlExists {
 
 #-------------------------------------------------------------------
 
+=head2 validParent ( )
+
+Make sure that the current session asset is a valid parent for the child and return true or false.
+For example, a WikiPage would check for a WikiMaster.  It should be overridden by those children
+that need to perform that kind of check.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
 =head2 view ( )
 
 The default view method for any asset that doesn't define one. Under all normal circumstances this should be overridden or your asset won't have any output.
@@ -2516,8 +2559,8 @@ sub www_add {
 		groupIdView => $self->get("groupIdView"),
 		groupIdEdit => $self->get("groupIdEdit"),
 		fluxEnabled => $self->get("fluxEnabled"),
-        fluxRuleIdView => $self->get("fluxEnabled"),
-        fluxRuleIdEdit => $self->get("fluxEnabled"),
+		fluxRuleIdView => $self->get("fluxEnabled"),
+		fluxRuleIdEdit => $self->get("fluxEnabled"),
 		ownerUserId => $self->get("ownerUserId"),
 		encryptPage => $self->get("encryptPage"),
 		styleTemplateId => $self->get("styleTemplateId"),
@@ -2628,6 +2671,11 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
+    
+    my $annotations = "";
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $annotations = $self->get("annotations");
+    }
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
     return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
@@ -2666,6 +2714,12 @@ sub www_editSave {
         }
     }
     
+    if ($self->isa("WebGUI::Asset::File::Image")) {
+        $object->update({ annotations => $annotations });
+    }
+
+    ### 
+
     $object->updateHistory("edited");
 
     # we handle auto commit assets here in case they didn't handle it themselves
@@ -2683,7 +2737,7 @@ sub www_editSave {
 
     # Handle "saveAndReturn" button
     if ( $self->session->form->process( "saveAndReturn" ) ne "" ) {
-        return $self->www_edit;
+        return $object->www_edit;
     }
 
     # Handle "proceed" form parameter
@@ -2743,12 +2797,6 @@ sub www_view {
 	return $check if (defined $check);
 
     # if all else fails 
-    if ($self->get('synopsis')) {
-        $self->session->style->setMeta({
-                name    => 'Description',
-                content => $self->get('synopsis'),
-        });
-    }
     $self->prepareView;
 	$self->session->output->print($self->view);
 	return undef;
@@ -2769,9 +2817,10 @@ sub www_widgetView {
 
     return $session->privilege->noAccess() unless $self->canView;
 
-    my $templateId  = $session->form->process('templateId');
-    my $width       = $session->form->process('width');
-    my $height      = $session->form->process('height');
+    my $templateId      = $session->form->process('templateId');
+    my $width           = $session->form->process('width');
+    my $height          = $session->form->process('height');
+    my $styleTemplateId = $session->form->process('styleTemplateId');
 
     if($templateId eq 'none') {
         $self->prepareView;
@@ -2779,7 +2828,7 @@ sub www_widgetView {
     else {
         $self->prepareWidgetView($templateId);
     }
-        return $self->outputWidgetMarkup($width, $height, $templateId);
+        return $self->outputWidgetMarkup($width, $height, $templateId, $styleTemplateId);
 }
 
 1;

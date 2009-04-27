@@ -18,11 +18,15 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'showAdmin' },
-            { 'name' => 'dragger.icon' },
+            { 'name' => 'showAdmin'    },
             { 'name' => 'dragger.init' },
             {   'name'      => 'position1_loop',
-                'variables' => [ { 'name' => 'id' }, { 'name' => 'content' }, { 'name' => 'isUncommitted' }, ]
+                'variables' => [
+                    { 'name' => 'id'            },
+                    { 'name' => 'content'       },
+                    { 'name' => 'isUncommitted' },
+                    { 'name' => 'dragger.icon'  },
+                ]
             },
         ],
         fields  => [],

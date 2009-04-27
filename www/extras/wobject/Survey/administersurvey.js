@@ -8,49 +8,35 @@ if (typeof Survey === "undefined") {
 	var CLASS_INVALID = 'survey-invalid'; // For elements that fail input validation
 	var CLASS_INVALID_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
 	
-    var multipleChoice = {
-        'Multiple Choice': 1,
-        'Gender': 1,
-        'Yes/No': 1,
-        'True/False': 1,
-        'Ideology': 1,
-        'Race': 1,
-        'Party': 1,
-        'Education': 1,
-        'Scale': 1,
-        'Agree/Disagree': 1,
-        'Oppose/Support': 1,
-        'Importance': 1,
-        'Likelihood': 1,
-        'Certainty': 1,
-        'Satisfaction': 1,
-        'Confidence': 1,
-        'Effectiveness': 1,
-        'Concern': 1,
-        'Risk': 1,
-        'Threat': 1,
-        'Security': 1
-    };
-    var text = {
+    // All specially-handled question types are listed here
+    // (anything else is assumed to be a multi-choice bundle)
+    var TEXT_TYPES = {
         'Text': 1,
         'Email': 1,
         'Phone Number': 1,
         'Text Date': 1,
-        'Currency': 1
+        'Currency': 1,
+	    'TextArea': 1
     };
-    var slider = {
+    var NUMBER_TYPES = {
+        'Number':1
+    };
+    var SLIDER_TYPES = {
         'Slider': 1,
         'Dual Slider - Range': 1,
         'Multi Slider - Allocate': 1
     };
-    var dateType = {
+    var DATE_SHORT = {
+        'Year Month': 1
+    };
+    var DATE_TYPES = {
         'Date': 1,
         'Date Range': 1
     };
-    var fileUpload = {
+    var UPLOAD_TYPES = {
         'File Upload': 1
     };
-    var hidden = {
+    var HIDDEN_TYPES = {
         'Hidden': 1
     };
     
@@ -82,6 +68,32 @@ if (typeof Survey === "undefined") {
                         alert("Please allocate the remaining " + amountLeft + ".");
                     }
                 }
+                else if (toValidate[i].type === 'Number') {
+                    answered = 1;
+                    for (var z1 in toValidate[i].answers) {
+                        var m = parseFloat(document.getElementById(z1).value);
+                        var ansValues = toValidate[i].answers[z1];
+                        if((ansValues.max != '' && m > ansValues.max) ||
+                           (ansValues.min != '' && m < ansValues.min) ||
+                           (ansValues.step != '' && ( (m % ansValues.step) != 0) )){
+                            answered = 0;
+                            break;
+                        }
+                    }
+
+                }
+                else if (toValidate[i].type === 'Year Month') {
+                    answered = 1;//set to true, then let a single failure set it back to false.
+                    for (var z1 in toValidate[i].answers) {
+                        var m = document.getElementById(z1+'-month').value;
+                        var y = document.getElementById(z1+'-year').value;
+                        if(m == ''){ answered = 0; }
+                        var yInt = parseInt(y, 10);
+                        if(!yInt) { answered = 0; }
+                        if(yInt < 1000 || yInt > 3000) { answered = 0; }
+                        if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
+                    }
+                }
                 else {
                     for (var z1 in toValidate[i].answers) {
                         if (YAHOO.lang.hasOwnProperty(toValidate[i].answers, z1)) {
@@ -94,6 +106,7 @@ if (typeof Survey === "undefined") {
                     }
                 }
 				var node = document.getElementById(i + 'required');
+
 				var q_parent_node = YAHOO.util.Dom.getAncestorByClassName(node, 'question');
                 if (!answered) {
                     submit = 0;
@@ -116,21 +129,102 @@ if (typeof Survey === "undefined") {
         }
     }
     
-    //an object which creates sliders for allocation type questions and then manages their events and keeps them from overallocating
-    function sliderManager(q, t){
+    function goBack(event){
+        YAHOO.log("Going back");
+        Survey.Comm.callServer('', 'goBack');
+    }
+    
+    function numberHandler(event, objs){
+        
+        var keycode = event.keyCode;
+        var value = this.value;
+        
+        //if starting a negative number, don't do anything
+        if(value == '' || value == "-"){return;}
+
+        var step = objs.step ? objs.step : 1;
+
+        if(!value){this.value = objs.min ? objs.min : 0;} 
+        if(value % step > 0){
+            this.value = +value + value % step;
+        }
+            
+        if(objs.min != '' && +value < +objs.min){
+            this.value = objs.min;
+        }
+
+        else if(objs.max != '' && +value > objs.max){this.value = objs.max;}
+        else if(+keycode == 40){//key down
+            if(objs.min == ''){
+                this.value = value - step;
+            }
+            else if((value - step) >= +objs.min){
+                this.value = value - step;
+            }  
+        }else if(+keycode == 38){//key up
+            if(objs.max == ''){
+                this.value = +value + +step;
+            }
+            if(+value + +step <= +objs.max){
+                this.value = +value + +step;
+            }
+        }
+    }
+    
+    function sliderManager(q){
+        //total number of pixels in the slider.
         var total = sliderWidth;
+
+        //steps must be integers
         var step = Math.round(parseFloat(q.answers[0].step));
+
+        //the starting value for the left side of the slider
         var min = Math.round(parseFloat(q.answers[0].min));
-        var distance = Math.round(parseFloat(q.answers[0].max) + (-1 * min));
-        var scale = Math.round(sliderWidth / distance);
+
+        //The number of values in between the max and min values
+        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min));
+       
+        //Number of pixels each bug step takes
+        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step));
+
+        //redefine number of pixels to round number of steps
+        total = distance * bugSteps / step;
+
+        var scale = Math.round(total / distance);
+        
+        //max is just the max value, used for determining allocation sliders. 
+        var max = 0;         
+        var type = 'slider';
+
+        //find the maximum difference between an answers max and min
+        for (var s in q.answers) {
+            if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
+                var a1 = q.answers[s];
+                YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
+                if (a1.max - a1.min > max) {
+                    max = a1.max - a1.min;
+                }
+            }
+        }
+
+        //Only validate allocation types which must allocate all their points
+        if (q.questionType === 'Multi Slider - Allocate') {
+            type = 'multi';
+            for (var x1 = 0; x1 < q.answers.length; x1++) {
+                if (toValidate[q.id]) {
+                    toValidate[q.id].total = q.answers[x1].max;
+                    toValidate[q.id].answers[q.answers[x1].id] = 1;
+                }
+            }
+        }
         for (var i in q.answers) {
             if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
                 var a = q.answers[i];
                 var Event = YAHOO.util.Event;
                 var lang = YAHOO.lang;
                 var id = a.id + 'slider-bg';
-                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, sliderWidth, scale * step);
-                s.animate = false;
+                var s = YAHOO.widget.Slider.getHorizSlider(id, a.id + 'slider-thumb', 0, total, scale * step);
+                s.animate = true;
                 if (YAHOO.lang.isUndefined(sliders[q.id])) {
                     sliders[q.id] = [];
                 }
@@ -141,14 +235,15 @@ if (typeof Survey === "undefined") {
                     var t = 0;
                     for (var x in sliders[q.id]) {
                         if (YAHOO.lang.hasOwnProperty(sliders[q.id], x)) {
-                            t += sliders[q.id][x].getValue();
+                            t += sliders[q.id][x].getRealValue();
                         }
                     }
-                    if (t > total) {
-                        t -= this.getValue();
-                        t = Math.round(t);
-                        this.setValue(total - t);// + (scale*step));
-                        document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
+                    if (t > max && type === 'multi') {
+                        t -= +this.getRealValue();
+                        var newVal = (max-t);
+                        this.setValue(newVal*bugSteps/step);
+                        //document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
+                        document.getElementById(this.input).value = newVal;
                     }
                     else {
                         this.lastValue = this.getValue();
@@ -156,7 +251,6 @@ if (typeof Survey === "undefined") {
                     }
                 };
                 s.subscribe("change", check);
-                s.subscribe("slideEnd", check);
                 var manualEntry = function(e){
                     // set the value when the 'return' key is detected 
                     if (Event.getCharCode(e) === 13 || e.type === 'blur') {
@@ -174,19 +268,19 @@ if (typeof Survey === "undefined") {
                 };
                 Event.on(document.getElementById(s.input), "blur", manualEntry);
                 Event.on(document.getElementById(s.input), "keypress", manualEntry);
-                
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
+                var getRealValue = function(){ 
+                    return parseInt((this.getValue() / bugSteps * step) + +min);
                 };
+                s.getRealValue = getRealValue;
                 document.getElementById(s.input).value = s.getRealValue();
             }
         }
+
     }
-    
+
     function sliderTextSet(event, objs){
         this.value = this.value * 1;
 		this.value = YAHOO.lang.isValue(this.value) ? this.value : 0;
-        sliders[this.id].setValue(Math.round(this.value * sliders[this.id].scale));
     }
     
     function handleDualSliders(q){
@@ -219,35 +313,6 @@ if (typeof Survey === "undefined") {
         //           s.subscribe('ready', updateUI); 
         //s.subscribe('change', updateUI);  
         s.subscribe('slideEnd', updateUI);
-    }
-    
-    function handleSliders(q){
-        var total = sliderWidth;
-        for (var i in q.answers) {
-            if (YAHOO.lang.hasOwnProperty(q.answers, i)) {
-                var a = q.answers[i];
-                var step = Math.round(q.answers[i].step);
-                var min = Math.round(parseFloat(q.answers[i].min));
-                var distance = Math.round(parseFloat(q.answers[i].max) + (-1 * min));
-                var scale = Math.round(sliderWidth / distance);
-                var id = a.id;
-                var s = YAHOO.widget.Slider.getHorizSlider(id + 'slider-bg', id + 'slider-thumb', 0, sliderWidth, (scale * step));
-                s.scale = scale;
-                sliders[q.Survey_questionid] = [];
-                sliders[q.Survey_questionid][id] = s;
-                s.input = a.id;
-                s.scale = scale;
-                document.getElementById(id).value = a.min;
-                var check = function(){
-                    var t = document.getElementById(this.input);
-                    t.value = this.getRealValue();
-                };
-                s.getRealValue = function(){
-                    return Math.round(parseFloat(((this.getValue() / total) * distance) + min));
-                };
-                s.subscribe("slideEnd", check);
-            }
-        }
     }
     
     function showCalendar(event, objs){
@@ -330,8 +395,126 @@ if (typeof Survey === "undefined") {
          }
          */
     }
-    
+
+    YAHOO.widget.Chart.SWFURL = "/extras/yui/build/charts/assets/charts.swf"; 
     // Public API
+    Survey.Summary = {
+        globalSummaryDataTip: function(item, index, series){
+                    var toolTipText =  "hello";
+                    //var toolTipText = series.displayName + " for " + item.section;
+                    //toolTipText += "\n" + item[series.yField];
+                    return toolTipText;
+        },
+        showSummary: function(summary,html){
+            var html = html;
+            document.getElementById('survey').innerHTML = html;
+
+
+            //Add totoal summary pie chart
+            totalSummary =
+            [
+                { correct: "Correct", count: summary.totalCorrect },
+                { correct: "Incorrect", count: summary.totalIncorrect }
+            ]
+
+            var totalSummaryDS = new YAHOO.util.DataSource( totalSummary );
+            totalSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+            totalSummaryDS.responseSchema = { fields: [ "correct", "count" ] };
+
+            new YAHOO.widget.PieChart( "chart", totalSummaryDS,
+            {
+                dataField: "count",
+                categoryField: "correct",
+                style:
+                {
+                    padding: 10,
+                    legend:
+                    {
+                        display: "left",
+                        padding: 10,
+                        spacing: 2,
+                        font:
+                        {
+                            family: "Arial",
+                            size: 13
+                        }
+                    }
+                },
+                //only needed for flash player express install
+                expressInstall: "/extras/yui/build/charts/assets/charts.swf" 
+            });
+
+            //define section datatable columns
+            var myColumnDefs = [ 
+                {key:"Question ID", sortable:true, resizeable:true}, 
+                {key:"Question Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true}, 
+                {key:"Answer ID", sortable:true, resizeable:true}, 
+                {key:"Correct", sortable:true, resizeable:true}, 
+                {key:"Answer Text", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true},
+                {key:"Score", sortable:true, resizeable:true}, 
+                {key:"Value", formatter: YAHOO.widget.DataTable.formatText, sortable:true, resizeable:true} 
+            ];
+            var sectionSummary = [];
+            //Load up datatables and create section data for bar chart
+            for(var i = 0; i < summary.sections.length; i++){
+                var temp = summary.sections[i];
+                sectionSummary[sectionSummary.length] = {"Total Responses": temp.total, "Correct": temp.correct, "Incorrect": temp.inCorrect, "section": (i+1)};
+                var myDataSource = new YAHOO.util.DataSource(summary.sections[i].responses);
+//These needs to be put in a destroy call list for when the html dom is recreated, if summaries are going to be uses with page reloads, else memory leak.
+                myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+                myDataSource.responseSchema = { 
+                   fields: ["Question ID","Question Text","Answer ID","Correct","Answer Text","Score","Value"] 
+                };
+                var tempText = "section"+ (i+1) + "datatable";
+                new YAHOO.widget.DataTable(tempText, myColumnDefs, myDataSource, {caption:"Section "+(i+1)});
+            }
+
+            //Now create section summary bar charts
+            var sectionSummaryDS = new YAHOO.util.DataSource( sectionSummary ); 
+            sectionSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
+            sectionSummaryDS.responseSchema = 
+            { 
+                fields: [ "Total Responses", "Correct", "Incorrect", "section" ] 
+            };
+            var sectionSummarySeriesDef =
+                [
+                    {
+                        displayName: "Total Responses",
+                        yField: "Total Responses",
+                        style:{size:10}
+                    },
+                    {
+                        displayName: "Correct",
+                        yField: "Correct",
+                        style:{size:10}
+                    },
+                    {
+                        displayName: "Incorrect",
+                        yField: "Incorrect",
+                        style:{size:10}
+                    }
+                ];
+            //create a Numeric Axis for displaying dollars
+            var responseAxis = new YAHOO.widget.NumericAxis();
+            responseAxis.title = "Responses";
+            //create Category Axis to specify a title for the months
+            var sectionAxis = new YAHOO.widget.CategoryAxis();
+            sectionAxis.title = "Sections";
+            //create the Chart
+            var mychart = new YAHOO.widget.ColumnChart( "summarychart", sectionSummaryDS,
+            {
+                series: sectionSummarySeriesDef,
+                xField: "section",
+                xAxis: sectionAxis,
+                yAxis: responseAxis,
+//                dataTipFunction: Survey.Form.globalSummaryDataTip,      //try again in 2.7
+                expressInstall: "/extras/yui/build/charts/assets/charts.swf" 
+            });
+
+            YAHOO.util.Event.addListener("submitbutton", "click", function(){ Survey.Comm.submitSummary(); });
+        }
+    };
+
     Survey.Form = {
         displayQuestions: function(params){
             toValidate = [];
@@ -353,13 +536,13 @@ if (typeof Survey === "undefined") {
                 if (lastSection !== s.id || s.everyPageText === '1') {
                     document.getElementById('headertext').style.display = 'block';
                 }
-				
                 if (lastSection !== s.id && s.questionsOnSectionPage !== '1') {
                     var span = document.createElement("div");
                     span.innerHTML = "<input type=button id='showQuestionsButton' value='Continue'>";
                     span.style.display = 'block';
                     
                     document.getElementById('survey-header').appendChild(span);
+                    
                     YAHOO.util.Event.addListener("showQuestionsButton", "click", function(){
                         document.getElementById('showQuestionsButton').style.display = 'none';
                         if (s.everyPageTitle !== '1') {
@@ -385,11 +568,16 @@ if (typeof Survey === "undefined") {
                 Survey.Form.addWidgets(qs);
             }
         },
-        
+
         addWidgets: function(qs){
             hasFile = false;
             for (var i = 0; i < qs.length; i++) {
                 var q = qs[i];
+                if (!q || !q.answers) {
+                    // gracefully handle q with no answers
+                    continue;
+                }
+                
                 var verts = '';
                 for (var x in q.answers) {
                     if (YAHOO.lang.hasOwnProperty(q.answers, x)) {
@@ -403,107 +591,106 @@ if (typeof Survey === "undefined") {
                     }
                 }
                 
-                //Check if this question should be validated
-                if (q.required) {
+                //Check if this question should be validated.
+                //Sliders can't really be not answered, so requiring them makes little sense.
+                if (q.required == true && q.questionType != 'Slider') {
                     toValidate[q.id] = [];
                     toValidate[q.id].type = q.questionType;
                     toValidate[q.id].answers = [];
                 }
-                
-                
-                if (multipleChoice[q.questionType]) {
-                    var butts = [];
-                    verb = 0;
-                    for (var j = 0; j < q.answers.length; j++) {
-                        var a = q.answers[j];
+               
+                if (DATE_SHORT[q.questionType]) {
+                    for (var k = 0; k < q.answers.length; k++) {
+                        var ans = q.answers[k];
                         if (toValidate[q.id]) {
-                            toValidate[q.id].answers[a.id] = 1;
+                            toValidate[q.id].type = q.questionType;
+                            toValidate[q.id].answers[ans.id] = 1;
                         }
-                        var b = document.getElementById(a.id + 'button');
-                        /*
-                         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
-                         value: a.id,
-                         container: a.id+"container", checked: false });
-                         */
-                        //                    b.on("click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
-                        //                    YAHOO.util.Event.addListener(a.id+'button', "click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
-                        if (a.verbatim) {
-                            verb = 1;
-                        }
-                        YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, [b, a.id, q.maxAnswers, butts, qs.length, a.id]);
-                        b.hid = a.id;
-                        butts.push(b);
                     }
+                    continue;
+                } 
+                
+                if (DATE_TYPES[q.questionType]) {
+                    for (var k = 0; k < q.answers.length; k++) {
+                        var ans = q.answers[k];
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].answers[ans.id] = 1;
+                        }
+                        var calid = ans.id + 'container';
+                        var c = new YAHOO.widget.Calendar(calid, {
+                            title: 'Choose a date:',
+                            close: true
+                        });
+                        c.selectEvent.subscribe(selectCalendar, [c, ans.id], true);
+                        c.render();
+                        c.hide();
+                        var btn = new YAHOO.widget.Button({
+                            label: "Select Date",
+                            id: "pushbutton" + ans.id,
+                            container: ans.id + 'button'
+                        });
+                        btn.on("click", showCalendar, [c]);
+                    }
+                    continue;
                 }
-                else 
-                    if (dateType[q.questionType]) {
-                        for (var k = 0; k < q.answers.length; k++) {
-                            var ans = q.answers[k];
-                            if (toValidate[q.id]) {
-                                toValidate[q.id].answers[ans.id] = 1;
-                            }
-                            var calid = ans.id + 'container';
-                            var c = new YAHOO.widget.Calendar(calid, {
-                                title: 'Choose a date:',
-                                close: true
-                            });
-                            c.selectEvent.subscribe(selectCalendar, [c, ans.id], true);
-                            c.render();
-                            c.hide();
-                            var btn = new YAHOO.widget.Button({
-                                label: "Select Date",
-                                id: "pushbutton" + ans.id,
-                                container: ans.id + 'button'
-                            });
-                            btn.on("click", showCalendar, [c]);
-                        }
+                
+                if (SLIDER_TYPES[q.questionType]) {
+                    //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
+                    var max = 0;
+                    if (q.questionType === 'Dual Slider - Range') {
+                        handleDualSliders(q);
                     }
-                    else 
-                        if (slider[q.questionType]) {
-                            //First run through and put up the span placeholders and find the max value for an answer, to know how big the allocation points will be.
-                            var max = 0;
-                            if (q.questionType === 'Dual Slider - Range') {
-                                handleDualSliders(q);
-                            }
-                            else {
-                                for (var s in q.answers) {
-                                    if (YAHOO.lang.hasOwnProperty(q.answers, s)) {
-                                        var a1 = q.answers[s];
-                                        YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
-                                        if (a1.max - a1.min > max) {
-                                            max = a1.max - a1.min;
-                                        }
-                                    }
-                                }
-                            }
-                            if (q.questionType === 'Multi Slider - Allocate') {
-                                //sliderManagers[sliderManagers.length] = new this.sliderManager(q,max);
-                                for (var x1 = 0; x1 < q.answers.length; x1++) {
-                                    if (toValidate[q.id]) {
-                                        toValidate[q.id].total = q.answers[x1].max;
-                                        toValidate[q.id].answers[q.answers[x1].id] = 1;
-                                    }
-                                }
-                                sliderManager(q, max);
-                            }
-                            else 
-                                if (q.questionType === 'Slider') {
-                                    handleSliders(q);
-                                }
+                    else {
+                        sliderManager(q);
+                    }
+                    continue;
+                }
+                
+                if (UPLOAD_TYPES[q.questionType]) {
+                    hasFile = true;
+                    continue;
+                }
+                
+                if (TEXT_TYPES[q.questionType]) {
+                    if (toValidate[q.id]) {
+                        toValidate[q.id].answers[q.answers[x].id] = 1;
+                    }
+                    continue;
+                }
+                if (NUMBER_TYPES[q.questionType]) {
+                    for (var x in q.answers) {
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
                         }
-                        
-                        else 
-                            if (fileUpload[q.questionType]) {
-                                hasFile = true;
-                            }
-                            
-                            else 
-                                if (text[q.questionType]) {
-                                    if (toValidate[q.id]) {
-                                        toValidate[q.id].answers[q.answers[x].id] = 1;
-                                    }
-                                }
+                        YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
+                    }
+                    continue;
+                }
+                // Must be a multi-choice bundle
+                var butts = [];
+                verb = 0;
+                for (var j = 0; j < q.answers.length; j++) {
+                    var a = q.answers[j];
+                    if (toValidate[q.id]) {
+                        toValidate[q.id].answers[a.id] = 1;
+                    }
+                    var b = document.getElementById(a.id + 'button');
+                    /*
+         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
+         value: a.id,
+         container: a.id+"container", checked: false });
+         */
+                    //                    b.on("click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+                    //                    YAHOO.util.Event.addListener(a.id+'button', "click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
+                    if (a.verbatim) {
+                        verb = 1;
+                    }
+                    YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, [b, a.id, q.maxAnswers, butts, qs.length, a.id]);
+                    b.hid = a.id;
+                    butts.push(b);
+                }
             }
+            YAHOO.util.Event.addListener("backbutton", "click", goBack);
             YAHOO.util.Event.addListener("submitbutton", "click", formsubmit);
         }
     };
@@ -515,3 +702,11 @@ YAHOO.util.Event.onDOMReady(function(){
     // Survey.Comm.setUrl('/' + document.getElementById('assetPath').value);
     Survey.Comm.callServer('', 'loadQuestions');
 });
+
+YAHOO.example.getDataTipText = function( item, index, series )
+{
+    var toolTipText = series.displayName + " for " + item.month;
+//    toolTipText += "\n" + YAHOO.example.formatCurrencyAxisLabel( item[series.yField] );
+    return toolTipText;
+}
+

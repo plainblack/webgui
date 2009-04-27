@@ -1,5 +1,7 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -63,6 +65,8 @@ checkModule("HTTP::Headers",                1.61         );
 checkModule("Test::More",                   0.61,      1 );
 checkModule("Test::MockObject",             1.02,      1 );
 checkModule("Test::Deep",                   0.095,     1 );
+checkModule("Test::Exception",              0.27,      1 );
+checkModule("Test::Class",                  0.30,      1 );
 checkModule("Pod::Coverage",                0.17,      2 );
 checkModule("Text::Balanced",               1.95,      1 );
 checkModule("Digest::MD5",                  2.20         );
@@ -79,19 +83,18 @@ checkModule("Net::POP3",                    2.28         );
 checkModule("Tie::IxHash",                  1.21         );
 checkModule("Tie::CPHash",                  1.001        );
 checkModule("XML::Simple",                  2.09         );
-checkModule("SOAP::Lite",                   0.60         );
 checkModule("DateTime",                     0.2901       );
 checkModule("Time::HiRes",                  1.38         );
 checkModule("DateTime::Format::Strptime",   1.0601       );
 checkModule("DateTime::Format::Mail",       0.2901       );
-checkModule("Image::Magick",                "6.0",     2 );
+checkModule("Image::Magick",                "6.0"        );
 checkModule("Log::Log4perl",                0.51         );
 checkModule("Net::LDAP",                    0.25         );
 checkModule("HTML::Highlight",              0.20         );
 checkModule("HTML::TagFilter",              0.07         );
 checkModule("HTML::Template",               2.9          );
 checkModule("HTML::Template::Expr",         0.05,      2 );
-checkModule("XML::FeedPP",                  0.36         );
+checkModule("XML::FeedPP",                  0.40         );
 checkModule("JSON",                         2.04         );
 checkModule("Config::JSON",                 "1.1.2"      );
 checkModule("Text::CSV_XS",                 "0.52"       );
@@ -118,7 +121,9 @@ checkModule("List::MoreUtils",              "0.22"       );
 checkModule("File::Path",                   "2.04"       );
 checkModule("Module::Find",                 "0.06"       );
 checkModule("Class::C3",                    "0.19"       );
+checkModule("Params::Validate",             "0.81"       );
 checkModule("GraphViz",                     "2.00"       );
+checkModule("Clone",                        "0.31"       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
@@ -394,6 +399,7 @@ sub prompt {
 __END__
 
 =head1 NAME
+
 testEnvironment - Test Perl environment for proper WebGUI support.
 
 =head1 SYNOPSIS
@@ -430,6 +436,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2008 Plain Black Corporation.
+Copyright 2001-2009 Plain Black Corporation.
 
 =cut

@@ -2,7 +2,7 @@ package WebGUI::Asset::Wobject::Poll;
 
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -192,7 +192,7 @@ sub freezeGraphConfig {
     my $self        = shift;
     my $obj         = shift;
     
-    return JSON::encode_json($obj);
+    return JSON::to_json($obj);
 }
 
 
@@ -404,7 +404,7 @@ sub thawGraphConfig {
     my $string      = shift;
     
     return unless $string;
-    return JSON::decode_json($string);
+    return JSON::from_json($string);
 }
 
 #-------------------------------------------------------------------

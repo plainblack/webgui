@@ -67,8 +67,8 @@ sub editSettingsForm {
 		name      => "userAccountLayoutTemplateId",
 		value     => $self->getLayoutTemplateId,
 		namespace => "Account/Layout",
-		label     => $i18n->get("layout template label"),
-        hoverHelp => $i18n->get("layout template hoverHelp")
+		label     => $i18n->get("user layout template label"),
+        hoverHelp => $i18n->get("user layout template hoverHelp")
     );
     $f->raw(q{<tr><td class="formDescription" colspan="2">&nbsp</td></tr>});
     $f->readOnly (

@@ -145,6 +145,7 @@ sub www_view {
     #Set the uid just in case;
     #$self->uid($userId);
 
+
     #Deal with sort order
     my $sortBy       = $session->form->get("sortBy") || "creationDate";
     my $sort_url     = ($sortBy)?";sortBy=$sortBy":"";
@@ -158,7 +159,7 @@ sub www_view {
     my $rpp_url      = ";rpp=$rpp";
     
     #Cache the base url
-    my $contribsUrl  =  $self->getUrl("module=contributions;do=view;uid=$userId");
+    my $contribsUrl  =  $self->getUrl(undef, 'appendUID');
 
     #Create sortBy headers
     $var->{'title_url'     } = $contribsUrl.";sortBy=title".$sortDir_url.$rpp_url;
@@ -176,6 +177,7 @@ sub www_view {
                 'WebGUI::Asset::Post',
                 'WebGUI::Asset::Wobject::GalleryAlbum',
                 'WebGUI::Asset::Event',
+                'WebGUI::Asset::WikiPage',
                 'WebGUI::Asset::Post::Thread',
             ],
             whereClause   => "asset.createdBy = '$userId' or assetData.ownerUserId = '$userId'",
@@ -195,8 +197,16 @@ sub www_view {
     my @contribs = ();
     foreach my $row ( @{$p->getPageData} ) {
         my $assetId    = $row->{assetId};
-        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId ); 
-        push(@contribs,$asset->get);
+        my $asset      = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        my $props      = $asset->get;
+        $props->{url}  = $asset->getUrl;
+        if (ref $asset eq "WebGUI::Asset::Post") {
+            $asset = $asset->getThread;
+            $props = $asset->get;
+            $props->{className} = "WebGUI::Asset::Post";
+        }
+        
+        push(@contribs,$props);
     }
     my $contribsCount  = $p->getRowCount;
 

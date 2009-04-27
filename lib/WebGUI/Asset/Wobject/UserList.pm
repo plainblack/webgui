@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::UserList;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -11,7 +11,6 @@ package WebGUI::Asset::Wobject::UserList;
 #-------------------------------------------------------------------
 
 use strict;
-use warnings;
 use HTML::Entities;
 use Tie::CPHash;
 use Tie::IxHash;
@@ -62,7 +61,7 @@ sub getAlphabetSearchLoop {
         my $htmlEncodedLetter = encode_entities($letter);
         my $searchURL = "?searchExact_".$fieldName."=".$letter."%25"; 
         my $hasResults;
-        my $users = $self->session->db->read("select userId from userProfileData where lastName like '".$letter."%'"); 
+        my $users = $self->session->db->read("select userId from userProfileData where `$fieldName` like '".$letter."%'"); 
         while (my $user = $users->hashRef){
             my $showGroupId = $self->get("showGroupId");
             if ($showGroupId eq '0' || ($showGroupId && $self->isInGroup($showGroupId,$user->{userId}))){
@@ -536,7 +535,7 @@ sub view {
 	my $users = $p->getPageData($paginatePage);
 	foreach my $user (@$users){
         my $userObject = WebGUI::User->new($self->session,$user->{userId});
-	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable($userObject)){
+	    if ($self->get('overridePublicProfile') || $userObject->profileIsViewable()) {
 		    my (@profileFieldValues);
 			my %userProperties;
 			foreach my $profileField (@profileFields){

@@ -1,7 +1,7 @@
 package WebGUI::Asset::Post;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -23,6 +23,7 @@ use WebGUI::HTMLForm;
 use WebGUI::Form::DynamicField;
 use WebGUI::International;
 use WebGUI::Inbox;
+use WebGUI::Macro;
 use WebGUI::Mail::Send;
 use WebGUI::Operation;
 use WebGUI::Paginator;
@@ -242,13 +243,13 @@ sub definition {
     my $properties = {
         storageId => {
             fieldType=>"image",
-            defaultValue=>undef,
+            defaultValue=>'',
             enforceSizeLimits => 0,
         },
         threadId => {
             noFormPost=>1,
             fieldType=>"hidden",
-            defaultValue=>undef
+            defaultValue=>'',
         },
         originalEmail => {
             noFormPost=>1,
@@ -548,11 +549,19 @@ sub getSynopsisAndContent {
 	my $synopsis = shift;
 	my $body = shift;
 	unless ($synopsis) {
-        	$body =~ s/\n/\^\-\;/ unless ($body =~ m/\^\-\;/);
-       	 	my @content = split(/\^\-\;/,$body);
-		$synopsis = WebGUI::HTML::filter($content[0],"all");
+           my @content;
+           if( $body =~ /\^\-\;/ ) {
+               @content = split(/\^\-\;/, $body ,2);
+           }
+           elsif( $body =~ /<p>/ ) {
+               @content = WebGUI::HTML::splitTag($body);
+           }
+           else {
+       	       @content = split("\n",$body);
+           }
+           shift @content if $content[0] =~ /^\s*$/;
+           $synopsis = WebGUI::HTML::filter($content[0],"all");
 	}
-	$body =~ s/\^\-\;/\n/;
 	return ($synopsis,$body);
 }
 
@@ -843,6 +852,7 @@ sub notifySubscribers {
         $var->{unsubscribeUrl} = $siteurl.$subscriptionAsset->getUnsubscribeUrl;
         $var->{unsubscribeLinkText} = $i18n->get("unsubscribe","Asset_Collaboration");
         my $message = $self->processTemplate($var, $cs->get("notificationTemplateId"));
+        WebGUI::Macro::process($self->session, \$message);
         my $groupId = $subscriptionAsset->get('subscriptionGroupId');
         my $mail = WebGUI::Mail::Send->create($self->session, {
 			from=>"<".$from.">",
@@ -919,30 +929,32 @@ sub paste {
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;	
-	my $i18n = WebGUI::International->new($self->session);
-	if ($self->session->form->process("assetId") eq "new") {
+    my $session = $self->session;
+    my $form    = $session->form;
+	my $i18n = WebGUI::International->new($session);
+	if ($form->process("assetId") eq "new") {
 		my %data = (
-			ownerUserId => $self->session->user->userId,
-			username => $self->session->form->process("visitorName") || $self->session->user->profileField("alias") || $self->session->user->username,
+			ownerUserId => $session->user->userId,
+			username => $form->process("visitorName") || $session->user->profileField("alias") || $session->user->username,
 			);
 		$self->update(\%data);
-		if ($self->getThread->getParent->canEdit) {
-			$self->getThread->lock if ($self->session->form->process('lock'));
-			$self->getThread->stick if ($self->session->form->process("stick"));
-		}
 	}
     # force the value to be empty so it gets updated properly by content
-    $self->update({synopsis => ($self->session->form->process("synopsis") || "")});
-	if ($self->session->form->process("archive") && $self->getThread->getParent->canModerate) {
+    $self->update({synopsis => ($form->process("synopsis") || "")});
+	if ($form->process("archive") && $self->getThread->getParent->canModerate) {
 		$self->getThread->archive;
 	} elsif ($self->getThread->get("status") eq "archived") {
 		$self->getThread->unarchive;
 	}
-    if ($self->session->form->process("subscribe")) {
+    if ($form->process("subscribe")) {
         $self->getThread->subscribe;
     }
     else {
         $self->getThread->unsubscribe;
+    }
+    if ($self->getThread->getParent->canEdit) {
+        $form->process('isLocked') ?  $self->getThread->lock  : $self->getThread->unlock;
+        $form->process('isSticky') ?  $self->getThread->stick : $self->getThread->unstick;
     }
 	delete $self->{_storageLocation};
 	$self->postProcess;
@@ -958,7 +970,9 @@ sub postProcess {
     my $spamStopWords = $self->session->config->get('spamStopWords');
     if (ref $spamStopWords eq 'ARRAY') {
         my $spamRegex = join('|',@{$spamStopWords});
+        $spamRegex =~ s/\s/\\ /g;
         if ($data{content} =~ m/$spamRegex/xmsi) {
+            $data{skipNotification} = 1;
             $self->trash;
         }
     }
@@ -1218,14 +1232,16 @@ sub www_edit {
     
 	my (%var, $content, $title, $synopsis);
 	my $i18n = WebGUI::International->new($session);
+
+
+    my $className = $form->process("class","className") || $self->get('className');
 	if ($func eq "add" || ($func eq "editSave" && $form->process("assetId") eq "new")) { # new post
-        #Add Form Header for all new posts
-        my $className = $form->process("class","className");
         #Post to the parent if this is a new request
         my $action    = $self->getParent->getUrl;
         #Post to self if there was an error Posting to a Thread (not a Collaboration)
         $action       = $self->getUrl if($func eq "editSave" && $className ne "WebGUI::Asset::Post::Thread");
         
+        #Add Form Header for all new posts
         $var{'form.header'} = WebGUI::Form::formHeader($session,{
             action=>$action
         });
@@ -1293,16 +1309,6 @@ sub www_edit {
 			return $privilege->insufficient() unless ($self->getThread->getParent->canPost);
 			$var{'isThread'    } = 1;
 			$var{'isNewThread' } = 1;
-            if ($self->getThread->getParent->canEdit) {
-                $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
-                    name=>'stick',
-                    value=>$form->process("stick")
-                });
-                $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
-                    name=>'lock',
-                    value=>$form->process('lock')
-                });
-			}
             my $subscribe = $form->process("subscribe");
 			$var{'subscribe.form'} = WebGUI::Form::yesNo($session, {
 				name=>"subscribe",
@@ -1418,6 +1424,17 @@ sub www_edit {
         value=>$content,
         richEditId=>$self->getThread->getParent->get("richEditor")
     });
+    ##Edit variables just for Threads
+    if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {
+        $var{'sticky.form'} = WebGUI::Form::yesNo($session, {
+            name=>'isSticky',
+            value=>$form->process('isSticky') || $self->get('isSticky'),
+        });
+        $var{'lock.form'  } = WebGUI::Form::yesNo($session, {
+            name=>'isLocked',
+            value=>$form->process('isLocked') || $self->get('isLocked'),
+        });
+    }
 	$var{'form.submit'} = WebGUI::Form::submit($session, {
         extras=>"onclick=\"this.value='".$i18n->get(452)."'; this.form.func.value='editSave';return true;\""
 	});

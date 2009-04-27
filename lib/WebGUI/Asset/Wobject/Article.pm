@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Article;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -144,6 +144,12 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 duplicate ( )
+
+Extend the super class to duplicate the storage location.
+
+=cut
+
 sub duplicate {
 	my $self = shift;
 	my $newAsset = $self->SUPER::duplicate(@_);
@@ -169,6 +175,14 @@ sub exportAssetData {
 
 
 #-------------------------------------------------------------------
+
+=head2 getStorageLocation ( )
+
+Fetches the storage location for this asset.  If it does not have one,
+then make one.  Build an internal cache of the storage object.
+
+=cut
+
 sub getStorageLocation {
 	my $self = shift;
 	unless (exists $self->{_storageLocation}) {
@@ -223,6 +237,13 @@ sub prepareView {
 
 #-------------------------------------------------------------------
 
+=head2 processPropertiesFromFormPost ( )
+
+Extend the super class to calculate total asset size from
+any files stored in the storage location.
+
+=cut
+
 sub processPropertiesFromFormPost {
     my $self = shift;
     $self->SUPER::processPropertiesFromFormPost(@_);
@@ -235,6 +256,38 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 update ( )
+
+Extend the super class to handle the storage location.  Sets
+the correct privileges and deletes the internally cached
+Storage object.
+
+=cut
+
+sub update {
+    my $self = shift;
+    my $previousStorageId = $self->get('storageId');
+    $self->SUPER::update(@_);
+    ##update may have entered a new storageId.  Reset the cached one just in case.
+    if ($self->get("storageId") ne $previousStorageId) {
+        delete $self->{_storageLocation};
+    }
+    $self->getStorageLocation->setPrivileges(
+        $self->get("ownerUserId"),
+        $self->get("groupIdView"),
+        $self->get("groupIdEdit"),
+    );
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 purge ( )
+
+Extend the super class to delete all storage locations.
+
+=cut
 
 sub purge {
         my $self = shift;
@@ -263,6 +316,12 @@ sub purgeCache {
 
 #-------------------------------------------------------------------
 
+=head2 purgeRevision ( )
+
+Extend the super class to delete the storage location for this revision.
+
+=cut
+
 sub purgeRevision {
         my $self = shift;
         $self->getStorageLocation->delete;
@@ -280,7 +339,8 @@ returns the output.
 
 sub view {
 	my $self = shift;
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		my $out = WebGUI::Cache->new($self->session,"view_".$self->getId)->get;
 		return $out if $out;
 	}
@@ -332,7 +392,7 @@ sub view {
 	$var{"description.first.2sentences"} =~ s/^((.*?\.){2}).*/$1/s;
 	$var{"description.first.sentence"} = $var{"description.first.2sentences"};
 	$var{"description.first.sentence"} =~ s/^(.*?\.).*/$1/s;
-	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,1);
+	my $p = WebGUI::Paginator->new($self->session,$self->getUrl,1,$self->paginateVar);
 	if ($self->session->form->process("makePrintable") || $var{description} eq "") {
 		$var{description} =~ s/\^\-\;//g;
 		$p->setDataByArrayRef([$var{description}]);
@@ -343,10 +403,25 @@ sub view {
 	}
 	$p->appendTemplateVars(\%var);
        	my $out = $self->processTemplate(\%var,undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") && !$self->session->form->process("pn") && !$self->session->form->process("makePrintable")) {
+	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10 && !$self->session->form->process("overrideTemplateId") &&
+            !$self->session->form->process($self->paginateVar) && !$self->session->form->process("makePrintable")) {
 		WebGUI::Cache->new($self->session,"view_".$self->getId)->set($out,$self->get("cacheTimeout"));
 	}
        	return $out;
+}
+
+#-------------------------------------------------------------------
+
+=head2 paginateVar ( )
+
+create a semi-unique variable for pagination based on the Asset Id
+
+=cut
+
+sub paginateVar {
+     my $self = shift;
+     my $id = $self->getId();
+     return 'pn' . substr($id,0,2) . substr($id,-2,2) ;
 }
 
 #-------------------------------------------------------------------

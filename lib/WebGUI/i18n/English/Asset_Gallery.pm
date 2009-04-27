@@ -127,6 +127,7 @@ our $I18N = {
         lastUpdated => 0,
         context     => 'Label for button to submit search form',
     },
+
     "templateIdAddArchive label" => {
         message     => "Template to Add Multiple",
         lastUpdated => 0,
@@ -480,8 +481,8 @@ our $I18N = {
     },
 
     'helpvar albums rss' => {
-        message     => 'This is the loop over the albums being currently displayed.',
-        lastUpdated => 0,
+        message     => 'A loop containing an RSS feed for albums in the gallery.',
+        lastUpdated => 1231287030,
     },
 
     'helpvar rssDate' => {
@@ -671,9 +672,15 @@ our $I18N = {
     },
 
     'template listFilesForUser albums title' => {
-        message     => q{Albums},
-        lastUpdated => 0,
+        message     => q{My Albums},
+        lastUpdated => 1230576660,
         context     => q{Title for list of user's Albums},
+    },
+
+    'template listFilesForUser pictures title' => {
+        message     => q{My Pictures},
+        lastUpdated => 1230576660,
+        context     => q{Title for list of user's Pictures},
     },
 
     'template listFilesForUser albums files' => {
@@ -719,8 +726,8 @@ our $I18N = {
     },
 
     'imageDensity description' => {
-        message     => q{The density of the image. Print-quality images are more than three times the size of web-quality images.},
-        lastUpdated => 0,
+        message     => q{The density of the image. Print-quality images are more than three times the resolution of web-quality images.},
+        lastUpdated => 1231764657,
         context     => q{Description of asset property},
     },
 
@@ -735,6 +742,25 @@ our $I18N = {
         lastUpdated => 0,
         context     => q{Option label for 300 pixels-per-inch images, good for printing images},
     },
+
+    'template listAlbumsRss' => {
+        message     => 'Subscribe',
+        lastUpdated => 1237403207,
+        context     => 'Label for link to RSS feed.',
+    },
+
+    'template search basic title' => {
+        message     => 'Search Gallery',
+        lastUpdated => 1237403442,
+        context     => 'Title for basic search form in page.',
+    },
+
+    'template search basic term' => {
+        message     => 'Search Term',
+        lastUpdated => 1237403498,
+        context     => 'Title for basic search term field in page.',
+    },
+
 };
 
 1;

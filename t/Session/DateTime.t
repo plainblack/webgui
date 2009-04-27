@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -213,15 +213,15 @@ cmp_ok(
 #
 ####################################################
 
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2)),   "2 years", "secondsToInterval(), years");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 years", "secondsToInterval(), years, rounded down");
-is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 years", "secondsToInterval(), years, rounded up");
-is(join(" ",$dt->secondsToInterval(60*60*24*363)), "12 months",  "secondsToInterval(), months");
-is(join(" ",$dt->secondsToInterval(60*60*24*7*3)), "3 weeks",    "secondsToInterval(), weeks");
-is(join(" ",$dt->secondsToInterval(60*60*24*5)),   "5 days",     "secondsToInterval(), days");
-is(join(" ",$dt->secondsToInterval(60*60*18)),     "18 hours",   "secondsToInterval(), hours");
-is(join(" ",$dt->secondsToInterval(60*27)),        "27 minutes", "secondsToInterval(), minutes");
-is(join(" ",$dt->secondsToInterval(59)),           "59 seconds", "secondsToInterval(), seconds");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2)),   "2 Year(s)", "secondsToInterval(), years");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.4)), "2 Year(s)", "secondsToInterval(), years, rounded down");
+is(join(" ",$dt->secondsToInterval(60*60*24*365*2.9)), "3 Year(s)", "secondsToInterval(), years, rounded up");
+is(join(" ",$dt->secondsToInterval(60*60*24*363)), "12 Month(s)",  "secondsToInterval(), months");
+is(join(" ",$dt->secondsToInterval(60*60*24*7*3)), "3 Week(s)",    "secondsToInterval(), weeks");
+is(join(" ",$dt->secondsToInterval(60*60*24*5)),   "5 Day(s)",     "secondsToInterval(), days");
+is(join(" ",$dt->secondsToInterval(60*60*18)),     "18 Hour(s)",   "secondsToInterval(), hours");
+is(join(" ",$dt->secondsToInterval(60*27)),        "27 Minute(s)", "secondsToInterval(), minutes");
+is(join(" ",$dt->secondsToInterval(59)),           "59 Second(s)", "secondsToInterval(), seconds");
 
 ####################################################
 #

@@ -1,5 +1,7 @@
+#!/usr/bin/env perl
+
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -16,13 +18,21 @@ BEGIN {
 }
 
 use strict;
-use DBI;
-use File::Path;
-use Getopt::Long;
-use Pod::Usage;
-use WebGUI::Config;
-use WebGUI::Session;
-use WebGUI::Utility;
+use Cwd ();
+use File::Path ();
+use Getopt::Long ();
+use Pod::Usage ();
+
+foreach my $libDir ( readLines( "$webguiRoot/sbin/preload.custom" ) ) {
+    if ( !-d $libDir ) {
+        warn "WARNING: Not adding lib directory '$libDir' from $webguiRoot/sbin/preload.custom: Directory does not exist.\n";
+        next;
+    }
+    unshift @INC, $libDir;
+}
+
+require WebGUI::Config;
+require WebGUI::Session;
 
 my $help;
 my $history;
@@ -36,7 +46,7 @@ my $skipDelete;
 my $skipMaintenance;
 my $doit;
 
-GetOptions(
+Getopt::Long::GetOptions(
         'help'=>\$help,
         'history'=>\$history,
         'override'=>\$override,
@@ -50,8 +60,8 @@ GetOptions(
 	'skipbackup'=>\$skipBackup
 );
 
-pod2usage( verbose => 2 ) if $help;
-pod2usage() unless $doit;
+Pod::Usage::pod2usage( verbose => 2 ) if $help;
+Pod::Usage::pod2usage() unless $doit;
 
 unless ($doit) {
 	print <<STOP;
@@ -132,10 +142,10 @@ foreach my $filename (keys %{$configs}) {
 			unless ($skipDelete) {
 				print "\tDeleting temp files.\n" unless ($quiet);
 				my $path = $configs->{$filename}->get("uploadsPath").$slash."temp";
-				rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
+				File::Path::rmtree($path) unless ($path eq "" || $path eq "/" || $path eq "/data");
 				print "\tDeleting file cache.\n" unless ($quiet);
 				$path = $configs->{$filename}->get("fileCacheRoot")||"/tmp/WebGUICache";
-				rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
+				File::Path::rmtree($path)  unless ($path eq "" || $path eq "/" || $path eq "/data");
 			}
 		}
 		$session->close();
@@ -188,9 +198,11 @@ foreach my $file (@files) {
 print "\nREADY TO BEGIN UPGRADES\n" unless ($quiet);
 
 my $notRun = 1;
-			
-chdir($upgradesPath);
+
+
+my $currentPath = Cwd::getcwd();
 foreach my $filename (keys %config) {
+    chdir($upgradesPath);
 	my $clicmd = $config{$filename}{mysqlCLI} || $mysql;
 	my $dumpcmd = $config{$filename}{mysqlDump} || $mysqldump;
 	my $backupTo = $config{$filename}{backupPath} || $backupDir;
@@ -243,11 +255,14 @@ foreach my $filename (keys %config) {
                 print "\tProcessing upgrade executable failed!\n";
                 fatalError();
             }
+            ##Do a dummy load of the config
+            WebGUI::Config->clearCache();
 		}
 		$config{$filename}{version} = $upgrade{$upgrade}{to};
 		$notRun = 0;
-                sleep 1; # Sleep a second to avoid adding asset revisions too quickly
+        sleep 1; # Sleep a second to avoid adding asset revisions too quickly
 	}
+    chdir($currentPath);
 	my $session = WebGUI::Session->open($webguiRoot,$filename);
 	print "\tSetting site upgrade completed..." unless ($quiet);
 	$session->setting->remove('specialState');
@@ -362,6 +377,22 @@ sub _parseDSN {
      return $hash;
 }
 
+sub readLines {
+    my $file = shift;
+    my @lines;
+    if (open(my $fh, '<', $file)) {
+        while (my $line = <$fh>) {
+            $line =~ s/#.*//;
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
+            next if !$line;
+            push @lines, $line;
+        }
+        close $fh;
+    }
+    return @lines;
+}
+
 __END__
 
 =head1 NAME
@@ -472,6 +503,6 @@ Shows this documentation, then exits.
 
 =head1 AUTHOR
 
-Copyright 2001-2008 Plain Black Corporation.
+Copyright 2001-2009 Plain Black Corporation.
 
 =cut

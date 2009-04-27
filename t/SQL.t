@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -164,7 +164,7 @@ SKIP: {
 
 	skip("No InnoDB tables in this MySQL.  Skipping all transaction related tests.",7) if (lc $mysqlVariables{have_innodb} ne 'yes');
     $session->db->dbh->do('DROP TABLE IF EXISTS testTable');
-    $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
+    $session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message CHAR(64), PRIMARY KEY(myIndex)) TYPE=InnoDB');
 
     my $dbh2 = WebGUI::SQL->connect($session,$session->config->get("dsn"), $session->config->get("dbuser"), $session->config->get("dbpass"));
     my ($sth, $sth2, $rc);
@@ -215,7 +215,7 @@ SKIP: {
 
 }
 
-$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message varchar(64), myKey varchar(32), PRIMARY KEY(myIndex))');
+$session->db->dbh->do('CREATE TABLE testTable (myIndex int(8) NOT NULL default 0, message CHAR(64), myKey varchar(32), PRIMARY KEY(myIndex))');
 
 my @tableData = (
 	[ 0, 'zero',  'A' ],

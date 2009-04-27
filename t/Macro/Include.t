@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -28,6 +28,7 @@ my $spectreConf = WebGUI::Test->root . '/etc/spectre.conf';
 my $goodFile = 'The contents of this file are accessible';
 my $twoLines = "This file contains two lines of text\nThis is the second line";
 my $storage = WebGUI::Storage->createTemp($session);
+WebGUI::Test->storagesToDelete($storage);
 $storage->addFileFromScalar('goodFile', $goodFile);
 $storage->addFileFromScalar('twoLines', $twoLines);
 $storage->addFileFromScalar('unreadableFile', 'The contents of this file are not readable');
@@ -112,5 +113,4 @@ SKIP: {
 }
 
 END {
-	$storage->delete;
 }

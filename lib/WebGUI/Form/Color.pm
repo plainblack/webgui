@@ -3,7 +3,7 @@ package WebGUI::Form::Color;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -40,12 +40,12 @@ The following methods are specifically available from this class. Check the supe
 
 =head2  getDatabaseFieldType ( )
 
-Returns "VARCHAR(7)".
+Returns "CHAR(7)".
 
 =cut 
 
 sub getDatabaseFieldType {
-    return "VARCHAR(7)";
+    return "CHAR(7)";
 }
 
 #-------------------------------------------------------------------

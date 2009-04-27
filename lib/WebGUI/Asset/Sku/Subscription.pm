@@ -3,7 +3,7 @@ package WebGUI::Asset::Sku::Subscription;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -99,6 +99,14 @@ sub definition {
 			label           => $i18n->get("template"),
 			hoverHelp       => $i18n->get("template help"),
 		},
+        redeemSubscriptionCodeTemplateId => {
+            tab             => "display",
+            fieldType       => "template",
+            namespace       => "Operation/RedeemSubscription",
+            defaultValue    => 'PBtmpl0000000000000053',
+            label           => $i18n->get("redeem subscription code template"),
+            hoverHelp       => $i18n->get("redeem subscription code template help"),
+        },
         thankYouMessage => {
             tab             => "properties",
 			defaultValue    => $i18n->get("default thank you message"),
@@ -257,6 +265,27 @@ sub generateSubscriptionCodeBatch {
 	}
 
     return $batchId;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAddToCartForm ( )
+
+Returns a form to add this Sku to the cart.  Used when this Sku is part of
+a shelf.  Override master class to add different form.
+
+=cut
+
+sub getAddToCartForm {
+    my $self    = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($session, 'Asset_Subscription');
+    return
+        WebGUI::Form::formHeader($session, {action => $self->getUrl})
+      . WebGUI::Form::hidden(    $session, {name => 'func', value => 'purchaseSubscription'})
+      . WebGUI::Form::submit(    $session, {value => $i18n->get('purchase button')})
+      . WebGUI::Form::formFooter($session)
+      ;
 }
 
 #-------------------------------------------------------------------
@@ -925,7 +954,7 @@ sub www_listSubscriptionCodes {
 
 #-------------------------------------------------------------------
 
-=head2 wwww_purchaseSubscription
+=head2 www_purchaseSubscription
 
 Add this subscription to the cart.
 
@@ -980,7 +1009,7 @@ sub www_redeemSubscriptionCode {
 	$f->submit;
 	$var->{ codeForm } = $f->print;
 
-    return $self->processStyle($self->processTemplate($var, 'PBtmpl0000000000000053'));
+    return $self->processStyle($self->processTemplate($var, $self->get('redeemSubscriptionCodeTemplateId')));
 }
 
 1;

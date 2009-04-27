@@ -147,7 +147,7 @@ An address object's unique id.
 
 sub getAddress {
     my ($self, $addressId) = @_;
-    my $id = ref $self;
+    my $id = id $self;
     unless (exists $addressCache{$id}{$addressId}) {
         $addressCache{$id}{$addressId} = WebGUI::Shop::Address->new($self, $addressId);
     }
@@ -502,14 +502,18 @@ sub www_view {
     my $form = $session->form;
     my $callback = $form->get('callback');
     $callback =~ s/'/"/g;
-    $callback = JSON->new->utf8->decode($callback);
+    $callback = JSON->new->decode($callback);
     my $callbackForm = '';
     foreach my $param (@{$callback->{params}}) {
         $callbackForm .= WebGUI::Form::hidden($session, {name=>$param->{name}, value=>$param->{value}});
     }
     my $i18n = WebGUI::International->new($session, "Shop");
     my @addresses = ();
-    foreach my $address (@{$self->getAddresses}) {
+    my @availableAddresses = @{ $self->getAddresses };
+    if (! @availableAddresses ) {
+        return $self->www_editAddress;
+    }
+    foreach my $address (@availableAddresses) {
         push(@addresses, {
             %{$address->get},
             address         => $address->getHtmlFormatted,

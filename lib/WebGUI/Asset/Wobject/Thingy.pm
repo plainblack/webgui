@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::Thingy;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -19,6 +19,7 @@ use WebGUI::Text;
 use WebGUI::Form::File;
 use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
+use Data::Dumper;
 
 
 #-------------------------------------------------------------------
@@ -129,13 +130,13 @@ sub addThing {
     }
 
     $db->write("create table ".$db->dbh->quote_identifier("Thingy_".$newThingId)."(
-        thingDataId varchar(22) binary not null,
+        thingDataId CHAR(22) binary not null,
         dateCreated int not null,
-        createdById varchar(22) not null,
-        updatedById varchar(22) not null,
-        updatedByName varchar(255) not null,
+        createdById CHAR(22) not null,
+        updatedById CHAR(22) not null,
+        updatedByName CHAR(255) not null,
         lastUpdated int not null,
-        ipAddress varchar(255),
+        ipAddress CHAR(255),
         primary key (thingDataId)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
     
@@ -200,6 +201,38 @@ sub canViewThing {
 
 #-------------------------------------------------------------------
 
+=head2 badOtherThing ( tableName, fieldName )
+
+Checks that the table and field for the other Thing are okay.  Returns 0 if okay,
+otherwise, returns an i18n message appropriate for the type of error, like the
+table or the field in the table not existing.
+
+=head3 tableName
+
+The table name for the other thing.
+
+=head3 fieldName
+
+The field in the other thing to check for.
+
+=cut
+
+sub badOtherThing {
+    my ($self, $tableName, $fieldName) = @_;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my $i18n    = WebGUI::International->new($session, 'Asset_Thingy');
+    my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);
+    return $i18n->get('other thing missing message') unless $otherThingTableExists;
+    my ($otherThingFieldExists) = $db->quickArray(
+        sprintf('show columns from %s like ?', $db->dbh->quote_identifier($tableName)),
+        [$fieldName]);
+    return $i18n->get('other thing field missing message') unless $otherThingFieldExists;
+    return undef;
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( )
 
 defines wobject properties for Thingy instances. If you choose to "autoGenerateForms", the
@@ -259,18 +292,43 @@ sub duplicate {
     my $assetId = $self->get("assetId");
     my $fields;
 
+    my $otherThingFields = $db->buildHashRefOfHashRefs(
+        "select fieldType, fieldId, right(fieldType,22) as otherThingId, fieldInOtherThingId from Thingy_fields
+        where fieldType like 'otherThing_%' and assetId = ?",
+        [$assetId],'fieldInOtherThingId'
+    );
+
     my $things = $self->getThings;
     while ( my $thing = $things->hashRef) {
-        my $oldThingId = $thing->{thingId};
-        my $newThingId = $newAsset->addThing($thing,0);
+        my $oldSortBy   = $thing->{sortBy};
+        my $oldThingId  = $thing->{thingId};
+        my $newThingId  = $newAsset->addThing($thing,0);
         $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
             ,[$assetId,$oldThingId]);
         foreach my $field (@$fields) {
             # set thingId to newly created thing's id.
             $field->{thingId} = $newThingId;
+        
+            my $originalFieldId = $field->{fieldId};
 
-            $newAsset->addField($field,0);
+            my $newFieldId = $newAsset->addField($field,0);
+            if ($originalFieldId eq $oldSortBy){
+                $self->session->db->write( "update Thingy_things set sortBy = ? where thingId = ?",
+                    [ $newFieldId, $newThingId ] );
+            }
+
+            if ($otherThingFields->{$originalFieldId}){
+                $otherThingFields->{$originalFieldId}->{newFieldType}   = 'otherThing_'.$newThingId;
+                $otherThingFields->{$originalFieldId}->{newFieldId}     = $newFieldId;
+            }
         }
+    }
+    foreach my $otherThingField (keys %$otherThingFields){
+        $db->write('update Thingy_fields set fieldType = ?, fieldInOtherThingId = ?
+                    where fieldInOtherThingId = ? and assetId = ?',
+                    [$otherThingFields->{$otherThingField}->{newFieldType},
+                    $otherThingFields->{$otherThingField}->{newFieldId},
+                    $otherThingFields->{$otherThingField}->{fieldInOtherThingId}, $newAsset->get('assetId')]);
     }
     return $newAsset;
 }
@@ -296,7 +354,7 @@ sub duplicateThing {
     my $thingProperties = $self->getThing($oldThingId);
     $thingProperties->{thingId} = 'new';
     $thingProperties->{label}   = $thingProperties->{label}.' (copy)';
-    
+
     my $newThingId = $self->addThing($thingProperties);
     my $fields = $db->buildArrayRefOfHashRefs('select * from Thingy_fields where assetId=? and thingId=?'
             ,[$self->getId,$oldThingId]);
@@ -309,6 +367,7 @@ sub duplicateThing {
     return $newThingId;
 
 }
+
 
 #-------------------------------------------------------------------
 
@@ -593,7 +652,7 @@ sub _getDbDataType {
     my ($dbDataType, $formClass);
 
     if ($fieldType =~ m/^otherThing/x){
-        $dbDataType = "varchar(22)";
+        $dbDataType = "CHAR(22)";
     }
     else{
         $formClass   = 'WebGUI::Form::' . ucfirst $fieldType;
@@ -843,10 +902,11 @@ sub getFieldValue {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $self->session->db->quickArray('show tables like ?',[$tableName]);
-        if ($otherThingTableExists){
+        my $fieldName = 'field_'.$field->{fieldInOtherThingId};
+        my $badThing  = $self->badOtherThing($tableName, $fieldName);
+        if (! $badThing){
             ($processedValue) = $self->session->db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$field->{fieldInOtherThingId})
+                .$dbh->quote_identifier($fieldName)
                 .' from '.$dbh->quote_identifier($tableName)
                 .' where thingDataId = ?',[$value]);
         }
@@ -880,9 +940,10 @@ sub getFormElement {
     my $self = shift;
     my $data = shift;
     my %param;
-    my $db = $self->session->db;
+    my $session = $self->session;
+    my $db = $session->db;
     my $dbh = $db->dbh;
-    my $i18n = WebGUI::International->new($self->session,"Asset_Thingy");
+    my $i18n = WebGUI::International->new($session,"Asset_Thingy");
 
     $param{name} = "field_".$data->{fieldId};
     my $name = $param{name};
@@ -905,7 +966,7 @@ sub getFormElement {
     if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
         my @defaultValues;
         if ($self->session->form->param($name)) {
-            @defaultValues = $self->session->form->selectList($name);
+            @defaultValues = $session->form->selectList($name);
         }
         else {
             foreach (split(/\n/x, $data->{value})) {
@@ -921,7 +982,7 @@ sub getFormElement {
     if ($class->isa('WebGUI::Form::List')) {
         delete $param{size};
 
-        my $values = WebGUI::Operation::Shared::secureEval($self->session,$data->{possibleValues});
+        my $values = WebGUI::Operation::Shared::secureEval($session,$data->{possibleValues});
         if (ref $values eq 'HASH') {
             $param{options} = $values;
         }
@@ -949,30 +1010,30 @@ sub getFormElement {
         my $otherThingId = $data->{fieldType}; 
         $otherThingId =~ s/^otherThing_(.*)/$1/x;
         $param{fieldType} = "SelectList"; 
+        $class = 'WebGUI::Form::'. $param{fieldType};
         my $options = ();
+
         my $tableName = 'Thingy_'.$otherThingId;
-        my ($otherThingTableExists) = $db->quickArray('show tables like ?',[$tableName]);  
-        if ($otherThingTableExists){
-            $options = $db->buildHashRef('select thingDataId, '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-                .' from '.$dbh->quote_identifier($tableName));
-        
-            my $value = $data->{value} || $data->{defaultValue};
-            ($param{value}) = $db->quickArray('select '
-                .$dbh->quote_identifier('field_'.$data->{fieldInOtherThingId})
-                .' from '.$dbh->quote_identifier($tableName)
-                .' where thingDataId = ?',[$value]);
-        }
-        else{
-            return $i18n->get('other thing missing message');
-        }
+        my $fieldName = 'field_'.$data->{fieldInOtherThingId};
+        my $errorMessage = $self->badOtherThing($tableName, $fieldName);
+        return $errorMessage if $errorMessage;
+
+        $options = $db->buildHashRef('select thingDataId, '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName));
+    
+        my $value = $data->{value} || $data->{defaultValue};
+        ($param{value}) = $db->quickArray('select '
+            .$dbh->quote_identifier($fieldName)
+            .' from '.$dbh->quote_identifier($tableName)
+            .' where thingDataId = ?',[$value]);
         $param{size} = 1;
         $param{multiple} = 0;
         $param{options} = $options;
         $param{value} = $data->{value} || $data->{defaultValue};
     }
 
-    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$self->session, \%param ])};
+    my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
     return $formElement->toHtml();
 
 }
@@ -1444,7 +1505,7 @@ sub www_deleteFieldConfirm {
 
 #-------------------------------------------------------------------
 
-=head2 www_deleteFieldConfirm ( )
+=head2 www_duplicateThing ( )
 
 Duplicates a Thing.
 
@@ -1542,7 +1603,7 @@ sub www_deleteThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -1553,11 +1614,11 @@ sub www_deleteThingDataViaAjax {
         $self->deleteThingData($thingId,$thingDataId);
 
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode({message => "Data with thingDataId $thingDataId was deleted."});
+        return JSON->new->encode({message => "Data with thingDataId $thingDataId was deleted."});
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you specified can not be found."});
+        return JSON->new->encode({message => "The thingId you specified can not be found."});
     }
 }
 
@@ -1721,6 +1782,9 @@ sub www_editThing {
         if ($field->{fieldType} eq "File"){
             $formElement = "<input type='file' name='file'>";
         }
+        if ($field->{fieldType} eq "Image"){
+            $formElement = "<input type='file' name='image'>";
+        }
         else{
             $formElement = $self->getFormElement($field);     
         }
@@ -1739,9 +1803,9 @@ sub www_editThing {
             ."?func=editField;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}."')\" value='Edit' type='button'>"
             ." <input onClick=\"editListItem('".$self->session->url->page()
             ."?func=editField;copy=1;fieldId=".$field->{fieldId}.";thingId=".$thingId."','".$field->{fieldId}
-            ."','copy')\" value='Copy' type='button'>" 
+            ."','copy')\" value='Copy' type='button'>"
             ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$field->{fieldId}."','".$thingId."')\" " 
-            ."value='Delete' type='button'></td>\n</tr>\n</table>\n</li>\n";
+            ."value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>\n</li>\n";
 
         $fieldsViewScreen .= "<tr id='view_tr_".$field->{fieldId}."'>"
             ."<td class='formDescription' style='width:180px;' id='view_label_".$field->{fieldId}."'>".$field->{label}
@@ -2162,6 +2226,9 @@ sub www_editFieldSave {
     if ($properties{fieldType} eq "File"){ 
         $formElement = "<input type='file' name='file'>";
     }
+    elsif ($properties{fieldType} eq "Image"){ 
+        $formElement = "<input type='file' name='image'>";
+    }
     else{
         $formElement = $self->getFormElement(\%properties);
     }
@@ -2175,12 +2242,9 @@ sub www_editFieldSave {
     $listItemHTML = "<table>\n<tr>\n<td style='width:100px;' valign='top' class='formDescription'>".$label."</td>\n"
         ."<td style='width:370px;'>".$formElement."</td>\n"
         ."<td style='width:120px;' valign='top'> <input onClick=\"editListItem('".$self->session->url->page()
-        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='Edit' type='button'>"
-        ." <input onClick=\"editListItem('".$self->session->url->page()
-            ."?func=editField;copy=1;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId
-            ."','copy')\" value='Copy' type='button'>"
+        ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
         ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
-        ."','".$properties{thingId}."')\" value='Delete' type='button'></td>\n</tr>\n</table>";
+        ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";
@@ -2487,7 +2551,7 @@ sub www_editThingDataSaveViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2499,19 +2563,19 @@ sub www_editThingDataSaveViaAjax {
 
         if($thingDataId eq 'new' && $self->hasEnteredMaxPerUser($thingId)){
             $session->http->setStatus("400", "Bad Request");
-            return JSON->new->utf8->encode({message => $i18n->get("has entered max per user message")});
+            return JSON->new->encode({message => $i18n->get("has entered max per user message")});
         }
 
     	my ($newThingDataId,$errors) = $self->editThingDataSave($thingId,$thingDataId);
 
     	if ($errors){
 	    $session->http->setStatus("400", "Bad Request");
-            return JSON->new->utf8->encode($errors);
+            return JSON->new->encode($errors);
     	}
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2600,7 +2664,7 @@ sub www_getThingViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't return thing properties without a thingId."});
+        return JSON->new->encode({message => "Can't return thing properties without a thingId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -2618,11 +2682,11 @@ sub www_getThingViaAjax {
         $thingProperties->{field_loop} = \@field_loop;
         
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode($thingProperties);
+        return JSON->new->encode($thingProperties);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -2652,11 +2716,11 @@ sub www_getThingsViaAjax {
         }
     }
     if (scalar @visibleThings > 0){
-        return JSON->new->utf8->encode(\@visibleThings);
+        return JSON->new->encode(\@visibleThings);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "No visible Things were found in this Thingy."});
+        return JSON->new->encode({message => "No visible Things were found in this Thingy."});
     }
 }
 
@@ -3016,7 +3080,7 @@ sub www_searchViaAjax {
 
     unless ($thingId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't perform search without a thingId."});
+        return JSON->new->encode({message => "Can't perform search without a thingId."});
     }
 
     if ($thingProperties->{thingId}){
@@ -3027,11 +3091,11 @@ sub www_searchViaAjax {
         my $var = $self->getSearchTemplateVars($thingId,$thingProperties);
 
         $session->http->setMimeType("application/json");
-        return JSON->new->utf8->encode($var);
+        return JSON->new->encode($var);
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 
@@ -3115,6 +3179,9 @@ sub getSearchTemplateVars {
 
     $currentUrl = $self->getUrl();
     foreach ($self->session->form->param) {
+                                 # if we just saved data from an edit, we do not want to keep any of the params
+        last if $_ eq 'func' and $self->session->form->process($_) eq 'editThingDataSave';
+
         unless ($_ eq "pn" || $_ eq "op" || $_ =~ /identifier/xi || $_ =~ /password/xi || $_ eq "orderBy" ||
 $self->session->form->process($_) eq "") {
             $currentUrl = $self->session->url->append($currentUrl,$self->session->url->escape($_)
@@ -3188,7 +3255,7 @@ sequenceNumber');
     WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
 
     $paginatePage = $self->session->form->param('pn') || 1;
-    $currentUrl .= ";orderBy=".$orderBy if ($orderBy);
+    $currentUrl = $self->session->url->append($currentUrl, "orderBy=".$orderBy) if $orderBy;
     
     $p = WebGUI::Paginator->new($self->session,$currentUrl,$thingProperties->{thingsPerPage}, undef, $paginatePage);
 
@@ -3223,10 +3290,16 @@ sequenceNumber');
             $templateVars{canEditThingData} = 1;
             $templateVars{searchResult_delete_icon} = $session->icon->delete('func=deleteThingDataConfirm;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"),$i18n->get('delete thing data warning'));
+            $templateVars{searchResult_delete_url} = $session->url->append($url,
+                'func=deleteThingDataConfirm;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_edit_icon} = $session->icon->edit('func=editThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_edit_url} = $session->url->append($url, 
+                'func=editThingData;thingId='.$thingId.';thingDataId='.$thingDataId);
             $templateVars{searchResult_copy_icon} = $session->icon->copy('func=copyThingData;thingId='
             .$thingId.';thingDataId='.$thingDataId,$self->get("url"));
+            $templateVars{searchResult_copy_url} = $session->url->append($url, 
+                'func=copyThingData;thingId='.$thingId.';thingDataId='.$thingDataId,);
         }
         push(@searchResult_loop,\%templateVars);
     }
@@ -3427,7 +3500,7 @@ sub www_viewThingDataViaAjax {
 
     unless ($thingId && $thingDataId) {
         $session->http->setStatus("400", "Bad Request");
-        return JSON->new->utf8->encode({message => "Can't get thing data without a thingId and a thingDataId."});
+        return JSON->new->encode({message => "Can't get thing data without a thingId and a thingDataId."});
     }
 
     my $thingProperties = $self->getThing($thingId);
@@ -3438,16 +3511,16 @@ sub www_viewThingDataViaAjax {
         my $output = $self->getViewThingVars($thingId,$thingDataId);
 
         if ($output){
-            return JSON->new->utf8->encode($output);
+            return JSON->new->encode($output);
         }
         else{
             $session->http->setStatus("404", "Not Found");
-            return JSON->new->utf8->encode({message => "The thingDataId you requested can not be found."});
+            return JSON->new->encode({message => "The thingDataId you requested can not be found."});
         }
     }
     else {
         $session->http->setStatus("404", "Not Found");
-        return JSON->new->utf8->encode({message => "The thingId you requested can not be found."});
+        return JSON->new->encode({message => "The thingId you requested can not be found."});
     }
 }
 

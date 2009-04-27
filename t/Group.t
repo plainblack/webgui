@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (144 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (147 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -142,6 +142,22 @@ is($g->dbQuery(), 'select userId from someOtherDatabase', 'dbQuery set and get c
 
 $g->isAdHocMailGroup(1); 
 is($g->isAdHocMailGroup(),  1, 'isAdHocMailGroup set and get correctly');
+
+$g->databaseLinkId('newDbLinkId'); 
+is($g->databaseLinkId(),  'newDbLinkId', 'databaseLinkId set and get correctly');
+$g->databaseLinkId(0); 
+is($g->databaseLinkId(),  0,             'databaseLinkId set and get correctly (0)');
+
+################################################################
+#
+# options for new
+#
+################################################################
+
+my $optionGroup = WebGUI::Group->new($session, 'new', undef, 'noAdmin');
+my $getGroupsIn = $optionGroup->getGroupsIn();
+cmp_deeply($getGroupsIn, [], 'new: noAdmin prevents the admin group from being added to this group');
+$optionGroup->delete;
 
 ################################################################
 #
@@ -217,6 +233,7 @@ my $gB = WebGUI::Group->new($session, "new");
 $gA->name('Group A');
 $gB->name('Group B');
 ok( ($gA->name eq 'Group A' and $gB->name eq 'Group B'), 'object name assignment, multiple objects');
+WebGUI::Test->groupsToDelete($gA, $gB);
 
 $gB->addGroups([$gA->getId]);
 
@@ -237,6 +254,7 @@ cmp_bag($gA->getGroupsIn(), [3], 'Not allowed to add myself to my group');
 my $gC = WebGUI::Group->new($session, "new");
 $gC->name('Group C');
 $gA->addGroups([$gC->getId]);
+WebGUI::Test->groupsToDelete($gC);
 
 cmp_bag($gC->getGroupsFor(), [$gA->getId], 'Group A contains Group C');
 cmp_bag($gA->getGroupsIn(),  [$gC->getId, 3], 'Group C is a member of Group A, cached');
@@ -263,6 +281,7 @@ my $gZ = WebGUI::Group->new($session, "new");
 $gX->name('Group X');
 $gY->name('Group Y');
 $gZ->name('Group Z');
+WebGUI::Test->groupsToDelete($gX, $gY, $gZ);
 
 $gZ->addGroups([$gX->getId, $gY->getId]);
 
@@ -384,7 +403,7 @@ cmp_bag($everyUsers, $everyoneGroup->getUsers(), 'addUsers will not add a user t
 ##Database based user membership in groups
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-$session->db->dbh->do(q!CREATE TABLE myUserTable (userId varchar(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
+$session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
 
 my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {
@@ -423,6 +442,7 @@ ok( isIn($mob[0]->userId, @{ $gZ->getAllUsers() }), 'mob[0] in list of group Z u
 my $gK = WebGUI::Group->new($session, "new");
 $gK->name('Group K');
 $gC->addGroups([$gK->getId]);
+WebGUI::Test->groupsToDelete($gK);
 
 #      B
 #     / \
@@ -452,7 +472,7 @@ is_deeply(
 
 my $defaultKarmaSetting = $session->setting->get('useKarma');
 
-$session->setting->set('useKarma', 0) if $defaultKarmaSetting;
+$session->setting->set('useKarma', 0);
 
 is_deeply(
 	[ (map { $_->isInGroup($gK->getId) }  @chameleons) ],
@@ -482,6 +502,7 @@ $session->setting->set('useKarma', $defaultKarmaSetting);
 my $gS = WebGUI::Group->new($session, "new");
 $gS->name('Group S');
 $gC->addGroups([$gS->getId]);
+WebGUI::Test->groupsToDelete($gS);
 
 #        B
 #    	/ \
@@ -563,6 +584,7 @@ foreach my $idx (0..$#ipTests) {
 }
 
 my $gI = WebGUI::Group->new($session, "new");
+WebGUI::Test->groupsToDelete($gI);
 $gI->name('Group I');
 $gI->ipFilter('194.168.0.0/24');
 
@@ -598,6 +620,7 @@ ok( !$cacheDude->isInGroup($gY->getId), "Cache dude removed from group Y");
 ok( !$cacheDude->isInGroup($gZ->getId), "Cache dude removed from group Z too");
 
 my $gCache = WebGUI::Group->new($session, "new");
+WebGUI::Test->groupsToDelete($gCache);
 
 $gCache->addUsers([$cacheDude->userId]);
 
@@ -626,10 +649,13 @@ SKIP: {
 	ok(undef, "expiration date in groupings for getUser");
 }
 
+################################################################
+#
+# getUserList
+#
+################################################################
+
 END {
-	foreach my $testGroup ($gX, $gY, $gZ, $gA, $gB, $gI, $gC, $g, $gK, $gS, $gCache) {
-		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
-	}
 	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps, $cacheDude) {
 		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}

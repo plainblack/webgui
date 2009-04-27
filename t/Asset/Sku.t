@@ -1,6 +1,6 @@
 # vim:syntax=perl
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 19;        # Increment this number for each test you create
+plan tests => 17;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -56,9 +56,6 @@ is($sku->getQuantityAvailable, 99999999, "skus should have an unlimited quantity
 is($sku->getQuantityAvailable, $sku->getMaxAllowedInCart, "quantity available and max allowed in cart should be the same");
 is($sku->getPrice, 0.00, "Got a valid default price.");
 is($sku->getWeight, 0, "Got a valid default weight.");
-is($sku->getTaxRate, undef, "Tax rate is not overridden.");
-$sku->update({overrideTaxRate=>1, taxRateOverride=>5});
-is($sku->getTaxRate, 5, "Tax rate is overridden.");
 isnt($sku->processStyle, "", "Got some style information.");
 is($sku->onAdjustQuantityInCart, undef, "onAdjustQuantityInCart should exist and return undef");
 is($sku->onCompletePurchase, undef, "onCompletePurchase should exist and return undef");

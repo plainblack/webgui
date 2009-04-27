@@ -1,7 +1,7 @@
 package WebGUI::Auth::WebGUI;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -21,6 +21,7 @@ use WebGUI::Mail::Send;
 use WebGUI::Storage;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Form::Captcha;
 use Encode ();
 
 our @ISA = qw(WebGUI::Auth);
@@ -224,8 +225,9 @@ sub createAccountSave {
     my $error;
     $error = $self->error unless($self->validUsername($username));
     if ($setting->get("webguiUseCaptcha")) {
-        unless ($form->process('authWebGUI.captcha', "Captcha")) {
-            $error .= '<li>'.$i18n->get("captcha failure","AuthWebGUI").'</li>';
+        my $form = WebGUI::Form::Captcha->new($session, {name => 'authWebGUI.captcha'});
+        if (! $form->getValue) {
+            $error .= '<li>' . $form->getErrorMessage . '</li>';
         }
     }
     $error .= $self->error unless($self->_isValidPassword($password,$passConfirm));
@@ -274,7 +276,8 @@ sub createAccountSave {
         my $var;
         $var->{newUser_username} = $username;
         $var->{activationUrl} = $session->url->page("op=auth;method=validateEmail;key=".$key, 'full');
-        my $text = WebGUI::Asset::Template->new($self->session,$self->getSetting('accountActivationTemplate'))->process($var);
+        my $text =
+WebGUI::Asset::Template->new($self->session,$self->getSetting('accountActivationTemplate'))->process($var);
         WebGUI::Macro::process($self->session,\$text);
         $mail->addText($text);
         $mail->addFooter;
@@ -640,7 +643,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiLoginTemplate", $f->process("webguiLoginTemplate","template"));
 	$s->set("webguiPasswordRecoveryTemplate", $f->process("webguiPasswordRecoveryTemplate","template"));
     $s->set("webguiWelcomeMessageTemplate", $f->process("webguiWelcomeMessageTemplate","template"));
-    $s->set("webguiAccountActivationTemplate", $f->process("webguiAccountActivationTemplate","template"));
+    $s->set("webguiAccountActivationTemplate", $f->process("webguiAccountActivationTemplate","template")); 
 
     if (@errors) {
         return \@errors;
@@ -1229,13 +1232,17 @@ sub resetExpiredPasswordSave {
 #-------------------------------------------------------------------
 sub validateEmail {
 	my $self = shift;
-	my ($userId) = $self->session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$self->session->form->process("key")]);
+    my $session = $self->session;
+	my ($userId) = $session->db->quickArray("select userId from authentication where fieldData=? and fieldName='emailValidationKey' and authMethod='WebGUI'", [$session->form->process("key")]);
+    my $i18n = WebGUI::International->new($session, 'AuthWebGUI');
+    my $message = '';
 	if (defined $userId) {
-		my $u = WebGUI::User->new($self->session,$userId);
+		my $u = WebGUI::User->new($session,$userId);
 		$u->status("Active");
 		$self->session->db->write("DELETE FROM authentication WHERE userId = ? AND fieldName = 'emailValidationKey'", [$userId]);
+        $message = $i18n->get('email validation confirmed','AuthWebGUI');
 	}
-	return $self->displayLogin;
+	return $self->displayLogin($message);
 }
 
 

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Survey::SurveyJSON;
 =head1 LEGAL
 
 -------------------------------------------------------------------
-WebGUI is Copyright 2001-2008 Plain Black Corporation.
+WebGUI is Copyright 2001-2009 Plain Black Corporation.
 -------------------------------------------------------------------
 Please read the legal notices (docs/legal.txt) and the license
 (docs/license.txt) that came with this distribution before using
@@ -25,90 +25,197 @@ serializing and deserializing JSON data, and manages the data for
 the Survey.  This package is not intended to be used by any other
 Asset in WebGUI.
 
+=head2 Address Parameter
+
+Most subroutines in this module accept an $address param. This param is an array ref that 
+serves as a multidimensional index into the section/question/answer structure.
+
+In general, the first element of the array is the section index, the second element is 
+the question index, and the third element is the answer index. E.g. in its most general
+form the array looks like:
+
+ [section index, question index, answer index]
+
+Most subroutines will not expect or require all three elements to be present. Often, the
+subroutine will alter its behaviour based on how many elements you provide. Typically,
+the subroutine will operate on the most specific element it can based on the amount of
+information you provide. For example if you provide two elements, the subroutine will most
+likely operate on the question indexed by:
+
+ [section index, question index]
+
 =cut
 
 use strict;
 use JSON;
+use Data::Dumper;
+use Params::Validate qw(:all);
+Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
-#use Clone qw/clone/;
-use Storable qw/dclone/;
+use Clone qw/clone/;
 
-=head2 new ( $json, $log )
+# The maximum value of questionsPerPage is currently hardcoded here
+my $MAX_QUESTIONS_PER_PAGE = 20;
+
+#sub specialQuestionTypes {
+#    return @SPECIAL_QUESTION_TYPES;
+#}
+
+=head2 new ( $session, json )
 
 Object constructor.
 
-=head3 $json
+=head3 $session
 
-Pass in some JSON to be serialized into a data structure.  Useful JSON would
-be a hash with "survey" and "sections" keys with appropriate values.
+WebGUI::Session object
 
-=head3 $log
+=head3 $json (optional)
 
-The session logger, from $session->log.  The class needs nothing else from the
-session object.
+A JSON string used to construct a new Perl object. The string should represent 
+a JSON hash made up of "survey" and "sections" keys.
 
 =cut
 
 sub new {
     my $class = shift;
-    my $json  = shift;
-    my $log   = shift;
-    my $self  = {};
-    $self->{log} = $log;
-    my $temp = from_json($json) if defined $json;
-    $self->{sections} = defined $temp->{sections} ? $temp->{sections} : [];
-    $self->{survey}   = defined $temp->{survey}   ? $temp->{survey}   : {};
-    bless( $self, $class );
+    my ($session, $json)   = validate_pos(@_, {isa => 'WebGUI::Session' }, { type => SCALAR | UNDEF, optional => 1});
 
-    if ( @{ $self->sections } == 0 ) {
+    # Load json object if given..
+    my $jsonData = $json ? from_json($json) : {};
+
+    # Create skeleton object..
+    my $self = {
+        _session  => $session,
+        _sections => $jsonData->{sections} || [],
+        _survey   => $jsonData->{survey} || {},
+    };
+
+    bless $self, $class;
+
+    #Load question types
+    $self->loadTypes();
+
+    # Initialise the survey data structure if empty..
+    if ( $self->totalSections == 0 ) {
         $self->newObject( [] );
     }
     return $self;
-} ## end sub new
+}
+
+=head2 loadTypes
+
+Loads the Multiple Choice and Special Question types
+
+=cut
+
+sub loadTypes {
+    my $self = shift;
+
+    @{$self->{specialQuestionTypes}} = ( 
+        'Dual Slider - Range',
+        'Multi Slider - Allocate',
+        'Slider',
+        'Currency',
+        'Email',
+        'Number',
+        'Phone Number',
+        'Text',
+        'Text Date',
+        'TextArea',
+        'File Upload',
+        'Date',
+        'Date Range',
+        'Year Month',
+        'Hidden',
+    ) if(! defined $self->{specialQuestionTypes});
+    if(! defined $self->{multipleChoiceTypes}){
+        my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes"); 
+        map($self->{multipleChoiceTypes}->{$_->{questionType}} = $_->{answers} ? from_json($_->{answers}) : {}, @$refs);
+    }
+}
+
+sub addType { 
+    my $self = shift;
+    my $name = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    my $ansString = $obj->{answers} ? to_json $obj->{answers} : {};
+    $self->session->db->write("INSERT INTO Survey_questionTypes VALUES(?,?) ON DUPLICATE KEY UPDATE answers = ?",[$name,$ansString,$ansString]);
+    $self->question($address)->{questionType} = $name;
+}
+
+
+sub removeType {
+    my $self = shift;
+    my $address = shift;
+    my $obj = $self->getObject($address);
+    $self->session->db->write("DELETE FROM Survey_questionTypes WHERE questionType = ?",[$obj->{questionType}]);
+}
+
+=head2 specialQuestionTypes
+
+Returns the arrayref to the special question types
+
+=cut 
+
+sub specialQuestionTypes {
+    my $self = shift;
+    return $self->{specialQuestionTypes};
+}
+
+=head2 multipleChoiceTypes
+
+Returns the hashref to the multiple choice types
+
+=cut
+
+sub multipleChoiceTypes {
+    my $self = shift;
+    return $self->{multipleChoiceTypes};
+}
 
 =head2 freeze
 
-Serializes the survey and sections data into JSON and returns the JSON.
+Serialize this Perl object into a JSON string. The serialized object is made up of the survey and sections 
+components of this object.
 
 =cut
 
 sub freeze {
     my $self = shift;
-    my %temp;
-    $temp{sections} = $self->{sections};
-    $temp{survey}   = $self->{survey};
-    return to_json( \%temp );
+    return to_json(
+        {   sections => $self->sections,
+            survey   => $self->{_survey},
+        }
+    );
 }
 
 =head2 newObject ( $address )
 
-Add new, empty elements to the survey data structure.  It returns $address,
-modified to show what was added.
+Add a new, empty Section, Question or Answer to the survey data structure.
+
+Updates $address to point at the newly added object. Returns $address.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. New objects are always added (pushed) onto the end of the list of similar objects at the
+given address. 
 
-This method modifies $address.  It also returns $address.
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, a new section is added.
+Add a new section.
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then that element is used as an index into
-the array of sections, and a new question is added to that section.
+Add a new question to the indexed section.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.  A new answer is added to the specified question in
-the specified section.
+Add a new answer to the indexed question inside the indexed section.
 
 =back
 
@@ -116,24 +223,35 @@ the specified section.
 
 sub newObject {
     my $self    = shift;
-    my $address = shift;
-    if ( @$address == 0 ) {
-        push( @{ $self->sections }, $self->newSection() );
-        $address->[0] = $#{ $self->sections };
-    }
-    elsif ( @$address == 1 ) {
-        push( @{ $self->questions($address) }, $self->newQuestion($address) );
-        $$address[1] = $#{ $self->questions($address) };
-    }
-    elsif ( @$address == 2 ) {
-        push( @{ $self->answers($address) }, $self->newAnswer($address) );
-        $$address[2] = $#{ $self->answers($address) };
-    }
-    return $address;
-} ## end sub newObject
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
 
-#address is the array of objects currently selected in the edit screen
-#data is the array of hash items for displaying
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+
+    if ( $count == 0 ) {
+        # Add a new section to the end of the list of sections..
+        push @{ $self->sections }, $self->newSection();
+
+        # Update $address with the index of the newly created section
+        $address->[0] = $self->lastSectionIndex;
+    }
+    elsif ( $count == 1 ) {
+        # Add a new question to the end of the list of questions in section located at $address
+        push @{ $self->questions($address) }, $self->newQuestion($address);
+
+        # Update $address with the index of the newly created question
+        $address->[1] = $self->lastQuestionIndex($address);
+    }
+    elsif ( $count == 2 ) {
+        # Add a new answer to the end of the list of answers in section/question located at $address
+        push @{ $self->answers($address) }, $self->newAnswer($address);
+
+        # Update $address with the index of the newly created answer
+        $address->[2] = $self->lastAnswerIndex($address);
+    }
+    # Return the (modified) $address
+    return $address;
+}
 
 =head2 getDragDropList ( $address )
 
@@ -164,45 +282,44 @@ All answers for the referenced question will also be in the array reference:
 
 The sections, question and answer will be in depth-first order:
 
-section, section, section, question, answer, answer, answer, section, section
+ section, section, section, question, answer, answer, answer, section, section
 
 =head3 $address
 
-An array ref.  Sets which question from a section will be listed, along with all
-its answers.  $address should ALWAYS have two elements.
+See L<"Address Parameter">. Determines which question from a section will be listed, along with all
+its answers.  Should ALWAYS have two elements since we want to address a question.
 
 =cut
 
 sub getDragDropList {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my @data;
-    for ( my $i = 0; $i <= $#{ $self->sections }; $i++ ) {
-        push( @data, { text => $self->section( [$i] )->{title}, type => 'section' } );
-        if ( $address->[0] == $i ) {
+    for my $sIndex (0 .. $self->lastSectionIndex) {
+        push @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' };
+        if ( sIndex($address) == $sIndex ) {
 
-            for ( my $x = 0; $x <= $#{ $self->questions($address) }; $x++ ) {
-                push(
-                    @data,
-                    {   text => $self->question( [ $i, $x ] )->{text},
+            for my $qIndex (0 .. $self->lastQuestionIndex($address)) {
+                push @data,
+                    {   text => $self->question( [ $sIndex, $qIndex ] )->{text},
                         type => 'question'
                     }
-                );
-                if ( $address->[1] == $x ) {
-                    for ( my $y = 0; $y <= $#{ $self->answers($address) }; $y++ ) {
-                        push(
-                            @data,
-                            {   text => $self->answer( [ $i, $x, $y ] )->{text},
+                ;
+                if ( qIndex($address) == $qIndex ) {
+                    for my $aIndex (0 .. $self->lastAnswerIndex($address)) {
+                        push @data,
+                            {   text => $self->answer( [ $sIndex, $qIndex, $aIndex ] )->{text},
                                 type => 'answer'
                             }
-                        );
+                        ;
                     }
                 }
-            } ## end for ( my $x = 0; $x <= ...
-        } ## end if ( $address->[0] == ...
-    } ## end for ( my $i = 0; $i <= ...
+            }
+        }
+    }
     return \@data;
-} ## end sub getDragDropList
+}
 
 =head2 getObject ( $address )
 
@@ -210,44 +327,51 @@ Retrieve objects from the sections data structure by address.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is fetched.
+See L<"Address Parameter">. 
+
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, nothing is done.
+Do Nothing
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, returns the section with that index.
+One element is enough to reference a section. Returns that section.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.  Returns that question.
+Two elements are enough to reference a question inside a section. Returns that question.
 
-=item 3 elements
+=item * 3 elements
 
-Three elements are enough to reference an answer, inside of a particular
-question in a section.  Returns that answer.
+Three elements are enough to reference an answer, inside of a particular question in a section. 
+Returns that answer.
 
 =back
 
 =cut
 
 sub getObject {
-    my ( $self, $address ) = @_;
-    if ( @$address == 1 ) {
-        return dclone $self->{sections}->[ $address->[0] ];
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+    
+    return if !$count;
+    
+    if ( $count == 1 ) {
+        return clone $self->sections->[ sIndex($address) ];
     }
-    elsif ( @$address == 2 ) {
-        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ];
+    elsif ( $count == 2 ) {
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ];
     }
     else {
-        return dclone $self->{sections}->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}
-            ->[ $address->[2] ];
+        return clone $self->sections->[ sIndex($address) ]->{questions}->[ qIndex($address) ]->{answers}
+            ->[ aIndex($address) ];
     }
 }
 
@@ -259,31 +383,68 @@ from it.
 
 =head3 $address
 
-An array ref.  The number of elements determines whether edit vars are fetched for
+See L<"Address Parameter">. The number of elements determines whether edit vars are fetched for
 sections, questions, or answers.
 
 =cut
 
 sub getEditVars {
-    my ( $self, $address ) = @_;
-
-    if ( @$address == 1 ) {
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+    
+    if ( $count == 1 ) {
         return $self->getSectionEditVars($address);
     }
-    elsif ( @$address == 2 ) {
+    elsif ( $count == 2 ) {
         return $self->getQuestionEditVars($address);
     }
-    elsif ( @$address == 3 ) {
+    elsif ( $count == 3 ) {
         return $self->getAnswerEditVars($address);
     }
+}
+
+=head2 getGotoTargets
+
+Generates the list of valid goto targets
+
+=cut
+
+sub getGotoTargets {
+    my $self = shift;
+
+    # Valid goto targets are all of the non-empty section variable names..
+    my @section_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->sections};
+    
+    # ..and all of the non-empty question variable names..
+    my @question_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->questions};
+    
+    # ..plus some special vars
+    my @special_vars = qw(NEXT_SECTION END_SURVEY);
+    
+    # ..all combined
+    return [ @section_vars, @question_vars, @special_vars ];
 }
 
 =head2 getSectionEditVars ( $address )
 
 Get a safe copy of the variables for this section, to use for editing
-purposes.  Adds two variables, id, which is the index of this section,
-and displayed_id, which is this question's index in a 1-based array
-(versus the default, perl style, 0-based array).
+purposes.  
+
+Adds two variables:
+
+=over 4
+
+=item * id
+
+the index of this section
+
+=item * displayed_id
+
+this question's index in a 1-based array (versus the default, perl style, 0-based array)
+
+=back
 
 It removes the questions array ref, and changes questionsPerPage from a single element, into
 an array of hashrefs, which list the available questions per page and which one is currently
@@ -291,47 +452,54 @@ selected for this section.
 
 =head3 $address
 
-An array reference, specifying which question to fetch variables for.
+See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 =cut
 
 sub getSectionEditVars {
     my $self    = shift;
-    my $address = shift;
-    my $object  = $self->section($address);
-    my %var     = %{$object};
-    $var{id}           = $address->[0];
-    $var{displayed_id} = $address->[0] + 1;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
+    my $section  = $self->section($address);
+    my %var     = %{$section};
+
+    # Add the extra fields..
+    $var{id}           = sIndex($address);
+    $var{displayed_id} = sIndex($address) + 1;
+
+    # Remove the fields we don't want..
     delete $var{questions};
     delete $var{questionsPerPage};
 
-    for ( 1 .. 20 ) {
-
-        #        if($_ == $self->section($address)->{questionsPerPage}){
-        if ( $_ == $object->{questionsPerPage} ) {
-            push( @{ $var{questionsPerPage} }, { 'index', $_, 'selected', 1 } );
-        }
-        else {
-            push( @{ $var{questionsPerPage} }, { 'index', $_, 'selected', 0 } );
-        }
+    # Change questionsPerPage from a single element, into an array of hashrefs, which list the 
+    # available questions per page and which one is currently selected for this section..
+    for my $index ( 1 .. $MAX_QUESTIONS_PER_PAGE ) {
+        push @{ $var{questionsPerPage} }, {
+            index => $index,
+            selected => $index == $section->{questionsPerPage} ? 1 : 0
+        };
     }
     return \%var;
-} ## end sub getSectionEditVars
-
-sub getGotoTargets {
-    my $self = shift;
-    
-    my @section_vars = map {$_->{variable}} @{$self->sections};
-    my @question_vars = map {$_->{variable}} @{$self->questions};
-    return grep {$_ ne ''} (@section_vars, @question_vars);   
 }
 
 =head2 getQuestionEditVars ( $address )
 
-Get a safe copy of the variables for this question, to use for editing purposes.  Adds
-two variables, id, which is the indeces of the question's position in its parent's 
-section array joined by dashes '-', and displayed_id, which is this question's index
-in a 1-based array (versus the default, perl style, 0-based array).
+Get a safe copy of the variables for this question, to use for editing purposes.  
+
+Adds two variables:
+
+=over 4
+
+=item * id 
+
+the index of the question's position in its parent's section array joined by dashes '-'
+See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/questionIndex>.
+
+=item * displayed_id
+
+this question's index in a 1-based array (versus the default, perl style, 0-based array).
+
+=back
 
 It removes the answers array ref, and changes questionType from a single element, into
 an array of hashrefs, which list the available question types and which one is currently
@@ -339,314 +507,365 @@ selected for this question.
 
 =head3 $address
 
-An array reference, specifying which question to fetch variables for.
+See L<"Address Parameter">. Specifies which question to fetch variables for.
 
 =cut
 
 sub getQuestionEditVars {
     my $self    = shift;
-    my $address = shift;
-    my $object  = $self->question($address);
-    my %var     = %{$object};
-    $var{id}           = $address->[0] . "-" . $address->[1];
-    $var{displayed_id} = $address->[1] + 1;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
+    my $question  = $self->question($address);
+    my %var       = %{$question};
+
+    # Add the extra fields..
+    $var{id}           = sIndex($address) . q{-} . qIndex($address);
+    $var{displayed_id} = qIndex($address) + 1;
+
+    # Remove the fields we don't want
     delete $var{answers};
     delete $var{questionType};
-    my @types = $self->getValidQuestionTypes();
 
-    for (@types) {
-        if ( $_ eq $object->{questionType} ) {
-            push( @{ $var{questionType} }, { 'text', $_, 'selected', 1 } );
-        }
-        else {
-            push( @{ $var{questionType} }, { 'text', $_, 'selected', 0 } );
-        }
+    # Change questionType from a single element into an array of hashrefs which list the available 
+    # question types and which one is currently selected for this question..
+    for my $qType ($self->getValidQuestionTypes) {
+        push @{ $var{questionType} }, {
+            text => $qType,
+            selected => $qType eq $question->{questionType} ? 1 : 0
+        };
     }
     return \%var;
-} ## end sub getQuestionEditVars
+}
 
 =head2 getValidQuestionTypes
 
-A convenience method.  Returns a list of question types.  If you add a question
-type to the Survey, you must handle it here, and also in updateQuestionAnswers
+A convenience method.  Returns a list of question types.
 
 =cut
 
 sub getValidQuestionTypes {
-    return (
-        'Agree/Disagree', 'Certainty',               'Concern',         'Confidence',
-        'Currency',       'Date',                    'Date Range',      'Dual Slider - Range',
-        'Education',      'Effectiveness',           'Email',           'File Upload',
-        'Gender',         'Hidden',                  'Ideology',        'Importance',
-        'Likelihood',     'Multi Slider - Allocate', 'Multiple Choice', 'Oppose/Support',
-        'Party',          'Phone Number',            'Race',            'Risk',
-        'Satisfaction',   'Scale',                   'Security',        'Slider',
-        'Text',           'Text Date',               'Threat',          'True/False',
-        'Yes/No'
-    );
+    my $self = shift;
+    return sort (@{$self->{specialQuestionTypes}}, keys %{$self->{multipleChoiceTypes}});
 }
 
 =head2 getAnswerEditVars ( $address )
 
-Get a safe copy of the variables for this answer, to use for editing purposes.  Adds
-two variables, id, which is the indeces of the answer's position in its parent's question
-and section arrays joined by dashes '-', and displayed_id, which is this answer's index
-in a 1-based array (versus the default, perl style, 0-based array).
+Get a safe copy of the variables for this answer, to use for editing purposes. 
+
+Adds two variables:
+
+=over 4
+
+=item * id 
+
+The index of the answer's position in its parent's question  and section arrays joined by dashes '-'
+See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/answerIndex>.
+
+=item * displayed_id
+
+This answer's index in a 1-based array (versus the default, perl style, 0-based array).
+
+=back
 
 =head3 $address
 
-An array reference, specifying which answer to fetch variables for.
+See L<"Address Parameter">. Specifies which answer to fetch variables for.
 
 =cut
 
 sub getAnswerEditVars {
     my $self    = shift;
-    my $address = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+    
     my $object  = $self->answer($address);
     my %var     = %{$object};
-    $var{id}           = $address->[0] . "-" . $address->[1] . "-" . $address->[2];
-    $var{displayed_id} = $address->[2] + 1;
+
+    # Add the extra fields..
+    $var{id}           = sIndex($address) . q{-} . qIndex($address) . q{-} . aIndex($address);
+    $var{displayed_id} = aIndex($address) + 1;
+    
     return \%var;
 }
 
-=head2 update ( $address, $object )
+=head2 update ( $address, $properties )
 
-Update new "objects" into the current data structure, or add new ones.  It does not
-return anything significant.
+Update a section/question/answer with $properties, or add new ones.  
+Does not return anything significant.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is updated.
+See L<"Address Parameter">. 
+
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, nothing is done.
+Do Nothing
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then that element is used as an index into
-the array of sections, and information from $object is used to replace
-the properties of that section.  If the select section does not exist, such
+Update the addressed section with $properties. If the section does not exist, such
 as by using an out of bounds array index, then a new section is appended
 to the list of sections.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.
+Update the addressed question with $properties. 
 
-=item 3 elements
+=item * 3 elements
 
-Three elements are enough to reference an answer, for a particular
-question in a section.
+Update the addressed answer with $properties. 
 
 =back
 
-=head3 $object
+=head3 $properties
 
-A perl data structure.  Note, that it is not checked for type, so it is
-possible to add a "question" object into the list of section objects.
-$object should never be a partial object, but contain all properties.
+A perl hash reference.  Note, that it is not checked for type, so it is
+possible to add a "question" object into the list of sections.
+$properties should never be a partial object, but contain all properties.
 
 =cut
 
 sub update {
-    my ( $self, $address, $ref ) = @_;
-    my $object;
+    my $self    = shift;
+    my ($address, $properties) = validate_pos(@_, { type => ARRAYREF }, {type => HASHREF});
+
+    # Keep track of whether a new question is created along the way..
     my $newQuestion = 0;
-    if ( @$address == 1 ) {
+
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+
+    # First retrieve the addressed object, or, if necessary, create it
+    my $object;
+    if ( $count == 1 ) {
         $object = $self->section($address);
         if ( !defined $object ) {
             $object = $self->newSection();
-            push( @{ $self->sections }, $object );
+            push @{ $self->sections }, $object;
         }
     }
-    elsif ( @$address == 2 ) {
+    elsif ( $count == 2 ) {
         $object = $self->question($address);
         if ( !defined $object ) {
-            my $newQuestion = 1;
             $object = $self->newQuestion();
-            push( @{ $self->questions($address) }, $object );
+            $newQuestion = 1; # make note that a new question was created
+            push @{ $self->questions($address) }, $object;
+        }
+        # We need to update all of the answers to reflect the new questionType
+        if ( $properties->{questionType} ne $object->{questionType} ) {
+            $self->updateQuestionAnswers( $address, $properties->{questionType} );
         }
     }
-    elsif ( @$address == 3 ) {
+    elsif ( $count == 3 ) {
         $object = $self->answer($address);
         if ( !defined $object ) {
             $object = $self->newAnswer();
-            push( @{ $self->answers($address) }, $object );
+            push @{ $self->answers($address) }, $object;
         }
     }
-    if ( @$address == 2 and !$newQuestion ) {
-        if ( $ref->{questionType} ne $self->question($address)->{questionType} ) {
-            $self->updateQuestionAnswers( $address, $ref->{questionType} );
-        }
-    }
-    for my $key ( keys %$ref ) {
-        $object->{$key} = $ref->{$key} if ( defined $$ref{$key} );
-    }
-} ## end sub update
 
-#determine what to add and add it.
-# ref should contain all the information for the new
+    $self->_handleSpecialAnswerUpdates($address,$properties); 
+
+    # Update $object with all of the data in $properties
+    while (my ($key, $value) = each %{$properties}) {
+        if (defined $value) {
+            $object->{$key} = $value;
+        }
+    }
+
+    return;
+}
+
+sub _handleSpecialAnswerUpdates{
+    my $self = shift;
+    my $address = shift;
+    my $properties = shift;
+    my $question = $self->question($address);
+    if($question->{questionType} =~ /^Slider|Multi Slider - Allocate|Dual Slider - Range$/){
+        for my $answer(@{$self->answers($address)}){
+            $answer->{max} = $properties->{max};
+            $answer->{min} = $properties->{min};
+            $answer->{step} = $properties->{step};
+        }
+    }
+}
 
 =head2 insertObject ( $object, $address )
 
-Used to move existing objects in the current data structure.  It does not
-return anything significant.
+Rearrange existing objects in the current data structure. 
+Does not return anything significant.
 
 =head3 $object
 
-A perl data structure.  Note, that it is not checked for homegeneity,
+A perl hash reference.  Note, that it is not checked for homegeneity,
 so it is possible to add a "question" object into the list of section
 objects.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
+
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item empty
+=item * 0 elements
 
-If the array ref is empty, nothing is done.
+Do Nothing
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then that element is used as an index into
-the array of sections, and $object is spliced into place right after
-that index.
+Reposition $object immediately after the indexed section
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, then the first element is an index into
-section array, and the second element is an index into the questions
-in that section.  $object is added right after that question.
+Reposition $object immediately after the indexed question
 
-=item 3 elements
+=item * 3 elements
 
-Three elements are enough to reference an answer, inside of a particular
-question in a section.  $object is spliced in right after that answer.
+Reposition $object immediately after the indexed answer
 
 =back
 
 =cut
 
 sub insertObject {
-    my ( $self, $object, $address ) = @_;
-    if ( @$address == 1 ) {
-        splice( @{ $self->sections($address) }, $$address[0] + 1, 0, $object );
-    }
-    elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1] + 1, 0, $object );
-    }
-    elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2] + 1, 0, $object );
-    }
+    my $self    = shift;
+    my ($object, $address) = validate_pos(@_, {type => HASHREF}, { type => ARRAYREF });
 
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+    return if !$count;
+
+    # Use splice to rearrange the relevant array of objects..
+    if ( $count == 1 ) {
+        splice @{ $self->sections($address) }, sIndex($address) +1, 0, $object;
+        $address->[0]++;
+    }
+    elsif ( $count == 2 ) {
+        splice @{ $self->questions($address) }, qIndex($address) + 1, 0, $object;
+        $address->[1]++;
+    }
+    elsif ( $count == 3 ) {
+        splice @{ $self->answers($address) }, aIndex($address) + 1, 0, $object;
+        $address->[2]++;
+    }
+    
+    return $address;
 }
 
 =head2 copy ( $address )
 
-Duplicate the structure pointed to by $address, and add it to the end of the list of
-similar structures.  copy returns $address with the last element changed to the highest
-index in that array.
+Duplicate the indexed section or question, and push the copy onto the end of the
+list of existing items. Modifies $address. Returns $address with the last element changed 
+to the highest index in that array.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
 
-This method modifies $address.
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then the section with that index is duplicated
-at the end of the array of sections.
+Duplice the indexed section onto the end of the array of sections.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, the question in the section that is indexed
-will be duplicated and added to the end of the array of questions
-in that section.
+Duplice the indexed question onto the end of the array of questions.
 
-=item 3 elements, or more
+=item * 3 elements, or more
 
-Nothing happens.  It is not allowed to duplicate answers.
+Nothing happens. It is not allowed to duplicate answers.
 
 =back
 
 =cut
 
 sub copy {
-    my ( $self, $address ) = @_;
-    if ( @$address == 1 ) {
-        my $newSection = dclone $self->section($address);
-        push( @{ $self->sections }, $newSection );
-        $address->[0] = $#{ $self->sections };
-        return $address;
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF });
+
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+    
+    if ( $count == 1 ) {
+        # Clone the indexed section onto the end of the list of sections..
+        push @{ $self->sections }, clone $self->section($address);
+
+        # Update $address with the index of the newly created section
+        $address->[0] = $self->lastSectionIndex;
     }
-    elsif ( @$address == 2 ) {
-        my $newQuestion = dclone $self->question($address);
-        push( @{ $self->questions($address) }, $newQuestion );
-        $address->[1] = $#{ $self->questions($address) };
-        return $address;
+    elsif ( $count == 2 ) {
+        # Clone the indexed question onto the end of the list of questions..
+        push @{ $self->questions($address) }, clone $self->question($address);
+
+        # Update $address with the index of the newly created question
+        $address->[1] = $self->lastQuestionIndex($address);
     }
+    # Return the (modified) $address 
+    return $address;
 }
 
 =head2 remove ( $address, $movingOverride )
 
-Delete the structure pointed to by $address.
+Delete the section/question/answer indexed by $address. Modifies $address if it has 1 or more elements.
 
 =head3 $address
 
-An array ref.  The number of elements array set what is added, and
-where.
+See L<"Address Parameter">. 
 
-This method modifies $address if it has 1 or more elements.
+The number of elements in $address determines the behaviour:
 
 =over 4
 
-=item 1 element
+=item * 1 element
 
-If there's just 1 element, then the section with that index is removed.  Normally,
-the first section, index 0, cannot be removed.  See $movingOverride below.
+Remove the indexed section. Normally, the first section, index 0, cannot be removed.  See $movingOverride below.
 
-=item 2 elements
+=item * 2 elements
 
-If there are 2 elements, the question in the section is removed.
-in that section.
+Remove the indexed question
 
 =item 3 elements
 
-Removes the answer in the specified question and section.
+Remove the indexed answer
 
 =back
 
 =head3 $movingOverride
 
-If $movingOverride is defined (meaning including 0 and ''), then the first section
-is allowed to be removed.
+If $movingOverride is defined (meaning including 0 and ''), then the first section is allowed to be removed.
 
 =cut
 
 sub remove {
-    my ( $self, $address, $movingOverride ) = @_;
-    if ( @$address == 1 ) {
-        splice( @{ $self->{sections} }, $$address[0], 1 )
-            if ( $$address[0] != 0 or defined $movingOverride );    #can't delete the first section
+    my $self    = shift;
+    my ($address, $movingOverride) = validate_pos(@_, { type => ARRAYREF }, 0);
+
+    # Figure out what to do by counting the number of elements in the $address array ref
+    my $count = @{$address};
+
+    # Use splice to remove the indexed section/question/answer..
+    if ( $count == 1 ) {
+        # Make sure the first section isn't removed unless we REALLY want to
+        if ( sIndex($address) != 0 || defined $movingOverride ) {
+            splice @{ $self->sections }, sIndex($address), 1;
+        }
     }
-    elsif ( @$address == 2 ) {
-        splice( @{ $self->questions($address) }, $$address[1], 1 );
+    elsif ( $count == 2 ) {
+        splice @{ $self->questions($address) }, qIndex($address), 1;
     }
-    elsif ( @$address == 3 ) {
-        splice( @{ $self->answers($address) }, $$address[2], 1 );
+    elsif ( $count == 3 ) {
+        splice @{ $self->answers($address) }, aIndex($address), 1;
     }
+    
+    return;
 }
 
 =head2 newSection
@@ -657,17 +876,18 @@ Returns a reference to a new, empty section.
 
 sub newSection {
     return {
-        text                   => '',
+        text                   => q{},
         title                  => 'NEW SECTION',    ##i18n
-        variable               => '',
+        variable               => q{},
         questionsPerPage       => 5,
         questionsOnSectionPage => 1,
         randomizeQuestions     => 0,
         everyPageTitle         => 1,
         everyPageText          => 1,
         terminal               => 0,
-        terminalUrl            => '',
-        goto                   => '',
+        terminalUrl            => q{},
+        goto                   => q{},
+        gotoExpression         => q{},
         timeLimit              => 0,
         type                   => 'section',
         questions              => [],
@@ -682,23 +902,23 @@ Returns a reference to a new, empty question.
 
 sub newQuestion {
     return {
-        text             => '',
-        variable         => '',
+        text             => q{},
+        variable         => q{},
         allowComment     => 0,
         commentCols      => 10,
         commentRows      => 5,
         randomizeAnswers => 0,
         questionType     => 'Multiple Choice',
-        randomWords      => '',
+        randomWords      => q{},
         verticalDisplay  => 0,
         required         => 0,
         maxAnswers       => 1,
         value            => 1,
         textInButton     => 0,
-#       terminal         => 0,
-#       terminalUrl      => '',
         type             => 'question',
         answers          => [],
+        goto             => q{},
+        gotoExpression   => q{},
     };
 }
 
@@ -710,216 +930,137 @@ Returns a reference to a new, empty answer.
 
 sub newAnswer {
     return {
-        text           => '',
+        text           => q{},
         verbatim       => 0,
         textCols       => 10,
         textRows       => 5,
-        goto           => '',
-        gotoExpression => '',
-        recordedAnswer => '',
+        goto           => q{},
+        gotoExpression => q{},
+        recordedAnswer => q{},
         isCorrect      => 1,
         min            => 1,
         max            => 10,
         step           => 1,
         value          => 1,
         terminal       => 0,
-        terminalUrl    => '',
+        terminalUrl    => q{},
         type           => 'answer'
     };
 }
 
 =head2 updateQuestionAnswers ($address, $type);
 
-Add answers to a question, based on the requested type.
+Remove all existing answers and add a default set of answers to a question, based on question type.
 
 =head3 $address
 
-Which question to add answers to.
+See L<"Address Parameter">. Determines question to add answers to.
 
 =head3 $type
 
-The question type to use to determine how many and what kind of answers
-to add to the question.
+The question type determines how many answers to add and what answer text (if any) to use
 
 =cut
 
 sub updateQuestionAnswers {
     my $self    = shift;
-    my $address = shift;
-    my $type    = shift;
+    my ($address, $type) = validate_pos(@_, { type => ARRAYREF }, { type => SCALAR | UNDEF, optional => 1});
 
-    my @addy     = @{$address};
+    # Make a private copy of the $address arrayref that we can use locally
+    # when updating answer text without causing side-effects for the caller's $address
+    my @address_copy     = @{$address};
+
+    # Get the indexed question, and remove all of its existing answers
     my $question = $self->question($address);
     $question->{answers} = [];
 
+    # Add the default set of answers. The question type determines both the number
+    # of answers added and the answer text to use. When updating answer text
+    # first update $address_copy to point to the answer
+    
     if (   $type eq 'Date Range'
         or $type eq 'Multi Slider - Allocate'
         or $type eq 'Dual Slider - Range' )
     {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        push( @{ $question->{answers} }, $self->newAnswer() );
+        push @{ $question->{answers} }, $self->newAnswer();
+        push @{ $question->{answers} }, $self->newAnswer();
     }
     elsif ( $type eq 'Currency' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Currency Amount:' } );
+        push @{ $question->{answers} }, $self->newAnswer();
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Currency Amount:' } );
     }
     elsif ( $type eq 'Text Date' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Date:' } );
+        push @{ $question->{answers} }, $self->newAnswer();
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Date:' } );
     }
     elsif ( $type eq 'Phone Number' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Phone Number:' } );
+        push @{ $question->{answers} }, $self->newAnswer();
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Phone Number:' } );
     }
     elsif ( $type eq 'Email' ) {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-        $addy[2] = 0;
-        $self->update( \@addy, { 'text', 'Email:' } );
+        push @{ $question->{answers} }, $self->newAnswer();
+        $address_copy[2] = 0;
+        $self->update( \@address_copy, { 'text', 'Email:' } );
     }
-    elsif ( $type eq 'Education' ) {
-        my @ans = (
-            'Elementary or some high school',
-            'High school/GED',
-            'Some college/vocational school',
-            'College graduate',
-            'Some graduate work',
-            'Master\'s degree',
-            'Doctorate (of any type)',
-            'Other degree (verbatim)'
-        );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 7, 1 } );
+    elsif ( my $answerBundle = $self->getMultiChoiceBundle($type) ) {
+        # We found a known multi-choice bundle. 
+        # Add the bundle of multi-choice answers
+        $self->addAnswersToQuestion( \@address_copy, $answerBundle );
+    } else {
+        # Default action is to add a single, default answer to the question
+        push @{ $question->{answers} }, $self->newAnswer();
     }
-    elsif ( $type eq 'Party' ) {
-        my @ans
-            = ( 'Democratic party', 'Republican party (or GOP)', 'Independant party', 'Other party (verbatim)' );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 3, 1 } );
-    }
-    elsif ( $type eq 'Race' ) {
-        my @ans = ( 'American Indian', 'Asian', 'Black', 'Hispanic', 'White non-Hispanic',
-            'Something else (verbatim)' );
-        $self->addAnswersToQuestion( \@addy, \@ans, { 5, 1 } );
-    }
-    elsif ( $type eq 'Ideology' ) {
-        my @ans = (
-            'Strongly liberal',
-            'Liberal',
-            'Somewhat liberal',
-            'Middle of the road',
-            'Slightly conservative',
-            'Conservative',
-            'Strongly conservative'
-        );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Security' ) {
-        my @ans = ( 'Not at all secure', '', '', '', '', '', '', '', '', '', 'Extremely secure' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Threat' ) {
-        my @ans = ( 'No threat', '', '', '', '', '', '', '', '', '', 'Extreme threat' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Risk' ) {
-        my @ans = ( 'No risk', '', '', '', '', '', '', '', '', '', 'Extreme risk' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Concern' ) {
-        my @ans = ( 'Not at all concerned', '', '', '', '', '', '', '', '', '', 'Extremely concerned' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Effectiveness' ) {
-        my @ans = ( 'Not at all effective', '', '', '', '', '', '', '', '', '', 'Extremely effective' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Confidence' ) {
-        my @ans = ( 'Not at all confident', '', '', '', '', '', '', '', '', '', 'Extremely confident' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Satisfaction' ) {
-        my @ans = ( 'Not at all satisfied', '', '', '', '', '', '', '', '', '', 'Extremely satisfied' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Certainty' ) {
-        my @ans = ( 'Not at all certain', '', '', '', '', '', '', '', '', '', 'Extremely certain' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Likelihood' ) {
-        my @ans = ( 'Not at all likely', '', '', '', '', '', '', '', '', '', 'Extremely likely' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Importance' ) {
-        my @ans = ( 'Not at all important', '', '', '', '', '', '', '', '', '', 'Extremely important' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Oppose/Support' ) {
-        my @ans = ( 'Strongly oppose', '', '', '', '', '', 'Strongly support' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Agree/Disagree' ) {
-        my @ans = ( 'Strongly disagree', '', '', '', '', '', 'Strongly agree' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'True/False' ) {
-        my @ans = ( 'True', 'False' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Yes/No' ) {
-        my @ans = ( 'Yes', 'No' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    elsif ( $type eq 'Gender' ) {
-        my @ans = ( 'Male', 'Female' );
-        $self->addAnswersToQuestion( \@addy, \@ans, {} );
-    }
-    else {
-        push( @{ $question->{answers} }, $self->newAnswer() );
-    }
-} ## end sub updateQuestionAnswers
 
-=head2 addAnswersToQuestion ($address, $answers, $verbatims)
+    return;
+}
+
+=head2 getMultiChoiceBundle
+
+Returns a list of answer objects for each multi-choice bundle.
+
+=cut
+
+sub getMultiChoiceBundle {
+    my $self = shift;
+    my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
+
+    return $self->{multipleChoiceTypes}->{$type};
+}
+
+=head2 addAnswersToQuestion ($address, $answers)
 
 Helper routine for updateQuestionAnswers.  Adds an array of answers to a question.
 
 =head3 $address
 
-The address of the question to add answers to.
+See L<"Address Parameter">. The address of the question to add answers to.
 
 =head3 $answers
 
 An array reference of answers to add.  Each element will be assigned to the text field of
 the answer that is created.
 
-=head3 $verbatims
-
-An hash reference.  Each key is an index into the answers array.  The value is a placeholder
-for doing existance lookups.  For each requested index, the verbatim flag in the answer is
-set to true.
-
 =cut
 
 sub addAnswersToQuestion {
-    my $self  = shift;
-    my $addy  = shift;
-    my $ans   = shift;
-    my $verbs = shift;
-    for ( 0 .. $#$ans ) {
-        push( @{ $self->question($addy)->{answers} }, $self->newAnswer() );
-        $$addy[2] = $_;
-        if ( exists $$verbs{$_} and $verbs->{$_} ) {
-            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1, 'verbatim', 1 } );
-        }
-        else {
-            $self->update( $addy, { 'text', $$ans[$_], 'recordedAnswer', $_ + 1 } );
-        }
-    }
-} ## end sub addAnswersToQuestion
+    my $self = shift;
+    my ( $address, $answers )
+        = validate_pos( @_, { type => ARRAYREF }, { type => ARRAYREF } );
 
-#------------------------------
-#accessors and helpers
-#------------------------------
+    # Make a private copy of the $address arrayref that we can use locally
+    # when updating answer text without causing side-effects for the caller's $address
+    my @address_copy = @{$address};
+    
+    for my $answer (@$answers) {
+        # Add a new answer to question
+        push @{ $self->question( \@address_copy )->{answers} }, $answer;
+    }
+    
+    return;
+}
 
 =head2 sections
 
@@ -929,7 +1070,234 @@ Returns a reference to all the sections in this object.
 
 sub sections {
     my $self = shift;
-    return $self->{sections};
+    return $self->{_sections};
+}
+
+=head2 lastSectionIndex
+
+Convenience method to return the index of the last Section. Frequently used to 
+iterate over all Sections. e.g. ( 0 .. lastSectionIndex )
+
+=cut
+
+sub lastSectionIndex {
+    my $self = shift;
+    return $self->totalSections(@_) - 1;
+}
+
+=head2 lastQuestionIndex
+
+Convenience method to return the index of the last Question, overall, or in the 
+given Section if $address given. Frequently used to  
+iterate over all Questions. e.g. ( 0 .. lastQuestionIndex )
+
+=head3 $address  (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub lastQuestionIndex {
+    my $self = shift;
+    return $self->totalQuestions(@_) - 1;
+}
+
+=head2 lastQuestionIndex
+
+Convenience method to return the index of the last Answer, overall, or in the 
+given Question if $address given. Frequently used to  
+iterate over all Answers. e.g. ( 0 .. lastAnswerIndex )
+
+=head3 $address  (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub lastAnswerIndex {
+    my $self = shift;
+    return $self->totalAnswers(@_) - 1;
+}
+
+=head2 totalSections
+
+Returns the total number of Sections
+
+=cut
+
+sub totalSections {
+    my $self = shift;
+    return scalar @{ $self->sections || [] };
+}
+
+=head2 totalQuestions ($address)
+
+Returns the total number of Questions, overall, or in the given Section if $address given 
+
+=head3 $address  (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub totalQuestions {
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    
+    if ($address) {
+        return scalar @{ $self->questions($address) || [] };
+    } else {
+        my $count = 0;
+        for my $sIndex (0 .. $self->lastSectionIndex) {
+            $count += $self->totalQuestions([$sIndex]);
+        }
+        return $count;
+    }
+}
+
+=head2 totalAnswers ($address)
+
+Returns the total number of Answers overall, or in the given Question if $address given
+
+=head3 $address (optional)
+
+See L<"Address Parameter">.
+
+=cut
+
+sub totalAnswers {
+    my $self    = shift;
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
+    
+    if ($address) {
+        return scalar @{ $self->answers($address) || [] };
+    } else {
+        my $count = 0;
+        for my $sIndex (0 .. $self->lastSectionIndex) {
+            for my $qIndex (0 .. $self->lastQuestionIndex([$sIndex])) {
+                $count += $self->totalAnswers([$sIndex, $qIndex]);
+            }
+        }
+        return $count;
+    }
+}
+
+=head2 validateSurvey ()
+
+Returns an array of messages to inform a user what is logically wrong with the Survey
+
+=cut
+
+sub validateSurvey{
+    my $self = shift;
+
+    my @messages;   
+   
+    #set up valid goto targets 
+    my $gotoTargets = $self->getGotoTargets();
+    my $goodTargets = {};
+    my $duplicateTargets;
+    for my $g (@{$gotoTargets}) { 
+        $goodTargets->{$g}++; 
+        $duplicateTargets->{$g}++ if $goodTargets->{$g} > 1;
+    }
+
+    #step through each section validating it. 
+    my $sections = $self->sections();
+    
+    for(my $s = 0; $s <= $#$sections; $s++){
+        my $sNum = $s + 1;
+        my $section = $self->section([$s]);
+        if(! $self->validateGoto($section,$goodTargets)){
+            push @messages,"Section $sNum has invalid Jump target: \"$section->{goto}\"";
+        }
+        if(! $self->validateGotoInfiniteLoop($section)){
+            push @messages,"Section $sNum jumps to itself.";
+        }
+        if(my $error = $self->validateGotoExpression($section,$goodTargets)){
+            push @messages,"Section $sNum has invalid Jump Expression: \"$section->{gotoExpression}\". Error: $error";
+        }
+        if (my $var = $section->{variable}) {
+            if (my $count = $duplicateTargets->{$var}) {
+                push @messages, "Section $sNum variable name $var is re-used in $count other place(s).";
+            }
+        }
+
+        #step through each question validating it. 
+        my $questions = $self->questions([$s]);
+        for(my $q = 0; $q <= $#$questions; $q++){
+            my $qNum = $q + 1;
+            my $question = $self->question([$s,$q]);
+            if(! $self->validateGoto($question,$goodTargets)){
+                push @messages,"Section $sNum Question $qNum has invalid Jump target: \"$question->{goto}\"";
+            }
+            if(! $self->validateGotoInfiniteLoop($question)){
+                push @messages,"Section $sNum Question $qNum jumps to itself.";
+            }
+            if(my $error = $self->validateGotoExpression($question,$goodTargets)){
+                push @messages,"Section $sNum Question $qNum has invalid Jump Expression: \"$question->{gotoExpression}\". Error: $error";
+            }
+            if($#{$question->{answers}} < 0){
+                push @messages,"Section $sNum Question $qNum does not have any answers.";
+            }
+            if(! $question->{text} =~ /\w/){
+                push @messages,"Section $sNum Question $qNum does not have any text.";
+            }
+            if (my $var = $question->{variable}) {
+                if (my $count = $duplicateTargets->{$var}) {
+                    push @messages, "Section $sNum Question $qNum variable name $var is re-used in $count other place(s).";
+                }
+            }
+            
+            #step through each answer validating it. 
+            my $answers = $self->answers([$s,$q]);
+            for(my $a = 0; $a <= $#$answers; $a++){
+                my $aNum = $a + 1;
+                my $answer = $self->answer([$s,$q,$a]);
+                if(! $self->validateGoto($answer,$goodTargets)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump target: \"$answer->{goto}\"";
+                }
+                if(! $self->validateGotoInfiniteLoop($answer)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum jumps to itself.";
+                }
+                if(my $error = $self->validateGotoExpression($answer,$goodTargets)){
+                    push @messages,"Section $sNum Question $qNum Answer $aNum has invalid Jump Expression: \"$answer->{gotoExpression}\". Error: $error";
+                }
+            }
+        }
+    }
+ 
+   return \@messages; 
+}
+
+sub validateGoto{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    return 0 if($object->{goto} =~ /\w/ && ! exists($goodTargets->{$object->{goto}}));
+    return 1;
+}
+
+sub validateGotoInfiniteLoop{
+    my $self = shift;
+    my $object = shift;
+    return 0 if($object->{goto} =~ /\w/ and $object->{goto} eq $object->{variable});
+    return 1;
+}
+
+sub validateGotoExpression{
+    my $self = shift;
+    my $object = shift;
+    my $goodTargets = shift;
+    return unless $object->{gotoExpression};
+    
+    if (!$self->session->config->get('enableSurveyExpressionEngine')) {
+        return 'enableSurveyExpressionEngine is disabled in your site config!';
+    }
+    
+    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
+    my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
+    return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
 }
 
 =head2 section ($address)
@@ -938,32 +1306,49 @@ Returns a reference to one section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section whose questions will be returned.
+See L<"Address Parameter">.
 
 =cut
 
 sub section {
     my $self    = shift;
-    my $address = shift;
-    return $self->{sections}->[ $$address[0] ];
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
+    return $self->sections->[ $address->[0] ];
+}
+
+=head2 session
+
+Accessor method for the local WebGUI::Session reference
+
+=cut
+
+sub session {
+    my $self    = shift;
+    return $self->{_session};
 }
 
 =head2 questions ($address)
 
 Returns a reference to all the questions from a particular section.
 
-=head3 $address
+=head3 $address (optional)
 
-An array ref.  The first element of the array ref is the index of
-the section whose questions will be returned.
+See L<"Address Parameter">. If not defined, returns all questions.
 
 =cut
 
 sub questions {
     my $self    = shift;
-    my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions};
+    my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
+    
+    if ($address) {
+        return $self->sections->[ $address->[0] ]->{questions};
+    } else {
+        my $questions;
+        push @$questions, @{$_->{questions} || []} for @{$self->sections};
+        return $questions;
+    }
 }
 
 =head2 question ($address)
@@ -972,17 +1357,35 @@ Return a reference to one question from a particular section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.
+See L<"Address Parameter">.
 
 =cut
 
 sub question {
     my $self    = shift;
-    my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ];
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
+
+#-------------------------------------------------------------------
+
+=head2 questionCount (){
+
+Return the total number of questions in this survey.
+
+=cut
+
+sub questionCount {
+    my $self    = shift;
+    my $count;
+    for ( my $s = 0; $s <= $#{ $self->sections() }; $s++ ) {
+        $count = $count + scalar @{$self->questions( [$s] )};
+    }
+    return $count;
+}
+
+#-------------------------------------------------------------------
 
 =head2 answers ($address)
 
@@ -990,17 +1393,15 @@ Return a reference to all answers from a particular question.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.  An array ref of anwers from that question will be
-returned.
+See L<"Address Parameter">.
 
 =cut
 
 sub answers {
     my $self    = shift;
-    my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers};
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
 }
 
 =head2 answer ($address)
@@ -1009,32 +1410,51 @@ Return a reference to one answer from a particular question and section.
 
 =head3 $address
 
-An array ref.  The first element of the array ref is the index of
-the section.  The second element is the index of the question in
-that section.  The third element is the index of the answer.
+See L<"Address Parameter">.
 
 =cut
 
 sub answer {
     my $self    = shift;
-    my $address = shift;
-    return $self->{sections}->[ $$address[0] ]->{questions}->[ $$address[1] ]->{answers}->[ $$address[2] ];
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    
+    return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
 
-=head2 log ($message)
+=head2 sIndex ($address)
 
-Logs an error message using the session logger.
-
-=head3 $message
-
-The message to log.  It will be logged as type "error".
+Convenience sub to extract the section index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
 
 =cut
 
-sub log {
-    my ( $self, $message ) = @_;
-    if ( defined $self->{log} ) {
-        $self->{log}->error($message);
-    }
+sub sIndex {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    return $address->[0];
 }
+
+=head2 qIndex ($address)
+
+Convenience sub to extract the question index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
+
+=cut
+
+sub qIndex {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    return $address->[1];
+}
+
+=head2 aIndex ($address)
+
+Convenience sub to extract the answer index from a standard $address parameter. See L<"Address Parameter">.
+This method exists purely to improve code readability.
+
+=cut
+
+sub aIndex {
+    my ($address) = validate_pos(@_, { type => ARRAYREF});
+    return $address->[2];
+}
+
 1;

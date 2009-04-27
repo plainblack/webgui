@@ -159,8 +159,8 @@ our $I18N = {
 	},
 
    	'emailField help' => {
-		message => q|A single text field for the user to enter in their street address.|,
-		lastUpdated => 0,
+		message => q|A single text field for the user to enter in their email address.|,
+		lastUpdated => 1231192368,
 		context => q|Template variable help.|
 	},
 
@@ -291,6 +291,11 @@ our $I18N = {
 		message => q|No description|,
 		lastUpdated => 0,
 		context => q|The default description of purchase of users.|
+	},
+	'template gone' => {
+		message => q|The template for entering in credentials has been deleted.  Please notify the site administrator.|,
+		lastUpdated => 0,
+		context => q|Error message when the getCredentials template cannot be accessed.|
 	},
 	'show terminal' => {
 		message => q|Click here to use your virtual terminal.|,

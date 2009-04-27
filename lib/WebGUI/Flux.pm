@@ -315,7 +315,7 @@ sub getLinearProgression {
         {   fluxRuleIds          => { type => ARRAYREF },
             user                 => { isa  => 'WebGUI::User' },
             skippableFluxRuleIds => { type => ARRAYREF, optional => 1 },
-            adminAlwaysTrue => 0,
+            alwaysTrueForGroup => 0,
             minimal         => 0,
         }
     );
@@ -327,14 +327,14 @@ sub getLinearProgression {
     my $user    = $args{user};
     my $session = $user->session;
 
-    my $force_true = $args{adminAlwaysTrue} && $user->isInGroup(3);
+    my $force_true = $args{alwaysTrueForGroup} && $user->isInGroup($args{alwaysTrueForGroup});
 
     my @results;
 
     # Find the last fluxRuleId that evaluates to true
     foreach my $fluxRuleId ( @{ $args{fluxRuleIds} } ) {
         if ($force_true) {
-            $session->log->debug("Admin user, so $fluxRuleId forced to be true");
+            $session->log->debug("In alwaysTrueForGroup ($args{alwaysTrueForGroup}), so $fluxRuleId forced to be true");
             push @results, { id => $fluxRuleId, success => 1 };
             next;
         }

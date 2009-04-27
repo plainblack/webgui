@@ -711,7 +711,7 @@ sub www_getTransactionsAsJson {
     $results{'sort'}         = undef;
     $results{'dir'}          = "desc";
     $session->http->setMimeType('application/json');
-    return JSON->new->utf8->encode(\%results);
+    return JSON->new->encode(\%results);
 }
 
 #-------------------------------------------------------------------
@@ -744,7 +744,7 @@ sub www_manage {
     my $output = q| 
 
 <div class=" yui-skin-sam">
-    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="Search" /></form></div>
+    <div id="search"><form id="keywordSearchForm"><input type="text" name="keywords" id="keywordsField" /><input type="submit" value="|.$i18n->get(364,'WebGUI').q|" /></form></div>
     <div id="paging"></div>
     <div id="dt"></div>
 </div>
@@ -794,7 +794,7 @@ STOP
     $output .= '{key:"amount", label:"'.$i18n->get('price').'",formatter:YAHOO.widget.DataTable.formatCurrency},';
     $output .= '{key:"statusCode", label:"'.$i18n->get('status code').'"},';
     $output .= '{key:"statusMessage", label:"'.$i18n->get('status message').'"},';
-    $output .= '{key:"paymentDriverLabel", label:"'.$i18n->get('payment method').'"},';
+    $output .= '{key:"paymentDriverLabel", label:"'.$i18n->get('payment method').'"}';
     $output .= <<STOP;
     ];
     var myTable = new DataTable('dt', myColumnDefs, mySource, myTableConfig);

@@ -3,7 +3,7 @@ package WebGUI::Macro;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -161,26 +161,38 @@ sub _processMacro {
     $parameters =~ s/^\(//;
     $parameters =~ s/\)$//;
 
-    # there are two possible matches and only one will ever match at a time, so we filter out the undef ones
-    my @params = grep { defined $_ } ($parameters =~ /
+    my @params;
+    while ($parameters =~ /
         (?<!\z)                             # don't try to match if we are at the end of the string
         (?:                                 # either
-            \s* "                               # white space followed by quotes
+            \s* "                               # white space followed by a double quote
             ( (?:                               # capture inside
-                [^"\\]                              # something other than a quote or backslash
+                [^"\\]                              # something other than backslash or double quote
             |                                   # or
                 \\.                                 # a backslash followed by any character
             ) * )                               # as many times as needed
-            " \s*                               # end quote and any white space
+            " \s*                              # end quote and any white space
         |                                   # or
-            ([^,]*)                         # anything but a comma
+            \s* '                               # same as above, but with single quotes
+            ( (?:
+                [^'\\]
+            |
+                \\.
+            ) * )
+            ' \s*
+        |                                   # or
+            ([^,]*)                             # anything but a comma
         )
         (?:                                 # followed by
             \z                                  # end of the string
         |                                   # or
             ,                                   # a comma
         )
-    /xg);
+    /xg) {
+        # three matches, only one will exist per run
+        push @params, defined $1 ? $1 : defined $2 ? $2 : $3;
+    }
+
     for my $param (@params) {
         $param =~ s/\\(.)/$1/xmsg;      # deal with backslash escapes
         process($session, \$param)

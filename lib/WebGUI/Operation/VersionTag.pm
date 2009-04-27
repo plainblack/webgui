@@ -3,7 +3,7 @@ package WebGUI::Operation::VersionTag;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -451,6 +451,17 @@ sub www_commitVersionTagConfirm {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_leaveVersionTag ( session )
+
+Clears the current working version tag, and returns the user to www_manageVersions.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
 sub www_leaveVersionTag {
     my $session = shift;
     WebGUI::VersionTag->getWorking($session)->clearWorking;
@@ -642,7 +653,8 @@ sub www_manageRevisionsInTag {
     $ac->addSubmenuItem($session->url->page('op=manageVersions'), $i18n->get("manage versions"));
 
     # Process any actions
-    if ( $session->form->get('action') eq "purge" ) {
+    my $action = lc $session->form->get('action');
+    if ( $action eq "purge" ) {
         # Purge these revisions
         my @assetInfo       = $session->form->get('assetInfo'); 
         for my $assetInfo ( @assetInfo ) {
@@ -657,7 +669,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $session->form->get('action') eq "move" ) {
+    elsif ( $action eq "move to:" ) {
         # Get the new version tag
         my $moveToTagId = $session->form->get('moveToTagId');
         my $moveToTag;
@@ -685,7 +697,7 @@ sub www_manageRevisionsInTag {
             return www_manageVersions( $session );
         }
     }
-    elsif ( $session->form->get('action') eq "update" ) {
+    elsif ( $action eq "update version tag" ) {
         my $startTime = WebGUI::DateTime->new($session,$session->form->process("startTime","dateTime"))->toDatabase;
         my $endTime   = WebGUI::DateTime->new($session,$session->form->process("endTime","dateTime"))->toDatabase;
         
@@ -746,6 +758,10 @@ sub www_manageRevisionsInTag {
         ( getVersionTagOptions( $session ) ),
     );
 
+    ##Setup valid times for the datetime range form
+    my $filterStartTime = defined $tag->get('startTime') ? $tag->get('startTime') : '1970-01-17 05:00:00';
+    my $filterEndTime   = defined $tag->get('endTime')   ? $tag->get('endTime')   : time();
+
     # Output the revisions
     ### FIXME: Users who only pass canApproveVersionTag() and not canViewVersionTag() should
     # probably not be allowed to see the Actions or modify the Start and End dates
@@ -759,23 +775,23 @@ sub www_manageRevisionsInTag {
         . $i18n->get('startTime label').':&nbsp;'
         . WebGUI::Form::dateTime($session, {
             name  =>"startTime",
-            value => WebGUI::DateTime->new($session,$tag->get("startTime"))->epoch,
+            value => WebGUI::DateTime->new($session,$filterStartTime)->epoch,
         })
         . '<br />'.$i18n->get('endTime label').':&nbsp;'
         . WebGUI::Form::dateTime($session,{
             name  =>"endTime",
-            value => WebGUI::DateTime->new($session,$tag->get("endTime"))->epoch,
+            value => WebGUI::DateTime->new($session,$filterEndTime)->epoch,
         })
         . '<br />'
-        . '<button name="action" value="update">' . $i18n->get('manageRevisionsInTag update') . '</button>'
+        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag update') . '" />'
         . '</td>'
         . '</tr>'
         . '<tr><td colspan="5">&nbsp;</td></tr>'
         . '<tr>'
         . '<td colspan="5">'
         . $i18n->get("manageRevisionsInTag with selected")
-        . '<button name="action" value="purge" class="red">' . $i18n->get('manageRevisionsInTag purge') . '</button>'
-        . '<button name="action" value="move">' . $i18n->get("manageRevisionsInTag move") . '</button>'
+        . '<input type="submit" name="action" value="'. $i18n->get('manageRevisionsInTag purge') . '" class="red" />'
+        . '<input type="submit" name="action" value="'. $i18n->get("manageRevisionsInTag move")  . '" />'
         . WebGUI::Form::SelectBox( $session, {
             name        => 'moveToTagId',
             options     => \%moveToTagOptions,

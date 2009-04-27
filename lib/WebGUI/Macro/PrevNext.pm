@@ -12,7 +12,7 @@ Provides YUI-powered previous/next buttons for inline page navigation, doing a d
 search one level deep. Handy if you want people to be able to click "next, next, next" to 
 navigate through your content. You probably want to use this in your Page Layout template.
 Generates attractive YUI button markup which gracefully degrades to a standard link tag when 
-javascript is disabled.  
+javascript is disabled.
 
 =head2 process( $session, $topPage, $depth, $templateId )
 

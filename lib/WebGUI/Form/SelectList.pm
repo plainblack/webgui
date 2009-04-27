@@ -3,7 +3,7 @@ package WebGUI::Form::SelectList;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -98,6 +98,19 @@ sub isDynamicCompatible {
 
 #-------------------------------------------------------------------
 
+=head2 isInRequest ( )
+
+=cut
+
+
+sub isInRequest {
+    my $self = shift;
+    my $form = $self->session->form;
+    return $form->hasParam($self->privateName('isIn'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 toHtml ( )
 
 Renders a select list form control.
@@ -105,9 +118,10 @@ Renders a select list form control.
 =cut
 
 sub toHtml {
-	my $self = shift;
+	my $self     = shift;
+    my $session  = $self->session;
 	my $multiple = $self->get("multiple") ? ' multiple="multiple"' : '';
-	my $output = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').$multiple.'>';
+	my $output   = '<select name="'.($self->get("name")||'').'" size="'.($self->get("size")||'').'" id="'.($self->get('id')||'').'" '.($self->get("extras")||'').$multiple.'>';
     my $options = $self->getOptions;
 	my @values = $self->getOriginalValue();
 	foreach my $key (keys %{$options}) {
@@ -120,6 +134,7 @@ sub toHtml {
 		$output .= '>'.$options->{$key}.'</option>';
 	}
 	$output .= '</select>'."\n";
+    $output .= WebGUI::Form::Hidden($session, { name => $self->privateName('isIn'), value => 1, });
 	return $output;
 }
 

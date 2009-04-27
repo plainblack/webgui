@@ -5,7 +5,7 @@ use strict;
 our $VERSION = "0.0.0";
 
 ####################################################################
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 ####################################################################
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -40,6 +40,14 @@ use WebGUI::DateTime;
 
 =head1 Methods
 
+
+=cut
+
+####################################################################
+
+=head2 addRevision ( )
+
+Extent the method from the super class to handle iCalSequenceNumbers.
 
 =cut
 
@@ -116,7 +124,7 @@ sub definition {
         },
         'storageId' => {
             fieldType       => "Image",
-            defaultValue    => undef,
+            defaultValue    => '',
             maxAttachments  => 1,
         },
         'feedUid' => {
@@ -1698,6 +1706,12 @@ sub processPropertiesFromFormPost {
 
 #-------------------------------------------------------------------
 
+=head2 purge ( )
+
+Extent the method from the super class to delete all storage locations.
+
+=cut
+
 sub purge {
     my $self = shift;
     my $sth = $self->session->db->read("select storageId from Event where assetId=?",[$self->getId]);
@@ -1710,6 +1724,12 @@ sub purge {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Extent the method from the super class to delete the storage location for this revision.
+
+=cut
 
 sub purgeRevision {
     my $self = shift;
@@ -1855,6 +1875,22 @@ sub update {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 validParent
+
+Make sure that the current session asset is a Calendar for pasting and adding checks.
+
+This is a class method.
+
+=cut
+
+sub validParent {
+    my $class   = shift;
+    my $session = shift;
+    return $session->asset->isa('WebGUI::Asset::Wobject::Calendar');
+}
+
 ####################################################################
 
 =head2 view
@@ -1892,6 +1928,13 @@ sub view  {
 
 
 #-------------------------------------------------------------------
+
+=head2 www_deleteFile ( )
+
+Delete a file given in the form variable "filename" from the storage location.
+
+=cut
+
 sub www_deleteFile {
     my $self = shift;
     $self->getStorageLocation->deleteFile($self->session->form->process("filename")) if $self->canEdit;

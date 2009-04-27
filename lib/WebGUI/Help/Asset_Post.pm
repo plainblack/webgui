@@ -136,11 +136,7 @@ our $HELP = {
         private => 1,
         title   => 'post asset variables title',
         body    => '',
-        isa     => [
-            {   tag       => 'asset template asset variables',
-                namespace => 'Asset'
-            },
-        ],
+        isa     => [ ],
         variables => [
             { 'name' => 'storageId' },
             { 'name' => 'threadId' },

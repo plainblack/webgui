@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -18,7 +18,7 @@ use WebGUI::Session;
 use Test::More;
 use Test::MockObject::Extends;
 
-my $numTests = 37;
+my $numTests = 39;
 
 plan tests => $numTests;
 
@@ -149,35 +149,37 @@ is($eh->canShowBasedOnIP(''), 0, 'canShowBasedOnIP: must send IP setting');
 #
 ####################################################
 
-my $origDebugIp   = $session->setting->get('debugIp');
-my $origShowDebug = $session->setting->get('showDebug');
 
 $session->setting->set('showDebug', 0);
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if not enabled');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if not enabled');
 
 $session->setting->set('showDebug', 1);
 $session->http->setMimeType('audio/mp3');
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if mime type is wrong');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if mime type is wrong');
 
 $session->http->setMimeType('text/html');
 $session->setting->set('debugIp', '');
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is empty string');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is empty string');
 
 $session->setting->set('debugIp', '10.0.0.5/32, 192.168.0.4/30');
 $newEnv{REMOTE_ADDR} = '172.17.0.5';
-is($eh->canShowDebug, 0, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
+delete $eh->{_canShowDebug};
+ok(! $eh->canShowDebug, 'canShowDebug: returns 0 if debugIp is set and IP address is out of filter');
 $newEnv{REMOTE_ADDR} = '10.0.0.5';
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
 $newEnv{REMOTE_ADDR} = '192.168.0.5';
-is($eh->canShowDebug, 1, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
+delete $eh->{_canShowDebug};
+ok($eh->canShowDebug, 'canShowDebug: returns 1 if debugIp is set and IP address matches filter');
 
 ####################################################
 #
 # canShowPerformanceIndicators
 #
 ####################################################
-
-my $origShowPerf = $session->setting->get('showPerformanceIndicators');
 
 $session->setting->set('showPerformanceIndicators', 0);
 is($eh->canShowPerformanceIndicators, 0, 'canShowPerformanceIndicators: returns 0 if not enabled');
@@ -217,9 +219,24 @@ foreach my $entry (qw/_debug_error _debug_warn _debug_info _debug_debug/) {
 
 my $showDebug = $eh->showDebug;
 
-END {
-	$session->setting->set('debugIp',   $origDebugIp);
-	$session->setting->set('showDebug', $origShowDebug);
+####################################################
+#
+# fatal, stub
+#
+####################################################
 
-	$session->setting->set('showPerformanceIndicators', $origShowPerf);
+my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
+my $outputBuffer;
+open my $outputHandle, '>', \$outputBuffer or die "Unable to create scalar filehandle: $!\n";
+$newSession->output->setHandle($outputHandle);
+WEBGUI_FATAL: {
+    $newSession->log->fatal('Bad things are happenning');
+}
+ok(1, 'fatal: recovered from fatal okay');
+TODO: {
+    local $TODO = 'Validate the fatal output';
+    ok(0, 'output from fatal when there is a db handler and request present');
+}
+
+END {
 }

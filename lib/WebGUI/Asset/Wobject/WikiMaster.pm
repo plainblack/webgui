@@ -1,7 +1,7 @@
 package WebGUI::Asset::Wobject::WikiMaster;
 
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -10,7 +10,8 @@ package WebGUI::Asset::Wobject::WikiMaster;
 # http://www.plainblack.com                     info@plainblack.com
 #-------------------------------------------------------------------
 
-use base 'WebGUI::Asset::Wobject';
+use Class::C3;
+use base qw(WebGUI::AssetAspect::RssFeed WebGUI::Asset::Wobject);
 use strict;
 use Tie::IxHash;
 use WebGUI::International;
@@ -70,6 +71,7 @@ sub appendRecentChanges {
 			username=>$user->username,
 			date=>$self->session->datetime->epochToHuman($asset->get("revisionDate")),
 			isAvailable=>$isAvailable,
+            assetId=>$id,
 			});
 	}
 }
@@ -139,7 +141,7 @@ sub autolinkHtml {
 #-------------------------------------------------------------------
 sub canAdminister {
 	my $self = shift;
-	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->SUPER::canEdit;
+	return $self->session->user->isInGroup($self->get('groupToAdminister')) || $self->WebGUI::Asset::Wobject::canEdit;
 }
 
 #-------------------------------------------------------------------
@@ -164,7 +166,7 @@ sub canEdit {
                         ) &&
                         $self->canEditPages
                 ) || # account for new posts
-                $self->SUPER::canEdit()
+                $self->next::method()
         );
 }
 
@@ -337,13 +339,44 @@ sub definition {
 	      properties => \%properties,
 	     };
 
-        return $class->SUPER::definition($session, $definition);
+        return $class->next::method($session, $definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getRssFeedItems ()
+
+Returns an array reference of hash references. Each hash reference has a title,
+description, link, and date field. The date field can be either an epoch date, an RFC 1123
+date, or a ISO date in the format of YYYY-MM-DD HH:MM::SS. Optionally specify an
+author, and a guid field.
+
+=cut
+
+sub getRssFeedItems {
+    my $self        = shift;
+    my $vars = {};
+    $self->appendRecentChanges( $vars, $self->get('itemsPerFeed') );
+    my $var = [];
+    foreach my $item ( @{ $vars->{recentChanges} } ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $self->session, $item->{assetId} );
+        push @{ $var }, {
+            'link'          => $asset->getUrl,
+            'guid'          => $item->{ 'assetId' } . $asset->get( 'revisionDate' ),
+            'title'         => $asset->getTitle,
+            'description'   => $item->{ 'actionTaken' },
+            'date'          => $item->{ 'date' },
+            'author'        => $item->{ 'username' },
+        };
+    }
+    
+    return $var;
 }
 
 #-------------------------------------------------------------------
 sub prepareView {
 	my $self = shift;
-	$self->SUPER::prepareView;
+	$self->next::method;
 	$self->{_frontPageTemplate} =
 	    WebGUI::Asset::Template->new($self->session, $self->get('frontPageTemplateId'));
 	$self->{_frontPageTemplate}->prepare;
@@ -355,7 +388,7 @@ sub processPropertiesFromFormPost {
 	my $groupsChanged =
 	    (($self->session->form->process('groupIdView') ne $self->get('groupIdView'))
 	     or ($self->session->form->process('groupIdEdit') ne $self->get('groupIdEdit')));
-	my $ret = $self->SUPER::processPropertiesFromFormPost(@_);
+	my $ret = $self->next::method(@_);
 	if ($groupsChanged) {
 		foreach my $child (@{$self->getLineage(['children'], {returnObjects => 1})}) {
 			$child->update({ groupIdView => $self->get('groupIdView'),

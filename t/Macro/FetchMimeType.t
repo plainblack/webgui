@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -21,37 +21,27 @@ my $session = WebGUI::Test->session;
 
 my @testSets = (
 	{
-		input => 'webgui.txt',
+		input  => 'webgui.txt',
 		output => 'text/plain',
 		comment => q|text|,
 	},
 	{
-		input => 'plainblack.gif',
+		input  => 'plainblack.gif',
 		output => 'image/gif',
 		comment => q|gif|,
 	},
 	{
-		input => 'background.jpg',
+		input  => 'background.jpg',
 		output => 'image/jpeg',
 		comment => q|jpeg|,
 	},
 	{
-		input => 'colorPicker.js',
-		output => 'application/octet-stream',
-		comment => q|javascript|,
-	},
-	{
-		input => 'favIcon.ico',
-		output => 'application/octet-stream',
-		comment => q|octet-stream for unknown type|,
-	},
-	{
-		input => '',
+		input  => '',
 		output => 'application/octet-stream',
 		comment => q|Null path returns application/octet-stream|,
 	},
 	{
-		input => undef,
+		input  => undef,
 		output => undef,
 		comment => q|Undef path returns undef|,
 	},

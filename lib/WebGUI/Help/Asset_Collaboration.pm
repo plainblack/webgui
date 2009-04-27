@@ -20,7 +20,6 @@ our $HELP = {
             { 'name' => 'open.label' },
             { 'name' => 'close.label' },
             { 'name' => 'closed.label' },
-            { 'name' => 'collaborationAssetId' },
             { 'name' => 'critical.label' },
             { 'name' => 'minor.label' },
             { 'name' => 'cosmetic.label' },
@@ -154,7 +153,8 @@ our $HELP = {
             { 'name' => 'sortby.lastreply.url' },
             { 'name' => 'sortby.views.url' },
             { 'name' => 'sortby.replies.url' },
-            { 'name' => 'sortby.rating.url' }
+            { 'name' => 'sortby.rating.url' },
+            { 'name' => 'collaborationAssetId' },
         ],
         related => [
             {   tag       => 'collaboration template labels',

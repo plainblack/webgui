@@ -4,8 +4,8 @@ use strict;
 
 
 our $HELP = { 
-	'template' => {	
 
+	'template' => {	
 		title => 'subscription template', 
 		body => '',	
 		isa => [
@@ -27,6 +27,20 @@ our $HELP = {
 			{	name => 'redeemCodeLabel' , required=>1 },
 			{	name => 'redeemCodeUrl' , required=>1 },
 			{	name => 'price' , required=>1 },
+		],
+		related => [  
+		],
+	},
+
+	'redeem subscription template' => {	
+		title => 'help redeem code template title', 
+		body => '',	
+		isa => [ ],
+		fields => [	],
+		variables => [
+			{ name => 'batchDescription' , required=>1},
+			{ name => 'message' , required=>1 },
+			{ name => 'codeForm' , required=>1 },
 		],
 		related => [  
 		],

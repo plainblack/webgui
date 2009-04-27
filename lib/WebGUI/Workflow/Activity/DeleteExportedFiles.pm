@@ -4,7 +4,7 @@ package WebGUI::Workflow::Activity::DeleteExportedFiles;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -37,6 +37,11 @@ See WebGUI::Workflow::Activity for details on how to use any activity.
 
 
 #-------------------------------------------------------------------
+
+=head2 definition 
+
+=cut
+
 sub definition {
 	my $class = shift;
 	my $session = shift;
@@ -56,11 +61,23 @@ sub definition {
 use constant DELETE_FILES_SCRATCH => 'Workflow_Activity_DeleteExportedFiles_deleteFiles';
 use constant PRUNE_DIRS_SCRATCH => 'Workflow_Activity_DeleteExportedFiles_pruneDirs';
 
+#-------------------------------------------------------------------
+
+=head2 _canonExportPath 
+
+=cut
+
 sub _canonExportPath {
 	my $self = shift;
 	my $path = shift;
 	$self->session->config->get('exportPath').'/'.canonpath($path);
 }
+
+#-------------------------------------------------------------------
+
+=head2 _pruneOfFile 
+
+=cut
 
 sub _pruneOfFile {
 	my $self = shift;
@@ -72,6 +89,12 @@ sub _pruneOfFile {
 
 	return ();
 }
+
+#-------------------------------------------------------------------
+
+=head2 execute 
+
+=cut
 
 sub execute {
 	my $self = shift;

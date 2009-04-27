@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -86,7 +86,7 @@ is($thingy->get('defaultThingId'),$thingId,"The Thingy assets defaultThingId was
 
 $session->user({userId => 3});
 my $json = $thingy->www_getThingViaAjax($thingId);
-my $dataFromJSON = JSON->new->utf8->decode($json);
+my $dataFromJSON = JSON->new->decode($json);
 
 cmp_deeply(
         $dataFromJSON,
@@ -127,7 +127,7 @@ cmp_deeply(
 # the newly created thing.
 
 $json = $thingy->www_getThingsViaAjax();
-$dataFromJSON = JSON->new->utf8->decode($json);
+$dataFromJSON = JSON->new->decode($json);
 
 cmp_deeply(
         $dataFromJSON,
@@ -228,7 +228,7 @@ cmp_deeply(
     );
 
 $json = $thingy->www_viewThingDataViaAjax($thingId,$newThingDataId);
-$dataFromJSON = JSON->new->utf8->decode($json);
+$dataFromJSON = JSON->new->decode($json);
 
 cmp_deeply(
         $dataFromJSON,
@@ -276,7 +276,7 @@ $thingy->deleteThingData($thingId,$newThingDataId);
 is($thingy->getViewThingVars($thingId,$newThingDataId),undef,'Thing data was succesfully deleted, getViewThingVars returns undef.');
 
 $json = $thingy->www_viewThingDataViaAjax($thingId,$newThingDataId);
-$dataFromJSON = JSON->new->utf8->decode($json);
+$dataFromJSON = JSON->new->decode($json);
 
 cmp_deeply(
         $dataFromJSON,

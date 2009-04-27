@@ -3,7 +3,7 @@ package WebGUI::Keyword;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -88,6 +88,67 @@ sub deleteKeyword {
     $self->session->db->write("delete from assetKeyword where keyword=?", [$options->{keyword}]);
 }
 
+#-------------------------------------------------------------------
+
+=head2 findKeywords ( $options )
+
+Find keywords.
+
+=head3 $options
+
+A hashref of options to change the behavior of the method.
+
+=head4 asset
+
+Find all keywords for all assets below an asset, providing a WebGUI::Asset object.
+
+=head4 assetId
+
+Find all keywords for all assets below an asset, providing an assetId.
+
+=head4 search
+
+Find all keywords using the SQL clause LIKE.  This can be used in tandem with asset or assetId.
+
+=head4 limit
+
+Limit the number of keywords that are returned.
+
+=cut
+
+sub findKeywords {
+    my $self = shift;
+    my $options = shift;
+
+    my $sql = 'SELECT keyword FROM assetKeyword';
+    my @where;
+    my @placeholders;
+    my $parentAsset;
+    if ($options->{asset}) {
+        $parentAsset = $options->{asset};
+    }
+    if ($options->{assetId}) {
+        $parentAsset = WebGUI::Asset->new($self->session, $options->{assetId});
+    }
+    if ($parentAsset) {
+        $sql .= ' INNER JOIN asset USING (assetId)';
+        push @where, 'lineage LIKE ?';
+        push @placeholders, $parentAsset->get('lineage') . '%';
+    }
+    if ($options->{search}) {
+        push @where, 'keyword LIKE ?';
+        push @placeholders, '%' . $options->{search} . '%';
+    }
+    if (@where) {
+        $sql .= ' WHERE ' . join(' AND ', @where);
+    }
+    $sql .= ' GROUP BY keyword';
+    if ($options->{limit}) {
+        $sql .= ' LIMIT ' . $options->{limit};
+    }
+    my $keywords = $self->session->db->buildArrayRef($sql, \@placeholders);
+    return $keywords;
+}
 
 #-------------------------------------------------------------------
 
@@ -115,7 +176,16 @@ site.
 
 =head3 maxKeywords
 
-The maximum number of keywords to display in the cloud. Defaults to 50. Valid range between 1 and 50, inclusive.
+The maximum number of keywords to display in the cloud. Defaults to 50. Valid range between 1 and 100, inclusive.
+
+=head3 urlCallback
+
+This is the name of a method that will be called on the displayAsset, or the startAsset to get the URL
+that elements in the tag cloud will link to.  The method will be passed the keyword as its first, and only argument.
+
+=head3 includeOnlyKeywords
+
+This is an arrayref of keywords.  The generated cloud will only contain these keywords.
 
 =cut
 
@@ -123,21 +193,40 @@ sub generateCloud {
     my $self = shift;
     my $options = shift;
     my $display = $options->{displayAsset} || $options->{startAsset};
-    my $sth = $self->session->db->read("select count(*) as keywordTotal, keyword from assetKeyword 
-        left join asset using (assetId) where lineage like ? group by keyword order by keywordTotal desc limit 50", 
-        [ $options->{startAsset}->get("lineage").'%' ]);
+    my $includeKeywords = $options->{includeOnlyKeywords};
+    my $maxKeywords = $options->{maxKeywords} || 50;
+    if ($maxKeywords > 100) {
+        $maxKeywords = 100;
+    }
+    my $urlCallback = $options->{urlCallback};
+    my $extraWhere = '';
+    my @extraPlaceholders;
+    if ($includeKeywords) {
+        $extraWhere .= ' AND keyword IN (' . join(',', ('?') x @{$includeKeywords}) . ')';
+        push @extraPlaceholders, @{$includeKeywords};
+    }
+    my $sth = $self->session->db->read("SELECT COUNT(*) as keywordTotal, keyword FROM assetKeyword
+        LEFT JOIN asset USING (assetId) WHERE lineage LIKE ? $extraWhere
+        GROUP BY keyword ORDER BY keywordTotal DESC LIMIT ?",
+        [ $options->{startAsset}->get("lineage").'%', @extraPlaceholders, $maxKeywords ]);
     my $cloud = HTML::TagCloud->new(levels=>$options->{cloudLevels} || 24);
     while (my ($count, $keyword) = $sth->array) {
-        $cloud->add($keyword, $display->getUrl("func=".$options->{displayFunc}.";keyword=".$keyword), $count);
+        my $url
+            = $urlCallback ? $display->$urlCallback($keyword)
+            : $options->{displayFunc} ? $display->getUrl("func=".$options->{displayFunc}.";keyword=".$keyword)
+            : $display->getUrl("keyword=".$keyword)
+            ;
+        $cloud->add($keyword, $url, $count);
     }
-    return $cloud->html_and_css($options->{maxKeywords});
+    return $cloud->html_and_css($maxKeywords);
 }
 
 #-------------------------------------------------------------------
 
 =head2 getKeywordsForAsset ( { asset => $asset } )
 
-Returns a string of keywords separated by spaces.
+Returns a string of keywords separated by spaces.  If the keyword has spaces in it, it
+will be quoted.
 
 =head3 asset
 
@@ -151,13 +240,14 @@ A boolean, that if set to 1 will return the keywords as an array reference rathe
 
 sub getKeywordsForAsset {
     my ($self, $options) = @_;
-    my @keywords = $self->session->db->buildArray("select keyword from assetKeyword where assetId=?",
-        [$options->{asset}->getId]);
+    my $assetId = $options->{asset} ? $options->{asset}->getId : $options->{assetId};
+    my $keywords = $self->session->db->buildArrayRef("select keyword from assetKeyword where assetId=?",
+        [$assetId]);
     if ($options->{asArrayRef}) {
-        return \@keywords;
+        return $keywords;
     }
     else {
-        return join(" ", map({ (m/\s/) ? '"' . $_ . '"' : $_ } @keywords));
+        return join(', ', @$keywords);
     }
 }
 
@@ -316,9 +406,9 @@ Either a string of space-separated keywords, or an array reference of keywords t
 sub setKeywordsForAsset {
     my $self = shift;
     my $options = shift;
-    my $keywords = [];
+    my $keywords;
     if (ref $options->{keywords} eq "ARRAY") {
-       $keywords = $options->{keywords}; 
+        $keywords = $options->{keywords};
     }
     else {
         $keywords = string2list($options->{keywords});
@@ -334,7 +424,7 @@ sub setKeywordsForAsset {
             next
                 if $found_keywords{$keyword};
             $found_keywords{$keyword}++;
-            $sth->execute([$assetId, lc($keyword)]);
+            $sth->execute([$assetId, $keyword]);
         }
     }
 }
@@ -347,35 +437,18 @@ Returns an array reference of phrases.
 
 =head3 string
 
-A scalar containing space separated phrases.
+A scalar containing comma separated phrases.
 
 =cut
 
 sub string2list {
     my $text = shift;
     return if (ref $text);
-    my @words = ();
-    my $word = '';
-    my $errorFlag = 0;
-    while ( defined $text and length $text and not $errorFlag) {
-        if ($text =~ s/\A(?: ([^\"\s\\]+) | \\(.) )//mx) {
-            $word .= $1;
-        } 
-        elsif ($text =~ s/\A"((?:[^\"\\]|\\.)*)"//mx) {
-            $word .= $1;
-        } 
-        elsif ($text =~ s/\A\s+//m){
-            push(@words, $word);
-            $word = '';
-        } 
-        elsif ($text =~ s/\A"//) {
-            $errorFlag = 1;
-        } 
-        else {
-            $errorFlag = 1;
-        }
+    my @words = split /,/, $text;
+    for my $word (@words) {
+        $word =~ s/^\s+//;
+        $word =~ s/\s+$//;
     }
-    push(@words, $word);
     return \@words;
 }
 

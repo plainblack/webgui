@@ -3,7 +3,7 @@ package WebGUI::Content::Setup;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -454,7 +454,7 @@ a:visited { color: '.$form->get("visitedLinkColor").'; }
                 description         => $i18n->get("We welcome your feedback."),
                 acknowledgement     => $i18n->get("Thanks for for your interest in ^c;. We will review your message shortly."),
                 mailData            => 1,
-                fieldConfiguration  => JSON::encode_json(\@fieldConfig),
+                fieldConfiguration  => JSON::to_json(\@fieldConfig),
                 });
         }
 

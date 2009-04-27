@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Calendar;
 use strict;
 
 #----------------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #----------------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -24,7 +24,7 @@ use WebGUI::DateTime;
 use base 'WebGUI::Asset::Wobject';
 
 use DateTime;
-use JSON qw/encode_json/;
+use JSON;
 
 =head1 NAME
 
@@ -584,26 +584,31 @@ sub getEditForm {
     
     </script>
 ENDJS
-    
-    
-    $tab->raw(<<'ENDHTML');
-    <label for="addFeed">Add a feed</label>
+
+
+    my $addFeed = $i18n->get('Add a feed');
+    my $add     = $i18n->get('Add');
+    my $feedUrl = $i18n->get('Feed URL');
+    my $status  = $i18n->get('434', 'WebGUI');
+    my $lastUpdated  = $i18n->get('454', 'WebGUI');
+    $tab->raw(<<"ENDHTML");
+    <label for="addFeed">$addFeed</label>
     <input type="text" size="60" id="addFeed" name="addFeed" value="" />
-    <input type="button" value="Add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
+    <input type="button" value="$add" onclick="FeedsManager.addFeed('feeds','new',{ 'url' : this.form.addFeed.value }); this.form.addFeed.value=''" />
     
     <table id="feeds" style="width: 100%;">
     <thead>
         <th style="width: 30px;">&nbsp;</th>
-        <th style="width: 50%;">Feed URL</th>
-        <th>Status</th>
-        <th>Last Updated</th>
+        <th style="width: 50%;">$feedUrl</th>
+        <th>$status</th>
+        <th>$lastUpdated</th>
         <th>&nbsp;</th>
     </thead>
     </table>
 ENDHTML
-    
-    
-    
+
+
+
     # Add the existing feeds
     my $feeds    = $self->getFeeds();
     $tab->raw('<script type="text/javascript">'."\n");
@@ -612,8 +617,8 @@ ENDHTML
         $tab->raw("FeedsManager.addFeed('feeds','".$feedId."',".JSON->new->encode( \%row ).");\n");
     }
     $tab->raw('</script>');
-    
-    
+
+
     $tab->raw("</td></tr>");
     return $form;
 }
@@ -2059,14 +2064,9 @@ sub www_search {
         });
 
     # This is very bad! It should be $self->processStyle or whatnot.
-    $self->session->http->sendHeader;
-    my $template    = WebGUI::Asset::Template->new($self->session,$self->get("templateIdSearch"));
-    my $style = $self->session->style->process($self->getSeparator,$self->get("styleTemplateId"));
-    my ($head, $foot) = split($self->getSeparator,$style);
-    $self->session->output->print($head, 1);
-    $self->session->output->print($self->processTemplate($var, undef, $template));
-    $self->session->output->print($foot, 1);
-    return "chunked";
+    return $self->processStyle(
+        $self->processTemplate( $var, $self->get('templateIdSearch') )
+    );
 }
 
 #----------------------------------------------------------------------------

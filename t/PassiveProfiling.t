@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -28,7 +28,6 @@ my $startingTime = $session->datetime->time();
 my $numTests = 5; # increment this value for each test you create
 plan tests => 1 + $numTests;
 
-my $origPassiveProfiling = $session->setting->get('passiveProfilingEnabled');
 my $loaded = use_ok('WebGUI::PassiveProfiling');
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -122,7 +121,6 @@ cmp_bag(
 }
 
 END {
-    $session->setting->set('passiveProfilingEnabled', $origPassiveProfiling);
     $session->db->write('delete from passiveProfileLog where dateOfEntry >= ?',[$startingTime-1]);
     $versionTag->rollback;
 }

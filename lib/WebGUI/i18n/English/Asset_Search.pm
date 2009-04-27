@@ -144,14 +144,31 @@ our $I18N = { ##hashref of hashes
 		lastUpdated => 1170549116,
 	},
 
+	'resultsFeedback' => {
+		message => q|Search results for|,
+		lastUpdated => 1230678996,
+	},
+
+	'page' => {
+		message => q|Page|,
+		lastUpdated => 1230678996,
+	},
+
+	'of' => {
+		message => q|of|,
+		lastUpdated => 1230678996,
+	},
+
 	'no results' => {
 		message => q|No results were found.|,
+		context => q|An internationalized label for telling the user that no results were found.|,
 		lastUpdated => 1170549113,
 	},
 
 	'no_results' => {
 		message => q|An internationalized label for telling the user that no results were found.|,
-		lastUpdated => 1170549119,
+		context => q|Template variable in the view method.|,
+		lastUpdated => 1236101532,
 	},
 
 };

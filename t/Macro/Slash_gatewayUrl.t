@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -29,8 +29,6 @@ $numTests += 1; #For the use_ok
 
 plan tests => $numTests;
 
-my $preventProxyCache = $session->setting->get('preventProxyCache');
-
 my $macro = 'WebGUI::Macro::Slash_gatewayUrl';
 my $loaded = use_ok($macro);
 
@@ -38,7 +36,7 @@ SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
-$session->setting->set('preventProxyCache', 0) if ($preventProxyCache);
+$session->setting->set('preventProxyCache', 0);
 
 my $output;
 
@@ -61,9 +59,4 @@ $session->setting->set('preventProxyCache', 0);
 }
 
 END {
-	# 
-	# Not sure we should be doing this.  I understand we want to leave things as we found them, however if this is set, a lot of tests after this one will fail.
-	# Perhaps we should set it to 0 always, regardless of their setting?
-	#
-	$session->setting->set('preventProxyCache', $preventProxyCache);
 }

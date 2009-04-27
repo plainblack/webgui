@@ -3,7 +3,7 @@ package WebGUI::Asset::Snippet;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -191,37 +191,41 @@ sub purgeCache {
 }
 
 #-------------------------------------------------------------------
+
+=head2 view ( $calledAsWebMethod )
+
+Override the base class to implement caching, template and macro processing.
+
+=head3 $calledAsWebMethod
+
+If this is true, then change the cache method, and do not display the
+toolbar if in adminMode.
+
+=cut
+
 sub view {
 	my $self = shift;
 	my $calledAsWebMethod = shift;
-    my $versionTag = WebGUI::VersionTag->getWorking($self->session, 1);
+    my $session = $self->session;
+    my $versionTag = WebGUI::VersionTag->getWorking($session, 1);
     my $noCache =
-        $self->session->var->isAdminOn
+        $session->var->isAdminOn
         || $self->get("cacheTimeout") <= 10
         || ($versionTag && $versionTag->getId eq $self->get("tagId"));
     unless ($noCache) {
-		my $out = WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->get;
+		my $out = WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->get;
 		return $out if $out;
 	}
 	my $output = $self->get("snippet");
-	WebGUI::Macro::process($self->session,\$output);
-	$output = $self->getToolbar.$output if ($self->session->var->isAdminOn && !$calledAsWebMethod);
+	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
 	if ($self->getValue("processAsTemplate")) {
-		$output = WebGUI::Asset::Template->processRaw($self->session, $output, $self->get);
+		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);
 	}
+	WebGUI::Macro::process($session,\$output);
     unless ($noCache) {
-		WebGUI::Cache->new($self->session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
+		WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->set($output,$self->get("cacheTimeout"));
 	}
        	return $output;
-}
-
-#-------------------------------------------------------------------
-sub www_edit {
-    my $self = shift;
-    return $self->session->privilege->insufficient() unless $self->canEdit;
-    return $self->session->privilege->locked() unless $self->canEditIfLocked;
-	return $self->getAdminConsole->render($self->getEditForm->print,$self->addEditLabel);
-
 }
 
 #-------------------------------------------------------------------
@@ -233,12 +237,12 @@ A web accessible version of the view method.
 =cut
 
 sub www_view {
-	my $self = shift;
-        return $self->session->privilege->insufficient() unless $self->canView;
-	my $mimeType=$self->getValue('mimeType');
-	$self->session->http->setMimeType($mimeType || 'text/html');
-	$self->session->http->setCacheControl($self->get("cacheTimeout"));
-	return $self->view(1);
+    my $self = shift;
+    return $self->session->privilege->insufficient() unless $self->canView;
+    my $mimeType=$self->getValue('mimeType');
+    $self->session->http->setMimeType($mimeType || 'text/html');
+    $self->session->http->setCacheControl($self->get("cacheTimeout"));
+    return $self->view(1);
 }
 
 

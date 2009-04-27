@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2007 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -25,7 +25,6 @@ use WebGUI::Asset::Template;
 
 use Test::More; # increment this value for each test you create
 my $numTests = 0;
-plan skip_all => 'set CODE_COP to enable this test' unless $ENV{CODE_COP};
 
 my $session = WebGUI::Test->session;
 my $lib = WebGUI::Test->lib;
@@ -53,12 +52,12 @@ my @templateLabels;
 
 while (my $templateAsset = $getATemplate->()) {
     my $template = $templateAsset->get('template');
-    my $header   = $templateAsset->get('headBlock');
+    my $header   = $templateAsset->get('extraHeadTags');
     my $match =  ($template =~ $macro);
     if ($header) {
         $match ||= ($header =~ $macro);
     }
-    ok(!$match, sprintf "%s: (%s) has no bad gateway macros", $templateAsset->getTitle, $templateAsset->getId);
+    ok(!$match, sprintf "%s: %s (%s) has no bad gateway macros", $templateAsset->getTitle, $templateAsset->getId, $templateAsset->getUrl);
 }
 
 

@@ -3,7 +3,7 @@ package WebGUI::Asset::Wobject::Layout;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -175,6 +175,7 @@ sub prepareView {
     }
 
     my %vars;
+    $vars{showAdmin} = ($session->var->isAdminOn && $self->canEdit && $self->canEditIfLocked);
 
     my $splitter = $self->{_viewSplitter} = $self->getSeparator;
 
@@ -194,9 +195,12 @@ sub prepareView {
         $child->prepareView;
         $placeHolder{$assetId} = $child;
         push @children, {
-            id              => $assetId,
-            isUncommitted   => $child->get('status') eq 'pending',
-            content         => $splitter . $assetId . '~~',
+            id             => $assetId,
+            isUncommitted  => $child->get('status') eq 'pending',
+            content        => $splitter . $assetId . '~~',
+        };
+        if ($vars{showAdmin}) {
+            $children[-1]->{'dragger.icon'} = sprintf '<div id="td%s_handle" class="dragable"><div class="dragTrigger dragTriggerWrap">%s</div></div>', $assetId, $session->icon->drag('class="dragTrigger"');
         };
     }
 
@@ -230,11 +234,14 @@ sub prepareView {
         unshift @{ $vars{"position1_loop"} }, reverse @children;
     }
 
-    $vars{showAdmin} = ($session->var->isAdminOn && $self->canEdit && $self->canEditIfLocked);
     if ($vars{showAdmin}) {
         # under normal circumstances we don't put HTML stuff in our code, but this will make it much easier
         # for end users to work with our templates
-        $session->style->setScript($session->url->extras("draggable.js"),{ type=>"text/javascript" });
+        $session->style->setScript($session->url->extras("yui/build/yahoo-dom-event/yahoo-dom-event.js"),{ type=>"text/javascript" });
+        $session->style->setScript($session->url->extras("yui/build/animation/animation-min.js"),{ type=>"text/javascript" });
+        $session->style->setScript($session->url->extras("yui/build/dragdrop/dragdrop.js"),{ type=>"text/javascript" });
+        $session->style->setScript($session->url->extras("yui-webgui/build/layout/draggable.js"),{ type=>"text/javascript" });
+
         $session->style->setLink($session->url->extras("draggable.css"),{ type=>"text/css", rel=>"stylesheet", media=>"all" });
         $session->style->setRawHeadTags('
             <style type="text/css">
@@ -243,7 +250,6 @@ sub prepareView {
             }
             </style>
         ');
-        $vars{"dragger.icon"} = '<div class="dragTrigger dragTriggerWrap">'.$session->icon->drag('class="dragTrigger"').'</div>';
         $vars{"dragger.init"} = '
             <iframe id="dragSubmitter" style="display: none;" src="'.$session->url->extras('spacer.gif').'"></iframe>
             <script type="text/javascript">

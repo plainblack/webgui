@@ -3,7 +3,7 @@ package WebGUI::Auth;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2007 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -304,8 +304,8 @@ sub createAccountSave {
         $var->{newUser_password}    = $password;
         my $message = WebGUI::Asset::Template->new($self->session,$self->getSetting('welcomeMessageTemplate'))->process($var);
         WebGUI::Macro::process($self->session,\$message);
-		WebGUI::Inbox->new($self->session)->addMessage({
-			message	=> $message,
+        WebGUI::Inbox->new($self->session)->addMessage({
+            message => $message,
 			subject	=> $i18n->get(870),
 			userId	=> $self->userId,
             status  => 'completed',

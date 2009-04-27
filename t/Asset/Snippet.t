@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------
-# WebGUI is Copyright 2001-2008 Plain Black Corporation.
+# WebGUI is Copyright 2001-2009 Plain Black Corporation.
 #-------------------------------------------------------------------
 # Please read the legal notices (docs/legal.txt) and the license
 # (docs/license.txt) that came with this distribution before using
@@ -16,7 +16,7 @@ use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 14; # increment this value for each test you create
+use Test::More tests => 15; # increment this value for each test you create
 use WebGUI::Asset::Snippet;
 
 my $session = WebGUI::Test->session;
@@ -69,6 +69,24 @@ isnt ($wwwViewOutput, undef, 'www_view returns something');
 
 my $editOutput = $snippet->www_edit;
 isnt ($editOutput, undef, 'www_edit returns something');
+
+$snippet->update({
+    title   => "authMethod",
+    processAsTemplate => 1,
+    cacheTimeout      => 1,
+    snippet => q|^SQL(select value from settings where name="<tmpl_var title>");|
+});
+
+my $sqlMacroAdded = exists $session->config->get('macros')->{'SQL'};
+if (! $sqlMacroAdded) {
+    $session->config->addToHash('macros', 'SQL', 'SQL');
+}
+
+is($snippet->view(), 'WebGUI', 'Interpolating macros in works with template in the correct order');
+
+if (! $sqlMacroAdded) {
+    $session->config->deleteFromHash('macros', 'SQL');
+}
 
 TODO: {
         local $TODO = "Tests to make later";

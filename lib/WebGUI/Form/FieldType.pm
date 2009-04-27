@@ -3,7 +3,7 @@ package WebGUI::Form::FieldType;
 =head1 LEGAL
 
  -------------------------------------------------------------------
-  WebGUI is Copyright 2001-2008 Plain Black Corporation.
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
  -------------------------------------------------------------------
   Please read the legal notices (docs/legal.txt) and the license
   (docs/license.txt) that came with this distribution before using
@@ -20,7 +20,7 @@ use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
-use Module::Find qw(findsubmod);
+use Module::Find qw(findallmod);
 
 =head1 NAME
 
@@ -113,7 +113,7 @@ sub getTypes {
     my $self = shift;
     my @types = @{$self->get('types')};
     unless (scalar(@types)) {
-        my @classes = findsubmod 'WebGUI::Form';
+        my @classes = findallmod 'WebGUI::Form';
         for my $class (@classes) {
             if ($class =~ /^WebGUI::Form::(.*)/) {
                 my $type = $1;
@@ -141,7 +141,7 @@ Returns either what's posted or if nothing comes back it returns "text".
 sub getValue {
 	my $self = shift;
 	my $fieldType = $self->SUPER::getValue(@_);
-	$fieldType =~ s/[^\w]//g;
+	$fieldType =~ s/[^\w:]//g;
 	return $fieldType || "text";
 }
 
