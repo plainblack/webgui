@@ -458,7 +458,9 @@ sub www_loadSurvey {
     }
     
     # Generate the list of valid goto targets
-    my @gotoTargets = $self->survey->getGotoTargets;
+    my @section_vars = map {$_->{variable}} @{$self->survey->sections};
+    my @question_vars = map {$_->{variable}} @{$self->survey->questions};
+    my @gotoTargets = grep {$_ ne ''} (@section_vars, @question_vars);
 
     my %buttons;
     $buttons{question} = $$address[0];
