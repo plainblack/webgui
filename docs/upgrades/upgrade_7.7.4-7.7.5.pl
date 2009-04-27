@@ -38,6 +38,8 @@ installStoryManagerTables($session);
 sm_upgradeConfigFiles($session);
 sm_updateDailyWorkflow($session);
 
+correctEventTemplateVariables($session);
+
 finish($session); # this line required
 
 
@@ -137,6 +139,31 @@ sub sm_updateDailyWorkflow {
     my $activity = $workflow->addActivity('WebGUI::Workflow::Activity::ArchiveOldStories');
     $activity->set('title',       'Archive Old Stories');
     $activity->set('description', 'Archive old stories, based on the settings of the Story Archives that own them');
+    print "DONE!\n" unless $quiet;
+}
+
+sub correctEventTemplateVariables {
+    my ($session) = @_;
+    print "\tCorrect Event Template Variables for URL actions... " unless $quiet;
+    my $root = WebGUI::Asset->getRoot($session);
+    my $getATemplate = $root->getLineageIterator(['descendants'], {
+        returnObjects      => 1,
+        includeOnlyClasses => ['WebGUI::Asset::Template'],
+        joinClass          => 'WebGUI::Asset::Template',
+        whereClause        => q!template.namespace = 'Calendar/Event' and template.parser='WebGUI::Asset::Template::HTMLTemplate'!,
+    });
+
+    TEMPLATE: while (my $templateAsset = $getATemplate->()) {
+        print("\t\t Correcting ". $templateAsset->getTitle. "\n") unless $quiet;
+        my $template = $templateAsset->get('template');
+        $template =~ s{<tmpl_var url>\?func=edit}{<tmpl_var urlEdit>}isg;
+        $template =~ s{<tmpl_var url>\?func=delete}{<tmpl_var urlDelete>}isg;
+        $template =~ s{<tmpl_var url>\?print=1}{<tmpl_var urlPrint>}isg;
+        $template =~ s{<tmpl_var url>\?type=list}{<tmpl_var urlList>}isg;
+        $templateAsset->update({
+            template => $template,
+        });
+    }
     print "DONE!\n" unless $quiet;
 }
 

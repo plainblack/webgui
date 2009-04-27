@@ -362,6 +362,11 @@ our $I18N = {
 		lastUpdated 	=> 1171043883,
 	},
 
+	'urlList' => {
+		message 	=> q|A URL to show Events as a list, rather than a calendar.|,
+		lastUpdated 	=> 1240635548,
+	},
+
 	'urlWeek' => {
 		message 	=> q|A URL to show all Events on the same week in this Event's Calendar.|,
 		lastUpdated 	=> 1171043883,
@@ -373,13 +378,28 @@ our $I18N = {
 	},
 
 	'urlParent' => {
-		message 	=> q|A URL the Calendar that contains this Event.|,
-		lastUpdated 	=> 1172693361,
+		message 	=> q|A URL to the Calendar that contains this Event.|,
+		lastUpdated 	=> 1240635921,
 	},
 
 	'urlSearch' => {
 		message 	=> q|A URL to the Search form for the Calendar that contains this Event.|,
 		lastUpdated 	=> 1172693363,
+	},
+
+	'urlEdit' => {
+		message 	=> q|A URL to edit this Event.|,
+		lastUpdated 	=> 1240635940,
+	},
+
+	'urlPrint' => {
+		message 	=> q|A URL to render this Event with its template for printing.|,
+		lastUpdated 	=> 1240635974,
+	},
+
+	'urlDelete' => {
+		message 	=> q|A URL to delete this Event.|,
+		lastUpdated 	=> 1240635972,
 	},
 
 	'relatedLinks' => {

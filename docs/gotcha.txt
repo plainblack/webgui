@@ -15,6 +15,15 @@ save you many hours of grief.
      the requirements for the new type.  The most common place this problem
      would be noticed would be if a text field was changed to HTML field.
 
+   * The Event url template variable was being used incorrectly.  This has
+     been fixed, but requires new template variables for viewing a list
+     of events, printing events and editing and deleting events.  Please
+     check the online Help for the new template variables.
+
+     Event templates using HTML::Template are automatically updated.  If your
+     site uses a different parser for this template it will need to be manually
+     upgraded.
+
 7.7.4
 --------------------------------------------------------------------
    * WebGUI now requires XML::FeedPP version 0.40 or greater.

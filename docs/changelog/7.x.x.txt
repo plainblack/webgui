@@ -6,6 +6,7 @@
  - fixed #10209: Changing existing user profile field type doesn't change underlying database column type
  - fixed #10047: SQLReport Debug doesn't catch when bind variables are incorrect
  - fixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
+ - fixed #10238: Edit Calendar Event not working when proxy cache disabled
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
