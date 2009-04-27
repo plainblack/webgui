@@ -8,6 +8,13 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.7.5
+--------------------------------------------------------------------
+   * Due to a long standing bug in the Profile system, if the type of a
+     Profile Field was changed, the database column was not updated to match
+     the requirements for the new type.  The most common place this problem
+     would be noticed would be if a text field was changed to HTML field.
+
 7.7.4
 --------------------------------------------------------------------
    * WebGUI now requires XML::FeedPP version 0.40 or greater.
@@ -15,6 +22,7 @@ save you many hours of grief.
 7.7.2
 --------------------------------------------------------------------
    * WebGUI now requires Clone version 0.31 or greater.
+
    * You must upgrade to WebGUI 7.7.2 before going on to higher versions of WebGUI due
      to changes in the database table for the Cart.
 
