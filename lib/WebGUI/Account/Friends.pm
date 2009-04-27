@@ -379,7 +379,7 @@ sub www_sendFriendsRequest {
     my $self     = shift;
     my $session  = $self->session;
     my $var      = {};
-    my $uid      = $self->uid || $session->form->get('uid');
+    my $uid      = $self->uid;
 
     my $user     = WebGUI::User->new($session,$uid);
     my $i18n     = WebGUI::International->new($session,'Account_Friends');
