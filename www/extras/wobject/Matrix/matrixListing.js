@@ -20,19 +20,11 @@ YAHOO.util.Event.addListener(window, "load", function() {
 			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
 		}
         };
-	this.formatColors = function(elCell, oRecord, oColumn, sData) {
-		if(oRecord.getData("fieldType") != 'category'){
-			var color = oRecord.getData("compareColor");
-			if(color){
-				Dom.setStyle(elCell.parentNode, "background-color", color);
-			}
-			elCell.innerHTML = sData;
-		}
-        };
+
         var myColumnDefs = [
             	{key:"stickied",formatter:this.formatStickied,label:""},
 		{key:"label",formatter:this.formatLabel,label:""},
-		{key:"value",label:"",formatter:this.formatColors}
+		{key:"value",label:""}
         ];
 
         this.myDataSource = new YAHOO.util.DataSource("?");
@@ -40,7 +32,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
         this.myDataSource.connXhrMode = "queueRequests";
         this.myDataSource.responseSchema = {
             resultsList: "ResultSet.Result",
-            fields: ["label","value","attributeId","fieldType","checked","description","compareColor"]
+            fields: ["label","value","attributeId","fieldType","checked","description"]
         };
 
 	var uri = "func=getAttributes";

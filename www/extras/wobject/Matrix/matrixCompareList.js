@@ -4,7 +4,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 	var hideStickies = 0;
 
 	this.formatStickied = function(elCell, oRecord, oColumn, sData) {
-		if(!(oRecord.getData("fieldType") in {'category':'','lastUpdated':''})){
+		if(oRecord.getData("fieldType") != 'category'){
             		var innerHTML = "<input type='checkBox' class='stickieCheckbox' id='" + oRecord.getData("attributeId") + "_stickied' name='" + oRecord.getData("attributeId") + "' onChange='setStickied(this)'";
 			if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
 				innerHTML = innerHTML + " checked='checked'";
@@ -15,14 +15,12 @@ YAHOO.util.Event.addListener(window, "load", function() {
         };
 
 	this.formatColors = function(elCell, oRecord, oColumn, sData) {
-		if(!(oRecord.getData("fieldType") in {'category':'','lastUpdated':''})){
+		if(oRecord.getData("fieldType") != 'category'){
 			var colorField = oColumn.key + "_compareColor";
 			var color = oRecord.getData(colorField);
 			if(color){
 				Dom.setStyle(elCell.parentNode, "background-color", color);
 			}
-			elCell.innerHTML = sData;
-		}else{
 			elCell.innerHTML = sData;
 		}
         };
@@ -30,10 +28,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(oRecord.getData("fieldType") == 'category'){
             		elCell.innerHTML = "<b>" +sData + "</b>";
 		}else{
-			elCell.innerHTML = sData; 
-			if(oRecord.getData("description")){
-				elCell.innerHTML = elCell.innerHTML + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
-			}
+			elCell.innerHTML = sData + "<div class='wg-hoverhelp'>" + oRecord.getData("description") +"</div>";
 		}
         };
 
@@ -86,7 +81,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		
 		for (var i = 0; i < len; i++) {
 		var c = oFullResponse.ColumnDefs[i];
-		oFullResponse.ColumnDefs[i].label = "<a href='"+ oFullResponse.ColumnDefs[i].url +"'>" + oFullResponse.ColumnDefs[i].label + "</a> <a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
+		oFullResponse.ColumnDefs[i].label = oFullResponse.ColumnDefs[i].label + "<a href='javascript:removeListing(\""+oFullResponse.ColumnDefs[i].key+"\")'><img src='/extras/toolbar/bullet/delete.gif' border='0'></a>"
 		myDataTable.insertColumn(c);
 		}
 	    }
@@ -157,7 +152,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		if(hideStickies == 0){
 			// hide non-selected attributes
 			for(i=0; i<elements.length; i++){
-				if(!(elements[i].getData('fieldType')  in {'category':'','lastUpdated':''})){
+				if(elements[i].getData('fieldType') != 'category'){
 					var attributeId = elements[i].getData('attributeId');
 					var checkBox = Dom.get(attributeId+"_stickied");
 					if (checkBox.checked == false){
@@ -170,7 +165,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		}else{
 			// show all attributes
 			for(i=0; i<elements.length; i++){
-				if(!(elements[i].getData('fieldType')  in {'category':'','lastUpdated':''})){
+				if(elements[i].getData('fieldType') != 'category'){
 					var attributeId = elements[i].getData('attributeId');
 					var checkBox = Dom.get(attributeId+"_stickied");
 					if (checkBox.checked == false){
