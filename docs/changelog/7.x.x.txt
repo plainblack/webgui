@@ -8,7 +8,7 @@
  - fixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
  - fixed #10238: Edit Calendar Event not working when proxy cache disabled
  - Fixed a bug in the RssFeed aspect that would cause the wrong HEAD links to be made for the feeds when exporting.
-
+ - Fixed a bug in the YUI simple editor for survey editing which was leaking memory.  Also improved the object edit templates.
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
  - fixed: 7.6 upgrade left some default content marked as packages

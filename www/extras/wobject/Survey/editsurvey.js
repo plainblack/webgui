@@ -197,4 +197,5 @@ Survey.Data = (function(){
 YAHOO.util.Event.onDOMReady(function(){
 	//var ddTarget = new YAHOO.util.DDTarget("sections", "sections");
     Survey.Comm.loadSurvey();
+    Survey.ObjectTemplate.initObjectEditor();
 });
