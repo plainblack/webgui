@@ -8,6 +8,7 @@
  - fixed #10238: Edit Calendar Event not working when proxy cache disabled
  - fixed #10193: matrix/broken save - maximum group field 
  - fixed #10184: Matrix 2.0 - Version Tag Duplicate Type
+ - fixed #10182: Matrix 2.0 - Comparison view broken in IE 6 & 7
 
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
