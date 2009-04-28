@@ -173,6 +173,71 @@ YAHOO.util.Event.addListener(window, "load", function() {
     };
 });
 
+YAHOO.util.Event.addListener(window, "load", function() {
+    YAHOO.example.XHR_JSON2 = new function() {
+        this.formatUrl = function(elCell, oRecord, oColumn, sData) {
+	     elCell.innerHTML = "<a href='" + oRecord.getData("url") + "'>" + sData + "</a>";
+        };
+	this.formatCheckBox = function(elCell, oRecord, oColumn, sData) { 
+		var innerHTML = "<input type='checkbox' name='listingId' value='" + sData + "' id='" + sData + "_checkBox'";
+		if(typeof(oRecord.getData("checked")) != 'undefined' && oRecord.getData("checked") == 'checked'){
+			innerHTML = innerHTML + " checked='checked'";
+		}
+		innerHTML = innerHTML + " class='compareCheckBox'>";
+		elCell.innerHTML = innerHTML;
+	};
+
+        var myColumnDefs = [
+	    {key:"assetId",label:"",sortable:false, formatter:this.formatCheckBox},
+            {key:"title", label:"", sortable:true, formatter:this.formatUrl},
+            {key:"views", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
+            {key:"clicks", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
+            {key:"compares", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}},
+            {key:"lastUpdated", sortable:true, sortOptions:{defaultDir:YAHOO.widget.DataTable.CLASS_DESC}}
+        ];
+
+	var uri = "func=getCompareFormData";
+		if(typeof(listingIds) != 'undefined'){
+		uri = uri + ';__listingId_isIn=1';
+		for (var i = 0; i < listingIds.length; i++) {
+			uri = uri+';listingId='+listingIds[i];
+		}
+	}
+
+        this.myDataSource = new YAHOO.util.DataSource(matrixUrl + "?");
+        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+        this.myDataSource.connXhrMode = "queueRequests";
+        this.myDataSource.responseSchema = {
+            resultsList: "ResultSet.Result",
+            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked"},{key: "lastUpdated", parser: "number"},"url","assetId"]
+        };
+
+        this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
+                this.myDataSource, {initialRequest:uri});
+
+	this.myDataTable.hideColumn(this.myDataTable.getColumn(2)); 
+	this.myDataTable.hideColumn(this.myDataTable.getColumn(3)); 
+	this.myDataTable.hideColumn(this.myDataTable.getColumn(4)); 
+	this.myDataTable.hideColumn(this.myDataTable.getColumn(5)); 
+
+        var myCallback = function() {
+            this.set("sortedBy", null);
+            this.onDataReturnAppendRows.apply(this,arguments);
+        };
+	
+	if(document.getElementById("search")){
+	var btnSearch = new YAHOO.widget.Button("search");
+        btnSearch.on("click", function(e) {
+		window.location.href = matrixUrl + '?func=search';
+	},this,true);
+	}
+
+	window.compareDataTable = this.myDataTable;
+
+    };
+});
+
+
 function setStickied (checkbox) {
 	if(checkbox.checked == true){
 		var request = YAHOO.util.Connect.asyncRequest('POST', "?func=setStickied;attributeId="+checkbox.name);
