@@ -41,9 +41,9 @@ None.  There is only 1 sequence of rules for a site.
 
 The name of a bucket to hold results for this rule.
 
-=head4 rules
+=head4 regular expression.
 
-JSON blob with configuration data for the individual rules.
+A regular expression to match against log entries.
 
 =cut
 
