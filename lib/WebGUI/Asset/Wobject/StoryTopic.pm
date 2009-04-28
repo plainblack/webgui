@@ -214,8 +214,8 @@ sub viewTemplateVariables {
         }
     }
     $var->{standAlone} = $self->{_standAlone};
-    $var->{rssUrl}     = $exporting ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
-    $var->{atomUrl}    = $exporting ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
+    $var->{rssUrl}     = $self->getRssFeedUrl;
+    $var->{atomUrl}    = $self->getAtomFeedUrl;
 
     return $var;
 }

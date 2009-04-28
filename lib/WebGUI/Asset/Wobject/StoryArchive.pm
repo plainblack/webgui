@@ -552,8 +552,8 @@ sub viewTemplateVariables {
     $var->{addStoryUrl}    = $var->{canPostStories}
                            ? $self->getUrl('func=add;class=WebGUI::Asset::Story')
                            : '';
-    $var->{rssUrl}         = $exporting ? $self->getStaticRssFeedUrl  : $self->getRssFeedUrl;
-    $var->{atomUrl}        = $exporting ? $self->getStaticAtomFeedUrl : $self->getAtomFeedUrl;
+    $var->{rssUrl}         = $self->getRssFeedUrl;
+    $var->{atomUrl}        = $self->getAtomFeedUrl;
     my $cloudOptions       = {
         startAsset  => $self,
         displayFunc => 'view',

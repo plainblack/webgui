@@ -541,6 +541,7 @@ cmp_bag(
     [qw/
         mystories.rss        mystories
         mystories.atom
+        mystories.rdf
     /],
     'exportAssetCollateral: feed files exported'
 );
