@@ -28,7 +28,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 7;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -37,11 +37,18 @@ use_ok('WebGUI::Search');
 
 my $search = WebGUI::Search->new($session);
 
+################################################
+#
+# _isStopword
+#
+################################################
+
 ok(! $search->_isStopword('not a stopword'), '_isStopword: not a stopword');
 ok(  $search->_isStopword('the'),            '_isStopword: "the" is a stopword');
 ok(  $search->_isStopword('all*'),           '_isStopword: regex metacharacter * does not crash the search');
 ok(  $search->_isStopword('anybody+'),       '_isStopword: regex metacharacter + does not crash the search');
 ok(  $search->_isStopword('maybe?'),         '_isStopword: regex metacharacter ? does not crash the search');
+ok(! $search->_isStopword('private.+'),      '_isStopword: regex metacharacter ? does not crash the search');
 
 #----------------------------------------------------------------------------
 # Cleanup
