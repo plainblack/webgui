@@ -33,6 +33,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 
 correctEventTemplateVariables($session);
+fixMatrixComparisonGroupColumn($session);
 
 finish($session); # this line required
 
@@ -45,6 +46,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub fixMatrixComparisonGroupColumn {
+    my $session = shift;
+    print "\tFixing the maxComparisonsGroup column type in the Matrix table." unless $quiet;
+    $session->db->write("alter table Matrix change maxComparisonsGroup maxComparisonsGroup char(22);");
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 
 sub correctEventTemplateVariables {
     my ($session) = @_;

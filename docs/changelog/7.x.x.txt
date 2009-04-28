@@ -6,6 +6,7 @@
  - fixed #10047: SQLReport Debug doesn't catch when bind variables are incorrect
  - fixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
  - fixed #10238: Edit Calendar Event not working when proxy cache disabled
+ - fixed #10193: matrix/broken save - maximum group field 
 
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
