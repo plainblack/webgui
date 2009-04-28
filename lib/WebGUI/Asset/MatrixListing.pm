@@ -210,7 +210,6 @@ sub definition {
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'MatrixListing.gif',
 		autoGenerateForms=>1,
 		tableName=>'MatrixListing',
 		className=>'WebGUI::Asset::MatrixListing',
