@@ -1143,6 +1143,7 @@ sub getViewThingVars {
             my %fieldProperties = (
                 "id" => $field{fieldId},
                 "name" => "field_".$field{fieldId},
+                "type" => $field{fieldType},
                 "value" => $value,
                 "label" => $field{label},
                 "isHidden" => $hidden,
