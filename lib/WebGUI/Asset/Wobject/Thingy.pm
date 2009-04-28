@@ -2414,7 +2414,7 @@ sub editThingData {
     }
 
 
-    $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+    $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})
     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"editThingDataSave"});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingDataId",value=>$thingDataId});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingId",value=>$thingId});
