@@ -145,6 +145,7 @@ our $HELP = {
                     { 'name' => 'field_label' },
                     { 'name' => 'field_value' },
                     { 'name' => 'field_name' },
+                    { 'name' => 'field_type' },
                     { 'name' => 'field_id' },
                     { 'name' => 'field_url' },
                     { 'name' => 'field_subtext' },
