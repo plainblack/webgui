@@ -40,7 +40,7 @@ sm_updateDailyWorkflow($session);
 turnOffAdmin($session);
 
 correctEventTemplateVariables($session);
-
+addGlobalHeadTags( $session );
 addShipsSeparateToSku($session);
 
 finish($session); # this line required
@@ -56,6 +56,13 @@ sub turnOffAdmin {
       "url" => "^PageUrl(\"\",op=switchOffAdmin);",
       "title" => "^International(12,WebGUI);"
    });
+    print "OK\n" unless $quiet;
+}
+
+sub addGlobalHeadTags {
+    my ( $session ) = @_;
+    print "\tAdding Global HEAD tags setting... " unless $quiet;
+    $session->setting->add('globalHeadTags','');
     print "OK\n" unless $quiet;
 }
 

@@ -262,6 +262,14 @@ sub definition {
         label           => $i18n->get('recaptcha private key'),
         defaultValue    => $setting->get('recaptchaPrivateKey'),
     });
+    push @fields, {
+        tab             => "ui",
+        fieldType       => "codearea",
+        name            => "globalHeadTags",
+        label           => $i18n->get('global head tags label'),
+        hoverHelp       => $i18n->get('global head tags description'),
+        defaultValue    => $setting->get('globalHeadTags'),
+    };
 	# messaging settings
 	push(@fields, {
 		tab=>"messaging",

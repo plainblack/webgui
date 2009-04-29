@@ -181,6 +181,7 @@ props["pageURL"] = "'.$self->session->url->page(undef, undef, 1).'";
 return props[propName];
 }
 </script>
+' . $self->session->setting->get('globalHeadTags') . '
 <!--morehead-->
 ';
 
