@@ -12,6 +12,7 @@
  - Fixed a bug in the YUI simple editor for survey editing which was leaking memory.  Also improved the object edit templates.
  - fixed #10184: Matrix 2.0 - Version Tag Duplicate Type
  - fixed #10182: Matrix 2.0 - Comparison view broken in IE 6 & 7
+ - Added individual shipping requirements to the Sku.
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)

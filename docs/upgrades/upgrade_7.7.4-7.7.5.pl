@@ -41,6 +41,8 @@ turnOffAdmin($session);
 
 correctEventTemplateVariables($session);
 
+addShipsSeparateToSku($session);
+
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -159,7 +161,6 @@ sub correctEventTemplateVariables {
     });
 
     TEMPLATE: while (my $templateAsset = $getATemplate->()) {
-        print("\t\t Correcting ". $templateAsset->getTitle. "\n") unless $quiet;
         my $template = $templateAsset->get('template');
         $template =~ s{<tmpl_var url>\?func=edit}{<tmpl_var urlEdit>}isg;
         $template =~ s{<tmpl_var url>\?func=delete}{<tmpl_var urlDelete>}isg;
@@ -169,6 +170,15 @@ sub correctEventTemplateVariables {
             template => $template,
         });
     }
+    print "DONE!\n" unless $quiet;
+}
+
+sub addShipsSeparateToSku {
+    my ($session) = @_;
+    print "\tAdd shipsSeparate property to Sku... " unless $quiet;
+    $session->db->write(<<EOSQL);
+ALTER TABLE sku ADD COLUMN shipsSeparately tinyint(1) NOT NULL
+EOSQL
     print "DONE!\n" unless $quiet;
 }
 

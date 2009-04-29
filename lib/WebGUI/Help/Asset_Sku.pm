@@ -18,6 +18,7 @@ our $HELP = {
             { 'name' => 'description', description=>'description help' },
             { 'name' => 'displayTitle', description=>'display title help' },
             { 'name' => 'vendorId', description=>'vendor help' },
+            { 'name' => 'shipsSeparately', description=>'shipsSeparately help' },
         ],
         related => []
     },

@@ -69,6 +69,18 @@ our $I18N = {
 		context => q|help for vendor field|
 	},
 
+    'shipsSeparately' => {
+        message => q|Ships Separately?|,
+        lastUpdated => 0,
+        context => q|label in the edit form.  Ships, as in ships via post or mail or shipping.  Separately, independently of other items in the cart.|,
+    },
+
+    'shipsSeparately help' => {
+        message => q|If set to yes, then this Sku will incur additional, independent shipping costs, rather than sharing costs with other items in a cart.|,
+        lastUpdated => 0,
+        context => q|help for shipsSeparate field in the edit form|
+    },
+
 	'add to cart' => {
 		message => q|Add To Cart|,
 		lastUpdated => 0,
