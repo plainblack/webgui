@@ -161,7 +161,8 @@ sub view {
 	my %var;
 	
     $var{'form_header'  } = WebGUI::Form::formHeader($session, {
-        action=>$self->getUrl
+        action => $self->getUrl,
+        method => "GET"
 		})
     .WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
 	$var{'form_footer'  } = WebGUI::Form::formFooter($session);
