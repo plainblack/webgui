@@ -1,5 +1,6 @@
 7.7.5
  - Adding StoryManager.
+ - rfe: Button to Turn Admin Off on Admin Accordian  (#475)
  - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
  - fixed #10226: html2text dropping text
  - fixed #10210: Generated Message-Id invalid (patch basis from tektek)

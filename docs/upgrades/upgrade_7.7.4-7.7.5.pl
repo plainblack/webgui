@@ -37,20 +37,25 @@ my $session = start(); # this line required
 installStoryManagerTables($session);
 sm_upgradeConfigFiles($session);
 sm_updateDailyWorkflow($session);
+turnOffAdmin($session);
 
 correctEventTemplateVariables($session);
 
 finish($session); # this line required
 
-
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub turnOffAdmin {
+    my $session = shift;
+    print "\tAdding admin off link to admin console." unless $quiet;
+    $session->config->addToHash("adminConsole","adminConsoleOff", {
+      "icon" => "adminConsoleOff.gif",
+      "group" => "12",
+      "uiLevel" => 1,
+      "url" => "^PageUrl(\"\",op=switchOffAdmin);",
+      "title" => "^International(12,WebGUI);"
+   });
+    print "OK\n" unless $quiet;
+}
 
 sub installStoryManagerTables {
     my ($session) = @_;
