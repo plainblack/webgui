@@ -4,6 +4,7 @@ use base qw/WebGUI::Crud/;
 use WebGUI::International;
 use WebGUI::Utility;
 use URI;
+use Path::Class::Dir;
 
 #-------------------------------------------------------------------
 
@@ -20,7 +21,8 @@ types of files.
 
 =head3 $uri
 
-A URI to the new file to add.
+A URI to the new file to add.  If the URI already exists in that part of the bundle,
+it will return 0 and an error message.
 
 =cut
 
@@ -30,7 +32,10 @@ sub addFile {
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
-                       : 'OTHER';
+                       : 'otherFiles';
+    my $files = $self->getAllCollateral($collateralType);
+    my $uriExists = $self->getCollateralDataIndex($files, 'uri', $uri) == -1;
+    return 0, 'Duplicate URI' if $uriExists;
     $self->setCollateral(
         $collateralType,
         'fileId',
@@ -41,6 +46,38 @@ sub addFile {
         },
     );
     $self->update({lastModified => time()});
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 build ( )
+
+build goes through and fetches all files referenced in all URIs stored for
+this bundle.  It downloads them, stores their modification time for future
+checks, and then does special processing, depending on the type of file.
+
+Javascript files are concatenated together in order, and minimized.  The
+resulting data is stored in the filepump area under the uploads directory
+with the name bundleName.timestamp/bundleName.js
+
+CSS files are handled likewise, except that the name is bundleName.timestamp/bundleName.css.
+
+Other files are copied from their current location into the timestamped bundle directory.
+
+Older timestamped build directories are removed.
+
+If the build is successful, it will return 1.  Otherwise, if problems
+occur during the build, then the old build directory is not affected and
+the method returns 0, along with an error message.
+
+=cut
+
+sub build {
+    my ($self) = @_;
+    my $lastBuild = time();
+    my $originalBuild = $self->get('lastBuild');
+    $self->update({lastBuild => $lastBuild});
     return 1;
 }
 
@@ -125,6 +162,22 @@ sub crud_definition {
 
 #-------------------------------------------------------------------
 
+=head2 delete ( )
+
+Extend the method from WebGUI::Crud to handle deleting the locally stored
+files.
+
+=cut
+
+sub delete {
+    my ($self) = @_;
+    my $bundleDir = $self->getPathClassDir();
+    $bundleDir->rmtree();
+    return $self->SUPER::delete;
+}
+
+#-------------------------------------------------------------------
+
 =head2 deleteCollateral ( tableName, keyName, keyValue )
 
 Deletes a row of collateral data.
@@ -180,7 +233,7 @@ sub deleteFile {
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
-                       : 'OTHER';
+                       : 'otherFiles';
     $self->deleteCollateral(
         $collateralType,
         'fileId',
@@ -293,6 +346,24 @@ sub getCollateralDataIndex {
             if (exists $table->[$index]->{$keyName} and $table->[$index]->{$keyName} eq $keyValue );
     }
     return -1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getPathClassDir ( )
+
+Returns a Path::Class::Dir object to the last build directory
+for this bundle.
+
+=cut
+
+sub getPathClassDir {
+    my ($self) = @_;
+    return Path::Class::Dir->new(
+        $self->session->get('uploadsPath'),
+        'filepump',
+        $self->get('bundleName') . $self->get('lastBuild')
+    );
 }
 
 #-------------------------------------------------------------------
@@ -419,7 +490,7 @@ sub moveFileDown {
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
-                       : 'OTHER';
+                       : 'otherFiles';
     $self->moveCollateralDown(
         $collateralType,
         'fileId',
@@ -453,7 +524,7 @@ sub moveFileUp {
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
-                       : 'OTHER';
+                       : 'otherFiles';
     $self->moveCollateralUp(
         $collateralType,
         'fileId',
