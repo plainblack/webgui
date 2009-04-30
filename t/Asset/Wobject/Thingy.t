@@ -223,6 +223,7 @@ cmp_deeply(
             field_isVisible => '',
             field_pretext => undef,
             field_subtext => undef,
+            field_type => "textarea",
         }],
         'Getting newly added thing data: getViewThingVars returns correct field_loop.'
     );
@@ -244,6 +245,7 @@ cmp_deeply(
             field_isVisible => '',
             field_pretext => undef,
             field_subtext => undef,
+            field_type => "textarea",
             }], 
         viewScreenTitle => "",
         },
@@ -267,6 +269,7 @@ cmp_deeply(
             field_isVisible => '',
             field_pretext => undef,
             field_subtext => undef,
+            field_type => "textarea",
         }],
         'Getting updated thing data: getViewThingVars returns correct field_loop with updated value.'
     );
