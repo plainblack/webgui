@@ -513,7 +513,7 @@
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
-   'WebGUI::Asset::Sku::ThingyRecord' : {
+   "WebGUI::Asset::Sku::ThingyRecord" : {
       "category" : "shop"
    },
    "WebGUI::Asset::Wobject::UserList" : {
