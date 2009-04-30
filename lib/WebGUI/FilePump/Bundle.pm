@@ -40,6 +40,7 @@ sub addFile {
             lastModified => 0,
         },
     );
+    $self->update({lastModified => time()});
     return 1;
 }
 
@@ -69,7 +70,13 @@ The name of a bundle
 
 =head4 lastBuild
 
-The date the bundle was last built
+The date the bundle was last built.  This is used to generate the name of the bundled files
+for this bundle.
+
+=head4 lastModified
+
+The date the bundle was last modified.  With this, and the lastBuild date, you can determine
+which bundles need to be rebuilt.
 
 =head4 jsFiles, cssFiles, otherFiles
 
@@ -89,6 +96,10 @@ sub crud_definition {
     $properties->{bucketName} = {
         fieldName    => 'text',
         defaultValue => $i18n->get('new bundle'),
+    };
+    $properties->{lastModified} = {
+        fieldName    => 'integer',
+        defaultValue => 0,
     };
     $properties->{lastBuild} = {
         fieldName    => 'integer',
@@ -175,6 +186,7 @@ sub deleteFile {
         'fileId',
         $fileId,
     );
+    $self->update({lastModified => time()});
     return 1;
 }
 
@@ -285,6 +297,33 @@ sub getCollateralDataIndex {
 
 #-------------------------------------------------------------------
 
+=head2 getOutOfDateBundles ( $session )
+
+This is a class method.  It returns an array reference of WebGUI::FilePump::Bundle
+objects that need to be rebuilt.
+
+=head3 $session
+
+A WebGUI::Session object.
+
+=cut
+
+sub getOutOfDateBundles {
+    my ($class, $session) = @_;
+    my $oldBundles = [];
+    my $oldBundleIterator = $class->getAllIterator({
+        constraints => [
+            'lastBuild < lastModified' => [],
+        ],
+    });
+    while (my $bundle = $oldBundleIterator->()) {
+        push @{ $oldBundles }, $bundle;
+    }
+    return $oldBundles;
+}
+
+#-------------------------------------------------------------------
+
 =head2 moveCollateralDown ( tableName, keyName, keyValue )
 
 Moves a collateral data item down one position.  If called on the last element of the
@@ -386,6 +425,7 @@ sub moveFileDown {
         'fileId',
         $fileId,
     );
+    $self->update({lastModified => time()});
     return 1;
 }
 
@@ -419,48 +459,8 @@ sub moveFileUp {
         'fileId',
         $fileId,
     );
+    $self->update({lastModified => time()});
     return 1;
-}
-
-#-------------------------------------------------------------------
-
-=head2 reorderCollateral ( tableName,keyName [,setName,setValue] )
-
-Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
-
-=head3 tableName
-
-The name of the table to resequence.
-
-=head3 keyName
-
-The key column name used to determine which data needs sorting within the table.
-
-=head3 setName
-
-Defaults to "assetId". This is used to define which data set to reorder.
-
-=head3 setValue
-
-Used to define which data set to reorder. Defaults to the value of setName (default "assetId", see above) in the wobject properties.
-
-=cut
-
-sub reorderCollateral {
-    my $self = shift;
-    my $table = shift;
-    my $keyName = shift;
-    my $setName = shift || "assetId";
-    my $setValue = shift || $self->get($setName);
-    my $i = 1;
-    my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
-    my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
-    while (my ($id) = $sth->array) {
-        $sth2->execute([$i, $setValue, $id]);
-        $i++;
-    }
-    $sth2->finish;
-    $sth->finish;
 }
 
 
