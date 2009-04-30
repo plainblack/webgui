@@ -15,6 +15,7 @@
  - Added individual shipping requirements to the Sku.
  - added #10145: Global Head Tags in Settings
  - added packing to templates, snippets, and head tags. 
+ - added #9289: Extending the "Request Approval For Version Tag" activity by reversing the test (Bernd Kalbfuß-Zimmermann)
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
