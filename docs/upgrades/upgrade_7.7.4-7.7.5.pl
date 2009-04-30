@@ -250,7 +250,7 @@ sub addTemplatePacking {
     $session->db->write("ALTER TABLE snippet ADD usePacked INT(1)");
 
     print "\n\t\tPre-packing all snippets, this may take a while..." unless $quiet;
-    my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM Snippet" );
+    my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM snippet" );
     while ( my ($assetId) = $sth->array ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         next unless $asset;
