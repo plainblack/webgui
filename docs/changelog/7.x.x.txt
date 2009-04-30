@@ -16,6 +16,7 @@
  - added #10145: Global Head Tags in Settings
  - added packing to templates, snippets, and head tags. 
  - added #9289: Extending the "Request Approval For Version Tag" activity by reversing the test (Bernd Kalbfuß-Zimmermann)
+ - added: Survey sections now have logical section type, which is never shown to the user, only used for silently checking gotos.
 
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)

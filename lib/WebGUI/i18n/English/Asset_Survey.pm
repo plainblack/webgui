@@ -39,6 +39,14 @@ our $I18N = {
 		message => q|Continue|,
 		lastUpdated => 1224686319
 	},
+    'logical section' => {
+		message => q|Logical Section|,
+		lastUpdated => 1224686319
+    },
+    'logical section help' => {
+		message => q|A logical section, or its questions, are never shown.  They are used to silently execute jump commands.|,
+		lastUpdated => 1224686319
+    },
 	'add section' => {
 		message => q|Add Section|,
 		lastUpdated => 1224686319
