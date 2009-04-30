@@ -386,7 +386,9 @@ sub prepare {
 
 =head2 process ( vars )
 
-Evaluate a template replacing template commands for HTML.
+Evaluate a template replacing template commands for HTML.  If the internal property templatePacked
+is set to true, the packed, minimized template will be used.  Otherwise, the original template
+will be used.
 
 =head3 vars
 
