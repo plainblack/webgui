@@ -24,6 +24,8 @@ save you many hours of grief.
      site uses a different parser for this template it will need to be manually
      upgraded.
 
+   * WebGUI now requires HTML::Packer, JavaScript::Packer, and CSS::Packer 
+
 7.7.4
 --------------------------------------------------------------------
    * WebGUI now requires XML::FeedPP version 0.40 or greater.
