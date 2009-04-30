@@ -104,7 +104,7 @@ cmp_deeply(
         title        => 'Dummy Title',
         description  => 'Dummy Synopsis',  ##Not description
         link         => '/home/shawshank',
-        copyright    => '',
+        copyright    => undef,
     ),
     '... title, description, link inherit from asset by default, copyright unset'
 );
