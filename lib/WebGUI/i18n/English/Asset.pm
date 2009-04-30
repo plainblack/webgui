@@ -1202,6 +1202,18 @@ Couldn't open %-s because %-s <br />
         context     => q{Admin Console label.  Shows the history of assets in this site.},
     },
 
+    'usePackedHeadTags label' => {
+        message     => q{Use Packed Head Tags},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'usePackedHeadTags description' => {
+        message     => q{Use the packed version of the head tags for faster downloads},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
+
 };
 
 1;

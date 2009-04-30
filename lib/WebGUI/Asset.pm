@@ -18,6 +18,7 @@ use Carp qw( croak confess );
 use Scalar::Util qw( blessed );
 use Clone qw(clone);
 use JSON;
+use HTML::Packer;
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -446,6 +447,19 @@ sub definition {
                         fieldType=>'codearea',
                         defaultValue=>undef,
                         customDrawMethod => 'drawExtraHeadTags',
+                        filter  => 'packExtraHeadTags',
+                    },
+                    extraHeadTagsPacked => {
+                        fieldType       => 'hidden',
+                        defaultValue    => undef,
+                    },
+                    usePackedHeadTags => {
+                        tab             => "meta",
+                        label           => $i18n->get('usePackedHeadTags label'),
+                        hoverHelp       => $i18n->get('usePackedHeadTags description'),
+                        uiLevel         => 7,
+                        fieldType       => 'yesNo',
+                        defaultValue    => 1,
                     },
 				    isPackage=>{
 					    label=>$i18n->get("make package"),
@@ -1086,7 +1100,10 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-	return $self->get("extraHeadTags");
+	return $self->get('usePackedHeadTags') 
+            ? $self->get('extraHeadTagsPacked')
+            : $self->get("extraHeadTags")
+            ;
 }
 
 
@@ -1996,6 +2013,29 @@ sub outputWidgetMarkup {
 </html>
 OUTPUT
     return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 packExtraHeadTags ( unpacked )
+
+Pack the extra head tags. Return the unpacked head tags (as per
+filter guidelines).
+
+=cut
+
+sub packExtraHeadTags {
+    my ( $self, $unpacked ) = @_;
+    return $unpacked if !$unpacked;
+    my $packed  = $unpacked;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->update({ extraHeadTagsPacked => $packed });
+    return $unpacked;
 }
 
 #-------------------------------------------------------------------

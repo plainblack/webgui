@@ -43,6 +43,8 @@ correctEventTemplateVariables($session);
 addGlobalHeadTags( $session );
 addShipsSeparateToSku($session);
 
+addTemplatePacking( $session );
+
 finish($session); # this line required
 
 #----------------------------------------------------------------------------
@@ -187,6 +189,59 @@ sub addShipsSeparateToSku {
 ALTER TABLE sku ADD COLUMN shipsSeparately tinyint(1) NOT NULL
 EOSQL
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Add the template packer
+# Pre-pack all templates
+sub addTemplatePacking {
+    my $session = shift;
+    print "\tAdding template packing/minifying... " unless $quiet;
+    $session->db->write("ALTER TABLE template ADD templatePacked LONGTEXT");
+    $session->db->write("ALTER TABLE template ADD usePacked INT(1)");
+
+    print "\n\t\tPre-packing all templates, this may take a while..." unless $quiet;
+    my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM template" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset::Template->new( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            template        => $asset->get('template'),
+            usePacked       => 1,
+        });
+    }
+
+    print "\n\t\tAdding extra head tags packing..." unless $quiet;
+    $session->db->write("ALTER TABLE assetData ADD extraHeadTagsPacked LONGTEXT");
+    $session->db->write("ALTER TABLE assetData ADD usePackedHeadTags INT(1)");
+
+    print "\n\t\tPre-packing all head tags, this may take a while..." unless $quiet;
+    my $sth = $session->db->read( "SELECT assetId FROM asset" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            extraHeadTags       => $asset->get('extraHeadTags'),
+            usePackedHeadTags   => 1,
+        });
+    }
+
+    print "\n\t\tAdding snippet packing..." unless $quiet;
+    $session->db->write("ALTER TABLE Snippet ADD snippetPacked LONGTEXT");
+    $session->db->write("ALTER TABLE Snippet ADD usePacked INT(1)");
+
+    print "\n\t\tPre-packing all snippets, this may take a while..." unless $quiet;
+    my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM Snippet" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            snippet         => $asset->get('snippet'),
+            usePacked       => 1,
+        });
+    }
+
+    print "\n\t... DONE!\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

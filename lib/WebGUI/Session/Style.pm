@@ -196,6 +196,10 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 } else {
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
+    # Removing the newlines will probably annoy people. 
+    # Perhaps turn it off under debug mode?
+    $var{'head.tags'} =~ s/\n//g;
+
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
 	if (defined $style) {
