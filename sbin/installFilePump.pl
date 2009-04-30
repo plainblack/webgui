@@ -16,7 +16,10 @@ use strict;
 use Pod::Usage;
 use Getopt::Long;
 use WebGUI::Session;
-use WebGUI::ProfileField;
+use WebGUI::Utility;
+use WebGUI::FilePump::Bundle;
+
+my $quiet = 0;
 
 # Get parameters here, including $help
 GetOptions(
@@ -32,6 +35,7 @@ pod2usage( msg => "Must specify a config file!" ) unless $configFile;
 my $session = start( $webguiRoot, $configFile );
 
 installFilePumpHandler($session);
+installFilePumpTable($session);
 
 # Do your work here
 finish($session);
@@ -64,6 +68,15 @@ sub installFilePumpHandler {
     });
     ##Setting for custom group
     $session->setting->add('groupIdFilePump', 12);
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub installFilePumpTable {
+    my $session = shift;
+    print "\tAdding FilePump database table via CRUD... \n" unless $quiet;
+    ##Content Handler
+    WebGUI::FilePump::Bundle->crud_createTable($session);
     print "Done.\n" unless $quiet;
 }
 
