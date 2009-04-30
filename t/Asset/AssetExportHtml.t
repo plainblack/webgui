@@ -775,6 +775,7 @@ my $numberCreatedAll = scalar @createdFiles;
 push @createdFiles,
     [ qw/ the_latest_news the_latest_news.atom /],
     [ qw/ the_latest_news the_latest_news.rss /],
+    [ qw/ the_latest_news the_latest_news.rdf /],
 ;
 
 # turn them into Path::Class::File objects
@@ -783,7 +784,7 @@ my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->st
 # ensure that the files that should exist do exist
 my @doExist;
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home writes correct files");
+cmp_bag(\@doExist, \@shouldExist, "exportAsHtml on home writes correct files");
 is($success, 1, "exportAsHtml on home returns true");
 like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on home returns correct message");
 
@@ -802,7 +803,7 @@ $exportPath->rmtree;
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_deeply(sort @shouldExist, sort @doExist, "exportAsHtml on getting-started writes correct files");
+cmp_deeply([sort @doExist], [sort @shouldExist], "exportAsHtml on getting-started writes correct files");
 is($success, 1, "exportAsHtml on getting-started returns true");
 like($message, qr/Exported 4 pages/, "exportAsHtml on getting-started returns correct message");
 
@@ -879,12 +880,13 @@ my $numberCreated = scalar @createdFiles;
 push @createdFiles,
     [ qw/ the_latest_news the_latest_news.atom /],
     [ qw/ the_latest_news the_latest_news.rss /],
+    [ qw/ the_latest_news the_latest_news.rdf /],
 ;
     
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home with non-exportable getting-started writes correct files");
+cmp_bag(\@doExist, \@shouldExist, "exportAsHtml on home with non-exportable getting-started writes correct files");
 is($success, 1, "exportAsHtml on home with non-exportable getting-started returns true");
 like($message, qr/Exported $numberCreated pages/, "exportAsHtml on home with non-exportable getting-started returns correct message");
 
