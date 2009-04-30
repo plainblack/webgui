@@ -246,8 +246,8 @@ sub addTemplatePacking {
     }
 
     print "\n\t\tAdding snippet packing..." unless $quiet;
-    $session->db->write("ALTER TABLE Snippet ADD snippetPacked LONGTEXT");
-    $session->db->write("ALTER TABLE Snippet ADD usePacked INT(1)");
+    $session->db->write("ALTER TABLE snippet ADD snippetPacked LONGTEXT");
+    $session->db->write("ALTER TABLE snippet ADD usePacked INT(1)");
 
     print "\n\t\tPre-packing all snippets, this may take a while..." unless $quiet;
     my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM Snippet" );
