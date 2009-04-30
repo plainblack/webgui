@@ -11,20 +11,32 @@
 
 # This script tests the creation, sending, and queuing of mail messages
 # TODO: There is plenty left to do in this script.
-$|=1;
-use FindBin;
 use strict;
+use FindBin;
 use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
 use File::Spec;
 use Data::Dumper;
 use MIME::Parser;
+use IO::Select;
 use Encode qw/decode/;
 
 use WebGUI::Test;
 
 use WebGUI::Mail::Send;
+
+# Load Net::SMTP::Server
+my $hasServer; # This is true if we have a Net::SMTP::Server module
+BEGIN {
+    eval {
+        require Net::SMTP::Server;
+        require Net::SMTP::Server::Client;
+    };
+    $hasServer = 1 unless $@;
+}
+
+$| = 1;
 
 #----------------------------------------------------------------------------
 # Init
@@ -33,28 +45,26 @@ my $session         = WebGUI::Test->session;
 my $mail;       # The WebGUI::Mail::Send object
 my $mime;       # for getMimeEntity
 
-# Load Net::SMTP::Server
-my $hasServer; # This is true if we have a Net::SMTP::Server module
-BEGIN { 
-    eval { require Net::SMTP::Server; require Net::SMTP::Server::Client; };
-    $hasServer = 1 unless $@;
-}
+# See if we have an SMTP server to use
+my $smtpdPid;
+my $smtpdStream;
+my $smtpdSelect;
 
-# See if we have an SMTP server to use
-# See if we have an SMTP server to use
-my ( $smtpd );
 my $SMTP_HOST        = 'localhost';
 my $SMTP_PORT        = '54921';
 if ($hasServer) {
+    my $smtpd    = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
+    $smtpdPid = open $smtpdStream, '-|', $^X, $smtpd, $SMTP_HOST, $SMTP_PORT
+        or die "Could not open pipe to SMTPD: $!";
+
+    $smtpdSelect = IO::Select->new;
+    $smtpdSelect->add($smtpdStream);
+
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
 
-    my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
-    open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT 5 |"
-        or die "Could not open pipe to SMTPD: $!";
-    sleep 1; # Give the smtpd time to establish itself
+    WebGUI::Test->originalConfig('emailToLog');
+    $session->config->set( 'emailToLog', 0 );
 }
-
-
 
 #----------------------------------------------------------------------------
 # Tests
@@ -155,8 +165,6 @@ SKIP: {
     # Override the emailOverride
     my $oldEmailOverride   = $session->config->get('emailOverride');
     $session->config->set( 'emailOverride', 'dufresne@localhost' );
-    my $oldEmailToLog      = $session->config->get('emailToLog');
-    $session->config->set( 'emailToLog', 0 );
 
     # Send the mail
     my $mail
@@ -177,6 +185,7 @@ SKIP: {
     );
 
     my $parser         = MIME::Parser->new();
+    $parser->output_to_core(1);
     my $parsed_message = $parser->parse_data($received->{contents});
     my $head           = $parsed_message->head;
     my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
@@ -184,7 +193,6 @@ SKIP: {
 
     # Restore the emailOverride
     $session->config->set( 'emailOverride', $oldEmailOverride );
-    $session->config->set( 'emailToLog', $oldEmailToLog );
 }
 
 SKIP: {
@@ -207,6 +215,7 @@ SKIP: {
 
     # Test the mail
     my $parser         = MIME::Parser->new();
+    $parser->output_to_core(1);
     my $parsed_message = $parser->parse_data($received->{contents});
     my $head           = $parsed_message->head;
     my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
@@ -264,15 +273,17 @@ SKIP: {
 }
 
 # TODO: Test the emailToLog config setting
-
-
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    close MAIL 
-        or die "Could not close pipe to SMTPD: $!";
-    sleep 1;
-
+    if ($smtpdPid) {
+        kill INT => $smtpdPid;
+    }
+    if ($smtpdStream) {
+        close $smtpdStream;
+        # we killed it, so there will be an error.  Prevent that from setting the exit value.
+        $? = 0;
+    }
     $session->db->write('delete from mailQueue');
 }
 
@@ -292,8 +303,11 @@ sub sendToServer {
     my $mail        = shift;
     my $status = $mail->send;
     my $json;
-    if ($status) {
-        $json = <MAIL>;
+    if ($status && $smtpdSelect->can_read(5)) {
+        $json = <$smtpdStream>;
+    }
+    elsif ($status) {
+        $json = ' { "error" : "unable to read from smptd.pl" } ';
     }
     else {
         $json = ' { "error": "mail not sent" } ';

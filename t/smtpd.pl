@@ -1,20 +1,18 @@
-
-my $HOST        = shift;
-my $PORT        = shift;
-my $EMAILS      = shift || 1;
-
-die "HOST must be first argument"   
-    unless $HOST;
-die "PORT must be second argument"
-    unless $PORT;
+use strict;
+use warnings;
 
 use JSON qw( to_json );
 use Net::SMTP::Server;
 use Net::SMTP::Server::Client;
 
-my $server  = Net::SMTP::Server->new( $HOST, $PORT );
+my ($HOST, $PORT) = @ARGV;
 
-my $counter = 0;
+die "HOST must be first argument"
+    unless $HOST;
+die "PORT must be second argument"
+    unless $PORT;
+
+my $server  = Net::SMTP::Server->new( $HOST, $PORT );
 
 $| = 1;
 
@@ -25,15 +23,9 @@ CONNECTION: while ( my $conn = $server->accept ) {
         to          => $client->{TO},
         from        => $client->{FROM},
         contents    => $client->{MSG},
-        counter     => $counter,
-        emails      => $EMAILS,
     });
     print "\n";
-    last CONNECTION if ++$counter >= $EMAILS;
 }
-
-sleep 3;
-exit(0);
 
 =head1 NAME
 
