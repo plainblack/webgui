@@ -142,8 +142,8 @@ sub definition {
             tab             => 'shop',
             fieldType       => 'yesNo',
             defaultValue    => 0,
-            label           => $i18n->get('shipsSeparate'),
-            hoverHelp       => $i18n->get('shipsSeparate help'),
+            label           => $i18n->get('shipsSeparately'),
+            hoverHelp       => $i18n->get('shipsSeparately help'),
         },
 	);
 	push(@{$definition}, {
