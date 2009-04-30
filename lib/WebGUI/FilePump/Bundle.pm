@@ -1,14 +1,22 @@
-package FilePump::Bundle;
+package WebGUI::FilePump::Bundle;
 
 use base qw/WebGUI::Crud/;
 use WebGUI::International;
+use WebGUI::Utility;
+use URI;
 
 #-------------------------------------------------------------------
 
-=head2 addCssFile ( $uri )
+=head2 addFile ( $type, $uri )
 
-Adds a CSS file to the bundle.  Returns 1 if the add was successful.
+Adds a file of the requested type to the bundle.  Returns 1 if the add was successful.
 Otherwise, returns 0 and an error message as to why it was not successful.
+
+=head3 $type
+
+If $type is JS, it adds it to the javascript part of the bundle.  If it is
+CSS, it adds it to the CSS part of the bundle.  OTHER is used for all other
+types of files.
 
 =head3 $uri
 
@@ -16,11 +24,15 @@ A URI to the new file to add.
 
 =cut
 
-sub addCssFile {
-    my ($self, $uri) = @_;
+sub addFile {
+    my ($self, $type, $uri) = @_;
     return 0, 'No URI' unless $uri;
+    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    my $collateralType = $type eq 'JS'  ? 'jsFiles'
+                       : $type eq 'CSS' ? 'cssFiles'
+                       : 'OTHER';
     $self->setCollateral(
-        'cssFiles',
+        $collateralType,
         'fileId',
         'new',
         {
@@ -28,60 +40,7 @@ sub addCssFile {
             lastModified => 0,
         },
     );
-}
-
-#-------------------------------------------------------------------
-
-=head2 addJsFile ( $uri )
-
-Adds a javascript file to the bundle.  Returns 1 if the add was successful.
-Otherwise, returns 0 and an error message as to why it was not successful.
-
-=head3 $uri
-
-A URI to the new file to add.
-
-=cut
-
-sub addJsFile {
-    my ($self, $uri) = @_;
-    return 0, 'No URI' unless $uri;
-    $self->setCollateral(
-        'jsFiles',
-        'fileId',
-        'new',
-        {
-            uri          =>  $uri,
-            lastModified => 0,
-        },
-    );
-}
-
-#-------------------------------------------------------------------
-
-=head2 addOtherFile ( $uri )
-
-Adds an Other file to the bundle.  Returns 1 if the add was successful.
-Otherwise, returns 0 and an error message as to why it was not successful.
-
-=head3 $uri
-
-A URI to the new file to add.
-
-=cut
-
-sub addOtherFile {
-    my ($self, $uri) = @_;
-    return 0, 'No URI' unless $uri;
-    $self->setCollateral(
-        'otherFiles',
-        'fileId',
-        'new',
-        {
-            uri          =>  $uri,
-            lastModified => 0,
-        },
-    );
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -150,6 +109,7 @@ sub crud_definition {
         defaultValue => 0,
         serialize    => 1,
     };
+    return $definition;
 }
 
 #-------------------------------------------------------------------
@@ -183,6 +143,39 @@ sub deleteCollateral {
     return if $index == -1;
     splice @{ $table }, $index, 1;
     $self->setAllCollateral($tableName);
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteFile ( $type, $fileId )
+
+Deletes a file of the requested type from the bundle.
+
+=head3 $type
+
+If $type is JS, it deletes it from the javascript part of the bundle.  If it is
+CSS, it deletes it from the CSS part of the bundle.  OTHER is used for all other
+types of files.
+
+=head3 $fileId
+
+The unique collateral GUID to delete from the bundle.
+
+=cut
+
+sub deleteFile {
+    my ($self, $type, $fileId) = @_;
+    return 0, 'No fileId' unless $fileId;
+    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    my $collateralType = $type eq 'JS'  ? 'jsFiles'
+                       : $type eq 'CSS' ? 'cssFiles'
+                       : 'OTHER';
+    $self->deleteCollateral(
+        $collateralType,
+        'fileId',
+        $fileId,
+    );
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -361,6 +354,72 @@ sub moveCollateralUp {
     return unless $index && (abs($index) <= $#{$table});
     @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
     $self->setAllCollateral($tableName);
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveFileDown ( $type, $fileId )
+
+Moves the requested file down in the ordered collateral.
+
+=head3 $type
+
+If $type is JS, it moves a file in the javascript part of the bundle.  If it is
+CSS, it moves a file in the CSS part of the bundle.  OTHER is used for all other
+types of files.
+
+=head3 $fileId
+
+The unique collateral GUID to move in the bundle.
+
+=cut
+
+sub moveFileDown {
+    my ($self, $type, $fileId) = @_;
+    return 0, 'No fileId' unless $fileId;
+    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    my $collateralType = $type eq 'JS'  ? 'jsFiles'
+                       : $type eq 'CSS' ? 'cssFiles'
+                       : 'OTHER';
+    $self->moveCollateralDown(
+        $collateralType,
+        'fileId',
+        $fileId,
+    );
+    return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 moveFileUp ( $type, $fileId )
+
+Moves the requested file up in the ordered collateral.
+
+=head3 $type
+
+If $type is JS, it moves a file in the javascript part of the bundle.  If it is
+CSS, it moves a file in the CSS part of the bundle.  OTHER is used for all other
+types of files.
+
+=head3 $fileId
+
+The unique collateral GUID to move in the bundle.
+
+=cut
+
+sub moveFileUp {
+    my ($self, $type, $fileId) = @_;
+    return 0, 'No fileId' unless $fileId;
+    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    my $collateralType = $type eq 'JS'  ? 'jsFiles'
+                       : $type eq 'CSS' ? 'cssFiles'
+                       : 'OTHER';
+    $self->moveCollateralUp(
+        $collateralType,
+        'fileId',
+        $fileId,
+    );
+    return 1;
 }
 
 #-------------------------------------------------------------------
