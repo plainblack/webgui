@@ -513,6 +513,9 @@
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
+   'WebGUI::Asset::Sku::ThingyRecord' : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Wobject::UserList" : {
       "category" : "intranet"
    },
@@ -532,6 +535,9 @@
    },
    "WebGUI::Asset::Wobject::StoryTopic" : {
       "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::Carousel" : {
+      "category" : "utilities"
    },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
@@ -843,7 +849,8 @@
         "WebGUI::Workflow::Activity::TrashClipboard",
         "WebGUI::Workflow::Activity::TrashExpiredEvents",
         "WebGUI::Workflow::Activity::SummarizePassiveAnalytics",
-        "WebGUI::Workflow::Activity::BucketPassiveAnalytics"
+        "WebGUI::Workflow::Activity::BucketPassiveAnalytics",
+        "WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords"
     ],
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
@@ -974,7 +981,13 @@
     "rar",
     "gz",
     "bz2"
-]
+],
+
+# Drivers for the pluggable tax system
+"taxDrivers" : [
+    "WebGUI::Shop::TaxDriver::Generic",
+    "WebGUI::Shop::TaxDriver::EU"
+],
 
 }
 

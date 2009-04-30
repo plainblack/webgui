@@ -22,7 +22,6 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-use WebGUI::Utility qw/isIn/;
 
 
 my $toVersion = '7.7.5';
@@ -38,6 +37,8 @@ installStoryManagerTables($session);
 sm_upgradeConfigFiles($session);
 sm_updateDailyWorkflow($session);
 turnOffAdmin($session);
+
+fixConfigs($session);
 
 correctEventTemplateVariables($session);
 addGlobalHeadTags( $session );
@@ -67,6 +68,29 @@ sub addGlobalHeadTags {
     $session->setting->add('globalHeadTags','');
     print "OK\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub fixConfigs {
+    my $session = shift;
+    print "\tFixing misconfigurations... " unless $quiet;
+    my $config = $session->config;
+    $config->delete('workflow');
+    $config->addToArray( 'workflowActivities/None', 'WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords');
+    $config->set('taxDrivers', [
+        "WebGUI::Shop::TaxDriver::Generic",
+        "WebGUI::Shop::TaxDriver::EU"
+    ]);
+    $config->set('macros/SpectreCheck', 'SpectreCheck');
+    $config->set('assets/WebGUI::Asset::Sku::ThingyRecord', {
+        category => 'shop',
+    });
+    $config->set('assets/WebGUI::Asset::Wobject::Carousel', {
+        category => 'utilities',
+    });
+
+    print "Done.\n" unless $quiet;
+}
+
 
 sub installStoryManagerTables {
     my ($session) = @_;
@@ -136,12 +160,7 @@ sub sm_upgradeConfigFiles {
             "category" => "community"
         },
     );
-    my $activities = $config->get('workflowActivities');
-    my $none = $activities->{None};
-    if (!isIn('WebGUI::Workflow::Activity::ArchiveOldStories', @{ $none })) {
-        unshift @{ $none }, 'WebGUI::Workflow::Activity::ArchiveOldStories';
-    }
-    $config->set('workflowActivities', $activities);
+    $config->addToArray('workflowActivities/None', 'WebGUI::Workflow::Activity::ArchiveOldStories');
     print "DONE!\n" unless $quiet;
 }
 
