@@ -37,7 +37,6 @@ my @fixTitleTests = getFixTitleTests($session);
 my @getTitleTests = getTitleTests($session);
 
 my $rootAsset = WebGUI::Asset->getRoot($session);
-my $originalAssetOverrides = dclone($session->config->get('assets'));
 
 ##Test users.
 ##All users in here will be deleted at the end of the test.  DO NOT PUT
@@ -71,6 +70,7 @@ $testUsers{'canAdd group user'} = WebGUI::User->new($session, 'new');
 $testUsers{'canAdd group user'}->addToGroups([$testGroups{'canAdd asset'}->getId]);
 $testUsers{'canEdit group user'}->username('Can Add Group User');
 WebGUI::Test->groupsToDelete($testGroups{'canAdd asset'});
+WebGUI::Test->usersToDelete(values %testUsers);
 
 my $canAddMaker = WebGUI::Test::Maker::Permission->new();
 $canAddMaker->prepare({
@@ -369,9 +369,9 @@ $session->setting->set('urlExtension', undef);
 is($importNode->fixUrl('1234'.'-'x235 . 'abcdefghij'), '1234'.'-'x235 . 'abcdefghij', 'fixUrl leaves long URLs under 250 characters alone');
 is($importNode->fixUrl('1234'.'-'x250 . 'abcdefghij'), '1234'.'-'x216, 'fixUrl truncates long URLs over 250 characters to 220 characters');
 
-my $origExtras   = $session->config->get('extrasURL');
-my $origUploads  = $session->config->get('uploadsURL');
-my $origPassthru = $session->config->get('passthruUrls');
+WebGUI::Test->originalConfig('extrasURL');
+WebGUI::Test->originalConfig('uploadsURL');
+WebGUI::Test->originalConfig('assets');
 
 $session->config->set('extrasURL',    '/extras');
 $session->config->set('uploadsURL',   '/uploads');
@@ -415,8 +415,6 @@ TODO: {
 
     $session->setting->set('urlExtension', $origUrlExtension);
 }
-
-$session->config->set('extrasURL', $origExtras);
 
 ################################################################
 #
@@ -478,7 +476,9 @@ foreach my $test (@getTitleTests) {
 like($importNode->getIcon,    qr{folder.gif$},       'getIcon gets correct icon for importNode');
 like($importNode->getIcon(1), qr{small/folder.gif$}, 'getIcon gets small icon for importNode');
 
-like($importNode->getIcon(),  qr{$origExtras}, 'getIcon returns an icon from the extras URL');
+my $extras = $session->config->get('extrasURL');
+
+like($importNode->getIcon(),  qr{$extras}, 'getIcon returns an icon from the extras URL');
 
 like($defaultAsset->getIcon,  qr{layout.gif$},       'getIcon gets icon for a layout');
 like($fixTitleAsset->getIcon, qr{snippet.gif$},      'getIcon gets icon for a snippet');
@@ -809,18 +809,8 @@ is($iufpAsset3->getUrl, '/inheriturlfromparent01/inheriturlfromparent02/inheritu
 
 
 END {
-    $session->config->set( 'extrasURL',    $origExtras)
-        if defined $origExtras;
-    $session->config->set( 'uploadsURL',   $origUploads)
-        if defined $origUploads;
-    if (defined $originalAssetOverrides) {
-        $session->config->set('assets', $originalAssetOverrides);
-    }
     foreach my $vTag ($versionTag, $versionTag2, $versionTag3, $versionTag4, ) {
         $vTag->rollback;
-    }
-    foreach my $user (values %testUsers) {
-        $user->delete;
     }
 }
 

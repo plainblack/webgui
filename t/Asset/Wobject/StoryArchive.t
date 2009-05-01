@@ -50,6 +50,7 @@ $editor->username('editor');
 my $reader   = WebGUI::User->new($session, 'new');
 $reader->username('reader');
 $staff->addUsers([$reporter->userId]);
+WebGUI::Test->usersToDelete($reporter, $editor, $reader);
 
 my $archive = 'placeholder for Test::Maker::Permission';
 
@@ -615,9 +616,6 @@ END {
     }
     if ($versionTag) {
         $versionTag->rollback;
-    }
-    foreach my $user ($editor, $reporter, $reader) {
-        $user->delete if defined $user;
     }
     $creationDateSth->finish;
 }
