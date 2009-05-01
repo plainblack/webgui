@@ -31,6 +31,7 @@ my $quiet;
 my $session = start(); 
 
 # upgrade functions go here
+addTemplateAttachmentsTable($session);
 revertUsePacked( $session );
 
 finish($session); 
@@ -44,6 +45,22 @@ finish($session);
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+sub addTemplateAttachmentsTable {
+    my $session = shift;
+    my $create = q{
+        create table template_attachments (
+            templateId   varchar(22),
+            revisionDate bigint(20),
+            url          varchar(256),
+            type         varchar(20),
+            sequence     int(11),
+
+            primary key (templateId, revisionDate, url)
+        )
+    };
+    $session->db->write($create);
+}
 
 #----------------------------------------------------------------------------
 # Rollback usePacked. It should be carefully applied manually for now

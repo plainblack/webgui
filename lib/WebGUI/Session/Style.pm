@@ -67,6 +67,30 @@ sub DESTROY {
         undef $self;
 }
 
+#-------------------------------------------------------------------
+
+sub _generateAdditionalTags {
+	my $var = shift;
+	return sub {
+		my $self = shift;
+		my $tags = $self->{$var};
+		delete $self->{$var};
+		WebGUI::Macro::process($self->session,\$tags);
+		return $tags;
+	};
+}
+
+#-------------------------------------------------------------------
+
+=head2 generateAdditionalBodyTags ( )
+
+Creates tags that were set using setScript (if inBody was true) and setRawBodyTags.
+Macros are processed in the tags if processed by this method.
+
+=cut
+
+BEGIN { *generateAdditionalBodyTags = _generateAdditionalTags('_rawBody') }
+
 
 #-------------------------------------------------------------------
 
@@ -77,15 +101,7 @@ Macros are processed in the tags if processed by this method.
 
 =cut
 
-sub generateAdditionalHeadTags {
-	my $self = shift;
-	my $tags = $self->{_raw};
-	delete $self->{_raw};
-	WebGUI::Macro::process($self->session,\$tags);
-	return $tags;
-}
-
-
+BEGIN { *generateAdditionalHeadTags = _generateAdditionalTags('_raw') }
 
 #-------------------------------------------------------------------
 
@@ -196,9 +212,15 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 } else {
 	$var{'head.tags'} .= '<meta http-equiv="Cache-Control" content="must-revalidate" />'
 }
+
     # Removing the newlines will probably annoy people. 
     # Perhaps turn it off under debug mode?
     $var{'head.tags'} =~ s/\n//g;
+
+	# head.tags = head_attachments . body_attachments
+	# keeping head.tags for backwards compatibility
+	$var{'head_attachments'} = $var{'head.tags'};
+	$var{'head.tags'}       .= ($var{'body_attachments'} = '<!--morebody-->');
 
 	my $style = WebGUI::Asset::Template->new($self->session,$templateId);
 	my $output;
@@ -216,8 +238,10 @@ if ($self->session->user->isRegistered || $self->session->setting->get("preventP
 	}
 	WebGUI::Macro::process($self->session,\$output);
 	$self->sent(1);
-        my $macroHeadTags = $self->generateAdditionalHeadTags();
-        $output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
+	my $macroHeadTags = $self->generateAdditionalHeadTags();
+	my $macroBodyTags = $self->generateAdditionalBodyTags();
+	$output =~ s/\<\!--morehead--\>/$macroHeadTags/;	
+	$output =~ s/\<\!--morebody--\>/$macroBodyTags/;	
 	return $output;
 }	
 
@@ -339,7 +363,33 @@ sub setMeta {
 	$self->setRawHeadTags($tag);
 }
 
+#-------------------------------------------------------------------
 
+sub _setRawTags {
+	my $var = shift;
+	return sub {
+		my $self = shift;
+		my $tags = shift;
+		if ($self->sent) {
+			$self->session->output->print($tags);
+		}
+		else {
+			$self->{$var} .= $tags;
+		}
+	};
+}
+
+#-------------------------------------------------------------------
+
+=head2 setRawBodyTags ( tags )
+
+Does exactly the same thing as setRawHeadTags, except that the tags will be
+appended to a seperate variable (to be output after the body if the style
+template supports it) instead.
+
+=cut
+
+BEGIN { *setRawBodyTags = _setRawTags('_rawBody') }
 
 #-------------------------------------------------------------------
 
@@ -357,21 +407,11 @@ A raw string containing tags. This is just a raw string so you must actually pas
 
 =cut
 
-sub setRawHeadTags {
-	my $self = shift;
-	my $tags = shift;
-	if ($self->sent) {
-		$self->session->output->print($tags);
-	}
-	else {
-		$self->{_raw} .= $tags;
-	}
-}
-
+BEGIN { *setRawHeadTags = _setRawTags('_raw') }
 
 #-------------------------------------------------------------------
 
-=head2 setScript ( url, params )
+=head2 setScript ( url, params, [inBody] )
 
 Sets a <script> tag into the <head> of this rendered page for this
 page view. This is typically used for dynamically adding references
@@ -388,12 +428,18 @@ The URL to your script.
 
 A hash reference containing the additional parameters to include in the script tag, such as "type" and "language".
 
+=head3 inBody
+
+Optional, defaults to false.  If true, the script will be added to the
+body_attachments variable instead of to head_attachments.
+
 =cut
 
 sub setScript {
 	my $self = shift;
 	my $url = shift;
 	my $params = shift;
+	my $inBody = shift;
 	return undef if ($self->{_javascript}{$url});
 	my $tag = '<script src="'.$url.'"';
 	foreach my $name (keys %{$params}) {
@@ -401,7 +447,12 @@ sub setScript {
 	}
 	$tag .= '></script>'."\n";
 	$self->{_javascript}{$url} = 1;
-	$self->setRawHeadTags($tag);
+	if ($inBody) {
+		$self->setRawBodyTags($tag);
+	}
+	else {
+		$self->setRawHeadTags($tag);
+	}
 }
 
 #-------------------------------------------------------------------
