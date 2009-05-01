@@ -114,6 +114,7 @@ SKIP: {
     
     # Create a test user
     $user = WebGUI::User->new( $session, 'new' );
+    WebGUI::Test->usersToDelete($user);
     
     # Create a Survey
     $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -166,7 +167,6 @@ SKIP: {
 #----------------------------------------------------------------------------
 # Cleanup
 END { 
-    $user->delete if $user;
     $survey->purge if $survey;
     $versionTag->rollback if $versionTag;
 }

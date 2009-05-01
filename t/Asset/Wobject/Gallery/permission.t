@@ -29,6 +29,7 @@ my $maker           = WebGUI::Test::Maker::Permission->new;
 my $gallery;
 
 my $nonAdmin    = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($nonAdmin);
 
 
 #----------------------------------------------------------------------------
@@ -79,5 +80,4 @@ $maker->run;
 # Cleanup
 END {
     $versionTag->rollback;
-    $nonAdmin->delete;
 }
