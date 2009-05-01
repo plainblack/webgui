@@ -149,8 +149,8 @@ Survey.ObjectTemplate = (function(){
 
             dialog.callback = Survey.Comm.callback;
 
-            dialog.hideEvent.subscribe(function(){Survey.ObjectTemplate.hideEditor();});
-            dialog.dragEvent.subscribe(function(){Survey.ObjectTemplate.showEditor();});
+            dialog.hideEvent.subscribe(Survey.ObjectTemplate.hideEditor);
+            dialog.dragEvent.subscribe(Survey.ObjectTemplate.showEditor);
 
             dialog.render();
 
