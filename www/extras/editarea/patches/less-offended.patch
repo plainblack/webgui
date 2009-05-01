@@ -1,0 +1,10 @@
+Index: www/extras/editarea/edit_area/reg_syntax/brainfuck.js
+===================================================================
+--- www/extras/editarea/edit_area/reg_syntax/brainfuck.js	(revision 10612)
++++ www/extras/editarea/edit_area/reg_syntax/brainfuck.js	(working copy)
+@@ -1,4 +1,4 @@
+-editAreaLoader.load_syntax["brainfuck"] = {
++editAreaLoader.load_syntax["bf"] = {
+ 	'COMMENT_SINGLE' : {}
+ 	,'COMMENT_MULTI' : {}
+ 	,'QUOTEMARKS' : {}

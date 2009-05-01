@@ -1,4 +1,4 @@
-editAreaLoader.load_syntax["brainfuck"] = {
+editAreaLoader.load_syntax["bf"] = {
 	'COMMENT_SINGLE' : {}
 	,'COMMENT_MULTI' : {}
 	,'QUOTEMARKS' : {}
