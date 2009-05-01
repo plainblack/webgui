@@ -73,10 +73,10 @@
 						<br /><span class='underline'>Default</span>: "onload"
 					</li>
 					<li><strong>toolbar</strong>: define the toolbar that will be displayed, each element being separated by a ",".
-						<br /><span class='underline'>Type</span>: String (combinaison of: "|", "*", "search", "go_to_line", "undo", "redo", "change_smooth_selection", "reset_highlight", "highlight", "help", "save", "load", "new_document", "syntax_selection")
+						<br /><span class='underline'>Type</span>: String (combinaison of: "|", "*", "search", "go_to_line", "undo", "redo", "change_smooth_selection", "reset_highlight", "highlight", "word_wrap", "help", "save", "load", "new_document", "syntax_selection")
 						<br />"|" or "separator" make appears a separator in the toolbar.
 						<br />"*" or "return" make appears a line-break in the toolbar
-						<br /><span class='underline'>Default</span>: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, |, help"
+						<br /><span class='underline'>Default</span>: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
 					</li>
 					<li><strong>begin_toolbar</strong>: toolbar button list to add before the toolbar defined by the "toolbar" option.
 						<br /><span class='underline'>Type</span>: String (cf. "toolbar" option)
@@ -94,6 +94,9 @@
 						<br /><span class='underline'>Type</span>: String
 						<br /><span class='underline'>Default</span>: "monospace"
 					</li>
+					<li><strong>cursor_position</strong>: define if the cursor should be placed where it was in the textarea before replacement (auto) or at the beginning of the file (begin).
+						<br /><span class='underline'>Type</span>: String ("begin" or "auto")
+						<br /><span class='underline'>Default</span>: "begin"
 					</li>
 					<li><strong>gecko_spellcheck</strong>: allow to disable/enable the Firefox 2 spellchecker
 						<br /><span class='underline'>Type</span>: Boolean
@@ -111,6 +114,11 @@
 							It's possible to switch the editable mode whenever you want (code example for a toggle edit mode: 	<em>editAreaLoader.execCommand('editor_id', 'set_editable', !editAreaLoader.execCommand('editor_id', 'is_editable'));</em>).
 						<br /><span class='underline'>Type</span>: Boolean
 						<br /><span class='underline'>Default</span>: true
+					</li>
+					<li><strong>word_wrap</strong>: determine if the text will be automatically wrapped to the next line when it reach the end of a line. This is linked ot the word_wrap icon available in the toolbar.
+							
+						<br /><span class='underline'>Type</span>: Boolean
+						<br /><span class='underline'>Default</span>: false
 					</li>
 					<li><strong>replace_tab_by_spaces</strong>: define the number of spaces that will replace tabulations (\t) in text. If tabulation should stay tabulation, set this option to false.
 						<br /><span class='underline'>Type</span>: Integer (or false)
@@ -209,7 +217,7 @@ editAreaLoader.init({
 	</div>
 	<div class='footer'>
 		<div class="indexlink"><a href="index.html">Index</a></div>	
-		<div class='copyright'>EditArea - &copy; Christophe Dolivet - 2007</div>
+		<div class='copyright'>EditArea - &copy; Christophe Dolivet 2007-2008</div>
 		<br style="clear: both" />
 	</div>
 </body>
