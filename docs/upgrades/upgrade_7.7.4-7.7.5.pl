@@ -226,7 +226,7 @@ sub addTemplatePacking {
         next unless $asset;
         $asset->update({
             template        => $asset->get('template'),
-            usePacked       => 1,
+            usePacked       => 0,
         });
     }
 
@@ -241,7 +241,7 @@ sub addTemplatePacking {
         next unless $asset;
         $asset->update({
             extraHeadTags       => $asset->get('extraHeadTags'),
-            usePackedHeadTags   => 1,
+            usePackedHeadTags   => 0,
         });
     }
 
@@ -256,7 +256,7 @@ sub addTemplatePacking {
         next unless $asset;
         $asset->update({
             snippet         => $asset->get('snippet'),
-            usePacked       => 1,
+            usePacked       => 0,
         });
     }
 
