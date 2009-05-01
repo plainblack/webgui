@@ -1,5 +1,8 @@
 7.7.6
  - Reverted using the packed templates and snippets by default. You can re-enable the packed templates and snippets carefully.
+ - Added support for template attachments; scripts and stylesheets that will
+   be included using style->setScript and setLink instead of just using raw
+   head tags.
 
 7.7.5
  - Adding StoryManager.
