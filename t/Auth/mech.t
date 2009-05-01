@@ -43,6 +43,7 @@ $session->setting->set( 'specialState', '' );
 my $USERNAME    = 'dufresne';
 my $IDENTIFIER  = 'ritahayworth';
 my $user        = WebGUI::User->new( $session, "new", "something new" );
+WebGUI::Test->usersToDelete($user);
 $user->username( $USERNAME );
 $user->addToGroups( ['3'] );
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
@@ -276,5 +277,4 @@ $mech->base_is( $assetUrl, "We don't get redirected" );
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $user->delete;
 }
