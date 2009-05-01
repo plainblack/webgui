@@ -54,6 +54,7 @@ my $originalSetting;
 
 my @groupsToDelete;
 my @usersToDelete;
+my @sessionsToDelete;
 my @storagesToDelete;
 
 BEGIN {
@@ -156,6 +157,10 @@ END {
         else {
             $stor->delete;
         }
+    }
+    SESSION: foreach my $session (@sessionsToDelete) {
+        $session->var->end;
+        $session->close;
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
@@ -433,6 +438,23 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 sessionsToDelete ( $session, [$session, ...] )
+
+Push a list of session objects onto the stack of groups to be automatically deleted
+at the end of the test.  Note, this will be the last group of objects to be
+cleaned up.
+
+This is a class method.
+
+=cut
+
+sub sessionsToDelete {
+    my $class = shift;
+    push @sessionsToDelete, @_;
 }
 
 #----------------------------------------------------------------------------

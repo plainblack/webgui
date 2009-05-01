@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 196; # increment this value for each test you create
+use Test::More tests => 194; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -29,15 +29,13 @@ my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
-my $numberOfUsers  = $session->db->quickScalar('select count(*) from users');
-my $numberOfGroups = $session->db->quickScalar('select count(*) from groups');
-
 my $user;
 my $lastUpdate;
 
 #Let's try to create a new user and make sure we get an object back
 my $userCreationTime = time();
 ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
+WebGUI::Test->usersToDelete($user);
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
 ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
@@ -250,6 +248,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 
 ##Test for group membership
 $user = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($user);
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
 ok($user->isRegistered, "User is not a visitor");
@@ -304,6 +303,7 @@ ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
 ################################################################
 
 my $dude = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($dude);
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: newly created users cannot');
 
@@ -402,6 +402,7 @@ is($useru->userId, $dude->userId, '... and it is the right user object');
 ################################################################
 
 my $buster = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($buster);
 is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received original user profile on user creation');
 
 my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
@@ -430,6 +431,7 @@ $copiedAliasProfile{'dataDefault'} = "'aliasAlias'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
 
 my $buster3 = WebGUI::User->new($session, $buster->userId);
+WebGUI::Test->usersToDelete($buster);
 is($buster3->profileField('alias'), 'aliasAlias', 'default alias set');
 
 $copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
@@ -476,6 +478,7 @@ is($session->scratch->get('hack'), undef, 'userProfile dataDefault is not execut
 ##Set up a group that has expired.
 
 my $expiredGroup = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($expiredGroup);
 $expiredGroup->name('Group that expires users automatically');
 $expiredGroup->expireOffset(-1000);
 
@@ -504,6 +507,7 @@ cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the cached list of groups does n
 ################################################################
 
 my $friend = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($friend);
 is($friend->getFirstName, undef, 'with no profile settings, getFirstName returns undef');
 
 $friend->username('friend');
@@ -520,6 +524,7 @@ is($friend->getFirstName, 'Mr', 'firstName is the highest priority profile setti
 ################################################################
 
 my $neighbor = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($neighbor);
 
 is($neighbor->getWholeName, undef, 'with no profile settings, getWholeName returns undef');
 $neighbor->username('neighbor');
@@ -611,6 +616,7 @@ foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
     $groupSet{$groupName} = WebGUI::Group->new($session, 'new');
     $groupSet{$groupName}->name($groupName);
 }
+WebGUI::Test->groupsToDelete(values %groupSet);
 
 $groupSet{blue}->expireOffset(-1500);
 
@@ -621,6 +627,7 @@ $groupSet{pink}->addGroups(   [ map { $groupSet{$_}->getId } qw/red/ ] );
 $groupSet{orange}->addGroups( [ map { $groupSet{$_}->getId } qw/red/ ] );
 
 my $newFish = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($newFish);
 $newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId ]);
 
 cmp_bag(
@@ -654,6 +661,7 @@ SKIP: {
 ok( my $newCreateUser = WebGUI::User->create( $session ),
     'create() returns something'
 );
+WebGUI::Test->usersToDelete($newCreateUser);
 isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 
 ################################################################
@@ -797,10 +805,6 @@ ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's 
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 
 END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
-        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
-    }
-
     foreach my $testGroup ($expiredGroup, values %groupSet) {
         if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
             $testGroup->delete;
@@ -819,9 +823,5 @@ END {
     $newProfileField->delete() if $newProfileField;
 
 	$testCache->flush;
-    my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');
-    my $newNumberOfGroups = $session->db->quickScalar('select count(*) from groups');
-    is ($newNumberOfUsers,  $numberOfUsers,  'no new additional users were leaked by this test');
-    is ($newNumberOfGroups, $numberOfGroups, 'no new additional groups were leaked by this test');
 }
 

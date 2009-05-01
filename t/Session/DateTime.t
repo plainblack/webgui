@@ -93,16 +93,19 @@ is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: fetching cached version
 my $buster = WebGUI::User->new($session, "new");
 $buster->profileField('timeZone', 'Amerigo/Vespucci');
 $session->user({user => $buster});
+WebGUI::Test->usersToDelete($buster);
 is ($dt->getTimeZone(), 'America/Chicago', 'getTimeZone: time zones not in the approved list get reset to the default');
 
 my $dude = WebGUI::User->new($session, "new");
 $dude->profileField('timeZone', 'Australia/Perth');
 $session->user({user => $dude});
+WebGUI::Test->usersToDelete($dude);
 is ($dt->getTimeZone(), 'Australia/Perth', 'getTimeZone: valid time zones are allowed');
 
 my $bud = WebGUI::User->new($session, "new");
 $bud->profileField('timeZone', '');
 $session->user({user => $bud});
+WebGUI::Test->usersToDelete($bud);
 is ($dt->getTimeZone(), 'America/Chicago', q|getTimeZone: if user's time zone doesn't exist, then return America/Chicago|);
 
 $session->user({userId => 1});  ##back to Visitor
@@ -284,7 +287,4 @@ sub installBadLocale {
 
 END {
 	unlink File::Spec->catfile(WebGUI::Test->lib, qw/WebGUI i18n BadLocale.pm/);
-    foreach my $account ($buster, $dude, $bud) {
-        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
-    }
 }

@@ -77,12 +77,10 @@ sub addUser {
 	##so the test will not fail in the summer
 	$user->profileField("timeZone","America/Hermosillo");
 	$user->username("Time Zone");
+    WebGUI::Test->usersToDelete($user);
 	return $user;
 }
 
 END { ##Clean-up after yourself, always
-	foreach my $dude ($timeZoneUser) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 }
 
