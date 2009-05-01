@@ -9,6 +9,8 @@
  - fixed #10193: matrix/broken save - maximum group field 
  - fixed #10184: Matrix 2.0 - Version Tag Duplicate Type
  - fixed #10182: Matrix 2.0 - Comparison view broken in IE 6 & 7
+ - fixed #9897: Snippet Drop Down Menu
+ - fixed: Codearea text highlighting is now easier to see
 
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
