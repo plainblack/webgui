@@ -623,6 +623,79 @@ sub www_deleteMessages {
 
 #-------------------------------------------------------------------
 
+=head2 www_actOnMessages ( )
+
+Acts on a list of messages selected for the current user
+
+=cut
+
+sub www_actOnMessages {
+    my $self    = shift;
+    my $session = $self->session;
+    my $action  = $session->form->process( 'action' );
+    my $i18n    = WebGUI::International->new( $session, 'Account_Inbox' );
+
+    my %handler = (
+        $i18n->get( 'delete label' )         => \&www_deleteMessages,
+        $i18n->get( 'mark as read label' )   => \&www_markAsReadMessages,
+        $i18n->get( 'mark as unread label' ) => \&www_markAsUnreadMessages,
+    );
+    if ( defined $action && length $action && defined $handler{$action} ) {
+        return $handler{$action}->( $self, @_ );
+    }
+    return $self->www_view();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_markAsReadMessages ( )
+
+Marks a list of messages selected for the current user as read
+
+=cut
+
+sub www_markAsReadMessages {
+    my $self    = shift;
+    my $session = $self->session;
+
+    $self->store->{tab} = 'inbox';
+
+    my @messages = $session->form->process( 'message', 'checkList' );
+
+    foreach my $messageId ( @messages ) {
+        my $message = WebGUI::Inbox::Message->new( $session, $messageId );
+        $message->setRead;
+    }
+
+    return $self->www_view();
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_markAsUnreadMessages ( )
+
+Marks a list of messages selected for the current user as unread
+
+=cut
+
+sub www_markAsUnreadMessages {
+    my $self    = shift;
+    my $session = $self->session;
+
+    $self->store->{tab} = 'inbox';
+
+    my @messages = $session->form->process( 'message', 'checkList' );
+
+    foreach my $messageId ( @messages ) {
+        my $message = WebGUI::Inbox::Message->new( $session, $messageId );
+        $message->setUnread;
+    }
+
+    return $self->www_view();
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_inviteUser ( )
 
 Form for inviting a user to join the site.
@@ -1259,7 +1332,7 @@ sub www_view {
     });
 
     $var->{'form_header'} = WebGUI::Form::formHeader($session,{
-        action => $self->getUrl("module=inbox;do=deleteMessages")
+        action => $self->getUrl("module=inbox;do=actOnMessages")
     });
     $var->{'form_footer'} = WebGUI::Form::formFooter($session);
 

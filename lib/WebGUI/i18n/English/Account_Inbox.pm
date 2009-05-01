@@ -3,6 +3,16 @@ use strict;
 
 our $I18N = {
 
+    'mark as read label' => {
+        message     => q{Mark as Read},
+        lastUpdated => 12411788761,
+    },
+
+    'mark as unread label' => {
+        message     => q{Mark as Unread},
+        lastUpdated => 12411788761,
+    },
+
     'title' => {
         message     => q{Inbox},
         lastUpdated => 1225724810,
@@ -262,11 +272,6 @@ our $I18N = {
 
     'reply label' => {
         message     => q{Reply},
-        lastUpdated => 1119068809
-    },
-
-    'delete label' => {
-        message     => q{Delete},
         lastUpdated => 1119068809
     },
 
