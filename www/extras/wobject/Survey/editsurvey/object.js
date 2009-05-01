@@ -146,8 +146,12 @@ Survey.ObjectTemplate = (function(){
                 visible: false,
                 buttons: btns
             });
-            
+
             dialog.callback = Survey.Comm.callback;
+
+            dialog.hideEvent.subscribe(function(){Survey.ObjectTemplate.hideEditor();});
+            dialog.dragEvent.subscribe(function(){Survey.ObjectTemplate.showEditor();});
+
             dialog.render();
 
             resizeGotoExpression = new YAHOO.util.Resize('resize_gotoExpression_formId');
