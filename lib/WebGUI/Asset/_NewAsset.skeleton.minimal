@@ -1,0 +1,110 @@
+package WebGUI::Asset::NewAsset;
+
+=head1 LEGAL
+
+ -------------------------------------------------------------------
+  WebGUI is Copyright 2001-2009 Plain Black Corporation.
+ -------------------------------------------------------------------
+  Please read the legal notices (docs/legal.txt) and the license
+  (docs/license.txt) that came with this distribution before using
+  this software.
+ -------------------------------------------------------------------
+  http://www.plainblack.com                     info@plainblack.com
+ -------------------------------------------------------------------
+
+=cut
+
+use strict;
+use Tie::IxHash;
+use base 'WebGUI::Asset';
+use WebGUI::Utility;
+
+# To get an installer for your wobject, add the Installable AssetAspect
+# See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
+# details
+
+=head1 NAME
+
+Package WebGUI::Asset::NewAsset
+
+=head1 DESCRIPTION
+
+Describe your New Asset's functionality and features here.
+
+=head1 SYNOPSIS
+
+use WebGUI::Asset::NewAsset;
+
+
+=head1 METHODS
+
+These methods are available from this class:
+
+=cut
+
+#-------------------------------------------------------------------
+
+=head2 definition ( session, definition )
+
+=cut
+
+sub definition {
+    my $class      = shift;
+    my $session    = shift;
+    my $definition = shift;
+    my $i18n       = WebGUI::International->new( $session, "Asset_NewAsset" );
+    tie my %properties, 'Tie::IxHash', (
+        templateIdView => {
+            tab         => "display",
+            fieldType   => "template",
+            label       => $i18n->get('templateIdView label'),
+            hoverHelp   => $i18n->get('templateIdView description'),
+            namespace   => '', # XXX Add template namespace
+        },
+        # XXX Add your properties
+    );
+    push @{$definition}, {
+        assetName         => $i18n->get('assetName'),
+        icon              => 'NewAsset.gif',
+        autoGenerateForms => 1,
+        tableName         => 'NewAsset',
+        className         => 'WebGUI::Asset::NewAsset',
+        properties        => \%properties,
+        };
+    return $class->SUPER::definition( $session, $definition );
+} ## end sub definition
+
+#-------------------------------------------------------------------
+
+=head2 prepareView ( )
+
+See WebGUI::Asset::prepareView() for details.
+
+=cut
+
+sub prepareView {
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new( $self->session, $self->get("templateIdView") );
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
+}
+
+#-------------------------------------------------------------------
+
+=head2 view ( )
+
+method called by the container www_view method. 
+
+=cut
+
+sub view {
+    my $self = shift;
+    my $var  = $self->get;    # $var is a hash reference.
+    $var->{controls} = $self->getToolbar;
+    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
+}
+
+1;
+
+#vim:ft=perl
