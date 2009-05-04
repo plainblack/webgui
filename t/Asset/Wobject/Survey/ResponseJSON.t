@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 82;
+my $tests = 83;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -431,6 +431,10 @@ is($rJSON->nextResponse, 3, '..and again when score used');
 $rJSON->nextResponse(2); # pretend we just finished s0q2
 $rJSON->processGotoExpression('jump { score("s0") == 300} s1');
 is($rJSON->nextResponse, 3, '..and again when section score total used');
+
+$rJSON->nextResponse(2); # pretend we just finished s0q2
+$rJSON->processGotoExpression('jump { answered(s0q0) && !answered(ABCDEFG) } s1');
+is($rJSON->nextResponse, 3, '..and again when answered() used');
 
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);

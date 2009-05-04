@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 41;
+my $tests = 42;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -75,6 +75,7 @@ SKIP: {
         q{jump { min(3,5,2) == 2 } target},                                    # List::Util min
         q{jump { sum(value(n),1,1,1) == 8 } target},                           # List::Util sum, etc..
         q{jump { score(n1) == 1 && score(n2) == 2 } target},                   # score() works
+        q{jump { answered(n) && !answered(X) } target},                        # answered() works
     );
 
     my @should_fail = (
@@ -110,7 +111,6 @@ SKIP: {
         undef, 'target is not valid' );
     is( $e->run( $session, q{jump {1} target}, { values => \%values, validTargets => { target => 1 } } ),
         'target', '..whereas now it is ok' );
-    
     
     # Create a test user
     $user = WebGUI::User->new( $session, 'new' );

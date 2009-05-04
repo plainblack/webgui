@@ -38,10 +38,10 @@ my $other_instances;
 
 Utility sub that gives expressions access to recorded response values
 
-value(question_variable) returns the recorded response value for the answer to question_variable
+Returns the recorded response value for the answer to question_variable
 
-value(asset_spec, question_variable) returns value(question_variable) on the most recent completed response
- for the user on the survey instance given by asset_spec (either an assetId or a url)
+If two arguments are provided, the first argument is assumed to be an asset spec (assetId or url). In this
+case the sub is applied to the most recent completed response for the user on the survey instance given by asset_spec.
 
 =cut
 
@@ -71,8 +71,12 @@ sub value {
 
 Utility sub that gives expressions access to recorded response scores.
 
-score(question_variable) returns the score for the answer selected for question_variable
-score(section_variable) returns the summed score for the answers to all the questions in section_variable
+If the argument is a question variable, returns the score for the answer selected for question_variable.
+
+If the argument is a section variable, returns the summed score for the answers to all the questions in section_variable
+
+If two arguments are provided, the first argument is assumed to be an asset spec (assetId or url). In this
+case the sub is applied to the most recent completed response for the user on the survey instance given by asset_spec.
 
 =cut
 
@@ -96,6 +100,37 @@ sub score {
     my $score = $scores->{$key};
     $session->log->debug("score($key) resolves to [$score]");
     return $score;    # scalar variable, so no need to clone
+}
+
+=head2 answered
+
+Returns true/false depending on whether use has actually reached and responded to the given question
+
+If two arguments are provided, the first argument is assumed to be an asset spec (assetId or url). In this
+case the sub is applied to the most recent completed response for the user on the survey instance given by asset_spec.
+
+=cut
+
+sub answered {
+    # Two arguments implies the first arg is an asset_spec
+    if ( @_ == 2 ) {
+        my ( $asset_spec, $key ) = @_;
+        
+        # See if $other_instances already contains the external survey
+        if (my $other_instance = $other_instances->{$asset_spec}) {
+            my $values = $other_instance->{values};
+            my $answered  = exists $values->{$key};
+            $session->log->debug("answered($asset_spec, $key) returns [$answered]");
+            return $answered;
+        } else {
+            # Throw an exception, triggering run() to resolve the external reference and re-run
+            die( { other_instance => $asset_spec } );
+        }
+    }
+    my $key   = shift;
+    my $answered = exists $values->{$key};
+    $session->log->debug("answered($key) returns [$answered]");
+    return $answered;
 }
 
 =head2 jump
@@ -160,7 +195,9 @@ A gotoExpression is essentially a perl expression that gets evaluated in a Safe 
 
 To access Section/Question recorded response values, the expression calls L<value>.
 To access Section/Question recorded response scores, the expression calls L<score>.
-Both L<value> and L<score> allow you to resolve values and scores from other completed survey
+To determine if a user reached and answered a question, the expression calls L<answered>.
+
+All of these subs allow you to resolve values and scores from other completed survey
 instances.
 
 To trigger a jump, the expression calls L<jump>. The first truthy jump succeeds.
@@ -226,6 +263,7 @@ sub run {
         # Share our utility subs with the compartment
         $compartment->share('&value');
         $compartment->share('&score');
+        $compartment->share('&answered');
         $compartment->share('&jump');
         $compartment->share('&avg');
 
