@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 83;
+my $tests = 87;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ cmp_deeply($rJSON->responseScoresByVariableName, { s1q0 => 100, s1q1 => 200, s1 
 
 ####################################################
 #
-# processGotoExpression
+# processExpression
 #
 ####################################################
 # Turn on the survey Expression Engine
@@ -378,63 +378,72 @@ $rJSON->recordResponses({
 
 is($rJSON->nextResponse, 2, 'nextResponse at 2 (s0q1) after first response');
 
-$rJSON->processGotoExpression('blah-dee-blah-blah {');
+$rJSON->processExpression('blah-dee-blah-blah {');
 is($rJSON->nextResponse, 2, '..unchanged after duff expression');
 
-$rJSON->processGotoExpression('jump { value(s0q0) == 4} s1');
+$rJSON->processExpression('jump { value(s0q0) == 4} s1');
 is($rJSON->nextResponse, 2, '..unchanged after false expression');
 
-$rJSON->processGotoExpression('jump { value(s0q0) == 4} s0; jump { value(s1q0) == 5} s1;');
+$rJSON->processExpression('jump { value(s0q0) == 4} s0; jump { value(s1q0) == 5} s1;');
 is($rJSON->nextResponse, 2, '..similarly for multi-statement false expression');
 
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} DUFF_TARGET');
+$rJSON->processExpression('jump { value(s0q0) == 3} DUFF_TARGET');
 is($rJSON->nextResponse, 2, '..similarly for expression with invalid target');
 
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} s1');
+$rJSON->processExpression('jump { value(s0q0) == 3} s1');
 is($rJSON->nextResponse, 3, 'jumps to index of first question in section');
 
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} s2');
+$rJSON->processExpression('jump { value(s0q0) == 3} s2');
 is($rJSON->nextResponse, 5, '..and updated to s2 with different jump target');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} s3');
+$rJSON->processExpression('jump { value(s0q0) == 3} s3');
 is($rJSON->nextResponse, 6, '..and updated to s3 with different jump target');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} s3q1');
+$rJSON->processExpression('jump { value(s0q0) == 3} s3q1');
 is($rJSON->nextResponse, 7, '..we can also jump to a question rather than a section');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} NEXT_SECTION');
+$rJSON->processExpression('jump { value(s0q0) == 3} NEXT_SECTION');
 is($rJSON->nextResponse, 3, '..we can also use the NEXT_SECTION target');
 
 $rJSON->lastResponse(3); # pretend we just finished s1q0
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} NEXT_SECTION');
+$rJSON->processExpression('jump { value(s0q0) == 3} NEXT_SECTION');
 is($rJSON->nextResponse, 5, '..try that again from a different starting point');
 
 $rJSON->lastResponse(8); # pretend we just finished s3q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} NEXT_SECTION');
+$rJSON->processExpression('jump { value(s0q0) == 3} NEXT_SECTION');
 is($rJSON->nextResponse, 9, '..NEXT_SECTION on the last section is ok, it just ends the survey');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 3} END_SURVEY');
+$rJSON->processExpression('jump { value(s0q0) == 3} END_SURVEY');
 is($rJSON->nextResponse, 9, '..we can also jump to end with END_SURVEY target');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { value(s0q0) == 4} s0; jump { value(s0q0) == 3} s1');
+$rJSON->processExpression('jump { value(s0q0) == 4} s0; jump { value(s0q0) == 3} s1');
 is($rJSON->nextResponse, 3, '..first true statement wins');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { score(s0q0) == 100} s1');
+$rJSON->processExpression('jump { score(s0q0) == 100} s1');
 is($rJSON->nextResponse, 3, '..and again when score used');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { score("s0") == 300} s1');
+$rJSON->processExpression('jump { score("s0") == 300} s1');
 is($rJSON->nextResponse, 3, '..and again when section score total used');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
-$rJSON->processGotoExpression('jump { answered(s0q0) && !answered(ABCDEFG) } s1');
+$rJSON->processExpression('jump { answered(s0q0) && !answered(ABCDEFG) } s1');
 is($rJSON->nextResponse, 3, '..and again when answered() used');
+
+$rJSON->nextResponse(2); # pretend we just finished s0q2
+cmp_deeply($rJSON->tags, {}, 'No tag data');
+$rJSON->processExpression('tag(a,100)');
+cmp_deeply($rJSON->tags, { a => 100 }, 'Tag data set');
+$rJSON->processExpression('tag(b,50); jump {tag(a) + tag(b) == 150} s1');
+
+cmp_deeply($rJSON->tags, { a => 100, b => 50 }, 'Tag data cumulative');
+is($rJSON->nextResponse, 3, '..and is useful for jump expressions');
 
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);

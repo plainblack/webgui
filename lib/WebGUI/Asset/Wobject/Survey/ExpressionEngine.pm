@@ -19,7 +19,6 @@ See L<run> for more details.
 use strict;
 use Params::Validate qw(:all);
 use Safe;
-use Data::Dumper;
 use List::Util qw/sum/;
 use WebGUI::Asset;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
@@ -29,10 +28,11 @@ Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidPar
 my $session;
 my $values;
 my $scores;
-my $jump_count;
+my $jumpCount;
 my $validate;
 my $validTargets;
-my $other_instances;
+my $otherInstances;
+my $tags;
 
 =head2 value
 
@@ -40,31 +40,36 @@ Utility sub that gives expressions access to recorded response values
 
 Returns the recorded response value for the answer to question_variable
 
-If two arguments are provided, the first argument is assumed to be an asset spec (assetId or url). In this
-case the sub is applied to the most recent completed response for the user on the survey instance given by asset_spec.
-
 =cut
 
 sub value {
-    # Two arguments implies the first arg is an asset_spec
-    if ( @_ == 2 ) {
-        my ( $asset_spec, $key ) = @_;
-        
-        # See if $other_instances already contains the external survey
-        if (my $other_instance = $other_instances->{$asset_spec}) {
-            my $values = $other_instance->{values};
-            my $value  = $values->{$key};
-            $session->log->debug("value($asset_spec, $key) resolves to [$value]");
-            return $value;
-        } else {
-            # Throw an exception, triggering run() to resolve the external reference and re-run
-            die( { other_instance => $asset_spec } );
-        }
-    }
     my $key   = shift;
-    my $value = $values->{$key};
+    my $value = $tags->{$key} || $values->{$key};
     $session->log->debug("value($key) resolves to [$value]");
     return $value;    # scalar variable, so no need to clone
+}
+
+=head2 valueX
+
+Same as L<value>, except that first argument is an asset spec (assetId or url), which must resolve
+to a valid survey instance. The sub is applied to the most recent completed response for the user 
+on the survey instance given by asset_spec.
+
+=cut
+
+sub valueX {
+    my ( $asset_spec, $key ) = @_;
+    
+    # See if $otherInstances already contains the external survey
+    if (my $other_instance = $otherInstances->{$asset_spec}) {
+        my $values = $other_instance->{values};
+        my $value  = $values->{$key};
+        $session->log->debug("valueX($asset_spec, $key) resolves to [$value]");
+        return $value;
+    } else {
+        # Throw an exception, triggering run() to resolve the external reference and re-run
+        die( { other_instance => $asset_spec } );
+    }
 }
 
 =head2 score
@@ -85,8 +90,8 @@ sub score {
     if ( @_ == 2 ) {
         my ( $asset_spec, $key ) = @_;
         
-        # See if $other_instances already contains the external survey
-        if (my $other_instance = $other_instances->{$asset_spec}) {
+        # See if $otherInstances already contains the external survey
+        if (my $other_instance = $otherInstances->{$asset_spec}) {
             my $scores = $other_instance->{scores};
             my $score  = $scores->{$key};
             $session->log->debug("score($asset_spec, $key) resolves to [$score]");
@@ -102,6 +107,29 @@ sub score {
     return $score;    # scalar variable, so no need to clone
 }
 
+=head2 scoreX
+
+Same as L<score>, except that first argument is an asset spec (assetId or url), which must resolve
+to a valid survey instance. The sub is applied to the most recent completed response for the user 
+on the survey instance given by asset_spec.
+
+=cut
+
+sub scoreX {
+    my ( $asset_spec, $key ) = @_;
+    
+    # See if $otherInstances already contains the external survey
+    if (my $other_instance = $otherInstances->{$asset_spec}) {
+        my $scores = $other_instance->{scores};
+        my $score  = $scores->{$key};
+        $session->log->debug("scoreX($asset_spec, $key) resolves to [$score]");
+        return $score;
+    } else {
+        # Throw an exception, triggering run() to resolve the external reference and re-run
+        die( { other_instance => $asset_spec } );
+    }
+}
+
 =head2 answered
 
 Returns true/false depending on whether use has actually reached and responded to the given question
@@ -112,25 +140,86 @@ case the sub is applied to the most recent completed response for the user on th
 =cut
 
 sub answered {
-    # Two arguments implies the first arg is an asset_spec
-    if ( @_ == 2 ) {
-        my ( $asset_spec, $key ) = @_;
-        
-        # See if $other_instances already contains the external survey
-        if (my $other_instance = $other_instances->{$asset_spec}) {
-            my $values = $other_instance->{values};
-            my $answered  = exists $values->{$key};
-            $session->log->debug("answered($asset_spec, $key) returns [$answered]");
-            return $answered;
-        } else {
-            # Throw an exception, triggering run() to resolve the external reference and re-run
-            die( { other_instance => $asset_spec } );
-        }
-    }
     my $key   = shift;
     my $answered = exists $values->{$key};
     $session->log->debug("answered($key) returns [$answered]");
     return $answered;
+}
+
+=head2 answeredX
+
+Same as L<answered>, except that first argument is an asset spec (assetId or url), which must resolve
+to a valid survey instance. The sub is applied to the most recent completed response for the user 
+on the survey instance given by asset_spec.
+
+=cut
+
+sub answeredX {
+    my ( $asset_spec, $key ) = @_;
+    
+    # See if $otherInstances already contains the external survey
+    if (my $other_instance = $otherInstances->{$asset_spec}) {
+        my $values = $other_instance->{values};
+        my $answered  = exists $values->{$key};
+        $session->log->debug("answeredX($asset_spec, $key) returns [$answered]");
+        return $answered;
+    } else {
+        # Throw an exception, triggering run() to resolve the external reference and re-run
+        die( { other_instance => $asset_spec } );
+    }
+}
+
+=head2 tag ($name, [$value])
+
+Mutator utility sub that gives expressions access to tag response values (and optionally set them).
+
+=head3 $name
+
+Name of tag whose value is returned.
+
+=head3 $value (optional)
+
+If provided, the tag is set to this value.
+
+=cut
+
+sub tag {
+    my ($name, $value) = @_;
+    if (defined $value) {
+        $session->log->debug("Setting tag [$name] to [$value]");
+        $tags->{$name} = $value;
+    } else {
+        $value = $tags->{$name};
+        $session->log->debug("tag($name) resolves to [$value]");
+    }
+    return $value;
+}
+
+=head2 tagX
+
+Same as L<tag>, except that first argument is an asset spec (assetId or url), which must resolve
+to a valid survey instance. The sub is applied to the most recent completed response for the user 
+on the survey instance given by asset_spec.
+
+Note that it doesn't really make sense to try to set a tag on an external asset, so this sub
+is only an accessor.
+
+=cut
+
+sub tagX {
+    my ( $asset_spec, $name ) = @_;
+    
+    # See if $otherInstances already contains the external survey
+    if (my $other_instance = $otherInstances->{$asset_spec}) {
+        my $tags = $other_instance->{tags};
+        
+        my $value = $tags->{$name};
+        $session->log->debug("tagX($asset_spec, $name) returns [$value]");
+        return $value;
+    } else {
+        # Throw an exception, triggering run() to resolve the external reference and re-run
+        die( { other_instance => $asset_spec } );
+    }
 }
 
 =head2 jump
@@ -144,7 +233,7 @@ catch the first successful jump.
 
 sub jump(&$) {
     my ( $sub, $target ) = @_;
-    $jump_count++;
+    $jumpCount++;
 
     # If $validTargets known, make sure target is valid
     if ( $validTargets && !exists $validTargets->{$target} ) {
@@ -158,11 +247,11 @@ sub jump(&$) {
     }
 
     if ( $sub->() ) {
-        $session->log->debug("jump call #$jump_count is truthy");
+        $session->log->debug("jump call #$jumpCount is truthy");
         die( { jump => $target } );
     }
     else {
-        $session->log->debug("jump call #$jump_count is falsey");
+        $session->log->debug("jump call #$jumpCount is falsey");
     }
 }
 
@@ -247,8 +336,13 @@ sub run {
         = validate_pos( @_, { isa => 'WebGUI::Session' }, { type => SCALAR }, { type => HASHREF, default => {} } );
 
     # Init package globals
-    ( $session, $values, $scores, $jump_count, $validate, $validTargets )
-        = ( $s, $opts->{values}, $opts->{scores}, 0, $opts->{validate}, $opts->{validTargets} );
+    $session = $s;
+    $values = $opts->{values} || {};
+    $scores = $opts->{scores} || {};
+    $jumpCount = 0;
+    $validate = $opts->{validate};
+    $validTargets = $opts->{validTargets};
+    $tags = $opts->{tags} || {};
 
     if ( !$session->config->get('enableSurveyExpressionEngine') ) {
         $session->log->debug('enableSurveyExpressionEngine config option disabled, skipping');
@@ -262,8 +356,13 @@ sub run {
 
         # Share our utility subs with the compartment
         $compartment->share('&value');
+        $compartment->share('&valueX');
         $compartment->share('&score');
+        $compartment->share('&scoreX');
         $compartment->share('&answered');
+        $compartment->share('&answeredX');
+        $compartment->share('&tag');
+        $compartment->share('&tagX');
         $compartment->share('&jump');
         $compartment->share('&avg');
 
@@ -289,7 +388,7 @@ sub run {
         if ( ref $@ && ref $@ eq 'HASH' && $@->{jump} ) {
             my $jump = $@->{jump};
             $session->log->debug("Returning [$jump]");
-            return $jump;
+            return { jump => $jump, tags => $tags };
         }
 
         # See if an unresolved external reference was encountered
@@ -337,11 +436,11 @@ sub run {
                 return;
             }
 
-            $other_instances->{$asset_spec} = {
-                values =>
-                    $asset->responseJSON( undef, $mostRecentlyCompletedResponseId )->responseValuesByVariableName,
-                scores =>
-                    $asset->responseJSON( undef, $mostRecentlyCompletedResponseId )->responseScoresByVariableName,
+            my $rJSON = $asset->responseJSON( undef, $mostRecentlyCompletedResponseId );
+            $otherInstances->{$asset_spec} = {
+                values => $rJSON->responseValuesByVariableName,
+                scores => $rJSON->responseScoresByVariableName,
+                tags => $rJSON->tags,
             };
             $session->log->debug("Successfully looked up asset: $assetId. Repeating reval.");
             redo REVAL;
@@ -350,10 +449,11 @@ sub run {
         # Log all other errors (for example compile errors from bad expressions)
         if ($@) {
             $session->log->error($@);
+            return; # Return undef on failure
         }
 
-        # Return undef on failure
-        return;
+        # If we reach here, no jump was issued, meaning that we probably just processed an expression that did some tagging
+        return { jump => undef, tags => $tags };
     }
 }
 

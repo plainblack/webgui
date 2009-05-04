@@ -89,6 +89,7 @@ sub new {
             questionsAnswered => 0,
             startTime => time(),
             surveyOrder => undef,
+            tags => {},
 
             # And then allow jsonData to override defaults and/or add other members
             %{$jsonData},
@@ -270,6 +271,30 @@ sub startTime {
 
 #-------------------------------------------------------------------
 
+=head2 tags ([ $tags ])
+
+Mutator for the tags that have been applied to the response.
+Returns (and optionally sets) the value of tags.
+
+=head3 $tags (optional)
+
+If defined, sets $tags to the supplied hashref.
+
+=cut
+
+sub tags {
+    my $self     = shift;
+    my ($tags) = validate_pos(@_, {type => HASHREF, optional => 1});
+
+    if ( $tags ) {
+        $self->response->{tags} = $tags;
+    }
+
+    return $self->response->{tags};
+}
+
+#-------------------------------------------------------------------
+
 =head2 surveyOrder
 
 Accessor. Initialized on first access via L<"initSurveyOrder">.
@@ -424,8 +449,11 @@ and answers being answered in L<"surveyOrder">.
 
 =head3 Branch processing
 
-gotos and gotoExpressions are handled similarly as with terminalUrls. The last goto or 
-gotoExpression in the set of questions wins.
+gotos are handled similarly as with terminalUrls. The last goto in the set of questions wins.
+
+In contrast, all gotoExpressions are passed to the Expression Engine (in order of: Answer, Question, Section). 
+Expressions are not guaranteed to trigger a jump, and thus we give every expression in turn a change to run.
+The first expression to trigger a jump will cause any remaining expressions to be skipped.
 
 =cut
 
@@ -443,7 +471,7 @@ sub recordResponses {
     my @questions = $self->nextQuestions();
 
     #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
-    my ($goto, $gotoExpression);
+    my ($goto, $sectionExpression, $questionExpression, $answerExpression);
 
     # Handle terminal Section..
     my $terminalUrl;
@@ -458,7 +486,7 @@ sub recordResponses {
     }
     # .. and also gotoExpressions..
     elsif ( $section->{gotoExpression} =~ /\w/ ) {
-        $gotoExpression = $section->{gotoExpression};
+        $sectionExpression = $section->{gotoExpression};
     }
 
     # Handle empty Section..
@@ -485,7 +513,7 @@ sub recordResponses {
         }
         # .. and also gotoExpressions..
         elsif ( $question->{gotoExpression} =~ /\w/ ) {
-            $gotoExpression = $question->{gotoExpression};
+            $questionExpression = $question->{gotoExpression};
         }
 
         # Record Question comment
@@ -539,7 +567,7 @@ sub recordResponses {
 
                 # .. and also gotoExpressions..
                 elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                    $gotoExpression = $answer->{gotoExpression};
+                    $answerExpression = $answer->{gotoExpression};
                 }
             }
         }
@@ -557,17 +585,20 @@ sub recordResponses {
 
     # If all required responses were given, proceed onwards!
     if ($allRequiredQsAnswered) {
+
         #  Move the lastResponse index to the last question answered
         $self->lastResponse( $self->lastResponse + @questions );
 
-        # Do any requested branching.. 
-        $self->processGoto($goto)                     if ( defined $goto );           ## no critic
-        $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression ); ## no critic
-        
+        # Do any requested branching..
+        $self->processGoto($goto)                     if ( defined $goto );                  ## no critic
+        $self->processExpression($answerExpression)   if ( defined $answerExpression );      ## no critic
+        $self->processExpression($questionExpression) if ( defined $questionExpression );    ## no critic
+        $self->processExpression($sectionExpression)  if ( defined $sectionExpression );     ## no critic
+
         # Handle next logic Section..
-        my $section   = $self->nextResponseSection();
-        if($section and $section->{logical}){
-            return $self->recordResponses({});
+        my $section = $self->nextResponseSection();
+        if ( $section and $section->{logical} ) {
+            return $self->recordResponses( {} );
         }
     }
     else {
@@ -649,33 +680,45 @@ sub processGoto {
 
 #-------------------------------------------------------------------
 
-=head2 processGotoExpression ( $gotoExpression )
+=head2 processExpression ( $expression )
 
-Processes the given gotoExpression, and triggers a call to L<"processGoto"> if the expression
-indicates that we should branch.
+Processes a Survey expression using the Survey Expression Engine. 
 
-=head3 $gotoExpression
+If the expression returns tag data, this data is stored in the response (see L<tags>).
 
-The gotoExpression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
+If the expression returns a jump target, triggers a call to L<"processGoto">.
+
+=head3 $expression
+
+The expression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
 
 =cut
     
-sub processGotoExpression {
+sub processExpression {
     my $self = shift;
     my ($expression) = validate_pos(@_, {type => SCALAR});
     
     # Prepare the ingredients..
     my $values = $self->responseValuesByVariableName;
     my $scores = $self->responseScoresByVariableName;
+    my $tags   = $self->tags;
     my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
     
     use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
-    if (my $jump = $engine->run($self->session, $expression, { values => $values, scores => $scores, validTargets => \%validTargets} )) {
-        $self->session->log->debug("Hit. Jumping to [$jump]");
-        $self->processGoto($jump);
-    }
-    $self->session->log->debug("No hits, falling through");
+    if (my $result = $engine->run($self->session, $expression, { values => $values, scores => $scores, tags => $tags, validTargets => \%validTargets} ) ) {
+        # Update tags
+        if (my $tags = $result->{tags} ) {
+            $self->tags( $tags );
+        }
+        
+        if (my $jump = $result->{jump}) {
+            $self->session->log->debug("Jumping to [$jump]");
+            $self->processGoto($jump);
+        } else {
+            $self->session->log->debug("No hits, falling through");
+        }
+    }    
     return;
 }
 
@@ -916,9 +959,13 @@ sub nextQuestions {
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
     my $responseValuesByVariableName = $self->responseValuesByVariableName( { useText => 1 } );
+    my $tags = $self->tags;
+    
+    # Merge values and tags hashes for processing [[var]] templated text
+    my %templateValues = (%$responseValuesByVariableName, %$tags);
 
     # Do text replacement
-    $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);
+    $section->{text} = $self->getTemplatedText($section->{text}, \%templateValues);
 
     # Collect all the questions to be shown on the next page..
     my @questions;
@@ -941,7 +988,7 @@ sub nextQuestions {
         my %questionCopy = %{$self->survey->question( $address )};
 
         # Do text replacement
-        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responseValuesByVariableName);
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, \%templateValues);
 
         # Add any extra fields we want..
         $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
@@ -953,7 +1000,7 @@ sub nextQuestions {
             my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
             # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responseValuesByVariableName);
+            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
 
             # Add any extra fields we want..
             $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
