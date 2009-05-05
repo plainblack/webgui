@@ -1850,10 +1850,16 @@ sub www_exportStructure {
         unless ( $self->session->user->isInGroup( $self->get('groupToEditSurvey') ) );
     
     if ($self->session->form->param('format') eq 'html') {
-        my $output = '<p>N.B. Items are formatted as: <pre>Numbering: (<b>variable|value</b>) &ldquo;$s->{title|text}&rdquo;</pre></p>';
-        
-        $output .= '<div style="border: 1px dashed; margin: 10px; padding: 10px;">';
-        
+        my $output = <<END_HTML;
+<p>N.B. Items are formatted as:
+    <ul>
+        <li>Section Number: (<b>variable</b>) &ldquo;Section Title&rdquo;</li>
+        <li>Question Number: (<b>variable</b>) &ldquo;Question Title&rdquo;</li>
+        <ul><li>Answer Number: (<b>Recorded Answer,Answer Score</b>) &ldquo;Answer Text&rdquo;</li></ul>
+    </ul>
+</p>
+<div style="border: 1px dashed; margin: 10px; padding: 10px;">
+END_HTML
         my $sNum = 1;
         for my $s (@{$self->surveyJSON->sections}) {
             $output .= "S$sNum: (<b>$s->{variable}</b>) &ldquo;$s->{title}&rdquo;";
@@ -1868,7 +1874,7 @@ sub www_exportStructure {
                 for my $a (@{$q->{answers}}) {
                     $aNum++;
                     $output .= '<li>';
-                    $output .= "A$aNum: (<b>$a->{value}</b>) &ldquo;$a->{text}&rdquo;";
+                    $output .= "A$aNum: (<b>$a->{recordedAnswer},$a->{value}</b>) &ldquo;$a->{text}&rdquo;";
                     $output .= '</li>';
                 }
                 $output .= '</ul>';
@@ -1880,19 +1886,19 @@ sub www_exportStructure {
         
         return $self->session->style->userStyle($output);
     } else {
-        my @rows = ([qw( numbering type variable value text goto gotoExpression)]);
+        my @rows = ([qw( numbering type variable recordedValue score text goto gotoExpression)]);
         my $sNum = 0;
         for my $s (@{$self->surveyJSON->sections}) {
             $sNum++;
-            push @rows, ["S$sNum", 'Section', $s->{variable}, '', $s->{text}, $s->{goto}, ''];
+            push @rows, ["S$sNum", 'Section', $s->{variable}, '', '', $s->{text}, $s->{goto}, ''];
             my $qNum = 0;
             for my $q (@{$s->{questions}}) {
                 $qNum++;
-                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', $q->{text}, '', ''];
+                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', '', $q->{text}, '', ''];
                 my $aNum = 0;
                 for my $a (@{$q->{answers}}) {
                     $aNum++;
-                    push @rows, ["S$sNum-Q$qNum-A$aNum", 'Answer', '', $a->{value}, $a->{text}, $a->{goto}, $a->{gotoExpression}];
+                    push @rows, ["S$sNum-Q$qNum-A$aNum", 'Answer', '', $a->{recordedAnswer}, $a->{value}, $a->{text}, $a->{goto}, $a->{gotoExpression}];
                 }
             }
         }
