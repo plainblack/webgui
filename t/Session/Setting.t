@@ -15,7 +15,7 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 6; # increment this value for each test you create
+use Test::More tests => 7; # increment this value for each test you create
  
 my $session = WebGUI::Test->session;
 
@@ -32,3 +32,4 @@ my ($value) = $session->db->quickArray("select value from settings where name='i
 is($value, undef, "delete()");
 
 isa_ok($session->setting->session, 'WebGUI::Session', 'session method returns a session object');
+isa_ok($session->setting->get, 'HASH', '->get with no parameters returns a hashref');
