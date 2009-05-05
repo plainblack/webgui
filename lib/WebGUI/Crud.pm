@@ -933,8 +933,8 @@ sub update {
         }
 
 		# serialize if needed
-		if ($properties->{$property}{serialize} && $data->{property} ne "") {
-			$data->{property} = JSON->new->canonical->encode($data->{property});
+		if ($properties->{$property}{serialize} && $data->{$property} ne "") {
+			$data->{$property} = JSON->new->canonical->encode($data->{$property});
 		}
 	}
 

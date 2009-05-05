@@ -12,6 +12,7 @@
  - fixed #9897: Snippet Drop Down Menu
  - fixed: Codearea text highlighting is now easier to see
  - fixed: #10322: Dataform: wrong attr on script tag
+ - fixed: serialized fields in WebGUI::Crud were broken
 
 7.6.21
  - fixed: #10190: Matrix 2.0 - Strange characters in "Show Ratings" box
