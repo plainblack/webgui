@@ -153,7 +153,7 @@ sub toHtml {
     # Add the maxlength script
     $style->setScript( 
         $url->extras( 'yui/build/yahoo-dom-event/yahoo-dom-event.js' ), 
-        { text => 'text/javascript' },
+        { type => 'text/javascript' },
     );
     $style->setScript( 
         $url->extras( 'yui-webgui/build/form/textarea.js' ), 
