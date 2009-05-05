@@ -3,6 +3,7 @@
  - Added support for template attachments; scripts and stylesheets that will
    be included using style->setScript and setLink instead of just using raw
    head tags.
+ - fixed: #10322: Dataform: wrong attr on script tag
 
 7.7.5
  - Adding StoryManager.
