@@ -452,7 +452,7 @@ is_deeply(
 
 my $defaultKarmaSetting = $session->setting->get('useKarma');
 
-$session->setting->set('useKarma', 0) if $defaultKarmaSetting;
+$session->setting->set('useKarma', 0);
 
 is_deeply(
 	[ (map { $_->isInGroup($gK->getId) }  @chameleons) ],

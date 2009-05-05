@@ -30,11 +30,8 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 my @versionTags     = ( WebGUI::VersionTag->getWorking( $session ) );
 
 # Override some settings to make things easier to test
-my %oldSettings;
 # userFunctionStyleId 
-$oldSettings{ userFunctionStyleId } = $session->setting->get( 'userFunctionStyleId' );
 $session->setting->set( 'userFunctionStyleId', 'PBtmpl0000000000000132' );
-$oldSettings{ defaultVersionTagWorkflow } = $session->setting->get( 'defaultVersionTagWorkflow' );
 $session->setting->set( 'defaultVersionTagWorkflow', 'pbworkflow000000000003' );
 
 # Create a user for testing purposes
@@ -173,10 +170,6 @@ END {
     }
 
     $user->delete;
-
-    for my $key ( keys %oldSettings ) {
-        $session->setting->set( $key, $oldSettings{ $key } );
-    }
 }
 
 #----------------------------------------------------------------------------
