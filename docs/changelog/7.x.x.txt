@@ -5,6 +5,8 @@
    head tags.
  - fixed #10322: Dataform: wrong attr on script tag
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
+ - fixed: Crud handling of Form fields with database types that cannot have default values.
+ - fixed: Crud serialization.
 
 7.7.5
  - Adding StoryManager.
