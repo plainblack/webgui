@@ -105,6 +105,8 @@ sub className {
     my $self = shift;
 
     $self->session->log->fatal( "Tax plugin ($self) is required to overload the className method" );
+
+    return 'WebGUI::Shop:TaxDriver';
 }
 
 #-----------------------------------------------------------
@@ -213,6 +215,9 @@ Instanciated WebGUI::Session object.
 sub new {
     my $class   = shift;
     my $session = shift;
+
+    WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
+        unless $session && $session->isa( 'WebGUI::Session' );
 
     my $self    = {};
     bless $self, $class;

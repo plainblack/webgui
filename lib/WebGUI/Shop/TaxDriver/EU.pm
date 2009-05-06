@@ -20,6 +20,8 @@ use SOAP::Lite;
 use WebGUI::Content::Account;
 use WebGUI::TabForm;
 use WebGUI::Utility qw{ isIn };
+use Business::Tax::VAT::Validation;
+use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::TaxDriver };
 
@@ -30,7 +32,8 @@ Package WebGUI::Shop::TaxDriver::EU
 =head1 DESCRIPTION
 
 This package manages tax information, and calculates taxes on a shopping cart specifically handling
-European Union VAT taxes.
+European Union VAT taxes. It allows you to define VAT groups (eg. in the Netherlands there are two VAT tariffs:
+high (19%) and low (6%) ) that can be applied to SKU assets. 
 
 =head1 SYNOPSIS
 
@@ -44,7 +47,8 @@ These subroutines are available from this package:
 
 =cut
 
-my $EU_COUNTRIES = {
+
+tie my %EU_COUNTRIES, 'Tie::IxHash', (
     AT => 'Austria',
     BE => 'Belgium',
     BG => 'Bulgaria',
@@ -72,7 +76,105 @@ my $EU_COUNTRIES = {
     SE => 'Sweden',
     SI => 'Slovenia',
     SK => 'Slovakia',
-};
+);
+
+#-------------------------------------------------------------------
+
+=head2 addGroup ( name, rate )
+
+Adds a tax group. Returns the group id.
+
+=head3 name
+
+The display name of the tax group.
+
+=head3 rate
+
+The tax rate for this group in percents.
+
+=cut
+
+sub addGroup {
+    my $self    = shift;
+    my $name    = shift;
+    my $rate    = shift;
+
+    WebGUI::Error::InvalidParam->throw( 'A group name is required' )
+        unless $name;
+    WebGUI::Error::InvalidParam->throw( 'Group rate must be within 0 and 100' )
+        unless defined $rate && $rate >= 0 && $rate <= 100;
+
+    my $id      = $self->session->id->generate;
+    my $groups  = $self->get( 'taxGroups' ) || [];
+
+    push @{ $groups }, {
+        name    => $name,
+        rate    => $rate,
+        id      => $id,
+    };
+
+    $self->update( { taxGroups => $groups } );
+
+    return $id;
+}
+
+#-------------------------------------------------------------------
+
+=head2 addVATNumber ( VATNumber, localCheckOnly )
+
+Adds a VAT number to the database. Checks the number through the VIES database. Returns and error message if a
+validation error occurred. If the number validates undef is returned.
+
+=head3 VATNumber
+
+The number that is to be added.
+
+=head3 user
+
+The user for which the number should be added. Defaults to the session user.
+
+=head3 localCheckOnly
+
+If set to a true value the the remote VAT number validation in the VIES database will not be preformed. The VAT
+number will be checked against regexes, however. Mostly convenient for testing purposes. 
+
+=cut
+
+sub addVATNumber {
+    my $self            = shift;
+    my $number          = shift;
+    my $user            = shift || $self->session->user; 
+    my $localCheckOnly  = shift;
+    my $db              = $self->session->db;
+
+    WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
+        unless $number;
+    WebGUI::Error::InvalidParam->throw( 'The second argument must be an instanciated WebGUI::User object' )
+        unless ref $user eq 'WebGUI::User';
+    WebGUI::Error::InvalidParam->throw( 'Visitor cannot add VAT numbers' )
+        if $user->isVisitor;
+
+    # Check number
+    my $validator       = Business::Tax::VAT::Validation->new;
+    my $numberIsValid   = $localCheckOnly ? $validator->local_check( $number ) : $validator->check( $number );
+
+    # Number contains syntax error does not exist. Do not write the code to the db.
+    if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
+        return 'The entered VAT number is invalid.';
+    }
+
+
+    # Write the code to the db.
+    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,approved,viesErrorCode) values (?,?,?,?,?)', [
+        $user->userId,
+        substr( $number, 0 , 2 ),
+        $number,
+        $numberIsValid ? 1 : 0,
+        $numberIsValid ? undef : $validator->get_last_error_code,
+    ] );
+
+    return $numberIsValid ? undef : 'Number validation currently not available. Check later.';
+}
 
 #-------------------------------------------------------------------
 
@@ -86,6 +188,59 @@ sub className {
     return 'WebGUI::Shop::TaxDriver::EU';
 }
 
+#-------------------------------------------------------------------
+
+=head2 deleteGroup ( groupId )
+
+Deletes a tax group.
+
+=head3 groupId
+
+The id of the tax group that is to be deleted.
+
+=cut
+
+sub deleteGroup {
+    my $self            = shift;
+    my $removeGroupId   = shift;
+
+    WebGUI::Error::InvalidParam->throw( 'A group id is required' )
+        unless $removeGroupId;
+
+    my $taxGroups       = $self->get( 'taxGroups' );
+    my @newGroups       = grep { $_->{ id } ne $removeGroupId } @{ $taxGroups };
+
+    $self->update( { taxGroups => \@newGroups } );
+}
+
+#-----------------------------------------------------------
+
+=head2 deleteVATNumber ( VATNumber, [ user ] )
+
+Deletes a VAT number.
+
+=head3 VATNumber
+
+The VATNumber to delete.
+
+=head3 user
+
+The user whose VATNumber must be deleted, in the form of a WebGUI::User object.
+
+=cut
+
+sub deleteVATNumber {
+    my $self    = shift;
+    my $number  = shift;
+    my $user    = shift || $self->session->user;
+    my $session = $self->session;
+
+    $session->db->write( 'delete from tax_eu_vatNumbers where userId=? and vatNumber=?', [
+        $user->userId,
+        $number,
+    ] );
+}
+    
 #-----------------------------------------------------------
 
 =head2 getConfigurationScreen ( )
@@ -99,7 +254,12 @@ sub getConfigurationScreen {
     my $session = $self->session;
 
     my $taxGroups = $self->get( 'taxGroups' ) || [];
-    
+
+    tie my %countryOptions, 'Tie::IxHash', (
+        ''  => ' - select a country - ',
+        %EU_COUNTRIES,
+    );
+
     # General setting form
     my $f = WebGUI::HTMLForm->new( $session );
     $f->hidden(
@@ -119,7 +279,7 @@ sub getConfigurationScreen {
         value       => $self->get( 'shopCountry' ),
         label       => 'Residential country',
         hoverHelp   => 'The country where your shop resides.',
-        options     => $EU_COUNTRIES,
+        options     => \%countryOptions,
     );
     $f->submit;
     my $general = $f->print;
@@ -203,12 +363,12 @@ sub getCountryCode {
     my $countryName = shift;
 
     # Do reverse lookup on eu countries hash
-    return { reverse %{ $EU_COUNTRIES } }->{ $countryName };
+    return { reverse %EU_COUNTRIES }->{ $countryName };
 }
 
 #-------------------------------------------------------------------
 
-=head2 getCountryName ($countryCode)
+=head2 getCountryName ( $countryCode )
 
 Given a 2 character country code, return the name of the country.
 
@@ -222,14 +382,18 @@ sub getCountryName {
     my $self = shift;
     my $countryCode = shift;
     
-    return $EU_COUNTRIES->{ $countryCode };
+    return $EU_COUNTRIES{ $countryCode };
 }
 
 #-------------------------------------------------------------------
 
-=head2 getGroupRate ($taxGroupId)
+=head2 getGroupRate ( $taxGroupId )
+
+Returns the tax rate for a given tax group.
 
 =head3 $taxGroupId
+
+The id of the tax group whose rate should be returned.
 
 =cut
 
@@ -303,7 +467,7 @@ sub getUserScreen {
 
 #-------------------------------------------------------------------
 
-=head2 getTaxRate ( sku, [ address ] )
+=head2 getTaxRate ( sku, [ address, user ] )
 
 Returns the tax rate in percents (eg. 19 for a rate of 19%) for the given sku and shipping address.  Implements
 EU VAT taxes and group rates.
@@ -314,6 +478,11 @@ sub getTaxRate {
     my $self    = shift;
     my $sku     = shift;
     my $address = shift;
+
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Asset::Sku object')
+        unless $sku && $sku->isa( 'WebGUI::Asset::Sku' );
+    WebGUI::Error::InvalidParam->throw(error => 'Must pass in a WebGUI::Shop::Address object')
+        if $address && !$address->isa( 'WebGUI::Shop::Address' );
 
     my $config  = $sku->getTaxConfiguration( $self->className );
 
@@ -340,26 +509,34 @@ sub getTaxRate {
 
 #-------------------------------------------------------------------
 
-=head2 getVATNumbers ($countryCode)
+=head2 getVATNumbers ( $countryCode )
+
+Returns an array ref of hash refs containing the properties of the VAT numbers a user s registered for a given
+country. Returns an empty array ref if the user has no VAT numbers in the requested country.
+
+The hash keys of interest for most people are vatNumber, which contains the actual number, and approved, which
+indicates whether or not the number has been approved for use yet.
 
 =head3 $countryCode
+
+The two letter country code of the country the VAT numbers are requested for.
 
 =cut
 
 sub getVATNumbers {
     my $self        = shift;
     my $countryCode = shift;
-    my $session     = $self->session;
+    my $user        = shift || $self->session->user;
 
     my $sql = 'select * from tax_eu_vatNumbers where userId=?';
-    my $placeHolders = [ $session->user->userId ];
+    my $placeHolders = [ $user->userId ];
 
     if ( $countryCode ) {
         $sql .= ' and countryCode=?';
         push @{ $placeHolders }, $countryCode;
     }
 
-    my $numbers = $session->db->buildArrayRefOfHashRefs( $sql, $placeHolders );
+    my $numbers = $self->session->db->buildArrayRefOfHashRefs( $sql, $placeHolders );
 
     return $numbers;
 }
@@ -368,7 +545,11 @@ sub getVATNumbers {
 
 =head2 hasVATNumber ($countrycode)
 
+Returns a boolean indicating whether or not the user has VAT numbers registered for the given country.
+
 =head3 $countryCode
+
+The two letter country code of contry for which the existance of VAT numbers is requested.
 
 =cut
 
@@ -417,6 +598,8 @@ sub skuFormDefinition {
 
 =head2 www_addGroup
 
+Adds a VAT group.
+
 =cut
 
 sub www_addGroup {
@@ -425,18 +608,7 @@ sub www_addGroup {
 
     return $self->session->privilege->insufficient unless $self->canManage;
 
-    my $groups  = $self->get( 'taxGroups' ) || [];
-    my $name    = $form->process( 'name' );
-    my $rate    = $form->process( 'rate' );
-    my $id      = $self->session->id->generate;
-
-    push @{ $groups }, {
-        name    => $name,
-        rate    => $rate,
-        id      => $id,
-    };
-
-    $self->update( { taxGroups => $groups } );
+    $self->addGroup( $form->process( 'name' ), $form->process( 'rate' ) );
 
     return '';
 }
@@ -444,6 +616,11 @@ sub www_addGroup {
 #-------------------------------------------------------------------
 
 =head2 www_addVATNumber
+
+Allows a user to add a VAT number. The validity of VAT numbers will be automatically checked using the VIES service
+provided by the European Union. See http://ec.europa.eu/taxation_customs/vies/vieshome.do for more information
+conerning the service. Please also read the disclamer information located at
+http://ec.europa.eu/taxation_customs/vies/viesdisc.do.
 
 =cut
 
@@ -457,22 +634,12 @@ sub www_addVATNumber {
     my $vatNumber              = uc $form->process( 'vatNumber' );
     my ($countryCode, $number) = $vatNumber =~ m/^([A-Z]{2})([A-Z0-9]+)$/;    
 
-    return 'Illegal country code' unless isIn( $countryCode, keys %{ $EU_COUNTRIES } );
- 
+    return 'Illegal country code' unless isIn( $countryCode, keys %EU_COUNTRIES );
+
     return 'You already have a VAT number for this country.' if @{ $self->getVATNumbers( $countryCode ) };
 
-    # Check VAT number via SOAP interface.
-    # TODO: Handle timeouts.
-    my $soap    = SOAP::Lite->service('http://ec.europa.eu/taxation_customs/vies/api/checkVatPort?wsdl');
-    my $isValid = ( $soap->checkVat( $countryCode, $number ) )[ 3 ] || 0;
-
-    # Write the code to the db.
-    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,approved) values (?,?,?,?)', [
-        $self->session->user->userId,
-        $countryCode,
-        $vatNumber,
-        $isValid,
-    ] );
+    #### TODO: Handle errorMessage.
+    my $errorMessage = $self->addVATNumber( $vatNumber );
 
     my $instance = WebGUI::Content::Account->createInstance($session,"shop");
     return $instance->displayContent( $instance->callMethod("manageTaxData", [], $session->user->userId) );
@@ -482,6 +649,8 @@ sub www_addVATNumber {
 
 =head2 www_deleteGroup
 
+Deletes a VAT group.
+
 =cut
 
 sub www_deleteGroup {
@@ -490,11 +659,7 @@ sub www_deleteGroup {
 
     return $self->session->privilege->insufficient unless $self->canManage;
 
-    my $taxGroups       = $self->get( 'taxGroups' );
-    my $removeGroupId   = $form->process( 'groupId' );
-    my @newGroups       = grep { $_->{ id } ne $removeGroupId } @{ $taxGroups };
-
-    $self->update( { taxGroups => \@newGroups } );
+    $self->deleteGroup( $form->process( 'groupId' ) );
 
     return '';
 }
@@ -503,19 +668,18 @@ sub www_deleteGroup {
 
 =head2 www_deleteVATNumber
 
+Deletes a VAT number.
+
 =cut
 
 sub www_deleteVATNumber {
     my $self    = shift;
     my $session = $self->session;
 
-    return $session->privilege->insufficient unless $session->user->isVisitor;
+    return $session->privilege->insufficient if $session->user->isVisitor;
 
-    $session->db->write( 'delete from tax_eu_vatNumbers where userId=? and vatNumber=?', [
-        $session->user->userId,
-        $session->form->process( 'vatNumber' ),
-    ] );
-
+    $self->deleteVATNumber( $session->form->process( 'vatNumber' ) );
+    
     my $instance = WebGUI::Content::Account->createInstance($session,"shop");
     return $instance->displayContent( $instance->callMethod("manageTaxData", [], $session->user->userId) );
 }
@@ -523,6 +687,8 @@ sub www_deleteVATNumber {
 #-------------------------------------------------------------------
 
 =head2 www_saveConfiguration
+
+Updates the configuration properties for this plugin, as passed by the form on the configuration screen.
 
 =cut
 
@@ -542,6 +708,8 @@ sub www_saveConfiguration {
 #-------------------------------------------------------------------
 
 =head2 www_setDefaultGroup
+
+Sets a VAT group to be used as default for SKU's that do not have a VAT group defined yet.
 
 =cut
 

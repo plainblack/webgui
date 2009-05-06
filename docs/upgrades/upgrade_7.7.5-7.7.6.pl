@@ -33,6 +33,7 @@ my $session = start();
 # upgrade functions go here
 addTemplateAttachmentsTable($session);
 revertUsePacked( $session );
+addEuVatDbColumns( $session );
 
 finish($session); 
 
@@ -75,6 +76,16 @@ sub revertUsePacked {
         }
     }
     print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addEuVatDbColumns {
+    my $session = shift;
+    print "\tAdding columns for improved VAT number checking..." unless $quiet;
+
+    $session->db->write( 'alter table tax_eu_vatNumbers add column viesErrorCode int(3) default NULL' );
+
+    print "Done\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
