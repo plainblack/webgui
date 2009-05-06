@@ -486,8 +486,8 @@ our $I18N = {
     },
 
     'Survey Exit URL help' => {
-        message     => q|When the user finishes the surevey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
-        lastUpdated => 1233714385,
+        message     => q|When the user finishes the survey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
+        lastUpdated => 1241648155,
     },
 
     'Max user responses' => {
