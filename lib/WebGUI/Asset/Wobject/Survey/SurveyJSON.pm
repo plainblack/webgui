@@ -57,10 +57,6 @@ use Clone qw/clone/;
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
 
-#sub specialQuestionTypes {
-#    return @SPECIAL_QUESTION_TYPES;
-#}
-
 =head2 new ( $session, json )
 
 Object constructor.
@@ -126,6 +122,7 @@ sub loadTypes {
         'Date',
         'Date Range',
         'Year Month',
+        'Country',
         'Hidden',
     ) if(! defined $self->{specialQuestionTypes});
     if(! defined $self->{multipleChoiceTypes}){

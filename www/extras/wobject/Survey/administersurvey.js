@@ -30,6 +30,9 @@ if (typeof Survey === "undefined") {
     var DATE_SHORT = {
         'Year Month': 1
     };
+    var COUNTRY = {
+        'Country': 1
+    };
     var DATE_TYPES = {
         'Date': 1,
         'Date Range': 1
@@ -633,6 +636,17 @@ if (typeof Survey === "undefined") {
                 }
                
                 if (DATE_SHORT[q.questionType]) {
+                    for (var k = 0; k < q.answers.length; k++) {
+                        var ans = q.answers[k];
+                        if (toValidate[q.id]) {
+                            toValidate[q.id].type = q.questionType;
+                            toValidate[q.id].answers[ans.id] = 1;
+                        }
+                    }
+                    continue;
+                } 
+                
+                if (COUNTRY[q.questionType]) {
                     for (var k = 0; k < q.answers.length; k++) {
                         var ans = q.answers[k];
                         if (toValidate[q.id]) {

@@ -1348,6 +1348,7 @@ sub prepareShowSurveyTemplate {
     my %slider      = ( 'Slider', 1, 'Dual Slider - Range', 1, 'Multi Slider - Allocate', 1 );
     my %dateType    = ( 'Date',        1, 'Date Range', 1 );
     my %dateShort   = ( 'Year Month', 1 );
+    my %country     = ( 'Country', 1 );
     my %fileUpload  = ( 'File Upload', 1 );
     my %hidden      = ( 'Hidden',      1 );
 
@@ -1383,6 +1384,14 @@ sub prepareShowSurveyTemplate {
                              {'month' => 'November'},
                              {'month' => 'December'}
                             ];
+            }
+        }
+        elsif ( $country{ $q->{questionType} } ) {
+            $q->{country} = 1;
+            use WebGUI::Form::Country;
+            my @countries = map +{ 'country' => $_ }, WebGUI::Form::Country::getCountries();
+            foreach my $a(@{$q->{answers}}){
+                $a->{countries} = [ {'country' => ''}, @countries ];
             }
         }
         elsif ( $slider{ $q->{questionType} } ) {

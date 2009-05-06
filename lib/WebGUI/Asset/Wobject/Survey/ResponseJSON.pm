@@ -527,48 +527,54 @@ sub recordResponses {
             my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
             my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
 
-            # Proceed if we're satisfied that the submitted answer response is valid..
-            if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
-
-                #Validate answers met question criteria
-                if($question->{questionType} eq 'Number'){
-                    if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
-                        next;
-                    }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
-                        next;
-                    }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
-                        next;
-                    }
-                }
+            # Server-side Validation and storing of extra data for special q types goes here
             
-                $aAnswered = 1;
-
-                # Now, decide what to record. For multi-choice questions, use recordedAnswer.
-                # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
-                $self->responses->{ $answer->{id} }->{value}
-                    = $knownTypes{ $question->{questionType} }
-                    ? $submittedAnswerResponse
-                    : $answer->{recordedAnswer};
-                
-                $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
-                $self->responses->{ $answer->{id} }->{time}     = time;
-                $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
-
-                # Handle terminal Answers..
-                if ( $answer->{terminal} ) {
-                    $terminal    = 1;
-                    $terminalUrl = $answer->{terminalUrl};
+            if($question->{questionType} eq 'Number'){
+                if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
+                    next;
+                }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
+                    next;
+                }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
+                    next;
                 }
-
-                # ..and also gotos..
-                elsif ( $answer->{goto} =~ /\w/ ) {
-                    $goto = $answer->{goto};
+            } elsif ($question->{questionType} eq 'Year Month'){
+                # store year and month as "YYYY Month"
+                $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
+            } else {
+                if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
+                    $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse");
+                    next;
                 }
+            }
+            
+            # If we reach here, answer validated ok
+            $aAnswered = 1;
 
-                # .. and also gotoExpressions..
-                elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                    $answerExpression = $answer->{gotoExpression};
-                }
+            # Now, decide what to record. For multi-choice questions, use recordedAnswer.
+            # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
+            $self->responses->{ $answer->{id} }->{value}
+                = $knownTypes{ $question->{questionType} }
+                ? $submittedAnswerResponse
+                : $answer->{recordedAnswer};
+            
+            $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
+            $self->responses->{ $answer->{id} }->{time}     = time;
+            $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
+
+            # Handle terminal Answers..
+            if ( $answer->{terminal} ) {
+                $terminal    = 1;
+                $terminalUrl = $answer->{terminalUrl};
+            }
+
+            # ..and also gotos..
+            elsif ( $answer->{goto} =~ /\w/ ) {
+                $goto = $answer->{goto};
+            }
+
+            # .. and also gotoExpressions..
+            elsif ( $answer->{gotoExpression} =~ /\w/ ) {
+                $answerExpression = $answer->{gotoExpression};
             }
         }
 
