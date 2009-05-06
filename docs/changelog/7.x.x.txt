@@ -1,3 +1,5 @@
+7.6.23
+
 7.6.22
  - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
  - fixed #10226: html2text dropping text
