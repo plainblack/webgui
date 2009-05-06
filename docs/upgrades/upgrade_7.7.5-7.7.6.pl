@@ -23,16 +23,15 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 
-
 my $toVersion = "7.7.6"; 
 my $quiet; 
-
 
 my $session = start(); 
 
 # upgrade functions go here
 addTemplateAttachmentsTable($session);
 revertUsePacked( $session );
+fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
 
 finish($session); 
@@ -75,6 +74,19 @@ sub revertUsePacked {
             $asset->update({ usePacked => 0 });
         }
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixDefaultPostReceived {
+    my $session = shift;
+    $session->db->write(<<EOSQL);
+UPDATE Collaboration SET postReceivedTemplateId='default_post_received1' WHERE postReceivedTemplateId='default-post-received'
+EOSQL
+    $session->db->write(<<EOSQL);
+ALTER TABLE Collaboration ALTER COLUMN postReceivedTemplateId SET DEFAULT 'default_post_received1'
+EOSQL
     print "DONE!\n" unless $quiet;
 }
 
