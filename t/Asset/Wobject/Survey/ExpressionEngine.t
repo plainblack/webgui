@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 49;
+my $tests = 50;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -141,19 +141,24 @@ SKIP: {
         '..but can be changed'
     );
     cmp_deeply(
-        $e->run( $session, q{ tag(b,1) }, { values => \%values, tags => { a => 1 } } ),
+        $e->run( $session, q{ tag(b) }, { values => \%values, tags => { a => 1 } } ),
         { jump => undef, tags => { a => 1, b => 1 } },
-        '..and new values can be set'
+        '..and new values can be set (defaults to 1)'
     );
     cmp_deeply(
-        $e->run( $session, q{ jump{ tag(a) == 'abc' } target }, { values => \%values, tags => { a => 'abc' } } ),
+        $e->run( $session, q{ jump{ tagged(a) } target }, { values => \%values, tags => { a => 1 } } ),
+        { jump => 'target', tags => { a => 1 } },
+        '..flag can be checked with tagged()'
+    );
+    cmp_deeply(
+        $e->run( $session, q{ jump{ tagged(a) eq 'abc' } target }, { values => \%values, tags => { a => 'abc' } } ),
         { jump => 'target', tags => { a => 'abc' } },
-        '..tag value resolved by tag() with single arg'
+        '..and any sort of tagged data returned'
     );
     cmp_deeply(
-        $e->run( $session, q{ tag(a,xyz); jump{ tag(a) == 'xyz' } target }, { values => {a => 'def'}, tags => { a => 'abc' } } ),
+        $e->run( $session, q{ tag(a,xyz); jump{ tagged(a) eq 'xyz' } target }, { values => {a => 'def'}, tags => { a => 'abc' } } ),
         { jump => 'target', tags => { a => 'xyz' } },
-        '..overwritten tag value can be used too everything else'
+        '..overwritten tag data can be used too'
     );
 
     # Create a test user
@@ -207,7 +212,7 @@ SKIP: {
         { jump => 'target', tags => {} }, 'external score resolves ok too' );
     cmp_deeply( $e->run( $session, qq{jump {scoreX('$url', ext_s0) == 200} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'external score section totals work too' );
-    cmp_deeply( $e->run( $session, qq{jump {tagX('$url', ext_tag) == 199} target}, {userId => $user->userId} ),
+    cmp_deeply( $e->run( $session, qq{jump {taggedX('$url', ext_tag, 1) == 199} target}, {userId => $user->userId} ),
         { jump => 'target', tags => {} }, 'external tag lookups work too' );
 }
 

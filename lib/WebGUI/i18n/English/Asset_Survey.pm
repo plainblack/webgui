@@ -281,23 +281,23 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'cols description' => {
-        message => q|The number of columns used for the comment TextArea input field.|,
+        message => q|The number of columns used for the input field (for TextArea question types).|,
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241588599
     },
 	'comment rows' => {
 		message => q|Comment Rows:|,
 		lastUpdated => 1224686319
 	},
     'rows description' => {
-        message => q|The number of rows shown for the comment TextArea input field.|,
+        message => q|The number of rows used for the input field (for TextArea question types).|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241588599
     },
-	'maximum number of answers' => {
-		message => q|Maximum number of answers:|,
-		lastUpdated => 1224686319
-	},
+    'maximum number of answers' => {
+            message => q|Maximum number of answers:|,
+            lastUpdated => 1224686319
+    },
     'maximum number of answers description' => {
         message => q|Enter the maximum number of answers.|,
         context => q|Description of the 'maximum number of answers' field, used as hoverhelp in the edit question dialog.|,
@@ -393,41 +393,41 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
 	'min label' => {
-		message => q|Slider Min|,
-		lastUpdated => 1224686319
+		message => q|Min|,
+		lastUpdated => 1241588065
 	},
-    'min description' => {
-        message => q|The minimum value of this answer for slider type questions.|,
-        context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'min description' => {
+            message => q|The minimum numeric value allowed for this answer (for numeric question types such as Number and Slider). Keep this field empty if you do not want to enforce a minimum value. |,
+            context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 1241588065
+        },
 	'max label' => {
-		message => q|Slider Max|,
-		lastUpdated => 1224686319
+		message => q|Max|,
+		lastUpdated => 1241588065
 	},
-    'max description' => {
-        message => q|The maximum value of this answer for slider type questions.|,
-        context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'max description' => {
+            message => q|The maximum numeric value allowed for this answer (for Number and Slider type questions). Keep this field empty if you do not want to enforce a maximum value. |,
+            context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 1241588065
+        },
 	'step label' => {
-		message => q|Slider Step|,
-		lastUpdated => 1224686319
+		message => q|Step|,
+		lastUpdated => 1241588065
 	},
-    'step description' => {
-        message => q|The step value of this answer for slider type questions.|,
-        context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'step description' => {
+            message => q|The step value, that is, the numeric interval to allow between values (for Number and Slider type questions).  Keep this field empty if you do not want to enforce a step value. |,
+            context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 0
+        },
 	'verbatim label' => {
 		message => q|Verbatim|,
 		lastUpdated => 1224686319
 	},
-    'verbatim description' => {
-        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
-        context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'verbatim description' => {
+            message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
+            context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 0
+        },
 	'answer score' => {
 		message => q|Answer score:|,
 		lastUpdated => 1239251986
@@ -1358,13 +1358,23 @@ section/answer.|,
     'textCols' => {
         message => q|The number of columns for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1241588599,
+    },
+    
+    'textCols label' => {
+        message => q|TextArea Columns|,
+        lastUpdated => 1241588599
     },
 
     'textRows' => {
         message => q|The number of rows for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1241588599,
+    },
+    
+    'textRows label' => {
+        message => q|TextArea Rows|,
+        lastUpdated => 1241588599
     },
 
     'answers' => {

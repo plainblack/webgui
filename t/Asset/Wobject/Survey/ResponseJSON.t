@@ -440,7 +440,7 @@ $rJSON->nextResponse(2); # pretend we just finished s0q2
 cmp_deeply($rJSON->tags, {}, 'No tag data');
 $rJSON->processExpression('tag(a,100)');
 cmp_deeply($rJSON->tags, { a => 100 }, 'Tag data set');
-$rJSON->processExpression('tag(b,50); jump {tag(a) + tag(b) == 150} s1');
+$rJSON->processExpression('tag(b,50); jump {tagged(a) + tagged(b) == 150} s1');
 
 cmp_deeply($rJSON->tags, { a => 100, b => 50 }, 'Tag data cumulative');
 is($rJSON->nextResponse, 3, '..and is useful for jump expressions');

@@ -171,50 +171,67 @@ sub answeredX {
 
 =head2 tag ($name, [$value])
 
-Mutator utility sub that gives expressions access to tag response values (and optionally set them).
+Utility sub that allows expressions to tag data
 
 =head3 $name
 
-Name of tag whose value is returned.
+Name of tag to set
 
 =head3 $value (optional)
 
-If provided, the tag is set to this value.
+Value of tag to set. Defaults to 1 (boolean true flag).
 
 =cut
 
 sub tag {
     my ($name, $value) = @_;
-    if (defined $value) {
-        $session->log->debug("Setting tag [$name] to [$value]");
-        $tags->{$name} = $value;
-    } else {
-        $value = $tags->{$name};
-        $session->log->debug("tag($name) resolves to [$value]");
-    }
-    return $value;
+    $value = 1 if !defined $value;
+    $session->log->debug("Setting tag [$name] to [$value]");
+    $tags->{$name} = $value;
 }
 
-=head2 tagX
+=head2 tagged ($name)
 
-Same as L<tag>, except that first argument is an asset spec (assetId or url), which must resolve
-to a valid survey instance. The sub is applied to the most recent completed response for the user 
-on the survey instance given by asset_spec.
+Utility sub that gives expressions access to tagged data
 
-Note that it doesn't really make sense to try to set a tag on an external asset, so this sub
-is only an accessor.
+=head3 $name
+
+Name of tag whose value is returned.
 
 =cut
 
-sub tagX {
+sub tagged {
+    my ($name) = @_;
+    if (@_ == 2) {
+        my $args = join ',', @_;
+        $session->log->warn("Two arguments passed to tagged($args). Did you mean tag($args)?");
+    }
+    my $value = $tags->{$name};
+    $session->log->debug("tagged($name) resolves to [$value]");
+    return $value;
+}
+
+=head2 taggedX
+
+Same as L<tagged>, except that first argument is an asset spec (assetId or url), which must resolve
+to a valid survey instance. The sub is applied to the most recent completed response for the user 
+on the survey instance given by asset_spec.
+
+=cut
+
+sub taggedX {
     my ( $asset_spec, $name ) = @_;
     
+    if (@_ == 3) {
+        my $args = join ',', @_;
+        $session->log->warn("Three arguments passed to taggedX($args). Did you mean tag($args)?");
+    }
     # See if $otherInstances already contains the external survey
     if (my $other_instance = $otherInstances->{$asset_spec}) {
         my $tags = $other_instance->{tags};
         
         my $value = $tags->{$name};
-        $session->log->debug("tagX($asset_spec, $name) returns [$value]");
+        $session->log->debug("taggedX($asset_spec, $name) returns [$value]");
         return $value;
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
@@ -362,7 +379,8 @@ sub run {
         $compartment->share('&answered');
         $compartment->share('&answeredX');
         $compartment->share('&tag');
-        $compartment->share('&tagX');
+        $compartment->share('&tagged');
+        $compartment->share('&taggedX');
         $compartment->share('&jump');
         $compartment->share('&avg');
 
