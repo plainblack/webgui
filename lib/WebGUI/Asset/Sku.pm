@@ -637,11 +637,14 @@ sub setTaxConfiguration {
 =head2 shipsSeparately
 
 Returns a boolean indicating whether this item must be shipped separately from other items.
+If the shipsSeparately property is true, but isShippingRequired is false, this will return
+false.
 
 =cut
 
 sub shipsSeparately {
-    return shift->get('shipsSeparately');
+    my ($self) = @_;
+    return $self->isShippingRequired && $self->get('shipsSeparately');
 }
 
 
