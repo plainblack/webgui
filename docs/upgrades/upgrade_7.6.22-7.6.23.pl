@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+fixDefaultPostReceived($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,19 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub fixDefaultPostReceived {
+    my $session = shift;
+    $session->db->write(<<EOSQL);
+UPDATE Collaboration SET postReceivedTemplateId='default_post_received1' WHERE postReceivedTemplateId='default-post-received'
+EOSQL
+    $session->db->write(<<EOSQL);
+ALTER TABLE Collaboration ALTER COLUMN postReceivedTemplateId SET DEFAULT 'default_post_received1'
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
