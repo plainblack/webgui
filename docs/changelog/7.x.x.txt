@@ -10,6 +10,7 @@
  - fixed: URLs that shouldn't happen  (#10353)
  - fixed: i18n typo in Survey exit URL hover help.
  - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
+ - rfre #9998: Mark inbox messages read/unread
 
 7.7.5
  - Adding StoryManager.
