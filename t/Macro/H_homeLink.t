@@ -99,7 +99,8 @@ sub addTemplate {
 		url => 'h_homelink-test',
 		namespace => 'Macro/H_homeLink',
 		template => "HREF=<tmpl_var homeLink.url>\nLABEL=<tmpl_var homeLink.text>",
-		id => 'testTemplateH_HomeLink'
+		id => 'testTemplateH_HomeLink',
+        usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;

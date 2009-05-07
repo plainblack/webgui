@@ -174,6 +174,7 @@ sub setupTest {
 		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
 		#     '1234567890123456789012'
 		id => 'GroupAdd001100Template',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;

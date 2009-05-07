@@ -121,6 +121,7 @@ sub setupTest {
 		template => "HREF=<tmpl_var printable.url>\nLABEL=<tmpl_var printable.text>",
 		#     '1234567890123456789012'
 		id => 'printable01100Template',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;

@@ -199,6 +199,7 @@ sub setupTest {
 		namespace => 'Macro/LoginToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
 		groupIdEdit => $tao->getId(),
+        usePacked => 1,
 		#     '1234567890123456789012'
 		id => 'LoginToggleTemplateA01',
 	};

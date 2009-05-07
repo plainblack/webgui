@@ -172,6 +172,7 @@ sub setupTest {
 		url => 'groupdelete-test',
 		namespace => 'Macro/GroupDelete',
 		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
+        usePacked => 1,
 		#     '1234567890123456789012'
 		id => 'GroupDelete001Template',
 	};

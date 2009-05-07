@@ -269,6 +269,7 @@ sub setupTest {
 		groupIdEdit => $editGroup->getId(),
 		#     '1234567890123456789012'
 		id => 'EditableToggleTemplate',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
