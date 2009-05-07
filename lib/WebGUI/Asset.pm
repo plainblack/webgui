@@ -459,7 +459,7 @@ sub definition {
                         hoverHelp       => $i18n->get('usePackedHeadTags description'),
                         uiLevel         => 7,
                         fieldType       => 'yesNo',
-                        defaultValue    => 1,
+                        defaultValue    => 0,
                     },
 				    isPackage=>{
 					    label=>$i18n->get("make package"),
