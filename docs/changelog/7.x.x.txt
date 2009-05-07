@@ -1,6 +1,7 @@
 7.6.23
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
  - fixed: i18n typo in Survey exit URL hover help.
+ - fixed: URLs that shouldn't happen  (#10353)
 
 7.6.22
  - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
