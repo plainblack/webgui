@@ -698,7 +698,7 @@ sub fixUrl {
 	# check to see if the url already exists or not, and increment it if it does
     if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
         my @parts = split(/\./,$url);
-        if ($parts[0] =~ /(.*)(\d+$)/) {
+        if ($parts[0] =~ /(.*?)(\d+$)/) {
             $parts[0] = $1.($2+1);
         }
         else {
