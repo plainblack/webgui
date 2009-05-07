@@ -452,7 +452,7 @@ and answers being answered in L<"surveyOrder">.
 Jump targets (gotos) and jump expressions (gotoExpressions) are attempted in the following
 order:
 
-=over3
+=over 3
 
 =item * answer goto
 
