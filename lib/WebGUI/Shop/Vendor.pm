@@ -500,6 +500,7 @@ sub www_managePayouts {
     $style->setScript($url->extras('yui/build/datasource/datasource.js'),           {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),                {type=>'text/javascript'});
     $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
 
     # Add css for scheduled payout highlighting
@@ -606,6 +607,7 @@ sub www_setPayoutStatus {
        $item->update({ vendorPayoutStatus => $status });
     }
 
+    $session->http->setMimeType( 'text/plain' );
     return $status;
 }
 

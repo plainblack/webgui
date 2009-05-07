@@ -6,6 +6,30 @@ WebGUI.VendorPayout = function ( containerId ) {
     var obj = this;
     this.container  = document.getElementById( containerId );
 
+    this.i18nObj = new WebGUI.i18n( {
+        namespaces : {
+            'Shop' : [
+                'schedule all button', 'deschedule all button', 'submit scheduled payouts button',
+                'vendor id', 'vendor name', 'scheduled payout amount', 'not scheduled payout amount',
+                'vp item id', 'vp item title', 'vp item price', 'vp item quantity', 'vp item payout amount', 
+                'vp item payout status'
+            ]
+        },
+        onpreload : {
+            fn       : this.initialize,
+            obj      : this,
+            override : true,
+        }
+    } );
+    this.i18n = function ( key ) { 
+        return this.i18nObj.get( 'Shop', key ) 
+    };
+                
+    return this;
+}
+
+//----------------------------------------------------------------------------
+WebGUI.VendorPayout.prototype.initialize = function (aaa, bbb,ccc,ddd) {
     // Vendors data table
     this.vendorList = document.createElement('div');
     this.container.appendChild( this.vendorList );
@@ -13,11 +37,11 @@ WebGUI.VendorPayout = function ( containerId ) {
     // (De)schedule buttons
     this.buttonDiv  = document.createElement('div');
     this.container.appendChild( this.buttonDiv );
-    this.scheduleAllButton      = new YAHOO.widget.Button({ label: 'Schedule all',   container: this.buttonDiv });
-    this.descheduleAllButton    = new YAHOO.widget.Button({ label: 'Deschedule all', container: this.buttonDiv });
+    this.scheduleAllButton      = new YAHOO.widget.Button({ label: this.i18n( 'schedule all button' ),   container: this.buttonDiv });
+    this.descheduleAllButton    = new YAHOO.widget.Button({ label: this.i18n( 'deschedule all button' ), container: this.buttonDiv });
 
     // Submit button
-    this.submitPayoutsButton    = new YAHOO.widget.Button({ label: 'Submit Scheduled Payouts', container: this.buttonDiv });
+    this.submitPayoutsButton    = new YAHOO.widget.Button({ label: this.i18n( 'submit scheduled payouts button' ), container: this.buttonDiv });
     this.submitPayoutsButton.on( 'click', function () { 
         YAHOO.util.Connect.asyncRequest( 'GET', '?shop=vendor;method=submitScheduledPayouts', { 
             success: obj.initialize, 
@@ -29,17 +53,8 @@ WebGUI.VendorPayout = function ( containerId ) {
     this.payoutDetails  = document.createElement('div');
     this.container.appendChild( this.payoutDetails );
 
-
     this.itemBaseUrl = '?shop=vendor;method=payoutDataAsJSON;';
 
-    // Initialise tables
-    this.initialize();
-
-    return this;
-}
-
-//----------------------------------------------------------------------------
-WebGUI.VendorPayout.prototype.initialize = function () {
     this.initVendorList();
     this.initPayoutDetails();
     this.initButtons();
@@ -49,10 +64,10 @@ WebGUI.VendorPayout.prototype.initialize = function () {
 WebGUI.VendorPayout.prototype.initVendorList = function () {
     var obj = this;
     this.vendorSchema = [
-        { key: 'vendorId'   },
-        { key: 'name' },
-        { key: 'Scheduled'  }, 
-        { key: 'NotPaid'   }
+        { key: 'vendorId',  label : this.i18n( 'vendor id' ) },
+        { key: 'name',      label : this.i18n( 'vendor name' ) },
+        { key: 'Scheduled', label : this.i18n( 'scheduled payout amount' ) }, 
+        { key: 'NotPaid',   label : this.i18n( 'not scheduled payout amount' ) }
     ];
 
     // setup data source
@@ -111,12 +126,12 @@ WebGUI.VendorPayout.prototype.refreshVendorRow = function () {
 WebGUI.VendorPayout.prototype.initPayoutDetails = function () {
     var obj = this;
     this.itemSchema = [
-        { key: 'itemId' },
-        { key: 'configuredTitle' }, 
-        { key: 'price' }, 
-        { key: 'quantity' }, 
-        { key: 'vendorPayoutAmount' }, 
-        { key: 'vendorPayoutStatus' }
+        { key: 'itemId',             label : this.i18n( 'vp item id' ) },
+        { key: 'configuredTitle',    label : this.i18n( 'vp item title' ) },
+        { key: 'price',              label : this.i18n( 'vp item price' ) }, 
+        { key: 'quantity',           label : this.i18n( 'vp item quantity' ) }, 
+        { key: 'vendorPayoutAmount', label : this.i18n( 'vp item payout amount' ) }, 
+        { key: 'vendorPayoutStatus', label : this.i18n( 'vp item payout status' ) }
     ]
 
     // Create a row formatter to highlight Scheduled payouts
