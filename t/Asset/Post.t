@@ -61,7 +61,6 @@ my $groupIdEditUser     = WebGUI::User->new($session, 'new');
 my $groupToEditPost     = WebGUI::Group->new($session, $collab->get('groupToEditPost'));
 my $groupIdEditGroup    = WebGUI::Group->new($session, $collab->get('groupIdEdit'));
 WebGUI::Test->usersToDelete($postingUser, $otherUser, $groupIdEditUser);
-WebGUI::Test->groupsToDelete($groupToEditPost, $groupIdEditGroup);
 $postingUser->username('userForPosting');
 $otherUser->username('otherUser');
 
