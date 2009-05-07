@@ -79,10 +79,11 @@ sub definition {
                 defaultValue => undef,
             },
             usePacked => {
-                tab       => 'properties',
-                fieldType => 'yesNo',
-                label     => $i18n->get('usePacked label'),
-                hoverHelp => $i18n->get('usePacked description'),
+                tab             => 'properties',
+                fieldType       => 'yesNo',
+                label           => $i18n->get('usePacked label'),
+                hoverHelp       => $i18n->get('usePacked description'),
+                defaultValue    => 0,
             },
 			cacheTimeout => {
 				tab => "display",
@@ -120,6 +121,19 @@ sub definition {
         return $class->SUPER::definition($session,$definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 addRevision ( properties, ... )
+
+Force the packed snippet to be regenerated.
+
+=cut
+
+sub addRevision {
+    my ( $self, $properties, @args ) = @_;
+    delete $properties->{ snippetPacked };
+    return $self->SUPER::addRevision( $properties, @args );
+}
 
 #-------------------------------------------------------------------
 
