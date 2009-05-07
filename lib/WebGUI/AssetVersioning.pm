@@ -144,6 +144,9 @@ sub addRevision {
 	# merge the defaults, current values, and the user set properties
 	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
     
+    # Force the packed head block to be regenerated
+    delete $mergedProperties{extraHeadTagsPacked};
+
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
