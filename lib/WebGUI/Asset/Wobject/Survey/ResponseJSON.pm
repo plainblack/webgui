@@ -449,11 +449,26 @@ and answers being answered in L<"surveyOrder">.
 
 =head3 Branch processing
 
-gotos are handled similarly as with terminalUrls. The last goto in the set of questions wins.
+Jump targets (gotos) and jump expressions (gotoExpressions) are attempted in the following
+order:
 
-In contrast, all gotoExpressions are passed to the Expression Engine (in order of: Answer, Question, Section). 
-Expressions are not guaranteed to trigger a jump, and thus we give every expression in turn a change to run.
-The first expression to trigger a jump will cause any remaining expressions to be skipped.
+=over3
+
+=item * answer goto
+
+=item * answer gotoExpression
+
+=item * question goto
+
+=item * question gotoExpression
+
+=item * question goto
+
+=item * question gotoExpression
+
+=back
+
+The first to trigger a jump short-circuits the process, and subsequent items are not attempted.
 
 =cut
 
@@ -471,7 +486,7 @@ sub recordResponses {
     my @questions = $self->nextQuestions();
 
     #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
-    my ($goto, $sectionExpression, $questionExpression, $answerExpression);
+    my ($sectionGoto, $questionGoto, $answerGoto, $sectionExpression, $questionExpression, $answerExpression);
 
     # Handle terminal Section..
     my $terminalUrl;
@@ -482,7 +497,7 @@ sub recordResponses {
     }
     # ..and also gotos..
     elsif ( $section->{goto} =~ /\w/ ) {
-        $goto = $section->{goto};
+        $sectionGoto = $section->{goto};
     }
     # .. and also gotoExpressions..
     elsif ( $section->{gotoExpression} =~ /\w/ ) {
@@ -509,7 +524,7 @@ sub recordResponses {
         }
         # ..and also gotos..
         elsif ( $question->{goto} =~ /\w/ ) {
-            $goto = $question->{goto};
+            $questionGoto = $question->{goto};
         }
         # .. and also gotoExpressions..
         elsif ( $question->{gotoExpression} =~ /\w/ ) {
@@ -569,7 +584,7 @@ sub recordResponses {
 
             # ..and also gotos..
             elsif ( $answer->{goto} =~ /\w/ ) {
-                $goto = $answer->{goto};
+                $answerGoto = $answer->{goto};
             }
 
             # .. and also gotoExpressions..
@@ -595,11 +610,14 @@ sub recordResponses {
         #  Move the lastResponse index to the last question answered
         $self->lastResponse( $self->lastResponse + @questions );
 
-        # Do any requested branching..
-        $self->processGoto($goto)                     if ( defined $goto );                  ## no critic
-        $self->processExpression($answerExpression)   if ( defined $answerExpression );      ## no critic
-        $self->processExpression($questionExpression) if ( defined $questionExpression );    ## no critic
-        $self->processExpression($sectionExpression)  if ( defined $sectionExpression );     ## no critic
+        # Process jumps and jump expressions in precedence order of:
+        # answer goto, answer expression, question goto, question expression, section..
+        $self->processGoto($answerGoto)               if defined $answerGoto;            ## no critic
+        $self->processExpression($answerExpression)   if defined $answerExpression;      ## no critic
+        $self->processGoto($questionGoto)             if defined $questionGoto;          ## no critic
+        $self->processExpression($questionExpression) if defined $questionExpression;    ## no critic
+        $self->processGoto($sectionGoto)              if defined $sectionGoto;           ## no critic
+        $self->processExpression($sectionExpression)  if defined $sectionExpression;     ## no critic
 
         # Handle next logic Section..
         my $section = $self->nextResponseSection();

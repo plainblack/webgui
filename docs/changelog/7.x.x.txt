@@ -8,6 +8,7 @@
  - fixed: Crud handling of Form fields with database types that cannot have default values.
  - fixed: Crud serialization.
  - fixed: i18n typo in Survey exit URL hover help.
+ - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
 
 7.7.5
  - Adding StoryManager.
