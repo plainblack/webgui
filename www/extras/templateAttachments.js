@@ -6,7 +6,6 @@ var addClick = (function() {
     var count        = 0;
     var urls         = {};
     var types        = {};
-    var originals    = {};
     var addAnchor    = document.getElementById('addAnchor');
     var displayTable = document.getElementById('attachmentDisplay');
     
@@ -40,20 +39,15 @@ var addClick = (function() {
                 type:  query('type',  'td', node)[0].innerHTML,
                 url:   query('url',   'td', node)[0].innerHTML
             };
-            originals[d.url] = true;
             add(d);
             node.parentNode.removeChild(node);
         }
     }
 
-    // When an original box gets changed, we should insert a removal node and
-    // name the fields so that we remove the old and insert the new.
+    // When an original box gets changed 
     function updater(u) {
         return function() {
             obj = urls[u];
-            obj.index.onchange = null;
-            obj.type.onchange  = null;
-            insertHidden(u);
             nameFields(u);
         };
     }
@@ -63,21 +57,12 @@ var addClick = (function() {
     function nameFields(u) {
         var id     = uniqueId++;
         var obj    = urls[u];
-        obj.index.name = 'attachmentIndex' + id;
-        obj.type.name  = 'attachmentType'  + id;
-        obj.url.name   = 'attachmentUrl'   + id;
-    }
-
-    // Insert a hidden input field in the form so that the backend knows to
-    // remove one of the original attachments
-    function insertHidden(u) {
-        var tr    = urls[u].tr;
-        var hid   = document.createElement('input');
-        hid.type  = 'hidden';
-        hid.name  = 'removeAttachment';
-        hid.value = u;
-        tr.parentNode.appendChild(hid);
-        delete originals[u];
+        if (!obj.index.name) 
+            obj.index.name = 'attachmentIndex' + id;
+        if (!obj.type.name) 
+            obj.type.name  = 'attachmentType'  + id;
+        if (!obj.url.name) 
+            obj.url.name   = 'attachmentUrl'   + id;
     }
 
     // Make a function which will remove an attachment (remove the table row
@@ -85,10 +70,6 @@ var addClick = (function() {
     function remover(u) {
         return function() {
             var tr = urls[u].tr;
-
-            if (originals[u]) {
-                insertHidden(u);
-            }
 
             tr.parentNode.removeChild(tr);
             delete urls[u];
@@ -144,9 +125,7 @@ var addClick = (function() {
             else {
                 url.oldValue = newValue;
                 var d = urls[oldValue];
-                if (originals[oldValue]) {
-                    update();
-                }
+                update();
 
                 delete urls[oldValue];
                 urls[newValue] = d;
@@ -173,14 +152,7 @@ var addClick = (function() {
             url   : url,
         };
 
-        if (originals[d.url]) {
-            // url's is already taken care of above
-            index.onchange = update;
-            type.onchange  = update;
-        }
-        else {
-            nameFields(d.url);
-        }
+        nameFields(d.url);
 
         addAnchor.appendChild(tr);
     }
@@ -199,5 +171,6 @@ var addClick = (function() {
             return;
         }
         add(d);
+        nodes.url.value = '';
     };
 })();

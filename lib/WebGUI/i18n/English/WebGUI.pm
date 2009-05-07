@@ -995,6 +995,8 @@ to add or remove users from their groups.
 	'head.tags' => {
 		message => q|Tags that WebGUI automatically generates for you so that caching works the way it should, search engines can find you better, and other useful automated functionality. This should go in the &lt;head&gt; &lt;/head&gt; section of your style.
 <br />
+<br />NOTE: This is for backwards-compatibility only. You should use 'head_attachments' and 'body_attachments' now.
+<br />
 <br />We suggest using something like this in the &lt;title&gt; &lt;/title&gt; portion of your style:
 <br />
 <br />&#94;PageTitle(); - &#94;c();
@@ -1002,6 +1004,19 @@ to add or remove users from their groups.
 <br />That particular example will help you get good ranking on search engines.|,
 		lastUpdated => 1225222473,
 	},
+
+    'head_attachments' => {
+        message     => q{Tags that belong only in the &lt;head&gt; of the document. If you use this, you must use body_attachments and must not use head.tags.},
+        lastUpdated => 0,
+        context     => 'description of template variable',
+    },
+
+    'body_attachments' => {
+        message     => q{Tags that can be placed right before the end of the &lt;body&gt; to speed up page load times. If you use this, you must use head_attachments and must not use head.tags.},
+        lastUpdated => 0,
+        context     => 'description of template variable',
+    },
+
 
 	'860' => {
 		message => q|Make email address public?|,

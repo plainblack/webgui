@@ -6,7 +6,7 @@ our $HELP = {
     'style template' => {
         title     => '1073',
         body      => '',
-        variables => [ { 'name' => 'body.content' }, { 'name' => 'head.tags' } ],
+        variables => [ { 'name' => 'body.content' }, { 'name' => 'head.tags' }, { 'name' => 'head_attachments' }, { 'name' => 'body_attachments' } ],
         fields    => [],
         related   => []
     },

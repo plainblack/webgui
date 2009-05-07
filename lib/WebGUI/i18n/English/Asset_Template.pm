@@ -351,6 +351,24 @@ Any scratch variables will be available in the template with this syntax:<br/>
         lastUpdated => 0,
         context     => q{Description of asset property},
     },
+
+    'css label' => {
+        message     => "Stylesheet (CSS)",
+        lastUpdated => 0,
+        context     => 'Label for a CSS file attachment',
+    },
+
+    'js head label' => {
+        message     => "JavaScript (head)",
+        lastUpdated => 0,
+        context     => "Label for a JS file attachment that goes in the <head> block",
+    },
+
+    'js body label' => {
+        message     => "JavaScript (body)",
+        lastUpdated => 0,
+        context     => "Label for a JS file attachment that goes after all the content in the <body> block",
+    },
 };
 
 1;
