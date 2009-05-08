@@ -6,6 +6,8 @@ use WebGUI::Exception;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use JSON qw{ from_json };
+
 use base qw/WebGUI::Account/;
 
 =head1 NAME
@@ -348,9 +350,15 @@ sub www_viewTransaction {
                 url         => $actions->{$label},
             }
         }
+        
+        my %taxConfiguration = %{ from_json( $item->get( 'taxConfiguration' ) || '{}' ) };
+        my %taxVars          =  
+            map     { ( "tax_$_" => $taxConfiguration{ $_ } ) }
+            keys    %taxConfiguration;
 
         push @items, {
-            %{$item->get},
+            %{ $item->get },
+            %taxVars,
             viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
             price               => sprintf("%.2f", $item->get('price')),
             itemShippingAddress => $address,

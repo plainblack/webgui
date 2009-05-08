@@ -178,6 +178,32 @@ sub getTaxRate {
 
 #-----------------------------------------------------------
 
+=head2 getTransactionTaxData ( sku, address )
+
+Returns a hashref containing tax information that should be stored along with transaction items.
+
+=head3 sku
+
+The sku belonging to the transaction item.
+
+=head3 address
+
+The address belonging to the transaction item.
+
+=cut
+
+sub getTransactionTaxData {
+    my $self = shift;
+
+    my $config = {
+        className => $self->className,
+    };
+
+    return $config;
+}
+
+#-----------------------------------------------------------
+
 =head2 getUserScreen ( )
 
 Returns the screen for entering per user configuration for this tax driver.

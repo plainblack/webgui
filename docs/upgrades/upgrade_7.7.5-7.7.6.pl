@@ -33,6 +33,7 @@ addTemplateAttachmentsTable($session);
 revertUsePacked( $session );
 fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
+addTransactionTaxColumns( $session );
 
 finish($session); 
 
@@ -98,6 +99,19 @@ sub addEuVatDbColumns {
     $session->db->write( 'alter table tax_eu_vatNumbers add column viesErrorCode int(3) default NULL' );
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addTransactionTaxColumns {
+    my $session = shift;
+    print "\tAdding columns for storing tax data in the transaction log..." unless $quiet;
+
+    $session->db->write( 'alter table transactionItem add column taxRate decimal(6,3)' );
+    $session->db->write( 'alter table transactionItem add column taxConfiguration mediumtext' );
+    $session->db->write( 'alter table transactionItem change vendorPayoutAmount vendorPayoutAmount decimal (8,2) default 0.00' );
+
+    print "Done\n" unless $quiet;
+
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

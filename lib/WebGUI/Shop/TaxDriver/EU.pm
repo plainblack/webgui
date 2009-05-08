@@ -509,6 +509,37 @@ sub getTaxRate {
 
 #-------------------------------------------------------------------
 
+=head2 getTransactionTaxData ( sku, address )
+
+See WebGUI::Shop::TaxDriver->getTransactionTaxData.
+
+=cut
+
+sub getTransactionTaxData {
+    my $self        = shift;
+    my $sku         = shift;
+    my $address     = shift;
+    my $countryCode = $self->getCountryCode( $address->get( 'country' ) );
+
+    my $config = $self->SUPER::getTransactionTaxData( $sku, $address );
+
+    if ( ! $countryCode ) {
+        $config->{ outsideEU       } = 1;
+    }
+    elsif ( $self->hasVATNumber( $countryCode ) ) {
+        $config->{ useVATNumber    } = 1;
+        $config->{ VATNumber       } = $self->getVATNumbers( $countryCode )->[0]->{ vatNumber };
+    }
+    else {
+        $config->{ useVATNumber    } = 0;
+    }
+
+    return $config;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 getVATNumbers ( $countryCode )
 
 Returns an array ref of hash refs containing the properties of the VAT numbers a user s registered for a given

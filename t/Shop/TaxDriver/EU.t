@@ -38,7 +38,7 @@ $taxUser->username( 'MrEvasion' );
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 44;
+my $tests = 48;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -314,6 +314,40 @@ SKIP: {
 
     #######################################################################
     #
+    # getTransactionTaxData
+    #
+    #######################################################################
+
+    my $details = $taxer->getTransactionTaxData( $sku, $usAddress );
+    cmp_deeply( $details, {
+        className   => 'WebGUI::Shop::TaxDriver::EU',
+        outsideEU   => 1,
+    }, 'getTransactionTaxData returns correct hashref for addresses outside EU' );
+
+    $details = $taxer->getTransactionTaxData( $sku, $beAddress );
+    cmp_deeply( $details, {
+        className       => 'WebGUI::Shop::TaxDriver::EU',
+        useVATNumber    => 1,
+        VATNumber       => $testVAT_BE,
+    }, 'getTransactionTaxData returns correct hashref for addresses inside EU but not shop country w/ VAT number' );
+
+    $details = $taxer->getTransactionTaxData( $sku, $nlAddress );
+    cmp_deeply( $details, {
+        className       => 'WebGUI::Shop::TaxDriver::EU',
+        useVATNumber    => 1,
+        VATNumber       => $testVAT_NL,
+    }, 'getTransactionTaxData returns correct hashref for addresses in shop country w/ VAT number' );
+    
+    $taxer->deleteVATNumber( $testVAT_NL );
+
+    $details = $taxer->getTransactionTaxData( $sku, $nlAddress );
+    cmp_deeply( $details, {
+        className       => 'WebGUI::Shop::TaxDriver::EU',
+        useVATNumber    => 0,
+    }, 'getTransactionTaxData returns correct hashref for addresses in EU w/o VAT number' );
+
+    #######################################################################
+    #
     # deleteGroup
     #
     #######################################################################
@@ -350,6 +384,7 @@ END {
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
-
+    $session->db->write('delete from taxDriver where className=?', [ 'WebGUI::Shop::TaxDriver::EU' ]);
+ 
     $taxUser->delete;
 }

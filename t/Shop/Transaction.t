@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 67;        # Increment this number for each test you create
+plan tests => 68;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -137,6 +137,7 @@ my $item = $transaction->addItem({
     shippingPhoneNumber     => 'l',
     quantity                => 5,
     price                   => 33, 
+    taxRate                 => 19,
 });
 
 isa_ok($item, "WebGUI::Shop::TransactionItem");
@@ -157,6 +158,7 @@ is($item->get("shippingCode"), 'k', "set and get shipping code");
 is($item->get("shippingPhoneNumber"), 'l', "set and get shipping phone number");
 is($item->get("quantity"), 5, "set and get quantity");
 is($item->get("price"), 33,  "set and get price");
+is($item->get('taxRate'), 19, 'set and get taxRate' );
 
 $item->update({
     shippingTrackingNumber  => 'adfs',
