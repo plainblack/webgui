@@ -1350,8 +1350,8 @@ Handle the uploading of a CSV event data file, along with other options.
 sub www_importEventsSave {
 	my $self = shift;
 	my $session = $self->session;
-
 	return $session->privilege->insufficient unless $self->canEdit;
+$|=1;
 
 	# set up
 	$session->http->setMimeType("text/plain");
@@ -1365,11 +1365,13 @@ sub www_importEventsSave {
 	my $validate = WebGUI::FormValidator->new($session);
 	
 	# find fields to import
+    $out->print("Finding fields to import...\n",1);
 	my @import = $form->get("fieldsToImport");
 	my $i = 0;
 	my $assetIdIndex = undef;
 	foreach my $field (@import) {
 		if ($field eq "assetId") {
+            $out->print("\t$i\n",1);
 			$assetIdIndex = $i;
 			last;
 		}
@@ -1394,6 +1396,8 @@ sub www_importEventsSave {
 			}
 			if ($csv->parse($line)) {
 				my @row = $csv->fields;
+                my $start = [Time::HiRes::gettimeofday];
+        		$out->print("Proessing ".join(",", @row)."\n",1);
 				my $event = undef;
 				if (defined $assetIdIndex) {
 					$event = WebGUI::Asset::Sku::EMSTicket->new($session, $row[$assetIdIndex]);
@@ -1410,6 +1414,7 @@ sub www_importEventsSave {
 				my $i = 0;
 				foreach my $field (@{$fields}) {
 					next unless isIn($field->{name}, @import);
+            		$out->print("\tAdding field ".$field->{name}."\n",1);
 					my $type = $field->{type};
 					my $value = $validate->$type({
 							name			=> $field->{name},
@@ -1424,8 +1429,13 @@ sub www_importEventsSave {
 					}
 					$i++;
 				}
+                $out->print("\tUpdating properties\n",1);
+                $properties{menuTitle} = $properties{title};
+                $properties{url} = $self->get("url")."/".$properties{title};
 				$event->update(\%properties);
+                $out->print("\tUpdating meta data\n",1);
 				$event->setEventMetaData(\%metadata);
+                $out->print("\tAdding event took ".Time::HiRes::tv_interval($start)." seconds to run.\n",1);
 			}
 			else {
 				$out->print($csv->error_input() . ": ". $line."\n",1);
