@@ -22,6 +22,8 @@ use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
+my $startTime = time();
+
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
@@ -29,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  23;         # Increment this number for each test you create
+my  $tests =  28;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -44,6 +46,8 @@ skip 'Unable to load module WebGUI::FilePump::Bundle', $tests unless $loaded;
 my $bundle = WebGUI::FilePump::Bundle->create($session);
 isa_ok($bundle, 'WebGUI::FilePump::Bundle');
 isa_ok($bundle, 'WebGUI::Crud');
+
+is($bundle->get('lastModified'), 0, 'by default, lastModified is 0');
 
 ###################################################################
 #
@@ -74,6 +78,7 @@ is(
     1,
     '... adding a JS file'
 );
+cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified');
 
 is(
     $bundle->addFile('CSS', 'http://mysite.com/script.js'),
@@ -145,6 +150,7 @@ cmp_deeply(
 
 my @fileIds = map { $_->{fileId} } @{ $bundle->get('jsFiles') };
 
+$bundle->update({lastModified => 0});
 ok($bundle->moveFileDown('JS', $fileIds[0]), 'moveFileDown returns 1 for a successful move');
 @fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
 cmp_deeply(
@@ -156,7 +162,9 @@ cmp_deeply(
     }],
     '... checking the actual order of js files'
 );
+cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified');
 
+$bundle->update({lastModified => 0});
 ok($bundle->moveFileUp('JS', $fileIds[2]), 'moveFileUp returns 1 for a successful move');
 @fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
 cmp_deeply(
@@ -168,6 +176,7 @@ cmp_deeply(
     }],
     '... checking the actual order of js files'
 );
+cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified');
 
 ###################################################################
 #
@@ -194,6 +203,7 @@ cmp_deeply(
 );
 
 @fileIds = map { $_->{fileId} } @{ $bundle->get('jsFiles') };
+$bundle->update({lastModified => 0});
 $bundle->deleteFile('JS', $fileIds[1]);
 @fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
 cmp_deeply(
@@ -204,6 +214,7 @@ cmp_deeply(
     }],
     '... checking the actual deletion of js files'
 );
+cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified');
 
 $bundle->delete;
 
