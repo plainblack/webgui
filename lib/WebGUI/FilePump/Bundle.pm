@@ -132,7 +132,7 @@ sub crud_definition {
     $definition->{tableKey}    = 'bundleId';
     $definition->{sequenceKey} = '';
     my $properties = $definition->{properties};
-    $properties->{bucketName} = {
+    $properties->{bundleName} = {
         fieldName    => 'text',
         defaultValue => $i18n->get('new bundle'),
     };
