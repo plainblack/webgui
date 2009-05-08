@@ -5,6 +5,8 @@ use WebGUI::International;
 use WebGUI::Utility;
 use URI;
 use Path::Class::Dir;
+use CSS::Minifier::XS;
+use JavaScript::Minifier::XS;
 
 #-------------------------------------------------------------------
 
@@ -28,13 +30,13 @@ it will return 0 and an error message.
 
 sub addFile {
     my ($self, $type, $uri) = @_;
-    return 0, 'No URI' unless $uri;
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'No URI' unless $uri;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
-    my $files = $self->getAllCollateral($collateralType);
-    my $uriExists = $self->getCollateralDataIndex($files, 'uri', $uri) == -1;
+    my $files     = $self->get($collateralType);
+    my $uriExists = $self->getCollateralDataIndex($files, 'uri', $uri) != -1 ? 1 : 0;
     return 0, 'Duplicate URI' if $uriExists;
     $self->setCollateral(
         $collateralType,
@@ -144,17 +146,17 @@ sub crud_definition {
     };
     $properties->{jsFiles} = {
         fieldName    => 'textarea',
-        defaultValue => 0,
+        defaultValue => [],
         serialize    => 1,
     };
     $properties->{cssFiles} = {
         fieldName    => 'textarea',
-        defaultValue => 0,
+        defaultValue => [],
         serialize    => 1,
     };
     $properties->{otherFiles} = {
         fieldName    => 'textarea',
-        defaultValue => 0,
+        defaultValue => [],
         serialize    => 1,
     };
     return $definition;
@@ -202,11 +204,11 @@ sub deleteCollateral {
     my $tableName = shift;
     my $keyName   = shift;
     my $keyValue  = shift;
-    my $table = $self->getAllCollateral($tableName);
+    my $table = $self->get($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return if $index == -1;
     splice @{ $table }, $index, 1;
-    $self->setAllCollateral($tableName);
+    $self->update({ $tableName => $table });
 }
 
 #-------------------------------------------------------------------
@@ -229,8 +231,8 @@ The unique collateral GUID to delete from the bundle.
 
 sub deleteFile {
     my ($self, $type, $fileId) = @_;
-    return 0, 'No fileId' unless $fileId;
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
@@ -242,36 +244,6 @@ sub deleteFile {
     $self->update({lastModified => time()});
     return 1;
 }
-
-#-------------------------------------------------------------------
-
-=head2 getAllCollateral ( tableName )
-
-Returns an array reference to the translated JSON data for the
-requested collateral table.
-
-=head3 tableName
-
-The name of the table you wish to retrieve the data from.
-
-=cut
-
-sub getAllCollateral {
-    my $self      = shift;
-    my $tableName = shift;
-    return $self->{_collateral}->{$tableName} if exists $self->{_collateral}->{$tableName};
-    my $json = $self->get($tableName);
-    my $table;
-    if ($json) {
-        $table = from_json($json);
-    }
-    else {
-        $table = [];
-    }
-    $self->{_collateral}->{$tableName} = $table;
-    return $table;
-}
-
 
 #-------------------------------------------------------------------
 
@@ -306,7 +278,7 @@ sub getCollateral {
     if ($keyValue eq "new" || $keyValue eq "") {
         return {};
     }
-    my $table = $self->getAllCollateral($tableName);
+    my $table = $self->get($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return {} if $index == -1;
     my %copy = %{ $table->[$index] };
@@ -343,7 +315,7 @@ sub getCollateralDataIndex {
     my $keyValue = shift;
     for (my $index=0; $index <= $#{ $table }; $index++) {
         return $index
-            if (exists $table->[$index]->{$keyName} and $table->[$index]->{$keyName} eq $keyValue );
+            if (exists($table->[$index]->{$keyName}) && ($table->[$index]->{$keyName} eq $keyValue ));
     }
     return -1;
 }
@@ -360,7 +332,7 @@ for this bundle.
 sub getPathClassDir {
     my ($self) = @_;
     return Path::Class::Dir->new(
-        $self->session->get('uploadsPath'),
+        $self->session->config->get('uploadsPath'),
         'filepump',
         $self->get('bundleName') . $self->get('lastBuild')
     );
@@ -398,7 +370,8 @@ sub getOutOfDateBundles {
 =head2 moveCollateralDown ( tableName, keyName, keyValue )
 
 Moves a collateral data item down one position.  If called on the last element of the
-collateral array then it does nothing.
+collateral array then it does nothing.  Returns 1 if the move is successful.  Returns
+undef or the empty array otherwise.
 
 =head3 tableName
 
@@ -421,12 +394,13 @@ sub moveCollateralDown {
     my $keyName   = shift;
     my $keyValue  = shift;
 
-    my $table = $self->getAllCollateral($tableName);
+    my $table = $self->get($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return if $index == -1;
     return unless (abs($index) < $#{$table});
     @{ $table }[$index,$index+1] = @{ $table }[$index+1,$index];
-    $self->setAllCollateral($tableName);
+    $self->update({ $tableName => $table });
+    return 1;
 }
 
 
@@ -435,7 +409,9 @@ sub moveCollateralDown {
 =head2 moveCollateralUp ( tableName, keyName, keyValue )
 
 Moves a collateral data item up one position.  If called on the first element of the
-collateral array then it does nothing.
+collateral array then it does nothing.  Returns 1 if the move is successful.  Returns
+undef or the empty array otherwise.
+
 
 =head3 tableName
 
@@ -458,12 +434,13 @@ sub moveCollateralUp {
     my $keyName   = shift;
     my $keyValue  = shift;
 
-    my $table = $self->getAllCollateral($tableName);
+    my $table = $self->get($tableName);
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return if $index == -1;
     return unless $index && (abs($index) <= $#{$table});
     @{ $table }[$index-1,$index] = @{ $table }[$index,$index-1];
-    $self->setAllCollateral($tableName);
+    $self->update({ $tableName => $table });
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -486,8 +463,8 @@ The unique collateral GUID to move in the bundle.
 
 sub moveFileDown {
     my ($self, $type, $fileId) = @_;
-    return 0, 'No fileId' unless $fileId;
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
@@ -520,8 +497,8 @@ The unique collateral GUID to move in the bundle.
 
 sub moveFileUp {
     my ($self, $type, $fileId) = @_;
-    return 0, 'No fileId' unless $fileId;
     return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    return 0, 'No fileId' unless $fileId;
     my $collateralType = $type eq 'JS'  ? 'jsFiles'
                        : $type eq 'CSS' ? 'cssFiles'
                        : 'otherFiles';
@@ -534,26 +511,6 @@ sub moveFileUp {
     return 1;
 }
 
-
-#-----------------------------------------------------------------
-
-=head2 setAllCollateral ( tableName )
-
-Update the db from the object cache.
-
-=head3 tableName
-
-The name of the table to insert the data.
-
-=cut
-
-sub setAllCollateral {
-    my $self       = shift;
-    my $tableName  = shift;
-    my $json = to_json($self->{_collateral}->{$tableName});
-    $self->update({ $tableName => $json });
-    return;
-}
 
 #-----------------------------------------------------------------
 
@@ -594,7 +551,7 @@ sub setCollateral {
     my $properties = shift;
     ##Note, since this returns a reference, it is actually updating
     ##the object cache directly.
-    my $table = $self->getAllCollateral($tableName);
+    my $table = $self->get($tableName);
     if ($keyValue eq 'new' || $keyValue eq '') {
         if (! exists $properties->{$keyName}
            or $properties->{$keyName} eq 'new'
@@ -602,13 +559,13 @@ sub setCollateral {
             $properties->{$keyName} = $self->session->id->generate;
         }
         push @{ $table }, $properties;
-        $self->setAllCollateral($tableName);
+        $self->update({$tableName => $table});
         return $properties->{$keyName};
     }
     my $index = $self->getCollateralDataIndex($table, $keyName, $keyValue);
     return if $index == -1;
     $table->[$index] = $properties;
-    $self->setAllCollateral($tableName);
+    $self->update({ $tableName => $table });
     return $keyValue;
 }
 

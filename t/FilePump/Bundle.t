@@ -29,7 +29,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  8;          # Increment this number for each test you create
+my  $tests =  23;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -69,16 +69,6 @@ cmp_deeply(
     '... checking error for no uri'
 );
 
-$bundle->setCollateral(
-    'jsFiles',
-    'fileId',
-    'new',
-    {
-        uri => 'mysite',
-        lastUpdated => 0,
-    }
-);
-
 is(
     $bundle->addFile('JS', 'http://mysite.com/script.js'),
     1,
@@ -95,6 +85,124 @@ cmp_deeply(
     [ $bundle->addFile('JS', 'http://mysite.com/script.js') ],
     [ 0, 'Duplicate URI' ],
     '... checking error message for duplicate URI'
+);
+
+$bundle->addFile('JS', 'http://mysite.com/helloworld.js');
+$bundle->addFile('JS', 'file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js');
+
+my @fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
+cmp_deeply(
+    [ @fileUris ],
+    [qw{
+        http://mysite.com/script.js
+        http://mysite.com/helloworld.js
+        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+    }],
+    '... checking actual jsFiles data structure contents'
+);
+
+###################################################################
+#
+# moveFile{Up,Down}
+#
+###################################################################
+
+cmp_deeply(
+    [ $bundle->moveFileUp() ],
+    [ 0, 'Illegal type' ],
+    'moveFileUp: checking error for no type'
+);
+
+cmp_deeply(
+    [ $bundle->moveFileUp('BEER') ],
+    [ 0, 'Illegal type' ],
+    '... checking error for bad type'
+);
+
+cmp_deeply(
+    [ $bundle->moveFileUp('JS', ) ],
+    [ 0, 'No fileId' ],
+    '... checking error for no fileId'
+);
+
+cmp_deeply(
+    [ $bundle->moveFileDown() ],
+    [ 0, 'Illegal type' ],
+    'moveFileDown: checking error for no type'
+);
+
+cmp_deeply(
+    [ $bundle->moveFileDown('BEER') ],
+    [ 0, 'Illegal type' ],
+    '... checking error for bad type'
+);
+
+cmp_deeply(
+    [ $bundle->moveFileDown('JS', ) ],
+    [ 0, 'No fileId' ],
+    '... checking error for no fileId'
+);
+
+my @fileIds = map { $_->{fileId} } @{ $bundle->get('jsFiles') };
+
+ok($bundle->moveFileDown('JS', $fileIds[0]), 'moveFileDown returns 1 for a successful move');
+@fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
+cmp_deeply(
+    [ @fileUris ],
+    [qw{
+        http://mysite.com/helloworld.js
+        http://mysite.com/script.js
+        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+    }],
+    '... checking the actual order of js files'
+);
+
+ok($bundle->moveFileUp('JS', $fileIds[2]), 'moveFileUp returns 1 for a successful move');
+@fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
+cmp_deeply(
+    [ @fileUris ],
+    [qw{
+        http://mysite.com/helloworld.js
+        file:/data/domains/mysite.com/www/uploads/XX/YY/XXYYZZ/graviticEnergyDrive.js
+        http://mysite.com/script.js
+    }],
+    '... checking the actual order of js files'
+);
+
+###################################################################
+#
+# deleteFile
+#
+###################################################################
+
+cmp_deeply(
+    [ $bundle->deleteFile() ],
+    [ 0, 'Illegal type' ],
+    'deleteFile: checking error for no type'
+);
+
+cmp_deeply(
+    [ $bundle->deleteFile('BEER') ],
+    [ 0, 'Illegal type' ],
+    '... checking error for bad type'
+);
+
+cmp_deeply(
+    [ $bundle->deleteFile('JS', ) ],
+    [ 0, 'No fileId' ],
+    '... checking error for no fileId'
+);
+
+@fileIds = map { $_->{fileId} } @{ $bundle->get('jsFiles') };
+$bundle->deleteFile('JS', $fileIds[1]);
+@fileUris = map { $_->{uri} } @{ $bundle->get('jsFiles') };
+cmp_deeply(
+    [ @fileUris ],
+    [qw{
+        http://mysite.com/helloworld.js
+        http://mysite.com/script.js
+    }],
+    '... checking the actual deletion of js files'
 );
 
 $bundle->delete;
