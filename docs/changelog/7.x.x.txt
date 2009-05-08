@@ -9,6 +9,7 @@
  - fixed: Crud serialization.
  - fixed: URLs that shouldn't happen  (#10353)
  - Added more information output to EMS record importer.
+ - Fixed a search results display error with synopsis.
  - fixed: i18n typo in Survey exit URL hover help.
  - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
  - rfre #9998: Mark inbox messages read/unread
