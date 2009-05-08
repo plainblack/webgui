@@ -815,8 +815,13 @@ sub responseValuesByVariableName {
     my %options = validate(@_, { useText => 0 });
     
     my %lookup;
-    while (my ($address, $response) = each %{$self->responses}) {
-        next if (!$response || !$address);
+    
+    # Process responses in id order (so that questions with maxAnswers != 1 stringify according
+    # to natural ordering of answers (e.g. answer 0, answer 1, etc..
+    for my $address (sort keys %{$self->responses}) {
+        next if !$address;
+        my $response = $self->responses->{$address};
+        next if !$response;
         
         # Turn responses s-q-a string into an address array
         my @address = split /-/, $address;
@@ -846,7 +851,11 @@ sub responseValuesByVariableName {
         }
         
         # Add variable => value to our hash
-        $lookup{$question->{variable}} = $value;
+        if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
+            push @{$lookup{$question->{variable}}}, $value;
+        } else {
+            $lookup{$question->{variable}} = $value;
+        }
     }
     return \%lookup;
 }
@@ -866,8 +875,11 @@ sub responseScoresByVariableName {
     my $self = shift;
     
     my %lookup;
-    while (my ($address, $response) = each %{$self->responses}) {
-        next if (!$response || !$address);
+    # Process responses in id order, just to be consistent with responseValuesByVariableName
+    for my $address (sort keys %{$self->responses}) {
+        next if !$address;
+        my $response = $self->responses->{$address};
+        next if !$response;
         
         # Turn responses s-q-a string into an address array
         my @address = split /-/, $address;
@@ -887,8 +899,8 @@ sub responseScoresByVariableName {
         # Use question score if answer score undefined
         my $score = (exists $answer->{value} && length $answer->{value} > 0) ? $answer->{value} : $question->{value};
         
-        # Add variable => score to our hash
-        $lookup{$question->{variable}} = $score;
+        # Add variable => score to our hash (or add to existing score for multi-answer questions, e.g. maxAnswers != 1)
+        $lookup{$question->{variable}} += $score;
     }
     
     # Add section score totals
@@ -933,6 +945,11 @@ A hash reference. Each matching key in the string will be replaced with its asso
 sub getTemplatedText {
     my $self = shift;
     my ($text, $params) = validate_pos(@_, { type => SCALAR }, { type => HASHREF });
+    
+    # Turn multi-valued answers into comma-separated text
+    for my $value (values %$params) {
+        $value = join(',', @$value) if ref $value eq 'ARRAY';
+    }
 
     # Replace all instances of [[var]] with the value from the $params hash reference
     $text =~ s/\[\[([^\%]*?)\]\]/$params->{$1}/eg;

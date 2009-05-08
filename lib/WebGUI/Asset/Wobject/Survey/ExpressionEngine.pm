@@ -45,8 +45,19 @@ Returns the recorded response value for the answer to question_variable
 sub value {
     my $key   = shift;
     my $value = $tags->{$key} || $values->{$key};
-    $session->log->debug("value($key) resolves to [$value]");
-    return $value;    # scalar variable, so no need to clone
+    if (ref $value eq 'ARRAY') {
+        my $joined = join ', ', @$value;
+        if (wantarray) {
+            $session->log->debug("value($key) in list context resolves to ($joined)");
+            return @$value;
+        } else {
+            $session->log->debug("value($key) in scalar|void context resolves to \"$joined\"");
+            return $joined;
+        }
+    } else {
+        $session->log->debug("value($key) resolves to [$value]");
+        return $value;
+    }
 }
 
 =head2 valueX
@@ -64,8 +75,19 @@ sub valueX {
     if (my $other_instance = $otherInstances->{$asset_spec}) {
         my $values = $other_instance->{values};
         my $value  = $values->{$key};
-        $session->log->debug("valueX($asset_spec, $key) resolves to [$value]");
-        return $value;
+        if (ref $value eq 'ARRAY') {
+            my $joined = join ', ', @$value;
+            if (wantarray) {
+                $session->log->debug("valueX($asset_spec, $key) in list context resolves to ($joined)");
+                return @$value;
+            } else {
+                $session->log->debug("valueX($asset_spec, $key) in scalar|void context resolves to \"$joined\"");
+                return $joined;
+            }
+        } else {
+            $session->log->debug("valueX($asset_spec, $key) resolves to [$value]");
+            return $value;
+        }
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
         die( { other_instance => $asset_spec } );

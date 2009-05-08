@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 50;
+my $tests = 52;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -46,6 +46,7 @@ SKIP: {
     my %values = (
         n  => 5,
         s1 => 'my string',
+        multi => [ 'answer1', 'answer2' ],
     );
 
     my %scores = (
@@ -76,6 +77,8 @@ SKIP: {
         q{jump { sum(value(n),1,1,1) == 8 } target},                           # List::Util sum, etc..
         q{jump { score(n1) == 1 && score(n2) == 2 } target},                   # score() works
         q{jump { answered(n) && !answered(X) } target},                        # answered() works
+        q{jump { value(multi) eq 'answer1, answer2' } target},                 # multi-answer question stringifies in scalar context
+        q{jump { (value(multi))[1] eq 'answer2' } target},                     # multi-answer question returns list in list context
     );
 
     my @should_not_jump = (

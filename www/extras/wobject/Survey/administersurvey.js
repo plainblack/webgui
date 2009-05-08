@@ -76,13 +76,15 @@ if (typeof Survey === "undefined") {
                 else if (toValidate[i].type === 'Number') {
                     answered = 1;
                     for (var z1 in toValidate[i].answers) {
-                        var m = parseFloat(document.getElementById(z1).value);
-                        var ansValues = toValidate[i].answers[z1];
-                        if((ansValues.max != '' && m > ansValues.max) ||
-                           (ansValues.min != '' && m < ansValues.min) ||
-                           (ansValues.step != '' && ( (m % ansValues.step) != 0) )){
-                            answered = 0;
-                            break;
+                        if (YAHOO.lang.hasOwnProperty(toValidate[i].answers, z1)) {
+                            var m = parseFloat(document.getElementById(z1).value);
+                            var ansValues = toValidate[i].answers[z1];
+                            if((ansValues.max != '' && m > ansValues.max) ||
+                               (ansValues.min != '' && m < ansValues.min) ||
+                               (ansValues.step != '' && ( (m % ansValues.step) != 0) )){
+                                answered = 0;
+                                break;
+                            }
                         }
                     }
 
@@ -90,13 +92,15 @@ if (typeof Survey === "undefined") {
                 else if (toValidate[i].type === 'Year Month') {
                     answered = 1;//set to true, then let a single failure set it back to false.
                     for (var z1 in toValidate[i].answers) {
-                        var m = document.getElementById(z1+'-month').value;
-                        var y = document.getElementById(z1+'-year').value;
-                        if(m == ''){ answered = 0; }
-                        var yInt = parseInt(y, 10);
-                        if(!yInt) { answered = 0; }
-                        if(yInt < 1000 || yInt > 3000) { answered = 0; }
-                        if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
+                        if (YAHOO.lang.hasOwnProperty(toValidate[i].answers, z1)) {
+                            var m = document.getElementById(z1+'-month').value;
+                            var y = document.getElementById(z1+'-year').value;
+                            if(m == ''){ answered = 0; }
+                            var yInt = parseInt(y, 10);
+                            if(!yInt) { answered = 0; }
+                            if(yInt < 1000 || yInt > 3000) { answered = 0; }
+                            if(answered == 1){ document.getElementById(z1).value = m + "-" + y; }
+                        }
                     }
                 }
                 else {
@@ -218,10 +222,10 @@ if (typeof Survey === "undefined") {
         var min = Math.round(parseFloat(q.answers[0].min));
 
         //The number of values in between the max and min values
-        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min));
+        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min), 10);
        
         //Number of pixels each bug step takes
-        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step));
+        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step), 10);
 
         //redefine number of pixels to round number of steps
         total = distance * bugSteps / step;
@@ -305,7 +309,7 @@ if (typeof Survey === "undefined") {
                 Event.on(document.getElementById(s.input), "blur", manualEntry);
                 Event.on(document.getElementById(s.input), "keypress", manualEntry);
                 var getRealValue = function(){ 
-                    return parseInt((this.getValue() / bugSteps * step) + +min);
+                    return parseInt((this.getValue() / bugSteps * step) + +min, 10);
                 };
                 s.getRealValue = getRealValue;
                 document.getElementById(s.input).value = s.getRealValue();
@@ -365,71 +369,78 @@ if (typeof Survey === "undefined") {
         obj[0].hide();
     }
     
-    function buttonChanged(event, objs){
-        var b = objs[0];
-        var qid = objs[1];
-        var maxA = objs[2];
-        var butts = objs[3];
-        var qsize = objs[4];
-        var aid = objs[5];
-        //max = parseFloat(max);
-        //        clearTimeout(Survey.Form.submittimer);
-        if (maxA) {
-            if (b.className === 'mcbutton-selected') {
-                document.getElementById(b.hid).value = 0;
-                b.className = 'mcbutton';
+    function toggleButtonOn( button ) {
+        document.getElementById(button.hid).value = 1;
+        button.className = 'mcbutton-selected';
+    }
+    
+    function toggleButtonOff( button ) {
+        document.getElementById(button.hid).value = '';
+        button.className = 'mcbutton';
+    }
+    
+    function buttonChanged(event, o){
+        var b = o.button;
+        var maxAnswers = parseInt(o.maxAnswers, 10);
+        var buttons = o.buttons;
+        
+        // When maxAnswers is 2 or greater, user is required to manually toggle options on/off
+        // (e.g. simulate checkboxes), and enforce maxAnswers limit
+        // When maxAnswers is 0, user is also required to manually toggle options on/off,
+        // but no limit is placed on maxAnswers
+        // When maxAnswers is 1, simulate radio group instead
+        // (e.g. no need to untoggle selected answer to change to a different answer)
+        if (!maxAnswers || maxAnswers > 1) {
+            
+            // Simulate checkbox..
+            
+            // See if answer is currently toggled on or off
+            if (b.className === 'mcbutton') {
+                // Answer currently off (unselected). User wants to toggle it on.
+                
+                // See if we need to enforce maxAnswers limit
+                if (maxAnswers) {
+                    // Count how many buttons are currently selected
+                    var bscount = 0;
+                    for (var ib in buttons) {
+                        if (YAHOO.lang.hasOwnProperty(buttons, ib)  && buttons[ib].className === 'mcbutton-selected') {
+                            bscount++;
+                        }
+                    }
+                    
+                    // Proceed if we haven't filled all the allowed selections
+                    if (maxAnswers - bscount > 0) {
+                        toggleButtonOn(b);
+                    }
+                } 
+                else {
+                    // No maxAnswers limit, toggle answer on without counting
+                    toggleButtonOn(b);
+                }
             }
             else {
-                document.getElementById(b.hid).value = 1;
-                b.className = 'mcbutton-selected';
+                // Answer currently on (selected). User wants to toggle it off.
+                toggleButtonOff(b);
             }
-            for (var i in butts) {
-                if (YAHOO.lang.hasOwnProperty(butts, i)) {
-                    if (butts[i] !== b) {
-                        butts[i].className = 'mcbutton';
-                        document.getElementById(butts[i].hid).value = '';
-                    }
+        }
+        else {
+            
+            // maxAnswers == 1, so simulate Radio group instead
+            
+            if (b.className === 'mcbutton-selected') {
+                toggleButtonOff(b);
+            }
+            else {
+                toggleButtonOn(b);
+            }
+            
+            // Toggle off all other answers
+            for (var i in buttons) {
+                if (YAHOO.lang.hasOwnProperty(buttons, i) && buttons[i] !== b) {
+                    toggleButtonOff(buttons[i]);
                 }
             }
         }
-        else 
-            if (b.className === 'mcbutton') {
-                var bscount = 0;//button selected count
-                for (var ib in butts) {
-                    if (butts[ib].className === 'mcbutton-selected') {
-                        bscount++;
-                    }
-                }
-                var max = maxA - bscount;//= parseFloat(document.getElementById(qid+'max').innerHTML);
-                if (max === 0) {
-                    b.className = 'mcbutton';
-                //warn that options used up
-                }
-                else {
-                    b.className = 'mcbutton-selected';
-                    //document.getElementById(qid+'max').innerHTML = parseFloat(max-1);
-                    document.getElementById(b.hid).value = 1;
-                }
-            }
-            else {
-                b.className = 'mcbutton';
-                var bscount1 = 0;//button selected count
-                for (var ibb in butts) {
-                    if (butts[ibb].className === 'mcbutton-selected') {
-                        bscount1++;
-                    }
-                }
-                //var max = maxA - bscount1;//= parseFloat(document.getElementById(qid+'max').innerHTML);
-                //            document.getElementById(qid+'max').innerHTML = parseFloat(max+1);
-                document.getElementById(b.hid).value = '';
-            }
-        /*
-         if(qsize == 1 && b.className == 'mcbutton-selected'){
-         if(! document.getElementById(aid+'verbatim')){
-         Survey.Form.submittimer=setTimeout("Survey.Form.formsubmit()",500);
-         }
-         }
-         */
     }
 
     YAHOO.widget.Chart.SWFURL = "/extras/yui/build/charts/assets/charts.swf"; 
@@ -447,18 +458,16 @@ if (typeof Survey === "undefined") {
 
 
             //Add totoal summary pie chart
-            totalSummary =
-            [
+            var totalSummary = [
                 { correct: "Correct", count: summary.totalCorrect },
                 { correct: "Incorrect", count: summary.totalIncorrect }
-            ]
+            ];
 
             var totalSummaryDS = new YAHOO.util.DataSource( totalSummary );
             totalSummaryDS.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
             totalSummaryDS.responseSchema = { fields: [ "correct", "count" ] };
 
-            new YAHOO.widget.PieChart( "chart", totalSummaryDS,
-            {
+            new YAHOO.widget.PieChart( "chart", totalSummaryDS, {
                 dataField: "count",
                 categoryField: "correct",
                 style:
@@ -496,13 +505,13 @@ if (typeof Survey === "undefined") {
                 var temp = summary.sections[i];
                 sectionSummary[sectionSummary.length] = {"Total Responses": temp.total, "Correct": temp.correct, "Incorrect": temp.inCorrect, "section": (i+1)};
                 var myDataSource = new YAHOO.util.DataSource(summary.sections[i].responses);
-//These needs to be put in a destroy call list for when the html dom is recreated, if summaries are going to be uses with page reloads, else memory leak.
+                //These needs to be put in a destroy call list for when the html dom is recreated, if summaries are going to be uses with page reloads, else memory leak.
                 myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
                 myDataSource.responseSchema = { 
                    fields: ["Question ID","Question Text","Answer ID","Correct","Answer Text","Score","Value"] 
                 };
-                var tempText = "section"+ (i+1) + "datatable";
-                new YAHOO.widget.DataTable(tempText, myColumnDefs, myDataSource, {caption:"Section "+(i+1)});
+                var tempText = "section" + (i+1) + "datatable";
+                new YAHOO.widget.DataTable(tempText, myColumnDefs, myDataSource, { caption: "Section " + (i+1) } );
             }
 
             //Now create section summary bar charts
@@ -706,10 +715,12 @@ if (typeof Survey === "undefined") {
                 }
                 if (NUMBER_TYPES[q.questionType]) {
                     for (var x in q.answers) {
-                        if (toValidate[q.id]) {
-                            toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
+                        if (YAHOO.lang.hasOwnProperty(q.answers, x)) {
+                            if (toValidate[q.id]) {
+                                toValidate[q.id].answers[q.answers[x].id] = {'min':q.answers[x].min,'max':q.answers[x].max,'step':q.answers[x].step};
+                            }
+                            YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
                         }
-                        YAHOO.util.Event.addListener(q.answers[x].id, "keyup", numberHandler, q.answers[x]);
                     }
                     continue;
                 }
@@ -722,17 +733,10 @@ if (typeof Survey === "undefined") {
                         toValidate[q.id].answers[a.id] = 1;
                     }
                     var b = document.getElementById(a.id + 'button');
-                    /*
-         b = new YAHOO.widget.Button({ type: "checkbox", label: a.answerText, id: a.id+'button', name: a.id+'button',
-         value: a.id,
-         container: a.id+"container", checked: false });
-         */
-                    //                    b.on("click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
-                    //                    YAHOO.util.Event.addListener(a.id+'button', "click", buttonChanged,[b,a.id,q.maxAnswers,butts,qs.length,a.id]);
                     if (a.verbatim) {
                         verb = 1;
                     }
-                    YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, [b, a.id, q.maxAnswers, butts, qs.length, a.id]);
+                    YAHOO.util.Event.addListener(a.id + 'button', "click", buttonChanged, { button: b, maxAnswers: q.maxAnswers, buttons: butts });
                     b.hid = a.id;
                     butts.push(b);
                 }
@@ -749,11 +753,3 @@ YAHOO.util.Event.onDOMReady(function(){
     // Survey.Comm.setUrl('/' + document.getElementById('assetPath').value);
     Survey.Comm.callServer('', 'loadQuestions');
 });
-
-YAHOO.example.getDataTipText = function( item, index, series )
-{
-    var toolTipText = series.displayName + " for " + item.month;
-//    toolTipText += "\n" + YAHOO.example.formatCurrencyAxisLabel( item[series.yField] );
-    return toolTipText;
-}
-

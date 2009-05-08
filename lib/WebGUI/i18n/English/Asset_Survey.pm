@@ -285,10 +285,10 @@ our $I18N = {
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 1241588599
     },
-	'comment rows' => {
-		message => q|Comment Rows:|,
-		lastUpdated => 1224686319
-	},
+    'comment rows' => {
+            message => q|Comment Rows:|,
+            lastUpdated => 1224686319
+    },
     'rows description' => {
         message => q|The number of rows used for the input field (for TextArea question types).|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
@@ -299,68 +299,68 @@ our $I18N = {
             lastUpdated => 1224686319
     },
     'maximum number of answers description' => {
-        message => q|Enter the maximum number of answers.|,
+        message => q|For multi-choice questions, how many answers the user can select. <br>0 = unlimited.<br>1 = radio group style.<br>2 and above = checkbox style.|,
         context => q|Description of the 'maximum number of answers' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241764603,
     },
-	'required label' => {
-		message => q|Required|,
-		lastUpdated => 1224686319
-	},
+    'required label' => {
+            message => q|Required|,
+            lastUpdated => 1224686319
+    },
     'required description' => {
         message => q|Is this a required question?|,
         context => q|Description of the 'required' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'question score' => {
-		message => q|Question score:|,
-		lastUpdated => 1224686319
-	},
+    'question score' => {
+            message => q|Question score:|,
+            lastUpdated => 1224686319
+    },
     'question score description' => {
         message => q|Default score to use for answers in this question that don't have an answer score value set.|,
         context => q|Description of the 'question value' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 1239255403
     },
-	'please enter answer information' => {
-		message => q|Please enter answer information:|,
-        context => q|Title of the edit answer dialog.|,
-		lastUpdated => 1224686319
-	},
-	'answer number' => {
-		message => q|Answer number:|,
-		lastUpdated => 1224686319
-	},
+    'please enter answer information' => {
+            message => q|Please enter answer information:|,
+    context => q|Title of the edit answer dialog.|,
+            lastUpdated => 1224686319
+    },
+    'answer number' => {
+            message => q|Answer number:|,
+            lastUpdated => 1224686319
+    },
     'answer number description' => {
         message => q|The number of this answer|,
         context => q|Description of the 'answer number' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'answer text' => {
-		message => q|Answer text:|,
-		lastUpdated => 1224686319
-	},
+    'answer text' => {
+            message => q|Answer text:|,
+            lastUpdated => 1224686319
+    },
     'answer text description' => {
         message => q|Enter a text for this answer. For multiple choice questions this answer will be displayed above the buttons.|,
         context => q|Description of the 'answer text' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'recorded answer' => {
-		message => q|Recorded Answer:|,
-		lastUpdated => 1224686319
-	},
+    'recorded answer' => {
+            message => q|Recorded Answer:|,
+            lastUpdated => 1224686319
+    },
     'recorded answer description' => {
         message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 1239251436
     },
-	'jump to' => {
-		message => q|Jump to:|,
-		lastUpdated => 1224686319
-	},
-	'jump expression' => {
-		message => q|Jump expression:|,
-		lastUpdated => 1229318805
-	},
+    'jump to' => {
+            message => q|Jump to:|,
+            lastUpdated => 1224686319
+    },
+    'jump expression' => {
+            message => q|Jump expression:|,
+            lastUpdated => 1229318805
+    },
     'jump to description' => {
         message => q|The section or question with this variable name will be the next to be displayed after this answer.|,
         context => q|Description of the 'jump to' field, used as hoverhelp in the edit answer dialog.|,
