@@ -11,6 +11,9 @@
  - fixed: i18n typo in Survey exit URL hover help.
  - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
  - rfre #9998: Mark inbox messages read/unread
+ - The transaction items now store the tax that is applied to them, as well as
+   tax plugin specific data that needs to be stored together with
+   transactions. (Martin Kamerbeek / Oqapi )
 
 7.7.5
  - Adding StoryManager.

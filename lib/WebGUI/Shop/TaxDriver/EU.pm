@@ -178,6 +178,33 @@ sub addVATNumber {
 
 #-------------------------------------------------------------------
 
+=head2 appendCartItemVars ( var, cartItem )
+
+See WebGUI::Shop::TaxDriver->appendCartItemVars.
+
+Additionally adds VAT number to var.
+
+=cut
+
+sub appendCartItemVars {
+    my $self    = shift;
+    my $var     = shift;
+    my $item    = shift;
+
+    $self->SUPER::appendCartItemVars( $var, $item );
+
+    my $address = eval { $item->getShippingAddress };
+    unless ( WebGUI::Error->caught ) {
+        my $countryCode = $self->getCountryCode( $address->get( 'country' ) );
+        if ( $countryCode && $self->hasVATNumber( $countryCode ) ) {
+            $var->{ VATNumber } = $self->getVATNumbers( $countryCode )->[0]->{ vatNumber };
+        }
+    }
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 className
 
 Returns the name of this class.

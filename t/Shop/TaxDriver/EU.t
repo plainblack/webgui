@@ -32,13 +32,13 @@ use WebGUI::Shop::AddressBook;
 my $session         = WebGUI::Test->session;
 
 my $taxUser     = WebGUI::User->new( $session, 'new' );
-$taxUser->username( 'MrEvasion' );
+$taxUser->username( 'Tex Evasion' );
 
 
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 48;
+my $tests = 55;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -277,9 +277,6 @@ SKIP: {
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'getTaxRate: error handling for not sending a sku');
     is($e->error, 'Must pass in a WebGUI::Asset::Sku object', 'getTaxRate: error handling for not sending a sku');
 
-    # Build a cart, add some Donation SKUs to it.  Set one to be taxable.
-    my $cart = WebGUI::Shop::Cart->newBySession( $session );
-
     my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
         className => 'WebGUI::Asset::Sku::Donation',
         title     => 'Taxable donation',
@@ -311,6 +308,67 @@ SKIP: {
         'getTaxRate: shipping addresses inside EU but other country than merchant w/ VAT number are tax exempt.' 
     );
     is( $taxer->getTaxRate( $sku, $nlAddress ), 100, 'getTaxRate: shipping addresses in country of merchant w/ VAT number pay tax' );
+
+    #######################################################################
+    #
+    # appendCartItemVars
+    #
+    #######################################################################
+
+    eval { $taxer->appendCartItemVars };
+    my $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidParam', 'appendCartItemVars requires a hash ref.' );
+    is( $e, 'Must supply a hash ref', 'appendCartItemVars returns correct message for missing hash ref' );
+
+    eval { $taxer->appendCartItemVars( {}, 'NotAUserObject' ) };
+    $e = Exception::Class->caught();
+    isa_ok( $e, 'WebGUI::Error::InvalidObject', 'appendCartItemVars: Second argument must be a cart item object' );
+    cmp_deeply( $e,  methods(
+        error    => 'Must pass a cart item',
+        expected => 'WebGUI::Shop::CartItem',
+        got      => '',
+    ), 'appendCartItemVars returns correct error for missing CartItem' );
+    
+
+    my $cart = WebGUI::Shop::Cart->newBySession( $session );
+
+    my $item = $cart->addItem( $sku );
+    $item->setQuantity( 2 );
+    $item->update( { shippingAddressId => $nlAddress->getId } );
+
+    my $cartItemVars = { must => 'be kept' };
+    $taxer->appendCartItemVars( $cartItemVars, $item );
+    cmp_deeply( $cartItemVars, {
+        pricePlusTax            => '200.00',
+        extendedPricePlusTax    => '400.00',
+        taxRate                 => '100',
+        taxAmount               => '100.00',
+        VATNumber               => $testVAT_NL,
+        must                    => 'be kept',
+    }, 'appendCartItemVars returns correct data for address in shopy country.' );
+
+    $item->update( { shippingAddressId => $beAddress->getId } );
+    $cartItemVars = { must => 'be kept' };
+    $taxer->appendCartItemVars( $cartItemVars, $item );
+    cmp_deeply( $cartItemVars, {
+        pricePlusTax            => '100.00',
+        extendedPricePlusTax    => '200.00',
+        taxRate                 => '0',
+        taxAmount               => '0.00',
+        VATNumber               => $testVAT_BE,
+        must                    => 'be kept',
+    }, 'appendCartItemVars returns correct data for address in otrher country in EU.' );
+    
+    $item->update( { shippingAddressId => $usAddress->getId } );
+    $cartItemVars = { must => 'be kept' };
+    $taxer->appendCartItemVars( $cartItemVars, $item );
+    cmp_deeply( $cartItemVars, {
+        pricePlusTax            => '100.00',
+        extendedPricePlusTax    => '200.00',
+        taxRate                 => '0',
+        taxAmount               => '0.00',
+        must                    => 'be kept',
+    }, 'appendCartItemVars returns correct data for address outside EU.' );
 
     #######################################################################
     #
@@ -372,9 +430,6 @@ SKIP: {
             id      => $id100,
         },
     ], 'deleteGroup deletes correctly' );
-
-
-
 }
 
 #----------------------------------------------------------------------------
