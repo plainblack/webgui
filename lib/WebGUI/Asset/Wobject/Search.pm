@@ -217,7 +217,7 @@ sub view {
                 #Add highlighting
                 $properties->{'title'               } = $hl->highlight($properties->{title} || '');
                 $properties->{'title_nohighlight'   } = $properties->{title};
-                my $synopsis = $properties->{'synopsis'} || '';
+                my $synopsis = $data->{'synopsis'} || '';
                 WebGUI::Macro::process($self->session, \$synopsis);
                 $properties->{'synopsis'            } = $hl->highlight($synopsis);
                 $properties->{'synopsis_nohighlight'} = $synopsis;
