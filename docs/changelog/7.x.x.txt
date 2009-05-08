@@ -10,6 +10,9 @@
  - fixed: URLs that shouldn't happen  (#10353)
  - Added more information output to EMS record importer.
  - Fixed a search results display error with synopsis.
+ - Fixed a load problem with Code Editor by making user toggle it on. This is
+   better than normal anyway since many users appear not to want to use the
+   editor in most cases.
  - fixed: i18n typo in Survey exit URL hover help.
  - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
  - rfre #9998: Mark inbox messages read/unread
