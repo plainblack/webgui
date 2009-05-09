@@ -1144,9 +1144,6 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 	my @records = ();
 	foreach my $id (@ids) {
 
-		# gotta get to the page we're working with
-		next unless ($counter >= $startIndex);
-
 		# skip tickets we already have
 		if (isIn($id, @existingTickets)) {
 			$totalTickets--;
@@ -1187,6 +1184,10 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 				next;
 			}
 		}
+
+        # gotta get to the page we're working with
+        $counter++;
+        next unless ($counter >= ($startIndex * $numberOfResults));
 		
 		# publish the data for this ticket
         my $description = $ticket->get('description');
@@ -1217,7 +1218,6 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 			duration			=> $ticket->get('duration'),
 			});
 		last unless (scalar(@records) < $numberOfResults);
-		$counter++;
 	}
 	
 	# humor
@@ -1410,11 +1410,11 @@ $|=1;
 					$out->print("Adding new asset ".$event->getId."\n",1)
 				}
 				my %properties = ();
-				my %metadata = $event->getEventMetaData;
+				my $metadata = $event->getEventMetaData;
 				my $i = 0;
 				foreach my $field (@{$fields}) {
 					next unless isIn($field->{name}, @import);
-            		$out->print("\tAdding field ".$field->{name}."\n",1);
+            		$out->print("\tAdding field ".$field->{label}."\n",1);
 					my $type = $field->{type};
 					my $value = $validate->$type({
 							name			=> $field->{name},
@@ -1422,7 +1422,7 @@ $|=1;
 							options			=> $field->{options},
 							},$row[$i]);
 					if ($field->{isMeta}) {
-						$metadata{$field->{name}} = $value;
+						$metadata->{$field->{label}} = $value;
 					}
 					else {
 						$properties{$field->{name}} = $value;
@@ -1434,7 +1434,9 @@ $|=1;
                 $properties{url} = $self->get("url")."/".$properties{title};
 				$event->update(\%properties);
                 $out->print("\tUpdating meta data\n",1);
-				$event->setEventMetaData(\%metadata);
+				$event->setEventMetaData($metadata);
+                $out->print("\tCommitting asset\n",1);
+                WebGUI::VersionTag->getWorking($session)->commit;
                 $out->print("\tAdding event took ".Time::HiRes::tv_interval($start)." seconds to run.\n",1);
 			}
 			else {
