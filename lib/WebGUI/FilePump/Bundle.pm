@@ -7,6 +7,7 @@ use URI;
 use Path::Class::Dir;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
+use LWP;
 
 #-------------------------------------------------------------------
 
@@ -79,6 +80,9 @@ sub build {
     my ($self) = @_;
     my $lastBuild = time();
     my $originalBuild = $self->get('lastBuild');
+
+    ##Whole lot of building
+
     $self->update({lastBuild => $lastBuild});
     return 1;
 }
@@ -243,6 +247,92 @@ sub deleteFile {
     );
     $self->update({lastModified => time()});
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 fetchAsset ( $uri )
+
+Fetches a bundle file from a WebGUI Asset (probably a snippet) in this site.  Returns a hashref
+with the content and date that it was lastUpdated.  If the Asset cannot be found with that URL,
+it returns an empty hashref.
+
+=head3 $uri
+
+A valid asset URI.
+
+=cut
+
+sub fetchAsset {
+    my ($self, $uri ) = @_;
+    my $url = URI->new($uri)->opaque;
+    my $asset = WebGUI::Asset->newByUrl($self->session, $url);
+    return {} unless $asset;
+    ##Check for a snippet, or snippet subclass?
+    my $guts = {
+        lastModified => $asset->get('lastModified'),
+        content      => $asset->view(1),
+    };
+    return $guts;
+}
+
+#-------------------------------------------------------------------
+
+=head2 fetchFile ( $uri )
+
+Fetches a bundle file from the local filesystem.  Returns a hashref
+with the content and date that it was last updated.  If there is any problem
+with getting the file, it returns an empty hashref.
+
+
+=head3 $uri
+
+A valid filesystem URI.
+
+=cut
+
+sub fetchFile {
+    my ($self, $uri ) = @_;
+
+    my $guts = {
+    };
+    return $guts;
+}
+
+#-------------------------------------------------------------------
+
+=head2 fetchHttp ( $uri )
+
+Fetches a bundle file from the web.  Returns a hashref with the content
+and date that it was last updated.  If there is any problem with making
+the request, it returns an empty hashref.
+
+=head3 $uri
+
+A valid web URI.
+
+=cut
+
+sub fetchHttp {
+    my ($self, $uri ) = @_;
+
+    # Set up LWP
+    my $userAgent = LWP::UserAgent->new;
+    $userAgent->env_proxy;
+    $userAgent->agent("WebGUI");
+    
+    # Create a request and stuff the uri in it
+    my $request  = HTTP::Request->new( GET => $uri );
+    my $response = $userAgent->request($request);
+
+    if (! $response->is_success) {
+        return {};
+    }
+    my $guts = {
+        lastModified => $response->header('lastModified'),
+        content      => $response->content(),
+    };
+    return $guts;
 }
 
 #-------------------------------------------------------------------
