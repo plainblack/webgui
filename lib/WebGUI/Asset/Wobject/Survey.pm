@@ -1890,11 +1890,11 @@ END_HTML
         my $sNum = 0;
         for my $s (@{$self->surveyJSON->sections}) {
             $sNum++;
-            push @rows, ["S$sNum", 'Section', $s->{variable}, '', '', $s->{text}, $s->{goto}, ''];
+            push @rows, ["S$sNum", 'Section', $s->{variable}, '', '', $s->{text}, $s->{goto}, $s->{gotoExpression}];
             my $qNum = 0;
             for my $q (@{$s->{questions}}) {
                 $qNum++;
-                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', '', $q->{text}, '', ''];
+                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', '', $q->{text}, $s->{goto}, $s->{gotoExpression}];
                 my $aNum = 0;
                 for my $a (@{$q->{answers}}) {
                     $aNum++;
