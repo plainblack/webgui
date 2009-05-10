@@ -44,6 +44,7 @@ Returns the recorded response value for the answer to question_variable
 
 sub value {
     my $key   = shift;
+    _validateVariable($key, 'value');
     my $value = $tags->{$key} || $values->{$key};
     if (ref $value eq 'ARRAY') {
         my $joined = join ', ', @$value;
@@ -72,8 +73,8 @@ sub valueX {
     my ( $asset_spec, $key ) = @_;
     
     # See if $otherInstances already contains the external survey
-    if (my $other_instance = $otherInstances->{$asset_spec}) {
-        my $values = $other_instance->{values};
+    if (my $otherInstance = $otherInstances->{$asset_spec}) {
+        my $values = $otherInstance->{values};
         my $value  = $values->{$key};
         if (ref $value eq 'ARRAY') {
             my $joined = join ', ', @$value;
@@ -90,7 +91,7 @@ sub valueX {
         }
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
-        die( { other_instance => $asset_spec } );
+        die( { otherInstance => $asset_spec } );
     }
 }
 
@@ -108,25 +109,11 @@ case the sub is applied to the most recent completed response for the user on th
 =cut
 
 sub score {
-    # Two arguments implies the first arg is an asset_spec
-    if ( @_ == 2 ) {
-        my ( $asset_spec, $key ) = @_;
-        
-        # See if $otherInstances already contains the external survey
-        if (my $other_instance = $otherInstances->{$asset_spec}) {
-            my $scores = $other_instance->{scores};
-            my $score  = $scores->{$key};
-            $session->log->debug("score($asset_spec, $key) resolves to [$score]");
-            return $score;
-        } else {
-            # Throw an exception, triggering run() to resolve the external reference and re-run
-            die( { other_instance => $asset_spec } );
-        }
-    }
-    my $key   = shift;
+    my $key = shift;
+    _validateVariable($key, 'score');
     my $score = $scores->{$key};
     $session->log->debug("score($key) resolves to [$score]");
-    return $score;    # scalar variable, so no need to clone
+    return $score;
 }
 
 =head2 scoreX
@@ -141,15 +128,41 @@ sub scoreX {
     my ( $asset_spec, $key ) = @_;
     
     # See if $otherInstances already contains the external survey
-    if (my $other_instance = $otherInstances->{$asset_spec}) {
-        my $scores = $other_instance->{scores};
+    if (my $otherInstance = $otherInstances->{$asset_spec}) {
+        my $scores = $otherInstance->{scores};
         my $score  = $scores->{$key};
         $session->log->debug("scoreX($asset_spec, $key) resolves to [$score]");
         return $score;
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
-        die( { other_instance => $asset_spec } );
+        die( { otherInstance => $asset_spec } );
     }
+}
+
+=head2 _validateVariable ($key, $fn)
+
+Convenience sub to do optional validation of variable names
+
+=head3 key
+
+Variable name to validate
+
+=head3 fn
+
+Function name of caller (for diagnostic output)
+
+=cut
+
+sub _validateVariable {
+    my $key = shift;
+    my $fn = shift || 'unspecified function';
+    if ( $validTargets && !exists $validTargets->{$key} ) {
+        my $error = "Param [$key] to $fn is not a valid variable name";
+        $session->log->debug($error);
+        die($error) if $validate;
+        return;
+    }
+    return 1;
 }
 
 =head2 answered
@@ -163,6 +176,8 @@ case the sub is applied to the most recent completed response for the user on th
 
 sub answered {
     my $key   = shift;
+    
+    _validateVariable($key, 'answered');
     my $answered = exists $values->{$key};
     $session->log->debug("answered($key) returns [$answered]");
     return $answered;
@@ -180,14 +195,14 @@ sub answeredX {
     my ( $asset_spec, $key ) = @_;
     
     # See if $otherInstances already contains the external survey
-    if (my $other_instance = $otherInstances->{$asset_spec}) {
-        my $values = $other_instance->{values};
+    if (my $otherInstance = $otherInstances->{$asset_spec}) {
+        my $values = $otherInstance->{values};
         my $answered  = exists $values->{$key};
         $session->log->debug("answeredX($asset_spec, $key) returns [$answered]");
         return $answered;
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
-        die( { other_instance => $asset_spec } );
+        die( { otherInstance => $asset_spec } );
     }
 }
 
@@ -249,15 +264,15 @@ sub taggedX {
         $session->log->warn("Three arguments passed to taggedX($args). Did you mean tag($args)?");
     }
     # See if $otherInstances already contains the external survey
-    if (my $other_instance = $otherInstances->{$asset_spec}) {
-        my $tags = $other_instance->{tags};
+    if (my $otherInstance = $otherInstances->{$asset_spec}) {
+        my $tags = $otherInstance->{tags};
         
         my $value = $tags->{$name};
         $session->log->debug("taggedX($asset_spec, $name) returns [$value]");
         return $value;
     } else {
         # Throw an exception, triggering run() to resolve the external reference and re-run
-        die( { other_instance => $asset_spec } );
+        die( { otherInstance => $asset_spec } );
     }
 }
 
@@ -275,14 +290,8 @@ sub jump(&$) {
     $jumpCount++;
 
     # If $validTargets known, make sure target is valid
-    if ( $validTargets && !exists $validTargets->{$target} ) {
-        $session->log->debug("Invalid target [$target]");
-        if ($validate) {
-            die("Invalid jump target \"$target\"");    # bail and report error
-        }
-        else {
-            return;                                    # skip jump but continue with expression
-        }
+    if (!_validateVariable($target, 'jump')) {
+        return; # skip jump but continue with expression
     }
 
     if ( $sub->() ) {
@@ -432,8 +441,8 @@ sub run {
         }
 
         # See if an unresolved external reference was encountered
-        if ( ref $@ && ref $@ eq 'HASH' && $@->{other_instance} ) {
-            my $asset_spec = $@->{other_instance};
+        if ( ref $@ && ref $@ eq 'HASH' && $@->{otherInstance} ) {
+            my $asset_spec = $@->{otherInstance};
             $session->log->debug("Resolving external reference: $asset_spec");
             my $asset;
 

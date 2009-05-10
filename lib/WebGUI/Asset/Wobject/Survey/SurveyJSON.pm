@@ -1215,6 +1215,9 @@ sub validateSurvey{
         if(my $error = $self->validateGotoExpression($section,$goodTargets)){
             push @messages,"Section $sNum has invalid Jump Expression: \"$section->{gotoExpression}\". Error: $error";
         }
+        if(my @errors = $self->validateGotoPrecedenceRules($section, $section->{variable} || $sNum)){
+            push @messages,@errors;
+        }
         if (my $var = $section->{variable}) {
             if (my $count = $duplicateTargets->{$var}) {
                 push @messages, "Section $sNum variable name $var is re-used in $count other place(s).";
@@ -1301,6 +1304,47 @@ sub validateGotoExpression{
     return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
 }
 
+sub validateGotoPrecedenceRules {
+    my $self = shift;
+    my $s = shift;
+    my $sLabel = shift;
+    my @errors;
+    my $endMsg = 'Precedence rules will apply.';
+    
+    my $hasSection
+        = $s->{goto}           =~ /\w/ ? 'Jump Target'
+        : $s->{gotoExpression} =~ /\w/ ? 'Jump Expression'
+        :                                '';
+    my $qNum = 0;
+    for my $q (@{$s->{questions}}) {
+        $qNum++;
+        my $qLabel = $q->{variable} || "Question $qNum";
+        my $hasQuestion
+            = $q->{goto}           =~ /\w/ ? 'Jump Target'
+            : $q->{gotoExpression} =~ /\w/ ? 'jump Expression'
+            :                                '';
+        if ( $hasSection && $hasQuestion) {
+            push @errors, "You have a $hasSection at $sLabel and a $hasQuestion at $qLabel. $endMsg";
+        }
+        my $aNum = 0;
+        for my $a (@{$q->{answers}}) {
+            $aNum++;
+            my $aLabel = "Answer $aNum";
+            my $hasAnswer
+                = $a->{goto}           =~ /\w/ ? 'Jump Target'
+                : $a->{gotoExpression} =~ /\w/ ? 'Jump Expression'
+                :                                '';
+            if ( $hasSection && $hasAnswer) {
+                push @errors, "You have a $hasSection at $sLabel and a $hasAnswer at $aLabel. $endMsg";
+            }
+            if ( $hasQuestion && $hasAnswer) {
+                push @errors, "You have a $hasQuestion at $qLabel and a $hasAnswer at $aLabel. $endMsg";
+            }
+        }
+    }
+    return @errors;
+}
+    
 =head2 section ($address)
 
 Returns a reference to one section.

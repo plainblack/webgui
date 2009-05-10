@@ -18,9 +18,7 @@ Survey.ObjectTemplate = (function(){
             editor.get('element').value = YAHOO.util.Dom.get('texteditortarget').value;
             editor.setEditorHTML(YAHOO.util.Dom.get('texteditortarget').value);
             YAHOO.util.Dom.setStyle("editor_container","visibility","visible");
-            var xy = YAHOO.util.Dom.getXY(YAHOO.util.Dom.get("texteditortarget").id);
-            YAHOO.util.Dom.setXY("editor_container",xy);
-
+            YAHOO.util.Dom.setXY("editor_container",YAHOO.util.Dom.getXY(YAHOO.util.Dom.get("texteditortarget").id));
         },
 
         initObjectEditor: function() {
@@ -158,6 +156,9 @@ Survey.ObjectTemplate = (function(){
             resizeGotoExpression.on('resize', function(ev) {
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'width', (ev.width - 6) + "px");
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'height', (ev.height - 6) + "px");
+                
+                // Resizing the gotoExpression box can cause the texteditor to move, so update its position
+                YAHOO.util.Dom.setXY("editor_container",YAHOO.util.Dom.getXY(YAHOO.util.Dom.get("texteditortarget").id));
             });
             
             // build the goto auto-complete widget

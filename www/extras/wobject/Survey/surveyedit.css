@@ -134,6 +134,9 @@ li.answer {
     margin:5px;
     padding:10px;
 }
+.warning {
+    padding: 5px;
+}
 #sections-panel .bd {
     overflow: auto;
     background-color:#fff;
