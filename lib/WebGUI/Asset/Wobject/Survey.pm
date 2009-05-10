@@ -1894,7 +1894,7 @@ END_HTML
             my $qNum = 0;
             for my $q (@{$s->{questions}}) {
                 $qNum++;
-                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', '', $q->{text}, $s->{goto}, $s->{gotoExpression}];
+                push @rows, ["S$sNum-Q$qNum", 'Question', $q->{variable}, '', '', $q->{text}, $q->{goto}, $q->{gotoExpression}];
                 my $aNum = 0;
                 for my $a (@{$q->{answers}}) {
                     $aNum++;
