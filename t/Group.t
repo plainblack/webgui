@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (147 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (148 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -403,7 +403,22 @@ my $everyUsers = $everyoneGroup->getUsers();
 $everyoneGroup->addUsers([$visitorUser->userId]);
 cmp_bag($everyUsers, $everyoneGroup->getUsers(), 'addUsers will not add a user to a group they already belong to');
 
-##Database based user membership in groups
+##Check expire time override on addUsers
+
+my $expireOverrideGroup = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($expireOverrideGroup);
+$expireOverrideGroup->expireOffset('50');
+my $expireOverrideUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($expireOverrideUser);
+$expireOverrideGroup->addUsers([$expireOverrideUser->userId], '5000');
+my $expirationDate = $session->db->quickScalar('select expireDate from groupings where userId=?', [$expireOverrideUser->userId]);
+cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addUsers');
+
+################################################################
+#
+# getDatabaseUsers
+#
+################################################################
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 $session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
