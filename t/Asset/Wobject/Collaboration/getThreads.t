@@ -146,8 +146,8 @@ $expect = sortThreads( sub { $b->get('title') cmp $a->get('title') }, @threads )
 cmp_deeply( $page, $expect, 'getThreadsPaginator sort by form sortBy' )
 or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 # sortBy scratch gets set by getThreadsPaginator
-is( $session->scratch->get($collab->getId.'_sortBy'), 'title', "sortBy scratch set after form submit 1" );
-is( $session->scratch->get($collab->getId.'_sortDir'), 'desc', "sortBy scratch set after form submit 1" );
+is( $session->scratch->get($collab->getId.'_sortBy'), 'title', "sortBy  scratch set after form submit 1" );
+is( $session->scratch->get($collab->getId.'_sortDir'), 'desc', "sortDir scratch set after form submit 1" );
 # DONT RESET SORT HERE
 
 # second sortBy from Form reverses sort
