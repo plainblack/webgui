@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 19;
+my $tests = 20;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -113,6 +113,23 @@ ok($s->responseId, '..(and similarly for responseId)');
     }
 }
 
+
+}
+
+eval 'use GraphViz';
+
+SKIP: {
+
+skip "Unable to load GraphViz", 1 if $@;
+
+$survey->surveyJSON->remove([1]);
+my ($storage, $filename) = $survey->graph( { format => 'plain', layout => 'dot' } );
+like($storage->getFileContentsAsScalar($filename), qr{
+    ^graph .*       # starts with graph
+    (node .*){3}    # ..then 3 nodes
+    (edge .*){3}    # ..then 3 edges
+    stop$            # ..and end with stop
+}xs, 'Generated graph looks roughly okay');
 
 }
 

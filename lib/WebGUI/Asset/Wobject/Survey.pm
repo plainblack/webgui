@@ -618,7 +618,11 @@ sub graph {
     my $method = "as_$format";
     $g->$method($path);
     
-    return $storage->getUrl($filename);
+    if (wantarray) {
+        return ( $storage, $filename);
+    } else {
+        return $storage->getUrl($filename);
+    }
 }
 
 #-------------------------------------------------------------------
