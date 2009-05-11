@@ -985,6 +985,7 @@ sub getThreadsPaginator {
     my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+        $self->session->scratch->set($scratchSortOrder, $sortOrder);
 	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
                 if ($sortOrder eq "asc") {
                         $sortOrder = "desc";
@@ -1000,6 +1001,7 @@ sub getThreadsPaginator {
         $sortBy = 'threadRating';
     } 
     $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+
 	my $sql = "
 		select 
 			asset.assetId,
