@@ -1,19 +1,22 @@
-
-my $HOST        = shift;
-my $PORT        = shift;
-
-die "HOST must be first argument"   
-    unless $HOST;
-die "PORT must be second argument"
-    unless $PORT;
+use strict;
+use warnings;
 
 use JSON qw( to_json );
 use Net::SMTP::Server;
 use Net::SMTP::Server::Client;
 
+my ($HOST, $PORT) = @ARGV;
+
+die "HOST must be first argument"
+    unless $HOST;
+die "PORT must be second argument"
+    unless $PORT;
+
 my $server  = Net::SMTP::Server->new( $HOST, $PORT );
 
-while ( my $conn = $server->accept ) {
+$| = 1;
+
+CONNECTION: while ( my $conn = $server->accept ) {
     my $client  = Net::SMTP::Server::Client->new( $conn );
     $client->process;
     print to_json({
@@ -21,9 +24,8 @@ while ( my $conn = $server->accept ) {
         from        => $client->{FROM},
         contents    => $client->{MSG},
     });
-    exit(0);
+    print "\n";
 }
-
 
 =head1 NAME
 

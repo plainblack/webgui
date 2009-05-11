@@ -380,6 +380,13 @@
       "title" : "^International(spectre,Spectre);",
       "groupSetting" : "groupIdAdminSpectre"
    },
+   "adminConsoleOff" : {
+      "icon" : "adminConsoleOff.gif",
+      "uiLevel" : 1,
+      "group" : "12",
+      "url" : "^PageUrl(\"\",op=switchOffAdmin);",
+      "title" : "^International(12,WebGUI);"
+   },
    "contentFilters" : {
       "icon" : "contentFilters.gif",
       "uiLevel" : 3,
@@ -506,6 +513,9 @@
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
+   "WebGUI::Asset::Sku::ThingyRecord" : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Wobject::UserList" : {
       "category" : "intranet"
    },
@@ -518,6 +528,16 @@
    "WebGUI::Asset::Wobject::WikiMaster" : {
       "isContainer" : 1,
       "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryArchive" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryTopic" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::Carousel" : {
+      "category" : "utilities"
    },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
@@ -805,6 +825,7 @@
 
 "workflowActivities" : {
     "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
@@ -828,7 +849,8 @@
         "WebGUI::Workflow::Activity::TrashClipboard",
         "WebGUI::Workflow::Activity::TrashExpiredEvents",
         "WebGUI::Workflow::Activity::SummarizePassiveAnalytics",
-        "WebGUI::Workflow::Activity::BucketPassiveAnalytics"
+        "WebGUI::Workflow::Activity::BucketPassiveAnalytics",
+        "WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords"
     ],
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
@@ -959,7 +981,13 @@
     "rar",
     "gz",
     "bz2"
-]
+],
+
+# Drivers for the pluggable tax system
+"taxDrivers" : [
+    "WebGUI::Shop::TaxDriver::Generic",
+    "WebGUI::Shop::TaxDriver::EU"
+],
 
 }
 

@@ -439,6 +439,7 @@ sub recordResponses {
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section   = $self->nextResponseSection();
+    
     my @questions = $self->nextQuestions();
 
     #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
@@ -461,7 +462,7 @@ sub recordResponses {
     }
 
     # Handle empty Section..
-    if ( !@questions ) {
+    if ( !@questions and !$section->{logical}) {
         # No questions to process, so increment lastResponse and return
         $self->lastResponse( $self->nextResponse );
         return [ $sTerminal, $terminalUrl ];
@@ -556,13 +557,18 @@ sub recordResponses {
 
     # If all required responses were given, proceed onwards!
     if ($allRequiredQsAnswered) {
-
         #  Move the lastResponse index to the last question answered
         $self->lastResponse( $self->lastResponse + @questions );
 
         # Do any requested branching.. 
         $self->processGoto($goto)                     if ( defined $goto );           ## no critic
         $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression ); ## no critic
+        
+        # Handle next logic Section..
+        my $section   = $self->nextResponseSection();
+        if($section and $section->{logical}){
+            return $self->recordResponses({});
+        }
     }
     else {
         # Required responses were missing, so we don't let the Survey terminate

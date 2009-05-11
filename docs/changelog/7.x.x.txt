@@ -1,3 +1,23 @@
+7.7.5
+ - Adding StoryManager.
+ - rfe: Button to Turn Admin Off on Admin Accordian  (#475)
+ - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
+ - fixed #10226: html2text dropping text
+ - fixed #10210: Generated Message-Id invalid (patch basis from tektek)
+ - fixed #10209: Changing existing user profile field type doesn't change underlying database column type
+ - fixed #10047: SQLReport Debug doesn't catch when bind variables are incorrect
+ - fixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
+ - fixed #10238: Edit Calendar Event not working when proxy cache disabled
+ - Fixed a bug in the RssFeed aspect that would cause the wrong HEAD links to be made for the feeds when exporting.
+ - Fixed a bug in the YUI simple editor for survey editing which was leaking memory.  Also improved the object edit templates.
+ - fixed #10184: Matrix 2.0 - Version Tag Duplicate Type
+ - fixed #10182: Matrix 2.0 - Comparison view broken in IE 6 & 7
+ - Added individual shipping requirements to the Sku.
+ - added #10145: Global Head Tags in Settings
+ - added packing to templates, snippets, and head tags. 
+ - added #9289: Extending the "Request Approval For Version Tag" activity by reversing the test (Bernd Kalbfuß-Zimmermann)
+ - added: Survey sections now have logical section type, which is never shown to the user, only used for silently checking gotos.
+
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
  - fixed: 7.6 upgrade left some default content marked as packages

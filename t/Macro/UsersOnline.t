@@ -192,6 +192,7 @@ sub setupUsers {
         my $newSession = WebGUI::Session->open(WebGUI::Test::root, WebGUI::Test::file);
         $newSession->user({user => $_});
     }
+    WebGUI::Test->usersToDelete(@users);
     return @users;
 }
 
@@ -251,5 +252,4 @@ EOTMPL
 
 END { ##Clean-up after yourself, always
 	$template->purge;
-    $_->delete foreach (@users);
 }

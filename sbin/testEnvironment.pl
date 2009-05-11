@@ -124,6 +124,9 @@ checkModule("Class::C3",                    "0.19"       );
 checkModule("Params::Validate",             "0.81"       );
 checkModule("GraphViz",                     "2.00"       );
 checkModule("Clone",                        "0.31"       );
+checkModule('HTML::Packer',                 "0.4"        );
+checkModule('JavaScript::Packer',           '0.02'       );
+checkModule('CSS::Packer',                  '0.2'        );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

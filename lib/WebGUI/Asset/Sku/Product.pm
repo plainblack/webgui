@@ -759,48 +759,6 @@ sub purgeRevision {
     return $self->SUPER::purgeRevision;
 }
 
-#-------------------------------------------------------------------
-
-=head2 reorderCollateral ( tableName,keyName [,setName,setValue] )
-
-Resequences collateral data. Typically useful after deleting a collateral item to remove the gap created by the deletion.
-
-=head3 tableName
-
-The name of the table to resequence.
-
-=head3 keyName
-
-The key column name used to determine which data needs sorting within the table.
-
-=head3 setName
-
-Defaults to "assetId". This is used to define which data set to reorder.
-
-=head3 setValue
-
-Used to define which data set to reorder. Defaults to the value of setName (default "assetId", see above) in the wobject properties.
-
-=cut
-
-sub reorderCollateral {
-    my $self = shift;
-    my $table = shift;
-    my $keyName = shift;
-    my $setName = shift || "assetId";
-    my $setValue = shift || $self->get($setName);
-    my $i = 1;
-    my $sth = $self->session->db->read("select $keyName from $table where $setName=? order by sequenceNumber", [$setValue]);
-    my $sth2 = $self->session->db->prepare("update $table set sequenceNumber=? where $setName=? and $keyName=?");
-    while (my ($id) = $sth->array) {
-        $sth2->execute([$i, $setValue, $id]);
-        $i++;
-    }
-    $sth2->finish;
-    $sth->finish;
-}
-
-
 #-----------------------------------------------------------------
 
 =head2 setAllCollateral ( tableName )

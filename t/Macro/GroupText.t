@@ -65,12 +65,14 @@ my $sth = $session->db->prepare('INSERT INTO myUserTable VALUES(?)');
 foreach my $mob (@mob) {
 	$sth->execute([ $mob->userId ]);
 }
+WebGUI::Test->usersToDelete(@mob);
 
 ##Create the 3 groups
 
 $ms_users = WebGUI::Group->new($session, "new");
 $ms_distributors = WebGUI::Group->new($session, "new");
 $ms_int_distributors = WebGUI::Group->new($session, "new");
+WebGUI::Test->groupsToDelete($ms_users, $ms_distributors, $ms_int_distributors);
 
 $ms_users->name('MS Users');
 $ms_distributors->name('MS Distributors');
@@ -92,6 +94,7 @@ $ms_distributors->addGroups([$ms_int_distributors->getId]);
 
 $disti = WebGUI::User->new($session, 'new');
 $int_disti = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($disti, $int_disti);
 
 $ms_distributors->addUsers([$disti->userId]);
 $ms_int_distributors->addUsers([$int_disti->userId]);
@@ -124,11 +127,5 @@ is($output, 'user,disti,int_disti', 'user is in all three groups');
 
 ##clean up everything
 END {
-	foreach my $testGroup ($ms_users, $ms_distributors, $ms_int_distributors, ) {
-		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
-	}
-	foreach my $dude (@mob, $disti, $int_disti, ) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 }

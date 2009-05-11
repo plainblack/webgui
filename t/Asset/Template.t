@@ -44,7 +44,7 @@ $var{variable} = "BBBBB";
 $output = $template->process(\%var);
 ok($output =~ m/\bBBBBB\b/, "process() - variables");
 ok($output =~ m/true/, "process() - conditionals");
-ok($output =~ m/\s(?:XY){5}\s/, "process() - loops");
+ok($output =~ m/\b(?:XY){5}\b/, "process() - loops");
 
 my $newList = WebGUI::Asset::Template->getList($session, 'WebGUI Test Template');
 ok(exists $newList->{$template->getId}, 'Uncommitted template exists returned from getList');

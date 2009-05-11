@@ -51,6 +51,7 @@ plan tests => $numTests;
 
 @testSets = setupTest($session, @testSets);
 my @users = map { $_->{user} } @testSets;
+WebGUI::Test->usersToDelete(@users);
 
 foreach my $testSet (@testSets) {
 	$session->user({ userId => $testSet->{user}->userId });
@@ -80,7 +81,4 @@ sub setupTest {
 }
 
 END { ##Clean-up after yourself, always
-	foreach my $dude (@users) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 }

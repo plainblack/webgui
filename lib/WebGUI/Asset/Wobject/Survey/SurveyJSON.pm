@@ -882,6 +882,7 @@ sub newSection {
         questionsPerPage       => 5,
         questionsOnSectionPage => 1,
         randomizeQuestions     => 0,
+        logical                => 0,
         everyPageTitle         => 1,
         everyPageText          => 1,
         terminal               => 0,
@@ -1221,6 +1222,9 @@ sub validateSurvey{
             if (my $count = $duplicateTargets->{$var}) {
                 push @messages, "Section $sNum variable name $var is re-used in $count other place(s).";
             }
+        }
+        if($section->{logical} and @{$self->questions([$s])} > 0){
+            push @messages, "Section $sNum is a logical section with questions.  Those questions will never be shown.";
         }
 
         #step through each question validating it. 

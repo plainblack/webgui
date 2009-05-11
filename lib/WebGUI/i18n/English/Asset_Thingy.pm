@@ -845,6 +845,12 @@ field.|,
         context => q|Description of a tmpl_var for the template help.|,
     },
 
+    'field_type' => {
+        message => q|The type (File, Text, etc) of this field|,
+        lastUpdated => 1240968588,
+        context => q|Description of a tmpl_var for the template help.|,
+    },
+
     'field_label' => {
         message => q|The label of this field|,
         lastUpdated => 1104630516,

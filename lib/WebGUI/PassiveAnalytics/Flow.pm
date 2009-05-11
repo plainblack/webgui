@@ -137,9 +137,13 @@ sub www_demoteRule {
 
 #-------------------------------------------------------------------
 
-=head2 www_editRuleflow ( session )
+=head2 www_editRuleflow ( $session, $error )
 
 Configure a set of analyses to run on the passive logs.  The analysis is destructive.
+
+=head3 $error
+
+Allows another method to pass an error into this method, to display to the user.
 
 =cut
 
@@ -219,10 +223,11 @@ Saves the results of www_editRuleflow()
 sub www_editRuleflowSave {
     my $session = shift;
     return $session->privilege->insufficient() unless canView($session);
-    return www_editRuleflow($session, 'Passive Analytics is already active.  Please do not try to subvert the UI in the future')
+    my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
+    return www_editRuleflow($session, $i18n->get('already active'))
         if analysisActive($session);
     my $workflow = WebGUI::Workflow->new($session, 'PassiveAnalytics000001');
-    return www_editRuleflow($session, "The Passive Analytics workflow has been deleted.  Please contact an Administrator immediately.") unless defined $workflow;
+    return www_editRuleflow($session, $i18n->get('workflow deleted')) unless defined $workflow;
     my $delta = $session->form->process('pauseInterval','integer');
     my $activities = $workflow->getActivities();
     ##Note, they're in order, and the order is known.
@@ -233,8 +238,8 @@ sub www_editRuleflowSave {
         priority   => 1,
     });
     if (!defined $instance) {
-        return www_editRuleflow($session, "A Passive Analytics analysis is currently running.") if $session->stow->get('singletonWorkflowClash');
-        return www_editRuleflow($session, "Error creating the workflow instance.");
+        return www_editRuleflow($session, $i18n->get('currently running')) if $session->stow->get('singletonWorkflowClash');
+        return www_editRuleflow($session, $i18n->get('error creating workflow'));
     }
     $instance->start('skipRealtime');
     $session->db->write('update passiveAnalyticsStatus set startDate=NOW(), userId=?, endDate=?, running=1', [$session->user->userId, '']);

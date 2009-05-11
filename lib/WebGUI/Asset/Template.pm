@@ -20,7 +20,7 @@ use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
 use Clone qw/clone/;
-
+use HTML::Packer;
 
 =head1 NAME
 
@@ -72,6 +72,7 @@ sub definition {
                 fieldType       => 'codearea',
                 syntax          => "html",
                 defaultValue    => undef,
+                filter          => 'packTemplate',
             },
             isEditable => {
                 noFormPost      => 1,
@@ -94,6 +95,14 @@ sub definition {
             namespace => {
                 fieldType       => 'combo',
                 defaultValue    => undef,
+            },
+            templatePacked => {
+                fieldType       => 'hidden',
+                defaultValue    => undef,
+            },
+            usePacked => {
+                fieldType       => 'yesNo',
+                defaultValue    => 1,
             },
         },
     };
@@ -133,6 +142,27 @@ sub duplicate {
 	my $newTemplate = $self->SUPER::duplicate;
     $newTemplate->update({isDefault => 0});
     return $newTemplate;
+}
+
+#-------------------------------------------------------------------
+
+=head2 packTemplate ( template )
+
+Pack the template into a minified version for faster downloads.
+
+=cut
+
+sub packTemplate {
+    my ( $self, $template ) = @_;
+    my $packed  = $template;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->update({ templatePacked => $packed });
+    return $template;
 }
 
 #-------------------------------------------------------------------
@@ -207,6 +237,12 @@ sub getEditForm {
         -syntax => "html",
 		-value=>$self->getValue("template")
 		);
+    $tabform->getTab('properties')->yesNo(
+        name        => "usePacked",
+        label       => $i18n->get('usePacked label'),
+        hoverHelp   => $i18n->get('usePacked description'),
+        value       => $self->getValue("usePacked"),
+    );
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';
@@ -350,7 +386,9 @@ sub prepare {
 
 =head2 process ( vars )
 
-Evaluate a template replacing template commands for HTML.
+Evaluate a template replacing template commands for HTML.  If the internal property templatePacked
+is set to true, the packed, minimized template will be used.  Otherwise, the original template
+will be used.
 
 =head3 vars
 
@@ -365,7 +403,12 @@ sub process {
 	my $self = shift;
 	my $vars = shift;
 	$self->prepare unless ($self->{_prepared});
-	return $self->getParser($self->session, $self->get("parser"))->process($self->get("template"), $vars);
+    my $parser      = $self->getParser($self->session, $self->get("parser"));
+    my $template    = $self->get('usePacked')
+                    ? $self->get('templatePacked')
+                    : $self->get('template')
+                    ;
+	return $parser->process($template, $vars);
 }
 
 

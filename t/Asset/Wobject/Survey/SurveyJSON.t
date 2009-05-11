@@ -2113,6 +2113,7 @@ sub getBareSkeletons {
            timeLimit              => 0,
            type                   => 'section',
            questions              => [],
+           logical                => 0,
         },
         {
            text                   => '',

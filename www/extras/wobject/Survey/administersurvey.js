@@ -5,8 +5,9 @@ if (typeof Survey === "undefined") {
 
 (function(){
 	
-	var CLASS_INVALID = 'survey-invalid'; // For elements that fail input validation
-	var CLASS_INVALID_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
+	var INVALID_QUESTION_CLASS = 'survey-invalid'; // CSS class for questions that fail input validation
+	var INVALID_SUBMIT_CLASS = 'survey-submit-invalid'; // CSS class for submit div when questions don't validate
+	var INVALID_QUESTION_MARKER = 'survey-invalid-marker'; // For default '*' invalid field marker
 	
     // All specially-handled question types are listed here
     // (anything else is assumed to be a multi-choice bundle)
@@ -50,6 +51,7 @@ if (typeof Survey === "undefined") {
     
     function formsubmit(event){
         var submit = 1;//boolean for if all was good or not
+        var lowestInvalidY = 0;
         for (var i in toValidate) {
             if (YAHOO.lang.hasOwnProperty(toValidate, i)) {
                 var answered = 0;
@@ -111,21 +113,35 @@ if (typeof Survey === "undefined") {
                 if (!answered) {
                     submit = 0;
 					
-					// Apply CLASS_INVALID to the parent question div for people who want to skin Survey
-                    YAHOO.util.Dom.addClass(q_parent_node, CLASS_INVALID);
+					// Apply INVALID_QUESTION_CLASS to the parent question div for people who want to skin Survey
+                    YAHOO.util.Dom.addClass(q_parent_node, INVALID_QUESTION_CLASS);
 					
 					// Insert default '*' marker (can be hidden via CSS for those who want something different)
-					node.innerHTML = "<span class='" + CLASS_INVALID_MARKER + "'>*</span>";
+					node.innerHTML = "<span class='" + INVALID_QUESTION_MARKER + "'>*</span>";
+                    
+                    // Keep track of the lowest y-coord invalid question (to scroll to)
+                    var qY = YAHOO.util.Dom.getY(q_parent_node);
+                    lowestInvalidY = lowestInvalidY && lowestInvalidY < qY ? lowestInvalidY : qY;
                 }
                 else {
-                    YAHOO.util.Dom.removeClass(q_parent_node, CLASS_INVALID);
+                    YAHOO.util.Dom.removeClass(q_parent_node, INVALID_QUESTION_CLASS);
 					node.innerHTML = '';
                 }
             }
         }
+        var submitButton = document.getElementById('submitbutton');
+        var submitDiv = submitButton && YAHOO.util.Dom.getAncestorByTagName(submitButton, 'div');
+        
         if (submit) {
+            submitDiv && YAHOO.util.Dom.removeClass(submitDiv, INVALID_SUBMIT_CLASS);
             YAHOO.log("Submitting");
             Survey.Comm.callServer('', 'submitQuestions', 'surveyForm', hasFile);
+        }
+        else {
+            submitDiv && YAHOO.util.Dom.addClass(submitDiv, INVALID_SUBMIT_CLASS);
+            
+            // Scroll page to the y-coord of the lowest invalid question
+            lowestInvalidY && scrollPage(lowestInvalidY, 1.5, YAHOO.util.Easing.easeOut);
         }
     }
     
@@ -133,6 +149,23 @@ if (typeof Survey === "undefined") {
         YAHOO.log("Going back");
         Survey.Comm.callServer('', 'goBack');
     }
+    
+    function scrollPage(to, dur, ease) {
+        var setAttr = function(a, v, u) {
+            window.scroll(0, v);
+        };
+    
+        var anim = new YAHOO.util.Anim(null,
+            { 'scroll' : {
+                from : YAHOO.util.Dom.getDocumentScrollTop(),
+                to : to }
+            },
+            dur, ease
+        );
+        anim.setAttribute = setAttr;
+        anim.animate();
+    }
+
     
     function numberHandler(event, objs){
         

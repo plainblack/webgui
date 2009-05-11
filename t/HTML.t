@@ -96,7 +96,28 @@ my @macroParamSets = (
 	},
 );
 
-my $numTests = scalar @filterSets + scalar @macroParamSets;
+my @htmlTextSets = (
+	{
+		inputText => q|I wish I could tell you that Andy fought the good fight.|,
+		output => q|I wish I could tell you that Andy fought the good fight.|,
+		comment => 'bare text',
+	},
+	{
+		inputText => q|The man likes to play chess; let's get him some rocks. |,
+		output => q|The man likes to play chess; let's get him some rocks.|,
+		comment => 'bare text with ending space has that space removed',
+	},
+	{
+		inputText => q|<p>Do you enjoy working in the laundry?</p>|,
+		output => qq|\nDo you enjoy working in the laundry?\n|,
+		comment => 'text in paragraph tag nested inside newlines',
+	},
+);
+
+my $numTests = scalar @filterSets
+             + scalar @macroParamSets
+             + scalar @htmlTextSets
+             ;
 
 plan tests => $numTests;
 
@@ -108,4 +129,9 @@ foreach my $testSet (@filterSets) {
 foreach my $testSet (@macroParamSets) {
 	WebGUI::HTML::makeParameterSafe(\$testSet->{inputText});
 	is($testSet->{inputText}, $testSet->{output}, $testSet->{comment});
+}
+
+foreach my $testSet (@htmlTextSets) {
+	my $text = WebGUI::HTML::html2text($testSet->{inputText});
+	is($text, $testSet->{output}, $testSet->{comment});
 }

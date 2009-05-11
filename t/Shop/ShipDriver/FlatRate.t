@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 14;
+my $tests = 19;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ plan tests => 1 + $tests;
 my $loaded = use_ok('WebGUI::Shop::ShipDriver::FlatRate');
 
 my $storage;
-my ($driver, $cart, $car);
+my ($driver, $cart, $car, $key);
 my $versionTag;
 
 SKIP: {
@@ -126,8 +126,6 @@ cmp_deeply(
 # create
 #
 #######################################################################
-
-$driver;
 
 my $options = {
                 label   => 'flat rate, ship weight, items in the cart',
@@ -319,6 +317,60 @@ $options = {
 $driver->update($options);
 is($driver->calculate($cart), 30_200, 'calculate by percentage of price');
 
+$cart->empty();
+$driver->update({
+    label   => 'flat fee for shipsSeparately test',
+    enabled => 1,
+    flatFee => 1,
+    percentageOfPrice => 0,
+    pricePerWeight    => 0,
+    pricePerItem      => 0,
+});
+
+$key = WebGUI::Asset->getImportNode($session)->addChild({
+    className          => 'WebGUI::Asset::Sku::Product',
+    title              => 'Key',
+    isShippingRequired => 1,
+    shipsSeparately    => 1,
+});
+
+my $metalKey = $key->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'metal key',
+        varSku    => 'metal-key',
+        price     => 1.00,
+        weight    => 1.00,
+        quantity  => 1e9,
+    }
+);
+
+my $bioKey = $key->setCollateral('variantsJSON', 'variantId', 'new',
+    {
+        shortdesc => 'biometric key',
+        varSku    => 'bio-key',
+        price     => 5.00,
+        weight    => 1.00,
+        quantity  => 1e9,
+    }
+);
+
+my $boughtCar = $car->addToCart($car->getCollateral('variantsJSON', 'variantId', $reallyNiceCar));
+my $firstKey  = $key->addToCart($key->getCollateral('variantsJSON', 'variantId', $metalKey));
+is($driver->calculate($cart), 2, 'shipsSeparately: returns two, one for ships separately, one for ships bundled');
+
+$boughtCar->adjustQuantity();
+is($driver->calculate($cart), 2, '... returns two, one for ships separately, one for ships bundled, even for two items');
+
+$firstKey->adjustQuantity();
+is($driver->calculate($cart), 3, '... returns three, two for ships separately, one for ships bundled, even for two items');
+
+$key->update({shipsSeparately => 0});
+is($driver->calculate($cart), 1, '... returns one, since all can be bundled together now');
+
+$car->update({shipsSeparately => 1});
+$key->update({shipsSeparately => 1});
+is($driver->calculate($cart), 4, '... returns four, since all must be shipped separately now');
+
 }
 
 #----------------------------------------------------------------------------
@@ -332,6 +384,9 @@ END {
     }
     if (defined $car && (ref($car) eq 'WebGUI::Asset::Sku::Product')) {
         $car->purge;
+    }
+    if (defined $key && (ref($key) eq 'WebGUI::Asset::Sku::Product')) {
+        $key->purge;
     }
     if (defined $versionTag) {
         $versionTag->rollback;

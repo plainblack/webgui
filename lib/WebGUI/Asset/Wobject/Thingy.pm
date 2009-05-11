@@ -1145,6 +1145,7 @@ sub getViewThingVars {
             my %fieldProperties = (
                 "id" => $field{fieldId},
                 "name" => "field_".$field{fieldId},
+                "type" => $field{fieldType},
                 "value" => $value,
                 "label" => $field{label},
                 "isHidden" => $hidden,
@@ -3306,7 +3307,7 @@ sequenceNumber');
     $var->{searchResult_loop} = \@searchResult_loop;    
     $p->appendTemplateVars($var);
 
-    $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl})
+    $var->{"form_start"} = WebGUI::Form::formHeader($self->session,{action=>$self->getUrl,method=>'GET'})
     .WebGUI::Form::hidden($self->session,{name=>"func",value=>"search"});
     $var->{"form_start"} .= WebGUI::Form::hidden($self->session,{name=>"thingId",value=>$thingId});
     $var->{"form_submit"} = WebGUI::Form::submit($self->session,{value=>$i18n->get("search button label")});

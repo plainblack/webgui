@@ -29,9 +29,9 @@ base methods.  These methods are customized in this class:
 Returns a shipping price. Calculates the shipping price using the following formula:
 
     total price of shippable items * percentageOfPrice
-    + flatFee
     + total weight of shippable items * pricePerWeight
     + total quantity of shippable items * pricePerItem
+    + flatFee * numberOfSeparatelyShippedItems
 
 =head3 $cart
 
@@ -45,17 +45,31 @@ sub calculate {
     my ($self, $cart) = @_;
 	my $cost = 0;
 	my $anyShippable = 0;
+    my $separatelyShipped = 0;
+    my $looseBundle = 0;
 	foreach my $item (@{$cart->getItems}) {
 		my $sku = $item->getSku;
 		if ($sku->isShippingRequired) {
-			$cost += ($item->get("quantity") * $sku->getPrice * $self->get("percentageOfPrice") / 100)  # cost by price
-				+ ($item->get("quantity") * $sku->getWeight * $self->get("pricePerWeight") / 100)	# cost by weight
-				+ ($item->get("quantity") * $self->get("pricePerItem"));								# cost by item
+            my $quantity = $item->get('quantity');
+			$cost += ($quantity * $sku->getPrice * $self->get("percentageOfPrice") / 100)  # cost by price
+				   + ($quantity * $sku->getWeight * $self->get("pricePerWeight") / 100)	# cost by weight
+				   + ($quantity * $self->get("pricePerItem"));								# cost by item
 			$anyShippable = 1;
+            ##Account for items which must be shipped separately, and with those that can be shipped
+            ##together.
+            ## Two items shipped separately    = two bundles
+            ## 1 shipped separately plus 1 not = two bundles
+            ## two items shipped together      = one bundle
+            if ($sku->shipsSeparately) {
+                $separatelyShipped += $quantity;
+            }
+            else {
+                $looseBundle = 1;
+            }
 		}
 	}
 	if ($anyShippable) {
-		$cost += $self->get('flatFee');
+		$cost += $self->get('flatFee') * ($separatelyShipped + $looseBundle);
 	}
     return $cost;
 }

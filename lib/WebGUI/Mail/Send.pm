@@ -294,11 +294,13 @@ sub create {
     my $id = $headers->{messageId} || "WebGUI-" . $session->id->generate;
     if ($id !~ m/\@/) {
         my $domain = $from;
-        $domain =~ s/.*\@//msx;
+        $domain =~ s/^.*\@//msx;
+        $domain =~ s/>$//msx;
         $id .= '@' . $domain;
     }
-    if ($id !~ m/[<>]/msx) {
-        $id = "<$id>";
+    if ($id !~ m/^<.+?>$/msx) {
+        $id =~ s/(^<)|(>$)//msxg;
+        $id = "<".$id.">";
     }
 	my $message = MIME::Entity->build(
 		Type=>$type,

@@ -113,7 +113,8 @@ sub definition {
                 defaultValue    => 'style="border-style:none;"',
             },
             annotations => {
-                fieldType       => 'textarea',
+                fieldType       => 'hidden',
+                noFormPost      => 1,
                 defaultValue    => '',
             },
         },

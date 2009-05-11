@@ -1329,11 +1329,15 @@ sub getTemplateVars {
     # Make some friendly URLs
     my $urlStartParam   = $dtStart->cloneToUserTimeZone->truncate(to => "day");
     $var{ "url"         } = $self->getUrl;
+    $var{ "urlEdit"     } = $self->getUrl("func=edit");
+    $var{ "urlPrint"    } = $self->getUrl("print=1");
+    $var{ "urlDelete"   } = $self->getUrl("func=delete");
     $var{ "urlDay"      } = $self->getParent->getUrl("type=day;start=".$urlStartParam);
     $var{ "urlWeek"     } = $self->getParent->getUrl("type=week;start=".$urlStartParam);
     $var{ "urlMonth"    } = $self->getParent->getUrl("type=month;start=".$urlStartParam);
-    $var{ "urlParent"   } = $self->getParent->getUrl;        
-    $var{ "urlSearch"   } = $self->getParent->getSearchUrl;        
+    $var{ "urlList"     } = $self->getParent->getUrl("type=list");
+    $var{ "urlParent"   } = $self->getParent->getUrl;
+    $var{ "urlSearch"   } = $self->getParent->getSearchUrl;
     
     # Related links
     $var{ relatedLinks } = $self->getRelatedLinks;    

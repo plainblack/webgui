@@ -298,6 +298,17 @@ Any scratch variables will be available in the template with this syntax:<br/>
         context     => q{Label for URL to make a duplicate and open the duplicate's edit screen},
     },
 
+    'usePacked label' => {
+        message     => q{Use Packed Template},
+        lastUpdated => 0,
+        context     => q{Label for asset property},
+    },
+
+    'usePacked description' => {
+        message     => q{Use the packed version of this template for faster downloads},
+        lastUpdated => 0,
+        context     => q{Description of asset property},
+    },
 };
 
 1;

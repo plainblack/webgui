@@ -766,9 +766,9 @@ sub www_compare {
     {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
     {type =>'text/javascript'});
+    $self->session->style->setScript($self->session->url->extras('yui/build/container/container-min.js'),
+    {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixCompareList.js'), {type =>
-    'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrix.js'), {type =>
     'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});

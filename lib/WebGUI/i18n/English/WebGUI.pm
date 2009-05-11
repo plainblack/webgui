@@ -4349,6 +4349,17 @@ Users may override this setting in their profile.
 		lastUpdated => 0,
 		context => q|name for the Ad Space control|
 	},
+    
+    'global head tags label' => {
+        message     => 'Global Head Tags',
+        lastUpdated => 0,
+        context     => "Label for setting",
+    },
+    'global head tags description' => { 
+        message     => '<head> tags for every page on the site (including admin pages)',
+        lastUpdated => 0,
+        context     => 'Description of setting',
+    },
 
 };
 

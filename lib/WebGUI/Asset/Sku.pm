@@ -56,7 +56,8 @@ These methods are available from this class:
 
 =head2 addToCart ( options ) 
 
-Adds this sku to the current session's cart.
+Adds this sku to the current session's cart.  Returns a copy of the Shop::Cart::Item
+object added to the cart.
 
 =head3 options
 
@@ -136,6 +137,13 @@ sub definition {
             noFormPost      => 1,
             fieldType       => 'hidden',
             defaultValue    => '{}',
+        },
+        shipsSeparately => {
+            tab             => 'shop',
+            fieldType       => 'yesNo',
+            defaultValue    => 0,
+            label           => $i18n->get('shipsSeparately'),
+            hoverHelp       => $i18n->get('shipsSeparately help'),
         },
 	);
 	push(@{$definition}, {
@@ -594,6 +602,15 @@ sub processStyle {
 }
 
 #-------------------------------------------------------------------
+
+=head2 setTaxConfiguration ($namespace, $configuration)
+
+=head3 $namespace
+
+=head3 $configuration
+
+=cut
+
 sub setTaxConfiguration {
     my $self            = shift;
     my $namespace       = shift;
@@ -614,6 +631,19 @@ sub setTaxConfiguration {
         taxConfiguration    => to_json( $configs ),
     } );
 }
+
+#-------------------------------------------------------------------
+
+=head2 shipsSeparately
+
+Returns a boolean indicating whether this item must be shipped separately from other items.
+
+=cut
+
+sub shipsSeparately {
+    return shift->get('shipsSeparately');
+}
+
 
 #-------------------------------------------------------------------
 

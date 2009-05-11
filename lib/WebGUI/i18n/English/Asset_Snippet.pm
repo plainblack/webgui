@@ -44,7 +44,17 @@ our $I18N = {
                 message => q|Allows you to specify the MIME type of this asset when viewed via the web; useful if you'd like to serve CSS, plain text,  javascript or other text files directly from the WebGUI asset system. Defaults to <b>text/html</b>.|,
                 lastUpdated => 1130880372,
         },
+    'usePacked label' => {
+        message     => q{Use Packed},
+        lastUpdated => 0,
+        context     => "Label for asset property",
+    },
 
+    'usePacked description' => {
+        message     => q{Use the packed version of this snippet for faster downloading.},
+        lastUpdated => 0,
+        context     => 'Description of asset property',
+    },
 };
 
 1;
