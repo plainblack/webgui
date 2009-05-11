@@ -805,6 +805,13 @@ sub copy {
         # Update $address with the index of the newly created question
         $address->[1] = $self->lastQuestionIndex($address);
     }
+    elsif ( $count == 3 ) {
+        # Clone the indexed answer onto the end of the list of answers..
+        push @{ $self->answers($address) }, clone $self->answer($address);
+        
+        # Update $address with the index of the newly created answer
+        $address->[2]++;
+    }
     # Return the (modified) $address 
     return $address;
 }
