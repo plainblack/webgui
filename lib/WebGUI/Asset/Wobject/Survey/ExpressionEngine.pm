@@ -44,7 +44,13 @@ Returns the recorded response value for the answer to question_variable
 
 sub value {
     my $key   = shift;
-    _validateVariable($key, 'value');
+    
+    # Verbatim values are valid variable + _verbatim
+    if (my ($verbatimKey) = $key =~ m/(.+)_verbatim/) {
+        _validateVariable($verbatimKey, 'value');
+    } else {
+        _validateVariable($key, 'value');
+    }
     my $value = $tags->{$key} || $values->{$key};
     if (ref $value eq 'ARRAY') {
         my $joined = join ', ', @$value;
