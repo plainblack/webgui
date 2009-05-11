@@ -835,11 +835,12 @@ sub responseValuesByVariableName {
         # Filter out questions without defined variable names
         next if !$question || !defined $question->{variable};
         
+        my $answer = $self->survey->answer([@address]);
+        
         my $value = $response->{value};
         if ($options{useText}) {
             # Test if question is a multiple choice type so we can use the answer text instead
             if($self->survey->getMultiChoiceBundle($question->{questionType})){
-                my $answer = $self->survey->answer([@address]);
                 my $answerText = $answer->{text};
                 
                 # For verbatim mc answers, combine answer text and recorded value
@@ -855,6 +856,17 @@ sub responseValuesByVariableName {
             push @{$lookup{$question->{variable}}}, $value;
         } else {
             $lookup{$question->{variable}} = $value;
+        }
+        
+        # For verbatims, also add verbatim value to lookup as variable + _verbatim
+        if ($answer->{verbatim}) {
+            my $verbatimKey = $question->{variable} . "_verbatim";
+            my $verbatimValue = $response->{verbatim};
+            if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
+                push @{$lookup{$verbatimKey}}, $verbatimValue;
+            } else {
+                $lookup{$verbatimKey} = $verbatimValue;
+            }
         }
     }
     return \%lookup;

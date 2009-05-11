@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 91;
+my $tests = 93;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -368,12 +368,14 @@ $rJSON->survey->question([3,2])->{variable} = 's3q2'; # surveyOrder index = 8
 $rJSON->survey->answer([0,0,0])->{recordedAnswer} = 3; # value recorded in responses hash for multi-choice answer
 $rJSON->survey->answer([0,0,0])->{value} = 100; # set answer score
 $rJSON->survey->answer([0,1,0])->{value} = 200; # set answer score
+$rJSON->survey->answer([0,1,0])->{verbatim} = 1; # make this answer verbatim
 
 # Reset responses and record first answer
 $rJSON->lastResponse(-1);
 $rJSON->recordResponses({
     '0-0-0' => 'I chose the first answer to s0q0',
     '0-1-0' => 'I chose the first answer to s0q1',
+    '0-1-0verbatim' => 'So you want to know more',
 });
 
 is($rJSON->nextResponse, 2, 'nextResponse at 2 (s0q1) after first response');
@@ -437,6 +439,10 @@ $rJSON->processExpression('jump { answered(s0q0) && !answered(ABCDEFG) } s1');
 is($rJSON->nextResponse, 3, '..and again when answered() used');
 
 $rJSON->nextResponse(2); # pretend we just finished s0q2
+$rJSON->processExpression('jump { value(s0q1_verbatim) eq "So you want to know more" } s1');
+is($rJSON->nextResponse, 3, '..and we can access verbatim values');
+
+$rJSON->nextResponse(2); # pretend we just finished s0q2
 cmp_deeply($rJSON->tags, {}, 'No tag data');
 $rJSON->processExpression('tag(a,100)');
 cmp_deeply($rJSON->tags, { a => 100 }, 'Tag data set');
@@ -445,16 +451,20 @@ $rJSON->processExpression('tag(b,50); jump {tagged(a) + tagged(b) == 150} s1');
 cmp_deeply($rJSON->tags, { a => 100, b => 50 }, 'Tag data cumulative');
 is($rJSON->nextResponse, 3, '..and is useful for jump expressions');
 
-# Check mult-answer questions
+# Check multi-answer questions
 $rJSON->survey->question([0,2])->{maxAnswers}     = 2; # Make it possible to select both "Yes" and "No" to this Yes/No mc question
 $rJSON->survey->answer([0,2,0])->{value} = 4; # set 'Yes' answer score
+$rJSON->survey->answer([0,2,0])->{verbatim} = 1;
 $rJSON->survey->answer([0,2,1])->{value} = 6; # set 'No' answer score
+$rJSON->survey->answer([0,2,1])->{verbatim} = 1;
 
 # Record the next question in section 0
 $rJSON->nextResponse(2); # pretend we just finished s0q2
 $rJSON->recordResponses({
     '0-2-0' => 'I chose both Yes',
+    '0-2-0verbatim' => 'YesYesYes',
     '0-2-1' => '..and No to this mc question',
+    '0-2-1verbatim' => 'NoNoNo',
 });
 
 is($rJSON->nextResponse, 3, 'nextResponse at 3 (s1q0) after first response');
@@ -469,6 +479,10 @@ is($rJSON->nextResponse, 5, '..and it can give us a list if thats what we want')
 $rJSON->nextResponse(2); # pretend we just finished s0q2
 $rJSON->processExpression(q{jump { score(s0q2) == 10 } s2});
 is($rJSON->nextResponse, 5, '..and score() knows how to sum multi-answer questions');
+
+$rJSON->nextResponse(2); # pretend we just finished s0q2
+$rJSON->processExpression(q{jump { (value(s0q2_verbatim))[0] eq 'YesYesYes' && (value(s0q2_verbatim))[1] eq 'NoNoNo' } s2});
+is($rJSON->nextResponse, 5, '..and we can get list of verbatims too');
 
 # Clean up after this set of tests
 $rJSON->responses({});
