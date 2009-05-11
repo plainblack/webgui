@@ -387,6 +387,240 @@ sub responseJSON {
     return $self->{_responseJSON};
 }
 
+=head2 getGraphFormats 
+
+Returns the list of supported Graph formats
+
+=cut
+
+sub getGraphFormats {
+    return qw(text ps gif jpeg png svg svgz plain);
+}
+
+=head2 getGraphLayouts
+
+Returns the list of supported Graph layouts
+
+=cut
+
+sub getGraphLayouts {
+    return qw(dot neato twopi circo fdp);
+}
+
+#-------------------------------------------------------------------
+
+=head2 graph ( )
+
+Generates a graph visualisation to survey.svg using GraphViz.
+
+=cut
+
+sub graph {
+    my $self = shift;
+    my %args = validate(@_, { format => 1, layout => 1 });
+    
+    my $session = $self->session;
+
+    eval 'use GraphViz';
+    if ($@) {
+        return;
+    }
+    
+    my $format = $args{format};
+    if (! grep {$_ eq $format} $self->getGraphFormats) {
+        $session->log->warn("Invalid format: $format");
+        return;
+    }
+    
+    my $layout = $args{layout};
+    if (! grep {$_ eq $layout} $self->getGraphLayouts) {
+        $session->log->warn("Invalid layout: $layout");
+        return;
+    }
+    
+    my $filename = "survey.$format";
+    my $storage = WebGUI::Storage->createTemp($session);
+    $storage->addFileFromScalar($filename);
+    my $path = $storage->getPath($filename);
+
+    my $FONTSIZE = 10;
+    my %COLOR = (
+        bg                   => 'white',
+        start                => 'CornflowerBlue',
+        start_fill           => 'Green',
+        section              => 'CornflowerBlue',
+        section_fill         => 'LightYellow',
+        question             => 'CornflowerBlue',
+        question_fill        => 'LightBlue',
+        start_edge           => 'Green',
+        fall_through_edge    => 'CornflowerBlue',
+        goto_edge            => 'DarkOrange',
+        goto_expression_edge => 'DarkViolet',
+    );
+
+    # Create the GraphViz object used to generate the image
+    # N.B. dot gives vertical layout, neato gives purdy circular
+    my $g = GraphViz->new( bgcolor => $COLOR{bg}, fontsize => $FONTSIZE, layout => $layout); # overlap => 'orthoyx'
+
+    $g->add_node(
+        'Start',
+        label     => 'Start',
+        fontsize  => $FONTSIZE,
+        shape     => 'ellipse',
+        style     => 'filled',
+        color     => $COLOR{start},
+        fillcolor => $COLOR{start_fill},
+    );
+
+    my $very_first = 1;
+
+    my $add_goto_edge = sub {
+        my ( $obj, $id, $taillabel ) = @_;
+        return unless $obj;
+
+        if ( my $goto = $obj->{goto} ) {
+            $g->add_edge(
+                $id => $goto,
+                taillabel => $taillabel || 'Jump To',
+                labelfontcolor => $COLOR{goto_edge},
+                labelfontsize  => $FONTSIZE,
+                color          => $COLOR{goto_edge},
+            );
+        }
+    };
+
+    my $add_goto_expression_edges = sub {
+        my ( $obj, $id, $taillabel ) = @_;
+        return unless $obj;
+        return unless $obj->{gotoExpression};
+
+        my $rj = 'WebGUI::Asset::Wobject::Survey::ResponseJSON';
+
+#        for my $gotoExpression ( split /\n/, $obj->{gotoExpression} ) {
+#            if ( my $processed = $rj->parseGotoExpression( $session, $gotoExpression ) ) {
+#                $g->add_edge(
+#                    $id            => $processed->{target},
+#                    taillabel      => $taillabel ? "$taillabel: $processed->{expression}" :  $processed->{expression},
+#                    labelfontcolor => $COLOR{goto_expression_edge},
+#                    labelfontsize  => $FONTSIZE,
+#                    color          => $COLOR{goto_expression_edge},
+#                );
+#            }
+#        }
+    };
+
+    my @fall_through;
+    my $sNum = 0;
+    foreach my $s ( @{ $self->surveyJSON->sections } ) {
+        $sNum++;
+
+        my $s_id = $s->{variable} || "S$sNum";
+        $g->add_node(
+            $s_id,
+            label     => "$s_id\n($s->{questionsPerPage} questions per page)",
+            fontsize  => $FONTSIZE,
+            shape     => 'ellipse',
+            style     => 'filled',
+            color     => $COLOR{section},
+            fillcolor => $COLOR{section_fill},
+        );
+
+        # See if this is the very first node
+        if ($very_first) {
+            $g->add_edge(
+                'Start'        => $s_id,
+                taillabel      => 'Begin Survey',
+                labelfontcolor => $COLOR{start_edge},
+                labelfontsize  => $FONTSIZE,
+                color          => $COLOR{start_edge},
+            );
+            $very_first = 0;
+        }
+
+        # See if there are any fall_throughs waiting
+        # if so, "next" == this section
+        while ( my $f = pop @fall_through ) {
+            $g->add_edge(
+                $f->{from}     => $s_id,
+                taillabel      => $f->{taillabel},
+                labelfontcolor => $COLOR{fall_through_edge},
+                labelfontsize  => $FONTSIZE,
+                color          => $COLOR{fall_through_edge},
+            );
+        }
+
+        # Add section-level goto and gotoExpression edges
+        $add_goto_edge->( $s, $s_id );
+        $add_goto_expression_edges->( $s, $s_id );
+
+        my $qNum = 0;
+        foreach my $q ( @{ $s->{questions} } ) {
+            $qNum++;
+
+            my $q_id = $q->{variable} || "S$sNum-Q$qNum";
+
+            # Link Section to first Question
+            if ( $qNum == 1 ) {
+                $g->add_edge( $s_id => $q_id, style => 'dotted' );
+            }
+
+            # Add Question node
+            $g->add_node(
+                $q_id,
+                label     => $q->{required} ? "$q_id *" : $q_id,
+                fontsize  => $FONTSIZE,
+                shape     => 'ellipse',
+                style     => 'filled',
+                color     => $COLOR{question},
+                fillcolor => $COLOR{question_fill},
+            );
+
+            # See if there are any fall_throughs waiting
+            # if so, "next" == this question
+            while ( my $f = pop @fall_through ) {
+                $g->add_edge(
+                    $f->{from}     => $q_id,
+                    taillabel      => $f->{taillabel},
+                    labelfontcolor => $COLOR{fall_through_edge},
+                    labelfontsize  => $FONTSIZE,
+                    color          => $COLOR{fall_through_edge},
+                );
+            }
+
+            # Add question-level goto and gotoExpression edges
+            $add_goto_edge->( $q, $q_id );
+            $add_goto_expression_edges->( $q, $q_id );
+
+            my $aNum = 0;
+            foreach my $a ( @{ $q->{answers} } ) {
+                $aNum++;
+
+                my $a_id = $a->{text} || "S$sNum-Q$qNum-A$aNum";
+
+                $add_goto_expression_edges->( $a, $q_id, $a_id );
+                if ( $a->{goto} ) {
+                    $add_goto_edge->( $a, $q_id, $a_id );
+                }
+                else {
+
+                    # Link this question to next question with Answer as taillabel
+                    push @fall_through,
+                        {
+                        from      => $q_id,
+                        taillabel => $a_id,
+                        };
+                }
+            }
+        }
+    }
+
+    # Render the image to a file
+    my $method = "as_$format";
+    $g->$method($path);
+    
+    return $storage->getUrl($filename);
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_editSurvey ( )
@@ -402,6 +636,73 @@ sub www_editSurvey {
         if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
     return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_graph ( )
+
+Visualize the Survey in the requested format and layout
+
+=cut
+
+sub www_graph {
+    my $self = shift;
+    
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+
+    my $i18n = WebGUI::International->new($session, "Asset_Survey");
+    
+    use WebGUI::AdminConsole;
+    my $ac = WebGUI::AdminConsole->new($self->session, $i18n->get('survey visualization'));
+    $ac->setIcon($session->url->extras('assets/survey.gif'));
+    my $edit = WebGUI::International->new($session, "WebGUI")->get(575);
+    $ac->addSubmenuItem($self->session->url->page("func=edit"), $edit);
+    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), "$edit Survey");
+    
+    eval 'use GraphViz';
+    if ($@) {
+        return $ac->render('Survey Visualization requires the GraphViz module', $i18n->get('survey visualization'));
+    }
+    
+    my $format = $self->session->form->param('format');
+    my $layout = $self->session->form->param('layout');
+    
+    my $f = WebGUI::HTMLForm->new($session);
+    $f->hidden(
+        name=>'func',
+        value=>'graph'
+    );
+    $f->selectBox(
+        name      => 'format',
+        label     => $i18n->get('visualization format'),
+        hoverHelp => $i18n->get('visualization format help'),
+        options =>  { map { $_ => $_ } $self->getGraphFormats },
+        defaultValue => [$format],
+        sortByValue => 1,
+    );
+    $f->selectBox(
+        name      => 'layout',
+        label     => $i18n->get('visualization layout algorithm'),
+        hoverHelp => $i18n->get('visualization layout algorithm help'),
+        options =>  { map { $_ => $_ } $self->getGraphLayouts },
+        defaultValue => [$layout],
+        sortByValue => 1,
+    );
+    $f->submit(
+        defaultValue => $i18n->get('generate'),
+    );
+    
+    my $output;
+    if ($format && $layout) {
+        if (my $url = $self->graph( { format => $format, layout => $layout } )) {
+            $output .= "<p>" . $i18n->get('visualization success') . qq{ <a href="$url">survey.$format</a></p>};
+        }
+    }
+    return $ac->render($f->print . $output, $i18n->get('survey visualization'));
 }
 
 #-------------------------------------------------------------------

@@ -20,6 +20,7 @@
    tax plugin specific data that needs to be stored together with
    transactions. (Martin Kamerbeek / Oqapi )
  - Added better Survey Expression Engine validation warnings
+ - added #9203: Survey Visualization
 
 7.7.5
  - Adding StoryManager.

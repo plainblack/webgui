@@ -15,6 +15,38 @@ our $I18N = {
 		message => q|Take Survey|,
 		lastUpdated => 1224686319
 	},
+	'visualize' => {
+		message => q|Visualize|,
+		lastUpdated => 0
+	},
+	'generate' => {
+		message => q|Generate|,
+		lastUpdated => 0
+	},
+	'survey visualization' => {
+		message => q|Survey Visualization|,
+		lastUpdated => 0
+	},
+	'visualization success' => {
+		message => q|Visualization successfully generated to|,
+		lastUpdated => 0
+	},
+	'visualization format' => {
+		message => q|Visualisation Format|,
+		lastUpdated => 0
+	},
+	'visualization format help' => {
+		message => q|Choose the type of visualization file you want to generate|,
+		lastUpdated => 0
+	},
+	'visualization layout algorithm' => {
+		message => q|Visualisation Layout Algorithm|,
+		lastUpdated => 0
+	},
+	'visualization layout algorithm help' => {
+		message => q|Choose the GraphViz layout algorithm you want to use|,
+		lastUpdated => 0
+	},
 	'view simple results' => {
 		message => q|View Simple Results|,
 		lastUpdated => 1224686319
