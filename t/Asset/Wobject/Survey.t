@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 20;
+my $tests = 24;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -89,6 +89,46 @@ delete $s->{canTake};
 delete $s->{responseId};
 ok($s->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
 ok($s->responseId, '..(and similarly for responseId)');
+
+# Restart the survey
+$s->submitQuestions({
+    '0-0-0'        => 'My chosen answer',
+    '0-1-0'        => 'My chosen answer',
+});
+
+cmp_deeply(
+    $s->responseJSON->responses,
+    superhashof(
+        {   '0-1-0' => {
+                'verbatim' => undef,
+                'comment'  => undef,
+                'time'     => num( time, 5 ),
+                'value'    => ''
+            },
+            '0-0-0' => {
+                'verbatim' => undef,
+                'comment'  => undef,
+                'time'     => num( time, 5 ),
+                'value'    => ''
+            },
+        }
+    ),
+    'submitQuestions does the right thing'
+);
+
+# Test out Restart
+$s->surveyEnd( { restart => 1 } );
+cmp_deeply($s->responseJSON->responses, {}, 'restart removes the in-progress response');
+
+# Test out exitUrl with an explicit
+use JSON;
+my $surveyEnd = $s->surveyEnd( { exitUrl => 'home' } );
+cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/home' }, 'exitUrl works (it adds a slash for us)');
+
+# Test out exitUrl using survye instance exitURL property
+$s->update({ exitURL => 'getting_started'});
+$surveyEnd = $s->surveyEnd( { exitUrl => undef } );
+cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started' }, 'exitUrl works (it adds a slash for us)');
 
 # www_jumpTo
 {

@@ -309,6 +309,35 @@ sub jump(&$) {
     }
 }
 
+=head2 exitUrl ( [$url] )
+
+Same as L<jump> except that instead of a jump, triggers survey exit
+
+=head3 url (optional)
+
+Url to exit to. If not given, the Survey instance's exitUrl property will be used.
+
+=cut
+
+sub exitUrl {
+    my ( $url ) = @_;
+
+    $session->log->debug("exitUrl($url)");
+    die( { exitUrl => $url } );
+}
+
+
+=head2 restart ( $sub )
+
+Same as L<jump> except that instead of a jump, triggers the Survey to restart
+
+=cut
+
+sub restart {
+    $session->log->debug("restart()");
+    die( { restart => 1 } );
+}
+
 =head2 avg
 
 Utility sub shared with Safe compartment to allows expressions to easily compute the average of a list
@@ -419,6 +448,8 @@ sub run {
         $compartment->share('&tagged');
         $compartment->share('&taggedX');
         $compartment->share('&jump');
+        $compartment->share('&exitUrl');
+        $compartment->share('&restart');
         $compartment->share('&avg');
 
         # Give them all of List::Util too
@@ -440,10 +471,16 @@ sub run {
         }
 
         # A successful jump triggers a hashref containing the jump target to be thrown
-        if ( ref $@ && ref $@ eq 'HASH' && $@->{jump} ) {
-            my $jump = $@->{jump};
-            $session->log->debug("Returning [$jump]");
-            return { jump => $jump, tags => $tags };
+        if ( ref $@ && ref $@ eq 'HASH') {
+            if (my $target = $@->{jump}) {
+                return { jump => $target, tags => $tags };
+            }
+            if (exists $@->{exitUrl}) { # url might be undefined
+                return { exitUrl => $@->{exitUrl}, tags => $tags };
+            }
+            if (my $restart = $@->{restart}) {
+                return { restart => $restart, tags => $tags };
+            }
         }
 
         # See if an unresolved external reference was encountered

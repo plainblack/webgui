@@ -1415,51 +1415,38 @@ sub www_submitQuestions {
 
     my $responses = $self->session->form->paramsHashRef();
     delete $responses->{func};
+    
+    return $self->submitQuestions($responses);
+}
 
-    my @goodResponses = keys %{$responses};    #load everything.
+#-------------------------------------------------------------------
 
-    my $termInfo = $self->recordResponses( $responses );
+=head2 submitQuestions
 
-    if ( $termInfo->[0] ) {
+Handles questions submitted by the survey taker, adding them to their response.
+
+=cut
+
+sub submitQuestions {
+    my $self = shift;
+    my $responses = shift;
+    
+    my $result = $self->recordResponses( $responses );
+    
+    # check for special actions
+    if ( my $url = $result->{terminal} ) {
         $self->session->log->debug('Terminal, surveyEnd');
-        return $self->surveyEnd( $termInfo->[1] );
+        return $self->surveyEnd( { exitUrl => $url } );
+    } elsif ( exists $result->{exitUrl} ) {
+        $self->session->log->debug('exitUrl triggered, surveyEnd');
+        return $self->surveyEnd( { exitUrl => $result->{exitUrl} });
+    } elsif ( my $restart = $result->{restart} ) {
+        $self->session->log->debug('restart triggered');
+        return $self->surveyEnd( { restart => $restart } );
     }
 
     return $self->www_loadQuestions();
-
-#    my $files = 0;
-#
-#        for my $id(@$orderOf){
-#    if a file upload, write to disk
-#            my $path;
-#            if($id->{'questionType'} eq 'File Upload'){
-#                $files = 1;
-#                my $storage = WebGUI::Storage->create($self->session);
-#                my $filename = $storage->addFileFromFormPost( $id->{'Survey_answerId'} );
-#                $path = $storage->getPath($filename);
-#            }
-#    $self->session->errorHandler->error("Inserting a response ".$id->{'Survey_answerId'}." $responseId, $path, ".$$responses{$id->{'Survey_answerId'}});
-#            $self->session->db->write("insert into Survey_questionResponse
-#                select ?, Survey_sectionId, Survey_questionId, Survey_answerId, ?, ?, ?, now(), ?, ? from Survey_answer where Survey_answerId = ?",
-#                [$self->getId(), $responseId, $$responses{ $id->{'Survey_answerId'} }, '', $path, ++$lastOrder, $id->{'Survey_answerId'}]);
-#        }
-#    if ($files) {
-#        ##special case, need to check for more questions in section, if not, more current up one
-#        my $lastA      = $self->getLastAnswerInfo($responseId);
-#        my $questionId = $self->getNextQuestionId( $lastA->{'Survey_questionId'} );
-#        if ( !$questionId ) {
-#            my $currentSection = $self->getCurrentSection($responseId);
-#            $currentSection = $self->getNextSection($currentSection);
-#            if ($currentSection) {
-#                $self->setCurrentSection( $responseId, $currentSection );
-#            }
-#        }
-#        return;
-#    }
-#    return $self->www_loadQuestions($responseId);
-
 }
-
 
 #-------------------------------------------------------------------
 
@@ -1536,7 +1523,7 @@ sub www_loadQuestions {
     }
     if ( $self->responseJSON->hasTimedOut( $self->get('timeLimit') ) ) {
         $self->session->log->debug('Response hasTimedOut, surveyEnd');
-        return $self->surveyEnd( undef, 2 );
+        return $self->surveyEnd( { timeout => 1 } );
     }
 
     if ( $self->responseJSON->surveyEnd() ) {
@@ -1568,37 +1555,51 @@ sub www_loadQuestions {
 
 #-------------------------------------------------------------------
 
-=head2 surveyEnd ( [ $url ], [ $completeCode ]  )
+=head2 surveyEnd ( [ $options ]  )
 
-Marks the survey completed with either 1 or the $completeCode and then sends the url to the site home or if defined, $url.
+Marks the survey response as completed and carries out special actions such as restarting or exiting to an exitUrl
 
-=head3 $url
+=head3 $options
 
-An optional url to send the user to upon survey completion.
+The following options are supported
 
-=head3 $completeCode
+=over3
 
-An optional code (defaults to 1) to say how the user completed the survey.
+=item timeout
 
-1 is normal completion.
-2 is timed out.
+Indicates that the survey has timed out. The doAfterTimeLimit setting controls whether the 
+survey restarts or exits to the exitUrl.
+
+=item restart
+
+The survey should be restarted
+
+=item exitUrl
+
+Exit to the supplied url, or if no url is provided exit to the survey's exitUrl.
 
 =cut
 
 sub surveyEnd {
-    my $self         = shift;
-    my $url          = shift;
-    my $completeCode = shift;
-
-    $completeCode = defined $completeCode ? $completeCode : 1;
-
+    my $self   = shift;
+    my %opts = validate(@_, { timeout => 0, restart => 0, exitUrl => 0 });
+    
+    # See if we should restart the Survey instead of completing it
+    if ( $opts{restart} || ( $opts{timeout} && $self->get('doAfterTimeLimit') eq 'restartSurvey' )  ){
+        $self->responseJSON->resetResponse();
+        $self->persistResponseJSON;
+        delete $self->{responseId};
+        return $self->www_loadQuestions('1');
+    }
+    
+    # If an in-progress response exists, mark it as complete
     if ( my $responseId = $self->responseId ) {
         $self->session->db->setRow(
             'Survey_response',
             'Survey_responseId', {
                 Survey_responseId => $responseId,
-                endDate           => scalar time,         #WebGUI::DateTime->now->toDatabase,
-                isComplete        => $completeCode
+                endDate           => scalar time,
+                isComplete        => 1,
             }
         );
         
@@ -1614,26 +1615,16 @@ sub surveyEnd {
                 }
             )->start;
         }
-    } 
-    if ($self->get('doAfterTimeLimit') eq 'restartSurvey' && $completeCode == 2){
-        $self->responseJSON->startTime(scalar time);
-        undef $self->{_responseJSON};
-        undef $self->{responseId};
-        return $self->www_loadQuestions('1');
-    } else {
-        if ( $url !~ /\w/ ) { $url = 0; }
-        if ( $url eq 'undefined' ) { $url = 0; }
-        if ( !$url ) {
-            $url = $self->get('exitURL');
-            if ( !$url ) {
-                $url = q{/};
-            }
-        }
     }
-    $url = $self->session->url->gateway($url) if($url !~ /^http:/i);
-    #$self->session->http->setRedirect($url);
-    #$self->session->http->setMimeType('application/json');
-    my $json = to_json( { type => 'forward', url => $url } );
+
+    
+    # If we get this far, it's time to forward users to an exitUrl
+    my $exitUrl = $opts{exitUrl};
+    undef $exitUrl if $exitUrl !~ /\w/;
+    undef $exitUrl if $exitUrl eq 'undefined';
+    $exitUrl = $exitUrl || $self->get('exitURL') || q{/};
+    $exitUrl = $self->session->url->gateway($exitUrl) if($exitUrl !~ /^https?:/i);
+    my $json = to_json( { type => 'forward', url => $exitUrl } );
     $self->session->http->setMimeType('application/json');
     return $json;
 }

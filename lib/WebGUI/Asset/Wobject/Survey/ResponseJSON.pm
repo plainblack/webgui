@@ -79,24 +79,14 @@ sub new {
         # First define core members..
         _survey => $survey,
         _session => $survey->session,
-
-        # Store all properties that are (de)serialized to/from JSON in a private variable
-        _response => {
-
-            # Response hash defaults..
-            responses => {},
-            lastResponse => -1,
-            questionsAnswered => 0,
-            startTime => time(),
-            surveyOrder => undef,
-            tags => {},
-
-            # And then allow jsonData to override defaults and/or add other members
-            %{$jsonData},
-        },
     };
     
-    return bless $self, $class;
+    bless $self, $class;
+    
+    # Initialise response data
+    $self->resetResponse($jsonData);
+    
+    return $self;
 }
 
 #----------------------------------------------------------------------------
@@ -508,7 +498,7 @@ sub recordResponses {
     if ( !@questions and !$section->{logical}) {
         # No questions to process, so increment lastResponse and return
         $self->lastResponse( $self->nextResponse );
-        return [ $sTerminal, $terminalUrl ];
+        return $sTerminal ? { terminal => $terminalUrl} : {};
     }
 
     # Process Questions in Section..
@@ -612,13 +602,22 @@ sub recordResponses {
 
         # Process jumps and jump expressions in precedence order of:
         # answer goto, answer expression, question goto, question expression, section..
-        $self->processGoto($answerGoto)               if defined $answerGoto;            ## no critic
-        $self->processExpression($answerExpression)   if defined $answerExpression;      ## no critic
-        $self->processGoto($questionGoto)             if defined $questionGoto;          ## no critic
-        $self->processExpression($questionExpression) if defined $questionExpression;    ## no critic
-        $self->processGoto($sectionGoto)              if defined $sectionGoto;           ## no critic
-        $self->processExpression($sectionExpression)  if defined $sectionExpression;     ## no critic
-
+        
+        # The joined logical OR here carries out the short-circuting for us
+        # e.g. processGoto returns 1 on its first match
+        # and processExpression returns hashref on its first match
+        my $action = $self->processGoto($answerGoto) ||
+                         $self->processExpression($answerExpression) ||
+                         $self->processGoto($questionGoto) ||
+                         $self->processExpression($questionExpression) ||
+                         $self->processGoto($sectionGoto) ||
+                         $self->processExpression($sectionExpression);
+        
+        # Special actions (such as exitUrl and restart) happen straight away
+        if ($action && ref $action eq 'HASH') {
+            return $action;
+        }
+        
         # Handle next logic Section..
         my $section = $self->nextResponseSection();
         if ( $section and $section->{logical} ) {
@@ -634,7 +633,10 @@ sub recordResponses {
         $terminal = 1;
     }
 
-    return [ $terminal, $terminalUrl ];
+    if ($terminal) {
+        return { terminal => $terminalUrl };
+    }
+    return {};
 }
 
 #-------------------------------------------------------------------
@@ -653,7 +655,9 @@ A variable name to match against all section and question variable names.
 
 sub processGoto {
     my $self = shift;
-    my ($goto) = validate_pos(@_, {type => SCALAR});
+    my ($goto) = validate_pos(@_, {type => SCALAR|UNDEF});
+    
+    return if !$goto;
     
     if ($goto eq 'NEXT_SECTION') {
         $self->session->log->debug("NEXT_SECTION jump target encountered");
@@ -663,13 +667,13 @@ sub processGoto {
         while ($self->nextResponseSectionIndex == $lastResponseSectionIndex) {
             $self->lastResponse( $self->lastResponse + 1);
         }
-        return;
+        return 1;
     }
     
     if ($goto eq 'END_SURVEY') {
         $self->session->log->debug("END_SURVEY jump target encountered");
         $self->lastResponse( scalar( @{ $self->surveyOrder} ) - 1 );
-        return;
+        return 1;
     }
 
     # Iterate over items in order..
@@ -685,7 +689,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item 
             $self->lastResponse( $itemIndex - 1 );
-            last;
+            return 1;
         }
 
         # See if our goto variable matches the question variable..
@@ -693,7 +697,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item
             $self->lastResponse( $itemIndex - 1 );
-            last;
+            return 1;
         }
 
         # Increment the item index counter
@@ -720,7 +724,9 @@ The expression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for mor
     
 sub processExpression {
     my $self = shift;
-    my ($expression) = validate_pos(@_, {type => SCALAR});
+    my ($expression) = validate_pos(@_, {type => SCALAR|UNDEF});
+    
+    return if !$expression;
     
     # Prepare the ingredients..
     my $values = $self->responseValuesByVariableName;
@@ -738,11 +744,19 @@ sub processExpression {
         
         if (my $jump = $result->{jump}) {
             $self->session->log->debug("Jumping to [$jump]");
-            $self->processGoto($jump);
+            return $self->processGoto($jump);
+        } elsif (exists $result->{exitUrl}) { # may be undefined
+            my $exitUrl = $result->{exitUrl};
+            $self->session->log->debug("exitUrl triggered [$exitUrl]");
+            return { exitUrl => $exitUrl };
+        } elsif (my $restart = $result->{restart}) {
+            $self->session->log->debug("restart triggered");
+            return { restart => $restart };
         } else {
             $self->session->log->debug("No hits, falling through");
+            return;
         }
-    }    
+    }
     return;
 }
 
@@ -1345,6 +1359,37 @@ sub returnResponseForReporting {
                 };
     }
     return \@report;
+}
+
+#-------------------------------------------------------------------
+
+=head2 resetResponse ( [$data] )
+
+Resets all response data (e.g. for when you want to restart a survey)
+
+=head3 data (optional)
+
+Extra data to apply over the defaults
+
+=cut
+
+sub resetResponse {    
+    my $self = shift;
+    my $data = shift || {};
+    
+    $self->{_response} = {
+        
+        # Response hash defaults..
+        responses => {},
+        lastResponse => -1,
+        questionsAnswered => 0,
+        startTime => time(),
+        surveyOrder => undef,
+        tags => {},
+        
+        # And then allow overrides
+        %{$data},
+    };
 }
 
 #-------------------------------------------------------------------

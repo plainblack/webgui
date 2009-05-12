@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 93;
+my $tests = 96;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -484,6 +484,11 @@ $rJSON->nextResponse(2); # pretend we just finished s0q2
 $rJSON->processExpression(q{jump { (value(s0q2_verbatim))[0] eq 'YesYesYes' && (value(s0q2_verbatim))[1] eq 'NoNoNo' } s2});
 is($rJSON->nextResponse, 5, '..and we can get list of verbatims too');
 
+$rJSON->nextResponse(2); # pretend we just finished s0q2
+cmp_deeply($rJSON->processExpression(q{restart()}), { restart => 1 }, 'restart works');
+cmp_deeply($rJSON->processExpression(q{exitUrl(blah)}), { exitUrl => 'blah' }, 'explicit exitUrl works');
+cmp_deeply($rJSON->processExpression(q{exitUrl()}), { exitUrl => undef }, 'unspecified exitUrl works too');
+
 # Clean up after this set of tests
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
@@ -499,8 +504,8 @@ $rJSON->lastResponse(4);
 my $terminals;
 cmp_deeply(
     $rJSON->recordResponses({}),
-    [ 0, undef ],
-    'recordResponses, if section has no questions, returns terminal info in the section.  With no terminal info, returns [0, undef]',
+    {},
+    'recordResponses, if section has no questions, returns terminal info in the section.  With no terminal info, returns {}',
 );
 is($rJSON->lastResponse(), 5, 'recordResponses, increments lastResponse if there are no questions in the section');
 
@@ -510,7 +515,7 @@ $rJSON->survey->section([2])->{terminalUrl} = '/terminal';
 $rJSON->lastResponse(4);
 cmp_deeply(
     $rJSON->recordResponses({}),
-    [ 1, '/terminal' ],
+    { terminal => '/terminal' },
     'recordResponses, if section has no questions, returns terminal info in the section.',
 );
 is($rJSON->questionsAnswered, 0, 'questionsAnswered=0, no questions answered');
@@ -527,7 +532,7 @@ cmp_deeply(
         '1-0-0verbatim' => 'First answer verbatim', # ignored
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
     }),
-    [ 1, 'question 1-0 terminal' ],
+    { terminal => 'question 1-0 terminal' },
     'recordResponses: question terminal overrides section terminal',
 );
 
@@ -627,7 +632,7 @@ cmp_deeply(
         '1-0-0'        => "\t\t\t\n\n\n\t\t\t", #SOS in whitespace
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
     }),
-    [ 1, 'answer 1-0-0 terminal' ],
+    { terminal => 'answer 1-0-0 terminal'},
     'recordResponses: answer terminal overrides question and section terminals',
 );
 

@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 52;
+my $tests = 55;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -162,6 +162,25 @@ SKIP: {
         $e->run( $session, q{ tag(a,xyz); jump{ tagged(a) eq 'xyz' } target }, { values => {a => 'def'}, tags => { a => 'abc' } } ),
         { jump => 'target', tags => { a => 'xyz' } },
         '..overwritten tag data can be used too'
+    );
+    
+    # Try the exitUrl sub
+    cmp_deeply(
+        $e->run( $session, q{ exitUrl(blah)} ),
+        { exitUrl => 'blah', tags => { } },
+        'explicit exitUrl works'
+    );
+    cmp_deeply(
+        $e->run( $session, q{ exitUrl()} ),
+        { exitUrl => undef, tags => { } },
+        '..as does unspecified exitUrl'
+    );
+    
+    # Try the restart sub
+    cmp_deeply(
+        $e->run( $session, q{ restart} ),
+        { restart => 1, tags => { } },
+        'restart works'
     );
 
     # Create a test user
