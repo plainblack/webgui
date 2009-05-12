@@ -365,7 +365,7 @@ if (typeof Survey === "undefined") {
         var date = selected[0];
         var year = date[0], month = date[1], day = date[2];
         var input = document.getElementById(id);
-        input.value = month + "/" + day + "/" + year;
+        input.value = year + "/" + month + "/" + day; // until we can i18n this, use ISO
         obj[0].hide();
     }
     
@@ -675,7 +675,8 @@ if (typeof Survey === "undefined") {
                         var calid = ans.id + 'container';
                         var c = new YAHOO.widget.Calendar(calid, {
                             title: 'Choose a date:',
-                            close: true
+                            close: true,
+                            navigator: true
                         });
                         c.selectEvent.subscribe(selectCalendar, [c, ans.id], true);
                         c.render();

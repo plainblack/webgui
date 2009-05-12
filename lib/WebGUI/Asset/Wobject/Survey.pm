@@ -1732,31 +1732,6 @@ sub prepareShowSurveyTemplate {
     return to_json( { type => 'displayquestions', section => $section, questions => $questions, html => $out } );
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 loadBothJSON($rId)
-#
-#Loads both the Survey and the appropriate response objects from JSON.
-#
-#=head3 $rId
-#
-#The reponse id to load.
-#
-#=cut
-#
-#sub loadBothJSON {
-#    my $self = shift;
-#    my $rId  = shift;
-##    if ( defined $self->surveyJSON and defined $self->responseJSON ) { return; }
-#    my $ref = $self->session->db->buildArrayRefOfHashRefs( "
-#        select s.surveyJSON,r.responseJSON 
-#        from Survey s, Survey_response r 
-#        where s.assetId = ? and r.Survey_responseId = ?",
-#        [ $self->getId, $rId ] );
-#    $self->surveyJSON( $ref->[0]->{surveyJSON} );
-#    $self->responseJSON( $ref->[0]->{responseJSON}, $rId );
-#}
-
 #-------------------------------------------------------------------
 
 =head2 persistSurveyJSON ( )
