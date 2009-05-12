@@ -458,6 +458,54 @@ sub getCompareForm {
 
 #-------------------------------------------------------------------
 
+=head2 getListings  (  )
+
+Returns the listings as an arrayRef of hashRefs.
+
+=head3 sort 
+
+The criterium by which the listings should be sorted.
+
+=cut
+
+sub getListings {
+
+    my $self            = shift;
+    my $session         = $self->session;
+    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+
+    my $sortDirection   = ' desc';
+    if ($sort eq 'title'){
+        $sortDirection = ' asc';
+    }
+
+    my $sql = "
+        select
+            assetData.title,
+            assetData.url,
+            listing.assetId,
+            listing.views,
+            listing.compares,
+            listing.clicks,
+            listing.lastUpdated
+        from asset
+            left join assetData using(assetId)
+            left join MatrixListing as listing on listing.assetId = assetData.assetId and listing.revisionDate =
+assetData.revisionDate
+        where
+            asset.parentId=?
+            and asset.state='published'
+            and asset.className='WebGUI::Asset::MatrixListing'
+            and assetData.revisionDate = (SELECT max(revisionDate) from assetData where assetId=asset.assetId and status='approved')
+            and status='approved'
+        order by ".$sort.$sortDirection;
+    
+    return $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 returns the tabform object that will be used in generating the edit page for Matrix.
@@ -544,12 +592,13 @@ sub view {
     
     my ($varStatistics,$varStatisticsEncoded);
 	my $var = $self->get;
+    $var->{listing_loop}            = $self->getListings;
     $var->{isLoggedIn}              = ($self->session->user->userId ne "1");
     $var->{addMatrixListing_url}    = $self->getUrl('func=add;class=WebGUI::Asset::MatrixListing'); 
-    $var->{compareForm}             = $self->getCompareForm;
     $var->{exportAttributes_url}    = $self->getUrl('func=exportAttributes');
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
+    $var->{compareForm_url}         = $self->getUrl();
    
     if ($self->canEdit){
         # Get all the MatrixListings that are still pending.
@@ -1053,32 +1102,9 @@ sub www_getCompareFormData {
         @searchParams_sorted    = sort { $b->{value} <=> $a->{value} } @searchParams;
     }
 
-    my $sql = "
-        select
-            assetData.title,
-            assetData.url,
-            listing.assetId,
-            listing.views,
-            listing.compares,
-            listing.clicks,
-            listing.lastUpdated
-        from asset
-            left join assetData using(assetId)
-            left join MatrixListing as listing on listing.assetId = assetData.assetId and listing.revisionDate =
-assetData.revisionDate
-        where
-            asset.parentId=?
-            and asset.state='published'
-            and asset.className='WebGUI::Asset::MatrixListing'
-            and assetData.revisionDate = (SELECT max(revisionDate) from assetData where assetId=asset.assetId and status='approved')
-            and status='approved'
-        order by ".$sort.$sortDirection;
-    
-    my $sth = $session->db->read($sql,[$self->getId]);
     my @results;
-
     if($form->process("search")){
-        while (my $result = $sth->hashRef) {
+        while (my $result = $self->getListings) {
                 my $matrixListing_attributes = $session->db->buildHashRefOfHashRefs("
                             select value, fieldType, attributeId from Matrix_attribute
                             left join MatrixListing_attribute as listing using(attributeId)
@@ -1105,7 +1131,7 @@ assetData.revisionDate
             push @results, $result;
         }
     }else{
-        while (my $result = $sth->hashRef) {
+        foreach my $result (@{$self->getListings}) {
             $result->{assetId}  =~ s/-/_____/g;
             if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
                 $result->{checked} = 'checked';
@@ -1114,7 +1140,6 @@ assetData.revisionDate
             push @results, $result;
         }
     }
-    $sth->finish;
 
     my $jsonOutput;
     $jsonOutput->{ResultSet} = {Result=>\@results};

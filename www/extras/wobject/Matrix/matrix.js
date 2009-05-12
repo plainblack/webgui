@@ -29,16 +29,14 @@ YAHOO.util.Event.addListener(window, "load", function() {
 		}
 	}
 
-        this.myDataSource = new YAHOO.util.DataSource(matrixUrl + "?");
-        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-        this.myDataSource.connXhrMode = "queueRequests";
-        this.myDataSource.responseSchema = {
-            resultsList: "ResultSet.Result",
-            fields: ["title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "checked"},{key: "lastUpdated", parser: "number"},"url","assetId"]
-        };
+	this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("compareFormTable")); 
+	this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE; 
+	this.myDataSource.responseSchema = { 
+	    fields: [{key: "checked"},"assetId","title",{key: "views", parser: "number"},{key: "clicks", parser: "number"},{key: "compares", parser: "number"},{key: "lastUpdated", parser: "number"},"url"]
+	}; 
 
-        this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
-                this.myDataSource, {initialRequest:uri});
+    this.myDataTable = new YAHOO.widget.DataTable("compareForm", myColumnDefs,
+        this.myDataSource);
 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(2)); 
 	this.myDataTable.hideColumn(this.myDataTable.getColumn(3)); 
