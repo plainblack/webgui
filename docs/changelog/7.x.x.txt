@@ -21,6 +21,7 @@
    transactions. (Martin Kamerbeek / Oqapi )
  - Added better Survey Expression Engine validation warnings
  - added #9203: Survey Visualization
+ - Added: United States Postal Service Shipping Driver.
 
 7.7.5
  - Adding StoryManager.

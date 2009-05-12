@@ -510,9 +510,14 @@ sub readyForCheckout {
     return 0 if ($self->hasMixedItems);
 
     # Check minimum cart checkout requirement
+    my $total = eval { $self->calculateTotal };
+    if (my $e = WebGUI::Error->caught) {
+        $error{id $self} = $e->error;
+        return 0;
+    }
     my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
     if ( $requiredAmount > 0 ) {
-        return 0 if $self->calculateTotal < $requiredAmount;
+        return 0 if $total < $requiredAmount;
     }
 
     # All checks passed so return true

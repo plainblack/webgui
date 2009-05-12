@@ -183,7 +183,8 @@
 # available for configuration on the site.
 
 "shippingDrivers" : [
-    "WebGUI::Shop::ShipDriver::FlatRate"
+    "WebGUI::Shop::ShipDriver::FlatRate",
+    "WebGUI::Shop::ShipDriver::USPS"
     ],
 
 # Specify the list of template parsers available in the system.

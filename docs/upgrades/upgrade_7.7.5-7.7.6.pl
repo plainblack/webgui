@@ -33,6 +33,7 @@ addTemplateAttachmentsTable($session);
 revertUsePacked( $session );
 fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
+addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
 
 finish($session); 
@@ -88,6 +89,15 @@ EOSQL
     $session->db->write(<<EOSQL);
 ALTER TABLE Collaboration ALTER COLUMN postReceivedTemplateId SET DEFAULT 'default_post_received1'
 EOSQL
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addShippingDrivers {
+    my $session = shift;
+    print "\tAdding columns for improved VAT number checking..." unless $quiet;
+    $session->config->addToArray('shippingDrivers', 'WebGUI::Shop::ShipDriver::USPS');
     print "DONE!\n" unless $quiet;
 }
 

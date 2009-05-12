@@ -32,8 +32,8 @@ These subroutines are available from this package:
 =cut
 
 readonly session   => my %session;
-private options  => my %options;
-private shipperId  => my %shipperId;
+private  options   => my %options;
+private  shipperId => my %shipperId;
 
 #-------------------------------------------------------------------
 
@@ -87,6 +87,9 @@ sub create {
 This subroutine returns an arrayref of hashrefs, used to validate data put into
 the object by the user, and to automatically generate the edit form to show
 the user.
+
+The optional hash key noFormProcess may be added to any field definition.
+This will prevent that field from being processed by processPropertiesFromFormPost.
 
 =cut
 
@@ -261,17 +264,20 @@ Updates ship driver with data from Form.
 =cut
 
 sub processPropertiesFromFormPost {
-    my $self = shift;
+    my $self    = shift;
+    my $session = $self->session;
+    my $form    = $session->form;
     my %properties;
-    my $fullDefinition = $self->definition($self->session);
+    my $fullDefinition = $self->definition($session);
     foreach my $definition (@{$fullDefinition}) {
-	foreach my $property (keys %{$definition->{properties}}) {
-	    $properties{$property} = $self->session->form->process(
-		$property,
-		$definition->{properties}{$property}{fieldType},
-		$definition->{properties}{$property}{defaultValue}
-		);
-	}
+        PROPERTY: foreach my $property (keys %{$definition->{properties}}) {
+            next PROPERTY if $definition->{properties}{$property}->{noFormProcess};
+            $properties{$property} = $form->process(
+                $property,
+                $definition->{properties}{$property}{fieldType},
+                $definition->{properties}{$property}{defaultValue}
+            );
+        }
     }
     $properties{title} = $fullDefinition->[0]{name} if ($properties{title} eq "" || lc($properties{title}) eq "untitled");
     $self->update(\%properties);
