@@ -19,6 +19,7 @@ use lib "$FindBin::Bin/../lib";
 use Test::More;
 use Test::Deep;
 use Data::Dumper;
+use URI;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
@@ -215,6 +216,18 @@ cmp_deeply(
     '... checking the actual deletion of js files'
 );
 cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified');
+
+###################################################################
+#
+# fetchAsset
+#
+###################################################################
+
+###################################################################
+#
+# delete
+#
+###################################################################
 
 $bundle->delete;
 
