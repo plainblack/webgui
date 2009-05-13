@@ -37,7 +37,7 @@ isa_ok($matrix, 'WebGUI::Asset::Wobject::Matrix');
 # Test to see if we can set new values
 my $newMatrixSettings = {
 	maxComparisons                  => 20,
-	defaultSort                     => 'assetRank',
+	defaultSort                     => 'lineage',
 	compareColorNo                  => '#aaffaa',
 	submissionApprovalWorkflowId    => 'pbworkflow000000000005',
     categories                      => "category1\ncategory2",
@@ -79,8 +79,7 @@ my $isValidId = $session->id->valid($newAttributeId);
 is($isValidId,1,"editAttributeSave returnes a valid guid");
 
 is($newAttribute->{name},'test attribute',"Adding a new attribute, attribute name was set correctly");
-is($newAttribute->{fieldType},'MatrixCompare',"Adding a new attribute, undefined fieldType was set correctly to
-default value");
+is($newAttribute->{fieldType},'MatrixCompare',"Adding a new attribute, undefined fieldType was set correctly to default value");
 
 # delete new attribute
 
