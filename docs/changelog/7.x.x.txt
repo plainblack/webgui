@@ -24,6 +24,7 @@
    transactions. (Martin Kamerbeek / Oqapi )
  - Added better Survey Expression Engine validation warnings
  - added #9203: Survey Visualization
+ - rfe #10253: add ability to select the htmlArea Rich Text Editor for DataForm
  - Added: United States Postal Service Shipping Driver.
  - Refactored transaction tmpl_var generation into WebGUI::Shop::Transaction. ( Martin Kamerbeek / Oqapi )
  - rfe #9906: Inbox Filtering

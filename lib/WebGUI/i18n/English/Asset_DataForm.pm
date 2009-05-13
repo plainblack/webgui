@@ -2,6 +2,18 @@ package WebGUI::i18n::English::Asset_DataForm;
 use strict;
 
 our $I18N = {
+	'htmlAreaRichEditor' => {
+		message => q|HTML Area Rich Editor|,
+		lastUpdated => 0,
+		context => 'label for HTMLArea field Rich Editor selector.',
+	},
+
+	'htmlAreaRichEditor description' => {
+		message => q|Select the Rich Editor you want to use for HTML Area fields.|,
+		lastUpdated => 0,
+		context => 'hover help for HTMLArea field Rich Editor selector.',
+	},
+
 	'delete file' => {
 		message => q|Delete Attached File|,
 		lastUpdated => 0,

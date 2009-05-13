@@ -29,6 +29,7 @@ use WebGUI::DateTime;
 use WebGUI::User;
 use WebGUI::Group;
 use WebGUI::AssetCollateral::DataForm::Entry;
+use WebGUI::Form::SelectRichEditor;
 use JSON ();
 
 our @ISA = qw(WebGUI::Asset::Wobject);
@@ -71,6 +72,9 @@ sub _createForm {
     }
     elsif ( $class->isa('WebGUI::Form::List') ) {
         delete $param{size};
+    }
+    elsif ( $type eq 'HTMLArea' && $data->{htmlAreaRichEditor} ne '**Use_Default_Editor**') {
+        $param{richEditId} = $data->{htmlAreaRichEditor}  ;
     }
     return $class->new($self->session, \%param);
 }
@@ -220,6 +224,12 @@ sub definition {
     my $definition = shift;
     my $i18n = WebGUI::International->new($session,"Asset_DataForm");
     my %properties;
+    
+    # populate hash of Rich Editors and add an entry to the list to use the default
+    my $selectRichEditor = WebGUI::Form::SelectRichEditor->new($session,{}) ;
+    my $richEditorOptions  = $selectRichEditor->getOptions() ;
+    $richEditorOptions->{'**Use_Default_Editor**'} = "Use Default Rich Editor" ;
+    
     tie %properties, 'Tie::IxHash';
     %properties = (
         templateId => {
@@ -231,6 +241,14 @@ sub definition {
             hoverHelp       => $i18n->get('82 description'),
             afterEdit       => 'func=edit',
         },
+        htmlAreaRichEditor =>{
+            fieldType=>"selectBox",
+            defaultValue=>0,
+            options=>$richEditorOptions,
+            tab=>'display',
+            label=>$i18n->get('htmlAreaRichEditor'),
+            hoverHelp=>$i18n->get('htmlAreaRichEditor description'),
+	},
         emailTemplateId => {
             fieldType       => "template",
             defaultValue    => 'PBtmpl0000000000000085',
@@ -686,6 +704,11 @@ sub getRecordTemplateVars {
         my $hidden
             = ($field->{status} eq 'hidden' && !$session->var->isAdminOn)
             || ($field->{isMailField} && !$self->get('mailData'));
+	
+	# populate Rich Editor field if the field is an HTMLArea
+	if ($field->{type} eq "HTMLArea") { 
+		$field->{htmlAreaRichEditor} = $self->get("htmlAreaRichEditor") ;
+	}
         my $form = $self->_createForm($field, $value);
         $value = $form->getValueAsHtml;
         my %fieldProperties = (

@@ -35,6 +35,7 @@ fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
 addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
+addDataFormColumns($session);
 addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
 installCopySender($session);
@@ -137,6 +138,19 @@ sub addTransactionTaxColumns {
     $session->db->write( 'alter table transactionItem add column taxRate decimal(6,3)' );
     $session->db->write( 'alter table transactionItem add column taxConfiguration mediumtext' );
     $session->db->write( 'alter table transactionItem change vendorPayoutAmount vendorPayoutAmount decimal (8,2) default 0.00' );
+
+    print "Done\n" unless $quiet;
+
+}
+
+sub addDataFormColumns {
+    my $session = shift;
+    print "\tAdding column to store htmlArea Rich Editor in DataForm Table ..." unless $quiet;
+
+    my $sth = $session->db->read( 'show columns in DataForm  where field = "htmlAreaRichEditor"' );
+    if ($sth->rows() == 0) { # only add column if it is not already there
+       $session->db->write( 'alter TABLE `DataForm` add column `htmlAreaRichEditor` varchar(22) default "**Use_Default_Editor**"' );
+    }
 
     print "Done\n" unless $quiet;
 
