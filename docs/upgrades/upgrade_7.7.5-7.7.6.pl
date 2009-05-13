@@ -166,7 +166,6 @@ sub installNotificationsSettings {
     $session->setting->add('inboxNotificationTemplateId', 'b1316COmd9xRv4fCI3LLGA');
 }
 
-<<<<<<< .mine
 sub installSMSUserProfileFields {
     my $session = shift;
     WebGUI::ProfileField->create(
