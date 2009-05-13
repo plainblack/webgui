@@ -1000,7 +1000,7 @@
           "sslUrl" : "https://ssl.example.com",
           "queuePath" : "/data/cdnqueue",
           "syncProgram" : "/usr/bin/rsync -av --chmod=u+rwx -- '%s' user@content.example.com:/path",
-          "deleteProgram" : "/usr/bin/ssh user@content.example.com 'rm -Rf -- %s'"
+          "deleteProgram" : "/usr/bin/ssh user@content.example.com 'rm -Rf -- %s'",
           "extrasCdn" : "http://content.example.com/extras",
           "extrasSsl" : "https://content.example.com/extras",
           "extrasExclude": ["tinymce", "^blah$"]
