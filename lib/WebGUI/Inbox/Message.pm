@@ -114,9 +114,10 @@ sub create {
     my $properties = shift;
     my $options    = shift || {};
 	my $self = {};
+    my $i18n = WebGUI::International->new($session);
 	$self->{_properties}{messageId} = "new";
 	$self->{_properties}{status}    = $properties->{status} || "pending";
-	$self->{_properties}{subject}   = $properties->{subject} || WebGUI::International->new($session)->get(523);
+	$self->{_properties}{subject}   = $properties->{subject} || $i18n->get(523,'WebGUI');
 	$self->{_properties}{message}   = $properties->{message};
 	$self->{_properties}{dateStamp} = time();
 	$self->{_properties}{userId}    = $properties->{userId};
@@ -171,8 +172,7 @@ sub create {
         my $fromUser = WebGUI::User->new($session, $properties->{sentBy});
         #Don't append prefaces to the visitor users or messages that don't specify a user (default case)
         unless ($fromUser->isVisitor || $fromUser->userId eq 3) {  #Can't use isAdmin because it will not send prefaces from normal users who in the admin group
-            my $i18n = WebGUI::International->new($session, 'Inbox_Message');
-            $preface = sprintf($i18n->get('from user preface'), $fromUser->username);
+            $preface = sprintf($i18n->get('from user preface', 'Inbox_Message'), $fromUser->username);
         }
         my $msg = (defined $properties->{emailMessage}) ? $properties->{emailMessage} : $self->{_properties}{message};
 		$msg = '<p>' . $preface . '</p><br />'.$msg if($preface ne "");
