@@ -35,6 +35,7 @@ fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
 addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
+addListingsCacheTimeoutToMatrix( $session );
 
 finish($session); 
 
@@ -47,6 +48,16 @@ finish($session);
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addListingsCacheTimeoutToMatrix{
+    my $session = shift;
+    print "\tAdding listingsCacheTimeout setting to Matrix table... " unless $quiet;
+    $session->db->write("alter table Matrix add listingsCacheTimeout int(11) not null default 3600;");
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 
 sub addTemplateAttachmentsTable {
     my $session = shift;

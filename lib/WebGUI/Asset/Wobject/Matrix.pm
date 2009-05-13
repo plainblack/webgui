@@ -260,6 +260,14 @@ sub definition {
             label           => $i18n->get("statistics cache timeout label"),
             hoverHelp       => $i18n->get("statistics cache timeout description")
         },
+        listingsCacheTimeout => {
+            tab             => "display",
+            fieldType       => "interval",
+            defaultValue    => 3600,
+            uiLevel         => 8,
+            label           => $i18n->get("listings cache timeout label"),
+            hoverHelp       => $i18n->get("listings cache timeout description")
+        },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
@@ -470,16 +478,30 @@ The criterium by which the listings should be sorted.
 
 sub getListings {
 
-    my $self            = shift;
-    my $session         = $self->session;
-    my $sort            = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+    my $self        = shift;
+    my $session     = $self->session;
+    my $sort        = shift || $session->scratch->get('matrixSort') || $self->get('defaultSort');
+    my $versionTag  = WebGUI::VersionTag->getWorking($session, 1);
+    my ($listings, $listingsEncoded);
 
-    my $sortDirection   = ' desc';
-    if ($sort eq 'title'){
-        $sortDirection = ' asc';
+    my $noCache =
+        $session->var->isAdminOn
+        || $self->get("listingsCacheTimeout") <= 10
+        || ($versionTag && $versionTag->getId eq $self->get("tagId"));
+    unless ($noCache) {
+        $listingsEncoded = WebGUI::Cache->new($session,"matrixListings_".$self->getId)->get;
     }
 
-    my $sql = "
+    if ($listingsEncoded){
+        $listings = JSON->new->decode($listingsEncoded);
+    }
+    else{
+        my $sortDirection   = ' desc';
+        if ($sort eq 'title'){
+            $sortDirection = ' asc';
+        }
+
+        my $sql = "
         select
             assetData.title,
             assetData.url,
@@ -500,8 +522,14 @@ assetData.revisionDate
             and status='approved'
         order by ".$sort.$sortDirection;
     
-    return $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
+        $listings = $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
 
+        $listingsEncoded = JSON->new->encode($listings);
+            WebGUI::Cache->new($session,"matrixListings_".$self->getId)->set(
+                $listingsEncoded,$self->get("listingsCacheTimeout")
+            );
+    }
+    return $listings;
 }
 
 #-------------------------------------------------------------------

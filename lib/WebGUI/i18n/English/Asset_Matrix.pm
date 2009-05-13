@@ -448,6 +448,16 @@ to increase performance. How long should we cache them?|,
         lastUpdated => 0,
     },
 
+    'listings cache timeout label' => {
+        message => q|Listings Cache Timeout|,
+        lastUpdated => 0,
+    },
+
+    'listings cache timeout description' => {
+        message => q|The complete list of Matrix listings can be cached for some time to increase performance. How long should we cache it?|,
+        lastUpdated => 0,
+    },
+
         'rating timeout description' => {
                 message => q|Set a timeout so that users are prevented from rating a given listing too often.|,
                 lastUpdated => 1135271460,
