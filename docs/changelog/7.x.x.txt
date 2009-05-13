@@ -29,6 +29,7 @@
  - rfe #9906: Inbox Filtering
  - rfe #9911: Inbox: Copy Sender
  - rfe #9907: Inbox: Notifications
+ - Added PayPal paydriver. (Thanks to Paul Wrightson)
 
 7.7.5
  - Adding StoryManager.

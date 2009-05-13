@@ -127,6 +127,7 @@ checkModule('HTML::Packer',                 "0.4"        );
 checkModule('JavaScript::Packer',           '0.02'       );
 checkModule('CSS::Packer',                  '0.2'        );
 checkModule('Business::Tax::VAT::Validation', '0.20'     );
+checkModule('Crypt::SSLeay',                '0.57'       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 

@@ -39,6 +39,7 @@ addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
 installCopySender($session);
 installNotificationsSettings($session);
+addPayDrivers($session);
 
 finish($session); 
 
@@ -161,6 +162,16 @@ sub installNotificationsSettings {
     $session->setting->add('sendInboxNotificationsOnly', 0);
     $session->setting->add('inboxNotificationTemplateId', 'b1316COmd9xRv4fCI3LLGA');
 }
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addPayDrivers {
+    my $session = shift;
+    print "\tAdding PayPal driver checking..." unless $quiet;
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::PayPal::PayPalStd');
+    print "DONE!\n" unless $quiet;
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
