@@ -39,6 +39,9 @@ addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
 installCopySender($session);
 installNotificationsSettings($session);
+installSMSUserProfileFields($session);
+installSMSSettings($session);
+upgradeSMSMailQueue($session);
 addPayDrivers($session);
 
 finish($session); 
@@ -161,6 +164,49 @@ sub installNotificationsSettings {
     my $session = shift;
     $session->setting->add('sendInboxNotificationsOnly', 0);
     $session->setting->add('inboxNotificationTemplateId', 'b1316COmd9xRv4fCI3LLGA');
+}
+
+<<<<<<< .mine
+sub installSMSUserProfileFields {
+    my $session = shift;
+    WebGUI::ProfileField->create(
+        $session,
+        'receiveInboxEmailNotifications',
+        {
+            label          => q!WebGUI::International::get('receive inbox emails','Message_Center')!,
+            visible        => 1,
+            required       => 0,
+            protected      => 1,
+            editable       => 1,
+            fieldType      => 'yesNo',
+            dataDefault    => 1,
+        },
+        4,
+    );
+    WebGUI::ProfileField->create(
+        $session,
+        'receiveInboxSmsNotifications',
+        {
+            label          => q!WebGUI::International::get('receive inbox sms','Message_Center')!,
+            visible        => 1,
+            required       => 0,
+            protected      => 1,
+            editable       => 1,
+            fieldType      => 'yesNo',
+            dataDefault    => 0,
+        },
+        4,
+    );
+}
+
+sub installSMSSettings {
+    my $session = shift;
+    $session->setting->add('smsGateway', '');
+}
+
+sub upgradeSMSMailQueue {
+    my $session = shift;
+    $session->db->write('alter table mailQueue add column isInbox TINYINT(4) default 0');
 }
 
 #----------------------------------------------------------------------------

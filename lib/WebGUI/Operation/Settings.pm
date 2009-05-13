@@ -295,6 +295,14 @@ sub definition {
 		hoverHelp=>$i18n->get('mail return path help'),
 		defaultValue=>$setting->get("mailReturnPath")
 		});
+	push(@fields, {
+		tab          => 'messaging',
+		fieldType    => 'email',
+		name         => 'smsGateway',
+		label        => $i18n->get('sms gateway'),
+		hoverHelp    => $i18n->get('sms gateway help'),
+		defaultValue => $setting->get('smsGateway'),
+		});
 	# misc
 	push(@fields, {
 		tab=>"misc",

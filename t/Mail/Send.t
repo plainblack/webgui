@@ -16,6 +16,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
+use Test::Deep;
 use File::Spec;
 use Data::Dumper;
 use MIME::Parser;
@@ -69,7 +70,7 @@ if ($hasServer) {
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 11;        # Increment this number for each test you create
+plan tests => 18;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -271,6 +272,134 @@ SKIP: {
     is($messageId, '<noAngles@localhost.localdomain>', 'bad messageId corrected (added both angles)');
 
 }
+
+#----------------------------------------------------------------------------
+#
+# Test sending an Inbox message to a user who has various notifications configured
+#
+#----------------------------------------------------------------------------
+
+my $inboxUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($inboxUser);
+$inboxUser->username('red');
+$inboxUser->profileField('receiveInboxEmailNotifications', 1);
+$inboxUser->profileField('receiveInboxSmsNotifications',   0);
+$inboxUser->profileField('email',     'ellis_boyd_redding@shawshank.gov');
+$inboxUser->profileField('cellPhone', '55555');
+$session->setting->set('smsGateway', 'textme.com');
+
+my $emailUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($emailUser);
+$emailUser->username('heywood');
+$emailUser->profileField('email', 'heywood@shawshank.gov');
+
+my $lonelyUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($lonelyUser);
+$lonelyUser->profileField('receiveInboxEmailNotifications', 0);
+$lonelyUser->profileField('receiveInboxSmsNotifications',   0);
+$lonelyUser->profileField('email',   'jake@shawshank.gov');
+
+my $inboxGroup = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($inboxGroup);
+$inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
+
+SKIP: {
+    my $numtests        = 1; # Number of tests in this block
+
+    # Must be able to write the config, or we'll die
+    skip "Cannot test email notifications", $numtests unless $smtpServerOk;
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via email' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    is($received->{to}->[0], '<ellis_boyd_redding@shawshank.gov>', 'send, toUser with email address');
+
+    $inboxUser->profileField('receiveInboxEmailNotifications', 0);
+    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via SMS' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    is($received->{to}->[0], '<55555@textme.com>', 'send, toUser with SMS address');
+
+    $inboxUser->profileField('receiveInboxEmailNotifications', 1);
+    $inboxUser->profileField('receiveInboxSmsNotifications',   1);
+
+    # Send the mail
+    $mail = WebGUI::Mail::Send->create( $session, { 
+            toUser  => $inboxUser->userId,
+            },
+            'fromInbox',
+    );
+    $mail->addText( 'sent via SMS' );
+
+    my $received = sendToServer( $mail ) ;
+
+    # Test the mail
+    cmp_bag(
+        $received->{to},
+        ['<55555@textme.com>', '<ellis_boyd_redding@shawshank.gov>',],
+        'send, toUser with SMS and email addresses'
+    );
+
+}
+
+#----------------------------------------------------------------------------
+#
+# Test sending an Inbox message to a group with various user profile settings
+#
+#----------------------------------------------------------------------------
+
+my @mailIds;
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+my $startingMessages = scalar @mailIds;
+
+$mail = WebGUI::Mail::Send->create( $session, { 
+        toGroup  => $inboxGroup->getId,
+        },
+        'fromInbox',
+);
+$mail->addText('Mail::Send test message');
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+is(scalar @mailIds, $startingMessages, 'creating a message does not queue a message');
+
+$mail->send;
+@mailIds = $session->db->buildArray('select messageId from mailQueue');
+is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added two messages');
+
+@mailIds = $session->db->buildArray("select messageId from mailQueue where message like ?",['%Mail::Send test message%']);
+is(scalar @mailIds, $startingMessages+2, 'sending a message with a group added the right two messages');
+
+my @emailAddresses = ();
+foreach my $mailId (@mailIds) {
+    my $mail = WebGUI::Mail::Send->retrieve($session, $mailId);
+    push @emailAddresses, $mail->getMimeEntity->head->get('to');
+}
+
+cmp_bag(
+    \@emailAddresses,
+    [
+        'heywood@shawshank.gov'."\n",
+        'ellis_boyd_redding@shawshank.gov,55555@textme.com'."\n",
+    ],
+    'send: when the original is sent, new messages are created for each user in the group, following their user profile settings'
+);
 
 # TODO: Test the emailToLog config setting
 #----------------------------------------------------------------------------

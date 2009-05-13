@@ -504,6 +504,34 @@ sub getGroupIdsRecursive {
 
 #-------------------------------------------------------------------
 
+=head2 getInboxAddresses ( )
+
+Return a string with addresses that the user wants to receive Inbox
+notifications.  If the user does not want Inbox notifications, then
+the string will be empty.
+
+=cut
+
+sub getInboxAddresses {
+    my $self   = shift;
+    my $emails = '';
+    if ( $self->profileField('receiveInboxEmailNotifications')
+      && $self->profileField('email')) {
+        $emails = $self->profileField('email');
+    }
+    if ( $self->profileField('receiveInboxSmsNotifications')
+      && $self->profileField('cellPhone')
+      && $self->session->setting->get('smsGateway')) {
+        $emails .= ',' if $emails;
+        my $phoneNumber = $self->profileField('cellPhone');
+        $phoneNumber =~ tr/0-9//dc;  ##remove nonnumbers
+        $emails = join '', $emails, $phoneNumber, '@', $self->session->setting->get('smsGateway');
+    }
+    return $emails;
+}   
+
+#-------------------------------------------------------------------
+
 =head2 getProfileFieldPrivacySetting ( [field ])
 
 Returns the privacy setting for the field passed in.  If no field is passed in the entire hash is returned

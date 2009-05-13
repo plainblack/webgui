@@ -4359,12 +4359,13 @@ Users may override this setting in their profile.
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
         },
+
 	'Ad Space control name' => {
 		message => q|Ad Space|,
 		lastUpdated => 0,
 		context => q|name for the Ad Space control|
 	},
-    
+
     'global head tags label' => {
         message     => 'Global Head Tags',
         lastUpdated => 0,
@@ -4375,6 +4376,17 @@ Users may override this setting in their profile.
         lastUpdated => 0,
         context     => 'Description of setting',
     },
+
+ 	'sms gateway' => {
+ 		message => q|SMS gateway|,
+ 		context => q|email to SMS/text email address for this site.|,
+ 		lastUpdated => 1235685248,
+ 	},
+
+ 	'sms gateway help' => {
+ 		message => q|The email address that this site would use to send an SMS message.|,
+ 		lastUpdated => 1235695517,
+ 	},
 
 };
 

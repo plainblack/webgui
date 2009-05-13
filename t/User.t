@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 194; # increment this value for each test you create
+use Test::More tests => 203; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -804,6 +804,47 @@ ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's p
 ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is friends, even for some other user");
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 
+################################################################
+#
+# getInboxAddresses
+#
+################################################################
+
+my $origSmsGateway = $session->setting->get('smsGateway');
+$session->setting->set('smsGateway', '');
+my $inmate = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($inmate);
+$inmate->profileField('email',     '');
+$inmate->profileField('cellPhone', '');
+$inmate->profileField('receiveInboxEmailNotifications', 0);
+$inmate->profileField('receiveInboxSmsNotifications',   0);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with no profile info, returns blank');
+
+$inmate->profileField('receiveInboxEmailNotifications', 1);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with receiveInboxEmailNotifications=1, but not email address, returns blank');
+
+$inmate->profileField('email', 'andy@shawshank.com');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: email address only');
+
+$inmate->profileField('receiveInboxSmsNotifications',   1);
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
+
+$inmate->profileField('cellPhone', '37927');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
+
+$inmate->profileField('cellPhone', '');
+$session->setting->set('smsGateway', 'textme.com');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+
+$inmate->profileField('cellPhone', '37927');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+
+$inmate->profileField('receiveInboxEmailNotifications', 0);
+is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get SMS and no email, even with email info present');
+
+$inmate->profileField('receiveInboxSmsNotifications', 0);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: can get no SMS and no email, even with profile info present');
+
 END {
     foreach my $testGroup ($expiredGroup, values %groupSet) {
         if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
@@ -821,6 +862,8 @@ END {
     $visitor->profileField('publicProfile', $originalVisitorPublicProfile);
 
     $newProfileField->delete() if $newProfileField;
+
+    $session->setting->set('smsGateway', $origSmsGateway);
 
 	$testCache->flush;
 }
