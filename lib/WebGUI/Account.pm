@@ -536,5 +536,15 @@ long as the session does.
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 store ( )
+
+This method returns an internal hash where you can store things for your Account Plugin.
+The store is private to your plugin, to each user's copy of the plugin, and only lasts as
+long as the session does.
+
+=cut
+
 
 1;
