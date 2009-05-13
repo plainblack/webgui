@@ -229,6 +229,19 @@ sub editSettingsForm {
         label     => $i18n->get("inbox copy sender label"),
         hoverHelp => $i18n->get("inbox copy sender hoverHelp")
     );
+    $f->yesNo(
+        name         => 'sendInboxNotificationsOnly',
+        label        => $i18n->get('send inbox notifications only'),
+        hoverHelp    => $i18n->get('send inbox notifications only help'),
+        defaultValue => $setting->get('sendInboxNotificationsOnly'),
+    );
+    $f->template(
+        name         => 'inboxNotificationTemplateId',
+        label        => $i18n->get('inbox notification template'),
+        hoverHelp    => $i18n->get('inbox notification template help'),
+        defaultValue => $self->getInboxNotificationTemplateId,
+        namespace    => 'Account/Inbox/Notification',
+    );
 
     return $f->printRowsOnly;
 }
@@ -271,6 +284,10 @@ sub editSettingsFormSave {
     #General Inbox Settings
     $setting->set("inboxRichEditorId",                 $form->process("inboxRichEditorId",                 "selectRichEditor") );
     $setting->set("inboxCopySender",                   $form->process("inboxCopySender",                   "yesNo"));
+
+    #Inbox Notification Settings
+    $setting->set("sendInboxNotificationsOnly",        $form->process("sendInboxNotificationsOnly", "yesNo"));
+    $setting->set("inboxNotificationTemplateId",       $form->process("inboxNotificationTemplateId","template"));
 }
 
 
@@ -285,6 +302,19 @@ This method returns the template ID for inbox errors.
 sub getInboxErrorTemplateId {
     my $self = shift;
     return $self->session->setting->get("inboxErrorTemplateId") || "ErEzulFiEKDkaCDVmxUavw";
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInboxNotificationTemplateId ( )
+
+This method returns the template ID for inbox notifications.
+
+=cut
+
+sub getInboxNotificationTemplateId {
+    my $self = shift;
+    return $self->session->setting->get("inboxNotificationTemplateId") || "b1316COmd9xRv4fCI3LLGA";
 }
 
 #-------------------------------------------------------------------
@@ -1236,14 +1266,39 @@ sub www_sendMessageSave {
     #Let sendMessage deal with displaying errors
     return $self->www_sendMessage($errorMsg) if $hasError;
 
+    my $messageProperties = {
+        message => $message,
+        subject => $subject,
+        status  => 'unread',
+        sentBy  => $fromUser->userId
+    };
+
+    if ($session->setting->get('sendInboxNotificationsOnly')) {
+        my $template = WebGUI::Asset::Template->new($session, $self->getInboxNotificationTemplateId);
+        if ($template) {
+            ##Create template variables
+            my $var = {
+                fromUsername => $fromUser->username,
+                subject      => $messageProperties->{subject},
+                message      => $messageProperties->{message},
+                inboxLink    => $session->url->append($session->url->getSiteURL, 'op=account;module=inbox'),
+            };
+            ##Fill in template
+            my $output = $template->process($var);
+            ##Evaluate macros by hand
+            WebGUI::Macro::process($session, \$output);
+            ##Assign template output to $messageProperties->{emailMessage}
+            $messageProperties->{emailMessage} = $output;
+        }
+        else {
+            $session->log->warn(sprintf "Unable to instanciate notification template: ". $self->getInboxNotificationTemplateId);
+        }
+
+    }
+
     foreach my $uid (@toUsers) {
-        my $message = $inbox->addMessage({
-            message => $message,
-            subject => $subject,
-            userId  => $uid,
-            status  => 'unread',
-            sentBy  => $fromUser->userId
-        });
+        $messageProperties->{userId} = $uid;
+        $inbox->addMessage($messageProperties);
         if ($uid eq $session->user->userId) {
             $message->setRead;
         }

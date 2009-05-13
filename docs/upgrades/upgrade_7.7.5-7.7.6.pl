@@ -38,6 +38,7 @@ addTransactionTaxColumns( $session );
 addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
 installCopySender($session);
+installNotificationsSettings($session);
 
 finish($session); 
 
@@ -153,6 +154,12 @@ sub installCopySender {
     my $session = shift;
     return if $session->setting->has('inboxCopySender');
     $session->setting->add('inboxCopySender',0);
+}
+
+sub installNotificationsSettings {
+    my $session = shift;
+    $session->setting->add('sendInboxNotificationsOnly', 0);
+    $session->setting->add('inboxNotificationTemplateId', 'b1316COmd9xRv4fCI3LLGA');
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

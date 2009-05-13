@@ -25,6 +25,7 @@
  - Refactored transaction tmpl_var generation into WebGUI::Shop::Transaction. ( Martin Kamerbeek / Oqapi )
  - rfe #9906: Inbox Filtering
  - rfe #9911: Inbox: Copy Sender
+ - rfe #9907: Inbox: Notifications
 
 7.7.5
  - Adding StoryManager.

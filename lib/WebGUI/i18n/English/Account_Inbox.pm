@@ -291,9 +291,9 @@ our $I18N = {
     },
 
     'send label' => {
-		message => q{Send},
-		lastUpdated => 1181019679,
-	},
+        message => q{Send},
+        lastUpdated => 1181019679,
+    },
 
     'no access' => {
         message     => q{You do not have permission to view this message.},
@@ -331,9 +331,9 @@ our $I18N = {
     },
 
     'no self error' => {
-		message => q|You may not send messages to yourself.|,
-		lastUpdated => 1181019679,
-	},
+        message => q|You may not send messages to yourself.|,
+        lastUpdated => 1181019679,
+    },
 
     'no friends error' => {
         message => q{You do not have any active friends in the system.  If you wish to send a new private message to a user without having to locate their profile, you must first add them as a friend.},
@@ -362,27 +362,27 @@ our $I18N = {
 
     'blocked error' => {
         message => q|This user does not wish to receive private messages.|,
-		lastUpdated => 1181019679,
+        lastUpdated => 1181019679,
     },
 
     'remove text' => {
         message => q{remove},
-		lastUpdated => 1181019679,
+        lastUpdated => 1181019679,
     },
 
     'update label' => {
         message => q{Update},
-		lastUpdated => 1181019679,
+        lastUpdated => 1181019679,
     },
 
     'message sent label' => {
         message => q{Message Sent},
-		lastUpdated => 1181019679,
+        lastUpdated => 1181019679,
     },
 
     'message sent text' => {
         message => q{Your message has been sent successfully},
-		lastUpdated => 1181019679,
+        lastUpdated => 1181019679,
     },
 
     'error label' => {
@@ -466,24 +466,24 @@ our $I18N = {
     },
 
     'missing email' => {
-		message => q|The invitation cannot be sent because you did not enter an email address.|,
-		lastUpdated => 1181409056,
-	},
+        message => q|The invitation cannot be sent because you did not enter an email address.|,
+        lastUpdated => 1181409056,
+    },
 
-	'missing message' => {
-		message     => q|Your invitiation must have a message.|,
-		lastUpdated => 1181409432,
-	},
+    'missing message' => {
+        message     => q|Your invitiation must have a message.|,
+        lastUpdated => 1181409432,
+    },
 
-	'missing subject' => {
-		message     => q|Your invitation must have a subject.|,
-		lastUpdated => 1181409433,
-	},
+    'missing subject' => {
+        message     => q|Your invitation must have a subject.|,
+        lastUpdated => 1181409433,
+    },
 
     'already a member' => {
-		message     => q|The email address you entered is already registered to <a href="%s">%s</a> on this site.|,
-		lastUpdated => 1227715272,
-	},
+        message     => q|The email address you entered is already registered to <a href="%s">%s</a> on this site.|,
+        lastUpdated => 1227715272,
+    },
 
     'no email' => {
         message     => q{The invitation cannot be sent because you do not have an email address set in your profile.},
@@ -491,54 +491,54 @@ our $I18N = {
     },
 
     'invitation sent label' => {
-		message => q|Invitation Sent|,
-		lastUpdated => 1181410226,
-	},
+        message => q|Invitation Sent|,
+        lastUpdated => 1181410226,
+    },
 
     'invitation sent text' => {
-		message => q|Your invitation has been sent successfully.|,
-		lastUpdated => 1181410226,
-	},
+        message => q|Your invitation has been sent successfully.|,
+        lastUpdated => 1181410226,
+    },
 
     'common account variables' => {
-		message => q|Common Account, Inbox Plugin, Template Variables.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|Common Account, Inbox Plugin, Template Variables.|,
+        lastUpdated => 1230867391,
+    },
 
     'view_inbox_url' => {
-		message => q|URL to view the Inbox screen.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|URL to view the Inbox screen.|,
+        lastUpdated => 1230867391,
+    },
 
     'view_invitations_url' => {
-		message => q|URL to view the Invitations screen.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|URL to view the Invitations screen.|,
+        lastUpdated => 1230867391,
+    },
 
     'unread_message_count' => {
-		message => q|The number of unread messages in the Inbox.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|The number of unread messages in the Inbox.|,
+        lastUpdated => 1230867391,
+    },
 
     'invitation_count' => {
-		message => q|The number of Invitations this user has received.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|The number of Invitations this user has received.|,
+        lastUpdated => 1230867391,
+    },
 
     'invitations_enabled' => {
-		message => q|A boolean that is true if the user is willing to receive invitations to join Friends Networks on this site.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|A boolean that is true if the user is willing to receive invitations to join Friends Networks on this site.|,
+        lastUpdated => 1230867391,
+    },
 
     'user_invitations_enabled' => {
-		message => q|A boolean that is true if this site is configured to send invitations to users outside of the site.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|A boolean that is true if this site is configured to send invitations to users outside of the site.|,
+        lastUpdated => 1230867391,
+    },
 
     'invite_friend_url' => {
-		message => q|The URL to invite this user to be join your Friend Network.|,
-		lastUpdated => 1230867391,
-	},
+        message => q|The URL to invite this user to be join your Friend Network.|,
+        lastUpdated => 1230867391,
+    },
 
     'inbox rich editor label' => {
         message         => q{Inbox Rich Editor},
@@ -747,6 +747,22 @@ our $I18N = {
     'inbox copy sender hoverHelp' => {
         message     => q|If this setting is 'yes', users will receive a copy of messages that they send using the inbox.|,
         lastUpdated => 0,
+    },
+ 
+    'send inbox notifications only' => {
+        message => q|Send only Inbox notifications|,
+        context => q|Site setting.  A notification is a short message that a message is in the Inbox.|,
+        lastUpdated => 1235685248,
+    },
+
+    'send inbox notifications only help' => {
+        message => q|Should WebGUI just send notifications about Inbox messages, instead of the message itself?|,
+        lastUpdated => 1235696295,
+    },
+
+    'inbox notification' => {
+        message => q|You have a new message in your Inbox.|,
+        lastUpdated => 1235708853,
     },
 
 };
