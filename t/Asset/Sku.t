@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 19;        # Increment this number for each test you create
+plan tests => 21;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -66,8 +66,14 @@ is($sku->getConfiguredTitle, $sku->getTitle, "configured title and title should 
 is($sku->shipsSeparately, 0, 'shipsSeparately return 0 by default');
 
 $sku->update({shipsSeparately => 1,});
-$sku->update({isShippingRequired => 1,});
-is($sku->shipsSeparately, 1, 'shipsSeparately only returns true when isShippingRequired and shipsSeparately');
+is($sku->shipsSeparately, 0, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+
+{
+    local *WebGUI::Asset::Sku::isShippingRequired = sub { return 1};
+    is($sku->shipsSeparately, 1, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+}
+
+ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
 
 isa_ok($sku->getCart, "WebGUI::Shop::Cart", "can get a cart object");
 my $item = $sku->addToCart;
