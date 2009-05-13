@@ -10,6 +10,8 @@
  - fixed: URLs that shouldn't happen  (#10353)
  - Added more information output to EMS record importer.
  - Fixed a search tickets problem in the EMS badge builder template.
+ - Fixed a problem in the EMS calculating prices on tickets with a badge that
+   has an existing ribbon.
  - Fixed a search results display error with synopsis.
  - Fixed a load problem with Code Editor by making user toggle it on. This is
    better than normal anyway since many users appear not to want to use the

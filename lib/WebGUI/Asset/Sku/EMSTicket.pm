@@ -346,7 +346,7 @@ sub getPrice {
 	my $discount = 0;
 	my $badgeId = $self->getOptions->{badgeId};
 	my $ribbonId = $self->session->db->quickScalar("select ribbonAssetId from EMSRegistrantRibbon where badgeId=? limit 1",[$badgeId]);
-	if (defined $ribbonId) {
+	if (defined $ribbonId && isIn($ribbonId, @ribbonIds)) {
 		my $ribbon = WebGUI::Asset->new($self->session,$ribbonId,'WebGUI::Asset::Sku::EMSRibbon');
 		$discount = $ribbon->get('percentageDiscount');
 	}
