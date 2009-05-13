@@ -37,6 +37,7 @@ addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
 addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
+installCopySender($session);
 
 finish($session); 
 
@@ -144,6 +145,14 @@ sub addSurveyFeedbackTemplateColumn {
 
     print "Done\n" unless $quiet;
 
+}
+
+#----------------------------------------------------------------------------
+# Your sub here
+sub installCopySender {
+    my $session = shift;
+    return if $session->setting->has('inboxCopySender');
+    $session->setting->add('inboxCopySender',0);
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

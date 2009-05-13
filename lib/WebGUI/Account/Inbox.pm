@@ -223,6 +223,12 @@ sub editSettingsForm {
         label       => $i18n->get("inbox rich editor label"),
         hoverHelp   => $i18n->get("inbox rich editor description"),
     );
+    $f->yesNo(
+        name      => "inboxCopySender",
+        value     => $setting->get("inboxCopySender"),
+        label     => $i18n->get("inbox copy sender label"),
+        hoverHelp => $i18n->get("inbox copy sender hoverHelp")
+    );
 
     return $f->printRowsOnly;
 }
@@ -242,28 +248,29 @@ sub editSettingsFormSave {
     my $form    = $session->form;
 
     #Messages Settings
-    $setting->set("inboxStyleTemplateId", $form->process("inboxStyleTemplateId","template"));
-    $setting->set("inboxLayoutTemplateId", $form->process("inboxLayoutTemplateId","template"));
-    $setting->set("inboxViewTemplateId", $form->process("inboxViewTemplateId","template"));
-    $setting->set("inboxViewMessageTemplateId",$form->process("inboxViewMessageTemplateId","template"));
-    $setting->set("inboxSendMessageTemplateId",$form->process("inboxSendMessageTemplateId","template"));
+    $setting->set("inboxStyleTemplateId",              $form->process("inboxStyleTemplateId",              "template"));
+    $setting->set("inboxLayoutTemplateId",             $form->process("inboxLayoutTemplateId",             "template"));
+    $setting->set("inboxViewTemplateId",               $form->process("inboxViewTemplateId",               "template"));
+    $setting->set("inboxViewMessageTemplateId",        $form->process("inboxViewMessageTemplateId",        "template"));
+    $setting->set("inboxSendMessageTemplateId",        $form->process("inboxSendMessageTemplateId",        "template"));
     $setting->set("inboxMessageConfirmationTemplateId",$form->process("inboxMessageConfirmationTemplateId","template"));
-    $setting->set("inboxErrorTemplateId",$form->process("inboxErrorTemplateId","template"));
+    $setting->set("inboxErrorTemplateId",              $form->process("inboxErrorTemplateId",              "template"));
     #Friends Invitations Settings
-    $setting->set("inboxManageInvitationsTemplateId",$form->process("inboxManageInvitationsTemplateId","template"));
-    $setting->set("inboxViewInvitationTemplateId",$form->process("inboxViewInvitationTemplateId","template"));
-    $setting->set("inboxInvitationConfirmTemplateId",$form->process("inboxInvitationConfirmTemplateId","template"));
+    $setting->set("inboxManageInvitationsTemplateId",  $form->process("inboxManageInvitationsTemplateId",  "template"));
+    $setting->set("inboxViewInvitationTemplateId",     $form->process("inboxViewInvitationTemplateId",     "template"));
+    $setting->set("inboxInvitationConfirmTemplateId",  $form->process("inboxInvitationConfirmTemplateId",  "template"));
     #User Invitation Settings
-    $setting->set("inboxInviteUserEnabled",$form->process("inboxInviteUserEnabled","yesNo"));
-    $setting->set("inboxInviteUserRestrictSubject",$form->process("inboxInviteUserRestrictSubject","yesNo"));
-    $setting->set("inboxInviteUserSubject",$form->process("inboxInviteUserSubject","text"));
-    $setting->set("inboxInviteUserRestrictMessage",$form->process("inboxInviteUserRestrictMessage","yesNo"));
-    $setting->set("inboxInviteUserMessage",$form->process("inboxInviteUserMessage","HTMLArea"));    
-    $setting->set("inboxInviteUserMessageTemplateId",$form->process("inboxInviteUserMessageTemplateId","template"));
-    $setting->set("inboxInviteUserTemplateId",$form->process("inboxInviteUserTemplateId","template"));
-    $setting->set("inboxInviteUserConfirmTemplateId",$form->process("inboxInviteUserConfirmTemplateId","template"));
-
-    $setting->set("inboxRichEditorId", $form->process("inboxRichEditorId", "selectRichEditor") );
+    $setting->set("inboxInviteUserEnabled",            $form->process("inboxInviteUserEnabled",            "yesNo"));
+    $setting->set("inboxInviteUserRestrictSubject",    $form->process("inboxInviteUserRestrictSubject",    "yesNo"));
+    $setting->set("inboxInviteUserSubject",            $form->process("inboxInviteUserSubject",            "text"));
+    $setting->set("inboxInviteUserRestrictMessage",    $form->process("inboxInviteUserRestrictMessage",    "yesNo"));
+    $setting->set("inboxInviteUserMessage",            $form->process("inboxInviteUserMessage",            "HTMLArea"));    
+    $setting->set("inboxInviteUserMessageTemplateId",  $form->process("inboxInviteUserMessageTemplateId",  "template"));
+    $setting->set("inboxInviteUserTemplateId",         $form->process("inboxInviteUserTemplateId",         "template"));
+    $setting->set("inboxInviteUserConfirmTemplateId",  $form->process("inboxInviteUserConfirmTemplateId",  "template"));
+    #General Inbox Settings
+    $setting->set("inboxRichEditorId",                 $form->process("inboxRichEditorId",                 "selectRichEditor") );
+    $setting->set("inboxCopySender",                   $form->process("inboxCopySender",                   "yesNo"));
 }
 
 
@@ -986,8 +993,9 @@ sub www_sendMessage {
     #Add any error passed in to be displayed if the form reloads
     $var->{'message_display_error'}  = $displayError;
 
-    #Add common template variable for displaying the inbox
     my $inbox     = WebGUI::Inbox->new($session); 
+
+    #Add common template variable for displaying the inbox
     $self->appendCommonVars($var,$inbox);
 
     my $messageId = $form->get("messageId");
@@ -1204,6 +1212,10 @@ sub www_sendMessageSave {
         }
     }
 
+    if($session->setting->get('inboxCopySender')) {
+        push @toUsers, $session->user->userId;
+    }
+
     #Check for client errors
     if($subject eq "") {
         my $i18n  = WebGUI::International->new($session,'Account_Inbox');
@@ -1225,13 +1237,16 @@ sub www_sendMessageSave {
     return $self->www_sendMessage($errorMsg) if $hasError;
 
     foreach my $uid (@toUsers) {
-        $inbox->addMessage({
+        my $message = $inbox->addMessage({
             message => $message,
             subject => $subject,
             userId  => $uid,
             status  => 'unread',
             sentBy  => $fromUser->userId
         });
+        if ($uid eq $session->user->userId) {
+            $message->setRead;
+        }
     }
 
     $self->appendCommonVars($var,$inbox);
