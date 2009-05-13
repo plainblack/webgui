@@ -490,6 +490,17 @@ our $I18N = {
         message     => q|The template to display the main page of the survey.|,
         lastUpdated => 0,
     },
+    
+    'Feedback Template' => {
+        message     => q|Feedback Template|,
+        lastUpdated => 0,
+    },
+
+    'Feedback Template help' => {
+        message     => q|The template used to display response feedback.|,
+        lastUpdated => 0,
+    },
+    
     'do after timelimit label' => {
         message => q|Do After Time Limit:|,
         lastUpdated => 1224686319,
@@ -925,32 +936,54 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 1078223096
     },
     
-    'lastResponseCompleted' => {
-        message => q|You completed this Survey|,
-        lastUpdated => 1242180657,
-    },
-
-    'lastResponseTimedOut' => {
-        message => q|Your last Survey response timed out|,
+    'response complete' => {
+        message => q|Survey Response completed|,
         lastUpdated => 1242180657,
     },
     
-    'lastResponseCompleted help' => {
-        message => q|A boolean indicating whether the current user's last response was completed.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+    'response complete help' => {
+        message => q|A boolean flag indicating whether the Survey Response completed|,
+        lastUpdated => 1242180657,
     },
     
-    'lastResponseEndDate help' => {
-        message => q|The date that the user's last response was completed.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+    'response restart' => {
+        message => q|Survey Response restarted|,
+        lastUpdated => 1242180657,
     },
-
-    'lastResponseTimedOut help' => {
-        message => q|A boolean indicating whether the current user's last response timed out.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+    
+    'response restart help' => {
+        message => q|A boolean flag indicating whether the Survey Response restarted|,
+        lastUpdated => 1242180657,
+    },
+    
+    'response timeout' => {
+        message => q|Survey Response timed out|,
+        lastUpdated => 1242180657,
+    },
+    
+    'response timeout help' => {
+        message => q|A boolean flag indicating whether the Survey Response timed out|,
+        lastUpdated => 1242180657,
+    },
+    
+    'response timeout restart' => {
+        message => q|Survey Response restarted due to a timeout|,
+        lastUpdated => 1242180657,
+    },
+    
+    'response timeout restart help' => {
+        message => q|A boolean flag indicating whether the Survey Response restarted as a result of a timeout|,
+        lastUpdated => 1242180657,
+    },
+    
+    'response endDate help' => {
+        message => q|A localised date/time string indicating when the response ended|,
+        lastUpdated => 1242180657,
+    },
+    
+    'survey feedback template body' => {
+        message => q|All data tagged in survey expressions is also made available as template variables|,
+        lastUpdated => 1242180657,
     },
 
     'maxResponsesSubmitted' => {
@@ -967,6 +1000,12 @@ directly inside the answer_loop for other types of questions.|,
 
     'user_canViewReports' => {
         message => q|A boolean indicating whether the current user can view the survey reports.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+    
+    'lastResponseFeedback help' => {
+        message => q|The templated response feedback text|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },

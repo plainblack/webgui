@@ -36,6 +36,7 @@ addEuVatDbColumns( $session );
 addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
 addListingsCacheTimeoutToMatrix( $session );
+addSurveyFeedbackTemplateColumn( $session );
 
 finish($session); 
 
@@ -116,7 +117,7 @@ sub addShippingDrivers {
 sub addEuVatDbColumns {
     my $session = shift;
     print "\tAdding columns for improved VAT number checking..." unless $quiet;
-
+    
     $session->db->write( 'alter table tax_eu_vatNumbers add column viesErrorCode int(3) default NULL' );
 
     print "Done\n" unless $quiet;
@@ -130,6 +131,16 @@ sub addTransactionTaxColumns {
     $session->db->write( 'alter table transactionItem add column taxRate decimal(6,3)' );
     $session->db->write( 'alter table transactionItem add column taxConfiguration mediumtext' );
     $session->db->write( 'alter table transactionItem change vendorPayoutAmount vendorPayoutAmount decimal (8,2) default 0.00' );
+
+    print "Done\n" unless $quiet;
+
+}
+
+#----------------------------------------------------------------------------
+sub addSurveyFeedbackTemplateColumn {
+    my $session = shift;
+    print "\tAdding columns for Survey Feedback Template..." unless $quiet;
+    $session->db->write("alter table Survey add column `feedbackTemplateId` char(22)");
 
     print "Done\n" unless $quiet;
 

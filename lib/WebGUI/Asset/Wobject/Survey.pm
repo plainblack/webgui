@@ -168,6 +168,14 @@ sub definition {
             defaultValue => 'AjhlNO3wZvN5k4i4qioWcg',
             namespace    => 'Survey/Edit',
         },
+        feedbackTemplateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            defaultValue => 'nWNVoMLrMo059mDRmfOp9g',
+            label        => $i18n->get('Feedback Template'),
+            hoverHelp    => $i18n->get('Feedback Template help'),
+            namespace    => 'Survey/Feedback',
+        },
         overviewTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
@@ -1212,16 +1220,15 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my ($lastResponseCompleteCode, $lastResponseEndDate) = $self->getLastResponseDetails();
-    
-    $var->{lastResponseCompleted} = $lastResponseCompleteCode == 1;
-    $var->{lastResponseEndDate} = WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
-    $var->{lastResponseTimedOut}  = $lastResponseCompleteCode == 3;
+    my $responseDetails = $self->getResponseDetails();
+
+    # Add lastResponse template vars
+    for my $tv qw(endDate feedback complete restart timeout timeoutRestart) {
+        $var->{"lastResponse\u$tv"} = $responseDetails->{$tv};
+    }
     $var->{maxResponsesSubmitted} = !$self->canTakeSurvey();
     
-    my $out = $self->processTemplate( $var, undef, $self->{_viewTemplate} );
-
-    return $out;
+    return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 }
 
 #-------------------------------------------------------------------
@@ -1251,57 +1258,91 @@ sub getMenuVars {
 
 #-------------------------------------------------------------------
 
-=head2 getLastResponseDetails ( )
+=head2 getResponseDetails ( [$responseId] )
 
-Gets the completeCode and endDate for the most recent response
+Looks up details about a given response.
+
+=head3 responseId
+
+A specific responseId to use. If none given, the most recent completed response is used.
 
 =cut
 
-sub getLastResponseDetails {
+sub getResponseDetails {
     my $self = shift;
-
-    my ($lastResponseCompleteCode, $lastResponseEndDate);
-
-    my $userId = $self->session->user->userId();
-    my $anonId 
-        = $self->session->form->process('userid')
-        || $self->session->http->getCookies->{Survey2AnonId}
-        || undef;
-    $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
-    my $ip = $self->session->env->getIp;
-    my $string;
-
-    if ( $anonId or $userId != 1 ) {
-        $string = 'userId';
-        if ($anonId) {
-            $string = 'anonId';
-            $userId = $anonId;
-        }
-        my $responseId
-            = $self->session->db->quickScalar(
-            "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-            [ $userId, $self->getId() ] );
-        if ( !$responseId ) {
-            ($lastResponseCompleteCode, $lastResponseEndDate) = $self->session->db->quickArray(
-                "select isComplete, endDate from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
-                [ $userId, $self->getId() ]
-            );
-        }
-
-    }
-    elsif ( $userId == 1 ) {
-        my $responseId = $self->session->db->quickScalar(
-            'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
-            [ $userId, $ip, $self->getId() ]
+    my $responseId = shift;
+    
+    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON);
+    
+    if ( $responseId ) {
+        ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
+            'select isComplete, endDate, responseJSON from Survey_response where responseId = ?', [ $responseId ]
         );
-        if ( !$responseId ) {
-            ($lastResponseCompleteCode, $lastResponseEndDate) = $self->session->db->quickArray(
-                'select isComplete, endDate from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
+    } else {
+        my $userId = $self->session->user->userId();
+        my $anonId 
+            = $self->session->form->process('userid')
+            || $self->session->http->getCookies->{Survey2AnonId}
+            || undef;
+        $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
+        my $ip = $self->session->env->getIp;
+        my $string;
+
+        if ( $anonId or $userId != 1 ) {
+            $string = 'userId';
+            if ($anonId) {
+                $string = 'anonId';
+                $userId = $anonId;
+            }
+            my $lastResponseId
+                = $self->session->db->quickScalar(
+                "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
+                [ $userId, $self->getId() ] );
+            if ( !$lastResponseId ) {
+                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
+                    "select isComplete, endDate, responseJSON from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
+                    [ $userId, $self->getId() ]
+                );
+            }
+        }
+        elsif ( $userId == 1 ) {
+            my $lastResponseId = $self->session->db->quickScalar(
+                'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
                 [ $userId, $ip, $self->getId() ]
             );
+            if ( !$lastResponseId ) {
+                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
+                    'select isComplete, endDate, responseJSON from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
+                    [ $userId, $ip, $self->getId() ]
+                );
+            }
         }
     }
-    return ($lastResponseCompleteCode, $lastResponseEndDate);
+    
+    # Process the feedback text
+    my $feedback;
+    my $tags = {};
+    if ($rJSON) {
+        $rJSON = from_json($rJSON) || {};
+        
+        # All tags become template vars
+        $tags = $rJSON->{tags} || {};
+        $tags->{complete} = $lastResponseCompleteCode == 1;
+        $tags->{restart} = $lastResponseCompleteCode == 2;
+        $tags->{timeout} = $lastResponseCompleteCode == 3;
+        $tags->{timeoutRestart} = $lastResponseCompleteCode == 4;
+        $tags->{endDate} = $lastResponseEndDate && WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
+        $feedback = $self->processTemplate($tags, $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g');
+    }
+    return {
+        completeCode => $lastResponseCompleteCode, 
+        endDate => $tags->{endDate},
+        feedback => $feedback,
+        complete => $tags->{complete},
+        restart => $tags->{restart},
+        timeout => $tags->{timeout},
+        timeoutRestart => $tags->{timeoutRestart},
+    };
 }
 
 #-------------------------------------------------------------------
