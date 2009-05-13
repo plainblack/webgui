@@ -1584,26 +1584,40 @@ sub surveyEnd {
     my $self   = shift;
     my %opts = validate(@_, { timeout => 0, restart => 0, exitUrl => 0 });
     
-    # See if we should restart the Survey instead of completing it
-    if ( $opts{restart} || ( $opts{timeout} && $self->get('doAfterTimeLimit') eq 'restartSurvey' )  ){
-        $self->responseJSON->resetResponse();
-        $self->persistResponseJSON;
-        delete $self->{responseId};
-        return $self->www_loadQuestions('1');
-    }
-    
     # If an in-progress response exists, mark it as complete
     if ( my $responseId = $self->responseId ) {
+        # Decide if we should flag any special actions such as restart or timeout
+        my $restart = $opts{restart};
+        my $timeoutRestart = $opts{timeout} && $self->get('doAfterTimeLimit') eq 'restartSurvey';
+        my $timeout = $opts{timeout};
+        
+        # First thing to do is to end the current response (and flag why it happened)
+        my $completeCode
+            = $timeoutRestart ? 4
+            : $timeout        ? 3
+            : $restart        ? 2
+            :                   1
+            ;
+        $self->session->log->debug("Completing survey response $responseId with completeCode: $completeCode");
+            
         $self->session->db->setRow(
             'Survey_response',
             'Survey_responseId', {
                 Survey_responseId => $responseId,
                 endDate           => scalar time,
-                isComplete        => 1,
+                isComplete        => $completeCode,
             }
         );
         
-         # Trigger workflow
+        # When restarting, we just need to uncache everything response-related
+        if ( $restart || $timeoutRestart ) {
+            $self->session->log->debug("Detaching from response $responseId as part of restart");
+            delete $self->{_responseJSON};
+            delete $self->{responseId};
+            return $self->www_loadQuestions(1);
+        }
+        
+         # Trigger workflow for everything else
         if ( my $workflowId = $self->get('onSurveyEndWorkflowId') ) {
             $self->session->log->debug("Triggering onSurveyEndWorkflowId workflow: $workflowId");
             WebGUI::Workflow::Instance->create(
@@ -1806,7 +1820,6 @@ sub responseId {
     my $user = WebGUI::User->new($self->session, $userId);
 
     if (!defined $self->{responseId}) {
-    
         my $ip = $self->session->env->getIp;
         my $id = $userId || $self->session->user->userId;
         my $anonId = $self->session->form->process('userid');
@@ -1840,7 +1853,6 @@ sub responseId {
                 [ $id, $ip, $self->getId() ]
             );
         }
-    
         if ( !$responseId ) {
             my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
             my $haveTaken;
@@ -1857,7 +1869,6 @@ sub responseId {
                     "select count(*) from Survey_response where $string = ? and assetId = ?",
                     [ $id, $self->getId() ] );
             }
-    
             if ( $maxResponsesPerUser == 0 || $haveTaken < $maxResponsesPerUser ) {
                 $responseId = $self->session->db->setRow(
                     'Survey_response',

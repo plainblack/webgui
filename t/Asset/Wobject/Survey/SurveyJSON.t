@@ -14,7 +14,6 @@ use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
 use Clone qw/clone/;
-#use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init

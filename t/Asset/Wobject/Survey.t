@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 24;
+my $tests = 25;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -116,9 +116,10 @@ cmp_deeply(
     'submitQuestions does the right thing'
 );
 
-# Test out Restart
+# Test Restart
 $s->surveyEnd( { restart => 1 } );
 cmp_deeply($s->responseJSON->responses, {}, 'restart removes the in-progress response');
+ok($responseId ne $s->responseId, '..and uses a new responseId');
 
 # Test out exitUrl with an explicit
 use JSON;

@@ -76,17 +76,23 @@ sub new {
 
     # Create skeleton object..
     my $self = {
-        # First define core members..
         _survey => $survey,
         _session => $survey->session,
+        _response => {
+            # Response hash defaults..
+            responses => {},
+            lastResponse => -1,
+            questionsAnswered => 0,
+            startTime => time(),
+            surveyOrder => undef,
+            tags => {},
+            
+            # And then jsonData overrides
+            %{$jsonData},
+        }
     };
     
     bless $self, $class;
-    
-    # Initialise response data
-    $self->resetResponse($jsonData);
-    
-    return $self;
 }
 
 #----------------------------------------------------------------------------
@@ -1359,37 +1365,6 @@ sub returnResponseForReporting {
                 };
     }
     return \@report;
-}
-
-#-------------------------------------------------------------------
-
-=head2 resetResponse ( [$data] )
-
-Resets all response data (e.g. for when you want to restart a survey)
-
-=head3 data (optional)
-
-Extra data to apply over the defaults
-
-=cut
-
-sub resetResponse {    
-    my $self = shift;
-    my $data = shift || {};
-    
-    $self->{_response} = {
-        
-        # Response hash defaults..
-        responses => {},
-        lastResponse => -1,
-        questionsAnswered => 0,
-        startTime => time(),
-        surveyOrder => undef,
-        tags => {},
-        
-        # And then allow overrides
-        %{$data},
-    };
 }
 
 #-------------------------------------------------------------------
