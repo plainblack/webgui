@@ -283,95 +283,17 @@ sub www_viewTransaction {
     my $session = $self->session;
    
     my $transactionId = $session->form->get('transactionId');
-    my $transaction   = shift || WebGUI::Shop::Transaction->new($session,$transactionId);
+    my $transaction   = shift || WebGUI::Shop::Transaction->new( $session,$transactionId );
     my $notice        = shift;
 
-    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
-
-    my $i18n          = WebGUI::International->new($session, 'Shop');
-    my ($style, $url) = $session->quick(qw(style url));
-    
-    my %var = (
-        %{$transaction->get},
-        notice                  => $notice,
-        cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$transaction->getId),
-        amount                  => sprintf("%.2f", $transaction->get('amount')),
-        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
-        taxes                   => sprintf("%.2f", $transaction->get('taxes')),
-        shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
-        shippingAddress         => $transaction->formatAddress({
-                                        name        => $transaction->get('shippingAddressName'),
-                                        address1    => $transaction->get('shippingAddress1'),
-                                        address2    => $transaction->get('shippingAddress2'),
-                                        address3    => $transaction->get('shippingAddress3'),
-                                        city        => $transaction->get('shippingCity'),
-                                        state       => $transaction->get('shippingState'),
-                                        code        => $transaction->get('shippingCode'),
-                                        country     => $transaction->get('shippingCountry'),
-                                        phoneNumber => $transaction->get('shippingPhoneNumber'),
-                                        }),
-        paymentAddress          =>  $transaction->formatAddress({
-                                        name        => $transaction->get('paymentAddressName'),
-                                        address1    => $transaction->get('paymentAddress1'),
-                                        address2    => $transaction->get('paymentAddress2'),
-                                        address3    => $transaction->get('paymentAddress3'),
-                                        city        => $transaction->get('paymentCity'),
-                                        state       => $transaction->get('paymentState'),
-                                        code        => $transaction->get('paymentCode'),
-                                        country     => $transaction->get('paymentCountry'),
-                                        phoneNumber => $transaction->get('paymentPhoneNumber'),
-                                        }),
-        );
-    
-    # items
-    my @items = ();
-    foreach my $item (@{$transaction->getItems}) {
-        my $address = '';
-        if ($transaction->get('shippingAddressId') ne $item->get('shippingAddressId')) {
-            $address = $transaction->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
-                            });
-        }
-
-        # Post purchase actions
-        my $actionsLoop = [];
-        my $actions     = $item->getSku->getPostPurchaseActions( $item );
-        for my $label ( keys %{$actions} ) {
-            push @{$actionsLoop}, {
-                label       => $label,
-                url         => $actions->{$label},
-            }
-        }
-        
-        my %taxConfiguration = %{ from_json( $item->get( 'taxConfiguration' ) || '{}' ) };
-        my %taxVars          =  
-            map     { ( "tax_$_" => $taxConfiguration{ $_ } ) }
-            keys    %taxConfiguration;
-
-        push @items, {
-            %{ $item->get },
-            %taxVars,
-            viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId),
-            price               => sprintf("%.2f", $item->get('price')),
-            itemShippingAddress => $address,
-            orderStatus         => $i18n->get($item->get('orderStatus')),
-            actionsLoop         => $actionsLoop,
-        };
-    }
-    $var{items} = \@items;
-
-    $self->appendCommonVars(\%var);
+    return $session->insufficient unless $transaction->get('userId') eq $session->user->userId;
+   
+    my $var = $transaction->getTransactionVars;
+    $var->{ notice } = $notice;
+    $self->appendCommonVars( $var );
 
     # render
-    return $self->processTemplate(\%var,$session->setting->get("shopMyPurchasesDetailTemplateId"));
+    return $self->processTemplate( $var, $session->setting->get('shopMyPurchasesDetailTemplateId') );
 }
 
 

@@ -22,6 +22,7 @@
  - Added better Survey Expression Engine validation warnings
  - added #9203: Survey Visualization
  - Added: United States Postal Service Shipping Driver.
+ - Refactored transaction tmpl_var generation into WebGUI::Shop::Transaction. ( Martin Kamerbeek / Oqapi )
 
 7.7.5
  - Adding StoryManager.

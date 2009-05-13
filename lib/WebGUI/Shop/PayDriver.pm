@@ -673,87 +673,32 @@ Sends out a receipt and a sale notification to the buyer and the store owner res
 sub sendNotifications {
     my ($self, $transaction) = @_;
     my $session = $self->session;
-    my $i18n = WebGUI::International->new($session, 'PayDriver');
-    my ($style, $url) = $session->quick(qw(style url));
-    my %var = (
-        %{$transaction->get},
-        viewDetailUrl           => $url->page('shop=transaction;method=viewMy;transactionId='.$transaction->getId,1),
-        amount                  => sprintf("%.2f", $transaction->get('amount')),
-        inShopCreditDeduction   => sprintf("%.2f", $transaction->get('inShopCreditDeduction')),
-        taxes                   => sprintf("%.2f", $transaction->get('taxes')),
-        shippingPrice           => sprintf("%.2f", $transaction->get('shippingPrice')),
-        shippingAddress         => $transaction->formatAddress({
-                                        name        => $transaction->get('shippingAddressName'),
-                                        address1    => $transaction->get('shippingAddress1'),
-                                        address2    => $transaction->get('shippingAddress2'),
-                                        address3    => $transaction->get('shippingAddress3'),
-                                        city        => $transaction->get('shippingCity'),
-                                        state       => $transaction->get('shippingState'),
-                                        code        => $transaction->get('shippingCode'),
-                                        country     => $transaction->get('shippingCountry'),
-                                        phoneNumber => $transaction->get('shippingPhoneNumber'),
-                                        }),
-        paymentAddress          =>  $transaction->formatAddress({
-                                        name        => $transaction->get('paymentAddressName'),
-                                        address1    => $transaction->get('paymentAddress1'),
-                                        address2    => $transaction->get('paymentAddress2'),
-                                        address3    => $transaction->get('paymentAddress3'),
-                                        city        => $transaction->get('paymentCity'),
-                                        state       => $transaction->get('paymentState'),
-                                        code        => $transaction->get('paymentCode'),
-                                        country     => $transaction->get('paymentCountry'),
-                                        phoneNumber => $transaction->get('paymentPhoneNumber'),
-                                        }),
-        );
-    
-    # items
-    my @items = ();
-    foreach my $item (@{$transaction->getItems}) {
-        my $address = '';
-        if ($transaction->get('shippingAddressId') ne $item->get('shippingAddressId')) {
-            $address = $transaction->formatAddress({
-                            name        => $item->get('shippingAddressName'),
-                            address1    => $item->get('shippingAddress1'),
-                            address2    => $item->get('shippingAddress2'),
-                            address3    => $item->get('shippingAddress3'),
-                            city        => $item->get('shippingCity'),
-                            state       => $item->get('shippingState'),
-                            code        => $item->get('shippingCode'),
-                            country     => $item->get('shippingCountry'),
-                            phoneNumber => $item->get('shippingPhoneNumber'),
-                            });
-        }
-        push @items, {
-            %{$item->get},
-            viewItemUrl         => $url->page('shop=transaction;method=viewItem;transactionId='.$transaction->getId.';itemId='.$item->getId, 1),
-            price               => sprintf("%.2f", $item->get('price')),
-            itemShippingAddress => $address,
-            orderStatus         => $i18n->get($item->get('orderStatus'),'Shop'),
-        };
-    }
-    $var{items} = \@items;
+    my $i18n    = WebGUI::International->new($session, 'PayDriver');
+    my $url     = $session->url;
+    my $var     = $transaction->getTransactionVars;
 
     # render
     my $template = WebGUI::Asset::Template->new( $session, $self->get("receiptEmailTemplateId") );
     my $inbox = WebGUI::Inbox->new($session);
-    my $receipt = $template->process(\%var);
+    my $receipt = $template->process( $var );
     WebGUI::Macro::process($session, \$receipt);
 
     # purchase receipt
     $inbox->addMessage( {
         message     => $receipt,
-        subject     => $i18n->get('receipt subject').' '.$transaction->get('orderNumber'),
+        subject     => $i18n->get('receipt subject') . ' ' . $transaction->get('orderNumber'),
         userId      => $transaction->get('userId'),
         status      => 'completed',
     } );
     
     # shop owner notification
-    $var{viewDetailUrl} = $url->page('shop=transaction;method=view;transactionId='.$transaction->getId,1);
-    my $notification = $template->process(\%var);
+    # Shop owner uses method=view rather than method=viewMy
+    $var->{viewDetailUrl} = $url->page( 'shop=transaction;method=view;transactionId='.$transaction->getId, 1 );
+    my $notification = $template->process( $var );
     WebGUI::Macro::process($session, \$notification);
     $inbox->addMessage( {
         message     => $notification,
-        subject     => $i18n->get('a sale has been made').' '.$transaction->get('orderNumber'),
+        subject     => $i18n->get('a sale has been made') . ' ' . $transaction->get('orderNumber'),
         groupId     => $self->get('saleNotificationGroupId'),
         status      => 'unread',
     } );
