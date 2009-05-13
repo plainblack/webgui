@@ -226,7 +226,7 @@ sub getCurrentRevisionDate  {
     my $class = shift;
     my $session = shift;
     my $assetId = shift;
-	my $assetRevision = $session->stow->get("assetRevision");
+	my $assetRevision = $session->stow->get("assetRevision",{noclone=>1});
 	my $revisionDate = $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and
