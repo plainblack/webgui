@@ -360,9 +360,11 @@ sub search {
         croak "'lineage' rule must be array reference"
             if ( $rules->{lineage} && ref $rules->{lineage} ne "ARRAY" );
 
-	my @params = ();
+	my @params;
+        my @orParams;
 	my $query = "";
-	my @clauses = ();
+	my @clauses;
+        my @orClauses;
 	if ($rules->{keywords}) {
 		my $keywords = $rules->{keywords};
 		unless ($keywords =~ m/"|\*/) { # do wildcards for people, like they'd expect
@@ -401,6 +403,15 @@ sub search {
 			push(@phrases, "lineage like ?");
 		}
 		push(@clauses, join(" or ", @phrases)) if (scalar(@phrases));
+	}
+	if ($rules->{assetIds}) {
+		my @phrases = ();
+		foreach my $assetId (@{$rules->{assetIds}}) {
+			next unless $assetId;
+			push(@orParams, $assetId);
+                        push(@phrases, "assetId like ?");
+                }
+		push(@orClauses, join(" or ", @phrases)) if (scalar(@phrases));
 	}
 	if ($rules->{classes}) {
 		my @phrases = ();
@@ -457,9 +468,19 @@ sub search {
 			unless (ref $rules->{columns} eq "ARRAY");
 		$self->{_columns} = $rules->{columns};
 	}
-	
-	$self->{_params} = \@params;
-	$self->{_where} = "(".join(") and (", @clauses).")";
+
+	push @{$self->{_params}}, @params;
+	push @{$self->{_params}}, @orParams;
+
+        if (@clauses) {
+            $self->{_where} .= "(".join(") and (", @clauses).")";
+        }
+        if (@orClauses) {
+            if (length( $self->{_where} )) {
+                $self->{_where} .= ' or ';
+            }
+            $self->{_where} .= "(".join(") or (", @orClauses).")";
+        }
 	return $self;
 }
 

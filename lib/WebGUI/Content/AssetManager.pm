@@ -131,6 +131,7 @@ sub getSearchPaginator {
     
     my $s       = WebGUI::Search->new( $session, 0 );
     $s->search( {
+        assetIds        => $query->{ assetIds },
         keywords        => $query->{ keywords },
         classes         => $query->{ classes },
     } );
@@ -611,7 +612,18 @@ sub www_search {
         my $keywords        = $session->form->get( 'keywords' );
         my @classes         = $session->form->get( 'class' );
 
-        my $p       = getSearchPaginator( $session, { 
+        # Detect a helper word key
+        my @assetIds        = ($keywords =~ /assetid:\s*([^\s]+)/gi);
+
+        # purge helper word keys
+        if (@assetIds) {
+            $keywords =~ s/\bassetid:\s*[^\s]+//gi;
+        }
+        $keywords =~ s/^\s+//g;
+        $keywords =~ s/\s+$//g;
+
+        my $p       = getSearchPaginator( $session, {
+            assetIds            => \@assetIds,
             keywords            => $keywords,
             classes             => \@classes,
             orderByColumn       => $session->form->get( 'orderByColumn' ),
