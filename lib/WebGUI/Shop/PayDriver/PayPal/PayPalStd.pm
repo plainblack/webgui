@@ -19,6 +19,7 @@ package WebGUI::Shop::PayDriver::PayPal::PayPalStd;
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  -------------------------------------------------------------------
+
 =cut
 
 use strict;
@@ -52,6 +53,7 @@ and transaction information on return.
 
 Tells the commerce system that this payment plugin can handle recurring payments.
 1 = yes, 0 = no. This module == no.
+
 =cut
 
 sub handlesRecurring {
