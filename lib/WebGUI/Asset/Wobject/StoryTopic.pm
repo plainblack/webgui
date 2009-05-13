@@ -75,7 +75,7 @@ sub definition {
     );
     push(@{$definition}, {
         assetName=>$i18n->get('assetName'),
-        icon=>'assets.gif',
+        icon=>'storytopic.gif',
         autoGenerateForms=>1,
         tableName=>'StoryTopic',
         className=>'WebGUI::Asset::Wobject::StoryTopic',
