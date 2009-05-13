@@ -490,7 +490,7 @@ our $I18N = {
         message     => q|The template to display the main page of the survey.|,
         lastUpdated => 0,
     },
-    
+
     'Feedback Template' => {
         message     => q|Feedback Template|,
         lastUpdated => 0,
@@ -500,7 +500,7 @@ our $I18N = {
         message     => q|The template used to display response feedback.|,
         lastUpdated => 0,
     },
-    
+
     'do after timelimit label' => {
         message => q|Do After Time Limit:|,
         lastUpdated => 1224686319,
@@ -597,7 +597,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|When the user finishes the survey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
         lastUpdated => 1241648155,
     },
-    
+
     'Overview Report Template' => {
         message     => q|Overview Report Template|,
         lastUpdated => 0,
@@ -607,7 +607,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Overview Report.|,
         lastUpdated => 0,
     },
-    
+
     'Grabebook Report Template' => {
         message     => q|Grabebook Report Template|,
         lastUpdated => 0,
@@ -617,7 +617,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Gradebook Report|,
         lastUpdated => 0,
     },
-    
+
     'Survey Edit Template' => {
         message     => q|Survey Edit Template|,
         lastUpdated => 0,
@@ -627,7 +627,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Survey Edit screen.|,
         lastUpdated => 0,
     },
-    
+
     'Allow back button' => {
         message     => q|Allow back button|,
         lastUpdated => 0,
@@ -681,13 +681,13 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message => q|The template for displaying the screen for editing the survey.|,
         lastUpdated => 0
     },
-    
+
     'Survey Summary Template' => {
         message => q|Survey Summary Template|,
         context => q|The template for displaying the summary page to users.|,
         lastUpdated => 0
     },
-    
+
     'Survey Summary Template help' => {
         message => q|This is the template shown to users in quiz mode to summarize their results.|,
         context => q|The template for displaying the summary page to users.|,
@@ -935,52 +935,57 @@ directly inside the answer_loop for other types of questions.|,
         context => q|The title of a template Help page.|,
         lastUpdated => 1078223096
     },
-    
+
     'response complete' => {
         message => q|Survey Response completed|,
         lastUpdated => 1242180657,
     },
-    
+
     'response complete help' => {
         message => q|A boolean flag indicating whether the Survey Response completed|,
         lastUpdated => 1242180657,
     },
-    
+
     'response restart' => {
         message => q|Survey Response restarted|,
         lastUpdated => 1242180657,
     },
-    
+
     'response restart help' => {
         message => q|A boolean flag indicating whether the Survey Response restarted|,
         lastUpdated => 1242180657,
     },
-    
+
     'response timeout' => {
         message => q|Survey Response timed out|,
         lastUpdated => 1242180657,
     },
-    
+
     'response timeout help' => {
         message => q|A boolean flag indicating whether the Survey Response timed out|,
         lastUpdated => 1242180657,
     },
-    
+
     'response timeout restart' => {
         message => q|Survey Response restarted due to a timeout|,
         lastUpdated => 1242180657,
     },
-    
+
     'response timeout restart help' => {
         message => q|A boolean flag indicating whether the Survey Response restarted as a result of a timeout|,
         lastUpdated => 1242180657,
     },
-    
+
     'response endDate help' => {
         message => q|A localised date/time string indicating when the response ended|,
         lastUpdated => 1242180657,
     },
-    
+
+    'survey feedback template variables title' => {
+        message => q|Survey Feedback Template Variables|,
+        lastUpdated => 1242256111,
+    },
+
     'survey feedback template body' => {
         message => q|All data tagged in survey expressions is also made available as template variables|,
         lastUpdated => 1242180657,
@@ -1003,7 +1008,7 @@ directly inside the answer_loop for other types of questions.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     'lastResponseFeedback help' => {
         message => q|The templated response feedback text|,
         context => q|Description of a template variable for a template Help page.|,
@@ -1447,7 +1452,7 @@ section/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1241588599,
     },
-    
+
     'textCols label' => {
         message => q|TextArea Columns|,
         lastUpdated => 1241588599
@@ -1458,7 +1463,7 @@ section/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 1241588599,
     },
-    
+
     'textRows label' => {
         message => q|TextArea Rows|,
         lastUpdated => 1241588599
@@ -1493,31 +1498,31 @@ section/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     'year' => {
         message => q|Year (YYYY):|,
         context => q|Sub-label for "Year Month" question type|,
         lastUpdated => 0,
     },
-    
+
     'month' => {
         message => q|Month:|,
         context => q|Sub-label for "Year Month" question type|,
         lastUpdated => 0,
     },
-    
+
     'back' => {
         message => q|Back|,
         context => q|Back button label on Take Survey page|,
         lastUpdated => 0,
     },
-    
+
     'continue' => {
         message => q|Continue|,
         context => q|Continue button label on Take Survey page|,
         lastUpdated => 0,
     },
-    
+
     'finish' => {
         message => q|Finish|,
         context => q|Finish button label on Take Survey page|,
