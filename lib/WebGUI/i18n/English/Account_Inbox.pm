@@ -726,6 +726,18 @@ our $I18N = {
          context      => "template variable for view inbox template",
      },
 
+     'userFilter' => {
+         message         => q{A select box form element to filter the list of messages by who sent them.},
+         lastUpdated     => 1235421123,
+         context         => "Description of Inbox setting",
+     },
+
+     'All users' => {
+         message         => q{All users},
+         lastUpdated     => 1235421123,
+         context         => "Default setting for filtering in the Inbox.  Short for Show messages from all users.",
+     },
+
 };
 
 1;

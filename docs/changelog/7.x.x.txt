@@ -23,6 +23,7 @@
  - added #9203: Survey Visualization
  - Added: United States Postal Service Shipping Driver.
  - Refactored transaction tmpl_var generation into WebGUI::Shop::Transaction. ( Martin Kamerbeek / Oqapi )
+ - rfe #9906: Inbox Filtering
 
 7.7.5
  - Adding StoryManager.

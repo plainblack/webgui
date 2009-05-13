@@ -223,7 +223,7 @@ sub editSettingsForm {
         label       => $i18n->get("inbox rich editor label"),
         hoverHelp   => $i18n->get("inbox rich editor description"),
     );
-    
+
     return $f->printRowsOnly;
 }
 
@@ -575,7 +575,7 @@ sub www_deleteMessage {
     my $message   = $inbox->getMessage($messageId);
 
     $self->store->{tab} = "inbox";
-    
+
     if (!(defined $message) || !$inbox->canRead($message)) {
         #View will handle displaying these errors
         return $self->www_viewMessage;
@@ -593,7 +593,7 @@ sub www_deleteMessage {
         }
     }
     $message->delete;
-    
+
     return $self->www_viewMessage($displayMessage->getId);
 }
 
@@ -708,7 +708,7 @@ sub www_inviteUser {
     my $form         = $session->form;
     my $setting      = $session->setting;
     my $user         = $session->user;
-    
+
     my $displayError = shift;
     my $var          = {};
 
@@ -717,11 +717,11 @@ sub www_inviteUser {
 
     #Add any error passed in to be displayed if the form reloads
     $var->{'message_display_error'}  = $displayError;
-   
+
     #Message From
     $var->{'message_from'     }  = $user->getWholeName;
     $var->{'message_from_id'  }  = $user->userId;
-    
+
     #Message To
     $var->{'form_to'          } = WebGUI::Form::email($session, {
         name  => "to",
@@ -772,7 +772,7 @@ sub www_inviteUser {
         action => $self->getUrl("module=inbox;do=inviteUserSave"),
         extras => q{name="inviteForm"}
     });
-    
+
     $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
     $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
     $var->{'back_url'         }  = $session->env->get("HTTP_REFERER") || $var->{'view_inbox_url'};
@@ -803,7 +803,7 @@ sub www_inviteUserSave {
     #Must have a person to send email to
     my $to = $form->get('to');
     return $self->www_inviteUser($i18n->get('missing email')) unless $to;
-    
+
     #Must have a subject
     my $defaultSubject = $setting->get("inboxInviteUserSubject");
     WebGUI::Macro::process($session,\$defaultSubject);
@@ -887,11 +887,11 @@ sub www_manageInvitations {
     my $i18n    = WebGUI::International->new($session,'Account_Inbox');
 
     $self->store->{tab} = "invitations";
-    
+
     #Deal with rows per page
     my $rpp          = $session->form->get("rpp") || 25;
     my $rpp_url      = ";rpp=$rpp";
-    
+
     #Cache the base url
     my $inboxUrl     =  $self->getUrl("op=account;module=inbox;do=manageInvitations");
 
@@ -903,15 +903,15 @@ sub www_manageInvitations {
         $rpp
     );
     $p->setDataByQuery($sql,undef,undef,[$user->userId]);
-    
+
     #Export page to template
     my @msg    = ();
     foreach my $row ( @{$p->getPageData} ) {
         my $inviter   = WebGUI::User->new($session,$row->{inviterId});
         next if($inviter->isVisitor); # Inviter account got deleted
-        
+
         my $epoch = WebGUI::DateTime->new(mysql => $row->{dateSent} )->epoch;
-        
+
         my $hash                       = {};
         $hash->{'invite_id'          } = $row->{inviteId};
         $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewInvitation;inviteId=".$row->{inviteId});
@@ -927,7 +927,7 @@ sub www_manageInvitations {
 	  	push(@msg,$hash);
    	}
     my $msgCount  = $p->getRowCount;
-         
+
    	$var->{'message_loop'  } = \@msg;
     $var->{'has_messages'  } = $msgCount > 0;
     $var->{'message_total' } = $msgCount;
@@ -989,7 +989,7 @@ sub www_sendMessage {
     #Add common template variable for displaying the inbox
     my $inbox     = WebGUI::Inbox->new($session); 
     $self->appendCommonVars($var,$inbox);
-    
+
     my $messageId = $form->get("messageId");
     my $userId    = $form->get("userId");
     my $pageUrl   = $session->url->page;
@@ -999,7 +999,7 @@ sub www_sendMessage {
     if($messageId) {
         #This is a reply to a message - automate who the user is
         my $message = $inbox->getMessage($messageId);
-        
+
         #Handle Errors
         if (!(defined $message)) {
             #Message doesn't exist
@@ -1046,14 +1046,14 @@ sub www_sendMessage {
             $var->{'isInbox'} = "true";
             return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
         }
-        
+
         $var->{'isPrivateMessage'} = "true";
         $var->{'message_to'      } = $toUser->getWholeName;
     }
     else {
         #This is a new message
         $var->{'isNew'     } = "true";
-        
+
         my $friends           = $fromUser->friends->getUserList;
         my @checkedFriends    = ();
         my @friendsChecked    = $form->process("friend","checkList");
@@ -1091,7 +1091,7 @@ sub www_sendMessage {
 
             push (@friendsLoop, $friendHash);
         }
-        
+
         #You can't send new messages if you don't have any friends to send to
         unless($activeFriendCount) {
             my $i18n  = WebGUI::International->new($session,'Account_Inbox');
@@ -1103,9 +1103,9 @@ sub www_sendMessage {
         $var->{'friends_loop'       } = \@friendsLoop;
         $var->{'checked_fiends_loop'} = \@checkedFriends;
     }
- 
+
     $var->{'message_from'         }  = $fromUser->getWholeName;
-    
+
     my $subject = $form->get("subject");
     if($subject eq "" && $messageId) {
         $subject = "Re: ".$var->{'message_subject'};
@@ -1118,7 +1118,7 @@ sub www_sendMessage {
     });
 
     $var->{'message_body'     } = $form->get('message');
-    
+
     $var->{'form_message_text'}  = WebGUI::Form::textarea($session, {
         name   =>"message",
         value  =>$var->{'message_body'} || "",
@@ -1132,12 +1132,12 @@ sub www_sendMessage {
         width => "600",
         richEditId => $self->getRichEditorId,
     });
-    
+
     $var->{'form_header'      }  = WebGUI::Form::formHeader($session,{
         action => $self->getUrl("module=inbox;do=sendMessageSave;messageId=$messageId;userId=$userId"),
         extras => q{name="messageForm"}
     });
-    
+
     $var->{'submit_button'    }  = WebGUI::Form::submit($session,{});
     $var->{'form_footer'      }  = WebGUI::Form::formFooter($session, {});
     $var->{'back_url'         }  = $backUrl;
@@ -1166,7 +1166,7 @@ sub www_sendMessageSave {
 
     #Add common template variable for displaying the inbox
     my $inbox     = WebGUI::Inbox->new($session); 
-    
+
     my $messageId = $form->get("messageId");
     my $userId    = $form->get("userId");
     my @friends   = $form->get("friend","checkList");    
@@ -1255,11 +1255,11 @@ sub www_view {
     my $var     = {};
 
     $self->store->{tab} = "inbox";
-   
+
     #Deal with sort order
     my $sortBy       = $session->form->get("sortBy") || undef;
     my $sort_url     = ($sortBy)?";sortBy=$sortBy":"";
-    
+
     #Deal with sort direction
     my $sortDir      = $session->form->get("sortDir") || "desc";
     my $sortDir_url  = ";sortDir=".(($sortDir eq "desc")?"asc":"desc");
@@ -1267,26 +1267,37 @@ sub www_view {
     #Deal with rows per page
     my $rpp          = $session->form->get("rpp") || 25;
     my $rpp_url      = ";rpp=$rpp";
-    
+
+    #Deal with user filtering
+    my $userFilter      = $session->form->get("userFilter") || 'all';
+    my $userFilter_url  = ";userFilter=$userFilter";
+
     #Cache the base url
     my $inboxUrl     =  $self->getUrl;
 
+    my $urlFrag = $sortDir_url . $rpp_url . $userFilter_url;
+
     #Create sortBy headers
-    $var->{'subject_url'   } = $inboxUrl.";sortBy=subject".$sortDir_url.$rpp_url;
-   	$var->{'status_url'    } = $inboxUrl.";sortBy=status".$sortDir_url.$rpp_url;
-    $var->{'from_url'      } = $inboxUrl.";sortBy=sentBy".$sortDir_url.$rpp_url;
-    $var->{'dateStamp_url' } = $inboxUrl.";sortBy=dateStamp".$sortDir_url.$rpp_url;
-    $var->{'rpp_url'       } = $inboxUrl.$sort_url.";sortDir=".$sortDir;
-    
+    $var->{'subject_url'   } = $inboxUrl.";sortBy=subject"   . $urlFrag;
+   	$var->{'status_url'    } = $inboxUrl.";sortBy=status"    . $urlFrag;
+    $var->{'from_url'      } = $inboxUrl.";sortBy=sentBy"    . $urlFrag;
+    $var->{'dateStamp_url' } = $inboxUrl.";sortBy=dateStamp" . $urlFrag;
+
+    $var->{'rpp_url'       } = $inboxUrl.$sort_url.$sortDir_url.$userFilter_url;
+
     #Create the paginator
     my $inbox     = WebGUI::Inbox->new($session);
-    my $p         = $inbox->getMessagesPaginator($session->user,{
+    my $messageOptions = {
         sortBy        => $sortBy,
         sortDir       => $sortDir,
-        baseUrl       => $inboxUrl.$sort_url.";sortDir=".$sortDir.$rpp_url,
-        paginateAfter => $rpp
-    });
-    
+        baseUrl       => $inboxUrl.$sort_url.$sortDir_url.$rpp_url.$userFilter_url,
+        paginateAfter => $rpp,
+    };
+    if ($userFilter ne 'all') {
+        $messageOptions->{whereClause} = sprintf 'ibox.sentBy=%s', $session->db->quote($session->form->get('userFilter'));
+    }
+    my $p         = $inbox->getMessagesPaginator($session->user, $messageOptions);
+
     #Export page to template
     my @msg       = ();
     foreach my $row ( @{$p->getPageData} ) {
@@ -1315,7 +1326,7 @@ sub www_view {
 	  	push(@msg,$hash);
    	}
     my $msgCount  = $p->getRowCount;
-         
+
    	$var->{'message_loop'        } = \@msg;
     $var->{'has_messages'        } = $msgCount > 0;
     $var->{'message_total'       } = $msgCount;
@@ -1329,6 +1340,20 @@ sub www_view {
         options => \%rpps,
         value   => $session->form->get("rpp") || 25,
         extras  => q{onchange="location.href='}.$var->{'rpp_url'}.q{;rpp='+this.options[this.selectedIndex].value"}
+    });
+
+    my $userSql = $inbox->getMessageSql(undef, { 'select' => <<EOSQL, });
+ibox.sentBy,
+(IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+EOSQL
+    tie my %userHash, 'Tie::IxHash';
+    my $i18n = WebGUI::International->new($session, 'Account_Inbox');
+    %userHash = ( 'all' => $i18n->get('All users'), $session->db->buildHash($userSql) );
+    $var->{'userFilter'} = WebGUI::Form::selectBox($session,{
+        name    => 'userFilter',
+        options => \%userHash,
+        value   => $session->form->get('userFilter') || 'all',
+        extras  => q{onchange="location.href='}.$inboxUrl.q{;userFilter='+this.options[this.selectedIndex].value"}
     });
 
     $var->{'form_header'} = WebGUI::Form::formHeader($session,{
@@ -1386,9 +1411,9 @@ sub www_viewInvitation {
         $var->{'isInvitation'} = "true";
         return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
     }
-        
+
     my $epoch = WebGUI::DateTime->new(mysql => $invitation->{dateSent} )->epoch;
-        
+
     $var->{'invite_id'              } = $inviteId;
     $var->{'message_from_id'        } = $inviter->userId; 
     $var->{'message_from'           } = $inviter->getWholeName;
@@ -1405,7 +1430,7 @@ sub www_viewInvitation {
                 || $var->{'message_body'} =~ /\<p/ig) {
         $var->{'message_body'} =~ s/\n/\<br \/\>\n/g;
     }
-    
+
     #Build the action URLs
     my $nextInvitation = $friends->getPreviousInvitation($invitation);  #Messages sorted descending so next is actually previous
     if( $nextInvitation->{inviteId} ) {
@@ -1461,7 +1486,7 @@ sub www_viewMessage {
 
     #Add common template variable for displaying the inbox
     $self->appendCommonVars($var,$inbox);
-    
+
     #Handler Errors
     if (!(defined $message)) {
         my $i18n  = WebGUI::International->new($session,'Account_Inbox');
@@ -1477,7 +1502,7 @@ sub www_viewMessage {
         $var->{'isInvitation'} = "true";
         return $self->showError($var,$errorMsg,$backUrl,$self->getInboxErrorTemplateId);
     }
-    
+
     $message->setStatus("read") unless ($message->isRead);
 
     $var->{'message_id'             } = $messageId;

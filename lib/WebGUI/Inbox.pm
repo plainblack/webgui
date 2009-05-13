@@ -154,7 +154,8 @@ sub getMessage {
 
 =head2 getNextMessage ( message [, userId] ) 
 
-Returns the message that was send after the message passed in for the user
+Returns the message that was sent after the message passed in for the user.  This is always assumed
+to be in date order.
 
 =head3 message
 
@@ -188,11 +189,12 @@ sub getNextMessage {
 
 =head2 getPreviousMessage ( message [, userId] ) 
 
-Returns the message that was sent before the message passed in for the user
+Returns the message that was sent before the message passed in for the user.  This is always assumed
+to be sorted in date order.
 
 =head3 message
 
-The message to find the previous message for
+The message to find the previous message for.
 
 =head3 user
 
@@ -240,6 +242,10 @@ An integer indication the page to return.  Defaults to 1
 
 The column to sort by
 
+=head3 where
+
+An extra clause for filtering results.
+
 =cut
 
 sub getMessagesForUser {
@@ -248,13 +254,14 @@ sub getMessagesForUser {
     my $perpage     = shift || 50;
     my $page        = shift || 1;
     my $sortBy      = shift;
+    my $where       = shift;
     
     my $p = $self->getMessagesPaginator( $user , {
         sortBy        => $sortBy,
         sortDir       => "desc",
         paginateAfter => $perpage,
-        pageNumber    => $page
-        
+        pageNumber    => $page,
+        whereClause   => $where,
     });
     
     return $self->getMessagesOnPage($p);
@@ -332,6 +339,10 @@ Specify the form variable the paginator should use in its links.  Defaults to "p
 
 By default the page number will be determined by looking at $self->session->form->process("pn"). If that is empty the page number will be defaulted to "1". If you'd like to override the page number specify it here.
 
+=head4 whereClause
+
+An extra clause to filter the results returned by the paginator.
+
 =cut
 
 sub getMessagesPaginator {    
@@ -347,6 +358,7 @@ sub getMessagesPaginator {
     my $paginateAfter = $properties->{paginateAfter};
     my $formVar       = $properties->{formVar};
     my $pageNumber    = $properties->{pageNumber};
+    my $whereClause   = $properties->{whereClause} || '';
 
     #Make sure a valid sortBy is passed in
     if($sortBy && !WebGUI::Utility::isIn($sortBy,qw( subject sentBy dateStamp status ))) {
@@ -368,12 +380,11 @@ sub getMessagesPaginator {
     }
     
     my $sql = $self->getMessageSql($user, {
-        user    => $user,
-        sortBy  => $sortBy,
-        sortDir => $sortDir
+        user        => $user,
+        sortBy      => $sortBy,
+        sortDir     => $sortDir,
+        whereClause => $whereClause,
     });
-
-    #$session->log->warn($sql);
 
     my $p = WebGUI::Paginator->new(
         $session,
@@ -439,6 +450,7 @@ sub getMessageSql {
     my $sortDir     = $props->{sortDir};
     my $whereClause = $props->{whereClause};
     my $limit       = $props->{limit};
+    my $select      = $props->{'select'};
 
     if($sortBy) {
         $sortBy = qq{ORDER BY $sortBy $sortDir};
@@ -452,6 +464,14 @@ sub getMessageSql {
         $limit = qq{LIMIT $limit};
     }
 
+    if(!$select) {
+        $select =<<SELECT;
+ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
+(IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
+(IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+SELECT
+    }
+
     my $messageLimit = 20_000;
     my $limitHalf    = $messageLimit / 2;
     my $limitQuarter = $messageLimit / 4;
@@ -461,9 +481,7 @@ sub getMessageSql {
     # for performance purposes don't use datasets larger than 20000 no matter how man messages are in the inbox
     my $sql = qq{
         SELECT
-            ibox.messageId, ibox.subject, ibox.sentBy, ibox.dateStamp,
-            (IF(ibox.status = 'completed' or ibox.status = 'pending',ibox.status,IF(inbox_messageState.repliedTo,'replied',IF(inbox_messageState.isRead,'read','unread')))) as messageStatus,
-            (IF(userProfileData.firstName != '' and userProfileData.firstName is not null and userProfileData.lastName !='' and userProfileData.lastName is not null, concat(userProfileData.firstName,' ',userProfileData.lastName),users.username)) as fullName
+            $select
         FROM (
                 ( SELECT messageId, subject, sentBy, dateStamp, status FROM inbox WHERE userId = '$userId' order by dateStamp desc limit $limitHalf)
                 UNION
