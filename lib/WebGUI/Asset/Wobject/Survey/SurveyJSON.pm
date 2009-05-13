@@ -291,7 +291,7 @@ its answers.  Should ALWAYS have two elements since we want to address a questio
 sub getDragDropList {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     my @data;
     for my $sIndex (0 .. $self->lastSectionIndex) {
         push @data, { text => $self->section( [$sIndex] )->{title}, type => 'section' };
@@ -357,9 +357,9 @@ sub getObject {
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
-    
+
     return if !$count;
-    
+
     if ( $count == 1 ) {
         return clone $self->sections->[ sIndex($address) ];
     }
@@ -390,7 +390,7 @@ sub getEditVars {
     my ($address) = validate_pos(@_, { type => ARRAYREF });
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
-    
+
     if ( $count == 1 ) {
         return $self->getSectionEditVars($address);
     }
@@ -413,13 +413,13 @@ sub getGotoTargets {
 
     # Valid goto targets are all of the non-empty section variable names..
     my @section_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->sections};
-    
+
     # ..and all of the non-empty question variable names..
     my @question_vars = grep { $_ ne q{} } map {$_->{variable}} @{$self->questions};
-    
+
     # ..plus some special vars
     my @special_vars = qw(NEXT_SECTION END_SURVEY);
-    
+
     # ..all combined
     return [ @section_vars, @question_vars, @special_vars ];
 }
@@ -456,7 +456,7 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 sub getSectionEditVars {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     my $section  = $self->section($address);
     my %var     = %{$section};
 
@@ -511,7 +511,7 @@ See L<"Address Parameter">. Specifies which question to fetch variables for.
 sub getQuestionEditVars {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     my $question  = $self->question($address);
     my %var       = %{$question};
 
@@ -573,14 +573,14 @@ See L<"Address Parameter">. Specifies which answer to fetch variables for.
 sub getAnswerEditVars {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF });
-    
+
     my $object  = $self->answer($address);
     my %var     = %{$object};
 
     # Add the extra fields..
     $var{id}           = sIndex($address) . q{-} . qIndex($address) . q{-} . aIndex($address);
     $var{displayed_id} = aIndex($address) + 1;
-    
+
     return \%var;
 }
 
@@ -750,7 +750,7 @@ sub insertObject {
         splice @{ $self->answers($address) }, aIndex($address) + 1, 0, $object;
         $address->[2]++;
     }
-    
+
     return $address;
 }
 
@@ -790,7 +790,7 @@ sub copy {
 
     # Figure out what to do by counting the number of elements in the $address array ref
     my $count = @{$address};
-    
+
     if ( $count == 1 ) {
         # Clone the indexed section onto the end of the list of sections..
         push @{ $self->sections }, clone $self->section($address);
@@ -808,7 +808,7 @@ sub copy {
     elsif ( $count == 3 ) {
         # Clone the indexed answer onto the end of the list of answers..
         push @{ $self->answers($address) }, clone $self->answer($address);
-        
+
         # Update $address with the index of the newly created answer
         $address->[2]++;
     }
@@ -868,7 +868,7 @@ sub remove {
     elsif ( $count == 3 ) {
         splice @{ $self->answers($address) }, aIndex($address), 1;
     }
-    
+
     return;
 }
 
@@ -982,7 +982,7 @@ sub updateQuestionAnswers {
     # Add the default set of answers. The question type determines both the number
     # of answers added and the answer text to use. When updating answer text
     # first update $address_copy to point to the answer
-    
+
     if (   $type eq 'Date Range'
         or $type eq 'Multi Slider - Allocate'
         or $type eq 'Dual Slider - Range' )
@@ -1058,12 +1058,12 @@ sub addAnswersToQuestion {
     # Make a private copy of the $address arrayref that we can use locally
     # when updating answer text without causing side-effects for the caller's $address
     my @address_copy = @{$address};
-    
+
     for my $answer (@$answers) {
         # Add a new answer to question
         push @{ $self->question( \@address_copy )->{answers} }, $answer;
     }
-    
+
     return;
 }
 
@@ -1148,7 +1148,7 @@ See L<"Address Parameter">.
 sub totalQuestions {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
-    
+
     if ($address) {
         return scalar @{ $self->questions($address) || [] };
     } else {
@@ -1173,7 +1173,7 @@ See L<"Address Parameter">.
 sub totalAnswers {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1 });
-    
+
     if ($address) {
         return scalar @{ $self->answers($address) || [] };
     } else {
@@ -1197,7 +1197,7 @@ sub validateSurvey{
     my $self = shift;
 
     my @messages;   
-   
+
     #set up valid goto targets 
     my $gotoTargets = $self->getGotoTargets();
     my $goodTargets = {};
@@ -1209,7 +1209,7 @@ sub validateSurvey{
 
     #step through each section validating it. 
     my $sections = $self->sections();
-    
+
     for(my $s = 0; $s <= $#$sections; $s++){
         my $sNum = $s + 1;
         my $section = $self->section([$s]);
@@ -1259,7 +1259,7 @@ sub validateSurvey{
                     push @messages, "Section $sNum Question $qNum variable name $var is re-used in $count other place(s).";
                 }
             }
-            
+
             #step through each answer validating it. 
             my $answers = $self->answers([$s,$q]);
             for(my $a = 0; $a <= $#$answers; $a++){
@@ -1277,7 +1277,7 @@ sub validateSurvey{
             }
         }
     }
- 
+
    return \@messages; 
 }
 
@@ -1301,11 +1301,11 @@ sub validateGotoExpression{
     my $object = shift;
     my $goodTargets = shift;
     return unless $object->{gotoExpression};
-    
+
     if (!$self->session->config->get('enableSurveyExpressionEngine')) {
         return 'enableSurveyExpressionEngine is disabled in your site config!';
     }
-    
+
     use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
     return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
@@ -1317,7 +1317,7 @@ sub validateGotoPrecedenceRules {
     my $sLabel = shift;
     my @errors;
     my $endMsg = 'Precedence rules will apply.';
-    
+
     my $hasSection
         = $s->{goto}           =~ /\w/ ? 'Jump Target'
         : $s->{gotoExpression} =~ /\w/ ? 'Jump Expression'
@@ -1351,7 +1351,7 @@ sub validateGotoPrecedenceRules {
     }
     return @errors;
 }
-    
+
 =head2 section ($address)
 
 Returns a reference to one section.
@@ -1365,7 +1365,7 @@ See L<"Address Parameter">.
 sub section {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
-    
+
     return $self->sections->[ $address->[0] ];
 }
 
@@ -1393,7 +1393,7 @@ See L<"Address Parameter">. If not defined, returns all questions.
 sub questions {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF, optional => 1});
-    
+
     if ($address) {
         return $self->sections->[ $address->[0] ]->{questions};
     } else {
@@ -1416,7 +1416,7 @@ See L<"Address Parameter">.
 sub question {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
-    
+
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ];
 }
 
@@ -1452,7 +1452,7 @@ See L<"Address Parameter">.
 sub answers {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
-    
+
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers};
 }
 
@@ -1469,7 +1469,7 @@ See L<"Address Parameter">.
 sub answer {
     my $self    = shift;
     my ($address) = validate_pos(@_, { type => ARRAYREF});
-    
+
     return $self->sections->[ $address->[0] ]->{questions}->[ $address->[1] ]->{answers}->[ $address->[2] ];
 }
 
