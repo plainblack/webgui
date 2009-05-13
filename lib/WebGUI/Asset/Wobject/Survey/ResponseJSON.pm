@@ -553,7 +553,7 @@ sub recordResponses {
                 $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
             } else {
                 if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
-                    $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse");
+                    $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse") if $submittedAnswerResponse;
                     next;
                 }
             }

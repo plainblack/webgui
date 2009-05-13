@@ -924,14 +924,30 @@ directly inside the answer_loop for other types of questions.|,
         context => q|The title of a template Help page.|,
         lastUpdated => 1078223096
     },
-
+    
     'lastResponseCompleted' => {
+        message => q|You completed this Survey|,
+        lastUpdated => 1242180657,
+    },
+
+    'lastResponseTimedOut' => {
+        message => q|Your last Survey response timed out|,
+        lastUpdated => 1242180657,
+    },
+    
+    'lastResponseCompleted help' => {
         message => q|A boolean indicating whether the current user's last response was completed.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
+    
+    'lastResponseEndDate help' => {
+        message => q|The date that the user's last response was completed.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
 
-    'lastResponseTimedOut' => {
+    'lastResponseTimedOut help' => {
         message => q|A boolean indicating whether the current user's last response timed out.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,

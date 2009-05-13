@@ -1212,11 +1212,12 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my ( $code, $overTakeLimit ) = $self->getResponseInfoForView();
+    my ($lastResponseCompleteCode, $lastResponseEndDate) = $self->getLastResponseDetails();
     
-    $var->{lastResponseCompleted} = $code;
-    $var->{lastResponseTimedOut}  = $code > 1 ? 1 : 0;
-    $var->{maxResponsesSubmitted} = $overTakeLimit;
+    $var->{lastResponseCompleted} = $lastResponseCompleteCode == 1;
+    $var->{lastResponseEndDate} = WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
+    $var->{lastResponseTimedOut}  = $lastResponseCompleteCode == 3;
+    $var->{maxResponsesSubmitted} = !$self->canTakeSurvey();
     
     my $out = $self->processTemplate( $var, undef, $self->{_viewTemplate} );
 
@@ -1250,20 +1251,18 @@ sub getMenuVars {
 
 #-------------------------------------------------------------------
 
-=head2 getResponseInfoForView ( )
+=head2 getLastResponseDetails ( )
 
-Looks to see if this user has a response, looks at the last one to see if it was completed or timed out.
-Then it checks to see if the user has reached the max number of responses.
+Gets the completeCode and endDate for the most recent response
 
 =cut
 
-sub getResponseInfoForView {
+sub getLastResponseDetails {
     my $self = shift;
 
-    my ( $code, $taken );
+    my ($lastResponseCompleteCode, $lastResponseEndDate);
 
-    my $maxResponsesPerUser = $self->getValue('maxResponsesPerUser');
-    my $userId              = $self->session->user->userId();
+    my $userId = $self->session->user->userId();
     my $anonId 
         = $self->session->form->process('userid')
         || $self->session->http->getCookies->{Survey2AnonId}
@@ -1272,7 +1271,6 @@ sub getResponseInfoForView {
     my $ip = $self->session->env->getIp;
     my $string;
 
-    #if there is an anonid or id is for a WG user
     if ( $anonId or $userId != 1 ) {
         $string = 'userId';
         if ($anonId) {
@@ -1284,15 +1282,11 @@ sub getResponseInfoForView {
             "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
             [ $userId, $self->getId() ] );
         if ( !$responseId ) {
-            $code = $self->session->db->quickScalar(
-                "select isComplete from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
+            ($lastResponseCompleteCode, $lastResponseEndDate) = $self->session->db->quickArray(
+                "select isComplete, endDate from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
                 [ $userId, $self->getId() ]
             );
         }
-        $taken
-            = $self->session->db->quickScalar(
-            "select count(*) from Survey_response where $string = ? and assetId = ? and isComplete > 0",
-            [ $userId, $self->getId() ] );
 
     }
     elsif ( $userId == 1 ) {
@@ -1301,17 +1295,13 @@ sub getResponseInfoForView {
             [ $userId, $ip, $self->getId() ]
         );
         if ( !$responseId ) {
-            $code = $self->session->db->quickScalar(
-                'select isComplete from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
+            ($lastResponseCompleteCode, $lastResponseEndDate) = $self->session->db->quickArray(
+                'select isComplete, endDate from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
                 [ $userId, $ip, $self->getId() ]
             );
         }
-        $taken = $self->session->db->quickScalar(
-            'select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0',
-            [ $userId, $ip, $self->getId() ]
-        );
     }
-    return ( $code, $maxResponsesPerUser > 0 && $taken >= $maxResponsesPerUser );
+    return ($lastResponseCompleteCode, $lastResponseEndDate);
 }
 
 #-------------------------------------------------------------------
@@ -1631,12 +1621,11 @@ sub surveyEnd {
         }
     }
 
-    
     # If we get this far, it's time to forward users to an exitUrl
     my $exitUrl = $opts{exitUrl};
     undef $exitUrl if $exitUrl !~ /\w/;
     undef $exitUrl if $exitUrl eq 'undefined';
-    $exitUrl = $exitUrl || $self->get('exitURL') || q{/};
+    $exitUrl = $exitUrl || $self->get('exitURL') || $self->getUrl || q{/};
     $exitUrl = $self->session->url->gateway($exitUrl) if($exitUrl !~ /^https?:/i);
     my $json = to_json( { type => 'forward', url => $exitUrl } );
     $self->session->http->setMimeType('application/json');
@@ -1855,21 +1844,15 @@ sub responseId {
         }
         if ( !$responseId ) {
             my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
-            my $haveTaken;
+            my $takenCount;
     
             if ( $id == 1 ) {
-                $haveTaken
-                    = $self->session->db->quickScalar(
-                    'select count(*) from Survey_response where userId = ? and ipAddress = ? and assetId = ?',
-                    [ $id, $ip, $self->getId() ] );
+                $takenCount = $self->takenCount( { userId => $id, ipAddress => $ip } );
             }
             else {
-                $haveTaken
-                    = $self->session->db->quickScalar(
-                    "select count(*) from Survey_response where $string = ? and assetId = ?",
-                    [ $id, $self->getId() ] );
+                $takenCount = $self->takenCount( { $string => $id } );
             }
-            if ( $maxResponsesPerUser == 0 || $haveTaken < $maxResponsesPerUser ) {
+            if ( $maxResponsesPerUser == 0 || $takenCount < $maxResponsesPerUser ) {
                 $responseId = $self->session->db->setRow(
                     'Survey_response',
                     'Survey_responseId', {
@@ -1891,12 +1874,39 @@ sub responseId {
                 $self->persistResponseJSON();
             }
             else {
-                $self->session->log->debug("haveTaken ($haveTaken) >= maxResponsesPerUser ($maxResponsesPerUser)");
+                $self->session->log->debug("takenCount ($takenCount) >= maxResponsesPerUser ($maxResponsesPerUser)");
             }
         }
         $self->{responseId} = $responseId;
     }
     return $self->{responseId};
+}
+
+=head2 takenCount
+
+Counts the number of existing responses
+N.B. only counts responses with completeCode of 1 
+(others codes indicate abnormal completion such as restart
+and thus should not count towards tally)
+
+=cut
+
+sub takenCount {
+    my $self = shift;
+    my %opts = validate(@_, { userId => 0, anonId => 0, ipAddress => 0 });
+    
+    my $sql = 'select count(*) from Survey_response where';
+    $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
+    $sql .= ' and isComplete = 1';
+    for my $o qw(userId anonId ipAddress) {
+        if (my $o_value = $opts{o}) {
+            $sql .= " and $o = " . $self->session->db->quote($o_value);
+        }
+    }
+    
+    my $count = $self->session->db->quickScalar($sql);
+    $self->session->log->debug($count);
+    return $count;
 }
 
 #-------------------------------------------------------------------
@@ -1922,16 +1932,10 @@ sub canTakeSurvey {
     my $takenCount          = 0;
 
     if ( $userId == 1 ) {
-        $takenCount = $self->session->db->quickScalar(
-            'select count(*) from Survey_response where userId = ? and ipAddress = ? '
-            . 'and assetId = ? and isComplete > ?', [ $userId, $ip, $self->getId(), 0 ]
-        );
+        $takenCount = $self->takenCount( { userId => $userId, ipAddress => $ip });
     }
     else {
-        $takenCount
-            = $self->session->db->quickScalar(
-            'select count(*) from Survey_response where userId = ? and assetId = ? and isComplete > ?',
-            [ $userId, $self->getId(), 0 ] );
+        $takenCount = $self->takenCount( { userId => $userId });
     }
 
     # A maxResponsesPerUser value of 0 implies unlimited
@@ -1942,7 +1946,6 @@ sub canTakeSurvey {
         $self->{canTake} = 1;
     }
     return $self->{canTake};
-
 }
 
 #-------------------------------------------------------------------

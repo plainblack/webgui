@@ -15,8 +15,8 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'lastResponseCompleted' },
-            { 'name' => 'lastResponseTimedOut' },
+            { 'name' => 'lastResponseCompleted help' },
+            { 'name' => 'lastResponseTimedOut help' },
             { 'name' => 'maxResponsesSubmitted' },
         ],
         related => [
