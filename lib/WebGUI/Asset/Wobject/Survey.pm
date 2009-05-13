@@ -1275,8 +1275,9 @@ sub getResponseDetails {
     my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON);
     
     if ( $responseId ) {
+        $self->session->log->debug("ResponseId provided: $responseId");
         ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-            'select isComplete, endDate, responseJSON from Survey_response where responseId = ?', [ $responseId ]
+            'select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]
         );
     } else {
         my $userId = $self->session->user->userId();
@@ -1528,7 +1529,34 @@ sub getSummary {
     my $out = $self->processTemplate( $summary, $self->get('surveySummaryTemplateId') );
 
     return ($summary,$out);
-#    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_showFeedback
+
+Displays feedback on demand for a given responseId
+
+=cut
+
+sub www_showFeedback {
+    my $self            = shift;
+    
+    my $responseId = $self->session->form->param('responseId');
+    
+    # Only continue if we were given a responseId
+    return if !$responseId;
+    
+    my $userId = $self->session->db->quickScalar('select userId from Survey_response where Survey_responseId = ?', [ $responseId ]);
+    
+    # Only continue if responseId gave us a legit userId
+    return if !$userId;
+    
+    # Only continue if user owns the response
+    return if $userId ne $self->session->user->userId;
+    
+    my $out = $self->getResponseDetails($responseId)->{feedback};
+    return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 
 #-------------------------------------------------------------------
