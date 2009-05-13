@@ -1553,7 +1553,7 @@ Marks the survey response as completed and carries out special actions such as r
 
 The following options are supported
 
-=over3
+=over 3
 
 =item timeout
 
@@ -1567,6 +1567,8 @@ The survey should be restarted
 =item exitUrl
 
 Exit to the supplied url, or if no url is provided exit to the survey's exitUrl.
+
+=back
 
 =cut
 
