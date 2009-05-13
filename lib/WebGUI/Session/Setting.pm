@@ -111,6 +111,30 @@ sub get {
 
 #-------------------------------------------------------------------
 
+=head2 has ( $param )
+
+Returns true if the requested setting exists in this object's cache of the settings.
+This works better than using ->get, since it doesn't care about the truthiness of
+the value of the setting.
+
+This method will have little use outside of upgrade and install scripts, to prevent
+them from creating and/or overwriting existing settings.
+
+=head3 $param
+
+The setting to check.
+
+=cut
+
+sub has {
+	my $self = shift;
+	my $param = shift;
+	return exists $self->{_settings}{$param};
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 new ( session ) 
 
 Constructor.
