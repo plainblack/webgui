@@ -49,6 +49,7 @@ finish($session); # this line required
 # Describe what our function does
 sub fixDefaultPostReceived {
     my $session = shift;
+    print "Fixing post received template... " unless $quiet;
     $session->db->write(<<EOSQL);
 UPDATE Collaboration SET postReceivedTemplateId='default_post_received1' WHERE postReceivedTemplateId='default-post-received'
 EOSQL
