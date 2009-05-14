@@ -593,12 +593,26 @@ sub definition {
 			label=>$i18n->get('filter code'),
 			hoverHelp=>$i18n->get('filter code description'),
 			},
+		replyFilterCode =>{
+			fieldType=>"filterContent",
+			defaultValue=>'javascript',
+			tab=>'security',
+			label=>$i18n->get('reply filter code'),
+			hoverHelp=>$i18n->get('reply filter code description'),
+			},
 		richEditor =>{
 			fieldType=>"selectRichEditor",
 			defaultValue=>"PBrichedit000000000002",
 			tab=>'display',
 			label=>$i18n->get('rich editor'),
 			hoverHelp=>$i18n->get('rich editor description'),
+			},
+		replyRichEditor =>{
+			fieldType=>"selectRichEditor",
+			defaultValue=>"PBrichedit000000000002",
+			tab=>'display',
+			label=>$i18n->get('reply rich editor'),
+			hoverHelp=>$i18n->get('reply rich editor description'),
 			},
 		attachmentsPerPost =>{
 			fieldType=>"integer",

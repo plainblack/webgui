@@ -45,6 +45,7 @@ installSMSUserProfileFields($session);
 installSMSSettings($session);
 upgradeSMSMailQueue($session);
 addPayDrivers($session);
+addCollaborationColumns($session);
 installFriendManagerSettings($session);
 installFriendManagerConfig($session);
 
@@ -234,6 +235,26 @@ sub addPayDrivers {
     print "DONE!\n" unless $quiet;
 }
 
+sub addCollaborationColumns {
+    my $session = shift;
+    print "\tAdding columns to store htmlArea Rich Editor and Filter Code for Replies in Collaboration Table ..." unless $quiet;
+
+    my $sth = $session->db->read( 'show columns in Collaboration where field = "replyRichEditor"' );
+    if ($sth->rows() == 0) { # only add columns if it hasn't been added already
+       $session->db->write( 'alter TABLE `Collaboration` add column `replyRichEditor` varchar(22) default "PBrichedit000000000002"') ;
+       $session->db->write( 'update `Collaboration` set `replyRichEditor` = `richEditor` ') ;
+    }
+
+   $sth = $session->db->read( 'show columns in Collaboration where field = "replyFilterCode"' );
+    if ($sth->rows() == 0) { # only add columns if it hasn't been added already
+       $session->db->write( 'alter TABLE `Collaboration` add column `replyFilterCode` varchar(30) default "javascript"') ;
+       $session->db->write( 'update `Collaboration` set `replyFilterCode` = `filterCode` ') ;
+    }
+
+    print "Done\n" unless $quiet;
+
+}
+
 sub installFriendManagerSettings {
     my $session = shift;
     print "\tInstalling FriendManager into settings...";
@@ -262,7 +283,6 @@ sub installFriendManagerConfig {
     $config->set('account', $account);
     print "\tDone\n";
 }
-
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
