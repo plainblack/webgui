@@ -33,7 +33,7 @@ WebGUI::Test->usersToDelete($newUser);
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 20;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -101,6 +101,15 @@ is($newProfileField->get('fieldType'), 'HTMLArea', 'test field updated to HTMLAr
 
 $fieldSpec = $session->db->quickHashRef('describe userProfileData testField');
 is (lc $fieldSpec->{Type}, $htmlFieldType, 'database updated along with profile field object');
+
+###########################################################
+#
+# exists
+#
+###########################################################
+
+ok( WebGUI::ProfileField->exists($session,"firstName"), "firstName field exists" );
+ok( !WebGUI::ProfileField->exists($session, time), "random field does not exist" );
 
 #----------------------------------------------------------------------------
 # Cleanup
