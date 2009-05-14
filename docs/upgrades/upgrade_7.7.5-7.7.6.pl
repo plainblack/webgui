@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Utility;
 
 my $toVersion = "7.7.6"; 
 my $quiet; 
@@ -44,6 +45,8 @@ installSMSUserProfileFields($session);
 installSMSSettings($session);
 upgradeSMSMailQueue($session);
 addPayDrivers($session);
+installFriendManagerSettings($session);
+installFriendManagerConfig($session);
 
 finish($session); 
 
@@ -229,6 +232,35 @@ sub addPayDrivers {
     print "\tAdding PayPal driver checking..." unless $quiet;
     $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::PayPal::PayPalStd');
     print "DONE!\n" unless $quiet;
+}
+
+sub installFriendManagerSettings {
+    my $session = shift;
+    print "\tInstalling FriendManager into settings...";
+    $session->setting->add('groupIdAdminFriends',         '3');
+    $session->setting->add('fmViewTemplateId', '64tqS80D53Z0JoAs2cX2VQ');
+    $session->setting->add('fmEditTemplateId', 'lG2exkH9FeYvn4pA63idNg');
+    $session->setting->add('groupsToManageFriends',       '2');
+    $session->setting->add('overrideAbleToBeFriend',       0);
+    print "\tDone\n";
+}
+
+sub installFriendManagerConfig {
+    my $session = shift;
+    my $config  = $session->config;
+    my $account = $config->get('account');
+    my @classes = map { $_->{className} } @{ $account };
+    return if isIn('WebGUI::Account::FriendManager', @classes);
+    print "\tInstalling FriendManager into config file...";
+    push @{ $account },
+        {
+            identifier => 'friendManager',
+            title      => '^International(title,Account_FriendManager);',
+            className  => 'WebGUI::Account::FriendManager',
+        }
+    ;
+    $config->set('account', $account);
+    print "\tDone\n";
 }
 
 

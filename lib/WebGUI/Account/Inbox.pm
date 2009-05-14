@@ -49,16 +49,16 @@ sub appendCommonVars {
     my $session = $self->session;
     my $var     = shift;
     my $inbox   = shift || WebGUI::Inbox->new($session);
-    my $user    = $session->user;
+    my $user    = $self->getUser;
     my $method  = $self->method;
 
     $self->SUPER::appendCommonVars($var);
 
-    $var->{'view_inbox_url'          } = $self->getUrl("module=inbox;do=view");
+    $var->{'view_inbox_url'          } = $self->getUrl("module=inbox;do=view", 'useUid');
     $var->{'view_invitations_url'    } = $self->getUrl("module=inbox;do=manageInvitations");
-    $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount;
+    $var->{'unread_message_count'    } = $inbox->getUnreadMessageCount($user->userId);
     $var->{'invitation_count'        } = $self->getInvitationCount;
-    $var->{'invitations_enabled'     } = $session->user->profileField('ableToBeFriend');
+    $var->{'invitations_enabled'     } = $user->profileField('ableToBeFriend');
     $var->{'user_invitations_enabled'} = $session->setting->get("inboxInviteUserEnabled");
     $var->{'invite_friend_url'       } = $self->getUrl("module=inbox;do=inviteUser");
 
@@ -77,7 +77,9 @@ Returns whether or not the user can view the inbox tab
 
 sub canView {
     my $self    = shift;
-    return ($self->uid eq ""); 
+    my $session = $self->session;
+    return $self->uid eq ""
+        || $self->uid ne "" && $session->user->isInGroup($session->setting->get('groupIdAdminUser'));
 }
 
 #-------------------------------------------------------------------
@@ -1321,7 +1323,8 @@ The main view page for editing the user's profile.
 sub www_view {
     my $self    = shift;
     my $session = $self->session;
-    my $user    = $session->user;
+    my $user    = $self->getUser;
+
     my $var     = {};
 
     $self->store->{tab} = "inbox";
@@ -1343,7 +1346,7 @@ sub www_view {
     my $userFilter_url  = ";userFilter=$userFilter";
 
     #Cache the base url
-    my $inboxUrl     =  $self->getUrl;
+    my $inboxUrl     =  $self->getUrl('', 'useUid');
 
     my $urlFrag = $sortDir_url . $rpp_url . $userFilter_url;
 
@@ -1366,7 +1369,7 @@ sub www_view {
     if ($userFilter ne 'all') {
         $messageOptions->{whereClause} = sprintf 'ibox.sentBy=%s', $session->db->quote($session->form->get('userFilter'));
     }
-    my $p         = $inbox->getMessagesPaginator($session->user, $messageOptions);
+    my $p         = $inbox->getMessagesPaginator($user, $messageOptions);
 
     #Export page to template
     my @msg       = ();
@@ -1376,7 +1379,7 @@ sub www_view {
 
         my $hash                       = {};
         $hash->{'message_id'         } = $message->getId;
-        $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewMessage;messageId=".$message->getId);
+        $hash->{'message_url'        } = $self->getUrl("module=inbox;do=viewMessage;messageId=".$message->getId,'useUid');
         $hash->{'subject'            } = $message->get("subject");
         $hash->{'status_class'       } = $message->get("status");
         $hash->{'status'             } = $message->getStatus;
@@ -1543,7 +1546,7 @@ The page on which users view their messages
 sub www_viewMessage {
     my $self      = shift;
     my $session   = $self->session;
-    my $user      = $session->user;
+    my $user      = $self->getUser;
 
     my $var       = {};
     my $messageId = shift || $session->form->get("messageId");

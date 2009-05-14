@@ -3749,7 +3749,6 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
-
     'settings groupIdAdminAdSpace label' => {
         message     => q{AdSpace},
         lastUpdated => 0,
@@ -3790,6 +3789,15 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+
+    'settings groupIdAdminFriends label' => {
+        message     => q{Friends},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminFriends hoverHelp' => {
+        message     => q{Group to manage friends.},
+        lastUpdated => 0,
+    },
 
     'settings groupIdAdminGraphics label' => {
         message     => q{Graphics},
@@ -4387,6 +4395,12 @@ Users may override this setting in their profile.
  		message => q|The email address that this site would use to send an SMS message.|,
  		lastUpdated => 1235695517,
  	},
+ 
+    'Select One' => {
+        message => q|Select One|,
+        context => q|Label in dropdown lists, indicating that the user should use the list to select 1 entry.  It is implied that if nothing is chosen, that nothing will happen.|,
+        lastUpdated => 1239057119,
+    },
 
 };
 

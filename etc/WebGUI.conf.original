@@ -700,6 +700,11 @@
         "title"      : "^International(title,Account_User);",
         "className"  : "WebGUI::Account::User"
     },
+    {
+        "identifier" : "friendManager",
+        "title"      : "^International(title,Account_FriendManager);",
+        "className"  : "WebGUI::Account::FriendManager"
+    },
 ],
 
 # Specify which of the modules in the above list is used

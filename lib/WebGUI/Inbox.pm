@@ -98,18 +98,22 @@ WebGUI::User object to test against.  Defaults to the current user.
 
 sub canRead {
 	my $self    = shift;
+    my $session = $self->session;
     my $message = shift;
-    my $user    = shift || $self->session->user;
+    my $user    = shift || $session->user;
 
     unless (ref $message eq "WebGUI::Inbox::Message") {
-        $self->session->log->warn("Message passed in was either empty or not a valid WebGUI::Inbox::Message.  Got: ".(ref $message));
+        $session->log->warn("Message passed in was either empty or not a valid WebGUI::Inbox::Message.  Got: ".(ref $message));
         return 0
     }
 
-    my $userId = $message->get("userId");
+    my $userId  = $message->get("userId");
     my $groupId = $message->get("groupId");
 
-    return ($user->userId eq $userId || (defined $groupId && $user->isInGroup($groupId)));
+    return ($user->userId eq $userId
+        || (defined $groupId && $user->isInGroup($groupId))
+        || ($user->isInGroup($session->setting->get('groupIdAdminUser')))
+    );
 
 }
 
