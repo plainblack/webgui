@@ -30,7 +30,7 @@
  - rfe #9906: Inbox Filtering
  - rfe #9911: Inbox: Copy Sender
  - rfe #9907: Inbox: Notifications
- - rfe #9134: Pluggable Storage to support Amazon S3 and Cloudfront
+ - rfe #9134: Pluggable Storage to support Amazon S3 and Cloudfront (Funded by donor.com, coded by Whizman)
  - Added PayPal paydriver. (Thanks to Paul Wrightson)
  - rfe #9908: Inbox: SMS delivery
 
