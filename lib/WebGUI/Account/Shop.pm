@@ -198,6 +198,7 @@ sub www_managePurchases {
             %{$transaction->get},
             viewDetailUrl   => $self->getUrl('op=account;module=shop;do=viewTransaction;transactionId='.$id),
             amount          => sprintf("%.2f", $transaction->get('amount')),
+            amountMinusTax  => sprintf( '%.2f', $transaction->get('amount') - $transaction->get('taxes') ),
         };
     }
 
@@ -256,7 +257,14 @@ sub www_viewSales {
         [ $vendor->getId ]
     );
     while (my $row = $sth->hashRef) {
+        my $data = $row;
+
+        # Add asset properties to tmpl_vars.
+        my $asset = WebGUI::Asset->newByDynamicClass( $session, $row->{ assetId } );
+        $row = { %{ $row }, %{ $asset->get } } if $asset;
+        
         push @products, $row;
+
         $totalSales += $row->{quantity};
     }
     $sth->finish;
