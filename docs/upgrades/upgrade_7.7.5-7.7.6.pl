@@ -46,6 +46,7 @@ installSMSSettings($session);
 upgradeSMSMailQueue($session);
 addPayDrivers($session);
 addCollaborationColumns($session);
+installSurveyTest($session);
 installFriendManagerSettings($session);
 installFriendManagerConfig($session);
 
@@ -232,6 +233,14 @@ sub addPayDrivers {
     my $session = shift;
     print "\tAdding PayPal driver checking..." unless $quiet;
     $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::PayPal::PayPalStd');
+    print "DONE!\n" unless $quiet;
+}
+
+sub installSurveyTest {
+    my $session = shift;
+    print "\tInstall Survey test table, via Crud... " unless $quiet;
+    use WebGUI::Asset::Wobject::Survey::Test;
+    WebGUI::Asset::Wobject::Survey::Test->crud_createTable($session);
     print "DONE!\n" unless $quiet;
 }
 

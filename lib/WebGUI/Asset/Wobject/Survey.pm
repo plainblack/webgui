@@ -650,6 +650,18 @@ sub www_editSurvey {
     return $self->processTemplate( {}, $self->get('surveyEditTemplateId') );
 }
 
+sub getAdminConsole {
+    my $self = shift;
+    my $ac = $self->SUPER::getAdminConsole;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
+    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
+    $ac->addSubmenuItem($self->session->url->page("func=edit"), $edit);
+    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), "$edit Survey");
+    $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('survey visualization'));
+    $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
+    return $ac;
+}
+
 #-------------------------------------------------------------------
 
 =head2 www_graph ( )
@@ -668,12 +680,7 @@ sub www_graph {
 
     my $i18n = WebGUI::International->new($session, "Asset_Survey");
     
-    use WebGUI::AdminConsole;
-    my $ac = WebGUI::AdminConsole->new($self->session, $i18n->get('survey visualization'));
-    $ac->setIcon($session->url->extras('assets/survey.gif'));
-    my $edit = WebGUI::International->new($session, "WebGUI")->get(575);
-    $ac->addSubmenuItem($self->session->url->page("func=edit"), $edit);
-    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), "$edit Survey");
+    my $ac   = $self->getAdminConsole;
     
     eval 'use GraphViz';
     if ($@) {
@@ -733,7 +740,7 @@ sub www_submitObjectEdit {
     my $self = shift;
     
     return $self->session->privilege->insufficient()
-        if !$self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
     my $params = $self->session->form->paramsHashRef();
 
@@ -2333,5 +2340,356 @@ sub www_downloadDefaultQuestionTypes{
     my $content = to_json($self->surveyJSON->{multipleChoiceTypes});
     return $self->export( "WebGUI-Survey-DefaultQuestionTypes.json", $content );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------------------------
+
+=head2 www_deleteTest ( )
+
+Deletes a test
+
+=cut
+
+sub www_deleteTest {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+        
+    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $session->form->get("testId"));
+    if (defined $test) {
+        $test->delete;
+    }
+    return $self->www_editTestSuite;
+}
+
+#------------------------------------------------------------------
+
+=head2 www_demoteTest ( )
+
+Moves a Test down one position
+
+=cut
+
+sub www_demoteTest {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $session->form->get("testId"));
+    if (defined $test) {
+        $test->demote;
+    }
+    return $self->www_editTestSuite;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editTestSuite ( $error )
+
+Configure a set of tests
+
+=head3 $error
+
+Allows another method to pass an error into this method, to display to the user.
+
+=cut
+
+sub www_editTestSuite {
+    my $self = shift;
+    my $error   = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+        
+    if ($error) {
+        $error = qq|<div class="error">$error</div>\n|;
+    }
+    my $i18n = WebGUI::International->new($session, "Asset_Survey");
+    my $addmenu = '<div style="float: left; width: 200px; font-size: 11px;">';
+    $addmenu .= sprintf '<a href="%s">%s</a>', $session->url->page('func=editTest'), $i18n->get('add a test');
+    $addmenu .= '</div>';
+    
+    my $testsFound = 0;
+    my $tests = '<table class="content"><tr><th></th><th>' . $i18n->get('test name') . '</th></tr><tbody class="tableData">';
+    my $getATest = WebGUI::Asset::Wobject::Survey::Test->getAllIterator($session);
+    my $icon = $session->icon;
+    while (my $test = $getATest->()) {
+        $testsFound++;
+        my $id     = $test->getId;
+        my $name = $test->get('name');
+        $tests .= '<tr><td>'
+               .  $icon->delete(  'func=deleteTest;testId='.$id, undef, $i18n->get('confirm delete test'))
+               .  $icon->edit(    'func=editTest;testId='.$id)
+               .  $icon->moveDown('func=demoteTest;testId='.$id)
+               .  $icon->moveUp(  'func=promoteTest;testId='.$id)
+               .  '</td><td>'.$name.'</td></tr>';
+    }
+    $tests .= '</tbody></table><div style="clear: both;"></div>';
+    
+    my $out = $error . $addmenu;
+    $out .= $tests if $testsFound;
+    
+    my $ac = $self->getAdminConsole;
+    return $ac->render($out, 'Survey');
+}
+
+##-------------------------------------------------------------------
+#
+#=head2 www_editTestSuiteSave ( )
+#
+#Saves the results of www_editTestSuite()
+#
+#=cut
+#
+#sub www_editTestSuiteSave {
+#    my $self = shift;
+#    my $session = $self->session;
+#    
+#    return $self->session->privilege->insufficient()
+#        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+#    my $session = shift;
+#    return $session->privilege->insufficient() unless canView($session);
+#    my $i18n = WebGUI::International->new($session, 'Survey');
+#    return www_editTestSuite($session, $i18n->get('already active'))
+#        if analysisActive($session);
+#    my $workflow = WebGUI::Workflow->new($session, 'Survey000001');
+#    return www_editTestSuite($session, $i18n->get('workflow deleted')) unless defined $workflow;
+#    my $delta = $session->form->process('pauseInterval','integer');
+#    my $activities = $workflow->getActivities();
+#    ##Note, they're in order, and the order is known.
+#    $activities->[0]->set('deltaInterval', $delta);
+#    $activities->[1]->set('userId', $session->user->userId);
+#    my $instance = WebGUI::Workflow::Instance->create($session, {
+#        workflowId => $workflow->getId,
+#        priority   => 1,
+#    });
+#    if (!defined $instance) {
+#        return www_editTestSuite($session, $i18n->get('currently running')) if $session->stow->get('singletonWorkflowClash');
+#        return www_editTestSuite($session, $i18n->get('error creating workflow'));
+#    }
+#    $instance->start('skipRealtime');
+#    $session->db->write('update surveyStatus set startDate=NOW(), userId=?, endDate=?, running=1', [$session->user->userId, '']);
+#    return www_editTestSuite($session);
+#}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_editTest ( )
+
+Displays a form to edit the properties test.
+
+=cut
+
+sub www_editTest {
+    my $self = shift;
+    my $error = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    if ($error) {
+        $error = qq|<div class="error">$error</div>\n|;
+    }
+    ##Make a Survey test to use to populate the form.
+    my $testId = $session->form->get('testId'); 
+    my $test;
+    if ($testId) {
+        $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId);
+    }
+    else {
+        ##We need a temporary test so that we can call dynamicForm, below
+        $testId = 'new';
+        $test = WebGUI::Asset::Wobject::Survey::Test->create($session, { assetId => $self->getId });
+    }
+
+    ##Build the form
+	my $form = WebGUI::HTMLForm->new($session);
+	$form->hidden( name=>"func",   value=>"editTestSave");
+	$form->hidden( name=>"testId", value=>$testId);
+	$form->hidden( name=>"assetId", value=>$self->getId);
+    $form->dynamicForm([WebGUI::Asset::Wobject::Survey::Test->crud_definition($session)], 'properties', $test);
+	$form->submit;
+
+	my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+	my $ac   = $self->getAdminConsole;
+	
+    if ($testId eq 'new') {
+        $test->delete;
+    }
+	return $ac->render($error.$form->print, $i18n->get('Edit Test'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_editTestSave ( )
+
+Saves the results of www_editTest().
+
+=cut
+
+sub www_editTestSave {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    my $form    = $session->form;
+    
+#    eval {
+#        'fooBarBaz' =~ qr/$regexp/;
+#    };
+#    if ($@) {
+#        my $error = $@;
+#        $error =~ s/at \S+?\.pm line \d+.*$//;
+#        my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+#        $error = join ' ', $i18n->get('Regular Expression Error:'), $error;
+#        return www_editTest($session, $error);
+#    }
+
+    my $testId = $form->get('testId');
+    my $test;
+    if ($testId eq 'new') {
+        $test = WebGUI::Asset::Wobject::Survey::Test->create($session, { assetId => $self->getId });
+    }
+    else {
+        $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId);
+    }
+    $test->updateFromFormPost if $test;
+    return $self->www_editTestSuite;
+}
+
+
+#------------------------------------------------------------------
+
+=head2 www_promoteTest ( )
+
+Moves a test up one position
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_promoteTest {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $session->form->get("testId"));
+    if (defined $test) {
+        $test->promote;
+    }
+	return $self->www_editTestSuite;
+}
+
+##-------------------------------------------------------------------
+#
+#=head2 www_settings ( )
+#
+#Configure Test Suite settings.
+#
+#=cut
+#
+#sub www_settings {
+#    my $self = shift;
+#    my $error   = shift;
+#    my $session = $self->session;
+#    
+#    return $self->session->privilege->insufficient()
+#        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+#    
+#    if ($error) {
+#        $error = qq|<div class="error">$error</div>\n|;
+#    }
+#    my $i18n = WebGUI::International->new($session, "Asset_Survey");
+#    my $f = WebGUI::HTMLForm->new($session);
+#    $f->hidden(
+#        name=>'func',
+#        value=>'settingsSave'
+#    );
+#    $f->integer(
+#        name      => 'pauseInterval',
+#        value     => $session->form->get('pauseInterval') || $session->setting->get('surveyInterval') || 300,
+#        label     => $i18n->get('default pause interval'),
+#        hoverHelp => $i18n->get('default pause interval help'),
+#    );
+#    $f->yesNo(
+#        name      => 'deleteDelta',
+#        value     => $session->form->get('deleteDelta') || $session->setting->get('surveyDeleteDelta') || 0,
+#        label     => $i18n->get('Delete Delta Table?'),
+#        hoverHelp => $i18n->get('Delete Delta Table? help'),
+#    );
+#    $f->yesNo(
+#        name      => 'enabled',
+#        value     => $session->form->get('enabled') || $session->setting->get('surveyEnabled') || 0,
+#        label     => $i18n->get('Enabled?'),
+#        hoverHelp => $i18n->get('Enabled? help'),
+#    );
+#    $f->submit();
+#    my $ac = WebGUI::AdminConsole->new($session,'survey');
+#    $ac->addSubmenuItem($session->url->page('surveyfunc=editTestSuite'), $i18n->get('Test Suite'));
+#    return $ac->render($error.$f->print, 'Test Suite Settings');
+#}
+#
+##-------------------------------------------------------------------
+#
+#=head2 www_settingsSave ( session )
+#
+#Save Test Suite settings.
+#
+#=cut
+#
+#sub www_settingsSave {
+#    my $self = shift;
+#    my $session = $self->session;
+#    
+#    return $self->session->privilege->insufficient()
+#    my $session = shift;
+#    return $session->privilege->insufficient() unless canView($session);
+#    my $form = $session->form;
+#    $session->setting->set('surveyInterval',    $form->process('pauseInterval', 'integer'));
+#    $session->setting->set('surveyDeleteDelta', $form->process('deleteDelta',   'yesNo'  ));
+#    $session->setting->set('surveyEnabled',     $form->process('enabled',       'yesNo'  ));
+#    return www_settings($session);
+#}
 
 1;

@@ -1528,6 +1528,46 @@ section/answer.|,
         context => q|Finish button label on Take Survey page|,
         lastUpdated => 0,
     },
+    
+    'add a test' => {
+        message => q{Add a test},
+        lastUpdated => 0,
+    },
+    
+    'confirm delete test' => {
+        message => q{Are you sure you want to delete this test?},
+        lastUpdated => 0,
+    },
+    
+    'test suite' => {
+        message => q{Test Suite},
+        lastUpdated => 0,
+    },
+    
+    'edit test' => {
+        message => q{Edit Test},
+        lastUpdated => 0,
+    },
+    
+    'test name' => {
+        message => q{Test Name},
+        lastUpdated => 0,
+    },
+    
+    'test name help' => {
+        message => q{A descriptive name for this test},
+        lastUpdated => 0,
+    },
+    
+    'test code' => {
+        message => q{Test Code},
+        lastUpdated => 0,
+    },
+    
+    'test code help' => {
+        message => q{The test code},
+        lastUpdated => 0,
+    },
 
 };
 
