@@ -33,6 +33,7 @@
  - rfe #9134: Pluggable Storage to support Amazon S3 and Cloudfront (Funded by donor.com, coded by Whizman)
  - Added PayPal paydriver. (Thanks to Paul Wrightson)
  - rfe #9908: Inbox: SMS delivery
+ - rfe #10384: Change the view Groups in this Group area
 
 7.7.5
  - Adding StoryManager.
