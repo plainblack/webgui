@@ -33,7 +33,7 @@
  - rfe #9134: Pluggable Storage to support Amazon S3 and Cloudfront (Funded by donor.com, coded by Whizman)
  - Added PayPal paydriver. (Thanks to Paul Wrightson)
  - rfe #9908: Inbox: SMS delivery
- - rfe #9204: Add Reply Filter Code Option to Collaboration System - provides ability to specify a code filter for collaboration system replies which might be different than the one used for posts.
+ - rfe #9204: Add Reply Filter Code Option to Collaboration System - provides ability to specify a code filter for collaboration system replies which might be different than the one used for posts.  Also adds ability to specify a different Rich Editor for replies.
  - rfe #10384: Change the view Groups in this Group area
 
 7.7.5
