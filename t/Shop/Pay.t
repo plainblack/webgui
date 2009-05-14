@@ -142,9 +142,6 @@ is($newDriver->get('label'), 'Cold, stone hard cash', 'label passed correctly to
 
 my $drivers = $pay->getDrivers();
 
-use Data::Dumper;
-diag Dumper $drivers;
-
 my $defaultPayDrivers = {
     'WebGUI::Shop::PayDriver::Cash'              => 'Cash',
     'WebGUI::Shop::PayDriver::ITransact'         => 'Credit Card (ITransact)',
