@@ -116,8 +116,8 @@ is(scalar @{ $inbox->getMessagesForUser($admin, '', '', '', 'sentBy='.$session->
 
 END {
     $session->db->write('delete from inbox where messageId = ?', [$message->getId]);
-#    foreach my $message (@{ $inbox->getMessagesForUser($admin, 1000) } ) {
-#        $message->setDeleted(3);
-#        $message->delete(3);
-#    }
+    foreach my $message (@{ $inbox->getMessagesForUser($admin, 1000) } ) {
+        $message->setDeleted(3);
+        $message->delete(3);
+    }
 }
