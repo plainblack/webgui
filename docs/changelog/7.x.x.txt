@@ -1,4 +1,8 @@
 7.6.23
+ - New UKplayer slidehow: you can hide the textblock, volume
+    slider and mute button, resize the textblock and thumbnails. A new demo
+    config is added. See: /extras/ukplayer/slideshow.html (Rogier Voogt, Arjan 
+       Widlak / United Knowledge)
  - Added internationalisations in to gallery, "Return to Album", "Add Photo",
    etc (Arjan Widlak / United Knowledge)
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
