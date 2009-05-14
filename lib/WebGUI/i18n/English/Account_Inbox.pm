@@ -764,6 +764,17 @@ our $I18N = {
         message => q|You have a new message in your Inbox.|,
         lastUpdated => 1235708853,
     },
+ 
+    'inbox notification template' => {
+        message => q|Inbox Notification Template|,
+        context => q|Site setting.  A notification is a short message that a message is in the Inbox.|,
+        lastUpdated => 1242274705,
+    },
+
+    'inbox notification template help' => {
+        message => q|Choose a template that will be used to display Inbox Notifications.|,
+        lastUpdated => 1242274703,
+    },
 
 };
 
