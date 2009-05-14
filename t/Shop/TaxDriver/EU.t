@@ -33,7 +33,13 @@ my $session         = WebGUI::Test->session;
 
 my $taxUser     = WebGUI::User->new( $session, 'new' );
 $taxUser->username( 'Tex Evasion' );
+WebGUI::Test->usersToDelete($taxUser);
 
+my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
+    className => 'WebGUI::Asset::Sku::Donation',
+    title     => 'Taxable donation',
+    defaultPrice => 100.00,
+} );
 
 #----------------------------------------------------------------------------
 # Tests
@@ -277,12 +283,6 @@ SKIP: {
     isa_ok($e, 'WebGUI::Error::InvalidParam', 'getTaxRate: error handling for not sending a sku');
     is($e->error, 'Must pass in a WebGUI::Asset::Sku object', 'getTaxRate: error handling for not sending a sku');
 
-    my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
-        className => 'WebGUI::Asset::Sku::Donation',
-        title     => 'Taxable donation',
-        defaultPrice => 100.00,
-    } );
-
     # Set defaultTaxGroup and residential country
     $taxer->update( { defaultGroup => $id50_5, shopCountry => 'NL' } );
 
@@ -441,5 +441,5 @@ END {
     $session->db->write('delete from address');
     $session->db->write('delete from taxDriver where className=?', [ 'WebGUI::Shop::TaxDriver::EU' ]);
  
-    $taxUser->delete;
+    $sku->purge;
 }
