@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 203; # increment this value for each test you create
+use Test::More tests => 211; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -54,6 +54,16 @@ foreach my $groupId (2,7) {
 	ok($user->isInGroup($groupId), "User added to group $groupId by default");
 }
 
+################################################################
+#
+# enable/disable
+#
+################################################################
+
+# NOTE: enable/disable replaces all functionality of the status() method.
+# We're keeping status() until we can remove it later
+# Enable/disable is tested by the status()
+
 #Let's check the status method
 $user->status('Active');
 $lastUpdate = time();
@@ -63,8 +73,151 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- status ch
 $user->status('Selfdestructed');
 is($user->status, "Selfdestructed", 'status("Selfdestructed")');
 
+
+# Deactivation user deletes all sessions and scratches
+my $newSession  = WebGUI::Session->open( WebGUI::Test->root, WebGUI::Test->file );
+$newSession->user({ user => $user });
+$newSession->scratch->set("hasStapler" => "no");
+
 $user->status('Deactivated');
 is($user->status, "Deactivated", 'status("Deactivated")');
+
+ok( 
+    !$session->db->quickScalar("SELECT COUNT(*) from userSession where userId=?",[$user->userId]),
+    "Deactivating user deletes all sessions",
+);
+
+ok(
+    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$session->getId]),
+    "Deactivating user deletes all user session scratch",
+);
+
+$newSession->close;
+
+################################################################
+#
+# get/update
+#
+################################################################
+
+# NOTE: get/set replaces the following methods, but we're leaving
+# the tests for the deprecated methods until they get removed, since
+# they test the get/update methods thoroughly
+# - authMethod
+# - dateCreated
+# - lastUpdated
+# - profileField
+# - referringAffiliate
+# - status
+# - updateProfileFields
+# - username
+# - getId
+
+my $now = time;
+$user->update({
+    username        => "jlumbe",
+    firstName       => "John",
+    lastName        => "Lumbergh",
+    lastUpdated     => $now,
+});
+
+is(
+    $session->db->quickScalar("SELECT username FROM users WHERE userId=?",[$user->getId]),
+    "jlumbe",
+    "update() updates username",
+);
+is(
+    $user->get('username'),
+    "jlumbe",
+    "update() updates get('username')",
+);
+
+is(
+    $session->db->quickScalar("SELECT lastUpdated FROM users WHERE userId=?",[$user->getId]),
+    $now,
+    "update() updates lastUpdated",
+);
+is(
+    $user->get('lastUpdated'),
+    $now,
+    "update() updates get('lastUpdated')",
+);
+
+is(
+    $session->db->quickScalar("SELECT firstName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "John",
+    "update() updates profile firstName",
+);
+is(
+    $user->get('firstName'),
+    "John",
+    "update() updates get('firstName')",
+);
+
+is(
+    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "Lumbergh",
+    "update() updates profile lastName",
+);
+is(
+    $user->get('lastName'),
+    "Lumbergh",
+    "update() updates get('lastName')",
+);
+
+sleep 1;
+ok(
+    eval { $user->update({ lastNameIsNotExistingInThisContext => "Lumberg" }); 1; },
+    "update() doesn't die with invalid field",
+);
+ok(
+    $session->db->quickScalar("SELECT lastUpdated FROM users WHERE userId=?",[$user->getId])
+    > $now,
+    "update() updates lastUpdated automatically",
+);
+ok(
+    $user->get('lastUpdated') > $now,
+    "update() updates get('lastUpdated') automatically",
+);
+
+$user->update({ lastName => "Lumberg" }),
+is( 
+    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "Lumberg",
+    "update() updates lastName again",
+);
+is(
+    $user->get("lastName"),
+    "Lumberg",
+    "update() updates get('lastName') again",
+);
+
+# get w/o arguments returns hashref of everything
+my $expectValues  = {
+    username        => "jlumbe",
+    firstName       => "John",
+    lastName        => "Lumberg",
+    status          => "Deactivated",
+    timeZone        => 'America/Chicago',
+    gender          => 'neuter',
+    toolbar         => 'useLanguageDefault',
+};
+
+# expects all user properties and all profile fields
+my @expectFields    = ( 
+    $session->db->buildArray('DESCRIBE users'),
+    $session->db->buildArray('SELECT fieldName FROM userProfileField'),
+);
+
+cmp_deeply(
+    [keys %{$user->get}], bag(@expectFields), 
+    "get() contains all properties and profileFields",
+);
+
+cmp_deeply(
+    $user->get, superhashof($expectValues),
+    "get() contains known correct values",
+);
 
 ################################################################
 #
@@ -85,9 +238,9 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
-is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be retrieved');
+ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
 $user->profileField('wg_privacySettings', '{"email"=>"all"}');
-is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be set');
+ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be set');
 
 ################################################################
 #

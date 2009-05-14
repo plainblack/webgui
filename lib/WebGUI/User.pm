@@ -39,20 +39,29 @@ This package provides an object-oriented way of managing WebGUI users as well as
  $u = WebGUI::User->newByEmail($session, $email);
  $u = WebGUI::User->newByUsername($session, $username);
 
- $authMethod =		$u->authMethod("WebGUI");
- $dateCreated = 	$u->dateCreated;
- $karma = 		    $u->karma;
- $lastUpdated = 	$u->lastUpdated;
- $languagePreference = 	$u->profileField("language",1);
- $referringAffiliate =	$u->referringAffiliate;
- $status =		$u->status("somestatus");
- $username =		$u->username("jonboy");
- $arrayRef =		$u->getGroups;
- $member =		$u->isInGroup($groupId);
+ # Get data
+ $authMethod            = $u->get("authMethod");
+ $dateCreated           = $u->get("dateCreated");
+ $karma                 = $u->karma;
+ $lastUpdated           = $u->get("lastUpdated");
+ $languagePreference    = $u->get("language");
+ $referringAffiliate    = $u->get("referringAffiliate");
+ $status                = $u->get("status");
+ $username              = $u->get("username");
+ $arrayRef              = $u->getGroups;
+ $isMember              = $u->isInGroup($groupId);
 
+ # Update data
+ $u->update({
+     username       => "m_bolton",
+     firstName      => "Mike",
+     likesSoftPop   => 1,
+ });
  $u->addToGroups(\@arr);
  $u->deleteFromGroups(\@arr);
  $u->delete;
+ $u->enable;
+ $u->disable;
 
  WebGUI::User->validUserId($session, $userId);
 
@@ -173,6 +182,8 @@ sub acceptsFriendsRequests {
 
 =head2 authMethod ( [ value ] )
 
+DEPRECATED! Use get("authMethod") and update({ authMethod => "value })
+
 Returns the authentication method for this user.
 
 =head3 value
@@ -186,13 +197,9 @@ sub authMethod {
         $self = shift;
         $value = shift;
         if (defined $value) {
-		$self->uncache;
-                $self->{_user}{"authMethod"} = $value;
-                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-                $self->session->db->write("update users set authMethod=".$self->session->db->quote($value).",
-			lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->{_userId}));
+            $self->update({ authMethod => $value });
         }
-        return $self->{_user}{"authMethod"};
+        return $self->get("authMethod");
 }
 
 #-------------------------------------------------------------------
@@ -298,12 +305,15 @@ sub canViewField {
 
 =head2 dateCreated ( )
 
+DEPRECATED! Use get("dateCreated") instead
+
 Returns the epoch for when this user was created.
 
 =cut
 
 sub dateCreated {
-        return $_[0]->{_user}{dateCreated};
+        my ( $self ) = @_;
+        return $self->get("dateCreated");
 }
 
 #-------------------------------------------------------------------
@@ -377,6 +387,48 @@ sub DESTROY {
         undef $self;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 disable ( [options] )
+
+Disable the user. C<options> is an optional hashref with the following keys:
+
+ bySelf         - If true, the user is disabling themselves
+
+=cut
+
+sub disable {
+    my ( $self, $options ) = @_;
+    my $session     = $self->session;
+    my $db          = $session->db;
+
+    if ( $options->{bySelf} ) {
+        $self->update({ status => "Selfdestructed" });
+    }
+    else {
+        $self->update({ status => "Deactivated" });
+
+        # Remove sessions
+        my $rs = $db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
+        while (my ($id) = $rs->array) {
+            $db->write("delete from userSessionScratch where sessionId=?",[$id]);
+        }
+        $db->write("delete from userSession where userId=?",[$self->{_userId}]);
+    }
+}
+
+#----------------------------------------------------------------------------
+
+=head2 enable ( )
+
+Enable the user.
+
+=cut
+
+sub enable {
+    my ( $self ) = @_;
+    $self->update({ status => "Active" });
+}
 
 #-------------------------------------------------------------------
 
@@ -421,6 +473,64 @@ sub friends {
     }
 
     return $myFriends;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 get ( [field] )
+
+Get properties for this user. If C<field> is defined, will return the value
+of the field. Otherwise, returns a hash reference of all properties and profile
+fields.
+
+=cut
+
+sub get {
+    my ( $self, $field ) = @_;
+    my $session     = $self->session;
+
+    if ( $field ) {
+        if ( exists $self->{_user}->{$field} ) {
+            return $self->{_user}->{$field};
+        }
+        else { 
+            if ( !WebGUI::ProfileField->exists( $session, $field ) ) {
+                return;
+            }
+
+            # XXX Should the defaults be set in new() ...
+            if ( !exists $self->{_profile}->{$field} ) {
+                my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
+                $self->{_profile}{$field} 
+                    = WebGUI::Operation::Shared::secureEval($session, $default);
+                $self->cache; # XXX ... Because we cache them here!
+            }
+            if (ref $self->{_profile}{$field} eq 'ARRAY') {
+                ##Return a scalar, that is a string with all the defaults
+                return join ',', @{ $self->{_profile}{$field} };
+            }
+            return $self->{_profile}->{$field};
+        }
+    }
+
+    # Create a safe copy of everything to return
+    my %properties  = (
+        %{$self->{_user}},
+        %{$self->{_profile}},
+    );
+
+    # Add any missing fields
+    my %default     = $session->db->buildHash(
+        "SELECT fieldName, dataDefault FROM userProfileField",
+    );
+    for my $key ( keys %default ) {
+        if ( !exists $properties{$key} ) {
+            $properties{$key}
+                = WebGUI::Operation::Shared::secureEval($session, $default{$key});
+        }
+    }
+
+    return \%properties;
 }
 
 #-------------------------------------------------------------------
@@ -500,6 +610,19 @@ sub getGroupIdsRecursive {
     }
 
     return [ keys %groupIds ];
+}
+
+#----------------------------------------------------------------------------
+
+=head2 getId ( )
+
+Get the user's ID
+
+=cut
+
+sub getId {
+    my ( $self ) = @_;
+    return $self->{_userId};
 }
 
 #-------------------------------------------------------------------
@@ -764,6 +887,8 @@ A description of why this user's karma was modified. For instance it could be "M
 
 =cut
 
+# NOTE: Should this be called "addKarma" instead?
+
 sub karma {
 	my $self = shift;
 	my $amount = shift;
@@ -782,12 +907,15 @@ sub karma {
 
 =head2 lastUpdated ( )
 
+DEPRECATED! Use get("lastUpdated")
+
 Returns the epoch for when this user was last modified.
 
 =cut
 
 sub lastUpdated {
-        return $_[0]->{_user}{lastUpdated};
+        my ( $self ) = @_;
+        return $self->get('lastUpdated');
 }
 
 #-------------------------------------------------------------------
@@ -830,11 +958,15 @@ sub new {
                 [$user{userId}]
             );
         delete $profile{userId};
+        delete $profile{wg_privacySettings};
 
-        # remove undefined fields so they will fall back on defaults when requested
+        # Fill in dataDefault
+        my $default = $session->db->buildHashRef(
+            "SELECT fieldName, dataDefault FROM userProfileField"
+        );
         for my $key (keys %profile) {
             if (!defined $profile{$key} || $profile{$key} eq '') {
-                delete $profile{$key};
+                delete $profile{$key}
             }
         }
 
@@ -912,6 +1044,8 @@ sub newByUsername {
 
 =head2 profileField ( fieldName [, value ] )
 
+DEPRECATED! Use get(fieldName) and update({ fieldName => "value" })
+
 Returns a profile field's value. If "value" is specified, it also sets the field to that value. 
 
 =head3 fieldName 
@@ -928,33 +1062,12 @@ sub profileField {
     my $self        = shift;
     my $fieldName   = shift;
     my $value       = shift;
-    my $db          = $self->session->db;
-    return "" if ($fieldName eq "wg_privacySettings");  # this is a special internal field, don't try to process it.
-    if (!exists $self->{_profile}{$fieldName} && !$self->session->db->quickScalar("SELECT COUNT(*) FROM userProfileField WHERE fieldName = ?", [$fieldName])) {
-        $self->session->errorHandler->warn("No such profile field: $fieldName");
-        return undef;
-    }
+
     if (defined $value) {
-        $self->uncache;
-        $self->{_profile}{$fieldName} = $value;
-        $db->write(
-            "UPDATE userProfileData SET ".$db->dbh->quote_identifier($fieldName)."=? WHERE userId=?",
-            [$value, $self->{_userId}]
-        );
-        my $time = $self->session->datetime->time;
-        $self->{_user}{"lastUpdated"} = $time;
-        $self->session->db->write("update users set lastUpdated=? where userId=?", [$time, $self->{_userId}]);
+        $self->update({ $fieldName => $value });
     }
-    elsif (!exists $self->{_profile}{$fieldName}) {
-        my $default = $self->session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$fieldName]);
-        $self->{_profile}{$fieldName} = WebGUI::Operation::Shared::secureEval($self->session, $default);
-        $self->cache;
-    }
-    if (ref $self->{_profile}{$fieldName} eq 'ARRAY') {
-        ##Return a scalar, that is a string with all the defaults
-        return join ',', @{ $self->{_profile}{$fieldName} };
-    }
-	return $self->{_profile}{$fieldName};
+
+	return $self->get($fieldName);
 }
 
 #-------------------------------------------------------------------
@@ -991,6 +1104,8 @@ sub profileIsViewable {
 
 =head2 referringAffiliate ( [ value ] )
 
+DEPRECATED! Use get("referringAffiliate") and update({ referringAffiliate => "value" })
+
 Returns the unique identifier of the affiliate that referred this user to the site. 
 
 =head3 value
@@ -1003,13 +1118,9 @@ sub referringAffiliate {
         my $self = shift;
         my $value = shift;
         if (defined $value) {
-		$self->uncache;
-                $self->{_user}{"referringAffiliate"} = $value;
-                $self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-                $self->session->db->write("update users set referringAffiliate=".$self->session->db->quote($value).",
-                        lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
+            $self->update({ "referringAffiliate" => $value });
         }
-        return $self->{_user}{"referringAffiliate"};
+        return $self->get("referringAffiliate");
 }
 
 #-------------------------------------------------------------------
@@ -1024,7 +1135,6 @@ sub session {
 	my $self = shift;
 	return $self->{_session};
 }
-
 
 #-------------------------------------------------------------------
 
@@ -1068,6 +1178,8 @@ sub setProfileFieldPrivacySetting {
 
 =head2 status ( [ value ] )
 
+DEPRECATED! Use get("status") and enable() and disable() instead
+
 Returns the status of the user. 
 
 =head3 value
@@ -1083,20 +1195,17 @@ sub status {
 	my $self = shift;
 	my $value = shift;
 	if (defined $value) {
-		$self->uncache;
-		$self->{_user}{"status"} = $value;
-		$self->{_user}{"lastUpdated"} =$self->session->datetime->time();
-		$self->session->db->write("update users set status=".$self->session->db->quote($value).",
-		lastUpdated=".$self->session->datetime->time()." where userId=".$self->session->db->quote($self->userId));
-		if ($value eq 'Deactivated') {
-			my $rs = $self->session->db->read("select sessionId from userSession where userId=?",[$self->{_userId}]);
-			while (my ($id) = $rs->array) {
-				$self->session->db->write("delete from userSessionScratch where sessionId=?",[$id]);
-			}
-			$self->session->db->write("delete from userSession where userId=?",[$self->{_userId}]);
-		}
+        if ( $value eq "Active" ) {
+            $self->enable;
+        }
+        elsif ( $value eq "Selfdestructed" ) {
+            $self->disable({ bySelf => 1 });
+        }
+        elsif ( $value eq "Deactivated" ) {
+            $self->disable;
+        }
 	}
-	return $self->{_user}{"status"};
+	return $self->get("status");
 }
 
 #-------------------------------------------------------------------
@@ -1113,9 +1222,86 @@ sub uncache {
 	$cache->delete;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 update ( properties )
+
+Update properties for the user. C<properties> is a hash reference of user properties
+and/or profile fields.
+
+Valid user properties:
+
+ authMethod
+ dateCreated
+ friendsGroup
+ karma              - NOTE: To add karma, use the karma() method
+ lastUpdated
+ referringAffiliate
+ status             - One of "Activated", "Deactivated", or "Selfdestructed"
+ username
+
+Anything else is a profile field.
+
+=cut
+
+sub update {
+    my ( $self, $properties ) = @_;
+    my $session     = $self->session;
+    my $db          = $session->db;
+    
+    # Make a safe copy of properties, we'll be deleting from it
+    $properties = { %$properties };
+
+    $self->uncache;
+    $properties->{lastUpdated} ||= time;
+
+    # $self->{_user} contains all fields in `users` table
+    my @userFields  = ();
+    my @userValues  = ();
+    for my $key ( keys %{$self->{_user}} ) {
+        if ( exists $properties->{$key} ) {
+            # Delete the value because it's not a profile field
+            my $value   = delete $properties->{$key};
+            push @userFields, $db->dbh->quote_identifier( $key ) . " = ?";
+            push @userValues, $value;
+            $self->{_user}->{$key} = $value;
+        }
+    }
+    # No matter what we update properties
+    my $userFields  = join ", ", @userFields;
+    $db->write(
+        "UPDATE users SET $userFields WHERE userId=?",
+        [@userValues, $self->{_userId}]
+    );
+
+    # Everything else must be a profile field
+    my @profileFields   = ();
+    my @profileValues   = ();
+    for my $key ( keys %{$properties} ) {
+        if (!exists $self->{_profile}{$key} && !WebGUI::ProfileField->exists($session,$key)) {
+            $self->session->errorHandler->warn("No such profile field: $key");
+            next;
+        }
+        push @profileFields, $db->dbh->quote_identifier( $key ) . " = ?";
+        push @profileValues, $properties->{ $key };
+        $self->{_profile}->{$key} = $properties->{ $key };
+    }
+    if ( @profileFields ) {
+        my $profileFields  = join ", ", @profileFields;
+        $db->write(
+            "UPDATE userProfileData SET $profileFields WHERE userId=?",
+            [@profileValues, $self->{_userId}]
+        );
+    }
+
+    return;
+}
+
 #-------------------------------------------------------------------
 
 =head2 updateProfileFields ( profile )
+
+DEPRECATED! Use update(profile)
 
 Saves profile data to a user's profile.  Does not validate any of the data.
 
@@ -1129,15 +1315,14 @@ sub updateProfileFields {
     my $self    = shift;
     my $profile = shift;
 
-	foreach my $fieldName (keys %{$profile}) {
-		$self->profileField($fieldName,$profile->{$fieldName});
-	}
+    $self->update($profile);
 }
 
 #-------------------------------------------------------------------
 
 =head2 username ( [ value ] )
 
+DEPRECATED! Use get("username") and update({ username => "value" }) instead.
 Returns the username. 
 
 =head3 value
@@ -1150,25 +1335,23 @@ sub username {
     my $self = shift;
     my $value = shift;
     if (defined $value) {
-        $self->uncache;
-        $self->{_user}{"username"} = $value;
-        $self->{_user}{"lastUpdated"} = $self->session->datetime->time();
-        $self->session->db->write("update users set username=?, lastUpdated=? where userId=?",
-            [$value, $self->session->datetime->time(), $self->userId]);
+        $self->update({ username => $value });
     }
-    return $self->{_user}{"username"};
+    return $self->get("username");
 }
 
 #-------------------------------------------------------------------
 
 =head2 userId ( )
 
+DEPRECATED: Use getId() instead!
+
 Returns the userId for this user.
 
 =cut
 
 sub userId {
-        return $_[0]->{_userId};
+        return $_[0]->getId;
 }
 
 #-------------------------------------------------------------------
