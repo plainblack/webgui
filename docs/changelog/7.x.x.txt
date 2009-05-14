@@ -1,4 +1,6 @@
 7.6.23
+ - Added internationalisations in to gallery, "Return to Album", "Add Photo",
+   etc (Arjan Widlak / United Knowledge)
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
  - fixed: i18n typo in Survey exit URL hover help.
  - Fixed a search results display error with synopsis.
