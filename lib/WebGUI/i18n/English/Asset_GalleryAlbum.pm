@@ -29,12 +29,12 @@ our $I18N = {
     },
 
     'add photo' => {
-        message     => '<li><a href="%s">Add Photo</a></li>',
+        message     => 'Add Photo',
         lastUpdated => 0,
     },
 
     'return to album' => {
-        message     => '<li><a href="%s">Return to Album</a></li>',
+        message     => 'Return to Album',
         lastUpdated => 0,
     },
 
