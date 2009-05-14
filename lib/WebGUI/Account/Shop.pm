@@ -252,8 +252,11 @@ sub www_viewSales {
     my @products;
 
     my $sth = $session->db->read(
-        'select *, sum(quantity) as quantity, sum(vendorPayoutAmount) as payoutAmount from transactionItem '
-        .'where vendorId=? group by assetId order by quantity desc',
+          q{ SELECT t1.*, sum(t1.quantity) as quantity, sum(t1.vendorPayoutAmount) as payoutAmount }
+        . q{ FROM transactionItem as t1, transaction as t2 }
+        . q{ WHERE t1.transactionId=t2.transactionId AND t2.isSuccessful <> 0 }
+        . q{ AND vendorId=? }
+        . q{ group by assetId order by quantity desc },
         [ $vendor->getId ]
     );
     while (my $row = $sth->hashRef) {
