@@ -2551,7 +2551,7 @@ sub www_editTest {
     if ($testId eq 'new') {
         $test->delete;
     }
-	return $ac->render($error.$form->print, $i18n->get('Edit Test'));
+	return $ac->render($error.$form->print, $i18n->get('edit test'));
 }
 
 #-------------------------------------------------------------------
