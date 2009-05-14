@@ -62,6 +62,7 @@ sub sendWebguiStats {
     my $wf = WebGUI::Workflow->create($session, {
         type        => 'None',
         mode        => 'singleton',
+        enabled     => 1,
         title       => 'Send WebGUI Stats',
         description => 'This workflow sends some information about your site to the central WebGUI statistics repository. No personal information is sent. The information is used to help determine the future direction WebGUI should take.',
         }, 'send_webgui_statistics');
