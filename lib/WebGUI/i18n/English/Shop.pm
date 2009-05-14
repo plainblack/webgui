@@ -1623,6 +1623,17 @@ our $I18N = {
         context => q|Table heading in the vendor payout manager.|,
     },
 
+    'copy from home address' => {
+        message => q|Copy home address from profile|,
+        lastUpdated => 0,
+        context => q|Button label in the edit address screen.|,
+    },
+
+    'copy from work address' => {
+        message => q|Copy work address from profile|,
+        lastUpdated => 0,
+        context => q|Button label in the edit address screen.|,
+    },
 };
 
 1;

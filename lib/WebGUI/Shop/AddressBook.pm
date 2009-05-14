@@ -373,59 +373,100 @@ Allows a user to edit an address in their address book.
 
 sub www_editAddress {
     my ($self, $error) = @_;
-    my $session = $self->session;
-    my $form = $session->form;
+    my $session     = $self->session;
+    my $form        = $session->form;
+    my $i18n        = WebGUI::International->new($session, "Shop");
+    my $properties  = {};
+
+    # Get address if available and extract address data
     my $address = eval{$self->getAddress($form->get("addressId"))};
     if (WebGUI::Error->caught) {
-        $address = undef;
+        $address    = undef;
     }
-    my %base = ();
-    if (defined $address) {
-        %base = %{$address->get};
+    else {
+        $properties = $address->get;
     }
-    my %var = (
-        %base,
+
+    # Replace address data with profile information if one of the copyFrom buttons is clicked.
+    my $copyFrom = $form->process( 'copyFrom' );
+    if ( $copyFrom eq 'work' || $copyFrom eq 'home' ) {
+        my $user = $session->user;
+
+        $properties->{ address1     } = $user->profileField( $copyFrom . 'Address' );
+        $properties->{ firstName    } = $user->profileField( 'firstName' );
+        $properties->{ lastName     } = 
+            join ' ', $user->profileField( 'middleName' ), $user->profileField( 'lastName' );
+        $properties->{ city         } = $user->profileField( $copyFrom . 'City'     );
+        $properties->{ state        } = $user->profileField( $copyFrom . 'State'    );
+        $properties->{ country      } = $user->profileField( $copyFrom . 'Country'  );
+        $properties->{ code         } = $user->profileField( $copyFrom . 'Zip'      );
+        $properties->{ phoneNumber  } = $user->profileField( $copyFrom . 'Phone'    );
+        $properties->{ email        } = $user->profileField( 'email' );
+        $properties->{ organization } = $user->profileField( 'workName' ) if $copyFrom eq 'work';
+    }
+
+    # Setup tmpl_vars
+    my $var = {
+        %{ $properties },
         error               => $error,
-        formHeader          => WebGUI::Form::formHeader($session)
-                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
-                                .$self->formatCallbackForm($form->get('callback'))
-                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddressSave"})
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$form->get("addressId")}),
+        formHeader          => 
+            WebGUI::Form::formHeader($session)
+            . $self->formatCallbackForm( $form->get('callback') )
+            . WebGUI::Form::hidden($session, { name => 'shop',      value => 'address'               } )
+            . WebGUI::Form::hidden($session, { name => 'method',    value => 'editAddressSave'       } )
+            . WebGUI::Form::hidden($session, { name => 'addressId', value => $form->get('addressId') } ),
         saveButton          => WebGUI::Form::submit($session),
         formFooter          => WebGUI::Form::formFooter($session),
-        address1Field       => WebGUI::Form::text($session, 
-                {name=>"address1", maxlength=>35, defaultValue=>($form->get("address1") || ((defined $address) ? $address->get('address1') : undef))}),
-        address2Field       => WebGUI::Form::text($session, 
-                {name=>"address2", maxlength=>35, defaultValue=>($form->get("address2") || ((defined $address) ? $address->get('address2') : undef))}),
-        address3Field       => WebGUI::Form::text($session, 
-                {name=>"address3", maxlength=>35, defaultValue=>($form->get("address3") || ((defined $address) ? $address->get('address3') : undef))}),
-        labelField          => WebGUI::Form::text($session, 
-                {name=>"label", maxlength=>35, defaultValue=>($form->get("label") || ((defined $address) ? $address->get('label') : undef))}),
-        firstNameField      => WebGUI::Form::text($session, 
-                {name=>"firstName", maxlength=>35, defaultValue=>($form->get("firstName") || ((defined $address) ? $address->get('firstName') : undef))}),
-        lastNameField       => WebGUI::Form::text($session, 
-                {name=>"lastName", maxlength=>35, defaultValue=>($form->get("lastName") || ((defined $address) ? $address->get('lastName') : undef))}),
-        cityField           => WebGUI::Form::text($session, 
-                {name=>"city", maxlength=>35, defaultValue=>($form->get("city") || ((defined $address) ? $address->get('city') : undef))}),
-        stateField          => WebGUI::Form::text($session, 
-                {name=>"state", maxlength=>35, defaultValue=>($form->get("state") || ((defined $address) ? $address->get('state') : undef))}),
-        countryField        => WebGUI::Form::country($session, 
-                {name=>"country", defaultValue=>($form->get("country") || ((defined $address) ? $address->get('country') : undef))}),
-        codeField           => WebGUI::Form::zipcode($session, 
-                {name=>"code", defaultValue=>($form->get("code") || ((defined $address) ? $address->get('code') : undef))}),
-        phoneNumberField    => WebGUI::Form::phone($session, 
-                {name=>"phoneNumber", defaultValue=>($form->get("phoneNumber") || ((defined $address) ? $address->get('phoneNumber') : undef))}),
-        emailField          => WebGUI::Form::email($session, 
-                {name=>"email", defaultValue=>($form->get("email") || ((defined $address) ? $address->get('email') : undef))}),
-        organizationField    => WebGUI::Form::text($session, 
-                {name=>"organization", defaultValue=>($form->get("organization") || ((defined $address) ? $address->get('organization') : undef))}),
-    );
-    my $template = WebGUI::Asset::Template->new($session, $session->setting->get("shopAddressTemplateId"));
+    };
+
+    # Add buttons for copying address data from the user's profile.
+    for ( qw{ work home } ) {
+        my $what = lcfirst $_;
+        $var->{ 'copyFrom' . $what . 'Button' } =
+            WebGUI::Form::formHeader( $session )
+            . $self->formatCallbackForm( $form->get('callback') )
+            . WebGUI::Form::hidden( $session, { name => 'shop',       value => 'address'        } )
+            . WebGUI::Form::hidden( $session, { name => 'method',     value => 'editAddress'    } )
+            . WebGUI::Form::hidden( $session, { name => 'copyFrom',   value => $_               } )
+            . WebGUI::Form::hidden( $session, { name => 'addressId',  value => $address ? $address->getId : '' } )
+            . WebGUI::Form::submit( $session, { value => $i18n->get("copy from $_ address") } )
+            . WebGUI::Form::formFooter( $session ), 
+    };
+
+    # Add form elements for each field to the tmpl_vars
+    for ( qw{ address1 address2 address3 label firstName lastName city state organization } ) {
+        $var->{ $_ . 'Field' } = WebGUI::Form::text( $session, {
+            name            => $_, 
+            maxlength       => 35, 
+            defaultValue    => $form->get( $_ ) || $properties->{ $_ }
+        } );
+    }
+    $var->{ countryField } = 
+        WebGUI::Form::country( $session,{
+            name            => 'country', 
+            defaultValue    => $form->get('country') || $properties->{ country }
+        } );
+    $var->{ codeField } =
+        WebGUI::Form::zipcode( $session, {
+            name            => 'code', 
+            defaultValue    => $form->get('code') || $properties->{ code }
+        } );
+    $var->{ phoneNumberField } =
+        WebGUI::Form::phone( $session, {
+            name            => 'phoneNumber', 
+            defaultValue    => $form->get('phoneNumber') || $properties->{ phoneNumber }
+        } );
+    $var->{ emailField } =
+        WebGUI::Form::email( $session, {
+            name            => 'email', 
+            defaultValue    =>$form->get('email') || $properties->{ email }
+        } );
+
+    my $template = WebGUI::Asset::Template->new( $session, $session->setting->get('shopAddressTemplateId') );
     $template->prepare;
-    return $session->style->userStyle($template->process(\%var));
+
+    return $session->style->userStyle( $template->process( $var ) );
 }
-
-
 
 #-------------------------------------------------------------------
 
@@ -518,32 +559,36 @@ sub www_view {
             %{$address->get},
             address         => $address->getHtmlFormatted,
             isDefault       => ($self->get('defaultAddressId') eq $address->getId),
-            deleteButton    => WebGUI::Form::formHeader($session)
-                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
-                                .WebGUI::Form::hidden($session, {name=>"method", value=>"deleteAddress"})
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .$self->formatCallbackForm($form->get('callback'))
-                                .WebGUI::Form::submit($session, {value=>$i18n->get("delete")})
-                                .WebGUI::Form::formFooter($session),
-            editButton      => WebGUI::Form::formHeader($session)
-                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
-                                .WebGUI::Form::hidden($session, {name=>"method", value=>"editAddress"})
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .$self->formatCallbackForm($form->get('callback'))
-                                .WebGUI::Form::submit($session, {value=>$i18n->get("edit")})
-                                .WebGUI::Form::formFooter($session),
-            defaultButton      => WebGUI::Form::formHeader($session)
-                                .WebGUI::Form::hidden($session, {name=>"shop", value=>"address"})
-                                .WebGUI::Form::hidden($session, {name=>"method", value=>"defaultAddress"})
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .$self->formatCallbackForm($form->get('callback'))
-                                .WebGUI::Form::submit($session, {value=>$i18n->get("default")})
-                                .WebGUI::Form::formFooter($session),
-            useButton       => WebGUI::Form::formHeader($session,{action=>$callback->{url}})
-                                .$callbackForm
-                                .WebGUI::Form::hidden($session, {name=>"addressId", value=>$address->getId})
-                                .WebGUI::Form::submit($session, {value=>$i18n->get("use this address")})
-                                .WebGUI::Form::formFooter($session),
+            deleteButton    => 
+                WebGUI::Form::formHeader( $session )
+                . WebGUI::Form::hidden( $session, { name => 'shop',      value => 'address'         } )
+                . WebGUI::Form::hidden( $session, { name => 'method',    value => 'deleteAddress'   } )
+                . WebGUI::Form::hidden( $session, { name => 'addressId', value => $address->getId   } )
+                . $self->formatCallbackForm( $form->get('callback') )
+                . WebGUI::Form::submit( $session, { value => $i18n->get('delete')                   } )
+                . WebGUI::Form::formFooter( $session ),
+            editButton      => 
+                WebGUI::Form::formHeader( $session )
+                . WebGUI::Form::hidden( $session, { name => 'shop',      value => 'address'         } )
+                . WebGUI::Form::hidden( $session, { name => 'method',    value => 'editAddress'     } )
+                . WebGUI::Form::hidden( $session, { name => 'addressId', value => $address->getId   } )
+                . $self->formatCallbackForm( $form->get('callback') )
+                . WebGUI::Form::submit( $session, { value => $i18n->get('edit')                     } )
+                . WebGUI::Form::formFooter( $session ),
+            defaultButton      => 
+                WebGUI::Form::formHeader( $session )
+                . WebGUI::Form::hidden( $session, { name => 'shop',       value => 'address'        } )
+                . WebGUI::Form::hidden( $session, { name => 'method',     value => 'defaultAddress' } )
+                . WebGUI::Form::hidden( $session, { name => 'addressId',  value => $address->getId  } )
+                . $self->formatCallbackForm( $form->get('callback') )
+                . WebGUI::Form::submit( $session, { value => $i18n->get('default')                  } )
+                . WebGUI::Form::formFooter( $session ),
+            useButton       => 
+                WebGUI::Form::formHeader( $session, { action => $callback->{url} } )
+                . $callbackForm
+                . WebGUI::Form::hidden( $session, { name => 'addressId',  value => $address->getId  } )
+                . WebGUI::Form::submit( $session, { value => $i18n->get('use this address')         } )
+                . WebGUI::Form::formFooter( $session ),
             });
     }
     my %var = (
