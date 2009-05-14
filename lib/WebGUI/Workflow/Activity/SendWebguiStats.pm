@@ -79,7 +79,7 @@ sub execute {
     my $db = $self->session->db;
     my $stats = {
         webguiVersion   => $WebGUI::VERSION,
-        perlVersion     => sprintf "%vd", $^V,
+        perlVersion     => sprintf("%vd", $^V),
         apacheVersion   => Apache2::ServerUtil::get_server_version(),
         osType          => $^O,
         siteId          => Digest::MD5::md5_base64($self->session->config->get("sitename")->[0]), # only here to identify the site if the user submits their info a second time
