@@ -1137,7 +1137,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
 	
 	# get a list of tickets already associated with the badge
 	my @existingTickets = $db->buildArray("select ticketAssetId from EMSRegistrantTicket where badgeId=?",[$badgeId]);
-	
+
 	# get assets
 	my $counter = 0;
 	my $totalTickets = scalar(@ids);

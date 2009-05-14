@@ -9,6 +9,9 @@
  - Added support for template attachments; scripts and stylesheets that will
    be included using style->setScript and setLink instead of just using raw
    head tags.
+ - Added the WebGUI stats system, which will allow site admins to submit
+   information about their site to a central repository on webgui.org which
+   help the developers make WebGUI better.
  - fixed #10322: Dataform: wrong attr on script tag
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
  - fixed: Crud handling of Form fields with database types that cannot have default values.

@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Workflow;
 use WebGUI::Utility;
 
 my $toVersion = "7.7.6"; 
@@ -36,6 +37,7 @@ fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
 addShippingDrivers( $session );
 addTransactionTaxColumns( $session );
+sendWebguiStats($session);
 addDataFormColumns($session);
 addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
@@ -54,13 +56,19 @@ finish($session);
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub sendWebguiStats {
+    my $session = shift;
+    print "\tAdding a workflow to allow users to take part in the WebGUI stats project..." unless $quiet;
+    my $wf = WebGUI::Workflow->create($session, {
+        type        => 'None',
+        mode        => 'singleton',
+        title       => 'Send WebGUI Stats',
+        description => 'This workflow sends some information about your site to the central WebGUI statistics repository. No personal information is sent. The information is used to help determine the future direction WebGUI should take.',
+        }, 'send_webgui_statistics');
+    my $act = $wf->addActivity('WebGUI::Workflow::Activity::SendWebguiStats','send_webgui_statistics');
+    $act->set('title', 'Send WebGUI Stats');
+    print "DONE!\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addListingsCacheTimeoutToMatrix{

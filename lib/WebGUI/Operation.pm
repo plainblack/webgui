@@ -186,6 +186,8 @@ sub getOperations {
 
         'ssoViaSessionId' => 'SSO',
 
+		'disableSendWebguiStats' => 'Statistics',
+		'enableSendWebguiStats' => 'Statistics',
 		'viewStatistics' => 'Statistics',
 
 		'makePrintable' => 'Style',
