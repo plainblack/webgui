@@ -41,6 +41,8 @@ my $sku  = WebGUI::Asset->getRoot($session)->addChild( {
     defaultPrice => 100.00,
 } );
 
+my $cart;
+
 #----------------------------------------------------------------------------
 # Tests
 
@@ -330,7 +332,7 @@ SKIP: {
     ), 'appendCartItemVars returns correct error for missing CartItem' );
     
 
-    my $cart = WebGUI::Shop::Cart->newBySession( $session );
+    $cart = WebGUI::Shop::Cart->newBySession( $session );
 
     my $item = $cart->addItem( $sku );
     $item->setQuantity( 2 );
@@ -436,6 +438,7 @@ SKIP: {
 # Cleanup
 END {
     $session->db->write('delete from tax_eu_vatNumbers');
+    $cart->delete;
     $session->db->write('delete from cart');
     $session->db->write('delete from addressBook');
     $session->db->write('delete from address');
