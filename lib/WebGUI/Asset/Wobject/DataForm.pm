@@ -228,7 +228,7 @@ sub definition {
     # populate hash of Rich Editors and add an entry to the list to use the default
     my $selectRichEditor = WebGUI::Form::SelectRichEditor->new($session,{}) ;
     my $richEditorOptions  = $selectRichEditor->getOptions() ;
-    $richEditorOptions->{'**Use_Default_Editor**'} = "Use Default Rich Editor" ;
+    $richEditorOptions->{'**Use_Default_Editor**'} = $i18n->get("Use Default Rich Editor");
     
     tie %properties, 'Tie::IxHash';
     %properties = (

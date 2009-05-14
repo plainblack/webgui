@@ -9,9 +9,15 @@ our $I18N = {
 	},
 
 	'htmlAreaRichEditor description' => {
-		message => q|Select the Rich Editor you want to use for HTML Area fields.|,
+		message => q|Select the Rich Editor you want to use for HTML Area fields.  The Default Rich Editor is the one defined in the settings.|,
 		lastUpdated => 0,
 		context => 'hover help for HTMLArea field Rich Editor selector.',
+	},
+
+	'Use Default Rich Editor' => {
+		message => q|Use Default Rich Editor|,
+		lastUpdated => 0,
+		context => q|Label in the edit screen.  Use the default Rich Editor, meaning to take the default used by the site.|,
 	},
 
 	'delete file' => {
