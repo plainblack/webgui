@@ -75,7 +75,7 @@ is( $storage1->getPathFrag, '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
 
 my $savecdn = $session->config->get('cdn');
 if ($savecdn) {
-	$session->config->delete('cdn');
+    $session->config->delete('cdn');
 }
 # Note: the CDN configuration will be reverted after CDN tests below
 
@@ -381,12 +381,13 @@ foreach my $iconTest (@{ $fileIconTests }) {
 #
 ####################################################
 
-my $cdnCfg = { "enabled"   => 1,
-			   "url"       => "file:///data/storage",
-			   "queuePath" => "/data/cdnqueue",
-			   "syncProgram" => "cp -r -- '%s' /data/storage/",
-			   "deleteProgram" => "rm -r -- '/data/storage/%s' > /dev/null 2>&1"
-			 };
+my $cdnCfg = {
+    "enabled"       => 1,
+    "url"           => "file:///data/storage",
+    "queuePath"     => "/data/cdnqueue",
+    "syncProgram"   => "cp -r -- '%s' /data/storage/",
+    "deleteProgram" => "rm -r -- '/data/storage/%s' > /dev/null 2>&1"
+};
 my ($addedCdnQ, $addedCdnU);
 $addedCdnQ = mkdir $cdnCfg->{'queuePath'}  unless -e $cdnCfg->{'queuePath'};
 my $dest = substr($cdnCfg->{'url'}, 7);
@@ -415,23 +416,21 @@ my $locIter = WebGUI::Storage->getCdnFileIterator($session);
 my $already;  # test the object type only once
 if (is(ref($locIter), 'CODE', 'CDN: getCdnFileIterator to return sub ref')) {
    while (my $sobj = $locIter->()) {
-	  unless ($already) {
-		 ok($sobj->isa('WebGUI::Storage'), 'CDN: iterator produces Storage objects');
-		 $already = 1;
-	  }
-	  if ($sobj->getId eq $cdnStorage->getId) {  # the one we want to test with
-		 ++$found;
-		 $flist = $sobj->getFiles;
-		 if (is(scalar @$flist, 1, 'CDN: there is one file in the storage')) {
-			my $file1 = $flist->[0];
-			is ($file1, $filename, 'CDN: correct filename in the storage');
-		 }
-	  }
+      unless ($already) {
+         ok($sobj->isa('WebGUI::Storage'), 'CDN: iterator produces Storage objects');
+         $already = 1;
+      }
+      if ($sobj->getId eq $cdnStorage->getId) {  # the one we want to test with
+         ++$found;
+         $flist = $sobj->getFiles;
+         if (is(scalar @$flist, 1, 'CDN: there is one file in the storage')) {
+            my $file1 = $flist->[0];
+            is ($file1, $filename, 'CDN: correct filename in the storage');
+         }
+      }
    }
 }
 is ($found, 1, 'CDN: getCdnFileIterator found storage');
-# TODO: I'm not sure how to make these run on MS-Windows.
-#       Should we SKIP in the meantime?   ($^O eq 'MSWin32')
 ### syncToCdn
 $cdnStorage->syncToCdn;
 ok( (-e $cdnPath and -d $cdnPath), 'CDN: target directory created');

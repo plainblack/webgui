@@ -105,7 +105,6 @@ sub _addError {
 	$self->session->errorHandler->error($errorMessage);
 }
 
-
 #-------------------------------------------------------------------
 
 =head2 _cdnAdd ( )
@@ -117,23 +116,24 @@ NOTE: This is a private method and should never be called except internally to t
 =cut
 
 sub _cdnAdd {
-	my $self = shift;
-	my $cdnCfg = $self->session->config->get('cdn');
- 	if ($cdnCfg  and  $cdnCfg->{'enabled'}) {
-	   if ($cdnCfg->{'queuePath'}) {
-		  my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex($self->getId);
-		  my $dest;
-		  if ( open $dest, '>', $cdnFile ) {
-			 close $dest;  # created empty file
-		  } else {
-			 $self->_addError("CDN: Couldn't open file $cdnFile for writing due to error: ".$!);
-		  }
-	   } else {
-		  $self->_addError('Invalid CDN configuration - missing queuePath');
-	   }
-	}
-}
-
+    my $self   = shift;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        if ( $cdnCfg->{'queuePath'} ) {
+            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            my $dest;
+            if ( open $dest, '>', $cdnFile ) {
+                close $dest;    # created empty file
+            }
+            else {
+                $self->_addError( "CDN: Couldn't open file $cdnFile for writing due to error: " . $! );
+            }
+        }
+        else {
+            $self->_addError('Invalid CDN configuration - missing queuePath');
+        }
+    }
+} ## end sub _cdnAdd
 
 #-------------------------------------------------------------------
 
@@ -150,30 +150,31 @@ Delete the ".cdn" file - clear vs. delete.
 =cut
 
 sub _cdnDel {
-	my $self = shift;
-	my $delDotCdn = shift;
-	my $cdnCfg = $self->session->config->get('cdn');
- 	if ($cdnCfg  and  $cdnCfg->{'enabled'}) {
-	   my $cdnFile;   # path/name of flag and/or queue file
-	   if ($delDotCdn) {
-		  $cdnFile = $self->getPath . '/.cdn';
-		  unlink $cdnFile;
-	   }
-	   if ($cdnCfg->{'queuePath'}) {
-		  $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex($self->getId);
-		  my $dest;
-		  if ( open $dest, '>', $cdnFile ) {
-			 print $dest "deleted\n";
-			 close $dest;
-		  } else {
-			 $self->_addError("Couldn't open file $cdnFile for writing due to error: ".$!);
-		  }
-	   } else {
-		  $self->_addError('Invalid CDN configuration - missing queuePath');
-	   }
-	}
-}
-
+    my $self      = shift;
+    my $delDotCdn = shift;
+    my $cdnCfg    = $self->session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        my $cdnFile;    # path/name of flag and/or queue file
+        if ($delDotCdn) {
+            $cdnFile = $self->getPath . '/.cdn';
+            unlink $cdnFile;
+        }
+        if ( $cdnCfg->{'queuePath'} ) {
+            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            my $dest;
+            if ( open $dest, '>', $cdnFile ) {
+                print $dest "deleted\n";
+                close $dest;
+            }
+            else {
+                $self->_addError( "Couldn't open file $cdnFile for writing due to error: " . $! );
+            }
+        }
+        else {
+            $self->_addError('Invalid CDN configuration - missing queuePath');
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub _cdnDel
 
 #-------------------------------------------------------------------
 
@@ -363,7 +364,7 @@ sub addFileFromFormPost {
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {
         $session->errorHandler->info("Trying to get " . $upload->filename." from ".$formVariableName);
-        if ($attachmentCount > $attachmentLimit) {
+        if ( $attachmentCount > $attachmentLimit ) {
             $self->_cdnAdd;
             return $filename;
         }
@@ -685,24 +686,26 @@ Also delete the related file in config/cdn/queuePath.
 sub deleteFromCdn {
     my $self   = shift;
     my $cdnCfg = $self->session->config->get('cdn');
-    if ($cdnCfg  and  $cdnCfg->{'enabled'}
-        and  $cdnCfg->{'syncProgram'}) {
-       my $id = $self->session->id->toHex($self->getId);
-       my $cmd = sprintf($cdnCfg->{'deleteProgram'}, $id);
-       if ($cmd =~ /$id/)  {  # sanity check, no rm -rf /
-          system($cmd);
-          if ($?) {   # This may occur benign in the case delete after clear
-             $self->_addError("Error running CDN deleteProgram: $?");
-          }
-          if ($cdnCfg->{'queuePath'}) {
-             unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex($self->getId);
-          }
-       } else  {   # Presume configuration error, missing %s
-          $self->_addError("CDN deleteProgram: storage ID missing from command: $cmd");
-       }
-    }
-}
-
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'syncProgram'} )
+    {
+        my $id = $self->session->id->toHex( $self->getId );
+        my $cmd = sprintf( $cdnCfg->{'deleteProgram'}, $id );
+        if ( $cmd =~ /$id/ ) {    # sanity check, no rm -rf /
+            system($cmd);
+            if ($?) {             # This may occur benign in the case delete after clear
+                $self->_addError("Error running CDN deleteProgram: $?");
+            }
+            if ( $cdnCfg->{'queuePath'} ) {
+                unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            }
+        }
+        else {                    # Presume configuration error, missing %s
+            $self->_addError("CDN deleteProgram: storage ID missing from command: $cmd");
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub deleteFromCdn
 
 #-------------------------------------------------------------------
 
@@ -814,30 +817,30 @@ A reference to the current session.
 =cut
 
 sub getCdnFileIterator {
-	my $class   = shift;
-	my $session = shift;
-	my $cdnCfg = $session->config->get('cdn');
-	if ($cdnCfg  and  $cdnCfg->{'enabled'}) {
-		if ($cdnCfg->{'queuePath'}) {
-			if (opendir my $DH, $cdnCfg->{'queuePath'}) {
-				my @ids = grep { !/^\.+$/ }
-				               readdir($DH);
-				close $DH;
-				my $sub = sub {
-					my $id = shift @ids;
-					return	if !$id;
-					return $class->get($session, $session->id->fromHex($id));
-				};
-				return $sub;
-			} else {
-				$session->errorHandler->warn("CDN: cannot read directory $cdnCfg->{'queuePath'}");
-			}
-		} else {
-			$session->errorHandler->warn("CDN: enabled but no queuePath");
-		}
-	}
-}
-
+    my $class   = shift;
+    my $session = shift;
+    my $cdnCfg  = $session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        if ( $cdnCfg->{'queuePath'} ) {
+            if ( opendir my $DH, $cdnCfg->{'queuePath'} ) {
+                my @ids = grep { !/^\.+$/ } readdir($DH);
+                close $DH;
+                my $sub = sub {
+                    my $id = shift @ids;
+                    return if !$id;
+                    return $class->get( $session, $session->id->fromHex($id) );
+                };
+                return $sub;
+            }
+            else {
+                $session->errorHandler->warn("CDN: cannot read directory $cdnCfg->{'queuePath'}");
+            }
+        }
+        else {
+            $session->errorHandler->warn("CDN: enabled but no queuePath");
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub getCdnFileIterator
 
 #-------------------------------------------------------------------
 
@@ -1185,34 +1188,36 @@ If specified, we'll return a URL to the file rather than the storage location.
 =cut
 
 sub getUrl {
-	my $self = shift;
-	my $file = shift;
-	my $url = $self->session->config->get("uploadsURL")
-            . '/'
-            . $self->getPathFrag;
-	my $cdnCfg = $self->session->config->get('cdn');
-	if ($cdnCfg  and  $cdnCfg->{'enabled'}  and  $cdnCfg->{'url'}
-		and  -e $self->getPath . '/.cdn') {
-	   my $sep = '/';   # separator, if not already present trailing
-	   if ($cdnCfg->{'sslAlt'}  and
-		   ($self->session->env->get('HTTPS') eq 'on'  or
-			$self->session->env->get('SSLPROXY'))) {
-		  if ($cdnCfg->{'sslUrl'}) {
-			 substr($cdnCfg->{'sslUrl'}, -1) eq '/'  and  $sep = '';
-			 $url = $cdnCfg->{'sslUrl'} . $sep . $self->session->id->toHex($self->getId);
-		  }  # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
-	   } else {
-		  substr($cdnCfg->{'url'}, -1) eq '/'  and  $sep = '';
-		  $url = $cdnCfg->{'url'} . $sep . $self->session->id->toHex($self->getId);
-	   }
-	}
-	if (defined $file) {
-		$url .= '/'.$file;
-	}
-	return $url;
-}
-
-
+    my $self   = shift;
+    my $file   = shift;
+    my $url    = $self->session->config->get("uploadsURL") . '/' . $self->getPathFrag;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'url'}
+        and -e $self->getPath . '/.cdn' )
+    {
+        my $sep = '/';    # separator, if not already present trailing
+        if ($cdnCfg->{'sslAlt'}
+            and (  $self->session->env->get('HTTPS') eq 'on'
+                or $self->session->env->get('SSLPROXY') )
+            )
+        {
+            if ( $cdnCfg->{'sslUrl'} ) {
+                substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
+                $url = $cdnCfg->{'sslUrl'} . $sep . $self->session->id->toHex( $self->getId );
+            }             # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
+        }
+        else {
+            substr( $cdnCfg->{'url'}, -1 ) eq '/' and $sep = '';
+            $url = $cdnCfg->{'url'} . $sep . $self->session->id->toHex( $self->getId );
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+    if ( defined $file ) {
+        $url .= '/' . $file;
+    }
+    return $url;
+} ## end sub getUrl
 
 #-------------------------------------------------------------------
 
@@ -1602,29 +1607,32 @@ the related file in config/cdn/queuePath.
 sub syncToCdn {
     my $self   = shift;
     my $cdnCfg = $self->session->config->get('cdn');
-    if ($cdnCfg  and  $cdnCfg->{'enabled'}
-        and  $cdnCfg->{'syncProgram'}) {
-       my $originalDir = Cwd::cwd();
-       my $locDir = join '/', $self->session->config->get('uploadsPath'), @{$self->{_pathParts}}[0..1];
-       chdir $locDir  or croak 'Unable to chdir to ' . $locDir . " : $!";
-       my $cmd = sprintf($cdnCfg->{'syncProgram'}, $self->session->id->toHex($self->getId));
-       system($cmd);
-       if ($?) {
-          $self->_addError("Error running CDN syncProgram: $?");
-       } elsif ($cdnCfg->{'queuePath'}) {
-          unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex($self->getId);
-       }
-       chdir $originalDir;
-       my $dest;
-       my $cdnFile = $self->getPath . '/.cdn';
-       if ( open $dest, '>', $cdnFile ) {
-          close $dest;  # created empty file
-       } else {
-          $self->_addError("Couldn't open file $cdnFile for writing due to error: ".$!);
-       }
-    }
-}
-
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'syncProgram'} )
+    {
+        my $originalDir = Cwd::cwd();
+        my $locDir = join '/', $self->session->config->get('uploadsPath'), @{ $self->{_pathParts} }[ 0 .. 1 ];
+        chdir $locDir or croak 'Unable to chdir to ' . $locDir . " : $!";
+        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->session->id->toHex( $self->getId ) );
+        system($cmd);
+        if ($?) {
+            $self->_addError("Error running CDN syncProgram: $?");
+        }
+        elsif ( $cdnCfg->{'queuePath'} ) {
+            unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+        }
+        chdir $originalDir;
+        my $dest;
+        my $cdnFile = $self->getPath . '/.cdn';
+        if ( open $dest, '>', $cdnFile ) {
+            close $dest;    # created empty file
+        }
+        else {
+            $self->_addError( "Couldn't open file $cdnFile for writing due to error: " . $! );
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub syncToCdn
 
 #-------------------------------------------------------------------
 

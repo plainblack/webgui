@@ -42,6 +42,18 @@ These methods are available from this class:
 
 =cut
 
+#-------------------------------------------------------------------
+
+=head2 DESTROY ( )
+
+Deconstructor.
+
+=cut
+
+sub DESTROY {
+        my $self = shift;
+        undef $self;
+}
 
 #-------------------------------------------------------------------
 
@@ -56,27 +68,13 @@ Hex value to convert to guid.
 =cut
 
 sub fromHex {
-    my $self = shift;
+    my $self  = shift;
     my $hexId = shift;
-    my $binId = pack('H2' x 16, unpack('A2' x 16, $hexId));
-    my $id = substr(encode_base64($binId), 0, 22);
+    my $binId = pack( 'H2' x 16, unpack( 'A2' x 16, $hexId ) );
+    my $id    = substr( encode_base64($binId), 0, 22 );
     $id =~ tr{+/}{_-};
     return $id;
 }
-
-#-------------------------------------------------------------------
-
-=head2 DESTROY ( )
-
-Deconstructor.
-
-=cut
-
-sub DESTROY {
-        my $self = shift;
-        undef $self;
-}
-
 
 #-------------------------------------------------------------------
 

@@ -286,7 +286,7 @@ my $extras  = $origExtras;
 
 my $savecdn = $session->config->get('cdn');
 if ($savecdn) {
-	$session->config->delete('cdn');
+    $session->config->delete('cdn');
 }
 # Note: the CDN configuration will be reverted in the END
 
@@ -310,11 +310,11 @@ is($session->url->extras('/dir1//foo.html'), join('', $extras,'dir1/foo.html'), 
 $extras = 'http://mydomain.com/';
 $session->config->set('extrasURL', $extras);
 
-my $cdnCfg = { "enabled"   => 1,
-			   "extrasCdn"  => "http://extras.example.com/",
-			   "extrasSsl"  => "https://ssl.example.com/",
-			   "extrasExclude" => ["^tiny"]
-			 };
+my $cdnCfg = { "enabled"       => 1,
+               "extrasCdn"     => "http://extras.example.com/",
+               "extrasSsl"     => "https://ssl.example.com/",
+               "extrasExclude" => ["^tiny"]
+             };
 $session->config->set('cdn', $cdnCfg);
 is($session->url->extras('/dir1/foo.html'), join('', $cdnCfg->{extrasCdn}, 'dir1/foo.html'),
    'extras cleartext with CDN');
