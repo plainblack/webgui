@@ -32,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  28;         # Increment this number for each test you create
+my  $tests =  31;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -219,7 +219,67 @@ cmp_ok($bundle->get('lastModified'), '>=', $startTime, '... updates lastModified
 
 ###################################################################
 #
-# fetchAsset
+# fetch
+#
+###################################################################
+
+my $root = WebGUI::Asset->getRoot($session);
+
+my $snippet =  $root->addChild({
+    className => 'WebGUI::Asset::Snippet',
+    url       => 'filePumpSnippet',
+    snippet   => 'Pump a Snippet',
+});
+
+my $fileAsset = $root->addChild({
+    className => 'WebGUI::Asset::File',
+    url       => 'filePumpFileAsset',
+    filename  => 'pumpfile',
+}); 
+
+$fileAsset->getStorageLocation->addFileFromScalar('pumpfile', 'Pump up the jam');
+
+my $snippetTag = WebGUI::VersionTag->getWorking($session);
+WebGUI::Test->tagsToRollback($snippetTag);
+$snippetTag->commit;
+
+my $guts;
+$guts = $bundle->fetchAsset(URI->new('asset://filePumpSnippet'));
+cmp_deeply(
+    $guts,
+    {
+        content      => 'Pump a Snippet',
+        lastModified => re('^\d+$'),
+    },
+    'fetchAsset: retrieved a snippet'
+);
+
+$guts = $bundle->fetchAsset(URI->new('asset://filePumpFileAsset'));
+cmp_deeply(
+    $guts,
+    {
+        content      => 'Pump up the jam',
+        lastModified => re('^\d+$'),
+    },
+    'fetchAsset: retrieved a file asset'
+);
+
+my $path = $fileAsset->getStorageLocation->getPath($fileAsset->get('filename'));
+my $urilet = URI->new('file:'.$path);
+
+$guts = $bundle->fetchFile($urilet);
+cmp_deeply(
+    $guts,
+    {
+        content      => 'Pump up the jam',
+        lastModified => re('^\d+$'),
+    },
+    'fetchFile: retrieved a file from the filesystem'
+);
+
+###################################################################
+#
+# build
 #
 ###################################################################
 

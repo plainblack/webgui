@@ -4,7 +4,7 @@ use base qw/WebGUI::Crud/;
 use WebGUI::International;
 use WebGUI::Utility;
 use URI;
-use Path::Class::Dir;
+use Path::Class;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 use LWP;
@@ -82,8 +82,56 @@ sub build {
     my $originalBuild = $self->get('lastBuild');
 
     ##Whole lot of building
+    my $error = undef;
 
-    $self->update({lastBuild => $lastBuild});
+    ##JavaScript first
+    my $jsFiles    = $self->get('jsFiles');
+    my $concatenatedJS = '';
+    JSFILE: foreach my $jsFile (@{ $jsFiles }) {
+        my $uri     = $jsFile->{uri};
+        my $results = $self->fetch($uri);
+        if (! $results->{content}) {
+            $error = $uri;
+            last JSFILE;
+        }
+        $concatenatedJS .= $results->{content};
+        $jsFile->{lastModified} = $results->{lastModified};
+    }
+    return (0, $error) if ($error);
+
+    ##CSS next
+    my $cssFiles    = $self->get('cssFiles');
+    my $concatenatedCSS = '';
+    CSSFILE: foreach my $cssFile (@{ $cssFiles }) {
+        my $uri     = $cssFile->{uri};
+        my $results = $self->fetch($uri);
+        if (! $results->{content}) {
+            $error = $uri;
+            last CSSFILE;
+        }
+        $concatenatedCSS .= $results->{content};
+        $cssFile->{lastModified} = $results->{lastModified};
+    }
+
+    return (0, $error) if ($error);
+
+    ##Create the new build directory
+
+    ##Minimize files, and write them out.
+
+    my $minimizedJS  =  JS::Minimizer::XS::minimize($concatenatedJS);
+    undef $concatenatedJS;
+
+    my $minimizedCSS = CSS::Minimizer::XS::minimize($concatenatedCSS);
+    undef $concatenatedCSS;
+
+    ##Delete the old build directory and update myself with the new data.
+    $self->deleteBuild();
+    $self->update({
+        jsFiles   => $jsFiles,
+        cssFiles  => $cssFiles,
+        lastBuild => $lastBuild,
+    });
     return 1;
 }
 
@@ -177,9 +225,22 @@ files.
 
 sub delete {
     my ($self) = @_;
+    $self->deleteBuild;
+    return $self->SUPER::delete;
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteBuild ( )
+
+Delete the build as specified by the Bundle's current lastBuild timestamp;
+
+=cut
+
+sub deleteBuild {
+    my ($self) = @_;
     my $bundleDir = $self->getPathClassDir();
     $bundleDir->rmtree();
-    return $self->SUPER::delete;
 }
 
 #-------------------------------------------------------------------
@@ -251,28 +312,74 @@ sub deleteFile {
 
 #-------------------------------------------------------------------
 
-=head2 fetchAsset ( $uri )
+=head2 fetch ( $uri )
 
-Fetches a bundle file from a WebGUI Asset (probably a snippet) in this site.  Returns a hashref
-with the content and date that it was lastUpdated.  If the Asset cannot be found with that URL,
-it returns an empty hashref.
+Based on the scheme of the URI, dispatch the URI to the correct method
+to handle it.  Returns the results of the method.
 
 =head3 $uri
 
-A valid asset URI.
+A uri, of the form accepted by URI.
+
+=cut
+
+sub fetch {
+    my ($self, $uri ) = @_;
+    my $guts   = {};
+    my $urio   = URI->new($uri);
+    my $scheme = $urio->scheme;
+    if ($scheme eq 'http' or $scheme eq 'https') {
+        $guts = $self->fetchHttp($urio);
+    }
+    elsif ($scheme eq 'asset') {
+        $guts = $self->fetchAsset($urio);
+    }
+    elsif ($scheme eq 'file') {
+        $guts = $self->fetchFile($urio);
+    }
+    return $guts;
+}
+
+#-------------------------------------------------------------------
+
+=head2 fetchAsset ( $uri )
+
+Fetches a bundle file from a WebGUI Asset (probably a snippet) in this site.
+If the Asset cannot be found with that URL, it returns an empty hashref.
+Depending on the type of Asset fetched, there will be different fields.  Every
+kind of asset will have the lastModified field.
+
+Snippet assets will have a content field with the contents of the Snippet inside
+of it.
+
+File assets will have a content field with the contents of the file.
+
+Any other kind of asset will return an empty content field.
+
+=head3 $uri
+
+A URI object.
 
 =cut
 
 sub fetchAsset {
     my ($self, $uri ) = @_;
-    my $url = URI->new($uri)->opaque;
+
+    my $url = $uri->opaque;
+    $url =~ s{^/+}{};
     my $asset = WebGUI::Asset->newByUrl($self->session, $url);
     return {} unless $asset;
     ##Check for a snippet, or snippet subclass?
     my $guts = {
         lastModified => $asset->get('lastModified'),
-        content      => $asset->view(1),
+        content      => '',
     };
+    if ($asset->isa('WebGUI::Asset::Snippet')) {
+        $guts->{content} = $asset->view(1);
+    }
+    elsif ($asset->isa('WebGUI::Asset::File')) {
+        $guts->{content} = $asset->getStorageLocation->getFileContentsAsScalar($asset->get('filename'));
+    }
     return $guts;
 }
 
@@ -284,18 +391,24 @@ Fetches a bundle file from the local filesystem.  Returns a hashref
 with the content and date that it was last updated.  If there is any problem
 with getting the file, it returns an empty hashref.
 
-
 =head3 $uri
 
-A valid filesystem URI.
+A URI object.
 
 =cut
 
 sub fetchFile {
     my ($self, $uri ) = @_;
-
+    my $filepath = $uri->path;
+    return {} unless (-e $filepath && -r _);
+    my @stats = stat(_); # recycle stat data from file tests.
+    open my $file, '<', $filepath or return {};
+    local $/;
     my $guts = {
+        lastModified => $stats[9],
+        content      => <$file>,
     };
+    close $file;
     return $guts;
 }
 
@@ -309,7 +422,7 @@ the request, it returns an empty hashref.
 
 =head3 $uri
 
-A valid web URI.
+A URI object.
 
 =cut
 
@@ -353,7 +466,7 @@ The name of a key in the collateral hash.  Typically a unique identifier for a g
 
 =head3 keyValue
 
-Along with keyName, determines which "row" of collateral data to delete.
+Along with keyName, determines which "row" of collateral data to get.
 If this is equal to "new", then an empty hashRef will be returned to avoid
 strict errors in the caller.  If the requested data does not exist in the
 collateral array, it also returns an empty hashRef.
@@ -412,19 +525,24 @@ sub getCollateralDataIndex {
 
 #-------------------------------------------------------------------
 
-=head2 getPathClassDir ( )
+=head2 getPathClassDir ( $otherBuild )
 
 Returns a Path::Class::Dir object to the last build directory
 for this bundle.
 
+=head3 $otherBuild
+
+Another time stamp to use instead of the lastModified timestamp.
+
 =cut
 
 sub getPathClassDir {
-    my ($self) = @_;
+    my ($self, $lastBuild) = @_;
+    $lastBuild ||= $self->get('lastBuild');
     return Path::Class::Dir->new(
         $self->session->config->get('uploadsPath'),
         'filepump',
-        $self->get('bundleName') . $self->get('lastBuild')
+        $self->get('bundleName') . $lastBuild
     );
 }
 
