@@ -1251,9 +1251,11 @@ sub update {
     
     # Make a safe copy of properties, we'll be deleting from it
     $properties = { %$properties };
-
     $self->uncache;
     $properties->{lastUpdated} ||= time;
+
+    # No userId, bad!
+    delete $properties->{userId};
 
     # $self->{_user} contains all fields in `users` table
     my @userFields  = ();
