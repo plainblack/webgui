@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 221; # increment this value for each test you create
+use Test::More tests => 211; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -115,17 +115,11 @@ $newSession->close;
 
 my $now = time;
 $user->update({
-    userId          => 'INEDU2COMEINSATURDYTHX',
     username        => "jlumbe",
     firstName       => "John",
     lastName        => "Lumbergh",
     lastUpdated     => $now,
 });
-
-isnt(
-    $user->get('userId'), 'INEDU2COMEINSATURDYTHX',
-    "update() does not allow changing userId",
-);
 
 is(
     $session->db->quickScalar("SELECT username FROM users WHERE userId=?",[$user->getId]),

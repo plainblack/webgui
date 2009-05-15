@@ -194,9 +194,6 @@ sub getOperations {
 		'setPersonalStyle' => 'Style',
 		'unsetPersonalStyle' => 'Style',
 
-        'ajaxCreateUser' => 'User',
-        'ajaxDeleteUser' => 'User',
-        'ajaxUpdateUser' => 'User',
 		'becomeUser' => 'User',
 		'deleteUser' => 'User',
 		'editUser' => 'User',

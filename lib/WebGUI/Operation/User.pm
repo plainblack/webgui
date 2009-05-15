@@ -25,8 +25,6 @@ use WebGUI::SQL;
 use WebGUI::TabForm;
 use WebGUI::User;
 use WebGUI::Utility;
-use JSON;
-use XML::Simple;
 
 =head1 NAME
 
@@ -138,7 +136,7 @@ sub canUseService {
     my ( $session ) = @_;
     my $subnets = $session->config->get('serviceSubnets');
     return 1 if !$subnets || !@{$subnets};
-    return 1 if WebGUI::Utility::isInSubnet( $session->env->getIp, $subnets );
+    return 1 if WebGUI::Utility::isInSubnet( $session->getIp, $subnets );
     return 0; # Don't go away mad, just go away
 }
 
@@ -155,27 +153,6 @@ sub canView {
     my $session     = shift;
     my $user        = shift || $session->user;
     return canAdd($session, $user);
-}
-
-#-------------------------------------------------------------------
-
-=head2 createServiceResponse ( format, data ) 
-
-Create a string with the correct C<format> from the given C<data>.
-
-Possible formats are "json" and "xml".
-
-=cut
-
-sub createServiceResponse {
-    my ( $format, $data ) = @_;
-    
-    if ( lc $format eq "xml" ) {
-        return XML::Simple::XMLout($data, NoAttr => 1, RootName => "response" );
-    }
-    else {
-        return JSON->new->encode($data);
-    }
 }
 
 #-------------------------------------------------------------------
@@ -362,21 +339,22 @@ sub www_ajaxCreateUser {
 
     ### Verify data
     # User data is <PROPERTY_NAME> in form
-    my %userParam = (
+    my %user    = (
         map { $_ => $session->form->get($_) }
-        grep { !/^auth:/ && $_ ne "op" }
-        ( $session->form->param )
+        grep { !/^auth:/ }
+        $session->form->get
     );
 
     # Auth data is auth:<AUTH_METHOD>:<PROPERTY_NAME> in form
-    my %authParam    = ();
-    for my $formParam ( grep { /^auth:[^:]+:.+$/ } $session->form->get ) {
-        my ( $authMethod, $property ) = $formParam =~ /^auth:([^:]+):(.+)$/;
-        $authParam{$authMethod}{$property} = $session->form->get($formParam);
+    my %auth    = ();
+    for my $formParam ( grep { /^auth:([^:]+):(.+)$/ } $session->form->get ) {
+        my $authMethod  = $1;
+        my $property    = $2;
+        $auth{$authMethod}{$property} = $session->form->get($formParam);
     }
-
+    
     # User must have a username
-    if ( !$userParam{username} ) {
+    if ( !$user{username} ) {
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::InvalidParam",
             param       => "username",
@@ -384,26 +362,11 @@ sub www_ajaxCreateUser {
         } );
     }
 
-    ### Create user
-    my $user    = WebGUI::User->create( $session );
-    $user->update( \%userParam );
-    for my $authMethod ( keys %authParam ) {
-        my $auth = WebGUI::Operation::Auth::getInstance($session,$authMethod,$user->getId);
+    # Create user
+    
+    # Send new user's data
+    
 
-        # XXX Special handling for WebGUI passwords. This should be removed when 
-        # Auth is fixed in WebGUI 8
-        if ( $authMethod eq 'WebGUI' && exists $authParam{$authMethod}{identifier} ) {
-            $authParam{$authMethod}{identifier}
-                = $auth->hashPassword( $authParam{$authMethod}{identifier} );
-        }
-
-        $auth->saveParams( $user->getId, $auth->authMethod, $authParam{$authMethod} );
-    }
-
-    ### Send new user's data
-    return createServiceResponse( $outputFormat, {
-        user        => $user->get,
-    } );
 }
 
 #-------------------------------------------------------------------
@@ -417,53 +380,7 @@ Delete a user using a web service.
 sub www_ajaxDeleteUser {
     my ( $session ) = @_;
     
-    ### Get desired output format first (for future error messages)
-    my $outputFormat    = "json";
-    my $mimeType        = "application/json";
 
-    # Allow XML
-    if ( lc $session->form->get('as') eq "xml" ) {
-        $outputFormat   = "xml";
-        $mimeType       = "application/xml";
-    }
-
-    $session->http->setMimeType( $mimeType ); 
-
-    # Verify access
-    if ( !canEdit($session) || !canUseService($session) ) {
-        # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
-        return createServiceResponse( $outputFormat, {
-            error       => "WebGUI::Error::Unauthorized",
-            message     => "",
-        } );
-    }
-
-    # Verify data
-    my $userId  = $session->form->get('userId');
-    if ( !$userId ) {
-        return createServiceResponse( $outputFormat, {
-            error       => "WebGUI::Error::InvalidParam",
-            param       => "userId",
-            message     => "",
-        } );
-    }
-    elsif ( $userId eq "1" || $userId eq "3" ) {
-        $session->http->setStatus(403,"Forbidden");
-        return createServiceResponse( $outputFormat, {
-            error       => 'WebGUI::Error::InvalidParam',
-            param       => 'userId',
-            message     => 'Cannot delete system user',
-        } );
-    }
-
-    ### Delete user
-    my $user    = WebGUI::User->new( $session, $userId );
-    $user->delete;
-    
-    return createServiceResponse( $outputFormat, {
-        message         => 'User deleted',
-    } );
 }
 
 #-------------------------------------------------------------------
@@ -477,72 +394,7 @@ Update a user using a web service.
 sub www_ajaxUpdateUser {
     my ( $session ) = @_;
     
-    ### Get desired output format first (for future error messages)
-    my $outputFormat    = "json";
-    my $mimeType        = "application/json";
 
-    # Allow XML
-    if ( lc $session->form->get('as') eq "xml" ) {
-        $outputFormat   = "xml";
-        $mimeType       = "application/xml";
-    }
-
-    $session->http->setMimeType( $mimeType ); 
-
-    # Verify access
-    if ( !canEdit($session) || !canUseService($session) ) {
-        # We need an automatic way to send a request for an http basic auth
-        $session->http->setStatus(401,'Unauthorized');
-        return createServiceResponse( $outputFormat, {
-            error       => "WebGUI::Error::Unauthorized",
-            message     => "",
-        } );
-    }
-
-    ### Verify data
-    # User data is <PROPERTY_NAME> in form
-    my %userParam = (
-        map { $_ => $session->form->get($_) }
-        grep { !/^auth:/ && $_ ne "op" }
-        ( $session->form->param )
-    );
-
-    # Auth data is auth:<AUTH_METHOD>:<PROPERTY_NAME> in form
-    my %authParam    = ();
-    for my $formParam ( grep { /^auth:[^:]+:.+$/ } $session->form->param ) {
-        my ( $authMethod, $property ) = $formParam =~ /^auth:([^:]+):(.+)$/;
-        $authParam{$authMethod}{$property} = $session->form->get($formParam);
-    }
-
-    # User must have a userId
-    if ( !$userParam{userId} ) {
-        return createServiceResponse( $outputFormat, {
-            error       => "WebGUI::Error::InvalidParam",
-            param       => "userId",
-            message     => "",
-        } );
-    }
-
-    ### Update user
-    my $user    = WebGUI::User->new( $session, delete $userParam{userId} );
-    $user->update( \%userParam );
-    for my $authMethod ( keys %authParam ) {
-        my $auth = WebGUI::Operation::Auth::getInstance($session,$authMethod,$user->getId);
-
-        # XXX Special handling for WebGUI passwords. This should be removed when 
-        # Auth is fixed in WebGUI 8
-        if ( $authMethod eq 'WebGUI' && exists $authParam{$authMethod}{identifier} ) {
-            $authParam{$authMethod}{identifier}
-                = $auth->hashPassword( $authParam{$authMethod}{identifier} );
-        }
-
-        $auth->saveParams( $user->getId, $auth->authMethod, $authParam{$authMethod} );
-    }
-
-    ### Send user's data
-    return createServiceResponse( $outputFormat, {
-        user        => $user->get,
-    } );
 }
 >>>>>>> added services to create, update, and delete users:lib/WebGUI/Operation/User.pm
 
