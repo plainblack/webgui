@@ -32,7 +32,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  31;         # Increment this number for each test you create
+my  $tests =  35;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -275,6 +275,30 @@ cmp_deeply(
         lastModified => re('^\d+$'),
     },
     'fetchFile: retrieved a file from the filesystem'
+);
+
+###################################################################
+#
+# getPathClassDir
+#
+###################################################################
+
+my $dir = $bundle->getPathClassDir();
+isa_ok($dir, 'Path::Class::Dir');
+my $timestampDir = $dir->dir_list(-1, 1);
+cmp_deeply(
+    [ split /\./, $timestampDir ],
+    [ 'new-bundle', 0 ],
+    '... directory has correct name and timestamp'
+);
+
+$dir = $bundle->getPathClassDir(997966800);
+isa_ok($dir, 'Path::Class::Dir');
+$timestampDir = $dir->dir_list(-1, 1);
+cmp_deeply(
+    [ split /\./, $timestampDir ],
+    [ 'new-bundle', 997966800 ],
+    '... directory has correct name and timestamp when timestamp is specified'
 );
 
 ###################################################################
