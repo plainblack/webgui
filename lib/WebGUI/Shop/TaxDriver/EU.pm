@@ -20,7 +20,10 @@ use SOAP::Lite;
 use WebGUI::Content::Account;
 use WebGUI::TabForm;
 use WebGUI::Utility qw{ isIn };
+use WebGUI::International;
+
 use Business::Tax::VAT::Validation;
+use JSON qw{ to_json };
 use Tie::IxHash;
 
 use base qw{ WebGUI::Shop::TaxDriver };
@@ -279,6 +282,7 @@ Returns the form that contains the configuration options for this plugin in the 
 sub getConfigurationScreen {
     my $self    = shift;
     my $session = $self->session;
+    my $i18n    = WebGUI::International->new( $session, 'Shop' );
 
     my $taxGroups = $self->get( 'taxGroups' ) || [];
 
@@ -329,12 +333,13 @@ sub getConfigurationScreen {
             . q{</td></tr>};
     }
     $vatGroups .= q{</tbody></table>};
-    $vatGroups .= 
-        WebGUI::Form::formHeader( $session )
+    $vatGroups = 
+        '<b>Add a VAT group</b>'
+        . WebGUI::Form::formHeader( $session, { extras => 'id="addGroupForm"' } )
         . WebGUI::Form::hidden( $session, { name => 'shop', value => 'tax' } )
         . WebGUI::Form::hidden( $session, { name => 'method', value => 'do' } )
         . WebGUI::Form::hidden( $session, { name => 'do', value => 'addGroup' } )
-        . 'Name '
+        . ' Name '
         . WebGUI::Form::text(   $session, { name => 'name' } )
         . ' Rate '
         . WebGUI::Form::float(  $session, { name => 'rate' } )
@@ -347,12 +352,17 @@ sub getConfigurationScreen {
 	$style->setLink($self->{_css},{rel=>"stylesheet", rel=>"stylesheet",type=>"text/css"});
 	$style->setLink($url->extras('/yui/build/fonts/fonts-min.css'),{type=>"text/css", rel=>"stylesheet"});
 	$style->setLink($url->extras('/yui/build/tabview/assets/skins/sam/tabview.css'),{type=>"text/css", rel=>"stylesheet"});
+	$style->setLink($url->extras('/yui/build/button/assets/skins/sam/button.css'),{type=>"text/css", rel=>"stylesheet"});
     $style->setLink($url->extras('/yui/build/container/assets/container.css'),{ type=>'text/css', rel=>"stylesheet" });
     $style->setLink($url->extras('/hoverhelp.css'),{ type=>'text/css', rel=>"stylesheet" });
+    $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {rel=>'stylesheet', type => 'text/CSS'});
     $style->setScript($url->extras('/yui/build/utilities/utilities.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/yui/build/container/container-min.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/yui/build/tabview/tabview-min.js'),{ type=>'text/javascript' });
     $style->setScript($url->extras('/hoverhelp.js'),{ type=>'text/javascript' });
+    $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
+    $style->setScript($url->extras('yui/build/button/button-min.js'), {type => 'text/javascript'});
     
     my $output = <<EOHTML;
         <div class="yui-skin-sam">
@@ -363,12 +373,101 @@ sub getConfigurationScreen {
                 </ul>
                 <div class="yui-content">
                     <div id="tab1">$general</div>
-                    <div id="tab2">$vatGroups</div>
+                    <div id="tab2">
+                        <div id="taxGroupTable"></div>
+                        <div id="addGroup">$vatGroups<div>
+                    </div>
                 </div>
             </div>
         </div>
         <script type="text/javascript"> var tabView = new YAHOO.widget.TabView('webguiTabForm'); </script> 
 EOHTML
+
+    $output .= qq|
+        <script type="text/javascript">
+        var beehhh = function() {
+            // Column definitions
+            formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
+                elCell.innerHTML = '<a href="|.$url->page(q{shop=tax;method=do;do=deleteTax}).q|;taxId='+oRecord.getData('taxId')+'">|.$i18n->get('delete').q|</a>';
+            };
+
+            var myColumnDefs = [ // sortable:true enables sorting
+                { key: "name",      label:"|.$i18n->get('group label').q|", sortable: true},
+                { key: "rate",      label:"|.$i18n->get('group rate').q|", sortable: true},
+                { key: "isDefault", label:'', sortable: true, formatter : 'formatMakeDefaultButton' },
+                { key: "deleteUrl", label:'', sortable: true, formatter: "formatDeleteButton"  }
+            ];
+
+            // DataSource instance
+            var myDataSource = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getTaxGroupsAsJSON').q|");
+            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            myDataSource.responseSchema = {
+                resultsList: "records",
+                fields: [
+                    { key : "name",      parser : "string" },
+                    { key : "rate",      parser : "string" },
+                    { key : "isDefault", parser : "string" },
+                    { key : "deleteUrl" },
+                    { key : 'setDefaultUrl' },
+                    { key : 'id' }
+                ],
+        //        metaFields: {
+        //            totalRecords: "totalRecords" // Access to value in the server response
+        //        }
+            };
+            
+            // DataTable configuration
+            var myConfigs = {
+        //        initialRequest: '', // Initial request for first page of data
+                dynamicData:    true, // Enables dynamic server-driven data
+        //        sortedBy :      { key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
+        //        paginator: new YAHOO.widget.Paginator({ rowsPerPage:25 }) // Enables pagination 
+            };
+            
+            // DataTable instance
+            var myDataTable = new YAHOO.widget.DataTable("taxGroupTable", myColumnDefs, myDataSource, myConfigs);
+        
+
+            var reloadTable = function () {
+                myDataSource.sendRequest( '', { 
+                    success     : myDataTable.onDataReturnInitializeTable,
+                    scope       : myDataTable
+                } );
+            };
+
+
+            YAHOO.widget.DataTable.Formatter.formatMakeDefaultButton = function (elCell, oRecord, oColumn, oData) {
+                if ( oRecord.getData('isDefault') === '1' ) {
+                    elCell.innerHTML = 'Default group';
+                }
+                else {
+                    var button  = new YAHOO.widget.Button( { label : 'Make default', container: elCell } );
+                    button.addListener( 'click', function () {
+                        YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('setDefaultUrl'), { success : reloadTable } );
+                    } );
+                }
+            }
+
+            YAHOO.widget.DataTable.Formatter.formatDeleteButton = function (elCell, oRecord, oColumn, oData) {
+                var datatable = this;
+
+                var button = new YAHOO.widget.Button( { label : 'Delete', container: elCell } );
+                button.addListener( 'click', function () {
+                    YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('deleteUrl'), { success : reloadTable } );
+                } );
+                    
+            }
+        
+            YAHOO.util.Event.addListener( 'addGroupForm', 'submit', function ( e ) {
+                YAHOO.util.Event.stopEvent( e );
+                YAHOO.util.Connect.setForm( 'addGroupForm' );
+                YAHOO.util.Connect.asyncRequest( 'POST', this.action, { success : reloadTable } );
+                this.reset();
+            } );
+            
+        }();
+    </script>
+    |;
 
     return $output;
 }
@@ -741,6 +840,26 @@ sub www_deleteVATNumber {
     my $instance = WebGUI::Content::Account->createInstance($session,"shop");
     return $instance->displayContent( $instance->callMethod("manageTaxData", [], $session->user->userId) );
 }
+
+#-------------------------------------------------------------------
+sub www_getTaxGroupsAsJSON {
+    my $self = shift;
+    my $url  = $self->session->url;
+
+    my $taxGroups = $self->get('taxGroups') || [];
+
+    foreach my $group ( @{ $taxGroups} ) {
+        my $id = $group->{ id };
+
+        $group->{ deleteUrl     } = $url->page( 'shop=tax;method=do;do=deleteGroup;groupId=' .     $id );
+        $group->{ setDefaultUrl } = $url->page( 'shop=tax;method=do;do=setDefaultGroup;groupId=' . $id );
+        $group->{ isDefault     } = 1 if $id eq $self->get( 'defaultGroup' );
+    }
+
+    $self->session->http->setMimeType( 'application/json' );
+    return to_json( { records => $taxGroups  } );
+}
+
 
 #-------------------------------------------------------------------
 

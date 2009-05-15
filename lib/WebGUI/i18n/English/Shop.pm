@@ -1634,6 +1634,19 @@ our $I18N = {
         lastUpdated => 0,
         context => q|Button label in the edit address screen.|,
     },
+
+    'group label' => {
+        message => q|Label|,
+        lastUpdated => 0,
+        context => q|Label in the EU tax manager|,
+    },
+
+    'group rate' => {
+        message => q|Tax rate|,
+        lastUpdated => 0,
+        context => q|Label in the EU tax manager|,
+    },
+
 };
 
 1;
