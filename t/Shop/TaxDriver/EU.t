@@ -152,15 +152,17 @@ SKIP: {
         userId           => $taxUser->userId,
         countryCode      => 'NL',
         vatNumber        => $testVAT_NL,
-        approved         => 1,
+        viesValidated    => 1,
         viesErrorCode    => undef,
+        approved         => 0,
     };
     my $expectBE = {
         userId           => $taxUser->userId,
         countryCode      => 'BE',
         vatNumber        => $testVAT_BE,
-        approved         => 1,
+        approved         => 0,
         viesErrorCode    => undef,
+        viesValidated    => 1,
     };
 
     my $vatNumbers = $taxer->getVATNumbers( undef, $taxUser );
@@ -257,6 +259,7 @@ SKIP: {
     #
     #######################################################################
 
+    $taxer->update( { 'automaticViesApproval' => 1 } );
     my $book = WebGUI::Shop::AddressBook->create($session);
 
     # setup address in EU but not in residential country of merchant

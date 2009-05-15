@@ -2,6 +2,7 @@
  - rfe #10061: Use email as username at registration
  - Added WebGUI community statistics question to the site setup wizard.
  - Added Ogone payment plugin ( Martin Kamerbeek / Oqapi )
+ - Improved VAT number management for admins ( Martin Kamerbeek / Oqapi )
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

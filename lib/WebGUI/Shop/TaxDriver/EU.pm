@@ -312,6 +312,12 @@ sub getConfigurationScreen {
         hoverHelp   => 'The country where your shop resides.',
         options     => \%countryOptions,
     );
+    $f->template(
+        name        => 'userTemplateId',
+        value       => $self->get('userTemplateId'),
+        label       => 'User screen template',
+        namespace   => 'TaxDriver/EU/User',
+    );
     $f->yesNo(
         name        => 'automaticViesApproval',
         value       => $self->get( 'automaticViesApproval' ),
@@ -606,27 +612,21 @@ Returns the screen for entering per user configuration for this tax driver.
 sub getUserScreen {
     my $self    = shift;
     my $url     = $self->session->url;
+    my $var     = {};
+   
+    $var->{ errorMessage } = $self->session->stow->get( 'userTaxError' );
 
-    my $output  = '<b>VAT Numbers</b><br />'
-        . '<table><thead><tr><th>Country</th><th>VAT Number</th></tr></thead><tbody>';
-
+    my @vatNumbers;
     foreach my $number ( @{ $self->getVATNumbers } ) {
-        my $deleteUrl = $url->page('shop=tax;method=do;do=deleteVATNumber;vatNumber='.$number->{ vatNumber });
-        $output .= 
-            '<tr><td>'
-            . join( '</td><td>', 
-                $self->getCountryName( $number->{ countryCode } ),
-                $number->{ vatNumber },
-                $number->{ name },
-                $number->{ address },
-                $self->isUsableVATNumber( $number ),
-                qq{<a href="$deleteUrl">delete</a>},
-            )
-            . '</td></tr>'
-            ;
+        $number->{ deleteUrl    } = 
+            $url->page('shop=tax;method=do;do=deleteVATNumber;vatNumber='.$number->{ vatNumber });
+        $number->{ countryName  } = $self->getCountryName( $number->{ countryCode } ),
+        $number->{ isUsable     } = $self->isUsableVATNumber( $number ),
+
+        push @vatNumbers, $number;
     }
 
-    $output .= '</tbody></table>';
+    $var->{ vatNumber_loop } = \@vatNumbers;
 
     my $f = WebGUI::HTMLForm->new( $self->session );
     $f->hidden(
@@ -648,9 +648,12 @@ sub getUserScreen {
     $f->submit(
         value   => 'Add',
     );
-    $output .= $f->print;
 
-    return $output;
+    $var->{ addVatNumber_form } = $f->print;
+
+    my $template = WebGUI::Asset::Template->new( $self->session, $self->get('userTemplateId') );
+
+    return $template->process( $var );
 }
 
 #-------------------------------------------------------------------
@@ -864,12 +867,12 @@ sub www_addVATNumber {
     my $vatNumber              = uc $form->process( 'vatNumber' );
     my ($countryCode, $number) = $vatNumber =~ m/^([A-Z]{2})([A-Z0-9]+)$/;    
 
-    return 'Illegal country code' unless isIn( $countryCode, keys %EU_COUNTRIES );
+    my $errorMessage;
+    $errorMessage = 'Illegal country code' unless isIn( $countryCode, keys %EU_COUNTRIES );
+    $errorMessage = 'You already have a VAT number for this country.' if @{ $self->getVATNumbers( $countryCode ) };
+    $errorMessage = $self->addVATNumber( $vatNumber ) unless $errorMessage;
 
-    return 'You already have a VAT number for this country.' if @{ $self->getVATNumbers( $countryCode ) };
-
-    #### TODO: Handle errorMessage.
-    my $errorMessage = $self->addVATNumber( $vatNumber );
+    $self->session->stow->set( 'userTaxError', $errorMessage );
 
     my $instance = WebGUI::Content::Account->createInstance($session,"shop");
     return $instance->displayContent( $instance->callMethod("manageTaxData", [], $session->user->userId) );
@@ -1035,6 +1038,7 @@ sub www_saveConfiguration {
         shopCountry             => $form->process( 'shopCountry',               'selectBox' ),
         automaticViesApproval   => $form->process( 'automaticViesApproval',     'yesNo'     ),
         acceptOnViesUnavailable => $form->process( 'acceptOnViesUnavailable',   'yesNo'     ),
+        userTemplateId          => $form->process( 'userTemplateId',            'template'  ),
     } );
 
     return '';
