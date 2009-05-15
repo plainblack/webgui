@@ -187,10 +187,10 @@ sub prepareView {
     my $templateId;
 
     if ($session->style->useMobileStyle) {
-        $templateId = $self->get('templateId');
+        $templateId = $self->get('mobileTemplateId');
     }
     else {
-        $templateId = $self->get('mobileTemplateId');
+        $templateId = $self->get('templateId');
     }
 
     my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
