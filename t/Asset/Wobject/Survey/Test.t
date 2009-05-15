@@ -151,7 +151,7 @@ sub try_it {
     my ($test, $spec, $opts) = @_;
     chomp($spec);
     
-    $test->update( { spec => $spec } );
+    $test->update( { test => $spec } );
     my $result = $t1->run();
     ok( $result, 'Tests ran ok' );
     

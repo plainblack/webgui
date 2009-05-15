@@ -33,6 +33,7 @@ addOgoneToConfig( $session );
 addUseEmailAsUsernameToSettings( $session );
 alterVATNumberTable( $session );
 addRedirectAfterLoginUrlToSettings( $session );
+addSurveyTestResultsTemplateColumn( $session );
 
 finish($session); # this line required
 
@@ -76,6 +77,16 @@ sub alterVATNumberTable {
     $session->db->write('alter table tax_eu_vatNumbers add column approved tinyint(1)');
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addSurveyTestResultsTemplateColumn {
+    my $session = shift;
+    print "\tAdding columns for Survey Test Results Template..." unless $quiet;
+    $session->db->write("alter table Survey add column `testResultsTemplateId` char(22)");
+
+    print "Done\n" unless $quiet;
+
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

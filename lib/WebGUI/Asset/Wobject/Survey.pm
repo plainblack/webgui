@@ -2452,7 +2452,7 @@ sub www_editTestSuite {
     
     my $testsFound = 0;
     my $tests = '<table class="content"><tr><th></th><th>' . $i18n->get('test name') . '</th></tr><tbody class="tableData">';
-    my $getATest = WebGUI::Asset::Wobject::Survey::Test->getAllIterator($session);
+    my $getATest = WebGUI::Asset::Wobject::Survey::Test->getAllIterator($session, { sequenceKeyValue => $self->getId } );
     my $icon = $session->icon;
     while (my $test = $getATest->()) {
         $testsFound++;

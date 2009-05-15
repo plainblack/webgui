@@ -5,6 +5,7 @@
  - Improved VAT number management for admins ( Martin Kamerbeek / Oqapi )
  - rfe #9981: RedirectAfterLogin Setting
  - Added user create, update, and delete web services ( HD Publishing )
+ - Added Survey web test suite for validating expression/branching logic
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

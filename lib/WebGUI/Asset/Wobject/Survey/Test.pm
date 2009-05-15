@@ -50,7 +50,7 @@ Identifies the Survey instance.
 
 A name for the test
 
-=head4 spec
+=head4 test
 
 The test spec
 
@@ -74,7 +74,7 @@ sub crud_definition {
         hoverHelp    => $i18n->get( 'test name help', 'Asset_Survey' ),
         defaultValue => '',
     };
-    $properties->{spec} = {
+    $properties->{test} = {
         fieldType    => 'codearea',
         label        => $i18n->get( 'test spec', 'Asset_Survey' ),
         hoverHelp    => $i18n->get( 'test spec help', 'Asset_Survey' ),
@@ -104,7 +104,7 @@ sub run {
         return { tap => 'Bail Out! enableSurveyExpressionEngine config option disabled' };
     }
     
-    my $spec = $self->get('spec') 
+    my $spec = $self->get('test') 
         or return { tap => "Bail Out! Test spec undefined" };
     
     eval {
