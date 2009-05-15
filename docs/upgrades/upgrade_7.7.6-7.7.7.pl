@@ -31,6 +31,7 @@ my $session = start(); # this line required
 
 addOgoneToConfig( $session );
 addUseEmailAsUsernameToSettings( $session );
+alterVATNumberTable( $session );
 
 finish($session); # this line required
 
@@ -53,6 +54,16 @@ sub addUseEmailAsUsernameToSettings {
     $session->db->write("insert into settings (name, value) values ('webguiUseEmailAsUsername',0)");
 
     print "Done.\n" unless $quiet;
+}
+
+sub alterVATNumberTable {
+    my $session = shift;
+    print "\tAdapting VAT Number table..." unless $quiet;
+
+    $session->db->write('alter table tax_eu_vatNumbers change column approved viesValidated tinyint(1)');
+    $session->db->write('alter table tax_eu_vatNumbers add column approved tinyint(1)');
+
+    print "Done\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

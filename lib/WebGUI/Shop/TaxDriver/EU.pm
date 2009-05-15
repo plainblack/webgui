@@ -166,14 +166,14 @@ sub addVATNumber {
         return 'The entered VAT number is invalid.';
     }
 
-
     # Write the code to the db.
-    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,approved,viesErrorCode) values (?,?,?,?,?)', [
+    $db->write( 'replace into tax_eu_vatNumbers (userId,countryCode,vatNumber,viesValidated,viesErrorCode,approved) values (?,?,?,?,?,?)', [
         $user->userId,
         substr( $number, 0 , 2 ),
         $number,
         $numberIsValid ? 1 : 0,
         $numberIsValid ? undef : $validator->get_last_error_code,
+        0,
     ] );
 
     return $numberIsValid ? undef : 'Number validation currently not available. Check later.';
@@ -312,6 +312,17 @@ sub getConfigurationScreen {
         hoverHelp   => 'The country where your shop resides.',
         options     => \%countryOptions,
     );
+    $f->yesNo(
+        name        => 'automaticViesApproval',
+        value       => $self->get( 'automaticViesApproval' ),
+        label       => 'Automatic VIES approval?',
+    );
+    $f->yesNo(
+        name        => 'acceptOnViesUnavailable',
+        value       => $self->get( 'acceptOnViesUnavailable' ),
+        label       => 'Accept VAT numbers when VIES is unavailable?',
+    );
+
     $f->submit;
     my $general = $f->print;
 
@@ -369,13 +380,17 @@ sub getConfigurationScreen {
             <div id="webguiTabForm" class="yui-navset">
                 <ul class="yui-nav">
                     <li class="selected"><a href="#tab1" ><em>General configuration</em></a></li>
-                    <li ><a href="#tab2" ><em>VAT Groups</em></a></li>
+                    <li><a href="#tab2" ><em>VAT Groups</em></a></li>
+                    <li><a href="#tab3"><em>VAT Numbers</em></a></li>
                 </ul>
                 <div class="yui-content">
                     <div id="tab1">$general</div>
                     <div id="tab2">
                         <div id="taxGroupTable"></div>
-                        <div id="addGroup">$vatGroups<div>
+                        <div id="addGroup">$vatGroups</div>
+                    </div>
+                    <div id="tab3">
+                        <div id="vatNumberManager"></div>
                     </div>
                 </div>
             </div>
@@ -391,7 +406,7 @@ EOHTML
                 elCell.innerHTML = '<a href="|.$url->page(q{shop=tax;method=do;do=deleteTax}).q|;taxId='+oRecord.getData('taxId')+'">|.$i18n->get('delete').q|</a>';
             };
 
-            var myColumnDefs = [ // sortable:true enables sorting
+            var groupColumDefs = [ // sortable:true enables sorting
                 { key: "name",      label:"|.$i18n->get('group label').q|", sortable: true},
                 { key: "rate",      label:"|.$i18n->get('group rate').q|", sortable: true},
                 { key: "isDefault", label:'', sortable: true, formatter : 'formatMakeDefaultButton' },
@@ -399,9 +414,9 @@ EOHTML
             ];
 
             // DataSource instance
-            var myDataSource = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getTaxGroupsAsJSON').q|");
-            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            myDataSource.responseSchema = {
+            var groupDS = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getTaxGroupsAsJSON').q|");
+            groupDS.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            groupDS.responseSchema = {
                 resultsList: "records",
                 fields: [
                     { key : "name",      parser : "string" },
@@ -410,31 +425,25 @@ EOHTML
                     { key : "deleteUrl" },
                     { key : 'setDefaultUrl' },
                     { key : 'id' }
-                ],
-        //        metaFields: {
-        //            totalRecords: "totalRecords" // Access to value in the server response
-        //        }
+                ]
             };
             
             // DataTable configuration
             var myConfigs = {
-        //        initialRequest: '', // Initial request for first page of data
                 dynamicData:    true, // Enables dynamic server-driven data
-        //        sortedBy :      { key:"country", dir:YAHOO.widget.DataTable.CLASS_ASC}, // Sets UI initial sort arrow
-        //        paginator: new YAHOO.widget.Paginator({ rowsPerPage:25 }) // Enables pagination 
             };
             
             // DataTable instance
-            var myDataTable = new YAHOO.widget.DataTable("taxGroupTable", myColumnDefs, myDataSource, myConfigs);
+            var groupDT = new YAHOO.widget.DataTable("taxGroupTable", groupColumDefs, groupDS, myConfigs);
         
-
-            var reloadTable = function () {
-                myDataSource.sendRequest( '', { 
-                    success     : myDataTable.onDataReturnInitializeTable,
-                    scope       : myDataTable
+            var reloadTable = function ( dt ) {
+                dt.getDataSource().sendRequest( '', { 
+                    success     : dt.onDataReturnInitializeTable,
+                    scope       : dt
                 } );
             };
 
+            var reloadGroupDT = function () { reloadTable( groupDT ) };
 
             YAHOO.widget.DataTable.Formatter.formatMakeDefaultButton = function (elCell, oRecord, oColumn, oData) {
                 if ( oRecord.getData('isDefault') === '1' ) {
@@ -443,7 +452,7 @@ EOHTML
                 else {
                     var button  = new YAHOO.widget.Button( { label : 'Make default', container: elCell } );
                     button.addListener( 'click', function () {
-                        YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('setDefaultUrl'), { success : reloadTable } );
+                        YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('setDefaultUrl'), { success : reloadGroupDT } );
                     } );
                 }
             }
@@ -453,7 +462,7 @@ EOHTML
 
                 var button = new YAHOO.widget.Button( { label : 'Delete', container: elCell } );
                 button.addListener( 'click', function () {
-                    YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('deleteUrl'), { success : reloadTable } );
+                    YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('deleteUrl'), { success : reloadGroupDT } );
                 } );
                     
             }
@@ -461,10 +470,63 @@ EOHTML
             YAHOO.util.Event.addListener( 'addGroupForm', 'submit', function ( e ) {
                 YAHOO.util.Event.stopEvent( e );
                 YAHOO.util.Connect.setForm( 'addGroupForm' );
-                YAHOO.util.Connect.asyncRequest( 'POST', this.action, { success : reloadTable } );
+                YAHOO.util.Connect.asyncRequest( 'POST', this.action, { success : reloadGroupDT } );
                 this.reset();
             } );
             
+            //===============================================================
+            //===============================================================
+            //===============================================================
+
+            var vatColumDefs = [
+                { key: "userId",        label : 'user id',          sortable: true},
+                { key: "vatNumber",     label : 'vat number',       sortable: true},
+                { key: "viesValidated", label : 'VIES Validated' },
+                { key: "viesErrorCode", label : 'VIES Error code' },
+                { key: "approvebutton", label :'', formatter : 'formatApproveButton' },
+                { key: "denyButton",    label :'', formatter : 'formatDenyButton'    }
+            ];
+
+            var vatDS = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getVATNumbersAsJSON').q|");
+            vatDS.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            vatDS.responseSchema = {
+                resultsList: "records",
+                fields: [
+                    { key : "userId",           parser : "string" },
+                    { key : "vatNumber",        parser : "string" },
+                    { key : "viesValidated",    parser : "string" },
+                    { key : "viesErrorCode" },
+                    { key : "approveUrl" },
+                    { key : "denyUrl" }
+                ]
+            };
+            
+            // DataTable configuration
+            
+            // DataTable instance
+            var vatDT = new YAHOO.widget.DataTable("vatNumberManager", vatColumDefs, vatDS, myConfigs);
+
+            var reloadVatDT = function () { reloadTable( vatDT ) };
+
+            YAHOO.widget.DataTable.Formatter.formatApproveButton = function (elCell, oRecord, oColumn, oData) {
+                var datatable = this;
+
+                var button = new YAHOO.widget.Button( { label : 'Approve', container: elCell } );
+                button.addListener( 'click', function () {
+                    YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('approveUrl'), { success : reloadVatDT } );
+                } );                    
+            }
+
+            YAHOO.widget.DataTable.Formatter.formatDenyButton = function (elCell, oRecord, oColumn, oData) {
+                var datatable = this;
+
+                var button = new YAHOO.widget.Button( { label : 'Deny', container: elCell } );
+                button.addListener( 'click', function () {
+                    YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('denyUrl'), { success : reloadVatDT } );
+                } );
+            }
+
+
         }();
     </script>
     |;
@@ -557,7 +619,7 @@ sub getUserScreen {
                 $number->{ vatNumber },
                 $number->{ name },
                 $number->{ address },
-                $number->{ approved },
+                $self->isUsableVATNumber( $number ),
                 qq{<a href="$deleteUrl">delete</a>},
             )
             . '</td></tr>'
@@ -717,7 +779,18 @@ sub hasVATNumber {
     my $numbers = $self->getVATNumbers( $countryCode );
     return 0 unless @{ $numbers };
 
-    return $numbers->[0]->{ approved };
+    return $self->isUsableVATNumber( $numbers->[0] );
+}
+
+#-------------------------------------------------------------------
+sub isUsableVATNumber {
+    my $self = shift;
+    my $vat  = shift;
+
+    return 1 if $vat->{ approved };
+    return 1 if $vat->{ viesValidated }         && $self->get('automaticViesApproval');
+    return 1 if $vat->{ viesErrorCode } > 16    && $self->get('acceptOnViesUnavailable');
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -842,9 +915,18 @@ sub www_deleteVATNumber {
 }
 
 #-------------------------------------------------------------------
+
+=head2 www_getTaxGroupsAsJSON ( )
+
+Returns a JSON string containg all VAT groups and their properties.
+
+=cut
+
 sub www_getTaxGroupsAsJSON {
     my $self = shift;
     my $url  = $self->session->url;
+
+    return $self->session->privilege->insufficient unless $self->canManage;
 
     my $taxGroups = $self->get('taxGroups') || [];
 
@@ -860,6 +942,80 @@ sub www_getTaxGroupsAsJSON {
     return to_json( { records => $taxGroups  } );
 }
 
+#-------------------------------------------------------------------
+
+=head2 www_approveVatNumber ( )
+
+Approves a VAT number.
+
+=cut
+
+sub www_approveVatNumber {
+    my $self = shift;
+    my ($db, $form) = $self->session->quick( 'db', 'form' );
+
+    return $self->session->privilege->insufficient unless $self->canManage;
+
+    $db->write( 'update tax_eu_vatNumbers set approved = ? where vatNumber=? and userId=?', [
+        '1',
+        $form->process('number'),
+        $form->process('userId'),
+    ] );
+
+    return '';
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_denyVatNumber ( )
+
+Rejects and deletes a VAT number.
+
+=cut
+
+sub www_denyVatNumber {
+    my $self = shift;
+    my ($db, $form) = $self->session->quick( 'db', 'form' );
+
+    return $self->session->privilege->insufficient unless $self->canManage;
+
+    $db->write( 'delete from tax_eu_vatNumbers where vatNumber=? and userId=?', [
+        $form->process('number'),
+        $form->process('userId'),
+    ] );
+
+    return '';
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_getVATNumbersAsJSON ( )
+
+Returns a JSON string containing all non-approved VAT numbers and their properties.
+
+=cut
+
+sub www_getVATNumbersAsJSON {
+    my $self = shift;
+    my ($db, $url)   = $self->session->quick( 'db', 'url') ;
+
+
+    return $self->session->privilege->insufficient unless $self->canManage;
+
+    my $sth = $db->read( 'select * from tax_eu_vatNumbers where approved <> 1 order by userId' );
+    
+    my @numbers;
+    while (my $number = $sth->hashRef ) {
+        $number->{ approveUrl } = 
+            $url->page( 'shop=tax;method=do;do=approveVatNumber;number='.$number->{ vatNumber }.';userId='.$number->{ userId } );
+        $number->{ denyUrl } = 
+            $url->page( 'shop=tax;method=do;do=denyVatNumber;number='.$number->{ vatNumber }.';userId='.$number->{ userId } );
+        push @numbers, $number;
+    }
+
+    $self->session->http->setMimeType( 'application/json' );
+    return to_json( { records => \@numbers } );
+}
 
 #-------------------------------------------------------------------
 
@@ -876,7 +1032,9 @@ sub www_saveConfiguration {
     return $self->session->privilege->insufficient unless $self->canManage;
 
     $self->update( {
-        shopCountry => $form->process( 'shopCountry', 'selectBox' ),
+        shopCountry             => $form->process( 'shopCountry',               'selectBox' ),
+        automaticViesApproval   => $form->process( 'automaticViesApproval',     'yesNo'     ),
+        acceptOnViesUnavailable => $form->process( 'acceptOnViesUnavailable',   'yesNo'     ),
     } );
 
     return '';
