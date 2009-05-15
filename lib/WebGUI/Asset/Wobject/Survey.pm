@@ -1408,7 +1408,7 @@ sub www_takeSurvey {
     my $self = shift;
     
     my $out = $self->processTemplate( {}, $self->get('surveyTakeTemplateId') );
-    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+    return $self->processStyle($out);
 }
 
 #-------------------------------------------------------------------
@@ -2071,7 +2071,7 @@ sub www_viewGradeBook {
     $paginator->appendTemplateVars($var);
 
     my $out = $self->processTemplate( $var, $self->get('gradebookTemplateId') );
-    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+    return $self->processStyle($out);
 }
 
 #-------------------------------------------------------------------
@@ -2161,7 +2161,7 @@ sub www_viewStatisticalOverview {
     $paginator->appendTemplateVars($var);
 
     my $out = $self->processTemplate( $var, $self->get('overviewTemplateId') );
-    return $self->session->style->process( $out, $self->get('styleTemplateId') );
+    return $self->processStyle($out);
 }
 
 #-------------------------------------------------------------------

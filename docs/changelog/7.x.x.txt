@@ -1,4 +1,9 @@
 7.7.6
+ - Added mobile style template.  If enabled in settings, will serve alternate style templates
+   and page layout templates to matching user agents.  Also adds the 'mobileExportPath' config
+   variable where the mobile version of the site will be exported in addition to the normal
+   export process.
+ - Clean up the Asset export API to allow for easier re-use.
  - New features in the UKplayer slidehow: you can hide the textblock, volume
    slider and mute button, resize the textblock and thumbnails. A new demo 
    config is added. See: /extras/ukplayer/slideshow.html (Rogier Voogt, Arjan 

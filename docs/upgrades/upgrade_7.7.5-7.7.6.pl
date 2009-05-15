@@ -32,6 +32,7 @@ my $session = start();
 
 # upgrade functions go here
 addTemplateAttachmentsTable($session);
+addMobileStyleTemplate( $session );
 revertUsePacked( $session );
 fixDefaultPostReceived($session);
 addEuVatDbColumns( $session );
@@ -72,6 +73,50 @@ sub sendWebguiStats {
 }
 
 #----------------------------------------------------------------------------
+sub addMobileStyleTemplate {
+    my $session = shift;
+    print "\tAdding mobile style template field... " unless $quiet;
+    $session->db->write(q{
+        ALTER TABLE wobject ADD COLUMN mobileStyleTemplateId CHAR(22) BINARY DEFAULT 'PBtmpl0000000000000060'
+    });
+    $session->db->write(q{
+        UPDATE wobject SET mobileStyleTemplateId = styleTemplateId
+    });
+    $session->db->write(q{
+        ALTER TABLE Layout ADD COLUMN mobileTemplateId CHAR(22) BINARY DEFAULT 'PBtmpl0000000000000054'
+    });
+    $session->setting->add('useMobileStyle', 0);
+    $session->config->set('mobileUserAgents', [
+        'AvantGo',
+        'DoCoMo',
+        'Vodafone',
+        'EudoraWeb',
+        'Minimo',
+        'UP\.Browser',
+        'PLink',
+        'Plucker',
+        'NetFront',
+        '^WM5 PIE$',
+        'Xiino',
+        'iPhone',
+        'Opera Mobi',
+        'BlackBerry',
+        'Opera Mini',
+        'HP iPAQ',
+        'IEMobile',
+        'Profile/MIDP',
+        'Smartphone',
+        'Symbian ?OS',
+        'J2ME/MIDP',
+        'PalmSource',
+        'PalmOS',
+        'Windows CE',
+        'Opera Mini',
+    ]);
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub addListingsCacheTimeoutToMatrix{
     my $session = shift;
     print "\tAdding listingsCacheTimeout setting to Matrix table... " unless $quiet;
@@ -80,21 +125,22 @@ sub addListingsCacheTimeoutToMatrix{
 }
 
 #----------------------------------------------------------------------------
-
 sub addTemplateAttachmentsTable {
     my $session = shift;
+    print "\tAdding template attachments table... " unless $quiet;
     my $create = q{
-        create table template_attachments (
-            templateId   varchar(22),
+        CREATE TABLE template_attachments (
+            templateId   CHAR(22) BINARY,
             revisionDate bigint(20),
             url          varchar(256),
             type         varchar(20),
             sequence     int(11),
 
-            primary key (templateId, revisionDate, url)
+            PRIMARY KEY (templateId, revisionDate, url)
         )
     };
     $session->db->write($create);
+    print "Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
@@ -116,6 +162,7 @@ sub revertUsePacked {
 # Describe what our function does
 sub fixDefaultPostReceived {
     my $session = shift;
+    print "\tFixing post received template setting... " unless $quiet;
     $session->db->write(<<EOSQL);
 UPDATE Collaboration SET postReceivedTemplateId='default_post_received1' WHERE postReceivedTemplateId='default-post-received'
 EOSQL

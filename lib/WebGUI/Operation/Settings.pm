@@ -270,6 +270,14 @@ sub definition {
         hoverHelp       => $i18n->get('global head tags description'),
         defaultValue    => $setting->get('globalHeadTags'),
     };
+    push @fields, {
+        tab             => 'ui',
+        fieldType       => 'yesNo',
+        name            => 'useMobileStyle',
+        label           => $i18n->get('mobile style label'),
+        hoverHelp       => $i18n->get('mobile style description'),
+        defaultValue    => $setting->get('useMobileStyle'),
+    };
 	# messaging settings
 	push(@fields, {
 		tab=>"messaging",

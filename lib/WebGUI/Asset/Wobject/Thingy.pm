@@ -3468,8 +3468,9 @@ sub www_viewThingData {
 
     $self->getViewThingVars($thingId,$thingDataId,$var);
     $self->appendThingsVars($var, $thingId);
-    return $self->session->style->process($self->processTemplate($var,$thingProperties->{viewTemplateId}),$self->get("styleTemplateId"));
-
+    return $self->processStyle(
+        $self->processTemplate($var,$thingProperties->{viewTemplateId})
+    );
 }
 
 #-------------------------------------------------------------------

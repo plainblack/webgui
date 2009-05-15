@@ -4402,6 +4402,13 @@ Users may override this setting in their profile.
         lastUpdated => 1239057119,
     },
 
+    'mobile style label' => {
+        message => 'Use Mobile Style',
+    },
+    'mobile style description' => {
+        message => q{Enables displaying using a mobile style template and mobile page layout template.  When enabled, the alternate templates are used when the browser's user agent string matches the list set in the config file.},
+    },
+
 };
 
 1;

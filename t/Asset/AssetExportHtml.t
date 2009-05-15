@@ -56,7 +56,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportCheckPath tests that its argum
 cmp_deeply(
     $e,
     methods(
-        error       => "first param to exportCheckPath must be a WebGUI::Session",
+        error       => 'first param to exportCheckPath as a class method must be a WebGUI::Session',
     ),
     "exportCheckPath tests that its argument is a WebGUI::Session"
 );
@@ -150,7 +150,7 @@ $config->set('exportPath', $tempDirectory);
 
 eval { $returnCode = WebGUI::Asset->exportCheckPath($session) };
 is($@, '', "exportCheckPath with valid path lives");
-is($returnCode, 1, "exportCheckPath returns true value");
+ok($returnCode, "exportCheckPath returns true value");
 
 # now, let's try a directory to which we know we have access, but a path within
 # it that doesn't exist.
@@ -159,7 +159,7 @@ $config->set('exportPath', $accessibleDirectory->stringify); # now accessible!
 
 eval { $returnCode = WebGUI::Asset->exportCheckPath($session) };
 is($@, '', "exportCheckPath creating subdirectory lives");
-is($returnCode, 1, "exportCheckPath creating subdirectory returns true value");
+ok($returnCode, "exportCheckPath creating subdirectory returns true value");
 is(-d $accessibleDirectory, 1, "exportCheckPath creating subdirectory actually creates said subdirectory");
 
 #----------------------------------------------------------------------------
@@ -492,7 +492,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkExtrasUploads without s
 cmp_deeply(
     $e,
     methods(
-        error       => 'first param to exportSymlinkExtrasUploads must be a WebGUI::Session',
+        error       => 'first param to exportSymlinkExtrasUploads as a class method must be a WebGUI::Session',
     ),
     'exportSymlinkExtrasUploads without session object throws',
 );
@@ -504,7 +504,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkExtrasUploads called wi
 cmp_deeply(
     $e,
     methods(
-        error       => 'first param to exportSymlinkExtrasUploads must be a WebGUI::Session',
+        error       => 'first param to exportSymlinkExtrasUploads as a class method must be a WebGUI::Session',
     ),
     'exportSymlinkExtrasUploads called with memetic parameter throws',
 );
@@ -541,7 +541,7 @@ $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkRoot without session object throws');
 cmp_deeply($e,
     methods(
-        error       => 'first param to exportSymlinkRoot must be a WebGUI::Session'
+        error       => 'first param to exportSymlinkRoot as a class method must be a WebGUI::Session'
     ),
     'exportSymlinkRoot without session object throws',
 );
@@ -553,7 +553,7 @@ $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkRoot called with memetic parameter throws');
 cmp_deeply($e,
     methods(
-        error       => 'first param to exportSymlinkRoot must be a WebGUI::Session'
+        error       => 'first param to exportSymlinkRoot as a class method must be a WebGUI::Session'
     ),
     'exportSymlinkRoot called with memetic parameter throws',
 );
@@ -590,18 +590,18 @@ cmp_deeply(
 $home->exportWriteFile;
 my $symlinkedRoot   = Path::Class::File->new($exportPath, 'index.html');
 my $homePath        = $home->exportGetUrlAsPath;
-eval { WebGUI::Asset->exportSymlinkRoot($session, $home, '', 1) };
+eval { WebGUI::Asset->exportSymlinkRoot($session, $home, '') };
 is($@, '', 'exportSymlinkRoot works when it should');
 ok(-e $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
-is($homePath, readlink $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
+is(readlink $symlinkedRoot->stringify, $homePath, 'exportSymlinkRoot sets up link correctly and supplies default index');
 unlink $symlinkedRoot->stringify;
 
 
 # give it an index and ensure it works
-eval { WebGUI::Asset->exportSymlinkRoot($session, $home, 'index.html', 1) };
+eval { WebGUI::Asset->exportSymlinkRoot($session, $home, 'index.html') };
 is($@, '', 'exportSymlinkRoot works when it should');
 ok(-e $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
-is($homePath, readlink $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
+is(readlink $symlinkedRoot->stringify, $homePath, 'exportSymlinkRoot sets up link correctly and supplies default index');
 unlink $symlinkedRoot->stringify;
 
 
@@ -644,26 +644,7 @@ $descendants = $grandChild->exportGetDescendants( WebGUI::User->new($session, 1)
 
 cmp_deeply($descendants, $gcDescendants, "exportGetDescendants returns correct data for getting-started");
 
-# finally, ensure that calling exportGetDescendants without a userID throws an exception.
-
 eval { $home->exportGetDescendants };
-
-$e = Exception::Class->caught;
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportGetDescendants called without a user object throws');
-cmp_deeply(
-    $e,
-    methods(
-        expected    => 'WebGUI::User',
-        got         => '',
-        error       => 'Need a WebGUI::User object',
-        param       => undef,
-    ),
-    "exportGetDescendants called without a user object throws",
-);
-
-# make sure calling exportGetDescendants without a depth throws an exception.
-
-eval { $home->exportGetDescendants( WebGUI::User->new($session, 1) ) };
 $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'exportGetDescendants called without a depth throws');
 cmp_deeply(
@@ -699,26 +680,23 @@ my $exportPath = Path::Class::Dir->new($session->config->get('exportPath'));
 # default. exportAsHtml is supposed to catch exceptions, not throw them, so
 # we'll be testing the return values rather than for an exception.
 
-($success, $message) = $home->exportAsHtml;
-is($success, 0, "exportAsHtml returns 0 when not given a userId");
-is($message, "need a userId parameter", "exportAsHtml returns correct message when not given a userId");
+eval { $message = $home->exportAsHtml };
+is($@, "need a userId parameter", "exportAsHtml returns correct error when not given a userId");
 
 # omitting the userId works, so let's give it a bogus userId
-($success, $message) = $home->exportAsHtml( { userId => '<rizen> perlDreamer is a 500 lb test mandating gorilla' } );
-is($success, 0, "exportAsHtml returns 0 when given a bogus (but nonetheless funny) userId");
-is($message, "'<rizen> perlDreamer is a 500 lb test mandating gorilla' is not a valid userId", "exportAsHtml returns correct message when given a bogus (but nonetheless funny) userId");
+eval { $message = $home->exportAsHtml( { userId => '<rizen> perlDreamer is a 500 lb test mandating gorilla' } ) };
+is($@, "'<rizen> perlDreamer is a 500 lb test mandating gorilla' is not a valid userId", "exportAsHtml throws correct error when given a bogus (but nonetheless funny) userId");
 
 # checking an autogenerated userId
 my $randomUser = WebGUI::User->new($session, 'new');
-($success, $message) = $home->exportAsHtml( { userId => $randomUser->userId, depth => 99} );
-is($success, 1, "exportAsHtml returns 1 when given a valid userId");
+eval { $message = $home->exportAsHtml( { userId => $randomUser->userId, depth => 99} ) };
+is($@, '', "exportAsHtml doesn't throw error when given a valid userId");
 $randomUser->delete;
 undef $randomUser;
 
 # checking userId works, so check extrasUploadAction next.
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'o hai' } );
-is($success, 0, "exportAsHtml returns 0 when given bogus, memetic extrasUploadAction parameter");
-is($message, "'o hai' is not a valid extrasUploadAction", "exportAsHtml returns 0 when given bogus, memetic extrasUploadAction parameter");
+eval { $message = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'o hai' } ) };
+is($@, "'o hai' is not a valid extrasUploadAction", "exportAsHtml throws correct error when given bogus, memetic extrasUploadAction parameter");
 
 # rootUrlAction
 ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'NO U' } );

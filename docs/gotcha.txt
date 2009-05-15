@@ -14,6 +14,8 @@ save you many hours of grief.
 
    * WebGUI now requires Crypt::SSLeay 0.57 or greater.
 
+   * WebGUI now requires Scope::Guard 0.03 or greater.
+
 7.7.5
 --------------------------------------------------------------------
    * Due to a long standing bug in the Profile system, if the type of a

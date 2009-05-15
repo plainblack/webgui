@@ -2469,7 +2469,7 @@ ENDJS
     
     ### Show the processed template
     $session->http->sendHeader;
-    my $style = $session->style->process($self->getSeparator,$self->getParent->get("styleTemplateId"));
+    my $style = $self->getParent->processStyle($self->getSeparator);
     my ($head, $foot) = split($self->getSeparator,$style);
     $self->session->output->print($head, 1);
     $self->session->output->print($self->processTemplate($var, undef, $template));

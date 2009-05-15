@@ -120,6 +120,51 @@ sub makePrintable {
 	$self->{_makePrintable} = shift;
 }
 
+#-------------------------------------------------------------------
+
+=head2 useMobileStyle
+
+Returns a true value if we are on a mobile display.
+
+=cut
+
+sub useMobileStyle {
+    my $self = shift;
+    my $session = $self->session;
+    my $scratchCheck = $session->scratch->get('useMobileStyle');
+    if (defined $scratchCheck) {
+        return $scratchCheck;
+    }
+    if (exists $self->{_useMobileStyle}) {
+        return $self->{_useMobileStyle};
+    }
+
+    if (! $session->setting->get('useMobileStyle')) {
+        return $self->{_useMobileStyle} = 0;
+    }
+    my $ua = $session->env->get('HTTP_USER_AGENT');
+    for my $mobileUA (@{ $self->session->config->get('mobileUserAgents') }) {
+        if ($ua =~ m/$mobileUA/) {
+            return $self->{_useMobileStyle} = 1;
+        }
+    }
+    return $self->{_useMobileStyle} = 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 setMobileStyle
+
+Sets whether the mobile style should be used for this session.
+
+=cut
+
+sub setMobileStyle {
+    my $self = shift;
+    my $enableMobile = shift;
+    $self->session->scratch->set('useMobileStyle', $enableMobile);
+    return $enableMobile;
+}
 
 #-------------------------------------------------------------------
 

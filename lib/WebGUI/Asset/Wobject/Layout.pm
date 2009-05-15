@@ -72,6 +72,11 @@ sub definition {
                 namespace    => "Layout",
                 defaultValue =>'PBtmpl0000000000000054',
             },
+            mobileTemplateId => {
+                fieldType    => ( $session->style->useMobileStyle ? 'template' : 'hidden' ),
+                namespace    => 'Layout',
+                defaultValue => 'PBtmpl0000000000000054',
+            },
             contentPositions => {
                 noFormPost   =>1,
                 defaultValue =>undef,
@@ -116,6 +121,22 @@ sub getEditForm {
             -hoverHelp=>$i18n->get('template description'),
             -namespace=>"Layout"
         );
+
+    if ( $self->session->setting->get('useMobileStyle') ) {
+        $tabform->getTab("display")->template(
+            name        => 'mobileTemplateId',
+            value       => $self->getValue('mobileTemplateId'),
+            label       => $i18n->get('mobileTemplateId label'),
+            hoverHelp   => $i18n->get('mobileTemplateId description'),
+            namespace   => 'Layout',
+        );
+    }
+    else {
+        $tabform->getTab("display")->hidden(
+            name        => 'mobileTemplateId',
+            value       => $self->getValue('mobileTemplateId'),
+        );
+    }
 
 	tie my %assetOrder, "Tie::IxHash";
 	%assetOrder = (
@@ -163,7 +184,16 @@ sub prepareView {
     my $self = shift;
     $self->SUPER::prepareView;
     my $session = $self->session;
-    my $template = WebGUI::Asset->new($session,$self->get("templateId"),"WebGUI::Asset::Template");
+    my $templateId;
+
+    if ($session->style->useMobileStyle) {
+        $templateId = $self->get('templateId');
+    }
+    else {
+        $templateId = $self->get('mobileTemplateId');
+    }
+
+    my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
 
@@ -325,30 +355,34 @@ sub getContentLastModified {
 #-------------------------------------------------------------------
 sub www_view {
     my $self = shift;
+    my $session = $self->session;
     # slashdot / burst protection hack
-    if ($self->session->var->get("userId") eq "1" && $self->session->form->param() == 0) { 
+    if ($session->var->get("userId") eq "1"
+        && $session->form->param() == 0
+        && !$session->scratch->get('isExporting')
+    ) {
         my $check = $self->checkView;
         return $check if (defined $check);
-        my $cache = WebGUI::Cache->new($self->session, "view_".$self->getId);
+        my $cache = WebGUI::Cache->new($session, "view_".$self->getId);
         my $out = $cache->get if defined $cache;
         unless ($out) {
             $self->prepareView;
-            $self->session->stow->set("cacheFixOverride", 1);
+            $session->stow->set("cacheFixOverride", 1);
             $out = $self->processStyle($self->view);
             $cache->set($out, 60);
-            $self->session->stow->delete("cacheFixOverride");
+            $session->stow->delete("cacheFixOverride");
         }
         # keep those ads rotating
         while ($out =~ /(\[AD\:([^\]]+)\])/gs) {
             my $code = $1;
-            my $adSpace = WebGUI::AdSpace->newByName($self->session, $2);
+            my $adSpace = WebGUI::AdSpace->newByName($session, $2);
             my $ad = $adSpace->displayImpression if (defined $adSpace);
             $out =~ s/\Q$code/$ad/ges;
         }
-        $self->session->http->setLastModified($self->getContentLastModified);
-        $self->session->http->sendHeader;   
-        $self->session->output->print($out, 1);
-        return "chunked";   
+        $session->http->setLastModified($self->getContentLastModified);
+        $session->http->sendHeader;
+        $session->output->print($out, 1);
+        return "chunked";
     }
     $self->{_viewPrintOverride} = 1; # we do this to make it output each asset as it goes, rather than waiting until the end
     return $self->SUPER::www_view;
