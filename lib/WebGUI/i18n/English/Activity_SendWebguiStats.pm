@@ -10,6 +10,12 @@ our $I18N = {
 		context     => q|A description of the stats program, what we're sending, and why it's important.|
 	},
 
+	'would you participate' => {
+		message     => q|Would you like to enable or disable participation in the WebGUI community statistics program?|,
+		lastUpdated => 0,
+		context     => q|A call to action for the statistics program.|
+	},
+
 	'topicName' => {
 		message     => q|Send WebGUI Statistics|,
 		lastUpdated => 0,

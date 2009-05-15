@@ -91,6 +91,7 @@ Deletes the workflow schedule that sends WebGUI statistics to webgui.org.
 
 sub www_disableSendWebguiStats {
     my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
     my $task = WebGUI::Workflow::Cron->new($session, 'send_webgui_statistics');
     $task->delete;
     return www_viewStatistics($session);
@@ -107,6 +108,7 @@ Creates the workflow schedule that sends WebGUI statistics to webgui.org.
 
 sub www_enableSendWebguiStats {
     my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
     # we set the current hour, minute, and day of week to send in the stats so we don't DOS webgui.org
     # by having everybody sending it at the same time
     my $dt = WebGUI::DateTime->new($session, time());

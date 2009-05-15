@@ -22,6 +22,7 @@ use WebGUI::International;
 use WebGUI::Storage;
 use WebGUI::VersionTag;
 use WebGUI::Utility;
+use WebGUI::Operation::Statistics;
 
 =head1 NAME
 
@@ -154,6 +155,16 @@ sub handler {
 		$session->setting->set('companyName',$form->text("companyName")) if ($form->get("companyName"));
 		$session->setting->set('companyURL',$form->url("companyURL")) if ($form->get("companyURL"));
 		$session->setting->set('companyEmail',$form->email("companyEmail")) if ($form->get("companyEmail"));
+        $legend = $i18n->get('topicName','Activity_SendWebguiStats');
+        $output .= ' <p>'.$i18n->get('why to send','Activity_SendWebguiStats').'</p>
+             <p>'.$i18n->get('would you participate','Activity_SendWebguiStats').'</p>
+            <p><a href="'.$session->url->gateway(undef, "step=sitestarter").'">'.$i18n->get('disable','Activity_SendWebguiStats').'</a> &nbsp; &nbsp; &nbsp;
+                <a href="'.$session->url->gateway(undef,"step=sitestarter;enableStats=1").'">'.$i18n->get('enable','Activity_SendWebguiStats').'</a></p>
+            ';
+	} 
+    elsif ($session->form->process("step") eq "sitestarter") {
+        my $form = $session->form;
+        WebGUI::Operation::Statistics::www_enableSendWebguiStats($session) if ($form->get("enableStats"));
         $legend = $i18n->get('site starter title');
         $output .= ' <p>'.$i18n->get('site starter body').'</p>
             <p><a href="'.$session->url->gateway(undef, "step=7").'">'.$i18n->get('no thanks').'</a> &nbsp; &nbsp; &nbsp;
