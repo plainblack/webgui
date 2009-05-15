@@ -14,6 +14,8 @@ save you many hours of grief.
 
 7.7.6
 --------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.5 before going to this version. 
+
    * WebGUI now requires Business::Tax::VAT::Validation.
 
    * WebGUI now requires Crypt::SSLeay 0.57 or greater.
@@ -22,6 +24,8 @@ save you many hours of grief.
 
 7.7.5
 --------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.4 before going to this version. 
+
    * Due to a long standing bug in the Profile system, if the type of a
      Profile Field was changed, the database column was not updated to match
      the requirements for the new type.  The most common place this problem
@@ -40,6 +44,8 @@ save you many hours of grief.
 
 7.7.4
 --------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.3 before going to this version. 
+
    * WebGUI now requires XML::FeedPP version 0.40 or greater.
 
 7.7.2
