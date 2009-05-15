@@ -27,23 +27,23 @@ use WebGUI::Asset;
 my $toVersion = '7.7.7';
 my $quiet; # this line required
 
-
 my $session = start(); # this line required
 
-# upgrade functions go here
+addOgoneToConfig( $session );
 addUseEmailAsUsernameToSettings( $session );
 
 finish($session); # this line required
 
 
 #----------------------------------------------------------------------------
-# Describe what our function does
-#sub exampleFunction {
-#    my $session = shift;
-#    print "\tWe're doing some stuff here that you should know about... " unless $quiet;
-#    # and here's our code
-#    print "DONE!\n" unless $quiet;
-#}
+sub addOgoneToConfig {
+    my $session = shift;
+    print "\tAdding Ogone payment plugin..." unless $quiet;
+
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::Ogone');
+    
+    print "Done\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addUseEmailAsUsernameToSettings {
@@ -51,9 +51,9 @@ sub addUseEmailAsUsernameToSettings {
     print "\tAdding webguiUseEmailAsUsername to settings \n" unless $quiet;
 
     $session->db->write("insert into settings (name, value) values ('webguiUseEmailAsUsername',0)");
+
     print "Done.\n" unless $quiet;
 }
-
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

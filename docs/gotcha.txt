@@ -8,6 +8,10 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.7.7
+--------------------------------------------------------------------
+   * WebGUI now requires Digest::SHA.
+
 7.7.6
 --------------------------------------------------------------------
    * WebGUI now requires Business::Tax::VAT::Validation.

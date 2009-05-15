@@ -1,5 +1,6 @@
 7.7.7
  - rfe #10061: Use email as username at registration
+ - Added Ogone payment plugin ( Martin Kamerbeek / Oqapi )
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates
