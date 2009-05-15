@@ -24,6 +24,7 @@ use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
 
 my $startTime = time();
+my $wgBday = 997966800;
 
 #----------------------------------------------------------------------------
 # Init
@@ -32,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  35;         # Increment this number for each test you create
+my  $tests =  45;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -292,20 +293,59 @@ cmp_deeply(
     '... directory has correct name and timestamp'
 );
 
-$dir = $bundle->getPathClassDir(997966800);
+$dir = $bundle->getPathClassDir($wgBday);
 isa_ok($dir, 'Path::Class::Dir');
 $timestampDir = $dir->dir_list(-1, 1);
 cmp_deeply(
     [ split /\./, $timestampDir ],
-    [ 'new-bundle', 997966800 ],
+    [ 'new-bundle', $wgBday ],
     '... directory has correct name and timestamp when timestamp is specified'
 );
+
+###################################################################
+#
+# deleteFiles
+#
+###################################################################
+
+$bundle->deleteFiles('JS');
+$bundle->deleteFiles('CSS');
+
+cmp_deeply($bundle->get('jsFiles'),  [], ' deleteFiles deleted all JS URIs');
+cmp_deeply($bundle->get('cssFiles'), [], ' ... deleted all CSS URIs');
 
 ###################################################################
 #
 # build
 #
 ###################################################################
+
+my $oldBuildDir = $bundle->getPathClassDir($wgBday);
+$oldBuildDir->mkpath;
+
+ok(-e $oldBuildDir->stringify && -d _, 'No problems creating old build directory');
+$bundle->update({lastBuild => $wgBday});
+
+$snippet->update({snippet => qq|\n\nfunction      doNothing()\n{ var foo = 'bar';} |});
+
+$fileAsset->getStorageLocation->deleteFile('pumpfile');
+$fileAsset->getStorageLocation->addFileFromScalar('pumpfile.css', qq|   body {\npadding:   0px;}\n\n|);
+$fileAsset->update({filename => 'pumpfile.css'});
+
+$bundle->addFile('JS',  'asset://filePumpSnippet');
+$bundle->addFile('CSS', 'asset://filePumpFileAsset');
+my ($buildFlag, $error) = $bundle->build();
+ok($buildFlag, 'build returns true when there are no errors');
+isnt($bundle->get('lastBuild'), $wgBday, '... lastBuild time updated');
+
+my $buildDir = $bundle->getPathClassDir();
+isnt($buildDir->stringify, $oldBuildDir->stringify, '... build directory did actually change');
+ok(-e $buildDir->stringify     &&  -d _, '... new build directory created');
+ok(!-e $oldBuildDir->stringify && !-d _, '... old build directory deleted');
+my $jsFile  = $buildDir->file($bundle->bundleUrl . '.js');
+my $cssFile = $buildDir->file($bundle->bundleUrl . '.css');
+ok(-e $jsFile->stringify  && -f _ && -s _, '... minified JS file built, not empty');
+ok(-e $cssFile->stringify && -f _ && -s _, '... minified CSS file built, not empty');
 
 ###################################################################
 #

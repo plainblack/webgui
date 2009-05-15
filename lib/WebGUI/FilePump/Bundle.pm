@@ -116,7 +116,7 @@ sub build {
     return (0, $error) if ($error);
 
     ##Create the new build directory
-    my $newDir = $self->getPathClassBuild($newBuild);
+    my $newDir = $self->getPathClassDir($newBuild);
     my $mkpathErrors;
     my $dirsCreated = $newDir->mkpath({ errors => $mkpathErrors });
     if (! $dirsCreated) {
@@ -127,11 +127,21 @@ sub build {
 
     ##Minimize files, and write them out.
 
-    my $minimizedJS  =  JS::Minimizer::XS::minimize($concatenatedJS);
+    my $minimizedJS  =  JavaScript::Minifier::XS::minify($concatenatedJS);
     undef $concatenatedJS;
 
-    my $minimizedCSS = CSS::Minimizer::XS::minimize($concatenatedCSS);
+    my $minimizedCSS = CSS::Minifier::XS::minify($concatenatedCSS);
     undef $concatenatedCSS;
+
+    my $flatJsFile = $newDir->file($self->bundleUrl . '.js');
+    my $jsFH = $flatJsFile->open('>');
+    print $jsFH $minimizedJS;
+    close $jsFH;
+
+    my $flatCssFile = $newDir->file($self->bundleUrl . '.css');
+    my $cssFH = $flatCssFile->open('>');
+    print $cssFH $minimizedCSS;
+    close $cssFH;
 
     ##Delete the old build directory and update myself with the new data.
     $self->deleteBuild();
@@ -282,6 +292,30 @@ sub deleteCollateral {
     return if $index == -1;
     splice @{ $table }, $index, 1;
     $self->update({ $tableName => $table });
+}
+
+#-------------------------------------------------------------------
+
+=head2 deleteFiles ( $type )
+
+Deletes all files of the requested type.
+
+=head3 $type
+
+If $type is JS, it deletes it from the javascript part of the bundle.  If it is
+CSS, it deletes it from the CSS part of the bundle.  OTHER is used for all other
+types of files.
+
+=cut
+
+sub deleteFiles {
+    my ($self, $type) = @_;
+    return 0, 'Illegal type' unless WebGUI::Utility::isIn($type, 'JS', 'CSS', 'OTHER');
+    my $collateralType = $type eq 'JS'  ? 'jsFiles'
+                       : $type eq 'CSS' ? 'cssFiles'
+                       : 'otherFiles';
+    $self->update({$collateralType => []});
+    return 1;
 }
 
 #-------------------------------------------------------------------
@@ -458,6 +492,19 @@ sub fetchHttp {
 
 #-------------------------------------------------------------------
 
+=head2 bundleUrl ( )
+
+Returns a urlized version of the bundle name, safe for URLs and filenames.
+
+=cut
+
+sub bundleUrl {
+    my ($self) = @_;
+    return $self->session->url->urlize($self->get('bundleName'));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getCollateral ( tableName, keyName, keyValue )
 
 Returns a hash reference containing one row of collateral data from a particular
@@ -550,7 +597,7 @@ sub getPathClassDir {
     return Path::Class::Dir->new(
         $self->session->config->get('uploadsPath'),
         'filepump',
-        $self->session->url->urlize($self->get('bundleName')) . '.' . $lastBuild
+        $self->bundleUrl . '.' . $lastBuild
     );
 }
 
