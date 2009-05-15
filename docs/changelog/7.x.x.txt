@@ -1,3 +1,5 @@
+7.7.7
+
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates
    and page layout templates to matching user agents.  Also adds the 'mobileExportPath' config
