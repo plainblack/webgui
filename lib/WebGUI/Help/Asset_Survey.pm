@@ -36,7 +36,10 @@ our $HELP = {
             },
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
-            },
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -102,7 +105,10 @@ our $HELP = {
             },
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
-            },
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -174,6 +180,9 @@ our $HELP = {
             },      
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
+            },   
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
             },      
         ]
     },
@@ -221,7 +230,10 @@ our $HELP = {
             },
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
-            },
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -268,7 +280,10 @@ our $HELP = {
             },
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
-            },
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -310,7 +325,10 @@ our $HELP = {
             },
             {   tag       => 'survey feedback template',
                 namespace => 'Asset_Survey'
-            },
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -396,6 +414,39 @@ our $HELP = {
             { name => 'timeoutRestart', description => 'response timeout restart help' },
             { name => 'endDate', description => 'response endDate help' },
         ],
+         related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },          
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            },  
+        ]
+    },
+    
+    'survey test results template' => {
+        title   => 'survey test results template title',
+        body => 'survey test results template body',
+        isa     => [],
+        fields    => [],
          related => [
             {   tag       => 'survey template',
                 namespace => 'Asset_Survey'

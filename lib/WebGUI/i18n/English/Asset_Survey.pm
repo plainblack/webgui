@@ -990,6 +990,16 @@ directly inside the answer_loop for other types of questions.|,
         message => q|All data tagged in survey expressions is also made available as template variables|,
         lastUpdated => 1242180657,
     },
+    
+    'survey test results template title' => {
+        message => q|Survey Test Results Template Variables|,
+        lastUpdated => 1242256111,
+    },
+
+    'survey test results template body' => {
+        message => q|All TAP::Parser and TAP::Parser::Result fields are exposed as template variables|,
+        lastUpdated => 0,
+    },
 
     'maxResponsesSubmitted' => {
         message => q|A boolean indicating whether the current user has reached the maximum number of responses.|,
@@ -1559,13 +1569,13 @@ section/answer.|,
         lastUpdated => 0,
     },
     
-    'test code' => {
-        message => q{Test Code},
+    'test spec' => {
+        message => q{Test Spec},
         lastUpdated => 0,
     },
     
-    'test code help' => {
-        message => q{The test code},
+    'test spec help' => {
+        message => q{The JSON-encoded specification for your test(s)},
         lastUpdated => 0,
     },
 

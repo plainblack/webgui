@@ -42,6 +42,7 @@ sendWebguiStats($session);
 addDataFormColumns($session);
 addListingsCacheTimeoutToMatrix( $session );
 addSurveyFeedbackTemplateColumn( $session );
+addSurveyTestResultsTemplateColumn( $session );
 installCopySender($session);
 installNotificationsSettings($session);
 installSMSUserProfileFields($session);
@@ -222,6 +223,16 @@ sub addSurveyFeedbackTemplateColumn {
     my $session = shift;
     print "\tAdding columns for Survey Feedback Template..." unless $quiet;
     $session->db->write("alter table Survey add column `feedbackTemplateId` char(22)");
+
+    print "Done\n" unless $quiet;
+
+}
+
+#----------------------------------------------------------------------------
+sub addSurveyTestResultsTemplateColumn {
+    my $session = shift;
+    print "\tAdding columns for Survey Test Results Template..." unless $quiet;
+    $session->db->write("alter table Survey add column `testResultsTemplateId` char(22)");
 
     print "Done\n" unless $quiet;
 

@@ -192,6 +192,14 @@ sub definition {
             defaultValue => 'PBtmpl0000000000000062',
             namespace    => 'Survey/Gradebook',
         },
+        testResultsTemplateId => {
+            tab          => 'display',
+            fieldType    => 'template',
+            label        => $i18n->get('Test Results Template'),
+            hoverHelp    => $i18n->get('Test Results Template help'),
+            defaultValue => 'S3zpVitAmhy58CAioH359Q',
+            namespace    => 'Survey/TestResults',
+        },
         surveyJSON => {
             fieldType    => 'text',
             defaultValue => '',
@@ -2455,6 +2463,7 @@ sub www_editTestSuite {
                .  $icon->edit(    'func=editTest;testId='.$id)
                .  $icon->moveDown('func=demoteTest;testId='.$id)
                .  $icon->moveUp(  'func=promoteTest;testId='.$id)
+               .  qq{<a href="} . $session->url->page("func=runTest;testId=$id") . qq{">Run Test</a>}
                .  '</td><td>'.$name.'</td></tr>';
     }
     $tests .= '</tbody></table><div style="clear: both;"></div>';
@@ -2619,6 +2628,84 @@ sub www_promoteTest {
         $test->promote;
     }
 	return $self->www_editTestSuite;
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_runTest ( )
+
+Runs a test
+
+=cut
+
+sub www_runTest {
+    my $self = shift;
+    my $session = $self->session;
+    
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    my $id = $session->form->get("testId");
+    
+    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $id)
+        or return $self->www_editTestSuite('Unable to find test');
+    
+    my $result = $test->run or return $self->www_editTestSuite('Unable to run test');
+    
+    my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result');
+    
+    $self->session->log->debug("Got tap: [$tap]");
+    use TAP::Parser;
+    my $parser = TAP::Parser->new( { tap => $tap } );
+    
+    # Expose TAP::Parser and TAP::Parser::Result info as template variables
+    my $var = {
+        results => [],
+    };
+    
+    while ( my $result = $parser->next ) {
+        my $rvar = {};
+        for my $key (qw(
+            is_plan is_pragma is_test is_comment is_bailout is_version is_unknown
+            raw
+            type
+            as_string
+            is_ok
+            has_directive
+            has_todo
+            has_skip
+           )) { 
+           $rvar->{$key} = $result->$key; 
+        }
+        push @{$var->{results}}, $rvar;
+    }
+
+    # add summary results
+    for my $key (qw(
+        passed
+        failed
+        actual_passed
+        actual_failed
+        todo
+        todo_passed
+        skipped
+        plan
+        tests_planned
+        tests_run
+        skip_all
+        has_problems
+        exit
+        wait
+        parse_errors
+       )) { 
+       $var->{$key} = $parser->$key; 
+    }
+
+    my $ac = $self->getAdminConsole;
+    my $out = $self->processTemplate($var, $self->get('testResultsTemplateId'));
+    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
+    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$id"), "$edit Test");
+    return $ac->render($out, 'Test Results');
 }
 
 ##-------------------------------------------------------------------

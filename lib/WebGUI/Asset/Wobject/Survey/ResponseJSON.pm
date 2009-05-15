@@ -332,6 +332,49 @@ sub surveyOrder {
     return $self->response->{surveyOrder};
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 surveyOrderIndexByVariableName
+
+Returns a lookup table of variable names to surveyOrder index
+
+Only questions with a defined variable name set are included.
+
+=cut
+
+sub surveyOrderIndexByVariableName {
+    my $self = shift;
+    
+    my %lookup;
+    
+    # Iterate over items in surveyOrder..
+    my $i = 0;
+    for my $address ( @{ $self->surveyOrder } ) {
+        next if !$address;
+
+        # Retreive the section and question for this address..
+        my $section  = $self->survey->section($address);
+        my $question = $self->survey->question($address);
+        
+        if (my $var = $section && $section->{variable} ) {
+            # Section variables appear for every question, only store lowest index
+            if (!exists $lookup{$var} || $lookup{$var} > $i) {
+                $lookup{$var} = $i;
+            }
+        }
+        
+        if (my $var = $question && $question->{variable} ) {
+            $lookup{$var} = $i;
+        }
+
+        # Increment the item index counter
+        $i++;
+    }
+    
+    return \%lookup;
+}
+
 #-------------------------------------------------------------------
 
 =head2 nextResponse ([ $responseIndex ])

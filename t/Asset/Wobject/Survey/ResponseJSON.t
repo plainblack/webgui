@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 96;
+my $tests = 97;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -320,6 +320,25 @@ $rJSON->processGoto('goto 0-1');
 is($rJSON->lastResponse(), 0, 'goto: works on existing question');
 $rJSON->processGoto('goto 3-0');
 is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
+
+####################################################
+#
+# surveyOrderIndexByVariableName
+#
+####################################################
+my $expect = {
+    'goto 0' => 0,
+   'goto 0-0' => 0,
+   'goto 0-1' => 1,
+   'goto 0-2' => 2,
+   'goto 1' => 3,
+   'goto 1-0' => 3,
+   'goto 1-1' => 4,
+   'goto 2' => 5,
+   'goto 3-0' => 7,
+   'goto 3-2' => 8,
+};
+cmp_deeply($rJSON->surveyOrderIndexByVariableName(), $expect, 'surveyOrderIndexByVariableName');
 
 ####################################################
 #
