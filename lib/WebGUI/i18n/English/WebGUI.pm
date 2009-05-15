@@ -3997,6 +3997,18 @@ LongTruncOk=1</p>
         lastUpdated => 1202274234,
     },
 
+        'redirectAfterLoginUrl label' => {
+            message     => q{Redirect After Login Url},
+            lastUpdated => 0,
+            context     => q{Label for site setting},
+        },
+
+        'showMessageOnLogin description' => {
+            message     => q{Users will be redirected to this url after logging in.},
+            lastUpdated => 0,
+            context     => q{Description for site setting},
+        },
+
         'showMessageOnLogin label' => {
             message     => q{Show Message On Login?},
             lastUpdated => 0,

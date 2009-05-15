@@ -454,6 +454,14 @@ sub definition {
 		});
     push @fields, {
         tab             => "user",
+        name            => "redirectAfterLoginUrl",
+        fieldType       => "url",
+        defaultValue    => $setting->get('redirectAfterLoginUrl'),
+        label           => $i18n->get( 'redirectAfterLoginUrl label' ),
+        hoverHelp       => $i18n->get( 'redirectAfterLoginUrl description' ),
+    };
+    push @fields, {
+        tab             => "user",
         name            => "showMessageOnLogin",
         fieldType       => "yesNo",
         defaultValue    => $setting->get('showMessageOnLogin'),

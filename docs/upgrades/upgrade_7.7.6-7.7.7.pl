@@ -32,6 +32,7 @@ my $session = start(); # this line required
 addOgoneToConfig( $session );
 addUseEmailAsUsernameToSettings( $session );
 alterVATNumberTable( $session );
+addRedirectAfterLoginUrlToSettings( $session );
 
 finish($session); # this line required
 
@@ -56,6 +57,17 @@ sub addUseEmailAsUsernameToSettings {
     print "Done.\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addRedirectAfterLoginUrlToSettings {
+    my $session = shift;
+    print "\tAdding redirectAfterLoginUrl to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings (name, value) values ('redirectAfterLoginUrl',NULL)");
+
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub alterVATNumberTable {
     my $session = shift;
     print "\tAdapting VAT Number table..." unless $quiet;
