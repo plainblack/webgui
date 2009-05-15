@@ -523,7 +523,7 @@ sub www_edit {
     my $form = $self->getEditForm;
     $form->submit;
 
-    my $processUrl = $self->session->url->getSiteURL.'/?shop=pay;method=do;do=processTransaction;paymentGatewayId='.$self->getId;
+    my $processUrl = $self->session->url->getSiteURL.'/?shop=pay&method=do&do=processTransaction&paymentGatewayId='.$self->getId;
     my $output = '<br />';
     $output .= sprintf $i18n->get('ogone setup'), $processUrl, $processUrl;
         
