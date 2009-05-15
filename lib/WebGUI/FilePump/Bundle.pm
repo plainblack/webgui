@@ -78,7 +78,7 @@ the method returns 0, along with an error message.
 
 sub build {
     my ($self) = @_;
-    my $lastBuild = time();
+    my $newBuild = time();
     my $originalBuild = $self->get('lastBuild');
 
     ##Whole lot of building
@@ -116,6 +116,14 @@ sub build {
     return (0, $error) if ($error);
 
     ##Create the new build directory
+    my $newDir = $self->getPathClassBuild($newBuild);
+    my $mkpathErrors;
+    my $dirsCreated = $newDir->mkpath({ errors => $mkpathErrors });
+    if (! $dirsCreated) {
+        $newDir->rmtree;
+        my $errorMessages = join "\n", @{ $mkpathErrors };
+        return (0, $errorMessages);
+    }
 
     ##Minimize files, and write them out.
 
@@ -130,7 +138,7 @@ sub build {
     $self->update({
         jsFiles   => $jsFiles,
         cssFiles  => $cssFiles,
-        lastBuild => $lastBuild,
+        lastBuild => $newBuild,
     });
     return 1;
 }
@@ -542,7 +550,7 @@ sub getPathClassDir {
     return Path::Class::Dir->new(
         $self->session->config->get('uploadsPath'),
         'filepump',
-        $self->get('bundleName') . $lastBuild
+        $self->session->url->urlize($self->get('bundleName')) . '.' . $lastBuild
     );
 }
 
