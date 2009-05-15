@@ -48,7 +48,6 @@ sub definition {
 
     tie my %fields, 'Tie::IxHash';
     
-    #TODO: internationilazation
     %fields = (
 		pspid => {
 		    fieldType       => 'text',
