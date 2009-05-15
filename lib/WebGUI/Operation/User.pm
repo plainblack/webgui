@@ -381,6 +381,14 @@ sub www_ajaxCreateUser {
             message     => "",
         } );
     }
+    # User must not already exist
+    if ( $session->db->quickScalar( "SELECT * FROM users WHERE username=?", [$userParam{username}] ) ) {
+        return createServiceResponse( $outputFormat, {
+            error       => "WebGUI::Error::InvalidParam",
+            param       => "username",
+            message     => "",
+        } );
+    }
 
     ### Create user
     my $user    = WebGUI::User->create( $session );
@@ -454,6 +462,13 @@ sub www_ajaxDeleteUser {
             message     => 'Cannot delete system user',
         } );
     }
+    elsif ( !WebGUI::User->validUserId( $session, $userId ) ) {
+        return createServiceResponse( $outputFormat, {
+            error       => 'WebGUI::Error::InvalidParam',
+            param       => 'userId',
+            message     => '',
+        } );
+    }
 
     ### Delete user
     my $user    = WebGUI::User->new( $session, $userId );
@@ -514,6 +529,14 @@ sub www_ajaxUpdateUser {
 
     # User must have a userId
     if ( !$userParam{userId} ) {
+        return createServiceResponse( $outputFormat, {
+            error       => "WebGUI::Error::InvalidParam",
+            param       => "userId",
+            message     => "",
+        } );
+    }
+    # User must exist
+    if ( !WebGUI::User->validUserId( $session, $userParam{userId} ) ) {
         return createServiceResponse( $outputFormat, {
             error       => "WebGUI::Error::InvalidParam",
             param       => "userId",
