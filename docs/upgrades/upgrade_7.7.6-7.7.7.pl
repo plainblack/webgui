@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+addUseEmailAsUsernameToSettings( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,15 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addUseEmailAsUsernameToSettings {
+    my $session = shift;
+    print "\tAdding webguiUseEmailAsUsername to settings \n" unless $quiet;
+
+    $session->db->write("insert into settings (name, value) values ('webguiUseEmailAsUsername',0)");
+    print "Done.\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
