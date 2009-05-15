@@ -325,8 +325,6 @@ sub getUserSearchForm {
 	return $output;
 }
 
-<<<<<<< HEAD:lib/WebGUI/Operation/User.pm
-=======
 #-------------------------------------------------------------------
 
 =head2 www_ajaxCreateUser ( )
@@ -544,7 +542,6 @@ sub www_ajaxUpdateUser {
         user        => $user->get,
     } );
 }
->>>>>>> added services to create, update, and delete users:lib/WebGUI/Operation/User.pm
 
 #-------------------------------------------------------------------
 
