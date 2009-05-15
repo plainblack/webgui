@@ -231,7 +231,10 @@ all form variables.
 sub body {
 	my $self = shift;
 	my $value = shift;
-	return keys %{ $self->{body} } unless defined $value;
+    if ( !defined $value ) {
+        return keys %{ $self->{body} } if wantarray;
+        return { %{ $self->{body} } };
+    }
 	if ($self->{body}->{$value}) {
         if (wantarray && ref $self->{body}->{$value} eq "ARRAY") {
             return @{$self->{body}->{$value}};
