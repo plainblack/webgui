@@ -55,6 +55,7 @@ my $originalSetting;
 my @groupsToDelete;
 my @usersToDelete;
 my @storagesToDelete;
+my @tagsToRollback;
 
 BEGIN {
 
@@ -156,6 +157,9 @@ END {
         else {
             $stor->delete;
         }
+    }
+    foreach my $tag (@tagsToRollback) {
+        $tag->rollback;
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
@@ -419,6 +423,21 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 tagsToRollback ( $tag )
+
+Push a list of version tags to rollback at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub tagsToRollback {
+    my $class = shift;
+    push @tagsToRollback, @_;
 }
 
 #----------------------------------------------------------------------------
