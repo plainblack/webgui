@@ -203,29 +203,29 @@ sub crud_definition {
     $definition->{sequenceKey} = '';
     my $properties = $definition->{properties};
     $properties->{bundleName} = {
-        fieldName    => 'text',
+        fieldType    => 'text',
         defaultValue => $i18n->get('new bundle'),
     };
     $properties->{lastModified} = {
-        fieldName    => 'integer',
+        fieldType    => 'integer',
         defaultValue => 0,
     };
     $properties->{lastBuild} = {
-        fieldName    => 'integer',
+        fieldType    => 'integer',
         defaultValue => 0,
     };
     $properties->{jsFiles} = {
-        fieldName    => 'textarea',
+        fieldType    => 'textarea',
         defaultValue => [],
         serialize    => 1,
     };
     $properties->{cssFiles} = {
-        fieldName    => 'textarea',
+        fieldType    => 'textarea',
         defaultValue => [],
         serialize    => 1,
     };
     $properties->{otherFiles} = {
-        fieldName    => 'textarea',
+        fieldType    => 'textarea',
         defaultValue => [],
         serialize    => 1,
     };
