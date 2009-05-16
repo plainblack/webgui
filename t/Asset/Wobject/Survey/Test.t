@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 25;
+plan tests => 34;
 
 my ( $s, $t1 );
 
@@ -77,7 +77,8 @@ $s->surveyJSON_update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes
 $s->surveyJSON_update( [ 0, 0 ], { gotoExpression => q{ tag('tagged at S0Q0'); } } ); # S0Q0 tags data
 
 $s->surveyJSON_update( [ 1, 0 ], { questionType => 'Yes/No' } ); # S1Q0 is a Yes/No
-$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3' } ); # S1Q0 jumps to S3
+$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3' } ); # S1Q0 answer 0 jumps to S3
+$s->surveyJSON_update( [ 1, 0, 1 ], { gotoExpression => q{ tag('tagged at S1Q0'); } } );# S1Q0 answer 1 tags data
 
 # And finally, persist the changes..
 $s->persistSurveyJSON;
@@ -139,8 +140,8 @@ $spec = <<END_SPEC;
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
-ok 1 - jumps to S1
-ok 2 - jumps to S1Q0
+ok 1 - Page containing Section S0 Question S0Q0 jumps to S1
+ok 2 - Page containing Section S0 Question S0Q0 jumps to S1Q0
 END_TAP
 
 # deliberately pass in a spec that will fail
@@ -156,7 +157,7 @@ $spec = <<END_SPEC;
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
 1..1
-not ok 1 - jumps to S2
+not ok 1 - Page containing Section S0 Question S0Q0 jumps to S2
 # Compared next section/question
 #    got : 'S1' (<-- a section) and 'S1Q0' (<-- a question)
 # expect : 'S2'
@@ -168,14 +169,72 @@ $spec = <<END_SPEC;
     {
        "test" : {
             "S1Q0" : "Yes",
-            "next" : "S3", # a goto jumps
+            "next" : "S3", # a goto jump
        }
     },
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..1
-ok 1 - jumps to S3
+ok 1 - Page containing Section S1 Question S1Q0 jumps to S3
+END_TAP
+
+# Use tags..
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S0Q0" : "Yes",
+            "next" : "S1",
+            "tags" : [ "tagged at S0Q0" ],  # and tagged correctly
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Page containing Section S0 Question S0Q0 jumps to S1 and tags data
+END_TAP
+
+# Use setup..
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+           "setup" : { "S0Q0" : "Yes" }, # S0Q0 tags 'tagged at S0Q0'
+            "S1Q0" : "No",               
+            "next" : "S2",
+            "tags" : [ "tagged at S0Q0" ],  # tagged by setup step
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Page containing Section S1 Question S1Q0 jumps to S2 and tags data
+END_TAP
+
+# Use nested setup..
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+           "setup" : { 
+               "setup" : { 
+                   "S0Q0" : "Yes"            # tags 'tagged at S0Q0'
+               },
+               "S1Q0" : "No",                # tags 'tagged at S1Q0'
+            }, 
+            "S2Q0" : null,
+            "next" : "S3",
+            "tags" : [ "tagged at S0Q0", "tagged at S1Q0", ],  # tagged by setup step
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Page containing Section S2 Question S2Q0 jumps to S3 and tags data
 END_TAP
 
 #########
@@ -233,7 +292,7 @@ $spec = <<END_SPEC;
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
-ok 1 - S0Q0 mc answer 1 jumps to S1Q0
+ok 1 - S0Q0 mc answer 1 jumps to S1Q0 and tags correct
 ok 2 - S0Q0 mc answer 2 jumps to S1
 END_TAP
 
@@ -253,7 +312,7 @@ $spec = <<END_SPEC;
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
-ok 1 - S1Q0 mc answer 1 jumps to S3
+ok 1 - S1Q0 mc answer 1 jumps to S3 and tags correct
 ok 2 - S1Q0 mc answer 2 jumps to S2
 END_TAP
 

@@ -216,44 +216,76 @@ sub _test {
     my $testCount = ++${$opts{testCount_ref}};
     
     # ..and the test-specific arguments
-    my $next = $args->{next};
+    my ($next, $tags, $setup ) = @{$args}{qw(next tags setup)};
     delete $args->{next};
-    # n.b. everything left in %args assumed to be var => answer text
+    delete $args->{tags};
+    delete $args->{setup};
+    # n.b. everything left in %args assumed to be variable => answer_spec
     
-    # get starting page
+    my $fakeTestCount = 0;
+    if ($setup) {
+        # Recursively call ourselves (ignoring the returned TAP), so that rJSON gets
+        # updated with responses, simulating the setup spec happening in the past
+        $self->_test( { 
+            responseJSON => $rJSON, 
+            surveyOrder => $surveyOrder, 
+            surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
+            testCount_ref => \$fakeTestCount,
+            args => $setup,
+        } );
+    }
     
     # Record responses
     my $responses = {};
     my $lowestIndex;
     
-    my $what = "jumps to $next";
-    while ( my ( $variable, $answerText ) = each %$args ) {
+    while ( my ( $variable, $spec ) = each %$args ) {
         my $index = $surveyOrderIndexByVariableName->{$variable};
         my $address = $surveyOrder->[$index];
-        my $answerAddress;
+        my $question = $rJSON->survey->question($address);
+        my $questionType = $question->{questionType};
         
         # Keep track of lowest index (to work out what survey page we should test on)
         $lowestIndex = $index if (!defined $lowestIndex || $index < $lowestIndex); 
         
-        my $question = $rJSON->survey->question($address);
-        my $answer;
-        my $aIndex = 0;
-        for my $a (@{$question->{answers}}) {
-            if ($a->{text} =~ m/\Q$answerText\E/i) {
-                $answerAddress = "$address->[0]-$address->[1]-$aIndex";
-                $answer = $a;
+        # Goal now is to figure out what answer(s) we are supposed to record
+        if (!defined $spec) {
+            $self->session->log->debug("Spec undefined, assuming that means ignore answer value");
+        } 
+        elsif ( $questionType eq 'Text' || $questionType eq 'Number' ) {
+            # Assume spec is raw value to record in the single answer
+            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
+        } 
+        else {
+            # Assume spec is the raw text of the answer we want
+            my $answer;
+            my $aIndex = 0;
+            my $answerAddress;
+            # Iterate over all answers to find the matching
+            for my $a (@{$question->{answers}}) {
+                if ($a->{text} =~ m/\Q$spec\E/i) {
+                    $answerAddress = "$address->[0]-$address->[1]-$aIndex";
+                    $answer = $a;
+                    last;
+                }
+                $aIndex++;
             }
-            $aIndex++;
+            if (!$answer) {
+                return fail($testCount, "determine answer for $variable", "No answers matched text: '$spec'");
+            }
+            $self->session->log->debug("Recording $variable ($answerAddress) => $answer->{recordedAnswer}");
+            $responses->{$answerAddress} = $answer->{recordedAnswer};
         }
-        if (!$answer || $answerAddress !~ m/\d+-\d+-\d+/) {
-            return fail($testCount, $what, 'answerText $answerText does not match any answers in your survey');
-        }
-        my $recordedAnswer = $answer->{recordedAnswer};
-        $responses->{$answerAddress} = $recordedAnswer;
-        $self->session->log->debug("Recording $variable ($answerAddress) => $recordedAnswer");
     }
     
     $rJSON->nextResponse($lowestIndex);
+    
+    my $pageSection = $rJSON->survey->section($surveyOrder->[$lowestIndex]);
+    my $pageQuestion = $rJSON->survey->question($surveyOrder->[$lowestIndex]);
+    my $what = "Page containing Section $pageSection->{variable}";
+    $what .= " Question $pageQuestion->{variable}" if $pageQuestion;
+    $what .= " jumps to $next" if $next;
+    $what .= " and tags data" if $tags;
     
     return $self->_recordResponses( { 
         responseJSON => $rJSON, 
@@ -261,6 +293,7 @@ sub _test {
         surveyOrder => $surveyOrder,
         surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
         next => $next,
+        tags => $tags,
         testCount => $testCount,
         what => $what,
     });
@@ -327,6 +360,10 @@ sub _test_mc {
         my $recordedAnswer = $answer->{recordedAnswer};
         $responses->{$answerAddress} = $recordedAnswer;
         
+        my $what = "$variable mc answer " . ($aIndex + 1);
+        $what .= " jumps to $next" if $next;
+        $what .= " and tags correct" if $tags;
+        
         $self->session->log->debug("Recording answer for mc question $variable at index $aIndex ($answerAddress) => $recordedAnswer");
         push @tap, $self->_recordResponses( { 
             responseJSON => $rJSON, 
@@ -335,7 +372,7 @@ sub _test_mc {
             surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
             next => $next,
             testCount => $testCount,
-            what => "$variable mc answer " . ($aIndex + 1) . " jumps to $next",
+            what => $what,
             tags => $tags,
         });
         

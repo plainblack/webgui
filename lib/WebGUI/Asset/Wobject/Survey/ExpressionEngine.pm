@@ -456,7 +456,7 @@ sub run {
         $compartment->share_from( 'List::Util',
             [ '&first', '&max', '&maxstr', '&min', '&minstr', '&reduce', '&shuffle', '&sum', ] );
 
-        $session->log->debug("Expression is: \"$expression\"");
+#        $session->log->debug("Expression is: \"$expression\"");
 
         $compartment->reval($expression);
 

@@ -2654,7 +2654,6 @@ sub www_runTest {
     
     my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result');
     
-    $self->session->log->debug("Got tap: [$tap]");
     use TAP::Parser;
     my $parser = TAP::Parser->new( { tap => $tap } );
     
