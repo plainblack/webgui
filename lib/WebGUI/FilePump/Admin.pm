@@ -264,6 +264,7 @@ EOTABLE
                    })
                  . WebGUI::Form::text($session, {
                        name => 'uri',
+                       size => 45,
                    })
                  . WebGUI::Form::submit($session)
                  . WebGUI::Form::formFooter()
@@ -337,13 +338,22 @@ sub www_manage {
     my $dt     = $session->datetime;
     my $url    = $session->url;
     my $getABundle = WebGUI::FilePump::Bundle->getAllIterator($session,{ orderBy => 'bundleName' } );
+    my $notYet = $i18n->get('not yet');
     while (my $bundle = $getABundle->()) {
+        my $lastModified = $bundle->get('lastModified');
+        my $lastBuild    = $bundle->get('lastBuild');
+        my $build = '';
+        if ($lastModified > $lastBuild) {
+            $build = sprintf q| <a href="%s">(%s)</a>|, 
+                     $url->gateway($url->getRequestedUrl,'op=filePump;func=buildBundle;bundleId='.$bundle->getId),
+                     $i18n->get('build');
+        }
         $rows .= sprintf '<tr><td>%s</td><td><a href="%s">%s</a></td><td>%s</td><td>%s</td>',
                  $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->getId),
                  $url->gateway($url->getRequestedUrl,'op=filePump;func=editBundle;bundleId='.$bundle->getId),
                  $bundle->get('bundleName'),
-                 $bundle->get('lastModified') ? $dt->epochToHuman($bundle->get('lastModified')) : '&nbsp;',
-                 $bundle->get('lastBuild')    ? $dt->epochToHuman($bundle->get('lastBuild'))    : '&nbsp;',
+                 $bundle->get('lastModified') ? $dt->epochToHuman($lastModified)        : $notYet,
+                 $bundle->get('lastBuild')    ? $dt->epochToHuman($lastBuild).$build    : $notYet,
                ;
     }
     my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $i18n->get('last modified'), $i18n->get('last build'), $rows;

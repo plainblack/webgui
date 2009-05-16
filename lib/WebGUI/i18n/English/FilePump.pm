@@ -76,10 +76,22 @@ our $I18N = {
 		context => q|Edit bundle label.|
 	},
 
+	'build' => {
+		message => q|Build|,
+		lastUpdated => 1242495011,
+		context => q|List bundles label.  Meaning to construct.  The short version of Build this bundle.|
+	},
+
 	'build error' => {
 		message => q|Problem fetching this URI: %s|,
 		lastUpdated => 1242495011,
 		context => q|Edit bundle error label.|
+	},
+
+	'not yet' => {
+		message => q|Not yet|,
+		lastUpdated => 1242515308,
+		context => q|Meaning that something has not been done at this time.  Before the first time.|
 	},
 
 };
