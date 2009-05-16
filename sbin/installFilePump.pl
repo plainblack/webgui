@@ -45,14 +45,14 @@ finish($session);
 # Your sub here
 
 #----------------------------------------------------------------------------
-sub installFileAdminGroup {
+sub installFilePumpAdminGroup {
     my $session = shift;
     print "\tAdding FilePump admin group setting... \n" unless $quiet;
     ##Content Handler
-    if (! $session->setting->has('groupIdAdminFilePump')) {
+    #if (! $session->setting->has('groupIdAdminFilePump')) {
         $session->setting->add('groupIdAdminFilePump','8');
         print "\tAdded FilePump admin group ... \n" unless $quiet;
-    }
+    #}
     print "Done.\n" unless $quiet;
 }
 
@@ -62,15 +62,8 @@ sub installFilePumpHandler {
     print "\tAdding FilePump content handler... \n" unless $quiet;
     ##Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
-    if (! isIn('WebGUI::Content::FilePump', @{ $contentHandlers }) ) {
-        my @newHandlers = ();
-        foreach my $handler (@{ $contentHandlers }) {
-            push @newHandlers, $handler;
-            push @newHandlers, 'WebGUI::Content::FilePump' if
-                $handler eq 'WebGUI::Content::AssetHistory';
-        }
-        $session->config->set('contentHandlers', \@newHandlers);
-    }
+    $session->config->addToArray('contentHandlers', 'WebGUI::Content::FilePump');
+
     ##Admin Console
     $session->config->addToHash('adminConsole', 'filePump', {
       "icon" => "filePump.gif",
@@ -88,7 +81,6 @@ sub installFilePumpHandler {
 sub installFilePumpTable {
     my $session = shift;
     print "\tAdding FilePump database table via CRUD... \n" unless $quiet;
-    ##Content Handler
     WebGUI::FilePump::Bundle->crud_createTable($session);
     print "Done.\n" unless $quiet;
 }
