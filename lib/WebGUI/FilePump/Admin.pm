@@ -31,7 +31,68 @@ the current user.
 sub canView {
     my $session     = shift;
     my $user        = shift || $session->user;
-    return $user->isInGroup( 3 );
+    return $user->isInGroup( $session->setting->get('groupIdAdminFilePump') );
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addBundle ( )
+
+Displays a form to add a bundle.
+
+Note, we do not allow bundle names to be edited.  This is why.  The directory to a bundle is based on
+the bundle name, and the time stamp of the last build.  If you change the name, then you have a few
+options.
+
+1) You delete the build directory with the old name, which will break every macro which references it.
+
+2) You leave it there, which means that they accumulate with time since they can't every be deleted because
+you don't know the old name.
+
+In short, this really means that instead of an option to edit the name, it needs a copy function.  When you
+copy the bundle, it asks you what you want for a new name, and it is supplied by the user at that time.
+
+=cut
+
+sub www_addBundle {
+    my ($session) = @_;
+    return $session->privilege->insufficient() unless canView($session);
+
+    ##Build the form
+	my $i18n = WebGUI::International->new($session, 'FilePump');
+	my $form = WebGUI::HTMLForm->new($session);
+	$form->hidden( name=>"op",       value=>"filePump");
+	$form->hidden( name=>"func",     value=>"addBundleSave");
+    $form->text(
+        name         => 'bundleName',
+        defaultValue => $i18n->get('new bundle'),
+        label        => $i18n->get('bundle name'),
+        hoverHelp    => $i18n->get('bundle name help'),
+    );
+	$form->submit;
+
+	my $ac   = WebGUI::AdminConsole->new($session,'filePump');
+	return $ac->render($form->print, $i18n->get('Add Bundle'));
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_addBundleSave ( )
+
+Saves the results of www_addBundle().
+
+=cut
+
+sub www_addBundleSave {
+    my $session = shift;
+    return $session->privilege->insufficient() unless canView($session);
+    my $form       = $session->form;
+    my $bundleName = $form->get('bundleName');
+    my $bundle = WebGUI::FilePump::Bundle->create($session, {
+        bundleName   => $bundleName,
+        lastModified => time(),
+    });
+    return www_manage($session);
 }
 
 #-------------------------------------------------------------------
@@ -72,64 +133,6 @@ sub www_demoteFile {
     if (defined $bundle) {
     }
 	return www_manage($session);
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_editBundle ( )
-
-Displays a form to add or edit a bundle.
-
-=cut
-
-sub www_editBundle {
-    my ($session, $error) = @_;
-    return $session->privilege->insufficient() unless canView($session);
-
-    if ($error) {
-        $error = qq|<div class="error">$error</div>\n|;
-    }
-    ##Make a PassiveAnalytics rule to use to populate the form.
-    my $bundleId = $session->form->get('bundleId'); 
-    my $bundle;
-    if ($bundleId) {
-        $bundle = WebGUI::FilePump::Bundle->new($session, $bundle);
-    }
-    else {
-        ##We need a temporary rule so that we can call dynamicForm, below
-        $bundleId = 'new';
-        $bundle   = WebGUI::FilePump::Bundle->create($session, {});
-    }
-
-    ##Build the form
-	my $form = WebGUI::HTMLForm->new($session);
-	$form->hidden( name=>"op",       value=>"filePump");
-	$form->hidden( name=>"func",     value=>"filePumpSave");
-	$form->hidden( name=>"bundleId", value=>$bundleId);
-    $form->dynamicForm([WebGUI::FilePump::Bundle->crud_definition($session)], 'properties', $bundle);
-	$form->submit;
-
-	my $i18n = WebGUI::International->new($session, 'FilePump');
-	my $ac   = WebGUI::AdminConsole->new($session,'filePump');
-    if ($bundleId eq 'new') {
-        $bundle->delete;
-    }
-	return $ac->render($error.$form->print,$i18n->get('Edit Bundle'));
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_editBundleSave ( )
-
-Saves the results of www_editBundle().
-
-=cut
-
-sub www_editBundleSave {
-    my $session = shift;
-    my $form    = $session->form;
-    return $session->privilege->insufficient() unless canView($session);
-    return www_manage($session);
 }
 
 #------------------------------------------------------------------
@@ -176,14 +179,14 @@ sub www_manage {
     while (my $bundle = $getABundle->()) {
         $rows .= sprintf '<tr><td>&nbsp;</td><td>%s</td>', $bundle->get('bundleName');
     }
-    my $output = sprintf <<EOHTML, $i18n->get('bundle name');
+    my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $rows;
 <table border="1">
 <tr><th>&nbsp;</th><th>%s</th></tr>
 %s
 </table>
 EOHTML
     my $ac = WebGUI::AdminConsole->new($session,'filePump');
-    $ac->addSubmenuItem($session->url->page('op=filePump;func=add'), $i18n->get('add a bundle'));
+    $ac->addSubmenuItem($session->url->page('op=filePump;func=addBundle'), $i18n->get('add a bundle'));
     return $ac->render($error.$output, 'File Pump');
 }
 

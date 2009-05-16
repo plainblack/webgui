@@ -36,15 +36,15 @@ sub handler {
     my ($session) = @_;
     my $output = undef;
     return undef unless $session->form->get('op') eq 'filePump';
-    my $method  = $session->form->get( 'method' )
-                ? 'www_' . $session->form->get( 'method' )
+    my $func    = $session->form->get( 'func' )
+                ? 'www_' . $session->form->get( 'func' )
                 : 'www_manage'
                 ;
-    if ($method ne "www_" && (my $sub = WebGUI::FilePump::Admin->can($method))) {
+    if ($func ne "www_" && (my $sub = WebGUI::FilePump::Admin->can($func))) {
         $output = $sub->($session);
     }
     else {
-        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant method $method inside FilePump", method=>$method);
+        WebGUI::Error::MethodNotFound->throw(error=>"Couldn't call non-existant function $func inside FilePump", method=>$func);
     }
     return $output;
 }

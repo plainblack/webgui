@@ -33,8 +33,8 @@ our $I18N = {
 		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
 	},
 
-	'Edit Bundle' => {
-		message => q|Edit Bundle|,
+	'Add Bundle' => {
+		message => q|Add Bundle|,
 		lastUpdated => 1242439269,
 		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
 	},
