@@ -4,7 +4,7 @@ use strict;
 use base qw/WebGUI::Crud/;
 use WebGUI::International;
 use Test::Deep::NoTest;
-use JSON -support_by_pp; # so that we can still use allow_barekey etc..
+use JSON;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -108,7 +108,7 @@ sub run {
         or return { tap => "Bail Out! Test spec undefined" };
     
     eval {
-        $spec = from_json($spec, { relaxed => 1, allow_barekey => 1, allow_singlequote => 1,  } );
+        $spec = from_json($spec, { relaxed => 1 } );
     };
     
     if ($@) {
@@ -224,10 +224,16 @@ sub _test {
     
     # Record responses
     my $responses = {};
+    my $lowestIndex;
+    
+    my $what = "jumps to $next";
     while ( my ( $variable, $answerText ) = each %$args ) {
         my $index = $surveyOrderIndexByVariableName->{$variable};
         my $address = $surveyOrder->[$index];
         my $answerAddress;
+        
+        # Keep track of lowest index (to work out what survey page we should test on)
+        $lowestIndex = $index if (!defined $lowestIndex || $index < $lowestIndex); 
         
         my $question = $rJSON->survey->question($address);
         my $answer;
@@ -240,23 +246,23 @@ sub _test {
             $aIndex++;
         }
         if (!$answer || $answerAddress !~ m/\d+-\d+-\d+/) {
-            return <<END_TAP;
-not ok $testCount - next $next
-# answerText $answerText does not match any answers in your survey
-END_TAP
+            return fail($testCount, $what, 'answerText $answerText does not match any answers in your survey');
         }
         my $recordedAnswer = $answer->{recordedAnswer};
         $responses->{$answerAddress} = $recordedAnswer;
         $self->session->log->debug("Recording $variable ($answerAddress) => $recordedAnswer");
     }
     
+    $rJSON->nextResponse($lowestIndex);
+    
     return $self->_recordResponses( { 
         responseJSON => $rJSON, 
-        responses => $responses, 
+        responses => $responses,
         surveyOrder => $surveyOrder,
         surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
         next => $next,
         testCount => $testCount,
+        what => $what,
     });
 }
 
@@ -300,6 +306,9 @@ sub _test_mc {
     my $aIndex = 0;
     for my $spec (@specs) {
         $self->_resetResponses($rJSON);
+        # Test runs from $variable
+        $rJSON->nextResponse($index);
+        
         my $responses = {};
         my $testCount = ++${$opts{testCount_ref}};
         
@@ -318,6 +327,7 @@ sub _test_mc {
             surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
             next => $next,
             testCount => $testCount,
+            what => "$variable mc answer " . ($aIndex + 1) . " jumps to $next",
         });
         
         $aIndex++;
@@ -340,6 +350,7 @@ sub _recordResponses {
         surveyOrderIndexByVariableName => { type => HASHREF },
         next => 1,
         testCount => 1,
+        what => 0,
     });
     
     # assemble the top-level ingredients..
@@ -349,6 +360,7 @@ sub _recordResponses {
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $next = $opts{next};
     my $testCount = $opts{testCount};
+    my $what = $opts{what};
     
     $rJSON->recordResponses($responses);
 
@@ -373,16 +385,35 @@ sub _recordResponses {
     
     my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
     if ($nextResponse != $expectedNextResponse) {
-        chomp (my $tap = <<END_TAP);
-not ok $testCount - next $next
-# Compared next section/question
-#    got : $got
-# expect : $next
-END_TAP
-        return $tap;
+        return fail($testCount, $what, <<END_WHY);
+Compared next section/question
+   got : $got
+expect : $next
+END_WHY
     }
     
-    return "ok $testCount";
+    return pass($testCount, $what);
+}
+
+sub pass {
+    my ($testCount, $what, $extra) = @_;
+    my $out = $what ? "ok $testCount - $what" : "ok $testCount";
+    if ($extra) {
+        $extra =~ s/^/# /gm;
+        $out .= "\n$extra";
+    }
+    return $out;
+}
+
+sub fail {
+    my ($testCount, $what, $extra) = @_;
+    my $out = $what ? "not ok $testCount - $what" : "not ok $testCount";
+    if ($extra) {
+        chomp($extra);
+        $extra =~ s/^/# /gm;
+        $out .= "\n$extra";
+    }
+    return $out;
 }
 
 1;
