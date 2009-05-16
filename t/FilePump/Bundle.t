@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  45;         # Increment this number for each test you create
+my  $tests =  46;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -354,6 +354,7 @@ ok(-e $cssFile->stringify && -f _ && -s _, '... minified CSS file built, not emp
 ###################################################################
 
 $bundle->delete;
+ok(!-e $buildDir->stringify && !-d _, 'delete deletes the current build directory deleted');
 
 }
 
