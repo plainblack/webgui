@@ -135,6 +135,27 @@ sub www_addFile {
 
 #-------------------------------------------------------------------
 
+=head2 www_buildBundle ( )
+
+Builds a bundle, identified by the form variable, bundleId.
+
+=cut
+
+sub www_buildBundle {
+    my $session = shift;
+    return $session->privilege->insufficient() unless canView($session);
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $session->form->get("bundleId"));
+    return www_editBundle($session) unless $bundle;
+    my ($code, $error) = $bundle->build;
+    if ($error) {
+        my $i18n = WebGUI::International->new($session, 'FilePump');
+        $error = sprintf $i18n->get('build error'), $error;
+    }
+    return www_editBundle($session, $error);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteBundle ( )
 
 Deletes a bundle, identified by the form variable, bundleId.
@@ -215,10 +236,12 @@ A reference to the current session.
 sub www_editBundle {
 	my ($session, $error) = @_;
 	return $session->privilege->insufficient() unless canView($session);
-    my $bundle = WebGUI::FilePump::Bundle->new($session, $session->form->get("bundleId"));
+    my $bundleId = $session->form->get("bundleId");
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $bundleId);
+    return www_addBundle($session) unless $bundle;
     my $i18n   = WebGUI::International->new($session, 'FilePump');
-    if (!defined $bundle) {
-        return www_addBundle($session);
+    if ($error) {
+        $error = qq|<div class="error">$error</div>\n|;
     }
     my $tableStub = <<EOTABLE;
 <h2>%s</h2>
@@ -229,7 +252,6 @@ sub www_editBundle {
 <p>%s</p>
 EOTABLE
     my $output   = '';
-    my $bundleId = $bundle->getId;
     my $dt       = $session->datetime;
     my $url      = $session->url;
     my $lastModifiedi18n = $i18n->get('last modified');
@@ -265,6 +287,7 @@ EOTABLE
     my $ac = WebGUI::AdminConsole->new($session,'filePump');
     $ac->addSubmenuItem($session->url->page('op=filePump;'),               $i18n->get('list bundles'));
     $ac->addSubmenuItem($session->url->page('op=filePump;func=addBundle'), $i18n->get('add a bundle'));
+    $ac->addSubmenuItem($session->url->page('op=filePump;func=buildBundle;bundleId='.$bundleId), $i18n->get('build this bundle'));
     return $ac->render($error.$output, 'File Pump');
 }
 

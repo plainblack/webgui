@@ -70,6 +70,18 @@ our $I18N = {
 		context => q|Edit bundle label.|
 	},
 
+	'build this bundle' => {
+		message => q|Build this bundle|,
+		lastUpdated => 1242495011,
+		context => q|Edit bundle label.|
+	},
+
+	'build error' => {
+		message => q|Problem fetching this URI: %s|,
+		lastUpdated => 1242495011,
+		context => q|Edit bundle error label.|
+	},
+
 };
 
 1;
