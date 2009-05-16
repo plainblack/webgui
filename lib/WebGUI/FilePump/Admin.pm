@@ -178,7 +178,7 @@ sub www_deleteFile {
 
 =head2 www_demoteFile ( session )
 
-Moves a bundle file down one position.  The kind of file is set by the form variable filetype,
+Moves a bundle file down one position.  The kind of file is set by the form variable fileType,
 the id of the bundle is bundleId, and the id of the file to move is fileId.
 
 =head3 session
@@ -190,10 +190,13 @@ A reference to the current session.
 sub www_demoteFile {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
-    my $bundle = WebGUI::FilePump::Bundle->new($session, $session->form->get("bundleId"));
-    if (defined $bundle) {
-    }
-	return www_manage($session);
+    my $form   = $session->form;
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $form->get("bundleId"));
+	return www_editBundle($session) unless $bundle;
+    my $type = $form->get('fileType');
+    my $fileId = $form->get('fileId');
+    $bundle->moveFileDown($type, $fileId);
+	return www_editBundle($session);
 }
 
 #------------------------------------------------------------------
@@ -247,7 +250,7 @@ EOTABLE
         my $rows = '';
         my $files = $bundle->get($fileType);
         foreach my $file (@{ $files }) {
-            my $urlFrag = 'bundleId='.$bundleId.'fileType='.$type.'fileId='.$file->{fileId};
+            my $urlFrag = 'bundleId='.$bundleId.';fileType='.$type.';fileId='.$file->{fileId};
             $rows .= sprintf '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', 
                      $session->icon->delete(   'op=filePump;func=deleteFile;'  . $urlFrag).
                      $session->icon->moveUp(   'op=filePump;func=promoteFile;' . $urlFrag).
@@ -269,7 +272,7 @@ EOTABLE
 
 =head2 www_promoteFile ( session )
 
-Moves a bundle file up one position.  The kind of file is set by the form variable filetype,
+Moves a bundle file up one position.  The kind of file is set by the form variable fileType,
 the id of the bundle is bundleId, and the id of the file to move is fileId.
 
 =head3 session
@@ -281,10 +284,13 @@ A reference to the current session.
 sub www_promoteFile {
 	my $session = shift;
 	return $session->privilege->insufficient() unless canView($session);
+    my $form   = $session->form;
     my $bundle = WebGUI::FilePump::Bundle->new($session, $session->form->get("bundleId"));
-    if (defined $bundle) {
-    }
-	return www_manage($session);
+	return www_editBundle($session) unless $bundle;
+    my $type = $form->get('fileType');
+    my $fileId = $form->get('fileId');
+    $bundle->moveFileUp($type, $fileId);
+	return www_editBundle($session);
 }
 
 #-------------------------------------------------------------------
