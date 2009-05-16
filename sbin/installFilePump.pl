@@ -66,11 +66,11 @@ sub installFilePumpHandler {
 
     ##Admin Console
     $session->config->addToHash('adminConsole', 'filePump', {
-      "icon" => "filePump.gif",
-      "groupSetting" => "groupIdFilePump",
+      "icon" => "filePump.png",
+      "groupSetting" => "groupIdAdminFilePump",
       "uiLevel" => 5,
       "url" => "^PageUrl(\"\",op=filePump);",
-      "title" => "^International(filePump,FilePump);"
+      "title" => "^International(File Pump,FilePump);"
     });
     ##Setting for custom group
     $session->setting->add('groupIdFilePump', 12);

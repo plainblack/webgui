@@ -393,6 +393,13 @@
       "url" : "^PageUrl(\"\",op=manageCache);",
       "title" : "^International(manage cache,WebGUI);",
       "groupSetting" : "groupIdAdminCache"
+   },
+   "filePump" : {
+      "icon" : "filePump.png",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=filePump);",
+      "title" : "^International(File Pump,FilePump);",
+      "groupSetting" : "groupIdAdminFilePump"
    }
 },
 
