@@ -207,7 +207,8 @@ sub exportAssetCollateral {
         # Get the parent dir's *path* (essentially the name of the dir) relative to
         #   its own parent dir.
         $filenameBase = $basepath->parent->relative( $basepath->parent->parent )->stringify;
-    } else {
+    }
+    else {
         # Get the 1st ancestor, since the asset is a file recognized by apache, so
         #   we want our files in the same dir.
         $filedir = $basepath->parent->absolute->stringify;
@@ -405,10 +406,18 @@ sub getStaticRssFeedUrl {
 
 #-------------------------------------------------------------------
 
-=head2 getFeed ()
+=head2 getFeed ( $feed )
 
 Adds the syndicated items to the feed; returns the stringified edition.
+
+Returns this feed so that XML::FeedPP methods can be chained on it.
+
 TODO: convert dates?
+
+=head3 $feed
+
+An XML::FeedPP sub-object, XML::FeedPP::{Atom,Rss,Rdf} that will be filled
+with data from the Asset via the getRssFeedItems method.
 
 =cut
 
@@ -421,7 +430,8 @@ sub getFeed {
         if (!$new_item->guid) {
             if ($new_item->link) {
                 $new_item->guid( $new_item->link );
-            } else {
+            }
+            else {
                 $new_item->guid( $self->session->id->generate );
                 $set_permalink_false = 1;
             }

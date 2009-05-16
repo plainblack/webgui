@@ -17,6 +17,7 @@ package WebGUI::Asset;
 use Carp qw( croak confess );
 use Scalar::Util qw( blessed );
 use Clone qw(clone);
+use JSON;
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -1927,8 +1928,9 @@ sub outputWidgetMarkup {
     my $styleTemplateId     = shift;
 
     # construct / retrieve the values we'll use later.
-    my $assetId         = $self->getId;
     my $session         = $self->session;
+    my $assetId         = $self->getId;
+    my $hexId           = $session->id->toHex($assetId);
     my $conf            = $session->config;
     my $extras          = $conf->get('extrasURL');
 
@@ -1952,8 +1954,10 @@ sub outputWidgetMarkup {
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
+    $session->log->warn($content);
     my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $body } } );
+    $body = $content;
+    my $jsonContent     = to_json( { "asset$hexId" => { content => $body } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
     my $jsonUrl         = $storage->getUrl("$assetId.js");
 
@@ -1979,15 +1983,15 @@ sub outputWidgetMarkup {
         <script type='text/javascript' src='$wgWidgetJs'></script>
         <script type='text/javascript'>
             function setupPage() {
-                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
+                WebGUI.widgetBox.doTemplate('widget$hexId'); WebGUI.widgetBox.retargetLinksAndForms();
                 WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
         $headTags
     </head>
-    <body id="widget$assetId">
-        \${asset$assetId.content}
+    <body id="widget$hexId">
+        \${asset$hexId.content}
     </body>
 </html>
 OUTPUT

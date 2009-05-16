@@ -150,7 +150,7 @@ $canViewMaker->prepare(
     },
 );
 
-plan tests => 103 
+plan tests => 104 
             + scalar(@fixIdTests)
             + scalar(@fixTitleTests)
             + 2*scalar(@getTitleTests) #same tests used for getTitle and getMenuTitle
@@ -391,6 +391,7 @@ is($importNode->fixUrl('/extras2'), '_extras2', 'underscore prepended to URLs th
 is($importNode->fixUrl('one.html/two.html'), 'one/two.html', 'extensions are not allowed higher up in the path');
 is($importNode->fixUrl('one.html/two.html/three.html'), 'one/two/three.html', 'extensions are not allowed anywhere in the path');
 is($importNode->fixUrl('one.one.html/two.html/three.html'), 'one/two/three.html', 'multiple dot extensions are removed in any path element');
+is($importNode->fixUrl('.startsWithDot'), '.startswithdot', 'leading dots are okay');
 
 ##Now, check duplicate URLs
 

@@ -288,7 +288,7 @@ sub addFileFromFormPost {
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {
-        $session->errorHandler->info("Trying to get " . $upload->filename);
+        $session->errorHandler->info("Trying to get " . $upload->filename." from ".$formVariableName);
         return $filename
             if $attachmentCount > $attachmentLimit;
         my $clientFilename = $upload->filename;

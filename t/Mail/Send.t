@@ -18,6 +18,10 @@ use lib "$FindBin::Bin/../lib";
 use JSON qw( from_json to_json );
 use Test::More;
 use File::Spec;
+use Data::Dumper;
+use MIME::Parser;
+use Encode qw/decode/;
+
 use WebGUI::Test;
 
 use WebGUI::Mail::Send;
@@ -37,18 +41,25 @@ BEGIN {
 }
 
 # See if we have an SMTP server to use
+# See if we have an SMTP server to use
 my ( $smtpd );
 my $SMTP_HOST        = 'localhost';
 my $SMTP_PORT        = '54921';
 if ($hasServer) {
     $session->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
-    
+
+    my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
+    open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT 5 |"
+        or die "Could not open pipe to SMTPD: $!";
+    sleep 1; # Give the smtpd time to establish itself
 }
+
+
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 6;        # Increment this number for each test you create
+plan tests => 11;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test create
@@ -122,6 +133,7 @@ is( $mime->parts(0)->as_string =~ m/\n/, $newlines,
 );
 
 # TODO: Test that addHtml creates a body with the right content type
+my $smtpServerOk = 0;
 
 #----------------------------------------------------------------------------
 # Test emailOverride
@@ -137,22 +149,24 @@ SKIP: {
     if ( !$hasServer ) {
         skip "Cannot test emailOverride: Module Net::SMTP::Server not loaded!", $numtests;
     }
-    
+
+    $smtpServerOk = 1;
+
     # Override the emailOverride
     my $oldEmailOverride   = $session->config->get('emailOverride');
     $session->config->set( 'emailOverride', 'dufresne@localhost' );
     my $oldEmailToLog      = $session->config->get('emailToLog');
     $session->config->set( 'emailToLog', 0 );
-    
+
     # Send the mail
     my $mail
         = WebGUI::Mail::Send->create( $session, { 
             to      => 'norton@localhost',
         } );
     $mail->addText( 'His judgement cometh and that right soon.' );
-    
+
     my $received = sendToServer( $mail );
-    
+
     if (!$received) {
         skip "Cannot test emailOverride: No response received from smtpd", $numtests;
     }
@@ -162,9 +176,91 @@ SKIP: {
         "Email TO: address is overridden",
     );
 
+    my $parser         = MIME::Parser->new();
+    my $parsed_message = $parser->parse_data($received->{contents});
+    my $head           = $parsed_message->head;
+    my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+    like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'Message-Id is valid');
+
     # Restore the emailOverride
     $session->config->set( 'emailOverride', $oldEmailOverride );
     $session->config->set( 'emailToLog', $oldEmailToLog );
+}
+
+SKIP: {
+    my $numtests        = 4; # Number of tests in this block
+
+    skip "Cannot test message ids", $numtests unless $smtpServerOk;
+
+    # Send the mail
+    my $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'norton@localhost',
+        } );
+    $mail->addText( "I understand you're a man who knows how to get things." );
+
+    my $received = sendToServer( $mail );
+
+    if (!$received) {
+        skip "Cannot test messageIds: No response received from smtpd", $numtests;
+    }
+
+    # Test the mail
+    my $parser         = MIME::Parser->new();
+    my $parsed_message = $parser->parse_data($received->{contents});
+    my $head           = $parsed_message->head;
+    my $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+    chomp $messageId;
+    like ($messageId, qr/^<WebGUI-([a-zA-Z0-9\-_]){22}@\w+\.\w{2,4}>$/, 'generated Message-Id is valid');
+
+    # Send the mail
+    $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'norton@localhost',
+            messageId => '<leadingAngleOnly@localhost.localdomain',
+        } );
+    $mail->addText( "What say you there, fuzzy-britches? Feel like talking?" );
+
+    $received = sendToServer( $mail );
+
+    $parsed_message = $parser->parse_data($received->{contents});
+    $head           = $parsed_message->head;
+    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+    chomp $messageId;
+    is($messageId, '<leadingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added ending angle)');
+
+    # Send the mail
+    $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'norton@localhost',
+            messageId => 'endingAngleOnly@localhost.localdomain>',
+        } );
+    $mail->addText( "Dear Warden, You were right. Salvation lies within." );
+
+    $received = sendToServer( $mail );
+
+    $parsed_message = $parser->parse_data($received->{contents});
+    $head           = $parsed_message->head;
+    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+    chomp $messageId;
+    is($messageId, '<endingAngleOnly@localhost.localdomain>', 'bad messageId corrected (added starting angle)');
+
+    # Send the mail
+    $mail
+        = WebGUI::Mail::Send->create( $session, { 
+            to        => 'red@localhost',
+            messageId => 'noAngles@localhost.localdomain',
+        } );
+    $mail->addText( "Neither are they. You have to be human first. They don't qualify." );
+
+    $received = sendToServer( $mail );
+
+    $parsed_message = $parser->parse_data($received->{contents});
+    $head           = $parsed_message->head;
+    $messageId      = decode('MIME-Header', $head->get('Message-Id'));
+    chomp $messageId;
+    is($messageId, '<noAngles@localhost.localdomain>', 'bad messageId corrected (added both angles)');
+
 }
 
 # TODO: Test the emailToLog config setting
@@ -173,6 +269,11 @@ SKIP: {
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+    close MAIL 
+        or die "Could not close pipe to SMTPD: $!";
+    sleep 1;
+
+    $session->db->write('delete from mailQueue');
 }
 
 #----------------------------------------------------------------------------
@@ -189,21 +290,17 @@ END {
 #                 by a MIME::Entity parser
 sub sendToServer {
     my $mail        = shift;
-
-    my $smtpd       = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
-    open MAIL, "perl $smtpd $SMTP_HOST $SMTP_PORT |"
-        or die "Could not open pipe to SMTPD: $!";
-    sleep 1; # Give the smtpd time to establish itself
-
-    $mail->send;
+    my $status = $mail->send;
     my $json;
-    while ( my $line = <MAIL> ) {
-        $json   .= $line; 
+    if ($status) {
+        $json = <MAIL>;
     }
-
-    close MAIL 
-        or die "Could not close pipe to SMTPD: $!";
-
+    else {
+        $json = ' { "error": "mail not sent" } ';
+    }
+    if (!$json) {
+        $json = ' { "error": "error in getting mail" } ';
+    }
     return from_json( $json );
 }
 

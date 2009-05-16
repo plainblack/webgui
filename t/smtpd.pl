@@ -1,6 +1,7 @@
 
 my $HOST        = shift;
 my $PORT        = shift;
+my $EMAILS      = shift || 1;
 
 die "HOST must be first argument"   
     unless $HOST;
@@ -13,17 +14,26 @@ use Net::SMTP::Server::Client;
 
 my $server  = Net::SMTP::Server->new( $HOST, $PORT );
 
-while ( my $conn = $server->accept ) {
+my $counter = 0;
+
+$| = 1;
+
+CONNECTION: while ( my $conn = $server->accept ) {
     my $client  = Net::SMTP::Server::Client->new( $conn );
     $client->process;
     print to_json({
         to          => $client->{TO},
         from        => $client->{FROM},
         contents    => $client->{MSG},
+        counter     => $counter,
+        emails      => $EMAILS,
     });
-    exit(0);
+    print "\n";
+    last CONNECTION if ++$counter >= $EMAILS;
 }
 
+sleep 3;
+exit(0);
 
 =head1 NAME
 
