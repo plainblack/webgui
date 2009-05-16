@@ -97,6 +97,44 @@ sub www_addBundleSave {
 
 #-------------------------------------------------------------------
 
+=head2 www_addFile ( )
+
+Processes the form to add a file to a bundle.
+
+Form variables used:
+
+=item uri
+
+The URI to add.
+
+=item type
+
+The type of file to add.
+
+=item bundleId
+
+The GUID of the bundle to add a file to.
+
+=cut
+
+sub www_addFile {
+    my ($session) = @_;
+    return $session->privilege->insufficient() unless canView($session);
+    my $form     = $session->form;
+    my $bundleId = $form->get('bundleId');
+    my $bundle   = WebGUI::FilePump::Bundle->new($session, $bundleId);
+    return www_editBundle($session) unless $bundle;
+
+    my $type     = $form->get('type');
+    my $uri      = $form->get('uri');
+
+    my (undef, $error) = $bundle->addFile($type, $uri);
+
+    return www_editBundle($session, $error);
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_deleteBundle ( )
 
 Deletes a bundle, identified by the form variable, bundleId.
@@ -190,13 +228,23 @@ EOTABLE
     my $output   = '';
     my $bundleId = $bundle->getId;
     my $dt       = $session->datetime;
+    my $url      = $session->url;
     my $lastModifiedi18n = $i18n->get('last modified');
     foreach my $fileType (qw/jsFiles cssFiles/) {
         my $type = $fileType eq 'jsFiles'  ? 'JS'
                  : $fileType eq 'cssFiles' ? 'CSS'
                  : 'OTHER';
+        my $form = WebGUI::Form::formHeader($session, {
+                       action => $url->gateway($url->getRequestedUrl,'op=filePump;func=addFile;type='.$type.';bundleId='.$bundleId),
+                   })
+                 . WebGUI::Form::text($session, {
+                       name => 'uri',
+                   })
+                 . WebGUI::Form::submit($session)
+                 . WebGUI::Form::formFooter()
+                 ;
+
         my $rows = '';
-        my $form = '';
         my $files = $bundle->get($fileType);
         foreach my $file (@{ $files }) {
             my $urlFrag = 'bundleId='.$bundleId.'fileType='.$type.'fileId='.$file->{fileId};
@@ -205,13 +253,10 @@ EOTABLE
                      $session->icon->moveUp(   'op=filePump;func=promoteFile;' . $urlFrag).
                      $session->icon->moveDown( 'op=filePump;func=demoteFile;'  . $urlFrag) ,
                      $file->{uri},
-                     $dt->epochToHuman($file->{lastModified})
+                     $file->{lastModified} ? $dt->epochToHuman($file->{lastModified}) : '&nbsp;'
                    ;
         }
         $output .= sprintf $tableStub, $i18n->get($fileType), $lastModifiedi18n, $rows, $form;
-        $output .= WebGUI::Form::text($session, {
-            name => 'uri',
-        });
     }
 
     my $ac = WebGUI::AdminConsole->new($session,'filePump');
@@ -268,8 +313,8 @@ sub www_manage {
                  $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->getId),
                  $url->gateway($url->getRequestedUrl,'op=filePump;func=editBundle;bundleId='.$bundle->getId),
                  $bundle->get('bundleName'),
-                 $dt->epochToHuman($bundle->get('lastModified')),
-                 $dt->epochToHuman($bundle->get('lastBuild')),
+                 $bundle->get('lastModified') ? $dt->epochToHuman($bundle->get('lastModified')) : '&nbsp;',
+                 $bundle->get('lastBuild')    ? $dt->epochToHuman($bundle->get('lastBuild'))    : '&nbsp;',
                ;
     }
     my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $i18n->get('last modified'), $i18n->get('last build'), $rows;
