@@ -177,7 +177,10 @@ sub www_manage {
     my $rows   = '';
     my $getABundle = WebGUI::FilePump::Bundle->getAllIterator($session,{ orderBy => 'bundleName' } );
     while (my $bundle = $getABundle->()) {
-        $rows .= sprintf '<tr><td>&nbsp;</td><td>%s</td>', $bundle->get('bundleName');
+        $rows .= sprintf '<tr><td>%s</td><td>%s</td>',
+                 $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->getId),
+                 $bundle->get('bundleName')
+               ;
     }
     my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $rows;
 <table border="1">
