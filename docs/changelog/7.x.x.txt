@@ -6,6 +6,7 @@
  - rfe #9981: RedirectAfterLogin Setting
  - Added user create, update, and delete web services ( HD Publishing )
  - Added Survey web test suite for validating expression/branching logic
+ - fixed SMS i18n for the user profile fields.
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

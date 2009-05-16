@@ -34,9 +34,27 @@ addUseEmailAsUsernameToSettings( $session );
 alterVATNumberTable( $session );
 addRedirectAfterLoginUrlToSettings( $session );
 addSurveyTestResultsTemplateColumn( $session );
+fixSMSUserProfileI18N($session);
 
 finish($session); # this line required
 
+
+#----------------------------------------------------------------------------
+sub fixSMSUserProfileI18N {
+    my $session = shift;
+    print "\tFixing bad I18N in SMS user profile fields..." unless $quiet;
+    my $field = WebGUI::ProfileField->new($session, 'receiveInboxEmailNotifications');
+    my $properties = $field->get();
+    $properties->{label} = q!WebGUI::International::get('receive inbox emails','WebGUI')!;
+    $field->set($properties);
+
+    $field = WebGUI::ProfileField->new($session, 'receiveInboxSmsNotifications');
+    $properties = $field->get();
+    $properties->{label} = q!WebGUI::International::get('receive inbox sms','WebGUI')!;
+    $field->set($properties);
+
+    print "Done\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub addOgoneToConfig {

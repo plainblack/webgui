@@ -4421,6 +4421,18 @@ Users may override this setting in their profile.
         message => q{Enables displaying using a mobile style template and mobile page layout template.  When enabled, the alternate templates are used when the browser's user agent string matches the list set in the config file.},
     },
 
+    'receive inbox emails' => {
+        message => q|Receive inbox notifications as email?|,
+        context => q|Label in profile field|,
+        lastUpdated => 1242438242,
+    },
+
+    'receive inbox sms' => {
+        message => q|Receive inbox notifications as SMS?|,
+        context => q|Label in profile field|,
+        lastUpdated => 1242438244,
+    },
+
 };
 
 1;
