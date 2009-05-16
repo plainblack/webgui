@@ -115,6 +115,29 @@ sub www_deleteBundle {
 
 #------------------------------------------------------------------
 
+=head2 www_deleteFile ( session )
+
+Deletes a file from it's bundle.  The kind of file is set by the form variable filetype,
+the id of the bundle is bundleId, and the id of the file to move is fileId.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_deleteFile {
+	my $session = shift;
+	return $session->privilege->insufficient() unless canView($session);
+    my $form   = $session->form;
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $form->get("bundleId"));
+    return www_editBundle($session) unless $bundle;
+    $bundle->deleteFile($form->get('fileType'), $form->get('fileId'));
+	return www_editBundle($session);
+}
+
+#------------------------------------------------------------------
+
 =head2 www_demoteFile ( session )
 
 Moves a bundle file down one position.  The kind of file is set by the form variable filetype,
@@ -133,6 +156,68 @@ sub www_demoteFile {
     if (defined $bundle) {
     }
 	return www_manage($session);
+}
+
+#------------------------------------------------------------------
+
+=head2 www_editBundle ( session )
+
+Interface for managing URIs in a bundle, given by the form param bundleId.  Add, delete,
+promote and demote are supported for all three file types.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub www_editBundle {
+	my ($session, $error) = @_;
+	return $session->privilege->insufficient() unless canView($session);
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $session->form->get("bundleId"));
+    my $i18n   = WebGUI::International->new($session, 'FilePump');
+    if (!defined $bundle) {
+        return www_addBundle($session);
+    }
+    my $tableStub = <<EOTABLE;
+<h2>%s</h2>
+<table border=1>
+<tr><th>&nbsp;</th><th>URI</th><th>%s</th></tr>
+%s
+</table>
+<p>%s</p>
+EOTABLE
+    my $output   = '';
+    my $bundleId = $bundle->getId;
+    my $dt       = $session->datetime;
+    my $lastModifiedi18n = $i18n->get('last modified');
+    foreach my $fileType (qw/jsFiles cssFiles/) {
+        my $type = $fileType eq 'jsFiles'  ? 'JS'
+                 : $fileType eq 'cssFiles' ? 'CSS'
+                 : 'OTHER';
+        my $rows = '';
+        my $form = '';
+        my $files = $bundle->get($fileType);
+        foreach my $file (@{ $files }) {
+            my $urlFrag = 'bundleId='.$bundleId.'fileType='.$type.'fileId='.$file->{fileId};
+            $rows .= sprintf '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', 
+                     $session->icon->delete(   'op=filePump;func=deleteFile;'  . $urlFrag).
+                     $session->icon->moveUp(   'op=filePump;func=promoteFile;' . $urlFrag).
+                     $session->icon->moveDown( 'op=filePump;func=demoteFile;'  . $urlFrag) ,
+                     $file->{uri},
+                     $dt->epochToHuman($file->{lastModified})
+                   ;
+        }
+        $output .= sprintf $tableStub, $i18n->get($fileType), $lastModifiedi18n, $rows, $form;
+        $output .= WebGUI::Form::text($session, {
+            name => 'uri',
+        });
+    }
+
+    my $ac = WebGUI::AdminConsole->new($session,'filePump');
+    $ac->addSubmenuItem($session->url->page('op=filePump;'),               $i18n->get('list bundles'));
+    $ac->addSubmenuItem($session->url->page('op=filePump;func=addBundle'), $i18n->get('add a bundle'));
+    return $ac->render($error.$output, 'File Pump');
 }
 
 #------------------------------------------------------------------
@@ -175,16 +260,21 @@ sub www_manage {
     my $i18n   = WebGUI::International->new($session, 'FilePump');
     my $error  = shift;
     my $rows   = '';
+    my $dt     = $session->datetime;
+    my $url    = $session->url;
     my $getABundle = WebGUI::FilePump::Bundle->getAllIterator($session,{ orderBy => 'bundleName' } );
     while (my $bundle = $getABundle->()) {
-        $rows .= sprintf '<tr><td>%s</td><td>%s</td>',
+        $rows .= sprintf '<tr><td>%s</td><td><a href="%s">%s</a></td><td>%s</td><td>%s</td>',
                  $session->icon->delete('op=filePump;func=deleteBundle;bundleId='.$bundle->getId),
-                 $bundle->get('bundleName')
+                 $url->gateway($url->getRequestedUrl,'op=filePump;func=editBundle;bundleId='.$bundle->getId),
+                 $bundle->get('bundleName'),
+                 $dt->epochToHuman($bundle->get('lastModified')),
+                 $dt->epochToHuman($bundle->get('lastBuild')),
                ;
     }
-    my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $rows;
+    my $output = sprintf <<EOHTML, $i18n->get('bundle name'), $i18n->get('last modified'), $i18n->get('last build'), $rows;
 <table border="1">
-<tr><th>&nbsp;</th><th>%s</th></tr>
+<tr><th>&nbsp;</th><th>%s</th><th>%s</th><th>%s</th></tr>
 %s
 </table>
 EOHTML

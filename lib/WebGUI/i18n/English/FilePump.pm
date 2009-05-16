@@ -3,10 +3,23 @@ package WebGUI::i18n::English::FilePump;
 use strict;
 
 our $I18N = {
+
 	'bundle name' => {
 		message => q|Bundle name|,
 		lastUpdated => 1131394070,
 		context => q|Label for the name of a bundle (group, clump) of files.|
+	},
+
+	'last build' => {
+		message => q|Last Build|,
+		lastUpdated => 1242493652,
+		context => q|The time the bundle was built last|
+	},
+
+	'last modified' => {
+		message => q|Last Modified|,
+		lastUpdated => 1242493669,
+		context => q|The time the bundle was last modified.|
 	},
 
 	'bundle name help' => {
@@ -37,6 +50,24 @@ our $I18N = {
 		message => q|Add Bundle|,
 		lastUpdated => 1242439269,
 		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
+	},
+
+	'list bundles' => {
+		message => q|List Bundles|,
+		lastUpdated => 1242495011,
+		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
+	},
+
+	'jsFiles' => {
+		message => q|JavaScript|,
+		lastUpdated => 1242495011,
+		context => q|Edit bundle label.|
+	},
+
+	'cssFiles' => {
+		message => q|CSS|,
+		lastUpdated => 1242495011,
+		context => q|Edit bundle label.|
 	},
 
 };
