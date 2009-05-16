@@ -3828,6 +3828,15 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+    'settings groupIdAdminHistory label' => {
+        message     => q{Asset History},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminHistory hoverHelp' => {
+        message     => q{Group allowed to access the Asset History Browser.},
+        lastUpdated => 0,
+    },
+
 
     'settings groupIdAdminHelp label' => {
         message     => q{Help},
