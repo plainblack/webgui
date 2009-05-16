@@ -36,12 +36,25 @@ my $session = start( $webguiRoot, $configFile );
 
 installFilePumpHandler($session);
 installFilePumpTable($session);
+installFilePumpAdminGroup($session);
 
 # Do your work here
 finish($session);
 
 #----------------------------------------------------------------------------
 # Your sub here
+
+#----------------------------------------------------------------------------
+sub installFileAdminGroup {
+    my $session = shift;
+    print "\tAdding FilePump admin group setting... \n" unless $quiet;
+    ##Content Handler
+    if (! $session->setting->has('groupIdAdminFilePump')) {
+        $session->setting->add('groupIdAdminFilePump','8');
+        print "\tAdded FilePump admin group ... \n" unless $quiet;
+    }
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub installFilePumpHandler {
