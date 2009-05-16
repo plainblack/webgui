@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 22;
+plan tests => 25;
 
 my ( $s, $t1 );
 
@@ -39,53 +39,88 @@ isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );
 
 $s->responseIdCookies(0);
 
-# Load bare-bones survey, containing a single section (S0)
+# N.B. Survey starts off with a single empty section (S0)
+
+# Add some sections and questions
+$s->surveyJSON_newObject( [] ); # S1
+$s->surveyJSON_newObject( [] ); # S2
+$s->surveyJSON_newObject( [] ); # S3
+$s->surveyJSON_newObject( [] ); # S4
+
+# Name the sections
 $s->surveyJSON_update( [0], { variable => 'S0' } );
-$s->surveyJSON_newObject( [0] );
-$s->surveyJSON_newObject( [] );
-$s->surveyJSON_newObject( [1] );
-$s->surveyJSON_newObject( [1] );
-$s->surveyJSON_newObject( [] );
-$s->surveyJSON_newObject( [2] );
-$s->surveyJSON_newObject( [] );
-
-$s->surveyJSON_update( [ 0, 0 ], { variable => 'S0Q0' } );
 $s->surveyJSON_update( [1], { variable => 'S1' } );
-$s->surveyJSON_update( [ 1, 0 ], { variable => 'S1Q0' } );
-$s->surveyJSON_update( [ 1, 1 ], { variable => 'S1Q1' } );
 $s->surveyJSON_update( [2], { variable => 'S2' } );
-$s->surveyJSON_update( [ 2, 0 ], { variable => 'S2Q0' } );
 $s->surveyJSON_update( [3], { variable => 'S3' } );
+$s->surveyJSON_update( [4], { variable => 'S4' } );
 
-$s->surveyJSON->updateQuestionAnswers( [ 0, 0 ], 'Yes/No' );
-$s->surveyJSON->updateQuestionAnswers( [ 1, 0 ], 'Yes/No' );
-$s->surveyJSON->updateQuestionAnswers( [ 1, 1 ], 'Yes/No' );
+# ..and now some questions
+$s->surveyJSON_newObject( [0] ); # S0Q0
+$s->surveyJSON_newObject( [1] ); # S1Q0
+$s->surveyJSON_newObject( [2] ); # S2Q0
+$s->surveyJSON_newObject( [3] ); # S3Q0
+$s->surveyJSON_newObject( [3] ); # S3Q1
+$s->surveyJSON_newObject( [4] ); # S4Q0
+$s->surveyJSON_newObject( [4] ); # S4Q1
 
+# Name the questions
+$s->surveyJSON_update( [ 0, 0 ], { variable => 'S0Q0' } );
+$s->surveyJSON_update( [ 1, 0 ], { variable => 'S1Q0' } );
+$s->surveyJSON_update( [ 2, 0 ], { variable => 'S2Q0' } );
+$s->surveyJSON_update( [ 3, 0 ], { variable => 'S3Q0' } );
+$s->surveyJSON_update( [ 3, 1 ], { variable => 'S3Q1' } );
+$s->surveyJSON_update( [ 4, 0 ], { variable => 'S4Q0' } );
+$s->surveyJSON_update( [ 4, 1 ], { variable => 'S4Q1' } );
+
+# Set additional options..
+$s->surveyJSON_update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes/No
+$s->surveyJSON_update( [ 0, 0 ], { gotoExpression => q{ tag('tagged at S0Q0'); } } ); # S0Q0 tags data
+
+$s->surveyJSON_update( [ 1, 0 ], { questionType => 'Yes/No' } ); # S1Q0 is a Yes/No
+$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3' } ); # S1Q0 jumps to S3
+
+# And finally, persist the changes..
 $s->persistSurveyJSON;
 
 cmp_deeply(
-    $s->responseJSON->surveyOrder,
-    [ [ 0, 0, [ 0, 1 ] ], [ 1, 0, [0, 1] ], [ 1, 1, [0, 1] ], [ 2, 0, [0] ], [ 3 ] ],
-    'At this stage our surveyOrder has 3 items'
+    $s->responseJSON->surveyOrder, [
+       [ 0, 0, [ 0, 1 ] ],  # S0Q0
+       [ 1, 0, [ 0, 1 ] ],  # S1Q0
+       [ 2, 0, [] ],     # S2Q0
+       [ 3, 0, [] ],     # S3Q0
+       [ 3, 1, [] ],     # S3Q1
+       [ 4, 0, [] ],     # S4Q0
+       [ 4, 1, [] ],     # S4Q1
+     ], 'surveyOrder is correct'
 );
 
 cmp_deeply(
-    $s->responseJSON->surveyOrderIndexByVariableName,
-    {   'S0'   => 0,
+    $s->responseJSON->surveyOrderIndexByVariableName, 
+    {   
+        'S0'   => 0,
         'S0Q0' => 0,
         'S1'   => 1,
         'S1Q0' => 1,
-        'S1Q1' => 2,
-        'S2'   => 3,
-        'S2Q0' => 3,
-        'S3'   => 4,
+        'S2'   => 2,
+        'S2Q0' => 2,
+        'S3'   => 3,
+        'S3Q0' => 3,
+        'S3Q1' => 4,
+        'S4'   => 5,
+        'S4Q0' => 5,
+        'S4Q1' => 6,
     },
-    '..which corresponds to'
+    'surveyOrderIndexByVariableName correct'
 );
 
 $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
 my $spec;
 
+######
+# test
+######
+
+# Both answers for S0Q0 jump to the next item, which can be referred to as either S1 or S1Q0
 $spec = <<END_SPEC;
 [
     {
@@ -97,7 +132,7 @@ $spec = <<END_SPEC;
     {
        "test" : {
             "S0Q0" : "No",
-            "next" : "S1",
+            "next" : "S1Q0",
        }
     }
 ]
@@ -105,11 +140,8 @@ END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
 ok 1 - jumps to S1
-ok 2 - jumps to S1
+ok 2 - jumps to S1Q0
 END_TAP
-
-# add a goto into the mix
-$s->surveyJSON_update( [ 0, 0, 0 ], { goto => 'S1Q1' } );
 
 # deliberately pass in a spec that will fail
 $spec = <<END_SPEC;
@@ -117,78 +149,112 @@ $spec = <<END_SPEC;
     {
        "test" : {
             "S0Q0" : "Yes",
-            "next" : "S1", # this will fail here, because Yes now jumps to S1Q1
-       }
-    },
-    {
-       "test" : {
-            "S0Q0" : "No",
-            "next" : "S1",
+            "next" : "S2", # wrong target, should fail
        }
     }
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
-1..2
-not ok 1 - jumps to S1
+1..1
+not ok 1 - jumps to S2
 # Compared next section/question
-#    got : S1Q1 (<-- a question)
-# expect : S1
-ok 2 - jumps to S1
+#    got : 'S1' (<-- a section) and 'S1Q0' (<-- a question)
+# expect : 'S2'
 END_TAP
 
-# try now with a spec that will pass
+# now try it on a question that has branching, and doesn't start on the first page
 $spec = <<END_SPEC;
 [
     {
        "test" : {
-            "S0Q0" : "Yes",
-            "next" : "S1Q1", # jumps
+            "S1Q0" : "Yes",
+            "next" : "S3", # a goto jumps
        }
     },
-    {
-       "test" : {
-            "S0Q0" : "No",
-            "next" : "S1",  # falls through
-       }
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - jumps to S3
+END_TAP
+
+#########
+# test_mc
+#########
+# Now use test_mc
+$spec = <<END_SPEC;
+[ 
+    { 
+        "test_mc" : [ 
+            "S0Q0",  # from S0Q0
+            "S1Q0",  # first answer falls through
+            "S1",    # second answer falls through to the same place
+        ] 
+    } 
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..2
+ok 1 - S0Q0 mc answer 1 jumps to S1Q0
+ok 2 - S0Q0 mc answer 2 jumps to S1
+END_TAP
+
+# try the same thing, but in a more verbose form
+$spec = <<END_SPEC;
+[ 
+    { 
+        "test_mc" : [ 
+            "S0Q0",  # from S0Q0
+            { "next" : "S1Q0" },    # first answer falls through
+            { "next" : "S1"   },    # second answer falls through to the same place
+        ]
     }
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
-ok 1 - jumps to S1Q1
-ok 2 - jumps to S1
-END_TAP
-
-# Now use test_mc
-$spec = q{ [ { "test_mc" : [ "S0Q0", "S1Q1", "S1" ] } ] };
-try_it( $t1, $spec, { tap => <<END_TAP } );
-1..2
-ok 1 - S0Q0 mc answer 1 jumps to S1Q1
+ok 1 - S0Q0 mc answer 1 jumps to S1Q0
 ok 2 - S0Q0 mc answer 2 jumps to S1
 END_TAP
 
-# Now try one that doesn't start on the first page of the survey
+# use the tags option
 $spec = <<END_SPEC;
-[ { "test" : { 
-        "S1Q0" : "Yes",
-        "S1Q0" : "No",
-        "next" : "S2", # falls through
-    } 
-  },
+[ 
+    { 
+        "test_mc" : [ 
+            "S0Q0",                             # test S0Q0
+            {   "next" : "S1Q0",                # first answer falls through
+                "tags" : [ "tagged at S0Q0" ],  # and tags data
+            },    
+            { "next" : "S1" },                  # second answer falls through to the same place
+        ]
+    }
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
-1..1
-ok 1 - jumps to S2
+1..2
+ok 1 - S0Q0 mc answer 1 jumps to S1Q0
+ok 2 - S0Q0 mc answer 2 jumps to S1
 END_TAP
 
-# And similarly a test_mc one that doesn't start on the first page
-$spec = q{ [ { "test_mc" : [ "S2Q0", "S3", "S3" ] } ] };
+# And try one that does branching, and doesn't start on the first page
+$spec = <<END_SPEC;
+[ 
+    { 
+        "test_mc" : [ 
+            "S1Q0",                             # test S1Q0
+            {   "next" : "S3",                  # first answer jumps
+                "tags" : [ ],                   # nothing gets tagged
+            },
+            { "next" : "S2" },                  # second answer falls through
+        ]
+    }
+]
+END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
-ok 1 - S2Q0 mc answer 1 jumps to S3
-ok 2 - S2Q0 mc answer 2 jumps to S3
+ok 1 - S1Q0 mc answer 1 jumps to S3
+ok 2 - S1Q0 mc answer 2 jumps to S2
 END_TAP
 
 use TAP::Parser;
@@ -219,5 +285,5 @@ sub try_it {
 # Cleanup
 END {
     $s->purge() if $s;
-    $t1->delete();
+    $t1->delete() if $t1;
 }

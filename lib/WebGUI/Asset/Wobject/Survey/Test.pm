@@ -305,20 +305,28 @@ sub _test_mc {
     my @tap;
     my $aIndex = 0;
     for my $spec (@specs) {
+        
+        # Reset responses between sub-tests
         $self->_resetResponses($rJSON);
+        
         # Test runs from $variable
         $rJSON->nextResponse($index);
         
         my $responses = {};
         my $testCount = ++${$opts{testCount_ref}};
         
-        # assume spec can only be a target
-        my $next = $spec;
+        my ($next, $tags);
+        if (ref $spec eq 'HASH') {
+            ($next, $tags) = @{$spec}{qw(next tags)};
+        } else {
+            $next = $spec;
+        }
         
         my $answerAddress = "$address->[0]-$address->[1]-$aIndex";
         my $answer = $answers->[$aIndex];
         my $recordedAnswer = $answer->{recordedAnswer};
         $responses->{$answerAddress} = $recordedAnswer;
+        
         $self->session->log->debug("Recording answer for mc question $variable at index $aIndex ($answerAddress) => $recordedAnswer");
         push @tap, $self->_recordResponses( { 
             responseJSON => $rJSON, 
@@ -328,6 +336,7 @@ sub _test_mc {
             next => $next,
             testCount => $testCount,
             what => "$variable mc answer " . ($aIndex + 1) . " jumps to $next",
+            tags => $tags,
         });
         
         $aIndex++;
@@ -351,6 +360,7 @@ sub _recordResponses {
         next => 1,
         testCount => 1,
         what => 0,
+        tags => 0,
     });
     
     # assemble the top-level ingredients..
@@ -361,6 +371,7 @@ sub _recordResponses {
     my $next = $opts{next};
     my $testCount = $opts{testCount};
     my $what = $opts{what};
+    my $tags = $opts{tags};
     
     $rJSON->recordResponses($responses);
 
@@ -369,27 +380,50 @@ sub _recordResponses {
     my $nextAddress = $surveyOrder->[$nextResponse];
     my $nextSection = $rJSON->survey->section($nextAddress);
     my $nextQuestion = $rJSON->survey->question($nextAddress);
-    
     # Get the lowest section surveyOrderIndex from lookup
     my $got;
     my $svar = $nextSection->{variable};
     my $qvar = $nextQuestion->{variable};
     if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
-        $got = "$svar (<-- a section)";
-        $got .= " and $qvar (<-- a question)" if $qvar;
+        $got = "'$svar' (<-- a section)";
+        $got .= " and '$qvar' (<-- a question)" if $qvar;
     } elsif ($qvar) {
-        $got = "$qvar (<-- a question)";
+        $got = "'$qvar' (<-- a question)";
     } else {
         $got = 'Unknown!';
     }
-    
     my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
     if ($nextResponse != $expectedNextResponse) {
         return fail($testCount, $what, <<END_WHY);
 Compared next section/question
    got : $got
-expect : $next
+expect : '$next'
 END_WHY
+    }
+    # Check tags, if asked
+    if ($tags && ref $tags eq 'ARRAY') {
+        my $currentTags = $rJSON->tags;
+        for my $tag (@$tags) {
+            my ($tagKey, $tagValue);
+            if (ref $tag eq 'HASH') {
+                ($tagKey, $tagValue) = @$tag; # individual tag spec only has one key and one value
+            } else {
+                ($tagKey, $tagValue) = ($tag, 1); # defaults to 1 (boolean truth flag)
+            }
+            if (!exists $currentTags->{$tagKey}) {
+                 $self->session->log->debug("Tag not found: $tagKey");
+                return fail($testCount, $what, "Tag not found: $tagKey");
+            }
+            my $currentTagValue = $currentTags->{$tagKey};
+            if ($currentTagValue != $tagValue) {
+                $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
+                return fail($testCount, $what, <<END_WHY);
+Compared tag '$tagKey'
+   got : '$currentTagValue'
+expect : '$tagValue'
+END_WHY
+            }
+        }
     }
     
     return pass($testCount, $what);

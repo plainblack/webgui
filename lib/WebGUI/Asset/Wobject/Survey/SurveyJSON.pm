@@ -651,8 +651,8 @@ sub update {
             $newQuestion = 1; # make note that a new question was created
             push @{ $self->questions($address) }, $object;
         }
-        # We need to update all of the answers to reflect the new questionType
-        if ( $properties->{questionType} ne $object->{questionType} ) {
+        # If questionType supplied, see if we need to update all of the answers to reflect the new questionType
+        if ( $properties->{questionType} && $properties->{questionType} ne $object->{questionType} ) {
             $self->updateQuestionAnswers( $address, $properties->{questionType} );
         }
     }
@@ -957,6 +957,11 @@ sub newAnswer {
 
 Remove all existing answers and add a default set of answers to a question, based on question type.
 
+N.B. You probably don't want to call this method directly to update a question's questionType, as it
+doesn't actually change the stored value of questionType. Instead, call:
+
+ $surveyJSON->update( $address, { questionType => "some question type" } );
+
 =head3 $address
 
 See L<"Address Parameter">. Determines question to add answers to.
@@ -1032,7 +1037,8 @@ sub getMultiChoiceBundle {
     my $self = shift;
     my ($type) = validate_pos( @_, { type => SCALAR | UNDEF } );
 
-    return $self->{multipleChoiceTypes}->{$type};
+    # Return a cloned copy of the bundle structure
+    return clone $self->{multipleChoiceTypes}->{$type};
 }
 
 =head2 addAnswersToQuestion ($address, $answers)
