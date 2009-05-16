@@ -21,6 +21,24 @@ our $I18N = {
 		context => q|Hover help for bundle name.|
 	},
 
+	'File Pump' => {
+		message => q|File Pump|,
+		lastUpdated => 1242439269,
+		context => q|File Pump is a system for pushing out lots of files at once.|
+	},
+
+	'add a bundle' => {
+		message => q|Add a Bundle|,
+		lastUpdated => 1242439269,
+		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
+	},
+
+	'Edit Bundle' => {
+		message => q|Edit Bundle|,
+		lastUpdated => 1242439269,
+		context => q|Admin console label.  Bundle is a loose set of similar, but not identical objects.  Similar to pile.|
+	},
+
 };
 
 1;

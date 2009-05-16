@@ -7,6 +7,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Pluggable;
 use WebGUI::Utility;
+use WebGUI::FilePump::Bundle;
 
 =head1 NAME
 
@@ -108,13 +109,12 @@ sub www_editBundle {
     $form->dynamicForm([WebGUI::FilePump::Bundle->crud_definition($session)], 'properties', $bundle);
 	$form->submit;
 
-	my $i18n = WebGUI::International->new($session, 'PassiveAnalytics');
-	my $ac   = WebGUI::AdminConsole->new($session,'passiveAnalytics');
-	$ac->addSubmenuItem($session->url->page("op=passiveAnalytics;func=editRuleflow"), $i18n->get("manage ruleset"));
-    if ($ruleId eq 'new') {
-        $rule->delete;
+	my $i18n = WebGUI::International->new($session, 'FilePump');
+	my $ac   = WebGUI::AdminConsole->new($session,'filePump');
+    if ($bundleId eq 'new') {
+        $bundle->delete;
     }
-	return $ac->render($error.$form->print,$i18n->get('Edit Rule'));
+	return $ac->render($error.$form->print,$i18n->get('Edit Bundle'));
 }
 
 #-------------------------------------------------------------------
@@ -169,9 +169,22 @@ A WebGUI session object.
 sub www_manage {
     my $session = shift;
     return $session->privilege->insufficient() unless canView($session);
-    my $ac = WebGUI::AdminConsole->new($session,'passiveAnalytics');
+    my $i18n   = WebGUI::International->new($session, 'FilePump');
+    my $error  = shift;
+    my $rows   = '';
+    my $getABundle = WebGUI::FilePump::Bundle->getAllIterator($session,{ orderBy => 'bundleName' } );
+    while (my $bundle = $getABundle->()) {
+        $rows .= sprintf '<tr><td>&nbsp;</td><td>%s</td>', $bundle->get('bundleName');
+    }
+    my $output = sprintf <<EOHTML, $i18n->get('bundle name');
+<table border="1">
+<tr><th>&nbsp;</th><th>%s</th></tr>
+%s
+</table>
+EOHTML
+    my $ac = WebGUI::AdminConsole->new($session,'filePump');
     $ac->addSubmenuItem($session->url->page('op=filePump;func=add'), $i18n->get('add a bundle'));
-    return $ac->render($error.$f->print.$addmenu.$steps, 'Passive Analytics');
+    return $ac->render($error.$output, 'File Pump');
 }
 
 
