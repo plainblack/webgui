@@ -232,6 +232,7 @@ sub body {
 	my $self = shift;
 	my $value = shift;
     if ( !defined $value ) {
+        return if !$self->{body};
         return keys %{ $self->{body} } if wantarray;
         return { %{ $self->{body} } };
     }
