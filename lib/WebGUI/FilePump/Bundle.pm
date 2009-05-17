@@ -8,6 +8,7 @@ use Path::Class;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 use LWP;
+use Data::Dumper;
 
 #-------------------------------------------------------------------
 
@@ -484,8 +485,8 @@ sub fetchHttp {
         return {};
     }
     my $guts = {
-        lastModified => $response->header('lastModified'),
-        content      => $response->content(),
+        content      => $response->content,
+        lastModified => $response->header('last-modified'),
     };
     return $guts;
 }
