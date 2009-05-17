@@ -9,6 +9,7 @@
  - fixed SMS i18n for the user profile fields.
  - added Google Maps asset
  - added a way for authors to prevent debugging output on page requests
+ - added --noprompt option to testEnvironment.pl to automatically install modules
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates
