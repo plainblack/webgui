@@ -7,6 +7,8 @@
  - Added user create, update, and delete web services ( HD Publishing )
  - Added Survey web test suite for validating expression/branching logic
  - fixed SMS i18n for the user profile fields.
+ - added Google Maps asset
+ - added a way for authors to prevent debugging output on page requests
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates
