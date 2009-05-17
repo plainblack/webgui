@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 56;
+my $tests = 57;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -71,6 +71,7 @@ SKIP: {
         q{jump { if (value(n) == 5) { 1 } else { 0 } } target},                # if statement
         q{jump { $q2 = 3; $avg = (value(n) + $q2) / 2; $avg == 4 } target},    # look ma, averages!
         q{jump { $q2 = 3; avg(value(n), $q2) == 4 } target},                   # look ma, built-in avg sub!
+        q{jump { round(3.456) == 3 && round(3.456, 2) == 3.46 } target},       # rounding
         q{jump { value(n) == 5 } target; jump { value(n) == 5 } targetX},      # first jump wins
         q{jump { value(n) == 0 } targetX; jump { value(n) == 5 } target},      # false jumps ignored
         q{jump { min(3,5,2) == 2 } target},                                    # List::Util min

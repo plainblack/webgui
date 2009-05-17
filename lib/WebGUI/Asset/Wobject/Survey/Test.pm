@@ -148,6 +148,7 @@ sub run {
     for my $item (@$spec) {
         $self->_resetResponses($rJSON);
         $rJSON->lastResponse(-1);
+        my $name = $item->{name};
         if (my $args = $item->{test} ) {
             push @tap, $self->_test( { 
                 responseJSON => $rJSON, 
@@ -155,6 +156,7 @@ sub run {
                 surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
+                name => $name,
             } );
         } 
         elsif (my $args = $item->{test_mc} ) {
@@ -164,6 +166,17 @@ sub run {
                 surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
+                name => $name,
+            } );
+        } 
+        elsif (my $args = $item->{sequence} ) {
+            push @tap, $self->_sequence( { 
+                responseJSON => $rJSON, 
+                surveyOrder =>  $surveyOrder,
+                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
+                args => $args,
+                testCount_ref => \$testCount,
+                name => $name,
             } );
         } 
         else {
@@ -206,6 +219,7 @@ sub _test {
         surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => HASHREF },
+        name => 0,
     });
     
     # assemble the top-level ingredients..
@@ -213,12 +227,14 @@ sub _test {
     my $surveyOrder = $opts{surveyOrder};
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
+    my $name = $opts{name};
     my $testCount = ++${$opts{testCount_ref}};
     
     # ..and the test-specific arguments
-    my ($next, $tags, $setup ) = @{$args}{qw(next tags setup)};
+    my ($next, $tagged, $score, $setup ) = @{$args}{qw(next tagged score setup)};
     delete $args->{next};
-    delete $args->{tags};
+    delete $args->{tagged};
+    delete $args->{score};
     delete $args->{setup};
     # n.b. everything left in %args assumed to be variable => answer_spec
     
@@ -255,7 +271,13 @@ sub _test {
         elsif ( $questionType eq 'Text' || $questionType eq 'Number' ) {
             # Assume spec is raw value to record in the single answer
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
-        } 
+        } elsif ( $questionType eq 'Year Month' ) {
+            if ($spec !~ m/\d{4} \w+/) {
+                return fail($testCount, "Invalid input for Year Month question type", "Got: $spec\nExpected: YYYY Month");
+            }
+            $self->session->log->debug("Recording Year Month value: $spec");
+            $responses->{"$address->[0]-$address->[1]-0"} = $spec;
+        }
         else {
             # Assume spec is the raw text of the answer we want
             my $answer;
@@ -282,10 +304,13 @@ sub _test {
     
     my $pageSection = $rJSON->survey->section($surveyOrder->[$lowestIndex]);
     my $pageQuestion = $rJSON->survey->question($surveyOrder->[$lowestIndex]);
-    my $what = "Page containing Section $pageSection->{variable}";
-    $what .= " Question $pageQuestion->{variable}" if $pageQuestion;
-    $what .= " jumps to $next" if $next;
-    $what .= " and tags data" if $tags;
+    if (!$name) {
+        $name = "Checking ";
+        my %what = ( next => $next, tagged => $tagged, score => $score );
+        $name .= join ' and ', (grep {$what{$_}} qw(next tagged score));
+        $name .= " on page containing Section $pageSection->{variable}";
+        $name .= " Question $pageQuestion->{variable}" if $pageQuestion;
+    }
     
     return $self->_recordResponses( { 
         responseJSON => $rJSON, 
@@ -293,9 +318,10 @@ sub _test {
         surveyOrder => $surveyOrder,
         surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
         next => $next,
-        tags => $tags,
+        tagged => $tagged,
+        score => $score,
         testCount => $testCount,
-        what => $what,
+        name => $name,
     });
 }
 
@@ -316,6 +342,7 @@ sub _test_mc {
         surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => ARRAYREF },
+        name => 0,
     });
     
     # assemble the top-level ingredients..
@@ -348,9 +375,9 @@ sub _test_mc {
         my $responses = {};
         my $testCount = ++${$opts{testCount_ref}};
         
-        my ($next, $tags);
+        my ($next, $tagged, $score);
         if (ref $spec eq 'HASH') {
-            ($next, $tags) = @{$spec}{qw(next tags)};
+            ($next, $tagged, $score) = @{$spec}{qw(next tagged score)};
         } else {
             $next = $spec;
         }
@@ -359,10 +386,17 @@ sub _test_mc {
         my $answer = $answers->[$aIndex];
         my $recordedAnswer = $answer->{recordedAnswer};
         $responses->{$answerAddress} = $recordedAnswer;
-        
-        my $what = "$variable mc answer " . ($aIndex + 1);
-        $what .= " jumps to $next" if $next;
-        $what .= " and tags correct" if $tags;
+
+        my $name = $opts{name}; # get this fresh for every subtest
+        if ($name) {
+            # Add some extra diagnostic text since single test_mc generates multiple sub-tests
+            $name .= " mc answer "  . ($aIndex + 1);
+        } else {
+            $name = "Checking ";
+            my %what = ( next => $next, tagged => $tagged, score => $score );
+            $name .= join ' and ', (grep {$what{$_}} qw(next tagged score));
+            $name .= " for $variable mc answer " . ($aIndex + 1);
+        }
         
         $self->session->log->debug("Recording answer for mc question $variable at index $aIndex ($answerAddress) => $recordedAnswer");
         push @tap, $self->_recordResponses( { 
@@ -372,13 +406,87 @@ sub _test_mc {
             surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
             next => $next,
             testCount => $testCount,
-            what => $what,
-            tags => $tags,
+            name => $name,
+            tagged => $tagged,
+            score => $score,
         });
         
         $aIndex++;
     }
     return @tap;
+}
+
+=head2 _test
+
+Private sub. Triggered when a test spec requests "sequence".
+
+=cut
+
+sub _sequence {
+    my $self = shift;
+    my %opts = validate(@_, { 
+        responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
+        surveyOrder => { type => ARRAYREF },
+        surveyOrderIndexByVariableName => { type => HASHREF },
+        testCount_ref => { type => SCALARREF },
+        args => { type => HASHREF },
+        name => 0,
+    });
+    
+    # assemble the top-level ingredients..
+    my $rJSON = $opts{responseJSON};
+    my $surveyOrder = $opts{surveyOrder};
+    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
+    my $args = $opts{args};
+    my $name = $opts{name};
+    my $testCount = ++${$opts{testCount_ref}};
+    
+    # n.b. everything in %args assumed to be variable => spec
+    
+    while ( my ( $variable, $spec ) = each %$args ) {
+        my $index = $surveyOrderIndexByVariableName->{$variable};
+        my $address = $surveyOrder->[$index];
+        my $question = $rJSON->survey->question($address);
+        my $questionType = $question->{questionType};
+        
+        # Iterate over all answers
+        my ($recordedAnswer, $score);
+        my $recordedAnswerDelta 
+            = $spec->{recordedAnswer} =~ m/desc/  ? -1 
+            : $spec->{recordedAnswer} =~ m/asc/   ?  1 
+            : $spec->{recordedAnswer} =~ m/cons/  ?  0
+            : undef;
+        
+        my $scoreDelta 
+            = $spec->{score} =~ m/desc/          ? -1 
+            : $spec->{score} =~ m/asc/           ?  1 
+            : $spec->{score} =~ m/cons/          ?  0
+            : undef;
+        
+        my $aNum = 0;
+        for my $a (@{$question->{answers}}) {
+            $aNum++;
+            
+            if (defined $recordedAnswerDelta && defined $recordedAnswer) {
+                my $expect = $recordedAnswer + $recordedAnswerDelta;
+                if ( $expect != $a->{recordedAnswer}) {
+                    return fail($testCount, "$variable answer index $aNum recordedAnswer not in sequence", "Got: $a->{recordedAnswer}\nExpected: $expect");
+                }
+            }
+            
+            if (defined $scoreDelta && defined $score) {
+                my $expect = $score + $scoreDelta;
+                if ( $expect != $a->{value}) {
+                    return fail($testCount, "$variable answer index $aNum score not in sequence",  "Got: $a->{value}\nExpected: $expect");
+                }
+            }
+            
+            $recordedAnswer = $a->{recordedAnswer};
+            $score = $a->{value};
+        }
+    }
+    
+    return pass($testCount, "Valid sequences");
 }
 
 =head2 _recordResponses
@@ -396,8 +504,9 @@ sub _recordResponses {
         surveyOrderIndexByVariableName => { type => HASHREF },
         next => 1,
         testCount => 1,
-        what => 0,
-        tags => 0,
+        name => 0,
+        tagged => 0,
+        score => 0,
     });
     
     # assemble the top-level ingredients..
@@ -407,8 +516,9 @@ sub _recordResponses {
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $next = $opts{next};
     my $testCount = $opts{testCount};
-    my $what = $opts{what};
-    my $tags = $opts{tags};
+    my $name = $opts{name};
+    my $tagged = $opts{tagged};
+    my $score = $opts{score};
     
     $rJSON->recordResponses($responses);
 
@@ -431,30 +541,33 @@ sub _recordResponses {
     }
     my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
     if ($nextResponse != $expectedNextResponse) {
-        return fail($testCount, $what, <<END_WHY);
+        return fail($testCount, $name, <<END_WHY);
 Compared next section/question
    got : $got
 expect : '$next'
 END_WHY
     }
-    # Check tags, if asked
-    if ($tags && ref $tags eq 'ARRAY') {
+    
+    # Check tagged, if asked
+    
+    # Since tags are often boolean flags, allow them to optionally be specified as an array
+    if ($tagged && ref $tagged eq 'ARRAY') {
         my $currentTags = $rJSON->tags;
-        for my $tag (@$tags) {
+        for my $tag (@$tagged) {
             my ($tagKey, $tagValue);
             if (ref $tag eq 'HASH') {
-                ($tagKey, $tagValue) = @$tag; # individual tag spec only has one key and one value
+                ($tagKey, $tagValue) = %$tag; # individual tag spec only has one key and one value
             } else {
                 ($tagKey, $tagValue) = ($tag, 1); # defaults to 1 (boolean truth flag)
             }
             if (!exists $currentTags->{$tagKey}) {
                  $self->session->log->debug("Tag not found: $tagKey");
-                return fail($testCount, $what, "Tag not found: $tagKey");
+                return fail($testCount, $name, "Tag not found: $tagKey");
             }
             my $currentTagValue = $currentTags->{$tagKey};
             if ($currentTagValue != $tagValue) {
                 $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
-                return fail($testCount, $what, <<END_WHY);
+                return fail($testCount, $name, <<END_WHY);
 Compared tag '$tagKey'
    got : '$currentTagValue'
 expect : '$tagValue'
@@ -463,12 +576,44 @@ END_WHY
         }
     }
     
-    return pass($testCount, $what);
+    # Alternatively, tags can be a hash
+    if ($tagged && ref $tagged eq 'HASH') {
+        my $currentTags = $rJSON->tags;
+        while (my ($tagKey, $tagValue) = each %$tagged) {
+            my $currentTagValue = $currentTags->{$tagKey};
+            if ($currentTagValue != $tagValue) {
+                $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
+                return fail($testCount, $name, <<END_WHY);
+Compared tag '$tagKey'
+   got : '$currentTagValue'
+expect : '$tagValue'
+END_WHY
+            }
+        }
+    }
+    
+    # Check score, if asked
+    if ($score && ref $score eq 'HASH') {
+        my $currentScores = $rJSON->responseScoresByVariableName;
+        while (my ($scoreKey, $scoreValue) = each %$score) {
+            my $currentScore = $currentScores->{$scoreKey};
+            if ($currentScore != $scoreValue) {
+                $self->session->log->debug("Incorrect score: $currentScore != $scoreValue");
+                return fail($testCount, $name, <<END_WHY);
+Compared score '$scoreKey'
+   got : '$currentScore'
+expect : '$scoreValue'
+END_WHY
+            }
+        }
+    }
+    
+    return pass($testCount, $name);
 }
 
 sub pass {
-    my ($testCount, $what, $extra) = @_;
-    my $out = $what ? "ok $testCount - $what" : "ok $testCount";
+    my ($testCount, $name, $extra) = @_;
+    my $out = $name ? "ok $testCount - $name" : "ok $testCount";
     if ($extra) {
         $extra =~ s/^/# /gm;
         $out .= "\n$extra";
@@ -477,8 +622,8 @@ sub pass {
 }
 
 sub fail {
-    my ($testCount, $what, $extra) = @_;
-    my $out = $what ? "not ok $testCount - $what" : "not ok $testCount";
+    my ($testCount, $name, $extra) = @_;
+    my $out = $name ? "not ok $testCount - $name" : "not ok $testCount";
     if ($extra) {
         chomp($extra);
         $extra =~ s/^/# /gm;

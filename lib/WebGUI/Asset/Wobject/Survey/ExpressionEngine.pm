@@ -349,6 +349,18 @@ sub avg {
     return sum(@vals) / @vals;
 }
 
+=head2 round
+
+Utility sub shared with Safe compartment to allows expressions to easily round numbers
+
+=cut
+
+sub round {
+    my ($number, $precision) = @_;
+    $precision ||= 0;
+    return sprintf("%.${precision}f", $number);
+}
+
 =head2 run ( $session, $expression, $opts )
 
 Class method.
@@ -451,6 +463,7 @@ sub run {
         $compartment->share('&exitUrl');
         $compartment->share('&restart');
         $compartment->share('&avg');
+        $compartment->share('&round');
 
         # Give them all of List::Util too
         $compartment->share_from( 'List::Util',
