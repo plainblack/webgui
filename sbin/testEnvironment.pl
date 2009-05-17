@@ -25,11 +25,12 @@ use Pod::Usage;
 use Cwd ();
 
 
-my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help);
+my ($os, $prereq, $dbi, $dbDrivers, $simpleReport, $help, $noprompt);
 
 GetOptions(
+    'noprompt' => \$noprompt,
 	'simpleReport'=>\$simpleReport,
-	'help'=>\$help
+	'help'=>\$help,
 );
 
 pod2usage( verbose => 2 ) if $help;
@@ -130,6 +131,7 @@ checkModule('Business::Tax::VAT::Validation', '0.20'     );
 checkModule('Crypt::SSLeay',                '0.57'       );
 checkModule('Scope::Guard',                 '0.03'       );
 checkModule('Digest::SHA',                  '5.47'       );
+checkModule('Catalyst', );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
@@ -249,8 +251,13 @@ sub checkModule {
 
             # if we're an admin let's offer to install it
             elsif (isRootRequirementMet()) {
-                my $installThisModule = prompt ("$currentVersion is installed, but we need at least "
-                    ."$version, do you want to upgrade it now?", "y", "y", "n");
+                
+                my $installThisModule = defined $noprompt ? "y" : "n";
+                if ( $installThisModule eq "n" ) {
+                    $installThisModule 
+                        = prompt ("$currentVersion is installed, but we need at least "
+                        . "$version, do you want to upgrade it now?", "y", "y", "n");
+                }
 
                 # does the user wish to install it
                 if ($installThisModule eq "y") {
@@ -287,7 +294,13 @@ sub checkModule {
 
         # if we're root lets try and install it
 		elsif (  isRootRequirementMet()) {
-            my $installThisModule = prompt ("Not installed, do you want to install it now?", "y", "y", "n");
+            my $installThisModule = defined $noprompt ? "y" : "n";
+            if ( $installThisModule eq "n" ) {
+                $installThisModule 
+                    = prompt ("Not installed, do you want to install it now?", 
+                        "y", "y", "n"
+                    );
+            }
 
             # user wishes to upgrade
             if ($installThisModule eq "y") {
