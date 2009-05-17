@@ -16,7 +16,7 @@ package WebGUI::Asset::MapPoint;
 
 use strict;
 use Tie::IxHash;
-use base 'WebGUI::AssetAspect::Installable','WebGUI::Asset';
+use base 'WebGUI::Asset';
 use WebGUI::Utility;
 
 # To get an installer for your wobject, add the Installable AssetAspect
@@ -63,86 +63,84 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, "Asset_MapPoint" );
     tie my %properties, 'Tie::IxHash', (
-        latitude    => {
+        latitude => {
             tab         => "properties",
             fieldType   => "float",
-            label       => $i18n->echo("Latitude"),
-            hoverHelp   => $i18n->echo("The latitude of the point"),
-            noFormPost  => 1,
+            label       => $i18n->get("latitude label"),
+            hoverHelp   => $i18n->get("latitude description"),
         },
-        longitude   => {
+        longitude => {
             tab         => "properties",
             fieldType   => "float",
-            label       => $i18n->echo("Longitude"),
-            hoverHelp   => $i18n->echo("The longitude of the point"),
-            noFormPost  => 1,
+            label       => $i18n->get("longitude label"),
+            hoverHelp   => $i18n->get("longitude description"),
         },
-        website     => {
+        website => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("Website"),
-            hoverHelp   => $i18n->echo("The URL to the location's website"),
+            label       => $i18n->get("website label"),
+            hoverHelp   => $i18n->get("website description"),
         },
-        address1    => {
+        address1 => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("Address 1"),
-            hoverHelp   => $i18n->echo("The first line of the address"),
+            label       => $i18n->get("address1 label"),
+            hoverHelp   => $i18n->get("address1 description"),
         },
-        address2    => {
+        address2 => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("Address 2"),
-            hoverHelp   => $i18n->echo("The second line of the address"),
+            label       => $i18n->get("address2 label"),
+            hoverHelp   => $i18n->get("address2 description"),
         },
-        city        => {
+        city => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("City"),
-            hoverHelp   => $i18n->echo("The city the point is located in"),
+            label       => $i18n->get("city label"),
+            hoverHelp   => $i18n->get("city description"),
         },
-        state       => {
+        state => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("State/Province"),
-            hoverHelp   => $i18n->echo("The state/provice the point is located in"),
+            label       => $i18n->get("state label"),
+            hoverHelp   => $i18n->get("state description"),
         },
-        zipCode     => {
+        zipCode => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("Zip/Postal Code"),
-            hoverHelp   => $i18n->echo("The zip/postal code the point is located in"),
+            label       => $i18n->get("zipCode label"),
+            hoverHelp   => $i18n->get("zipCode description"),
         },
-        country     => {
+        country => {
             tab         => "properties",
             fieldType   => "country",
-            label       => $i18n->echo("Country"),
-            hoverHelp   => $i18n->echo("The country the point is located in"),
+            label       => $i18n->get("country label"),
+            hoverHelp   => $i18n->get("country description"),
         },
-        phone       => {
+        phone => {
             tab         => "properties",
             fieldType   => "phone",
-            label       => $i18n->echo("Phone"),
-            hoverHelp   => $i18n->echo("The phone number of the location"),
+            label       => $i18n->get("phone label"),
+            hoverHelp   => $i18n->get("phone description"),
         },
-        fax         => {
+        fax => {
             tab         => "properties",
             fieldType   => "phone",
-            label       => $i18n->echo("Fax"),
-            hoverHelp   => $i18n->echo("The fax number of the location"),
+            label       => $i18n->get("fax label"),
+            hoverHelp   => $i18n->get("fax description"),
         },
-        email       => {
+        email => {
             tab         => "properties",
             fieldType   => "email",
-            label       => $i18n->echo("E-mail"),
-            hoverHelp   => $i18n->echo("The e-mail address of the location"),
+            label       => $i18n->get("email label"),
+            hoverHelp   => $i18n->get("email description"),
         },
-        storageIdPhoto       => {
+        storageIdPhoto => {
             tab             => "properties",
             fieldType       => "image",
             forceImageOnly  => 1,
-            label           => $i18n->echo("Photo"),
-            hoverHelp       => $i18n->echo("A photo of the location"),
+            label           => $i18n->get("storageIdPhoto label"),
+            hoverHelp       => $i18n->get("storageIdPhoto description"),
             noFormPost      => 1,
         },
         userDefined1 => {
@@ -186,6 +184,19 @@ sub canEdit {
     my $userId  = shift || $self->session->user->userId;
     return 1 if $userId eq $self->get('ownerUserId');
     return $self->SUPER::canEdit( $userId );
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAutoCommitWorkflowId ( )
+
+Get the workflowId to commit this MapPoint
+
+=cut
+
+sub getAutoCommitWorkflowId {
+    my ( $self ) = @_;
+    return $self->getParent->get('workflowIdPoint');
 }
 
 #-------------------------------------------------------------------
@@ -274,6 +285,14 @@ sub getTemplateVarsEditForm {
             value   => $self->getId,
             defaultValue => 'new',
         } )
+        . WebGUI::Form::hidden( $session, {
+            name    => 'latitude',
+            value   => $self->get('latitude'),
+        } )
+        . WebGUI::Form::hidden( $session, {
+            name    => 'longitude',
+            value   => $self->get('longitude'),
+        } )
         ;
     $var->{ form_footer } = WebGUI::Form::formFooter( $session );
 
@@ -346,9 +365,7 @@ sub processAjaxEditForm {
     $self->update( $prop );
 
     # Photo magic
-    $session->log->info("BEEP!");
     if ( $form->get('storageIdPhoto') ) {
-        $session->log->info("BOOP!");
         my $storage;
         if ( $self->get('storageIdPhoto') ) {
             $storage = WebGUI::Storage->get( $session, $self->get('storageIdPhoto') );

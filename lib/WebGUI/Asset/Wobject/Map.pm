@@ -16,7 +16,7 @@ use strict;
 use Tie::IxHash;
 use WebGUI::International;
 use WebGUI::Utility;
-use base 'WebGUI::AssetAspect::Installable','WebGUI::Asset::Wobject';
+use base 'WebGUI::Asset::Wobject';
 
 # To get an installer for your wobject, add the Installable AssetAspect
 # See WebGUI::AssetAspect::Installable and sbin/installClass.pl for more
@@ -36,47 +36,52 @@ sub definition {
     my $definition = shift;
     my $i18n       = WebGUI::International->new( $session, 'Asset_Map' );
 
+    my $googleApiKeyUrl = 'http://code.google.com/apis/maps/signup.html';
+    my $googleApiKeyLink
+        = q{<a href="%s" onclick="window.open('%s'); return false;">%s</a>};
+    
     tie my %properties, 'Tie::IxHash', (
         groupIdAddPoint => {
             tab         => "security",
             fieldType   => "group",
-            label       => $i18n->echo("Group to Add Points"),
-            hoverHelp   => $i18n->echo("Group that is allowed to add points to the map"),
+            label       => $i18n->get("groupIdAddPoint label"),
+            hoverHelp   => $i18n->get("groupIdAddPoint description"),
+            defaultValue=> '2', # Registered users
         },
         mapApiKey       => {
             tab         => "properties",
             fieldType   => "text",
-            label       => $i18n->echo("Google Maps API Key"),
-            hoverHelp   => $i18n->echo("The generated Google Maps API key for this site"),
+            label       => $i18n->get("mapApiKey label"),
+            hoverHelp   => $i18n->get("mapApiKey description"),
             defaultValue=> $class->getDefaultApiKey($session),
-            subtext     => $i18n->echo(q{<a href="http://code.google.com/apis/maps/signup.html" onclick="window.open('http://code.google.com/apis/maps/signup.html');return false">Get your Google Maps API key</a>}),
+            subtext     => sprintf($googleApiKeyLink, ($googleApiKeyUrl)x2, $i18n->get('mapApiKey link') ),
         },
         mapHeight       => {
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->echo("Map Height"),
-            hoverHelp   => $i18n->echo("The height of the generated map"),
+            label       => $i18n->get("mapHeight label"),
+            hoverHelp   => $i18n->get("mapHeight description"),
             defaultValue    => '400px',
         },
         mapWidth       => {
             tab         => "display",
             fieldType   => "text",
-            label       => $i18n->echo("Map Width"),
-            hoverHelp   => $i18n->echo("The width of the generated map"),
+            label       => $i18n->get("mapWidth label"),
+            hoverHelp   => $i18n->get("mapWidth description"),
             defaultValue    => '100%',
         },
         startLatitude   => {
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->echo("Starting Latitude"),
-            hoverHelp   => $i18n->echo("Latitude of the default starting point of the map"),
+            label       => $i18n->get("startLatitude label"),
+            hoverHelp   => $i18n->get("startLatitude description"),
             defaultValue    => 43.074719,
         },
         startLongitude  => {
             tab         => "display",
             fieldType   => "float",
-            label       => $i18n->echo("Starting Longitude"),
-            hoverHelp   => $i18n->echo("Longitude of the default starting point of the map"),
+            label       => $i18n->get("startLongitude label"),
+            hoverHelp   => $i18n->get("startLongitude description"),
             defaultValue    => -89.384251,
         },
         startZoom       => {
@@ -84,35 +89,36 @@ sub definition {
             fieldType   => "intSlider",
             minimum     => 1,
             maximum     => 19,
-            label       => $i18n->echo("Starting Zoom Level"),
-            hoverHelp   => $i18n->echo("Zoom level of the default starting point of the map"),
+            label       => $i18n->get("startZoom label"),
+            hoverHelp   => $i18n->get("startZoom description"),
         },
         templateIdEditPoint => {
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/Edit",
-            label       => $i18n->echo("Template to Edit Map Point"),
-            hoverHelp   => $i18n->echo("Template to edit a map point."),
+            label       => $i18n->get("templateIdEditPoint label"),
+            hoverHelp   => $i18n->get("templateIdEditPoint description"),
         },
         templateIdView  => {
             tab         => "display",
             fieldType   => "template",
             namespace   => "Map/View",
-            label       => $i18n->echo("Template to View"),
-            hoverHelp   => $i18n->echo("Template to view the map"),
+            label       => $i18n->get("templateIdView label"),
+            hoverHelp   => $i18n->get("templateIdView description"),
         },
         templateIdViewPoint => {
             tab         => "display",
             fieldType   => "template",
             namespace   => "MapPoint/View",
-            label       => $i18n->echo("Template to View Map Point"),
-            hoverHelp   => $i18n->echo("Template to view a map point. Will pop-up a box inside the map."),
+            label       => $i18n->get("templateIdViewPoint label"),
+            hoverHelp   => $i18n->get("templateIdViewPoint description"),
         },
         workflowIdPoint => {
             tab         => "security",
             fieldType   => "workflow",
-            label       => $i18n->echo("Workflow for Adding Points"),
-            hoverHelp   => $i18n->echo("Commit workflow for adding points"),
+            label       => $i18n->get("workflowIdPoint label"),
+            hoverHelp   => $i18n->get("workflowIdPoint description"),
+            type        => 'WebGUI::VersionTag',
         },
     );
     push @{$definition}, {
@@ -211,8 +217,7 @@ sub getDefaultApiKey {
     my $session     = shift;
 
     # Get the API key used in other Maps on the site
-    eval {
-        # Map may not exist yet!
+    eval { # Map may not exist yet!
         my $defaultApiKey   = $session->db->quickScalar(
             "SELECT mapApiKey FROM Map LIMIT 1"
         );
@@ -313,7 +318,7 @@ ENDHTML
     $style->setScript($url->extras('yui/build/yahoo-dom-event/yahoo-dom-event.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/connection/connection-min.js'),{type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/json/json-min.js'),{type=>'text/javascript'});
-    $style->setScript($url->extras('map/map.js'),{type=>'text/javascript'});
+    $style->setScript($url->extras('yui-webgui/build/map/map.js'),{type=>'text/javascript'});
 
     return;
 }
@@ -429,14 +434,14 @@ ENDHTML
     # Button to add a map point
     $var->{ button_addPoint }
         = WebGUI::Form::Button( $session, {
-            value       => $i18n->echo("Add Point"),
+            value       => $i18n->get("add point label"),
             id          => sprintf( 'addPoint_%s', $self->getId ),
         } );
 
     # Button to set the map's default view
     $var->{ button_setCenter }
         = WebGUI::Form::Button( $session, {
-            value       => $i18n->echo("Set Default Viewing Area"),
+            value       => $i18n->get("set default viewing area label"),
             id          => sprintf( 'setCenter_%s', $self->getId ),
         } );
 
@@ -454,14 +459,15 @@ Immediately remove a point from the map.
 sub www_ajaxDeletePoint {
     my ( $self ) = @_;
     my $session = $self->session;
-    my $assetId = $self->session->form->get('assetId');
+    my $i18n    = WebGUI::International->new( $session, 'Asset_Map' );
+    my $assetId = $session->form->get('assetId');
     my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-    $self->session->http->setMimeType('application/json');
-    return JSON->new->encode({error => 'You are not allowed to remove this point'})
+    $session->http->setMimeType('application/json');
+    return JSON->new->encode({error => $i18n->get('error delete unauthorized')})
         unless $asset && $asset->canEdit;
 
     $asset->purge;
-    return JSON->new->encode({message => 'Point deleted'});
+    return JSON->new->encode({message => $i18n->get('message delete success')});
 }
 
 #-------------------------------------------------------------------
@@ -489,6 +495,7 @@ sub www_ajaxEditPoint {
     
     my $output  = $self->getEditPointTemplate->process( $asset->getTemplateVarsEditForm );
     WebGUI::Macro::process( $session, \$output );
+    $session->log->preventDebugOutput;
     return $output;
 }
 
@@ -504,13 +511,15 @@ sub www_ajaxEditPointSave {
     my $self        = shift;
     my $session     = $self->session;
     my $form        = $self->session->form;
+    my $i18n        = WebGUI::International->new( $session, 'Asset_Map' );
 
-    $session->http->setMimeType("text/html");
+    $session->http->setMimeType("text/html"); 
+    $session->log->preventDebugOutput;
 
     my $assetId     = $form->get('assetId');
     my $asset;
     if ( $assetId eq "new" ) {
-        return JSON->new->encode({message => "Error"})
+        return JSON->new->encode({message => $i18n->get("error add unauthorized")})
             unless $self->canAddPoint;
 
         $asset  = $self->addChild( {
@@ -519,11 +528,17 @@ sub www_ajaxEditPointSave {
     }
     else {
         $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
-        return JSON->new->encode({message => "Error"})
+        return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
             unless $asset && $asset->canEdit;
+        $asset  = $asset->addRevision;
     }
     
     my $errors  = $asset->processAjaxEditForm;
+
+    # Commit!
+    if ($asset->getAutoCommitWorkflowId && $self->hasBeenCommitted) {
+        $asset->requestAutoCommit;
+    }
 
     return JSON->new->encode($asset->getMapInfo);
 }
@@ -544,7 +559,7 @@ sub www_ajaxSetCenter {
 
     $session->http->setMimeType("application/json");
 
-    return JSON->new->encode({message => $i18n->echo("No permissions")})
+    return JSON->new->encode({message => $i18n->get("error set center unauthorized")})
         unless $self->canEdit;
 
     $self->update({
@@ -553,7 +568,7 @@ sub www_ajaxSetCenter {
         startZoom       => $form->get("startZoom"),
     });
 
-    return JSON->new->encode({message => $i18n->echo("Success!")});
+    return JSON->new->encode({message => $i18n->get("message set center success")});
 }
 
 #-------------------------------------------------------------------
@@ -574,12 +589,14 @@ sub www_ajaxSetPointLocation {
     
     my $assetId = $form->get('assetId');
     my $asset   = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+    return JSON->new->encode({message => $i18n->get("error edit unauthorized")})
+        unless $asset && $asset->canEdit;
     $asset->update( {
         latitude    => $form->get('latitude'),
         longitude   => $form->get('longitude'),
     } );
 
-    return JSON->new->encode( {message => $i18n->echo("Success!")} ); 
+    return JSON->new->encode( {message => $i18n->get("message set point location")} ); 
 }
 
 1;

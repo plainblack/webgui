@@ -1,4 +1,3 @@
-
 // Initialize namespace
 if (typeof WebGUI == "undefined") {
     var WebGUI = {};
@@ -53,6 +52,7 @@ WebGUI.Map.editPoint
     // Callback should open the window with the form
     var callback    = function (text, code) {
         marker.openInfoWindowHtml( text );
+
         GEvent.addListener( marker, "infowindowbeforeclose", function () {
             WebGUI.Map.editPointSave( map, mgr, mapUrl, marker );
         });
@@ -71,26 +71,40 @@ WebGUI.Map.editPointSave
     var iwin    = map.getInfoWindow();
     var form    = iwin.getContentContainers()[0].getElementsByTagName('form')[0];
     
+    // Add the lat/long to the form
+    var lat = marker.getLatLng().lat();
+    var lng = marker.getLatLng().lng();
+    form.elements['latitude'].value = lat;
+    form.elements['longitude'].value = lng;
+
     // Make ajax request
     var callback = {
         upload: function (o) {
             // Update marker info
-            console.log(o.responseText);
             var point   = YAHOO.lang.JSON.parse( o.responseText );
+            marker.assetId  = point.assetId;
             GEvent.clearListeners( marker, "click" );
             GEvent.clearListeners( marker, "infowindowbeforeclose" );
+
+            // Set the marker's title
+            marker.kh.title = point.title;
+            // I hate the google maps API.
 
             var infoWin = document.createElement( "div" );
             infoWin.innerHTML       = point.content;
             marker.infoWin          = infoWin;
+
             if ( point.canEdit ) {
+                var divButton    = document.createElement('div');
+                infoWin.appendChild( divButton );
+
                 var editButton      = document.createElement("input");
                 editButton.type     = "button";
                 editButton.value    = "Edit";
                 GEvent.addDomListener( editButton, "click", function () {
                     WebGUI.Map.editPoint( map, mgr, mapUrl, marker );
                 } );
-                infoWin.appendChild( editButton );
+                divButton.appendChild( editButton );
 
                 var deleteButton    = document.createElement("input");
                 deleteButton.type   = "button";
@@ -103,14 +117,9 @@ WebGUI.Map.editPointSave
                 divButton.appendChild( deleteButton );
             }
             marker.bindInfoWindow( infoWin );
-
-            // Make sure the point has a Lat/Lng in case the user doesn't
-            // move it after initially creating it.
-            if ( marker.assetId == "new" ) {
-                marker.assetId  = point.assetId;
-                WebGUI.Map.setPointLocation( marker, marker.getLatLng(), mapUrl );
-            }
-            marker.assetId  = point.assetId;
+            GEvent.addListener( marker, "dragend", function (latlng) {
+                WebGUI.Map.setPointLocation( marker, latlng, mapUrl );
+            } );
         }
     };
     // In case our form does not have a file upload in it
@@ -127,10 +136,10 @@ WebGUI.Map.editPointSave
 WebGUI.Map.focusOn
 = function ( assetId ) {
     var marker  = WebGUI.Map.markers[assetId];
-    var map	= marker.map;
-    var infoWin	= marker.infoWin;
+    var map     = marker.map;
+    var infoWin = marker.infoWin;
     if ( map.getZoom() < 5 ) {
-	map.setZoom(6);
+        map.setZoom(6);
     }
     map.panTo( marker.getLatLng() );
     marker.openInfoWindow( marker.infoWin );

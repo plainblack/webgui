@@ -35,6 +35,7 @@ alterVATNumberTable( $session );
 addRedirectAfterLoginUrlToSettings( $session );
 addSurveyTestResultsTemplateColumn( $session );
 fixSMSUserProfileI18N($session);
+addMapAsset( $session );
 
 finish($session); # this line required
 
@@ -104,7 +105,67 @@ sub addSurveyTestResultsTemplateColumn {
     $session->db->write("alter table Survey add column `testResultsTemplateId` char(22)");
 
     print "Done\n" unless $quiet;
+}
 
+#----------------------------------------------------------------------------
+# Add the map asset
+sub addMapAsset {
+    my $session = shift;
+    print "\tAdding Google Map asset..." unless $quiet;
+    
+    # Map asset
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS Map (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    groupIdAddPoint CHAR(22) BINARY,
+    mapApiKey TEXT,
+    mapHeight CHAR(12),
+    mapWidth CHAR(12),
+    startLatitude FLOAT,
+    startLongitude FLOAT,
+    startZoom TINYINT UNSIGNED,
+    templateIdEditPoint CHAR(22) BINARY,
+    templateIdView CHAR(22) BINARY,
+    templateIdViewPoint CHAR(22) BINARY,
+    workflowIdPoint CHAR(22) BINARY,
+    PRIMARY KEY (assetId, revisionDate)
+);
+ENDSQL
+
+    # MapPoint asset
+    $session->db->write(<<'ENDSQL');
+CREATE TABLE IF NOT EXISTS MapPoint (
+    assetId CHAR(22) BINARY NOT NULL,
+    revisionDate BIGINT NOT NULL,
+    latitude FLOAT,
+    longitude FLOAT,
+    website VARCHAR(255),
+    address1 VARCHAR(255),
+    address2 VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(255),
+    zipCode VARCHAR(255),
+    country VARCHAR(255),
+    phone VARCHAR(255),
+    fax VARCHAR(255),
+    email VARCHAR(255),
+    storageIdPhoto CHAR(22) BINARY,
+    userDefined1 TEXT,
+    userDefined2 TEXT,
+    userDefined3 TEXT,
+    userDefined4 TEXT,
+    userDefined5 TEXT,
+    PRIMARY KEY (assetId, revisionDate)
+);
+ENDSQL
+
+    # Add to assets
+    $session->config->addToHash( "assets", 'WebGUI::Asset::Wobject::Map', {
+       "category" => "basic",
+    });
+
+    print "Done!\n" unless $quiet;
 }
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

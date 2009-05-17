@@ -642,6 +642,9 @@
    },
    "WebGUI::Asset::Template" : {
       "category" : "utilities"
+   },
+   'WebGUI::Asset::Wobject::Map' : {
+       "category" : "basic"
    }
 },
 
