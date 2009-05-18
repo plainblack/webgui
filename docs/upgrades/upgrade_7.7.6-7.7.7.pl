@@ -140,6 +140,9 @@ sub installFilePumpHandler {
             push @{ $newHandlers }, $handler;
         }
     }
+    else {
+        $newHandlers = $handlers;
+    }
     $session->config->set('contentHandlers', $newHandlers);
 
     ##Admin Console
