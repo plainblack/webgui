@@ -23,6 +23,7 @@ use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
 use WebGUI::FilePump::Bundle;
+use WebGUI::Utility;
 
 my $toVersion = '7.7.7';
 my $quiet; # this line required
@@ -128,8 +129,18 @@ sub installFilePumpHandler {
     print "\tAdding FilePump content handler... \n" unless $quiet;
     ##Content Handler
     my $contentHandlers = $session->config->get('contentHandlers');
-    $session->config->addToArray('contentHandlers', 'WebGUI::Content::FilePump');
     $session->config->addToHash( 'macros',          { FilePump => 'FilePump' });
+    my $handlers    = $session->config->get('contentHandlers');
+    my $newHandlers = [];
+    if (!isIn('WebGUI::Content::FilePump', @{ $handlers })) {
+        foreach my $handler (@{ $handlers }) {
+            if ($handler eq 'WebGUI::Content::Operation') {
+                push @{ $newHandlers }, 'WebGUI::Content::FilePump';
+            }
+            push @{ $newHandlers }, $handler;
+        }
+    }
+    $session->config->set('contentHandlers', $newHandlers);
 
     ##Admin Console
     $session->config->addToHash('adminConsole', 'filePump', {
