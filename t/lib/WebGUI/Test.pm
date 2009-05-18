@@ -396,22 +396,6 @@ sub webguiBirthday {
 
 #----------------------------------------------------------------------------
 
-=head2 webguiBirthday ( )
-
-This constant is used in several tests, so it's reproduced here so it can
-be found easy.  This is the epoch date when WebGUI was released.
-
-=cut
-
-sub webguiBirthday {
-    return 997966800 ;
-}
-
-
-
-
-#----------------------------------------------------------------------------
-
 =head2 originalConfig ( $param )
 
 Stores the original data from the config file, to be restored
