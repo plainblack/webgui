@@ -255,7 +255,7 @@ EOTABLE
     my $dt       = $session->datetime;
     my $url      = $session->url;
     my $lastModifiedi18n = $i18n->get('last modified');
-    foreach my $fileType (qw/jsFiles cssFiles/) {
+    foreach my $fileType (qw/jsFiles cssFiles otherFiles/) {
         my $type = $fileType eq 'jsFiles'  ? 'JS'
                  : $fileType eq 'cssFiles' ? 'CSS'
                  : 'OTHER';

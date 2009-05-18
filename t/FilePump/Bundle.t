@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  46;         # Increment this number for each test you create
+my  $tests =  50;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -334,18 +334,26 @@ $fileAsset->update({filename => 'pumpfile.css'});
 
 $bundle->addFile('JS',  'asset://filePumpSnippet');
 $bundle->addFile('CSS', 'asset://filePumpFileAsset');
+$bundle->addFile('OTHER', 'file:'.WebGUI::Test->getTestCollateralPath('gooey.jpg'));
 my ($buildFlag, $error) = $bundle->build();
 ok($buildFlag, 'build returns true when there are no errors');
+diag $error unless $buildFlag;
 isnt($bundle->get('lastBuild'), $wgBday, '... lastBuild time updated');
 
 my $buildDir = $bundle->getPathClassDir();
 isnt($buildDir->stringify, $oldBuildDir->stringify, '... build directory did actually change');
 ok(-e $buildDir->stringify     &&  -d _, '... new build directory created');
 ok(!-e $oldBuildDir->stringify && !-d _, '... old build directory deleted');
-my $jsFile  = $buildDir->file($bundle->bundleUrl . '.js');
-my $cssFile = $buildDir->file($bundle->bundleUrl . '.css');
-ok(-e $jsFile->stringify  && -f _ && -s _, '... minified JS file built, not empty');
-ok(-e $cssFile->stringify && -f _ && -s _, '... minified CSS file built, not empty');
+my $jsFile    = $buildDir->file($bundle->bundleUrl . '.js');
+my $cssFile   = $buildDir->file($bundle->bundleUrl . '.css');
+my $otherFile = $buildDir->file('gooey.jpg');
+ok(-e $jsFile->stringify    && -f _ && -s _, '... minified JS file built, not empty');
+ok(-e $cssFile->stringify   && -f _ && -s _, '... minified CSS file built, not empty');
+ok(-e $otherFile->stringify && -f _ && -s _, '... other file copied over, not empty');
+
+ok($bundle->get('jsFiles')->[0]->{lastModified},    '... updated JS file lastModified');
+ok($bundle->get('cssFiles')->[0]->{lastModified},   '... updated CSS file lastModified');
+ok($bundle->get('otherFiles')->[0]->{lastModified}, '... updated OTHER file lastModified');
 
 ###################################################################
 #
@@ -354,7 +362,7 @@ ok(-e $cssFile->stringify && -f _ && -s _, '... minified CSS file built, not emp
 ###################################################################
 
 $bundle->delete;
-ok(!-e $buildDir->stringify && !-d _, 'delete deletes the current build directory deleted');
+ok(!-e $buildDir->stringify, 'delete deletes the current build directory');
 
 }
 

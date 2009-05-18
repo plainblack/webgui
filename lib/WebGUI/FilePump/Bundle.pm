@@ -5,6 +5,7 @@ use WebGUI::International;
 use WebGUI::Utility;
 use URI;
 use Path::Class;
+use File::Basename;
 use CSS::Minifier::XS;
 use JavaScript::Minifier::XS;
 use LWP;
@@ -126,6 +127,36 @@ sub build {
         return (0, $errorMessages);
     }
 
+    ##Copy files over
+    my $otherFiles = $self->get('otherFiles');
+    my $i18n = WebGUI::International->new($self->session, 'FilePump');
+    OTHERFILE: foreach my $file (@{ $otherFiles }) {
+        my $uri     = $file->{uri};
+        my $results = $self->fetch($uri);
+        if (! $results->{content}) {
+            $error = $uri;
+            last OTHERFILE;
+        }
+        $file->{lastModified} = $results->{lastModified};
+        my $uriPath = URI->new($uri)->opaque;
+        $uriPath =~ tr{/}{/}s;
+        my $filename = basename($uriPath);
+        my $newFile = $newDir->file($filename);
+        if (-e $newFile->stringify) {
+            $error = join ' ', $uri, $i18n->get('duplicate file');
+            last OTHERFILE;
+        }
+        my $fh = $newFile->open('>');
+        $fh->binmode;
+        print $fh $results->{content};
+        close $fh;
+    }
+
+    if ($error) {
+        $newDir->rmtree;
+        return (0, $error);
+    }
+
     ##Minimize files, and write them out.
 
     my $minimizedJS  =  JavaScript::Minifier::XS::minify($concatenatedJS);
@@ -147,9 +178,10 @@ sub build {
     ##Delete the old build directory and update myself with the new data.
     $self->deleteBuild();
     $self->update({
-        jsFiles   => $jsFiles,
-        cssFiles  => $cssFiles,
-        lastBuild => $newBuild,
+        jsFiles     => $jsFiles,
+        cssFiles    => $cssFiles,
+        otherFiles  => $otherFiles,
+        lastBuild   => $newBuild,
     });
     return 1;
 }

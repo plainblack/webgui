@@ -70,6 +70,12 @@ our $I18N = {
 		context => q|Edit bundle label.|
 	},
 
+	'otherFiles' => {
+		message => q|CSS Images|,
+		lastUpdated => 1242681632,
+		context => q|Edit bundle label.|
+	},
+
 	'build this bundle' => {
 		message => q|Build this bundle|,
 		lastUpdated => 1242495011,
@@ -92,6 +98,12 @@ our $I18N = {
 		message => q|Not yet|,
 		lastUpdated => 1242515308,
 		context => q|Meaning that something has not been done at this time.  Before the first time.|
+	},
+
+	'duplicate file' => {
+		message => q|A file with the same name already exists in the build directory.|,
+		lastUpdated => 1242515308,
+		context => q|Error message when building a new bundle.|
 	},
 
 };
