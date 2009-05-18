@@ -514,6 +514,7 @@ sub definition {
         groupIdAdminCache
         groupIdAdminCron
         groupIdAdminDatabaseLink
+        groupIdAdminFilePump
         groupIdAdminGraphics
         groupIdAdminGroup
         groupIdAdminGroupAdmin

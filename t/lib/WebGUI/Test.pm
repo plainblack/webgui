@@ -56,6 +56,7 @@ my @groupsToDelete;
 my @usersToDelete;
 my @sessionsToDelete;
 my @storagesToDelete;
+my @tagsToRollback;
 
 BEGIN {
 
@@ -163,6 +164,9 @@ END {
     SESSION: foreach my $session (@sessionsToDelete) {
         $session->var->end;
         $session->close;
+    }
+    foreach my $tag (@tagsToRollback) {
+        $tag->rollback;
     }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
@@ -390,6 +394,20 @@ sub webguiBirthday {
     return 997966800 ;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 webguiBirthday ( )
+
+This constant is used in several tests, so it's reproduced here so it can
+be found easy.  This is the epoch date when WebGUI was released.
+
+=cut
+
+sub webguiBirthday {
+    return 997966800 ;
+}
+
+
 
 
 #----------------------------------------------------------------------------
@@ -457,6 +475,21 @@ This is a class method.
 sub sessionsToDelete {
     my $class = shift;
     push @sessionsToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 tagsToRollback ( $tag )
+
+Push a list of version tags to rollback at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub tagsToRollback {
+    my $class = shift;
+    push @tagsToRollback, @_;
 }
 
 #----------------------------------------------------------------------------

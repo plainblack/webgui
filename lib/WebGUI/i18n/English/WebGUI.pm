@@ -3818,6 +3818,15 @@ LongTruncOk=1</p>
         lastUpdated => 0,
     },
 
+    'settings groupIdAdminFilePump label' => {
+        message     => q{File Pump},
+        lastUpdated => 0,
+    },
+    'settings groupIdAdminFilePump hoverHelp' => {
+        message     => q{Group to access and manage File Pump bundles.},
+        lastUpdated => 0,
+    },
+
 
     'settings groupIdAdminGroupAdmin label' => {
         message     => q{Groups (limited)},

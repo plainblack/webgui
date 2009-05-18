@@ -22,7 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
-
+use WebGUI::FilePump::Bundle;
 
 my $toVersion = '7.7.7';
 my $quiet; # this line required
@@ -36,6 +36,9 @@ addRedirectAfterLoginUrlToSettings( $session );
 addSurveyTestResultsTemplateColumn( $session );
 fixSMSUserProfileI18N($session);
 addMapAsset( $session );
+installFilePumpHandler($session);
+installFilePumpTable($session);
+installFilePumpAdminGroup($session);
 
 finish($session); # this line required
 
@@ -106,6 +109,48 @@ sub addSurveyTestResultsTemplateColumn {
 
     print "Done\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub installFilePumpAdminGroup {
+    my $session = shift;
+    print "\tAdding FilePump admin group setting... \n" unless $quiet;
+    ##Content Handler
+    #if (! $session->setting->has('groupIdAdminFilePump')) {
+        $session->setting->add('groupIdAdminFilePump','8');
+        print "\tAdded FilePump admin group ... \n" unless $quiet;
+    #}
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub installFilePumpHandler {
+    my $session = shift;
+    print "\tAdding FilePump content handler... \n" unless $quiet;
+    ##Content Handler
+    my $contentHandlers = $session->config->get('contentHandlers');
+    $session->config->addToArray('contentHandlers', 'WebGUI::Content::FilePump');
+    $session->config->addToHash( 'macros',          { FilePump => 'FilePump' });
+
+    ##Admin Console
+    $session->config->addToHash('adminConsole', 'filePump', {
+      "icon" => "filePump.png",
+      "groupSetting" => "groupIdAdminFilePump",
+      "uiLevel" => 5,
+      "url" => "^PageUrl(\"\",op=filePump);",
+      "title" => "^International(File Pump,FilePump);"
+    });
+    ##Setting for custom group
+    print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub installFilePumpTable {
+    my $session = shift;
+    print "\tAdding FilePump database table via CRUD... \n" unless $quiet;
+    WebGUI::FilePump::Bundle->crud_createTable($session);
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 # Add the map asset
