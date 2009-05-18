@@ -957,6 +957,7 @@
     "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Account",
     "WebGUI::Content::AssetHistory",
+    "WebGUI::Content::FilePump",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
