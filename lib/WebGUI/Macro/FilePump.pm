@@ -12,6 +12,7 @@ package WebGUI::Macro::FilePump;
 
 use strict;
 use WebGUI::FilePump::Bundle;
+use Path::Class;
 
 =head1 NAME
 
@@ -59,39 +60,59 @@ sub process {
     });
     return '' unless $bundleId and $bundleId->[0];
 
-    my $bundle = WebGUI::FilePump::Bundle->new($session, $bundleId);
+    my $bundle = WebGUI::FilePump::Bundle->new($session, $bundleId->[0]);
     return '' unless $bundle;
+    my $uploadsDir = Path::Class::Dir->new($session->config->get('uploadsPath'));
+    my $uploadsUrl = Path::Class::Dir->new($session->config->get('uploadsURL'));
 
+    ##Normal mode
     if (! $session->var->isAdminOn) {
-        my $dir = $bundle->getPathClassDir;
+        my $dir = $bundle->getPathClassDir->relative($uploadsDir);
         if ($type eq 'js' || $type eq 'javascript') {
-            my $file = $dir->file($bundle->bundleUrl . '.js');
-            return sprintf qq|<script type="type/javascript" src="%s">\n|, $file->stringify;
+            my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.js');
+            return sprintf qq|<script type="text/javascript" src="%s">\n|, $file->stringify;
         }
         elsif ($type eq 'css') {
-            my $file = $dir->file($bundle->bundleUrl . '.css');
-            return sprintf qq|<link rel="stylesheet" type="type/css" href="%s">\n|, $file->stringify;
+            my $file = $uploadsUrl->file($dir, $bundle->bundleUrl . '.css');
+            return sprintf qq|<link rel="stylesheet" type="text/css" href="%s">\n|, $file->stringify;
         }
         else {
             return '';
         }
     }
+    ##Admin/Design mode
     else {
         my $template;
         my $files;
         if ($type eq 'js' || $type eq 'javascript') {
-            $template = qq|<script type="type/javascript" src="%s">\n|;
+            $template = qq|<script type="text/javascript" src="%s">\n|;
             $files    = $bundle->get('jsFiles');
         }
         elsif ($type eq 'css') {
-            $template = qq|<link rel="stylesheet" type="type/css" href="%s">\n|;
+            $template = qq|<link rel="stylesheet" type="text/css" href="%s">\n|;
             $files    = $bundle->get('cssFiles');
         }
         else {
             return '';
         }
         foreach my $file (@{ $files }) {
-            $output .= sprintf $template, $file->{uri};
+            my $uri    = URI->new($file->{uri});
+            my $scheme = $uri->scheme;
+            my $url = '';
+            if ($scheme eq 'asset') {
+                $url = $uri->opaque;
+            }
+            elsif ($scheme eq 'file') {
+                my $file           = Path::Class::File->new($uri->path);
+                my $uploadsRelFile = $file->relative($uploadsDir);
+                $url               = $uploadsUrl->file($uploadsRelFile)->stringify;
+
+            }
+            elsif ($scheme eq 'http' or $scheme eq 'https') {
+                $url = $uri->as_string;
+            }
+            $url =~ tr{/}{/}s;
+            $output .= sprintf $template, $url;
         }
         return $output;
     }
