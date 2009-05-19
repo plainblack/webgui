@@ -155,7 +155,8 @@ sub run {
         $self->_resetResponses($rJSON);
         $rJSON->lastResponse(-1);
         my $name = $item->{name};
-        if (my $args = $item->{test} ) {
+        my $args;
+        if ($args = $item->{test} ) {
             push @tap, $self->_test( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
@@ -165,7 +166,7 @@ sub run {
                 name => $name,
             } );
         } 
-        elsif (my $args = $item->{test_mc} ) {
+        elsif ($args = $item->{test_mc} ) {
             push @tap, $self->_test_mc( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
@@ -175,7 +176,7 @@ sub run {
                 name => $name,
             } );
         } 
-        elsif (my $args = $item->{sequence} ) {
+        elsif ($args = $item->{sequence} ) {
             push @tap, $self->_sequence( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
