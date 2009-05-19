@@ -448,6 +448,7 @@ sub run {
 
         # Create the Safe compartment
         my $compartment = Safe->new();
+        $compartment->permit(qw(sort));
 
         # Share our utility subs with the compartment
         $compartment->share('&value');

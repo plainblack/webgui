@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 57;
+my $tests = 58;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -80,7 +80,8 @@ SKIP: {
         q{jump { answered(n) && !answered(X) } target},                        # answered() works
         q{jump { value(multi) eq 'answer1, answer2' } target},                 # multi-answer question stringifies in scalar context
         q{jump { (value(multi))[1] eq 'answer2' } target},                     # multi-answer question returns list in list context
-        q{ sub mySub { return $_[0] + 2 } jump { mySub(1) == 3 } target }      # expressions can define and use subs
+        q{ sub mySub { return $_[0] + 2 } jump { mySub(1) == 3 } target },     # expressions can define and use subs
+        q{ jump { (sort { $a <=> $b } ( 5, 4, 3, 2 ))[1] == 3 } target },      # sorting allowed
     );
 
     my @should_not_jump = (
