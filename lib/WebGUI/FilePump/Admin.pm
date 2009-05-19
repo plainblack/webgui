@@ -103,6 +103,8 @@ Processes the form to add a file to a bundle.
 
 Form variables used:
 
+=over 4
+
 =item uri
 
 The URI to add.
@@ -114,6 +116,8 @@ The type of file to add.
 =item bundleId
 
 The GUID of the bundle to add a file to.
+
+=back
 
 =cut
 
