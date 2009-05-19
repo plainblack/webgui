@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 52;
+plan tests => 67;
 
 my ( $s, $t1 );
 
@@ -125,9 +125,49 @@ cmp_deeply(
 $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );
 my $spec;
 
+# No tests
+$spec = <<END_SPEC;
+[ ]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..0
+
+END_TAP
+
+# Empty defn
+$spec = <<END_SPEC;
+[ {} ]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..0
+Bail Out! Invalid test definition
+END_TAP
+
+# Rubbish defn
+$spec = <<END_SPEC;
+[ { blah: 1 } ]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..0
+Bail Out! Invalid test definition
+END_TAP
+
 ######
 # test
 ######
+
+# No tests
+$spec = <<END_SPEC;
+[
+    {
+       "test" : { }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
+1..1
+not ok 1 - Nothing to do
+END_TAP
 
 # Both answers for S0Q0 jump to the next item, which can be referred to as either S1 or S1Q0
 $spec = <<END_SPEC;
@@ -274,15 +314,15 @@ try_it( $t1, $spec, { tap => <<END_TAP } );
 ok 1 - Checking next and tagged on page containing Section S0 Question S0Q0
 END_TAP
 
-# Use setup..
+# Use page..
 $spec = <<END_SPEC;
 [
     {
        "test" : {
-           "setup" : { "S0Q0" : "Yes" }, # S0Q0 tagged 'tagged at S0Q0'
+           "page" : { "S0Q0" : "Yes" }, # S0Q0 tagged 'tagged at S0Q0'
             "S1Q0" : "No",               
             "next" : "S2",
-            "tagged" : [ "tagged at S0Q0" ],  # tagged by setup step
+            "tagged" : [ "tagged at S0Q0" ],  # tagged by page step
        }
     },
 ]
@@ -292,20 +332,20 @@ try_it( $t1, $spec, { tap => <<END_TAP } );
 ok 1 - Checking next and tagged on page containing Section S1 Question S1Q0
 END_TAP
 
-# Use nested setup..
+# Use nested page..
 $spec = <<END_SPEC;
 [
     {
        "test" : {
-           "setup" : { 
-               "setup" : { 
+           "page" : { 
+               "page" : { 
                    "S0Q0" : "Yes"            # tagged 'tagged at S0Q0'
                },
                "S1Q0" : "No",                # tagged 'tagged at S1Q0' with value 999
             }, 
             "S2Q0" : null,
             "next" : "S3",
-            "tagged" : [ "tagged at S0Q0", { "tagged at S1Q0" : 999 }, ],  # tagged by setup step
+            "tagged" : [ "tagged at S0Q0", { "tagged at S1Q0" : 999 }, ],  # tagged by page step
        }
     },
 ]
@@ -332,6 +372,24 @@ END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..1
 ok 1 - Checking next and score on page containing Section S3 Question S3Q0
+END_TAP
+
+# Use the setup option
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S1Q0"  : "n",  # sets a tag of its own
+            "setup" : { tag: [ "my test tag", { "my data tag": 1.5 } ] },
+            "page" : { S0Q0: "y" }, # make sure this doesn't get overwritten
+            "tagged" : [ 'tagged at S0Q0', { 'tagged at S1Q0' : 999 }, "my test tag", { "my data tag": 1.5 } ],
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Checking tagged on page containing Section S1 Question S1Q0
 END_TAP
 
 #########

@@ -1085,6 +1085,7 @@ sub nextQuestions {
 
     # Collect all the questions to be shown on the next page..
     my @questions;
+    QUESTION:
     for my $i (1 .. $questionsPerPage ) {
         my $address = $self->surveyOrder->[ $self->lastResponse + $i ];
         last if(! defined $address);
@@ -1112,17 +1113,55 @@ sub nextQuestions {
 
         # Rebuild the list of anwers with a safe copy
         delete $questionCopy{answers};
-        for my $aIndex ( aIndexes($address) ) {
-            my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
+        
+        if ($questionCopy{questionType} eq 'Tagged') {
+            if (!$questionCopy{variable}) {
+                $self->session->log->warn("Unable to build Tagged question, question variable must be defined");
+                next QUESTION;
+            }
+            
+            my $tags = $self->tags;
+            my $taggedAnswers = $tags->{"$questionCopy{variable}_TAGGED_ANSWERS"};
+            if (!$taggedAnswers || ref $taggedAnswers ne 'ARRAY') {
+                $self->session->log->warn("Unable to build Tagged question, $questionCopy{variable}_TAGGED_ANSWERS is invalid");
+                next QUESTION;
+            }
+            
+            my $aIndex = 0;
+            for my $taggedAnswer (@$taggedAnswers) {
+                
+                if (!$taggedAnswer || ref $taggedAnswer ne 'HASH') {
+                    $self->session->log->warn("Unable to build Tagged question, one or more answers definitions invalid");
+                    next QUESTION;
+                }
+                
+                # Tagged data overrides answer defaults
+                my %answerCopy = (%{$self->survey->newAnswer()}, %$taggedAnswer);
+                
+                # Do text replacement
+                $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
 
-            # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
+                # Add any extra fields we want..
+                $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+                
+                push @{ $questionCopy{answers} }, \%answerCopy;
+                
+                $aIndex++;
+            }
+        } else {
+            for my $aIndex ( aIndexes($address) ) {
+                my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
-            # Add any extra fields we want..
-            $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+                # Do text replacement
+                $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
 
-            push @{ $questionCopy{answers} }, \%answerCopy;
+                # Add any extra fields we want..
+                $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+
+                push @{ $questionCopy{answers} }, \%answerCopy;
+            }
         }
+        
         push @questions, \%questionCopy;
     }
     return @questions;

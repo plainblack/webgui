@@ -4,7 +4,7 @@ use strict;
 use base qw/WebGUI::Crud/;
 use WebGUI::International;
 use Test::Deep::NoTest;
-use JSON;
+use JSON::PP;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -81,9 +81,13 @@ sub crud_definition {
         syntax       => 'js',
         defaultValue => <<END_SPEC,
 [
-    {
-        test: {},
+{
+    "name": "My Test",
+    "test": {
+        "variable1": "yes",
+        "next": "section2",
     },
+},
 ]
 END_SPEC
     };
@@ -107,13 +111,15 @@ sub run {
     my $spec = $self->get('test') 
         or return { tap => "Bail Out! Test spec undefined" };
     
+    # Use JSON::PP rather than JSON::XS so that we can use things like allow_barekey
+    my $json = JSON::PP->new->relaxed->allow_barekey->allow_singlequote;
     eval {
-        $spec = from_json($spec, { relaxed => 1 } );
+        $spec = $json->decode($spec); # N.B. This will change to from_json when JSON upgraded to >=2.14
     };
     
     if ($@) {
         my $error = $@;
-        $error =~ s/(.*?) at .*/$1/s;    # don't reveal too much
+#        $error =~ s/(.*?) at .*/$1/s;    # don't reveal too much
         return { tap => "Bail Out! Invalid test spec: $error" };
     }
     
@@ -180,7 +186,7 @@ sub run {
             } );
         } 
         else {
-            push @tap, "Bail Out!";
+            push @tap, "Bail Out! Invalid test definition";
         }
     }
     
@@ -231,24 +237,55 @@ sub _test {
     my $testCount = ++${$opts{testCount_ref}};
     
     # ..and the test-specific arguments
-    my ($next, $tagged, $score, $setup ) = @{$args}{qw(next tagged score setup)};
+    my ($next, $tagged, $score, $page, $setup ) = @{$args}{qw(next tagged score page setup)};
     delete $args->{next};
     delete $args->{tagged};
     delete $args->{score};
+    delete $args->{page};
     delete $args->{setup};
     # n.b. everything left in %args assumed to be variable => answer_spec
     
-    my $fakeTestCount = 0;
-    if ($setup) {
+    if (!$next && !$tagged && !$score && !$page && !$setup && scalar(%$args) == 0 ) {
+        return fail($testCount, "Nothing to do");
+    }
+    
+    if ($page) {
         # Recursively call ourselves (ignoring the returned TAP), so that rJSON gets
-        # updated with responses, simulating the setup spec happening in the past
+        # updated with responses, simulating the page spec happening in the past
+        my $fakeTestCount = 0;
         $self->_test( { 
             responseJSON => $rJSON, 
             surveyOrder => $surveyOrder, 
             surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
             testCount_ref => \$fakeTestCount,
-            args => $setup,
+            args => $page,
         } );
+    }
+    
+    # Setup any fake data the user wants prior to the test
+    if ($setup && ref $setup eq 'HASH') {
+        my %existingTags = %{$rJSON->tags};
+        
+        # Process tags
+        # N.B. Make sure we add to existing tags instead of overwriting
+        if (ref $setup->{tag} eq 'HASH') {
+             # already a hash, so store it right away
+            $rJSON->tags( {%existingTags, %{$setup->{tag}} });
+        } elsif (ref $setup->{tag} eq 'ARRAY') {
+            # turn array into hash before storing it
+            my $tags;
+            for my $tag (@{$setup->{tag}}) {
+                if (ref $tag eq 'HASH') {
+                    # Individual item is a single key/value hash
+                    my ($key, $value) = %$tag;
+                    $tags->{$key} = $value;
+                } else {
+                    # Individual item is a string, default to boolean truth flag
+                    $tags->{$tag} = 1; # default to 1
+                }
+            }
+            $rJSON->tags( {%existingTags, %$tags });
+        }
     }
     
     # Record responses
@@ -300,15 +337,18 @@ sub _test {
         }
     }
     
-    $rJSON->nextResponse($lowestIndex);
+    my ($pageSection, $pageQuestion);
+    if (defined $lowestIndex) {
+        $rJSON->nextResponse($lowestIndex);
+        $pageSection = $rJSON->survey->section($surveyOrder->[$lowestIndex]);
+        $pageQuestion = $rJSON->survey->question($surveyOrder->[$lowestIndex]);
+    }
     
-    my $pageSection = $rJSON->survey->section($surveyOrder->[$lowestIndex]);
-    my $pageQuestion = $rJSON->survey->question($surveyOrder->[$lowestIndex]);
     if (!$name) {
         $name = "Checking ";
         my %what = ( next => $next, tagged => $tagged, score => $score );
         $name .= join ' and ', (grep {$what{$_}} qw(next tagged score));
-        $name .= " on page containing Section $pageSection->{variable}";
+        $name .= " on page containing Section $pageSection->{variable}" if $pageSection;
         $name .= " Question $pageQuestion->{variable}" if $pageQuestion;
     }
     
@@ -502,7 +542,7 @@ sub _recordResponses {
         responses => { type => HASHREF },
         surveyOrder => { type => ARRAYREF },
         surveyOrderIndexByVariableName => { type => HASHREF },
-        next => 1,
+        next => 0,
         testCount => 1,
         name => 0,
         tagged => 0,
@@ -522,30 +562,32 @@ sub _recordResponses {
     
     $rJSON->recordResponses($responses);
 
-    # Check where we end up
-    my $nextResponse = $rJSON->nextResponse;
-    my $nextAddress = $surveyOrder->[$nextResponse];
-    my $nextSection = $rJSON->survey->section($nextAddress);
-    my $nextQuestion = $rJSON->survey->question($nextAddress);
-    # Get the lowest section surveyOrderIndex from lookup
-    my $got;
-    my $svar = $nextSection->{variable};
-    my $qvar = $nextQuestion->{variable};
-    if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
-        $got = "'$svar' (<-- a section)";
-        $got .= " and '$qvar' (<-- a question)" if $qvar;
-    } elsif ($qvar) {
-        $got = "'$qvar' (<-- a question)";
-    } else {
-        $got = 'Unknown!';
-    }
-    my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
-    if ($nextResponse != $expectedNextResponse) {
-        return fail($testCount, $name, <<END_WHY);
+    # Check where we end up, if asked
+    if ($next) {
+        my $nextResponse = $rJSON->nextResponse;
+        my $nextAddress = $surveyOrder->[$nextResponse];
+        my $nextSection = $rJSON->survey->section($nextAddress);
+        my $nextQuestion = $rJSON->survey->question($nextAddress);
+        # Get the lowest section surveyOrderIndex from lookup
+        my $got;
+        my $svar = $nextSection->{variable};
+        my $qvar = $nextQuestion->{variable};
+        if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
+            $got = "'$svar' (<-- a section)";
+            $got .= " and '$qvar' (<-- a question)" if $qvar;
+        } elsif ($qvar) {
+            $got = "'$qvar' (<-- a question)";
+        } else {
+            $got = 'Unknown!';
+        }
+        my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
+        if ($nextResponse != $expectedNextResponse) {
+            return fail($testCount, $name, <<END_WHY);
 Compared next section/question
    got : $got
 expect : '$next'
 END_WHY
+        }
     }
     
     # Check tagged, if asked

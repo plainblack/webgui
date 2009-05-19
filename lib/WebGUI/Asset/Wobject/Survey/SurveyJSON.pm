@@ -128,6 +128,9 @@ sub loadTypes {
     if(! defined $self->{multipleChoiceTypes}){
         my $refs = $self->session->db->buildArrayRefOfHashRefs("SELECT questionType, answers FROM Survey_questionTypes"); 
         map($self->{multipleChoiceTypes}->{$_->{questionType}} = $_->{answers} ? from_json($_->{answers}) : {}, @$refs);
+        
+        # Also add 'Tagged' question type to multipleChoiceTypes hash, since it is treated like the other mc types
+        $self->{multipleChoiceTypes}->{Tagged} = {};
     }
 }
 
@@ -1014,7 +1017,10 @@ sub updateQuestionAnswers {
         push @{ $question->{answers} }, $self->newAnswer();
         $address_copy[2] = 0;
         $self->update( \@address_copy, { 'text', 'Email:' } );
-    }
+    } 
+    elsif ( $type eq 'Tagged' ) {
+        # Tagged question should have no answers created for it
+    } 
     elsif ( my $answerBundle = $self->getMultiChoiceBundle($type) ) {
         # We found a known multi-choice bundle. 
         # Add the bundle of multi-choice answers
@@ -1254,7 +1260,7 @@ sub validateSurvey{
             if(my $error = $self->validateGotoExpression($question,$goodTargets)){
                 push @messages,"Section $sNum Question $qNum has invalid Jump Expression: \"$question->{gotoExpression}\". Error: $error";
             }
-            if($#{$question->{answers}} < 0){
+            if($#{$question->{answers}} < 0 && $question->{questionType} ne 'Tagged'){
                 push @messages,"Section $sNum Question $qNum does not have any answers.";
             }
             if(! $question->{text} =~ /\w/){
