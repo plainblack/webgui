@@ -1,3 +1,5 @@
+7.6.24
+
 7.6.23
  - fixed: tries to reject friend invitations for deleted users
  - New UKplayer slidehow: you can hide the textblock, volume
