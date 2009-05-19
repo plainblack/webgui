@@ -1213,7 +1213,7 @@ sub www_getCompareListData {
             label       =>$listing->get('title').' '.$listing->get('version'),
             formatter   =>"formatColors",
             url         =>$listing->getUrl,
-            lastUpdated =>$session->datetime->epochToHuman( $listing->get('revisonDate'),"%z" ),
+            lastUpdated =>$session->datetime->epochToHuman( $listing->get('lastUpdated'),"%z" ),
         });
         push(@responseFields, $listingId_safe, $listingId_safe."_compareColor");
     }

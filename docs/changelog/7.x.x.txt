@@ -12,6 +12,7 @@
  - added --noprompt option to testEnvironment.pl to automatically install modules
  - added FilePump, a way to reduce Yslow scores by minimizing JS, CSS and the number of files transferred.
  - fixed #10394: CC Purchases Fail When Variants Contain Trailing Zero(s)
+ - fixed #10332: Matrix: last updated fields = today
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates
