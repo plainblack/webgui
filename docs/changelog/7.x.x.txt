@@ -1,4 +1,5 @@
 7.6.23
+ - fixed: tries to reject friend invitations for deleted users
  - New UKplayer slidehow: you can hide the textblock, volume
     slider and mute button, resize the textblock and thumbnails. A new demo
     config is added. See: /extras/ukplayer/slideshow.html (Rogier Voogt, Arjan 

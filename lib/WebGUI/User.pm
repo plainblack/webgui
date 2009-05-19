@@ -334,6 +334,8 @@ sub delete {
 	while (my ($id) = $rs->array) {
         	$db->write("delete from userSessionScratch where sessionId=?",[$id]);
 	}
+    $db->write("delete from friendInvitations where inviterId=?",[$userId]);
+    $db->write("delete from friendInvitations where friendId=?",[$userId]);
     $db->write("delete from userSession where userId=?",[$userId]);
     $db->write("delete from userProfileData where userId=?",[$userId]);
     $db->write("delete from users where userId=?",[$userId]);
