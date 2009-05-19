@@ -107,6 +107,15 @@ sub addMobileStyleTemplate {
         'Profile/MIDP',
         'Smartphone',
         'Symbian ?OS',
+        'J2ME/MIDP',
+        'PalmSource',
+        'PalmOS',
+        'Windows CE',
+        'Opera Mini',
+    ]);
+    print "Done.\n" unless $quiet;
+}
+
 
 #----------------------------------------------------------------------------
 sub addSurveyTestResultsTemplateColumn {
@@ -117,15 +126,6 @@ sub addSurveyTestResultsTemplateColumn {
     print "Done\n" unless $quiet;
 
 }
-        'J2ME/MIDP',
-        'PalmSource',
-        'PalmOS',
-        'Windows CE',
-        'Opera Mini',
-    ]);
-    print "Done.\n" unless $quiet;
-}
-
 #----------------------------------------------------------------------------
 sub addListingsCacheTimeoutToMatrix{
     my $session = shift;
