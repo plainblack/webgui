@@ -161,6 +161,7 @@ SKIP: {
         skip "Cannot test emailOverride: Module Net::SMTP::Server not loaded!", $numtests;
     }
 
+    sleep 1;
     $smtpServerOk = 1;
 
     # Override the emailOverride
