@@ -204,8 +204,7 @@ sub definition {
             },
         lastUpdated => {
             defaultValue    =>time(),
-            autoGenerate    =>0,
-            noFormPost      =>1,
+            fieldType       =>'hidden',
             },
 	);
 	push(@{$definition}, {

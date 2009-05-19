@@ -14,6 +14,7 @@
  - fixed: URLs that shouldn't happen  (#10353)
  - Improved performance for large numbers of asset instantiations
  - fixed #10394: CC Purchases Fail When Variants Contain Trailing Zero(s)
+ - fixed #10332: Matrix: last updated fields = today
 
 7.6.22
  - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
