@@ -142,6 +142,7 @@ END {
     wipeMessages($inbox, $admin);
     $messages = $inbox->getMessagesForUser($admin);
     is(scalar @{$messages}, 0, 'Inbox cleaned up');
+    $session->db->write("delete from mailQueue where message like '%Threshold=10%'");
 }
 
 sub wipeMessages {
