@@ -72,25 +72,25 @@ $post   = WebGUI::Asset->newByDynamicClass( $session, $post->getId );
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 0;
+plan tests => 12;
 
 #----------------------------------------------------------------------------
 # Permissions for posts
 # View
-#$maker->prepare( {
-#    object      => $post,
-#    method      => 'canView',
-#    pass        => [ '1', $user{"2"}, '3', ], 
-#} )->run;
-#
+$maker->prepare( {
+    object      => $post,
+    method      => 'canView',
+    pass        => [ '1', $user{"2"}, '3', ], 
+} )->run;
+
 ## Edit
-#$maker->prepare( {
-#    object      => $post,
-#    method      => 'canEdit',
-#    pass        => [ $user{"2"}, '3', ], 
-#    fail        => [ '1', ], 
-#} )->run;
-#
+$maker->prepare( {
+    object      => $post,
+    method      => 'canEdit',
+    pass        => [ $user{"2"}, '3', ], 
+    fail        => [ '1', ], 
+} )->run;
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
