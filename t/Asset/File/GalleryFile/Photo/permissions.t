@@ -134,4 +134,6 @@ END {
     for my $versionTag ( @versionTags ) {
         $versionTag->rollback;
     }
+    $session->user({userId => 3});
+    $session->user->friends->delete();
 }
