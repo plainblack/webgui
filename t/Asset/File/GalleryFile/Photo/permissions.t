@@ -37,6 +37,7 @@ WebGUI::Friends->new($session)->add( [ $friend->userId ] );
 
 # Add a new registered user
 my $notFriend   = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($friend, $notFriend);
 
 my $gallery
     = $node->addChild({
@@ -132,6 +133,6 @@ END {
     for my $versionTag ( @versionTags ) {
         $versionTag->rollback;
     }
-    $friend->delete;
-    $notFriend->delete;
+    $session->user({userId => 3});
+    $session->user->friends->delete();
 }
