@@ -120,7 +120,7 @@ sub _cdnAdd {
     my $cdnCfg = $self->session->config->get('cdn');
     if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
         if ( $cdnCfg->{'queuePath'} ) {
-            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 close $dest;    # created empty file
@@ -160,7 +160,7 @@ sub _cdnDel {
             unlink $cdnFile;
         }
         if ( $cdnCfg->{'queuePath'} ) {
-            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
             my $dest;
             if ( open $dest, '>', $cdnFile ) {
                 print $dest "deleted\n";
@@ -617,7 +617,7 @@ sub createTemp {
 	my $path    = $session->id->toHex($id);
 
 	$path =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $id, _pathParts => ['temp', $1, $path], _errors => []};
+	my $self = {_session=>$session, _id => $id, _Hexid => $path, _pathParts => ['temp', $1, $path], _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
@@ -690,7 +690,7 @@ sub deleteFromCdn {
         and $cdnCfg->{'enabled'}
         and $cdnCfg->{'syncProgram'} )
     {
-        my $id = $self->session->id->toHex( $self->getId );
+        my $id = $self->getHexId;
         my $cmd = sprintf( $cdnCfg->{'deleteProgram'}, $id );
         if ( $cmd =~ /$id/ ) {    # sanity check, no rm -rf /
             system($cmd);
@@ -698,7 +698,7 @@ sub deleteFromCdn {
                 $self->_addError("Error running CDN deleteProgram: $?");
             }
             if ( $cdnCfg->{'queuePath'} ) {
-                unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+                unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
             }
         }
         else {                    # Presume configuration error, missing %s
@@ -730,7 +730,7 @@ sub get {
     my $id      = shift;
     return undef
         unless $id;
-    my $self = bless {_session=>$session, _id => $id, _errors => []}, $class;
+    my $self = bless {_session=>$session, _id => $id, _hexId => $session->id->toHex($id), _errors => []}, $class;
 
     my $uploadsRoot = $session->config->get('uploadsPath');
     my @parts = ($id =~ m/^((.{2})(.{2}).+)/)[1,2,0];
@@ -739,8 +739,7 @@ sub get {
         return $self;
     }
     if (!-e join('/', $uploadsRoot, @parts)) {
-        my $hexId = $session->id->toHex($id);
-        @parts = ($hexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+        @parts = ($self->getHexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
     }
     $self->{_pathParts} = \@parts;
     # create the folder in case it got deleted somehow
@@ -1047,6 +1046,20 @@ sub getFileId {
 
 #-------------------------------------------------------------------
 
+=head2 getHexId ( )
+
+Returns the unique identifier of this storage location in hexadecimal format
+instead of base64.
+
+=cut
+
+sub getHexId {
+	my $self = shift;
+	return $self->{_hexId};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the unique identifier of this storage location.
@@ -1205,12 +1218,12 @@ sub getUrl {
         {
             if ( $cdnCfg->{'sslUrl'} ) {
                 substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
-                $url = $cdnCfg->{'sslUrl'} . $sep . $self->session->id->toHex( $self->getId );
+                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getHexId;
             }             # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
         }
         else {
             substr( $cdnCfg->{'url'}, -1 ) eq '/' and $sep = '';
-            $url = $cdnCfg->{'url'} . $sep . $self->session->id->toHex( $self->getId );
+            $url = $cdnCfg->{'url'} . $sep . $self->getHexId;
         }
     } ## end if ( $cdnCfg and $cdnCfg...
     if ( defined $file ) {
@@ -1614,13 +1627,13 @@ sub syncToCdn {
         my $originalDir = Cwd::cwd();
         my $locDir = join '/', $self->session->config->get('uploadsPath'), @{ $self->{_pathParts} }[ 0 .. 1 ];
         chdir $locDir or croak 'Unable to chdir to ' . $locDir . " : $!";
-        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->session->id->toHex( $self->getId ) );
+        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getHexId );
         system($cmd);
         if ($?) {
             $self->_addError("Error running CDN syncProgram: $?");
         }
         elsif ( $cdnCfg->{'queuePath'} ) {
-            unlink $cdnCfg->{'queuePath'} . '/' . $self->session->id->toHex( $self->getId );
+            unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
         }
         chdir $originalDir;
         my $dest;

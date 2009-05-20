@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 102; # increment this value for each test you create
+my $numTests = 103; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -142,7 +142,7 @@ undef $storage3;
 
 ####################################################
 #
-# create
+# create, getHexId
 #
 ####################################################
 
@@ -150,6 +150,7 @@ $storage1 = WebGUI::Storage->create($session);
 
 isa_ok( $storage1, "WebGUI::Storage");
 ok($session->id->valid($storage1->getId), 'create returns valid sessionIds');
+is($storage1->getHexId, $session->id->toHex($storage1->getId), 'getHexId, returns the hexadecimal value of the GUID');
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
