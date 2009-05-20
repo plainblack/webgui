@@ -521,10 +521,7 @@ sub recordResponses {
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section   = $self->nextResponseSection();
-    
-    my @questions = $self->nextQuestions();
 
-    #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
     my ($sectionGoto, $questionGoto, $answerGoto, $sectionExpression, $questionExpression, $answerExpression);
 
     # Handle terminal Section..
@@ -543,112 +540,118 @@ sub recordResponses {
         $sectionExpression = $section->{gotoExpression};
     }
 
-    # Handle empty Section..
-    if ( !@questions and !$section->{logical}) {
-        # No questions to process, so increment lastResponse and return
-        $self->lastResponse( $self->nextResponse );
-        return $sTerminal ? { terminal => $terminalUrl} : {};
-    }
+    my $logicalSection = $section->{logical};
 
     # Process Questions in Section..
     my $terminal = 0;
     my $allRequiredQsAnswered = 1;
-    for my $question (@questions) {
-        my $aAnswered = 0;
+    my @questions;
+    
+    if (!$logicalSection) {
+        
+        # N.B. Important that nextQuestions is not called for logicalSetions, since 
+        # logical sections cause this sub to be called from nextQuestions() in the first place!
+        @questions = $self->nextQuestions();
+        
+        for my $question (@questions) {
+            my $aAnswered = 0;
 
-        # Handle terminal Questions..
-        if ( $question->{terminal} ) {
-            $terminal    = 1;
-            $terminalUrl = $question->{terminalUrl};
-        }
-        # ..and also gotos..
-        elsif ( $question->{goto} =~ /\w/ ) {
-            $questionGoto = $question->{goto};
-        }
-        # .. and also gotoExpressions..
-        elsif ( $question->{gotoExpression} =~ /\w/ ) {
-            $questionExpression = $question->{gotoExpression};
-        }
-
-        # Record Question comment
-        $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
-
-        # Process Answers in Question..
-        for my $answer ( @{ $question->{answers} } ) {
-
-            # Pluck the values out of the responses hash that we want to record..
-            my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
-            my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
-            my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
-
-            # Server-side Validation and storing of extra data for special q types goes here
-            
-            if($question->{questionType} eq 'Number'){
-                if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
-                    next;
-                }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
-                    next;
-                }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
-                    next;
-                }
-            } elsif ($question->{questionType} eq 'Year Month'){
-                # store year and month as "YYYY Month"
-                $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
-            } else {
-                if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
-                    $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse") if $submittedAnswerResponse;
-                    next;
-                }
-            }
-            
-            # If we reach here, answer validated ok
-            $aAnswered = 1;
-
-            # Now, decide what to record. For multi-choice questions, use recordedAnswer.
-            # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
-            $self->responses->{ $answer->{id} }->{value}
-                = $knownTypes{ $question->{questionType} }
-                ? $submittedAnswerResponse
-                : $answer->{recordedAnswer};
-            
-            $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
-            $self->responses->{ $answer->{id} }->{time}     = time;
-            $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
-
-            # Handle terminal Answers..
-            if ( $answer->{terminal} ) {
+            # Handle terminal Questions..
+            if ( $question->{terminal} ) {
                 $terminal    = 1;
-                $terminalUrl = $answer->{terminalUrl};
+                $terminalUrl = $question->{terminalUrl};
             }
-
             # ..and also gotos..
-            elsif ( $answer->{goto} =~ /\w/ ) {
-                $answerGoto = $answer->{goto};
+            elsif ( $question->{goto} =~ /\w/ ) {
+                $questionGoto = $question->{goto};
             }
-
             # .. and also gotoExpressions..
-            elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                $answerExpression = $answer->{gotoExpression};
+            elsif ( $question->{gotoExpression} =~ /\w/ ) {
+                $questionExpression = $question->{gotoExpression};
             }
-        }
 
-        # Check if a required Question was skipped 
-        if ( $question->{required} && !$aAnswered  ) {
-            $allRequiredQsAnswered = 0;
-        }
+            # Record Question comment
+            $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
 
-        # If question was answered, increment the questionsAnswered count..
-        if ($aAnswered) {
-            $self->questionsAnswered(+1);
+            # Process Answers in Question..
+            for my $answer ( @{ $question->{answers} } ) {
+
+                # Pluck the values out of the responses hash that we want to record..
+                my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
+                my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
+                my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
+
+                # Server-side Validation and storing of extra data for special q types goes here
+                
+                if($question->{questionType} eq 'Number'){
+                    if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
+                        next;
+                    }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
+                        next;
+                    }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
+                        next;
+                    }
+                } elsif ($question->{questionType} eq 'Year Month'){
+                    # store year and month as "YYYY Month"
+                    $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
+                } else {
+                    if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
+                        $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse") if $submittedAnswerResponse;
+                        next;
+                    }
+                }
+                
+                # If we reach here, answer validated ok
+                $aAnswered = 1;
+
+                # Now, decide what to record. For multi-choice questions, use recordedAnswer.
+                # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
+                $self->responses->{ $answer->{id} }->{value}
+                    = $knownTypes{ $question->{questionType} }
+                    ? $submittedAnswerResponse
+                    : $answer->{recordedAnswer};
+                
+                $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
+                $self->responses->{ $answer->{id} }->{time}     = time;
+                $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
+
+                # Handle terminal Answers..
+                if ( $answer->{terminal} ) {
+                    $terminal    = 1;
+                    $terminalUrl = $answer->{terminalUrl};
+                }
+
+                # ..and also gotos..
+                elsif ( $answer->{goto} =~ /\w/ ) {
+                    $answerGoto = $answer->{goto};
+                }
+
+                # .. and also gotoExpressions..
+                elsif ( $answer->{gotoExpression} =~ /\w/ ) {
+                    $answerExpression = $answer->{gotoExpression};
+                }
+            }
+
+            # Check if a required Question was skipped 
+            if ( $question->{required} && !$aAnswered  ) {
+                $allRequiredQsAnswered = 0;
+            }
+
+            # If question was answered, increment the questionsAnswered count..
+            if ($aAnswered) {
+                $self->questionsAnswered(+1);
+            }
         }
     }
 
     # If all required responses were given, proceed onwards!
-    if ($allRequiredQsAnswered) {
-
+    if ($allRequiredQsAnswered && !$logicalSection) {
+        
         #  Move the lastResponse index to the last question answered
         $self->lastResponse( $self->lastResponse + @questions );
-
+    }
+    
+    if ($allRequiredQsAnswered || $logicalSection) {
         # Process jumps and jump expressions in precedence order of:
         # answer goto, answer expression, question goto, question expression, section..
         
@@ -666,16 +669,18 @@ sub recordResponses {
         if ($action && ref $action eq 'HASH') {
             return $action;
         }
-        
-        # Handle next logic Section..
-        my $section = $self->nextResponseSection();
-        if ( $section and $section->{logical} ) {
-            return $self->recordResponses( {} );
-        }
     }
-    else {
+    
+    if (!$allRequiredQsAnswered) {
         # Required responses were missing, so we don't let the Survey terminate
         $terminal = 0;
+    }
+
+    # Handle special cases down here, after we've given sections a chance for their jump [expressions] to run
+    if ( !@questions || $logicalSection ) {
+        # No questions to be (or should be) displayed, so increment lastResponse and return
+        $self->lastResponse( $self->nextResponse );
+        return $sTerminal ? { terminal => $terminalUrl } : {};
     }
 
     if ( $sTerminal && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex ) {
@@ -1070,6 +1075,26 @@ sub nextQuestions {
 
     # Get some information about the Section that the next response belongs to..
     my $section = $self->nextResponseSection();
+    
+    # Logical sections get processed immediately rather than displayed
+    if ($section->{logical}) {
+        my $nextResponse = $self->nextResponse;
+        
+        $self->session->log->debug("Processing logical section");
+        
+        # Pass off to recordResponses, which will process expressions and increment nextResponse
+        $self->recordResponses({});
+        
+        # Explicitly check that nextResponse was incremented, lest we end up with an infinite loop
+        if ($nextResponse == $self->nextResponse) {
+            $self->session->log->error("Something bad happened in Survey logic, bailing out to avoid infinite loop");
+        } else {
+            $self->session->log->debug("nextResponse has been updated to " . $self->nextResponse);
+            # ..and then start over
+            return $self->nextQuestions;
+        }
+    }
+    
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     

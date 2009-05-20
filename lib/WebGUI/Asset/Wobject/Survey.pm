@@ -1616,6 +1616,22 @@ sub www_loadQuestions {
     my @questions;
     eval { @questions = $self->responseJSON->nextQuestions(); };
     
+    # Logical sections cause nextResponse to move when nextQuestions is called, so
+    # persist and changes, and repeat the surveyEnd check in case we are now at the end
+    $self->persistResponseJSON();
+    if ( $self->responseJSON->surveyEnd() ) {
+        $self->session->log->debug('surveyEnd, probably as a result of a Logical Section');
+        if ( $self->get('quizModeSummary') ) {
+            if(! $self->session->form->param('shownsummary')){
+                my ($summary,$html) = $self->getSummary();
+                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
+                $self->session->http->setMimeType('application/json');
+                return $json;
+            }
+        }
+        return $self->surveyEnd();
+    }
+    
     my $section = $self->responseJSON->nextResponseSection();
 
     #return $self->prepareShowSurveyTemplate($section,$questions);
