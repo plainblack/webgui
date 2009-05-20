@@ -149,6 +149,7 @@ sub addVATNumber {
     my $user            = shift || $self->session->user; 
     my $localCheckOnly  = shift;
     my $db              = $self->session->db;
+    my $i18n            = WebGUI::International->new( $self->session, 'TaxDriver_EU' );
 
     WebGUI::Error::InvalidParam->throw( 'A VAT number is required' )
         unless $number;
@@ -163,7 +164,7 @@ sub addVATNumber {
 
     # Number contains syntax error does not exist. Do not write the code to the db.
     if ( !$numberIsValid && $validator->get_last_error_code <= 16 ) {
-        return 'The entered VAT number is invalid.';
+        return $i18n->get('vat number invalid');
     }
 
     # Write the code to the db.
@@ -176,7 +177,7 @@ sub addVATNumber {
         0,
     ] );
 
-    return $numberIsValid ? undef : 'Number validation currently not available. Check later.';
+    return $numberIsValid ? undef : $i18n->get('vies unavailable');
 }
 
 #-------------------------------------------------------------------
@@ -282,12 +283,12 @@ Returns the form that contains the configuration options for this plugin in the 
 sub getConfigurationScreen {
     my $self    = shift;
     my $session = $self->session;
-    my $i18n    = WebGUI::International->new( $session, 'Shop' );
+    my $i18n    = WebGUI::International->new( $session, 'TaxDriver_EU' );
 
     my $taxGroups = $self->get( 'taxGroups' ) || [];
 
     tie my %countryOptions, 'Tie::IxHash', (
-        ''  => ' - select a country - ',
+        ''  => ' - ' . $i18n->get('select country') . ' - ',
         %EU_COUNTRIES,
     );
 
@@ -308,57 +309,43 @@ sub getConfigurationScreen {
     $f->selectBox(
         name        => 'shopCountry',
         value       => $self->get( 'shopCountry' ),
-        label       => 'Residential country',
-        hoverHelp   => 'The country where your shop resides.',
+        label       => $i18n->get('shop country'),
+        hoverHelp   => $i18n->get('shop country help'),
         options     => \%countryOptions,
     );
     $f->template(
         name        => 'userTemplateId',
         value       => $self->get('userTemplateId'),
-        label       => 'User screen template',
+        label       => $i18n->get('user template'),
+        hoverHelp   => $i18n->get('user template help'), 
         namespace   => 'TaxDriver/EU/User',
     );
     $f->yesNo(
         name        => 'automaticViesApproval',
-        value       => $self->get( 'automaticViesApproval' ),
-        label       => 'Automatic VIES approval?',
+        value       => $self->get('automaticViesApproval'),
+        label       => $i18n->get('auto vies approval'),
+        hoverHelp   => $i18n->get('auto vies approval help'),
     );
     $f->yesNo(
         name        => 'acceptOnViesUnavailable',
-        value       => $self->get( 'acceptOnViesUnavailable' ),
-        label       => 'Accept VAT numbers when VIES is unavailable?',
+        value       => $self->get('acceptOnViesUnavailable'),
+        label       => $i18n->get('accept when vies unavailable'),
+        hoverHelp   => $i18n->get('accept when vies unavailable help'),
     );
 
     $f->submit;
     my $general = $f->print;
 
     # VAT groups manager
-    my $vatGroups = '<b>VAT groups</b><br />';
-    $vatGroups   .= q{<table><thead><tr><th>Group name</th><th>Rate</th></tr></thead><tbody>};
-    foreach my $group ( @{ $taxGroups} ) {
-        my $deleteUrl       = $session->url->page('shop=tax;method=do;do=deleteGroup;groupId=' . $group->{ id });
-        my $makeDefaultUrl  = $session->url->page('shop=tax;method=do;do=setDefaultGroup;groupId=' . $group->{ id });
-
-        $vatGroups .= 
-            q{<tr><td>}  
-            . join( '</td><td>', 
-                $group->{ name } . ( $group->{ id } eq $self->get( 'defaultGroup' )  ? '<i>(default)</i>' : '' ),
-                $group->{ rate },
-                qq{<a href="$deleteUrl">delete</a>},
-                qq{<a href="$makeDefaultUrl">Set as default group</a>},
-            )
-            . q{</td></tr>};
-    }
-    $vatGroups .= q{</tbody></table>};
-    $vatGroups = 
-        '<b>Add a VAT group</b>'
+    my $vatGroups = 
+        '<b>' . $i18n->get('add vat group') . '</b>'
         . WebGUI::Form::formHeader( $session, { extras => 'id="addGroupForm"' } )
-        . WebGUI::Form::hidden( $session, { name => 'shop', value => 'tax' } )
-        . WebGUI::Form::hidden( $session, { name => 'method', value => 'do' } )
-        . WebGUI::Form::hidden( $session, { name => 'do', value => 'addGroup' } )
-        . ' Name '
+        . WebGUI::Form::hidden( $session, { name => 'shop',     value => 'tax' } )
+        . WebGUI::Form::hidden( $session, { name => 'method',   value => 'do' } )
+        . WebGUI::Form::hidden( $session, { name => 'do',       value => 'addGroup' } )
+        . $i18n->get('group name')
         . WebGUI::Form::text(   $session, { name => 'name' } )
-        . ' Rate '
+        . $i18n->get('rate')
         . WebGUI::Form::float(  $session, { name => 'rate' } )
         . '%'
         . WebGUI::Form::submit( $session, { value => 'Add' } )
@@ -380,14 +367,17 @@ sub getConfigurationScreen {
     $style->setScript($url->extras('yui/build/datasource/datasource-min.js'), {type => 'text/javascript'});
     $style->setScript($url->extras('yui/build/datatable/datatable-min.js'), {type => 'text/javascript'});
     $style->setScript($url->extras('yui/build/button/button-min.js'), {type => 'text/javascript'});
-    
+   
+    my $generalLabel    = $i18n->get('general configuration');
+    my $groupsLabel     = $i18n->get('vat groups');
+    my $numbersLabel    = $i18n->get('vat numbers');
     my $output = <<EOHTML;
         <div class="yui-skin-sam">
             <div id="webguiTabForm" class="yui-navset">
                 <ul class="yui-nav">
-                    <li class="selected"><a href="#tab1" ><em>General configuration</em></a></li>
-                    <li><a href="#tab2" ><em>VAT Groups</em></a></li>
-                    <li><a href="#tab3"><em>VAT Numbers</em></a></li>
+                    <li class="selected"><a href="#tab1" ><em>$generalLabel</em></a></li>
+                    <li><a href="#tab2" ><em>$groupsLabel</em></a></li>
+                    <li><a href="#tab3"><em>$numbersLabel</em></a></li>
                 </ul>
                 <div class="yui-content">
                     <div id="tab1">$general</div>
@@ -404,43 +394,56 @@ sub getConfigurationScreen {
         <script type="text/javascript"> var tabView = new YAHOO.widget.TabView('webguiTabForm'); </script> 
 EOHTML
 
+    # labels
+    my $groupNameLabel  = $i18n->get('group name');
+    my $groupRateLabel  = $i18n->get('rate');
+    my $defaultLabel    = $i18n->get('default group');
+    my $makeDefaultLabel= $i18n->get('make default');
+    my $deleteLabel     = $i18n->get('delete group');
+    my $userIdLabel     = $i18n->get('user id');
+    my $vatNumberLabel  = $i18n->get('vat number');
+    my $validatedLabel  = $i18n->get('vies validated');
+    my $viesErrorLabel  = $i18n->get('vies error code');
+    my $approveLabel    = $i18n->get('approve');
+    my $denyLabel       = $i18n->get('deny');
+
+    # urls
+    my $getTaxGroupsUrl     = $url->page( 'shop=tax;method=do;do=getTaxGroupsAsJSON'    );
+    my $getVATNumbersUrl    = $url->page( 'shop=tax;method=do;do=getVATNumbersAsJSON'   );
+
     $output .= qq|
         <script type="text/javascript">
         var beehhh = function() {
             // Column definitions
-            formatDeleteTaxId = function(elCell, oRecord, oColumn, orderNumber) {
-                elCell.innerHTML = '<a href="|.$url->page(q{shop=tax;method=do;do=deleteTax}).q|;taxId='+oRecord.getData('taxId')+'">|.$i18n->get('delete').q|</a>';
-            };
-
             var groupColumDefs = [ // sortable:true enables sorting
-                { key: "name",      label:"|.$i18n->get('group label').q|", sortable: true},
-                { key: "rate",      label:"|.$i18n->get('group rate').q|", sortable: true},
-                { key: "isDefault", label:'', sortable: true, formatter : 'formatMakeDefaultButton' },
-                { key: "deleteUrl", label:'', sortable: true, formatter: "formatDeleteButton"  }
+                { key: 'name',      label:'$groupNameLabel',    sortable: true },
+                { key: 'rate',      label:'$groupRateLabel',    sortable: true },
+                { key: 'isDefault', label:'',                   sortable: false, formatter : 'formatMakeDefaultButton'  },
+                { key: 'deleteUrl', label:'',                   sortable: false, formatter : 'formatDeleteButton'       }
             ];
 
             // DataSource instance
-            var groupDS = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getTaxGroupsAsJSON').q|");
+            var groupDS = new YAHOO.util.DataSource( '$getTaxGroupsUrl' );
             groupDS.responseType = YAHOO.util.DataSource.TYPE_JSON;
             groupDS.responseSchema = {
                 resultsList: "records",
                 fields: [
-                    { key : "name",      parser : "string" },
-                    { key : "rate",      parser : "string" },
-                    { key : "isDefault", parser : "string" },
-                    { key : "deleteUrl" },
-                    { key : 'setDefaultUrl' },
-                    { key : 'id' }
+                    { key : "name",      parser : "string"  },
+                    { key : "rate",      parser : "string"  },
+                    { key : "isDefault", parser : "string"  },
+                    { key : "deleteUrl"                     },
+                    { key : 'setDefaultUrl'                 },
+                    { key : 'id'                            }
                 ]
             };
             
             // DataTable configuration
             var myConfigs = {
-                dynamicData:    true, // Enables dynamic server-driven data
+                // dynamicData : true, // Enables dynamic server-driven data
             };
             
             // DataTable instance
-            var groupDT = new YAHOO.widget.DataTable("taxGroupTable", groupColumDefs, groupDS, myConfigs);
+            var groupDT = new YAHOO.widget.DataTable( 'taxGroupTable', groupColumDefs, groupDS, myConfigs );
         
             var reloadTable = function ( dt ) {
                 dt.getDataSource().sendRequest( '', { 
@@ -453,10 +456,10 @@ EOHTML
 
             YAHOO.widget.DataTable.Formatter.formatMakeDefaultButton = function (elCell, oRecord, oColumn, oData) {
                 if ( oRecord.getData('isDefault') === '1' ) {
-                    elCell.innerHTML = 'Default group';
+                    elCell.innerHTML = '$defaultLabel';
                 }
                 else {
-                    var button  = new YAHOO.widget.Button( { label : 'Make default', container: elCell } );
+                    var button  = new YAHOO.widget.Button( { label : '$makeDefaultLabel', container: elCell } );
                     button.addListener( 'click', function () {
                         YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('setDefaultUrl'), { success : reloadGroupDT } );
                     } );
@@ -466,7 +469,7 @@ EOHTML
             YAHOO.widget.DataTable.Formatter.formatDeleteButton = function (elCell, oRecord, oColumn, oData) {
                 var datatable = this;
 
-                var button = new YAHOO.widget.Button( { label : 'Delete', container: elCell } );
+                var button = new YAHOO.widget.Button( { label : '$deleteLabel', container: elCell } );
                 button.addListener( 'click', function () {
                     YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('deleteUrl'), { success : reloadGroupDT } );
                 } );
@@ -485,15 +488,15 @@ EOHTML
             //===============================================================
 
             var vatColumDefs = [
-                { key: "userId",        label : 'user id',          sortable: true},
-                { key: "vatNumber",     label : 'vat number',       sortable: true},
-                { key: "viesValidated", label : 'VIES Validated' },
-                { key: "viesErrorCode", label : 'VIES Error code' },
-                { key: "approvebutton", label :'', formatter : 'formatApproveButton' },
-                { key: "denyButton",    label :'', formatter : 'formatDenyButton'    }
+                { key: "userId",        label : '$userIdLabel',    sortable : true  },
+                { key: "vatNumber",     label : '$vatNumberLabel', sortable : true  },
+                { key: "viesValidated", label : '$validatedLabel', sortable : true  },
+                { key: "viesErrorCode", label : '$viesErrorLabel', sortable : false },
+                { key: "approvebutton", label : '', formatter : 'formatApproveButton' },
+                { key: "denyButton",    label : '', formatter : 'formatDenyButton'    }
             ];
 
-            var vatDS = new YAHOO.util.DataSource("|.$url->page('shop=tax;method=do;do=getVATNumbersAsJSON').q|");
+            var vatDS = new YAHOO.util.DataSource( '$getVATNumbersUrl' );
             vatDS.responseType = YAHOO.util.DataSource.TYPE_JSON;
             vatDS.responseSchema = {
                 resultsList: "records",
@@ -517,7 +520,7 @@ EOHTML
             YAHOO.widget.DataTable.Formatter.formatApproveButton = function (elCell, oRecord, oColumn, oData) {
                 var datatable = this;
 
-                var button = new YAHOO.widget.Button( { label : 'Approve', container: elCell } );
+                var button = new YAHOO.widget.Button( { label : '$approveLabel', container: elCell } );
                 button.addListener( 'click', function () {
                     YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('approveUrl'), { success : reloadVatDT } );
                 } );                    
@@ -526,7 +529,7 @@ EOHTML
             YAHOO.widget.DataTable.Formatter.formatDenyButton = function (elCell, oRecord, oColumn, oData) {
                 var datatable = this;
 
-                var button = new YAHOO.widget.Button( { label : 'Deny', container: elCell } );
+                var button = new YAHOO.widget.Button( { label : '$denyLabel', container: elCell } );
                 button.addListener( 'click', function () {
                     YAHOO.util.Connect.asyncRequest( 'GET', oRecord.getData('denyUrl'), { success : reloadVatDT } );
                 } );
@@ -613,6 +616,7 @@ sub getUserScreen {
     my $self    = shift;
     my $url     = $self->session->url;
     my $var     = {};
+    my $i18n    = WebGUI::International->new( $self->session, 'TaxDriver_EU' );
    
     $var->{ errorMessage } = $self->session->stow->get( 'userTaxError' );
 
@@ -643,10 +647,10 @@ sub getUserScreen {
     );
     $f->text(
         name    => 'vatNumber',
-        label   => 'VAT Number',
+        label   => $i18n->get('vat number'),
     );
     $f->submit(
-        value   => 'Add',
+        value   => $i18n->get('add'),
     );
 
     $var->{ addVatNumber_form } = $f->print;
@@ -786,6 +790,17 @@ sub hasVATNumber {
 }
 
 #-------------------------------------------------------------------
+=head2 isUsableVATNumber ( number ) 
+
+Returns a boolean whether or not the given number can be used within the constraints set by the admin.
+
+=head3 number
+
+Hashref containing at least the keys 'approved', 'viesValidated' and 'viesErrorCode'. Usually this is just the
+quickHashRef result for the row in the db corresponding to the number.
+
+=cut
+
 sub isUsableVATNumber {
     my $self = shift;
     my $vat  = shift;
@@ -806,7 +821,7 @@ Returns a hash ref containing the form defintion for the per sku options for thi
 
 sub skuFormDefinition {
     my $self = shift;
-
+    my $i18n = WebGUI::International->new( $self->session, 'TaxDriver_EU' );
     my $taxGroups = $self->get( 'taxGroups' );
 
     # If no tax groups are defined there's no need to add a form element.
@@ -819,7 +834,7 @@ sub skuFormDefinition {
     tie my %definition, 'Tie::IxHash', (
         taxGroup => {
             fieldType   => 'selectBox',
-            label       => 'Tax group',
+            label       => $i18n->get('vat group'),
             options     => \%options,
         }
     );
@@ -861,6 +876,7 @@ sub www_addVATNumber {
     my $self        = shift;
     my $session     = $self->session;
     my ($db, $form) = $session->quick( qw{ db form } );
+    my $i18n        = WebGUI::International->new( $session, 'TaxDriver_EU' );
 
     return $session->privilege->insufficient if $session->user->isVisitor;
 
@@ -868,9 +884,9 @@ sub www_addVATNumber {
     my ($countryCode, $number) = $vatNumber =~ m/^([A-Z]{2})([A-Z0-9]+)$/;    
 
     my $errorMessage;
-    $errorMessage = 'Illegal country code' unless isIn( $countryCode, keys %EU_COUNTRIES );
-    $errorMessage = 'You already have a VAT number for this country.' if @{ $self->getVATNumbers( $countryCode ) };
-    $errorMessage = $self->addVATNumber( $vatNumber ) unless $errorMessage;
+    $errorMessage = $i18n->get('illegal country code')      unless isIn( $countryCode, keys %EU_COUNTRIES );
+    $errorMessage = $i18n->get('already has vat number')    if     @{ $self->getVATNumbers( $countryCode ) };
+    $errorMessage = $self->addVATNumber( $vatNumber )       unless $errorMessage;
 
     $self->session->stow->set( 'userTaxError', $errorMessage );
 
