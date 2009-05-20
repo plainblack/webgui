@@ -32,6 +32,7 @@ use WebGUI::HTMLForm;
 use WebGUI::International;
 use WebGUI::Utility;
 use WebGUI::Workflow::Instance;
+use Tie::IxHash;
 
 
 
@@ -53,11 +54,26 @@ sub definition {
 		},
 		templateId => {
 			fieldType 		=> 'template',
-			defaultValue 	=> '2rC4ErZ3c77OJzJm7O5s3w',
+			defaultValue 	        => '2rC4ErZ3c77OJzJm7O5s3w',
 			tab				=> 'display',
 			label			=> $i18n->get('main template'),
 			hoverHelp		=> $i18n->get('main template help'),
 			namespace		=> 'EMS',
+		},
+		scheduleTemplateId => {
+			fieldType 		=> 'template',
+			defaultValue 	        => 'S2_LsvVa95OSqc66ITAoig',
+			tab			=> 'display',
+			label			=> $i18n->get('schedule template'),
+			hoverHelp		=> $i18n->get('schedule template help'),
+			namespace		=> 'EMS',
+		},
+		scheduleColumnsPerPage => {
+			fieldType 		=> 'Integer',
+			defaultValue 		=> '5',
+			tab			=> 'display',
+			label			=> $i18n->get('schedule number of columns'),
+			hoverHelp		=> $i18n->get('schedule number of columns help'),
 		},
 		badgeBuilderTemplateId => {
 			fieldType 		=> 'template',
@@ -257,6 +273,35 @@ sub getEventFieldsForImport {
 	return \@fields;
 }
 
+#-------------------------------------------------------------------
+
+=head2 getLocations ()
+
+Returns an array of all locations for this EMS
+SQL optimized for quick access
+
+=cut
+
+sub getLocations {
+    my $self = shift;
+
+    my %hash;
+    my $tickets = $self->getTickets;
+    for my $ticket ( @$tickets ) {
+	my $name = $ticket->get('location');
+	next if not defined $name;
+        $hash{$name} = 1;
+    }
+    my @locations = sort keys %hash;
+#	@locations = $self->session->db->read(q{
+#                     select distinct(EMSTicket.location)
+#                       from EMSTicket join asset using (assetId)
+#                      where asset.parentId = ?
+#                      order by EMSTicket.location
+#                     },[$self->getId])->array;
+
+    return @locations;
+}
 
 #-------------------------------------------------------------------
 
@@ -410,6 +455,7 @@ sub view {
 	my %var = (
 		addBadgeUrl			=> $self->getUrl('func=add;class=WebGUI::Asset::Sku::EMSBadge'),
 		buildBadgeUrl		=> $self->getUrl('func=buildBadge'),
+		viewScheduleUrl		=> $self->getUrl('func=viewSchedule'),
 		manageBadgeGroupsUrl=> $self->getUrl('func=manageBadgeGroups'),
 		getBadgesUrl		=> $self->getUrl('func=getBadgesAsJson'),
 		canEdit				=> $self->canEdit,
@@ -1087,6 +1133,103 @@ sub www_getRibbonsAsJson {
 
 #-------------------------------------------------------------------
 
+=head2 www_getScheduleDataJSON ()
+
+returns the JSON data for a page of the schedule table
+
+=cut
+
+
+sub www_getScheduleDataJSON {
+    my $self = shift;
+    my $session = $self->session;
+    # the following two are expected to be configurable...
+    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+
+    my ($db, $form) = $session->quick(qw(db form));
+    my $pageNumber = $form->get('pageNumber') || 1;
+    my @ticketLocations = $self->getLocations();
+    # the total number of pages is the number of locations divided by the number of locations per page
+    my $numberOfPages = int( .9 + scalar(@ticketLocations) / $locationsPerPage );
+        # skip everything else if there are no locations/pages
+    return JSON->new->encode( {
+        records => [ ],  totalRecords => 0, recordsReturned => 0, startIndex => 0,
+        currentPage => 0, totalPages => 0,
+        sort => undef,  dir => 'asc', pageSize => 0,
+    })  if $numberOfPages == 0;
+    # now we pick out the locations to be displayed on this page
+    my $indexFirstLocation = ($pageNumber-1)*$locationsPerPage;
+    my $indexLastLocation = $pageNumber*$locationsPerPage - 1;
+    @ticketLocations = @ticketLocations[$indexFirstLocation..$indexLastLocation];
+	my $tickets = $db->read( q{
+             select assetData.assetId, sku.description, assetData.title, EMSTicket.startDate, EMSTicket.location
+               from EMSTicket
+               join sku using (assetId,revisionDate)
+               join assetData using (assetId,revisionDate)
+               join asset using (assetId)
+              where asset.parentId = ? 
+                 and EMSTicket.location in (  } . 
+		         join( ',', (map { $db->quote($_) } (@ticketLocations))) .
+			 q{ )
+                 and assetData.revisionDate = (
+                           select max(revisionDate)
+                             from assetData
+                            where assetData.assetId=asset.assetId
+                              and ( assetData.status = 'approved'
+                                  or assetData.tagId = ? )
+	      )
+              order by EMSTicket.startDate
+                     },[  $self->getId, 
+                           $session->scratch->get("versionTag")
+                      ]);
+    my %hash;
+    tie %hash, 'Tie::IxHash';
+    while( my $row = $tickets->hashRef ) {
+	$row->{type} = 'ticket';
+        $hash{$row->{startDate}}{$row->{location}} = $row;
+    }
+    my %results = ();
+    $results{records} = [];  ##Initialize to an empty array
+    my $ctr = 0;
+    my %locationMap = map { 'col' . ++$ctr , $_ } @ticketLocations;
+         # fill out the columns in the table
+    while( $ctr < $locationsPerPage ) { $locationMap{ 'col' . ++$ctr } = '' };
+    push @{$results{records}}, { colDate => '' , map { $_ , { type => 'label', title => $locationMap{$_} || '' } } ( keys %locationMap ) };
+    for my $startDate ( keys %hash ) {
+        my $row = { colDate => $startDate };
+	my $empty = 1;
+	for my $col ( keys %locationMap ) {
+	    my $location = $locationMap{$col};
+	    if( exists $hash{$startDate}{$location} ) {
+	        $row->{$col} = $hash{$startDate}{$location};
+		$empty = 0;
+	    } else {
+	        $row->{$col} = { type => 'empty' };
+	    }
+	}
+	next if $empty;
+	push @{$results{records}}, $row;
+    }
+
+    my $rowCount = scalar(@{$results{records}});
+    $results{totalRecords} = $rowCount;
+    $results{recordsReturned} = $rowCount;
+    $results{rowsPerPage} = $rowCount;
+    $results{startIndex} = 0; 
+    $results{sort}       = undef;
+    $results{dir}        = "asc";
+    $results{pageSize}   = 10;
+             # these next two are used to configure the paginator
+    $results{totalPages} = $numberOfPages;
+    $results{currentPage} = $pageNumber;
+    $session->http->setMimeType('application/json');
+    return JSON->new->encode(\%results);
+}
+
+
+
+#-------------------------------------------------------------------
+
 =head2 www_getTicketsAsJson ()
 
 Retrieves a list of tickets for the www_buildBadge() method.
@@ -1238,6 +1381,7 @@ className='WebGUI::Asset::Sku::EMSTicket' and state='published' and revisionDate
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
 }
+
 
 
 #-------------------------------------------------------------------
@@ -1872,4 +2016,36 @@ sub www_toggleRegistrantCheckedIn {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 www_viewSchedule ()
+
+view the schedule table
+
+=cut
+
+sub www_viewSchedule {
+	my $self = shift;
+	my $db = $self->session->db;
+    my $rowsPerPage = 25;
+    my $locationsPerPage = $self->get('scheduleColumnsPerPage');
+
+    my @columnNames = map { "'col" . $_ . "'" } ( 1..$locationsPerPage );
+    my $fieldList = join ',', @columnNames;
+    my $dataColumns = join ",\n",  map {
+	    '{key:' . $_ . ',sortable:false,label:"",formatter:formatViewScheduleItem}'
+                     }  @columnNames;
+
+	return $self->processStyle(
+               $self->processTemplate({
+                      backUrl => $self->getUrl,
+                      rowsPerPage => $rowsPerPage,
+                      dataColumns => $dataColumns,
+                      fieldList => $fieldList,
+		      dataSourceUrl => $self->getUrl('func=getScheduleDataJSON'),
+                  },$self->get('scheduleTemplateId')));
+
+}
+
 1;
+

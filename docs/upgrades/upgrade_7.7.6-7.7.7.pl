@@ -36,6 +36,7 @@ alterVATNumberTable( $session );
 addRedirectAfterLoginUrlToSettings( $session );
 addSurveyTestResultsTemplateColumn( $session );
 fixSMSUserProfileI18N($session);
+addEmsScheduleColumns ($session);
 addMapAsset( $session );
 installFilePumpHandler($session);
 installFilePumpTable($session);
@@ -122,6 +123,18 @@ sub installFilePumpAdminGroup {
     #}
     print "Done.\n" unless $quiet;
 }
+#----------------------------------------------------------------------------
+sub addEmsScheduleColumns {
+    my $session = shift;
+    print "\tAdding columns for the EMS Schedule table..." unless $quiet;
+
+    $session->db->write( 'alter table EventManagementSystem add column scheduleTemplateId char(22)' );
+    $session->db->write( 'alter table EventManagementSystem add column scheduleColumnsPerPage integer' );
+
+    print "Done\n" unless $quiet;
+
+}
+
 
 #----------------------------------------------------------------------------
 sub installFilePumpHandler {

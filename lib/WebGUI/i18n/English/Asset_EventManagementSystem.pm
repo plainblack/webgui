@@ -80,6 +80,18 @@ our $I18N = {
         context        => q|a link label|,
     },
 
+    'view schedule' => {
+        message     => q|Schedule|,
+        lastUpdated    => 0,
+        context        => q|a link label:Brings up the schedule for the event.|,
+    },
+
+    'schedule back link' => {
+        message     => q|Back|,
+        lastUpdated    => 0,
+        context        => q|a link label:goes back to the main Event Manager form|,
+    },
+
     'view tickets' => {
         message     => q|View Tickets|,
         lastUpdated    => 0,
@@ -1840,6 +1852,30 @@ normal templates.|,
         message => q|Prerequisite Set Name|,
         lastUpdated => 1147050475,
         context => q|Event data field|,
+    },
+
+    'schedule template' => {
+        message => q|Schedule Template|,
+        lastUpdated => 1147050475,
+        context => q|Select a template to display the schedule tables.|,
+    },
+
+    'schedule template help' => {
+        message => q|This template is used to display the schedule for events|,
+        lastUpdated => 1147050475,
+        context => q|Help text for the Schedule Template field|,
+    },
+
+    'schedule number of columns' => {
+        message => q|Number of columns per page|,
+        lastUpdated => 1147050475,
+        context => q|the number of columns per page in the schedule table|,
+    },
+
+    'schedule number of columns help' => {
+        message => q|This controls how many event locations will be displayed per page in the schedule.  If your event only has a few locations then set this to that number; for ten to twenty locations: use half or a third of the number;  for a large number of locations use the default|,
+        lastUpdated => 1147050475,
+        context => q|help text for the columns per page field|,
     },
 
 };
