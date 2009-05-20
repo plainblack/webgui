@@ -15,6 +15,8 @@
  - fixed #10394: CC Purchases Fail When Variants Contain Trailing Zero(s)
  - fixed #10332: Matrix: last updated fields = today
  - fixed Thread subscription groups not cleaned up during purge.
+ - fixed: Story subtitle is supposed to be a text field, not a text area.
+ - fixed: Display of short pagination bar when there's less than 1 page of data in StoryArchive
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

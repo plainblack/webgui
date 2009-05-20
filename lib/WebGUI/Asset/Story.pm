@@ -113,7 +113,7 @@ sub definition {
             defaultValue => '',
         },
         subtitle => {
-            fieldType    => 'textarea',  
+            fieldType    => 'text',  
             #label        => $i18n->get('subtitle'),
             #hoverHelp    => $i18n->get('subtitle help'),
             defaultValue => '',
@@ -361,7 +361,7 @@ sub getEditForm {
                              name  => 'title',
                              value => $form->get('title')    || $self->get('title'),
                           } ),
-        subtitleForm   => WebGUI::Form::textarea($session, {
+        subtitleForm   => WebGUI::Form::text($session, {
                              name  => 'subtitle',
                              value => $form->get('subtitle') || $self->get('subtitle')
                           } ),
