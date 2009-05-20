@@ -1,6 +1,7 @@
 package WebGUI::FilePump::Bundle;
 
 use base qw/WebGUI::Crud/;
+use strict;
 use WebGUI::International;
 use WebGUI::Utility;
 use URI;
@@ -120,7 +121,7 @@ sub build {
     ##Create the new build directory
     my $newDir = $self->getPathClassDir($newBuild);
     my $mkpathErrors;
-    my $dirsCreated = $newDir->mkpath({ errors => $mkpathErrors });
+    my $dirsCreated = $newDir->mkpath({ errors => \$mkpathErrors });
     if (! $dirsCreated) {
         $newDir->rmtree;
         my $errorMessages = join "\n", @{ $mkpathErrors };
@@ -129,7 +130,6 @@ sub build {
 
     ##Copy files over
     my $otherFiles = $self->get('otherFiles');
-    my $i18n = WebGUI::International->new($self->session, 'FilePump');
     OTHERFILE: foreach my $file (@{ $otherFiles }) {
         my $uri     = $file->{uri};
         my $results = $self->fetch($uri);
@@ -138,18 +138,14 @@ sub build {
             last OTHERFILE;
         }
         $file->{lastModified} = $results->{lastModified};
-        my $uriPath = URI->new($uri)->opaque;
-        $uriPath =~ tr{/}{/}s;
-        my $filename = basename($uriPath);
-        my $newFile = $newDir->file($filename);
-        if (-e $newFile->stringify) {
-            $error = join ' ', $uri, $i18n->get('duplicate file');
-            last OTHERFILE;
+        if ($results->{type} eq 'file') {
+            $error = $self->_buildFile($newDir, $uri, $results);
         }
-        my $fh = $newFile->open('>');
-        $fh->binmode;
-        print $fh $results->{content};
-        close $fh;
+        elsif ($results->{type} eq 'directory') {
+            $error = $self->_buildDir($newDir, $uri, $results);
+        }
+        last OTHERFILE if ($error);
+
     }
 
     if ($error) {
@@ -184,6 +180,102 @@ sub build {
         lastBuild   => $newBuild,
     });
     return 1;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _buildDir ( $newDir, $uri, $results )
+
+Copy over a directory and all its files from the filesystem into the build directory.  It does
+not copy deeply.
+
+=head3 $newDir
+
+A Path::Class::Dir object pointing to the new build directory.
+
+=head3 $uri
+
+A URI to the original directory.
+
+=head3 $results
+
+The returned results from fetchDir, with the file contents to
+install into the build directory.
+
+=cut
+
+sub _buildDir {
+    my ($self, $newDir, $uri, $results) = @_;
+    my $uriPath   =  URI->new($uri)->opaque;
+    $uriPath      =~ tr{/}{/}s;
+    my $uriDir    =  Path::Class::Dir->new($uriPath);
+    my $dirname   =  $uriDir->dir_list(-1, 1);
+    my $newSubDir =  $newDir->subdir($dirname);
+    if (-e $newSubDir->stringify) {
+        my $i18n = WebGUI::International->new($self->session, 'FilePump');
+        return join ' ', $uri, $i18n->get('duplicate directory');
+    }
+    my $mkpathErrors;
+    my $dirsCreated = $newSubDir->mkpath({ errors => \$mkpathErrors });
+    if (! $dirsCreated) {
+        $newSubDir->rmtree;
+        my $errorMessages = join "\n", @{ $mkpathErrors };
+        return $errorMessages;
+    }
+    ##Note, we built the directory, so there should be no problems with
+    ##file permissions.  Likewise, since you can't have files with the same
+    ##name in the source directory, there's no need to check for filename collisions.
+    foreach my $subFile (@{ $results->{content} }) {
+        my $inFH    = $subFile->open('<');
+        my $newFile = $newSubDir->file($subFile->basename);
+        my $outFH   = $newFile->open('>');
+        $inFH->binmode;
+        $outFH->binmode;
+        local $/;
+        my $inFile = <$inFH>;
+        print $outFH $inFile;
+        $inFH->close;
+        $outFH->close;
+    }
+    return 0;
+}
+
+#-------------------------------------------------------------------
+
+=head2 _buildFile ( $newDir, $uri, $results )
+
+Copy over a file from the filesystem into the build directory.
+
+=head3 $newDir
+
+A Path::Class::Dir object pointing to the new build directory.
+
+=head3 $uri
+
+A URI to the original file.
+
+=head3 $results
+
+The returned results from fetchFile, with the file contents to
+install into the build directory.
+
+=cut
+
+sub _buildFile {
+    my ($self, $newDir, $uri, $results) = @_;
+    my $uriPath  =  URI->new($uri)->opaque;
+    $uriPath     =~ tr{/}{/}s;
+    my $filename =  basename($uriPath);
+    my $newFile  =  $newDir->file($filename);
+    if (-e $newFile->stringify) {
+        my $i18n = WebGUI::International->new($self->session, 'FilePump');
+        return join ' ', $uri, $i18n->get('duplicate file');
+    }
+    my $fh = $newFile->open('>');
+    $fh->binmode;
+    print $fh $results->{content};
+    close $fh;
+    return 0;
 }
 
 #-------------------------------------------------------------------
@@ -460,11 +552,46 @@ sub fetchAsset {
 
 #-------------------------------------------------------------------
 
+=head2 fetchDirectory ( $uri )
+
+Fetches all files from a filesystem directory.  Returns a hashref
+with the date that the directory was last updated, a contents entry
+which is an arrayref of Path::Class objects from the directory. '.', and '../'
+are always ommitted, and a type entry which is the string 'directory'.
+
+If there is any problem with getting files, it returns an empty hashref.
+
+=head3 $uri
+
+A URI object.
+
+=cut
+
+sub fetchDir {
+    my ($self, $uri ) = @_;
+    my $filepath = $uri->path;
+    return {} unless (-e $filepath && -r _ && -d _);
+    my @stats = stat(_);
+    my $dir   = Path::Class::Dir->new($filepath);
+    my $guts  = {
+        lastModified => $stats[9],
+        content      => [ $dir->children ],
+        type         => 'directory',
+    };
+    return $guts;
+}
+
+#-------------------------------------------------------------------
+
 =head2 fetchFile ( $uri )
 
-Fetches a bundle file from the local filesystem.  Returns a hashref
-with the content and date that it was last updated.  If there is any problem
-with getting the file, it returns an empty hashref.
+Fetches a bundle file from the local filesystem.  Returns a hashref with the
+content, date that it was last updated, and a type entry which is the string
+'file'.  If there is any problem with getting the file, it returns an
+empty hashref.
+
+If fetchFile is passed a URI which is a directory, it will call fetchDir on
+that URI and return the results.
 
 =head3 $uri
 
@@ -476,12 +603,14 @@ sub fetchFile {
     my ($self, $uri ) = @_;
     my $filepath = $uri->path;
     return {} unless (-e $filepath && -r _);
+    return $self->fetchDir($uri) if -d _;
     my @stats = stat(_); # recycle stat data from file tests.
     open my $file, '<', $filepath or return {};
     local $/;
     my $guts = {
         lastModified => $stats[9],
         content      => <$file>,
+        type         => 'file',
     };
     close $file;
     return $guts;

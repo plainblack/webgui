@@ -18,6 +18,7 @@
  - fixed: Story subtitle is supposed to be a text field, not a text area.
  - fixed: Display of short pagination bar when there's less than 1 page of data in StoryArchive
  - added: Storage now has a getHexId method for returning a cached hexadecimal version of the storageId.
+ - fixed: FilePump should copy filesystem directories and their files when given a file URI that is a directory.
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

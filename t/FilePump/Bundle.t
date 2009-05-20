@@ -33,7 +33,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my  $tests =  50;         # Increment this number for each test you create
+my  $tests =  54;         # Increment this number for each test you create
 plan tests => 1 + $tests; # 1 for the use_ok
 
 #----------------------------------------------------------------------------
@@ -240,6 +240,11 @@ my $fileAsset = $root->addChild({
 
 $fileAsset->getStorageLocation->addFileFromScalar('pumpfile', 'Pump up the jam');
 
+my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
+$storage->addFileFromScalar('addendum', 'Red was too');
+$storage->addFileFromFilesystem(WebGUI::Test->getTestCollateralPath('ShawshankRedemptionMoviePoster.jpg'));
+
 my $snippetTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($snippetTag);
 $snippetTag->commit;
@@ -274,8 +279,24 @@ cmp_deeply(
     {
         content      => 'Pump up the jam',
         lastModified => re('^\d+$'),
+        type         => 'file',
     },
     'fetchFile: retrieved a file from the filesystem'
+);
+
+my $uriDir = URI->new('file:'.$storage->getPath);
+$guts = $bundle->fetchDir($uriDir);
+cmp_deeply(
+    $guts,
+    {
+        lastModified => re('^\d+$'),
+        content      => [
+            isa('Path::Class::File'),
+            isa('Path::Class::File'),
+        ],
+        type         => 'directory',
+    },
+    'fetchDir: retrieved information about a directory and its subfiles from the filesystem'
 );
 
 ###################################################################
@@ -335,6 +356,7 @@ $fileAsset->update({filename => 'pumpfile.css'});
 $bundle->addFile('JS',  'asset://filePumpSnippet');
 $bundle->addFile('CSS', 'asset://filePumpFileAsset');
 $bundle->addFile('OTHER', 'file:'.WebGUI::Test->getTestCollateralPath('gooey.jpg'));
+$bundle->addFile('OTHER', 'file:'.$storage->getPath);
 my ($buildFlag, $error) = $bundle->build();
 ok($buildFlag, 'build returns true when there are no errors');
 diag $error unless $buildFlag;
@@ -347,13 +369,22 @@ ok(!-e $oldBuildDir->stringify && !-d _, '... old build directory deleted');
 my $jsFile    = $buildDir->file($bundle->bundleUrl . '.js');
 my $cssFile   = $buildDir->file($bundle->bundleUrl . '.css');
 my $otherFile = $buildDir->file('gooey.jpg');
+my $otherDir  = $buildDir->subdir($storage->getHexId);
 ok(-e $jsFile->stringify    && -f _ && -s _, '... minified JS file built, not empty');
 ok(-e $cssFile->stringify   && -f _ && -s _, '... minified CSS file built, not empty');
 ok(-e $otherFile->stringify && -f _ && -s _, '... other file copied over, not empty');
+ok(-e $otherDir->stringify  && -d _ ,        '... other directory copied over');
+
+cmp_deeply(
+    [ map { $_->basename } $otherDir->children ],
+    [ qw/addendum ShawshankRedemptionMoviePoster.jpg/ ],
+    '... File copied over to new directory'
+);
 
 ok($bundle->get('jsFiles')->[0]->{lastModified},    '... updated JS file lastModified');
 ok($bundle->get('cssFiles')->[0]->{lastModified},   '... updated CSS file lastModified');
 ok($bundle->get('otherFiles')->[0]->{lastModified}, '... updated OTHER file lastModified');
+ok($bundle->get('otherFiles')->[1]->{lastModified}, '... updated OTHER directory lastModified');
 
 ###################################################################
 #

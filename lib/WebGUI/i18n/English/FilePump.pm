@@ -106,6 +106,12 @@ our $I18N = {
 		context => q|Error message when building a new bundle.|
 	},
 
+	'duplicate directory' => {
+		message => q|A directory with the same name already exists in the build directory.|,
+		lastUpdated => 1242515308,
+		context => q|Error message when building a new bundle.|
+	},
+
 };
 
 1;
