@@ -2701,7 +2701,7 @@ sub www_runTest {
     }
 
     my $ac = $self->getAdminConsole;
-    my $out = $self->processTemplate($var, $self->get('testResultsTemplateId'));
+    my $out = $self->processTemplate($var, $self->get('testResultsTemplateId') || 'S3zpVitAmhy58CAioH359Q');
     my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
     $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$id"), "$edit Test");
     return $ac->render($out, 'Test Results');

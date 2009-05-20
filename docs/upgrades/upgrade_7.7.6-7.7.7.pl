@@ -35,6 +35,7 @@ addUseEmailAsUsernameToSettings( $session );
 alterVATNumberTable( $session );
 addRedirectAfterLoginUrlToSettings( $session );
 addSurveyTestResultsTemplateColumn( $session );
+updateSurveyTest( $session );
 fixSMSUserProfileI18N($session);
 addEmsScheduleColumns ($session);
 addMapAsset( $session );
@@ -107,9 +108,21 @@ sub alterVATNumberTable {
 sub addSurveyTestResultsTemplateColumn {
     my $session = shift;
     print "\tAdding columns for Survey Test Results Template..." unless $quiet;
-    $session->db->write("alter table Survey add column `testResultsTemplateId` char(22)");
+    my $sth = $session->db->read('describe Survey testResultsTemplateId');
+    if (! defined $sth->hashRef) {
+        $session->db->write("alter table Survey add column `testResultsTemplateId` char(22)");
+    }
 
     print "Done\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub updateSurveyTest {
+    my $session = shift;
+    print "\tUpdate Survey test table, via Crud... " unless $quiet;
+    use WebGUI::Asset::Wobject::Survey::Test;
+    WebGUI::Asset::Wobject::Survey::Test->crud_updateTable($session);
+    print "DONE!\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------
