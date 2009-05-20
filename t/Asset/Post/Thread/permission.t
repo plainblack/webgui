@@ -36,7 +36,7 @@ $user{"2"}->addToGroups( ['2'] ); # Registered user
 my $versionTag      = WebGUI::VersionTag->getWorking( $session );
 $versionTag->set( { name => "Collaboration Test" } );
 
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1 } );
+my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
 my $collab
     = $node->addChild({
