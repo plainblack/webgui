@@ -59,7 +59,7 @@ SKIP: {
     local $ENV{REMOTE_ADDR} = '10.0.0.1';
     local $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
 
-    $adSpace = WebGUI::AdSpace->create($session, {name=>"Alfred"});
+    $adSpace = WebGUI::AdSpace->create($session, {name=>"Tim Robbins"});
     $ad=WebGUI::AdSpace::Ad->create($session, $adSpace->getId, {"type" => "text"});
     isa_ok($ad,"WebGUI::AdSpace::Ad");
 
