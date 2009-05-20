@@ -36,10 +36,10 @@ my $message_body = 'Test message';
 my $new_message = {
     message => $message_body,
     groupId => 3,
-    userId => 1,
+    userId  => 1,
 };
 
-my $message = $inbox->addMessage($new_message);
+my $message = $inbox->addMessage($new_message,{ testing => 1, });
 isa_ok($message, 'WebGUI::Inbox::Message');
 
 ok(defined($message), 'addMessage returned a response');
@@ -88,24 +88,32 @@ $inbox->addMessage({
     message => "First message",
     userId  => 3,
     sentBy  => $senders[0]->userId,
+},{
+    testing => 1,
 });
 
 $inbox->addMessage({
     message => "Second message",
     userId  => 3,
     sentBy  => $senders[1]->userId,
+},{
+    testing => 1,
 });
 
 $inbox->addMessage({
     message => "Third message",
     userId  => 3,
     sentBy  => $senders[2]->userId,
+},{
+    testing => 1,
 });
 
 $inbox->addMessage({
     message => "Fourth message",
     userId  => 3,
     sentBy  => $senders[2]->userId,
+},{
+    testing => 1,
 });
 
 is(scalar @{ $inbox->getMessagesForUser($admin) }, 4, 'Added 3 messages by various users');
