@@ -493,15 +493,15 @@ sub get {
         if ( exists $self->{_user}->{$field} ) {
             return $self->{_user}->{$field};
         }
-        else { 
-            if ( !WebGUI::ProfileField->exists( $session, $field ) ) {
-                return;
-            }
-
+        else {
             # XXX Should the defaults be set in new() ...
             if ( !exists $self->{_profile}->{$field} ) {
+                if ( !WebGUI::ProfileField->exists( $session, $field ) ) {
+                    $self->session->errorHandler->warn("No such profile field: $field");
+                }
+
                 my $default = $session->db->quickScalar("SELECT dataDefault FROM userProfileField WHERE fieldName=?", [$field]);
-                $self->{_profile}{$field} 
+                $self->{_profile}{$field}
                     = WebGUI::Operation::Shared::secureEval($session, $default);
                 $self->cache; # XXX ... Because we cache them here!
             }
@@ -513,22 +513,22 @@ sub get {
         }
     }
 
-    # Create a safe copy of everything to return
-    my %properties  = (
-        %{$self->{_user}},
-        %{$self->{_profile}},
-    );
-
     # Add any missing fields
     my %default     = $session->db->buildHash(
         "SELECT fieldName, dataDefault FROM userProfileField",
     );
     for my $key ( keys %default ) {
-        if ( !exists $properties{$key} ) {
-            $properties{$key}
+        if ( !exists $self->{_profile}{$key} ) {
+            $self->{_profile}{$key}
                 = WebGUI::Operation::Shared::secureEval($session, $default{$key});
         }
     }
+
+    # Create a safe copy of everything to return
+    my %properties  = (
+        %{$self->{_user}},
+        %{$self->{_profile}},
+    );
 
     return \%properties;
 }
@@ -1256,6 +1256,9 @@ sub update {
 
     # No userId, bad!
     delete $properties->{userId};
+
+    # This is an internal field with its own api to set it
+    delete $properties->{wg_privacySettings};
 
     # $self->{_user} contains all fields in `users` table
     my @userFields  = ();
