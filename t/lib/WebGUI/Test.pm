@@ -146,13 +146,13 @@ END {
         my $groupId = $group->getId;
         next GROUP if any { $groupId eq $_ } qw/1 2 3 4 6 7 8 11 12 13 14 pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /;
         my $newGroup = WebGUI::Group->new($SESSION, $groupId);
-        $newGroup->delete;
+        $newGroup->delete if $newGroup;
     }
     USER: foreach my $user (@usersToDelete) {
         my $userId = $user->userId;
         next USER if any { $userId eq $_ } (1,3);
         my $newUser = WebGUI::User->new($SESSION, $userId);
-        $newUser->delete;
+        $newUser->delete if $newUser;
     }
     foreach my $stor (@storagesToDelete) {
         if ($SESSION->id->valid($stor)) {
