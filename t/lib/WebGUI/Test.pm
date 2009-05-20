@@ -173,6 +173,7 @@ END {
         $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
         $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
         $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+        $Test->diag('mailQ   : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
     }
     while (my ($key, $value) = each %originalConfig) {
         if (defined $value) {
