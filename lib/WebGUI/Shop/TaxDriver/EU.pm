@@ -400,7 +400,7 @@ EOHTML
     my $defaultLabel    = $i18n->get('default group');
     my $makeDefaultLabel= $i18n->get('make default');
     my $deleteLabel     = $i18n->get('delete group');
-    my $userIdLabel     = $i18n->get('user id');
+    my $userLabel       = $i18n->get('user');
     my $vatNumberLabel  = $i18n->get('vat number');
     my $validatedLabel  = $i18n->get('vies validated');
     my $viesErrorLabel  = $i18n->get('vies error code');
@@ -488,7 +488,7 @@ EOHTML
             //===============================================================
 
             var vatColumDefs = [
-                { key: "userId",        label : '$userIdLabel',    sortable : true  },
+                { key: "username",      label : '$userLabel',      sortable : true, formatter : 'formatUsername' },
                 { key: "vatNumber",     label : '$vatNumberLabel', sortable : true  },
                 { key: "viesValidated", label : '$validatedLabel', sortable : true  },
                 { key: "viesErrorCode", label : '$viesErrorLabel', sortable : false },
@@ -506,7 +506,9 @@ EOHTML
                     { key : "viesValidated",    parser : "string" },
                     { key : "viesErrorCode" },
                     { key : "approveUrl" },
-                    { key : "denyUrl" }
+                    { key : "denyUrl" },
+                    { key : "username" },
+                    { key : "manageUserUrl" }
                 ]
             };
             
@@ -516,6 +518,14 @@ EOHTML
             var vatDT = new YAHOO.widget.DataTable("vatNumberManager", vatColumDefs, vatDS, myConfigs);
 
             var reloadVatDT = function () { reloadTable( vatDT ) };
+
+            YAHOO.widget.DataTable.Formatter.formatUsername = function (elCell, oRecord, oColumn, oData) {
+                elCell.innerHTML = 
+                    '<a href="' + oRecord.getData('manageUserUrl') + '" alt="User id ' + oRecord.getData('userId') + '">'
+                    + oRecord.getData('username')
+                    + '</a>';
+            }
+
 
             YAHOO.widget.DataTable.Formatter.formatApproveButton = function (elCell, oRecord, oColumn, oData) {
                 var datatable = this;
@@ -1021,10 +1031,14 @@ sub www_getVATNumbersAsJSON {
 
     return $self->session->privilege->insufficient unless $self->canManage;
 
-    my $sth = $db->read( 'select * from tax_eu_vatNumbers where approved <> 1 order by userId' );
+    my $sth = $db->read( 
+        'select username, t1.* from tax_eu_vatNumbers as t1, users as t2 where t1.userId=t2.userId and approved <> 1 order by userId' 
+    );
     
     my @numbers;
     while (my $number = $sth->hashRef ) {
+        $number->{ manageUserUrl } =
+            $url->page( 'op=editUser;uid=' . $number->{ userId } );
         $number->{ approveUrl } = 
             $url->page( 'shop=tax;method=do;do=approveVatNumber;number='.$number->{ vatNumber }.';userId='.$number->{ userId } );
         $number->{ denyUrl } = 

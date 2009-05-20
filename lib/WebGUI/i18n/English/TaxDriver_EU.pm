@@ -122,8 +122,8 @@ our $I18N = {
         context => q|Button label in VAT group manager|,
     },
 
-    'user id' => {
-        message => q|User id|,
+    'user' => {
+        message => q|User|,
         lastUpdated => 0,
         context => q|Label in the VAT number manager|,
     },
