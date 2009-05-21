@@ -20,6 +20,7 @@
  - added: Storage now has a getHexId method for returning a cached hexadecimal version of the storageId.
  - fixed: FilePump should copy filesystem directories and their files when given a file URI that is a directory.
  - fixed #10133: Matrix compare for priv. group open to any user
+ - added: Activate, Deactivate, Delete User workflow activities
 
 7.7.6
  - Added mobile style template.  If enabled in settings, will serve alternate style templates

@@ -43,6 +43,7 @@ installFilePumpHandler($session);
 installFilePumpTable($session);
 installFilePumpAdminGroup($session);
 addMatrixMaxGroup($session);
+addUserControlWorkflows($session);
 
 finish($session); # this line required
 
@@ -53,6 +54,16 @@ sub addMatrixMaxGroup {
     $session->db->write("alter table Matrix add column maxComparisonsGroup char(22);");
     $session->db->write("alter table Matrix add column maxComparisonsGroupInt integer;");
     print "Done.\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addUserControlWorkflows {
+    my $session = shift;
+    print "\tAdding Activate, Deactivate, Delete User workflow activities..." unless $quiet;
+    $session->config->addToArray('workflowActivities/WebGUI::User', 'WebGUI::Workflow::Activity::ActivateUser');
+    $session->config->addToArray('workflowActivities/WebGUI::User', 'WebGUI::Workflow::Activity::DeactivateUser');
+    $session->config->addToArray('workflowActivities/WebGUI::User', 'WebGUI::Workflow::Activity::DeleteUser');
+    print " Done.\n" unless $quiet;
 }
 
 #----------------------------------------------------------------------------

@@ -4451,6 +4451,18 @@ Users may override this setting in their profile.
         lastUpdated => 1242438244,
     },
 
+    'activate user' => {
+        message => 'Activate User',
+    },
+
+    'deactivate user' => {
+        message => 'Deactivate User',
+    },
+
+    'delete user' => {
+        message => 'Delete User',
+    },
+
 };
 
 1;

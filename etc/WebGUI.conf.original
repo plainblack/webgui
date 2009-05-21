@@ -875,7 +875,10 @@
     ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
-        "WebGUI::Workflow::Activity::NotifyAboutUser"
+        "WebGUI::Workflow::Activity::NotifyAboutUser",
+        "WebGUI::Workflow::Activity::ActivateUser",
+        "WebGUI::Workflow::Activity::DeactivateUser",
+        "WebGUI::Workflow::Activity::DeleteUser"
     ],
     "WebGUI::VersionTag" : [
         "WebGUI::Workflow::Activity::CommitVersionTag",
