@@ -1559,8 +1559,18 @@ section/answer.|,
         lastUpdated => 0,
     },
     
+    'run test' => {
+        message => q{Run Test},
+        lastUpdated => 0,
+    },
+    
     'test name' => {
         message => q{Test Name},
+        lastUpdated => 0,
+    },
+    
+    'tests run' => {
+        message => q{Tests Run},
         lastUpdated => 0,
     },
     
@@ -1576,6 +1586,56 @@ section/answer.|,
     
     'test spec help' => {
         message => q{The JSON-encoded specification for your test(s)},
+        lastUpdated => 0,
+    },
+    
+    'run all tests' => {
+        message => q{Run All Tests},
+        lastUpdated => 0,
+    },
+    
+    'pass' => {
+        message => q{Pass},
+        lastUpdated => 0,
+    },
+    
+    'fail' => {
+        message => q{Fail},
+        lastUpdated => 0,
+    },
+    
+    'test results template' => {
+        message => q{Test Results Template},
+        lastUpdated => 0,
+    },
+    
+    'test results template help' => {
+        message => q{Template used to display individual test and aggregate test results},
+        lastUpdated => 0,
+    },
+    
+    'test results' => {
+        message => q{Test Results},
+        lastUpdated => 0,
+    },
+    
+    'test result' => {
+        message => q{Test Result},
+        lastUpdated => 0,
+    },
+    
+    'details' => {
+        message => q{Details},
+        lastUpdated => 0,
+    },
+    
+    'tests passed' => {
+        message => q{Tests Passed},
+        lastUpdated => 0,
+    },
+    
+    'tests failed' => {
+        message => q{Tests Failed},
         lastUpdated => 0,
     },
 

@@ -195,8 +195,8 @@ sub definition {
         testResultsTemplateId => {
             tab          => 'display',
             fieldType    => 'template',
-            label        => $i18n->get('Test Results Template'),
-            hoverHelp    => $i18n->get('Test Results Template help'),
+            label        => $i18n->get('test results template'),
+            hoverHelp    => $i18n->get('test results template help'),
             defaultValue => 'S3zpVitAmhy58CAioH359Q',
             namespace    => 'Survey/TestResults',
         },
@@ -667,6 +667,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), "$edit Survey");
     $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('survey visualization'));
     $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
+    $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
     return $ac;
 }
 
@@ -2491,45 +2492,6 @@ sub www_editTestSuite {
     return $ac->render($out, 'Survey');
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 www_editTestSuiteSave ( )
-#
-#Saves the results of www_editTestSuite()
-#
-#=cut
-#
-#sub www_editTestSuiteSave {
-#    my $self = shift;
-#    my $session = $self->session;
-#    
-#    return $self->session->privilege->insufficient()
-#        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
-#    my $session = shift;
-#    return $session->privilege->insufficient() unless canView($session);
-#    my $i18n = WebGUI::International->new($session, 'Survey');
-#    return www_editTestSuite($session, $i18n->get('already active'))
-#        if analysisActive($session);
-#    my $workflow = WebGUI::Workflow->new($session, 'Survey000001');
-#    return www_editTestSuite($session, $i18n->get('workflow deleted')) unless defined $workflow;
-#    my $delta = $session->form->process('pauseInterval','integer');
-#    my $activities = $workflow->getActivities();
-#    ##Note, they're in order, and the order is known.
-#    $activities->[0]->set('deltaInterval', $delta);
-#    $activities->[1]->set('userId', $session->user->userId);
-#    my $instance = WebGUI::Workflow::Instance->create($session, {
-#        workflowId => $workflow->getId,
-#        priority   => 1,
-#    });
-#    if (!defined $instance) {
-#        return www_editTestSuite($session, $i18n->get('currently running')) if $session->stow->get('singletonWorkflowClash');
-#        return www_editTestSuite($session, $i18n->get('error creating workflow'));
-#    }
-#    $instance->start('skipRealtime');
-#    $session->db->write('update surveyStatus set startDate=NOW(), userId=?, endDate=?, running=1', [$session->user->userId, '']);
-#    return www_editTestSuite($session);
-#}
-
 
 #-------------------------------------------------------------------
 
@@ -2670,6 +2632,25 @@ sub www_runTest {
     
     my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result');
     
+    my $parsed = $self->parseTap($tap) or return $self->www_editTestSuite('Unable to parse test output');
+    
+    my $ac = $self->getAdminConsole;    
+    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
+    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$id"), "$edit Test");
+    $ac->addSubmenuItem($self->session->url->page("func=runTests"), "Run All Tests");
+    return $ac->render($parsed->{templateText}, 'Test Results');
+}
+
+=head2 parseTap
+
+Parses TAP and returns an object containing the TAP::Parser, the template var (containing 
+all interesting TAP::Parser and TAP::Parser::Result properties) and the templated text
+
+=cut
+
+sub parseTap {
+    my ($self, $tap) = @_;
+    
     use TAP::Parser;
     my $parser = TAP::Parser->new( { tap => $tap } );
     
@@ -2715,83 +2696,84 @@ sub www_runTest {
        )) { 
        $var->{$key} = $parser->$key; 
     }
-
-    my $ac = $self->getAdminConsole;
     my $out = $self->processTemplate($var, $self->get('testResultsTemplateId') || 'S3zpVitAmhy58CAioH359Q');
-    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
-    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$id"), "$edit Test");
-    return $ac->render($out, 'Test Results');
+    
+    return { 
+        templateText => $out,
+        templateVar => $var,
+        parser => $parser,
+    };
 }
 
-##-------------------------------------------------------------------
-#
-#=head2 www_settings ( )
-#
-#Configure Test Suite settings.
-#
-#=cut
-#
-#sub www_settings {
-#    my $self = shift;
-#    my $error   = shift;
-#    my $session = $self->session;
-#    
-#    return $self->session->privilege->insufficient()
-#        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
-#    
-#    if ($error) {
-#        $error = qq|<div class="error">$error</div>\n|;
-#    }
-#    my $i18n = WebGUI::International->new($session, "Asset_Survey");
-#    my $f = WebGUI::HTMLForm->new($session);
-#    $f->hidden(
-#        name=>'func',
-#        value=>'settingsSave'
-#    );
-#    $f->integer(
-#        name      => 'pauseInterval',
-#        value     => $session->form->get('pauseInterval') || $session->setting->get('surveyInterval') || 300,
-#        label     => $i18n->get('default pause interval'),
-#        hoverHelp => $i18n->get('default pause interval help'),
-#    );
-#    $f->yesNo(
-#        name      => 'deleteDelta',
-#        value     => $session->form->get('deleteDelta') || $session->setting->get('surveyDeleteDelta') || 0,
-#        label     => $i18n->get('Delete Delta Table?'),
-#        hoverHelp => $i18n->get('Delete Delta Table? help'),
-#    );
-#    $f->yesNo(
-#        name      => 'enabled',
-#        value     => $session->form->get('enabled') || $session->setting->get('surveyEnabled') || 0,
-#        label     => $i18n->get('Enabled?'),
-#        hoverHelp => $i18n->get('Enabled? help'),
-#    );
-#    $f->submit();
-#    my $ac = WebGUI::AdminConsole->new($session,'survey');
-#    $ac->addSubmenuItem($session->url->page('surveyfunc=editTestSuite'), $i18n->get('Test Suite'));
-#    return $ac->render($error.$f->print, 'Test Suite Settings');
-#}
-#
-##-------------------------------------------------------------------
-#
-#=head2 www_settingsSave ( session )
-#
-#Save Test Suite settings.
-#
-#=cut
-#
-#sub www_settingsSave {
-#    my $self = shift;
-#    my $session = $self->session;
-#    
-#    return $self->session->privilege->insufficient()
-#    my $session = shift;
-#    return $session->privilege->insufficient() unless canView($session);
-#    my $form = $session->form;
-#    $session->setting->set('surveyInterval',    $form->process('pauseInterval', 'integer'));
-#    $session->setting->set('surveyDeleteDelta', $form->process('deleteDelta',   'yesNo'  ));
-#    $session->setting->set('surveyEnabled',     $form->process('enabled',       'yesNo'  ));
-#    return www_settings($session);
-#}
+
+#-------------------------------------------------------------------
+
+=head2 www_runTests ( )
+
+Runs all tests
+
+=cut
+
+sub www_runTests {
+    my $self = shift;
+    my $session = $self->session;
+    my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
+    return $self->session->privilege->insufficient()
+        unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
+    
+    my $all = WebGUI::Asset::Wobject::Survey::Test->getAllIterator($session, { sequenceKeyValue => $self->getId } );
+    
+    # Expose TAP::Parser::Aggregate info as template variables
+    my $var = {
+        aggregate => 1,
+        results => [],
+    };
+    
+    my @parsers;
+    use TAP::Parser::Aggregator;
+    my $aggregate = TAP::Parser::Aggregator->new;
+    $aggregate->start;
+    
+    while (my $test = $all->()) {
+        my $result = $test->run or return $self->www_editTestSuite('Unable to run test: ' . $test->getId);
+        my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result: ' . $test->getId);
+        my $name = $test->get('name') || "Unnamed";
+        my $parsed = $self->parseTap($tap);
+        push @parsers, { $name => $parsed->{parser} };
+        push @{$var->{results}}, {
+            %{$parsed->{templateVar}},
+            name => $name,
+            testId => $test->getId,
+            text => $parsed->{templateText},
+            };
+    }
+    $aggregate->stop;
+    
+    $aggregate->add( %$_ ) for @parsers;
+    
+    # add summary results
+    for my $key (qw(
+        elapsed_timestr
+        all_passed
+        get_status
+        failed
+        parse_errors
+        passed
+        skipped
+        todo
+        todo_passed
+        wait
+        exit
+        total
+        has_problems
+        has_errors
+       )) { 
+       $var->{$key} = $aggregate->$key; 
+    }
+    my $out = $self->processTemplate($var, $self->get('testResultsTemplateId') || 'S3zpVitAmhy58CAioH359Q');
+
+    my $ac = $self->getAdminConsole;
+    return $ac->render($out, $i18n->get('test results'));
+}
 
 1;
