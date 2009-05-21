@@ -447,7 +447,7 @@ sub getInstancesForObject {
         SELECT
             instanceId
         FROM
-            workflowInstance
+            WorkflowInstance
         WHERE
             className = ?
             AND methodName = ?

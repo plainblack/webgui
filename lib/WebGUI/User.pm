@@ -188,7 +188,8 @@ Returns an instance of the authentication object for this user.
 =cut
 
 sub authInstance {
-    my $session = shift;
+    my $self    = shift;
+    my $session = $self->session;
 
     my $authMethod;
     if ($self->isVisitor) {
@@ -373,7 +374,7 @@ sub delete {
         if ($self->{_user}{"friendsGroup"} ne "");
 
     # clean up any user workflows
-    my $instances = WebGUI::Workflow::Instance->getInstancesByObject($session, {
+    my $instances = WebGUI::Workflow::Instance->getInstancesForObject($session, {
         className       => ref $self,
         methodName      => 'new',
         parameters      => $self->getId,
