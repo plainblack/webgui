@@ -306,7 +306,7 @@ sub _test {
                 return fail($testCount, "determine answer for $variable", "No answers matched text: '$spec'");
             }
             $self->session->log->debug("Recording $variable ($answerAddress) => $answer->{recordedAnswer}");
-            $responses->{$answerAddress} = $answer->{recordedAnswer};
+            $responses->{$answerAddress} = 1;
         }
     }
     
@@ -444,8 +444,7 @@ sub _test_mc {
         
         my $answerAddress = "$address->[0]-$address->[1]-$aIndex";
         my $answer = $answers->[$aIndex];
-        my $recordedAnswer = $answer->{recordedAnswer};
-        $responses->{$answerAddress} = $recordedAnswer;
+        $responses->{$answerAddress} = 1;
 
         my $name = $opts{name}; # get this fresh for every subtest
         if ($name) {
@@ -458,7 +457,7 @@ sub _test_mc {
             $name .= " for $variable mc answer " . ($aIndex + 1);
         }
         
-        $self->session->log->debug("Recording answer for mc question $variable at index $aIndex ($answerAddress) => $recordedAnswer");
+        $self->session->log->debug("Choosing mc question $variable answer index $aIndex ($answerAddress)");
         push @tap, $self->_recordResponses( { 
             responseJSON => $rJSON, 
             responses => $responses, 

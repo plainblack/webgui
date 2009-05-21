@@ -83,8 +83,8 @@ $s->surveyJSON_update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes
 $s->surveyJSON_update( [ 0, 0 ], { gotoExpression => q{ tag('tagged at S0Q0'); } } ); # S0Q0 tagged data
 
 $s->surveyJSON_update( [ 1, 0 ], { questionType => 'Yes/No' } ); # S1Q0 is a Yes/No
-$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3' } ); # S1Q0 answer 0 jumps to S3
-$s->surveyJSON_update( [ 1, 0, 1 ], { gotoExpression => q{ tag('tagged at S1Q0', 999); } } );# S1Q0 answer 1 tagged numeric data
+$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3', recordedAnswer => q{} } ); # S1Q0 answer 0 jumps to S3 (set recordedAnswer to '' to detect subtle bug)
+$s->surveyJSON_update( [ 1, 0, 1 ], { gotoExpression => q{ tag('tagged at S1Q0', 999); }, recordedAnswer => q{} } );# S1Q0 answer 1 tagged numeric data
 
 $s->surveyJSON_update( [ 3 ], { gotoExpression => q{ jump { score(S3) == 0 } S5; } } ); # jump to S5 if all 3 questions answered as No
 for my $qIndex (0..2) {
@@ -596,7 +596,7 @@ $spec = <<END_SPEC;
 [ 
     { 
         "sequence" : { 
-            "S1Q0" : { "recordedAnswer" : "desc", "score" : "cons" }, # This is a default Yes/No (score all 1)
+            "S0Q0" : { "recordedAnswer" : "desc", "score" : "cons" }, # This is a default Yes/No (score all 1)
             "S4Q0" : { "recordedAnswer" : "asc" },                    # Certainty scale, with recordedAnswer 0 .. 11
             "S3Q0" : { "recordedAnswer" : "desc", "score" : "desc" }, # These 3 are yes/no questions where we have
             "S3Q1" : { "recordedAnswer" : "desc", "score" : "desc" }, # ..set the score on the No answer to zero, hence
