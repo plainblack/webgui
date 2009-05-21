@@ -21,6 +21,7 @@ use WebGUI::DatabaseLink;
 use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use WebGUI::Workflow::Instance;
 use JSON;
 
 =head1 NAME
@@ -180,6 +181,33 @@ sub acceptsFriendsRequests {
 
 #-------------------------------------------------------------------
 
+=head2 authInstance
+
+Returns an instance of the authentication object for this user.
+
+=cut
+
+sub authInstance {
+    my $session = shift;
+
+    my $authMethod;
+    if ($self->isVisitor) {
+        $authMethod = $session->setting->get("authMethod");
+    }
+    else {
+        $authMethod = $self->authMethod || $session->setting->get("authMethod");
+    }
+    if ( ! isIn($authMethod, @{ $session->config->get('authMethods') } ) ) {
+        $authMethod = $session->config->get('authMethods')->[0] || 'WebGUI';
+    }
+    my $authClass = 'WebGUI::Auth::' . $authMethod;
+    WebGUI::Pluggable::load($authClass);
+    my $auth = $authClass->new($session, $authMethod, $self->getId);
+    return $auth;
+}
+
+#-------------------------------------------------------------------
+
 =head2 authMethod ( [ value ] )
 
 DEPRECATED! Use get("authMethod") and update({ authMethod => "value })
@@ -330,23 +358,44 @@ Friend's group.
 sub delete {
     my $self = shift;
     my $userId = $self->userId;
-	$self->uncache;
-    my $db = $self->session->db;
-	foreach my $groupId (@{$self->getGroups($userId)}) {
-		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$userId]);
-	}
-    $self->friends->delete if ($self->{_user}{"friendsGroup"} ne "");
-	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$userId]);
-	require WebGUI::Operation::Auth;
-	my $authMethod = WebGUI::Operation::Auth::getInstance($self->session,$self->authMethod,$userId);
-	$authMethod->deleteParams($userId);
-	my $rs = $db->read("select sessionId from userSession where userId=?",[$userId]);
-	while (my ($id) = $rs->array) {
-        	$db->write("delete from userSessionScratch where sessionId=?",[$id]);
-	}
-    $db->write("delete from userSession where userId=?",[$userId]);
-    $db->write("delete from userProfileData where userId=?",[$userId]);
-    $db->write("delete from users where userId=?",[$userId]);
+    my $session = $self->session;
+    my $db = $session->db;
+    $self->uncache;
+
+    foreach my $groupId ( @{ $self->getGroups } ) {
+        WebGUI::Group->new($session, $groupId)->deleteUsers([$userId]);
+    }
+
+    my $auth = $self->authInstance;
+    $auth->deleteParams($userId);
+
+    $self->friends->delete
+        if ($self->{_user}{"friendsGroup"} ne "");
+
+    # clean up any user workflows
+    my $instances = WebGUI::Workflow::Instance->getInstancesByObject($session, {
+        className       => ref $self,
+        methodName      => 'new',
+        parameters      => $self->getId,
+        returnObjects   => 1,
+    });
+    for my $instance ( @{$instances} ) {
+        $instance->delete;
+    }
+
+    # remove sessions
+    $db->write(
+        "DELETE FROM userSessionScratch WHERE sessionId IN (SELECT sessionId FROM userSession WHERE userId=?)",
+        [$userId],
+    );
+    $db->write("DELETE FROM userSession WHERE userId=?",[$userId]);
+
+    # remove inbox entries
+    $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
+
+    # remove user itself
+    $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);
+    $db->write("DELETE FROM users WHERE userId=?",[$userId]);
 }
 
 #-------------------------------------------------------------------
@@ -777,6 +826,19 @@ Returns 1 if the user is in the admins group.
 sub isAdmin {
 	my $self = shift;
 	return $self->isInGroup(3);
+}
+
+#-------------------------------------------------------------------
+
+=head2 isEnabled ()
+
+Returns 1 if the user is enabled.
+
+=cut
+
+sub isEnabled {
+    my $self = shift;
+    return $self->get('status') eq 'Active';
 }
 
 #-------------------------------------------------------------------
