@@ -800,6 +800,7 @@ sub hasVATNumber {
 }
 
 #-------------------------------------------------------------------
+
 =head2 isUsableVATNumber ( number ) 
 
 Returns a boolean whether or not the given number can be used within the constraints set by the admin.
