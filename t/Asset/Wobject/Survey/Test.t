@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 67;
+plan tests => 70;
 
 my ( $s, $t1 );
 
@@ -390,6 +390,48 @@ END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..1
 ok 1 - Checking tagged on page containing Section S1 Question S1Q0
+END_TAP
+
+# Check that the tags disappear between tests
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S1Q0"  : "n",  # sets a tag of its own
+            "setup" : { tag: [ "my test tag", { "my data tag": 1.5 } ] },
+            "page" : { S0Q0: "y" }, # make sure this doesn't get overwritten
+            "tagged" : [ 'tagged at S0Q0', { 'tagged at S1Q0' : 999 }, "my test tag", { "my data tag": 1.5 } ],
+       }
+    },
+    {
+       "test" : {
+            "S1Q0"  : "y",
+            "tagged" : [ 'tagged at S0Q0'],
+       }
+    },
+    {
+       "test" : {
+            "S1Q0"  : "y",
+            "tagged" : [ 'tagged at S1Q0',],
+       }
+    },
+    {
+       "test" : {
+            "S1Q0"  : "y",
+            "tagged" : [ "my data tag" ],
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
+1..4
+ok 1 - Checking tagged on page containing Section S1 Question S1Q0
+not ok 2 - Checking tagged on page containing Section S1 Question S1Q0
+# Tag not found: tagged at S0Q0
+not ok 3 - Checking tagged on page containing Section S1 Question S1Q0
+# Tag not found: tagged at S1Q0
+not ok 4 - Checking tagged on page containing Section S1 Question S1Q0
+# Tag not found: my data tag
 END_TAP
 
 #########

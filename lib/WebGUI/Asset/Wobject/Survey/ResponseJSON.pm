@@ -78,21 +78,35 @@ sub new {
     my $self = {
         _survey => $survey,
         _session => $survey->session,
-        _response => {
-            # Response hash defaults..
-            responses => {},
-            lastResponse => -1,
-            questionsAnswered => 0,
-            startTime => time(),
-            surveyOrder => undef,
-            tags => {},
-            
-            # And then jsonData overrides
-            %{$jsonData},
-        }
+        # _response property set by call to reset()
     };
     
     bless $self, $class;
+    $self->reset($jsonData);
+}
+
+=head2 reset
+
+Reset all response data in this object (e.g. re-init the _response property)
+
+=cut
+
+sub reset {
+    my $self = shift;
+    my ($data) = validate_pos(@_, { type => HASHREF, default => {} } );
+    $self->{_response} = {
+        # Response hash defaults..
+        responses => {},
+        lastResponse => -1,
+        questionsAnswered => 0,
+        startTime => time(),
+        surveyOrder => undef,
+        tags => {},
+        
+        # And then data overrides
+        %{$data},
+    };
+    return $self;
 }
 
 #----------------------------------------------------------------------------

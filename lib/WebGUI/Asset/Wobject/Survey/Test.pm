@@ -152,8 +152,7 @@ sub run {
     my $testCount = 0;
     my @tap;
     for my $item (@$spec) {
-        $self->_resetResponses($rJSON);
-        $rJSON->lastResponse(-1);
+        $rJSON->reset;
         my $name = $item->{name};
         my $args;
         if ($args = $item->{test} ) {
@@ -194,18 +193,6 @@ sub run {
     my $tap = "1..$testCount\n";
     $tap .= join "\n", @tap;
     return { tap => "$tap" };
-}
-
-=head2 _resetResponses
-
-Private convenience sub to carry out the task of resetting a response between tests
-
-=cut
-
-sub _resetResponses {
-    my ($self, $rJSON) = @_;
-    $rJSON->responses( {} );
-    $rJSON->lastResponse(-1);
 }
 
 =head2 _test
@@ -313,7 +300,6 @@ sub _test {
             if ($spec !~ m/\d{4} \w+/) {
                 return fail($testCount, "Invalid input for Year Month question type", "Got: $spec\nExpected: YYYY Month");
             }
-            $self->session->log->debug("Recording Year Month value: $spec");
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         }
         else {
@@ -408,7 +394,7 @@ sub _test_mc {
     for my $spec (@specs) {
         
         # Reset responses between sub-tests
-        $self->_resetResponses($rJSON);
+        $rJSON->reset;
         
         # Test runs from $variable
         $rJSON->nextResponse($index);
