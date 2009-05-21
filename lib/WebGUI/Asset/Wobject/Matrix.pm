@@ -230,6 +230,19 @@ sub definition {
             hoverHelp       =>$i18n->get('max comparisons privileged description'),
             label           =>$i18n->get('max comparisons privileged label'),
         },
+        maxComparisonsGroup=>{
+            fieldType       =>"group",
+            tab             =>"properties",
+            hoverHelp       =>$i18n->get('maxgroup description'),
+            label           =>$i18n->get('maxgroup label'),
+        },
+        maxComparisonsGroupInt=>{
+            fieldType       =>"integer",
+            tab             =>"properties",
+            defaultValue    =>25,
+            hoverHelp       =>$i18n->get('maxgroup per description'),
+            label           =>$i18n->get('maxgroup per label'),
+        },
         groupToAdd=>{
             fieldType       =>"group",
             tab             =>"security",
@@ -454,6 +467,9 @@ sub getCompareForm {
     if($self->session->user->isVisitor){
         $maxComparisons = $self->get('maxComparisons');
     }
+    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) { 
+        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    }
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');
     }        
@@ -627,6 +643,21 @@ sub view {
     $var->{listAttributes_url}      = $self->getUrl('func=listAttributes');
     $var->{search_url}              = $self->getUrl('func=search');
     $var->{compareForm_url}         = $self->getUrl();
+
+    my $maxComparisons;
+    if($self->session->user->isVisitor){
+        $maxComparisons = $self->get('maxComparisons');
+    }
+    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) {
+        $maxComparisons = $self->get('maxComparisonsGroupInt');
+    }
+    else{
+        $maxComparisons = $self->get('maxComparisonsPrivileged');
+    }
+    $var->{javascript} = "<script type='text/javascript'>\n".
+        "var maxComparisons = ".$maxComparisons.";\n".
+        "var matrixUrl = '".$self->getUrl."';\n".
+        "</script>";
    
     if ($self->canEdit){
         # Get all the MatrixListings that are still pending.
@@ -857,6 +888,9 @@ sub www_compare {
     my $maxComparisons;
     if($self->session->user->isVisitor){
         $maxComparisons = $self->get('maxComparisons');
+    }
+    elsif($self->session->user->isInGroup( $self->get("maxComparisonsGroup") )) { 
+        $maxComparisons = $self->get('maxComparisonsGroupInt');
     }
     else{
         $maxComparisons = $self->get('maxComparisonsPrivileged');

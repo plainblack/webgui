@@ -42,9 +42,18 @@ addMapAsset( $session );
 installFilePumpHandler($session);
 installFilePumpTable($session);
 installFilePumpAdminGroup($session);
+addMatrixMaxGroup($session);
 
 finish($session); # this line required
 
+#----------------------------------------------------------------------------
+sub addMatrixMaxGroup {
+    my $session = shift;
+    print "\tAdding maxComparisonsGroup to Matrix..." unless $quiet;
+    $session->db->write("alter table Matrix add column maxComparisonsGroup char(22);");
+    $session->db->write("alter table Matrix add column maxComparisonsGroupInt integer;");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 sub fixSMSUserProfileI18N {

@@ -427,6 +427,16 @@ listing,|,
                 lastUpdated => 1135271460,
         },
 
+    'maxgroup per description' => {
+        message => q|Specifies how many comparisons are allowed for the privileged group.|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup description' => {
+        message => q|Select a group for which a specific maximum comparisons can be selected.|,
+        lastUpdated => 0,
+    },
+
     'max comparisons description' => {
         message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
         lastUpdated => 0,
@@ -600,6 +610,16 @@ to increase performance. How long should we cache them?|,
 
     'compare color yes label' => {
         message => q|Compare Color: Yes|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup per label' => {
+        message => q|Maximum for Privileged Group|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup label' => {
+        message => q|Privileged Maximum Group|,
         lastUpdated => 0,
     },
     
