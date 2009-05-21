@@ -11,6 +11,11 @@ save you many hours of grief.
 7.7.7
 --------------------------------------------------------------------
    * WebGUI now requires Digest::SHA.
+   
+   * WebGUI now requires JavsScript::Minifier::XS 0.05
+   
+   * WebGUI now requires CSS::Minifier::XS 0.03
+
 
 7.7.6
 --------------------------------------------------------------------
