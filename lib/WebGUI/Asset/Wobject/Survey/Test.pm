@@ -191,6 +191,16 @@ sub run {
                 name => $name,
             } );
         } 
+        elsif (my $args = $item->{defined} ) {
+            push @tap, $self->_defined( { 
+                responseJSON => $rJSON, 
+                surveyOrder =>  $surveyOrder,
+                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
+                args => $args,
+                testCount_ref => \$testCount,
+                name => $name,
+            } );
+        } 
         else {
             push @tap, "Bail Out! Invalid test definition";
         }
@@ -284,7 +294,7 @@ sub _test {
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         } elsif ( $questionType eq 'Year Month' ) {
             if ($spec !~ m/\d{4} \w+/) {
-                return fail($testCount, "Invalid input for Year Month question type", "Got: $spec\nExpected: YYYY Month");
+                return fail($testCount, "Invalid input for Year Month question type", "got: $spec\nExpected: YYYY Month");
             }
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         }
@@ -529,14 +539,14 @@ sub _sequence {
             if (defined $recordedAnswerDelta && defined $recordedAnswer) {
                 my $expect = $recordedAnswer + $recordedAnswerDelta;
                 if ( $expect != $a->{recordedAnswer}) {
-                    return fail($testCount, "$variable answer index $aNum recordedAnswer not in sequence", "Got: $a->{recordedAnswer}\nExpected: $expect");
+                    return fail($testCount, "$variable answer index $aNum recordedAnswer not in sequence", "got: $a->{recordedAnswer}\nExpected: $expect");
                 }
             }
             
             if (defined $scoreDelta && defined $score) {
                 my $expect = $score + $scoreDelta;
                 if ( $expect != $a->{value}) {
-                    return fail($testCount, "$variable answer index $aNum score not in sequence",  "Got: $a->{value}\nExpected: $expect");
+                    return fail($testCount, "$variable answer index $aNum score not in sequence",  "got: $a->{value}\nExpected: $expect");
                 }
             }
             
@@ -545,7 +555,57 @@ sub _sequence {
         }
     }
     
-    return pass($testCount, $name || $name);
+    return pass($testCount, $name);
+}
+
+=head2 _defined
+
+Private sub. Triggered when a test spec requests "defined".
+
+=cut
+
+sub _defined {
+    my $self = shift;
+    my %opts = validate(@_, { 
+        responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
+        surveyOrder => { type => ARRAYREF },
+        surveyOrderIndexByVariableName => { type => HASHREF },
+        testCount_ref => { type => SCALARREF },
+        args => { type => HASHREF },
+        name => 0,
+    });
+    
+    # assemble the top-level ingredients..
+    my $rJSON = $opts{responseJSON};
+    my $surveyOrder = $opts{surveyOrder};
+    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
+    my $args = $opts{args};
+    my $name = $opts{name} || 'Defined';
+    my $testCount = ++${$opts{testCount_ref}};
+    
+    # n.b. everything in %args assumed to be regex => spec
+    
+    while ( my ( $regex, $spec ) = each %$args ) {
+        my $r = qr/$regex/;
+        for my $question (@{$rJSON->survey->questions}) {
+            my $variable = $question->{variable};
+            if ($variable =~ $r) {
+                # Currently only supports answer specs
+                my $answerSpec = $spec->{answer};
+                my $aNum = 0;
+                for my $answer (@{$question->{answers}}) {
+                    $aNum++;
+                    for my $property (@$answerSpec) {
+                        if (!defined $answer->{$property} || $answer->{$property} =~ m/^\s*$/) {
+                            return fail($testCount, "$variable answer number $aNum property $property not defined",  "got: '$answer->{$property}'");
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return pass($testCount, $name);
 }
 
 =head2 _recordResponses

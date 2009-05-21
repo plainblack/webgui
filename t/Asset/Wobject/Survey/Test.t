@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 79;
+plan tests => 85;
 
 my ( $s, $t1 );
 
@@ -615,6 +615,38 @@ try_it( $t1, $spec, { tap => <<END_TAP } );
 1..2
 ok 1 - Valid sequences
 ok 2 - Say my name
+END_TAP
+
+#########
+# defined
+#########
+$spec = <<END_SPEC;
+[ 
+    { 
+        defined : { 
+            S0Q0 : { answer: [ 'value', 'recordedAnswer' ] },
+        }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Defined
+END_TAP
+$spec = <<END_SPEC;
+[ 
+    { 
+        defined : { 
+            S0Q0 : { answer: [ 'value', 'recordedAnswer' ] },
+            'S1Q.' : { answer: [ 'value', 'recordedAnswer' ] },
+        }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP, fail => 1 } );
+1..1
+not ok 1 - S1Q0 answer number 1 property recordedAnswer not defined
+# got: ''
 END_TAP
 
 use TAP::Parser;
