@@ -154,8 +154,12 @@ sub run {
     for my $item (@$spec) {
         $rJSON->reset;
         my $name = $item->{name};
-        my $args;
-        if ($args = $item->{test} ) {
+        my $setup = $item->{setup};
+        
+        # N.B. we pass setup to individual test rather than running it for test, because 
+        # some test subs reset rJSON between sub-tests
+        
+        if (my $args = $item->{test} ) {
             push @tap, $self->_test( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
@@ -163,9 +167,10 @@ sub run {
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
+                setup => $setup,
             } );
         } 
-        elsif ($args = $item->{test_mc} ) {
+        elsif (my $args = $item->{test_mc} ) {
             push @tap, $self->_test_mc( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
@@ -173,9 +178,10 @@ sub run {
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
+                setup => $setup,
             } );
         } 
-        elsif ($args = $item->{sequence} ) {
+        elsif (my $args = $item->{sequence} ) {
             push @tap, $self->_sequence( { 
                 responseJSON => $rJSON, 
                 surveyOrder =>  $surveyOrder,
@@ -214,6 +220,7 @@ sub _test {
         testCount_ref => { type => SCALARREF },
         args => { type => HASHREF },
         name => 0,
+        setup => 1,
     });
     
     # assemble the top-level ingredients..
@@ -222,10 +229,11 @@ sub _test {
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
     my $name = $opts{name};
+    my $setup = $opts{setup} || $args->{setup}; # Setup option can also appear inside of test definition
     my $testCount = ++${$opts{testCount_ref}};
     
     # ..and the test-specific arguments
-    my ($next, $tagged, $score, $page, $setup ) = @{$args}{qw(next tagged score page setup)};
+    my ($next, $tagged, $score, $page) = @{$args}{qw(next tagged score page)};
     delete $args->{next};
     delete $args->{tagged};
     delete $args->{score};
@@ -247,34 +255,12 @@ sub _test {
             surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
             testCount_ref => \$fakeTestCount,
             args => $page,
+            setup => $setup,
         } );
     }
     
-    # Setup any fake data the user wants prior to the test
-    if ($setup && ref $setup eq 'HASH') {
-        my %existingTags = %{$rJSON->tags};
-        
-        # Process tags
-        # N.B. Make sure we add to existing tags instead of overwriting
-        if (ref $setup->{tag} eq 'HASH') {
-             # already a hash, so store it right away
-            $rJSON->tags( {%existingTags, %{$setup->{tag}} });
-        } elsif (ref $setup->{tag} eq 'ARRAY') {
-            # turn array into hash before storing it
-            my $tags;
-            for my $tag (@{$setup->{tag}}) {
-                if (ref $tag eq 'HASH') {
-                    # Individual item is a single key/value hash
-                    my ($key, $value) = %$tag;
-                    $tags->{$key} = $value;
-                } else {
-                    # Individual item is a string, default to boolean truth flag
-                    $tags->{$tag} = 1; # default to 1
-                }
-            }
-            $rJSON->tags( {%existingTags, %$tags });
-        }
-    }
+    # Run setup
+    $self->_setup( { responseJSON => $rJSON, setup => $setup } );
     
     # Record responses
     my $responses = {};
@@ -293,7 +279,7 @@ sub _test {
         if (!defined $spec) {
             $self->session->log->debug("Spec undefined, assuming that means ignore answer value");
         } 
-        elsif ( $questionType eq 'Text' || $questionType eq 'Number' ) {
+        elsif ( $questionType eq 'Text' || $questionType eq 'Number' || $questionType eq 'Slider' ) {
             # Assume spec is raw value to record in the single answer
             $responses->{"$address->[0]-$address->[1]-0"} = $spec;
         } elsif ( $questionType eq 'Year Month' ) {
@@ -352,6 +338,48 @@ sub _test {
     });
 }
 
+=head2 _setup
+
+Private sub. Used to setup tags etc.. on a ResponseJSON instance prior to tests being run.
+
+=cut
+
+sub _setup {
+    my $self = shift;
+    my %opts = validate(@_, { 
+        responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
+        setup => 1,
+    });
+    
+    my ($rJSON, $setup) = @opts{'responseJSON', 'setup'};
+
+    # Setup any fake data the user wants prior to the test
+    if ($setup && ref $setup eq 'HASH') {
+        my %existingTags = %{$rJSON->tags};
+        
+        # Process tags
+        # N.B. Make sure we add to existing tags instead of overwriting
+        if (ref $setup->{tag} eq 'HASH') {
+             # already a hash, so store it right away
+            $rJSON->tags( {%existingTags, %{$setup->{tag}} });
+        } elsif (ref $setup->{tag} eq 'ARRAY') {
+            # turn array into hash before storing it
+            my $tags;
+            for my $tag (@{$setup->{tag}}) {
+                if (ref $tag eq 'HASH') {
+                    # Individual item is a single key/value hash
+                    my ($key, $value) = %$tag;
+                    $tags->{$key} = $value;
+                } else {
+                    # Individual item is a string, default to boolean truth flag
+                    $tags->{$tag} = 1; # default to 1
+                }
+            }
+            $rJSON->tags( {%existingTags, %$tags });
+        }
+    }
+}
+
 =head2 _test_mc
 
 Private sub. Triggered when a test spec requests "test_mc".
@@ -370,6 +398,7 @@ sub _test_mc {
         testCount_ref => { type => SCALARREF },
         args => { type => ARRAYREF },
         name => 0,
+        setup => 1,
     });
     
     # assemble the top-level ingredients..
@@ -377,6 +406,7 @@ sub _test_mc {
     my $surveyOrder = $opts{surveyOrder};
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
+    my $setup = $opts{setup};
     
     # the first item is the section/question
     my $variable = shift @$args;
@@ -395,6 +425,9 @@ sub _test_mc {
         
         # Reset responses between sub-tests
         $rJSON->reset;
+        
+        # Run setup (per-sub-test)
+        $self->_setup( { responseJSON => $rJSON, setup => $setup } );
         
         # Test runs from $variable
         $rJSON->nextResponse($index);
@@ -465,7 +498,7 @@ sub _sequence {
     my $surveyOrder = $opts{surveyOrder};
     my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
-    my $name = $opts{name};
+    my $name = $opts{name} || 'Valid sequences';
     my $testCount = ++${$opts{testCount_ref}};
     
     # n.b. everything in %args assumed to be variable => spec
@@ -513,7 +546,7 @@ sub _sequence {
         }
     }
     
-    return pass($testCount, "Valid sequences");
+    return pass($testCount, $name || $name);
 }
 
 =head2 _recordResponses

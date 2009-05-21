@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 70;
+plan tests => 79;
 
 my ( $s, $t1 );
 
@@ -47,9 +47,10 @@ $s->surveyJSON_newObject( [] ); # S2
 $s->surveyJSON_newObject( [] ); # S3
 $s->surveyJSON_newObject( [] ); # S4
 $s->surveyJSON_newObject( [] ); # S5
+$s->surveyJSON_newObject( [] ); # S6
 
 # Name the sections
-for my $sIndex (0..5) {
+for my $sIndex (0..6) {
     $s->surveyJSON_update( [$sIndex], { variable => "S$sIndex" } );
 }
 
@@ -61,6 +62,9 @@ $s->surveyJSON_newObject( [3] ); # S3Q0
 $s->surveyJSON_newObject( [3] ); # S3Q1
 $s->surveyJSON_newObject( [3] ); # S3Q2
 $s->surveyJSON_newObject( [4] ); # S4Q0
+$s->surveyJSON_newObject( [5] ); # S5Q0
+$s->surveyJSON_newObject( [5] ); # S5Q1
+$s->surveyJSON_newObject( [5] ); # S5Q2
 
 # Name the questions
 $s->surveyJSON_update( [ 0, 0 ], { variable => 'S0Q0' } );
@@ -70,6 +74,9 @@ $s->surveyJSON_update( [ 3, 0 ], { variable => 'S3Q0' } );
 $s->surveyJSON_update( [ 3, 1 ], { variable => 'S3Q1' } );
 $s->surveyJSON_update( [ 3, 2 ], { variable => 'S3Q2' } );
 $s->surveyJSON_update( [ 4, 0 ], { variable => 'S4Q0' } );
+$s->surveyJSON_update( [ 5, 0 ], { variable => 'S5Q0' } );
+$s->surveyJSON_update( [ 5, 1 ], { variable => 'S5Q1' } );
+$s->surveyJSON_update( [ 5, 2 ], { variable => 'S5Q2' } );
 
 # Set additional options..
 $s->surveyJSON_update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes/No
@@ -87,20 +94,28 @@ for my $qIndex (0..2) {
 
 $s->surveyJSON_update( [ 4, 0 ], { questionType => 'Concern' } );
 
+$s->surveyJSON_update( [ 5, 0 ], { questionType => 'Slider', required => 1 } );
+$s->surveyJSON_update( [ 5, 1 ], { questionType => 'Text', required => 1 } );
+$s->surveyJSON_update( [ 5, 2 ], { questionType => 'Number', required => 1 } );
+
 # And finally, persist the changes..
 $s->persistSurveyJSON;
 
 cmp_deeply(
-    $s->responseJSON->surveyOrder, [
-       [ 0, 0, [ 0, 1 ] ],  # S0Q0
-       [ 1, 0, [ 0, 1 ] ],  # S1Q0
-       [ 2, 0, [] ],        # S2Q0
-       [ 3, 0, [ 0, 1 ] ],  # S3Q0
-       [ 3, 1, [ 0, 1 ] ],  # S3Q1
-       [ 3, 2, [ 0, 1 ] ],  # S3Q2
-       [ 4, 0, [ 0 .. 10 ] ],        # S4Q0
-       [ 5 ],               # S5
-     ], 'surveyOrder is correct'
+    $s->responseJSON->surveyOrder,
+    [   [ 0, 0, [ 0, 1 ] ],    # S0Q0
+        [ 1, 0, [ 0, 1 ] ],    # S1Q0
+        [ 2, 0, [] ],          # S2Q0
+        [ 3, 0, [ 0, 1 ] ],    # S3Q0
+        [ 3, 1, [ 0, 1 ] ],    # S3Q1
+        [ 3, 2, [ 0, 1 ] ],    # S3Q2
+        [ 4, 0, [ 0 .. 10 ] ], # S4Q0
+        [ 5, 0, [0] ],         # S5Q0
+        [ 5, 1, [0] ],         # S5Q0
+        [ 5, 2, [0] ],         # S5Q0
+        [6],                   # S6
+    ],
+    'surveyOrder is correct'
 );
 cmp_deeply(
     $s->responseJSON->surveyOrderIndexByVariableName, 
@@ -118,6 +133,10 @@ cmp_deeply(
         'S4'   => 6,
         'S4Q0' => 6,
         'S5'   => 7,
+        'S5Q0' => 7,
+        'S5Q1' => 8,
+        'S5Q2' => 9,
+        'S6'   => 10,
     },
     'surveyOrderIndexByVariableName correct'
 );
@@ -380,6 +399,24 @@ $spec = <<END_SPEC;
     {
        "test" : {
             "S1Q0"  : "n",  # sets a tag of its own
+            "page" : { S0Q0: "y" }, # make sure this doesn't get overwritten
+            "tagged" : [ 'tagged at S0Q0', { 'tagged at S1Q0' : 999 }, "my test tag", { "my data tag": 1.5 } ],
+       },
+       "setup" : { tag: [ "my test tag", { "my data tag": 1.5 } ] },
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Checking tagged on page containing Section S1 Question S1Q0
+END_TAP
+
+# setup can also be specified inside test object
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S1Q0"  : "n",  # sets a tag of its own
             "setup" : { tag: [ "my test tag", { "my data tag": 1.5 } ] },
             "page" : { S0Q0: "y" }, # make sure this doesn't get overwritten
             "tagged" : [ 'tagged at S0Q0', { 'tagged at S1Q0' : 999 }, "my test tag", { "my data tag": 1.5 } ],
@@ -432,6 +469,24 @@ not ok 3 - Checking tagged on page containing Section S1 Question S1Q0
 # Tag not found: tagged at S1Q0
 not ok 4 - Checking tagged on page containing Section S1 Question S1Q0
 # Tag not found: my data tag
+END_TAP
+
+# Slider, Number & Text question types
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S5Q0" : 5, # Slider
+            "S5Q1" : 'blah', # Text
+            "S5Q2" : 5, # Number
+            "next" : "S6",
+       }
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Checking next on page containing Section S5 Question S5Q0
 END_TAP
 
 #########
@@ -493,6 +548,27 @@ ok 1 - Checking next and tagged for S0Q0 mc answer 1
 ok 2 - Checking next for S0Q0 mc answer 2
 END_TAP
 
+# use the setup option
+$spec = <<END_SPEC;
+[ 
+    { 
+        "test_mc" : [ 
+            "S0Q0",                             # test S0Q0
+            {   "next" : "S1Q0",                # first answer falls through
+                "tagged" : [ "tagged at S0Q0", 'blah' ],  # and tagged data
+            },    
+            { "next" : "S1" },                  # second answer falls through to the same place
+        ],
+        setup : { tag: [ "blah" ] },
+    }
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..2
+ok 1 - Checking next and tagged for S0Q0 mc answer 1
+ok 2 - Checking next for S0Q0 mc answer 2
+END_TAP
+
 # And try one that does branching, and doesn't start on the first page
 $spec = <<END_SPEC;
 [ 
@@ -526,12 +602,19 @@ $spec = <<END_SPEC;
             "S3Q1" : { "recordedAnswer" : "desc", "score" : "desc" }, # ..set the score on the No answer to zero, hence
             "S3Q2" : { "recordedAnswer" : "desc", "score" : "desc" }, # ..they are descending
         }
+    },
+    { 
+        "name" : "Say my name",
+        "sequence" : {
+            "S3Q2" : { "recordedAnswer" : "desc", "score" : "desc" }, # ..they are descending
+        }
     }
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
-1..1
+1..2
 ok 1 - Valid sequences
+ok 2 - Say my name
 END_TAP
 
 use TAP::Parser;
