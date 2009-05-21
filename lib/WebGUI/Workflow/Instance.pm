@@ -357,7 +357,7 @@ sub run {
         return "error";
     }
 
-	$status = eval { $activity->execute($object, $self) };
+	my $status = eval { $activity->execute($object, $self) };
 	if ($@) {
 		$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
 		$self->set({lastStatus=>"error"}, 1);
@@ -370,21 +370,6 @@ sub run {
 		$self->set({lastStatus=>$status}, 1);
 	}
 	return $status;
-}
-
-#-------------------------------------------------------------------
-
-=head2 getNextActivity
-
-Returns the next activity object for this instance.
-
-=cut
-
-sub getNextActivity {
-    my $self = shift;
-    my $workflow = $self->getWorkflow;
-    my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
-    return $activity;
 }
 
 #-------------------------------------------------------------------
