@@ -288,7 +288,7 @@ sub set {
             . $adSpace->get("height") . q{px; margin:0px; overflow:hidden; border:0px;"><a href="#" }
             . q{onclick="window.location.assign('} .$self->session->url->gateway(undef, "op=clickAd;id=".$self->getId)
             . q{')" style="position:absolute; padding: }
-            . q{3px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; }
+            . q{0px; top:0px; left:0px; width:100%; height:100%; z-index:10; display:block; text-decoration:none; }
             . q{vertical-align:top;"><img }
             . q{src="} . $storage->getUrl($storage->getFiles->[0]) . q{" alt="} . $self->get("title")
             . q{" style="z-index:0;position:relative;border-style:none;border: 0px;" /></a></div>};
