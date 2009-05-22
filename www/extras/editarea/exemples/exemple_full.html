@@ -11,6 +11,7 @@
 			,start_highlight: true	// if start with highlight
 			,allow_resize: "both"
 			,allow_toggle: true
+			,word_wrap: true
 			,language: "en"
 			,syntax: "php"	
 		});
@@ -22,7 +23,7 @@
 			,language: "en"
 			,syntax: "html"	
 			,toolbar: "search, go_to_line, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
-			,syntax_selection_allow: "css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas"
+			,syntax_selection_allow: "css,html,js,php,python,vb,xml,c,cpp,sql,basic,pas,brainfuck"
 			,is_multi_files: true
 			,EA_load_callback: "editAreaLoaded"
 			,show_line_colors: true
@@ -122,21 +123,22 @@
 <body>
 <h2>EditArea examples</h2>
 <p>Retrieve EditArea on <a href='http://sourceforge.net/projects/editarea'>sourceforge</a> or on 
-	my personal <a href='http://www.cdolivet.net/index.php?page=editArea'>website</a>.
+	my personal <a href='http://www.cdolivet.com/index.php?page=editArea'>website</a>.
 </p>
 <form action='' method='post'>
 	<fieldset>
 		<legend>Example 1</legend>
-		<p>Test in English with php syntax, highlighted, toggle enabled, resize enabled and default toolbar. Also offer the possibility to switch on/off the readonly mode.</p>
+		<p>Test in English with php syntax, highlighted, toggle enabled, word-wrap enabled, resize enabled and default toolbar. Also offer the possibility to switch on/off the readonly mode.</p>
 		<textarea id="example_1" style="height: 350px; width: 100%;" name="test_1">
 <?php	
-	$authors= array();
-	$news= array();
-	$query="SELECT author, COUNT(id) as 'nb_news' FROM news_messages GROUP BY author";
-	$result=mysql_query($query, $DBnews);
-	while($line = mysql_fetch_assoc($result)){
-		$authors[$line["author"]]= $line["author"];
-		$news[$line["author"]]=$line['nb_news'];
+	$authors	= array();
+	$news		= array();
+	/* this is a long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long comment for showing word-wrap feature */
+	$query	= "SELECT author, COUNT(id) as 'nb_news' FROM news_messages GROUP BY author";
+	$result	= mysql_query($query, $DBnews);
+	while( $line = mysql_fetch_assoc($result) ){
+		$authors[$line["author"]]	= $line["author"];
+		$news[$line["author"]]		= $line['nb_news'];
 	}
 	
 	$list= sprintf("('%s')", implode("', '", $authors));

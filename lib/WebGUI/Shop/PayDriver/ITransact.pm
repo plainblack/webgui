@@ -97,13 +97,13 @@ sub _generatePaymentRequestXML {
             $recurringData->{ RecurRecipe   } = $self->_resolveRecurRecipe( $sku->getRecurInterval );
             $recurringData->{ RecurReps     } = 99999;
             $recurringData->{ RecurTotal    } = 
-                $item->get('price') + $transaction->get('taxes') + $transaction->get('shippingPrice');
+                sprintf("%.2f",$item->get('price') + $transaction->get('taxes') + $transaction->get('shippingPrice'));
             $recurringData->{ RecurDesc     } = $item->get('configuredTitle');
         }
 #       else {
             push @{ $orderItems->{ Item } }, {
                 Description     => $item->get('configuredTitle'),
-                Cost            => $item->get('price'),
+                Cost            => sprintf("%.2f", $item->get('price')),
                 Qty             => $item->get('quantity'),
             }
 #        }
@@ -114,21 +114,21 @@ sub _generatePaymentRequestXML {
 	if ( $transaction->get('taxes') > 0 ) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('taxes'),
-			Cost			=> $transaction->get('taxes'),
+			Cost			=> sprintf("%.2f",$transaction->get('taxes')),
 			Qty				=> 1,
 			};
 	}
 	if ($transaction->get('shippingPrice') > 0) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('shipping'),
-			Cost			=> $transaction->get('shippingPrice'),
+			Cost			=> sprintf("%.2f",$transaction->get('shippingPrice')),
 			Qty				=> 1,
 			};
 	}
 	if ($transaction->get('shopCreditDeduction') < 0) {
 		push @{ $orderItems->{ Item } }, {
 			Description		=> $i18n->get('in shop credit'),
-			Cost			=> $transaction->get('shopCreditDeduction'),
+			Cost			=> sprintf("%.2f",$transaction->get('shopCreditDeduction')),
 			Qty				=> 1,
 			};
 	}

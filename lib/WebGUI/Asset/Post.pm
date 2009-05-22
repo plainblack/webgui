@@ -374,7 +374,12 @@ sub formatContent {
 	my $self = shift;
 	my $content = shift || $self->get("content");
 	my $contentType = shift || $self->get("contentType");	
-        my $msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("filterCode"));
+        my $msg = undef ;
+	if (!$self->isa("WebGUI::Asset::Post::Thread")) { # apply appropriate content filter
+		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("replyFilterCode"));
+	} else {
+		$msg = WebGUI::HTML::filter($content,$self->getThread->getParent->get("filterCode"));
+	}
         $msg = WebGUI::HTML::format($msg, $contentType);
         if ($self->getThread->getParent->get("useContentFilter")) {
                 $msg = WebGUI::HTML::processReplacements($self->session,$msg);
@@ -1422,7 +1427,9 @@ sub www_edit {
 	$var{'content.form'} = WebGUI::Form::HTMLArea($session, {
         name=>"content",
         value=>$content,
-        richEditId=>$self->getThread->getParent->get("richEditor")
+        richEditId=>($self->isa("WebGUI::Asset::Post::Thread") ? 
+	  $self->getThread->getParent->get("richEditor") :
+ 	  $self->getThread->getParent->get("replyRichEditor")),
     });
     ##Edit variables just for Threads
     if ($className eq 'WebGUI::Asset::Post::Thread' && $self->getThread->getParent->canEdit) {

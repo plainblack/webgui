@@ -15,6 +15,38 @@ our $I18N = {
 		message => q|Take Survey|,
 		lastUpdated => 1224686319
 	},
+	'visualize' => {
+		message => q|Visualize|,
+		lastUpdated => 0
+	},
+	'generate' => {
+		message => q|Generate|,
+		lastUpdated => 0
+	},
+	'survey visualization' => {
+		message => q|Survey Visualization|,
+		lastUpdated => 0
+	},
+	'visualization success' => {
+		message => q|Visualization successfully generated to|,
+		lastUpdated => 0
+	},
+	'visualization format' => {
+		message => q|Visualisation Format|,
+		lastUpdated => 0
+	},
+	'visualization format help' => {
+		message => q|Choose the type of visualization file you want to generate|,
+		lastUpdated => 0
+	},
+	'visualization layout algorithm' => {
+		message => q|Visualisation Layout Algorithm|,
+		lastUpdated => 0
+	},
+	'visualization layout algorithm help' => {
+		message => q|Choose the GraphViz layout algorithm you want to use|,
+		lastUpdated => 0
+	},
 	'view simple results' => {
 		message => q|View Simple Results|,
 		lastUpdated => 1224686319
@@ -39,6 +71,14 @@ our $I18N = {
 		message => q|Continue|,
 		lastUpdated => 1224686319
 	},
+    'logical section' => {
+		message => q|Logical Section|,
+		lastUpdated => 1224686319
+    },
+    'logical section help' => {
+		message => q|A logical section, or its questions, are never shown.  They are used to silently execute jump commands.|,
+		lastUpdated => 1224686319
+    },
 	'add section' => {
 		message => q|Add Section|,
 		lastUpdated => 1224686319
@@ -273,86 +313,86 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
     'cols description' => {
-        message => q|The number of columns used for the comment TextArea input field.|,
+        message => q|The number of columns used for the input field (for TextArea question types).|,
         context => q|Description of the 'cols' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241588599
     },
-	'comment rows' => {
-		message => q|Comment Rows:|,
-		lastUpdated => 1224686319
-	},
+    'comment rows' => {
+            message => q|Comment Rows:|,
+            lastUpdated => 1224686319
+    },
     'rows description' => {
-        message => q|The number of rows shown for the comment TextArea input field.|,
+        message => q|The number of rows used for the input field (for TextArea question types).|,
         context => q|Description of the 'rows' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241588599
     },
-	'maximum number of answers' => {
-		message => q|Maximum number of answers:|,
-		lastUpdated => 1224686319
-	},
+    'maximum number of answers' => {
+            message => q|Maximum number of answers:|,
+            lastUpdated => 1224686319
+    },
     'maximum number of answers description' => {
-        message => q|Enter the maximum number of answers.|,
+        message => q|For multi-choice questions, how many answers the user can select. <br>0 = unlimited.<br>1 = radio group style.<br>2 and above = checkbox style.|,
         context => q|Description of the 'maximum number of answers' field, used as hoverhelp in the edit question dialog.|,
-        lastUpdated => 0
+        lastUpdated => 1241764603,
     },
-	'required label' => {
-		message => q|Required|,
-		lastUpdated => 1224686319
-	},
+    'required label' => {
+            message => q|Required|,
+            lastUpdated => 1224686319
+    },
     'required description' => {
         message => q|Is this a required question?|,
         context => q|Description of the 'required' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 0
     },
-	'question score' => {
-		message => q|Question score:|,
-		lastUpdated => 1224686319
-	},
+    'question score' => {
+            message => q|Question score:|,
+            lastUpdated => 1224686319
+    },
     'question score description' => {
         message => q|Default score to use for answers in this question that don't have an answer score value set.|,
         context => q|Description of the 'question value' field, used as hoverhelp in the edit question dialog.|,
         lastUpdated => 1239255403
     },
-	'please enter answer information' => {
-		message => q|Please enter answer information:|,
-        context => q|Title of the edit answer dialog.|,
-		lastUpdated => 1224686319
-	},
-	'answer number' => {
-		message => q|Answer number:|,
-		lastUpdated => 1224686319
-	},
+    'please enter answer information' => {
+            message => q|Please enter answer information:|,
+    context => q|Title of the edit answer dialog.|,
+            lastUpdated => 1224686319
+    },
+    'answer number' => {
+            message => q|Answer number:|,
+            lastUpdated => 1224686319
+    },
     'answer number description' => {
         message => q|The number of this answer|,
         context => q|Description of the 'answer number' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'answer text' => {
-		message => q|Answer text:|,
-		lastUpdated => 1224686319
-	},
+    'answer text' => {
+            message => q|Answer text:|,
+            lastUpdated => 1224686319
+    },
     'answer text description' => {
         message => q|Enter a text for this answer. For multiple choice questions this answer will be displayed above the buttons.|,
         context => q|Description of the 'answer text' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 0
     },
-	'recorded answer' => {
-		message => q|Recorded Answer:|,
-		lastUpdated => 1224686319
-	},
+    'recorded answer' => {
+            message => q|Recorded Answer:|,
+            lastUpdated => 1224686319
+    },
     'recorded answer description' => {
         message => q|Determines what gets recorded as the response value if this answer is selected. Allows you to 'recode' recorded responses, e.g. 'Yes' could be recorded as '1' and 'No' as '0'. Relevant only for Multiple Choice questions (other question types record the input actually entered by the user: free text, selected date, etc..).|,
         context => q|Description of the 'recorded answer' field, used as hoverhelp in the edit answer dialog.|,
         lastUpdated => 1239251436
     },
-	'jump to' => {
-		message => q|Jump to:|,
-		lastUpdated => 1224686319
-	},
-	'jump expression' => {
-		message => q|Jump expression:|,
-		lastUpdated => 1229318805
-	},
+    'jump to' => {
+            message => q|Jump to:|,
+            lastUpdated => 1224686319
+    },
+    'jump expression' => {
+            message => q|Jump expression:|,
+            lastUpdated => 1229318805
+    },
     'jump to description' => {
         message => q|The section or question with this variable name will be the next to be displayed after this answer.|,
         context => q|Description of the 'jump to' field, used as hoverhelp in the edit answer dialog.|,
@@ -385,41 +425,41 @@ our $I18N = {
 		lastUpdated => 1224686319
 	},
 	'min label' => {
-		message => q|Slider Min|,
-		lastUpdated => 1224686319
+		message => q|Min|,
+		lastUpdated => 1241588065
 	},
-    'min description' => {
-        message => q|The minimum value of this answer for slider type questions.|,
-        context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'min description' => {
+            message => q|The minimum numeric value allowed for this answer (for numeric question types such as Number and Slider). Keep this field empty if you do not want to enforce a minimum value. |,
+            context => q|Description of the 'min' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 1241588065
+        },
 	'max label' => {
-		message => q|Slider Max|,
-		lastUpdated => 1224686319
+		message => q|Max|,
+		lastUpdated => 1241588065
 	},
-    'max description' => {
-        message => q|The maximum value of this answer for slider type questions.|,
-        context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'max description' => {
+            message => q|The maximum numeric value allowed for this answer (for Number and Slider type questions). Keep this field empty if you do not want to enforce a maximum value. |,
+            context => q|Description of the 'max' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 1241588065
+        },
 	'step label' => {
-		message => q|Slider Step|,
-		lastUpdated => 1224686319
+		message => q|Step|,
+		lastUpdated => 1241588065
 	},
-    'step description' => {
-        message => q|The step value of this answer for slider type questions.|,
-        context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'step description' => {
+            message => q|The step value, that is, the numeric interval to allow between values (for Number and Slider type questions).  Keep this field empty if you do not want to enforce a step value. |,
+            context => q|Description of the 'step' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 0
+        },
 	'verbatim label' => {
 		message => q|Verbatim|,
 		lastUpdated => 1224686319
 	},
-    'verbatim description' => {
-        message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
-        context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
-        lastUpdated => 0
-    },
+        'verbatim description' => {
+            message => q|Set to yes to add an extra text input to the answer, where the user can enter a single line of text. Typically used to permit a free-text 'other' response.|,
+            context => q|Description of the 'verbatim' field, used as hoverhelp in the edit answer dialog.|,
+            lastUpdated => 0
+        },
 	'answer score' => {
 		message => q|Answer score:|,
 		lastUpdated => 1239251986
@@ -450,6 +490,17 @@ our $I18N = {
         message     => q|The template to display the main page of the survey.|,
         lastUpdated => 0,
     },
+
+    'Feedback Template' => {
+        message     => q|Feedback Template|,
+        lastUpdated => 0,
+    },
+
+    'Feedback Template help' => {
+        message     => q|The template used to display response feedback.|,
+        lastUpdated => 0,
+    },
+
     'do after timelimit label' => {
         message => q|Do After Time Limit:|,
         lastUpdated => 1224686319,
@@ -543,10 +594,10 @@ the time limit for completing the survey. This message is in the 'take survey' t
     },
 
     'Survey Exit URL help' => {
-        message     => q|When the user finishes the surevey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
-        lastUpdated => 1233714385,
+        message     => q|When the user finishes the survey, they will be sent to this URL.  Leave blank if no special forwarding is required.  The gateway setting from the config file will be automatically added to the URL for you.|,
+        lastUpdated => 1241648155,
     },
-    
+
     'Overview Report Template' => {
         message     => q|Overview Report Template|,
         lastUpdated => 0,
@@ -556,7 +607,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Overview Report.|,
         lastUpdated => 0,
     },
-    
+
     'Grabebook Report Template' => {
         message     => q|Grabebook Report Template|,
         lastUpdated => 0,
@@ -566,7 +617,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Gradebook Report|,
         lastUpdated => 0,
     },
-    
+
     'Survey Edit Template' => {
         message     => q|Survey Edit Template|,
         lastUpdated => 0,
@@ -576,7 +627,7 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message     => q|The template used to display the Survey Edit screen.|,
         lastUpdated => 0,
     },
-    
+
     'Allow back button' => {
         message     => q|Allow back button|,
         lastUpdated => 0,
@@ -630,13 +681,13 @@ the time limit for completing the survey. This message is in the 'take survey' t
         message => q|The template for displaying the screen for editing the survey.|,
         lastUpdated => 0
     },
-    
+
     'Survey Summary Template' => {
         message => q|Survey Summary Template|,
         context => q|The template for displaying the summary page to users.|,
         lastUpdated => 0
     },
-    
+
     'Survey Summary Template help' => {
         message => q|This is the template shown to users in quiz mode to summarize their results.|,
         context => q|The template for displaying the summary page to users.|,
@@ -885,15 +936,68 @@ directly inside the answer_loop for other types of questions.|,
         lastUpdated => 1078223096
     },
 
-    'lastResponseCompleted' => {
-        message => q|A boolean indicating whether the current user's last response was completed.|,
-        context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+    'response complete' => {
+        message => q|Survey Response completed|,
+        lastUpdated => 1242180657,
     },
 
-    'lastResponseTimedOut' => {
-        message => q|A boolean indicating whether the current user's last response timed out.|,
-        context => q|Description of a template variable for a template Help page.|,
+    'response complete help' => {
+        message => q|A boolean flag indicating whether the Survey Response completed|,
+        lastUpdated => 1242180657,
+    },
+
+    'response restart' => {
+        message => q|Survey Response restarted|,
+        lastUpdated => 1242180657,
+    },
+
+    'response restart help' => {
+        message => q|A boolean flag indicating whether the Survey Response restarted|,
+        lastUpdated => 1242180657,
+    },
+
+    'response timeout' => {
+        message => q|Survey Response timed out|,
+        lastUpdated => 1242180657,
+    },
+
+    'response timeout help' => {
+        message => q|A boolean flag indicating whether the Survey Response timed out|,
+        lastUpdated => 1242180657,
+    },
+
+    'response timeout restart' => {
+        message => q|Survey Response restarted due to a timeout|,
+        lastUpdated => 1242180657,
+    },
+
+    'response timeout restart help' => {
+        message => q|A boolean flag indicating whether the Survey Response restarted as a result of a timeout|,
+        lastUpdated => 1242180657,
+    },
+
+    'response endDate help' => {
+        message => q|A localised date/time string indicating when the response ended|,
+        lastUpdated => 1242180657,
+    },
+
+    'survey feedback template variables title' => {
+        message => q|Survey Feedback Template Variables|,
+        lastUpdated => 1242256111,
+    },
+
+    'survey feedback template body' => {
+        message => q|All data tagged in survey expressions is also made available as template variables|,
+        lastUpdated => 1242180657,
+    },
+    
+    'survey test results template title' => {
+        message => q|Survey Test Results Template Variables|,
+        lastUpdated => 1242256111,
+    },
+
+    'survey test results template body' => {
+        message => q|All TAP::Parser and TAP::Parser::Result fields are exposed as template variables|,
         lastUpdated => 0,
     },
 
@@ -911,6 +1015,12 @@ directly inside the answer_loop for other types of questions.|,
 
     'user_canViewReports' => {
         message => q|A boolean indicating whether the current user can view the survey reports.|,
+        context => q|Description of a template variable for a template Help page.|,
+        lastUpdated => 0,
+    },
+
+    'lastResponseFeedback help' => {
+        message => q|The templated response feedback text|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
@@ -1350,13 +1460,23 @@ section/answer.|,
     'textCols' => {
         message => q|The number of columns for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1241588599,
+    },
+
+    'textCols label' => {
+        message => q|TextArea Columns|,
+        lastUpdated => 1241588599
     },
 
     'textRows' => {
         message => q|The number of rows for TextArea questions.|,
         context => q|Description of a template variable for a template Help page.|,
-        lastUpdated => 0,
+        lastUpdated => 1241588599,
+    },
+
+    'textRows label' => {
+        message => q|TextArea Rows|,
+        lastUpdated => 1241588599
     },
 
     'answers' => {
@@ -1388,34 +1508,134 @@ section/answer.|,
         context => q|Description of a template variable for a template Help page.|,
         lastUpdated => 0,
     },
-    
+
     'year' => {
         message => q|Year (YYYY):|,
         context => q|Sub-label for "Year Month" question type|,
         lastUpdated => 0,
     },
-    
+
     'month' => {
         message => q|Month:|,
         context => q|Sub-label for "Year Month" question type|,
         lastUpdated => 0,
     },
-    
+
     'back' => {
         message => q|Back|,
         context => q|Back button label on Take Survey page|,
         lastUpdated => 0,
     },
-    
+
     'continue' => {
         message => q|Continue|,
         context => q|Continue button label on Take Survey page|,
         lastUpdated => 0,
     },
-    
+
     'finish' => {
         message => q|Finish|,
         context => q|Finish button label on Take Survey page|,
+        lastUpdated => 0,
+    },
+    
+    'add a test' => {
+        message => q{Add a test},
+        lastUpdated => 0,
+    },
+    
+    'confirm delete test' => {
+        message => q{Are you sure you want to delete this test?},
+        lastUpdated => 0,
+    },
+    
+    'test suite' => {
+        message => q{Test Suite},
+        lastUpdated => 0,
+    },
+    
+    'edit test' => {
+        message => q{Edit Test},
+        lastUpdated => 0,
+    },
+    
+    'run test' => {
+        message => q{Run Test},
+        lastUpdated => 0,
+    },
+    
+    'test name' => {
+        message => q{Test Name},
+        lastUpdated => 0,
+    },
+    
+    'tests run' => {
+        message => q{Tests Run},
+        lastUpdated => 0,
+    },
+    
+    'test name help' => {
+        message => q{A descriptive name for this test},
+        lastUpdated => 0,
+    },
+    
+    'test spec' => {
+        message => q{Test Spec},
+        lastUpdated => 0,
+    },
+    
+    'test spec help' => {
+        message => q{The JSON-encoded specification for your test(s)},
+        lastUpdated => 0,
+    },
+    
+    'run all tests' => {
+        message => q{Run All Tests},
+        lastUpdated => 0,
+    },
+    
+    'pass' => {
+        message => q{Pass},
+        lastUpdated => 0,
+    },
+    
+    'fail' => {
+        message => q{Fail},
+        lastUpdated => 0,
+    },
+    
+    'test results template' => {
+        message => q{Test Results Template},
+        lastUpdated => 0,
+    },
+    
+    'test results template help' => {
+        message => q{Template used to display individual test and aggregate test results},
+        lastUpdated => 0,
+    },
+    
+    'test results' => {
+        message => q{Test Results},
+        lastUpdated => 0,
+    },
+    
+    'test result' => {
+        message => q{Test Result},
+        lastUpdated => 0,
+    },
+    
+    'details' => {
+        message => q{Details},
+        lastUpdated => 0,
+    },
+    
+    'tests passed' => {
+        message => q{Tests Passed},
+        lastUpdated => 0,
+    },
+    
+    'tests failed' => {
+        message => q{Tests Failed},
         lastUpdated => 0,
     },
 

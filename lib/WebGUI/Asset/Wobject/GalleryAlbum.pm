@@ -1335,7 +1335,8 @@ sub www_showConfirmation {
     my $output      = '<p>' . sprintf( $i18n->get('save message'), $self->getUrl ) . '</p>'
                     . '<p>' . $i18n->get('what next') . '</p>'
                     . '<ul>'
-                    . sprintf( '<li><a href="%s">Add Photo</a></li>', $self->getUrl('func=add;class=WebGUI::Asset::File::GalleryFile::Photo') )
+                    . sprintf( '<li><a href="%s">%s</a></li>', $self->getUrl('func=add;class=WebGUI::Asset::File::GalleryFile::Photo'), $i18n->get('add photo')  )
+                    . sprintf( '<li><a href="%s">%s</a></li>', $self->getUrl, $i18n->get('return to album') )
                     . '</ul>'
                     ;
 

@@ -63,24 +63,75 @@ readonly session    => my %session;
 readonly messages   => my %messages;
 private  options    => my %options;
 
-#-----------------------------------------------------------
 
-=head2 appendTaxDetailVars ($var)
+=head2 appendCartItemVars ( var, cartItem ) 
 
-=head3 $var
+Adds tax driver specific template variables for the given cart item to the supplied hashref.
+
+=head3 var
+
+The template variable hash ref to add the tax vars to.
+
+=head3 cartItem
+
+The instanstance of WebGUI::Shop::CartItem to add the vars for.
 
 =cut
 
-sub appendTaxDetailVars {
+sub appendCartItemVars {
     my $self    = shift;
     my $var     = shift;
+    my $item    = shift;
 
-    return $var;
+    WebGUI::Error::InvalidParam->throw( 'Must supply a hash ref' )
+        unless $var && ref $var eq 'HASH';
+    WebGUI::Error::InvalidObject->throw( expected => 'WebGUI::Shop::CartItem', got => ref $item, error => 'Must pass a cart item' )
+        unless $item && $item->isa( 'WebGUI::Shop::CartItem' );
+
+    my $sku         = $item->getSku;
+    my $address     = eval { $item->getShippingAddress };
+    my $taxRate     = $self->getTaxRate( $sku, $address );
+
+    my $quantity    = $item->get( 'quantity' );
+    my $price       = $sku->getPrice;
+    my $tax         = $price * $taxRate / 100;
+
+    $var->{ taxRate                 } = $taxRate;
+    $var->{ taxAmount               } = $item->cart->formatCurrency( $tax );
+    $var->{ pricePlusTax            } = $item->cart->formatCurrency( $price + $tax );
+    $var->{ extendedPricePlusTax    } = $item->cart->formatCurrency( $quantity * ( $price + $tax ) );
 }
 
 #-----------------------------------------------------------
 
-=head2 canManage
+=head2 appendCartVars ( var, cart )
+
+Extend this method to add tax driver specific template variables to those supplied to the cart template.
+
+=head3 var
+
+The hash ref to add the template variables to.
+
+=head3 cart
+
+The instance of WebGUI::Shop::Cart to add the template variables for.
+
+=cut
+
+sub appendCartVars {
+    my $self = shift;
+    my $var  = shift;
+    my $cart = shift;
+
+    WebGUI::Error::InvalidParam->throw( 'Must supply a hash ref' )
+        unless $var && ref $var eq 'HASH';
+    WebGUI::Error::InvalidObject->throw( expected => 'WebGUI::Shop::Cart', got => ref $cart, error => 'Must pass a cart' )
+        unless $cart && $cart->isa( 'WebGUI::Shop::Cart' );
+}
+
+#-----------------------------------------------------------
+
+=head2 canManage ( )
 
 Returns true if the current user can manage taxes.
 
@@ -105,6 +156,8 @@ sub className {
     my $self = shift;
 
     $self->session->log->fatal( "Tax plugin ($self) is required to overload the className method" );
+
+    return 'WebGUI::Shop:TaxDriver';
 }
 
 #-----------------------------------------------------------
@@ -176,6 +229,32 @@ sub getTaxRate {
 
 #-----------------------------------------------------------
 
+=head2 getTransactionTaxData ( sku, address )
+
+Returns a hashref containing tax information that should be stored along with transaction items.
+
+=head3 sku
+
+The sku belonging to the transaction item.
+
+=head3 address
+
+The address belonging to the transaction item.
+
+=cut
+
+sub getTransactionTaxData {
+    my $self = shift;
+
+    my $config = {
+        className => $self->className,
+    };
+
+    return $config;
+}
+
+#-----------------------------------------------------------
+
 =head2 getUserScreen ( )
 
 Returns the screen for entering per user configuration for this tax driver.
@@ -213,6 +292,9 @@ Instanciated WebGUI::Session object.
 sub new {
     my $class   = shift;
     my $session = shift;
+
+    WebGUI::Error::InvalidObject->throw( expected => "WebGUI::Session", got => (ref $session), error => "Need a session." )
+        unless $session && $session->isa( 'WebGUI::Session' );
 
     my $self    = {};
     bless $self, $class;

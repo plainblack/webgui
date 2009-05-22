@@ -35,6 +35,7 @@ $session->setting->set( 'specialState', '' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($user);
 $user->username( 'dufresne' . time );
 my $identifier  = 'ritahayworth';
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
@@ -115,8 +116,6 @@ END {
     for my $tag ( @versionTags ) {
         $tag->rollback;
     }
-
-    $user->delete;
 }
 
 #----------------------------------------------------------------------------

@@ -17,6 +17,8 @@ package WebGUI::Asset;
 use Carp qw( croak confess );
 use Scalar::Util qw( blessed );
 use Clone qw(clone);
+use JSON;
+use HTML::Packer;
 
 use WebGUI::AssetBranch;
 use WebGUI::AssetClipboard;
@@ -497,6 +499,19 @@ sub definition {
                         fieldType=>'codearea',
                         defaultValue=>undef,
                         customDrawMethod => 'drawExtraHeadTags',
+                        filter  => 'packExtraHeadTags',
+                    },
+                    extraHeadTagsPacked => {
+                        fieldType       => 'hidden',
+                        defaultValue    => undef,
+                    },
+                    usePackedHeadTags => {
+                        tab             => "meta",
+                        label           => $i18n->get('usePackedHeadTags label'),
+                        hoverHelp       => $i18n->get('usePackedHeadTags description'),
+                        uiLevel         => 7,
+                        fieldType       => 'yesNo',
+                        defaultValue    => 0,
                     },
 				    isPackage=>{
 					    label=>$i18n->get("make package"),
@@ -735,7 +750,7 @@ sub fixUrl {
 	# check to see if the url already exists or not, and increment it if it does
     if ($self->urlExists($self->session, $url, {assetId=>$self->getId})) {
         my @parts = split(/\./,$url);
-        if ($parts[0] =~ /(.*)(\d+$)/) {
+        if ($parts[0] =~ /(.*?)(\d+$)/) {
             $parts[0] = $1.($2+1);
         }
         else {
@@ -1137,7 +1152,10 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-	return $self->get("extraHeadTags");
+	return $self->get('usePackedHeadTags') 
+            ? $self->get('extraHeadTagsPacked')
+            : $self->get("extraHeadTags")
+            ;
 }
 
 
@@ -1979,8 +1997,9 @@ sub outputWidgetMarkup {
     my $styleTemplateId     = shift;
 
     # construct / retrieve the values we'll use later.
-    my $assetId         = $self->getId;
     my $session         = $self->session;
+    my $assetId         = $self->getId;
+    my $hexId           = $session->id->toHex($assetId);
     my $conf            = $session->config;
     my $extras          = $conf->get('extrasURL');
 
@@ -2004,8 +2023,10 @@ sub outputWidgetMarkup {
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
+    $session->log->warn($content);
     my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
-    my $jsonContent     = to_json( { "asset$assetId" => { content => $body } } );
+    $body = $content;
+    my $jsonContent     = to_json( { "asset$hexId" => { content => $body } } );
     $storage->addFileFromScalar("$assetId.js", "data = $jsonContent");
     my $jsonUrl         = $storage->getUrl("$assetId.js");
 
@@ -2031,19 +2052,42 @@ sub outputWidgetMarkup {
         <script type='text/javascript' src='$wgWidgetJs'></script>
         <script type='text/javascript'>
             function setupPage() {
-                WebGUI.widgetBox.doTemplate('widget$assetId'); WebGUI.widgetBox.retargetLinksAndForms();
+                WebGUI.widgetBox.doTemplate('widget$hexId'); WebGUI.widgetBox.retargetLinksAndForms();
                 WebGUI.widgetBox.initButton( { 'wgWidgetPath' : '$wgWidgetPath', 'fullUrl' : '$fullUrl', 'assetId' : '$assetId', 'width' : $width, 'height' : $height, 'templateId' : '$templateId' } );
             }
             YAHOO.util.Event.addListener(window, 'load', setupPage);
         </script>
         $headTags
     </head>
-    <body id="widget$assetId">
-        \${asset$assetId.content}
+    <body id="widget$hexId">
+        \${asset$hexId.content}
     </body>
 </html>
 OUTPUT
     return $output;
+}
+
+#-------------------------------------------------------------------
+
+=head2 packExtraHeadTags ( unpacked )
+
+Pack the extra head tags. Return the unpacked head tags (as per
+filter guidelines).
+
+=cut
+
+sub packExtraHeadTags {
+    my ( $self, $unpacked ) = @_;
+    return $unpacked if !$unpacked;
+    my $packed  = $unpacked;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->update({ extraHeadTagsPacked => $packed });
+    return $unpacked;
 }
 
 #-------------------------------------------------------------------
@@ -2671,11 +2715,7 @@ NOTE: Don't try to override or overload this method. It won't work. What you are
 
 sub www_editSave {
     my $self = shift;
-    
-    my $annotations = "";
-    if ($self->isa("WebGUI::Asset::File::Image")) {
-        $annotations = $self->get("annotations");
-    }
+
     ##If this is a new asset (www_add), the parent may be locked.  We should still be able to add a new asset.
     my $isNewAsset = $self->session->form->process("assetId") eq "new" ? 1 : 0;
     return $self->session->privilege->locked() if (!$self->canEditIfLocked and !$isNewAsset);
@@ -2713,12 +2753,6 @@ sub www_editSave {
             return $self->www_edit();
         }
     }
-    
-    if ($self->isa("WebGUI::Asset::File::Image")) {
-        $object->update({ annotations => $annotations });
-    }
-
-    ### 
 
     $object->updateHistory("edited");
 

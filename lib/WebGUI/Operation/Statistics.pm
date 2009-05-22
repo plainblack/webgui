@@ -14,7 +14,8 @@ use strict;
 use WebGUI::AdminConsole;
 use WebGUI::Cache;
 use WebGUI::International;
-use WebGUI::SQL;
+use WebGUI::Workflow::Cron;
+use WebGUI::DateTime;
 
 =head1 NAME
 
@@ -79,9 +80,56 @@ sub canView {
     return $user->isInGroup( $session->setting->get("groupIdAdminStatistics") );
 }
 
+
 #-------------------------------------------------------------------
 
-=head2 www_viewStatistics ( $session )
+=head2 www_disableSendWebguiStats ()
+
+Deletes the workflow schedule that sends WebGUI statistics to webgui.org.
+
+=cut
+
+sub www_disableSendWebguiStats {
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
+    my $task = WebGUI::Workflow::Cron->new($session, 'send_webgui_statistics');
+    $task->delete;
+    return www_viewStatistics($session);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_enableSendWebguiStats ()
+
+Creates the workflow schedule that sends WebGUI statistics to webgui.org.
+
+=cut
+
+sub www_enableSendWebguiStats {
+    my $session = shift;
+    return $session->privilege->adminOnly() unless canView($session);
+    # we set the current hour, minute, and day of week to send in the stats so we don't DOS webgui.org
+    # by having everybody sending it at the same time
+    my $dt = WebGUI::DateTime->new($session, time());
+    WebGUI::Workflow::Cron->create($session, {
+        enabled         => 1,
+        workflowId      => 'send_webgui_statistics',
+        minuteOfHour    => $dt->minute,
+        hourOfDay       => $dt->hour,
+        dayOfWeek       => ($dt->dow % 7),
+        dayOfMonth      => '*',
+        monthOfYear     => '*', 
+        priority        => 3,
+        title           => 'Send WebGUI Statistics',
+        }, 'send_webgui_statistics');
+    return www_viewStatistics($session);
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 www_viewStatistics ( $session, $sent )
 
 Displays information to the user about WebGUI statistics if they are
 in group Admin (3).
@@ -128,8 +176,8 @@ Number of groups.
 
 sub www_viewStatistics {
 	my $session = shift;
-        return $session->privilege->adminOnly() unless canView($session);
-        my ($output, $data);
+    return $session->privilege->adminOnly() unless canView($session);
+    my ($output, $data);
 	my $i18n = WebGUI::International->new($session);
 	my $url = "http://update.webgui.org/latest-version.txt";
 	my $cache = WebGUI::Cache->new($session,$url,"URL");
@@ -159,7 +207,18 @@ sub www_viewStatistics {
 	($data) = $session->db->quickArray("select count(*) from groups");
 	$output .= '<tr><td align="right" class="tableHeader">'.$i18n->get(89).':</td><td class="tableData">'.$data.'</td></tr>';
 	$output .= '</table>';
-        return _submenu($session,$output);
+
+    $output .= q|<p>|.$i18n->get('why to send','Activity_SendWebguiStats').q|</p>|;
+
+    my $task = WebGUI::Workflow::Cron->new($session, 'send_webgui_statistics');
+    if (defined $task) {
+        $output .= q|<p><a href="|.$session->url->page("op=disableSendWebguiStats").q|">|.$i18n->get('disable','Activity_SendWebguiStats').q|</a></p>|;
+    }
+    else {
+        $output .= q|<p><a href="|.$session->url->page("op=enableSendWebguiStats").q|">|.$i18n->get('enable','Activity_SendWebguiStats').q|</a></p>|;
+    }
+    $output .= q|<p><a href="http://www.webgui.org/stats">http://www.webgui.org/stats</a></p>|;
+    return _submenu($session,$output);
 }
 
 

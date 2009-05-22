@@ -155,6 +155,7 @@ sub addTemplate {
 		namespace => 'Macro/AdminToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
 		id => 'AdminToggleTemplate--Z',
+        usePacked => 0,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -175,8 +176,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)\s/;
+	my ($label) = $text =~ /LABEL=(.+?)\Z/;
 
 	return ($url, $label);
 }

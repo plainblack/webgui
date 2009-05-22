@@ -602,10 +602,22 @@ sub processPropertiesFromFormPost {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Extend the base class to delete from the Thread_read table, and to delete
+the subscriptionGroup for this thread.
+
+=cut
+
 sub purge {
-	my $self = shift;
-	$self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
-        $self->SUPER::purge;
+    my $self = shift;
+    $self->session->db->write("delete from Thread_read where threadId=?",[$self->getId]);
+    my $group = WebGUI::Group->new($self->session, $self->get("subscriptionGroupId"));
+    if ($group) {
+        $group->delete;
+    }
+    $self->SUPER::purge;
 }
 
 #-------------------------------------------------------------------

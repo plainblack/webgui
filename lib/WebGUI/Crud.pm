@@ -20,10 +20,10 @@ use strict;
 use Class::InsideOut qw(readonly private id register);
 use JSON;
 use Tie::IxHash;
+use Clone qw/clone/;
 use WebGUI::DateTime;
 use WebGUI::Exception;
 use WebGUI::Utility;
-
 
 private objectData => my %objectData;
 readonly session => my %session;
@@ -438,8 +438,14 @@ sub crud_updateTable {
 		my $fieldType = $control->getDatabaseFieldType;
 		my $isKey = $properties->{$property}{isQueryKey};
 		my $defaultValue =  $properties->{$property}{defaultValue};
+        if ($properties->{$property}{serialize}) {
+            $defaultValue = JSON->new->canonical->encode($defaultValue);
+        }
 		my $notNullClause = ($isKey || $defaultValue ne "") ? "not null" : "";
-		my $defaultClause = "default ".$dbh->quote($defaultValue) if ($defaultValue ne "");
+		my $defaultClause = '';
+        if ($fieldType !~ /(?:text|blob)$/i) {
+            $defaultClause = "default ".$dbh->quote($defaultValue) if ($defaultValue ne "");
+        }
 		if (exists $tableFields{$property}) {
 			my $changed = 0;
 			
@@ -549,12 +555,11 @@ sub get {
 
 	# return a specific property
 	if (defined $name) {
-		return $objectData{id $self}{$name};
+		return clone $objectData{id $self}{$name};
 	}
 
 	# return a copy of all properties
-	my %copy = %{$objectData{id $self}};	
-	return \%copy;
+	return clone $objectData{id $self};
 }
 
 #-------------------------------------------------------------------
@@ -920,9 +925,11 @@ B<WARNING:> As part of it's validation mechanisms, update() will delete any elem
 
 sub update {
 	my ($self, $data) = @_;
+    my $session = $self->session;
 
 	# validate incoming data
-	my $properties = $self->crud_getProperties($self->session);
+	my $properties = $self->crud_getProperties($session);
+    my $dbData = { $self->crud_getTableKey($session) => $self->getId };
 	foreach my $property (keys %{$data}) {
 
 		# don't save fields that aren't part of our definition
@@ -937,20 +944,23 @@ sub update {
         }
 
 		# serialize if needed
-		if ($properties->{$property}{serialize} && $data->{property} ne "") {
-			$data->{property} = JSON->new->canonical->encode($data->{property});
+		if ($properties->{$property}{serialize} && $data->{$property} ne "") {
+			$dbData->{$property} = JSON->new->canonical->encode($data->{$property});
 		}
+        else {
+            $dbData->{$property} = $data->{$property};
+        }
 	}
 
 	# set last updated
-	$data->{lastUpdated} ||= WebGUI::DateTime->new($self->session, time())->toDatabase;
+	$data->{lastUpdated} ||= WebGUI::DateTime->new($session, time())->toDatabase;
 
 	# update memory
 	my $refId = id $self;
 	%{$objectData{$refId}} = (%{$objectData{$refId}}, %{$data});
 
 	# update the database
-	$self->session->db->setRow($self->crud_getTableName($self->session), $self->crud_getTableKey($self->session), $objectData{$refId});
+	$session->db->setRow($self->crud_getTableName($session), $self->crud_getTableKey($session), $dbData);
 	return 1;
 }
 

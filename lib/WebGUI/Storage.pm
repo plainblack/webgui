@@ -105,6 +105,76 @@ sub _addError {
 	$self->session->errorHandler->error($errorMessage);
 }
 
+#-------------------------------------------------------------------
+
+=head2 _cdnAdd ( )
+
+Adds to CDN queue, for any of the add* methods.
+
+NOTE: This is a private method and should never be called except internally to this package.
+
+=cut
+
+sub _cdnAdd {
+    my $self   = shift;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        if ( $cdnCfg->{'queuePath'} ) {
+            my $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            my $dest;
+            if ( open $dest, '>', $cdnFile ) {
+                close $dest;    # created empty file
+            }
+            else {
+                $self->_addError( "CDN: Couldn't open file $cdnFile for writing due to error: " . $! );
+            }
+        }
+        else {
+            $self->_addError('Invalid CDN configuration - missing queuePath');
+        }
+    }
+} ## end sub _cdnAdd
+
+#-------------------------------------------------------------------
+
+=head2 _cdnDel ( [delDotCdn] )
+
+Add file denoting deletion to the CDN queue, for the clear & delete methods.
+
+NOTE: This is a private method and should never be called except internally to this package.
+
+=head3 delDotCdn
+
+Delete the ".cdn" file - clear vs. delete.
+
+=cut
+
+sub _cdnDel {
+    my $self      = shift;
+    my $delDotCdn = shift;
+    my $cdnCfg    = $self->session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        my $cdnFile;    # path/name of flag and/or queue file
+        if ($delDotCdn) {
+            $cdnFile = $self->getPath . '/.cdn';
+            unlink $cdnFile;
+        }
+        if ( $cdnCfg->{'queuePath'} ) {
+            $cdnFile = $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            my $dest;
+            if ( open $dest, '>', $cdnFile ) {
+                print $dest "deleted\n";
+                close $dest;
+            }
+            else {
+                $self->_addError( "Couldn't open file $cdnFile for writing due to error: " . $! );
+            }
+        }
+        else {
+            $self->_addError('Invalid CDN configuration - missing queuePath');
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub _cdnDel
 
 #-------------------------------------------------------------------
 
@@ -157,6 +227,8 @@ sub _changeOwner {
 =head2 addFileFromCaptcha ( )
 
 Generates a captcha image (200x x 50px) and returns the filename and challenge string (6 random characters). For more information about captcha, consult the Wikipedia here: http://en.wikipedia.org/wiki/Captcha
+
+Note: captcha images will NOT be synchronized to a CDN, even if other files are.
 
 =cut 
 
@@ -212,6 +284,7 @@ sub addFileFromCaptcha {
 =head2 addFileFromFilesystem( pathToFile )
 
 Grabs a file from the server's file system and saves it to a storage location and returns a URL compliant filename.  If there are errors encountered during the add, then it will return undef instead.
+If configured for CDN, add this storage location to CDN queue.
 
 =head3 pathToFile
 
@@ -256,6 +329,7 @@ sub addFileFromFilesystem {
         or $self->_addError("Couldn't copy $pathToFile to ".$self->getPath($filename).": $!");
     close $dest;
     close $source;
+    $self->_cdnAdd;
     return $filename;
 }
 
@@ -265,6 +339,7 @@ sub addFileFromFilesystem {
 =head2 addFileFromFormPost ( formVariableName, attachmentLimit )
 
 Grabs an attachment from a form POST and saves it to this storage location.
+If configured for CDN, add this storage location to CDN queue.
 
 =head3 formVariableName
 
@@ -288,9 +363,11 @@ sub addFileFromFormPost {
     my $filename;
     my $attachmentCount = 1;
     foreach my $upload ($session->request->upload($formVariableName)) {
-        $session->errorHandler->info("Trying to get " . $upload->filename);
-        return $filename
-            if $attachmentCount > $attachmentLimit;
+        $session->errorHandler->info("Trying to get " . $upload->filename." from ".$formVariableName);
+        if ( $attachmentCount > $attachmentLimit ) {
+            $self->_cdnAdd;
+            return $filename;
+        }
         my $clientFilename = $upload->filename;
         next
             unless $clientFilename;
@@ -316,6 +393,7 @@ sub addFileFromFormPost {
             return undef;
         }
     }
+    $filename  and  $self->_cdnAdd;
     return $filename;
 }
 
@@ -325,6 +403,7 @@ sub addFileFromFormPost {
 =head2 addFileFromHashref ( filename, hashref )
 
 Stores a hash reference as a file and returns a URL compliant filename. Retrieve the data with getFileContentsAsHashref.
+If configured for CDN, add this storage location to CDN queue.
 
 =head3 filename
 
@@ -343,6 +422,7 @@ sub addFileFromHashref {
     Storable::nstore($hashref, $self->getPath($filename))
         or $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
     $self->_changeOwner($self->getPath($filename));
+	$filename  and  $self->_cdnAdd;
 	return $filename;
 }
 
@@ -351,6 +431,7 @@ sub addFileFromHashref {
 =head2 addFileFromScalar ( filename, content )
 
 Adds a file to this storage location and returns a URL compliant filename.
+If configured for CDN, add this storage location to CDN queue.
 
 =head3 filename
 
@@ -373,6 +454,7 @@ sub addFileFromScalar {
 		print $FILE $content;
 		close($FILE);
         $self->_changeOwner($self->getPath($filename));
+        $self->_cdnAdd;
 	}
     else {
         $self->_addError("Couldn't create file ".$self->getPath($filename)." because ".$!);
@@ -415,6 +497,7 @@ sub adjustMaxImageSize {
 =head2 clear ( )
 
 Clears a storage locations of all files except the .wgaccess file
+If configured for CDN, add deletion of this location's files, to CDN queue.
 
 =cut
 
@@ -424,6 +507,7 @@ sub clear {
 	foreach my $file (@{$filelist}) {
        $self->deleteFile($file);
     }
+    $self->_cdnDel(1);
 }
 
 
@@ -431,7 +515,8 @@ sub clear {
 
 =head2 copy ( [ storage, filelist ] )
 
-Copies a storage location and it's contents. Returns a new storage location object. Note that this does not copy privileges or other special filesystem properties.
+Copies a storage location and its contents. Returns a new storage location object. Note that this does not copy privileges or other special filesystem properties.
+If configured for CDN, add the resulting new storage location to CDN queue.
 
 =head3 storage
 
@@ -448,6 +533,7 @@ sub copy {
     my $newStorage = shift || WebGUI::Storage->create($self->session);
     my $filelist = shift || $self->getFiles(1);
     foreach my $file (@{$filelist}) {
+        next if  $file eq '.cdn';
         open my $source, '<:raw', $self->getPath($file) or next;
         open my $dest, '>:raw', $newStorage->getPath($file) or next;
         File::Copy::copy($source, $dest) or $self->_addError("Couldn't copy file ".$self->getPath($file)." to ".$newStorage->getPath($file)." because ".$!);
@@ -455,6 +541,7 @@ sub copy {
         close $source;
         $newStorage->_changeOwner($newStorage->getPath($file));
     }
+    $newStorage->_cdnAdd;
     return $newStorage;
 }
 
@@ -464,6 +551,7 @@ sub copy {
 
 Copy a file in this storage location. C<filename> is the file to copy. 
 C<newFilename> is the new file to create.
+If configured for CDN, add this storage location to CDN queue.
 
 =cut
 
@@ -481,6 +569,7 @@ sub copyFile {
         || croak "Couldn't copy '$filename' to '$newFilename': $!";
     $self->_changeOwner($self->getPath($filename));
 
+    $self->_cdnAdd;
     return undef;
 }
 
@@ -528,7 +617,7 @@ sub createTemp {
 	my $path    = $session->id->toHex($id);
 
 	$path =~ m/^(.{2})/;
-	my $self = {_session=>$session, _id => $id, _pathParts => ['temp', $1, $path], _errors => []};
+	my $self = {_session=>$session, _id => $id, _Hexid => $path, _pathParts => ['temp', $1, $path], _errors => []};
 	bless $self, ref($class)||$class;
 	$self->_makePath;
 	return $self;
@@ -539,6 +628,7 @@ sub createTemp {
 =head2 delete ( )
 
 Deletes this storage location and its contents (if any) from the filesystem.
+If configured for CDN, add deletion of this storage location to CDN queue.
 
 =cut
 
@@ -554,6 +644,8 @@ sub delete {
         # can only remove empty directories, will fail silently otherwise
         rmdir $fullPath;
     }
+    # Delete the content from the CDN - enqueue
+    $self->_cdnDel(0);
     $self->session->errorHandler->info("Deleted storage ".$self->getId);
     return undef;
 }
@@ -562,7 +654,7 @@ sub delete {
 
 =head2 deleteFile ( filename )
 
-Deletes a file from it's storage location.
+Deletes a file from its storage location.
 
 =head3 filename
 
@@ -580,6 +672,40 @@ sub deleteFile {
     unlink($self->getPath($filename));
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 deleteFromCdn ( )
+
+Run config/cdn/deleteProgram to synchronize this location to Content Delivery Network.
+Replace %s with the path of the storage location.
+Also delete the related file in config/cdn/queuePath.
+
+=cut
+
+sub deleteFromCdn {
+    my $self   = shift;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'syncProgram'} )
+    {
+        my $id = $self->getHexId;
+        my $cmd = sprintf( $cdnCfg->{'deleteProgram'}, $id );
+        if ( $cmd =~ /$id/ ) {    # sanity check, no rm -rf /
+            system($cmd);
+            if ($?) {             # This may occur benign in the case delete after clear
+                $self->_addError("Error running CDN deleteProgram: $?");
+            }
+            if ( $cdnCfg->{'queuePath'} ) {
+                unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+            }
+        }
+        else {                    # Presume configuration error, missing %s
+            $self->_addError("CDN deleteProgram: storage ID missing from command: $cmd");
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub deleteFromCdn
 
 #-------------------------------------------------------------------
 
@@ -604,7 +730,7 @@ sub get {
     my $id      = shift;
     return undef
         unless $id;
-    my $self = bless {_session=>$session, _id => $id, _errors => []}, $class;
+    my $self = bless {_session=>$session, _id => $id, _hexId => $session->id->toHex($id), _errors => []}, $class;
 
     my $uploadsRoot = $session->config->get('uploadsPath');
     my @parts = ($id =~ m/^((.{2})(.{2}).+)/)[1,2,0];
@@ -613,8 +739,7 @@ sub get {
         return $self;
     }
     if (!-e join('/', $uploadsRoot, @parts)) {
-        my $hexId = $session->id->toHex($id);
-        @parts = ($hexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
+        @parts = ($self->getHexId =~ m/^((.{2})(.{2}).+)/)[1,2,0];
     }
     $self->{_pathParts} = \@parts;
     # create the folder in case it got deleted somehow
@@ -676,6 +801,46 @@ sub generateThumbnail {
 	return 1;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 getCdnFileIterator ( session )
+
+Class method to return an iterator method full of storage objects to
+be updated or deleted, based upon what's in config/cdn/queuePath.
+
+=head3 session
+
+A reference to the current session.
+
+=cut
+
+sub getCdnFileIterator {
+    my $class   = shift;
+    my $session = shift;
+    my $cdnCfg  = $session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} ) {
+        if ( $cdnCfg->{'queuePath'} ) {
+            if ( opendir my $DH, $cdnCfg->{'queuePath'} ) {
+                my @ids = grep { !/^\.+$/ } readdir($DH);
+                close $DH;
+                my $sub = sub {
+                    my $id = shift @ids;
+                    return if !$id;
+                    return $class->get( $session, $session->id->fromHex($id) );
+                };
+                return $sub;
+            }
+            else {
+                $session->errorHandler->warn("CDN: cannot read directory $cdnCfg->{'queuePath'}");
+            }
+        }
+        else {
+            $session->errorHandler->warn("CDN: enabled but no queuePath");
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub getCdnFileIterator
+
 #-------------------------------------------------------------------
 
 =head2 getSize ( filename ) 
@@ -701,6 +866,7 @@ sub getSize {
 
 	return($x, $y);
 }
+
 
 #-------------------------------------------------------------------
 
@@ -880,6 +1046,20 @@ sub getFileId {
 
 #-------------------------------------------------------------------
 
+=head2 getHexId ( )
+
+Returns the unique identifier of this storage location in hexadecimal format
+instead of base64.
+
+=cut
+
+sub getHexId {
+	my $self = shift;
+	return $self->{_hexId};
+}
+
+#-------------------------------------------------------------------
+
 =head2 getId ( )
 
 Returns the unique identifier of this storage location.
@@ -1021,18 +1201,36 @@ If specified, we'll return a URL to the file rather than the storage location.
 =cut
 
 sub getUrl {
-	my $self = shift;
-	my $file = shift;
-	my $url = $self->session->config->get("uploadsURL")
-            . '/'
-            . $self->getPathFrag;
-	if (defined $file) {
-		$url .= '/'.$file;
-	}
-	return $url;
-}
-
-
+    my $self   = shift;
+    my $file   = shift;
+    my $url    = $self->session->config->get("uploadsURL") . '/' . $self->getPathFrag;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'url'}
+        and -e $self->getPath . '/.cdn' )
+    {
+        my $sep = '/';    # separator, if not already present trailing
+        if ($cdnCfg->{'sslAlt'}
+            and (  $self->session->env->get('HTTPS') eq 'on'
+                or $self->session->env->get('SSLPROXY') )
+            )
+        {
+            if ( $cdnCfg->{'sslUrl'} ) {
+                substr( $cdnCfg->{'sslUrl'}, -1 ) eq '/' and $sep = '';
+                $url = $cdnCfg->{'sslUrl'} . $sep . $self->getHexId;
+            }             # else do NOT override $url with CDN URL  ($url = $sslUrl || $url)
+        }
+        else {
+            substr( $cdnCfg->{'url'}, -1 ) eq '/' and $sep = '';
+            $url = $cdnCfg->{'url'} . $sep . $self->getHexId;
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+    if ( defined $file ) {
+        $url .= '/' . $file;
+    }
+    return $url;
+} ## end sub getUrl
 
 #-------------------------------------------------------------------
 
@@ -1408,6 +1606,46 @@ sub setPrivileges {
 }
 
 
+#-------------------------------------------------------------------
+
+=head2 syncToCdn ( )
+
+Run config/cdn/syncProgram to synchronize this location to Content Delivery Network.
+Replace %s with the path of the storage location.
+Also put an empty ".cdn" file in the storage location, and then delete
+the related file in config/cdn/queuePath.
+
+=cut
+
+sub syncToCdn {
+    my $self   = shift;
+    my $cdnCfg = $self->session->config->get('cdn');
+    if (    $cdnCfg
+        and $cdnCfg->{'enabled'}
+        and $cdnCfg->{'syncProgram'} )
+    {
+        my $originalDir = Cwd::cwd();
+        my $locDir = join '/', $self->session->config->get('uploadsPath'), @{ $self->{_pathParts} }[ 0 .. 1 ];
+        chdir $locDir or croak 'Unable to chdir to ' . $locDir . " : $!";
+        my $cmd = sprintf( $cdnCfg->{'syncProgram'}, $self->getHexId );
+        system($cmd);
+        if ($?) {
+            $self->_addError("Error running CDN syncProgram: $?");
+        }
+        elsif ( $cdnCfg->{'queuePath'} ) {
+            unlink $cdnCfg->{'queuePath'} . '/' . $self->getHexId;
+        }
+        chdir $originalDir;
+        my $dest;
+        my $cdnFile = $self->getPath . '/.cdn';
+        if ( open $dest, '>', $cdnFile ) {
+            close $dest;    # created empty file
+        }
+        else {
+            $self->_addError( "Couldn't open file $cdnFile for writing due to error: " . $! );
+        }
+    } ## end if ( $cdnCfg and $cdnCfg...
+} ## end sub syncToCdn
 
 #-------------------------------------------------------------------
 

@@ -737,7 +737,8 @@ sub www_manageGroupsInGroup {
 		-excludeGroups=>\@groups,
 		-label=>$i18n->get(605),
 		-size=>5,
-		-multiple=>1
+		-multiple=>1,
+        -defaultValue=>[],
 		);
     $f->submit;
     my $output = $f->print;

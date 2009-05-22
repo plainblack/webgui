@@ -1,3 +1,101 @@
+7.7.7
+ - Added EMS Schedule table
+ - rfe #10061: Use email as username at registration
+ - Added WebGUI community statistics question to the site setup wizard.
+ - Added Ogone payment plugin ( Martin Kamerbeek / Oqapi )
+ - Improved VAT number management for admins ( Martin Kamerbeek / Oqapi )
+ - rfe #9981: RedirectAfterLogin Setting
+ - Added user create, update, and delete web services ( HD Publishing )
+ - Added Survey web test suite for validating expression/branching logic
+ - fixed SMS i18n for the user profile fields.
+ - added Google Maps asset
+ - added a way for authors to prevent debugging output on page requests
+ - added --noprompt option to testEnvironment.pl to automatically install modules
+ - added FilePump, a way to reduce Yslow scores by minimizing JS, CSS and the number of files transferred.
+ - fixed #10394: CC Purchases Fail When Variants Contain Trailing Zero(s)
+ - fixed #10332: Matrix: last updated fields = today
+ - fixed Thread subscription groups not cleaned up during purge.
+ - fixed: Story subtitle is supposed to be a text field, not a text area.
+ - fixed: Display of short pagination bar when there's less than 1 page of data in StoryArchive
+ - added: Storage now has a getHexId method for returning a cached hexadecimal version of the storageId.
+ - fixed: FilePump should copy filesystem directories and their files when given a file URI that is a directory.
+ - fixed #10133: Matrix compare for priv. group open to any user
+ - added: Activate, Deactivate, Delete User workflow activities
+
+7.7.6
+ - Added mobile style template.  If enabled in settings, will serve alternate style templates
+   and page layout templates to matching user agents.  Also adds the 'mobileExportPath' config
+   variable where the mobile version of the site will be exported in addition to the normal
+   export process.
+ - Clean up the Asset export API to allow for easier re-use.
+ - New features in the UKplayer slidehow: you can hide the textblock, volume
+   slider and mute button, resize the textblock and thumbnails. A new demo 
+   config is added. See: /extras/ukplayer/slideshow.html (Rogier Voogt, Arjan 
+   Widlak / United Knowledge)
+ - Added internationalisations in Gallery.pm "Return to Album" and "Add Photo"
+   (Arjan Widlak / United Knowledge)
+ - Reverted using the packed templates and snippets by default. You can re-enable the packed templates and snippets carefully.
+ - Added support for template attachments; scripts and stylesheets that will
+   be included using style->setScript and setLink instead of just using raw
+   head tags.
+ - Added the WebGUI stats system, which will allow site admins to submit
+   information about their site to a central repository on webgui.org which
+   help the developers make WebGUI better.
+ - fixed #10322: Dataform: wrong attr on script tag
+ - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
+ - fixed: Crud handling of Form fields with database types that cannot have default values.
+ - fixed: Crud serialization.
+ - fixed: URLs that shouldn't happen  (#10353)
+ - Added more information output to EMS record importer.
+ - Fixed a search tickets problem in the EMS badge builder template.
+ - Fixed a problem in the EMS calculating prices on tickets with a badge that
+   has an existing ribbon.
+ - Fixed a search results display error with synopsis.
+ - Fixed a load problem with Code Editor by making user toggle it on. This is
+   better than normal anyway since many users appear not to want to use the
+   editor in most cases.
+ - fixed: i18n typo in Survey exit URL hover help.
+ - fixed: Survey jump target and jump expression precedence order across Section, Question, Answer.
+ - rfre #9998: Mark inbox messages read/unread
+ - The transaction items now store the tax that is applied to them, as well as
+   tax plugin specific data that needs to be stored together with
+   transactions. (Martin Kamerbeek / Oqapi )
+ - Added better Survey Expression Engine validation warnings
+ - added #9203: Survey Visualization
+ - rfe #10253: add ability to select the htmlArea Rich Text Editor for DataForm
+ - Added: United States Postal Service Shipping Driver.
+ - Refactored transaction tmpl_var generation into WebGUI::Shop::Transaction. ( Martin Kamerbeek / Oqapi )
+ - rfe #9906: Inbox Filtering
+ - rfe #9911: Inbox: Copy Sender
+ - rfe #9907: Inbox: Notifications
+ - rfe #9134: Pluggable Storage to support Amazon S3 and Cloudfront (Funded by donor.com, coded by Whizman)
+ - Added PayPal paydriver. (Thanks to Paul Wrightson)
+ - rfe #9908: Inbox: SMS delivery
+ - rfe #9204: Add Reply Filter Code Option to Collaboration System - provides ability to specify a code filter for collaboration system replies which might be different than the one used for posts.  Also adds ability to specify a different Rich Editor for replies.
+ - rfe #10384: Change the view Groups in this Group area
+ - rfe #10254: Profile address as default for shop shipping and billing
+   address ( Martin Kamerbeek / Oqapi )
+
+7.7.5
+ - Adding StoryManager.
+ - rfe: Button to Turn Admin Off on Admin Accordian  (#475)
+ - fixed #10223: Calendar List View Ignores Event Permissions (dhelsten)
+ - fixed #10226: html2text dropping text
+ - fixed #10210: Generated Message-Id invalid (patch basis from tektek)
+ - fixed #10209: Changing existing user profile field type doesn't change underlying database column type
+ - fixed #10047: SQLReport Debug doesn't catch when bind variables are incorrect
+ - fixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
+ - fixed #10238: Edit Calendar Event not working when proxy cache disabled
+ - Fixed a bug in the RssFeed aspect that would cause the wrong HEAD links to be made for the feeds when exporting.
+ - Fixed a bug in the YUI simple editor for survey editing which was leaking memory.  Also improved the object edit templates.
+ - fixed #10184: Matrix 2.0 - Version Tag Duplicate Type
+ - fixed #10182: Matrix 2.0 - Comparison view broken in IE 6 & 7
+ - Added individual shipping requirements to the Sku.
+ - added #10145: Global Head Tags in Settings
+ - added packing to templates, snippets, and head tags. 
+ - added #9289: Extending the "Request Approval For Version Tag" activity by reversing the test (Bernd Kalbfuß-Zimmermann)
+ - added: Survey sections now have logical section type, which is never shown to the user, only used for silently checking gotos.
+
 7.7.4
  - rfe: Extend DateTime for Week-Nrs  (#9151)
  - fixed: 7.6 upgrade left some default content marked as packages

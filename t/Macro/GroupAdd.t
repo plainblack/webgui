@@ -156,11 +156,13 @@ sub setupTest {
 	$groups[1] = WebGUI::Group->new($session, "new");
 	$groups[1]->name('Regular Old Group');
 	$groups[1]->autoAdd(0);
+    WebGUI::Test->groupsToDelete(@groups);
 
 	##Three users.  One in each group and one with no group membership
 	my @users = map { WebGUI::User->new($session, "new") } 0..2;
 	$users[0]->addToGroups([$groups[0]->getId]);
 	$users[1]->addToGroups([$groups[1]->getId]);
+    WebGUI::Test->usersToDelete(@users);
 
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
 	$versionTag->set({name=>"GroupAdd test"});
@@ -172,6 +174,7 @@ sub setupTest {
 		template => "HREF=<tmpl_var group.url>\nLABEL=<tmpl_var group.text>",
 		#     '1234567890123456789012'
 		id => 'GroupAdd001100Template',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -193,20 +196,13 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }
 
-
 END { ##Clean-up after yourself, always
-	foreach my $testGroup (@{ $groups }, ) {
-		$testGroup->delete if (defined $testGroup and ref $testGroup eq 'WebGUI::Group');
-	}
-	foreach my $dude (@{ $users }, ) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
 	}

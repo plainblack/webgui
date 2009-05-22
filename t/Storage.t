@@ -29,7 +29,7 @@ my $cwd = Cwd::cwd();
 
 my ($extensionTests, $fileIconTests) = setupDataDrivenTests($session);
 
-my $numTests = 74; # increment this value for each test you create
+my $numTests = 103; # increment this value for each test you create
 plan tests => $numTests + scalar @{ $extensionTests } + scalar @{ $fileIconTests };
 
 my $uploadDir = $session->config->get('uploadsPath');
@@ -72,6 +72,12 @@ is( $storage1->getPathFrag, '7e/8a/7e8a1b6a', 'pathFrag returns correct value');
 # getPath, getUrl
 #
 ####################################################
+
+my $savecdn = $session->config->get('cdn');
+if ($savecdn) {
+    $session->config->delete('cdn');
+}
+# Note: the CDN configuration will be reverted after CDN tests below
 
 my $storageDir1 = join '/', $uploadDir, '7e', '8a', '7e8a1b6a';
 is ($storage1->getPath, $storageDir1, 'getPath: path calculated correctly for directory');
@@ -136,7 +142,7 @@ undef $storage3;
 
 ####################################################
 #
-# create
+# create, getHexId
 #
 ####################################################
 
@@ -144,6 +150,7 @@ $storage1 = WebGUI::Storage->create($session);
 
 isa_ok( $storage1, "WebGUI::Storage");
 ok($session->id->valid($storage1->getId), 'create returns valid sessionIds');
+is($storage1->getHexId, $session->id->toHex($storage1->getId), 'getHexId, returns the hexadecimal value of the GUID');
 
 is( $storage1->getErrorCount, 0, "No errors during object creation");
 
@@ -369,6 +376,117 @@ foreach my $iconTest (@{ $fileIconTests }) {
 	is( $storage1->getFileIconUrl($iconTest->{filename}), $iconTest->{iconUrl}, $iconTest->{comment} );
 }
 
+####################################################
+#
+# CDN (Content Delivery Network)
+#
+####################################################
+
+my $cdnCfg = {
+    "enabled"       => 1,
+    "url"           => "file:///data/storage",
+    "queuePath"     => "/data/cdnqueue",
+    "syncProgram"   => "cp -r -- '%s' /data/storage/",
+    "deleteProgram" => "rm -r -- '/data/storage/%s' > /dev/null 2>&1"
+};
+my ($addedCdnQ, $addedCdnU);
+$addedCdnQ = mkdir $cdnCfg->{'queuePath'}  unless -e $cdnCfg->{'queuePath'};
+my $dest = substr($cdnCfg->{'url'}, 7);
+$addedCdnU = mkdir $dest  unless  -e $dest;
+$session->config->set('cdn', $cdnCfg);
+my $cdnUrl = $cdnCfg->{'url'};
+my $cdnUlen = length $cdnUrl;
+my $cdnStorage = WebGUI::Storage->create($session);
+# Functional URL before sync done
+my $hexId = $session->id->toHex($cdnStorage->getId);
+my $initUrl = join '/', $uploadUrl, $cdnStorage->getPathFrag;
+is ($cdnStorage->getUrl, $initUrl, 'CDN: getUrl: URL before sync');
+$filename = $cdnStorage->addFileFromScalar('cdnfile1', $content);
+is ($filename, 'cdnfile1', 'CDN: filename returned by addFileFromScalar');
+my $qFile = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex($cdnStorage->getId);
+my $dotCdn = $cdnStorage->getPath . '/.cdn';
+ok (-e $qFile, 'CDN: queue file created when file added to storage');
+
+### getCdnFileIterator
+my $found = 0;
+my $sobj = undef;
+my $flist;
+my $cdnPath = substr($cdnUrl, 7) . '/' . $hexId;
+my $cdnFn = $cdnPath . '/' . $filename;
+my $locIter = WebGUI::Storage->getCdnFileIterator($session);
+my $already;  # test the object type only once
+if (is(ref($locIter), 'CODE', 'CDN: getCdnFileIterator to return sub ref')) {
+   while (my $sobj = $locIter->()) {
+      unless ($already) {
+         ok($sobj->isa('WebGUI::Storage'), 'CDN: iterator produces Storage objects');
+         $already = 1;
+      }
+      if ($sobj->getId eq $cdnStorage->getId) {  # the one we want to test with
+         ++$found;
+         $flist = $sobj->getFiles;
+         if (is(scalar @$flist, 1, 'CDN: there is one file in the storage')) {
+            my $file1 = $flist->[0];
+            is ($file1, $filename, 'CDN: correct filename in the storage');
+         }
+      }
+   }
+}
+is ($found, 1, 'CDN: getCdnFileIterator found storage');
+### syncToCdn
+$cdnStorage->syncToCdn;
+ok( (-e $cdnPath and -d $cdnPath), 'CDN: target directory created');
+ok( (-e $cdnFn and -T $cdnFn), 'CDN: target text file created');
+is (-s $cdnFn, length $content, 'CDN: file is the right size');
+ok (!(-e $qFile), 'CDN: queue file removed after sync');
+ok (-e $dotCdn, 'CDN: dot-cdn flag file present after sync');
+### getUrl with CDN
+my $locUrl = $cdnUrl . '/' . $session->id->toHex($cdnStorage->getId);
+is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: URL for directory');
+my $fileUrl = $locUrl . '/' . 'cdn-file';
+is ($cdnStorage->getUrl('cdn-file'), $fileUrl, 'CDN: getUrl: URL for file');
+# SSL
+my %mockEnv = %ENV;
+my $env = Test::MockObject::Extends->new($session->env);
+$env->mock('get', sub { return $mockEnv{$_[1]} } );
+$mockEnv{HTTPS} = 'on';
+$cdnCfg->{'sslAlt'} = 1;
+$session->config->set('cdn', $cdnCfg);
+is ($cdnStorage->getUrl, $initUrl, 'CDN: getUrl: URL with sslAlt flag');
+$cdnCfg->{'sslUrl'} = 'https://ssl.example.com';
+$session->config->set('cdn', $cdnCfg);
+my $sslUrl = $cdnCfg->{'sslUrl'} . '/' . $session->id->toHex($cdnStorage->getId);
+is ($cdnStorage->getUrl, $sslUrl, 'CDN: getUrl: sslUrl');
+$mockEnv{HTTPS} = undef;
+is ($cdnStorage->getUrl, $locUrl, 'CDN: getUrl: cleartext request to not use sslUrl');
+# Copy
+my $cdnCopy = $cdnStorage->copy;
+my $qcp = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex($cdnCopy->getId);
+ok (-e $qcp, 'CDN: queue file created when storage location copied');
+my $dotcp = $cdnCopy->getPath . '/.cdn';
+ok (!(-e $dotcp), 'CDN: dot-cdn flag file absent after copy');
+# On clear, need to see the entry in cdnQueue
+$qFile = $cdnCfg->{'queuePath'} . '/' . $session->id->toHex($cdnStorage->getId);
+$cdnStorage->clear;
+ok (-e $qFile, 'CDN: queue file created when storage cleared');
+ok (-s $qFile >= 7 && -s $qFile <= 9, 'CDN: queue file has right size for deleted (clear)');
+ok (!(-e $dotCdn), 'CDN: dot-cdn flag file absent after clear');
+### deleteFromCdn
+$cdnStorage->deleteFromCdn;
+ok(! (-e $cdnPath), 'CDN: target directory removed');
+ok(! (-e $qFile), 'CDN: queue file removed');
+# Idea: add a file back before testing delete
+# Note: expect it is necessary to be able to delete after clear.
+# On delete, need to see the entry in cdnQueue
+$cdnStorage->delete;
+ok (-e $qFile, 'CDN: queue file created when storage deleted');
+ok (-s $qFile >= 7 && -s $qFile <= 9, 'CDN: queue file has right size for deleted');
+$cdnStorage->deleteFromCdn;
+ok(! (-e $qFile), 'CDN: queue file removed');
+
+# partial cleanup here; complete cleanup in END block
+undef $cdnStorage;
+$session->config->delete('cdn');
+
 
 ####################################################
 #
@@ -452,8 +570,15 @@ END {
         $storage1,   $storage2, $storage3, $copiedStorage,
         $secondCopy, $s3copy,   $tempStor, $tarStorage,
         $untarStorage, $fileStore,
-        $hackedStore,
+        $hackedStore, $cdnStorage, $cdnCopy,
     ) {
 		ref $stor eq "WebGUI::Storage" and $stor->delete;
 	}
+	if ($savecdn) {
+	   $session->config->set('cdn', $savecdn);
+	} else {
+	   $session->config->delete('cdn');
+	}
+	$addedCdnQ  and  rmdir $addedCdnQ;
+	$addedCdnU  and  rmdir $addedCdnU;
 }

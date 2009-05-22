@@ -267,16 +267,28 @@ A unique id for this message, in case you want to see what replies come in for i
 
 If this is a reply to a previous message, then you should specify the messageId of the previous message here.
 
+=head3 isInbox
+
+A flag indicating that this email message is from the Inbox, and should follow per user settings
+for delivery.
+
 =cut
 
 sub create {
 	my $class = shift;
 	my $session = shift;
 	my $headers = shift;
+    my $isInbox = shift;
 	if ($headers->{toUser}) {
 		my $user = WebGUI::User->new($session, $headers->{toUser});
 		if (defined $user) {
-			my $email = $user->profileField("email");
+            my $email;
+            if ($isInbox) {
+                $email = $user->getInboxAddresses;
+            }
+            else {
+                $email = $user->profileField("email");
+            }
 			if ($email) {
 				if ($headers->{to}) {
 					$headers->{to} .= ','.$email;
@@ -286,19 +298,21 @@ sub create {
 			}	
 		}
 	}
-    my $from    = $headers->{from} || $session->setting->get('comanyName') . " <".$session->setting->get("companyEmail").">";
+    my $from    = $headers->{from}        || $session->setting->get('comanyName') . " <".$session->setting->get("companyEmail").">";
 	my $type    = $headers->{contentType} || "multipart/mixed";
-    my $replyTo = $headers->{replyTo} ||  $session->setting->get("mailReturnPath");
+    my $replyTo = $headers->{replyTo}     || $session->setting->get("mailReturnPath");
 
     # format of Message-Id should be '<unique-id@domain>'
     my $id = $headers->{messageId} || "WebGUI-" . $session->id->generate;
     if ($id !~ m/\@/) {
         my $domain = $from;
-        $domain =~ s/.*\@//msx;
+        $domain =~ s/^.*\@//msx;
+        $domain =~ s/>$//msx;
         $id .= '@' . $domain;
     }
-    if ($id !~ m/[<>]/msx) {
-        $id = "<$id>";
+    if ($id !~ m/^<.+?>$/msx) {
+        $id =~ s/(^<)|(>$)//msxg;
+        $id = "<".$id.">";
     }
 	my $message = MIME::Entity->build(
 		Type=>$type,
@@ -324,7 +338,7 @@ sub create {
 		delete $headers->{toGroup};
 		$message->attach(Data=>"This message was intended for ".$to." but was overridden in the config file.\n\n");
 	}
-	bless {_message=>$message,  _session=>$session, _toGroup=>$headers->{toGroup} }, $class;
+	bless {_message=>$message,  _session=>$session, _toGroup=>$headers->{toGroup}, _isInbox => $isInbox }, $class;
 }
 
 #-------------------------------------------------------------------
@@ -467,10 +481,10 @@ sub send {
         else {
             my $smtp = Net::SMTP->new($smtpServer); # connect to an SMTP server
             if (defined $smtp) {
-                $smtp->mail($mail->head->get("X-Return-Path")); 
-                $smtp->to(split(",",$mail->head->get("to"))); 
-                $smtp->cc(split(",",$mail->head->get("cc")));
-                $smtp->bcc(split(",",$mail->head->get("bcc")));
+                $smtp->mail($mail->head->get('X-Return-Path')); 
+                $smtp->to(  split(',', $mail->head->get('to')  )); 
+                $smtp->cc(  split(',', $mail->head->get('cc')  ));
+                $smtp->bcc( split(',', $mail->head->get('bcc') ));
                 $smtp->data();              # Start the mail
                 $smtp->datasend($mail->stringify);
                 $smtp->dataend();           # Finish sending the mail
@@ -490,15 +504,21 @@ sub send {
     if ($group) {
         my $group = WebGUI::Group->new($self->session, $group);
         return $status if !defined $group;
-        $mail->head->replace("bcc", undef);
-        $mail->head->replace("cc", undef);
-        foreach my $userId (@{$group->getAllUsers(1)}) {
+        $mail->head->replace('bcc', undef);
+        $mail->head->replace('cc',  undef);
+        USER: foreach my $userId (@{$group->getAllUsers(1)}) {
             my $user = WebGUI::User->new($self->session, $userId);
-            next unless $user->status eq 'Active';  ##Don't send this to invalid user accounts
-            if ($user->profileField("email")) {
-                $mail->head->replace("To",$user->profileField("email"));
-                $self->queue;
+            next USER unless $user->status eq 'Active';    ##Don't send this to invalid user accounts
+            my $emailAddress;
+            if ($self->{_isInbox}) {
+                $emailAddress = $user->getInboxAddresses;
             }
+            else {
+                $emailAddress = $user->profileField('email');
+            }
+            next USER unless $emailAddress;
+            $mail->head->replace('To', $emailAddress);
+            $self->queue;
         }
         #Delete the group if it is flagged as an AdHocMailGroup
         $group->delete if ($group->isAdHocMailGroup);

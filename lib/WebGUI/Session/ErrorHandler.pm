@@ -121,6 +121,9 @@ sub canShowDebug {
     ##This check prevents in infinite loop during startup.
     return 0 unless ($self->session->hasSettings);
 
+    # Allow programmers to stop debugging output for certain requests
+    return 0 if $self->{_preventDebugOutput};
+
     my $canShow = $self->session->setting->get("showDebug")
         && $self->canShowBasedOnIP('debugIp');
     $self->{_canShowDebug} = $canShow;
@@ -323,6 +326,22 @@ sub new {
     Log::Log4perl->init_once( $session->config->getWebguiRoot."/etc/log.conf" );   
 	my $logger = Log::Log4perl->get_logger($session->config->getFilename);
 	bless {_queryCount=>0, _logger=>$logger, _session=>$session}, $class;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 preventDebugOutput ( )
+
+Prevent this session from sending debugging output even if we're supposed to.
+
+Some times we need to use 'text/html' to send non-html content (these may be
+browser limitations, but we need to work with them).
+
+=cut
+
+sub preventDebugOutput {
+    my ( $self ) = @_;
+    $self->{_preventDebugOutput} = 1;
 }
 
 #-------------------------------------------------------------------

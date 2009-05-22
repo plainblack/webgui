@@ -186,12 +186,17 @@ sub getOperations {
 
         'ssoViaSessionId' => 'SSO',
 
+		'disableSendWebguiStats' => 'Statistics',
+		'enableSendWebguiStats' => 'Statistics',
 		'viewStatistics' => 'Statistics',
 
 		'makePrintable' => 'Style',
 		'setPersonalStyle' => 'Style',
 		'unsetPersonalStyle' => 'Style',
 
+        'ajaxCreateUser' => 'User',
+        'ajaxDeleteUser' => 'User',
+        'ajaxUpdateUser' => 'User',
 		'becomeUser' => 'User',
 		'deleteUser' => 'User',
 		'editUser' => 'User',

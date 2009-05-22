@@ -179,8 +179,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }
@@ -188,7 +188,6 @@ sub simpleTextParser {
 sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
-	my $editGroup = WebGUI::Group->new($session, "new");
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -199,7 +198,8 @@ sub setupTest {
 		url => 'editabletoggle-test',
 		namespace => 'Macro/LoginToggle',
 		template => "HREF=<tmpl_var toggle.url>\nLABEL=<tmpl_var toggle.text>",
-		groupIdEdit => $editGroup->getId(),
+		groupIdEdit => $tao->getId(),
+        usePacked => 1,
 		#     '1234567890123456789012'
 		id => 'LoginToggleTemplateA01',
 	};

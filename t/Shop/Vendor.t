@@ -45,6 +45,7 @@ my $fenceUser = WebGUI::User->new($session, 'new');
 $fenceUser->username('fence');
 my $guardUser = WebGUI::User->new($session, 'new');
 $guardUser->username('guard');
+WebGUI::Test->usersToDelete($fenceUser, $guardUser);
 
 SKIP: {
 
@@ -312,7 +313,5 @@ undef $guard;
 # Cleanup
 END {
     $fence->delete;
-    $fenceUser->delete;
-    $guardUser->delete;
     is( scalar @{  WebGUI::Shop::Vendor->getVendors($session) }, $numberOfVendors, 'No vendors leaked');
 }

@@ -245,8 +245,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }
@@ -255,6 +255,7 @@ sub setupTest {
 	my ($session, $defaultNode) = @_;
 	$session->user({userId=>3});
 	my $editGroup = WebGUI::Group->new($session, "new");
+    WebGUI::Test->groupsToDelete($editGroup);
 	my $tao = WebGUI::Group->find($session, "Turn Admin On");
 	##Create an asset with specific editing privileges
 	my $versionTag = WebGUI::VersionTag->getWorking($session);
@@ -268,6 +269,7 @@ sub setupTest {
 		groupIdEdit => $editGroup->getId(),
 		#     '1234567890123456789012'
 		id => 'EditableToggleTemplate',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -276,14 +278,12 @@ sub setupTest {
 	$users[1]->addToGroups([$editGroup->getId]);
 	##User 2 is an editor AND can turn on Admin
 	$users[2]->addToGroups([$editGroup->getId, $tao->getId]);
+    WebGUI::Test->usersToDelete(@users);
 	return ($versionTag, $asset, @users);
 }
 
 END { ##Clean-up after yourself, always
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {
 		$versionTag->rollback;
-	}
-	foreach my $dude (@users) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
 	}
 }

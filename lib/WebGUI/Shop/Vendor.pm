@@ -145,8 +145,8 @@ sub getPayoutTotals {
     my $self    = shift;
 
     my %totals = $self->session->db->buildHash(
-        'select vendorPayoutStatus, sum(vendorPayoutAmount) as amount from transactionItem '
-        .'where vendorId=? group by vendorPayoutStatus ',
+        'select vendorPayoutStatus, sum(vendorPayoutAmount) as amount from transactionItem as t1, transaction as t2 '
+        .'where t1.transactionId = t2.transactionId and t2.isSuccessful <> 0 and vendorId=? group by vendorPayoutStatus ',
         [ $self->getId ]
     );
 
@@ -480,14 +480,13 @@ Displays the payout manager.
 sub www_managePayouts {
     my $class   = shift;
     my $session = shift;
+    my $style   = $session->style;
+    my $url     = $session->url;
 
     my $admin   = WebGUI::Shop::Admin->new($session);
     return $session->privilege->adminOnly() unless ($admin->canManage);
     
     # Load the required YUI stuff.
-    my $style = $session->style;
-    my $url = $session->url;
-
     $style->setLink($url->extras('yui/build/paginator/assets/skins/sam/paginator.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink($url->extras('yui/build/datatable/assets/skins/sam/datatable.css'), {type=>'text/css', rel=>'stylesheet'});
     $style->setLink($url->extras('yui/build/button/assets/skins/sam/button.css'),       {type=>'text/css', rel=>'stylesheet'});
@@ -500,6 +499,7 @@ sub www_managePayouts {
     $style->setScript($url->extras('yui/build/datasource/datasource.js'),           {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/datatable/datatable-min.js'),         {type=>'text/javascript'});
     $style->setScript($url->extras('yui/build/button/button-min.js'),               {type=>'text/javascript'});
+    $style->setScript($url->extras('yui-webgui/build/i18n/i18n.js'),                {type=>'text/javascript'});
     $style->setScript($url->extras('VendorPayout/vendorPayout.js'),                 {type=>'text/javascript'});
 
     # Add css for scheduled payout highlighting
@@ -559,7 +559,7 @@ sub www_payoutDataAsJSON {
     
     my $sql         = 
         "select t1.* from transactionItem as t1 join transaction as t2 on t1.transactionId=t2.transactionId "
-        ." where vendorId=? and vendorPayoutAmount > 0 and vendorPayoutStatus <> 'Paid' order by t2.orderNumber";
+        ." where t2.isSuccessful <> 0 and vendorId=? and vendorPayoutAmount > 0 and vendorPayoutStatus <> 'Paid' order by t2.orderNumber";
     my $placeholders =  [ $vendorId ];
 
     my $paginator   = WebGUI::Paginator->new( $session, '', $rowsPerPage, '', $pageNumber ); 
@@ -606,6 +606,7 @@ sub www_setPayoutStatus {
        $item->update({ vendorPayoutStatus => $status });
     }
 
+    $session->http->setMimeType( 'text/plain' );
     return $status;
 }
 
@@ -658,9 +659,10 @@ sub www_vendorTotalsAsJSON {
     my ($vendorPayoutData, @placeholders);
   
     my @sql;
-    push @sql,
-        'select vendorId, vendorPayoutStatus, sum(vendorPayoutAmount) as total from transactionItem';
-    push @sql, ' where vendorId=? ' if $vendorId;
+    push @sql, ' select vendorId, vendorPayoutStatus, sum(vendorPayoutAmount) as total ';
+    push @sql, ' from transactionItem as t1, transaction as t2 ';
+    push @sql, ' where t1.transactionId=t2.transactionId and isSuccessful <> 0 ';
+    push @sql, ' and vendorId=? ' if $vendorId;
     push @sql, ' group by vendorId, vendorPayoutStatus ';
 
     push @placeholders, $vendorId if $vendorId;

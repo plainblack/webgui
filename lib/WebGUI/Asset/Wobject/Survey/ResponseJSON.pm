@@ -76,26 +76,37 @@ sub new {
 
     # Create skeleton object..
     my $self = {
-        # First define core members..
         _survey => $survey,
         _session => $survey->session,
-
-        # Store all properties that are (de)serialized to/from JSON in a private variable
-        _response => {
-
-            # Response hash defaults..
-            responses => {},
-            lastResponse => -1,
-            questionsAnswered => 0,
-            startTime => time(),
-            surveyOrder => undef,
-
-            # And then allow jsonData to override defaults and/or add other members
-            %{$jsonData},
-        },
+        # _response property set by call to reset()
     };
     
-    return bless $self, $class;
+    bless $self, $class;
+    $self->reset($jsonData);
+}
+
+=head2 reset
+
+Reset all response data in this object (e.g. re-init the _response property)
+
+=cut
+
+sub reset {
+    my $self = shift;
+    my ($data) = validate_pos(@_, { type => HASHREF, default => {} } );
+    $self->{_response} = {
+        # Response hash defaults..
+        responses => {},
+        lastResponse => -1,
+        questionsAnswered => 0,
+        startTime => time(),
+        surveyOrder => undef,
+        tags => {},
+        
+        # And then data overrides
+        %{$data},
+    };
+    return $self;
 }
 
 #----------------------------------------------------------------------------
@@ -270,6 +281,30 @@ sub startTime {
 
 #-------------------------------------------------------------------
 
+=head2 tags ([ $tags ])
+
+Mutator for the tags that have been applied to the response.
+Returns (and optionally sets) the value of tags.
+
+=head3 $tags (optional)
+
+If defined, sets $tags to the supplied hashref.
+
+=cut
+
+sub tags {
+    my $self     = shift;
+    my ($tags) = validate_pos(@_, {type => HASHREF, optional => 1});
+
+    if ( $tags ) {
+        $self->response->{tags} = $tags;
+    }
+
+    return $self->response->{tags};
+}
+
+#-------------------------------------------------------------------
+
 =head2 surveyOrder
 
 Accessor. Initialized on first access via L<"initSurveyOrder">.
@@ -309,6 +344,49 @@ sub surveyOrder {
     }
     
     return $self->response->{surveyOrder};
+}
+
+
+#-------------------------------------------------------------------
+
+=head2 surveyOrderIndexByVariableName
+
+Returns a lookup table of variable names to surveyOrder index
+
+Only questions with a defined variable name set are included.
+
+=cut
+
+sub surveyOrderIndexByVariableName {
+    my $self = shift;
+    
+    my %lookup;
+    
+    # Iterate over items in surveyOrder..
+    my $i = 0;
+    for my $address ( @{ $self->surveyOrder } ) {
+        next if !$address;
+
+        # Retreive the section and question for this address..
+        my $section  = $self->survey->section($address);
+        my $question = $self->survey->question($address);
+        
+        if (my $var = $section && $section->{variable} ) {
+            # Section variables appear for every question, only store lowest index
+            if (!exists $lookup{$var} || $lookup{$var} > $i) {
+                $lookup{$var} = $i;
+            }
+        }
+        
+        if (my $var = $question && $question->{variable} ) {
+            $lookup{$var} = $i;
+        }
+
+        # Increment the item index counter
+        $i++;
+    }
+    
+    return \%lookup;
 }
 
 #-------------------------------------------------------------------
@@ -424,8 +502,26 @@ and answers being answered in L<"surveyOrder">.
 
 =head3 Branch processing
 
-gotos and gotoExpressions are handled similarly as with terminalUrls. The last goto or 
-gotoExpression in the set of questions wins.
+Jump targets (gotos) and jump expressions (gotoExpressions) are attempted in the following
+order:
+
+=over 3
+
+=item * answer goto
+
+=item * answer gotoExpression
+
+=item * question goto
+
+=item * question gotoExpression
+
+=item * question goto
+
+=item * question gotoExpression
+
+=back
+
+The first to trigger a jump short-circuits the process, and subsequent items are not attempted.
 
 =cut
 
@@ -439,10 +535,8 @@ sub recordResponses {
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section   = $self->nextResponseSection();
-    my @questions = $self->nextQuestions();
 
-    #GOTO jumps in the Survey.  Order of precedence is Answer, Question, then Section.
-    my ($goto, $gotoExpression);
+    my ($sectionGoto, $questionGoto, $answerGoto, $sectionExpression, $questionExpression, $answerExpression);
 
     # Handle terminal Section..
     my $terminalUrl;
@@ -453,55 +547,56 @@ sub recordResponses {
     }
     # ..and also gotos..
     elsif ( $section->{goto} =~ /\w/ ) {
-        $goto = $section->{goto};
+        $sectionGoto = $section->{goto};
     }
     # .. and also gotoExpressions..
     elsif ( $section->{gotoExpression} =~ /\w/ ) {
-        $gotoExpression = $section->{gotoExpression};
+        $sectionExpression = $section->{gotoExpression};
     }
 
-    # Handle empty Section..
-    if ( !@questions ) {
-        # No questions to process, so increment lastResponse and return
-        $self->lastResponse( $self->nextResponse );
-        return [ $sTerminal, $terminalUrl ];
-    }
+    my $logicalSection = $section->{logical};
 
     # Process Questions in Section..
     my $terminal = 0;
     my $allRequiredQsAnswered = 1;
-    for my $question (@questions) {
-        my $aAnswered = 0;
+    my @questions;
+    
+    if (!$logicalSection) {
+        
+        # N.B. Important that nextQuestions is not called for logicalSetions, since 
+        # logical sections cause this sub to be called from nextQuestions() in the first place!
+        @questions = $self->nextQuestions();
+        
+        for my $question (@questions) {
+            my $aAnswered = 0;
 
-        # Handle terminal Questions..
-        if ( $question->{terminal} ) {
-            $terminal    = 1;
-            $terminalUrl = $question->{terminalUrl};
-        }
-        # ..and also gotos..
-        elsif ( $question->{goto} =~ /\w/ ) {
-            $goto = $question->{goto};
-        }
-        # .. and also gotoExpressions..
-        elsif ( $question->{gotoExpression} =~ /\w/ ) {
-            $gotoExpression = $question->{gotoExpression};
-        }
+            # Handle terminal Questions..
+            if ( $question->{terminal} ) {
+                $terminal    = 1;
+                $terminalUrl = $question->{terminalUrl};
+            }
+            # ..and also gotos..
+            elsif ( $question->{goto} =~ /\w/ ) {
+                $questionGoto = $question->{goto};
+            }
+            # .. and also gotoExpressions..
+            elsif ( $question->{gotoExpression} =~ /\w/ ) {
+                $questionExpression = $question->{gotoExpression};
+            }
 
-        # Record Question comment
-        $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
+            # Record Question comment
+            $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
 
-        # Process Answers in Question..
-        for my $answer ( @{ $question->{answers} } ) {
+            # Process Answers in Question..
+            for my $answer ( @{ $question->{answers} } ) {
 
-            # Pluck the values out of the responses hash that we want to record..
-            my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
-            my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
-            my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
+                # Pluck the values out of the responses hash that we want to record..
+                my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
+                my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
+                my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
 
-            # Proceed if we're satisfied that the submitted answer response is valid..
-            if ( defined $submittedAnswerResponse && $submittedAnswerResponse =~ /\S/ ) {
-
-                #Validate answers met question criteria
+                # Server-side Validation and storing of extra data for special q types goes here
+                
                 if($question->{questionType} eq 'Number'){
                     if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
                         next;
@@ -510,8 +605,17 @@ sub recordResponses {
                     }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
                         next;
                     }
+                } elsif ($question->{questionType} eq 'Year Month'){
+                    # store year and month as "YYYY Month"
+                    $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
+                } else {
+                    if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
+                        $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse") if $submittedAnswerResponse;
+                        next;
+                    }
                 }
-            
+                
+                # If we reach here, answer validated ok
                 $aAnswered = 1;
 
                 # Now, decide what to record. For multi-choice questions, use recordedAnswer.
@@ -533,47 +637,74 @@ sub recordResponses {
 
                 # ..and also gotos..
                 elsif ( $answer->{goto} =~ /\w/ ) {
-                    $goto = $answer->{goto};
+                    $answerGoto = $answer->{goto};
                 }
 
                 # .. and also gotoExpressions..
                 elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                    $gotoExpression = $answer->{gotoExpression};
+                    $answerExpression = $answer->{gotoExpression};
                 }
             }
-        }
 
-        # Check if a required Question was skipped 
-        if ( $question->{required} && !$aAnswered  ) {
-            $allRequiredQsAnswered = 0;
-        }
+            # Check if a required Question was skipped 
+            if ( $question->{required} && !$aAnswered  ) {
+                $allRequiredQsAnswered = 0;
+            }
 
-        # If question was answered, increment the questionsAnswered count..
-        if ($aAnswered) {
-            $self->questionsAnswered(+1);
+            # If question was answered, increment the questionsAnswered count..
+            if ($aAnswered) {
+                $self->questionsAnswered(+1);
+            }
         }
     }
 
     # If all required responses were given, proceed onwards!
-    if ($allRequiredQsAnswered) {
-
+    if ($allRequiredQsAnswered && !$logicalSection) {
+        
         #  Move the lastResponse index to the last question answered
         $self->lastResponse( $self->lastResponse + @questions );
-
-        # Do any requested branching.. 
-        $self->processGoto($goto)                     if ( defined $goto );           ## no critic
-        $self->processGotoExpression($gotoExpression) if ( defined $gotoExpression ); ## no critic
     }
-    else {
+    
+    if ($allRequiredQsAnswered || $logicalSection) {
+        # Process jumps and jump expressions in precedence order of:
+        # answer goto, answer expression, question goto, question expression, section..
+        
+        # The joined logical OR here carries out the short-circuting for us
+        # e.g. processGoto returns 1 on its first match
+        # and processExpression returns hashref on its first match
+        my $action = $self->processGoto($answerGoto) ||
+                         $self->processExpression($answerExpression) ||
+                         $self->processGoto($questionGoto) ||
+                         $self->processExpression($questionExpression) ||
+                         $self->processGoto($sectionGoto) ||
+                         $self->processExpression($sectionExpression);
+        
+        # Special actions (such as exitUrl and restart) happen straight away
+        if ($action && ref $action eq 'HASH') {
+            return $action;
+        }
+    }
+    
+    if (!$allRequiredQsAnswered) {
         # Required responses were missing, so we don't let the Survey terminate
         $terminal = 0;
+    }
+
+    # Handle special cases down here, after we've given sections a chance for their jump [expressions] to run
+    if ( !@questions || $logicalSection ) {
+        # No questions to be (or should be) displayed, so increment lastResponse and return
+        $self->lastResponse( $self->nextResponse );
+        return $sTerminal ? { terminal => $terminalUrl } : {};
     }
 
     if ( $sTerminal && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex ) {
         $terminal = 1;
     }
 
-    return [ $terminal, $terminalUrl ];
+    if ($terminal) {
+        return { terminal => $terminalUrl };
+    }
+    return {};
 }
 
 #-------------------------------------------------------------------
@@ -592,7 +723,9 @@ A variable name to match against all section and question variable names.
 
 sub processGoto {
     my $self = shift;
-    my ($goto) = validate_pos(@_, {type => SCALAR});
+    my ($goto) = validate_pos(@_, {type => SCALAR|UNDEF});
+    
+    return if !$goto;
     
     if ($goto eq 'NEXT_SECTION') {
         $self->session->log->debug("NEXT_SECTION jump target encountered");
@@ -602,13 +735,13 @@ sub processGoto {
         while ($self->nextResponseSectionIndex == $lastResponseSectionIndex) {
             $self->lastResponse( $self->lastResponse + 1);
         }
-        return;
+        return 1;
     }
     
     if ($goto eq 'END_SURVEY') {
         $self->session->log->debug("END_SURVEY jump target encountered");
         $self->lastResponse( scalar( @{ $self->surveyOrder} ) - 1 );
-        return;
+        return 1;
     }
 
     # Iterate over items in order..
@@ -624,7 +757,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item 
             $self->lastResponse( $itemIndex - 1 );
-            last;
+            return 1;
         }
 
         # See if our goto variable matches the question variable..
@@ -632,7 +765,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item
             $self->lastResponse( $itemIndex - 1 );
-            last;
+            return 1;
         }
 
         # Increment the item index counter
@@ -643,33 +776,55 @@ sub processGoto {
 
 #-------------------------------------------------------------------
 
-=head2 processGotoExpression ( $gotoExpression )
+=head2 processExpression ( $expression )
 
-Processes the given gotoExpression, and triggers a call to L<"processGoto"> if the expression
-indicates that we should branch.
+Processes a Survey expression using the Survey Expression Engine. 
 
-=head3 $gotoExpression
+If the expression returns tag data, this data is stored in the response (see L<tags>).
 
-The gotoExpression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
+If the expression returns a jump target, triggers a call to L<"processGoto">.
+
+=head3 $expression
+
+The expression. See  L<WebGUI::Asset::Wobject::Survey::ExpressionEngine> for more info.
 
 =cut
     
-sub processGotoExpression {
+sub processExpression {
     my $self = shift;
-    my ($expression) = validate_pos(@_, {type => SCALAR});
+    my ($expression) = validate_pos(@_, {type => SCALAR|UNDEF});
+    
+    return if !$expression;
     
     # Prepare the ingredients..
     my $values = $self->responseValuesByVariableName;
     my $scores = $self->responseScoresByVariableName;
+    my $tags   = $self->tags;
     my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
     
     use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
-    if (my $jump = $engine->run($self->session, $expression, { values => $values, scores => $scores, validTargets => \%validTargets} )) {
-        $self->session->log->debug("Hit. Jumping to [$jump]");
-        $self->processGoto($jump);
+    if (my $result = $engine->run($self->session, $expression, { values => $values, scores => $scores, tags => $tags, validTargets => \%validTargets} ) ) {
+        # Update tags
+        if (my $tags = $result->{tags} ) {
+            $self->tags( $tags );
+        }
+        
+        if (my $jump = $result->{jump}) {
+            $self->session->log->debug("Jumping to [$jump]");
+            return $self->processGoto($jump);
+        } elsif (exists $result->{exitUrl}) { # may be undefined
+            my $exitUrl = $result->{exitUrl};
+            $self->session->log->debug("exitUrl triggered [$exitUrl]");
+            return { exitUrl => $exitUrl };
+        } elsif (my $restart = $result->{restart}) {
+            $self->session->log->debug("restart triggered");
+            return { restart => $restart };
+        } else {
+            $self->session->log->debug("No hits, falling through");
+            return;
+        }
     }
-    $self->session->log->debug("No hits, falling through");
     return;
 }
 
@@ -742,8 +897,13 @@ sub responseValuesByVariableName {
     my %options = validate(@_, { useText => 0 });
     
     my %lookup;
-    while (my ($address, $response) = each %{$self->responses}) {
-        next if (!$response || !$address);
+    
+    # Process responses in id order (so that questions with maxAnswers != 1 stringify according
+    # to natural ordering of answers (e.g. answer 0, answer 1, etc..
+    for my $address (sort keys %{$self->responses}) {
+        next if !$address;
+        my $response = $self->responses->{$address};
+        next if !$response;
         
         # Turn responses s-q-a string into an address array
         my @address = split /-/, $address;
@@ -757,11 +917,12 @@ sub responseValuesByVariableName {
         # Filter out questions without defined variable names
         next if !$question || !defined $question->{variable};
         
+        my $answer = $self->survey->answer([@address]);
+        
         my $value = $response->{value};
         if ($options{useText}) {
             # Test if question is a multiple choice type so we can use the answer text instead
             if($self->survey->getMultiChoiceBundle($question->{questionType})){
-                my $answer = $self->survey->answer([@address]);
                 my $answerText = $answer->{text};
                 
                 # For verbatim mc answers, combine answer text and recorded value
@@ -773,7 +934,22 @@ sub responseValuesByVariableName {
         }
         
         # Add variable => value to our hash
-        $lookup{$question->{variable}} = $value;
+        if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
+            push @{$lookup{$question->{variable}}}, $value;
+        } else {
+            $lookup{$question->{variable}} = $value;
+        }
+        
+        # For verbatims, also add verbatim value to lookup as variable + _verbatim
+        if ($answer->{verbatim}) {
+            my $verbatimKey = $question->{variable} . "_verbatim";
+            my $verbatimValue = $response->{verbatim};
+            if (!$question->{maxAnswers} || $question->{maxAnswers} > 1) {
+                push @{$lookup{$verbatimKey}}, $verbatimValue;
+            } else {
+                $lookup{$verbatimKey} = $verbatimValue;
+            }
+        }
     }
     return \%lookup;
 }
@@ -793,8 +969,11 @@ sub responseScoresByVariableName {
     my $self = shift;
     
     my %lookup;
-    while (my ($address, $response) = each %{$self->responses}) {
-        next if (!$response || !$address);
+    # Process responses in id order, just to be consistent with responseValuesByVariableName
+    for my $address (sort keys %{$self->responses}) {
+        next if !$address;
+        my $response = $self->responses->{$address};
+        next if !$response;
         
         # Turn responses s-q-a string into an address array
         my @address = split /-/, $address;
@@ -814,8 +993,8 @@ sub responseScoresByVariableName {
         # Use question score if answer score undefined
         my $score = (exists $answer->{value} && length $answer->{value} > 0) ? $answer->{value} : $question->{value};
         
-        # Add variable => score to our hash
-        $lookup{$question->{variable}} = $score;
+        # Add variable => score to our hash (or add to existing score for multi-answer questions, e.g. maxAnswers != 1)
+        $lookup{$question->{variable}} += $score;
     }
     
     # Add section score totals
@@ -860,6 +1039,11 @@ A hash reference. Each matching key in the string will be replaced with its asso
 sub getTemplatedText {
     my $self = shift;
     my ($text, $params) = validate_pos(@_, { type => SCALAR }, { type => HASHREF });
+    
+    # Turn multi-valued answers into comma-separated text
+    for my $value (values %$params) {
+        $value = join(',', @$value) if ref $value eq 'ARRAY';
+    }
 
     # Replace all instances of [[var]] with the value from the $params hash reference
     $text =~ s/\[\[([^\%]*?)\]\]/$params->{$1}/eg;
@@ -905,17 +1089,42 @@ sub nextQuestions {
 
     # Get some information about the Section that the next response belongs to..
     my $section = $self->nextResponseSection();
+    
+    # Logical sections get processed immediately rather than displayed
+    if ($section->{logical}) {
+        my $nextResponse = $self->nextResponse;
+        
+        $self->session->log->debug("Processing logical section");
+        
+        # Pass off to recordResponses, which will process expressions and increment nextResponse
+        $self->recordResponses({});
+        
+        # Explicitly check that nextResponse was incremented, lest we end up with an infinite loop
+        if ($nextResponse == $self->nextResponse) {
+            $self->session->log->error("Something bad happened in Survey logic, bailing out to avoid infinite loop");
+        } else {
+            $self->session->log->debug("nextResponse has been updated to " . $self->nextResponse);
+            # ..and then start over
+            return $self->nextQuestions;
+        }
+    }
+    
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     
     # Get all of the existing question responses (so that we can do Section and Question [[var]] replacements
     my $responseValuesByVariableName = $self->responseValuesByVariableName( { useText => 1 } );
+    my $tags = $self->tags;
+    
+    # Merge values and tags hashes for processing [[var]] templated text
+    my %templateValues = (%$responseValuesByVariableName, %$tags);
 
     # Do text replacement
-    $section->{text} = $self->getTemplatedText($section->{text}, $responseValuesByVariableName);
+    $section->{text} = $self->getTemplatedText($section->{text}, \%templateValues);
 
     # Collect all the questions to be shown on the next page..
     my @questions;
+    QUESTION:
     for my $i (1 .. $questionsPerPage ) {
         my $address = $self->surveyOrder->[ $self->lastResponse + $i ];
         last if(! defined $address);
@@ -935,7 +1144,7 @@ sub nextQuestions {
         my %questionCopy = %{$self->survey->question( $address )};
 
         # Do text replacement
-        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, $responseValuesByVariableName);
+        $questionCopy{text} = $self->getTemplatedText($questionCopy{text}, \%templateValues);
 
         # Add any extra fields we want..
         $questionCopy{id}  = $self->questionId($sIndex, $qIndex);
@@ -943,17 +1152,55 @@ sub nextQuestions {
 
         # Rebuild the list of anwers with a safe copy
         delete $questionCopy{answers};
-        for my $aIndex ( aIndexes($address) ) {
-            my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
+        
+        if ($questionCopy{questionType} eq 'Tagged') {
+            if (!$questionCopy{variable}) {
+                $self->session->log->warn("Unable to build Tagged question, question variable must be defined");
+                next QUESTION;
+            }
+            
+            my $tags = $self->tags;
+            my $taggedAnswers = $tags->{"$questionCopy{variable}_TAGGED_ANSWERS"};
+            if (!$taggedAnswers || ref $taggedAnswers ne 'ARRAY') {
+                $self->session->log->warn("Unable to build Tagged question, $questionCopy{variable}_TAGGED_ANSWERS is invalid");
+                next QUESTION;
+            }
+            
+            my $aIndex = 0;
+            for my $taggedAnswer (@$taggedAnswers) {
+                
+                if (!$taggedAnswer || ref $taggedAnswer ne 'HASH') {
+                    $self->session->log->warn("Unable to build Tagged question, one or more answers definitions invalid");
+                    next QUESTION;
+                }
+                
+                # Tagged data overrides answer defaults
+                my %answerCopy = (%{$self->survey->newAnswer()}, %$taggedAnswer);
+                
+                # Do text replacement
+                $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
 
-            # Do text replacement
-            $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, $responseValuesByVariableName);
+                # Add any extra fields we want..
+                $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+                
+                push @{ $questionCopy{answers} }, \%answerCopy;
+                
+                $aIndex++;
+            }
+        } else {
+            for my $aIndex ( aIndexes($address) ) {
+                my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
 
-            # Add any extra fields we want..
-            $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+                # Do text replacement
+                $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
 
-            push @{ $questionCopy{answers} }, \%answerCopy;
+                # Add any extra fields we want..
+                $answerCopy{id} = $self->answerId($sIndex, $qIndex, $aIndex);
+
+                push @{ $questionCopy{answers} }, \%answerCopy;
+            }
         }
+        
         push @questions, \%questionCopy;
     }
     return @questions;

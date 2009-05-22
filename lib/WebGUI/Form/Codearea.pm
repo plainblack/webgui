@@ -157,6 +157,8 @@ sub toHtml {
                 id              : "$id",
                 syntax          : "$syntax",
                 start_highlight : true,
+                show_line_colors: true,
+                display         : "later",
                 toolbar         : "search, go_to_line, |, undo, redo, |, syntax_selection, highlight, reset_highlight, |, help"
             });
         </script>

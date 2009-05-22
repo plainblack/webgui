@@ -144,6 +144,9 @@ sub addRevision {
 	# merge the defaults, current values, and the user set properties
 	my %mergedProperties = (%defaults, %{$self->get}, %{$properties}, (status => 'pending'));
     
+    # Force the packed head block to be regenerated
+    delete $mergedProperties{extraHeadTagsPacked};
+
     #Instantiate new revision and fill with real data
     my $newVersion = WebGUI::Asset->new($self->session,$self->getId, $self->get("className"), $now);
     $newVersion->setSkipNotification if ($options->{skipNotification});
@@ -223,7 +226,7 @@ sub getCurrentRevisionDate  {
     my $class = shift;
     my $session = shift;
     my $assetId = shift;
-	my $assetRevision = $session->stow->get("assetRevision");
+	my $assetRevision = $session->stow->get("assetRevision",{noclone=>1});
 	my $revisionDate = $assetRevision->{$assetId}{$session->scratch->get("versionTag")||'_'};
 	unless ($revisionDate) {
 		($revisionDate) = $session->db->quickArray("select max(revisionDate) from assetData where assetId=? and

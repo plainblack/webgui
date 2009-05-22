@@ -97,12 +97,17 @@ sub getOptions {
     WebGUI::Error::InvalidParam->throw(error => q{Need a cart.}) unless defined $cart and $cart->isa("WebGUI::Shop::Cart");
     my $session = $cart->session; 
     my %options = ();
-    foreach my $shipper (@{$self->getShippers()}) {
-        next unless $shipper->get('enabled');
+    SHIPPER: foreach my $shipper (@{$self->getShippers()}) {
+        next SHIPPER unless $shipper->get('enabled');
+        my $price = eval { $shipper->calculate($cart) };
+        if (my $e = WebGUI::Error->caught()) {
+            $self->session->log->warn($e->error);
+            next SHIPPER;
+        }
         $options{$shipper->getId} = {
             label => $shipper->get("label"),
-            price => $shipper->calculate($cart),
-            };    
+            price => $price,
+        };
     }
     return \%options;
 }

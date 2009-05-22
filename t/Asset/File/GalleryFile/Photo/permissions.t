@@ -33,10 +33,12 @@ $versionTags[-1]->set({name=>"Photo Test, add Gallery, Album and 1 Photo"});
 
 # Add a new user to the test user's friends list
 my $friend  = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($friend);
 WebGUI::Friends->new($session)->add( [ $friend->userId ] );
 
 # Add a new registered user
 my $notFriend   = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($notFriend);
 
 my $gallery
     = $node->addChild({
@@ -132,6 +134,6 @@ END {
     for my $versionTag ( @versionTags ) {
         $versionTag->rollback;
     }
-    $friend->delete;
-    $notFriend->delete;
+    $session->user({userId => 3});
+    $session->user->friends->delete();
 }

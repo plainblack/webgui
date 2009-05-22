@@ -87,9 +87,12 @@ my $drivers;
 
 $drivers = $ship->getDrivers();
 my @driverClasses = keys %{$drivers};
-cmp_deeply(
+cmp_bag(
     \@driverClasses,
-    [ 'WebGUI::Shop::ShipDriver::FlatRate' ],
+    [
+        'WebGUI::Shop::ShipDriver::FlatRate',
+        'WebGUI::Shop::ShipDriver::USPS',
+    ],
     'getDrivers: WebGUI only ships with 1 default shipping driver',
 );
 

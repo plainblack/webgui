@@ -176,7 +176,7 @@ sub simpleTextParser {
 	my ($text) = @_;
 
 	my %pairedData = ();
-	while($text =~ m/^\s*(\S+)\s*=\s*(.*?)-\+-/smgc) {
+	while($text =~ m/\s*(\S+)\s*=\s*(.*?)-\+-/smgc) {
 		$pairedData{$1} = $2;
 	}
 	return %pairedData;

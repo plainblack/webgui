@@ -115,6 +115,13 @@ is displayed as part of a Layout Asset, the Layout Asset's <b>Style Template</b>
 		lastUpdated => 1167374430,
 	},
 
+    'mobileStyleTemplateId label' => {
+        message => 'Mobile Style Template'
+    },
+    'mobileStyleTemplateId description' => {
+        message => q|Select a style template from the list to enclose your asset if it is viewed on a mobile browser|,
+    },
+
 };
 
 1;

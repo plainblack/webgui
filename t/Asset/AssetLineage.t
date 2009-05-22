@@ -57,6 +57,7 @@ my $folder2 = $topFolder->addChild({
 });
 
 my $editor = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($editor);
 $editor->addToGroups([4]);
 
 my @snippets = ();
@@ -530,8 +531,5 @@ TODO: {
 END {
     foreach my $tag ($versionTag, $vTag2) {
         $tag->rollback;
-    }
-    foreach my $account ($editor) {
-        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
     }
 }

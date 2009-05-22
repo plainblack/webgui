@@ -121,6 +121,7 @@ sub setupTest {
 		template => "HREF=<tmpl_var printable.url>\nLABEL=<tmpl_var printable.text>",
 		#     '1234567890123456789012'
 		id => 'printable01100Template',
+        usePacked => 1,
 	};
 	my $asset = $defaultNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -142,12 +143,11 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }
-
 
 END { ##Clean-up after yourself, always
 	if (defined $versionTag and ref $versionTag eq 'WebGUI::VersionTag') {

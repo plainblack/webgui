@@ -204,13 +204,11 @@ sub definition {
             },
         lastUpdated => {
             defaultValue    =>time(),
-            autoGenerate    =>0,
-            noFormPost      =>1,
+            fieldType       =>'hidden',
             },
 	);
 	push(@{$definition}, {
 		assetName=>$i18n->get('assetName'),
-		icon=>'MatrixListing.gif',
 		autoGenerateForms=>1,
 		tableName=>'MatrixListing',
 		className=>'WebGUI::Asset::MatrixListing',

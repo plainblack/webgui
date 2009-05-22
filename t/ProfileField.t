@@ -17,19 +17,23 @@ use FindBin;
 use strict;
 use lib "$FindBin::Bin/lib";
 use Test::More;
+use Data::Dumper;
 use WebGUI::Test; # Must use this before any other WebGUI modules
 use WebGUI::Session;
+use WebGUI::Form::Text;
+use WebGUI::Form::HTMLArea;
 
 #----------------------------------------------------------------------------
 # Init
 my $session         = WebGUI::Test->session;
 
 my $newUser         = WebGUI::User->create( $session );
+WebGUI::Test->usersToDelete($newUser);
 
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 22;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # Test the creation of ProfileField
@@ -66,19 +70,51 @@ like( $ff, qr/value="$ffvalue"[^>]+selected/, 'html returned contains value, uiL
 $ff         = undef;
 $ffvalue    = undef;
 ok( $ff = $aliasField->formField(undef, undef, $newUser), 'formField method returns something, alias field, defaulted user' );
-my $ffvalue = $newUser->profileField('alias');
+$ffvalue = $newUser->profileField('alias');
 like( $ff, qr/$ffvalue/, 'html returned contains value, alias field, defaulted user' );
 
 $ff         = undef;
 $ffvalue    = undef;
 ok( $ff = $uilevelField->formField(undef, undef, $newUser), 'formField method returns something, uiLevel field, defaulted user' );
-my $ffvalue = $newUser->profileField('uiLevel');
+$ffvalue = $newUser->profileField('uiLevel');
 like( $ff, qr/$ffvalue/, 'html returned contains value, uiLevel field, defaulted user' );
+
+#########################################################
+#
+# set, changing fieldTypes
+#
+#########################################################
+
+my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {
+    fieldType => 'Text',
+    label     => 'Test Field',
+});
+
+my $textFieldType = lc WebGUI::Form::Text->getDatabaseFieldType();
+my $htmlFieldType = lc WebGUI::Form::HTMLArea->getDatabaseFieldType();
+
+my $fieldSpec = $session->db->quickHashRef('describe userProfileData testField');
+is (lc $fieldSpec->{Type}, $textFieldType, 'test field created with correct type for text field');
+
+$newProfileField->set({ fieldType => 'HTMLArea' });
+is($newProfileField->get('fieldType'), 'HTMLArea', 'test field updated to HTMLArea');
+
+$fieldSpec = $session->db->quickHashRef('describe userProfileData testField');
+is (lc $fieldSpec->{Type}, $htmlFieldType, 'database updated along with profile field object');
+
+###########################################################
+#
+# exists
+#
+###########################################################
+
+ok( WebGUI::ProfileField->exists($session,"firstName"), "firstName field exists" );
+ok( !WebGUI::ProfileField->exists($session, time), "random field does not exist" );
 
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $newUser->delete;
+    $newProfileField->delete;
 }
 
 

@@ -594,12 +594,26 @@ sub definition {
 			label=>$i18n->get('filter code'),
 			hoverHelp=>$i18n->get('filter code description'),
 			},
+		replyFilterCode =>{
+			fieldType=>"filterContent",
+			defaultValue=>'javascript',
+			tab=>'security',
+			label=>$i18n->get('reply filter code'),
+			hoverHelp=>$i18n->get('reply filter code description'),
+			},
 		richEditor =>{
 			fieldType=>"selectRichEditor",
 			defaultValue=>"PBrichedit000000000002",
 			tab=>'display',
 			label=>$i18n->get('rich editor'),
 			hoverHelp=>$i18n->get('rich editor description'),
+			},
+		replyRichEditor =>{
+			fieldType=>"selectRichEditor",
+			defaultValue=>"PBrichedit000000000002",
+			tab=>'display',
+			label=>$i18n->get('reply rich editor'),
+			hoverHelp=>$i18n->get('reply rich editor description'),
 			},
 		attachmentsPerPost =>{
 			fieldType=>"integer",
@@ -986,6 +1000,7 @@ sub getThreadsPaginator {
     my $sortOrder = $self->session->scratch->get($scratchSortOrder) || $self->get("sortOrder");
 	if ($sortBy ne $self->session->scratch->get($scratchSortBy) && $self->session->form->process("func") ne "editSave") {
 		$self->session->scratch->set($scratchSortBy,$self->session->form->process("sortBy"));
+        $self->session->scratch->set($scratchSortOrder, $sortOrder);
 	} elsif ($self->session->form->process("sortBy") && $self->session->form->process("func") ne "editSave") {
                 if ($sortOrder eq "asc") {
                         $sortOrder = "desc";
@@ -1001,6 +1016,7 @@ sub getThreadsPaginator {
         $sortBy = 'threadRating';
     } 
     $sortBy = join('.', map { $self->session->db->dbh->quote_identifier($_) } split(/\./, $sortBy));
+
 	my $sql = "
 		select 
 			asset.assetId,

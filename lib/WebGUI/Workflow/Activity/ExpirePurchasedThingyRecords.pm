@@ -94,10 +94,10 @@ sub execute {
         = WebGUI::AssetCollateral::Sku::ThingyRecord::Record->getAllIterator(
             $self->session,
             {
-                constraints => {
-                    "expires < ?"   => $time + $self->get('notificationOffset'),
-                    "sentExpiresNotice != ?" => 1,
-                },
+                constraints => [
+                    { "expires < ?"   => $time + $self->get('notificationOffset') },
+                    { "sentExpiresNotice != ?" => 1 },
+                ],
             });
     while ( my $record = $iter->() ) {
         $record->update({
@@ -121,10 +121,10 @@ sub execute {
         = WebGUI::AssetCollateral::Sku::ThingyRecord::Record->getAllIterator(
             $self->session,
             {
-                constraints => {
-                    "expires < ?"   => $time,
-                    "isHidden != ?" => 1,
-                },
+                constraints => [
+                    { "expires < ?"   => $time },
+                    { "isHidden != ?" => 1 },
+                ],
             });
     while ( my $record = $iter->() ) {
         # Record is hidden

@@ -2011,7 +2011,7 @@ sub www_viewProject {
 	$var->{'task.back.label'} = $i18n->get("task back label");
 	$var->{'task.back.url'} = $self->getUrl;
 
-	return $style->process($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")),$self->getValue("styleTemplateId"));
+	return $style->processStyle($self->processTemplate($var,$self->getValue("projectDisplayTemplateId")));
 }
 
 

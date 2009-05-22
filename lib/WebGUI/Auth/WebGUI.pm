@@ -163,14 +163,16 @@ sub createAccount {
    		$vars->{'create.form.captcha.label'} = $i18n->get("captcha label","AuthWebGUI");
 	}
 
-    my $username = $form->process("authWebGUI.username");
-   $vars->{'create.form.username'} 
-        = WebGUI::Form::text($self->session, {
-            name   => "authWebGUI.username",
-            value  => $username,
-            extras => $self->getExtrasStyle($username)
-        });
-    $vars->{'create.form.username.label'} = $i18n->get(50);
+    unless($setting->get('webguiUseEmailAsUsername')){   
+        my $username = $form->process("authWebGUI.username");
+        $vars->{'create.form.username'} 
+            = WebGUI::Form::text($self->session, {
+                name   => "authWebGUI.username",
+                value  => $username,
+                extras => $self->getExtrasStyle($username)
+            });
+        $vars->{'create.form.username.label'} = $i18n->get(50);
+    }
     
     my $password = $form->process("authWebGUI.identifier");
     $vars->{'create.form.password'}
@@ -217,7 +219,13 @@ sub createAccountSave {
         $session->errorHandler->security($i18n->get("no registration hack", "AuthWebGUI"));
         return $self->displayLogin;
     }
-    my $username    = $form->process('authWebGUI.username');
+    my $username;
+    if($setting->get('webguiUseEmailAsUsername')){
+        $username    = $form->process('email');
+    }
+    else{
+        $username    = $form->process('authWebGUI.username');
+    }
     my $password    = $form->process('authWebGUI.identifier');
     my $passConfirm = $form->process('authWebGUI.identifierConfirm');
    
@@ -504,6 +512,12 @@ sub editUserSettingsForm {
         -hoverHelp => $i18n->get('869 help','WebGUI'),
     );
     $f->yesNo(
+        -name      => "webguiUseEmailAsUsername",
+        -value     => $self->session->setting->get("webguiUseEmailAsUsername"),
+        -label     => $i18n->get('use email as username label'),
+        -hoverHelp => $i18n->get('use email as username description'),
+    );
+    $f->yesNo(
         -name      => "webguiChangeUsername",
         -value     => $self->session->setting->get("webguiChangeUsername"),
         -label     => $i18n->get(19),
@@ -611,6 +625,7 @@ sub editUserSettingsFormSave {
 	$s->set("webguiWelcomeMessage", $f->process("webguiWelcomeMessage","textarea"));
 	$s->set("webguiChangeUsername", $f->process("webguiChangeUsername","yesNo"));
 	$s->set("webguiChangePassword", $f->process("webguiChangePassword","yesNo"));
+    $s->set("webguiUseEmailAsUsername", $f->process("webguiUseEmailAsUsername"));
 
     # Make sure we have the ability to recover a password if we're trying to
     # enable password recovery

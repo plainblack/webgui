@@ -30,7 +30,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-plan tests => 17;        # Increment this number for each test you create
+plan tests => 21;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # put your tests here
@@ -63,6 +63,17 @@ is($sku->onRemoveFromCart, undef, "onRemoveFromCart should exist and return unde
 is($sku->isRecurring, 0, "skus are not recurring by default");
 is($sku->isShippingRequired, 0, "skus are not shippable by default");
 is($sku->getConfiguredTitle, $sku->getTitle, "configured title and title should be the same by default");
+is($sku->shipsSeparately, 0, 'shipsSeparately return 0 by default');
+
+$sku->update({shipsSeparately => 1,});
+is($sku->shipsSeparately, 0, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+
+{
+    local *WebGUI::Asset::Sku::isShippingRequired = sub { return 1};
+    is($sku->shipsSeparately, 1, 'shipsSeparately only returns true when isShippingRequired AND shipsSeparately');
+}
+
+ok(! $sku->isShippingRequired, 'Making sure that GLOB is no longer in effect');
 
 isa_ok($sku->getCart, "WebGUI::Shop::Cart", "can get a cart object");
 my $item = $sku->addToCart;
@@ -72,11 +83,11 @@ $item->cart->delete;
 my $loadSku = WebGUI::Asset::Sku->newBySku($session, $sku->get("sku"));
 is($loadSku->getId, $sku->getId, "newBySku() works.");
 
-$sku->purge;
-
 #----------------------------------------------------------------------------
 # Cleanup
 END {
+
+$sku->purge;
 
 }
 

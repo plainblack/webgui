@@ -14,7 +14,6 @@ use WebGUI::Test;    # Must use this before any other WebGUI modules
 use WebGUI::Session;
 use JSON;
 use Clone qw/clone/;
-#use Storable qw/dclone/;
 
 #----------------------------------------------------------------------------
 # Init
@@ -2113,6 +2112,7 @@ sub getBareSkeletons {
            timeLimit              => 0,
            type                   => 'section',
            questions              => [],
+           logical                => 0,
         },
         {
            text                   => '',

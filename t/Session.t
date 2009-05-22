@@ -24,6 +24,7 @@ plan tests => 4; # increment this value for each test you create
 my $session = WebGUI::Test->session;
 
 my $user = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($user);
 
 $session->user({user => $user});
 
@@ -55,8 +56,5 @@ my $slave2 = $session->dbSlave;
 isa_ok($slave2, 'WebGUI::SQL');
 
 END {
-	foreach my $dude ($user) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
     $session->config->delete('dbslave2');
 }

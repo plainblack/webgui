@@ -54,7 +54,9 @@ my $originalSetting;
 
 my @groupsToDelete;
 my @usersToDelete;
+my @sessionsToDelete;
 my @storagesToDelete;
+my @tagsToRollback;
 
 BEGIN {
 
@@ -141,12 +143,16 @@ BEGIN {
 END {
     my $Test = Test::Builder->new;
     GROUP: foreach my $group (@groupsToDelete) {
-        $group->delete;
+        my $groupId = $group->getId;
+        next GROUP if any { $groupId eq $_ } qw/1 2 3 4 6 7 8 11 12 13 14 pbgroup000000000000015 pbgroup000000000000016 pbgroup000000000000017 /;
+        my $newGroup = WebGUI::Group->new($SESSION, $groupId);
+        $newGroup->delete if $newGroup;
     }
     USER: foreach my $user (@usersToDelete) {
         my $userId = $user->userId;
         next USER if any { $userId eq $_ } (1,3);
-        $user->delete;
+        my $newUser = WebGUI::User->new($SESSION, $userId);
+        $newUser->delete if $newUser;
     }
     foreach my $stor (@storagesToDelete) {
         if ($SESSION->id->valid($stor)) {
@@ -157,11 +163,19 @@ END {
             $stor->delete;
         }
     }
+    SESSION: foreach my $session (@sessionsToDelete) {
+        $session->var->end;
+        $session->close;
+    }
+    foreach my $tag (@tagsToRollback) {
+        $tag->rollback;
+    }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
         $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
         $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
         $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
         $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
+        $Test->diag('mailQ   : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
     }
     while (my ($key, $value) = each %originalConfig) {
         if (defined $value) {
@@ -370,6 +384,18 @@ sub session {
     return $SESSION;
 }
 
+#----------------------------------------------------------------------------
+
+=head2 webguiBirthday ( )
+
+This constant is used in several tests, so it's reproduced here so it can
+be found easy.  This is the epoch date when WebGUI was released.
+
+=cut
+
+sub webguiBirthday {
+    return 997966800 ;
+}
 
 #----------------------------------------------------------------------------
 
@@ -419,6 +445,38 @@ This is a class method.
 sub storagesToDelete {
     my $class = shift;
     push @storagesToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 sessionsToDelete ( $session, [$session, ...] )
+
+Push a list of session objects onto the stack of groups to be automatically deleted
+at the end of the test.  Note, this will be the last group of objects to be
+cleaned up.
+
+This is a class method.
+
+=cut
+
+sub sessionsToDelete {
+    my $class = shift;
+    push @sessionsToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 tagsToRollback ( $tag )
+
+Push a list of version tags to rollback at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub tagsToRollback {
+    my $class = shift;
+    push @tagsToRollback, @_;
 }
 
 #----------------------------------------------------------------------------

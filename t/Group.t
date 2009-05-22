@@ -75,7 +75,7 @@ my @ipTests = (
 );
 
 
-plan tests => (147 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
+plan tests => (148 + scalar(@scratchTests) + scalar(@ipTests)); # increment this value for each test you create
 
 my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
@@ -307,6 +307,7 @@ cmp_bag($gY->getAllGroupsFor(), [ map {$_->getId} ($gZ, $gA, $gB) ], 'getAllGrou
 cmp_bag($gZ->getAllGroupsFor(), [ map {$_->getId} ($gA, $gB) ], 'getAllGroupsFor Z');
 
 my $user = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($user);
 $gX->userIsAdmin($user->userId, "yes");
 ok(!$gX->userIsAdmin($user->userId), "userIsAdmin: User who isn't secondary admin can't be group admin");
 isnt($gX->userIsAdmin($user->userId), 'yes', "userIsAdmin returns 1 or 0, not value");
@@ -365,11 +366,13 @@ $user->delete;
 ################################################################
 
 my @crowd = map { WebGUI::User->new($session, "new") } 0..7;
+WebGUI::Test->usersToDelete(@crowd);
 my @mob;
 foreach my $idx (0..2) {
 	$mob[$idx] = WebGUI::User->new($session, "new");
 	$mob[$idx]->username("mob$idx");
 }
+WebGUI::Test->usersToDelete(@mob);
 
 my @bUsers = map { $_->userId } @crowd[0,1];
 my @aUsers = map { $_->userId } @crowd[2,3];
@@ -400,7 +403,22 @@ my $everyUsers = $everyoneGroup->getUsers();
 $everyoneGroup->addUsers([$visitorUser->userId]);
 cmp_bag($everyUsers, $everyoneGroup->getUsers(), 'addUsers will not add a user to a group they already belong to');
 
-##Database based user membership in groups
+##Check expire time override on addUsers
+
+my $expireOverrideGroup = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($expireOverrideGroup);
+$expireOverrideGroup->expireOffset('50');
+my $expireOverrideUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($expireOverrideUser);
+$expireOverrideGroup->addUsers([$expireOverrideUser->userId], '5000');
+my $expirationDate = $session->db->quickScalar('select expireDate from groupings where userId=?', [$expireOverrideUser->userId]);
+cmp_ok($expirationDate-time(), '>', 50, 'checking expire offset override on addUsers');
+
+################################################################
+#
+# getDatabaseUsers
+#
+################################################################
 
 $session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
 $session->db->dbh->do(q!CREATE TABLE myUserTable (userId CHAR(22) binary NOT NULL default '', PRIMARY KEY(userId)) TYPE=InnoDB!);
@@ -459,6 +477,7 @@ foreach my $idx (0..3) {
 	$chameleons[$idx] = WebGUI::User->new($session, "new");
 	$chameleons[$idx]->username("chameleon$idx");
 }
+WebGUI::Test->usersToDelete(@chameleons);
 
 foreach my $idx (0..3) {
 	$chameleons[$idx]->karma(5*$idx, 'testCode', 'testable karma, dude');
@@ -540,6 +559,8 @@ foreach my $idx (0..$#scratchTests) {
 		$sessionBank[$idx]->scratch->set($name, $value);
 	}
 }
+WebGUI::Test->usersToDelete(@itchies);
+WebGUI::Test->sessionsToDelete(@sessionBank);
 
 foreach my $scratchTest (@scratchTests) {
 	is($scratchTest->{user}->isInGroup($gS->getId), $scratchTest->{expect}, $scratchTest->{comment});
@@ -556,10 +577,6 @@ cmp_bag(
 	[ ( (map { $_->{user}->userId() }  grep { $_->{expect} } @scratchTests), 3) ],
 	'getAllUsers for group with scratch'
 );
-
-foreach my $subSession (@sessionBank) {
-	$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
-}
 
 @sessionBank = ();
 my @tcps =  ();
@@ -582,6 +599,8 @@ foreach my $idx (0..$#ipTests) {
 	##Assign this user to this test to be fetched later
 	$ipTests[$idx]->{user} = $tcps[$idx];
 }
+WebGUI::Test->usersToDelete(@tcps);
+WebGUI::Test->sessionsToDelete(@sessionBank);
 
 my $gI = WebGUI::Group->new($session, "new");
 WebGUI::Test->groupsToDelete($gI);
@@ -607,6 +626,7 @@ foreach my $ipTest (@ipTests) {
 ##Cache check.
 
 my $cacheDude = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($cacheDude);
 $cacheDude->username('Cache Dude');
 
 $gY->addUsers([$cacheDude->userId]);
@@ -656,17 +676,6 @@ SKIP: {
 ################################################################
 
 END {
-	foreach my $dude ($user, @crowd, @mob, @chameleons, @itchies, @tcps, $cacheDude) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 	$session->db->dbh->do('DROP TABLE IF EXISTS myUserTable');
-
-
-	foreach my $subSession (@sessionBank) {
-		$subSession->db->write("DELETE FROM userSession WHERE sessionId=?",[ $subSession->getId]);
-		$subSession->db->write("DELETE FROM userSessionScratch WHERE sessionId=?",[ $subSession->getId]);
-        $subSession->scratch->deleteAll;
-		$subSession->close() if (defined $subSession and ref $subSession eq 'WebGUI::Session');
-	}
 	$testCache->flush;
 }

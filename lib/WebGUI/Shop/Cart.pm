@@ -510,9 +510,14 @@ sub readyForCheckout {
     return 0 if ($self->hasMixedItems);
 
     # Check minimum cart checkout requirement
+    my $total = eval { $self->calculateTotal };
+    if (my $e = WebGUI::Error->caught) {
+        $error{id $self} = $e->error;
+        return 0;
+    }
     my $requiredAmount = $self->session->setting->get( 'shopCartCheckoutMinimum' );
     if ( $requiredAmount > 0 ) {
-        return 0 if $self->calculateTotal < $requiredAmount;
+        return 0 if $total < $requiredAmount;
     }
 
     # All checks passed so return true
@@ -735,6 +740,7 @@ sub www_view {
     my $url = $session->url;
     my $i18n = WebGUI::International->new($session, "Shop");
     my @items = ();
+    my $taxDriver = WebGUI::Shop::Tax->getDriver( $session );
 
     if($url->forceSecureConnection()){
             return "redirect";
@@ -785,6 +791,9 @@ sub www_view {
         unless (WebGUI::Error->caught) {
             $properties{shippingAddress} = $address->getHtmlFormatted;
         }
+
+        $taxDriver->appendCartItemVars( \%properties, $item );
+
         push(@items, \%properties);
     }
     my %var = (

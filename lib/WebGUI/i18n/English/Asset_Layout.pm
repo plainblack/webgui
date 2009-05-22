@@ -139,6 +139,13 @@ be useful, others may not.|,
 		lastUpdated => 1210967539
 	},
 
+    'mobileTemplateId label' => {
+        message => 'Mobile Template',
+    },
+
+    'mobileTemplateId description' => {
+        message => 'Choose the template to use if viewing this Page Layout in a mobile browser.',
+    },
 };
 
 1;

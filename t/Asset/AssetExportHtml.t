@@ -41,7 +41,7 @@ my $originalExportPath = $session->config->get('exportPath');
 
 my $testRan = 1;
 
-plan tests => 144;        # Increment this number for each test you create
+plan tests => 126;        # Increment this number for each test you create
 
 #----------------------------------------------------------------------------
 # exportCheckPath()
@@ -56,7 +56,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportCheckPath tests that its argum
 cmp_deeply(
     $e,
     methods(
-        error       => "first param to exportCheckPath must be a WebGUI::Session",
+        error       => 'first param to exportCheckPath as a class method must be a WebGUI::Session',
     ),
     "exportCheckPath tests that its argument is a WebGUI::Session"
 );
@@ -150,7 +150,7 @@ $config->set('exportPath', $tempDirectory);
 
 eval { $returnCode = WebGUI::Asset->exportCheckPath($session) };
 is($@, '', "exportCheckPath with valid path lives");
-is($returnCode, 1, "exportCheckPath returns true value");
+ok($returnCode, "exportCheckPath returns true value");
 
 # now, let's try a directory to which we know we have access, but a path within
 # it that doesn't exist.
@@ -159,7 +159,7 @@ $config->set('exportPath', $accessibleDirectory->stringify); # now accessible!
 
 eval { $returnCode = WebGUI::Asset->exportCheckPath($session) };
 is($@, '', "exportCheckPath creating subdirectory lives");
-is($returnCode, 1, "exportCheckPath creating subdirectory returns true value");
+ok($returnCode, "exportCheckPath creating subdirectory returns true value");
 is(-d $accessibleDirectory, 1, "exportCheckPath creating subdirectory actually creates said subdirectory");
 
 #----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ isa_ok($gcAsPath, 'Path::Class::File', 'exportGetUrlAsPath for grandchild return
 is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->stringify, "exportGetUrlAsPath for grandchild works for root directory");
 
 # without index.html
-my $gcAsPath = $grandChild->exportGetUrlAsPath();
+$gcAsPath = $grandChild->exportGetUrlAsPath();
 $litmus = Path::Class::File->new($exportPath, $grandChild->getUrl, 'index.html');
 isa_ok($gcAsPath, 'Path::Class::File', 'exportGetUrlAsPath for grandchild without index file returns a Path::Class::File object');
 is($gcAsPath->absolute($exportPath)->stringify, $litmus->absolute($exportPath)->stringify, "exportGetUrlAsPath for grandchild without index file works for root directory");
@@ -492,7 +492,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkExtrasUploads without s
 cmp_deeply(
     $e,
     methods(
-        error       => 'first param to exportSymlinkExtrasUploads must be a WebGUI::Session',
+        error       => 'first param to exportSymlinkExtrasUploads as a class method must be a WebGUI::Session',
     ),
     'exportSymlinkExtrasUploads without session object throws',
 );
@@ -504,7 +504,7 @@ isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkExtrasUploads called wi
 cmp_deeply(
     $e,
     methods(
-        error       => 'first param to exportSymlinkExtrasUploads must be a WebGUI::Session',
+        error       => 'first param to exportSymlinkExtrasUploads as a class method must be a WebGUI::Session',
     ),
     'exportSymlinkExtrasUploads called with memetic parameter throws',
 );
@@ -541,7 +541,7 @@ $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkRoot without session object throws');
 cmp_deeply($e,
     methods(
-        error       => 'first param to exportSymlinkRoot must be a WebGUI::Session'
+        error       => 'first param to exportSymlinkRoot as a class method must be a WebGUI::Session'
     ),
     'exportSymlinkRoot without session object throws',
 );
@@ -553,7 +553,7 @@ $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportSymlinkRoot called with memetic parameter throws');
 cmp_deeply($e,
     methods(
-        error       => 'first param to exportSymlinkRoot must be a WebGUI::Session'
+        error       => 'first param to exportSymlinkRoot as a class method must be a WebGUI::Session'
     ),
     'exportSymlinkRoot called with memetic parameter throws',
 );
@@ -590,18 +590,18 @@ cmp_deeply(
 $home->exportWriteFile;
 my $symlinkedRoot   = Path::Class::File->new($exportPath, 'index.html');
 my $homePath        = $home->exportGetUrlAsPath;
-eval { WebGUI::Asset->exportSymlinkRoot($session, $home, '', 1) };
+eval { WebGUI::Asset->exportSymlinkRoot($session, $home, '') };
 is($@, '', 'exportSymlinkRoot works when it should');
 ok(-e $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
-is($homePath, readlink $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
+is(readlink $symlinkedRoot->stringify, $homePath, 'exportSymlinkRoot sets up link correctly and supplies default index');
 unlink $symlinkedRoot->stringify;
 
 
 # give it an index and ensure it works
-eval { WebGUI::Asset->exportSymlinkRoot($session, $home, 'index.html', 1) };
+eval { WebGUI::Asset->exportSymlinkRoot($session, $home, 'index.html') };
 is($@, '', 'exportSymlinkRoot works when it should');
 ok(-e $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
-is($homePath, readlink $symlinkedRoot->stringify, 'exportSymlinkRoot sets up link correctly and supplies default index');
+is(readlink $symlinkedRoot->stringify, $homePath, 'exportSymlinkRoot sets up link correctly and supplies default index');
 unlink $symlinkedRoot->stringify;
 
 
@@ -644,26 +644,7 @@ $descendants = $grandChild->exportGetDescendants( WebGUI::User->new($session, 1)
 
 cmp_deeply($descendants, $gcDescendants, "exportGetDescendants returns correct data for getting-started");
 
-# finally, ensure that calling exportGetDescendants without a userID throws an exception.
-
 eval { $home->exportGetDescendants };
-
-$e = Exception::Class->caught;
-isa_ok($e, 'WebGUI::Error::InvalidObject', 'exportGetDescendants called without a user object throws');
-cmp_deeply(
-    $e,
-    methods(
-        expected    => 'WebGUI::User',
-        got         => '',
-        error       => 'Need a WebGUI::User object',
-        param       => undef,
-    ),
-    "exportGetDescendants called without a user object throws",
-);
-
-# make sure calling exportGetDescendants without a depth throws an exception.
-
-eval { $home->exportGetDescendants( WebGUI::User->new($session, 1) ) };
 $e = Exception::Class->caught;
 isa_ok($e, 'WebGUI::Error::InvalidParam', 'exportGetDescendants called without a depth throws');
 cmp_deeply(
@@ -691,7 +672,7 @@ $session->user( { userId => 3 } );
 # in other words, we need to test that the ultimate results of calling
 # exportAsHtml are what they should be, given the inputs we provide.
 my (@createdFiles, @shouldExist, $success, $message);
-my $exportPath = Path::Class::Dir->new($session->config->get('exportPath'));
+$exportPath = Path::Class::Dir->new($session->config->get('exportPath'));
 
 # first things first. let's make sure the code checks for the proper arguments.
 # quiet is optional, so don't test that. userId is a bit smart and will take
@@ -699,46 +680,41 @@ my $exportPath = Path::Class::Dir->new($session->config->get('exportPath'));
 # default. exportAsHtml is supposed to catch exceptions, not throw them, so
 # we'll be testing the return values rather than for an exception.
 
-($success, $message) = $home->exportAsHtml;
-is($success, 0, "exportAsHtml returns 0 when not given a userId");
-is($message, "need a userId parameter", "exportAsHtml returns correct message when not given a userId");
+eval { $message = $home->exportAsHtml };
+is($@, "need a userId parameter", "exportAsHtml returns correct error when not given a userId");
 
 # omitting the userId works, so let's give it a bogus userId
-($success, $message) = $home->exportAsHtml( { userId => '<rizen> perlDreamer is a 500 lb test mandating gorilla' } );
-is($success, 0, "exportAsHtml returns 0 when given a bogus (but nonetheless funny) userId");
-is($message, "'<rizen> perlDreamer is a 500 lb test mandating gorilla' is not a valid userId", "exportAsHtml returns correct message when given a bogus (but nonetheless funny) userId");
+eval { $message = $home->exportAsHtml( { userId => '<rizen> perlDreamer is a 500 lb test mandating gorilla' } ) };
+is($@, "'<rizen> perlDreamer is a 500 lb test mandating gorilla' is not a valid userId", "exportAsHtml throws correct error when given a bogus (but nonetheless funny) userId");
 
 # checking an autogenerated userId
 my $randomUser = WebGUI::User->new($session, 'new');
-($success, $message) = $home->exportAsHtml( { userId => $randomUser->userId, depth => 99} );
-is($success, 1, "exportAsHtml returns 1 when given a valid userId");
+eval { $message = $home->exportAsHtml( { userId => $randomUser->userId, depth => 99} ) };
+is($@, '', "exportAsHtml doesn't throw error when given a valid userId");
 $randomUser->delete;
 undef $randomUser;
 
 # checking userId works, so check extrasUploadAction next.
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'o hai' } );
-is($success, 0, "exportAsHtml returns 0 when given bogus, memetic extrasUploadAction parameter");
-is($message, "'o hai' is not a valid extrasUploadAction", "exportAsHtml returns 0 when given bogus, memetic extrasUploadAction parameter");
+eval { $message = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'o hai' } ) };
+is($@, "'o hai' is not a valid extrasUploadAction", "exportAsHtml throws correct error when given bogus, memetic extrasUploadAction parameter");
 
 # rootUrlAction
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'NO U' } );
-is($success, 0, "exportAsHtml returns 0 when given bogus, memetic rootUrlAction parameter");
-is($message, "'NO U' is not a valid rootUrlAction", "exportAsHtml returns correct message when given bogus, memetic extrasUploadAction parameter");
+eval { $message = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'NO U' } ) };
+is($@, "'NO U' is not a valid rootUrlAction", "exportAsHtml throws correct error when given bogus, memetic extrasUploadAction parameter");
 
 # finally, depth
-($success, $message) = $home->exportAsHtml( { userId => 3 } );
-is($success, 0, "exportAsHtml returns 0 when not given depth");
-is($message, "need a depth", "exportAsHtml returns correct message when not given a depth");
+eval { $message = $home->exportAsHtml( { userId => 3 } ) };
+is($@, "need a depth", "exportAsHtml throws correct error when not given a depth");
 
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 'orly? yarly!' } );
-is($success, 0, "exportAsHtml returns 0 when given bogus, memetic depth");
-is($message, "orly? yarly! is not a valid depth", "exportAsHtml returns correct message when given bogus, memetic depth");
+eval { $message = $home->exportAsHtml( { userId => 3, depth => 'orly? yarly!' } ) };
+is($@, "orly? yarly! is not a valid depth", "exportAsHtml throws correct error when given bogus, memetic depth");
 
 # next, let's make sure some simple exports work. export 'home', but clean up
 # the exportPath first to make sure there are no residuals from the tests
 # above.
 $exportPath->rmtree;
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } );
+eval { $message = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
+is($@, '', "exportAsHtml on home does not throw an error"); ##Note, string comparison
 
 # list of files that should exist. obtained by running previous known working
 # export function on a full stock asset tree
@@ -772,27 +748,27 @@ $exportPath->rmtree;
 );
 
 my $numberCreatedAll = scalar @createdFiles;
+like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on home returns correct message");
 push @createdFiles,
     [ qw/ the_latest_news the_latest_news.atom /],
     [ qw/ the_latest_news the_latest_news.rss /],
+    [ qw/ the_latest_news the_latest_news.rdf /],
 ;
 
 # turn them into Path::Class::File objects
-my @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
+@shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 # ensure that the files that should exist do exist
 my @doExist;
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home writes correct files");
-is($success, 1, "exportAsHtml on home returns true");
-like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml on home returns correct message");
+cmp_bag(\@doExist, \@shouldExist, "exportAsHtml on home writes correct files");
 
 $exportPath->rmtree;
 @doExist = ();
 
 # previous tests ensure that the contents of the exported files are right. so
 # let's go a level deeper and ensure that the right files are present.
-($success, $message) = $gettingStarted->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } );
+eval { ($message) = $gettingStarted->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
 @createdFiles = (
     [ qw/ getting_started getting-started index.html /],
     [ qw/ getting_started getting-started-part2 index.html /],
@@ -802,15 +778,15 @@ $exportPath->rmtree;
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_deeply(sort @shouldExist, sort @doExist, "exportAsHtml on getting-started writes correct files");
-is($success, 1, "exportAsHtml on getting-started returns true");
-like($message, qr/Exported 4 pages/, "exportAsHtml on getting-started returns correct message");
+is($@, '', 'exportAsHtml on getting-started page does not throw an exception');
+cmp_bag(\@doExist, \@shouldExist, "... writes correct files");
+like($message, qr/Exported 4 pages/, "... returns correct message");
 
 $exportPath->rmtree;
 @doExist = ();
 
 # test the grandchild.
-($success, $message) = $grandChild->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } );
+eval { ($message) = $grandChild->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
 @createdFiles = (
     [ qw/ getting_started getting-started index.html /],
 );
@@ -818,9 +794,9 @@ $exportPath->rmtree;
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_deeply(sort @shouldExist, sort @doExist, "exportAsHtml on grandchild writes correct files");
-is($success, 1, "exportAsHtml on grandchild returns true");
-like($message, qr/Exported 1 pages/, "exportAsHtml on grandchild returns correct message");
+is($@, '', 'exportAsHtml on grandchild does not throw an exception');
+cmp_bag(\@shouldExist, \@doExist, "... writes correct files");
+like($message, qr/Exported 1 pages/, "... returns correct message");
 
 $exportPath->rmtree;
 @doExist = ();
@@ -828,12 +804,12 @@ $exportPath->rmtree;
 # fiddle with the isExportable setting and make sure appropriate files are
 # written 
 $home->update({ isExportable => 0 });
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } );
+eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
 
 @shouldExist = ();
-is(@shouldExist, @doExist, "exportAsHtml on nonexportable home doesn't write anything");
-is($success, 1, "exportAsHtml on nonexportable home returns true (but doesn't do anything)");
-like($message, qr/Exported 0 pages/, "exportAsHtml on nonexportable home returns correct message");
+is($@, '', 'exportAsHtml on nonexportable home does not throw an exception');
+is(@shouldExist, @doExist, "... doesn't write anything");
+like($message, qr/Exported 0 pages/, "... returns correct message");
 
 # restore the original setting
 $home->update({ isExportable => 1 });
@@ -846,7 +822,7 @@ $exportPath->rmtree;
 @doExist = ();
 $gettingStarted->update({ isExportable => 0 });
 
-($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } );
+eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99, quiet => 1 } ) };
 
 # since getting-started isn't exportable, it shouldn't be written. remove it
 # and its descendants from the list.
@@ -879,14 +855,15 @@ my $numberCreated = scalar @createdFiles;
 push @createdFiles,
     [ qw/ the_latest_news the_latest_news.atom /],
     [ qw/ the_latest_news the_latest_news.rss /],
+    [ qw/ the_latest_news the_latest_news.rdf /],
 ;
     
 @shouldExist = map { Path::Class::File->new($exportPath, @{$_})->absolute->stringify } @createdFiles;
 
 $exportPath->recurse( callback => sub { my $o = shift; $o->is_dir ? return : push @doExist, $o->absolute->stringify } );
-cmp_bag(\@shouldExist, \@doExist, "exportAsHtml on home with non-exportable getting-started writes correct files");
-is($success, 1, "exportAsHtml on home with non-exportable getting-started returns true");
-like($message, qr/Exported $numberCreated pages/, "exportAsHtml on home with non-exportable getting-started returns correct message");
+is($@, '', 'exportAsHtml on home with non-exportable getting-started writes correct files');
+cmp_bag(\@doExist, \@shouldExist, "... writes correct files");
+like($message, qr/Exported $numberCreated pages/, "... returns correct message");
 
 # restore the original setting
 $gettingStarted->update({ isExportable => 1 });
@@ -924,10 +901,8 @@ $exportPath->rmtree;
 $config->delete('exportPath');
 
 # undefined exportPath
-eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@,       '', "exportAsHtml catches undefined exportPath exception");
-is($success, 0,  "exportAsHtml returns 0 for undefined exportPath");
-is($message, 'exportPath must be defined and not ""', "exportAsHtml returns correct message for undefined exportPath");
+eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+is($@,       'exportPath must be defined and not ""', "exportAsHtml catches undefined exportPath exception");
 
 SKIP: {
     skip 'Root will cause this test to fail since it does not obey file permissions', 3
@@ -937,19 +912,15 @@ SKIP: {
     chmod 0000, $tempDirectory; 
     $config->set('exportPath', $inaccessibleDirectory->stringify); 
 
-    eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-    is($@,       '', "exportAsHtml catches inaccessible exportPath ");
-    is($success, 0,  "exportAsHtml returns 0 for inaccessible exportPath");
-    is($message, "can't create exportPath " . $inaccessibleDirectory->stringify, "exportAsHtml returns correct message for inaccessible exportPath");
+    eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+    is($@,       "can't create exportPath " . $inaccessibleDirectory->stringify, "exportAsHtml catches inaccessible exportPath ");
 }
 
 # exportPath is a file, not a directory
 $config->set('exportPath', $exportPathFile);
 
-eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-is($@,       '', "exportAsHtml catches exportPath is file exception");
-is($success, 0,  "exportAsHtml returns 0 if exportPath is a file");
-is($message, "$exportPathFile isn't a directory", "exportAsHtml returns correct message if exportPath is a file");
+eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+is($@,       "$exportPathFile isn't a directory", "exportAsHtml catches exportPath is file exception");
 
 $config->set('exportPath', $inaccessibleDirectory->stringify);
 SKIP: {
@@ -959,10 +930,8 @@ SKIP: {
     # can't create export path
     chmod 0000, $tempDirectory;
 
-    eval { ($success, $message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
-    is($@,       '',                                               "exportAsHtml catches uncreatable exportPath exception");
-    is($success, 0,                                                "exportAsHtml returns 0 for uncreatable exportPath");
-    is($message, "can't create exportPath $inaccessibleDirectory", "exportAsHtml returns correct message for uncreatable exportPath");
+    eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
+    is($@, "can't create exportPath $inaccessibleDirectory", "exportAsHtml catches uncreatable exportPath exception");
 }
 
 # user can't view asset
@@ -970,10 +939,8 @@ $home->update( { groupIdView => 3 } );
 $session->http->setNoHeader(1);
 
 chmod 0755, $tempDirectory;
-eval { ($success, $message) = $home->exportAsHtml( { userId => 1, depth => 99 } ) };
-is($@, '', "exportAsHtml catches unviewable asset exception");
-is($success, 0, "exportAsHtml returns 0 for unviewable asset");
-is($message, "can't view asset at URL /home", "exportAsHtml returns correct message for unviewable asset");
+eval { ($message) = $home->exportAsHtml( { userId => 1, depth => 99 } ) };
+is($@, "can't view asset at URL /home", "exportAsHtml catches unviewable asset exception");
 
 # fix viewing the asset
 $home->update( { groupIdView => 7 } );
@@ -993,10 +960,10 @@ $uploadsUrl         = $config->get('uploadsURL');
 
 $exportPath->rmtree;
 
-($success, $message)    = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'symlink', quiet => 1 } );
+eval { ($message)    = $home->exportAsHtml( { userId => 3, depth => 99, extrasUploadAction => 'symlink', quiet => 1 } ) };
 
-is($success,   1,                                    "exportAsHtml when linking extras and uploads returns true");
-like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml when linking extras and uploads returns correct message");
+is($@, '', "exportAsHtml when linking extras and uploads does not throw an exception");
+like($message, qr/Exported $numberCreatedAll pages/, "... returns correct message");
 
 $extrasSymlink          = Path::Class::File->new($exportPath, $extrasUrl);
 $uploadsSymlink         = Path::Class::File->new($exportPath, $uploadsUrl);
@@ -1008,12 +975,12 @@ ok(-e $uploadsSymlink->absolute->stringify,                     "exportAsHtml wr
 is($uploadsPath, readlink $uploadsSymlink->absolute->stringify, "exportAsHtml uploads symlink points to right place");
 
 # next, make sure the root URL symlinking works.
-($success, $message)    = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'symlink', quiet => 1 } );
+eval { ($message)    = $home->exportAsHtml( { userId => 3, depth => 99, rootUrlAction => 'symlink', quiet => 1 } ) };
 my $rootUrlSymlink      = Path::Class::File->new($exportPath, 'index.html');
-is($success, 1, 'exportAsHtml when linking root URL returns true');
-like($message, qr/Exported $numberCreatedAll pages/, "exportAsHtml when linking root URL returns correct message");
-ok(-e $rootUrlSymlink->absolute->stringify, "exportAsHtml writes root URL symlink");
-is($home->exportGetUrlAsPath->absolute->stringify, readlink $rootUrlSymlink->absolute->stringify, "exportAsHtml root URL symlink points to right place");
+is($@, '', 'exportAsHtml does not throw an error when linking root URL');
+like($message, qr/Exported $numberCreatedAll pages/, "... returns correct message");
+ok(-e $rootUrlSymlink->absolute->stringify, "... writes root URL symlink");
+is($home->exportGetUrlAsPath->absolute->stringify, readlink $rootUrlSymlink->absolute->stringify, "... root URL symlink points to right place");
 
 
 #----------------------------------------------------------------------------

@@ -677,6 +677,11 @@ our $I18N = {
 		lastUpdated => 1109698614,
 	},
 
+	'reply filter code' => {
+		message => q|Reply Filter Code|,
+		lastUpdated => 1109698614,
+	},
+
 	'sort by' => {
 		message => q|Sort By|,
 		lastUpdated => 1109698614,
@@ -714,6 +719,11 @@ our $I18N = {
 
 	'rich editor' => {
 		message => q|Rich Editor|,
+		lastUpdated => 0,
+	},
+
+	'reply rich editor' => {
+		message => q|Reply Rich Editor|,
 		lastUpdated => 0,
 	},
 
@@ -1140,7 +1150,12 @@ submitted by a user.|,
         },
 
         'filter code description' => {
-                message => q|Sets the level of HTML filtering done on each Post.|,
+                message => q|Sets the level of HTML filtering done on each Post (the start of each thread).|,
+                lastUpdated => 1119070429,
+        },
+
+        'reply filter code description' => {
+                message => q|Sets the level of HTML filtering done on each Reply.|,
                 lastUpdated => 1119070429,
         },
 
@@ -1183,7 +1198,12 @@ the original poster.|,
         },
 
         'rich editor description' => {
-                message => q|Select which Rich Editor to use for the content of Posts.|,
+                message => q|Select which Rich Editor to use for the content of Posts (the start of each thread).|,
+                lastUpdated => 1187991394,
+        },
+
+        'reply rich editor description' => {
+                message => q|Select which Rich Editor to use for the content of Replies.|,
                 lastUpdated => 1187991394,
         },
 

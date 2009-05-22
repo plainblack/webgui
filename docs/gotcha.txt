@@ -8,13 +8,55 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.7.7
+--------------------------------------------------------------------
+   * WebGUI now requires Digest::SHA.
+   
+   * WebGUI now requires JavsScript::Minifier::XS 0.05
+   
+   * WebGUI now requires CSS::Minifier::XS 0.03
+
+
+7.7.6
+--------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.5 before going to this version. 
+
+   * WebGUI now requires Business::Tax::VAT::Validation.
+
+   * WebGUI now requires Crypt::SSLeay 0.57 or greater.
+
+   * WebGUI now requires Scope::Guard 0.03 or greater.
+
+7.7.5
+--------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.4 before going to this version. 
+
+   * Due to a long standing bug in the Profile system, if the type of a
+     Profile Field was changed, the database column was not updated to match
+     the requirements for the new type.  The most common place this problem
+     would be noticed would be if a text field was changed to HTML field.
+
+   * The Event url template variable was being used incorrectly.  This has
+     been fixed, but requires new template variables for viewing a list
+     of events, printing events and editing and deleting events.  Please
+     check the online Help for the new template variables.
+
+     Event templates using HTML::Template are automatically updated.  If your
+     site uses a different parser for this template it will need to be manually
+     upgraded.
+
+   * WebGUI now requires HTML::Packer, JavaScript::Packer, and CSS::Packer 
+
 7.7.4
 --------------------------------------------------------------------
+   * You must upgrade to WebGUI 7.7.3 before going to this version. 
+
    * WebGUI now requires XML::FeedPP version 0.40 or greater.
 
 7.7.2
 --------------------------------------------------------------------
    * WebGUI now requires Clone version 0.31 or greater.
+
    * You must upgrade to WebGUI 7.7.2 before going on to higher versions of WebGUI due
      to changes in the database table for the Cart.
 

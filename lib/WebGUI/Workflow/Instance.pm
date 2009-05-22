@@ -149,7 +149,7 @@ sub DESTROY {
 
 #-------------------------------------------------------------------
 
-=head2 get ( name ) 
+=head2 get ( name )
 
 Returns the value for a given property. See the set() method for details.
 
@@ -160,7 +160,7 @@ sub get {
     my $name = shift;
     if ($name eq "parameters") {
         if ($self->{_data}{parameters}) {
-            my $parameters = JSON::decode_json($self->{_data}{$name});
+            my $parameters = JSON::decode_json($self->{_data}{parameters});
             return $parameters->{parameters};
         }
         else {
@@ -335,32 +335,29 @@ sub run {
 			return "waiting";
 		}
 	}
-	my $activity = $workflow->getNextActivity($self->get("currentActivityId"));
+    my $activity = $self->getNextActivity;
 	unless  (defined $activity)  {
 		$self->delete(1);
 		return "done";
 	}
 	$self->session->errorHandler->info("Running workflow activity ".$activity->getId.", which is a ".(ref $activity).", for instance ".$self->getId.".");
-	my $class = $self->get("className");
-	my $method = $self->get("methodName");
-	my $status = "";
-    my $object = undef;
-    my @params;
-    unless ($self->get('noSession')) {
-        push @params, $self->session;
+    my $object = eval { $self->getObject };
+    if ( my $e = WebGUI::Error::ObjectNotFound->caught ) {
+        $self->session->log->warn(
+            q{The object for this workflow does not exist.  Type: } . $self->get('className') . q{, ID: } . $e->id
+        );
+        $self->delete(1);
+        return "done";
     }
-    push @params, $self->get("parameters");
-	if ($class && $method) {
-        $object = eval { WebGUI::Pluggable::instanciate($class, $method, \@params) };
-        if ($@) {
-			$self->session->errorHandler->error(
-                            q{Error on workflow instance '} . $self->getId . q{': }. $@
-                        );
-			$self->set({lastStatus=>"error"}, 1);
-			return "error";
-        } 
-	} 
-	$status = eval { $activity->execute($object, $self) };
+    elsif ($@) {
+        $self->session->errorHandler->error(
+            q{Error on workflow instance '} . $self->getId . q{': }. $@
+        );
+        $self->set({lastStatus=>"error"}, 1);
+        return "error";
+    }
+
+	my $status = eval { $activity->execute($object, $self) };
 	if ($@) {
 		$self->session->errorHandler->error("Caught exception executing workflow activity ".$activity->getId." for instance ".$self->getId." which reported ".$@);
 		$self->set({lastStatus=>"error"}, 1);
@@ -368,12 +365,109 @@ sub run {
 	}
 	if ($status eq "complete") {
 		$self->set({lastStatus=>"complete", "currentActivityId"=>$activity->getId}, 1);
-	} 
+	}
     else {
 		$self->set({lastStatus=>$status}, 1);
 	}
 	return $status;
 }
+
+#-------------------------------------------------------------------
+
+=head2 getObject
+
+Returns the object this workflow is being used on, or undef if it does not have a related object.
+
+=cut
+
+sub getObject {
+    my $self = shift;
+    if ( exists $self->{_object} ) {
+        return $self->{_object};
+    }
+    my $class = $self->get("className");
+    my $method = $self->get("methodName");
+    if ( !($class && $method) ) {
+        return undef;
+    }
+    my @params;
+    unless ($self->get('noSession')) {
+        push @params, $self->session;
+    }
+    push @params, $self->get("parameters");
+    WebGUI::Pluggable::load($class);
+    return $self->{_object} = $class->$method(@params);
+}
+
+#-------------------------------------------------------------------
+
+=head2 getInstancesForObject ( session, properties )
+
+Class method.  Finds the instances of running workflows pertaining to a given object.
+Returns an array reference of instance IDs, or an array reference of instance objects.
+
+=head3 session
+
+The WebGUI session object to use.
+
+=head3 properties
+
+A hash reference of properties similar to what is given to L</create>.  The relevant entries are:
+
+=head4 className
+
+The class of the object to search for
+
+=head4 methodName
+
+The method used to instanciate the object
+
+=head4 parameters
+
+The parameters to be given to the creation method to instanciate the object
+
+=head4 returnObjects
+
+If true, returns objects instead of instance IDs.
+
+=cut
+
+sub getInstancesForObject {
+    my $class = shift;
+    my $session = shift;
+    my $properties = shift;
+    my $className = $properties->{className};
+    my $methodName = $properties->{methodName};
+    my $parameters = $properties->{parameters};
+    my $workflowId = $properties->{workflowId};
+    my $returnObjects = $properties->{returnObjects};
+    my $dbParameters = JSON->new->canonical->encode({parameters => $parameters});
+
+    my $sql = q{
+        SELECT
+            instanceId
+        FROM
+            WorkflowInstance
+        WHERE
+            className = ?
+            AND methodName = ?
+            AND parameters = ?
+    };
+    my $sqlParams = [$className, $methodName, $parameters];
+    if ($workflowId) {
+        $sql .= 'AND workflowId = ?';
+        push @$sqlParams, $workflowId;
+    }
+    my $instanceIds = $session->db->buildArrayRef($sql, $sqlParams);
+    if ($returnObjects) {
+        my $instances = [ map {
+            $class->new($session, $_);
+        } @{$instanceIds} ];
+        return $instances;
+    }
+    return $instanceIds;
+}
+
 
 #-------------------------------------------------------------------
 

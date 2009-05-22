@@ -1545,6 +1545,108 @@ our $I18N = {
         lastUpdated => 0,
         context => q|message that is displayed in the cart view screen|,
     },
+
+    'schedule all button' => {
+        message => q|Schedule all|,
+        lastUpdated => 0,
+        context => 'Label for the schedule all button in the vendor payouts manager',
+    },
+
+    'deschedule all button' => {
+        message => q|Deschedule all|,
+        lastUpdated => 0,
+        context => 'Label for the deschedule all button in the vendor payouts manager',
+    },
+
+    'submit scheduled payouts button' => {
+        message => q|Submit Scheduled Payouts|,
+        lastUpdated => 0,
+        context => 'Label for the submit scheduled payouts button in the vendor payouts manager',
+    },
+   
+    'vendor id'  => {
+        message => q|Vendor ID|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vendor name'  => {
+        message => q|Name|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'scheduled payout amount'  => {
+        message => q|Scheduled for payout|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'not scheduled payout amount'  => {
+        message => q|Not scheduled for payout|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vp item id'  => {
+        message => q|Item ID|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vp item title'  => {
+        message => q|Item name|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vp item price'  => {
+        message => q|Price|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+    'vp item quantity'  => {
+        message => q|Qty|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vp item payout amount'  => {
+        message => q|Payout amount|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'vp item payout status'  => {
+        message => q|Payout status|,
+        lastUpdated => 0,
+        context => q|Table heading in the vendor payout manager.|,
+    },
+
+    'copy from home address' => {
+        message => q|Copy home address from profile|,
+        lastUpdated => 0,
+        context => q|Button label in the edit address screen.|,
+    },
+
+    'copy from work address' => {
+        message => q|Copy work address from profile|,
+        lastUpdated => 0,
+        context => q|Button label in the edit address screen.|,
+    },
+
+    'group label' => {
+        message => q|Label|,
+        lastUpdated => 0,
+        context => q|Label in the EU tax manager|,
+    },
+
+    'group rate' => {
+        message => q|Tax rate|,
+        lastUpdated => 0,
+        context => q|Label in the EU tax manager|,
+    },
+
 };
 
 1;

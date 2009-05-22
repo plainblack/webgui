@@ -43,10 +43,11 @@ my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Collab setup"});
 
 # Need to create a Collaboration system in which the post lives.
-my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'});
+my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
+
+my $collab = $node->addChild({className => 'WebGUI::Asset::Wobject::Collaboration', editTimeout => '1'}, @addArgs);
 
 # The Collaboration system must be committed before a post can be made.
-$versionTag->commit();
 
 # Need to do $post->canEdit tests, which test group membership. Therefore,
 # create three users and a group for the process. One user will be doing the
@@ -60,8 +61,10 @@ my $otherUser           = WebGUI::User->new($session, 'new');
 my $groupIdEditUser     = WebGUI::User->new($session, 'new');
 my $groupToEditPost     = WebGUI::Group->new($session, $collab->get('groupToEditPost'));
 my $groupIdEditGroup    = WebGUI::Group->new($session, $collab->get('groupIdEdit'));
+WebGUI::Test->usersToDelete($postingUser, $otherUser, $groupIdEditUser);
 $postingUser->username('userForPosting');
 $otherUser->username('otherUser');
+WebGUI::Test->groupsToDelete($groupToEditPost, $groupIdEditGroup);
 
 # Add the posting user to the group allowd to post.
 $postingUser->addToGroups([$collab->get('postGroupId')]);
@@ -85,7 +88,10 @@ my $props = {
     content     => 'hello, world!',
 };
 
-my $post = $collab->addChild($props);
+my $post = $collab->addChild($props, @addArgs);
+
+$versionTag->commit();
+WebGUI::Test->tagsToRollback($versionTag);
 
 # Test for a sane object type
 isa_ok($post, 'WebGUI::Asset::Post::Thread');
@@ -115,11 +121,6 @@ TODO: {
 }
 
 END {
-    # Clean up after thyself
-    $versionTag->rollback();
-    $postingUser->delete();
-    $otherUser->delete();
-    $groupIdEditUser->delete();
 }
 
 

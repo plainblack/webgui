@@ -1,3 +1,50 @@
+**** v 0.8.1.1 ****
+- Fix bug of frequent syntax desynchronisation when the first character of the textarea was highlighted
+- In unload now check that parent.editareaLoader still exists before calling it
+- Now consider that gecko and webkit based browser are valid browsers (but I won't test them all)
+
+**** v 0.8.1 ****
+- Improved speed of text highlighting process for huge file. Now we try to only insert or delete the changed caracters inside DOM text node instead of refreshing the whole area. (3 time faster in firefox)
+- Greatly improved speed of line-height management in word-wrap context 
+- Add java syntax (thanks to Dawson Goodell)
+- Use faster regexp for matching quoted strings
+- Bug fix: if a highlighted quote or comment string contains cariage return, editing text on one of the lines was causin a highlight desynchronisation
+- Bug fix: text war blur on Safari 3.2 (thanks to spellcoder)
+- Bug fix: there had several mistake with non-monospace font (thanks to spellcoder)
+- Bug fix: if show_line_colors was disabled and word wrap enable, highlighted text wasn't refreshed if a new line appears
+- Bug fix: in multi file edition, closing the last tab was throwing an error in Firefox and let the content of the textarea displayed
+- Browser bug detection: when using non-monospace font Firefox will sometime have strange behavior on text-width (the highlighted text-width in the background may change fron textarea one and simply can change after beeing updated); look likes a browser rendering bug
+
+**** v 0.8 ****
+- Word-wrap is now supported (except for opera...). The new init() option is 'word_wrap' to set to 'true' (default is false). A new button appears in the default toolbar (button_code: 'word_wrap' )
+- We can now clearly see the selected text
+- Add Internet explorer 8 support (but sadly I must use IE7 emulate mode in iframe due to a bug with tabulation width not beeing resized in IE's textarea) 
+- Add Safari 4 support
+- Add Chrome 2 support
+- Better support of Opera 9.6
+- Add Simplified Chinese translation "zh" (thanks to Abentian)
+- Add Bulgarian translation "bg" (thanks to Valentin Hristov)
+- Rename internal function $() by _$()
+- Delete EditArea.add_event() method (duplicate af editAreaLoader.add_event() method)
+- Do some code cleanup-up
+- Bug fix: highlight optimisation process was not working under IE (don't known how long it remain broken but must be since a long time)
+- Bug fix: EditArea.update_size sometimes uses undefined variable (fix this possibility and cleanup events)
+- Bug fix: Template.html was not valid XHTML
+- Bug fix: The checked attribute of the toogle button was not defined in xhtml syntax
+- Bug fix: If the editArea was loaded on a page related to a domain which was itself an iframe comming from another domain a JS error was thrown on load
+- Bug fix: When EditArea is used to replace a textarea which has style="visibility:hidden;", switching off EditArea would throw an error under IE 
+
+**** v 0.7.3 ****
+- Add Finnish transaltion (thanks to Janne Mäntyharju)
+- Add 'cursor_position' init() option for defining where the cursor should be when the editor is show on the first time ('auto' or 'begin'). This was like 'auto' before now this is like 'begin' by default
+- better add_style method (faster than old one) thanks to Spellcoder
+- Bug fix: fix bug with mootools 1.2
+- Bug fix: if page had no stylesheets when editarea load, it would generate an error
+
+**** v 0.7.2.3 ****
+- it's now released under both LGPL, Apache, BSD license (you can use the one you prefer)
+- add support for bonEcho browser
+
 **** v 0.7.2.2 ****
 - Fix bug regression introduced in 0.7.2 that make IE7 not working 
 - add Esperento translation (thanks to Olivier)  

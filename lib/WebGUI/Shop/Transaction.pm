@@ -3,7 +3,7 @@ package WebGUI::Shop::Transaction;
 use strict;
 
 use Class::InsideOut qw{ :std };
-use JSON;
+use JSON qw{ from_json };
 use WebGUI::Asset::Template;
 use WebGUI::Exception::Shop;
 use WebGUI::Form;
@@ -391,6 +391,102 @@ sub getTransactionIdsForUser {
         $userId = $session->user->userId;
     }
     return $session->db->buildArrayRef("select transactionId from transaction where userId=? order by dateOfPurchase desc",[$userId]);
+}
+
+#-------------------------------------------------------------------
+
+sub getTransactionVars {
+    my $self = shift;
+    my $url  = $self->session->url;
+    my $i18n = WebGUI::International->new( $self->session, 'Shop' );
+
+    my $var = {
+        %{ $self->get },
+        viewDetailUrl           => $url->page( 'shop=transaction;method=viewMy;transactionId='.$self->getId, 1 ),
+        cancelRecurringUrl      => $url->page('shop=transaction;method=cancelRecurring;transactionId='.$self->getId),
+        amount                  => sprintf( "%.2f", $self->get('amount') ),
+        inShopCreditDeduction   => sprintf( "%.2f", $self->get('inShopCreditDeduction') ),
+        taxes                   => sprintf( "%.2f", $self->get('taxes') ),
+        shippingPrice           => sprintf( "%.2f", $self->get('shippingPrice') ),
+        shippingAddress         => $self->formatAddress( {
+            name        => $self->get('shippingAddressName'),
+            address1    => $self->get('shippingAddress1'),
+            address2    => $self->get('shippingAddress2'),
+            address3    => $self->get('shippingAddress3'),
+            city        => $self->get('shippingCity'),
+            state       => $self->get('shippingState'),
+            code        => $self->get('shippingCode'),
+            country     => $self->get('shippingCountry'),
+            phoneNumber => $self->get('shippingPhoneNumber'),
+        } ),
+        paymentAddress          =>  $self->formatAddress({
+            name        => $self->get('paymentAddressName'),
+            address1    => $self->get('paymentAddress1'),
+            address2    => $self->get('paymentAddress2'),
+            address3    => $self->get('paymentAddress3'),
+            city        => $self->get('paymentCity'),
+            state       => $self->get('paymentState'),
+            code        => $self->get('paymentCode'),
+            country     => $self->get('paymentCountry'),
+            phoneNumber => $self->get('paymentPhoneNumber'),
+        } ),
+    };
+    
+    # items
+    my @items = ();
+    foreach my $item (@{$self->getItems}) {
+        my $address = '';
+        if ($self->get('shippingAddressId') ne $item->get('shippingAddressId')) {
+            $address = $self->formatAddress({
+                            name        => $item->get('shippingAddressName'),
+                            address1    => $item->get('shippingAddress1'),
+                            address2    => $item->get('shippingAddress2'),
+                            address3    => $item->get('shippingAddress3'),
+                            city        => $item->get('shippingCity'),
+                            state       => $item->get('shippingState'),
+                            code        => $item->get('shippingCode'),
+                            country     => $item->get('shippingCountry'),
+                            phoneNumber => $item->get('shippingPhoneNumber'),
+                            });
+        }
+ 
+        # Post purchase actions
+        my $actionsLoop = [];
+        my $actions     = $item->getSku->getPostPurchaseActions( $item );
+        for my $label ( keys %{$actions} ) {
+            push @{$actionsLoop}, {
+                label       => $label,
+                url         => $actions->{$label},
+            }
+        }
+
+        my %taxConfiguration = %{ from_json( $item->get( 'taxConfiguration' ) || '{}' ) };
+        my %taxVars          =  
+            map     { ( "tax_$_" => $taxConfiguration{ $_ } ) }
+            keys    %taxConfiguration;
+
+        my $price       = $item->get('price');
+        my $quantity    = $item->get('quantity');
+        my $taxRate     = $item->get('taxRate');
+        my $taxAmount   = $price * $taxRate / 100;
+
+        push @items, {
+            %{$item->get},
+            %taxVars,
+            viewItemUrl             => $url->page('shop=transaction;method=viewItem;transactionId='.$self->getId.';itemId='.$item->getId, 1),
+            price                   => sprintf("%.2f", $item->get('price')),
+            pricePlusTax            => sprintf( "%.2f", $price + $taxAmount ),
+            extendedPrice           => sprintf( "%.2f", $quantity * $price ),
+            extendedPricePlusTax    => sprintf( "%.2f", $quantity * ( $price + $taxAmount ) ),
+            itemShippingAddress     => $address,
+            orderStatus             => $i18n->get( $item->get('orderStatus'), 'Shop' ),
+            actionsLoop             => $actionsLoop,
+        };
+    }
+    $var->{items} = \@items;
+
+    return $var;
+
 }
 
 #-------------------------------------------------------------------

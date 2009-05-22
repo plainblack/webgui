@@ -107,7 +107,8 @@ sub getEditForm {
         .'    <td class="formDescription"  valign="top" style="width: 180px;"><label for="item1">'
               .$i18n->get("items label").'</label><div class="wg-hoverhelp">'.$i18n->get("items description").'</div></td>'
         .'    <td id="items_td" valign="top" class="tableData">'
-        .'    <input type="button" value="Add item" onClick="javascript:addItem()"></button><br /><br />';
+        .'    <input type="button" value="Add item" onClick="javascript:addItem()"></input><br />'
+        ."    <br />\n";
 
     $tabform->getTab("properties")->raw($tableRowStart);
 
@@ -115,25 +116,37 @@ sub getEditForm {
         my @items = @{JSON->new->decode($self->getValue('items'))->{items}};
 
         foreach my $item (@items){
-            my $itemHTML = $i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
-                .'<input type="text" id="itemId'.$item->{sequenceNumber}.'" '
-                .'name="itemId_'.$item->{sequenceNumber}.'" value="'.$item->{itemId}.'">'
-                .'<textarea id="item'.$item->{sequenceNumber}.'" name="item_'.$item->{sequenceNumber}.'" '
+            my $itemNr = $item->{sequenceNumber};
+            my $itemHTML = "<div id='item_div".$itemNr."' name='item_div_".$itemNr."'>\n"
+                ."<span>\n"
+                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
+                .'<input type="text" id="itemId'.$itemNr.'" '
+                .'name="itemId_'.$itemNr.'" value="'.$item->{itemId}.'">'
+                ."</span>\n"
+                ."<input type='button' id='deleteItem".$itemNr."' value='Delete this item'
+onClick='javascript:deleteItem(this.id)'></input>\n"
+                .'<textarea id="item'.$itemNr.'" name="item_'.$itemNr.'" '
                 .'class="carouselItemText" rows="#" cols="#" '
                 .'style="width: 500px; height: 80px;">'.$item->{text}."</textarea><br />\n";
             
             $itemHTML .= 
                 " <script type='text/javascript'>\n"
-                .'var myEditor'.$item->{sequenceNumber}.' '
-                .'= new YAHOO.widget.SimpleEditor("item'.$item->{sequenceNumber}.'", '
+                .'var myEditor'.$itemNr.' '
+                .'= new YAHOO.widget.SimpleEditor("item'.$itemNr.'", '
                 ."{height: '80px', width: '500px', handleSubmit: true});\n"
-                .'myEditor'.$item->{sequenceNumber}.".render()\n"
-                ."</script>\n";
+                .'myEditor'.$itemNr.".render()\n"
+                ."</script>\n"
+                ."</div>\n";
             $tabform->getTab("properties")->raw($itemHTML);
         }
     }
     else{
-        my $itemHTML = 'ID: <input type="text" id="itemId1" name="itemId_1" value="carousel_item_1">'
+        my $itemHTML = "<div id='item_div1' name='item_div_1'>\n"
+                ."<span>\n"
+                .$i18n->get("id label").'<div class="wg-hoverhelp">'.$i18n->get("id description").'</div>: '
+                .' <input type="text" id="itemId1" name="itemId_1" value="carousel_item_1">'
+                ."</span>\n"
+                ."<input type='button' id='deleteItem1' value='Delete this item' onClick='javascript:deleteItem(this.id)'></input>\n"
                 .'<textarea id="item1" name="item_1" class="carouselItemText" rows="#" cols="#" '
                 ."style='width: 500px; height: 80px;'></textarea><br />\n";
             

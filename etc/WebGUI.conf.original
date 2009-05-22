@@ -176,14 +176,16 @@
 
 "paymentDrivers" : [
     "WebGUI::Shop::PayDriver::Cash",
-    "WebGUI::Shop::PayDriver::ITransact"
+    "WebGUI::Shop::PayDriver::ITransact",
+    "WebGUI::Shop::PayDriver::PayPal::PayPalStd"
     ],
 
 # List the shipping drivers you have installed and wish to be
 # available for configuration on the site.
 
 "shippingDrivers" : [
-    "WebGUI::Shop::ShipDriver::FlatRate"
+    "WebGUI::Shop::ShipDriver::FlatRate",
+    "WebGUI::Shop::ShipDriver::USPS"
     ],
 
 # Specify the list of template parsers available in the system.
@@ -380,6 +382,13 @@
       "title" : "^International(spectre,Spectre);",
       "groupSetting" : "groupIdAdminSpectre"
    },
+   "adminConsoleOff" : {
+      "icon" : "adminConsoleOff.gif",
+      "uiLevel" : 1,
+      "group" : "12",
+      "url" : "^PageUrl(\"\",op=switchOffAdmin);",
+      "title" : "^International(12,WebGUI);"
+   },
    "contentFilters" : {
       "icon" : "contentFilters.gif",
       "uiLevel" : 3,
@@ -393,6 +402,13 @@
       "url" : "^PageUrl(\"\",op=manageCache);",
       "title" : "^International(manage cache,WebGUI);",
       "groupSetting" : "groupIdAdminCache"
+   },
+   "filePump" : {
+      "icon" : "filePump.png",
+      "uiLevel" : 5,
+      "url" : "^PageUrl(\"\",op=filePump);",
+      "title" : "^International(File Pump,FilePump);",
+      "groupSetting" : "groupIdAdminFilePump"
    }
 },
 
@@ -506,6 +522,9 @@
    "WebGUI::Asset::Sku::Donation" : {
       "category" : "shop"
    },
+   "WebGUI::Asset::Sku::ThingyRecord" : {
+      "category" : "shop"
+   },
    "WebGUI::Asset::Wobject::UserList" : {
       "category" : "intranet"
    },
@@ -518,6 +537,16 @@
    "WebGUI::Asset::Wobject::WikiMaster" : {
       "isContainer" : 1,
       "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryArchive" : {
+      "isContainer" : 1,
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::StoryTopic" : {
+      "category" : "community"
+   },
+   "WebGUI::Asset::Wobject::Carousel" : {
+      "category" : "utilities"
    },
    "WebGUI::Asset::Wobject::StockData" : {
       "category" : "intranet"
@@ -620,6 +649,9 @@
    },
    "WebGUI::Asset::Template" : {
       "category" : "utilities"
+   },
+   "WebGUI::Asset::Wobject::Map" : {
+       "category" : "basic"
    }
 },
 
@@ -677,6 +709,11 @@
         "identifier" : "user",
         "title"      : "^International(title,Account_User);",
         "className"  : "WebGUI::Account::User"
+    },
+    {
+        "identifier" : "friendManager",
+        "title"      : "^International(title,Account_FriendManager);",
+        "className"  : "WebGUI::Account::FriendManager"
     },
 ],
 
@@ -748,6 +785,7 @@
     "e"                : "e_companyEmail", 
     "Extras"           : "Extras", 
     "FetchMimeType"    : "FetchMimeType", 
+    "FilePump"         : "FilePump", 
     "FileUrl"          : "FileUrl", 
     "GroupAdd"         : "GroupAdd", 
     "GroupDelete"      : "GroupDelete", 
@@ -805,6 +843,7 @@
 
 "workflowActivities" : {
     "None" : [ 
+        "WebGUI::Workflow::Activity::ArchiveOldStories",
         "WebGUI::Workflow::Activity::ArchiveOldThreads",
         "WebGUI::Workflow::Activity::CalendarUpdateFeeds",
         "WebGUI::Workflow::Activity::CleanDatabaseCache",
@@ -828,14 +867,18 @@
         "WebGUI::Workflow::Activity::TrashClipboard",
         "WebGUI::Workflow::Activity::TrashExpiredEvents",
         "WebGUI::Workflow::Activity::SummarizePassiveAnalytics",
-        "WebGUI::Workflow::Activity::BucketPassiveAnalytics"
+        "WebGUI::Workflow::Activity::BucketPassiveAnalytics",
+        "WebGUI::Workflow::Activity::ExpirePurchasedThingyRecords"
     ],
     "WebGUI::Asset::Wobject::Thingy" : [
         "WebGUI::Workflow::Activity::NotifyAboutThing"
     ],
     "WebGUI::User" : [
         "WebGUI::Workflow::Activity::CreateCronJob",
-        "WebGUI::Workflow::Activity::NotifyAboutUser"
+        "WebGUI::Workflow::Activity::NotifyAboutUser",
+        "WebGUI::Workflow::Activity::ActivateUser",
+        "WebGUI::Workflow::Activity::DeactivateUser",
+        "WebGUI::Workflow::Activity::DeleteUser"
     ],
     "WebGUI::VersionTag" : [
         "WebGUI::Workflow::Activity::CommitVersionTag",
@@ -917,6 +960,7 @@
     "WebGUI::Content::AjaxI18N",
     "WebGUI::Content::Account",
     "WebGUI::Content::AssetHistory",
+    "WebGUI::Content::FilePump",
     "WebGUI::Content::Operation",
     "WebGUI::Content::Setup",
     "WebGUI::Content::Shop",
@@ -959,7 +1003,27 @@
     "rar",
     "gz",
     "bz2"
-]
+],
+
+# Drivers for the pluggable tax system
+"taxDrivers" : [
+    "WebGUI::Shop::TaxDriver::Generic",
+    "WebGUI::Shop::TaxDriver::EU"
+],
+
+# Content Delivery Network - for use with WebGUI::Storage
+# required for CDN: enabled, url, queuePath, syncProgram, deleteProgram
+# optional for CDN: sslAlt, sslUrl, extrasCdn, extrasSsl, extrasExclude
+"cdn" : { "enabled" : 0,
+          "url" : "http://content.example.com",
+          "sslAlt" : 0,
+          "sslUrl" : "https://ssl.example.com",
+          "queuePath" : "/data/cdnqueue",
+          "syncProgram" : "/usr/bin/rsync -av --chmod=u+rwx -- '%s' user@content.example.com:/path",
+          "deleteProgram" : "/usr/bin/ssh user@content.example.com 'rm -Rf -- %s'",
+          "extrasCdn" : "http://content.example.com/extras",
+          "extrasSsl" : "https://content.example.com/extras",
+          "extrasExclude": ["tinymce", "^blah$"]
+        }
 
 }
-

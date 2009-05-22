@@ -796,6 +796,17 @@ Settings screen, displayed as hoverhelp.|,
         context => q|Description of the newUser_password tmpl_var for the template help.|,
     },
 
+    'use email as username label' => {
+        message     => 'Use Email Address as Username',
+        lastUpdated => 0,
+        context => q|Label of the webguiUseEmailAsUsername field on the Auth tab of the Edit Settings screen.|,
+    },
+
+    'use email as username description' => {
+        message     => 'When this is set to Yes, the registration screen will not show a username field. Instead the submitted email address will automatically be used as username.',
+        lastUpdated => 0,
+        context => q|Description of the webguiUseEmailAsUsername field, used as hoverhelp on the Auth tab of the Edit Settings screen.|,
+    },
 };
 
 1;

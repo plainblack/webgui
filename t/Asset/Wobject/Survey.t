@@ -18,7 +18,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 19;
+my $tests = 25;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -31,6 +31,7 @@ SKIP: {
 
 skip $tests, "Unable to load Survey" unless $usedOk;
 $user = WebGUI::User->new( $session, 'new' );
+WebGUI::Test->usersToDelete($user);
 $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
@@ -42,9 +43,9 @@ $survey->surveyJSON_update([0], { variable => 'S0' });
 
 # Add 2 questions to S0
 $survey->surveyJSON_newObject([0]);    # S0Q0
-$survey->surveyJSON_update([0,0], { variable => 'S0Q0' });
+$survey->surveyJSON_update([0,0], { variable => 'S0Q0', questionType => 'Yes/No' });
 $survey->surveyJSON_newObject([0]);    # S0Q1
-$survey->surveyJSON_update([0,1], { variable => 'S0Q1' });
+$survey->surveyJSON_update([0,1], { variable => 'S0Q1', questionType => 'Yes/No' });
 
 # Add a new section (S1)
 $survey->surveyJSON_newObject([]);     # S1
@@ -89,6 +90,47 @@ delete $s->{responseId};
 ok($s->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
 ok($s->responseId, '..(and similarly for responseId)');
 
+# Restart the survey
+$s->submitQuestions({
+    '0-0-0'        => 'this text ignored',
+    '0-1-0'        => 'this text ignored',
+});
+
+cmp_deeply(
+    $s->responseJSON->responses,
+    superhashof(
+        {   '0-1-0' => {
+                'verbatim' => undef,
+                'comment'  => undef,
+                'time'     => num( time, 5 ),
+                'value'    => 1
+            },
+            '0-0-0' => {
+                'verbatim' => undef,
+                'comment'  => undef,
+                'time'     => num( time, 5 ),
+                'value'    => 1
+            },
+        }
+    ),
+    'submitQuestions does the right thing'
+);
+
+# Test Restart
+$s->surveyEnd( { restart => 1 } );
+cmp_deeply($s->responseJSON->responses, {}, 'restart removes the in-progress response');
+ok($responseId ne $s->responseId, '..and uses a new responseId');
+
+# Test out exitUrl with an explicit
+use JSON;
+my $surveyEnd = $s->surveyEnd( { exitUrl => 'home' } );
+cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/home' }, 'exitUrl works (it adds a slash for us)');
+
+# Test out exitUrl using survye instance exitURL property
+$s->update({ exitURL => 'getting_started'});
+$surveyEnd = $s->surveyEnd( { exitUrl => undef } );
+cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started' }, 'exitUrl works (it adds a slash for us)');
+
 # www_jumpTo
 {
     # Check a simple www_jumpTo request
@@ -115,10 +157,26 @@ ok($s->responseId, '..(and similarly for responseId)');
 
 }
 
+eval 'use GraphViz';
+
+SKIP: {
+
+skip "Unable to load GraphViz", 1 if $@;
+
+$survey->surveyJSON->remove([1]);
+my ($storage, $filename) = $survey->graph( { format => 'plain', layout => 'dot' } );
+like($storage->getFileContentsAsScalar($filename), qr{
+    ^graph .*       # starts with graph
+    (node .*){3}    # ..then 3 nodes
+    (edge .*){3}    # ..then 3 edges
+    stop$            # ..and end with stop
+}xs, 'Generated graph looks roughly okay');
+
+}
+
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    $user->delete() if $user;
     $survey->purge() if $survey;
 
     my $versionTag = WebGUI::VersionTag->getWorking( $session, 1 );

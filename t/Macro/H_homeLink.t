@@ -99,7 +99,8 @@ sub addTemplate {
 		url => 'h_homelink-test',
 		namespace => 'Macro/H_homeLink',
 		template => "HREF=<tmpl_var homeLink.url>\nLABEL=<tmpl_var homeLink.text>",
-		id => 'testTemplateH_HomeLink'
+		id => 'testTemplateH_HomeLink',
+        usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -120,8 +121,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }

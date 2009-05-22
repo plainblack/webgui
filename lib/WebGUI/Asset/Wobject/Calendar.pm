@@ -1210,7 +1210,8 @@ sub viewList {
 
     ### Build the event vars
     my $dtLast = $dtStart; # The DateTime of the last event
-    for my $event (@events) {
+    EVENT: for my $event (@events) {
+        next EVENT unless $event && $event->canView();
         my ( %eventVar, %eventDate )
             = $self->getEventVars( $event );
 

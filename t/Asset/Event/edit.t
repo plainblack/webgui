@@ -36,6 +36,7 @@ $session->setting->set( 'defaultVersionTagWorkflow', 'pbworkflow000000000003' );
 
 # Create a user for testing purposes
 my $user        = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($user);
 $user->username( 'dufresne' . time );
 my $identifier  = 'ritahayworth';
 my $auth        = WebGUI::Operation::Auth::getInstance( $session, $user->authMethod, $user->userId );
@@ -169,7 +170,6 @@ END {
         $tag->rollback;
     }
 
-    $user->delete;
 }
 
 #----------------------------------------------------------------------------

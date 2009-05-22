@@ -104,12 +104,7 @@ sub create {
 
     ### Check data
     # Check if the field already exists
-    my $fieldNameExists 
-        = $session->db->quickScalar(
-            "select count(*) from userProfileField where fieldName=?", 
-            [$fieldName]
-        );
-    return undef if $fieldNameExists;
+    return undef if $class->exists($session,$fieldName);
     return undef if $class->isReservedFieldName($fieldName);
 
     ### Data okay, create the field
@@ -155,6 +150,24 @@ sub delete {
     $db->deleteRow("userProfileField","fieldName",$self->getId);
 }
 
+#-------------------------------------------------------------------
+
+=head2 exists ( session, fieldName )
+
+Class method that returns true if a field with the given name already 
+exists. The first argument is a WebGUI::Session object. C<fieldName> is 
+the field name to check
+
+=cut
+
+sub exists {
+    my ( $class, $session, $fieldName ) = @_;
+    
+    return 1 if $session->db->quickScalar(
+        "SELECT COUNT(*) FROM userProfileField WHERE fieldName=?",
+        [$fieldName]
+    );
+}
 
 #-------------------------------------------------------------------
 
@@ -717,12 +730,7 @@ sub rename {
 
     ### Check data
     # Make sure the field doesn't exist
-    my $fieldNameExists
-    = $self->session->db->quickScalar(
-        "SELECT COUNT(*) FROM userProfileField WHERE fieldName=?",
-        [$newName]
-    );
-    return 0 if ($fieldNameExists);
+    return 0 if $self->exists($session, $newName);
 
     # Rename the userProfileData column
     my $fieldClass  = $self->getFormControlClass;
@@ -828,8 +836,19 @@ sub set {
     }
     $properties->{fieldName} = $self->getId;
 
+    ##Save the fieldType now.  It can't be chacked against getFormControlClass now
+    ##because it will return the OLD formControlClass, not the new one that we need
+    ##to check against.
+    my $originalFieldType = $self->get('fieldType');
+
+    # Update the record
+    $db->setRow("userProfileField","fieldName",$properties);
+    foreach my $key (keys %{$properties}) {
+        $self->{_properties}{$key} = $properties->{$key};
+    }
+
     # If the fieldType has changed, modify the userProfileData column
-    if ($properties->{fieldType} ne $self->get("fieldType")) {
+    if ($properties->{fieldType} ne $originalFieldType) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = $self->getFormControlClass;
         eval "use $fieldClass;";
@@ -845,11 +864,6 @@ sub set {
         $db->write($sql);
     }
 
-    # Update the record
-    $db->setRow("userProfileField","fieldName",$properties);
-    foreach my $key (keys %{$properties}) {
-        $self->{_properties}{$key} = $properties->{$key};
-    }
 }
 
 #-------------------------------------------------------------------

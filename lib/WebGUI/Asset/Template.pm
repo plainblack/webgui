@@ -19,8 +19,10 @@ use base 'WebGUI::Asset';
 use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
+use WebGUI::Form;
+use Tie::IxHash;
 use Clone qw/clone/;
-
+use HTML::Packer;
 
 =head1 NAME
 
@@ -72,6 +74,7 @@ sub definition {
                 fieldType       => 'codearea',
                 syntax          => "html",
                 defaultValue    => undef,
+                filter          => 'packTemplate',
             },
             isEditable => {
                 noFormPost      => 1,
@@ -95,9 +98,64 @@ sub definition {
                 fieldType       => 'combo',
                 defaultValue    => undef,
             },
+            templatePacked => {
+                fieldType       => 'hidden',
+                defaultValue    => undef,
+            },
+            usePacked => {
+                fieldType       => 'yesNo',
+                defaultValue    => 0,
+            },
         },
     };
     return $class->SUPER::definition($session,$definition);
+}
+
+#-------------------------------------------------------------------
+
+=head2 addAttachments ( attachments )
+
+Adds attachments to this template.  Attachments is an arrayref of hashrefs,
+where each hashref should have at least url, type, and sequence as keys.
+
+=cut
+
+sub addAttachments {
+    my ($self, $attachments) = @_;
+
+    my $db = $self->session->db;
+
+    my $sql = q{
+        INSERT INTO template_attachments
+            (templateId, revisionDate, url, type, sequence)
+        VALUES
+            (?,          ?,            ?,   ?,    ?)
+    };
+
+    foreach my $a (@$attachments) {
+        my @params = (
+            $self->getId, 
+            $self->get('revisionDate'),
+            @{$a}{qw(url type sequence)}
+        );
+        $db->write($sql, \@params);
+    }
+}
+
+#-------------------------------------------------------------------
+
+=head2 addRevision ( )
+
+Override the master addRevision to copy attachments
+
+=cut
+
+sub addRevision {
+    my ( $self, $properties, @args ) = @_;
+    my $asset = $self->SUPER::addRevision($properties, @args);
+    delete $properties->{templatePacked};
+    $asset->addAttachments($self->getAttachments);
+    return $asset;
 }
 
 #-------------------------------------------------------------------
@@ -137,25 +195,56 @@ sub duplicate {
 
 #-------------------------------------------------------------------
 
-sub processPropertiesFromFormPost {
-	my $self = shift;
-	$self->SUPER::processPropertiesFromFormPost;
-    # TODO: Perhaps add a way to check template syntax before it blows stuff up?
-    my %data;
-    my $needsUpdate = 0;
-	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
-        $needsUpdate = 1;
-		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
-			%data = ( parser => $self->session->form->process("parser","className") );
-		} else {
-			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
-		}
+=head2 exportAssetData (  )
+
+Override to add attachments to package data
+
+=cut
+
+sub exportAssetData {
+    my ( $self ) = @_;
+    my $data    = $self->SUPER::exportAssetData;
+    $data->{template_attachments} = $self->getAttachments;
+    return $data;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getAttachments ( [type] )
+
+Returns an arrayref of hashrefs representing all attachments for this template
+of the specified type (link, bodyScript, headScript).
+
+=head3 type
+
+If defined, will limit the attachments to this type; e.g., passing
+'stylesheet' will return only stylesheets.
+
+=cut
+
+sub getAttachments {
+	my ( $self, $type ) = @_;
+	my @params = ($self->getId, $self->get('revisionDate'));
+	my $typeString;
+
+	if ($type) {
+		$typeString = 'AND type = ?';
+		push(@params, $type);
 	}
-	if ($self->session->form->process("namespace") eq 'style') {
-        $needsUpdate = 1;
-        $data{extraHeadTags} = '';
-    }
-    $self->update(\%data) if $needsUpdate;
+
+	my $sql = qq{
+		SELECT 
+			* 
+		FROM 
+			template_attachments 
+		WHERE 
+			templateId = ?
+            AND revisionDate = ?
+			$typeString
+		ORDER BY
+			type, sequence ASC
+	};
+	return $self->session->db->buildArrayRefOfHashRefs($sql, \@params);
 }
 
 #-------------------------------------------------------------------
@@ -200,13 +289,19 @@ sub getEditForm {
 		-label=>$i18n->get('show in forms'),
 		-hoverHelp=>$i18n->get('show in forms description'),
 		);
-        $tabform->getTab("properties")->codearea(
+	$tabform->getTab("properties")->codearea(
 		-name=>"template",
 		-label=>$i18n->get('assetName'),
 		-hoverHelp=>$i18n->get('template description'),
-        -syntax => "html",
+		-syntax => "html",
 		-value=>$self->getValue("template")
 		);
+    $tabform->getTab('properties')->yesNo(
+        name        => "usePacked",
+        label       => $i18n->get('usePacked label'),
+        hoverHelp   => $i18n->get('usePacked description'),
+        value       => $self->getValue("usePacked"),
+    );
 	if($self->session->config->get("templateParsers")){
 		my @temparray = @{$self->session->config->get("templateParsers")};
 		tie my %parsers, 'Tie::IxHash';
@@ -221,8 +316,74 @@ sub getEditForm {
 			-value=>$value,
 			-label=>$i18n->get('parser'),
 			-hoverHelp=>$i18n->get('parser description'),
-		);
+			);
 	}
+
+    ### Template attachments
+	my $session = $self->session;
+	my @headers = map { '<th>' . $i18n->get("attachment header $_") . '</th>' } 
+                      qw(index type url remove);
+
+    tie my %attachmentTypeNames, 'Tie::IxHash' => (
+        stylesheet => $i18n->get('css label'),
+        headScript => $i18n->get('js head label'),
+        bodyScript => $i18n->get('js body label'),
+    );
+
+	my $table = '<table id="attachmentDisplay">';
+	$table .= "<thead><tr>@headers</tr></thead><tbody id='addAnchor'>";
+	foreach my $a ( @{ $self->getAttachments } ) {
+		my ($seq, $type, $url) = @{$a}{qw(sequence type url)};
+        # escape macros in the url so they don't get processed
+        $url =~ s/\^/&#94;/g;
+		my $del = WebGUI::Form::checkbox(
+			$session, { 
+				name   => 'removeAttachment',
+				value  => $url,
+				extras => 'class="id"',
+            }
+        );
+		my @data = (
+			"<td class='index'>$seq</td>", 
+			"<td class='type'>$type</td>", 
+			"<td class='url'>$url</td>", 
+			"<td>$del</td>",
+		);
+		$table .= "<tr class='existingAttachment'>@data</tr>";
+	}
+	$table .= '</tbody></table>';
+	my $properties = $tabform->getTab('properties');
+	my $label = $i18n->get('attachment display label');
+	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
+
+	my @data = map { "<td>$_</td>" } (
+		WebGUI::Form::integer(
+			$session, { size => '2', id => 'addBoxIndex' }
+		),
+		WebGUI::Form::selectBox(
+			$session, { options => \%attachmentTypeNames, id => 'addBoxType' }
+		),
+		WebGUI::Form::text($session, { id => 'addBoxUrl', size => 40 }),
+		WebGUI::Form::button(
+			$session, { 
+				value  => $i18n->get('attachment add button'), 
+				extras => 'onclick="addClick()"' 
+			}
+		),
+	);
+
+	my ($style, $url) = $self->session->quick(qw(style url));
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
+	$style->setScript($url->extras('yui/build/json/json-min.js'));
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'));
+
+	pop(@headers);
+	my $scriptUrl = $url->extras('templateAttachments.js');
+	$table = "<table id='addBox'><tr>@headers</tr><tr>@data</tr></table>";
+	$table .= qq(<script type="text/javascript" src="$scriptUrl"></script>);
+	$label = $i18n->get('attachment add field label');
+	$properties->raw("<tr><td>$label</td><td>$table</td></tr>");
+
 	return $tabform;
 }
 
@@ -303,7 +464,21 @@ sub getParser {
     }
 }
 
+#-------------------------------------------------------------------
 
+=head2 importAssetCollateralData ( data )
+
+Override to import attachments
+
+=cut
+
+sub importAssetCollateralData {
+    my ( $self, $data, @args ) = @_;
+    $self->removeAttachments;
+    $self->addAttachments( $data->{template_attachments} );
+    return $self->SUPER::importAssetCollateralData( $data, @args );
+}
+    
 #-------------------------------------------------------------------
 
 =head2 indexContent ( )
@@ -319,6 +494,26 @@ sub indexContent {
 	$indexer->setIsPublic(0);
 }
 
+#-------------------------------------------------------------------
+
+=head2 packTemplate ( template )
+
+Pack the template into a minified version for faster downloads.
+
+=cut
+
+sub packTemplate {
+    my ( $self, $template ) = @_;
+    my $packed  = $template;
+    HTML::Packer::minify( \$packed, {
+        remove_comments     => 1,
+        remove_newlines     => 1,
+        do_javascript       => "shrink",
+        do_stylesheet       => "minify",
+    } );
+    $self->update({ templatePacked => $packed });
+    return $template;
+}
 
 #-------------------------------------------------------------------
 
@@ -334,15 +529,42 @@ A hash reference containing template variables to be processed for the head bloc
 
 sub prepare {
 	my $self = shift;
-    my $vars = shift;
+	my $vars = shift;
 	$self->{_prepared} = 1;
-	my $templateHeadersSent = $self->session->stow->get("templateHeadersSent") || [];
-	my @sent = @{$templateHeadersSent};
-    unless (isIn($self->getId, @sent)) { # don't send head block if we've already sent it for this template
-        $self->session->style->setRawHeadTags($self->getParser($self->session, $self->get('parser'))->process($self->getExtraHeadTags, $vars));
-    }
-	push(@sent, $self->getId);
-	$self->session->stow->set("templateHeadersSent", \@sent);
+
+	my $sent = $self->session->stow->get('templateHeadersSent');
+	unless ($sent) {
+		$self->session->stow->set('templateHeadersSent', $sent = []);
+	}
+
+	my $id   = $self->getId;
+	# don't send head block if we've already sent it for this template
+	return if isIn($id, @$sent);
+
+	my $session      = $self->session;
+	my ($db, $style) = $session->quick(qw(db style));
+	my $parser       = $self->getParser($session, $self->get('parser'));
+	my $headBlock    = $parser->process($self->getExtraHeadTags, $vars);
+
+	$style->setRawHeadTags($headBlock);
+
+	foreach my $sheet ( @{ $self->getAttachments('stylesheet') } ) {
+		my %props = ( type => 'text/css', rel => 'stylesheet' );
+		$style->setLink($sheet->{url}, \%props);
+	}
+
+	my $doScripts = sub {
+		my ($type, $body) = @_;
+		foreach my $script ( @{ $self->getAttachments($type) } ) {
+			my %props = ( type => 'text/javascript' );
+			$style->setScript($script->{url}, \%props, $body);
+		}
+	};
+
+	$doScripts->('headScript');
+	$doScripts->('bodyScript', 1);
+
+	push(@$sent, $id);
 }
 
 
@@ -350,7 +572,9 @@ sub prepare {
 
 =head2 process ( vars )
 
-Evaluate a template replacing template commands for HTML.
+Evaluate a template replacing template commands for HTML.  If the internal property templatePacked
+is set to true, the packed, minimized template will be used.  Otherwise, the original template
+will be used.
 
 =head3 vars
 
@@ -365,9 +589,62 @@ sub process {
 	my $self = shift;
 	my $vars = shift;
 	$self->prepare unless ($self->{_prepared});
-	return $self->getParser($self->session, $self->get("parser"))->process($self->get("template"), $vars);
+    my $parser      = $self->getParser($self->session, $self->get("parser"));
+    my $template    = $self->get('usePacked')
+                    ? $self->get('templatePacked')
+                    : $self->get('template')
+                    ;
+	return $parser->process($template, $vars);
 }
 
+
+#-------------------------------------------------------------------
+
+sub processPropertiesFromFormPost {
+	my $self = shift;
+	$self->SUPER::processPropertiesFromFormPost;
+    # TODO: Perhaps add a way to check template syntax before it blows stuff up?
+    my %data;
+    my $needsUpdate = 0;
+	if ($self->getValue("parser") ne $self->session->form->process("parser","className") && ($self->session->form->process("parser","className") ne "")) {
+        $needsUpdate = 1;
+		if (isIn($self->session->form->process("parser","className"),@{$self->session->config->get("templateParsers")})) {
+			%data = ( parser => $self->session->form->process("parser","className") );
+		} else {
+			%data = ( parser => $self->session->config->get("defaultTemplateParser") );
+		}
+	}
+	if ($self->session->form->process("namespace") eq 'style') {
+        $needsUpdate = 1;
+        $data{extraHeadTags} = '';
+    }
+
+    ### Template attachments
+    my $f    = $self->session->form;
+    my $p    = $f->paramsHashRef;
+    my @nums = grep {$_} map { my ($i) = /^attachmentUrl(\d+)$/; $i } keys %$p;
+    my @add;
+    
+    # Remove all attachments first, then re-add whatever's left in the form
+    $self->removeAttachments;
+
+    foreach my $n (@nums) {
+        my ($index, $type, $url) = 
+            map { $f->process('attachment' . $_ . $n) }
+            qw(Index Type Url);
+
+        push(
+            @add, {
+                sequence     => $index,
+                url          => $url,
+                type         => $type,
+            }
+        );
+    }
+    $self->addAttachments(\@add);
+
+    return;
+}
 
 #-------------------------------------------------------------------
 
@@ -402,15 +679,62 @@ sub processRaw {
 	return $class->getParser($session,$parser)->process($template, $vars);
 }
 
+#-------------------------------------------------------------------
+
+=head2 purgeRevision ( )
+
+Override the master purgeRevision to purge attachments
+
+=cut
+
+sub purgeRevision {
+    my $self = shift;
+    $self->removeAttachments;
+    return $self->SUPER::purgeRevision(@_);
+}
+
+#-------------------------------------------------------------------
+
+=head2 removeAttachments ( urls )
+
+Removes attachments. C<urls> is an arrayref of URLs to remove. If C<urls>
+is not defined, will remove all attachments for this revision.
+
+=cut
+
+sub removeAttachments {
+    my ($self, $urls) = @_;
+
+    my $db    = $self->session->db;
+    my $dbh   = $db->dbh;
+    my $rmsql = qq{
+        DELETE FROM 
+            template_attachments
+        WHERE
+            templateId = ?
+            AND revisionDate = ?
+    };
+    
+    if ( $urls && @{$urls} ) {
+        my $in    = join(',', map { $dbh->quote($_) } @{$urls});
+        $rmsql .= qq{
+            AND url IN ($in)
+        };
+    }
+
+    my @params = (
+        $self->getId,
+        $self->get('revisionDate'),
+    );
+    $db->write($rmsql, \@params);
+}
 
 #-------------------------------------------------------------------
 
 =head2 update
 
 Override update from Asset.pm to handle backwards compatibility with the old
-packages that contain headBlocks.
-
-This method is deprecated and will be removed in the future.  Don't plan
+packages that contain headBlocks. This will be removed in the future.  Don't plan
 on this being here.
 
 =cut
@@ -419,10 +743,12 @@ sub update {
     my $self = shift;
     my $requestedProperties = shift;
     my $properties = clone($requestedProperties);
+
     if (exists $properties->{headBlock}) {
         $properties->{extraHeadTags} .= $properties->{headBlock};
         delete $properties->{headBlock};
     }
+
     $self->SUPER::update($properties);
 }
 

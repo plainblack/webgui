@@ -146,7 +146,6 @@ sub www_editBranch {
 		-value=>$self->getValue("styleTemplateId"),
 		-hoverHelp=>$i18n2->get('1073 description'),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_styleTemplateId"})
 		);
          $tabform->getTab("display")->template(
@@ -155,9 +154,19 @@ sub www_editBranch {
 		-hoverHelp=>$i18n2->get('1079 description'),
 		-value=>$self->getValue("printableStyleTemplateId"),
 		-namespace=>'style',
-		-afterEdit=>'op=editPage;npp='.$self->session->form->process("npp"),
 		-subtext=>'<br />'.$i18n->get("change").' '.WebGUI::Form::yesNo($self->session,{name=>"change_printableStyleTemplateId"})
 		);
+        if ( $self->session->setting->get('useMobileStyle') ) {
+            $tabform->getTab("display")->template(
+                name        => 'mobileStyleTemplateId',
+                label       => $i18n2->get('mobileStyleTemplateId label'),
+                hoverHelp   => $i18n2->get('mobileStyleTemplateId description'),
+                value       => $self->getValue('mobileStyleTemplateId'),
+                namespace   => 'style',
+                subtext     => '<br />' . $i18n->get('change') . q{ }
+                    . WebGUI::Form::yesNo($self->session,{name=>"change_mobileStyleTemplateId"}),
+            );
+        }
 	$tabform->addTab("security",$i18n->get(107),6);
         if ($self->session->config->get("sslEnabled")) {
             $tabform->getTab("security")->yesNo(
@@ -254,6 +263,8 @@ sub www_editBranchSave {
         if ($self->session->form->yesNo("change_styleTemplateId"));
     $wobjectData{printableStyleTemplateId} = $self->session->form->template("printableStyleTemplateId")
         if ($self->session->form->yesNo("change_printableStyleTemplateId"));
+    $wobjectData{mobileStyleTemplateId} = $self->session->form->template("mobileStyleTemplateId")
+        if ($self->session->form->yesNo("change_mobileStyleTemplateId"));
 	my ($urlBaseBy, $urlBase, $endOfUrl);
 	my $changeUrl = $self->session->form->yesNo("change_url");
 	if ($changeUrl) {

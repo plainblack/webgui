@@ -30,12 +30,13 @@ my $node            = WebGUI::Asset->getImportNode( $session );
 
 my %user;
 $user{"2"}          = WebGUI::User->new( $session, "new" );
+WebGUI::Test->usersToDelete($user{'2'});
 $user{"2"}->addToGroups( ['2'] ); # Registered user
 
 my $versionTag      = WebGUI::VersionTag->getWorking( $session );
 $versionTag->set( { name => "Collaboration Test" } );
 
-my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1 } );
+my @addArgs = ( undef, undef, { skipAutoCommitWorkflows => 1, skipNotification => 1 } );
 
 my $collab
     = $node->addChild({
@@ -122,8 +123,7 @@ $thread->unlock;
 #----------------------------------------------------------------------------
 # Cleanup
 END {
-    for my $user ( values %user ) {
-        $user->delete;
-    }
+    my $subscriptionGroup = WebGUI::Group->new($session, $thread->get('subscriptionGroupId'));
+    WebGUI::Test->groupsToDelete($subscriptionGroup);
     $versionTag->rollback;
 }

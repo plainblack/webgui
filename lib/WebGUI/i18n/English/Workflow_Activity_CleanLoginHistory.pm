@@ -19,7 +19,16 @@ our $I18N = {
 		context => q|The name of this workflow activity.|,
 		lastUpdated => 0,
 	},
-
+"retain last login is enabled" => {
+		message => q|Always Retain Last Login Record|,
+		context => q|user login record retention|,
+		lastUpdated => 0,
+	},
+        "retain last login is enabled help" => {
+		message => q|Do not delete the user's very last login record even if it is older than age to delete.  Useful to determine if the login id has not been used on your site because it has been set up manually or has been transferred from another site.|,
+		context => q|Explain user login record retention|,
+		lastUpdated => 0,
+	},
 };
 
 1;

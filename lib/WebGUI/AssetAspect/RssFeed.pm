@@ -207,7 +207,8 @@ sub exportAssetCollateral {
         # Get the parent dir's *path* (essentially the name of the dir) relative to
         #   its own parent dir.
         $filenameBase = $basepath->parent->relative( $basepath->parent->parent )->stringify;
-    } else {
+    }
+    else {
         # Get the 1st ancestor, since the asset is a file recognized by apache, so
         #   we want our files in the same dir.
         $filedir = $basepath->parent->absolute->stringify;
@@ -219,7 +220,7 @@ sub exportAssetCollateral {
         $reportSession->output->print('<br />');
     }
 
-    foreach my $ext (qw( rss atom )) {
+    foreach my $ext (qw( rss atom rdf )) {
         my $dest = Path::Class::File->new($filedir, $filenameBase . '.' . $ext);
 
         # tell the user which asset we're exporting.
@@ -312,103 +313,152 @@ sub getRssFeedItems {
 
 #-------------------------------------------------------------------
 
+=head2 _getFeedUrl ($extension)
+
+Generic method for returning the URL for a type of feed.  If the special scratch variable
+isExporting is true, the static url (url based vs asset function based) will be returned
+instead.
+
+=head3 $extension
+
+The kind of feed that is requested.  Valid extensions are "rss", "atom" or "rdf".
+
+=cut
+
+sub _getFeedUrl {
+    my $self = shift;
+    my $extension = shift;
+    if ( $self->session->scratch->get('isExporting') ) {
+        return $self->_getStaticFeedUrl($extension);
+    }
+    return $self->getUrl("func=view\u$extension");
+}
+
+#-------------------------------------------------------------------
+
+=head2 _getStaticFeedUrl ($extension)
+
+Generic method for returning the static URL for a type of feed.
+
+=head3 $extension
+
+The kind of feed that is requested.  Valid extensions are "rss", "atom" or "rdf".
+
+=cut
+
+sub _getStaticFeedUrl {
+    my $self = shift;
+    my $extension = shift;
+    my $url = $self->get("url") . '.' . $extension;
+    $url = $self->session->url->gateway($url);
+    if ($self->get("encryptPage")) {
+        $url = $self->session->url->getSiteURL . $url;
+        $url =~ s/^http:/https:/;
+    }
+    return $url;
+}
+
+#-------------------------------------------------------------------
+
 =head2 getAtomFeedUrl ()
 
-Returns $self->getUrl('func=viewAtom').
+Returns the URL for this asset's feed in Atom format.  If the special scratch variable
+isExporting is true, the static url (url based vs asset function based) will be returned
+instead.
+
 
 =cut
 
 sub getAtomFeedUrl {
-    shift->getUrl("func=viewAtom");
+    my $self = shift;
+    return $self->_getFeedUrl('atom');
 }
 
 #-------------------------------------------------------------------
 
 =head2 getRdfFeedUrl ()
 
-Returns $self->getUrl('func=viewRdf').
+Returns the URL for this asset's feed in RDF format.  If the special scratch variable
+isExporting is true, the static url (url based vs asset function based) will be returned
+instead.
+
 
 =cut
 
 sub getRdfFeedUrl {
-    shift->getUrl("func=viewRdf");
+    my $self = shift;
+    return $self->_getFeedUrl('rdf');
 }
 
 #-------------------------------------------------------------------
 
 =head2 getRssFeedUrl ()
 
-Returns $self->getUrl('func=viewRss').
+Returns the URL for this asset's feed in RSS 2.0 format.  If the special scratch variable
+isExporting is true, the static url (url based vs asset function based) will be returned
+instead.
+
 
 =cut
 
 sub getRssFeedUrl {
-    shift->getUrl("func=viewRss");
+    my $self = shift;
+    return $self->_getFeedUrl('rss');
 }
 
 #-------------------------------------------------------------------
 
 =head2 getStaticAtomFeedUrl ()
 
-Returns the current asset's URL with .atom concatenated onto it.
+Returns the URL to use when exporting for this asset's feed in Atom format.
 
 =cut
 
 sub getStaticAtomFeedUrl {
     my $self = shift;
-    my $url = $self->get("url") . '.atom';
-    $url = $self->session->url->gateway($url);
-    if ($self->get("encryptPage")) {
-        $url = $self->session->url->getSiteURL . $url;
-        $url =~ s/^http:/https:/;
-    }
-    return $url;
+    return $self->_getStaticFeedUrl('atom');
 }
 
 #-------------------------------------------------------------------
 
 =head2 getStaticRdfFeedUrl ()
 
-Returns the current asset's URL with .rdf concatenated onto it.
+Returns the URL to use when exporting for this asset's feed in RDF format.
 
 =cut
 
 sub getStaticRdfFeedUrl {
     my $self = shift;
-    my $url = $self->get("url") . '.rdf';
-    $url = $self->session->url->gateway($url);
-    if ($self->get("encryptPage")) {
-        $url = $self->session->url->getSiteURL . $url;
-        $url =~ s/^http:/https:/;
-    }
-    return $url;
+    return $self->_getStaticFeedUrl('rdf');
 }
 
 #-------------------------------------------------------------------
 
 =head2 getStaticRssFeedUrl ()
 
-Returns the current asset's URL with .rss concatenated onto it.
+Returns the URL to use when exporting for this asset's feed in RSS 2.0 format.
 
 =cut
 
 sub getStaticRssFeedUrl {
     my $self = shift;
-    my $url = $self->get("url") . '.rss';
-    $url = $self->session->url->gateway($url);
-    if ($self->get("encryptPage")) {
-        $url = $self->session->url->getSiteURL . $url;
-        $url =~ s/^http:/https:/;
-    }
-    return $url;
+    return $self->_getStaticFeedUrl('rss');
 }
 
 #-------------------------------------------------------------------
 
-=head2 getFeed ()
+=head2 getFeed ( $feed )
 
 Adds the syndicated items to the feed; returns the stringified edition.
+
+Returns this feed so that XML::FeedPP methods can be chained on it.
+
 TODO: convert dates?
+
+=head3 $feed
+
+An XML::FeedPP sub-object, XML::FeedPP::{Atom,Rss,Rdf} that will be filled
+with data from the Asset via the getRssFeedItems method.
 
 =cut
 
@@ -421,7 +471,8 @@ sub getFeed {
         if (!$new_item->guid) {
             if ($new_item->link) {
                 $new_item->guid( $new_item->link );
-            } else {
+            }
+            else {
                 $new_item->guid( $self->session->id->generate );
                 $set_permalink_false = 1;
             }

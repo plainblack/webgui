@@ -15,9 +15,8 @@ our $HELP = {
             },
         ],
         variables => [
-            { 'name' => 'lastResponseCompleted' },
-            { 'name' => 'lastResponseTimedOut' },
             { 'name' => 'maxResponsesSubmitted' },
+            { 'name' => 'lastResponseFeedback', description => 'lastResponseFeedback help' },
         ],
         related => [
             {   tag       => 'gradebook report template',
@@ -35,6 +34,12 @@ our $HELP = {
             {   tag       => 'survey answer edit template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -98,6 +103,12 @@ our $HELP = {
             {   tag       => 'survey answer edit template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -166,7 +177,13 @@ our $HELP = {
             },
             {   tag       => 'survey answer edit template',
                 namespace => 'Asset_Survey'
-            },            
+            },      
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },   
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            },      
         ]
     },
 
@@ -211,6 +228,12 @@ our $HELP = {
             {   tag       => 'statistical overview report template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -255,6 +278,12 @@ our $HELP = {
             {   tag       => 'statistical overview report template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -294,6 +323,12 @@ our $HELP = {
             {   tag       => 'statistical overview report template',
                 namespace => 'Asset_Survey'
             },
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            }, 
         ]
     },
 
@@ -366,7 +401,76 @@ our $HELP = {
             { 'name' => 'responseTemplateId' },
         ],
     },
-
+    
+    'survey feedback template' => {
+        title   => 'survey feedback template variables title',
+        body => 'survey feedback template body',
+        isa     => [],
+        fields    => [],
+        variables => [
+            { name => 'complete', description => 'response complete help' },
+            { name => 'restart', description => 'response complete help' },
+            { name => 'timeout', description => 'response timeout help' },
+            { name => 'timeoutRestart', description => 'response timeout restart help' },
+            { name => 'endDate', description => 'response endDate help' },
+        ],
+         related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },          
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+            {   tag       => 'survey test results template',
+                namespace => 'Asset_Survey'
+            },  
+        ]
+    },
+    
+    'survey test results template' => {
+        title   => 'survey test results template title',
+        body => 'survey test results template body',
+        isa     => [],
+        fields    => [],
+         related => [
+            {   tag       => 'survey template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'statistical overview report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'gradebook report template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey section edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey question edit template',
+                namespace => 'Asset_Survey'
+            },
+            {   tag       => 'survey answer edit template',
+                namespace => 'Asset_Survey'
+            },          
+            {   tag       => 'survey feedback template',
+                namespace => 'Asset_Survey'
+            },  
+        ]
+    },
 };
 
 1;

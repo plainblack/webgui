@@ -239,6 +239,26 @@ sub DESTROY {
 	$self->close;
 }
 
+#-------------------------------------------------------------------
+
+=head2 duplicate ( )
+
+Creates a new session using the same WebGUI root, config file, and user.
+
+=cut
+
+sub duplicate {
+    my $self = shift;
+    my $newSession = WebGUI::Session->open(
+        $self->config->getWebguiRoot,
+        $self->config->getFilename,
+        undef,
+        undef,
+        $self->getId,
+    );
+    return $newSession;
+}
+
 
 #-------------------------------------------------------------------
 

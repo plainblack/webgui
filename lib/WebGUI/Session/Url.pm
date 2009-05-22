@@ -131,7 +131,7 @@ sub escape {
 
 =head2 extras ( path )
 
-Combinds the base extrasURL defined in the config file with a specfied path.
+Combines the base extrasURL defined in the config file with a specified path.
 
 =head3 path
 
@@ -142,12 +142,28 @@ consecutive slashes in the path part of the URL will be replaced with a single s
 =cut
 
 sub extras {
-    my $self = shift;
-    my $path = shift;
-    my $url = $self->session->config->get("extrasURL").'/'.$path;
-    $url =~ s$(?<!:)/{2,}$/$g;  ##Remove //, unless it's after a :, which can't be a valid URL character
+    my $self   = shift;
+    my $path   = shift;
+    my $url    = $self->session->config->get("extrasURL");
+    my $cdnCfg = $self->session->config->get('cdn');
+    if ( $cdnCfg and $cdnCfg->{'enabled'} and $cdnCfg->{'extrasCdn'} ) {
+        unless ( $path and grep $path =~ m/$_/, @{ $cdnCfg->{'extrasExclude'} } ) {
+            if ($cdnCfg->{'extrasSsl'}
+                and (  $self->session->env->get('HTTPS') eq 'on'
+                    or $self->session->env->get('SSLPROXY') )
+                )
+            {
+                $url = $cdnCfg->{'extrasSsl'};
+            }
+            else {
+                $url = $cdnCfg->{'extrasCdn'};
+            }
+        }    # if excluded, stick with regular extrasURL
+    }
+    $url .= '/' . $path;
+    $url =~ s$(?<!:)/{2,}$/$g;    ##Remove //, unless it's after a :, which can't be a valid URL character
     return $url;
-}
+} ## end sub extras
 
 #-------------------------------------------------------------------
 

@@ -99,7 +99,16 @@ sub definition {
 		hoverHelp=>$i18n->get('1079 description'),
 	    filter=>'fixId',
 		namespace=>'style'
-	}
+	},
+    mobileStyleTemplateId => {
+        fieldType       => ( $session->setting->get('useMobileStyle') ? 'template' : 'hidden' ),
+        defaultValue    => 'PBtmpl0000000000000060',
+        tab             => 'display',
+        label           => $i18n->get('mobileStyleTemplateId label'),
+        hoverHelp       => $i18n->get('mobileStyleTemplateId description'),
+        filter          => 'fixId',
+        namespace       => 'style',
+    },
 	);
 	push(@{$definition}, {
 		tableName=>'wobject',
@@ -390,7 +399,10 @@ sub processStyle {
             content => $self->get('synopsis'),
         });
     }
-	return $style->process($output,$self->get("styleTemplateId"));
+    if ($style->useMobileStyle) {
+        return $style->process($output,$self->get("mobileStyleTemplateId"));
+    }
+    return $style->process($output,$self->get("styleTemplateId"));
 }
 
 

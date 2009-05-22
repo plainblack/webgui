@@ -20,7 +20,7 @@ use WebGUI::Cache;
 use WebGUI::User;
 use WebGUI::ProfileField;
 
-use Test::More tests => 196; # increment this value for each test you create
+use Test::More tests => 221; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -29,15 +29,13 @@ my $session = WebGUI::Test->session;
 my $testCache = WebGUI::Cache->new($session, 'myTestKey');
 $testCache->flush;
 
-my $numberOfUsers  = $session->db->quickScalar('select count(*) from users');
-my $numberOfGroups = $session->db->quickScalar('select count(*) from groups');
-
 my $user;
 my $lastUpdate;
 
 #Let's try to create a new user and make sure we get an object back
 my $userCreationTime = time();
 ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object reference is defined');
+WebGUI::Test->usersToDelete($user);
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
 ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
@@ -56,6 +54,16 @@ foreach my $groupId (2,7) {
 	ok($user->isInGroup($groupId), "User added to group $groupId by default");
 }
 
+################################################################
+#
+# enable/disable
+#
+################################################################
+
+# NOTE: enable/disable replaces all functionality of the status() method.
+# We're keeping status() until we can remove it later
+# Enable/disable is tested by the status()
+
 #Let's check the status method
 $user->status('Active');
 $lastUpdate = time();
@@ -65,8 +73,157 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- status ch
 $user->status('Selfdestructed');
 is($user->status, "Selfdestructed", 'status("Selfdestructed")');
 
+
+# Deactivation user deletes all sessions and scratches
+my $newSession  = WebGUI::Session->open( WebGUI::Test->root, WebGUI::Test->file );
+$newSession->user({ user => $user });
+$newSession->scratch->set("hasStapler" => "no");
+
 $user->status('Deactivated');
 is($user->status, "Deactivated", 'status("Deactivated")');
+
+ok( 
+    !$session->db->quickScalar("SELECT COUNT(*) from userSession where userId=?",[$user->userId]),
+    "Deactivating user deletes all sessions",
+);
+
+ok(
+    !$session->db->quickScalar("SELECT COUNT(*) FROM userSessionScratch WHERE sessionId=?",[$session->getId]),
+    "Deactivating user deletes all user session scratch",
+);
+
+$newSession->close;
+
+################################################################
+#
+# get/update
+#
+################################################################
+
+# NOTE: get/set replaces the following methods, but we're leaving
+# the tests for the deprecated methods until they get removed, since
+# they test the get/update methods thoroughly
+# - authMethod
+# - dateCreated
+# - lastUpdated
+# - profileField
+# - referringAffiliate
+# - status
+# - updateProfileFields
+# - username
+# - getId
+
+my $now = time;
+$user->update({
+    userId          => 'INEDU2COMEINSATURDYTHX',
+    username        => "jlumbe",
+    firstName       => "John",
+    lastName        => "Lumbergh",
+    lastUpdated     => $now,
+});
+
+isnt(
+    $user->get('userId'), 'INEDU2COMEINSATURDYTHX',
+    "update() does not allow changing userId",
+);
+
+is(
+    $session->db->quickScalar("SELECT username FROM users WHERE userId=?",[$user->getId]),
+    "jlumbe",
+    "update() updates username",
+);
+is(
+    $user->get('username'),
+    "jlumbe",
+    "update() updates get('username')",
+);
+
+is(
+    $session->db->quickScalar("SELECT lastUpdated FROM users WHERE userId=?",[$user->getId]),
+    $now,
+    "update() updates lastUpdated",
+);
+is(
+    $user->get('lastUpdated'),
+    $now,
+    "update() updates get('lastUpdated')",
+);
+
+is(
+    $session->db->quickScalar("SELECT firstName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "John",
+    "update() updates profile firstName",
+);
+is(
+    $user->get('firstName'),
+    "John",
+    "update() updates get('firstName')",
+);
+
+is(
+    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "Lumbergh",
+    "update() updates profile lastName",
+);
+is(
+    $user->get('lastName'),
+    "Lumbergh",
+    "update() updates get('lastName')",
+);
+
+sleep 1;
+ok(
+    eval { $user->update({ lastNameIsNotExistingInThisContext => "Lumberg" }); 1; },
+    "update() doesn't die with invalid field",
+);
+ok(
+    $session->db->quickScalar("SELECT lastUpdated FROM users WHERE userId=?",[$user->getId])
+    > $now,
+    "update() updates lastUpdated automatically",
+);
+ok(
+    $user->get('lastUpdated') > $now,
+    "update() updates get('lastUpdated') automatically",
+);
+
+$user->update({ lastName => "Lumberg" }),
+is( 
+    $session->db->quickScalar("SELECT lastName FROM userProfileData WHERE userId=?",[$user->getId]),
+    "Lumberg",
+    "update() updates lastName again",
+);
+is(
+    $user->get("lastName"),
+    "Lumberg",
+    "update() updates get('lastName') again",
+);
+
+# get w/o arguments returns hashref of everything
+my $expectValues  = {
+    username        => "jlumbe",
+    firstName       => "John",
+    lastName        => "Lumberg",
+    status          => "Deactivated",
+    timeZone        => 'America/Chicago',
+    gender          => 'neuter',
+    toolbar         => 'useLanguageDefault',
+};
+
+# expects all user properties and all profile fields
+my @expectFields    = ( 
+    $session->db->buildArray('DESCRIBE users'),
+    $session->db->buildArray('SELECT fieldName FROM userProfileField'),
+);
+
+cmp_deeply(
+    [keys %{$user->get}], bag(@expectFields), 
+    "get() contains all properties and profileFields",
+);
+
+cmp_deeply(
+    $user->get, superhashof($expectValues),
+    "get() contains known correct values",
+);
 
 ################################################################
 #
@@ -87,9 +244,9 @@ is($user->profileField('notAProfileField'), undef, 'getting non-existant profile
 my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
-is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be retrieved');
+ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
 $user->profileField('wg_privacySettings', '{"email"=>"all"}');
-is($user->profileField('wg_privacySettings'), '', '... wg_privacySettings may not be set');
+ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be set');
 
 ################################################################
 #
@@ -250,6 +407,7 @@ $cm->ipFilter(defined $origFilter ? $origFilter : '');
 
 ##Test for group membership
 $user = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($user);
 ok($user->isInGroup(7), "addToGroups: New user is in group 7(Everyone)");
 ok(!$user->isInGroup(1),  "New user not in group 1 (Visitors)");
 ok($user->isRegistered, "User is not a visitor");
@@ -304,6 +462,7 @@ ok($visitor->isInGroup(7), "Visitor added back to group Everyone");
 ################################################################
 
 my $dude = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($dude);
 
 ok(!$dude->canUseAdminMode, 'canUseAdminMode: newly created users cannot');
 
@@ -402,6 +561,7 @@ is($useru->userId, $dude->userId, '... and it is the right user object');
 ################################################################
 
 my $buster = WebGUI::User->new($session, "new");
+WebGUI::Test->usersToDelete($buster);
 is( $buster->profileField('timeZone'), 'America/Chicago', 'buster received original user profile on user creation');
 
 my $profileField = WebGUI::ProfileField->new($session, 'timeZone');
@@ -430,6 +590,7 @@ $copiedAliasProfile{'dataDefault'} = "'aliasAlias'"; ##Non word characters;
 $aliasProfile->set(\%copiedAliasProfile);
 
 my $buster3 = WebGUI::User->new($session, $buster->userId);
+WebGUI::Test->usersToDelete($buster);
 is($buster3->profileField('alias'), 'aliasAlias', 'default alias set');
 
 $copiedAliasProfile{'dataDefault'} = "'....^^^^....'"; ##Non word characters;
@@ -476,6 +637,7 @@ is($session->scratch->get('hack'), undef, 'userProfile dataDefault is not execut
 ##Set up a group that has expired.
 
 my $expiredGroup = WebGUI::Group->new($session, 'new');
+WebGUI::Test->groupsToDelete($expiredGroup);
 $expiredGroup->name('Group that expires users automatically');
 $expiredGroup->expireOffset(-1000);
 
@@ -504,6 +666,7 @@ cmp_bag($dude->getGroups(1), [2, 7], 'Accessing the cached list of groups does n
 ################################################################
 
 my $friend = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($friend);
 is($friend->getFirstName, undef, 'with no profile settings, getFirstName returns undef');
 
 $friend->username('friend');
@@ -520,6 +683,7 @@ is($friend->getFirstName, 'Mr', 'firstName is the highest priority profile setti
 ################################################################
 
 my $neighbor = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($neighbor);
 
 is($neighbor->getWholeName, undef, 'with no profile settings, getWholeName returns undef');
 $neighbor->username('neighbor');
@@ -611,6 +775,7 @@ foreach my $groupName (qw/red pink orange blue turquoise lightBlue purple/) {
     $groupSet{$groupName} = WebGUI::Group->new($session, 'new');
     $groupSet{$groupName}->name($groupName);
 }
+WebGUI::Test->groupsToDelete(values %groupSet);
 
 $groupSet{blue}->expireOffset(-1500);
 
@@ -621,6 +786,7 @@ $groupSet{pink}->addGroups(   [ map { $groupSet{$_}->getId } qw/red/ ] );
 $groupSet{orange}->addGroups( [ map { $groupSet{$_}->getId } qw/red/ ] );
 
 my $newFish = WebGUI::User->new($session, 'new');
+WebGUI::Test->usersToDelete($newFish);
 $newFish->addToGroups([ $groupSet{red}->getId, $groupSet{blue}->getId ]);
 
 cmp_bag(
@@ -654,6 +820,7 @@ SKIP: {
 ok( my $newCreateUser = WebGUI::User->create( $session ),
     'create() returns something'
 );
+WebGUI::Test->usersToDelete($newCreateUser);
 isa_ok( $newCreateUser, 'WebGUI::User', 'create() returns a WebGUI::User' );
 
 ################################################################
@@ -796,11 +963,48 @@ ok(! $neighbor->canViewField('email', $admin), "... returns 0 when the field's p
 ok(! $neighbor->canViewField('email', $buster), "... returns 0 when the field's privacy setting is friends, even for some other user");
 $friend->deleteFromGroups([$neighbor->friends->getId]);
 
-END {
-    foreach my $account ($user, $dude, $buster, $buster3, $neighbor, $friend, $newFish, $newCreateUser) {
-        (defined $account  and ref $account  eq 'WebGUI::User') and $account->delete;
-    }
+################################################################
+#
+# getInboxAddresses
+#
+################################################################
 
+my $origSmsGateway = $session->setting->get('smsGateway');
+$session->setting->set('smsGateway', '');
+my $inmate = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($inmate);
+$inmate->profileField('email',     '');
+$inmate->profileField('cellPhone', '');
+$inmate->profileField('receiveInboxEmailNotifications', 0);
+$inmate->profileField('receiveInboxSmsNotifications',   0);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with no profile info, returns blank');
+
+$inmate->profileField('receiveInboxEmailNotifications', 1);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: with receiveInboxEmailNotifications=1, but not email address, returns blank');
+
+$inmate->profileField('email', 'andy@shawshank.com');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: email address only');
+
+$inmate->profileField('receiveInboxSmsNotifications',   1);
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 but no other profile info');
+
+$inmate->profileField('cellPhone', '37927');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and cell phone but no gateway');
+
+$inmate->profileField('cellPhone', '');
+$session->setting->set('smsGateway', 'textme.com');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+
+$inmate->profileField('cellPhone', '37927');
+is ($inmate->getInboxAddresses, 'andy@shawshank.com,37927@textme.com', 'getInboxAddresses: receive only email address, with receiveInboSMSNotifications=1 and gateway but no cell phone');
+
+$inmate->profileField('receiveInboxEmailNotifications', 0);
+is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get SMS and no email, even with email info present');
+
+$inmate->profileField('receiveInboxSmsNotifications', 0);
+is ($inmate->getInboxAddresses, '', 'getInboxAddresses: can get no SMS and no email, even with profile info present');
+
+END {
     foreach my $testGroup ($expiredGroup, values %groupSet) {
         if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
             $testGroup->delete;
@@ -818,10 +1022,8 @@ END {
 
     $newProfileField->delete() if $newProfileField;
 
+    $session->setting->set('smsGateway', $origSmsGateway);
+
 	$testCache->flush;
-    my $newNumberOfUsers  = $session->db->quickScalar('select count(*) from users');
-    my $newNumberOfGroups = $session->db->quickScalar('select count(*) from groups');
-    is ($newNumberOfUsers,  $numberOfUsers,  'no new additional users were leaked by this test');
-    is ($newNumberOfGroups, $numberOfGroups, 'no new additional groups were leaked by this test');
 }
 

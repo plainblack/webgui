@@ -18,6 +18,9 @@ use strict;
 use WebGUI::Asset;
 use WebGUI::Asset::Template;
 use WebGUI::Macro;
+use HTML::Packer;
+use JavaScript::Packer;
+use CSS::Packer;
 
 our @ISA = qw(WebGUI::Asset);
 
@@ -68,8 +71,20 @@ sub definition {
 				tab=>"properties",
 				label=>$i18n->get('assetName'),
 				hoverHelp=>$i18n->get('snippet description'),
-                                defaultValue=>undef
+                                defaultValue=>undef,
+                filter   => "packSnippet",
                                 },
+            snippetPacked => {
+                fieldType => "hidden",
+                defaultValue => undef,
+            },
+            usePacked => {
+                tab             => 'properties',
+                fieldType       => 'yesNo',
+                label           => $i18n->get('usePacked label'),
+                hoverHelp       => $i18n->get('usePacked description'),
+                defaultValue    => 0,
+            },
 			cacheTimeout => {
 				tab => "display",
 				fieldType => "interval",
@@ -106,6 +121,19 @@ sub definition {
         return $class->SUPER::definition($session,$definition);
 }
 
+#-------------------------------------------------------------------
+
+=head2 addRevision ( properties, ... )
+
+Force the packed snippet to be regenerated.
+
+=cut
+
+sub addRevision {
+    my ( $self, $properties, @args ) = @_;
+    delete $properties->{ snippetPacked };
+    return $self->SUPER::addRevision( $properties, @args );
+}
 
 #-------------------------------------------------------------------
 
@@ -176,6 +204,43 @@ sub indexContent {
 
 #-------------------------------------------------------------------
 
+=head2 packSnippet ( unpacked )
+
+Pack the snippet if possible. We can pack HTML, CSS, and JS snippets.
+
+=cut
+
+sub packSnippet {
+    my ( $self, $unpacked ) = @_;
+    return $unpacked if !$unpacked;
+    my $packed  = $unpacked;
+
+    if ( $self->get('mimeType') eq "text/html" ) {
+        HTML::Packer::minify( \$packed, {
+            remove_comments     => 1,
+            remove_newlines     => 1,
+            do_javascript       => "shrink",
+            do_stylesheet       => "minify",
+        } );
+    }
+    elsif ( $self->get('mimeType') eq "text/css" ) {
+        CSS::Packer::minify( \$packed, {
+            compress            => 'minify',
+        });
+    }
+    elsif ( $self->get('mimeType') eq 'text/javascript' ) {
+        JavaScript::Packer::minify( \$packed, {
+            compress            => "shrink",
+        });
+    }
+
+    $self->update({ snippetPacked => $packed });
+    
+    return $unpacked;
+}
+
+#-------------------------------------------------------------------
+
 =head2 purgeCache ( )
 
 Extending purgeCache to handle caching of the rendered snippet
@@ -216,7 +281,10 @@ sub view {
 		my $out = WebGUI::Cache->new($session,"view_".$calledAsWebMethod."_".$self->getId)->get;
 		return $out if $out;
 	}
-	my $output = $self->get("snippet");
+	my $output = $self->get('usePacked')
+                ? $self->get("snippetPacked")
+                : $self->get('snippet')
+                ;
 	$output = $self->getToolbar.$output if ($session->var->isAdminOn && !$calledAsWebMethod);
 	if ($self->getValue("processAsTemplate")) {
 		$output = WebGUI::Asset::Template->processRaw($session, $output, $self->get);

@@ -161,7 +161,8 @@ sub view {
 	my %var;
 	
     $var{'form_header'  } = WebGUI::Form::formHeader($session, {
-        action=>$self->getUrl
+        action => $self->getUrl,
+        method => "GET"
 		})
     .WebGUI::Form::hidden($self->session,{name=>"doit", value=>"1"});
 	$var{'form_footer'  } = WebGUI::Form::formFooter($session);
@@ -217,7 +218,7 @@ sub view {
                 #Add highlighting
                 $properties->{'title'               } = $hl->highlight($properties->{title} || '');
                 $properties->{'title_nohighlight'   } = $properties->{title};
-                my $synopsis = $properties->{'synopsis'} || '';
+                my $synopsis = $data->{'synopsis'} || '';
                 WebGUI::Macro::process($self->session, \$synopsis);
                 $properties->{'synopsis'            } = $hl->highlight($synopsis);
                 $properties->{'synopsis_nohighlight'} = $synopsis;

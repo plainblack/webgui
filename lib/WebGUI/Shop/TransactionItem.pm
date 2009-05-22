@@ -2,10 +2,11 @@ package WebGUI::Shop::TransactionItem;
 
 use strict;
 use Class::InsideOut qw{ :std };
-use JSON;
+use JSON qw{ to_json };
 use WebGUI::DateTime;
 use WebGUI::Exception::Shop;
 use WebGUI::Shop::Transaction;
+use WebGUI::Shop::Tax;
 
 =head1 NAME
 
@@ -263,7 +264,10 @@ The status of this item. The default is 'NotShipped'. Other statuses include: Ca
 
 sub update {
     my ($self, $newProperties) = @_;
-    my $id = id $self;
+    my $id          = id $self;
+    my $session     = $self->transaction->session;
+    my $taxDriver   = WebGUI::Shop::Tax->getDriver( $session );
+
     if (exists $newProperties->{item}) {
         my $item = $newProperties->{ item };
         my $sku = $item->getSku;
@@ -286,6 +290,12 @@ sub update {
         $newProperties->{ shippingCountry       } = $address->get('country');
         $newProperties->{ shippingCode          } = $address->get('code');
         $newProperties->{ shippingPhoneNumber   } = $address->get('phoneNumber');
+
+        # Store tax rate for product
+        $newProperties->{ taxRate               } = $taxDriver->getTaxRate( $sku, $address );
+        $newProperties->{ taxConfiguration      } = 
+            to_json( $taxDriver->getTransactionTaxData( $sku, $address ) || '{}' );
+
         unless ($sku->isShippingRequired) {
             $newProperties->{orderStatus} = 'Shipped';
         }
@@ -293,7 +303,7 @@ sub update {
     my @fields = (qw(assetId configuredTitle options shippingAddressId shippingTrackingNumber orderStatus
         shippingName shippingAddress1 shippingAddress2 shippingAddress3 shippingCity shippingState
         shippingCountry shippingCode shippingPhoneNumber quantity price vendorId 
-        vendorPayoutStatus vendorPayoutAmount));
+        vendorPayoutStatus vendorPayoutAmount taxRate taxConfiguration));
     foreach my $field (@fields) {
         $properties{$id}{$field} = (exists $newProperties->{$field}) ? $newProperties->{$field} : $properties{$id}{$field};
     }

@@ -1,3 +1,7 @@
+#editor_container {
+    visibility: hidden;
+    z-index:  100;
+}
 
 #loading-mask {
   position: absolute;
@@ -129,6 +133,9 @@ li.answer {
     border:1px solid red;
     margin:5px;
     padding:10px;
+}
+.warning {
+    padding: 5px;
 }
 #sections-panel .bd {
     overflow: auto;

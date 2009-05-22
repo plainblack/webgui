@@ -8,16 +8,33 @@ Survey.ObjectTemplate = (function(){
 
 	// Keep references to widgets here so that we can destory any instances before
 	// creating new ones (to avoid memory leaks)
-    var dialog, editor, resizeGotoExpression, gotoAutoComplete;
-
+    var dialog, editor, resizeGotoExpression, gotoAutoComplete, editing;
+        
     return {
-    
+        hideEditor: function(){
+            YAHOO.util.Dom.setStyle("editor_container","visibility","hidden");
+        },
+        showEditor: function(){
+            editor.get('element').value = YAHOO.util.Dom.get('texteditortarget').value;
+            editor.setEditorHTML(YAHOO.util.Dom.get('texteditortarget').value);
+            YAHOO.util.Dom.setStyle("editor_container","visibility","visible");
+            YAHOO.util.Dom.setXY("editor_container",YAHOO.util.Dom.getXY(YAHOO.util.Dom.get("texteditortarget").id));
+        },
+
+        initObjectEditor: function() {
+            editor = new YAHOO.widget.SimpleEditor("editor", {
+                height: '100px',
+                width: '570px',
+                dompath: false 
+            });
+
+            if (editor.get('toolbar')) {
+                editor.get('toolbar').titlebar = false;
+            }
+            editor.render();
+        },
+ 
         unloadObject: function(){
-            // First destory the editor..
-            if (editor) {
-				editor.destroy();
-				editor = null;
-			}
             
             // And then the Dialog that contains it.
             if (dialog) {
@@ -62,6 +79,8 @@ Survey.ObjectTemplate = (function(){
                 text: "Submit",
                 handler: function(){
                     editor.saveHTML();
+                    YAHOO.util.Dom.get('texteditortarget').value = editor.getEditorHTML();
+                    Survey.ObjectTemplate.hideEditor();
                     this.submit();
                 },
                 isDefault: true
@@ -125,14 +144,21 @@ Survey.ObjectTemplate = (function(){
                 visible: false,
                 buttons: btns
             });
-            
+
             dialog.callback = Survey.Comm.callback;
+
+            dialog.hideEvent.subscribe(Survey.ObjectTemplate.hideEditor);
+            dialog.dragEvent.subscribe(Survey.ObjectTemplate.showEditor);
+
             dialog.render();
 
             resizeGotoExpression = new YAHOO.util.Resize('resize_gotoExpression_formId');
             resizeGotoExpression.on('resize', function(ev) {
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'width', (ev.width - 6) + "px");
                 YAHOO.util.Dom.setStyle('gotoExpression_formId', 'height', (ev.height - 6) + "px");
+                
+                // Resizing the gotoExpression box can cause the texteditor to move, so update its position
+                YAHOO.util.Dom.setXY("editor_container",YAHOO.util.Dom.getXY(YAHOO.util.Dom.get("texteditortarget").id));
             });
             
             // build the goto auto-complete widget
@@ -149,20 +175,9 @@ Survey.ObjectTemplate = (function(){
                 height = '300px';
             }
 
-			// N.B. SimpleEditor has a memory leak so this eats memory on every instantiation
-            editor = new YAHOO.widget.SimpleEditor(textareaId, {
-                height: height,
-                width: '100%',
-                dompath: false //Turns on the bar at the bottom
-            });
-
-            if (editor.get('toolbar')) {
-                editor.get('toolbar').titlebar = false;
-            }
-            editor.render();
-
             dialog.show();
             initHoverHelp(type);
+            Survey.ObjectTemplate.showEditor();
         }
     };
 })();

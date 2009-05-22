@@ -177,6 +177,30 @@ home\?func=match, or<br />
 		context => q|Admin console submenu label.  Ruleset is a set of rules.|,
 	},
 
+	'already active' => {
+		message => q|Passive Analytics is already active.  Please do not try to subvert the UI in the future.|,
+		lastUpdated => 0,
+		context => q|Error message|,
+	},
+
+	'workflow deleted' => {
+		message => q|The Passive Analytics workflow has been deleted.  Please contact an Administrator immediately.|,
+		lastUpdated => 0,
+		context => q|Error message|,
+	},
+
+	'currently running' => {
+		message => q|A Passive Analytics analysis is currently running.|,
+		lastUpdated => 0,
+		context => q|Error message|,
+	},
+
+	'error creating workflow' => {
+		message => q|Error creating the workflow instance.|,
+		lastUpdated => 0,
+		context => q|Error message|,
+	},
+
 };
 
 1;

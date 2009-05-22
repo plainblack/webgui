@@ -31,9 +31,10 @@ $session->asset($defaultAsset);
 ##Create a non-admin user who will be in the Registered User group
 my $registeredUser = WebGUI::User->new($session, "new");
 $registeredUser->username('TimBob');
+WebGUI::Test->usersToDelete($registeredUser);
 $session->user({user => $registeredUser});
 
-my %originalMacros = %{ $session->config->get('macros') };
+WebGUI::Test->originalConfig('macros');
 ##Overwrite any local configuration so that we know how to call it.
 foreach my $macro (qw/
     GroupText LoginToggle PageTitle MacroStart MacroEnd MacroNest
@@ -283,8 +284,4 @@ is(
 
 
 END {
-	$session->config->set('macros', \%originalMacros);
-	foreach my $dude ($registeredUser) {
-		$dude->delete if (defined $dude and ref $dude eq 'WebGUI::User');
-	}
 }

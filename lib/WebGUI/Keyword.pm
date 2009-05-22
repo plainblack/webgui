@@ -256,7 +256,7 @@ sub getKeywordsForAsset {
 
 =head2 getMatchingAssets ( { startAsset => $asset, keyword => $keyword } )
 
-Returns an array reference of asset ids matching the params.
+Returns an array reference of asset ids matching the params.  Assets are returned in order of creationDate.
 
 =head3 startAsset
 
@@ -282,6 +282,11 @@ A classname pattern to match. For example, if you provide 'WebGUI::Asset::Sku' t
 =head3 usePaginator
 
 Instead of returning an array reference of assetId's, return a paginator object.
+
+=head3 rowsPerPage
+
+If usePaginator is passed, then this variable will set the number of rows per page that the paginator uses.
+If usePaginator is not passed, then this variable will limit the number of assetIds that are returned.
 
 =cut
 
@@ -331,13 +336,16 @@ sub getMatchingAssets {
 
     # write the query
     my $query = 'select distinct assetKeyword.assetId from assetKeyword left join asset using (assetId)
-        where '.join(' and ', @clauses).' order by creationDate desc';
+        where '.join(' and ', @clauses).' order by creationDate desc, lineage';
 
     # perform the search
     if ($options->{usePaginator}) {
-        my $p = WebGUI::Paginator->new($self->session);
+        my $p = WebGUI::Paginator->new($self->session, undef, $options->{rowsPerPage});
         $p->setDataByQuery($query, undef, undef, \@params);
         return $p;
+    }
+    elsif ($options->{rowsPerPage}) {
+        $query .= ' limit '. $options->{rowsPerPage};
     }
     return $self->session->db->buildArrayRef($query, \@params);
 }

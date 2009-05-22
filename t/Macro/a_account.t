@@ -103,7 +103,8 @@ sub addTemplate {
 		url => 'a_account-test',
 		namespace => 'Macro/a_account',
 		template => "HREF=<tmpl_var account.url>\nLABEL=<tmpl_var account.text>",
-		id => 'testTemplatea_account1'
+		id => 'testTemplatea_account1',
+        usePacked => 1,
 	};
 	my $template = $importNode->addChild($properties, $properties->{id});
 	$versionTag->commit;
@@ -124,8 +125,8 @@ sub simpleHTMLParser {
 sub simpleTextParser {
 	my ($text) = @_;
 
-	my ($url)   = $text =~ /^HREF=(.+)$/m;
-	my ($label) = $text =~ /^LABEL=(.+)$/m;
+	my ($url)   = $text =~ /HREF=(.+?)(LABEL|\Z)/;
+	my ($label) = $text =~ /LABEL=(.+?)(HREF|\Z)/;
 
 	return ($url, $label);
 }

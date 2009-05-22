@@ -427,6 +427,16 @@ listing,|,
                 lastUpdated => 1135271460,
         },
 
+    'maxgroup per description' => {
+        message => q|Specifies how many comparisons are allowed for the privileged group.|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup description' => {
+        message => q|Select a group for which a specific maximum comparisons can be selected.|,
+        lastUpdated => 0,
+    },
+
     'max comparisons description' => {
         message => q|Specifies how many comparisons are allowed in searches and comparisons.|,
         lastUpdated => 0,
@@ -445,6 +455,16 @@ listing,|,
     'statistics cache timeout description' => {
         message => q|Since all users will see the matrix statistics the same way, we can cache them for some time
 to increase performance. How long should we cache them?|,
+        lastUpdated => 0,
+    },
+
+    'listings cache timeout label' => {
+        message => q|Listings Cache Timeout|,
+        lastUpdated => 0,
+    },
+
+    'listings cache timeout description' => {
+        message => q|The complete list of Matrix listings can be cached for some time to increase performance. How long should we cache it?|,
         lastUpdated => 0,
     },
 
@@ -590,6 +610,16 @@ to increase performance. How long should we cache them?|,
 
     'compare color yes label' => {
         message => q|Compare Color: Yes|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup per label' => {
+        message => q|Maximum for Privileged Group|,
+        lastUpdated => 0,
+    },
+
+    'maxgroup label' => {
+        message => q|Privileged Maximum Group|,
         lastUpdated => 0,
     },
     

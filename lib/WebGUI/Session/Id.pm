@@ -55,6 +55,26 @@ sub DESTROY {
         undef $self;
 }
 
+#-------------------------------------------------------------------
+
+=head2 fromHex ( hexId )
+
+Returns the guid corresponding to hexId.  Converse of toHex.
+
+=head3 hexId
+
+Hex value to convert to guid.
+
+=cut
+
+sub fromHex {
+    my $self  = shift;
+    my $hexId = shift;
+    my $binId = pack( 'H2' x 16, unpack( 'A2' x 16, $hexId ) );
+    my $id    = substr( encode_base64($binId), 0, 22 );
+    $id =~ tr{+/}{_-};
+    return $id;
+}
 
 #-------------------------------------------------------------------
 

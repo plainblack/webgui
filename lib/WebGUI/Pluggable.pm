@@ -195,6 +195,9 @@ sub instanciate {
     }
     my $object;
     if (! eval{$object = $module->$sub(@{$params}); 1}) {
+        if ( ref $@ ) {
+            die $@;
+        }
         croak "Could not instanciate object using $sub on $module because $@";
     }
     if (defined $object) {

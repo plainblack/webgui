@@ -1739,7 +1739,7 @@ sub fixIsPublicOnTemplates {
 sub addCSPostReceivedTemplate {
     my $session = shift;
     print "\tAdding Post Received Template ID field for CS..." unless $quiet;
-    $session->db->write("ALTER TABLE Collaboration ADD COLUMN postReceivedTemplateId VARCHAR(22) DEFAULT 'default-post-received';");
+    $session->db->write("ALTER TABLE Collaboration ADD COLUMN postReceivedTemplateId VARCHAR(22) DEFAULT 'default_post_received';");
     print "Done.\n" unless $quiet;
 }
 
