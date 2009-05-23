@@ -662,10 +662,10 @@ sub getAdminConsole {
     my $self = shift;
     my $ac = $self->SUPER::getAdminConsole;
     my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
-    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
-    $ac->addSubmenuItem($self->session->url->page("func=edit"), $edit);
-    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), "$edit Survey");
-    $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('survey visualization'));
+    $ac->addSubmenuItem($self->session->url->page("func=edit"), WebGUI::International->new($self->session, "WebGUI")->get(575));
+    $ac->addSubmenuItem($self->session->url->page("func=editSurvey"), $i18n->get('edit survey'));
+    $ac->addSubmenuItem($self->session->url->page("func=takeSurvey"), $i18n->get('take survey'));
+    $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('visualize'));
     $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
     $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
     return $ac;
@@ -2497,14 +2497,14 @@ sub www_editTestSuite {
     my $icon = $session->icon;
     while (my $test = $getATest->()) {
         $testsFound++;
-        my $id     = $test->getId;
+        my $testId     = $test->getId;
         my $name = $test->get('name');
         $tests .= '<tr><td>'
-               .  $icon->delete(  'func=deleteTest;testId='.$id, undef, $i18n->get('confirm delete test'))
-               .  $icon->edit(    'func=editTest;testId='.$id)
-               .  $icon->moveDown('func=demoteTest;testId='.$id)
-               .  $icon->moveUp(  'func=promoteTest;testId='.$id)
-               .  qq{<a href="} . $session->url->page("func=runTest;testId=$id") . qq{">Run Test</a>}
+               .  $icon->delete(  'func=deleteTest;testId='.$testId, undef, $i18n->get('confirm delete test'))
+               .  $icon->edit(    'func=editTest;testId='.$testId)
+               .  $icon->moveDown('func=demoteTest;testId='.$testId)
+               .  $icon->moveUp(  'func=promoteTest;testId='.$testId)
+               .  qq{<a href="} . $session->url->page("func=runTest;testId=$testId") . qq{">Run Test</a>}
                .  '</td><td>'.$name.'</td></tr>';
     }
     $tests .= '</tbody></table><div style="clear: both;"></div>';
@@ -2555,13 +2555,14 @@ sub www_editTest {
 	$form->hidden( name=>"assetId", value=>$self->getId);
     $form->dynamicForm([WebGUI::Asset::Wobject::Survey::Test->crud_definition($session)], 'properties', $test);
 	$form->submit;
-
-	my $i18n = WebGUI::International->new($session, 'Asset_Survey');
-	my $ac   = $self->getAdminConsole;
 	
     if ($testId eq 'new') {
         $test->delete;
     }
+    my $ac = $self->getAdminConsole;
+    my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
+    $ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
 	return $ac->render($error.$form->print, $i18n->get('edit test'));
 }
 
@@ -2647,9 +2648,9 @@ sub www_runTest {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
     
-    my $id = $session->form->get("testId");
+    my $testId = $session->form->get("testId");
     
-    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $id)
+    my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId)
         or return $self->www_editTestSuite('Unable to find test');
     
     my $result = $test->run or return $self->www_editTestSuite('Unable to run test');
@@ -2658,10 +2659,10 @@ sub www_runTest {
     
     my $parsed = $self->parseTap($tap) or return $self->www_editTestSuite('Unable to parse test output');
     
-    my $ac = $self->getAdminConsole;    
-    my $edit = WebGUI::International->new($self->session, "WebGUI")->get(575);
-    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$id"), "$edit Test");
-    $ac->addSubmenuItem($self->session->url->page("func=runTests"), "Run All Tests");
+    my $ac = $self->getAdminConsole;
+    my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+    $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
+    $ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
     return $ac->render($parsed->{templateText}, 'Test Results');
 }
 
