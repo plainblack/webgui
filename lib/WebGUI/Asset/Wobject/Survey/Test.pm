@@ -207,6 +207,8 @@ sub run {
         }
     }
     
+    $survey->persistResponseJSON;
+    
     my $tap = "1..$testCount\n";
     $tap .= join "\n", @tap;
     return { tap => "$tap" };

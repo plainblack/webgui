@@ -1236,12 +1236,13 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my $responseDetails = $self->getResponseDetails();
+    my $responseDetails = $self->getResponseDetails;
 
     # Add lastResponse template vars
-    for my $tv qw(endDate feedback complete restart timeout timeoutRestart) {
+    for my $tv qw(endDate complete restart timeout timeoutRestart) {
         $var->{"lastResponse\u$tv"} = $responseDetails->{$tv};
     }
+    $var->{lastResponseFeedback} = $responseDetails->{templateText};
     $var->{maxResponsesSubmitted} = !$self->canTakeSurvey();
     
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
@@ -1274,67 +1275,43 @@ sub getMenuVars {
 
 #-------------------------------------------------------------------
 
-=head2 getResponseDetails ( [$responseId] )
+=head2 getResponseDetails ( [$options] )
 
 Looks up details about a given response.
 
-=head3 responseId
+=head3 options
+
+=head4 responseId
 
 A specific responseId to use. If none given, the most recent completed response is used.
+
+=head4 userId
+
+A specific userId to use. Defaults to the current user
+
+=head4 templateId
+
+A template to use. Defaults to this Survey's feedbackTemplateId
 
 =cut
 
 sub getResponseDetails {
     my $self = shift;
-    my $responseId = shift;
+    my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0 } );
+    my $responseId = $opts{responseId};
+    my $userId = $opts{userId} || $self->session->user->userId;
+    my $templateId = $opts{templateId} || $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g';
     
-    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON);
+    $responseId 
+        ||= $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete > 0", [ $userId, $self->getId ]);
     
-    if ( $responseId ) {
-        $self->session->log->debug("ResponseId provided: $responseId");
-        ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-            'select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]
-        );
-    } else {
-        my $userId = $self->session->user->userId();
-        my $anonId 
-            = $self->session->form->process('userid')
-            || $self->session->http->getCookies->{Survey2AnonId}
-            || undef;
-        $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
-        my $ip = $self->session->env->getIp;
-        my $string;
-
-        if ( $anonId or $userId != 1 ) {
-            $string = 'userId';
-            if ($anonId) {
-                $string = 'anonId';
-                $userId = $anonId;
-            }
-            my $lastResponseId
-                = $self->session->db->quickScalar(
-                "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-                [ $userId, $self->getId() ] );
-            if ( !$lastResponseId ) {
-                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-                    "select isComplete, endDate, responseJSON from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
-                    [ $userId, $self->getId() ]
-                );
-            }
-        }
-        elsif ( $userId == 1 ) {
-            my $lastResponseId = $self->session->db->quickScalar(
-                'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
-                [ $userId, $ip, $self->getId() ]
-            );
-            if ( !$lastResponseId ) {
-                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-                    'select isComplete, endDate, responseJSON from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
-                    [ $userId, $ip, $self->getId() ]
-                );
-            }
-        }
+    if (!$responseId) {
+        $self->session->log->debug("ResponseId not found");
+        return {};
     }
+    
+    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) 
+        = $self->session->db->quickArray('select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]);
     
     # Process the feedback text
     my $feedback;
@@ -1349,12 +1326,13 @@ sub getResponseDetails {
         $tags->{timeout} = $lastResponseCompleteCode == 3;
         $tags->{timeoutRestart} = $lastResponseCompleteCode == 4;
         $tags->{endDate} = $lastResponseEndDate && WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
-        $feedback = $self->processTemplate($tags, $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g');
+        $feedback = $self->processTemplate($tags, $templateId);
     }
     return {
-        completeCode => $lastResponseCompleteCode, 
+        completeCode => $lastResponseCompleteCode,
+        templateText => $feedback,
+        templateVars => $tags,
         endDate => $tags->{endDate},
-        feedback => $feedback,
         complete => $tags->{complete},
         restart => $tags->{restart},
         timeout => $tags->{timeout},
@@ -1571,7 +1549,7 @@ sub www_showFeedback {
     # Only continue if user owns the response
     return if $userId ne $self->session->user->userId;
     
-    my $out = $self->getResponseDetails($responseId)->{feedback};
+    my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 
@@ -2008,7 +1986,6 @@ sub takenCount {
     }
     
     my $count = $self->session->db->quickScalar($sql);
-    $self->session->log->debug($count);
     return $count;
 }
 
