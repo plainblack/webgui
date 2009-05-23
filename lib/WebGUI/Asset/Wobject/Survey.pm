@@ -1297,13 +1297,18 @@ A template to use. Defaults to this Survey's feedbackTemplateId
 
 sub getResponseDetails {
     my $self = shift;
-    my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0 } );
+    my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0, isComplete => 0} );
     my $responseId = $opts{responseId};
     my $userId = $opts{userId} || $self->session->user->userId;
     my $templateId = $opts{templateId} || $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g';
+    my $isComplete = $opts{isComplete};
+    
+    # By default, get most recent completed response with any complete code (e.g. isComplete > 0)
+    # This includes abnormal finishes such as timeouts and restarts
+    my $isCompleteClause = defined $isComplete ? "isComplete = $isComplete" : 'isComplete > 0';
     
     $responseId 
-        ||= $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete > 0", [ $userId, $self->getId ]);
+        ||= $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and assetId = ? and $isCompleteClause order by endDate desc limit 1", [ $userId, $self->getId ]);
     
     if (!$responseId) {
         $self->session->log->debug("ResponseId not found");
