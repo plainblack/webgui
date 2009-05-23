@@ -602,7 +602,7 @@ sub recordResponses {
     # Stop here on validation errors
     if ( !$allQsValid ) {
         $self->session->log->debug("One or more questions failed validation");
-        return {};
+        return;
     }
     
     # Add newResponse to the overall response (via a hash slice)
@@ -702,7 +702,7 @@ sub recordResponses {
     $self->checkForLogicalSection;
     
     $self->session->log->debug("Falling through..");
-    return {};
+    return;
 }
 
 =head2 checkForLogicalSection

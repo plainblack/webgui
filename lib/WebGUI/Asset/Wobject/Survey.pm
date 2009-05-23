@@ -1465,15 +1465,17 @@ sub submitQuestions {
     my $result = $self->recordResponses( $responses );
     
     # check for special actions
-    if ( my $url = $result->{terminal} ) {
-        $self->session->log->debug('Terminal, surveyEnd');
-        return $self->surveyEnd( { exitUrl => $url } );
-    } elsif ( exists $result->{exitUrl} ) {
-        $self->session->log->debug('exitUrl triggered, surveyEnd');
-        return $self->surveyEnd( { exitUrl => $result->{exitUrl} });
-    } elsif ( my $restart = $result->{restart} ) {
-        $self->session->log->debug('restart triggered');
-        return $self->surveyEnd( { restart => $restart } );
+    if ($result && ref $result eq 'HASH') {
+        if ( my $url = $result->{terminal} ) {
+            $self->session->log->debug('Terminal, surveyEnd');
+            return $self->surveyEnd( { exitUrl => $url } );
+        } elsif ( exists $result->{exitUrl} ) {
+            $self->session->log->debug('exitUrl triggered, surveyEnd');
+            return $self->surveyEnd( { exitUrl => $result->{exitUrl} });
+        } elsif ( my $restart = $result->{restart} ) {
+            $self->session->log->debug('restart triggered');
+            return $self->surveyEnd( { restart => $restart } );
+        }
     }
 
     return $self->www_loadQuestions();

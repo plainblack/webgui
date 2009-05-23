@@ -520,10 +520,10 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice';
 $rJSON->lastResponse(4);
 my $terminals;
-cmp_deeply(
+is(
     $rJSON->recordResponses({}),
-    {},
-    'recordResponses, if section has no questions, returns terminal info in the section.  With no terminal info, returns {}',
+    undef,
+    'recordResponses, with no terminal info, returns undef',
 );
 is($rJSON->lastResponse(), 5, 'recordResponses, increments lastResponse if there are no questions in the section');
 
