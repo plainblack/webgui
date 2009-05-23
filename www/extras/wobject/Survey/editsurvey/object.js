@@ -1,5 +1,4 @@
-
-/*global Survey, YAHOO */
+/*global Survey, YAHOO, alert, initHoverHelp, window */
 if (typeof Survey === "undefined") {
     var Survey = {};
 }
@@ -55,7 +54,7 @@ Survey.ObjectTemplate = (function(){
             
             // Remove all hover-help
             var hovers = document.getElementsByClassName('wg-hoverhelp');
-            for (i = 0; i < hovers.length; i++) {
+            for (var i = 0; i < hovers.length; i++) {
                 var hover = hovers[i];
                 if (!hover) {
                     continue;
@@ -128,14 +127,14 @@ Survey.ObjectTemplate = (function(){
                                 this.submit();
                         }
                     }
-                }
+                };
                 btns[btns.length] = {
                     text: "Remove Default Type",
                         handler: function(){
                                 document.getElementById('removetype').value = 1;
                                 this.submit();
                     }
-                }
+                };
 
             } 
             dialog = new YAHOO.widget.Dialog(type, {

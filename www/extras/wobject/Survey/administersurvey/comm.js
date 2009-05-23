@@ -1,5 +1,4 @@
-
-/*global Survey, YAHOO */
+/*global Survey, YAHOO, alert, window */
 if (typeof Survey === "undefined") {
     var Survey = {};
 }
@@ -41,7 +40,7 @@ if (typeof Survey === "undefined") {
                 callMade = 0;
                 var response = '';
                 try { 
-                    response = YAHOO.lang.JSON.parse(o.responseText) 
+                    response = YAHOO.lang.JSON.parse(o.responseText);
                 }
                 catch (err) { 
                     YAHOO.log(err);

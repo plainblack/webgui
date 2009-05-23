@@ -1058,7 +1058,8 @@ A hash reference. Each matching key in the string will be replaced with its asso
 
 sub getTemplatedText {
     my $self = shift;
-    my ($text, $params) = validate_pos(@_, { type => SCALAR }, { type => HASHREF });
+    my ($text, $params) = validate_pos(@_, { type => SCALAR|UNDEF }, { type => HASHREF });
+    $text = q{} if not defined $text;
     
     # Turn multi-valued answers into comma-separated text
     for my $value (values %$params) {
