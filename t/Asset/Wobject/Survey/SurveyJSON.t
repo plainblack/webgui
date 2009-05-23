@@ -1412,7 +1412,7 @@ cmp_deeply(
             }),
         ],
     }),
-    'addAnswersToQuestion: Yes/No bundle created'
+    'addAnswersToQuestion: Yes/No bundle created' # N.B. This test is dependent on the default values of the Yes/No bundle
 );
 
 ####################################################

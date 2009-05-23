@@ -1236,12 +1236,13 @@ sub view {
     my $self    = shift;
     my $var     = $self->getMenuVars;
     
-    my $responseDetails = $self->getResponseDetails();
+    my $responseDetails = $self->getResponseDetails;
 
     # Add lastResponse template vars
-    for my $tv qw(endDate feedback complete restart timeout timeoutRestart) {
+    for my $tv qw(endDate complete restart timeout timeoutRestart) {
         $var->{"lastResponse\u$tv"} = $responseDetails->{$tv};
     }
+    $var->{lastResponseFeedback} = $responseDetails->{templateText};
     $var->{maxResponsesSubmitted} = !$self->canTakeSurvey();
     
     return $self->processTemplate( $var, undef, $self->{_viewTemplate} );
@@ -1274,67 +1275,43 @@ sub getMenuVars {
 
 #-------------------------------------------------------------------
 
-=head2 getResponseDetails ( [$responseId] )
+=head2 getResponseDetails ( [$options] )
 
 Looks up details about a given response.
 
-=head3 responseId
+=head3 options
+
+=head4 responseId
 
 A specific responseId to use. If none given, the most recent completed response is used.
+
+=head4 userId
+
+A specific userId to use. Defaults to the current user
+
+=head4 templateId
+
+A template to use. Defaults to this Survey's feedbackTemplateId
 
 =cut
 
 sub getResponseDetails {
     my $self = shift;
-    my $responseId = shift;
+    my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0 } );
+    my $responseId = $opts{responseId};
+    my $userId = $opts{userId} || $self->session->user->userId;
+    my $templateId = $opts{templateId} || $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g';
     
-    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON);
+    $responseId 
+        ||= $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete > 0", [ $userId, $self->getId ]);
     
-    if ( $responseId ) {
-        $self->session->log->debug("ResponseId provided: $responseId");
-        ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-            'select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]
-        );
-    } else {
-        my $userId = $self->session->user->userId();
-        my $anonId 
-            = $self->session->form->process('userid')
-            || $self->session->http->getCookies->{Survey2AnonId}
-            || undef;
-        $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
-        my $ip = $self->session->env->getIp;
-        my $string;
-
-        if ( $anonId or $userId != 1 ) {
-            $string = 'userId';
-            if ($anonId) {
-                $string = 'anonId';
-                $userId = $anonId;
-            }
-            my $lastResponseId
-                = $self->session->db->quickScalar(
-                "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-                [ $userId, $self->getId() ] );
-            if ( !$lastResponseId ) {
-                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-                    "select isComplete, endDate, responseJSON from Survey_response where $string = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1",
-                    [ $userId, $self->getId() ]
-                );
-            }
-        }
-        elsif ( $userId == 1 ) {
-            my $lastResponseId = $self->session->db->quickScalar(
-                'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
-                [ $userId, $ip, $self->getId() ]
-            );
-            if ( !$lastResponseId ) {
-                ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) = $self->session->db->quickArray(
-                    'select isComplete, endDate, responseJSON from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete > 0 order by endDate desc limit 1',
-                    [ $userId, $ip, $self->getId() ]
-                );
-            }
-        }
+    if (!$responseId) {
+        $self->session->log->debug("ResponseId not found");
+        return {};
     }
+    
+    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) 
+        = $self->session->db->quickArray('select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]);
     
     # Process the feedback text
     my $feedback;
@@ -1349,12 +1326,13 @@ sub getResponseDetails {
         $tags->{timeout} = $lastResponseCompleteCode == 3;
         $tags->{timeoutRestart} = $lastResponseCompleteCode == 4;
         $tags->{endDate} = $lastResponseEndDate && WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
-        $feedback = $self->processTemplate($tags, $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g');
+        $feedback = $self->processTemplate($tags, $templateId);
     }
     return {
-        completeCode => $lastResponseCompleteCode, 
+        completeCode => $lastResponseCompleteCode,
+        templateText => $feedback,
+        templateVars => $tags,
         endDate => $tags->{endDate},
-        feedback => $feedback,
         complete => $tags->{complete},
         restart => $tags->{restart},
         timeout => $tags->{timeout},
@@ -1571,7 +1549,7 @@ sub www_showFeedback {
     # Only continue if user owns the response
     return if $userId ne $self->session->user->userId;
     
-    my $out = $self->getResponseDetails($responseId)->{feedback};
+    my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
 }
 
@@ -1617,21 +1595,21 @@ sub www_loadQuestions {
     my @questions;
     eval { @questions = $self->responseJSON->nextQuestions(); };
     
-    # Logical sections cause nextResponse to move when nextQuestions is called, so
-    # persist and changes, and repeat the surveyEnd check in case we are now at the end
-    $self->persistResponseJSON();
-    if ( $self->responseJSON->surveyEnd() ) {
-        $self->session->log->debug('surveyEnd, probably as a result of a Logical Section');
-        if ( $self->get('quizModeSummary') ) {
-            if(! $self->session->form->param('shownsummary')){
-                my ($summary,$html) = $self->getSummary();
-                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
-                $self->session->http->setMimeType('application/json');
-                return $json;
-            }
-        }
-        return $self->surveyEnd();
-    }
+#    # Logical sections cause nextResponse to move when nextQuestions is called, so
+#    # persist and changes, and repeat the surveyEnd check in case we are now at the end
+#    $self->persistResponseJSON();
+#    if ( $self->responseJSON->surveyEnd() ) {
+#        $self->session->log->debug('surveyEnd, probably as a result of a Logical Section');
+#        if ( $self->get('quizModeSummary') ) {
+#            if(! $self->session->form->param('shownsummary')){
+#                my ($summary,$html) = $self->getSummary();
+#                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
+#                $self->session->http->setMimeType('application/json');
+#                return $json;
+#            }
+#        }
+#        return $self->surveyEnd();
+#    }
     
     my $section = $self->responseJSON->nextResponseSection();
 
@@ -1909,79 +1887,49 @@ sub responseId {
     my $self = shift;
     my ($userId) = validate_pos(@_, {type => SCALAR, optional => 1});
     
+    $userId ||= $self->session->user->userId;
     my $user = WebGUI::User->new($self->session, $userId);
-
-    if (!defined $self->{responseId}) {
-        my $ip = $self->session->env->getIp;
-        my $id = $userId || $self->session->user->userId;
-        my $anonId = $self->session->form->process('userid');
-        if ($self->responseIdCookies) {
-            $anonId ||= $self->session->http->getCookies->{Survey2AnonId}; ## no critic
-        }
-        $anonId ||= undef;
-        
-        if ($self->responseIdCookies) {
-            $anonId && $self->session->http->setCookie( Survey2AnonId => $anonId );
-        }
+    my $ip = $self->session->env->getIp;
     
-        my ($responseId, $string);
-
-        # if there is an anonid or id is for a WG user
-        if ( $anonId or $id != 1 ) {
-            $string = 'userId';
-            if ($anonId) {
-                $string = 'anonId';
-                $id     = $anonId;
-            }
-            $responseId
-                = $self->session->db->quickScalar(
-                "select Survey_responseId from Survey_response where $string = ? and assetId = ? and isComplete = 0",
-                [ $id, $self->getId() ] );
+    my $responseId = $self->{responseId};
     
-        }
-        elsif ( $id == 1 ) {
-            $responseId = $self->session->db->quickScalar(
-                'select Survey_responseId from Survey_response where userId = ? and ipAddress = ? and assetId = ? and isComplete = 0',
-                [ $id, $ip, $self->getId() ]
+    # If a cached responseId doesn't exist, get the current in-progress response from the db
+    $responseId ||= $self->session->db->quickScalar(
+        "select Survey_responseId from Survey_response where userId = ? and assetId = ? and isComplete = 0",
+        [ $userId, $self->getId ] );
+
+    # If no current in-progress response exists, create one (as long as we're allowed to)
+    if ( !$responseId ) {
+        my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
+        my $takenCount = $self->takenCount( { userId => $userId } );
+        if ( $maxResponsesPerUser == 0 || $takenCount < $maxResponsesPerUser ) {
+            # Create a new response
+            $responseId = $self->session->db->setRow(
+                'Survey_response',
+                'Survey_responseId', {
+                    Survey_responseId => 'new',
+                    userId            => $userId,
+                    ipAddress         => $ip,
+                    username          => $user->username,
+                    startDate         => scalar time,
+                    endDate           => 0,
+                    assetId           => $self->getId,
+                    anonId            => undef
+                }
             );
-        }
-        if ( !$responseId ) {
-            my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
-            my $takenCount;
-    
-            if ( $id == 1 ) {
-                $takenCount = $self->takenCount( { userId => $id, ipAddress => $ip } );
-            }
-            else {
-                $takenCount = $self->takenCount( { $string => $id } );
-            }
-            if ( $maxResponsesPerUser == 0 || $takenCount < $maxResponsesPerUser ) {
-                $responseId = $self->session->db->setRow(
-                    'Survey_response',
-                    'Survey_responseId', {
-                        Survey_responseId => 'new',
-                        userId            => $id,
-                        ipAddress         => $ip,
-                        username          => $user ? $user->username : $self->session->user->username,
-                        startDate         => scalar time,                      #WebGUI::DateTime->now->toDatabase,
-                        endDate           => 0,                                #WebGUI::DateTime->now->toDatabase,
-                        assetId           => $self->getId(),
-                        anonId            => $anonId
-                    }
-                );
 
-                # Store the newly created responseId
-                $self->{responseId} = $responseId;
-                
-                # Manually persist ResponseJSON since we have changed $self->responseId
-                $self->persistResponseJSON();
-            }
-            else {
-                $self->session->log->debug("takenCount ($takenCount) >= maxResponsesPerUser ($maxResponsesPerUser)");
-            }
+            # Store the newly created responseId
+            $self->{responseId} = $responseId;
+            
+            # Manually persist ResponseJSON since we have changed $self->responseId
+            $self->persistResponseJSON();
         }
-        $self->{responseId} = $responseId;
+        else {
+            $self->session->log->debug("Refusing to create new response, takenCount ($takenCount) >= maxResponsesPerUser ($maxResponsesPerUser)");
+        }
     }
+    $self->{responseId} = $responseId;
+    
     return $self->{responseId};
 }
 
@@ -1996,19 +1944,20 @@ and thus should not count towards tally)
 
 sub takenCount {
     my $self = shift;
-    my %opts = validate(@_, { userId => 0, anonId => 0, ipAddress => 0 });
+    my %opts = validate(@_, { userId => 0, anonId => 0, ipAddress => 0, isComplete => 0 });
+    my $isComplete = defined $opts{isComplete} ? $opts{isComplete} : 1;
     
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
-    $sql .= ' and isComplete = 1';
+    $sql .= ' and isComplete = ' . $self->session->db->quote($isComplete);
     for my $o qw(userId anonId ipAddress) {
         if (my $o_value = $opts{o}) {
             $sql .= " and $o = " . $self->session->db->quote($o_value);
         }
     }
+    $self->session->log->debug($sql);
     
     my $count = $self->session->db->quickScalar($sql);
-    $self->session->log->debug($count);
     return $count;
 }
 
@@ -2239,6 +2188,7 @@ sub www_exportTransposedResults {
         [ $self->getId() ] );
     return $self->export( $filename, $content );
 }
+
 
 #-------------------------------------------------------------------
 

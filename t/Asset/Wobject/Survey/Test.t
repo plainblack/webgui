@@ -103,17 +103,17 @@ $s->persistSurveyJSON;
 
 cmp_deeply(
     $s->responseJSON->surveyOrder,
-    [   [ 0, 0, [ 0, 1 ] ],    # S0Q0
-        [ 1, 0, [ 0, 1 ] ],    # S1Q0
-        [ 2, 0, [] ],          # S2Q0
-        [ 3, 0, [ 0, 1 ] ],    # S3Q0
-        [ 3, 1, [ 0, 1 ] ],    # S3Q1
-        [ 3, 2, [ 0, 1 ] ],    # S3Q2
-        [ 4, 0, [ 0 .. 10 ] ], # S4Q0
-        [ 5, 0, [0] ],         # S5Q0
-        [ 5, 1, [0] ],         # S5Q0
-        [ 5, 2, [0] ],         # S5Q0
-        [6],                   # S6
+    [   [ 0, 0, [ 0, 1 ] ],    # S0Q0 (surveyOrderIndex: 0)
+        [ 1, 0, [ 0, 1 ] ],    # S1Q0 (surveyOrderIndex: 1)
+        [ 2, 0, [] ],          # S2Q0 (surveyOrderIndex: 2)
+        [ 3, 0, [ 0, 1 ] ],    # S3Q0 (surveyOrderIndex: 3)
+        [ 3, 1, [ 0, 1 ] ],    # S3Q1 (surveyOrderIndex: 4)
+        [ 3, 2, [ 0, 1 ] ],    # S3Q2 (surveyOrderIndex: 5)
+        [ 4, 0, [ 0 .. 10 ] ], # S4Q0 (surveyOrderIndex: 6)
+        [ 5, 0, [0] ],         # S5Q0 (surveyOrderIndex: 7)
+        [ 5, 1, [0] ],         # S5Q0 (surveyOrderIndex: 8)
+        [ 5, 2, [0] ],         # S5Q0 (surveyOrderIndex: 9)
+        [6],                   # S6   (surveyOrderIndex: 10)
     ],
     'surveyOrder is correct'
 );

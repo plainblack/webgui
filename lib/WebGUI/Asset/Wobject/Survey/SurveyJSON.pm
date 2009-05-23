@@ -960,11 +960,6 @@ sub newAnswer {
 
 Remove all existing answers and add a default set of answers to a question, based on question type.
 
-N.B. You probably don't want to call this method directly to update a question's questionType, as it
-doesn't actually change the stored value of questionType. Instead, call:
-
- $surveyJSON->update( $address, { questionType => "some question type" } );
-
 =head3 $address
 
 See L<"Address Parameter">. Determines question to add answers to.
@@ -986,6 +981,7 @@ sub updateQuestionAnswers {
     # Get the indexed question, and remove all of its existing answers
     my $question = $self->question($address);
     $question->{answers} = [];
+    $question->{questionType} = $type;
 
     # Add the default set of answers. The question type determines both the number
     # of answers added and the answer text to use. When updating answer text

@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 97;
+my $tests = 103;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -384,7 +384,6 @@ $rJSON->survey->question([3,0])->{variable} = 's3q0'; # surveyOrder index = 6
 $rJSON->survey->question([3,1])->{variable} = 's3q1'; # surveyOrder index = 7
 $rJSON->survey->question([3,2])->{variable} = 's3q2'; # surveyOrder index = 8
 
-$rJSON->survey->answer([0,0,0])->{recordedAnswer} = 3; # value recorded in responses hash for multi-choice answer
 $rJSON->survey->answer([0,0,0])->{value} = 100; # set answer score
 $rJSON->survey->answer([0,1,0])->{value} = 200; # set answer score
 $rJSON->survey->answer([0,1,0])->{verbatim} = 1; # make this answer verbatim
@@ -392,8 +391,8 @@ $rJSON->survey->answer([0,1,0])->{verbatim} = 1; # make this answer verbatim
 # Reset responses and record first answer
 $rJSON->lastResponse(-1);
 $rJSON->recordResponses({
-    '0-0-0' => 'I chose the first answer to s0q0',
-    '0-1-0' => 'I chose the first answer to s0q1',
+    '0-0-0' => 3, # it's a funny email address I know...
+    '0-1-0' => '13 11 66',
     '0-1-0verbatim' => 'So you want to know more',
 });
 
@@ -544,38 +543,6 @@ $rJSON->survey->question([1,0])->{terminalUrl} = 'question 1-0 terminal';
 
 $rJSON->lastResponse(2);
 $rJSON->survey->answer([1,0,0])->{recordedAnswer} = 1; # Set recordedAnswer
-cmp_deeply(
-    $rJSON->recordResponses({
-        '1-0comment'   => 'Section 1, question 0 comment',
-        '1-0-0'        => 'First answer',
-        '1-0-0verbatim' => 'First answer verbatim', # ignored
-        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
-    }),
-    { terminal => 'question 1-0 terminal' },
-    'recordResponses: question terminal overrides section terminal',
-);
-
-is($rJSON->lastResponse(), 4, 'lastResponse advanced to next page of questions');
-is($rJSON->questionsAnswered, 1, 'questionsAnswered=1, answered one question');
-
-cmp_deeply(
-    $rJSON->responses,
-    {
-        '1-0'   => {
-            comment => 'Section 1, question 0 comment',
-        },
-        '1-0-0' => {
-            comment => 'Section 1, question 0, answer 0 comment',
-            'time'    => num(time(), 3),
-            value   => 1, # 'recordedAnswer' value used because question is multi-choice
-            verbatim => undef,
-        },
-        '1-1'   => {
-            comment => undef,
-        }
-    },
-    'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
-);
 
 # Check that raw input is recorded for verbatim mc answers
 $rJSON->survey->answer([1,0,0])->{verbatim} = 1;
@@ -583,10 +550,10 @@ $rJSON->lastResponse(2);
 $rJSON->responses({});
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->recordResponses({
-    '1-0comment'   => 'Section 1, question 0 comment',
-    '1-0-0'        => 'First answer',
-    '1-0-0verbatim'        => 'First answer verbatim',
-    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    '1-0comment'    => 'Section 1, question 0 comment',
+    '1-0-0'         => 'First answer',
+    '1-0-0verbatim' => 'First answer verbatim',
+    '1-0-0comment'  => 'Section 1, question 0, answer 0 comment',
 });
 cmp_deeply(
     $rJSON->responses,
@@ -639,8 +606,8 @@ cmp_deeply(
 );
 $rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice'; # revert change
 
-$rJSON->survey->question([1,0,0])->{terminal}    = 1;
-$rJSON->survey->question([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
+$rJSON->survey->answer([1,0,0])->{terminal}    = 1;
+$rJSON->survey->answer([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
 $rJSON->responses({});
 $rJSON->lastResponse(2);
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
@@ -648,22 +615,25 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 cmp_deeply(
     $rJSON->recordResponses({
         '1-0comment'   => 'Section 1, question 0 comment',
-        '1-0-0'        => "\t\t\t\n\n\n\t\t\t", #SOS in whitespace
+        '1-0-0'        => 1,
         '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
     }),
     { terminal => 'answer 1-0-0 terminal'},
-    'recordResponses: answer terminal overrides question and section terminals',
+    'recordResponses: answer terminal overrides section terminals',
 );
 
+$rJSON->responses({});
+$rJSON->lastResponse(2);
+$rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 cmp_deeply(
     $rJSON->responses,
     {
-        '1-0'   => {
-            comment => 'Section 1, question 0 comment',
-        },
-        '1-1'   => {
-            comment => undef,
-        }
+#        '1-0'   => {
+#            comment => 'Section 1, question 0 comment',
+#        },
+#        '1-1'   => {
+#            comment => undef,
+#        }
     },
     'recordResponses: if the answer is all whitespace, it is skipped over'
 );
@@ -771,6 +741,130 @@ cmp_deeply($rJSON->responses, {}, '..and now responses hash empty again');
    
 is($rJSON->pop, undef, 'additional pop has no effect');
 
+####################################################
+#
+# Question Types
+#
+####################################################
+$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session));
+
+# Use Section 1 (containing 2 questions) for testing. This allows us to test 2 different responses at once.
+
+########
+# Yes/No
+$rJSON->survey->updateQuestionAnswers([1,0], 'Yes/No');
+$rJSON->survey->updateQuestionAnswers([1,1], 'Yes/No');
+for my $q (0,1) {
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = 'Yes';
+    $rJSON->survey->answer([1,$q,1])->{recordedAnswer} = 'No';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => 1, # Multi-choice answers are submitted like this, 
+    '1-1-1' => 1, # with the selected answer set to 1
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'Yes'
+    }, 
+    'Yes recorded correctly'
+);
+cmp_deeply(
+    $rJSON->responses->{'1-1-1'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'No'
+    }, 
+    'No recorded correctly'
+);
+
+####################################################
+#
+# logical sections
+#
+####################################################
+$rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session));
+cmp_deeply(
+    $rJSON->surveyOrder,
+    [   [ 0, 0, [0] ],                      # S0Q0 (surveyOrder: 0)
+        [ 0, 1, [0] ],                      # S0Q1 (surveyOrder: 1)
+        [ 0, 2, [ 0, 1 ] ],                 # S0Q2 (surveyOrder: 2)
+        [ 1, 0, [ 0, 1 ] ],                 # S1Q0 (surveyOrder: 3)
+        [ 1, 1, [ 0, 1 ] ],                 # S1Q1 (surveyOrder: 4)
+        [2],                                # S2   (surveyOrder: 5)
+        [ 3, 0, [ 0, 1 ] ],                 # S3Q0 (surveyOrder: 6)
+        [ 3, 1, [ 0, 1, 2, 3, 4, 5, 6 ] ],  #S3Q1  (surveyOrder: 7)
+        [ 3, 2, [0] ],                      #S3Q2  (surveyOrder: 8)
+    ], 
+    'surveyOrder',
+);
+
+$rJSON->survey->section([$_])->{gotoExpression} = qq{tag('tagged at s$_')} for (0..3);
+
+# Submit section 0, should fall through to section 2 because section 1 is logical
+# If we submit S0 normally, nextResponse will be 3 (S1 / S1Q0)
+$rJSON->recordResponses( {
+    '0-0-0' => 'me@email.com',
+    '0-1-0' => 'my phone',
+    '0-2-0' => 1,
+});
+is($rJSON->nextResponse, 3, 'Natural progression');
+
+# However if S1 is logical, nextResponse will be 5 (S2)
+$rJSON->reset;
+$rJSON->survey->section([1])->{logical} = 1;
+
+$rJSON->recordResponses( {
+    '0-0-0' => 'me@email.com',
+    '0-1-0' => 'my phone',
+    '0-2-0' => 1,
+});
+is($rJSON->nextResponse, 5, 'Logical section processed automatically');
+cmp_deeply($rJSON->tags, { 'tagged at s0' => 1, 'tagged at s1' => 1,  }, 'Logical section gotoExpression can still tag data');
+$rJSON->survey->section([1])->{logical} = 0;
+
+# Check behaviour when first section is logical
+$rJSON->reset;
+cmp_deeply( [ $rJSON->nextQuestions ],
+    [ 
+        superhashof( { id => '0-0' } ), 
+        superhashof( { id => '0-1' } ), 
+        superhashof( { id => '0-2' } ),
+    ], 
+    'Normally nextQuestions returns all questions in first section' 
+);
+$rJSON->survey->section([0])->{logical} = 1;
+$rJSON->reset;
+cmp_deeply( [ $rJSON->nextQuestions ],
+    [ 
+        superhashof( { id => '1-0' } ), 
+        superhashof( { id => '1-1' } ), 
+    ], 
+    '..but when first section logical, second section questions returned instead' 
+);
+cmp_deeply($rJSON->tags, { 'tagged at s0' => 1 }, '..and s0 gotoExpression was run');
+
+# Check behaviour when all sections logical
+$rJSON->survey->section([$_])->{logical} = 1 for (0..3);
+$rJSON->reset;
+cmp_deeply($rJSON->tags, 
+    { 
+        'tagged at s0' => 1,
+        'tagged at s1' => 1,
+        'tagged at s2' => 1,
+        'tagged at s3' => 1,
+    }, 
+    '..all gotoExpressions run'
+);
+$rJSON->survey->section([$_])->{logical} = 0 for (0..3);
+
 }
 
 ####################################################
@@ -798,7 +892,7 @@ sub buildSurveyJSON {
     $sjson->newObject([3]);
     ##Add questions
     $sjson->updateQuestionAnswers([0,0], 'Email');
-    $sjson->updateQuestionAnswers([0,1], 'Phone number');
+    $sjson->updateQuestionAnswers([0,1], 'Phone Number');
     $sjson->updateQuestionAnswers([0,2], 'Yes/No');
     $sjson->updateQuestionAnswers([1,0], 'True/False');
     $sjson->updateQuestionAnswers([1,1], 'Gender');
