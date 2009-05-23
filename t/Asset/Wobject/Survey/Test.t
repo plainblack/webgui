@@ -98,6 +98,8 @@ $s->surveyJSON_update( [ 5, 0 ], { questionType => 'Slider', required => 1 } );
 $s->surveyJSON_update( [ 5, 1 ], { questionType => 'Text', required => 1 } );
 $s->surveyJSON_update( [ 5, 2 ], { questionType => 'Number', required => 1 } );
 
+$s->surveyJSON_update( [ 6 ], { logical => 1, gotoExpression => q{tag('tagged at S6');} } );
+
 # And finally, persist the changes..
 $s->persistSurveyJSON;
 
@@ -472,6 +474,7 @@ not ok 4 - Checking tagged on page containing Section S1 Question S1Q0
 END_TAP
 
 # Slider, Number & Text question types
+# And also test the fact that S6 is logical
 $spec = <<END_SPEC;
 [
     {
@@ -479,15 +482,18 @@ $spec = <<END_SPEC;
             "S5Q0" : 5, # Slider
             "S5Q1" : 'blah', # Text
             "S5Q2" : 5, # Number
-            "next" : "S6",
+            "next" : "SURVEY_END",
+            tagged : [ 'tagged at S6' ],
        }
     },
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..1
-ok 1 - Checking next on page containing Section S5 Question S5Q0
+ok 1 - Checking next and tagged on page containing Section S5 Question S5Q0
 END_TAP
+
+# Fall off the end of the Survey
 
 #########
 # test_mc

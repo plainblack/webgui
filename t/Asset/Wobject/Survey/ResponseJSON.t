@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 103;
+my $tests = 104;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -807,6 +807,8 @@ cmp_deeply(
 );
 
 $rJSON->survey->section([$_])->{gotoExpression} = qq{tag('tagged at s$_')} for (0..3);
+$rJSON->survey->section([$_])->{variable} = "S$_" for (0..3);
+$rJSON->survey->answer([0,2,1])->{goto} = 'S2';
 
 # Submit section 0, should fall through to section 2 because section 1 is logical
 # If we submit S0 normally, nextResponse will be 3 (S1 / S1Q0)
@@ -864,6 +866,16 @@ cmp_deeply($rJSON->tags,
     '..all gotoExpressions run'
 );
 $rJSON->survey->section([$_])->{logical} = 0 for (0..3);
+
+# Check that we can jump to a logical section
+$rJSON->survey->section([2])->{logical} = 1;
+$rJSON->reset;
+$rJSON->recordResponses( {
+    '0-0-0' => 'me@email.com',
+    '0-1-0' => 'my phone',
+    '0-2-1' => 1, # goto -> S2
+});
+is($rJSON->nextResponse, 6, 'S2 processed automatically and we land as S3');
 
 }
 
