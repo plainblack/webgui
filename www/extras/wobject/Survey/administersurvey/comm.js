@@ -1,5 +1,4 @@
-
-/*global Survey, YAHOO */
+/*global Survey, YAHOO, alert, window */
 if (typeof Survey === "undefined") {
     var Survey = {};
 }
@@ -20,7 +19,7 @@ if (typeof Survey === "undefined") {
             //YAHOO.log('setForm was true');
         }
         if (callMade) {
-            alert("Waiting on previous request");
+            alert("Your previous action is still being processed. Please try again.");
         }
         else {
             callMade = 1;
@@ -40,7 +39,14 @@ if (typeof Survey === "undefined") {
                 window.scrollTo(0, 0);
                 callMade = 0;
                 var response = '';
-                response = YAHOO.lang.JSON.parse(o.responseText);
+                try { 
+                    response = YAHOO.lang.JSON.parse(o.responseText);
+                }
+                catch (err) { 
+                    YAHOO.log(err);
+                    alert("Oops.. A problem was encountered. Please try again.");
+                    return;
+                }
                 if (response.type === 'displayquestions') {
                     Survey.Form.displayQuestions(response);
                 }

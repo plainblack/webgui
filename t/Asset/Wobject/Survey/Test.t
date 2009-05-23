@@ -98,22 +98,24 @@ $s->surveyJSON_update( [ 5, 0 ], { questionType => 'Slider', required => 1 } );
 $s->surveyJSON_update( [ 5, 1 ], { questionType => 'Text', required => 1 } );
 $s->surveyJSON_update( [ 5, 2 ], { questionType => 'Number', required => 1 } );
 
+$s->surveyJSON_update( [ 6 ], { logical => 1, gotoExpression => q{tag('tagged at S6');} } );
+
 # And finally, persist the changes..
 $s->persistSurveyJSON;
 
 cmp_deeply(
     $s->responseJSON->surveyOrder,
-    [   [ 0, 0, [ 0, 1 ] ],    # S0Q0
-        [ 1, 0, [ 0, 1 ] ],    # S1Q0
-        [ 2, 0, [] ],          # S2Q0
-        [ 3, 0, [ 0, 1 ] ],    # S3Q0
-        [ 3, 1, [ 0, 1 ] ],    # S3Q1
-        [ 3, 2, [ 0, 1 ] ],    # S3Q2
-        [ 4, 0, [ 0 .. 10 ] ], # S4Q0
-        [ 5, 0, [0] ],         # S5Q0
-        [ 5, 1, [0] ],         # S5Q0
-        [ 5, 2, [0] ],         # S5Q0
-        [6],                   # S6
+    [   [ 0, 0, [ 0, 1 ] ],    # S0Q0 (surveyOrderIndex: 0)
+        [ 1, 0, [ 0, 1 ] ],    # S1Q0 (surveyOrderIndex: 1)
+        [ 2, 0, [] ],          # S2Q0 (surveyOrderIndex: 2)
+        [ 3, 0, [ 0, 1 ] ],    # S3Q0 (surveyOrderIndex: 3)
+        [ 3, 1, [ 0, 1 ] ],    # S3Q1 (surveyOrderIndex: 4)
+        [ 3, 2, [ 0, 1 ] ],    # S3Q2 (surveyOrderIndex: 5)
+        [ 4, 0, [ 0 .. 10 ] ], # S4Q0 (surveyOrderIndex: 6)
+        [ 5, 0, [0] ],         # S5Q0 (surveyOrderIndex: 7)
+        [ 5, 1, [0] ],         # S5Q0 (surveyOrderIndex: 8)
+        [ 5, 2, [0] ],         # S5Q0 (surveyOrderIndex: 9)
+        [6],                   # S6   (surveyOrderIndex: 10)
     ],
     'surveyOrder is correct'
 );
@@ -472,6 +474,7 @@ not ok 4 - Checking tagged on page containing Section S1 Question S1Q0
 END_TAP
 
 # Slider, Number & Text question types
+# And also test the fact that S6 is logical
 $spec = <<END_SPEC;
 [
     {
@@ -479,15 +482,18 @@ $spec = <<END_SPEC;
             "S5Q0" : 5, # Slider
             "S5Q1" : 'blah', # Text
             "S5Q2" : 5, # Number
-            "next" : "S6",
+            "next" : "SURVEY_END",
+            tagged : [ 'tagged at S6' ],
        }
     },
 ]
 END_SPEC
 try_it( $t1, $spec, { tap => <<END_TAP } );
 1..1
-ok 1 - Checking next on page containing Section S5 Question S5Q0
+ok 1 - Checking next and tagged on page containing Section S5 Question S5Q0
 END_TAP
+
+# Fall off the end of the Survey
 
 #########
 # test_mc

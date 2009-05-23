@@ -106,6 +106,9 @@ sub reset {
         # And then data overrides
         %{$data},
     };
+    
+    # If first section is logical, process it immediately
+    $self->checkForLogicalSection;
     return $self;
 }
 
@@ -213,6 +216,9 @@ sub hasTimedOut{
 Mutator. The lastResponse property represents the surveyOrder index of the most recent item shown. 
 
 This method returns (and optionally sets) the value of lastResponse.
+
+You may want to call L<checkForLogicalSection> after modifying this so that
+any logical section you land in gets immediately processed.
 
 =head3 $responseIndex (optional)
 
@@ -397,6 +403,9 @@ Mutator. The index of the next item that should be shown to the user,
 that is, the index of the next item in the L<"surveyOrder"> array,
 e.g. L<"lastResponse"> + 1.
 
+You may want to call L<checkForLogicalSection> after modifying this so that
+any logical section you land in gets immediately processed.
+
 =head3 $responseIndex (optional)
 
 If defined, nextResponse is set to $responseIndex.
@@ -480,7 +489,7 @@ Processes and records submitted survey responses in the L<"responses"> data stru
 Does terminal handling, and branch processing, and advances the L<"lastResponse"> index 
 if all required questions have been answered.
 
-=head3 $submittedResponses
+=head3 $responses
 
 A hash ref of submitted form param data. Each element should look like:
 
@@ -492,219 +501,226 @@ A hash ref of submitted form param data. Each element should look like:
 
 See L<"questionId"> and L<"answerId">.
 
-=head3 Terminal processing
+=head3 Terminal, goto and gotoExpression processing
 
-Terminal processing for a section and its questions and answers are handled in
-order.  The terminalUrl setting in a question overrides the terminalUrl setting
-for its section.  Similarly, with questions and answers, the last terminalUrl
-setting of the set of questions is what is returned for the page, with the questions
-and answers being answered in L<"surveyOrder">.
+Gotos are processed first, followed by gotoExpressions, and finally terminals.
+On a page with the following items:
+   Section 1
+     Question 1.1
+       Answer 1.1.1
+       Answer 1.1.2
+     Question 1.2
+       Answer 1.2.1
+     ..
 
-=head3 Branch processing
+the precedence order is inside-out, in order of questions displayed, e.g.
 
-Jump targets (gotos) and jump expressions (gotoExpressions) are attempted in the following
-order:
+   Answer 1.1.1
+   Answer 1.1.2
+   Question 1.1
+   Answer 1.2.1
+   Question 1.2
+   Section 1
 
-=over 3
-
-=item * answer goto
-
-=item * answer gotoExpression
-
-=item * question goto
-
-=item * question gotoExpression
-
-=item * question goto
-
-=item * question gotoExpression
-
-=back
-
-The first to trigger a jump short-circuits the process, and subsequent items are not attempted.
+The first to trigger a jump short-circuits the process, meaning that subsequent items are not attempted.
 
 =cut
 
 sub recordResponses {
     my $self = shift;
-    my ($submittedResponses) = validate_pos( @_, { type => HASHREF } );
+    my ($responses) = validate_pos( @_, { type => HASHREF } );
 
     # Build a lookup table of non-multiple choice question types
-    my %knownTypes = map {$_ => 1} @{$self->survey->specialQuestionTypes};
-    
+    my %specialQTypes = map { $_ => 1 } @{ $self->survey->specialQuestionTypes };
+
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
-    my $section   = $self->nextResponseSection();
+    my $section = $self->nextResponseSection();
 
-    my ($sectionGoto, $questionGoto, $answerGoto, $sectionExpression, $questionExpression, $answerExpression);
+    # Process responses by looping over expected questions in survey order
+    my @questions  = $self->nextQuestions();
+    my %newResponse;
+    my $allQsValid = 1;
+    my %validAnswers;
+    for my $question (@questions) {
+        my $aValid = 0; # TODO: this is flawed because we can have multi-answer quesions
+        my $qId = $question->{id};
 
-    # Handle terminal Section..
-    my $terminalUrl;
-    my $sTerminal = 0;
-    if ( $section->{terminal} ) {
-        $sTerminal   = 1;
-        $terminalUrl = $section->{terminalUrl};
+        $newResponse{ $qId }->{comment} = $responses->{ "${qId}comment" };
+        
+        for my $answer ( @{ $question->{answers} } ) {
+            my $aId = $answer->{id};
+            my $recordedAnswer = $responses->{ $aId };
+            my $questionType = $question->{questionType};
+
+            # Server-side Validation and storing of extra data for special q types goes here
+            # Any answer that fails validation should be skipped with 'next'
+            
+            
+            if ( $questionType eq 'Number' ) {
+                if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
+                    next;
+                }
+                elsif ( $answer->{min} =~ /\d/ and $recordedAnswer < $answer->{min} ) {
+                    next;
+                }
+                elsif ( $answer->{step} =~ /\d/ and $recordedAnswer % $answer->{step} != 0 ) {
+                    next;
+                }
+            }
+            elsif ( $questionType eq 'Year Month' ) {
+                # store year and month as "YYYY Month"
+                $recordedAnswer = $responses->{ "$aId-year" } . " " . $responses->{ "$aId-month" };
+            }
+            else {
+                # In the case of a mc question, only selected answers will have a defined recordedAnswer
+                # Thus we skip any answers where recordedAnswer is not defined
+                next if !defined $recordedAnswer || $recordedAnswer !~ /\S/;
+            }
+
+            # If we reach here, answer validated ok
+            $aValid = 1;
+            $validAnswers{$aId} = 1;
+
+            # Now, decide what to record. For multi-choice questions, use recordedAnswer.
+            # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
+            $newResponse{ $aId } = {
+                value       => $specialQTypes{ $questionType } ? $recordedAnswer : $answer->{recordedAnswer},
+                verbatim    => $answer->{verbatim} ? $responses->{ "${aId}verbatim" } : undef,
+                time        => time,
+                comment     => $responses->{ "${aId}comment" },
+            };  
+        }
+
+        # Check if a required Question was skipped
+        $allQsValid = 0 if $question->{required} && !$aValid;
+
+        # If question was answered, increment the questionsAnswered count..
+        $self->questionsAnswered(+1) if $aValid;
     }
-    # ..and also gotos..
-    elsif ( $section->{goto} =~ /\w/ ) {
-        $sectionGoto = $section->{goto};
-    }
-    # .. and also gotoExpressions..
-    elsif ( $section->{gotoExpression} =~ /\w/ ) {
-        $sectionExpression = $section->{gotoExpression};
-    }
 
-    my $logicalSection = $section->{logical};
-
-    # Process Questions in Section..
-    my $terminal = 0;
-    my $allRequiredQsAnswered = 1;
-    my @questions;
+    # Stop here on validation errors
+    if ( !$allQsValid ) {
+        $self->session->log->debug("One or more questions failed validation");
+        return;
+    }
     
-    if (!$logicalSection) {
+    # Add newResponse to the overall response (via a hash slice)
+    @{$self->responses}{keys %newResponse} = values %newResponse;
+    
+    # Now that the response has been recorded, increment nextResponse
+    # N.B. This can be overwritten by goto and gotoExpressions, below.
+    # (we give them a chance to run before processing logical sections)
+    # Normally we move forward by the number of questions answered, but if
+    # the section has no questions we still move forward by 1
+    $self->nextResponse( $self->nextResponse + ( @questions || 1 ) );
+
+    # Now that the response has been added, loop over the questions a second time
+    # to process goto, gotoExpression, and terminalUrls. 
+    #
+    # We are only dealing with a single section. On a page with:
+    #
+    #   Section 1
+    #     Question 1.1
+    #       Answer 1.1.1
+    #       Answer 1.1.2
+    #     Question 1.2
+    #       Answer 1.2.1
+    #     ..
+    #
+    # the precedence order is inside-out, in order of questions displayed, e.g.
+    #
+    #   Answer 1.1.1
+    #   Answer 1.1.2
+    #   Question 1.1
+    #   Answer 1.2.1
+    #   Question 1.2
+    #   Section 1
+    #   ..
+    for my $question (@questions) {
         
-        # N.B. Important that nextQuestions is not called for logicalSetions, since 
-        # logical sections cause this sub to be called from nextQuestions() in the first place!
-        @questions = $self->nextQuestions();
+        # First Answers..
         
-        for my $question (@questions) {
-            my $aAnswered = 0;
-
-            # Handle terminal Questions..
-            if ( $question->{terminal} ) {
-                $terminal    = 1;
-                $terminalUrl = $question->{terminalUrl};
+        for my $answer ( @{ $question->{answers} } ) {
+            # Only process the chosen answer..
+            my $aId = $answer->{id};
+            next if !$validAnswers{$aId};
+            
+            # Answer goto
+            if (my $action = $self->processGoto($answer->{goto})) {
+                $self->session->log->debug("Branching on Answer goto: $answer->{goto}");
+                return $action;
             }
-            # ..and also gotos..
-            elsif ( $question->{goto} =~ /\w/ ) {
-                $questionGoto = $question->{goto};
+            # Then answer gotoExpression
+            if (my $action = $self->processExpression($answer->{gotoExpression})) {
+                $self->session->log->debug("Branching on Answer gotoExpression: $answer->{gotoExpression}");
+                return $action;
             }
-            # .. and also gotoExpressions..
-            elsif ( $question->{gotoExpression} =~ /\w/ ) {
-                $questionExpression = $question->{gotoExpression};
-            }
-
-            # Record Question comment
-            $self->responses->{ $question->{id} }->{comment} = $submittedResponses->{ $question->{id} . 'comment' };
-
-            # Process Answers in Question..
-            for my $answer ( @{ $question->{answers} } ) {
-
-                # Pluck the values out of the responses hash that we want to record..
-                my $submittedAnswerResponse = $submittedResponses->{ $answer->{id} };
-                my $submittedAnswerComment  = $submittedResponses->{ $answer->{id} . 'comment' };
-                my $submittedAnswerVerbatim = $submittedResponses->{ $answer->{id} . 'verbatim' };
-
-                # Server-side Validation and storing of extra data for special q types goes here
-                
-                if($question->{questionType} eq 'Number'){
-                    if($answer->{max} =~ /\d/ and $submittedAnswerResponse > $answer->{max}){
-                        next;
-                    }elsif($answer->{min} =~ /\d/ and $submittedAnswerResponse < $answer->{min}){
-                        next;
-                    }elsif($answer->{step} =~ /\d/ and $submittedAnswerResponse % $answer->{step} != 0){
-                        next;
-                    }
-                } elsif ($question->{questionType} eq 'Year Month'){
-                    # store year and month as "YYYY Month"
-                    $submittedAnswerResponse = $submittedResponses->{ $answer->{id} . '-year' } . " " . $submittedResponses->{ $answer->{id} . '-month' };
-                } else {
-                    if ( !defined $submittedAnswerResponse || $submittedAnswerResponse !~ /\S/ ) {
-                        $self->session->log->debug("Skipping invalid submitted answer response: $submittedAnswerResponse") if $submittedAnswerResponse;
-                        next;
-                    }
-                }
-                
-                # If we reach here, answer validated ok
-                $aAnswered = 1;
-
-                # Now, decide what to record. For multi-choice questions, use recordedAnswer.
-                # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
-                $self->responses->{ $answer->{id} }->{value}
-                    = $knownTypes{ $question->{questionType} }
-                    ? $submittedAnswerResponse
-                    : $answer->{recordedAnswer};
-                
-                $self->responses->{ $answer->{id} }->{verbatim} = $answer->{verbatim} ? $submittedAnswerVerbatim : undef;
-                $self->responses->{ $answer->{id} }->{time}     = time;
-                $self->responses->{ $answer->{id} }->{comment}  = $submittedAnswerComment;
-
-                # Handle terminal Answers..
-                if ( $answer->{terminal} ) {
-                    $terminal    = 1;
-                    $terminalUrl = $answer->{terminalUrl};
-                }
-
-                # ..and also gotos..
-                elsif ( $answer->{goto} =~ /\w/ ) {
-                    $answerGoto = $answer->{goto};
-                }
-
-                # .. and also gotoExpressions..
-                elsif ( $answer->{gotoExpression} =~ /\w/ ) {
-                    $answerExpression = $answer->{gotoExpression};
-                }
-            }
-
-            # Check if a required Question was skipped 
-            if ( $question->{required} && !$aAnswered  ) {
-                $allRequiredQsAnswered = 0;
-            }
-
-            # If question was answered, increment the questionsAnswered count..
-            if ($aAnswered) {
-                $self->questionsAnswered(+1);
+            # Then answer terminal
+            if ($answer->{terminal}) {
+                $self->session->log->debug("Answer terminal: $answer->{terminalUrl}");
+                return { terminal => $answer->{terminalUrl} };
             }
         }
-    }
-
-    # If all required responses were given, proceed onwards!
-    if ($allRequiredQsAnswered && !$logicalSection) {
         
-        #  Move the lastResponse index to the last question answered
-        $self->lastResponse( $self->lastResponse + @questions );
-    }
-    
-    if ($allRequiredQsAnswered || $logicalSection) {
-        # Process jumps and jump expressions in precedence order of:
-        # answer goto, answer expression, question goto, question expression, section..
+        # Then Questions..
         
-        # The joined logical OR here carries out the short-circuting for us
-        # e.g. processGoto returns 1 on its first match
-        # and processExpression returns hashref on its first match
-        my $action = $self->processGoto($answerGoto) ||
-                         $self->processExpression($answerExpression) ||
-                         $self->processGoto($questionGoto) ||
-                         $self->processExpression($questionExpression) ||
-                         $self->processGoto($sectionGoto) ||
-                         $self->processExpression($sectionExpression);
-        
-        # Special actions (such as exitUrl and restart) happen straight away
-        if ($action && ref $action eq 'HASH') {
+        # Question goto
+        if (my $action = $self->processGoto($question->{goto})) {
+            $self->session->log->debug("Branching on Question goto: $question->{goto}");
             return $action;
         }
+        # Then question gotoExpression
+        if (my $action = $self->processExpression($question->{gotoExpression})) {
+            $self->session->log->debug("Branching on Question gotoExpression: $question->{gotoExpression}");
+            return $action;
+        }
+        # N.B. Questions don't have terminalUrls
     }
     
-    if (!$allRequiredQsAnswered) {
-        # Required responses were missing, so we don't let the Survey terminate
-        $terminal = 0;
+    # Then Sections..
+    
+    # Section goto
+    if (my $action = $self->processGoto($section->{goto})) {
+        $self->session->log->debug("Branching on Section goto: $section->{goto}");
+        return $action;
     }
+    # Then section gotoExpression
+    if (my $action = $self->processExpression($section->{gotoExpression})) {
+        $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
+        return $action;
+    }
+    # Then section terminal
+    if ($section->{terminal} && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex) {
+        $self->session->log->debug("Section terminal: $section->{terminalUrl}");
+        return { terminal => $section->{terminalUrl} };
+    }
+    
+    # The above goto and gotoExpression checks will have already called $self->checkForLogicalSection after
+    # moving nextResponse, however we need to call it again here for the case where the survey fell
+    # through naturally to a logical section
+    $self->checkForLogicalSection;
+    
+    $self->session->log->debug("Falling through..");
+    return;
+}
 
-    # Handle special cases down here, after we've given sections a chance for their jump [expressions] to run
-    if ( !@questions || $logicalSection ) {
-        # No questions to be (or should be) displayed, so increment lastResponse and return
-        $self->lastResponse( $self->nextResponse );
-        return $sTerminal ? { terminal => $terminalUrl } : {};
-    }
+=head2 checkForLogicalSection
 
-    if ( $sTerminal && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex ) {
-        $terminal = 1;
-    }
+Check if the next response section is marked as logical, and if so, immediately processed it.
+Normally, this sub should be called every time lastResponse or nextResponse is modified, so
+that logical sections "automatically" trigger.
 
-    if ($terminal) {
-        return { terminal => $terminalUrl };
+=cut
+
+sub checkForLogicalSection {
+    my $self = shift;
+    my $section = $self->nextResponseSection();
+    if ($section && $section->{logical}) {
+        $self->session->log->debug("Processing logical section $section->{variable}");
+        $self->recordResponses({});
     }
-    return {};
+    return;
 }
 
 #-------------------------------------------------------------------
@@ -735,12 +751,14 @@ sub processGoto {
         while ($self->nextResponseSectionIndex == $lastResponseSectionIndex) {
             $self->lastResponse( $self->lastResponse + 1);
         }
+        $self->checkForLogicalSection;
         return 1;
     }
     
     if ($goto eq 'END_SURVEY') {
         $self->session->log->debug("END_SURVEY jump target encountered");
         $self->lastResponse( scalar( @{ $self->surveyOrder} ) - 1 );
+        $self->checkForLogicalSection;
         return 1;
     }
 
@@ -757,6 +775,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item 
             $self->lastResponse( $itemIndex - 1 );
+            $self->checkForLogicalSection;
             return 1;
         }
 
@@ -765,6 +784,7 @@ sub processGoto {
 
             # Fudge lastResponse so that the next response item will be our matching item
             $self->lastResponse( $itemIndex - 1 );
+            $self->checkForLogicalSection;
             return 1;
         }
 
@@ -1038,7 +1058,8 @@ A hash reference. Each matching key in the string will be replaced with its asso
 
 sub getTemplatedText {
     my $self = shift;
-    my ($text, $params) = validate_pos(@_, { type => SCALAR }, { type => HASHREF });
+    my ($text, $params) = validate_pos(@_, { type => SCALAR|UNDEF }, { type => HASHREF });
+    $text = q{} if not defined $text;
     
     # Turn multi-valued answers into comma-separated text
     for my $value (values %$params) {
@@ -1089,26 +1110,6 @@ sub nextQuestions {
 
     # Get some information about the Section that the next response belongs to..
     my $section = $self->nextResponseSection();
-    
-    # Logical sections get processed immediately rather than displayed
-    if ($section->{logical}) {
-        my $nextResponse = $self->nextResponse;
-        
-        $self->session->log->debug("Processing logical section");
-        
-        # Pass off to recordResponses, which will process expressions and increment nextResponse
-        $self->recordResponses({});
-        
-        # Explicitly check that nextResponse was incremented, lest we end up with an infinite loop
-        if ($nextResponse == $self->nextResponse) {
-            $self->session->log->error("Something bad happened in Survey logic, bailing out to avoid infinite loop");
-        } else {
-            $self->session->log->debug("nextResponse has been updated to " . $self->nextResponse);
-            # ..and then start over
-            return $self->nextQuestions;
-        }
-    }
-    
     my $sectionIndex = $self->nextResponseSectionIndex;
     my $questionsPerPage = $self->survey->section( [ $self->nextResponseSectionIndex ] )->{questionsPerPage};
     

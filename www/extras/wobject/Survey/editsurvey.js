@@ -1,4 +1,4 @@
-/*global Survey, YAHOO */
+/*global Survey, YAHOO, alert */
 if (typeof Survey === "undefined") {
     var Survey = {};
 }
@@ -55,7 +55,9 @@ Survey.Data = (function(){
             focus = d.address;//What is the current highlighted item.
             var warnings = ""; 
             for(var w in d.warnings){
-                warnings += "<div class='warning'>" + d.warnings[w] + "</div>"; 
+                if (YAHOO.lang.hasOwnProperty(d.warnings, w)) {
+                    warnings += "<div class='warning'>" + d.warnings[w] + "</div>"; 
+                }
             }
             if (document.getElementById('warnings')) {
                 if (warnings !== "") {
@@ -111,7 +113,9 @@ Survey.Data = (function(){
             }
             
             // (re)Add resize handler
-            Survey.Data.ddContainerResize && Survey.Data.ddContainerResize.destroy();
+            if (Survey.Data.ddContainerResize) {
+                Survey.Data.ddContainerResize.destroy();
+            }
             Survey.Data.ddContainerResize = new YAHOO.util.Resize('sections-panel', {
                 proxy: true,
                 minWidth: 300, 
@@ -137,7 +141,9 @@ Survey.Data = (function(){
                 YAHOO.util.Dom.addClass(selectedId, 'selected');
             }
 
-			sButton && sButton.destroy();
+			if (sButton) {
+			    sButton.destroy();
+			}
 			sButton = new YAHOO.widget.Button({
                 label: "Add Section",
                 id: "addSection",
@@ -145,7 +151,9 @@ Survey.Data = (function(){
             });
             sButton.on("click", this.addSection);
 
-			qButton && qButton.destroy();
+			if (qButton) {
+			    qButton.destroy();
+			}
             qButton = new YAHOO.widget.Button({
                 label: "Add Question",
                 id: "addQuestion",
@@ -154,7 +162,9 @@ Survey.Data = (function(){
             qButton.on("click", this.addQuestion, d.buttons.question);
 
             if (d.buttons.answer) {
-				aButton && aButton.destroy();
+				if (aButton) {
+				    aButton.destroy();
+				}
                 aButton = new YAHOO.widget.Button({
                     label: "Add Answer",
                     id: "addAnswer",

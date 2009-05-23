@@ -281,8 +281,10 @@ sub _test {
     
     while ( my ( $variable, $spec ) = each %$args ) {
         my $index = $surveyOrderIndexByVariableName->{$variable};
+        return fail($testCount, "Invalid question variable: $variable") if !defined $index;
         my $address = $surveyOrder->[$index];
         my $question = $rJSON->survey->question($address);
+        return fail($testCount, "Invalid question variable: $variable") if !defined $question;
         my $questionType = $question->{questionType};
         
         # Keep track of lowest index (to work out what survey page we should test on)
@@ -325,6 +327,7 @@ sub _test {
     
     my ($pageSection, $pageQuestion);
     if (defined $lowestIndex) {
+        my $address = $surveyOrder->[$lowestIndex] or return fail($testCount, "Unable to determine address from lowest index: $lowestIndex");
         $rJSON->nextResponse($lowestIndex);
         $pageSection = $rJSON->survey->section($surveyOrder->[$lowestIndex]);
         $pageQuestion = $rJSON->survey->question($surveyOrder->[$lowestIndex]);
@@ -427,8 +430,10 @@ sub _test_mc {
     my @specs = @$args;
     
     my $index = $surveyOrderIndexByVariableName->{$variable};
+    return fail(-1, "Invalid question variable: $variable") if !defined $index;
     my $address = $surveyOrder->[$index];
     my $question = $rJSON->survey->question($address);
+    return fail(-1, "Invalid question variable: $variable") if !defined $question;
     my $answers = $question->{answers};
     
     # Each spec is a sub-test, one per answer in the question
@@ -517,8 +522,10 @@ sub _sequence {
     
     while ( my ( $variable, $spec ) = each %$args ) {
         my $index = $surveyOrderIndexByVariableName->{$variable};
+        return fail($testCount, "Invalid question variable: $variable") if !defined $index;
         my $address = $surveyOrder->[$index];
         my $question = $rJSON->survey->question($address);
+        return fail($testCount, "Invalid question variable: $variable") if !defined $question;
         my $questionType = $question->{questionType};
         
         # Iterate over all answers
@@ -648,27 +655,38 @@ sub _recordResponses {
     if ($next) {
         my $nextResponse = $rJSON->nextResponse;
         my $nextAddress = $surveyOrder->[$nextResponse];
-        my $nextSection = $rJSON->survey->section($nextAddress);
-        my $nextQuestion = $rJSON->survey->question($nextAddress);
-        # Get the lowest section surveyOrderIndex from lookup
-        my $got;
-        my $svar = $nextSection->{variable};
-        my $qvar = $nextQuestion->{variable};
-        if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
-            $got = "'$svar' (<-- a section)";
-            $got .= " and '$qvar' (<-- a question)" if $qvar;
-        } elsif ($qvar) {
-            $got = "'$qvar' (<-- a question)";
-        } else {
-            $got = 'Unknown!';
-        }
-        my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
-        if ($nextResponse != $expectedNextResponse) {
+        if ($next ne 'SURVEY_END' && !defined $nextAddress) {
             return fail($testCount, $name, <<END_WHY);
+Compared next section/question
+   got : Survey finished
+expect : '$next'
+END_WHY
+        }
+        if ($next eq 'SURVEY_END' && !defined $nextAddress) {
+            $self->session->log->debug("SURVEY_END matched correctly");
+        } else {
+            my $nextSection = $rJSON->survey->section($nextAddress);
+            my $nextQuestion = $rJSON->survey->question($nextAddress);
+            # Get the lowest section surveyOrderIndex from lookup
+            my $got;
+            my $svar = $nextSection->{variable};
+            my $qvar = $nextQuestion->{variable};
+            if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
+                $got = "'$svar' (<-- a section)";
+                $got .= " and '$qvar' (<-- a question)" if $qvar;
+            } elsif ($qvar) {
+                $got = "'$qvar' (<-- a question)";
+            } else {
+                $got = 'Unknown!';
+            }
+            my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
+            if ($nextResponse != $expectedNextResponse) {
+                return fail($testCount, $name, <<END_WHY);
 Compared next section/question
    got : $got
 expect : '$next'
 END_WHY
+            }
         }
     }
     
