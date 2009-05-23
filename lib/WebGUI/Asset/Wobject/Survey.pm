@@ -2763,7 +2763,7 @@ sub www_runTests {
         results => [],
     };
     my $format = $self->session->form->param('format');
-    local $| = 1 if $format eq 'tap';
+    local $| = 1;# if $format eq 'tap';
     
     my @parsers;
     use TAP::Parser::Aggregator;
@@ -2782,7 +2782,11 @@ sub www_runTests {
             testId => $test->getId,
             text => $parsed->{templateText},
             };
-        $self->session->output->print("$name\n$tap\n\n") if $format eq 'tap';
+        if ($format eq 'tap') {
+            $self->session->output->print("$name\n$tap\n\n");
+        } else {
+            $self->session->output->print("                    \n");
+        }
     }
     $aggregate->stop;
     
@@ -2820,7 +2824,16 @@ END_SUMMARY
         $self->session->output->print(sprintf $summary, scalar $aggregate->passed, scalar $aggregate->failed);
         return 'chunked';
     } else {
-        return $ac->render($out, $i18n->get('test results'));
+        print <<END_HEADER;
+HTTP/1.1 200 OK
+Cache-Control: must-revalidate, max-age=1
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+
+
+END_HEADER
+        $self->session->output->print($ac->render($out, $i18n->get('test results')));
+        return 'chunked';
     }
 }
 
