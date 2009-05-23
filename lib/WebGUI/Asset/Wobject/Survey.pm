@@ -668,6 +668,7 @@ sub getAdminConsole {
     $ac->addSubmenuItem($self->session->url->page("func=graph"), $i18n->get('visualize'));
     $ac->addSubmenuItem($self->session->url->page("func=editTestSuite"), $i18n->get("test suite"));
     $ac->addSubmenuItem($self->session->url->page("func=runTests"), $i18n->get("run all tests"));
+    $ac->addSubmenuItem($self->session->url->page("func=runTests;format=tap"), $i18n->get("run all tests") . " (TAP)");
     return $ac;
 }
 
@@ -2748,6 +2749,7 @@ Runs all tests
 
 sub www_runTests {
     my $self = shift;
+
     my $session = $self->session;
     my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
     return $self->session->privilege->insufficient()
@@ -2760,6 +2762,8 @@ sub www_runTests {
         aggregate => 1,
         results => [],
     };
+    my $format = $self->session->form->param('format');
+    local $| = 1 if $format eq 'tap';
     
     my @parsers;
     use TAP::Parser::Aggregator;
@@ -2778,6 +2782,7 @@ sub www_runTests {
             testId => $test->getId,
             text => $parsed->{templateText},
             };
+        $self->session->output->print("$name\n$tap\n\n") if $format eq 'tap';
     }
     $aggregate->stop;
     
@@ -2805,7 +2810,18 @@ sub www_runTests {
     my $out = $self->processTemplate($var, $self->get('testResultsTemplateId') || 'S3zpVitAmhy58CAioH359Q');
 
     my $ac = $self->getAdminConsole;
-    return $ac->render($out, $i18n->get('test results'));
+    if ($format eq 'tap') {
+        my $summary = <<'END_SUMMARY';
+SUMMARY
+-------
+Passed:  %s
+Failed:  %s
+END_SUMMARY
+        $self->session->output->print(sprintf $summary, scalar $aggregate->passed, scalar $aggregate->failed);
+        return 'chunked';
+    } else {
+        return $ac->render($out, $i18n->get('test results'));
+    }
 }
 
 1;
