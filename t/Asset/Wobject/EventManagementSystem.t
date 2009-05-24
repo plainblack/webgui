@@ -110,8 +110,14 @@ ok(scalar(@$badges) == 2, 'Two Badges exist');
 
 # Add tickets
 my @tickets;
-push(@tickets, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSTicket'}));
-push(@tickets, $ems->addChild({className=>'WebGUI::Asset::Sku::EMSTicket'}));
+push(@tickets, $ems->addChild({
+        className=>'WebGUI::Asset::Sku::EMSTicket',
+	startDate => '2009-01-01 14:00:00',
+}));
+push(@tickets, $ems->addChild({
+        className=>'WebGUI::Asset::Sku::EMSTicket',
+	startDate => '2009-01-01 14:00:00',
+}));
 
 foreach my $ticket(@tickets) {
 	ok(ref($ticket) eq 'WebGUI::Asset::Sku::EMSTicket', 'Ticket added');
@@ -142,15 +148,18 @@ ok( $html !~ /REPLACE/, 'tags were successfully replaced');
 my $data = $ems->www_getScheduleDataJSON();
 cmp_deeply( JSON::from_json($data),
       {
-          'totalPages' => 0,
-          'records' => [],
-          'pageSize' => 0,
-          'dir' => 'asc',
-          'recordsReturned' => 0,
-          'currentPage' => 0,
-          'sort' => undef,
-          'startIndex' => 0,
-          'totalRecords' => 0
+          records => [],
+          pageSize => 0,
+          dir => 'asc',
+          recordsReturned => 0,
+          totalRecords => 0,
+          totalLocationPages => 0,
+          currentLocationPage => 0,
+          totalDatePages => 0,
+          currentDatePage => 0,
+          dateRecords => [ ],
+          sort => undef,
+          startIndex => 0,
         },
      'empty set: schedule data looks good' );
 
@@ -307,9 +316,12 @@ cmp_deeply( JSON::from_json($data), {
          startIndex => 0,
          sort => undef,
          dir => 'asc',
-         totalPages => 2,
+         totalLocationPages => 2,
+         currentLocationPage => 1,
+         totalDatePages => 1,
+         currentDatePage => 1,
+         dateRecords => [ '2009-01-01' ],
          pageSize => 10,
-         currentPage => 1,
          rowsPerPage => 6,
        },
      'twelve tickets: schedule data looks good' );

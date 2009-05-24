@@ -1867,7 +1867,7 @@ normal templates.|,
     },
 
     'schedule number of columns' => {
-        message => q|Number of columns per page|,
+        message => q|Schedule Locations Per Page|,
         lastUpdated => 1147050475,
         context => q|the number of columns per page in the schedule table|,
     },

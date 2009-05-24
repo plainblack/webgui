@@ -277,22 +277,28 @@ sub getEventFieldsForImport {
 
 =head2 getLocations ()
 
-Returns an array of all locations for this EMS
-SQL optimized for quick access
+Returns an array of all locations & dates for this EMS
+may be SQL optimized for quick access
 
 =cut
 
 sub getLocations {
     my $self = shift;
+    my $dateRef = shift || [ ];
 
     my %hash;
+    my %hashDate;
     my $tickets = $self->getTickets;
     for my $ticket ( @$tickets ) {
 	my $name = $ticket->get('location');
-	next if not defined $name;
-        $hash{$name} = 1;
+        my $date = $ticket->get('startDate');
+        $hash{$name} = 1 if defined $name;
+              # cut off the time from the startDate.
+        $date =~ s/\s*\d+:\d+(:\d+)?// if defined $date;
+        $hashDate{$date} = 1 if defined $date;
     }
     my @locations = sort keys %hash;
+    push @$dateRef, sort keys %hashDate ;
 #	@locations = $self->session->db->read(q{
 #                     select distinct(EMSTicket.location)
 #                       from EMSTicket join asset using (assetId)
@@ -1147,19 +1153,23 @@ sub www_getScheduleDataJSON {
     my $locationsPerPage = $self->get('scheduleColumnsPerPage');
 
     my ($db, $form) = $session->quick(qw(db form));
-    my $pageNumber = $form->get('pageNumber') || 1;
-    my @ticketLocations = $self->getLocations();
+    my $locationPageNumber = $form->get('locationPage') || 1;
+    my $datePageNumber = $form->get('datePage') || 1;
+    my @dateRecords;
+    my @ticketLocations = $self->getLocations( \@dateRecords );
     # the total number of pages is the number of locations divided by the number of locations per page
-    my $numberOfPages = int( .9 + scalar(@ticketLocations) / $locationsPerPage );
+    my $numberOfLocationPages = int( .9 + scalar(@ticketLocations) / $locationsPerPage );
         # skip everything else if there are no locations/pages
     return JSON->new->encode( {
         records => [ ],  totalRecords => 0, recordsReturned => 0, startIndex => 0,
-        currentPage => 0, totalPages => 0,
+        currentLocationPage => 0, totalLocationPages => 0,
+        currentDatePage => 0, totalDatePages => 0, dateRecords => [ ],
         sort => undef,  dir => 'asc', pageSize => 0,
-    })  if $numberOfPages == 0;
+    })  if $numberOfLocationPages == 0;
     # now we pick out the locations to be displayed on this page
-    my $indexFirstLocation = ($pageNumber-1)*$locationsPerPage;
-    my $indexLastLocation = $pageNumber*$locationsPerPage - 1;
+    my $indexFirstLocation = ($locationPageNumber-1)*$locationsPerPage;
+    my $indexLastLocation = $locationPageNumber*$locationsPerPage - 1;
+    my $currentDate = $dateRecords[$datePageNumber-1];
     @ticketLocations = @ticketLocations[$indexFirstLocation..$indexLastLocation];
 	my $tickets = $db->read( q{
              select assetData.assetId, sku.description, assetData.title, EMSTicket.startDate, EMSTicket.location
@@ -1168,6 +1178,7 @@ sub www_getScheduleDataJSON {
                join assetData using (assetId,revisionDate)
                join asset using (assetId)
               where asset.parentId = ? 
+                 and DATE_FORMAT( EMSTicket.startDate, '%Y-%m-%d' ) = ?
                  and EMSTicket.location in (  } . 
 		         join( ',', (map { $db->quote($_) } (@ticketLocations))) .
 			 q{ )
@@ -1179,7 +1190,7 @@ sub www_getScheduleDataJSON {
                                   or assetData.tagId = ? )
 	      )
               order by EMSTicket.startDate
-                     },[  $self->getId, 
+                     },[  $self->getId,  $currentDate,
                            $session->scratch->get("versionTag")
                       ]);
     my %hash;
@@ -1220,8 +1231,11 @@ sub www_getScheduleDataJSON {
     $results{dir}        = "asc";
     $results{pageSize}   = 10;
              # these next two are used to configure the paginator
-    $results{totalPages} = $numberOfPages;
-    $results{currentPage} = $pageNumber;
+    $results{totalLocationPages} = $numberOfLocationPages;
+    $results{currentLocationPage} = $locationPageNumber;
+    $results{totalDatePages} = scalar(@dateRecords);
+    $results{currentDatePage} = $datePageNumber;
+    $results{dateRecords} = \@dateRecords;
     $session->http->setMimeType('application/json');
     return JSON->new->encode(\%results);
 }

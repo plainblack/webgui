@@ -1,4 +1,5 @@
 7.7.8
+ - added date pagination, and some formatting to EMS Schedule table
  - Removed dubious 3px padding around image based ads in an adspace.
 
 7.7.7
