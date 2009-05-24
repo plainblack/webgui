@@ -102,10 +102,10 @@ sub reset {
         startTime => time(),
         surveyOrder => undef,
         tags => {},
-        
-        # And then data overrides
-        %{$data},
     };
+    
+    # And then data overrides (via a hash slice)
+    @{$self->{_response}}{keys %{$data}} = values %{$data};
     
     # If first section is logical, process it immediately
     $self->checkForLogicalSection;
@@ -1141,6 +1141,15 @@ sub nextQuestions {
             last;
         }
 
+        # In rare cases where you change the structure of your survey after 
+        # someone has already started a response, it's possible for this
+        # to be triggered, in which case the easiest course of action is
+        # to just skip over the question.
+        if (!$self->survey->question( $address )) {
+            $self->session->log->debug("Unable to retrieve question for address $sIndex-$qIndex");
+            next;
+        }
+
         # Make a safe copy of the question
         my %questionCopy = %{$self->survey->question( $address )};
 
@@ -1190,7 +1199,10 @@ sub nextQuestions {
             }
         } else {
             for my $aIndex ( aIndexes($address) ) {
-                my %answerCopy = %{ $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) };
+                my %answerCopy 
+                    = %{  $self->survey->answer( [ $sIndex, $qIndex, $aIndex ] ) 
+                        || $self->survey->newAnswer # in case the lookup fails, use a default answer
+                        };
 
                 # Do text replacement
                 $answerCopy{text} = $self->getTemplatedText($answerCopy{text}, \%templateValues);
