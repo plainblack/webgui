@@ -133,9 +133,6 @@ sub run {
     $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
         [ $self->getId, $self->session->user->userId() ] );
     
-    # disable cookies so that test code doesn't die
-    $survey->responseIdCookies(0); 
-    
     # Start a response as current user
     my $responseId = $survey->responseId($self->session->user->userId)
         or return { tap => "Bail Out! Unable to start survey response" };
@@ -144,7 +141,6 @@ sub run {
     my $rJSON = $survey->responseJSON 
         or return { tap => "Bail Out! Unable to get responseJSON" };
         
-    my %validTargets = map { $_ => 1 } @{$survey->surveyJSON->getGotoTargets};
     my $surveyOrder = $rJSON->surveyOrder;
     my $surveyOrderIndexByVariableName = $rJSON->surveyOrderIndexByVariableName;
     
@@ -371,28 +367,24 @@ sub _setup {
 
     # Setup any fake data the user wants prior to the test
     if ($setup && ref $setup eq 'HASH') {
-        my %existingTags = %{$rJSON->tags};
-        
         # Process tags
-        # N.B. Make sure we add to existing tags instead of overwriting
+        my %tags;
         if (ref $setup->{tag} eq 'HASH') {
-             # already a hash, so store it right away
-            $rJSON->tags( {%existingTags, %{$setup->{tag}} });
+            %tags = %{$setup->{tag}};
         } elsif (ref $setup->{tag} eq 'ARRAY') {
-            # turn array into hash before storing it
-            my $tags;
             for my $tag (@{$setup->{tag}}) {
                 if (ref $tag eq 'HASH') {
                     # Individual item is a single key/value hash
                     my ($key, $value) = %$tag;
-                    $tags->{$key} = $value;
+                    $tags{$key} = $value;
                 } else {
                     # Individual item is a string, default to boolean truth flag
-                    $tags->{$tag} = 1; # default to 1
+                    $tags{$tag} = 1; # default to 1
                 }
             }
-            $rJSON->tags( {%existingTags, %$tags });
         }
+        # N.B. Make sure we add to existing tags instead of overwriting
+        @{$rJSON->tags}{keys %tags} = values %tags;
     }
 }
 
