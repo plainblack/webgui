@@ -186,42 +186,59 @@ if (typeof Survey === "undefined") {
         anim.setAttribute = setAttr;
         anim.animate();
     }
-
     
     function numberHandler(event, objs){
         
         var keycode = event.keyCode;
-        var value = this.value;
+        var value = parseFloat(this.value, 10);
         
-        //if starting a negative number, don't do anything
-        if(value == '' || value == "-"){return;}
-
-        var step = objs.step ? objs.step : 1;
-
-        if(!value){this.value = objs.min ? objs.min : 0;} 
-        if(value % step > 0){
-            this.value = +value + value % step;
-        }
+        // Keep a record of the original value entered
+        var originalValue = value;
+        
+        // Get the constraints
+        var min = parseFloat(objs.min, 10);
+        var max = parseFloat(objs.max, 10);
+        var step = parseFloat(objs.step, 10);
+        
+        // Response to up/down arrow keys
+        if (keycode == 38 || keycode == 40) {
+            // start at zero if we don't have a valid number
+            if (!YAHOO.lang.isNumber(value)) {
+                value = 0;
+            }
             
-        if(objs.min != '' && +value < +objs.min){
-            this.value = objs.min;
+            // Default to 1 for increment steps
+            step = step ? step : 1;
+            
+            if (keycode == 38){ // up
+                value += step;
+            }            
+            if (keycode == 40){ // down
+                value -= step;
+            }
+        } else {
+            // Apart from when we respond to up/down requests, if the input 
+            // isn't a valid number it's best if we do nothing - the user 
+            // might be half-way through entering something, and
+            // besides, validation will take care of it for us later
+            if (!YAHOO.lang.isNumber(value)) { 
+                return; 
+            }
         }
-
-        else if(objs.max != '' && +value > objs.max){this.value = objs.max;}
-        else if(+keycode == 40){//key down
-            if(objs.min == ''){
-                this.value = value - step;
-            }
-            else if((value - step) >= +objs.min){
-                this.value = value - step;
-            }  
-        }else if(+keycode == 38){//key up
-            if(objs.max == ''){
-                this.value = value + step;
-            }
-            if(value + step <= objs.max){
-                this.value = value + step;
-            }
+        
+        // Enforce max/min constraints
+        if (YAHOO.lang.isNumber(min) && value < min){
+            value = min;
+        }        
+        if (YAHOO.lang.isNumber(max) && value > max){
+            value = max;
+        }
+        
+        // Only modify the value if the new numeric value
+        // is different from the original parsed value
+        // (so that "0.000" doesn't get turned into "0" etc..)
+        if (value != originalValue) {
+            this.value = value;
         }
     }
 
@@ -733,7 +750,7 @@ if (typeof Survey === "undefined") {
                             if (toValidate[q.id]) {
                                 toValidate[q.id].answers[q.answers[x1].id] = {'min':q.answers[x1].min,'max':q.answers[x1].max,'step':q.answers[x1].step};
                             }
-                            YAHOO.util.Event.addListener(q.answers[x1].id, "keyup", numberHandler, q.answers[x1]);
+                            YAHOO.util.Event.addListener(q.answers[x1].id, "keydown", numberHandler, q.answers[x1]);
                         }
                     }
                     continue;
