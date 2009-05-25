@@ -1,5 +1,6 @@
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
+ - fixed: Crud serialization.
 
 7.6.23
  - fixed: tries to reject friend invitations for deleted users
