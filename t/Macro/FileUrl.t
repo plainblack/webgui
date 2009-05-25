@@ -93,15 +93,13 @@ plan tests => $numTests;
 my $macro = 'WebGUI::Macro::FileUrl';
 my $loaded = use_ok($macro);
 
-my $versionTag;
-
 SKIP: {
 
 skip "Unable to load $macro", $numTests-1 unless $loaded;
 
 my $homeAsset = WebGUI::Asset->getDefault($session);
 
-($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
+my ($versionTag, @testSets) = setupTest($session, $homeAsset, @testSets);
 
 foreach my $testSet (@testSets) {
 	my $output = WebGUI::Macro::FileUrl::process($session, $testSet->{url});
@@ -147,10 +145,9 @@ sub setupTest {
 		++$testNum;
 	}
 	$versionTag->commit;
+    WebGUI::Test->tagsToRollback($versionTag);
 	return $versionTag, @testSets;
 }
 
 END { ##Clean-up after yourself, always
-	use Data::Dumper;
-	$versionTag->rollback;
 }
