@@ -177,6 +177,7 @@ END {
         $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
         $Test->diag('mailQ   : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
         $Test->diag('Tags    : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
+        $Test->diag('Assets  : '.$SESSION->db->quickScalar('select count(*) from assetData'));
     }
     while (my ($key, $value) = each %originalConfig) {
         if (defined $value) {
