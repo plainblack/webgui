@@ -40,6 +40,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Article Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $article = $node->addChild({className=>'WebGUI::Asset::Wobject::Article'});
 
 # Test for a sane object type
@@ -70,6 +71,7 @@ my $pathedFile = WebGUI::Test->getTestCollateralPath($filename);
 
 # Use some test collateral to create a storage location and assign it to our article
 my $storage = WebGUI::Storage->create($session);
+WebGUI::Test->storagesToDelete($storage);
 my $storedFilename = $storage->addFileFromFilesystem($pathedFile);
 my $filenameOK = is ($storedFilename, $filename, 'storage created correctly');
 
@@ -97,6 +99,7 @@ $duplicateArticle->purge();
 
 # The get method will create the directory if it doesnt exist... very strange.
 $duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
+WebGUI::Test->storagesToDelete($duplicateStorage);
 
 # so lets check for the file instead
 $duplicateFilename = $duplicateStorage->getFiles->[0];
