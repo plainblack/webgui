@@ -69,7 +69,7 @@ my $asset
     });
 $versionTags[-1]->commit;
 my $assetUrl    = $baseUrl . $asset->get('url');
-WebGUI::Test->tagsToDelete(@versionTags);
+WebGUI::Test->tagsToRollback(@versionTags);
 
 #----------------------------------------------------------------------------
 # Tests
