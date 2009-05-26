@@ -1,3 +1,5 @@
+7.6.25
+
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
  - fixed: Crud serialization.
