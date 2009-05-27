@@ -25,10 +25,11 @@ our @ISA = qw(WebGUI::Asset);
 
 #-------------------------------------------------------------------
 sub _drawQueryBuilder {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 	# Initialize operators
 	my @textFields = qw|text yesNo selectBox radioList|;
-	my $i18n = WebGUI::International->new($self->session,"Asset_Shortcut");
+	my $i18n = WebGUI::International->new($session,"Asset_Shortcut");
 	my %operator;
 	foreach (@textFields) {
 		$operator{$_} = {
@@ -48,16 +49,16 @@ sub _drawQueryBuilder {
 	my $fieldCount = scalar(keys %$fields);
 
 	unless ($fieldCount) {	# No fields found....
-		return sprintf $i18n->get('no metadata yet'), $self->session->url->page('func=manageMetaData');
+		return sprintf $i18n->get('no metadata yet'), $session->url->page('func=manageMetaData');
 	}
 
 	# Static form fields
-	my $shortcutCriteriaField = WebGUI::Form::textarea($self->session, {
+	my $shortcutCriteriaField = WebGUI::Form::textarea($session, {
 		name=>"shortcutCriteria",
 		value=>$self->getValue("shortcutCriteria"),
 		extras=>'style="width: 100%" '.$self->{_disabled}
 	});
-	my $conjunctionField = WebGUI::Form::selectBox($self->session, {
+	my $conjunctionField = WebGUI::Form::selectBox($session, {
 		name=>"conjunction",
 		options=>{
 			"AND" => $i18n->get("AND"),
@@ -68,8 +69,8 @@ sub _drawQueryBuilder {
 	);
 
 	# html
-	$self->session->style->setScript($self->session->url->extras('wobject/Shortcut/querybuilder.js'), {type=>"text/javascript"});
-	$self->session->style->setLink($self->session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
+	$session->style->setScript($session->url->extras('wobject/Shortcut/querybuilder.js'), {type=>"text/javascript"});
+	$session->style->setLink($session->url->extras('wobject/Shortcut/querybuilder.css'), {type=>"text/css", rel=>"stylesheet"});
 	my $output;
 	$output .= qq|<table cellspacing="0" cellpadding="0" border="0"><tr><td colspan="5" align="right">$shortcutCriteriaField</td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr><tr><td></td><td></td><td></td><td></td><td class="qbtdright">$conjunctionField</td></tr>|;
 
@@ -89,12 +90,13 @@ sub _drawQueryBuilder {
 		});
 		# The value select field
 		my $valFieldName = "val_field".$i;
-		my $valueField = WebGUI::Form::dynamicField($self->session,
+        my $options = WebGUI::Operation::Shared::secureEval($session,$fields->{$field}{possibleValues});
+		my $valueField = WebGUI::Form::dynamicField($session,
 			fieldType=>$fieldType,
 			name=>$valFieldName,
 			uiLevel=>5,
 			extras=>qq/title="$fields->{$field}{description}" class="qbselect"/,
-			options=>$fields->{$field}{possibleValues},
+			options=>$options,
 		);
 		# An empty row
 		$output .= qq|<tr><td></td><td></td><td></td><td></td><td class="qbtdright"></td></tr>|;
