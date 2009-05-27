@@ -5,6 +5,7 @@
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed #10044: Gallery: Javascript, CSS included in body
  - fixed #10409: Problem using hash in metadata possible values
+ - fixed #10396: Syndicated Content wobject not displaying edit controls
 
 7.7.7
  - Added EMS Schedule table

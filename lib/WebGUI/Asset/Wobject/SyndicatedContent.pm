@@ -334,17 +334,19 @@ Returns the rendered output of the wobject.
 =cut
 
 sub view {
-	my $self = shift;
+	my $self    = shift;
+    my $session = $self->session;
 
 	# try the cached version
-	my $cache = WebGUI::Cache->new($self->session,"view_".$self->getId);
+	my $cache = WebGUI::Cache->new($session,"view_".$self->getId);
 	my $out = $cache->get;
-	return $out if ($out ne "");
+	return $out if ($out ne "" && !$session->var->isAdminOn);
+    #return $out if $out;
 
 	# generate from scratch
 	my $feed = $self->generateFeed;
 	$out = $self->processTemplate($self->getTemplateVariables($feed),undef,$self->{_viewTemplate});
-	if (!$self->session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
+	if (!$session->var->isAdminOn && $self->get("cacheTimeout") > 10) {
 		$cache->set($out,$self->get("cacheTimeout"));
 	}
 	return $out;
