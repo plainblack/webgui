@@ -4,6 +4,7 @@
  - Stats now send over SSL rather than straight HTTP.
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed #10044: Gallery: Javascript, CSS included in body
+ - fixed #10409: Problem using hash in metadata possible values
 
 7.7.7
  - Added EMS Schedule table
