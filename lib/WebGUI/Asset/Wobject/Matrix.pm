@@ -540,6 +540,10 @@ assetData.revisionDate
     
         $listings = $session->db->buildArrayRefOfHashRefs($sql,[$self->getId]);
 
+        foreach my $listing (@{$listings}) {
+            $listing->{url}      = $session->url->gateway($listing->{url});
+        }
+
         $listingsEncoded = JSON->new->encode($listings);
             WebGUI::Cache->new($session,"matrixListings_".$self->getId)->set(
                 $listingsEncoded,$self->get("listingsCacheTimeout")
@@ -1189,7 +1193,6 @@ sub www_getCompareFormData {
                         }
                 }
             $result->{assetId}  =~ s/-/_____/g;
-            $result->{url}      = $session->url->gateway($result->{url});
             push @results, $result;
         }
     }else{
@@ -1198,7 +1201,6 @@ sub www_getCompareFormData {
             if(WebGUI::Utility::isIn($result->{assetId},@listingIds)){
                 $result->{checked} = 'checked';
             }
-            $result->{url}      = $session->url->gateway($result->{url});
             push @results, $result;
         }
     }
