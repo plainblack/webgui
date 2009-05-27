@@ -741,13 +741,15 @@ sub sendChunkedContent {
     my $self        = shift;
     my $callback    = shift;
 
-	$self->session->http->setLastModified($self->getContentLastModified);
-	$self->session->http->sendHeader;
+    my $session = $self->session;
+
+	$session->http->setLastModified($self->getContentLastModified);
+	$session->http->sendHeader;
 	my $style = $self->processStyle($self->getSeparator);
 	my ($head, $foot) = split($self->getSeparator,$style);
-	$self->session->output->print($head, 1);
-	$self->session->output->print( $callback->() );
-	$self->session->output->print($foot, 1);
+	$session->output->print($head, 1);
+	$session->output->print( $callback->() );
+	$session->output->print($foot, 1);
 	return "chunked";
 }
 
@@ -800,11 +802,8 @@ Show a slideshow of the GalleryAlbum's files.
 sub view_slideshow {
     my $self        = shift;
     my $session     = $self->session;	
-    my $var         = $self->getTemplateVars;
-
-    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
-
-    return $self->processTemplate($var, $self->getParent->get("templateIdViewSlideshow"));
+    my $var         = delete $self->{_templateVars};
+    return $self->processTemplate($var, $self->getParent->get("templateIdViewSlideshow"), $self->{_preparedTemplate});
 }
 
 #----------------------------------------------------------------------------
@@ -822,11 +821,9 @@ about a specific thumbnail.
 sub view_thumbnails {
     my $self        = shift;
     my $session     = $self->session;	
-    my $var         = $self->getTemplateVars;
+    my $var         = delete $self->{_templateVars};
 
     my $fileId      = $session->form->get("fileId");
-
-    $self->appendTemplateVarsFileLoop( $var, $self->getFileIds );
 
     # Process the file loop to add an additional URL
     for my $file ( @{ $var->{file_loop} } ) {
@@ -1323,6 +1320,15 @@ sub www_slideshow {
 
 	my $check = $self->checkView;
 	return $check if (defined $check);
+
+    $self->{_templateVars} = $self->getTemplateVars;
+    $self->appendTemplateVarsFileLoop( $self->{_templateVars}, $self->getFileIds );
+
+    my $templateId = $self->getParent->get('templateIdViewSlideshow');
+    my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_preparedTemplate} = $template;
+
     return $self->sendChunkedContent( sub { $self->view_slideshow } );
 }
 
@@ -1338,6 +1344,14 @@ sub www_thumbnails {
 	my $self = shift;
 	my $check = $self->checkView;
 	return $check if (defined $check);
+    $self->{_templateVars} = $self->getTemplateVars;
+    $self->appendTemplateVarsFileLoop($self->{_templateVars}, $self->getFileIds);
+
+    my $templateId = $self->getParent->get('templateIdViewThumbnails');
+    my $template   = WebGUI::Asset::Template->new($self->session, $templateId);
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_preparedTemplate} = $template;
+
     return $self->sendChunkedContent( sub { $self->view_thumbnails } );
 }
 
