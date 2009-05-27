@@ -2,7 +2,8 @@
  - added date pagination, and some formatting to EMS Schedule table
  - Removed dubious 3px padding around image based ads in an adspace.
  - Stats now send over SSL rather than straight HTTP.
- - epoch for calendar/List View for Calendar  (#8914)
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed #10044: Gallery: Javascript, CSS included in body
 
 7.7.7
  - Added EMS Schedule table
