@@ -368,6 +368,15 @@ sub getFieldsList {
 }
 
 #-------------------------------------------------------------------
+
+=head2 getOverridesList
+
+Generates a table of overrides, based on the shortcutted Asset's definition sub.
+If the field type is hidden, or the field label is empty, then an override is not
+generated for that field
+
+=cut
+
 sub getOverridesList {
 	my $self = shift;
 	my $output = '';

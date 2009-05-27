@@ -7,6 +7,7 @@
  - fixed #10409: Problem using hash in metadata possible values
  - fixed a similar problem with metadata in the Shortcut Asset.
  - fixed #10396: Syndicated Content wobject not displaying edit controls
+ - fixed #10386: Template override missing in nav shortcut
 
 7.7.7
  - Added EMS Schedule table
