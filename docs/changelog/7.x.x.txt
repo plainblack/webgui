@@ -1,4 +1,5 @@
 7.6.25
+ - epoch for calendar/List View for Calendar  (#8914)
 
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
