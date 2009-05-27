@@ -116,6 +116,10 @@ are required:
 
 An instanciated object to work on.
 
+=item className
+
+The class name of a module to work on.  This would be useful for class methods.
+
 =item method
 
 The permissions method to test
