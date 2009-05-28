@@ -23,6 +23,7 @@
    elements (eg. check lists) only one of the selected elements was taken into
    account in the search query. ( Martin Kamerbeek / Oqapi )
  - fixed #10439: Call to insufficient is wrong (lrobinson / Orchard Solutions )
+ - fixed #10373: Admin groups inbox messages linger after task complete
  - fixed a bug in Thingy where the defaultValue of multi value form elements
    would not be applied ( Martin Kamerbeek / Oqapi )
 

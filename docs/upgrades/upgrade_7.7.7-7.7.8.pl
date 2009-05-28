@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+messageStateCleanup($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,37 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+
+sub messageStateCleanup {
+    my $session = shift;
+    my $db      = $session->db;
+
+    # Acquire messageIds to fine orphans (no inbox message associated) and those with group delivered system messages marked as completed
+    #
+    my $messageListRef = $db->buildArrayRef("SELECT distinct messageId FROM inbox_messageState WHERE isRead=0 AND deleted = 0");
+    my $sth            = $db->read("SELECT status,groupId FROM inbox WHERE messageId=?");
+    for my $messageId (@$messageListRef) {
+        $sth->execute([$messageId]);
+        my $rows = $sth->rows;
+
+        # No reference to any current message in the inbox
+        #
+        if ( !$rows ) {
+            $db->write( "DELETE FROM inbox_messageState WHERE messageId=?", [$messageId] );
+        }
+        else {
+            # test messages for values of completed status and group delivery
+            #
+            while ( my ( $status, $groupId ) = $sth->array ) {
+                next if $status ne "completed" || !$groupId;
+                $db->write( "UPDATE inbox_messageState SET isRead=1 WHERE messageId=?", [$messageId] );
+            }
+        }
+    } ## end for my $messageId (@$messageListRef)
+    $sth->finish;
+} ## end sub messageStateCleanup
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
