@@ -22,6 +22,7 @@
  - fixed a bug in Thingy where when searching using multi value search form
    elements (eg. check lists) only one of the selected elements was taken into
    account in the search query. ( Martin Kamerbeek / Oqapi )
+ - fixed #10439: Call to insufficient is wrong (lrobinson / Orchard Solutions )
 
 7.7.7
  - Added EMS Schedule table
