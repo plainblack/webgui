@@ -120,7 +120,7 @@ cmp_deeply(
             clicks=>"0",
             compares=>"0",
             assetId=>$expectedAssetId,
-            url=>$matrixListing->get('url'),
+            url=>$session->url->gateway($matrixListing->get('url')),
             title=>$matrixListing->get('title')
         }]
         ,
@@ -141,7 +141,7 @@ cmp_deeply(
             clicks=>"0",
             compares=>"0",
             assetId=>$expectedAssetId,
-            url=>$matrixListing->get('url'),
+            url=>$session->url->gateway($matrixListing->get('url')),
             title=>$matrixListing->get('title')
         }]
         ,
