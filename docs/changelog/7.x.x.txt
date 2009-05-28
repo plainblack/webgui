@@ -10,6 +10,7 @@
  - fixed #10396: Syndicated Content wobject not displaying edit controls
  - fixed #10386: Template override missing in nav shortcut
  - fixed #10439: Call to insufficient is wrong (lrobinson / Orchard Solutions )
+ - fixed #10373: Admin groups inbox messages linger after task complete
 
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
