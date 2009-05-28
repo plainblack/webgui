@@ -37,74 +37,76 @@ my $import_node = WebGUI::Asset->getImportNode($session);
 $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );
 
-$s->responseIdCookies(0);
+my $sJSON = $s->surveyJSON;
 
 # N.B. Survey starts off with a single empty section (S0)
 
 # Add some sections and questions
-$s->surveyJSON_newObject( [] ); # S1
-$s->surveyJSON_newObject( [] ); # S2
-$s->surveyJSON_newObject( [] ); # S3
-$s->surveyJSON_newObject( [] ); # S4
-$s->surveyJSON_newObject( [] ); # S5
-$s->surveyJSON_newObject( [] ); # S6
+$sJSON->newObject( [] ); # S1
+$sJSON->newObject( [] ); # S2
+$sJSON->newObject( [] ); # S3
+$sJSON->newObject( [] ); # S4
+$sJSON->newObject( [] ); # S5
+$sJSON->newObject( [] ); # S6
 
 # Name the sections
 for my $sIndex (0..6) {
-    $s->surveyJSON_update( [$sIndex], { variable => "S$sIndex" } );
+    $sJSON->update( [$sIndex], { variable => "S$sIndex" } );
 }
 
 # ..and now some questions
-$s->surveyJSON_newObject( [0] ); # S0Q0
-$s->surveyJSON_newObject( [1] ); # S1Q0
-$s->surveyJSON_newObject( [2] ); # S2Q0
-$s->surveyJSON_newObject( [3] ); # S3Q0
-$s->surveyJSON_newObject( [3] ); # S3Q1
-$s->surveyJSON_newObject( [3] ); # S3Q2
-$s->surveyJSON_newObject( [4] ); # S4Q0
-$s->surveyJSON_newObject( [5] ); # S5Q0
-$s->surveyJSON_newObject( [5] ); # S5Q1
-$s->surveyJSON_newObject( [5] ); # S5Q2
+$sJSON->newObject( [0] ); # S0Q0
+$sJSON->newObject( [1] ); # S1Q0
+$sJSON->newObject( [2] ); # S2Q0
+$sJSON->newObject( [3] ); # S3Q0
+$sJSON->newObject( [3] ); # S3Q1
+$sJSON->newObject( [3] ); # S3Q2
+$sJSON->newObject( [4] ); # S4Q0
+$sJSON->newObject( [5] ); # S5Q0
+$sJSON->newObject( [5] ); # S5Q1
+$sJSON->newObject( [5] ); # S5Q2
 
 # Name the questions
-$s->surveyJSON_update( [ 0, 0 ], { variable => 'S0Q0' } );
-$s->surveyJSON_update( [ 1, 0 ], { variable => 'S1Q0' } );
-$s->surveyJSON_update( [ 2, 0 ], { variable => 'S2Q0' } );
-$s->surveyJSON_update( [ 3, 0 ], { variable => 'S3Q0' } );
-$s->surveyJSON_update( [ 3, 1 ], { variable => 'S3Q1' } );
-$s->surveyJSON_update( [ 3, 2 ], { variable => 'S3Q2' } );
-$s->surveyJSON_update( [ 4, 0 ], { variable => 'S4Q0' } );
-$s->surveyJSON_update( [ 5, 0 ], { variable => 'S5Q0' } );
-$s->surveyJSON_update( [ 5, 1 ], { variable => 'S5Q1' } );
-$s->surveyJSON_update( [ 5, 2 ], { variable => 'S5Q2' } );
+$sJSON->update( [ 0, 0 ], { variable => 'S0Q0' } );
+$sJSON->update( [ 1, 0 ], { variable => 'S1Q0' } );
+$sJSON->update( [ 2, 0 ], { variable => 'S2Q0' } );
+$sJSON->update( [ 3, 0 ], { variable => 'S3Q0' } );
+$sJSON->update( [ 3, 1 ], { variable => 'S3Q1' } );
+$sJSON->update( [ 3, 2 ], { variable => 'S3Q2' } );
+$sJSON->update( [ 4, 0 ], { variable => 'S4Q0' } );
+$sJSON->update( [ 5, 0 ], { variable => 'S5Q0' } );
+$sJSON->update( [ 5, 1 ], { variable => 'S5Q1' } );
+$sJSON->update( [ 5, 2 ], { variable => 'S5Q2' } );
 
 # Set additional options..
-$s->surveyJSON_update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes/No
-$s->surveyJSON_update( [ 0, 0 ], { gotoExpression => q{ tag('tagged at S0Q0'); } } ); # S0Q0 tagged data
+$sJSON->update( [ 0, 0 ], { questionType => 'Yes/No' } ); # S0Q0 is a Yes/No
+$sJSON->update( [ 0, 0 ], { gotoExpression => q{ tag('tagged at S0Q0'); } } ); # S0Q0 tagged data
 
-$s->surveyJSON_update( [ 1, 0 ], { questionType => 'Yes/No' } ); # S1Q0 is a Yes/No
-$s->surveyJSON_update( [ 1, 0, 0 ], { goto => 'S3', recordedAnswer => q{} } ); # S1Q0 answer 0 jumps to S3 (set recordedAnswer to '' to detect subtle bug)
-$s->surveyJSON_update( [ 1, 0, 1 ], { gotoExpression => q{ tag('tagged at S1Q0', 999); }, recordedAnswer => q{} } );# S1Q0 answer 1 tagged numeric data
+$sJSON->update( [ 1, 0 ], { questionType => 'Yes/No' } ); # S1Q0 is a Yes/No
+$sJSON->update( [ 1, 0, 0 ], { goto => 'S3', recordedAnswer => q{} } ); # S1Q0 answer 0 jumps to S3 (set recordedAnswer to '' to detect subtle bug)
+$sJSON->update( [ 1, 0, 1 ], { gotoExpression => q{ tag('tagged at S1Q0', 999); }, recordedAnswer => q{} } );# S1Q0 answer 1 tagged numeric data
 
-$s->surveyJSON_update( [ 3 ], { gotoExpression => q{ jump { score(S3) == 0 } S5; } } ); # jump to S5 if all 3 questions answered as No
+$sJSON->update( [ 3 ], { gotoExpression => q{ jump { score(S3) == 0 } S5; } } ); # jump to S5 if all 3 questions answered as No
 for my $qIndex (0..2) {
-    $s->surveyJSON_update( [ 3, $qIndex ], { questionType => 'Yes/No', required => 1 } );
-    $s->surveyJSON_update( [ 3, $qIndex, 1 ], { value => 0 } ); # Set 'No' score to 0
+    $sJSON->update( [ 3, $qIndex ], { questionType => 'Yes/No', required => 1 } );
+    $sJSON->update( [ 3, $qIndex, 1 ], { value => 0 } ); # Set 'No' score to 0
 }
 
-$s->surveyJSON_update( [ 4, 0 ], { questionType => 'Concern' } );
+$sJSON->update( [ 4, 0 ], { questionType => 'Concern' } );
 
-$s->surveyJSON_update( [ 5, 0 ], { questionType => 'Slider', required => 1 } );
-$s->surveyJSON_update( [ 5, 1 ], { questionType => 'Text', required => 1 } );
-$s->surveyJSON_update( [ 5, 2 ], { questionType => 'Number', required => 1 } );
+$sJSON->update( [ 5, 0 ], { questionType => 'Slider', required => 1 } );
+$sJSON->update( [ 5, 1 ], { questionType => 'Text', required => 1 } );
+$sJSON->update( [ 5, 2 ], { questionType => 'Number', required => 1 } );
 
-$s->surveyJSON_update( [ 6 ], { logical => 1, gotoExpression => q{tag('tagged at S6');} } );
+$sJSON->update( [ 6 ], { logical => 1, gotoExpression => q{tag('tagged at S6');} } );
 
 # And finally, persist the changes..
 $s->persistSurveyJSON;
 
+my $rJSON = $s->responseJSON;
+
 cmp_deeply(
-    $s->responseJSON->surveyOrder,
+    $rJSON->surveyOrder,
     [   [ 0, 0, [ 0, 1 ] ],    # S0Q0 (surveyOrderIndex: 0)
         [ 1, 0, [ 0, 1 ] ],    # S1Q0 (surveyOrderIndex: 1)
         [ 2, 0, [] ],          # S2Q0 (surveyOrderIndex: 2)
@@ -120,7 +122,7 @@ cmp_deeply(
     'surveyOrder is correct'
 );
 cmp_deeply(
-    $s->responseJSON->surveyOrderIndexByVariableName, 
+    $rJSON->surveyOrderIndex, 
     {   
         'S0'   => 0,
         'S0Q0' => 0,
@@ -140,7 +142,7 @@ cmp_deeply(
         'S5Q2' => 9,
         'S6'   => 10,
     },
-    'surveyOrderIndexByVariableName correct'
+    'surveyOrderIndex correct'
 );
 
 $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );

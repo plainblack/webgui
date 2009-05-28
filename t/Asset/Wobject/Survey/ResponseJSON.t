@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 104;
+my $tests = 114;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -310,10 +310,9 @@ $rJSON->survey->section([3])->{variable} = 'goto 2';
 $rJSON->survey->question([3,0])->{variable} = 'goto 3-0';
 $rJSON->survey->question([3,1])->{variable} = 'goto 3-0';  ##Intentional duplicate
 $rJSON->survey->question([3,2])->{variable} = 'goto 3-2';
-
-$rJSON->lastResponse(0);
+$rJSON->reset;
 $rJSON->processGoto('goto 80');
-is($rJSON->lastResponse(), 0, 'goto: no change in lastResponse if the variable cannot be found');
+is($rJSON->lastResponse(), -1, 'goto: no change in lastResponse if the variable cannot be found');
 $rJSON->processGoto('goto 1');
 is($rJSON->lastResponse(), 2, 'goto: works on existing section');
 $rJSON->processGoto('goto 0-1');
@@ -323,22 +322,22 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 ####################################################
 #
-# surveyOrderIndexByVariableName
+# surveyOrderIndex
 #
 ####################################################
 my $expect = {
-    'goto 0' => 0,
-   'goto 0-0' => 0,
-   'goto 0-1' => 1,
-   'goto 0-2' => 2,
-   'goto 1' => 3,
-   'goto 1-0' => 3,
-   'goto 1-1' => 4,
-   'goto 2' => 5,
-   'goto 3-0' => 7,
-   'goto 3-2' => 8,
+    'goto 0'   => 0,
+    'goto 0-0' => 0,
+    'goto 0-1' => 1,
+    'goto 0-2' => 2,
+    'goto 1'   => 3,
+    'goto 1-0' => 3,
+    'goto 1-1' => 4,
+    'goto 2'   => 5,
+    'goto 3-0' => 6,
+    'goto 3-2' => 8,
 };
-cmp_deeply($rJSON->surveyOrderIndexByVariableName(), $expect, 'surveyOrderIndexByVariableName');
+cmp_deeply($rJSON->surveyOrderIndex(), $expect, 'surveyOrderIndex');
 
 ####################################################
 #
@@ -389,7 +388,7 @@ $rJSON->survey->answer([0,1,0])->{value} = 200; # set answer score
 $rJSON->survey->answer([0,1,0])->{verbatim} = 1; # make this answer verbatim
 
 # Reset responses and record first answer
-$rJSON->lastResponse(-1);
+$rJSON->reset;
 $rJSON->recordResponses({
     '0-0-0' => 3, # it's a funny email address I know...
     '0-1-0' => '13 11 66',
@@ -749,6 +748,106 @@ is($rJSON->pop, undef, 'additional pop has no effect');
 $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session));
 
 # Use Section 1 (containing 2 questions) for testing. This allows us to test 2 different responses at once.
+########
+# Country
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Country');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => 'Australia',
+    '1-1-0' => 'JTville',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'Australia'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid country ignored');
+
+########
+# Date
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Date');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '2009/05/01',
+    '1-1-0' => '12345',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '2009/05/01'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid date ignored');
+
+########
+# Number
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Number');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{min} = '-5';
+    $rJSON->survey->answer([1,$q,0])->{max} = '10';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '-3',
+    '1-1-0' => '11',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '-3'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid number ignored');
+
+########
+# Slider
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Slider');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{min} = '-5';
+    $rJSON->survey->answer([1,$q,0])->{max} = '10';
+    $rJSON->survey->answer([1,$q,0])->{step} = '1';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '-3',
+    '1-1-0' => '11',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '-3'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid slider value ignored');
 
 ########
 # Yes/No
@@ -783,6 +882,41 @@ cmp_deeply(
         'value' => 'No'
     }, 
     'No recorded correctly'
+);
+
+########
+# True/False
+$rJSON->survey->updateQuestionAnswers([1,0], 'True/False');
+$rJSON->survey->updateQuestionAnswers([1,1], 'True/False');
+for my $q (0,1) {
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = 'True';
+    $rJSON->survey->answer([1,$q,1])->{recordedAnswer} = 'False';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => 1, # Multi-choice answers are submitted like this, 
+    '1-1-1' => 1, # with the selected answer set to 1
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'True'
+    }, 
+    'True recorded correctly'
+);
+cmp_deeply(
+    $rJSON->responses->{'1-1-1'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'False'
+    }, 
+    'False recorded correctly'
 );
 
 ####################################################

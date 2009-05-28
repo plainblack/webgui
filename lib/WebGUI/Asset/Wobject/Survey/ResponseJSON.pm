@@ -45,6 +45,7 @@ use strict;
 use JSON;
 use Params::Validate qw(:all);
 use List::Util qw(shuffle);
+use Clone qw/clone/;
 use Safe;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -82,7 +83,7 @@ sub new {
     };
     
     bless $self, $class;
-    $self->reset($jsonData);
+    $self->reset({ data => $jsonData });
 }
 
 =head2 reset
@@ -93,7 +94,14 @@ Reset all response data in this object (e.g. re-init the _response property)
 
 sub reset {
     my $self = shift;
-    my ($data) = validate_pos(@_, { type => HASHREF, default => {} } );
+    my (%opts) = validate(@_, { data => { type => HASHREF, default => {} }, preserveSurveyOrder => 0 } );
+    
+    my $data = $opts{data};
+    
+    # Access these via the private hash var so that we don't inadvertantly trigger initSurveyOrder
+    my $oldSurveyOrder = $self->{_response}{surveyOrder};
+    my $oldSurveyOrderLookup = $self->{_response}{surveyOrderLookup};
+    
     $self->{_response} = {
         # Response hash defaults..
         responses => {},
@@ -107,8 +115,14 @@ sub reset {
     # And then data overrides (via a hash slice)
     @{$self->{_response}}{keys %{$data}} = values %{$data};
     
+    if ($opts{preserveSurveyOrder}) {
+        $self->{_response}{surveyOrder} = $oldSurveyOrder;
+        $self->{_response}{surveyOrderLookup} = $oldSurveyOrderLookup;
+    }
+    
     # If first section is logical, process it immediately
     $self->checkForLogicalSection;
+    
     return $self;
 }
 
@@ -120,6 +134,8 @@ Computes and stores the order of Sections, Questions and Aswers for this Survey.
 See L<"surveyOrder">. You normally don't need to call this, as L<"surveyOrder"> will
 call it for you the first time it is used.
 
+Also builds a lookup table for surveyOrder index, for performance reasons.
+
 Questions and Answers that are set to be randomized are shuffled into a random order.
 
 =cut
@@ -127,13 +143,22 @@ Questions and Answers that are set to be randomized are shuffled into a random o
 sub initSurveyOrder {
     my $self = shift;
 
+    # Build a lookup table as we go
+    my %lookup;
+    
     # Order Questions in each Section
     my @surveyOrder;
+    my $surveyOrderIndex = 0;
     for my $sIndex ( 0 .. $self->survey->lastSectionIndex ) {
-
+        my $s = $self->survey->section( [$sIndex] );
+        
+        if (my $variable = $s->{variable}) {
+            $lookup{$variable} = $surveyOrderIndex if !exists $lookup{$variable};
+        }
+        
         #  Randomize Questions if required..
         my @qOrder;
-        if ( $self->survey->section( [$sIndex] )->{randomizeQuestions} ) {
+        if ( $s->{randomizeQuestions} ) {
             @qOrder = shuffle 0 .. $self->survey->lastQuestionIndex( [$sIndex] );
         }
         else {
@@ -141,25 +166,33 @@ sub initSurveyOrder {
         }
 
         # Order Answers in each Question
-        for my $q (@qOrder) {
-
+        for my $qIndex (@qOrder) {
+            
+            my $question = $self->survey->question( [ $sIndex, $qIndex ] );
+            if (my $variable = $question->{variable}) {
+                $lookup{$variable} = $surveyOrderIndex if !exists $lookup{$variable};
+            }
+            
             # Randomize Answers if required..
             my @aOrder;
-            if ( $self->survey->question( [ $sIndex, $q ] )->{randomizeAnswers} ) {
-                @aOrder = shuffle 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] );
+            if ( $question->{randomizeAnswers} ) {
+                @aOrder = shuffle 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $qIndex ] );
             }
             else {
-                @aOrder = ( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $q ] ) );
+                @aOrder = ( 0 .. $self->survey->lastAnswerIndex( [ $sIndex, $qIndex ] ) );
             }
-            push @surveyOrder, [ $sIndex, $q, \@aOrder ];
+            push @surveyOrder, [ $sIndex, $qIndex, \@aOrder ];
+            $surveyOrderIndex++; # Increment each time an item is pushed onto @surveyOrder
         }
 
         # If Section had no Questions, make sure it is still added to @surveyOrder
         if ( !@qOrder ) {
             push @surveyOrder, [$sIndex];
+            $surveyOrderIndex++; # Increment each time an item is pushed onto @surveyOrder
         }
     }
     $self->response->{surveyOrder} = \@surveyOrder;
+    $self->response->{surveyOrderLookup} = \%lookup;
     
     return;
 }
@@ -352,47 +385,27 @@ sub surveyOrder {
     return $self->response->{surveyOrder};
 }
 
+=head2 surveyOrderIndex ($variable)
 
-#-------------------------------------------------------------------
+Looks up the surveyOrder index of Section/Question via variable name
 
-=head2 surveyOrderIndexByVariableName
-
-Returns a lookup table of variable names to surveyOrder index
-
-Only questions with a defined variable name set are included.
+Uses the surveyOrderLookup table, which gets lazily built if it doesn't exist
 
 =cut
 
-sub surveyOrderIndexByVariableName {
+sub surveyOrderIndex {
     my $self = shift;
+    my $variable = shift;
     
-    my %lookup;
-    
-    # Iterate over items in surveyOrder..
-    my $i = 0;
-    for my $address ( @{ $self->surveyOrder } ) {
-        next if !$address;
-
-        # Retreive the section and question for this address..
-        my $section  = $self->survey->section($address);
-        my $question = $self->survey->question($address);
-        
-        if (my $var = $section && $section->{variable} ) {
-            # Section variables appear for every question, only store lowest index
-            if (!exists $lookup{$var} || $lookup{$var} > $i) {
-                $lookup{$var} = $i;
-            }
-        }
-        
-        if (my $var = $question && $question->{variable} ) {
-            $lookup{$var} = $i;
-        }
-
-        # Increment the item index counter
-        $i++;
+    if (!defined $self->response->{surveyOrderLookup}) {
+        $self->initSurveyOrder();
     }
     
-    return \%lookup;
+    if ($variable) {
+        return $self->response->{surveyOrderLookup}{$variable};
+    } else {
+        return clone $self->response->{surveyOrderLookup};
+    }
 }
 
 #-------------------------------------------------------------------
@@ -556,18 +569,22 @@ sub recordResponses {
             # Server-side Validation and storing of extra data for special q types goes here
             # Any answer that fails validation should be skipped with 'next'
             
-            
-            if ( $questionType eq 'Number' ) {
+            if ( $questionType eq 'Country' ) {
+                # Must be a valid country
+                next if !grep { $_ eq $recordedAnswer } WebGUI::Form::Country->getCountries;
+            }
+            elsif ( $questionType eq 'Date' ) {
+                # Must be a valid date (until we get date i18n this is limited to YYYY/MM/DD)
+                next if $recordedAnswer !~ m|^\d{4}/\d{2}/\d{2}$|;
+            } 
+            elsif ( $questionType eq 'Number' || $questionType eq 'Slider' ) {
                 if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
                     next;
                 }
                 elsif ( $answer->{min} =~ /\d/ and $recordedAnswer < $answer->{min} ) {
                     next;
                 }
-                elsif ( $answer->{step} =~ /\d/ and $recordedAnswer % $answer->{step} != 0 ) {
-                    next;
-                }
-            }
+            } 
             elsif ( $questionType eq 'Year Month' ) {
                 # store year and month as "YYYY Month"
                 $recordedAnswer = $responses->{ "$aId-year" } . " " . $responses->{ "$aId-month" };
@@ -576,7 +593,7 @@ sub recordResponses {
                 # In the case of a mc question, only selected answers will have a defined recordedAnswer
                 # Thus we skip any answers where recordedAnswer is not defined
                 next if !defined $recordedAnswer || $recordedAnswer !~ /\S/;
-            }
+            } 
 
             # If we reach here, answer validated ok
             $aValid = 1;
@@ -647,12 +664,12 @@ sub recordResponses {
             next if !$validAnswers{$aId};
             
             # Answer goto
-            if (my $action = $self->processGoto($answer->{goto})) {
+            if (my $action = $answer->{goto} && $self->processGoto($answer->{goto})) {
                 $self->session->log->debug("Branching on Answer goto: $answer->{goto}");
                 return $action;
             }
             # Then answer gotoExpression
-            if (my $action = $self->processExpression($answer->{gotoExpression})) {
+            if (my $action = $answer->{gotoExpression} && $self->processExpression($answer->{gotoExpression})) {
                 $self->session->log->debug("Branching on Answer gotoExpression: $answer->{gotoExpression}");
                 return $action;
             }
@@ -666,12 +683,12 @@ sub recordResponses {
         # Then Questions..
         
         # Question goto
-        if (my $action = $self->processGoto($question->{goto})) {
+        if (my $action = $question->{goto} && $self->processGoto($question->{goto})) {
             $self->session->log->debug("Branching on Question goto: $question->{goto}");
             return $action;
         }
         # Then question gotoExpression
-        if (my $action = $self->processExpression($question->{gotoExpression})) {
+        if (my $action = $question->{gotoExpression} && $self->processExpression($question->{gotoExpression})) {
             $self->session->log->debug("Branching on Question gotoExpression: $question->{gotoExpression}");
             return $action;
         }
@@ -681,12 +698,12 @@ sub recordResponses {
     # Then Sections..
     
     # Section goto
-    if (my $action = $self->processGoto($section->{goto})) {
+    if (my $action = $section->{goto} && $self->processGoto($section->{goto})) {
         $self->session->log->debug("Branching on Section goto: $section->{goto}");
         return $action;
     }
     # Then section gotoExpression
-    if (my $action = $self->processExpression($section->{gotoExpression})) {
+    if (my $action = $section->{gotoExpression} && $self->processExpression($section->{gotoExpression})) {
         $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
         return $action;
     }
@@ -761,36 +778,13 @@ sub processGoto {
         $self->checkForLogicalSection;
         return 1;
     }
-
-    # Iterate over items in order..
-    my $itemIndex = 0;
-    for my $address (@{ $self->surveyOrder }) {
-
-        # Retreive the section and question for this address..
-        my $section  = $self->survey->section( $address );
-        my $question = $self->survey->question( $address );
-
-        # See if our goto variable matches the section variable..
-        if ( ref $section eq 'HASH' && $section->{variable} eq $goto ) {
-
-            # Fudge lastResponse so that the next response item will be our matching item 
-            $self->lastResponse( $itemIndex - 1 );
-            $self->checkForLogicalSection;
-            return 1;
-        }
-
-        # See if our goto variable matches the question variable..
-        if ( ref $question eq 'HASH' && $question->{variable} eq $goto ) {
-
-            # Fudge lastResponse so that the next response item will be our matching item
-            $self->lastResponse( $itemIndex - 1 );
-            $self->checkForLogicalSection;
-            return 1;
-        }
-
-        # Increment the item index counter
-        $itemIndex++;
+    
+    if (defined(my $surveyOrderIndex = $self->surveyOrderIndex($goto))) {
+        $self->nextResponse( $surveyOrderIndex );
+        $self->checkForLogicalSection;
+        return 1;
     }
+    
     return;
 }
 
@@ -989,10 +983,11 @@ sub responseScoresByVariableName {
     my $self = shift;
     
     my %lookup;
+    my $responses = $self->responses;
     # Process responses in id order, just to be consistent with responseValuesByVariableName
-    for my $address (sort keys %{$self->responses}) {
+    for my $address (sort keys %$responses) {
         next if !$address;
-        my $response = $self->responses->{$address};
+        my $response = $responses->{$address};
         next if !$response;
         
         # Turn responses s-q-a string into an address array
@@ -1018,16 +1013,13 @@ sub responseScoresByVariableName {
     }
     
     # Add section score totals
-    for my $s (@{$self->survey->sections}) {
-        next unless $s->{variable};
+    for my $s ( @{ $self->survey->sections } ) {
+        my $sVar = $s->{variable};
+        next unless $sVar;
         
-        my $score = 0;
-        for my $q (@{$s->{questions}}) {
-            next unless $q->{variable};
-            next unless exists $lookup{$q->{variable}};
-            
-            $lookup{$s->{variable}} += $lookup{$q->{variable}};
-        }
+        # N.B. Using map and grep here proved to be about twice as fast as looping over $s->{questions}
+        map { $lookup{$sVar} += $lookup{ $_->{variable} } }
+            grep { $_->{variable} and exists $lookup{ $_->{variable} } } @{ $s->{questions} };
     }
     
     return \%lookup;

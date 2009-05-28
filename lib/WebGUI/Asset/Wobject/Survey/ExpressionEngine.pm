@@ -536,7 +536,6 @@ sub run {
             # (re)Instantiate the survey instance using the responseId
             use WebGUI::Asset::Wobject::Survey;
             $asset = WebGUI::Asset::Wobject::Survey->newByResponseId( $session, $mostRecentlyCompletedResponseId );
-            $asset->responseIdCookies(0);
             if ( !$asset ) {
                 $session->log->warn("Unable to instantiate asset by responseId: $mostRecentlyCompletedResponseId");
                 return;
