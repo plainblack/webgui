@@ -10,6 +10,15 @@
  - fixed #10396: Syndicated Content wobject not displaying edit controls
  - fixed #10386: Template override missing in nav shortcut
  - fixed #10439: Call to insufficient is wrong (lrobinson / Orchard Solutions )
+ - fixed a bug in Thingy where fields with list type form elements wouldn't
+   show up in Thingy search results ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where the search form would lose part of its contents
+   when searching. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where when searching using multi value search form
+   elements (eg. check lists) only one of the selected elements was taken into
+   account in the search query. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where the defaultValue of multi value form elements
+   would not be applied ( Martin Kamerbeek / Oqapi )
  - fixed #10373: Admin groups inbox messages linger after task complete
 
 7.6.24
