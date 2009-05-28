@@ -167,15 +167,21 @@ sub handler {
     $matchUri =~ s{^$gateway}{/};
 	my $gotMatch = 0;
 
-	# handle basic auth
-	my $auth = $request->headers_in->{'Authorization'};
-    if ($auth =~ m/^Basic/) { # machine oriented
-		$auth =~ s/Basic //;
-		authen($request, split(":",MIME::Base64::decode_base64($auth)), $config);
+    # handle basic auth
+    # Get the type of authorization required for this request (the per
+    # directory configuration directive AuthType):
+    my $auth = $request->auth_type;
+    if ($auth eq "Basic") { # machine oriented
+	# Get username and password from Apache and hand over to authen, Basic
+	# Auth for WebGUI
+	my $basicAuthUser = $request->get_remote_logname;
+	my $basicAuthPass = $request->get_basic_auth_pw;
+	authen($request, $basicAuthUser, $basicAuthPass, $config);
     }
-	else { # realm oriented
-		$request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
-	}
+    else { # realm oriented
+	$request->push_handlers(PerlAuthenHandler => sub { return WebGUI::authen($request, undef, undef, $config)});
+    }
+
 	
 	# url handlers
     WEBGUI_FATAL: foreach my $handler (@{$config->get("urlHandlers")}) {

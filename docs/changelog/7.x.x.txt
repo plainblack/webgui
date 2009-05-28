@@ -1,4 +1,8 @@
 7.7.8
+ - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
+   United Knowledge)
+ - fixed: Basic Auth causes internal server error if you use more than one
+   colon. (Arjan Widlak, United Knowledge)
  - added date pagination, and some formatting to EMS Schedule table
  - Removed dubious 3px padding around image based ads in an adspace.
  - Stats now send over SSL rather than straight HTTP.
