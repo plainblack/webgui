@@ -939,12 +939,12 @@ A hashref containing the properties of this field.
 sub getFormElement {
     my $self = shift;
 
-    return $self->getFormPlugin( @_ )->toHtml;
+    return $self->getFormPlugin( @_, 1 )->toHtml;
 }
 
 #-------------------------------------------------------------------
 
-=head2 getFormPlugin ( properties )
+=head2 getFormPlugin ( properties, [ useFormPostData ] )
 
 Returns an instanciated WebGUI::Form::* plugin.
 
@@ -952,11 +952,17 @@ Returns an instanciated WebGUI::Form::* plugin.
 
 The properties to configure the form plugin with. The fieldType key should contain the type of the form plugin.
 
+=head3 useFormPostData
+
+If set to true, the value of the form element will be set to the data posted by it if available.
+
 =cut
 
 sub getFormPlugin {
-    my $self = shift;
-    my $data = shift;
+    my $self            = shift;
+    my $data            = shift;
+    my $useFormPostData = shift;
+
     my %param;
     my $session = $self->session;
     my $db = $session->db;
@@ -982,19 +988,19 @@ sub getFormPlugin {
     }
 
     if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
-        my @defaultValues;
-        if ( $self->session->form->param($name) && !$data->{value} ) {
-            @defaultValues = $session->form->process( $name, $data->{fieldType} );
+        my @values;
+        if ( $useFormPostData && $self->session->form->param($name) ) {
+            $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
         }
-        else {
+        elsif ( $data->{ value } ) {
             foreach (split(/\n/x, $data->{value})) {
                 s/\s+$//x; # remove trailing spaces
-                push(@defaultValues, $_);
+                push(@values, $_);
             }
+            $param{value} = \@values;
         }
-        $param{value} = \@defaultValues;
     }
-    elsif ( $self->session->form->param($name) && !$data->{value} ) {
+    elsif ( $useFormPostData && $self->session->form->param($name) ) {
         $param{value} = $session->form->process( $name, $data->{fieldType} );
     }
 
