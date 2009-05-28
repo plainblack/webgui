@@ -102,6 +102,7 @@ Run this test. Returns TAP in a hashref.
 
 sub run {
     my $self = shift;
+    my %opts = validate(@_, { responseId => 0 });
     my $session = $self->session;
     
     if ( !$session->config->get('enableSurveyExpressionEngine') ) {
@@ -115,6 +116,7 @@ sub run {
     my $json = JSON::PP->new->relaxed->allow_barekey->allow_singlequote;
     eval {
         $spec = $json->decode($spec); # N.B. This will change to from_json when JSON upgraded to >=2.14
+#        $spec = from_json($spec, { relaxed => 1} );
     };
     
     if ($@) {
@@ -129,26 +131,27 @@ sub run {
         return { tap => "Bail Out! Unable to instantiate Survey using assetId: $assetId" };
     }
     
-    # Remove existing responses for current user
-    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
-        [ $self->getId, $self->session->user->userId() ] );
+    my $responseId = $opts{responseId};
     
-    # Start a response as current user
-    my $responseId = $survey->responseId($self->session->user->userId)
-        or return { tap => "Bail Out! Unable to start survey response" };
+    # Remove existing responses for current user
+    if (!$responseId) {
+        $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
+            [ $self->getId, $self->session->user->userId() ] );
+        
+        # Start a response as current user
+        $responseId = $survey->responseId($self->session->user->userId)
+            or return { tap => "Bail Out! Unable to start survey response" };
+    }
     
     # Prepare the ingredients..
     my $rJSON = $survey->responseJSON 
         or return { tap => "Bail Out! Unable to get responseJSON" };
-        
-    my $surveyOrder = $rJSON->surveyOrder;
-    my $surveyOrderIndexByVariableName = $rJSON->surveyOrderIndexByVariableName;
     
     # Run the tests
     my $testCount = 0;
     my @tap;
     for my $item (@$spec) {
-        $rJSON->reset;
+        $rJSON->reset( {preserveSurveyOrder => 1});
         my $name = $item->{name};
         my $setup = $item->{setup};
         
@@ -159,8 +162,6 @@ sub run {
         if ($args = $item->{test} ) {
             push @tap, $self->_test( { 
                 responseJSON => $rJSON, 
-                surveyOrder =>  $surveyOrder,
-                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
@@ -170,8 +171,6 @@ sub run {
         elsif ($args = $item->{test_mc} ) {
             push @tap, $self->_test_mc( { 
                 responseJSON => $rJSON, 
-                surveyOrder =>  $surveyOrder,
-                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
@@ -181,8 +180,6 @@ sub run {
         elsif ($args = $item->{sequence} ) {
             push @tap, $self->_sequence( { 
                 responseJSON => $rJSON, 
-                surveyOrder =>  $surveyOrder,
-                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
@@ -191,8 +188,6 @@ sub run {
         elsif ($args = $item->{defined} ) {
             push @tap, $self->_defined( { 
                 responseJSON => $rJSON, 
-                surveyOrder =>  $surveyOrder,
-                surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
                 args => $args,
                 testCount_ref => \$testCount,
                 name => $name,
@@ -224,8 +219,6 @@ sub _test {
     my $self = shift;
     my %opts = validate(@_, { 
         responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
-        surveyOrder => { type => ARRAYREF },
-        surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => HASHREF },
         name => 0,
@@ -234,8 +227,6 @@ sub _test {
     
     # assemble the top-level ingredients..
     my $rJSON = $opts{responseJSON};
-    my $surveyOrder = $opts{surveyOrder};
-    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
     my $name = $opts{name};
     my $setup = $opts{setup} || $args->{setup}; # Setup option can also appear inside of test definition
@@ -260,8 +251,6 @@ sub _test {
         my $fakeTestCount = 0;
         $self->_test( { 
             responseJSON => $rJSON, 
-            surveyOrder => $surveyOrder, 
-            surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName,
             testCount_ref => \$fakeTestCount,
             args => $page,
             setup => $setup,
@@ -274,13 +263,13 @@ sub _test {
     # Record responses
     my $responses = {};
     my $lowestIndex;
-    
+    my $surveyOrder = $rJSON->surveyOrder;
     while ( my ( $variable, $spec ) = each %$args ) {
-        my $index = $surveyOrderIndexByVariableName->{$variable};
-        return fail($testCount, "Invalid question variable: $variable") if !defined $index;
+        my $index = $rJSON->surveyOrderIndex($variable);
+        return fail($testCount, "Invalid question variable (1): $variable") if !defined $index;
         my $address = $surveyOrder->[$index];
         my $question = $rJSON->survey->question($address);
-        return fail($testCount, "Invalid question variable: $variable") if !defined $question;
+        return fail($testCount, "Invalid question variable (2): $variable") if !defined $question;
         my $questionType = $question->{questionType};
         
         # Keep track of lowest index (to work out what survey page we should test on)
@@ -340,8 +329,6 @@ sub _test {
     return $self->_recordResponses( { 
         responseJSON => $rJSON, 
         responses => $responses,
-        surveyOrder => $surveyOrder,
-        surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
         next => $next,
         tagged => $tagged,
         score => $score,
@@ -401,8 +388,6 @@ sub _test_mc {
     my $self = shift;
         my %opts = validate(@_, { 
         responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
-        surveyOrder => { type => ARRAYREF },
-        surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => ARRAYREF },
         name => 0,
@@ -411,8 +396,6 @@ sub _test_mc {
     
     # assemble the top-level ingredients..
     my $rJSON = $opts{responseJSON};
-    my $surveyOrder = $opts{surveyOrder};
-    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
     my $setup = $opts{setup};
     
@@ -421,11 +404,12 @@ sub _test_mc {
     # ..and all remaining items are the specs
     my @specs = @$args;
     
-    my $index = $surveyOrderIndexByVariableName->{$variable};
-    return fail(-1, "Invalid question variable: $variable") if !defined $index;
+    my $surveyOrder = $rJSON->surveyOrder;
+    my $index = $rJSON->surveyOrderIndex($variable);
+    return fail(-1, "Invalid question variable (3): $variable") if !defined $index;
     my $address = $surveyOrder->[$index];
     my $question = $rJSON->survey->question($address);
-    return fail(-1, "Invalid question variable: $variable") if !defined $question;
+    return fail(-1, "Invalid question variable (4): $variable") if !defined $question;
     my $answers = $question->{answers};
     
     # Each spec is a sub-test, one per answer in the question
@@ -434,7 +418,7 @@ sub _test_mc {
     for my $spec (@specs) {
         
         # Reset responses between sub-tests
-        $rJSON->reset;
+        $rJSON->reset( {preserveSurveyOrder => 1});
         
         # Run setup (per-sub-test)
         $self->_setup( { responseJSON => $rJSON, setup => $setup } );
@@ -471,8 +455,6 @@ sub _test_mc {
         push @tap, $self->_recordResponses( { 
             responseJSON => $rJSON, 
             responses => $responses, 
-            surveyOrder => $surveyOrder,
-            surveyOrderIndexByVariableName => $surveyOrderIndexByVariableName, 
             next => $next,
             testCount => $testCount,
             name => $name,
@@ -495,8 +477,6 @@ sub _sequence {
     my $self = shift;
     my %opts = validate(@_, { 
         responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
-        surveyOrder => { type => ARRAYREF },
-        surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => HASHREF },
         name => 0,
@@ -504,20 +484,18 @@ sub _sequence {
     
     # assemble the top-level ingredients..
     my $rJSON = $opts{responseJSON};
-    my $surveyOrder = $opts{surveyOrder};
-    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
     my $name = $opts{name} || 'Valid sequences';
     my $testCount = ++${$opts{testCount_ref}};
     
     # n.b. everything in %args assumed to be variable => spec
-    
+    my $surveyOrder = $rJSON->surveyOrder;
     while ( my ( $variable, $spec ) = each %$args ) {
-        my $index = $surveyOrderIndexByVariableName->{$variable};
-        return fail($testCount, "Invalid question variable: $variable") if !defined $index;
+        my $index = $rJSON->surveyOrderIndex($variable);
+        return fail($testCount, "Invalid question variable (5): $variable") if !defined $index;
         my $address = $surveyOrder->[$index];
         my $question = $rJSON->survey->question($address);
-        return fail($testCount, "Invalid question variable: $variable") if !defined $question;
+        return fail($testCount, "Invalid question variable (6): $variable") if !defined $question;
         my $questionType = $question->{questionType};
         
         # Iterate over all answers
@@ -570,8 +548,6 @@ sub _defined {
     my $self = shift;
     my %opts = validate(@_, { 
         responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
-        surveyOrder => { type => ARRAYREF },
-        surveyOrderIndexByVariableName => { type => HASHREF },
         testCount_ref => { type => SCALARREF },
         args => { type => HASHREF },
         name => 0,
@@ -579,8 +555,6 @@ sub _defined {
     
     # assemble the top-level ingredients..
     my $rJSON = $opts{responseJSON};
-    my $surveyOrder = $opts{surveyOrder};
-    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $args = $opts{args};
     my $name = $opts{name} || 'Defined';
     my $testCount = ++${$opts{testCount_ref}};
@@ -621,8 +595,6 @@ sub _recordResponses {
     my %opts = validate(@_, { 
         responseJSON => { isa => 'WebGUI::Asset::Wobject::Survey::ResponseJSON' },
         responses => { type => HASHREF },
-        surveyOrder => { type => ARRAYREF },
-        surveyOrderIndexByVariableName => { type => HASHREF },
         next => 0,
         testCount => 1,
         name => 0,
@@ -633,8 +605,6 @@ sub _recordResponses {
     # assemble the top-level ingredients..
     my $rJSON = $opts{responseJSON};
     my $responses = $opts{responses};
-    my $surveyOrder = $opts{surveyOrder};
-    my $surveyOrderIndexByVariableName = $opts{surveyOrderIndexByVariableName};
     my $next = $opts{next};
     my $testCount = $opts{testCount};
     my $name = $opts{name};
@@ -642,7 +612,8 @@ sub _recordResponses {
     my $score = $opts{score};
     
     $rJSON->recordResponses($responses);
-
+    my $surveyOrder = $rJSON->surveyOrder;
+    
     # Check where we end up, if asked
     if ($next) {
         my $nextResponse = $rJSON->nextResponse;
@@ -663,7 +634,7 @@ END_WHY
             my $got;
             my $svar = $nextSection->{variable};
             my $qvar = $nextQuestion->{variable};
-            if ($surveyOrderIndexByVariableName->{$svar} == $nextResponse) {
+            if ($rJSON->surveyOrderIndex($svar) == $nextResponse) {
                 $got = "'$svar' (<-- a section)";
                 $got .= " and '$qvar' (<-- a question)" if $qvar;
             } elsif ($qvar) {
@@ -671,7 +642,7 @@ END_WHY
             } else {
                 $got = 'Unknown!';
             }
-            my $expectedNextResponse = $surveyOrderIndexByVariableName->{$next};
+            my $expectedNextResponse = $rJSON->surveyOrderIndex($next);
             if ($nextResponse != $expectedNextResponse) {
                 return fail($testCount, $name, <<END_WHY);
 Compared next section/question

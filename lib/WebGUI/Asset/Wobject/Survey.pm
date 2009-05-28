@@ -2728,6 +2728,15 @@ sub www_runTests {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
     
+    # Manage response ourselves rather than doing it over and over per-test
+    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
+            [ $self->getId, $self->session->user->userId() ] );
+    my $responseId = $self->responseId($self->session->user->userId)
+        or return $self->www_editTestSuite('Unable to start survey response');
+    
+    # Also initSurveyOrder ourselves once, and then preserve, rather than re-loading
+    $self->responseJSON->initSurveyOrder;
+    
     my $all = WebGUI::Asset::Wobject::Survey::Test->getAllIterator($session, { sequenceKeyValue => $self->getId } );
     
     # Expose TAP::Parser::Aggregate info as template variables
@@ -2744,7 +2753,8 @@ sub www_runTests {
     $aggregate->start;
     
     while (my $test = $all->()) {
-        my $result = $test->run or return $self->www_editTestSuite('Unable to run test: ' . $test->getId);
+        my $result = $test->run( { responseId => $responseId }) 
+            or return $self->www_editTestSuite('Unable to run test: ' . $test->getId);
         my $tap = $result->{tap} or return $self->www_editTestSuite('Unable to determine test result: ' . $test->getId);
         my $name = $test->get('name') || "Unnamed";
         my $parsed = $self->parseTap($tap);

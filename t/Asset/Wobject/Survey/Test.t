@@ -122,7 +122,7 @@ cmp_deeply(
     'surveyOrder is correct'
 );
 cmp_deeply(
-    $rJSON->surveyOrderIndexByVariableName, 
+    $rJSON->surveyOrderIndex, 
     {   
         'S0'   => 0,
         'S0Q0' => 0,
@@ -142,7 +142,7 @@ cmp_deeply(
         'S5Q2' => 9,
         'S6'   => 10,
     },
-    'surveyOrderIndexByVariableName correct'
+    'surveyOrderIndex correct'
 );
 
 $t1 = WebGUI::Asset::Wobject::Survey::Test->create( $session, { assetId => $s->getId } );

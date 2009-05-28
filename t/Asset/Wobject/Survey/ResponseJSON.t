@@ -310,10 +310,9 @@ $rJSON->survey->section([3])->{variable} = 'goto 2';
 $rJSON->survey->question([3,0])->{variable} = 'goto 3-0';
 $rJSON->survey->question([3,1])->{variable} = 'goto 3-0';  ##Intentional duplicate
 $rJSON->survey->question([3,2])->{variable} = 'goto 3-2';
-
-$rJSON->lastResponse(0);
+$rJSON->reset;
 $rJSON->processGoto('goto 80');
-is($rJSON->lastResponse(), 0, 'goto: no change in lastResponse if the variable cannot be found');
+is($rJSON->lastResponse(), -1, 'goto: no change in lastResponse if the variable cannot be found');
 $rJSON->processGoto('goto 1');
 is($rJSON->lastResponse(), 2, 'goto: works on existing section');
 $rJSON->processGoto('goto 0-1');
@@ -323,22 +322,22 @@ is($rJSON->lastResponse(), 5, 'goto: finds first if there are duplicates');
 
 ####################################################
 #
-# surveyOrderIndexByVariableName
+# surveyOrderIndex
 #
 ####################################################
 my $expect = {
-    'goto 0' => 0,
-   'goto 0-0' => 0,
-   'goto 0-1' => 1,
-   'goto 0-2' => 2,
-   'goto 1' => 3,
-   'goto 1-0' => 3,
-   'goto 1-1' => 4,
-   'goto 2' => 5,
-   'goto 3-0' => 7,
-   'goto 3-2' => 8,
+    'goto 0'   => 0,
+    'goto 0-0' => 0,
+    'goto 0-1' => 1,
+    'goto 0-2' => 2,
+    'goto 1'   => 3,
+    'goto 1-0' => 3,
+    'goto 1-1' => 4,
+    'goto 2'   => 5,
+    'goto 3-0' => 6,
+    'goto 3-2' => 8,
 };
-cmp_deeply($rJSON->surveyOrderIndexByVariableName(), $expect, 'surveyOrderIndexByVariableName');
+cmp_deeply($rJSON->surveyOrderIndex(), $expect, 'surveyOrderIndex');
 
 ####################################################
 #
@@ -389,7 +388,7 @@ $rJSON->survey->answer([0,1,0])->{value} = 200; # set answer score
 $rJSON->survey->answer([0,1,0])->{verbatim} = 1; # make this answer verbatim
 
 # Reset responses and record first answer
-$rJSON->lastResponse(-1);
+$rJSON->reset;
 $rJSON->recordResponses({
     '0-0-0' => 3, # it's a funny email address I know...
     '0-1-0' => '13 11 66',
