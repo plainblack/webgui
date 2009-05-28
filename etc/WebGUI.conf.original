@@ -177,7 +177,8 @@
 "paymentDrivers" : [
     "WebGUI::Shop::PayDriver::Cash",
     "WebGUI::Shop::PayDriver::ITransact",
-    "WebGUI::Shop::PayDriver::PayPal::PayPalStd"
+    "WebGUI::Shop::PayDriver::PayPal::PayPalStd",
+    "WebGUI::Shop::PayDriver::Ogone"
     ],
 
 # List the shipping drivers you have installed and wish to be
