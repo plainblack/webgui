@@ -222,8 +222,8 @@ sub www_viewTransaction {
     my $transaction   = shift || WebGUI::Shop::Transaction->new($session,$transactionId);
     my $notice        = shift;
 
-    return $session->insufficient unless ($transaction->get('userId') eq $session->user->userId);
-
+    return $session->privilege->insufficient unless $transaction->get('userId') eq $session->user->userId;
+   
     my $i18n          = WebGUI::International->new($session, 'Shop');
     my ($style, $url) = $session->quick(qw(style url));
     
