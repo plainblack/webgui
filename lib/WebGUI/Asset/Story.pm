@@ -85,6 +85,25 @@ sub addRevision {
 
 #-------------------------------------------------------------------
 
+=head2 canEdit ( )
+
+You can't add children to a Story.
+
+=cut
+
+sub canEdit {
+    my $self = shift;
+    my $userId = shift || $self->session->user->userId;
+    if ($userId eq $self->get("ownerUserId")) {
+        return 1;
+    }
+    my $user = WebGUI::User->new($self->session, $userId);
+    return $self->SUPER::canEdit($userId)
+        || $self->getArchive->canPostStories($userId);
+}
+
+#-------------------------------------------------------------------
+
 =head2 definition ( session, definition )
 
 defines asset properties for New Asset instances.  You absolutely need 
@@ -839,6 +858,7 @@ sub viewTemplateVariables {
     }
     $var->{hasPhotos}   = $photoCounter;
     $var->{singlePhoto} = $photoCounter == 1;
+    $var->{canEdit}     = $self->canEdit;
     return $var;
 }
 

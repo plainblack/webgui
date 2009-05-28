@@ -55,6 +55,7 @@ our $HELP = {
         ],
         fields    => [],
         variables => [
+            { name      => 'canEdit', },
             { name      => 'highlights_loop',
               'variables' => [
                 { name      => 'highlight', },

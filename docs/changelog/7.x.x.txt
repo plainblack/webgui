@@ -8,6 +8,7 @@
  - fixed a similar problem with metadata in the Shortcut Asset.
  - fixed #10396: Syndicated Content wobject not displaying edit controls
  - fixed #10386: Template override missing in nav shortcut
+ - fixed #10436: Story Manager - Story Edit/Delete links are Admin Only
 
 7.7.7
  - Added EMS Schedule table

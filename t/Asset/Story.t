@@ -13,33 +13,52 @@ use strict;
 use lib "$FindBin::Bin/../lib";
 
 use WebGUI::Test;
+use WebGUI::Test::Maker::Permission;
 use WebGUI::Session;
 use WebGUI::Storage;
+use WebGUI::User;
+use WebGUI::Group;
 
 use Test::More; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
-my $tests = 42;
-plan tests => 1
-            + $tests
-            ;
-
 #TODO: This script tests certain aspects of WebGUI::Storage and it should not
 
 my $session = WebGUI::Test->session;
 
-my $class  = 'WebGUI::Asset::Story';
-my $loaded = use_ok($class);
-my $story;
+my $story = 'placeholder for Test::Maker::Permission';
 my $wgBday = WebGUI::Test->webguiBirthday;
+
+my $canPostGroup = WebGUI::Group->new($session, 'new');
+my $postUser     = WebGUI::User->create($session);
+$canPostGroup->addUsers([$postUser->userId]);
+my $archiveOwner = WebGUI::User->create($session);
+my $reader       = WebGUI::User->create($session);
+$postUser->username('Can Post User');
+$reader->username('Average Reader');
+$archiveOwner->username('Archive Owner');
+WebGUI::Test->groupsToDelete($canPostGroup);
+WebGUI::Test->usersToDelete($postUser, $archiveOwner, $reader);
+
+my $canEditMaker = WebGUI::Test::Maker::Permission->new();
+$canEditMaker->prepare({
+    object   => $story,
+    session  => $session,
+    method   => 'canEdit',
+    pass     => [3, $postUser, $archiveOwner ],
+    fail     => [1, $reader                  ],
+});
+
 
 my $defaultNode = WebGUI::Asset->getDefault($session);
 my $archive     = $defaultNode->addChild({
-    className => 'WebGUI::Asset::Wobject::StoryArchive',
-    title     => 'Test Archive',
-                 #1234567890123456789012
-    assetId   => 'TestStoryArchiveAsset1',
+    className   => 'WebGUI::Asset::Wobject::StoryArchive',
+    title       => 'Test Archive',
+                   #1234567890123456789012
+    assetId     => 'TestStoryArchiveAsset1',
+    groupToPost => $canPostGroup->getId,
+    ownerUserId => $archiveOwner->userId,
 });
 my $topic       = $defaultNode->addChild({
     className => 'WebGUI::Asset::Wobject::StoryTopic',
@@ -50,11 +69,26 @@ my $topic       = $defaultNode->addChild({
 });
 my $archiveTag  = WebGUI::VersionTag->getWorking($session);
 $archiveTag->commit;
+WebGUI::Test->tagsToRollback($archiveTag);
 
 my $storage1 = WebGUI::Storage->create($session);
 my $storage2 = WebGUI::Storage->create($session);
 WebGUI::Test->storagesToDelete($storage1, $storage2);
 
+############################################################
+#
+# PLAN
+#
+############################################################
+
+my $tests = 42;
+plan tests => 1
+            + $tests
+            + $canEditMaker->plan
+            ;
+
+my $class  = 'WebGUI::Asset::Story';
+my $loaded = use_ok($class);
 
 SKIP: {
 
@@ -107,6 +141,16 @@ is($story->get('state'),    'published', 'Story is published');
 ############################################################
 
 is($story->getArchive->getId, $archive->getId, 'getArchive gets the parent archive for the Story');
+
+############################################################
+#
+# canEdit
+#
+############################################################
+
+$canEditMaker->{_tests}->[0]->{object} = $story;
+
+$canEditMaker->run();
 
 ############################################################
 #
@@ -383,9 +427,4 @@ cmp_bag(
 }
 
 END {
-    $story->purge   if $story;
-    $archive->purge if $archive;
-    $topic->purge   if $topic;
-    $archiveTag->rollback;
-    WebGUI::VersionTag->getWorking($session)->rollback;
 }
