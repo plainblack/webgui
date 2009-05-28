@@ -1,4 +1,8 @@
 7.6.25
+ - fixed: Basic Auth doesn't word if password contains colon (Arjan Widlak,
+   United Knowledge)
+   fixed: Basic Auth causes internal server error if you use more than one
+   colon. (Arjan Widlak, United Knowledge)
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed #10044: Gallery: Javascript, CSS included in body
  - fixed #10409: Problem using hash in metadata possible values
