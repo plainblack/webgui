@@ -905,7 +905,7 @@ eval { ($message) = $home->exportAsHtml( { userId => 3, depth => 99 } ) };
 is($@,       'exportPath must be defined and not ""', "exportAsHtml catches undefined exportPath exception");
 
 SKIP: {
-    skip 'Root will cause this test to fail since it does not obey file permissions', 3
+    skip 'Root will cause this test to fail since it does not obey file permissions', 1
         if $< == 0;
 
     # inaccessible exportPath
@@ -924,7 +924,7 @@ is($@,       "$exportPathFile isn't a directory", "exportAsHtml catches exportPa
 
 $config->set('exportPath', $inaccessibleDirectory->stringify);
 SKIP: {
-    skip 'Root will cause this test to fail since it does not obey file permissions', 3
+    skip 'Root will cause this test to fail since it does not obey file permissions', 1
         if $< == 0;
 
     # can't create export path
