@@ -26,6 +26,7 @@
  - fixed #10373: Admin groups inbox messages linger after task complete
  - fixed a bug in Thingy where the defaultValue of multi value form elements
    would not be applied ( Martin Kamerbeek / Oqapi )
+ - added "addedToCart" var for ThingyRecord
 
 7.7.7
  - Added EMS Schedule table
