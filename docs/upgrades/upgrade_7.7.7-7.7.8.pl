@@ -88,6 +88,14 @@ sub addOgoneToConfig {
 }
 
 
+#----------------------------------------------------------------------------
+sub addSurveyExpressionEngineConfigFlag{
+    my $session = shift;
+    print "\tAdding enableSurveyExpressionEngine config option... " unless $quiet;
+    $session->config->set('enableSurveyExpressionEngine', 0);
+    print "Done.\n" unless $quiet;
+}
+
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 
 #----------------------------------------------------------------------------

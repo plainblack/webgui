@@ -33,6 +33,9 @@ my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->usersToDelete($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
 
+WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
+$session->config->set('enableSurveyExpressionEngine', 1);
+
 # Create a Survey
 $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
 isa_ok( $s, 'WebGUI::Asset::Wobject::Survey' );

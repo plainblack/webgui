@@ -195,6 +195,11 @@
     "WebGUI::Asset::Template::HTMLTemplate"
     ],
 
+# Enable the Survey Expression Engine, which allows goto expressions in
+# the config.
+
+"enableSurveyExpressionEngine" : 0,
+
 # Specify the default template parser.
 
 "defaultTemplateParser" : "WebGUI::Asset::Template::HTMLTemplate",
