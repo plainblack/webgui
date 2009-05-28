@@ -385,9 +385,7 @@ sub responseJSON {
     my $self = shift;
     my ($json, $responseId) = validate_pos(@_, { type => SCALAR | UNDEF, optional => 1 }, { type => SCALAR, optional => 1});
     
-    if (!defined $responseId) {
-        $responseId = $self->responseId;
-    }
+    $responseId ||= $self->responseId;
      
     if (!$self->{_responseJSON} || $json) {
 
@@ -769,7 +767,7 @@ sub www_submitObjectEdit {
         return $self->addType($params->{addtype},\@address);        
     }
 
-    # Update the addressed object
+    # Update the addressed object (and have it automatically persisted)
     $self->surveyJSON_update( \@address, $params );
 
     # Return the updated Survey structure
@@ -1853,37 +1851,12 @@ sub persistResponseJSON {
 
 #-------------------------------------------------------------------
 
-=head2 responseIdCookies
-
-Mutator for the responseIdCookies that determines whether cookies are used as
-part of the L<"responseId"> lookup process.
-
-Useful for disabling cookie operations during tests, since WebGUI::Test::getPage
-currently does not support cookies.
-
-=cut
-
-sub responseIdCookies {
-    my $self = shift;
-    my ($x) = validate_pos(@_, {type => SCALAR, optional => 1});
-    
-    if (defined $x) {
-        $self->{_responseIdCookies} = $x;
-    }
-
-    # Defaults to true..
-    return defined $self->{_responseIdCookies} ? $self->{_responseIdCookies} : 1;
-}
-
-#-------------------------------------------------------------------
-
 =head2 responseId( [userId] )
 
 Accessor for the responseId property, which is the unique identifier for a single 
 L<WebGUI::Asset::Wobject::Survey::ResponseJSON> instance. See also L<"responseJSON">.
 
 The responseId of the current user is returned, or created if one does not already exist.
-If the user is anonymous, the IP is used. Or an emailed or linked code can be used.
 
 =head3 userId (optional)
 

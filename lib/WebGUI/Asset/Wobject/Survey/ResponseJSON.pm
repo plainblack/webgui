@@ -556,18 +556,22 @@ sub recordResponses {
             # Server-side Validation and storing of extra data for special q types goes here
             # Any answer that fails validation should be skipped with 'next'
             
-            
-            if ( $questionType eq 'Number' ) {
+            if ( $questionType eq 'Country' ) {
+                # Must be a valid country
+                next if !grep { $_ eq $recordedAnswer } WebGUI::Form::Country->getCountries;
+            }
+            elsif ( $questionType eq 'Date' ) {
+                # Must be a valid date (until we get date i18n this is limited to YYYY/MM/DD)
+                next if $recordedAnswer !~ m|^\d{4}/\d{2}/\d{2}$|;
+            } 
+            elsif ( $questionType eq 'Number' || $questionType eq 'Slider' ) {
                 if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
                     next;
                 }
                 elsif ( $answer->{min} =~ /\d/ and $recordedAnswer < $answer->{min} ) {
                     next;
                 }
-                elsif ( $answer->{step} =~ /\d/ and $recordedAnswer % $answer->{step} != 0 ) {
-                    next;
-                }
-            }
+            } 
             elsif ( $questionType eq 'Year Month' ) {
                 # store year and month as "YYYY Month"
                 $recordedAnswer = $responses->{ "$aId-year" } . " " . $responses->{ "$aId-month" };
@@ -576,7 +580,7 @@ sub recordResponses {
                 # In the case of a mc question, only selected answers will have a defined recordedAnswer
                 # Thus we skip any answers where recordedAnswer is not defined
                 next if !defined $recordedAnswer || $recordedAnswer !~ /\S/;
-            }
+            } 
 
             # If we reach here, answer validated ok
             $aValid = 1;

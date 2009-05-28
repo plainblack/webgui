@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 104;
+my $tests = 114;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -749,6 +749,106 @@ is($rJSON->pop, undef, 'additional pop has no effect');
 $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($session));
 
 # Use Section 1 (containing 2 questions) for testing. This allows us to test 2 different responses at once.
+########
+# Country
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Country');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => 'Australia',
+    '1-1-0' => 'JTville',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'Australia'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid country ignored');
+
+########
+# Date
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Date');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '2009/05/01',
+    '1-1-0' => '12345',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '2009/05/01'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid date ignored');
+
+########
+# Number
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Number');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{min} = '-5';
+    $rJSON->survey->answer([1,$q,0])->{max} = '10';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '-3',
+    '1-1-0' => '11',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '-3'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid number ignored');
+
+########
+# Slider
+for my $q (0,1) {
+    $rJSON->survey->updateQuestionAnswers([1,$q], 'Slider');
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{min} = '-5';
+    $rJSON->survey->answer([1,$q,0])->{max} = '10';
+    $rJSON->survey->answer([1,$q,0])->{step} = '1';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => '-3',
+    '1-1-0' => '11',
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => '-3'
+    }, 
+    'Valid value recorded correctly'
+);
+is($rJSON->responses->{'1-1-0'}, undef, 'Invalid slider value ignored');
 
 ########
 # Yes/No
@@ -783,6 +883,41 @@ cmp_deeply(
         'value' => 'No'
     }, 
     'No recorded correctly'
+);
+
+########
+# True/False
+$rJSON->survey->updateQuestionAnswers([1,0], 'True/False');
+$rJSON->survey->updateQuestionAnswers([1,1], 'True/False');
+for my $q (0,1) {
+    $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = 'True';
+    $rJSON->survey->answer([1,$q,1])->{recordedAnswer} = 'False';
+}
+$rJSON->reset;
+$rJSON->lastResponse(2);
+$rJSON->recordResponses( {
+    '1-0-0' => 1, # Multi-choice answers are submitted like this, 
+    '1-1-1' => 1, # with the selected answer set to 1
+});
+cmp_deeply(
+    $rJSON->responses->{'1-0-0'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'True'
+    }, 
+    'True recorded correctly'
+);
+cmp_deeply(
+    $rJSON->responses->{'1-1-1'}, 
+    {
+        'verbatim' => undef,
+        'comment' => undef,
+        'time' => num(time(), 3),
+        'value' => 'False'
+    }, 
+    'False recorded correctly'
 );
 
 ####################################################
