@@ -171,7 +171,7 @@ sub handler {
     # Get the type of authorization required for this request (the per
     # directory configuration directive AuthType):
     my $auth = $request->auth_type;
-    if ($auth eq "Basic") { # machine oriented
+    if ($auth =~ m/^Basic/) { # machine oriented
 	# Get username and password from Apache and hand over to authen, Basic
 	# Auth for WebGUI
 	my $basicAuthUser = $request->get_remote_logname;
