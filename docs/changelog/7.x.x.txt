@@ -9,6 +9,15 @@
  - fixed #10396: Syndicated Content wobject not displaying edit controls
  - fixed #10386: Template override missing in nav shortcut
  - fixed #10436: Story Manager - Story Edit/Delete links are Admin Only
+ - fixed a bug in Thingy where fields with list type form elements wouldn't
+   show up in Thingy search results ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where the search form would lose part of its contents
+   when searching. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where debug information would show up in the Thing
+   editor when adding/editing fields. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where when searching using multi value search form
+   elements (eg. check lists) only one of the selected elements was taken into
+   account in the search query. ( Martin Kamerbeek / Oqapi )
 
 7.7.7
  - Added EMS Schedule table
