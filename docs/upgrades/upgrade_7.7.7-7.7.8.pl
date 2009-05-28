@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 messageStateCleanup($session);
+addOgoneToConfig( $session );
 
 finish($session); # this line required
 
@@ -75,6 +76,16 @@ sub messageStateCleanup {
     } ## end for my $messageId (@$messageListRef)
     $sth->finish;
 } ## end sub messageStateCleanup
+
+#----------------------------------------------------------------------------
+sub addOgoneToConfig {
+    my $session = shift;
+    print "\tAdding Ogone payment plugin..." unless $quiet;
+
+    $session->config->addToArray('paymentDrivers', 'WebGUI::Shop::PayDriver::Ogone');
+    
+    print "Done\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
