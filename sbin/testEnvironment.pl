@@ -133,7 +133,6 @@ checkModule('Scope::Guard',                 '0.03'       );
 checkModule('Digest::SHA',                  '5.47'       );
 checkModule("CSS::Minifier::XS",            "0.03"       );
 checkModule("JavaScript::Minifier::XS",     "0.05"       );
-checkModule('Test::Harness',                '3.16'       );
 
 failAndExit("Required modules are missing, running no more checks.") if $missingModule;
 
