@@ -619,6 +619,10 @@ sub processPropertiesFromFormPost {
         $data{extraHeadTags} = '';
     }
 
+    if ($needsUpdate) {
+        $self->update(\%data);
+    }
+
     ### Template attachments
     my $f    = $self->session->form;
     my $p    = $f->paramsHashRef;
