@@ -22,6 +22,7 @@ use WebGUI::Operation::Shared;
 use WebGUI::HTML;
 use WebGUI::User;
 use WebGUI::Utility;
+use WebGUI::Pluggable;
 
 
 =head1 NAME
@@ -116,7 +117,7 @@ sub create {
     # Get the field's data type
     $properties->{fieldType} ||= "ReadOnly";
     my $formClass   = $self->getFormControlClass;
-    eval "use $formClass;";
+    eval { WebGUI::Pluggable->load($formClass) };
     my $dbDataType = $formClass->getDatabaseFieldType;
 
     # Add the column to the userProfileData table
@@ -734,7 +735,7 @@ sub rename {
 
     # Rename the userProfileData column
     my $fieldClass  = $self->getFormControlClass;
-    eval "use $fieldClass;";
+    eval { WebGUI::Pluggable->load($fieldClass) };
     my $dbDataType  = $fieldClass->getDatabaseFieldType;
 
     $self->session->db->write(
@@ -851,7 +852,7 @@ sub set {
     if ($properties->{fieldType} ne $originalFieldType) {
         # Create a copy of the new properties so we don't mess them up
         my $fieldClass  = $self->getFormControlClass;
-        eval "use $fieldClass;";
+        eval { WebGUI::Pluggable->load($fieldClass) };
         my $dbDataType 
         = $fieldClass->new($session, $self->formProperties($properties))->getDatabaseFieldType;
 

@@ -19,6 +19,8 @@ use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use WebGUI::Form::Country;
+use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
@@ -440,7 +442,7 @@ sub graph {
     
     my $session = $self->session;
 
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return;
     }
@@ -695,7 +697,7 @@ sub www_graph {
     
     my $ac   = $self->getAdminConsole;
     
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return $ac->render('Survey Visualization requires the GraphViz module', $i18n->get('survey visualization'));
     }
@@ -1779,7 +1781,6 @@ sub prepareShowSurveyTemplate {
         }
         elsif ( $country{ $q->{questionType} } ) {
             $q->{country} = 1;
-            use WebGUI::Form::Country;
             my @countries = map +{ 'country' => $_ }, WebGUI::Form::Country::getCountries();
             foreach my $a(@{$q->{answers}}){
                 $a->{countries} = [ {'country' => ''}, @countries ];
@@ -2238,7 +2239,6 @@ END_HTML
             }
         }
         
-        use Text::CSV_XS;
         my $csv = Text::CSV_XS->new( { binary => 1 } );
         my @lines = map {$csv->combine(@$_); $csv->string} @rows;
         my $output = join "\n", @lines;
@@ -2637,7 +2637,7 @@ sub www_runTest {
     my $i18n = WebGUI::International->new($session, 'Asset_Survey');
     my $ac = $self->getAdminConsole;
     
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
@@ -2669,7 +2669,7 @@ all interesting TAP::Parser and TAP::Parser::Result properties) and the template
 sub parseTap {
     my ($self, $tap) = @_;
     
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return;
@@ -2766,12 +2766,12 @@ sub www_runTests {
 
     
     my @parsers;
-    eval 'use TAP::Parser';
+    eval { require TAP::Parser };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
     }
-    eval 'use TAP::Parser::Aggregator';
+    eval { require TAP::Parser::Aggregator };
     if ($@) {
         $self->session->log->warn($TAP_PARSER_MISSING);
         return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));

@@ -47,6 +47,7 @@ use Params::Validate qw(:all);
 use List::Util qw(shuffle);
 use Clone qw/clone/;
 use Safe;
+use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 #-------------------------------------------------------------------
@@ -816,7 +817,6 @@ sub processExpression {
     my $tags   = $self->tags;
     my %validTargets = map { $_ => 1 } @{$self->survey->getGotoTargets};
     
-    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
     if (my $result = $engine->run($self->session, $expression, { values => $values, scores => $scores, tags => $tags, validTargets => \%validTargets} ) ) {
         # Update tags

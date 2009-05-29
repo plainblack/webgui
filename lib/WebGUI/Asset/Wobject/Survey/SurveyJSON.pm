@@ -48,11 +48,11 @@ likely operate on the question indexed by:
 
 use strict;
 use JSON;
-use Data::Dumper;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 use Clone qw/clone/;
+use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
 
 # The maximum value of questionsPerPage is currently hardcoded here
 my $MAX_QUESTIONS_PER_PAGE = 20;
@@ -1314,7 +1314,6 @@ sub validateGotoExpression{
         return 'enableSurveyExpressionEngine is disabled in your site config!';
     }
 
-    use WebGUI::Asset::Wobject::Survey::ExpressionEngine;
     my $engine = "WebGUI::Asset::Wobject::Survey::ExpressionEngine";
     return $engine->run($self->session, $object->{gotoExpression}, { validate => 1, validTargets => $goodTargets } );
 }
