@@ -33,6 +33,8 @@ my $session = start(); # this line required
 # upgrade functions go here
 messageStateCleanup($session);
 addOgoneToConfig( $session );
+addSurveyExpressionEngineConfigFlag($session);
+addMobileStyleConfig($session);
 
 finish($session); # this line required
 
@@ -95,6 +97,41 @@ sub addSurveyExpressionEngineConfigFlag{
     $session->config->set('enableSurveyExpressionEngine', 0);
     print "Done.\n" unless $quiet;
 }
+
+#----------------------------------------------------------------------------
+sub addMobileStyleConfig {
+    my $session = shift;
+    print "\tAdding mobile style user agents to config file... " unless $quiet;
+    $session->config->set('mobileUserAgents', [
+        'AvantGo',
+        'DoCoMo',
+        'Vodafone',
+        'EudoraWeb',
+        'Minimo',
+        'UP\.Browser',
+        'PLink',
+        'Plucker',
+        'NetFront',
+        '^WM5 PIE$',
+        'Xiino',
+        'iPhone',
+        'Opera Mobi',
+        'BlackBerry',
+        'Opera Mini',
+        'HP iPAQ',
+        'IEMobile',
+        'Profile/MIDP',
+        'Smartphone',
+        'Symbian ?OS',
+        'J2ME/MIDP',
+        'PalmSource',
+        'PalmOS',
+        'Windows CE',
+        'Opera Mini',
+    ]);
+    print "Done.\n" unless $quiet;
+}
+
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
 

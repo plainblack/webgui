@@ -1030,6 +1030,36 @@
           "extrasCdn" : "http://content.example.com/extras",
           "extrasSsl" : "https://content.example.com/extras",
           "extrasExclude": ["tinymce", "^blah$"]
-        }
+        },
+
+#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
+#Admin settings, then the mobile style will be used for these browsers.
+   "mobileUserAgents" : [
+      "AvantGo",
+      "DoCoMo",
+      "Vodafone",
+      "EudoraWeb",
+      "Minimo",
+      "UP\\.Browser",
+      "PLink",
+      "Plucker",
+      "NetFront",
+      "^WM5 PIE$",
+      "Xiino",
+      "iPhone",
+      "Opera Mobi",
+      "BlackBerry",
+      "Opera Mini",
+      "HP iPAQ",
+      "IEMobile",
+      "Profile/MIDP",
+      "Smartphone",
+      "Symbian ?OS",
+      "J2ME/MIDP",
+      "PalmSource",
+      "PalmOS",
+      "Windows CE",
+      "Opera Mini"
+   ],
 
 }
