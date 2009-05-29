@@ -34,6 +34,9 @@
    etc (Arjan Widlak / United Knowledge)
  - fixed #10336: postReceivedTemplateId not corrected in upgrade_7.6.0-7.6.1 (Jukka Raimovaara / Axxion Oy)
  - fixed: i18n typo in Survey exit URL hover help.
+ - Fixed a search tickets problem in the EMS badge builder template.
+ - Fixed a problem in the EMS calculating prices on tickets with a badge that
+   has an existing ribbon.
  - Fixed a search results display error with synopsis.
  - Fixed a load problem with Code Editor by making user toggle it on. This is
    better than normal anyway since many users appear not to want to use the
