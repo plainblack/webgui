@@ -212,6 +212,15 @@ sub discernUserId {
 }
 
 #-------------------------------------------------------------------
+
+=head2 duplicate
+
+Extend the base method to duplicate shortcut overrides.
+
+See also Asset::duplicate.
+
+=cut
+
 sub duplicate {
     my $self = shift;
     my $newAsset = $self->SUPER::duplicate(@_);
@@ -312,22 +321,6 @@ sub getEditForm {
 	return $tabform;
 }
 
-
-#-------------------------------------------------------------------
-
-=head2 getExtraHeadTags (  )
-
-Returns the extraHeadTags stored in the asset.  Called in $self->session->style->generateAdditionalHeadTags if this asset is the $self->session->asset.  Also called in WebGUI::Asset::Wobject::Layout for its child assets.  Overriden to also add tags from shortcutted asset.
-
-=cut
-
-sub getExtraHeadTags {
-	my $self = shift;
-	my $output = $self->get("extraHeadTags")."\n";
-	my $shortcut = $self->getShortcut;
-	$output .= $self->getShortcut->get("extraHeadTags") if defined $shortcut;
-	return $output;
-}
 
 #-------------------------------------------------------------------
 sub getFieldsList {
@@ -667,7 +660,8 @@ sub notLinked {
 
 =head2 prepareView ( )
 
-See WebGUI::Asset::prepareView() for details.
+See WebGUI::Asset::prepareView() for details.  Extends the base class to call prepareView
+on the Asset that is shortcutted.
 
 =cut
 
@@ -683,6 +677,14 @@ sub prepareView {
 
 
 #-------------------------------------------------------------------
+
+=head2 processPropertiesFromFormPost ( )
+
+See WebGUI::Asset::processPropertiesFromFormPost () for details.  Extends the base class to delete
+the scratch variables, and to uncache the overrides.
+
+=cut
+
 sub processPropertiesFromFormPost {
 	my $self = shift;
 	$self->SUPER::processPropertiesFromFormPost;
@@ -720,6 +722,14 @@ sub setOverride {
 }
 
 #-------------------------------------------------------------------
+
+=head2 purge ( )
+
+See Asset::purge for details.  Extends the base method to delete this Shortcut's
+overrides.
+
+=cut
+
 sub purge {
     my $self = shift;
     $self->session->db->write(<<'END_SQL', [$self->getId]);
@@ -985,8 +995,9 @@ sub www_view {
         if ($shortcut->isa('WebGUI::Asset::Wobject')) {
                 $self->session->http->setLastModified($self->getContentLastModified);
                 $self->session->http->sendHeader;
-                my $style = $shortcut->processStyle($self->getSeparator);
-                my ($head, $foot) = split($self->getSeparator,$style);
+                ##Tell processStyle not to set the h
+                my $style = $shortcut->processStyle($shortcut->getSeparator, { noHeadTags => 1 });
+                my ($head, $foot) = split($shortcut->getSeparator,$style);
                 $self->session->output->print($head, 1);
                 $self->session->output->print($self->view);
                 $self->session->output->print($foot, 1);

@@ -2196,23 +2196,30 @@ sub processTemplate {
 
 #-------------------------------------------------------------------
 
-=head2 processStyle ( html )
+=head2 processStyle ( $output, $noHeadTags )
 
-Returns some HTML wrappered in a style. Should be overridden by subclasses, because
+Returns the output wrappered in a style. Should be overridden by subclasses, because
 this one actually doesn't do anything other than return the html back to you and
 adds the Asset's extraHeadTags into the raw head tags.
 
-=head3 html
+=head3 $output
 
 The content to wrap up.
+
+=head3 $options
+
+Options that alter how the method behaves.
+
+=head4 noHeadTags
+
+If this options is true, then this method will not set the extraHeadTags
 
 =cut
 
 sub processStyle {
-	my ($self, $output) = @_;
-    my $session = $self->session;
-    my $style   = $session->style;
-    $style->setRawHeadTags($self->getExtraHeadTags);
+	my ($self, $output, $options) = @_;
+    my $style   = $self->session->style;
+    $style->setRawHeadTags($self->getExtraHeadTags) unless $options->{noHeadTags};
     if ($self->get('synopsis')) {
         $style->setMeta({
             name    => 'Description',
