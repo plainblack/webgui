@@ -17,6 +17,7 @@ save you many hours of grief.
      approval.  The old behavior often resulted in several users trying
      to approve version tags that had already been approved.
    
+   * WebGUI now requires Test::Harness 3.16 or higher.
 
 7.7.7
 --------------------------------------------------------------------
