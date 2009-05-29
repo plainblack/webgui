@@ -19,6 +19,7 @@
  - fixed a bug in Thingy where the defaultValue of multi value form elements
    would not be applied ( Martin Kamerbeek / Oqapi )
  - fixed #10373: Admin groups inbox messages linger after task complete
+ - fixed #10361: Shortcuts duplicate extra header tags
 
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
