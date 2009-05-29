@@ -961,7 +961,7 @@ sub getEditForm {
 		my $meta = $self->getMetaDataFields();
 		foreach my $field (keys %$meta) {
 			my $fieldType = $meta->{$field}{fieldType} || "text";
-			my $options = WebGUI::Operation::Shared::secureEval($session,$meta->{$field}{possibleValues});
+			my $options = $meta->{$field}{possibleValues};
 			# Add a "Select..." option on top of a select list to prevent from
 			# saving the value on top of the list when no choice is made.
 			if("\l$fieldType" eq "selectBox") {
