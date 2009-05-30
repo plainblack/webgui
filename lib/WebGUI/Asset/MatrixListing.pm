@@ -710,8 +710,6 @@ sub view {
     {type =>'text/javascript'});
     $self->session->style->setScript($self->session->url->extras('yui/build/button/button-min.js'),
     {type =>'text/javascript'});
-    $self->session->style->setScript($self->session->url->extras('wobject/Matrix/matrixListing.js'), {type =>
-    'text/javascript'});
     $self->session->style->setLink($self->session->url->extras('yui/build/datatable/assets/skins/sam/datatable.css'),
         {type =>'text/css', rel=>'stylesheet'});
 
