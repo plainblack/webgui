@@ -388,6 +388,11 @@ A property or value must be quoted if it contains spaces. Feel free to use the c
 		lastUpdated => 1146539258,
 	},
 
+	'no longer exists' => {
+		message => q|The asset this shortcut is linked to no longer exists. You need to delete this shortcut.|,
+		lastUpdated => 1243698146,
+	},
+
 };
 
 1;
