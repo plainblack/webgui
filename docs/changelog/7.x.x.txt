@@ -2,6 +2,7 @@
  - fixed: Reverted bugfix for 10409 and changed the hover help to reflect the correct way to build list-type form controls in the MetaData.
  - fixed: Template parser cannot be set
  - fixed #10361: Shortcuts duplicate extra header tags
+ - fixed #10356: SQL report is cached too long
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,

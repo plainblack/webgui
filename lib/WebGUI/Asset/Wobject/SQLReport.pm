@@ -221,6 +221,20 @@ sub definition {
 
 #-------------------------------------------------------------------
 
+=head2 getContentLastModified ( )
+
+Override the base method, since SQL Report content can change without the asset being
+touched.  Default to using $self->get('cacheTimeout') seconds ago.
+
+=cut
+
+sub getContentLastModified {
+    my $self = shift;
+    return (time - $self->get("cacheTimeout"));
+}
+
+#-------------------------------------------------------------------
+
 =head2 getEditForm ( )
 
 Manually make the edit form due to javascript for adding more queries.
