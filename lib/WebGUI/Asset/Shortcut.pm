@@ -653,7 +653,8 @@ sub isDashlet {
 sub notLinked {
 	my $self = shift;
 	$self->session->errorHandler->warn("Shortcut ".$self->getId." is linked to an asset ".$self->get("shortcutToAssetId").", which no longer exists.");
-	return "The asset this shortcut is linked to no longer exists. You need to delete this shortcut.";
+    my $i18n = WebGUI::International->new($self->session, 'Asset_Shortcut');
+	return $i18n->get('no longer exists');
 }
 
 #-------------------------------------------------------------------
