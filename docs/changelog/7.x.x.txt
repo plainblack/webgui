@@ -2,6 +2,7 @@
  - fixed: Reverted bugfix for 10409 and changed the hover help to reflect the correct way to build list-type form controls in the MetaData.
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak, United Knowledge)
  - fixed: Basic Auth causes internal server error if you use more than one colon. (Arjan Widlak, United Knowledge)
+ - fixed #10356: SQL report is cached too long
  - fixed #8914: epoch for calendar/List View for Calendar
  - fixed #10044: Gallery: Javascript, CSS included in body
  - fixed #10409: Problem using hash in metadata possible values
