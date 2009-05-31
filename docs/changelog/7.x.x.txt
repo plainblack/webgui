@@ -1,4 +1,6 @@
 7.6.25
+ - fixed #10450: A different errormessage is given if the username does exist and
+   does not exist. (Arjan Widlak / United Knowledge)
  - fixed: Reverted bugfix for 10409 and changed the hover help to reflect the correct way to build list-type form controls in the MetaData.
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak, United Knowledge)
  - fixed: Basic Auth causes internal server error if you use more than one colon. (Arjan Widlak, United Knowledge)

@@ -469,11 +469,6 @@ our $I18N = {
 		lastUpdated => 1078854953
 	},
 
-	'LDAPLink_104' => {
-		message => q|The account information you supplied is invalid. Either the account does not exist or the username/password combination was incorrect.|,
-		lastUpdated => 1078854953
-	},
-
 	'LDAPLink_105' => {
 		message => q|Invalid LDAP connection URL. Contact your administrator.|,
 		lastUpdated => 1078854953
