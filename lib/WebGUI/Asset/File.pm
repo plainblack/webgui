@@ -216,8 +216,8 @@ sub getEditForm {
 
 =head2 getEditFormUploadControl
 
-Returns the HTML to render the upload box and link to delete the existing 
-file, if necessary.
+Returns the HTML to display the current photo, if it has one, and a file chooser
+to either upload one, or replace the current one.
 
 =cut
 
@@ -229,8 +229,6 @@ sub getEditFormUploadControl {
 
     if ($self->get("filename") ne "") {
         $html .= WebGUI::Form::readOnly( $session, {
-            label       => $i18n->get('current file'),
-            hoverHelp   => $i18n->get('current file description', 'Asset_File'),
             value       => '<p style="display:inline;vertical-align:middle;"><a href="'.$self->getFileUrl.'"><img src="'.$self->getFileIconUrl.'" alt="'.$self->get("filename").'" style="border-style:none;vertical-align:middle;" /> '.$self->get("filename").'</a></p>'
         });
     }
