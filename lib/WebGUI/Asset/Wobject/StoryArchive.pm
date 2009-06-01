@@ -481,7 +481,8 @@ sub viewTemplateVariables {
     my $query           = $session->form->get('query'); 
     my $exporting       = $session->scratch->get('isExporting');
     my $p;
-    my $var = $self->get();
+    my $i18n = WebGUI::International->new($session);
+    my $var  = $self->get();
     if ($mode eq 'keyword') {
         $var->{mode} = 'keyword';
         my $wordList = WebGUI::Keyword::string2list($keywords);
@@ -524,9 +525,15 @@ sub viewTemplateVariables {
         ##Pagination variables aren't useful in export mode
         $p->appendTemplateVars($var);
     }
+
     $var->{date_loop} = [];
     my $lastStoryDate = '';
-    my $datePointer = undef;
+    my $datePointer   = undef;
+
+    my $icon          = $session->icon;
+    my $userUiLevel   = $session->user->profileField("uiLevel");
+    my $uiLevels      = $session->config->get('assetToolbarUiLevel');
+
     ##Only build objects for the assets that we need
     STORY: foreach my $storyId (@{ $storyIds }) {
         my $story = WebGUI::Asset->new($session, $storyId->{assetId}, $storyId->{className}, $storyId->{revisionDate});
@@ -541,11 +548,18 @@ sub viewTemplateVariables {
             $datePointer->{story_loop} = [];
             $lastStoryDate = $storyDate;
         }
-        push @{$datePointer->{story_loop}}, {
+        my $storyVars = {
             url           => $story->getUrl,
             title         => $story->getTitle,
             creationDate  => $creationDate,
+        };
+        if ($userUiLevel >= $uiLevels->{delete}) {
+            $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
         }
+        if ($userUiLevel >= $uiLevels->{edit}) {
+            $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
+        }
+        push @{$datePointer->{story_loop}}, $storyVars;
     }
 
     $var->{canPostStories} = $self->canPostStories;
