@@ -7,6 +7,7 @@
  - fixed #10356: SQL report is cached too long
  - fixed #10313: extra head elements appear twice
  - fixed missing edit story and delete story icons in the Story Archive and Story Topic.
+ - fixed #10453: Project Management System Broken in 7.7.8
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
