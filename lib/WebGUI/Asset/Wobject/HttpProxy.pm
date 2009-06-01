@@ -445,7 +445,7 @@ sub www_view {
         return $output;
     } else {
         $self->session->http->sendHeader;
-        my $style = $self->processStyle($self->getSeparator);
+        my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
         my ($head, $foot) = split($self->getSeparator,$style);
         $self->session->output->print($head);
         $self->session->output->print($output, 1); # Do not process macros

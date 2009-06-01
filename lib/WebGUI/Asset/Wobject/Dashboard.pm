@@ -365,7 +365,7 @@ sub www_view {
         }
         $self->logView();
         $self->prepareView;
-        my $style = $self->processStyle($self->view);
+        my $style = $self->processStyle($self->view, { noHeadTags => 1});
 }
 
 
