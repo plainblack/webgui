@@ -553,10 +553,10 @@ sub viewTemplateVariables {
             title         => $story->getTitle,
             creationDate  => $creationDate,
         };
-        if ($userUiLevel >= $uiLevels->{delete}) {
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{delete} && !$exporting) {
             $storyVars->{deleteIcon} = $icon->delete('func=delete', $story->get('url'), $i18n->get(43));
         }
-        if ($userUiLevel >= $uiLevels->{edit}) {
+        if ($story->canEdit && $userUiLevel >= $uiLevels->{edit}   && !$exporting) {
             $storyVars->{editIcon}   = $icon->edit('func=edit', $story->get('url'));
         }
         push @{$datePointer->{story_loop}}, $storyVars;

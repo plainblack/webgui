@@ -225,6 +225,7 @@ KEY: foreach my $key (keys %{ $templateVars }) {
     delete $templateVars->{$key};
 }
 
+$session->user({userId => 1});
 cmp_deeply(
     $templateVars,
     {
@@ -258,7 +259,7 @@ cmp_deeply(
             },
         ]
     },
-    'viewTemplateVariables: returns expected template variables with 3 stories in different folders'
+    'viewTemplateVariables: returns expected template variables with 3 stories in different folders, user is cannot edit stories'
 );
 
 my $story2 = $folder->addChild({ className => 'WebGUI::Asset::Story', title => 'Story 2', keywords => "roger,foxtrot"});
@@ -292,16 +293,22 @@ cmp_deeply(
                         creationDate => ignore(),
                         url          => re('first-story'),
                         title        => 'First Story',
+                        editIcon     => ignore(),
+                        deleteIcon   => ignore(),
                     },
                     {
                         creationDate => ignore(),
                         url          => ignore(),
                         title        => 'Story 2',
+                        editIcon     => ignore(),
+                        deleteIcon   => ignore(),
                     },
                     {
                         creationDate => ignore(),
                         url          => ignore(),
                         title        => 'Story 3',
+                        editIcon     => ignore(),
+                        deleteIcon   => ignore(),
                     },
                 ],
             },
@@ -336,11 +343,15 @@ cmp_deeply(
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'Story 2',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
                 {
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'Story 3',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
             ],
         },
@@ -351,6 +362,8 @@ cmp_deeply(
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'WebGUI is released',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
             ],
         },
@@ -383,11 +396,15 @@ cmp_bag(
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'Story 3',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
                 {
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'Story 4',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
             ],
         },
@@ -398,6 +415,8 @@ cmp_bag(
                     creationDate => ignore(),
                     url          => ignore(),
                     title        => 'WebGUI is released',
+                    editIcon     => ignore(),
+                    deleteIcon   => ignore(),
                 },
             ],
         },
