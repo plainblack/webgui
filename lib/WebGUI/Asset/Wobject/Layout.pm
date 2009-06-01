@@ -368,7 +368,7 @@ sub www_view {
         unless ($out) {
             $self->prepareView;
             $session->stow->set("cacheFixOverride", 1);
-            $out = $self->processStyle($self->view);
+            $out = $self->processStyle($self->view, { noHeadTags => 1 });
             $cache->set($out, 60);
             $session->stow->delete("cacheFixOverride");
         }

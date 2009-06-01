@@ -557,7 +557,7 @@ sub www_view {
         });
     }
 	$self->prepareView;
-	my $style = $self->processStyle($self->getSeparator);
+	my $style = $self->processStyle($self->getSeparator, { noHeadTags => 1 });
 	my ($head, $foot) = split($self->getSeparator,$style);
 	$self->session->output->print($head, 1);
 	$self->session->output->print($self->view);

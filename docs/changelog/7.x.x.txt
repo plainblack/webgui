@@ -5,6 +5,7 @@
  - fixed: Template parser cannot be set
  - fixed #10361: Shortcuts duplicate extra header tags
  - fixed #10356: SQL report is cached too long
+ - fixed #10313: extra head elements appear twice
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,

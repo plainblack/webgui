@@ -1599,7 +1599,7 @@ sub www_process {
     if (@errors) {
         $var->{error_loop} = \@errors;
         $self->prepareViewForm;
-        return $self->processStyle($self->viewForm($var, $entry));
+        return $self->processStyle($self->viewForm($var, $entry), { noHeadTags => 1 });
     }
 
     # Send email
