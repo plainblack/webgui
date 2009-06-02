@@ -106,7 +106,7 @@ sub toHtml {
     var oDS = new YAHOO.util.XHRDataSource('$pageUrl');
     oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
     oDS.responseSchema = {
-        resultsList : "keywords",
+        resultsList : "keywords"
     };
 
     var oAC = new YAHOO.widget.AutoComplete("$name", "$autocompleteDiv", oDS);
