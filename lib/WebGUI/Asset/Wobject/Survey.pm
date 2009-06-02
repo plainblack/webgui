@@ -1920,25 +1920,41 @@ sub responseId {
     return $self->{responseId};
 }
 
-=head2 takenCount
+=head2 takenCount ( $options )
 
 Counts the number of existing responses
 N.B. only counts responses with completeCode of 1 
 (others codes indicate abnormal completion such as restart
 and thus should not count towards tally)
 
+=head3 options
+
+The following options are supported
+
+=head4 userId
+
+The userId to count responses for (required)
+
+=head4 ipAddress
+
+An IP address to filter responses by (optional)
+
+=head4 isComplete
+
+A complete code to use to filter responses by (optional, defaults to 1)
+
 =cut
 
 sub takenCount {
     my $self = shift;
-    my %opts = validate(@_, { userId => 0, anonId => 0, ipAddress => 0, isComplete => 0 });
+    my %opts = validate(@_, { userId => 1, ipAddress => 0, isComplete => 0 });
     my $isComplete = defined $opts{isComplete} ? $opts{isComplete} : 1;
     
     my $sql = 'select count(*) from Survey_response where';
     $sql .= ' assetId = ' . $self->session->db->quote($self->getId);
     $sql .= ' and isComplete = ' . $self->session->db->quote($isComplete);
-    for my $o qw(userId anonId ipAddress) {
-        if (my $o_value = $opts{o}) {
+    for my $o qw(userId ipAddress) {
+        if (my $o_value = $opts{$o}) {
             $sql .= " and $o = " . $self->session->db->quote($o_value);
         }
     }
