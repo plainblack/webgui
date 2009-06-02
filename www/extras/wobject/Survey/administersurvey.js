@@ -252,16 +252,18 @@ if (typeof Survey === "undefined") {
         var total = sliderWidth;
 
         //steps must be integers
-        var step = Math.round(parseFloat(q.answers[0].step));
+        var step = Math.round(parseFloat(q.answers[0].step, 10)) || 1;
 
         //the starting value for the left side of the slider
-        var min = Math.round(parseFloat(q.answers[0].min));
+        var min = Math.round(parseFloat(q.answers[0].min, 10)) || 0;
+        var max = Math.round(parseFloat(q.answers[0].max, 10));
+        if (!YAHOO.lang.isNumber(max) || max <= min ) { max = min + 10; }
 
         //The number of values in between the max and min values
-        var distance = parseInt(parseFloat(q.answers[0].max) + (-1 * min), 10);
+        var distance = max - min;
        
         //Number of pixels each bug step takes
-        var bugSteps = parseInt(total / ((+q.answers[0].max + (-1 * q.answers[0].min) ) / step), 10);
+        var bugSteps = Math.round(total * step / distance);
 
         //redefine number of pixels to round number of steps
         total = distance * bugSteps / step;
@@ -269,7 +271,7 @@ if (typeof Survey === "undefined") {
         var scale = Math.round(total / distance);
         
         //max is just the max value, used for determining allocation sliders. 
-        var max = 0;         
+        var allocMax = 0;         
         var type = 'slider';
 
         //find the maximum difference between an answers max and min
@@ -278,7 +280,7 @@ if (typeof Survey === "undefined") {
                 var a1 = q.answers[_s];
                 YAHOO.util.Event.addListener(a1.id, "blur", sliderTextSet);
                 if (a1.max - a1.min > max) {
-                    max = a1.max - a1.min;
+                    allocMax = a1.max - a1.min;
                 }
             }
         }
@@ -314,9 +316,9 @@ if (typeof Survey === "undefined") {
                             t += sliders[q.id][x].getRealValue();
                         }
                     }
-                    if (t > max && type === 'multi') {
+                    if (t > allocMax && type === 'multi') {
                         t -= +this.getRealValue();
-                        var newVal = (max-t);
+                        var newVal = (allocMax-t);
                         this.setValue(newVal*bugSteps/step);
                         //document.getElementById(this.input).value = Math.round(parseFloat((((total - t) / total) * distance) + min));
                         document.getElementById(this.input).value = newVal;
