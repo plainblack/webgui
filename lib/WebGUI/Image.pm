@@ -177,7 +177,7 @@ sub new {
 		size => $width.'x'.$height,
 	);
 
-	$img->Read(filename => 'xc:white');
+	$img->ReadImage('xc:white');
 	
 	bless {_image => $img, _session => $session, _properties => {
 		width	=> $width,

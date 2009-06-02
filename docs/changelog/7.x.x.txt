@@ -2,6 +2,8 @@
  - fixed #10450: A different errormessage is given if the username does exist and
    does not exist. (Arjan Widlak / United Knowledge)
  - fixed: Reverted bugfix for 10409 and changed the hover help to reflect the correct way to build list-type form controls in the MetaData.
+ - Fixed a problem with graphing created by the newer versions of Image
+   Magick.
  - fixed: Template parser cannot be set
  - fixed #10361: Shortcuts duplicate extra header tags
  - fixed #10356: SQL report is cached too long
