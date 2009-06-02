@@ -19,10 +19,12 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Misja Op de Coul / E-Wise
                                      Flavio Curti
                                      John Dagitz / Plain Black
+                                     Joeri de Bruin / Oqapi
                                      Michele Dell'Aquila / CSU
                                      Jeff Depons / Adaptive Dynamics
                                      Frank Dillon / Plain Black
                                      Arne Dokken
+                                     Patrick Donnellan / SDH Consulting
                                      Junying Du / Brunswick
                                      Ed Van Duinen / UNC
                                      Greg Fast / Brunswick
@@ -60,12 +62,20 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Sean Tu / WDI
                                      Vladimir Vitkovsky / WebGUI Worldwide
                                      Jamie Vrbsky / Plain Black
+                                     Arjan Widlak / United Knowledge
                                      Madsen Wikholm
                                      Matt Wilson / Plain Black
+                                     Paul Wrightson / Invicta Services
                                      Zhou Xiaopeng / WebGUI Worldwide
                                      Gerald Young
                                      Tabitha Zipperer / Plain Black
                                      Henry Tang / Long Term Results B.V.
+
+
+Invicta Services made the PayPal payment gateway in WebGUI and also offers
+additional PayPal related services for WebGUI. You can find out more at:
+    http://webgui.invictaservices.net
+
 
 The following are people/companies who didn't directly contribute
 to WebGUI, but whose work has made WebGUI possible:
