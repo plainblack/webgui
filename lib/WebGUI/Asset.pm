@@ -1102,7 +1102,6 @@ Returns the extraHeadTags stored in the asset.  Called in $self->session->style-
 
 sub getExtraHeadTags {
 	my $self = shift;
-    $self->session->log->warn("usePackedHeadTags: ". $self->get('usePackedHeadTags'));
 	return $self->get('usePackedHeadTags') 
             ? $self->get('extraHeadTagsPacked')
             : $self->get("extraHeadTags")
@@ -1974,7 +1973,6 @@ sub outputWidgetMarkup {
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
-    $session->log->warn($content);
     my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
     $body = $content;
     my $jsonContent     = to_json( { "asset$hexId" => { content => $body } } );
@@ -2029,7 +2027,6 @@ filter guidelines).
 
 sub packExtraHeadTags {
     my ( $self, $unpacked ) = @_;
-    $self->session->log->warn('packExtraHeadTags called with '. $unpacked);
     return $unpacked if !$unpacked;
     my $packed  = $unpacked;
     HTML::Packer::minify( \$packed, {
@@ -2038,9 +2035,7 @@ sub packExtraHeadTags {
         do_javascript       => "shrink",
         do_stylesheet       => "minify",
     } );
-    $self->session->log->warn('updated extraHeadTagsPacked to '. $packed);
     $self->update({ extraHeadTagsPacked => $packed });
-    $self->session->log->warn('extraHeadTagsPacked is '. $self->get('extraHeadTagsPacked'));
     return $unpacked;
 }
 
