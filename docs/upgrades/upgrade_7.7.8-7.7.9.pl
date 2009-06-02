@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+repackTemplates( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,47 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Repack all templates since the packed columns may have been wiped out due to the bug.
+sub repackTemplates {
+    my $session = shift;
+
+    print "\n\t\tRepacking all templates that use packing, this may take a while..." unless $quiet;
+    my $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM template where usePacked=1" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset::Template->new( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            template        => $asset->get('template'),
+            usePacked       => 0,
+        });
+    }
+
+    print "\n\t\tRepacking head tags in assets that use packing, this may take a while..." unless $quiet;
+    $sth = $session->db->read( "SELECT assetId FROM asset where usePackedHeadTags=1" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            extraHeadTags       => $asset->get('extraHeadTags'),
+            usePackedHeadTags   => 0,
+        });
+    }
+
+    print "\n\t\tRepacking snippets that use packing, this may take a while..." unless $quiet;
+    $sth = $session->db->read( "SELECT DISTINCT(assetId) FROM snippet where usePacked=1" );
+    while ( my ($assetId) = $sth->array ) {
+        my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
+        next unless $asset;
+        $asset->update({
+            snippet         => $asset->get('snippet'),
+            usePacked       => 0,
+        });
+    }
+
+    print "\n\t... DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

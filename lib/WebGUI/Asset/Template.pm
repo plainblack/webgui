@@ -101,6 +101,7 @@ sub definition {
             templatePacked => {
                 fieldType       => 'hidden',
                 defaultValue    => undef,
+                noFormPost      => 1,
             },
             usePacked => {
                 fieldType       => 'yesNo',
