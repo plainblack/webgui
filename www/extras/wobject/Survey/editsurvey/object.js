@@ -53,7 +53,7 @@ Survey.ObjectTemplate = (function(){
             }
             
             // Remove all hover-help
-            var hovers = document.getElementsByClassName('wg-hoverhelp');
+            var hovers = YAHOO.util.Dom.getElementsByClassName('wg-hoverhelp');
             for (var i = 0; i < hovers.length; i++) {
                 var hover = hovers[i];
                 if (!hover) {
