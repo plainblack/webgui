@@ -18,21 +18,21 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 25;
+my $tests = 29;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
 # put your tests here
 
 my $usedOk = use_ok('WebGUI::Asset::Wobject::Survey');
-my ($user, $import_node, $survey);
+my ($survey);
 
 SKIP: {
 
 skip $tests, "Unable to load Survey" unless $usedOk;
-$user = WebGUI::User->new( $session, 'new' );
+my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->usersToDelete($user);
-$import_node = WebGUI::Asset->getImportNode($session);
+my $import_node = WebGUI::Asset->getImportNode($session);
 
 # Create a Survey
 $survey = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
@@ -61,8 +61,8 @@ $sJSON->update([1,1], { variable => 'S1Q1' });
 
 $survey->persistSurveyJSON;
 
-# Now start a response as admin user
-$session->user( { userId =>3 } );
+# Now start a response as the test user
+$session->user( { user => $user } );
 
 my $responseId = $survey->responseId;
 my $s = WebGUI::Asset::Wobject::Survey->newByResponseId($session, $responseId);
@@ -91,6 +91,22 @@ delete $s->{canTake};
 delete $s->{responseId};
 ok($s->canTakeSurvey, '..and also when maxResponsesPerUser set to 0 (unlimited)');
 ok($s->responseId, '..(and similarly for responseId)');
+
+# Start a new response as another user
+$s->update({maxResponsesPerUser => 1});
+is($s->takenCount( { userId => 1 } ), 0, 'Visitor has no responses');
+my $u = WebGUI::User->new( $session, 'new' );
+WebGUI::Test->usersToDelete($u);
+is($s->takenCount( { userId => $u->userId } ), 0, 'New user has no responses');
+delete $s->{canTake};
+delete $s->{responseId};
+$session->user( { userId => $u->userId } );
+ok($s->canTakeSurvey, 'Separate counts for separate users');
+ok($s->responseId, '..(and similarly for responseId)');
+# Put things back to normal..
+delete $s->{canTake};
+delete $s->{responseId};
+$session->user( { user => $user } );
 
 # Restart the survey
 $s->submitQuestions({
@@ -136,6 +152,7 @@ cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started'
 # www_jumpTo
 {
     # Check a simple www_jumpTo request
+    $session->user( { userId => 3 } );
     WebGUI::Test->getPage( $survey, 'www_jumpTo', { formParams => {id => '0'} } );
     is( $session->http->getStatus, '201', 'Page request ok' ); # why is "201 - created" status used??
     is($survey->responseJSON->nextResponse, 0, 'S0 is the first response');
