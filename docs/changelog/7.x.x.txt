@@ -12,6 +12,7 @@
  - fixed #10453: Project Management System Broken in 7.7.8
  - fixed Two sets of delete buttons for photos in the Story.
  - fixed #9920: Survey: cannot add questions in IE
+ - fixed #10449: Undefined template
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,

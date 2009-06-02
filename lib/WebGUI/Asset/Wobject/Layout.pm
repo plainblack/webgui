@@ -194,6 +194,13 @@ sub prepareView {
     }
 
     my $template = WebGUI::Asset->new($session,$templateId,"WebGUI::Asset::Template");
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare( $self->getMetaDataAsTemplateVariables );
     $self->{_viewTemplate} = $template;
 
@@ -298,7 +305,7 @@ sub view {
     my $session = $self->session;
     my $showPerformance = $session->errorHandler->canShowPerformanceIndicators;
     my @parts = split $self->{_viewSplitter},
-        $self->processTemplate($self->{_viewVars}, undef, $self->{_viewTemplate});
+    $self->processTemplate($self->{_viewVars}, undef, $self->{_viewTemplate});
     my $output = "";
 
     if ($self->{_viewPrintOverride}) {

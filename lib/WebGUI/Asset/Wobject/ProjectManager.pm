@@ -613,11 +613,18 @@ sub i18n {
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new($self->session, $self->get("projectDashboardTemplateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("projectDashboardTemplateId"),
+            assetId    => $self->getId,
+        );
+    }
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 #-------------------------------------------------------------------

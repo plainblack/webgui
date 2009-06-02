@@ -903,6 +903,13 @@ sub prepareView {
     #$self->session->errorHandler->warn("Prepare view ".$view." with template ".$self->get("templateId".$view));
     
     my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId".$view));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId".$view),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare($self->getMetaDataAsTemplateVariables);
     
     $self->{_viewTemplate} = $template;
