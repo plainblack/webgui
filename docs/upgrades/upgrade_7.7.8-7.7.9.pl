@@ -62,7 +62,7 @@ sub repackTemplates {
     }
 
     print "\n\t\tRepacking head tags in assets that use packing, this may take a while..." unless $quiet;
-    $sth = $session->db->read( "SELECT assetId FROM asset where usePackedHeadTags=1" );
+    $sth = $session->db->read( "SELECT distinct(assetId) FROM assetData where usePackedHeadTags=1" );
     while ( my ($assetId) = $sth->array ) {
         my $asset       = WebGUI::Asset->newByDynamicClass( $session, $assetId );
         next unless $asset;
