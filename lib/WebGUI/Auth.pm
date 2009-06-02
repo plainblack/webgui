@@ -148,6 +148,7 @@ sub authenticate {
 }
 
 #-------------------------------------------------------------------
+
 =head2 authenticationError
 
 This subroutine is called by authenticate and its subclasses to make
