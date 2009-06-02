@@ -89,11 +89,18 @@ See WebGUI::Asset::prepareView() for details.
 =cut
 
 sub prepareView {
-	my $self = shift;
-	$self->SUPER::prepareView();
-	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
-	$template->prepare($self->getMetaDataAsTemplateVariables);
-	$self->{_viewTemplate} = $template;
+    my $self = shift;
+    $self->SUPER::prepareView();
+    my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
+    $template->prepare($self->getMetaDataAsTemplateVariables);
+    $self->{_viewTemplate} = $template;
 }
 
 

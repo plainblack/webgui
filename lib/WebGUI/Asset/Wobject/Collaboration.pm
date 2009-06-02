@@ -1175,6 +1175,13 @@ sub prepareView {
     if ($self->get('rssCapableRssEnabled')) {
         $self->session->style->setLink($self->getRssUrl,{ rel=>'alternate', type=>'application/rss+xml', title=>$self->get('title') . ' RSS' });
     }
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("collaborationTemplateId"),
+            assetId    => $self->getId,
+        );
+    }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }

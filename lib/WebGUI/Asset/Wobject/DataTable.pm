@@ -230,6 +230,13 @@ sub prepareView {
 
     # Prepare the template
     my $template = WebGUI::Asset::Template->new( $session, $self->get("templateId") );
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_template} = $template;
 

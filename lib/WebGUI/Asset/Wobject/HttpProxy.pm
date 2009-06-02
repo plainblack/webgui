@@ -209,12 +209,26 @@ sub prepareView {
 	my $self = shift;
 	$self->SUPER::prepareView();
 	my $template = WebGUI::Asset::Template->new($self->session, $self->get("templateId"));
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $self->get("templateId"),
+            assetId    => $self->getId,
+        );
+    }
 	$template->prepare($self->getMetaDataAsTemplateVariables);
 	$self->{_viewTemplate} = $template;
 }
 
 
 #-------------------------------------------------------------------
+
+=head2 purge
+
+Extend the base method to delete the cookie jar
+
+=cut
+
 sub purge {
 	my $self = shift;
 	$self->getCookieJar->delete;	
