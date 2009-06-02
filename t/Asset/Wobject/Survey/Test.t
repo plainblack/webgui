@@ -25,6 +25,12 @@ plan tests => 85;
 
 my ( $s, $t1 );
 
+eval 'use TAP::Parser; use TAP::Parser::Aggregator';
+
+SKIP: {
+
+skip "Unable to load TAP::Parser and TAP::Parser::Aggregator", 1 if $@;
+
 #----------------------------------------------------------------------------
 # put your tests here
 use_ok('WebGUI::Asset::Wobject::Survey::Test');
@@ -32,6 +38,9 @@ use_ok('WebGUI::Asset::Wobject::Survey::Test');
 my $user = WebGUI::User->new( $session, 'new' );
 WebGUI::Test->usersToDelete($user);
 my $import_node = WebGUI::Asset->getImportNode($session);
+
+WebGUI::Test->originalConfig('enableSurveyExpressionEngine');
+$session->config->set('enableSurveyExpressionEngine', 1);
 
 # Create a Survey
 $s = $import_node->addChild( { className => 'WebGUI::Asset::Wobject::Survey', } );
@@ -679,6 +688,7 @@ sub try_it {
         # go all the way through so that we can access ->has_problems
     }
     ok( !$parser->has_problems == !$opts->{fail}, ( $opts->{fail} ? "Fails" : "Passes" ) . ' as expected' );
+}
 }
 
 #----------------------------------------------------------------------------

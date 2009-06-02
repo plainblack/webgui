@@ -21,6 +21,7 @@ use Params::Validate qw(:all);
 use Safe;
 use List::Util qw/sum/;
 use WebGUI::Asset;
+use WebGUI::Asset::Wobject::Survey;
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
 
 # We need these as semi-globals so that utility subs (which are shared with the safe compartment)
@@ -534,7 +535,6 @@ sub run {
             $session->log->debug("Using responseId: $mostRecentlyCompletedResponseId");
 
             # (re)Instantiate the survey instance using the responseId
-            use WebGUI::Asset::Wobject::Survey;
             $asset = WebGUI::Asset::Wobject::Survey->newByResponseId( $session, $mostRecentlyCompletedResponseId );
             if ( !$asset ) {
                 $session->log->warn("Unable to instantiate asset by responseId: $mostRecentlyCompletedResponseId");

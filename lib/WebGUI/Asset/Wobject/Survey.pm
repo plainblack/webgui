@@ -19,8 +19,15 @@ use WebGUI::Utility;
 use base 'WebGUI::Asset::Wobject';
 use WebGUI::Asset::Wobject::Survey::SurveyJSON;
 use WebGUI::Asset::Wobject::Survey::ResponseJSON;
+use WebGUI::Form::Country;
+use Text::CSV_XS;
 use Params::Validate qw(:all);
 Params::Validate::validation_options( on_fail => sub { WebGUI::Error::InvalidParam->throw( error => shift ) } );
+
+my $TAP_PARSER_MISSING = <<END_WARN;
+The Survey Test Suite feature requires TAP::Parser and TAP::Parser::Aggregator CPAN modules. 
+These will be installed as a dependency if you upgrade to Test::Harness 3.x
+END_WARN
 
 #-------------------------------------------------------------------
 
@@ -435,7 +442,7 @@ sub graph {
     
     my $session = $self->session;
 
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return;
     }
@@ -690,7 +697,7 @@ sub www_graph {
     
     my $ac   = $self->getAdminConsole;
     
-    eval 'use GraphViz';
+    eval { require GraphViz };
     if ($@) {
         return $ac->render('Survey Visualization requires the GraphViz module', $i18n->get('survey visualization'));
     }
@@ -1774,7 +1781,6 @@ sub prepareShowSurveyTemplate {
         }
         elsif ( $country{ $q->{questionType} } ) {
             $q->{country} = 1;
-            use WebGUI::Form::Country;
             my @countries = map +{ 'country' => $_ }, WebGUI::Form::Country::getCountries();
             foreach my $a(@{$q->{answers}}){
                 $a->{countries} = [ {'country' => ''}, @countries ];
@@ -2233,7 +2239,6 @@ END_HTML
             }
         }
         
-        use Text::CSV_XS;
         my $csv = Text::CSV_XS->new( { binary => 1 } );
         my @lines = map {$csv->combine(@$_); $csv->string} @rows;
         my $output = join "\n", @lines;
@@ -2629,6 +2634,15 @@ sub www_runTest {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
     
+    my $i18n = WebGUI::International->new($session, 'Asset_Survey');
+    my $ac = $self->getAdminConsole;
+    
+    eval { require TAP::Parser };
+    if ($@) {
+        $self->session->log->warn($TAP_PARSER_MISSING);
+        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
+    }
+    
     my $testId = $session->form->get("testId");
     
     my $test = WebGUI::Asset::Wobject::Survey::Test->new($session, $testId)
@@ -2640,8 +2654,6 @@ sub www_runTest {
     
     my $parsed = $self->parseTap($tap) or return $self->www_editTestSuite('Unable to parse test output');
     
-    my $ac = $self->getAdminConsole;
-    my $i18n = WebGUI::International->new($session, 'Asset_Survey');
     $ac->addSubmenuItem($self->session->url->page("func=editTest;testId=$testId"), $i18n->get('edit test'));
     $ac->addSubmenuItem($self->session->url->page("func=runTest;testId=$testId"), $i18n->get('run test'));
     return $ac->render($parsed->{templateText}, 'Test Results');
@@ -2657,7 +2669,11 @@ all interesting TAP::Parser and TAP::Parser::Result properties) and the template
 sub parseTap {
     my ($self, $tap) = @_;
     
-    use TAP::Parser;
+    eval { require TAP::Parser };
+    if ($@) {
+        $self->session->log->warn($TAP_PARSER_MISSING);
+        return;
+    }
     my $parser = TAP::Parser->new( { tap => $tap } );
     
     # Expose TAP::Parser and TAP::Parser::Result info as template variables
@@ -2725,6 +2741,7 @@ sub www_runTests {
 
     my $session = $self->session;
     my $i18n = WebGUI::International->new($self->session, "Asset_Survey");
+    my $ac = $self->getAdminConsole;
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
     
@@ -2746,9 +2763,19 @@ sub www_runTests {
     };
     my $format = $self->session->form->param('format');
     local $| = 1 if $format eq 'tap';
+
     
     my @parsers;
-    use TAP::Parser::Aggregator;
+    eval { require TAP::Parser };
+    if ($@) {
+        $self->session->log->warn($TAP_PARSER_MISSING);
+        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
+    }
+    eval { require TAP::Parser::Aggregator };
+    if ($@) {
+        $self->session->log->warn($TAP_PARSER_MISSING);
+        return $ac->render($TAP_PARSER_MISSING, $i18n->get('test results'));
+    }
     my $aggregate = TAP::Parser::Aggregator->new;
     $aggregate->start;
     
@@ -2792,7 +2819,7 @@ sub www_runTests {
     }
     my $out = $self->processTemplate($var, $self->get('testResultsTemplateId') || 'S3zpVitAmhy58CAioH359Q');
 
-    my $ac = $self->getAdminConsole;
+    
     if ($format eq 'tap') {
         my $summary = <<'END_SUMMARY';
 SUMMARY
