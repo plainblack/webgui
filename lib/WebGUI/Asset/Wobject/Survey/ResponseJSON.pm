@@ -572,17 +572,25 @@ sub recordResponses {
             
             if ( $questionType eq 'Country' ) {
                 # Must be a valid country
-                next if !grep { $_ eq $recordedAnswer } WebGUI::Form::Country->getCountries;
+                if (!grep { $_ eq $recordedAnswer } WebGUI::Form::Country->getCountries) {
+                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
+                    next;
+                }
             }
             elsif ( $questionType eq 'Date' ) {
                 # Must be a valid date (until we get date i18n this is limited to YYYY/MM/DD)
-                next if $recordedAnswer !~ m|^\d{4}/\d{2}/\d{2}$|;
+                if ($recordedAnswer !~ m|^\d{4}/\d{1,2}/\d{1,2}$|) {
+                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
+                    next;
+                }
             } 
             elsif ( $questionType eq 'Number' || $questionType eq 'Slider' ) {
                 if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
+                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
                     next;
                 }
                 elsif ( $answer->{min} =~ /\d/ and $recordedAnswer < $answer->{min} ) {
+                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
                     next;
                 }
             } 
@@ -593,7 +601,10 @@ sub recordResponses {
             else {
                 # In the case of a mc question, only selected answers will have a defined recordedAnswer
                 # Thus we skip any answers where recordedAnswer is not defined
-                next if !defined $recordedAnswer || $recordedAnswer !~ /\S/;
+                if (!defined $recordedAnswer || $recordedAnswer !~ /\S/) {
+                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
+                    next;
+                }
             } 
 
             # If we reach here, answer validated ok
