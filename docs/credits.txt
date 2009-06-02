@@ -24,7 +24,7 @@ Contributing Developers..............Meg O'Keefe Andrea / Plain Black
                                      Jeff Depons / Adaptive Dynamics
                                      Frank Dillon / Plain Black
                                      Arne Dokken
-                                     Patrick Donnellan / SDH Consulting
+                                     Patrick Donelan / SDH Consulting
                                      Junying Du / Brunswick
                                      Ed Van Duinen / UNC
                                      Greg Fast / Brunswick
