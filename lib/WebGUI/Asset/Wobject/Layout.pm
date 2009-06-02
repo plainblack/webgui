@@ -167,7 +167,7 @@ sub prepareView {
     if (!$template) {
         WebGUI::Error::ObjectNotFound::Template->throw(
             error      => qq{Template not found},
-            templateId => $templateId,
+            templateId => $self->get("templateId"),
             assetId    => $self->getId,
         );
     }
