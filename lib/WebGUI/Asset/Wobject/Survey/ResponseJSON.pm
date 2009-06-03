@@ -545,6 +545,8 @@ the precedence order is inside-out, in order of questions displayed, e.g.
 
 The first to trigger a jump short-circuits the process, meaning that subsequent items are not attempted.
 
+For Sections with questions spread out over several pages, Section-level actions are only performed on the final page of the Section.
+
 =cut
 
 sub recordResponses {
@@ -557,6 +559,7 @@ sub recordResponses {
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section = $self->nextResponseSection();
+    my $sId = $self->nextResponseSectionIndex(); # make note of the section id prior to recording any responses
 
     # Process responses by looping over expected questions in survey order
     my @questions  = $self->nextQuestions();
@@ -628,9 +631,10 @@ sub recordResponses {
                 time        => time,
             };
             
-            # Only record verbatim if this is a verbatim answer
-            if ($answer->{verbatim}) {
-                $newResponse{ $aId }{verbatim} = $responses->{ "${aId}verbatim" };
+            # Only record verbatim if answer is marked verbatim
+            my $verbatim = $responses->{ "${aId}verbatim" };
+            if ($answer->{verbatim} && defined $verbatim && length $verbatim) {
+                $newResponse{ $aId }{verbatim} = $verbatim;
             }
         }
 
@@ -720,22 +724,24 @@ sub recordResponses {
         # N.B. Questions don't have terminalUrls
     }
     
-    # Then Sections..
-    
-    # Section goto
-    if (my $action = $section->{goto} && $self->processGoto($section->{goto})) {
-        $self->session->log->debug("Branching on Section goto: $section->{goto}");
-        return $action;
-    }
-    # Then section gotoExpression
-    if (my $action = $section->{gotoExpression} && $self->processExpression($section->{gotoExpression})) {
-        $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
-        return $action;
-    }
-    # Then section terminal
-    if ($section->{terminal} && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex) {
-        $self->session->log->debug("Section terminal: $section->{terminalUrl}");
-        return { terminal => $section->{terminalUrl} };
+    # Then Sections.. (but if this is the last page of the Section)
+    my $newSectionIndex = $self->nextResponseSectionIndex;
+    if ($newSectionIndex != $sId) {
+        # Section goto
+        if (my $action = $section->{goto} && $self->processGoto($section->{goto})) {
+            $self->session->log->debug("Branching on Section goto: $section->{goto}");
+            return $action;
+        }
+        # Then section gotoExpression
+        if (my $action = $section->{gotoExpression} && $self->processExpression($section->{gotoExpression})) {
+            $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
+            return $action;
+        }
+        # Then section terminal
+        if ($section->{terminal} && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex) {
+            $self->session->log->debug("Section terminal: $section->{terminalUrl}");
+            return { terminal => $section->{terminalUrl} };
+        }
     }
     
     # The above goto and gotoExpression checks will have already called $self->checkForLogicalSection after

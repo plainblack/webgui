@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 113;
+my $tests = 115;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -506,8 +506,23 @@ cmp_deeply($rJSON->processExpression(q{restart()}), { restart => 1 }, 'restart w
 cmp_deeply($rJSON->processExpression(q{exitUrl(blah)}), { exitUrl => 'blah' }, 'explicit exitUrl works');
 cmp_deeply($rJSON->processExpression(q{exitUrl()}), { exitUrl => undef }, 'unspecified exitUrl works too');
 
+# Section branching should not happen until all questions in a section have been completed
+$rJSON->survey->section([0])->{questionsPerPage} = 2; # Has 3 questions, so first submit will not trigger section-branching
+$rJSON->survey->section([0])->{gotoExpression} = q{ tag('not so fast'); };
+$rJSON->reset;
+$rJSON->recordResponses({
+    '0-0-0' => 1,
+    '0-1-0' => '13 11 66',
+});
+cmp_deeply($rJSON->tags, {}, 'No tags yet, section branching should not run yet');
+$rJSON->recordResponses({
+    '0-2-1' => 1,
+});
+cmp_deeply($rJSON->tags, { 'not so fast' => 1 }, 'Section branching has now run');
+
 # Clean up after this set of tests
-$rJSON->responses({});
+$rJSON->reset;
+$rJSON->survey->section([0])->{gotoExpression} = undef;
 $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 
 ####################################################
@@ -851,7 +866,7 @@ $rJSON->recordResponses( {
     '1-0-0' => 1, # Multi-choice answers are submitted like this, 
     '1-0-0verbatim' => 'insert witty comment',
     '1-1-1' => 1, # with the selected answer set to 1
-    '1-1-1verbatim' => '',
+    '1-1-1verbatim' => ' ',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
@@ -865,7 +880,7 @@ cmp_deeply(
 cmp_deeply(
     $rJSON->responses->{'1-1-1'}, 
     {
-        'verbatim' => '',
+        'verbatim' => ' ',
         'time' => num(time(), 3),
         'value' => 'No'
     }, 
