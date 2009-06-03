@@ -1955,7 +1955,6 @@ sub outputWidgetMarkup {
         $content = $self->session->style->process($content,$styleTemplateId); 
     }
     WebGUI::Macro::process($session, \$content);
-    $session->log->warn($content);
     my ($headTags, $body) = WebGUI::HTML::splitHeadBody($content);
     $body = $content;
     my $jsonContent     = to_json( { "asset$hexId" => { content => $body } } );
