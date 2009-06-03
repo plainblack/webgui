@@ -217,11 +217,18 @@ sub session {
 
 Serializes the internal perl hash representing the Response to a JSON string
 
+To reduce json serialization time and db bloat, we only serialize the bare essentials
+
 =cut
 
 sub freeze {
     my $self = shift;
-    return to_json($self->response);
+    
+    # These are the only properties of the response hash that we serialize:
+    my @props = qw(responses lastResponse questionsAnswered startTime tags);
+    my %serialize;
+    @serialize{@props} = @{$self->response}{@props};
+    return to_json(\%serialize);
 }
 
 #-------------------------------------------------------------------
@@ -560,7 +567,10 @@ sub recordResponses {
         my $aValid = 0;
         my $qId = $question->{id};
 
-        $newResponse{ $qId }->{comment} = $responses->{ "${qId}comment" };
+        my $comment = $responses->{ "${qId}comment" };
+        if (defined $comment && length $comment) {
+            $newResponse{ $qId }->{comment} = $comment;
+        }
         
         for my $answer ( @{ $question->{answers} } ) {
             my $aId = $answer->{id};
@@ -577,13 +587,13 @@ sub recordResponses {
                     next;
                 }
             }
-            elsif ( $questionType eq 'Date' ) {
-                # Must be a valid date (until we get date i18n this is limited to YYYY/MM/DD)
-                if ($recordedAnswer !~ m|^\d{4}/\d{1,2}/\d{1,2}$|) {
-                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
-                    next;
-                }
-            } 
+#            elsif ( $questionType eq 'Date' ) {
+#                # Accept any date input until we get per-question validation options
+#                if ($recordedAnswer !~ m|^\d{4}/\d{1,2}/\d{1,2}$|) {
+#                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
+#                    next;
+#                }
+#            } 
             elsif ( $questionType eq 'Number' || $questionType eq 'Slider' ) {
                 if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
                     $self->session->log->debug("Invalid $questionType: $recordedAnswer");

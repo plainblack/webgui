@@ -22,7 +22,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 114;
+my $tests = 113;
 plan tests => $tests + 1;
 
 #----------------------------------------------------------------------------
@@ -564,9 +564,6 @@ cmp_deeply(
             value   => 1, # 'recordedAnswer' value used because question is multi-choice
             verbatim => 'Section 1, question 0, answer 0 verbatim',
         },
-        '1-1'   => {
-            comment => undef,
-        }
     },
     'recordResponses: verbatim answer recorded responses correctly'
 );
@@ -594,9 +591,6 @@ cmp_deeply(
             'time'    => num(time(), 3),
             value   => 'First answer', # submitted answer value used this time because non-mc
         },
-        '1-1'   => {
-            comment => undef,
-        }
     },
     'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
 );
@@ -783,7 +777,8 @@ cmp_deeply(
     }, 
     'Valid value recorded correctly'
 );
-is($rJSON->responses->{'1-1-0'}, undef, 'Invalid date ignored');
+# All date input accepted until validation options supported
+#is($rJSON->responses->{'1-1-0'}, undef, 'Invalid date ignored');
 
 ########
 # Number
