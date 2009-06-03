@@ -17,6 +17,8 @@
  - fixed #10365: Head tags do not work "Use Packed Head Tags".
  - fixed #9927: Survey - verbatim
  - fixed #10352: Deleting a user does not clean up any address books
+ - Fixed the problem with Basic Auth that UK fixed, but in a different way
+   that still allows non-realm based Basic authentication.
  - fixed #10228: Calendar: Weekly re-occurence function not working properly 
    ( Martin Kamerbeek / Oqapi )
 
