@@ -22,6 +22,7 @@
    that still allows non-realm based Basic authentication.
  - fixed #10228: Calendar: Weekly re-occurence function not working properly 
    ( Martin Kamerbeek / Oqapi )
+ - fixed #9851: New Users have blank profile field privacy settings
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,

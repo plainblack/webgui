@@ -301,7 +301,14 @@ sub www_editProfileField {
             -value=>$data->{forceImageOnly},
             -defaultValue=>1,
         );
-    }	
+    }
+    $f->radioList(
+        -name       => 'defaultPrivacySetting',
+        -label      => $i18n->get('default privacy setting label'),
+        -hoverHelp  => $i18n->get('default privacy setting description'),
+        -options    => WebGUI::ProfileField->getPrivacyOptions($session),
+        -value      => $data->{defaultPrivacySetting}
+    );	
     my $fieldType = WebGUI::Form::FieldType->new($session,
         -name=>"fieldType",
         -label=>$i18n->get(486),
@@ -377,6 +384,7 @@ sub www_editProfileFieldSave {
 		fieldType=>$session->form->fieldType("fieldType"),
 		forceImageOnly=>$session->form->yesNo("forceImageOnly"),
         extras=>$session->form->text('extras'),
+        defaultPrivacySetting=>$session->form->radioList('defaultPrivacySetting'),
 		);
 	my $categoryId = $session->form->selectBox("profileCategoryId");
 	if ($session->form->process("new")) {
