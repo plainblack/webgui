@@ -63,7 +63,7 @@ WebGUI.i18n.prototype.load
     var callback    = {
         failure : function ( o, preload ) {
             // TODO: YUI logger for this
-            console.log( "Could not load i18n" );
+            //console.log( "Could not load i18n" );
         },
         success : function ( o ) {
             var responseObj = YAHOO.lang.JSON.parse( o.responseText );

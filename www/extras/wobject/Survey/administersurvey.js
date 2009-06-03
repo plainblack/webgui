@@ -45,10 +45,8 @@ if (typeof Survey === "undefined") {
     function formsubmit(event){
         var submit = 1;//boolean for if all was good or not
         for (var i in toValidate) {
-console.log(toValidate);
             if (YAHOO.lang.hasOwnProperty(toValidate, i)) {
                 var answered = 0;
-console.log(toValidate[i].type);
                 if (toValidate[i].type === 'Multi Slider - Allocate') {
                     var total = 0;
                     for (var z in toValidate[i].answers) {
