@@ -432,7 +432,7 @@ sub incrementCounter {
     
     my $currentIp = $self->session->env->get("HTTP_X_FORWARDED_FOR");
     
-    unless ($self->get($counter."LastIp") eq $currentIp) {
+    unless ($self->get($counter."LastIp") && ($self->get($counter."LastIp") eq $currentIp)) {
         $self->update({ 
             $counter."LastIp"   => $currentIp,
             $counter            => $self->get($counter)+1
