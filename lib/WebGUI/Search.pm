@@ -48,6 +48,7 @@ Returns true if the given word is in the stopword list.
 sub _isStopword {
     my $self    = shift;
     my $word    = lc shift;
+    $word       =~ s/[^A-Za-z']//g;
     my $stopwords   = q{ 
         a's able about above according accordingly across actually after 
         afterwards again against ain't all allow allows almost alone 

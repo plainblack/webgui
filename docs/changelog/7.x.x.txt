@@ -1,4 +1,5 @@
 7.6.26
+ - fixed #10211: Regex quantifiers like ? and + broke search engine
  - fixed #10266: Public Profile overrides Able to be friend   
  - fixed #10261: fixed span tag per bug report
  - fixed #10352: Deleting a user does not clean up any address books
