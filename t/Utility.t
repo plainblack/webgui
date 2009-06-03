@@ -17,7 +17,7 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 44; # increment this value for each test you create
+use Test::More tests => 46; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -139,6 +139,19 @@ is(WebGUI::Utility::isInSubnet('192.168.0.1', ['256.168.0.1/32']), undef, 'isInS
 is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.257.0.1/32']), undef, 'isInSubnet: ip has an out of range quad');
 is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.258.1/32']), undef, 'isInSubnet: ip has an out of range quad');
 is(WebGUI::Utility::isInSubnet('192.168.0.1', ['192.168.0.259/32']), undef, 'isInSubnet: ip has an out of range quad');
+
+#####################################################################
+#
+# emailRegex
+#
+#####################################################################
+
+isa_ok(WebGUI::Utility::emailRegex, 'Regexp');
+
+TODO: {
+    local $TODO = 'Things to do';
+    ok(0, 'Move email validation tests out of Form/Email into here');
+}
 
 # Local variables:
 # mode: cperl

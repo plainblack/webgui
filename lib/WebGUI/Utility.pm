@@ -81,6 +81,19 @@ sub commify {
 
 #-------------------------------------------------------------------
 
+=head2 emailRegex ( )
+
+Returns a regex object that can be used to validate email addresses.
+
+=cut
+
+sub emailRegex {
+	return qr/^([0-9a-zA-Z]+[-._+&])*\w+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,7}$/;
+}
+
+
+#-------------------------------------------------------------------
+
 =head2 formatBytes ( integer )
 
 Returns a formatted file size like "3MB" or "44kB".
