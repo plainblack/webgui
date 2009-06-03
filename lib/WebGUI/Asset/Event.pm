@@ -747,13 +747,13 @@ sub getRecurrenceDates {
     return undef unless $recur->{recurType};
     
     my %dayNames = (
-        monday      => "m",
-        tuesday     => "t",
-        wednesday   => "w",
-        thursday    => "r",
-        friday      => "f",
-        saturday    => "s",
-        sunday      => "u",
+        1 => "m",
+        2 => "t",
+        3 => "w",
+        4 => "r",
+        5 => "f",
+        6 => "s",
+        7 => "u",
     );
     
     my %weeks    = (
@@ -836,7 +836,7 @@ sub getRecurrenceDates {
                 last RECURRENCE
                     if ($recur->{endDate} && $dt_day > $dt_end);
                 
-                my $today    = $dayNames{lc $dt_day->day_name};
+                my $today    = $dayNames{ $dt_day->day_of_week };
                 
                 if (grep /$today/i, @{$recur->{dayNames}}) {
                     ### Add date
@@ -907,7 +907,7 @@ sub getRecurrenceDates {
                         # If today isn't in the month, stop looking
                         last if ($dt_day->month ne $dt->month);
                         
-                        my $today    = $dayNames{lc $dt_day->day_name};
+                        my $today    = $dayNames{ $dt_day->day_of_week };
                         
                         if (grep /$today/i, @{$recur->{dayNames}})
                         {
@@ -938,7 +938,7 @@ sub getRecurrenceDates {
                     # If today is past the endDate, try the next one
                     next if ($recur->{endDate} && $dt_day > $dt_end);
                     
-                    my $today    = $dayNames{lc $dt_day->day_name};
+                    my $today    = $dayNames{ $dt_day->day_of_week };
                     
                     if (grep /$today/i, @{$recur->{dayNames}}) {
                         ### Add date
@@ -1028,7 +1028,7 @@ sub getRecurrenceDates {
                                 # If today isn't in the month, stop looking
                                 last if ($dt_day->month ne $dt_month->month);
                                 
-                                my $today    = $dayNames{lc $dt_day->day_name};
+                                my $today    = $dayNames{ lc $dt_day->day_of_week };
                                 
                                 if (grep /$today/i, @{$recur->{dayNames}}) {
                                     ### Add date
@@ -1056,7 +1056,7 @@ sub getRecurrenceDates {
                             next
                                 if ($recur->{endDate} && $dt_day > $dt_end);
                             
-                            my $today    = $dayNames{lc $dt_day->day_name};
+                            my $today    = $dayNames{ $dt_day->day_of_week };
                             
                             if (grep /$today/i, @{$recur->{dayNames}}) {
                                 ### Add date

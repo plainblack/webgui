@@ -1,5 +1,7 @@
 7.6.26
  - fixed #10352: Deleting a user does not clean up any address books
+ - fixed #10228: Calendar: Weekly re-occurence function not working properly
+   ( Martin Kamerbeek / Oqapi )
 
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.
