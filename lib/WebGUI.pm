@@ -169,7 +169,6 @@ sub handler {
 
     # handle basic auth
     my $auth = $request->headers_in->{'Authorization'};
-    warn "auth: ".$auth;
     if ($auth =~ m/^Basic/) { # machine oriented
 	    # Get username and password from Apache and hand over to authen
         $auth =~ s/Basic //;
