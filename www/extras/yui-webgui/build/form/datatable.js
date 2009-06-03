@@ -132,8 +132,10 @@ WebGUI.Form.DataTable
      */
     this.handleEditorShowEvent
     = function ( obj ) {
-        obj.editor.focus();
-        setTimeout( obj.editor.focus, 500 );
+        /* If we set the focus now, something might (and sometimes does) set
+         * it later in the event handling chain.  Let's defer the focus set
+         * until this chain is finished. */
+        setTimeout(function() { obj.editor.focus() }, 0);
     };
 
     /************************************************************************
@@ -144,7 +146,6 @@ WebGUI.Form.DataTable
     = function () { 
         var row = this.dataTable.getLastTrEl();
         this.dataTable.showCellEditor( row.firstChild );
-        this.dataTable.getCellEditor().focus();
     };
 
     /************************************************************************
