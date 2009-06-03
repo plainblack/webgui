@@ -1194,6 +1194,13 @@ sub prepareView {
         $templateId = $self->session->form->process('overrideTemplateId');
     }
     my $template = WebGUI::Asset::Template->new( $self->session, $templateId );
+    if (!$template) {
+        WebGUI::Error::ObjectNotFound::Template->throw(
+            error      => qq{Template not found},
+            templateId => $templateId,
+            assetId    => $self->getId,
+        );
+    }
     $template->prepare;
     $self->{_viewTemplate} = $template;
     return;
@@ -2338,7 +2345,7 @@ sub loadTempReportTable {
                     'insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
                         $self->getId(),    $ref->{Survey_responseId}, $count++,           $q->{section},
                         $q->{sectionName}, $q->{question},            $q->{questionName}, $q->{questionComment},
-                        $a->{id},          $a->{value},               $a->{comment},      $a->{time},
+                        $a->{id},          $a->{value},               $a->{verbatim},      $a->{time},
                         $a->{isCorrect},   $a->{value},               undef
                     ]
                 );

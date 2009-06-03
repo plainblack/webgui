@@ -217,11 +217,18 @@ sub session {
 
 Serializes the internal perl hash representing the Response to a JSON string
 
+To reduce json serialization time and db bloat, we only serialize the bare essentials
+
 =cut
 
 sub freeze {
     my $self = shift;
-    return to_json($self->response);
+    
+    # These are the only properties of the response hash that we serialize:
+    my @props = qw(responses lastResponse questionsAnswered startTime tags);
+    my %serialize;
+    @serialize{@props} = @{$self->response}{@props};
+    return to_json(\%serialize);
 }
 
 #-------------------------------------------------------------------
@@ -510,7 +517,7 @@ A hash ref of submitted form param data. Each element should look like:
     {
         "questionId-comment"    => "question comment",
         "answerId"              => "answer",
-        "answerId-comment"      => "answer comment",
+        "answerId-verbatim"     => "answer verbatim",
     }
 
 See L<"questionId"> and L<"answerId">.
@@ -538,6 +545,8 @@ the precedence order is inside-out, in order of questions displayed, e.g.
 
 The first to trigger a jump short-circuits the process, meaning that subsequent items are not attempted.
 
+For Sections with questions spread out over several pages, Section-level actions are only performed on the final page of the Section.
+
 =cut
 
 sub recordResponses {
@@ -550,6 +559,7 @@ sub recordResponses {
     # We want to record responses against the "next" response section and questions, since these are
     # the items that have just been displayed to the user.
     my $section = $self->nextResponseSection();
+    my $sId = $self->nextResponseSectionIndex(); # make note of the section id prior to recording any responses
 
     # Process responses by looping over expected questions in survey order
     my @questions  = $self->nextQuestions();
@@ -557,10 +567,13 @@ sub recordResponses {
     my $allQsValid = 1;
     my %validAnswers;
     for my $question (@questions) {
-        my $aValid = 0; # TODO: this is flawed because we can have multi-answer quesions
+        my $aValid = 0;
         my $qId = $question->{id};
 
-        $newResponse{ $qId }->{comment} = $responses->{ "${qId}comment" };
+        my $comment = $responses->{ "${qId}comment" };
+        if (defined $comment && length $comment) {
+            $newResponse{ $qId }->{comment} = $comment;
+        }
         
         for my $answer ( @{ $question->{answers} } ) {
             my $aId = $answer->{id};
@@ -577,13 +590,13 @@ sub recordResponses {
                     next;
                 }
             }
-            elsif ( $questionType eq 'Date' ) {
-                # Must be a valid date (until we get date i18n this is limited to YYYY/MM/DD)
-                if ($recordedAnswer !~ m|^\d{4}/\d{1,2}/\d{1,2}$|) {
-                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
-                    next;
-                }
-            } 
+#            elsif ( $questionType eq 'Date' ) {
+#                # Accept any date input until we get per-question validation options
+#                if ($recordedAnswer !~ m|^\d{4}/\d{1,2}/\d{1,2}$|) {
+#                    $self->session->log->debug("Invalid $questionType: $recordedAnswer");
+#                    next;
+#                }
+#            } 
             elsif ( $questionType eq 'Number' || $questionType eq 'Slider' ) {
                 if ( $answer->{max} =~ /\d/ and $recordedAnswer > $answer->{max} ) {
                     $self->session->log->debug("Invalid $questionType: $recordedAnswer");
@@ -615,10 +628,14 @@ sub recordResponses {
             # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
             $newResponse{ $aId } = {
                 value       => $specialQTypes{ $questionType } ? $recordedAnswer : $answer->{recordedAnswer},
-                verbatim    => $answer->{verbatim} ? $responses->{ "${aId}verbatim" } : undef,
                 time        => time,
-                comment     => $responses->{ "${aId}comment" },
-            };  
+            };
+            
+            # Only record verbatim if answer is marked verbatim
+            my $verbatim = $responses->{ "${aId}verbatim" };
+            if ($answer->{verbatim} && defined $verbatim && length $verbatim) {
+                $newResponse{ $aId }{verbatim} = $verbatim;
+            }
         }
 
         # Check if a required Question was skipped
@@ -707,22 +724,24 @@ sub recordResponses {
         # N.B. Questions don't have terminalUrls
     }
     
-    # Then Sections..
-    
-    # Section goto
-    if (my $action = $section->{goto} && $self->processGoto($section->{goto})) {
-        $self->session->log->debug("Branching on Section goto: $section->{goto}");
-        return $action;
-    }
-    # Then section gotoExpression
-    if (my $action = $section->{gotoExpression} && $self->processExpression($section->{gotoExpression})) {
-        $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
-        return $action;
-    }
-    # Then section terminal
-    if ($section->{terminal} && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex) {
-        $self->session->log->debug("Section terminal: $section->{terminalUrl}");
-        return { terminal => $section->{terminalUrl} };
+    # Then Sections.. (but if this is the last page of the Section)
+    my $newSectionIndex = $self->nextResponseSectionIndex;
+    if ($newSectionIndex != $sId) {
+        # Section goto
+        if (my $action = $section->{goto} && $self->processGoto($section->{goto})) {
+            $self->session->log->debug("Branching on Section goto: $section->{goto}");
+            return $action;
+        }
+        # Then section gotoExpression
+        if (my $action = $section->{gotoExpression} && $self->processExpression($section->{gotoExpression})) {
+            $self->session->log->debug("Branching on Section gotoExpression: $section->{gotoExpression}");
+            return $action;
+        }
+        # Then section terminal
+        if ($section->{terminal} && $self->nextResponseSectionIndex != $self->lastResponseSectionIndex) {
+            $self->session->log->debug("Section terminal: $section->{terminalUrl}");
+            return { terminal => $section->{terminalUrl} };
+        }
     }
     
     # The above goto and gotoExpression checks will have already called $self->checkForLogicalSection after
@@ -1535,11 +1554,11 @@ Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> 
          comment => "question comment",
      },
      # ...
-     # Answers entries contain: value (the recorded value), time and comment fields.
+     # Answers entries contain: value (the recorded value), time and verbatim field.
      '0-0-0' => {
          value   => "recorded answer value",
          time    => time(),
-         comment => "answer comment",
+         verbatim => "answer verbatim",
     },
     # ...
  }

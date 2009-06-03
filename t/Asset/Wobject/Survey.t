@@ -109,6 +109,7 @@ delete $s->{responseId};
 $session->user( { user => $user } );
 
 # Restart the survey
+$s->update({maxResponsesPerUser => 0});
 $s->submitQuestions({
     '0-0-0'        => 'this text ignored',
     '0-1-0'        => 'this text ignored',
@@ -118,14 +119,10 @@ cmp_deeply(
     $s->responseJSON->responses,
     superhashof(
         {   '0-1-0' => {
-                'verbatim' => undef,
-                'comment'  => undef,
                 'time'     => num( time, 5 ),
                 'value'    => 1
             },
             '0-0-0' => {
-                'verbatim' => undef,
-                'comment'  => undef,
                 'time'     => num( time, 5 ),
                 'value'    => 1
             },
@@ -144,7 +141,7 @@ use JSON;
 my $surveyEnd = $s->surveyEnd( { exitUrl => 'home' } );
 cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/home' }, 'exitUrl works (it adds a slash for us)');
 
-# Test out exitUrl using survye instance exitURL property
+# Test out exitUrl using survey instance exitURL property
 $s->update({ exitURL => 'getting_started'});
 $surveyEnd = $s->surveyEnd( { exitUrl => undef } );
 cmp_deeply(from_json($surveyEnd), { type => 'forward', url => '/getting_started' }, 'exitUrl works (it adds a slash for us)');
