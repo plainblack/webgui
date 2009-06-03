@@ -477,15 +477,21 @@ sub www_view {
 
     $var->{'can_edit_profile'  } = $uid eq $session->user->userId;
 
+    my $privacySetting = $user->profileField('publicProfile') || 'none';
+    $var->{"profile_privacy_$privacySetting"} = "true";
+
+    $var->{'acceptsPrivateMessages'} 
+        = $user->acceptsPrivateMessages($session->user->userId);
+
+    $var->{'acceptsFriendsRequests'} 
+        = $user->acceptsFriendsRequests($session->user);
+
     #Check user privileges
     unless ($user->profileIsViewable($session->user)) {
         my $i18n = WebGUI::International->new($session,'Account_Profile');
-        return $self->showError(
-            $var,
-            $i18n->get("profile not public error"),
-            $var->{'back_url'},
-            $self->getErrorTemplateId
-        );
+        $var->{'notViewable'}   = 1;
+        $var->{'error_message'} = $i18n->get("profile not public error");
+        return $self->processTemplate($var,$self->getViewTemplateId);
     }
 
     #Cache the privacy settings
@@ -528,12 +534,6 @@ sub www_view {
     unless ($self->store->{hasActiveTab}) {
         $var->{'profile_category_loop'}->[0]->{'profile_category_isActive'} = 1;
     }
-
-    my $privacySetting                          = $user->profileField("publicProfile") || "none";
-    $var->{'profile_privacy_'.$privacySetting } = "true";
-
-    $var->{'acceptsPrivateMessages'} = $user->acceptsPrivateMessages($session->user->userId);
-    $var->{'acceptsFriendsRequests'} = $user->acceptsFriendsRequests($session->user);
 
     return $self->processTemplate($var,$self->getViewTemplateId);
 }

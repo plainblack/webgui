@@ -1,4 +1,5 @@
 7.7.9
+ - fixed #10266: Public Profile overrides Able to be friend   
  - fixed #10211: Regex quantifiers like ? and + broke search engine
  - fixed #10261: editted tag in Default Contributions View Template
  - fixed #10450: A different errormessage is given if the username does exist and
