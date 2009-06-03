@@ -15,6 +15,7 @@
  - fixed #9920: Survey: cannot add questions in IE
  - fixed #10449: Undefined template
  - fixed: WebGUI::Search epoch maximum range error  (#10288)
+ - fixed: Insufficient filtering in javascript filter  (#10001)
  - fixed #10365: Head tags do not work "Use Packed Head Tags".
  - fixed #9927: Survey - verbatim
  - fixed #10352: Deleting a user does not clean up any address books

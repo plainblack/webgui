@@ -588,14 +588,14 @@ sub definition {
 			},
 		filterCode =>{
 			fieldType=>"filterContent",
-			defaultValue=>'javascript',
+			defaultValue=>'most',
 			tab=>'security',
 			label=>$i18n->get('filter code'),
 			hoverHelp=>$i18n->get('filter code description'),
 			},
 		replyFilterCode =>{
 			fieldType=>"filterContent",
-			defaultValue=>'javascript',
+			defaultValue=>'most',
 			tab=>'security',
 			label=>$i18n->get('reply filter code'),
 			hoverHelp=>$i18n->get('reply filter code description'),
