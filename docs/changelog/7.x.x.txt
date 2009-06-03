@@ -1,4 +1,5 @@
 7.6.26
+ - fixed #10261: fixed span tag per bug report
  - fixed #10352: Deleting a user does not clean up any address books
  - fixed: Insufficient filtering in javascript filter  (#10001)
  - Fixed the problem with Basic Auth that UK fixed, but in a different way that still allows non-realm based Basic authentication.
