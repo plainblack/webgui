@@ -1,3 +1,5 @@
+7.6.26
+
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.
  - fixed #10450: A different errormessage is given if the username does exist and
