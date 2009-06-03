@@ -3,8 +3,7 @@
  - fixed #10450: A different errormessage is given if the username does exist and
    does not exist. (Arjan Widlak / United Knowledge)
  - fixed: Reverted bugfix for 10409 and changed the hover help to reflect the correct way to build list-type form controls in the MetaData.
- - Fixed a problem with graphing created by the newer versions of Image
-   Magick.
+ - Fixed a problem with graphing created by the newer versions of Image Magick.
  - fixed: Template parser cannot be set
  - fixed #10361: Shortcuts duplicate extra header tags
  - fixed #10356: SQL report is cached too long
@@ -19,12 +18,10 @@
  - fixed #10365: Head tags do not work "Use Packed Head Tags".
  - fixed #9927: Survey - verbatim
  - fixed #10352: Deleting a user does not clean up any address books
- - Fixed the problem with Basic Auth that UK fixed, but in a different way
-   that still allows non-realm based Basic authentication.
- - fixed #10228: Calendar: Weekly re-occurence function not working properly 
-   ( Martin Kamerbeek / Oqapi )
- - fixed #9851: New Users have blank profile field privacy settings (United
-   Knowledge)
+ - Fixed the problem with Basic Auth that UK fixed, but in a different way that still allows non-realm based Basic authentication.
+ - fixed #10228: Calendar: Weekly re-occurence function not working properly ( Martin Kamerbeek / Oqapi )
+ - fixed #9851: New Users have blank profile field privacy settings (United Knowledge)
+ - fixed #10208: Account/Inbox.pm site invititations
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
