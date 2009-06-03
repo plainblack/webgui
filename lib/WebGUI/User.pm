@@ -22,7 +22,9 @@ use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
 use WebGUI::Workflow::Instance;
+use WebGUI::Shop::AddressBook;
 use JSON;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -352,15 +354,16 @@ sub dateCreated {
 Deletes this user, removes their user profile data, cleans up their
 inbox, removes userSessionScratch data and authentication information,
 removes them from any groups they belong to and deletes their
-Friend's group.
+Friend's group.  Also deletes any address books and addresses that
+belong to this user.
 
 =cut
 
 sub delete {
-    my $self = shift;
-    my $userId = $self->userId;
+    my $self    = shift;
+    my $userId  = $self->userId;
     my $session = $self->session;
-    my $db = $session->db;
+    my $db      = $session->db;
     $self->uncache;
 
     foreach my $groupId ( @{ $self->getGroups } ) {
@@ -393,6 +396,16 @@ sub delete {
 
     # remove inbox entries
     $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
+
+    # Shop cleanups
+    my $sth = $session->db->prepare('select addressBookId from addressBook where userId=?');
+    $sth->execute([$userId]);
+    BOOK: while (my $bookId = $sth->hashRef) {
+        my $book;
+        eval { $book =  WebGUI::Shop::AddressBook->new($session, $bookId->{addressBookId}); };
+        next BOOK if (my $e = Exception::Class->caught);
+        $book->delete;
+    }
 
     # remove user itself
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);

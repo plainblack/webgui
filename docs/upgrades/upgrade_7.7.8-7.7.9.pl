@@ -22,6 +22,7 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Shop::AddressBook;
 
 
 my $toVersion = '7.7.9';
@@ -32,6 +33,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 repackTemplates( $session );
+deleteUnattachedAddressBooks( $session );
 
 finish($session); # this line required
 
@@ -81,6 +83,21 @@ sub repackTemplates {
             snippet         => $asset->get('snippet'),
             usePacked       => 0,
         });
+    }
+
+    print "\n\t... DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+# Delete all AddressBooks where the userId does not exist in the users table
+sub deleteUnattachedAddressBooks {
+    my $session = shift;
+
+    print "\n\t\tDelete all AddressBooks if the user for that book was deleted..." unless $quiet;
+    my $sth = $session->db->read( "SELECT addressBookId FROM addressBook where userId NOT IN (SELECT userId FROM users)" );
+    while ( my ($addressBookId) = $sth->array ) {
+        my $book = WebGUI::Shop::AddressBook->new($session, $addressBookId);
+        $book->delete;
     }
 
     print "\n\t... DONE!\n" unless $quiet;

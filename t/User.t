@@ -16,11 +16,13 @@ use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Utility;
 use WebGUI::Cache;
+#use Exception::Class;
 
 use WebGUI::User;
 use WebGUI::ProfileField;
+use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 221; # increment this value for each test you create
+use Test::More tests => 223; # increment this value for each test you create
 use Test::Deep;
 use Data::Dumper;
 
@@ -241,7 +243,7 @@ cmp_ok(abs($user->lastUpdated-$lastUpdate), '<=', 1, 'lastUpdated() -- profileFi
 is($user->profileField('notAProfileField'), undef, 'getting non-existant profile fields returns undef');
 
 ##Check for valid profileField access, even if it is not cached in the user object.
-my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test'});
+my $newProfileField = WebGUI::ProfileField->create($session, 'testField', {dataDefault => 'this is a test', fieldType => 'Text'});
 is($user->profileField('testField'), 'this is a test', 'getting profile fields not cached in the user object returns the profile field default');
 
 ok(!$user->profileField('wg_privacySettings'), '... wg_privacySettings may not be retrieved');
@@ -1004,14 +1006,28 @@ is ($inmate->getInboxAddresses, '37927@textme.com', 'getInboxAddresses: can get 
 $inmate->profileField('receiveInboxSmsNotifications', 0);
 is ($inmate->getInboxAddresses, '', 'getInboxAddresses: can get no SMS and no email, even with profile info present');
 
-END {
-    foreach my $testGroup ($expiredGroup, values %groupSet) {
-        if (defined $testGroup and ref $testGroup eq 'WebGUI::Group') {
-            $testGroup->delete;
-        }
-    }
+################################################################
+#
+# delete
+#
+################################################################
 
-    ##Note, do not delete the visitor account.  That would be really bad
+##Specifically, cleaning up Address books
+
+my $shopUser = WebGUI::User->create($session);
+WebGUI::Test->usersToDelete($shopUser);
+$session->user({user => $shopUser});
+my $book = WebGUI::Shop::AddressBook->create($session);
+is ($book->get('userId'), $shopUser->userId, 'delete: Address book created with proper user');
+my $bookId = $book->getId;
+$shopUser->delete;
+undef $book;
+eval { $book = WebGUI::Shop::AddressBook->new($session, $bookId); };
+my $e = Exception::Class->caught();
+diag ref $e;
+isa_ok($e, 'WebGUI::Error::ObjectNotFound', '... cleans up the address book');
+
+END {
 
     $profileField->set(\%originalFieldData);
     $aliasProfile->set(\%originalAliasProfile);
@@ -1021,8 +1037,6 @@ END {
     $visitor->profileField('publicProfile', $originalVisitorPublicProfile);
 
     $newProfileField->delete() if $newProfileField;
-
-    $session->setting->set('smsGateway', $origSmsGateway);
 
 	$testCache->flush;
 }
