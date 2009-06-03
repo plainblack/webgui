@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-plan tests => 85;
+plan tests => 88;
 
 my ( $s, $t1 );
 
@@ -416,6 +416,23 @@ $spec = <<END_SPEC;
             "tagged" : [ 'tagged at S0Q0', { 'tagged at S1Q0' : 999 }, "my test tag", { "my data tag": 1.5 } ],
        },
        "setup" : { tag: [ "my test tag", { "my data tag": 1.5 } ] },
+    },
+]
+END_SPEC
+try_it( $t1, $spec, { tap => <<END_TAP } );
+1..1
+ok 1 - Checking tagged on page containing Section S1 Question S1Q0
+END_TAP
+
+# Complex tag object via setup option
+$spec = <<END_SPEC;
+[
+    {
+       "test" : {
+            "S1Q0"  : "n",
+            "setup" : { tag: { nested: { a: { a: 1 }, b: [ 2 ] } } },
+            "tagged" : { nested: { a: { a: 1 }, b: [ 2 ] } },
+       },
     },
 ]
 END_SPEC
