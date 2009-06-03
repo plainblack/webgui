@@ -670,7 +670,8 @@ END_WHY
                 return fail($testCount, $name, "Tag not found: $tagKey");
             }
             my $currentTagValue = $currentTags->{$tagKey};
-            if ($currentTagValue != $tagValue) {
+           
+            if (!eq_deeply($currentTagValue, $tagValue)) {
                 $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
                 return fail($testCount, $name, <<END_WHY);
 Compared tag '$tagKey'
@@ -686,7 +687,7 @@ END_WHY
         my $currentTags = $rJSON->tags;
         while (my ($tagKey, $tagValue) = each %$tagged) {
             my $currentTagValue = $currentTags->{$tagKey};
-            if ($currentTagValue != $tagValue) {
+            if (!eq_deeply($currentTagValue, $tagValue)) {
                 $self->session->log->debug("Incorrect tag value: $currentTagValue != $tagValue");
                 return fail($testCount, $name, <<END_WHY);
 Compared tag '$tagKey'
