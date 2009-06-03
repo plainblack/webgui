@@ -24,6 +24,7 @@ use WebGUI::Operation::Shared;
 use WebGUI::Shop::AddressBook;
 use JSON;
 use WebGUI::Exception;
+use WebGUI::ProfileField;
 
 =head1 NAME
 
@@ -73,6 +74,18 @@ sub _create {
     my $userId = shift || $session->id->generate();
     $session->db->write("insert into users (userId,dateCreated) values (?,?)",[$userId, time()]);
     $session->db->write("INSERT INTO userProfileData (userId) VALUES (?)",[$userId]);
+
+    # Set wg_privacySettings
+    my @fields     = @{WebGUI::ProfileField->getFields($session)};
+    my $privacy  = {};
+    foreach my $field (@fields) {
+        my $privacySetting = $field->get('defaultPrivacySetting');
+        next unless (WebGUI::Utility::isIn($privacySetting,qw(all none friends)));
+        $privacy->{$field->get('fieldName')} = $privacySetting;
+    }
+    my $json = JSON->new->encode($privacy);
+    $session->db->write("update userProfileData set wg_privacySettings=? where userId=?",[$json,$userId]);
+
     WebGUI::Group->new($session,2)->addUsers([$userId]);
     WebGUI::Group->new($session,7)->addUsers([$userId]);
     return $userId;

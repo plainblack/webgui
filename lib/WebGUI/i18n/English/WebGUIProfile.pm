@@ -418,6 +418,19 @@ If you wish to set the Default Value for any other field.  Create the field with
         message => q|Extra HTML to include with this profile field.|,
         lastUpdated => 1224620527,
     },
+
+    'default privacy setting label' => {
+        message => q|Default Privacy Setting|,
+        lastUpdated => 0,
+        context => q|Label for a profile field property on the Edit User Profile Field screen.|,
+    },
+
+    'default privacy setting description' => {
+        message => q|Select the default privacy setting for this profile field. This will be used when a new user is created.|,
+        lastUpdated => 0,
+        context => q|Description for a profile field property, used as hoverhelp on the Edit User Profile Field screen.|,
+    },
+
 };
 
 1;

@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 deleteUnattachedAddressBooks( $session );
+addDefaultPrivacySettings( $session );
 
 finish($session); # this line required
 
@@ -44,6 +45,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+sub addDefaultPrivacySettings {
+    my $session = shift;
+    print "\tAdding default privacy setting to profile fields..." unless $quiet;
+    $session->db->write("alter table userProfileField add defaultPrivacySetting char(128);");
+    $session->db->write("update userProfileField set defaultPrivacySetting = 'all' where profileCategoryId IN(2,3,6);");
+    $session->db->write("update userProfileField set defaultPrivacySetting = 'none' where !(profileCategoryId IN(2,3,6));");
+    print "Done.\n" unless $quiet;
+}
 
 #----------------------------------------------------------------------------
 # Delete all AddressBooks where the userId does not exist in the users table
