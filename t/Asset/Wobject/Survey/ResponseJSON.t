@@ -551,8 +551,7 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->recordResponses({
     '1-0comment'    => 'Section 1, question 0 comment',
     '1-0-0'         => 'First answer',
-    '1-0-0verbatim' => 'First answer verbatim',
-    '1-0-0comment'  => 'Section 1, question 0, answer 0 comment',
+    '1-0-0verbatim' => 'Section 1, question 0, answer 0 verbatim',
 });
 cmp_deeply(
     $rJSON->responses,
@@ -561,10 +560,9 @@ cmp_deeply(
             comment => 'Section 1, question 0 comment',
         },
         '1-0-0' => {
-            comment => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
             value   => 1, # 'recordedAnswer' value used because question is multi-choice
-            verbatim => 'First answer verbatim',
+            verbatim => 'Section 1, question 0, answer 0 verbatim',
         },
         '1-1'   => {
             comment => undef,
@@ -572,7 +570,7 @@ cmp_deeply(
     },
     'recordResponses: verbatim answer recorded responses correctly'
 );
-$rJSON->survey->answer([1,0,0])->{verbatim} = 0; # revert change
+
 
 # Repeat with non multi-choice question, to check that submitted answer value is used
 # instead of recordedValue
@@ -583,7 +581,7 @@ $rJSON->questionsAnswered(-1 * $rJSON->questionsAnswered);
 $rJSON->recordResponses({
     '1-0comment'   => 'Section 1, question 0 comment',
     '1-0-0'        => 'First answer',
-    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+    '1-0-0verbatim' => 'Section 1, question 0, answer 0 comment',
 });
 cmp_deeply(
     $rJSON->responses,
@@ -592,10 +590,9 @@ cmp_deeply(
             comment => 'Section 1, question 0 comment',
         },
         '1-0-0' => {
-            comment => 'Section 1, question 0, answer 0 comment',
+            verbatim => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
             value   => 'First answer', # submitted answer value used this time because non-mc
-            verbatim => undef,
         },
         '1-1'   => {
             comment => undef,
@@ -604,6 +601,7 @@ cmp_deeply(
     'recordResponses: recorded responses correctly, two questions, one answer, comments, values and time'
 );
 $rJSON->survey->question([1,0])->{questionType} = 'Multiple Choice'; # revert change
+$rJSON->survey->answer([1,0,0])->{verbatim} = 0; # revert change
 
 $rJSON->survey->answer([1,0,0])->{terminal}    = 1;
 $rJSON->survey->answer([1,0,0])->{terminalUrl} = 'answer 1-0-0 terminal';
@@ -650,10 +648,8 @@ cmp_deeply($rJSON->responses, {}, 'initially no responses');
 $rJSON->recordResponses({
     '1-0comment'   => 'Section 1, question 0 comment',
     '1-0-0'        => 'First answer',
-    '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
     '1-1comment'   => 'Section 1, question 1 comment',
     '1-1-0'        => 'Second answer',
-    '1-1-0comment' => 'Section 1, question 1, answer 0 comment',
     
 });
 my $popped = $rJSON->pop;
@@ -661,16 +657,12 @@ cmp_deeply($popped, {
     # the first q answer
     '1-0-0'        => { 
         value => 1,
-        comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
-        verbatim => undef,
     },
     # the second q answer
     '1-1-0'        => { 
         value => 0,
-        comment => 'Section 1, question 1, answer 0 comment',
         time => num(time(), 3),
-        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
@@ -701,9 +693,7 @@ cmp_deeply($rJSON->pop, {
     # the second q answer
     '1-1-0'        => { 
         value => 0,
-        comment => 'Section 1, question 1, answer 0 comment',
         time => num(time(), 3),
-        verbatim => undef,
     },
     # the second question comment
     '1-1' => {
@@ -714,9 +704,7 @@ cmp_deeply($rJSON->responses, {
     # the first q answer
     '1-0-0'        => { 
         value => 1,
-        comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
-        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
@@ -727,9 +715,7 @@ cmp_deeply($rJSON->pop, {
     # the first q answer
     '1-0-0'        => { 
         value => 1,
-        comment => 'Section 1, question 0, answer 0 comment',
         time => num(time(), 3),
-        verbatim => undef,
     },
     # the first question comment
     '1-0' => {
@@ -753,18 +739,20 @@ $rJSON = WebGUI::Asset::Wobject::Survey::ResponseJSON->new(buildSurveyJSON($sess
 for my $q (0,1) {
     $rJSON->survey->updateQuestionAnswers([1,$q], 'Country');
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 1;
 }
 $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => 'Australia',
+    '1-0-0verbatim' => 'insert witty comment',
     '1-1-0' => 'JTville',
+    '1-1-0verbatim' => '',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => 'insert witty comment',
         'time' => num(time(), 3),
         'value' => 'Australia'
     }, 
@@ -777,18 +765,19 @@ is($rJSON->responses->{'1-1-0'}, undef, 'Invalid country ignored');
 for my $q (0,1) {
     $rJSON->survey->updateQuestionAnswers([1,$q], 'Date');
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 1;
 }
 $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => '2009/05/01',
+    '1-0-0verbatim' => 'insert witty comment',
     '1-1-0' => '12345',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => 'insert witty comment',
         'time' => num(time(), 3),
         'value' => '2009/05/01'
     }, 
@@ -801,6 +790,7 @@ is($rJSON->responses->{'1-1-0'}, undef, 'Invalid date ignored');
 for my $q (0,1) {
     $rJSON->survey->updateQuestionAnswers([1,$q], 'Number');
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 1;
     $rJSON->survey->answer([1,$q,0])->{min} = '-5';
     $rJSON->survey->answer([1,$q,0])->{max} = '10';
 }
@@ -808,13 +798,13 @@ $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => '-3',
+    '1-0-0verbatim' => 'insert witty comment',
     '1-1-0' => '11',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => 'insert witty comment',
         'time' => num(time(), 3),
         'value' => '-3'
     }, 
@@ -827,6 +817,7 @@ is($rJSON->responses->{'1-1-0'}, undef, 'Invalid number ignored');
 for my $q (0,1) {
     $rJSON->survey->updateQuestionAnswers([1,$q], 'Slider');
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = '-';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 1;
     $rJSON->survey->answer([1,$q,0])->{min} = '-5';
     $rJSON->survey->answer([1,$q,0])->{max} = '10';
     $rJSON->survey->answer([1,$q,0])->{step} = '1';
@@ -835,13 +826,13 @@ $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => '-3',
+    '1-0-0verbatim' => 'insert witty comment',
     '1-1-0' => '11',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => 'insert witty comment',
         'time' => num(time(), 3),
         'value' => '-3'
     }, 
@@ -856,18 +847,21 @@ $rJSON->survey->updateQuestionAnswers([1,1], 'Yes/No');
 for my $q (0,1) {
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = 'Yes';
     $rJSON->survey->answer([1,$q,1])->{recordedAnswer} = 'No';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 1;
+    $rJSON->survey->answer([1,$q,1])->{verbatim} = 1;
 }
 $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => 1, # Multi-choice answers are submitted like this, 
+    '1-0-0verbatim' => 'insert witty comment',
     '1-1-1' => 1, # with the selected answer set to 1
+    '1-1-1verbatim' => '',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => 'insert witty comment',
         'time' => num(time(), 3),
         'value' => 'Yes'
     }, 
@@ -876,8 +870,7 @@ cmp_deeply(
 cmp_deeply(
     $rJSON->responses->{'1-1-1'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
+        'verbatim' => '',
         'time' => num(time(), 3),
         'value' => 'No'
     }, 
@@ -891,18 +884,20 @@ $rJSON->survey->updateQuestionAnswers([1,1], 'True/False');
 for my $q (0,1) {
     $rJSON->survey->answer([1,$q,0])->{recordedAnswer} = 'True';
     $rJSON->survey->answer([1,$q,1])->{recordedAnswer} = 'False';
+    $rJSON->survey->answer([1,$q,0])->{verbatim} = 0;
+    $rJSON->survey->answer([1,$q,1])->{verbatim} = 0;
 }
 $rJSON->reset;
 $rJSON->lastResponse(2);
 $rJSON->recordResponses( {
     '1-0-0' => 1, # Multi-choice answers are submitted like this, 
+    '1-0-0verbatim' => 'will be ignored',
     '1-1-1' => 1, # with the selected answer set to 1
+    '1-1-1verbatim' => 'will be ignored',
 });
 cmp_deeply(
     $rJSON->responses->{'1-0-0'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
         'time' => num(time(), 3),
         'value' => 'True'
     }, 
@@ -911,8 +906,6 @@ cmp_deeply(
 cmp_deeply(
     $rJSON->responses->{'1-1-1'}, 
     {
-        'verbatim' => undef,
-        'comment' => undef,
         'time' => num(time(), 3),
         'value' => 'False'
     }, 

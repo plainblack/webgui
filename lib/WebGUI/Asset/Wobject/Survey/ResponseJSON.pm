@@ -510,7 +510,7 @@ A hash ref of submitted form param data. Each element should look like:
     {
         "questionId-comment"    => "question comment",
         "answerId"              => "answer",
-        "answerId-comment"      => "answer comment",
+        "answerId-verbatim"     => "answer verbatim",
     }
 
 See L<"questionId"> and L<"answerId">.
@@ -557,7 +557,7 @@ sub recordResponses {
     my $allQsValid = 1;
     my %validAnswers;
     for my $question (@questions) {
-        my $aValid = 0; # TODO: this is flawed because we can have multi-answer quesions
+        my $aValid = 0;
         my $qId = $question->{id};
 
         $newResponse{ $qId }->{comment} = $responses->{ "${qId}comment" };
@@ -615,10 +615,13 @@ sub recordResponses {
             # Otherwise, we use the (raw) submitted response (e.g. text input, date input etc..)
             $newResponse{ $aId } = {
                 value       => $specialQTypes{ $questionType } ? $recordedAnswer : $answer->{recordedAnswer},
-                verbatim    => $answer->{verbatim} ? $responses->{ "${aId}verbatim" } : undef,
                 time        => time,
-                comment     => $responses->{ "${aId}comment" },
-            };  
+            };
+            
+            # Only record verbatim if this is a verbatim answer
+            if ($answer->{verbatim}) {
+                $newResponse{ $aId }{verbatim} = $responses->{ "${aId}verbatim" };
+            }
         }
 
         # Check if a required Question was skipped
@@ -1535,11 +1538,11 @@ Answer keys are constructed by hypenating the relevant L<"sIndex">, L<"qIndex"> 
          comment => "question comment",
      },
      # ...
-     # Answers entries contain: value (the recorded value), time and comment fields.
+     # Answers entries contain: value (the recorded value), time and verbatim field.
      '0-0-0' => {
          value   => "recorded answer value",
          time    => time(),
-         comment => "answer comment",
+         verbatim => "answer verbatim",
     },
     # ...
  }

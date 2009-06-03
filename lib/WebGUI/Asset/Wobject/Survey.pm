@@ -2345,7 +2345,7 @@ sub loadTempReportTable {
                     'insert into Survey_tempReport VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
                         $self->getId(),    $ref->{Survey_responseId}, $count++,           $q->{section},
                         $q->{sectionName}, $q->{question},            $q->{questionName}, $q->{questionComment},
-                        $a->{id},          $a->{value},               $a->{comment},      $a->{time},
+                        $a->{id},          $a->{value},               $a->{verbatim},      $a->{time},
                         $a->{isCorrect},   $a->{value},               undef
                     ]
                 );
