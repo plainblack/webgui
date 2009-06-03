@@ -424,13 +424,13 @@ sub search {
 	}
 	if ($rules->{creationDate}) {
 		my $start = $rules->{creationDate}{start} || 0;
-		my $end = $rules->{creationDate}{end} || 9999999999999999999999;
+		my $end = $rules->{creationDate}{end} || "9223372036854775807";
 		push(@clauses, "creationDate between ? and ?");
 		push(@params, $start, $end);
 	}
 	if ($rules->{revisionDate}) {
 		my $start = $rules->{revisionDate}{start} || 0;
-		my $end = $rules->{revisionDate}{end} || 9999999999999999999999;
+		my $end = $rules->{revisionDate}{end} || "9223372036854775807";
 		push(@clauses, "revisionDate between ? and ?");
 		push(@params, $start, $end);
 	}
