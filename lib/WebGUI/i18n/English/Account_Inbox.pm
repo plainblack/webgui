@@ -470,11 +470,6 @@ our $I18N = {
         lastUpdated => 1181409056,
     },
 
-    'too many emails' => {
-        message => q|The invitation cannot be sent because you did not enter an email address.|,
-        lastUpdated => 1181409056,
-    },
-
     'missing message' => {
         message     => q|Your invitation must have a message.|,
         lastUpdated => 1181409432,
