@@ -21,7 +21,9 @@ use WebGUI::DatabaseLink;
 use WebGUI::Exception;
 use WebGUI::Utility;
 use WebGUI::Operation::Shared;
+use WebGUI::Shop::AddressBook;
 use JSON;
+use WebGUI::Exception;
 
 =head1 NAME
 
@@ -313,17 +315,19 @@ sub dateCreated {
 Deletes this user, removes their user profile data, cleans up their
 inbox, removes userSessionScratch data and authentication information,
 removes them from any groups they belong to and deletes their
-Friend's group.
+Friend's group.  Also deletes any address books and addresses that
+belong to this user.
 
 =cut
 
 sub delete {
-    my $self = shift;
-    my $userId = $self->userId;
+    my $self    = shift;
+    my $session = $self->session;
+    my $userId  = $self->userId;
 	$self->uncache;
     my $db = $self->session->db;
 	foreach my $groupId (@{$self->getGroups($userId)}) {
-		WebGUI::Group->new($self->session,$groupId)->deleteUsers([$userId]);
+		WebGUI::Group->new($session,$groupId)->deleteUsers([$userId]);
 	}
     $self->friends->delete if ($self->{_user}{"friendsGroup"} ne "");
 	$db->write("delete from inbox where userId=? and (groupId is null or groupId='')",[$userId]);
@@ -336,6 +340,16 @@ sub delete {
 	}
     $db->write("delete from friendInvitations where inviterId=?",[$userId]);
     $db->write("delete from friendInvitations where friendId=?",[$userId]);
+
+    # Shop cleanups
+    my $sth = $db->prepare('select addressBookId from addressBook where userId=?');
+    $sth->execute([$userId]);
+    BOOK: while (my $bookId = $sth->hashRef) {
+        my $book;
+        eval { $book =  WebGUI::Shop::AddressBook->new($session, $bookId->{addressBookId}); };
+        next BOOK if (my $e = Exception::Class->caught);
+        $book->delete;
+    }
     $db->write("delete from userSession where userId=?",[$userId]);
     $db->write("delete from userProfileData where userId=?",[$userId]);
     $db->write("delete from users where userId=?",[$userId]);

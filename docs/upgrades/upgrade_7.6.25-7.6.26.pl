@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+deleteUnattachedAddressBooks( $session );
 
 finish($session); # this line required
 
@@ -43,6 +44,21 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Delete all AddressBooks where the userId does not exist in the users table
+sub deleteUnattachedAddressBooks {
+    my $session = shift;
+
+    print "\n\t\tDelete all AddressBooks if the user for that book was deleted..." unless $quiet;
+    my $sth = $session->db->read( "SELECT addressBookId FROM addressBook where userId NOT IN (SELECT userId FROM users)" );
+    while ( my ($addressBookId) = $sth->array ) {
+        my $book = WebGUI::Shop::AddressBook->new($session, $addressBookId);
+        $book->delete;
+    }
+
+    print "\n\t... DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
