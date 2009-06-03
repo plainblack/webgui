@@ -22,7 +22,7 @@ use WebGUI::User;
 use WebGUI::ProfileField;
 use WebGUI::Shop::AddressBook;
 
-use Test::More tests => 169; # increment this value for each test you create
+use Test::More tests => 170; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -42,6 +42,9 @@ ok(defined ($user = WebGUI::User->new($session,"new")), 'new("new") -- object re
 
 #New does not return undef if something breaks, so we'll see if the _profile hash was set.
 ok(exists $user->{_profile}, 'new("new") -- profile subhash exists');  
+
+#The new user's profile privacy settings should be set based on their default values
+is($user->getProfileFieldPrivacySetting('uiLevel'),'none','get a profile field privacy setting');
 
 #Let's assign a username
 $user->username("bill_lumberg");
