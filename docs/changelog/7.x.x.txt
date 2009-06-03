@@ -25,6 +25,7 @@
  - fixed #9851: New Users have blank profile field privacy settings (United Knowledge)
  - fixed #10208: Account/Inbox.pm site invititations
  - fixed #10355: Thingy: dirty delete FileField value
+ - fixed #10095: Widget Macro (syndication) - templateing broken
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
