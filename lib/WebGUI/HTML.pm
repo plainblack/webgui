@@ -142,7 +142,7 @@ sub filter {
 		$html =~ s/&nbsp;/ /ixsg ;
 		WebGUI::Macro::negate(\$html);
 	} elsif ($type eq "javascript") {
-		$html =~ s/\<script.*?\/script\>//ixsg;
+		$html =~ s/\<\s*script.*?\/script\s*\>//ixsg;
 		$html =~ s/(href="??)javascript\:.*?\)/$1removed/ixsg;
 		$html =~ s/onClick/removed/ixsg;
 		$html =~ s/onDblClick/removed/ixsg;
