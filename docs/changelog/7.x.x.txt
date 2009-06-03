@@ -29,6 +29,7 @@
  - fixed #10373: Admin groups inbox messages linger after task complete
  - fixed #10361: Shortcuts duplicate extra header tags
  - fixed #10449: Undefined template
+ - Fixed #10425: Edit Survey screen does not work in IE6
 
 7.6.24
  - fixed Thread subscription groups not cleaned up during purge.
