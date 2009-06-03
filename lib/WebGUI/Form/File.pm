@@ -222,6 +222,7 @@ sub getValueAsHtml {
 	return '' unless $value;
 	my $location = WebGUI::Storage->get($self->session,$value);
 	my $file = shift @{ $location->getFiles };
+    return '' unless $file;
 	my $fileValue = sprintf qq|<img src="%s" />&nbsp;<a href="%s">%s</a>|, $location->getFileIconUrl($file), $location->getUrl($file), $file; 
 	return $fileValue;
 }
