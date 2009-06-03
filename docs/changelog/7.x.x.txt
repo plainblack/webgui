@@ -9,6 +9,7 @@
  - fixed #9851: New Users have blank profile field privacy settings (United Knowledge)
  - fixed #10208: Account/Inbox.pm site invititations
  - fixed #10355: Thingy: dirty delete FileField value
+ - fixed #10095: Widget Macro (syndication) - templateing broken
 
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.
