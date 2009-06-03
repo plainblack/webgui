@@ -17,6 +17,8 @@
  - fixed #10365: Head tags do not work "Use Packed Head Tags".
  - fixed #9927: Survey - verbatim
  - fixed #10352: Deleting a user does not clean up any address books
+ - fixed #10228: Calendar: Weekly re-occurence function not working properly 
+   ( Martin Kamerbeek / Oqapi )
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
