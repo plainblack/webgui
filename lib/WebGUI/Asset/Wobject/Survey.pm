@@ -1328,32 +1328,42 @@ sub getResponseDetails {
         return {};
     }
     
-    my ($lastResponseCompleteCode, $lastResponseEndDate, $rJSON) 
-        = $self->session->db->quickArray('select isComplete, endDate, responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ]);
-    
+    my ( $completeCode, $endDate, $rJSON, $userId, $username ) = $self->session->db->quickArray(
+        'select isComplete, endDate, responseJSON, userId, username from Survey_response where Survey_responseId = ?',
+        [$responseId]
+    );
+
+    my $endDateEpoch = $endDate;
+    $endDate = $endDate && WebGUI::DateTime->new( $self->session, $endDate )->toUserTimeZone;
+
     # Process the feedback text
     my $feedback;
     my $tags = {};
     if ($rJSON) {
         $rJSON = from_json($rJSON) || {};
-        
+
         # All tags become template vars
         $tags = $rJSON->{tags} || {};
-        $tags->{complete} = $lastResponseCompleteCode == 1;
-        $tags->{restart} = $lastResponseCompleteCode == 2;
-        $tags->{timeout} = $lastResponseCompleteCode == 3;
-        $tags->{timeoutRestart} = $lastResponseCompleteCode == 4;
-        $tags->{endDate} = $lastResponseEndDate && WebGUI::DateTime->new($self->session, $lastResponseEndDate)->toUserTimeZone;
-        $feedback = $self->processTemplate($tags, $templateId);
+        $tags->{complete}       = $completeCode == 1;
+        $tags->{restart}        = $completeCode == 2;
+        $tags->{timeout}        = $completeCode == 3;
+        $tags->{timeoutRestart} = $completeCode == 4;
+        $tags->{endDate}        = $endDate;
+        $tags->{endDateEpoch}   = $endDateEpoch;
     }
     return {
-        completeCode => $lastResponseCompleteCode,
-        templateText => $feedback,
         templateVars => $tags,
-        endDate => $tags->{endDate},
-        complete => $tags->{complete},
-        restart => $tags->{restart},
-        timeout => $tags->{timeout},
+        templateText => $self->processTemplate( $tags, $templateId ),
+
+        completeCode => $completeCode,
+        endDate      => $endDate,
+        endDateEpoch => $endDateEpoch,
+        userId       => $userId,
+        username     => $username,
+
+        complete       => $tags->{complete},
+        restart        => $tags->{restart},
+        timeout        => $tags->{timeout},
         timeoutRestart => $tags->{timeoutRestart},
     };
 }
@@ -1561,13 +1571,19 @@ sub www_showFeedback {
     # Only continue if we were given a responseId
     return if !$responseId;
     
-    my $userId = $self->session->db->quickScalar('select userId from Survey_response where Survey_responseId = ?', [ $responseId ]);
+    my $responseUserId 
+        = $self->session->db->quickScalar('select userId from Survey_response where Survey_responseId = ?', [ $responseId ]);
     
     # Only continue if responseId gave us a legit userId
-    return if !$userId;
+    return if !$responseUserId;
     
-    # Only continue if user owns the response
-    return if $userId ne $self->session->user->userId;
+    my $responseUser = WebGUI::User->new($self->session, $responseUserId);
+    return if !$responseUser;
+    
+    # Only continue if user owns the response (or user is allowed to view reports)
+    if ($responseUserId ne $self->session->user->userId || !$responseUser->isInGroup( $self->get('groupToViewReports') )) {
+        return $self->session->privilege->insufficient();
+    }
     
     my $out = $self->getResponseDetails( { responseId => $responseId } )->{templateText};
     return $self->session->style->process( $out, $self->get('styleTemplateId') );
