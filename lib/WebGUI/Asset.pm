@@ -892,11 +892,17 @@ sub getEditForm {
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
 		}
 	}
-	if ($session->form->process("proceed")) {
+	if (my $proceed = $session->form->process("proceed")) {
 		$tabform->hidden({
 			name=>"proceed",
-			value=>$self->session->form->process("proceed")
-			});
+			value=>$proceed,
+        });
+        if (my $returnUrl = $session->form->process('returnUrl')) {
+            $tabform->hidden({
+                name=>"returnUrl",
+                value=>$returnUrl,
+            });
+        }
 	}
 	
 	# create tabs
@@ -2728,15 +2734,20 @@ sub www_editSave {
     }
 
     # Handle "proceed" form parameter
-    if ($self->session->form->process("proceed") eq "manageAssets") {
+    my $proceed = $self->session->form->process('proceed');
+    if ($proceed eq "manageAssets") {
         $self->session->asset($object->getParent);
         return $self->session->asset->www_manageAssets;
     }
-    elsif ($self->session->form->process("proceed") eq "viewParent") {
+    elsif ($proceed eq "viewParent") {
         $self->session->asset($object->getParent);
         return $self->session->asset->www_view;
     }
-    elsif ($self->session->form->process("proceed") ne "") {
+    elsif ($proceed eq "goBackToPage" && $self->session->form->process('returnUrl')) {
+        $self->session->http->setRedirect($self->session->form->process("returnUrl"));
+        return undef;
+    }
+    elsif ($proceed ne "") {
         my $method = "www_".$self->session->form->process("proceed");
         $self->session->asset($object);
         return $self->session->asset->$method();

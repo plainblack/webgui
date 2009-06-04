@@ -28,6 +28,7 @@
  - fixed #10095: Widget Macro (syndication) - templateing broken
  - fixed #10473: Fwd: Album Bug?
  - fixed #10088: ##userPref:firstName## doesn't work in Dashboard
+ - fixed: allow any Asset to use the proceed=goBackToPage;returnUrl url parameter coda
 
 7.7.8
  - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
