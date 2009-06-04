@@ -1312,7 +1312,7 @@ sub getResponseDetails {
     my $self = shift;
     my %opts = validate(@_, { userId => 0, responseId => 0, templateId => 0, isComplete => 0} );
     my $responseId = $opts{responseId};
-    my $userId = $opts{userId} || $self->session->user->userId;
+    my $userId     = $opts{userId}     || $self->session->user->userId;
     my $templateId = $opts{templateId} || $self->get('feedbackTemplateId') || 'nWNVoMLrMo059mDRmfOp9g';
     my $isComplete = $opts{isComplete};
     
@@ -1328,7 +1328,7 @@ sub getResponseDetails {
         return {};
     }
     
-    my ( $completeCode, $endDate, $rJSON, $userId, $username ) = $self->session->db->quickArray(
+    my ( $completeCode, $endDate, $rJSON, $ruserId, $rusername ) = $self->session->db->quickArray(
         'select isComplete, endDate, responseJSON, userId, username from Survey_response where Survey_responseId = ?',
         [$responseId]
     );
@@ -1350,8 +1350,8 @@ sub getResponseDetails {
         $tags->{timeoutRestart} = $completeCode == 4;
         $tags->{endDate}        = $endDate;
         $tags->{endDateEpoch}   = $endDateEpoch;
-        $tags->{userId}         = $userId;
-        $tags->{username}       = $username;
+        $tags->{userId}         = $ruserId;
+        $tags->{username}       = $rusername;
     }
     return {
         templateVars => $tags,
@@ -1360,8 +1360,8 @@ sub getResponseDetails {
         completeCode => $completeCode,
         endDate      => $endDate,
         endDateEpoch => $endDateEpoch,
-        userId       => $userId,
-        username     => $username,
+        userId       => $ruserId,
+        username     => $rusername,
 
         complete       => $tags->{complete},
         restart        => $tags->{restart},
