@@ -1350,6 +1350,8 @@ sub getResponseDetails {
         $tags->{timeoutRestart} = $completeCode == 4;
         $tags->{endDate}        = $endDate;
         $tags->{endDateEpoch}   = $endDateEpoch;
+        $tags->{userId}         = $userId;
+        $tags->{username}       = $username;
     }
     return {
         templateVars => $tags,
