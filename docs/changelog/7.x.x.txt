@@ -11,6 +11,7 @@
  - fixed #10355: Thingy: dirty delete FileField value
  - fixed #10095: Widget Macro (syndication) - templateing broken
  - fixed #10473: Fwd: Album Bug?
+ - fixed #9927: Survey - verbatim
 
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.

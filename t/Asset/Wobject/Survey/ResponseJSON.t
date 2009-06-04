@@ -353,7 +353,7 @@ cmp_deeply(
     $rJSON->recordResponses($session, {
         '1-0comment'   => 'Section 1, question 0 comment',
         '1-0-0'        => 'First answer',
-        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+        '1-0-0verbatim' => 'Section 1, question 0, answer 0 comment',
     }),
     [ 1, 'question 1-0 terminal' ],
     'recordResponses: question terminal overrides section terminal',
@@ -368,7 +368,7 @@ cmp_deeply(
             comment => 'Section 1, question 0 comment',
         },
         '1-0-0' => {
-            comment => 'Section 1, question 0, answer 0 comment',
+            verbatim => 'Section 1, question 0, answer 0 comment',
             'time'    => num(time(), 3),
             value   => 1,
         },
@@ -389,7 +389,7 @@ cmp_deeply(
     $rJSON->recordResponses($session, {
         '1-0comment'   => 'Section 1, question 0 comment',
         '1-0-0'        => "\t\t\t\n\n\n\t\t\t", #SOS in whitespace
-        '1-0-0comment' => 'Section 1, question 0, answer 0 comment',
+        '1-0-0verbatim' => 'Section 1, question 0, answer 0 comment',
     }),
     [ 1, 'answer 1-0-0 terminal' ],
     'recordResponses: answer terminal overrides question and section terminals',

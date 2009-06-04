@@ -338,7 +338,7 @@ A hash ref of form param data.  Each element will look like:
     {
         "__qid__comment" => "question comment",
         "__aid__"        => "answer",
-        "__aid__comment" => "answer comment",
+        "__aid__verbatim" => "answer verbatim",
     }
 
 where __qid__ is a question id, as described in L<nextQuestions>, and __aid__ is an
@@ -368,7 +368,7 @@ is set up like this:
         },
         __aid__ => {
             time    => time(),
-            comment => "answer comment",
+            verbatim => "answer verbatim",
             value   => "answer value",
         },
     }
@@ -435,7 +435,7 @@ sub recordResponses {
                     $self->responses->{ $answer->{id} }->{value} = $responses->{ $answer->{id} };
                 }
                 $self->responses->{ $answer->{id} }->{'time'} = time();
-                $self->responses->{ $answer->{id} }->{comment} = $responses->{ $answer->{id} . "comment" };
+                $self->responses->{ $answer->{id} }->{verbatim} = $responses->{ $answer->{id} . "verbatim" };
 
                 if ( $answer->{terminal} ) {
                     $terminal    = 1;
