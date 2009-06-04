@@ -1350,8 +1350,11 @@ sub getResponseDetails {
         $tags->{timeoutRestart} = $completeCode == 4;
         $tags->{endDate}        = $endDate;
         $tags->{endDateEpoch}   = $endDateEpoch;
+<<<<<<< HEAD:lib/WebGUI/Asset/Wobject/Survey.pm
         $tags->{userId}         = $userId;
         $tags->{username}       = $username;
+=======
+>>>>>>> c75317c3c6f4bbb6fbdf6babe24447f7d7612644:lib/WebGUI/Asset/Wobject/Survey.pm
     }
     return {
         templateVars => $tags,
@@ -1583,7 +1586,7 @@ sub www_showFeedback {
     return if !$responseUser;
     
     # Only continue if user owns the response (or user is allowed to view reports)
-    if ($responseUserId ne $self->session->user->userId && !$responseUser->isInGroup( $self->get('groupToViewReports') )) {
+    if ($responseUserId ne $self->session->user->userId || !$responseUser->isInGroup( $self->get('groupToViewReports') )) {
         return $self->session->privilege->insufficient();
     }
     
