@@ -119,7 +119,7 @@ $session->scratch->set($collab->getId.'_sortBy','title');
 $session->scratch->set($collab->getId.'_sortDir','desc');
 $p      = $collab->getThreadsPaginator;
 $page   = $p->getPageData;
-$expect = sortThreads( sub { $b->get('title') <=> $a->get('title') }, @threads );
+$expect = sortThreads( sub { $b->get('title') cmp $a->get('title') }, @threads );
 cmp_deeply( $page, $expect, 'getThreadsPaginator sort by set directly from scratch' )
 or diag( "GOT: " . Dumper $page ), diag( "EXPECTED: " . Dumper $expect );
 # clear scratch to reset sort
