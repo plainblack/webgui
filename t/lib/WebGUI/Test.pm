@@ -514,6 +514,32 @@ sub getMail {
     return from_json( $json );
 }
 
+#----------------------------------------------------------------------------
+
+=head2 getMailFromQueue ( )
+
+Send the first mail in the queue and then retrieve it from the smtpd. Returns
+false if there is no mail in the queue.
+
+Will prepare the server if necessary
+
+=cut
+
+sub getMailFromQueue {
+    my $class   = shift;
+    if ( !$smtpdSelect ) {
+        $class->prepareMailServer;
+    }
+    
+    my $messageId = $SESSION->db->quickScalar( "SELECT messageId FROM mailQueue" );
+    warn $messageId;
+    return unless $messageId; 
+
+    my $mail    = WebGUI::Mail::Send->retrieve( $SESSION, $messageId );
+    $mail->send;
+
+    return $class->getMail;
+}
 
 #----------------------------------------------------------------------------
 
