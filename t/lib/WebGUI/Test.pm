@@ -31,11 +31,14 @@ our ( $SESSION, $WEBGUI_ROOT, $CONFIG_FILE, $WEBGUI_LIB, $WEBGUI_TEST_COLLATERAL
 use Config     qw[];
 use IO::Handle qw[];
 use File::Spec qw[];
+use IO::Select qw[];
 use Cwd        qw[];
 use Test::MockObject::Extends;
 use WebGUI::PseudoRequest;
 use Scalar::Util qw( blessed );
 use List::MoreUtils qw/ any /;
+use Carp qw[ carp croak ];
+use JSON qw( from_json to_json );
 
 ##Hack to get ALL test output onto STDOUT.
 use Test::Builder;
@@ -57,6 +60,10 @@ my @usersToDelete;
 my @sessionsToDelete;
 my @storagesToDelete;
 my @tagsToRollback;
+
+my $smtpdPid;
+my $smtpdStream;
+my $smtpdSelect;
 
 BEGIN {
 
@@ -192,6 +199,16 @@ END {
     }
     $SESSION->var->end;
     $SESSION->close if defined $SESSION;
+
+    # Close SMTPD
+    if ($smtpdPid) {
+        kill INT => $smtpdPid;
+    }
+    if ($smtpdStream) {
+        close $smtpdStream;
+        # we killed it, so there will be an error.  Prevent that from setting the exit value.
+        $? = 0;
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -401,6 +418,41 @@ sub webguiBirthday {
 
 #----------------------------------------------------------------------------
 
+=head2 prepareMailServer ( )
+
+Prepare a Net::SMTP::Server to use for testing mail.
+
+=cut
+
+sub prepareMailServer {
+    eval {
+        require Net::SMTP::Server;
+        require Net::SMTP::Server::Client;
+    };
+    croak "Cannot load Net::SMTP::Server: $@" if $@;
+
+    my $SMTP_HOST        = 'localhost';
+    my $SMTP_PORT        = '54921';
+    my $smtpd    = File::Spec->catfile( WebGUI::Test->root, 't', 'smtpd.pl' );
+    $smtpdPid = open $smtpdStream, '-|', $^X, $smtpd, $SMTP_HOST, $SMTP_PORT
+        or die "Could not open pipe to SMTPD: $!";
+
+    $smtpdSelect = IO::Select->new;
+    $smtpdSelect->add($smtpdStream);
+
+    $SESSION->setting->set( 'smtpServer', $SMTP_HOST . ':' . $SMTP_PORT );
+
+    WebGUI::Test->originalConfig('emailToLog');
+    $SESSION->config->set( 'emailToLog', 0 );
+
+    # Let it start up yo
+    sleep 2;
+
+    return;
+}
+
+#----------------------------------------------------------------------------
+
 =head2 originalConfig ( $param )
 
 Stores the original data from the config file, to be restored
@@ -432,6 +484,36 @@ sub groupsToDelete {
     my $class = shift;
     push @groupsToDelete, @_;
 }
+
+#----------------------------------------------------------------------------
+
+=head2 getMail ( ) 
+
+Read a sent mail from the prepared mail server (L<prepareMailServer>)
+
+=cut
+
+sub getMail {
+    my $json;
+    
+    if ( !$smtpdSelect ) {
+        return from_json ' { "error": "mail server not prepared" }';
+    }
+
+    if ($smtpdSelect->can_read(5)) {
+        $json = <$smtpdStream>;
+    }
+    else {
+        $json = ' { "error": "mail not sent" } ';
+    }
+    
+    if (!$json) {
+        $json = ' { "error": "error in getting mail" } ';
+    }
+    
+    return from_json( $json );
+}
+
 
 #----------------------------------------------------------------------------
 
