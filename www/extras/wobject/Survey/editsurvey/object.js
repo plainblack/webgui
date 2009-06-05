@@ -108,7 +108,7 @@ Survey.ObjectTemplate = (function(){
                         alert('Sorry, preview is only supported for Sections and Questions, not Answers');
                     }
                     else {
-                        var msg = 'This will delete any Survey responses you have made under this ' +
+                        var msg = 'This will delete any in-progress Survey responses you have made under this ' +
                         'user account and redirect you to the Take Survey page starting at the selected item. ' +
                         "\n\nAre you sure you want to continue?";
                         if (confirm(msg)) {
