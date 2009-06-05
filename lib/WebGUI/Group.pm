@@ -804,11 +804,14 @@ sub getLDAPUsers {
 	foreach my $person (@{$people}) {
 	   $person =~ s/\s*,\s*/,/g;
 	   $person = lc($person);
-	   my ($userId) = $self->session->db->quickArray("select userId from authentication where authMethod='LDAP' and fieldName='connectDN' and lower(fieldData)=?",[$person]);
+	   my $personRegExp = "^uid=$person,";
+	   
+	   my ($userId) = $self->session->db->quickArray("select userId from authentication where authMethod='LDAP' and fieldName='connectDN' and lower(fieldData) = ? OR lower(fieldData) REGEXP ?",[$person,$personRegExp]);
+	   
 	   if($userId) {
 	      push(@ldapUsers,$userId);
 	   } else {
-	      $self->session->errorHandler->warn("Could not find matching userId for dn $person in WebGUI for group $gid");
+	      $self->session->errorHandler->warn("Could not find matching userId for dn/uid $person in WebGUI for group $gid");
 	   }
 	}
 	
