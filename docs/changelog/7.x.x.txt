@@ -1,6 +1,7 @@
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
  - fixed #10481: i18n outdated message saving
+ - fixed: getNextThread/getPreviousThread won't sort by thread rating
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
