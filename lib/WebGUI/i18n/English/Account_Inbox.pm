@@ -5,12 +5,12 @@ our $I18N = {
 
     'mark as read label' => {
         message     => q{Mark as Read},
-        lastUpdated => 12411788761,
+        lastUpdated => 1241178876,
     },
 
     'mark as unread label' => {
         message     => q{Mark as Unread},
-        lastUpdated => 12411788761,
+        lastUpdated => 1241178876,
     },
 
     'title' => {
