@@ -8,6 +8,12 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.6.26
+--------------------------------------------------------------------
+   * An additional perl module was missed in the 7.6.24 gotchas.  If you are using
+     the WRE, the Clone module is already provided.
+   
+
 7.6.25
 --------------------------------------------------------------------
    * A basic behavior of the Inbox has been changed.  If a message is
@@ -16,6 +22,11 @@ save you many hours of grief.
      most often happens for commit reminders for version tags that require
      approval.  The old behavior often resulted in several users trying
      to approve version tags that had already been approved.
+   
+
+7.6.24
+--------------------------------------------------------------------
+   * WebGUI now requires Clone version 0.31 or greater.
    
 
 7.6.22
