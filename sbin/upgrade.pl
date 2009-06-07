@@ -452,7 +452,7 @@ upgrade.
 =item B<--backupDir path>
 
 Specify a path where database backups should be created during the
-upgrade procedure. If left unspecified, it defaults to B</var/backups>.
+upgrade procedure. If left unspecified, it defaults to B</tmp/backups>.
 
 =item B<--history>
 
