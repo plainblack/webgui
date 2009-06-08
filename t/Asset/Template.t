@@ -15,7 +15,8 @@ use lib "$FindBin::Bin/../lib";
 use WebGUI::Test;
 use WebGUI::Session;
 use WebGUI::Asset::Template;
-use Test::More tests => 32; # increment this value for each test you create
+use Exception::Class;
+use Test::More tests => 37; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -109,11 +110,24 @@ is(@$att4, 3, 'rev is proper size');
 
 $template3rev->purgeRevision();
 
+my $brokenTemplate = $importNode->addChild({
+    className => "WebGUI::Asset::Template",
+    title     => 'Broken template',
+    template  => q|<tmpl_if unclosedIf>If clause with no ending tag|,
+});
 
 # done checking revision stuff
 
-$template->purge;
-$templateCopy->purge;
-$template3->purge;
-WebGUI::VersionTag->getWorking($session)->rollback;
+WebGUI::Test->interceptLogging;
+my $brokenOutput = $brokenTemplate->process({});
+my $logError = $WebGUI::Test::logger_error;
+my $brokenUrl = $brokenTemplate->getUrl;
+my $brokenId  = $brokenTemplate->getId;
+like($brokenOutput, qr/^There is a syntax error in this template/, 'process: returned error output contains boilerplate');
+like($brokenOutput, qr/$brokenUrl/, '... and the template url');
+like($brokenOutput, qr/$brokenId/, '... and the template id');
+like($logError, qr/$brokenUrl/, 'process: logged error has the url');
+like($logError, qr/$brokenId/, '... and the template id');
+
+WebGUI::Test->tagsToRollback(WebGUI::VersionTag->getWorking($session));
 

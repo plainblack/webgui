@@ -54,6 +54,10 @@ use Exception::Class (
         description     => "The file you have provided has errors.",
         fields          => [qw{ brokenFile brokenLine }],
         },
+    'WebGUI::Error::Template' => {
+        isa             => 'WebGUI::Error',
+        description     => "A template has errors that prevent it from being processed.",
+        },
 );
 
 

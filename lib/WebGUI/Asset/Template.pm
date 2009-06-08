@@ -20,6 +20,7 @@ use WebGUI::International;
 use WebGUI::Asset::Template::HTMLTemplate;
 use WebGUI::Utility;
 use WebGUI::Form;
+use WebGUI::Exception;
 use Tie::IxHash;
 use Clone qw/clone/;
 use HTML::Packer;
@@ -374,9 +375,9 @@ sub getEditForm {
 	);
 
 	my ($style, $url) = $self->session->quick(qw(style url));
-	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'));
-	$style->setScript($url->extras('yui/build/json/json-min.js'));
-	$style->setScript($url->extras('yui/build/dom/dom-min.js'));
+	$style->setScript($url->extras('yui/build/yahoo/yahoo-min.js'), {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/json/json-min.js'),   {type => 'text/javascript'});
+	$style->setScript($url->extras('yui/build/dom/dom-min.js'),     {type => 'text/javascript'});
 
 	pop(@headers);
 	my $scriptUrl = $url->extras('templateAttachments.js');
@@ -595,7 +596,14 @@ sub process {
                     ? $self->get('templatePacked')
                     : $self->get('template')
                     ;
-	return $parser->process($template, $vars);
+    my $output;
+    eval { $output = $parser->process($template, $vars); };
+    if (my $e = Exception::Class->caught) {
+        $self->session->log->error(sprintf "Error processing template: %s, %s, %s", $self->getUrl, $self->getId, $e->error);
+        my $i18n = WebGUI::International->new($self->session, 'Asset_Template');
+        $output = sprintf $i18n->get('template error').$e->error, $self->getUrl, $self->getId;
+    }
+	return $output;
 }
 
 

@@ -4,6 +4,7 @@
  - fixed: getNextThread/getPreviousThread won't sort by thread rating
  - fixed: #10485: User not returned to asset manager after adding content to /impor
  - fixed: #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
+ - fixed rfe #10474: Improve error message for template errors
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
