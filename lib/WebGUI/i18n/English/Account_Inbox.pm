@@ -340,6 +340,11 @@ our $I18N = {
         lastUpdated => 1181019679,
     },
 
+    'no messagable friends error' => {
+        message => q{None of your friends allow private messaging.},
+        lastUpdated => 1244494607,
+    },
+
     'no friends hover' => {
         message => q{You must have active friends in the system if you wish to send new private messages without having to first locate their profile},
         lastUpdated => 1181019679,

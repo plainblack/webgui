@@ -6,6 +6,7 @@
  - fixed: #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
  - fixed rfe #10474: Improve error message for template errors
  - removed hardcoding of administer.js and survey.css hardcoded extras paths.
+ - fixed Error message when you try to send a message from the Inbox, but none of your friends allow private messaging.
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
