@@ -640,15 +640,21 @@ sub processPropertiesFromFormPost {
         };
         splice @{ $photoData }, $photoIndex-1, 1, $newPhoto;
     }
-    my $newStorage = $form->process('newPhoto', 'image');
-    if ($newStorage) {
+    my $newStorageId = $form->process('newPhoto', 'image');
+    if ($newStorageId) {
+        my $newStorage = WebGUI::Storage->get($session, $newStorageId);
+        my $photoName = $newStorage->getFiles->[0];
+        my ($width, $height) = $newStorage->getSizeInPixels($photoName);
+        if ($width > $self->getArchive->get('photoWidth')) {
+            $newStorage->resize($photoName, $self->getArchive->get('photoWidth'));
+        }
         push @{ $photoData }, {
             caption   => $form->process('newImgCaption', 'text'),
             alt       => $form->process('newImgAlt',     'text'),
             title     => $form->process('newImgTitle',   'text'),
             byLine    => $form->process('newImgByline',  'text'),
             url       => $form->process('newImgUrl',     'url'),
-            storageId => $newStorage,
+            storageId => $newStorageId,
         };
     }
     $self->setPhotoData($photoData);

@@ -29,6 +29,7 @@ my $quiet; # this line required
 
 
 my $session = start(); # this line required
+addStoryPhotoWidth($session);
 
 # upgrade functions go here
 
@@ -43,6 +44,18 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub addStoryPhotoWidth {
+    my $session = shift;
+    print "\tAdd a width parameter to the StoryManager... " unless $quiet;
+    # and here's our code
+    $session->db->write(<<EOSQL);
+alter table StoryArchive add column photoWidth int(11)
+EOSQL
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------

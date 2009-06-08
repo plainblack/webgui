@@ -309,6 +309,24 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'photoWidth' => {
+        message => q|The width that all photos uploaded into Stories for this StoryArchive will be resized to.|,
+        context => q|Template variable.|,
+        lastUpdated => 0,
+    },
+
+    'photo width' => {
+        message => q|Photo width|,
+        context => q|Label in the edit screen|,
+        lastUpdated => 0,
+    },
+
+    'photo width help' => {
+        message => q|Photos displayed by the YUI Carousel need to be similar sizes for it to render correctly.  This width will be used to resize all photos.  To disable this feature, set it to 0.|,
+        context => q|hoverhelp for photoWidth in the edit screen|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

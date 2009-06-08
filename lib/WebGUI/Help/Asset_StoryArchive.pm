@@ -66,6 +66,7 @@ our $HELP = {
                     { 'name' => 'groupToPost', },
                     { 'name' => 'templateId', },
                     { 'name' => 'storyTemplateId', },
+                    { 'name' => 'photoWidth', },
                     { 'name' => 'editStoryTemplateId', },
                     { 'name' => 'keywordListTemplateId', },
                     { 'name' => 'archiveAfter', },
