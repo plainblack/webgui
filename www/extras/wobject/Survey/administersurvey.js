@@ -475,8 +475,8 @@ if (typeof Survey === "undefined") {
             }
         }
     }
-
-    YAHOO.widget.Chart.SWFURL = "../../../extras/yui/build/charts/assets/charts.swf"; 
+    var chartsUrl = getWebguiProperty('extrasURL') + "/yui/build/charts/assets/charts.swf"; 
+    YAHOO.widget.Chart.SWFURL = chartsUrl;
     // Public API
     Survey.Summary = {
         globalSummaryDataTip: function(item, index, series){
@@ -518,7 +518,7 @@ if (typeof Survey === "undefined") {
                     }
                 },
                 //only needed for flash player express install
-                expressInstall: "../../../extras/yui/build/charts/assets/charts.swf" 
+                expressInstall: chartsUrl
             });
 
             //define section datatable columns
@@ -585,7 +585,7 @@ if (typeof Survey === "undefined") {
                 xAxis: sectionAxis,
                 yAxis: responseAxis,
 //                dataTipFunction: Survey.Form.globalSummaryDataTip,      //try again in 2.7
-                expressInstall: "../../../extras/yui/build/charts/assets/charts.swf" 
+                expressInstall: chartsUrl
             });
 
             YAHOO.util.Event.addListener("submitbutton", "click", function(){ Survey.Comm.submitSummary(); });
