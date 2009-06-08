@@ -14,6 +14,7 @@
  - fixed #9927: Survey - verbatim
  - fixed #10485: User not returned to asset manager after adding content to /import
  - fixed #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
+ - fixed #10088: ##userPref:firstName## doesn't work in Dashboard
 
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.
