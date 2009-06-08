@@ -15,6 +15,7 @@
  - fixed #10485: User not returned to asset manager after adding content to /import
  - fixed #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
  - fixed #10088: ##userPref:firstName## doesn't work in Dashboard
+ - fixed Error message when you try to send a message from the Inbox, but none of your friends allow private messaging.
 
 7.6.25
  - Fixed a problem with graphing created by the newer versions of Image Magick.
