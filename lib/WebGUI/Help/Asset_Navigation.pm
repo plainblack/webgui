@@ -33,7 +33,6 @@ our $HELP = {
                     { 'name' => 'page.ownerUserId' },
                     { 'name' => 'page.synopsis' },
                     { 'name' => 'page.newWindow' },
-                    { 'name' => 'page.assetProperty' },
                     { 'name' => 'page.menuTitle' },
                     { 'name' => 'page.title' },
                     { 'name' => 'page.rank' },
