@@ -581,6 +581,9 @@ sub www_view {
         value   => $session->form->get("rpp") || 25,
         extras  => q{onchange="location.href='}.$friendsUrl.q{;rpp='+this.options[this.selectedIndex].value"}
     });
+    unless ( $displayView ) {
+        $var->{'new_message_url'} = $self->getUrl("module=inbox;do=sendMessage");
+    }
 
     my $templateId = ($displayView) ? $self->getViewTemplateId : $self->getEditTemplateId;
     return $self->processTemplate($var,$templateId);

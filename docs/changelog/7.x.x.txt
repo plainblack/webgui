@@ -1,4 +1,5 @@
 7.6.26
+ - fixed #9912: Account/Friends, only message one Friend at a time
  - fixed #10211: Regex quantifiers like ? and + broke search engine
  - fixed #10266: Public Profile overrides Able to be friend   
  - fixed #10261: fixed span tag per bug report

@@ -183,8 +183,8 @@ Thanks,
         lastUpdated => 1186030776,
     },
 
-    'send private message label' => {
-        message     => q{Send Private Message},
+    'send group message label' => {
+        message     => q{Send Group Message},
         lastUpdated => 1186030776,
     },
 
