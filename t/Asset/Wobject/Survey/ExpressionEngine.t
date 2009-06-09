@@ -214,7 +214,7 @@ SKIP: {
     $survey->surveyJSON->answer([0,1,0])->{recordedAnswer} = 'ext_s0q1a0';
     $survey->surveyJSON->answer([0,1,0])->{value} = 50; # worth 50 points
     
-    my $responseId = $survey->responseId($user->userId);
+    my $responseId = $survey->responseId( { userId => $user->userId } );
     
     my $rJSON = $survey->responseJSON(undef, $responseId);
     $rJSON->recordResponses({
