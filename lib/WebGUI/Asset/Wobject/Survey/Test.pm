@@ -139,7 +139,7 @@ sub run {
             [ $self->getId, $self->session->user->userId() ] );
         
         # Start a response as current user
-        $responseId = $survey->responseId($self->session->user->userId)
+        $responseId = $survey->responseId( { userId => $self->session->user->userId } )
             or return { tap => "Bail Out! Unable to start survey response" };
     }
     
