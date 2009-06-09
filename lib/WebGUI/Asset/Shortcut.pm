@@ -489,7 +489,7 @@ sub getOverrides {
             }
         }
     }
-    $overrides{userLastUpdated} = $session->user->get('lastUpdated');
+    $overrides{userLastUpdated} = $session->user->lastUpdated;
     $cache->set(\%overrides, 60*60);
     $overridesRef = \%overrides;
 	return %{ $overridesRef };
