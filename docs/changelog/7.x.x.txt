@@ -1,6 +1,7 @@
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
  - fixed #10481: i18n outdated message saving
+ - fixed #10491: Side by Side template metadata extra headers CSS
  - fixed: getNextThread/getPreviousThread won't sort by thread rating
  - fixed: #10485: User not returned to asset manager after adding content to /impor
  - fixed: #10262: Default Inbox View Template: Mismatch in HTML for upper and lower page navigation 
