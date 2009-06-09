@@ -1582,8 +1582,9 @@ sub www_showFeedback {
     my $responseUser = WebGUI::User->new($self->session, $responseUserId);
     return if !$responseUser;
     
-    # Only continue if user owns the response (or user is allowed to view reports)
-    if ($responseUserId ne $self->session->user->userId && !$responseUser->isInGroup( $self->get('groupToViewReports') )) {
+    # Only continue if current user is allowed to view this response
+    unless ( $self->session->user->userId eq $responseUserId || $self->session->user->isInGroup( $self->get('groupToViewReports') ) ) {
+        $self->session->log->warn("User is not allowed to view responseId: $responseId, which belongs to user: $responseUserId");
         return $self->session->privilege->insufficient();
     }
     
