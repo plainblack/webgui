@@ -791,7 +791,7 @@ point. This is useful for user-testing large Survey instances where you don't wa
 to waste your time clicking through all of the initial questions to get to the one 
 you want to look at. 
 
-Note that calling this method will delete any existing survey responses for the
+Note that calling this method will delete any in-progress survey responses for the
 current user (although only survey builders can call this method so that shouldn't be
 a problem).
 
@@ -811,8 +811,8 @@ sub www_jumpTo {
 
     $self->session->log->debug("www_jumpTo: $id");
 
-    # Remove existing responses for current user
-    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
+    # Remove any in-progress responses for current user
+    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ? and isComplete = 0',
         [ $self->getId, $self->session->user->userId() ] );
 
     # Break the $id down into sIndex and qIndex
