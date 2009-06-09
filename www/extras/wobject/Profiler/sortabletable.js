@@ -145,7 +145,7 @@ SortableTable.prototype.initHeader = function (oSortTypes) {
 		c = cells[i];
 		if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
 			img = doc.createElement("IMG");
-			img.src = "/extras/wobject/Profiler/blank.png";
+			img.src = getWebguiProperty('extrasURL')+"/wobject/Profiler/blank.png";
 			c.appendChild(img);
 			if (this.sortTypes[i] != null)
 				c._sortType = this.sortTypes[i];
