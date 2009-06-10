@@ -371,6 +371,7 @@
  - fixed #9671: Survey - breaks admin bar
  - fixed #9702: Phone number on EMS badges not saving
  - fixed: Email address is not filled in for ITransact credentials.
+ - fixed: Icons don't show on first view of admin panel in IE
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
