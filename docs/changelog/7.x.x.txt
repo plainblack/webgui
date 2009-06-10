@@ -1,4 +1,5 @@
 7.6.27
+ - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
 
 7.6.26
  - fixed #9912: Account/Friends, only message one Friend at a time
