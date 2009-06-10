@@ -1,3 +1,5 @@
+7.6.27
+
 7.6.26
  - fixed #9912: Account/Friends, only message one Friend at a time
  - fixed #10211: Regex quantifiers like ? and + broke search engine
