@@ -52,7 +52,7 @@ my @getRefererUrlTests = (
 
 use Test::More;
 use Test::MockObject::Extends;
-plan tests => 76 + scalar(@getRefererUrlTests);
+plan tests => 81 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -359,8 +359,13 @@ is($unEscapedString, '10% is enough!', 'unescape method');
 #######################################
 
 is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower cased');
-is($session->url->urlize('home/'), 'home', 'urlize: trailing slashes removed');
-is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', 'urlize: makeCompliant translates spaces to dashes');
+is($session->url->urlize('home/'), 'home', '... trailing slashes removed');
+is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', '... makeCompliant translates spaces to dashes');
+is($session->url->urlize('/home'), 'home', '... removes initial slash');
+is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes multiple ../');
+is($session->url->urlize('home/./here'),              'home/here', '... removes multiple ./');
+is($session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple ../');
+is($session->url->urlize('home/././here'),            'home/here', '... removes multiple ./');
 
 #######################################
 #
