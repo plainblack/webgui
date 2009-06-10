@@ -52,7 +52,7 @@ my @getRefererUrlTests = (
 
 use Test::More;
 use Test::MockObject::Extends;
-plan tests => 77 + scalar(@getRefererUrlTests);
+plan tests => 79 + scalar(@getRefererUrlTests);
 
 my $session = WebGUI::Test->session;
 
@@ -330,10 +330,12 @@ is($session->url->urlize('HOME/PATH1'), 'home/path1', 'urlize: urls are lower ca
 is($session->url->urlize('home/'), 'home', '... trailing slashes removed');
 is($session->url->urlize('home is where the heart is'), 'home-is-where-the-heart-is', '... makeCompliant translates spaces to dashes');
 is($session->url->urlize('/home'), 'home', '... removes initial slash');
-is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes multiple ../');
-is($session->url->urlize('home/./here'),              'home/here', '... removes multiple ./');
-is($session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple ../');
-is($session->url->urlize('home/././here'),            'home/here', '... removes multiple ./');
+is($session->url->urlize('home/../out-of-bounds'),    'home/out-of-bounds', '... removes single ../');
+is($session->url->urlize('home/./here'),              'home/here',          '... removes single ./');
+is($session->url->urlize('home/../../out-of-bounds'), 'home/out-of-bounds', '... removes multiple adjacent ../');
+is($session->url->urlize('home/././here'),            'home/here',          '... removes multiple adjacent ./');
+is($session->url->urlize('home/../up/./over'),        'home/up/over',       '... removes multiple ./');
+is($session->url->urlize('home/./here/./plate'),      'home/here/plate',    '... removes multiple ../');
 
 #######################################
 #
