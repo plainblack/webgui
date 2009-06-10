@@ -515,7 +515,7 @@ sub urlize {
 	$value = $self->makeCompliant($value);
 
     # remove /./ or /../
-    $value =~ s{(^|/)\.\.?/}{$1};
+    $value =~ s{(^|/)(?:\.\.?/)*}{$1}g;
 
     # remove trailing slashes
 	$value =~ s/\/$//;
