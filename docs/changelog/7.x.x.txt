@@ -12,6 +12,7 @@
  - fixed: assets can have urls with /./ or /../ in them, making them inaccessible
  - fixed: Icons don't show on first view of admin panel in IE
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
+ - fixed #9953: Matrix 2.0 - Not enough tests
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   

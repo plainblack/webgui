@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 21; # increment this value for each test you create
+use Test::More tests => 26; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Matrix;
@@ -62,10 +62,17 @@ cmp_deeply (
     'getCategories method returned correct hashref'
     );
 
+# Test add/edit privileges
 
-# add a new attribute
+is ($matrix->canEdit,'0',"Checking canEdit privilege");
+is ($matrix->canAddMatrixListing,'0',"Checking canAddMatrixListing privilege");
 
 $session->user({userId => 3});
+
+is ($matrix->canEdit,'1',"Checking canEdit privilege as Admin");
+is ($matrix->canAddMatrixListing,'1',"Checking canAddMatrixListing privilege as Admin");
+
+# add a new attribute
 
 my $attributeProperties = {
     name        =>'test attribute',
@@ -106,7 +113,13 @@ isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
 
 is($matrixListing->getAutoCommitWorkflowId,undef,"The matrix listings getAutoCommitWorkflowId method correctly returns undef, because the auto commit workflow should only be used on adding a new matrix listing.");
 
-is($matrixListing->hasRated,'0',"The matrix listings hasRated method returns correct value.");
+#is($matrixListing->hasRated,'0',"The matrix listings hasRated method returns correct value.");
+
+$matrixListing->setRatings({category1=>'1',category2=>'10'});
+
+ok($matrixListing->hasRated > 0,"Checking hasRated method after rating.");
+
+$matrixListing->setRatings({category1=>'2',category2=>'5'});
 
 $matrixListing->www_click;
 
@@ -184,6 +197,34 @@ cmp_deeply(
         'Getting compareFormData as JSON: www_getCompareFormData returns correct data as JSON.'
     );        
 
+# Test getting compareListData
+$json = $matrix->www_getCompareListData([$expectedAssetId]);
+
+my $compareListData = JSON->new->decode($json);
+
+my $matrixListingLastUpdatedHuman = $session->datetime->epochToHuman( $matrixListing->get('lastUpdated'),"%z" );
+
+cmp_deeply(
+        $compareListData,
+        {ResultSet=>{
+            Result=>[
+                    {$expectedAssetId=>$matrixListingLastUpdatedHuman,fieldType=>"lastUpdated",name=>"Last Updated"},
+                    {fieldType=>"category",name=>"category1",$expectedAssetId=>$matrixListing->get('title').' '},
+                    {fieldType=>"category",name=>"category2",$expectedAssetId=>$matrixListing->get('title').' '}
+                    ]
+            },
+         ColumnDefs=>[{
+            key         =>$expectedAssetId,
+            label       =>$matrixListing->get('title').' '.$matrixListing->get('version'),
+            formatter   =>"formatColors",
+            url         =>$matrixListing->getUrl,
+            lastUpdated =>$matrixListingLastUpdatedHuman,
+            }],
+         ResponseFields=>["attributeId", "name", "description","fieldType", "checked",$expectedAssetId,$expectedAssetId."_compareColor"]
+        },
+        'Getting compareListData as JSON'
+    ); 
+
 # Test statistics caching by view method
 
 $matrix->view;
@@ -200,7 +241,7 @@ cmp_deeply(
         bestViews_name=>$matrixListing->get('title'),
         bestViews_sortButton=>"<span id='sortByViews'><button type='button'>Sort by views</button></span><br />",
         bestCompares_url=>'/'.$matrixListing->get('url'),
-        bestCompares_count=>0,
+        bestCompares_count=>1,
         bestCompares_name=>$matrixListing->get('title'),
         bestCompares_sortButton=>"<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />",
         bestClicks_url=>'/'.$matrixListing->get('url'),
@@ -214,36 +255,36 @@ cmp_deeply(
             }],
         lastUpdated_sortButton=>"<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />",
         best_rating_loop=>[{
-            url=>'/',
+            url=>'/'.$matrixListing->get('url'),
             category=>'category1',
-            name=>undef,
-            mean=>undef,
-            median=>undef,
-            count=>undef,
+            name=>'untitled',
+            mean=>'1.50',
+            median=>2,
+            count=>2,
             },
             {
-            url=>'/',
+            url=>'/'.$matrixListing->get('url'),
             category=>'category2',
-            name=>undef,
-            mean=>undef,
-            median=>undef,
-            count=>undef,
+            name=>'untitled',
+            mean=>'7.50',
+            median=>10,
+            count=>2,
             }],
         worst_rating_loop=>[{
-            url=>'/',
+            url=>'/'.$matrixListing->get('url'),
             category=>'category1',
-            name=>undef,
-            mean=>undef,
-            median=>undef,
-            count=>undef,
+            name=>'untitled',
+            mean=>'1.50',
+            median=>2,
+            count=>2,
             },
             {
-            url=>'/',
+            url=>'/'.$matrixListing->get('url'),
             category=>'category2',
-            name=>undef,
-            mean=>undef,
-            median=>undef,
-            count=>undef,
+            name=>'untitled',
+            mean=>'7.50',
+            median=>10,
+            count=>2,
             }],
         listingCount=>1,
         },
