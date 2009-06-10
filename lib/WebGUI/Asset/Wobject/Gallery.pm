@@ -437,12 +437,12 @@ sub appendTemplateVarsSearchForm {
     $var->{ searchForm_creationDate_after }
         = WebGUI::Form::dateTime( $session, {
             name        => "creationDate_after",
-            value       => $form->get("creationDate_after") || $oneYearAgo,
+            value       => $form->get("creationDate_after",  "dateTime", $oneYearAgo),
         });
     $var->{ searchForm_creationDate_before }
         = WebGUI::Form::dateTime( $session, {
             name        => "creationDate_before",
-            value       => $form->get("creationDate_before","dateTime"),
+            value       => $form->get("creationDate_before", "dateTime", time()),
         });
 
     # Buttons
@@ -1422,8 +1422,8 @@ sub www_search {
         }
 
         my $oneYearAgo = WebGUI::DateTime->new( $session, time )->add( years => -1 )->epoch;
-        my $dateAfter  = $form->get("creationDate_after") || $oneYearAgo;
-        my $dateBefore = $form->get("creationDate_before", "dateTime");
+        my $dateAfter  = $form->get("creationDate_after", "dateTime", $oneYearAgo);
+        my $dateBefore = $form->get("creationDate_before", "dateTime", time());
         my $creationDate = {};
         if ($dateAfter) {
             $creationDate->{start} = $dateAfter;
@@ -1451,8 +1451,8 @@ sub www_search {
                 . 'keywords=' . $form->get('keywords') . ';'
                 . 'title=' . $form->get('title') . ';'
                 . 'description=' . $form->get('description') . ';'
-                . 'creationDate_after=' . $form->get('creationDate_after') . ';'
-                . 'creationDate_before=' . $form->get('creationDate_before') . ';'
+                . 'creationDate_after=' . $dateAfter . ';'
+                . 'creationDate_before=' . $dateBefore . ';'
                 . 'userId=' . $form->get("userId") . ';'
             );
         for my $class ( @$joinClass ) {

@@ -11,6 +11,7 @@
  - fixed: Images uploaded to a Story should all be the same width so the YUI carousel does not break.
  - fixed: assets can have urls with /./ or /../ in them, making them inaccessible
  - fixed: Icons don't show on first view of admin panel in IE
+ - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
