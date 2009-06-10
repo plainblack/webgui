@@ -9,6 +9,7 @@
  - removed hardcoding of administer.js and survey.css hardcoded extras paths.
  - fixed: Error message when you try to send a message from the Inbox, but none of your friends allow private messaging.
  - fixed: Images uploaded to a Story should all be the same width so the YUI carousel does not break.
+ - fixed: assets can have urls with /./ or /../ in them, making them inaccessible
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   

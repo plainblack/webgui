@@ -529,6 +529,11 @@ sub urlize {
 	my ($value);
         $value = lc(shift);		#lower cases whole string
 	$value = $self->makeCompliant($value);
+
+    # remove /./ or /../
+    $value =~ s{(^|/)\.\.?/}{$1};
+
+    # remove trailing slashes
 	$value =~ s/\/$//;
         return $value;
 }
