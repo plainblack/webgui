@@ -10,6 +10,7 @@
  - fixed: Error message when you try to send a message from the Inbox, but none of your friends allow private messaging.
  - fixed: Images uploaded to a Story should all be the same width so the YUI carousel does not break.
  - fixed: assets can have urls with /./ or /../ in them, making them inaccessible
+ - fixed: Icons don't show on first view of admin panel in IE
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
@@ -372,7 +373,6 @@
  - fixed #9671: Survey - breaks admin bar
  - fixed #9702: Phone number on EMS badges not saving
  - fixed: Email address is not filled in for ITransact credentials.
- - fixed: Icons don't show on first view of admin panel in IE
 
 7.6.10
  - fixed #9577: WebGUI::Form::Url::getValue returns blank rather than undef for blank fields
