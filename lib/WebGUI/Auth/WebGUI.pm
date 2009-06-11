@@ -125,7 +125,6 @@ sub authenticate {
 		return 1;
 	} 
 	$self->user(WebGUI::User->new($self->session,1));
-	my $i18n = WebGUI::International->new($self->session);
 	$self->SUPER::authenticationError;
 	return 0;
 }

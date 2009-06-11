@@ -180,7 +180,7 @@ sub authenticate {
         
         # Authentication failed
         if ($auth->code == 48 || $auth->code == 49){
-            $self->SUPER::authenticationError;
+            $error .= $self->SUPER::authenticationError;
         }
         elsif ($auth->code > 0) { # Some other LDAP error happened
             $error .= '<li>LDAP error "'.$self->ldapStatusCode($auth->code).'" occured.'.$i18n->get(69).'</li>';
