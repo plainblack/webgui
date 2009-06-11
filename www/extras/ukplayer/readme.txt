@@ -1,6 +1,6 @@
 United Knowledge Slideshow Player - readme.txt
 
-Copyright: United Knowledge, 2008
+Copyright: United Knowledge, 2009
 
 The Slideshow PLayer is licensed under the terms of the GNU General Public License, version 2
 http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
@@ -62,6 +62,10 @@ default values for most, but we recommend setting ALL properties yourself).
 	and when a slide is smaller than the slideshow.
 	Value: 0x followed by hexadecimal color
 
+<skin>rounded</skin>
+	The textarea, controls and thumbnails can be displayed with two different skins.
+	Value: simple or rounded
+
 
 
 **********************************************************************************************
@@ -92,6 +96,16 @@ default values for most, but we recommend setting ALL properties yourself).
 	When set to true the textarea will hide after a few seconds.
 	Value: true or false
 
+<text_display>over</text_display>
+	The textarea can be postioned over the slides, above the slides (the height of the player
+	should be the sum of the height of the slides and the height of the textarea) or can be
+	hidden.
+	Value: over, above or none
+
+<text_height>50</text_height>
+	The minimum height of the textarea.
+	Value: number in px
+
 
 
 **********************************************************************************************
@@ -113,6 +127,16 @@ default values for most, but we recommend setting ALL properties yourself).
 <controls_autohide>true</controls_autohide>
 	When set to true the controls will hide after a few seconds.
 	Value: true or false
+
+<playbutton_percent_width>20</playbutton_percent_width>
+	The width of the big play button (which appears when auto_start is false and, if loop is
+	set to false, after the slideshow has finished) can be set in a percentage of the total
+	width of the movie.
+	Value: percentage of movie width
+
+<playbutton_max_width>200</playbutton_max_width>
+	A maximum width for the play button to prevent it from becoming too large.
+	Value: number in px
 
 
 
@@ -143,6 +167,10 @@ default values for most, but we recommend setting ALL properties yourself).
 	The width of the gap between two thumbnail images.
 	Value: number in px
 
+<thumbnails_hide>false</thumbnails_hide>
+	When set to true, the thumbnails are hidden.
+	Value: true or false
+
 
 
 **********************************************************************************************
@@ -152,6 +180,11 @@ default values for most, but we recommend setting ALL properties yourself).
 <mute_at_start>true</mute_at_start>
 	If true the slideshow will start with the sound muted.
 	Value: true or false
+
+<sound>off</sound>
+	If the sound is turned off, the audio files will not be played and the mute and volume
+	controls will be hidden.
+	Value: on or off
 
 <autostart>false</autostart>
 	If true the slideshow will start upon loading. If false a play button will be
