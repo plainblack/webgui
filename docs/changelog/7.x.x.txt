@@ -16,6 +16,7 @@
  - fixed #10121: Q and A template doesn't work with default Forum Rich Editor
  - rfe #10423: Provide a way to access the instance of the thing that was added, modified, or deleted via workflow. (Eric Kennedy)
  - fixed #10486: Hardcoded extras in files in www/extras
+ - fixed: LDAP authentication does not check for failed passwords.  Bug added to 7.7.10.
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
