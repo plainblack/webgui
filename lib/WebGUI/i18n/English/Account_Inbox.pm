@@ -475,10 +475,15 @@ our $I18N = {
         lastUpdated => 1181409056,
     },
 
-    'missing message' => {
-        message     => q|Your invitation must have a message.|,
-        lastUpdated => 1181409432,
-    },
+    'invalid email' => {
+		message => q|Invalid email address entered: %s.|,
+		lastUpdated => 1181409056,
+	},
+
+	'missing message' => {
+		message     => q|Your invitiation must have a message.|,
+		lastUpdated => 1181409432,
+	},
 
     'missing subject' => {
         message     => q|Your invitation must have a subject.|,
@@ -489,6 +494,11 @@ our $I18N = {
         message     => q|The email address you entered is already registered to <a href="%s">%s</a> on this site.|,
         lastUpdated => 1227715272,
     },
+
+    'currently invited' => {
+		message     => q|The email address you entered, %s, has an outstanding invitation on this site.|,
+		lastUpdated => 1227715272,
+	},
 
     'no email' => {
         message     => q{The invitation cannot be sent because you do not have an email address set in your profile.},

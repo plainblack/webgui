@@ -873,7 +873,7 @@ sub www_inviteUserSave {
     my @toList = split /[;,]/, $to;
     for my $inviteeEmail (@toList) {
         unless ( $inviteeEmail =~ WebGUI::Utility::emailRegex ) {
-            return $self->www_inviteUser( $i18n->get('invalid email') );
+            return $self->www_inviteUser( sprintf $i18n->get('invalid email'), $inviteeEmail );
         }
 
         # User existance check.
