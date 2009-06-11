@@ -838,7 +838,7 @@ sub www_getUserPrefsForm {
 	#This is a form retrieved by "ajax".
 	my $self    = shift;
     my $session = $self->session;
-    my $i18n = WebGUI::International->new($session);
+    my $i18n = WebGUI::International->new($session, 'Asset_Shortcut');
 	return $i18n->get('not logged in') if $session->user->isVisitor;
 	return $i18n->get('cannot personalize') unless $self->getParent->canPersonalize;
 	my $output;
