@@ -14,6 +14,7 @@
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
  - fixed #9953: Matrix 2.0 - Not enough tests
  - fixed #10121: Q and A template doesn't work with default Forum Rich Editor
+ - rfe #10423: Provide a way to access the instance of the thing that was added, modified, or deleted via workflow. (Eric Kennedy)
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
