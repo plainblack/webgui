@@ -473,13 +473,13 @@ sub deleteThingData {
 
     return undef unless $self->canEditThingData($thingId, $thingDataId);;
 
+    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
+
     my ($onDeleteWorkflowId) = $db->quickArray("select onDeleteWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
     if ($onDeleteWorkflowId){
-        $self->triggerWorkflow($onDeleteWorkflowId, $thingId,$thingDataId);
+        $self->triggerWorkflow($onDeleteWorkflowId);
     }
-
-    $self->deleteCollateral("Thingy_".$thingId,"thingDataId",$thingDataId);
 
     return undef;
 }
@@ -598,13 +598,13 @@ sub editThingDataSave {
         my ($onAddWorkflowId) = $session->db->quickArray("select onAddWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onAddWorkflowId){
-            $self->triggerWorkflow($onAddWorkflowId,$thingId,$newThingDataId);
+            $self->triggerWorkflow($onAddWorkflowId);
         }
     }else{
         my ($onEditWorkflowId) = $session->db->quickArray("select onEditWorkflowId from Thingy_things where thingId=?"
             ,[$thingId]);
         if ($onEditWorkflowId){
-            $self->triggerWorkflow($onEditWorkflowId,$thingId,$newThingDataId);
+            $self->triggerWorkflow($onEditWorkflowId);
         }
     }
 
@@ -1390,7 +1390,7 @@ sub purge {
 
 #-------------------------------------------------------------------
 
-=head2 triggerWorkflow ( workflowId, thingId, thingDataId )
+=head2 triggerWorkflow ( workflowId )
 
 Runs the specified workflow when this Thingy changes.
 
@@ -1404,17 +1404,12 @@ sub triggerWorkflow {
 
     my $self = shift;
     my $workflowId = shift;
-    my $thingId = shift ;
-    my $thingDataId = shift ;
-    my $workflowInstance = WebGUI::Workflow::Instance->create($self->session, {
+    WebGUI::Workflow::Instance->create($self->session, {
         workflowId=>$workflowId,
         className=>"WebGUI::Asset::Wobject::Thingy",
         methodName=>"new",
         parameters=>$self->getId
-        });
-    $workflowInstance->setScratch("thingId", $thingId);
-    $workflowInstance->setScratch("thingDataId",$thingDataId);
-    $workflowInstance->start;
+        })->start;
     return undef;
 }
 
