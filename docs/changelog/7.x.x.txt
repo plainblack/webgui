@@ -1,3 +1,5 @@
+7.6.28
+
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
  - fixed #9953: Matrix 2.0 - Not enough tests
