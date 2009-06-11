@@ -15,7 +15,7 @@
  - fixed #9953: Matrix 2.0 - Not enough tests
  - fixed #10121: Q and A template doesn't work with default Forum Rich Editor
  - fixed #10486: Hardcoded extras in files in www/extras
- - fixed: LDAP authentication does not check for failed passwords.  Bug added to 7.7.10.
+ - fixed: LDAP authentication does not check for failed passwords.  (Rob Harhen <rharhen@gmail.com>)
 
 7.7.9
  - fixed #10266: Public Profile overrides Able to be friend   
