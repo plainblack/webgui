@@ -1234,16 +1234,12 @@ sub resetGroupFields {
         foreach my $wfActivities (values %{ $workflowActivities} ) {
             push @activities, @{ $wfActivities };
         }
-        use Data::Dumper;
-        warn Dumper \@activities;
         foreach my $activity (@activities) {
             my $definition = WebGUI::Pluggable::instanciate($activity, 'definition', [$session]);
             my $sth = $db->prepare('UPDATE WorkflowActivityData set value=3 where name=? and value=?');
             SUBDEF: foreach my $subdef (@{ $definition }) {
                 PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
                     next PROP unless $properties->{fieldType} eq 'group';
-                    warn $fieldName;
-                    warn $gid;
                     $sth->execute([$fieldName, $gid]);
                 }
             }
