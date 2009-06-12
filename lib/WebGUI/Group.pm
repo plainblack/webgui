@@ -19,6 +19,8 @@ use Tie::CPHash;
 use WebGUI::LDAPLink;
 use WebGUI::Macro;
 use WebGUI::Utility;
+use WebGUI::Pluggable;
+use WebGUI::International;
 
 
 =head1 NAME
@@ -261,12 +263,13 @@ Deletes this group from the group related tables in the database and calls clear
 =cut
 
 sub delete {
-	my $self = shift;
-	$self->clearCaches;
-        $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
-        $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
-        $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
-	undef $self;
+    my $self = shift;
+    $self->resetGroupFields;
+    $self->clearCaches;
+    $self->session->db->write("delete from groups where groupId=?", [$self->getId]);
+    $self->session->db->write("delete from groupings where groupId=?", [$self->getId]);
+    $self->session->db->write("delete from groupGroupings where inGroup=? or groupId=?", [$self->getId, $self->getId]);
+    undef $self;
 }
 
 #-------------------------------------------------------------------
@@ -1138,6 +1141,117 @@ sub new {
 	return $self;
 }
 
+
+#-------------------------------------------------------------------
+
+=head2 resetGroupFields (  )
+
+Looks through WebGUI and resets any group field that it can find, that uses this group,
+to the admin group, 3.  Called internally by delete.
+
+Currently handes these areas:
+
+=over 4
+
+=item *
+
+Anything in an Asset definition that is labeled as type group.  JSON data is not handled.
+
+=item *
+
+Everything in Operation/Settings, from its definition subroutine.
+
+=item *
+
+Settings fields hand picked from Shop/Admin and Account/FriendManager.
+
+=item *
+
+Any Workflow Activity data from the definition that is labeled as type group.
+
+=back
+
+=cut
+
+sub resetGroupFields {
+    my $self    = shift;
+    my $gid     = $self->getId;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my $config  = $session->config;
+    my $assets  = $config->get('assets');
+    my $tableCache = {};
+
+    ##Note, I did assets in SQL instead of using the API because you would have to
+    ##instanciate every version of the asset that used the group.  This should be much quicker
+    ASSET: foreach my $asset (keys %{ $assets }) {
+        my $definition = WebGUI::Pluggable::instanciate($asset, 'definition', [$session]);
+        SUBDEF: foreach my $subdef (@{ $definition }) {
+            next SUBDEF if exists $tableCache->{$subdef->{tableName}}; 
+            PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
+                next PROP unless $properties->{fieldType} eq 'group';
+                push @{ $tableCache->{$subdef->{tableName}} }, $fieldName;
+            }
+        }
+    }
+    ##VersionTags
+    $tableCache->{assetVersionTag} = ['groupToUse'];
+    $tableCache->{adSpace}         = ['groupToPurchase'];
+    foreach my $tableName (keys %{ $tableCache }) {
+        foreach my $fieldName (@{ $tableCache->{$tableName} }) {
+            my $sql = sprintf 'UPDATE %s SET %s=3 where %s=?',
+                $db->dbh->quote_identifier($tableName),
+                (($db->dbh->quote_identifier($fieldName)) x 2);
+            $db->write($sql, [ $gid ]);
+        }
+    }
+
+    SETTINGS: {
+        my $setting = $session->setting;
+        my $i18n = WebGUI::International->new($session);
+        my $definition = WebGUI::Pluggable::run('WebGUI::Operation::Settings', 'definition', [$session, $i18n]);
+        FIELD: foreach my $field (@{ $definition }) {
+            next FIELD unless $field->{fieldType} eq 'group'
+                          and $setting->get($field->{name}) eq $gid;
+            $setting->set($field->{name}, 3);
+        }
+    }
+    ##Settings in the settings table not from Operation/Settings.  These should all
+    ##be moved to definition style subroutines for future auto-probing.
+    AUX_SETTINGS: {
+        ##These are extra fields 
+        my $setting = $session->setting;
+        my @extraFields = qw/groupIdCashier groupIdAdminCommerce/;  ##Shop/Admin
+        push @extraFields, qw/groupIdAdminFriends groupsToManageFriends/; ##Account/FriendManager
+        FIELD: foreach my $field (@extraFields) {
+            next FIELD unless $setting->get($field) eq $gid;
+            $setting->set($field, 3);
+        }
+    }
+    ACTIVITY: {
+        my $workflowActivities = $config->get('workflowActivities');
+        my @activities;
+        foreach my $wfActivities (values %{ $workflowActivities} ) {
+            push @activities, @{ $wfActivities };
+        }
+        use Data::Dumper;
+        warn Dumper \@activities;
+        foreach my $activity (@activities) {
+            my $definition = WebGUI::Pluggable::instanciate($activity, 'definition', [$session]);
+            my $sth = $db->prepare('UPDATE WorkflowActivityData set value=3 where name=? and value=?');
+            SUBDEF: foreach my $subdef (@{ $definition }) {
+                PROP: while (my ($fieldName, $properties) = each %{ $subdef->{properties} }) {
+                    next PROP unless $properties->{fieldType} eq 'group';
+                    warn $fieldName;
+                    warn $gid;
+                    $sth->execute([$fieldName, $gid]);
+                }
+            }
+        }
+    }
+    ##Inbox messages, inbox table
+    return 1;
+}
 
 #-------------------------------------------------------------------
 
