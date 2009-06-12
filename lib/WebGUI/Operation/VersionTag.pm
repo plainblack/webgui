@@ -654,7 +654,7 @@ sub www_manageRevisionsInTag {
 
         # If no revisions remain, delete the version tag
         if ( $tag->getRevisionCount <= 0 ) {
-            $tag->delete;
+            $tag->rollback;
             return www_manageVersions( $session );
         }
     }
@@ -682,7 +682,7 @@ sub www_manageRevisionsInTag {
 
         # If no revisions remain, delete the version tag
         if ( $tag->getRevisionCount <= 0 ) {
-            $tag->delete;
+            $tag->rollback;
             return www_manageVersions( $session );
         }
     }

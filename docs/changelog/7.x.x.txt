@@ -1,5 +1,6 @@
 7.6.28
  - fixed: deploying a package doesn't commit version tag with autocommit on
+ - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
