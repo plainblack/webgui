@@ -306,6 +306,12 @@ sub www_deployPackage {
 			$deployedTreeMaster->update({isPackage=>0, styleTemplateId=>$self->get("styleTemplateId")});
 		}
 	}
+    if (WebGUI::VersionTag->autoCommitWorkingIfEnabled($self->session, {
+        allowComments   => 1,
+        returnUrl       => $self->getUrl,
+    }) eq 'redirect') {
+        return undef;
+    };
 	if ($self->session->form->param("proceed") eq "manageAssets") {
 		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
 	} else {
