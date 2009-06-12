@@ -2,6 +2,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
     YAHOO.example.XHR_JSON = new function() {
 	var Dom = YAHOO.util.Dom;
 	var hideStickies = 0;
+	var rowDisplay = '';
 
 	this.formatStickied = function(elCell, oRecord, oColumn, sData) {
 		if(!(oRecord.getData("fieldType") in {'category':'','lastUpdated':''})){
@@ -149,6 +150,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 					var checkBox = Dom.get(attributeId+"_stickied");
 					if (checkBox.checked == false){
 						elRow = myDataTable.getTrEl(elements[i]);
+						rowDisplay = Dom.getStyle(elRow, "display");
 						Dom.setStyle(elRow, "display", "none");
 					}
 				}
@@ -162,7 +164,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
 					var checkBox = Dom.get(attributeId+"_stickied");
 					if (checkBox.checked == false){
 						elRow = myDataTable.getTrEl(elements[i]);
-						Dom.setStyle(elRow, "display", "table-row");
+						Dom.setStyle(elRow, "display", rowDisplay);
 					}
 				}
 			}
