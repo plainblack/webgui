@@ -448,7 +448,7 @@ sub getOverrides {
     if ( ! $session->var->isAdminOn
         && $overridesRef
         && $overridesRef->{cacheNotExpired}
-        && $overridesRef->{userLastUpdated} >= $u->get('lastUpdated')) {
+        && $overridesRef->{userLastUpdated} >= $u->lastUpdated) {
         return %{ $overridesRef };
     }
     my %overrides;
