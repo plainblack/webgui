@@ -31,6 +31,7 @@ my $quiet; # this line required
 my $session = start(); # this line required
 
 # upgrade functions go here
+setDefaultIcalInterval($session);
 
 finish($session); # this line required
 
@@ -43,6 +44,16 @@ finish($session); # this line required
 #    # and here's our code
 #    print "DONE!\n" unless $quiet;
 #}
+
+#----------------------------------------------------------------------------
+# Describe what our function does
+sub setDefaultIcalInterval {
+    my $session = shift;
+    print "\tSet default ICAL interval in older calendars... " unless $quiet;
+    $session->db->write("UPDATE Calendar SET icalInterval = 7776000 where icalInterval is null or icalInterval = ''");
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
 
 
 # -------------- DO NOT EDIT BELOW THIS LINE --------------------------------
