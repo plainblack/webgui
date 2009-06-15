@@ -3,6 +3,7 @@
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)
  - fixed: Bug #10524 - reverted 7.7 API call to get('lastUpdated') on a WebGUI::User object in WebGUI/Asset/Shortcut.pm to 7.6 equivalent (Eric Kennedy)
  - fixed #10526: icalInterval in Calendar.pm
+ - fixed #10528: Thingy css error
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
