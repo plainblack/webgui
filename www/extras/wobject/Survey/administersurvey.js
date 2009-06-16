@@ -783,6 +783,5 @@ if (typeof Survey === "undefined") {
 })();
 
 YAHOO.util.Event.onDOMReady(function(){
-    // Survey.Comm.setUrl('/' + document.getElementById('assetPath').value);
     Survey.Comm.callServer('', 'loadQuestions');
 });

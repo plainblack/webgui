@@ -32,6 +32,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 setDefaultIcalInterval($session);
+makeSurveyResponsesVersionAware($session);
 
 finish($session); # this line required
 
@@ -52,6 +53,26 @@ sub setDefaultIcalInterval {
     print "\tSet default ICAL interval in older calendars... " unless $quiet;
     $session->db->write("UPDATE Calendar SET icalInterval = 7776000 where icalInterval is null or icalInterval = ''");
     # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+sub makeSurveyResponsesVersionAware {
+    my $session = shift;
+    print "\tAdding revisionDate column to Survey_response table... " unless $quiet;
+    $session->db->write("alter table Survey_response add column revisionDate bigint(20) not null default 0");
+    
+    print "\tDefaulting revisionDate on existing responses to current latest revision... " unless $quiet;
+    for my $assetId ($session->db->buildArray('select assetId from Survey_response')) {
+        $session->db->write(<<END_SQL, [ $assetId, $assetId]);
+update Survey_response 
+set revisionDate = ( 
+    select max(revisionDate)
+    from Survey 
+    where Survey.assetId = ?
+    )
+where Survey_response.assetId = ?
+END_SQL
+    }
     print "DONE!\n" unless $quiet;
 }
 

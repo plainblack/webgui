@@ -410,7 +410,7 @@ sub responseJSON {
 
         # See if we need to load responseJSON from the database
         if (!defined $json) {
-            $json = $self->session->db->quickScalar( 'select responseJSON from Survey_response where assetId = ? and Survey_responseId = ?', [ $self->getId, $responseId ] );
+            $json = $self->session->db->quickScalar( 'select responseJSON from Survey_response where Survey_responseId = ?', [ $responseId ] );
         }
 
         # Instantiate the ResponseJSON instance, and store it
@@ -753,6 +753,65 @@ sub www_graph {
 
 #-------------------------------------------------------------------
 
+=head2 submitObjectEdit ( $params )
+
+Called by L<www_submitObjectEdit> when an edit is submitted to a survey object.
+
+A new revision of this Survey object will be created automatically if any responses exist for the current
+revision (completed or in-progress). This ensures that the revision bound to a response never changes once
+a response has been started.
+
+=head3 params
+
+The updated params of the object. If the special hash keys "delete", "copy", "removetype" or "addtype" are present,
+these special actions will be carried out by delegating to e.g. L<deleteObject>, L<copyObject>, etc..
+
+=cut
+
+sub submitObjectEdit {
+    my $self = shift;
+    my $params = shift || {};
+
+    # Id is made up of at most: sectionIndex-questionIndex-answerIndex
+    my @address = split /-/, $params->{id};
+
+    # We will create a new revision if any responses exist for the current revision
+    my $responses
+        = $self->session->db->quickScalar(
+        'select count(*) from Survey_response where assetId = ? and revisionDate = ?',
+        [ $self->getId, $self->get('revisionDate') ] );
+
+    # Get a reference to the Survey instance that we want to perform updates on
+    my $survey = $self;
+    if ($responses) {
+        $self->session->log->debug( "Creating a new revision, $responses responses exist for the current revision "
+                . $self->get('revisionDate') );
+        $survey = $self->addRevision;
+    }
+
+    # See if any special actions were requested..
+    if ( $params->{delete} ) {
+        return $survey->deleteObject( \@address );
+    }
+    elsif ( $params->{copy} ) {
+        return $survey->copyObject( \@address );
+    }
+    elsif ( $params->{removetype} ) {
+        return $survey->removeType( \@address );
+    }
+    elsif ( $params->{addtype} ) {
+        return $survey->addType( $params->{addtype}, \@address );
+    }
+
+    # Update the addressed object (and have it automatically persisted)
+    $survey->surveyJSON_update( \@address, $params );
+
+    # Return the updated Survey structure
+    return $survey->www_loadSurvey( { address => \@address } );
+}
+
+#-------------------------------------------------------------------
+
 =head2 www_submitObjectEdit ( )
 
 This is called when an edit is submitted to a survey object. The POST should contain the id and updated params
@@ -765,32 +824,13 @@ See L<WebGUI::Asset::Wobject::Survey::ResponseJSON/sectionIndex>.
 
 sub www_submitObjectEdit {
     my $self = shift;
-    
+
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
 
     my $params = $self->session->form->paramsHashRef();
-
-    # Id is made up of at most: sectionIndex-questionIndex-answerIndex
-    my @address = split /-/, $params->{id};
-
-    # See if any special actions were requested..
-    if ( $params->{delete} ) {
-        return $self->deleteObject( \@address );
-    }
-    elsif ( $params->{copy} ) {
-        return $self->copyObject( \@address );
-    }elsif( $params->{removetype} ){
-        return $self->removeType(\@address);        
-    }elsif( $params->{addtype} ){
-        return $self->addType($params->{addtype},\@address);        
-    }
-
-    # Update the addressed object (and have it automatically persisted)
-    $self->surveyJSON_update( \@address, $params );
-
-    # Return the updated Survey structure
-    return $self->www_loadSurvey( { address => \@address } );
+    
+    return $self->submitObjectEdit($params);
 }
 
 #-------------------------------------------------------------------
@@ -1336,8 +1376,17 @@ sub getResponseDetails {
     # This includes abnormal finishes such as timeouts and restarts
     my $isCompleteClause = defined $isComplete ? "isComplete = $isComplete" : 'isComplete > 0';
     
-    $responseId 
-        ||= $self->session->db->quickScalar("select Survey_responseId from Survey_response where userId = ? and assetId = ? and $isCompleteClause order by endDate desc limit 1", [ $userId, $self->getId ]);
+    if (!$responseId) {
+        ($responseId, my $revisionDate) 
+            = $self->session->db->quickArray(
+            "select Survey_responseId, revisionDate from Survey_response where userId = ? and assetId = ? and $isCompleteClause order by endDate desc limit 1", 
+            [ $userId, $self->getId ]);
+        
+        if ($responseId && $revisionDate != $self->get('revisionDate')) {
+            $self->session->log->debug("Revision Date $revisionDate for retrieved responseId $responseId does not match instantiated object " 
+            . $self->getId . " revision date " . $self->get('revisionDate') . ". getResponseDetails could possibly do weird things.");
+        }
+    }
     
     if (!$responseId) {
         $self->session->log->debug("ResponseId not found");
@@ -1391,7 +1440,8 @@ sub getResponseDetails {
 =head2 newByResponseId ( responseId )
 
 Class method. Instantiates a Survey instance from the given L<"responseId">, and loads the
-user response into the Survey instance.
+user response into the Survey instance. The Survey object returned will be the revision 
+bound to the response.
 
 =head3 responseId
 
@@ -1403,8 +1453,8 @@ sub newByResponseId {
     my $class = shift;
     my ($session, $responseId) = validate_pos(@_, {isa => 'WebGUI::Session'}, { type => SCALAR });
     
-    my ($assetId, $userId) = $session->db->quickArray('select assetId, userId from Survey_response where Survey_responseId = ?',
-        [$responseId]);
+    my ($assetId, $revisionDate, $userId) 
+        = $session->db->quickArray('select assetId, revisionDate, userId from Survey_response where Survey_responseId = ?', [$responseId]);
     
     if (!$assetId) {
         $session->log->warn("ResponseId not bound to valid assetId: $responseId");
@@ -1416,7 +1466,7 @@ sub newByResponseId {
         return;
     }
     
-    if (my $survey = $class->new($session, $assetId)) {
+    if (my $survey = $class->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey', $revisionDate)) {
         # Set the responseId manually rather than calling $self->responseId so that we
         # can load a response regardless of whether it's marked isComplete
         $survey->{responseId} = $responseId;
@@ -1445,7 +1495,15 @@ sub www_takeSurvey {
         return;
     }
     
-    my $out = $self->processTemplate( {}, $self->get('surveyTakeTemplateId') );
+    # The template needs to know what Survey revisionDate is bound to the response, so that
+    # it can ask for questions for the appropriate Survey revision
+    # We don't mind if the revisionDate for the retrieved response doesn't match the revisionDate
+    # for this Survey object, because this www_ method simply returns the shell that is used to
+    # retrieve the actual Survey data (using the appropriate revisionDate url param)
+    my $responseId = $self->responseId({ignoreRevisionDate => 1});
+    my $revision = $self->session->db->quickScalar("select revisionDate from Survey_response where Survey_responseId = ?", [ $responseId ]);
+    
+    my $out = $self->processTemplate( { revision => $revision }, $self->get('surveyTakeTemplateId') );
     return $self->processStyle($out);
 }
 
@@ -1655,25 +1713,8 @@ sub www_loadQuestions {
     my @questions;
     eval { @questions = $self->responseJSON->nextQuestions(); };
     
-#    # Logical sections cause nextResponse to move when nextQuestions is called, so
-#    # persist and changes, and repeat the surveyEnd check in case we are now at the end
-#    $self->persistResponseJSON();
-#    if ( $self->responseJSON->surveyEnd() ) {
-#        $self->session->log->debug('surveyEnd, probably as a result of a Logical Section');
-#        if ( $self->get('quizModeSummary') ) {
-#            if(! $self->session->form->param('shownsummary')){
-#                my ($summary,$html) = $self->getSummary();
-#                my $json = to_json( { type => 'summary', summary => $summary, html => $html });
-#                $self->session->http->setMimeType('application/json');
-#                return $json;
-#            }
-#        }
-#        return $self->surveyEnd();
-#    }
-    
     my $section = $self->responseJSON->nextResponseSection();
 
-    #return $self->prepareShowSurveyTemplate($section,$questions);
     $section->{id}              = $self->responseJSON->nextResponseSectionIndex();
     $section->{wasRestarted}    = $wasRestarted;
 
@@ -1928,27 +1969,42 @@ A value of isComplete to filter against (defaults to isComplete = 0)
 
 If a responseId does not already exist, do not create one (default is to create an new responseId)
 
+=head4 ignoreRevisionDate
+
+Ignore the fact that the revisionDate bound to the retrieved response does not match the revisionDate for this Survey instance.
+
 =cut
 
 sub responseId {
     my $self       = shift;
-    my %opts       = validate( @_, { userId => 0, isComplete => 0, noCreate => 0 } );
+    my %opts       = validate( @_, { userId => 0, isComplete => 0, noCreate => 0, ignoreRevisionDate => 0 } );
     my $userId     = $opts{userId} || $self->session->user->userId;
     my $isComplete = $opts{isComplete};
     my $noCreate   = $opts{noCreate};
+    my $ignoreRevisionDate = $opts{ignoreRevisionDate};
 
     my $user = WebGUI::User->new( $self->session, $userId );
     my $ip = $self->session->env->getIp;
 
     my $responseId = $self->{responseId};
+    return $responseId if $responseId;
 
     # If a cached responseId doesn't exist, get the current in-progress response from the db
     # By default, get current response (e.g. isComplete = 0)
     my $isCompleteClause = defined $isComplete ? "isComplete = $isComplete" : 'isComplete = 0';
-    $responseId ||= $self->session->db->quickScalar(
-        "select Survey_responseId from Survey_response where userId = ? and assetId = ? and $isCompleteClause order by endDate desc limit 1",
-        [ $userId, $self->getId ]
-    );
+    
+    if (!$responseId) {
+        ($responseId, my $revisionDate) = $self->session->db->quickArray(
+            "select Survey_responseId, revisionDate from Survey_response where userId = ? and assetId = ? and $isCompleteClause order by endDate desc limit 1",
+            [ $userId, $self->getId ]
+        );
+        
+        if (!$ignoreRevisionDate && $responseId && $revisionDate != $self->get('revisionDate')) {
+            $self->session->log->warn("Revision Date $revisionDate for retrieved responseId $responseId does not match instantiated object " 
+            . $self->getId . " revision date " . $self->get('revisionDate') . ". Refusing to return response");
+            return;
+        }
+     }   
 
     if ( !$responseId && $noCreate ) {
         $self->session->log->debug("ResponseId doesn't exist, but we were asked not to create a new one");
@@ -1956,6 +2012,7 @@ sub responseId {
     }
     
     # If no current in-progress response exists, create one (as long as we're allowed to)
+    # N.B. Response is bound to current Survey revisionDate
     if ( !$responseId ) {
         my $maxResponsesPerUser = $self->get('maxResponsesPerUser');
         my $takenCount = $self->takenCount( { userId => $userId } );
@@ -1971,7 +2028,8 @@ sub responseId {
                     startDate         => scalar time,
                     endDate           => 0,
                     assetId           => $self->getId,
-                    anonId            => undef
+                    revisionDate      => $self->get('revisionDate'),
+                    anonId            => undef,
                 }
             );
 
@@ -2833,9 +2891,11 @@ sub www_runTests {
     return $self->session->privilege->insufficient()
         unless $self->session->user->isInGroup( $self->get('groupToEditSurvey') );
     
-    # Manage response ourselves rather than doing it over and over per-test
-    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ?',
-            [ $self->getId, $self->session->user->userId() ] );
+    # Remove any in-progress reponses for current user
+    $self->session->db->write( 'delete from Survey_response where assetId = ? and userId = ? and isComplete = 0',
+        [ $self->getId, $self->session->user->userId() ] );
+        
+    # Manage responses ourselves rather than doing it over and over per-test
     my $responseId = $self->responseId( { userId => $self->session->user->userId } )
         or return $self->www_editTestSuite('Unable to start survey response');
     
