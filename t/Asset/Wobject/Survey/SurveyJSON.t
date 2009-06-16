@@ -1393,7 +1393,6 @@ my $answerBundle = $surveyJSON->getMultiChoiceBundle('Yes/No');
 $surveyJSON->addAnswersToQuestion( [3,0],
     $answerBundle,
 );
-
 cmp_deeply(
     $surveyJSON->question([3,0]),
     superhashof({
@@ -1401,14 +1400,14 @@ cmp_deeply(
             superhashof({
                 text     => 'Yes',
                 verbatim => 0,
-                recordedAnswer => 1,
-                value => 1,
+                recordedAnswer => $answerBundle->[0]{recordedAnswer},
+                value => $answerBundle->[0]{value},
             }),
             superhashof({
                 text     => 'No',
                 verbatim => 0,
-                recordedAnswer => 0,
-                value => 1,
+                recordedAnswer => $answerBundle->[1]{recordedAnswer},
+                value => $answerBundle->[1]{value},
             }),
         ],
     }),

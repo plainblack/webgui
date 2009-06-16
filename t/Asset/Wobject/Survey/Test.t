@@ -631,7 +631,7 @@ $spec = <<END_SPEC;
 [ 
     { 
         "sequence" : { 
-            "S0Q0" : { "recordedAnswer" : "desc", "score" : "cons" }, # This is a default Yes/No (score all 1)
+            "S0Q0" : { "recordedAnswer" : "desc"}, # This is a default Yes/No (score all 1)
             "S4Q0" : { "recordedAnswer" : "asc" },                    # Certainty scale, with recordedAnswer 0 .. 11
             "S3Q0" : { "recordedAnswer" : "desc", "score" : "desc" }, # These 3 are yes/no questions where we have
             "S3Q1" : { "recordedAnswer" : "desc", "score" : "desc" }, # ..set the score on the No answer to zero, hence
