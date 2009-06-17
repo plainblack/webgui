@@ -2560,9 +2560,9 @@ sub www_editThingDataSave {
         $otherThingId =~ s/^addOther_//x;
         return $self->www_editThingData($otherThingId,"new");
     }
-    # if afterSave is thingy default or in any other case return view()
+    # if afterSave is thingy default or in any other case return www_view()
     else {
-        return $self->view();
+        return $self->www_view();
     }
 }
 
