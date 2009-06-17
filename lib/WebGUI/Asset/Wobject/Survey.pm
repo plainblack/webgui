@@ -1940,7 +1940,7 @@ sub persistResponseJSON {
     my $self = shift;
     my $data = $self->responseJSON->freeze();
     $self->session->db->write( 'update Survey_response set responseJSON = ? where Survey_responseId = ?',
-        [ $data, $self->responseId( { noCreate => 1 } ) ] );
+        [ $data, $self->responseId( { ignoreRevisionDate => 1 } ) ] );
     return;
 }
 
