@@ -146,15 +146,10 @@ sub process {
 		}
 		
 		# prototypes
-		my $sth = $session->db->read("select asset.className,asset.assetId,assetData.revisionDate from asset
-			left join assetData on asset.assetId=assetData.assetId
-			where assetData.isPrototype=1 and asset.state='published' and assetData.revisionDate=(SELECT max(revisionDate) from assetData where assetData.assetId=asset.assetId)
-			group by assetData.assetId");
-		while (my ($class, $id, $date) = $sth->array) {
-			my $prototype = WebGUI::Asset->new($session,$id,$class,$date);
+		foreach my $prototype (@{ $session->asset->getPrototypeList }) {
 			next unless ($prototype->canView && $prototype->canAdd($session) && $prototype->getUiLevel <= $userUiLevel);
             $categories{prototypes}{items}{$prototype->getTitle} = {
-				url		=> $asset->getUrl("func=add;class=".$class.";prototype=".$prototype->getId),
+				url		=> $asset->getUrl("func=add;class=".$prototype->get('className').";prototype=".$prototype->getId),
 				icon	=> $prototype->getIcon(1),
 				};
 		}

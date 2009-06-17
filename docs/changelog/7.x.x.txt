@@ -5,6 +5,7 @@
  - fixed #10526: icalInterval in Calendar.pm
  - fixed #10528: Thingy css error
  - fixed: Performance improvements with getting the list of asset packages.
+ - fixed: Performance improvements with getting the list of content prototypes.
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
