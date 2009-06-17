@@ -489,7 +489,7 @@ sub www_paste {
     return $session->privilege->insufficient() unless $self->canEdit;
     my $pasteAssetId = $session->form->process('assetId');
     my $pasteAsset   = WebGUI::Asset->newPending($session, $pasteAssetId);
-    return $session->privilege->insufficient() unless $pasteAsset->canEdit;
+    return $session->privilege->insufficient() unless $pasteAsset && $pasteAsset->canEdit;
     $self->paste($pasteAssetId);
     return "";
 }
@@ -498,19 +498,27 @@ sub www_paste {
 
 =head2 www_pasteList ( )
 
-Returns a www_manageAssets() method. Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
+Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
+Returns the user to the manageAssets screen. 
 
 =cut
 
 sub www_pasteList {
-	my $self = shift;
-	return $self->session->privilege->insufficient() unless $self->canEdit;
-	ASSET: foreach my $clipId ($self->session->form->param("assetId")) {
-        my $pasteAsset = WebGUI::Asset->newPending($self->session, $clipId);
+	my $self    = shift;
+    my $session = $self->session;
+	return $session->privilege->insufficient() unless $self->canEdit;
+    my $form    = $session->form;
+	ASSET: foreach my $clipId ($form->param("assetId")) {
+        my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
         next ASSET unless $pasteAsset->canEdit;
 		$self->paste($clipId);
 	}
-	return $self->www_manageAssets();
+    if ($form->param("proceed") eq 'manageAssets') {
+        return $self->www_manageAssets();
+    }
+    else {
+        return "";
+    }
 }
 
 
