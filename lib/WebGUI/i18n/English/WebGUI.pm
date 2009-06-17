@@ -4453,14 +4453,17 @@ Users may override this setting in their profile.
 
     'activate user' => {
         message => 'Activate User',
+        lastUpdated => 0,
     },
 
     'deactivate user' => {
         message => 'Deactivate User',
+        lastUpdated => 0,
     },
 
     'delete user' => {
         message => 'Delete User',
+        lastUpdated => 0,
     },
 
 };
