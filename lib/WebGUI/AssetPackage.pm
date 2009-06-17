@@ -80,7 +80,8 @@ sub exportPackage {
 
 =head2 getPackageList ( )
 
-Returns an array of hashes containing title, assetId, and className for all assets defined as packages.
+Returns an array of all assets that the user can view and edit that are packages.  The array
+is sorted by the title of the assets.
 
 =cut
 
@@ -93,7 +94,7 @@ sub getPackageList {
     ID: foreach my $id (@packageIds) {
         my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
         next ID unless defined $asset;
-        next ID unless $asset->canView && $asset->get('isPackage');
+        next ID unless $asset->get('isPackage');
         next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
         push @assets, [$asset->getTitle, $asset];
     }
