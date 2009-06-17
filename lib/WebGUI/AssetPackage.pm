@@ -80,7 +80,8 @@ sub exportPackage {
 
 =head2 getPackageList ( )
 
-Returns an array of all assets that the user can view and edit that are packages.
+Returns an array of all assets that the user can view and edit that are packages.  The array
+is sorted by the title of the assets.
 
 =cut
 
