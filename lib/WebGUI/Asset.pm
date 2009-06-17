@@ -1281,6 +1281,32 @@ sub getNotFound {
 
 #-------------------------------------------------------------------
 
+=head2 getPrototypeList ( )
+
+Returns an array of all assets that the user can view and edit that are prototypes.
+
+=cut
+
+sub getPrototypeList {
+    my $self    = shift;
+    my $session = $self->session;
+    my $db      = $session->db;
+    my @prototypeIds = $db->buildArray("select distinct assetId from assetData where isPrototype=1");
+    my $userUiLevel = $session->user->profileField('uiLevel');
+    my @assets;
+    ID: foreach my $id (@prototypeIds) {
+        my $asset = WebGUI::Asset->newByDynamicClass($session, $id);
+        next ID unless defined $asset;
+        next ID unless $asset->get('isPrototype');
+        next ID unless ($asset->get('status') eq 'approved' || $asset->get('tagId') eq $session->scratch->get("versionTag"));
+        push @assets, $asset;
+    }
+    return \@assets;
+
+}
+
+#-------------------------------------------------------------------
+
 =head2 getRoot ( session )
 
 Constructor. Returns the root asset object.
