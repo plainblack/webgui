@@ -4386,16 +4386,20 @@ Users may override this setting in their profile.
 
         'use recaptcha' => {
             message     => q{Use reCAPTCHA?}
+            lastUpdated => 0,
         },
         'use recaptcha description' => {
             message     => q{reCAPTCHA is a free CAPTCHA service that helps to digitize books.  It requires a key set generated for your domain, available from <a href="http://recaptcha.net/">http://recaptcha.net/</a>.}
+            lastUpdated => 0,
         },
 
         'recaptcha private key' => {
             message     => 'reCAPTCHA Private Key'
+            lastUpdated => 0,
         },
         'recaptcha public key' => {
             message     => 'reCAPTCHA Public Key'
+            lastUpdated => 0,
         },
 
 	'Ad Space control name' => {
