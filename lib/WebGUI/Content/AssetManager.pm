@@ -464,16 +464,21 @@ ENDHTML
 
     tie my %options, 'Tie::IxHash';
     my $hasClips = 0;
+    my $clipNum  = 0;
     foreach my $asset (@{$currentAsset->getAssetsInClipboard(1)}) {
             $options{$asset->getId} = '<img src="'.$asset->getIcon(1).'" alt="'.$asset->getName.'" style="border: 0px;" /> '.$asset->getTitle;
             $hasClips = 1;
+            $clipNum++;
     }
     if ($hasClips) {
             $output .= '<div class="functionPane"><fieldset><legend>'.$i18n->get(1082).'</legend>'
                     .WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
                     .WebGUI::Form::hidden($session,{name=>"func",value=>"pasteList"})
-                    .WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'})
-                    .' '.$i18n->get("select all").'<br />'
+                    .( $clipNum > 1
+                        ? WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'}).' '.$i18n->get("select all").'<br />'
+                        : ''
+                     )
+                    
                     .WebGUI::Form::checkList($session,{name=>"assetId",vertical=>1,options=>\%options})
                     .'<br />'
                     .WebGUI::Form::submit($session,{value=>"Paste"})

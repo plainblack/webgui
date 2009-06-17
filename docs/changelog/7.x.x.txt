@@ -11,6 +11,7 @@
    editing a Thing and the 'return after edit' setting was set to 'Thing 
    Default' ( Martin Kamerbeek / Oqapi )
  - fixed: In the Asset Manager, if you pasted an asset if returned you to the page instead the manager.
+ - fixed: In the Asset Manager, only display a Select All button if there is more than one asset.
 
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
