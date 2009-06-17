@@ -6,6 +6,10 @@
  - fixed #10528: Thingy css error
  - fixed: Performance improvements with getting the list of asset packages.
  - fixed: Performance improvements with getting the list of content prototypes.
+ - fixed bug in Thingy where the style template would not be processed after
+   editing a Thing and the 'return after edit' setting was set to 'Thing 
+   Default' ( Martin Kamerbeek / Oqapi )
+
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
