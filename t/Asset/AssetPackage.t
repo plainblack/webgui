@@ -67,6 +67,8 @@ is(scalar @{ $targetFolderChildren }, 0, 'target folder has no children');
 
 $versionTag->commit;
 
+sleep 2;
+
 $targetFolder->www_deployPackage();
 
 $targetFolderChildren = $targetFolder->getLineage(["children"], {returnObjects => 1,});
@@ -83,7 +85,7 @@ is(scalar @{ $deployedFolderChildren }, 1, 'deployed package folder still has 1 
 isa_ok($deployedFolderChildren->[0] , 'WebGUI::Asset::Snippet', 'deployed child is a Snippet');
 
 ##Unset isPackage in this versionTag for the next tests
-$folder->update({isPackage => 0});
+$folder->addRevision({isPackage => 0});
 
 my $newVersionTag = WebGUI::VersionTag->getWorking($session);
 WebGUI::Test->tagsToRollback($newVersionTag);
