@@ -35,9 +35,6 @@ These methods are available from this class:
 
 =cut
 
-
-
-
 #-------------------------------------------------------------------
 
 =head2 canPaste ( )
@@ -183,8 +180,8 @@ Alphanumeric ID tag of Asset.
 =cut
 
 sub paste {
-	my $self = shift;
-	my $assetId = shift;
+	my $self         = shift;
+	my $assetId      = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
@@ -508,17 +505,53 @@ sub www_pasteList {
     my $session = $self->session;
 	return $session->privilege->insufficient() unless $self->canEdit;
     my $form    = $session->form;
-	ASSET: foreach my $clipId ($form->param("assetId")) {
-        my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
-        next ASSET unless $pasteAsset->canEdit;
-		$self->paste($clipId);
-	}
-    if ($form->param("proceed") eq 'manageAssets') {
-        return $self->www_manageAssets();
+    my $pb      = WebGUI::ProgressBar->new($session);
+    ##Need to store the list of assetIds for the status subroutine
+    my @assetIds = $form->param('assetId');
+    $session->scratch->set('assetPasteList', JSON::to_json(\@assetIds));
+    if ($form->param('proceed') eq 'manageAssets') {
+        $session->scratch->set('assetPasteReturnUrl', $self->getUrl('op=manageAssets'));
     }
     else {
-        return "";
+        $session->scratch->set('assetPasteReturnUrl', $self->getUrl);
     }
+    $session->scratch->set('assetPasteList', JSON::to_json(\@assetIds));
+    ##Need to set the URL that should be displayed when it is done
+    my $i18n     = WebGUI::International->new($session, 'Asset');
+    $pb->setIcon($session->url->extras('adminConsole/assets.gif'));
+    return $pb->render({
+        title     => $i18n->get('Paste Assets'),
+        statusUrl => $self->getUrl('func=pasteListStatus'),
+    });
+}
+
+#-------------------------------------------------------------------
+
+=head2 www_pasteListStatus ( )
+
+Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
+Returns the user to the manageAssets screen. 
+
+=cut
+
+sub www_pasteListStatus {
+	my $self    = shift;
+    my $session = $self->session;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    if (! $self->canEdit ) {
+        return $session->privilege->insufficient('no style')."return to site";
+    }
+    my $assetIds = $session->scratch->get('assetPasteList') || '[]';
+    my @assetIds = @{ JSON::from_json($assetIds) };
+    my $i18n     = WebGUI::International->new($session, 'Asset');
+	ASSET: foreach my $clipId (@assetIds) {
+        my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
+        next ASSET unless $pasteAsset && $pasteAsset->canEdit;
+        $pb->print(sprintf $i18n->get("Pasting %s"), $pasteAsset->getTitle);
+		$self->paste($clipId);
+	}
+    $pb->redirect( $session->scratch->get('assetPasteReturnUrl') );
+    return "";
 }
 
 

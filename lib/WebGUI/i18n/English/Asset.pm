@@ -272,6 +272,17 @@ our $I18N = {
 		context => q|To remove an item from the clipboard, and put it on the current page.|
 	},
 
+	'Paste Assets' => {
+		message => q|Paste Assets|,
+		lastUpdated => 1245342798,
+	},
+
+	'Pasting %s' => {
+		message => q|Pasting %s|,
+		lastUpdated => 1245343280,
+		context => q|short for "I am pasting this asset onto the page."|
+	},
+
 	'this asset only' => {
 		message => q|This&nbsp;Asset&nbsp;Only|,
 		lastUpdated => 0,

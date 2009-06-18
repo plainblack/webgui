@@ -474,6 +474,7 @@ ENDHTML
             $output .= '<div class="functionPane"><fieldset><legend>'.$i18n->get(1082).'</legend>'
                     .WebGUI::Form::formHeader($session, {action=>$currentAsset->getUrl})
                     .WebGUI::Form::hidden($session,{name=>"func",value=>"pasteList"})
+                    .WebGUI::Form::hidden($session,{name=>"proceed",value=>"manageAssets"})
                     .( $clipNum > 1
                         ? WebGUI::Form::checkbox($session,{extras=>'onclick="toggleClipboardSelectAll(this.form);"'}).' '.$i18n->get("select all").'<br />'
                         : ''

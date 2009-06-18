@@ -87,14 +87,14 @@ sub process {
 	# stuff to do if we're on a page with an asset
 	if ($asset) {
 		
-        my $inAssetManager = $session->form->get('op') eq 'assetManager';
+        my $proceed = $session->form->get('op') eq 'assetManager' ?  ';proceed=manageAssets' : '';
 		# clipboard
 		my $clipboardItems = $session->asset->getAssetsInClipboard(1);
 		if (scalar (@$clipboardItems)) {
 			$out .= q{<dt class="a-m-t">}.$i18n->get("1082").q{</dt><dd class="a-m-d"><div class="bd">};
 			foreach my $item (@{$clipboardItems}) {
 				my $title = $asset->getTitle;
-				$out .= q{<a class="link" href="}.$asset->getUrl("func=paste;assetId=".$item->getId).q{">}
+				$out .= q{<a class="link" href="}.$asset->getUrl("func=pasteList;assetId=".$item->getId.$proceed).q{">}
 					.q{<img src="}.$item->getIcon(1).q{" style="border: 0px; vertical-align: middle;" alt="icon" /> }
 					.$item->getTitle.q{</a>};
 			}
@@ -119,7 +119,6 @@ sub process {
 
 		# assets
 		my %assetList = %{$config->get('assets')};
-        my $proceed   = $inAssetManager ? ';proceed=manageAssets' : '';
 		foreach my $assetClass (keys %assetList) {
 			my $dummy = WebGUI::Asset->newByPropertyHashRef($session,{dummy=>1, className=>$assetClass});
             next unless defined $dummy;
@@ -136,7 +135,7 @@ sub process {
 		foreach my $package (@{$session->asset->getPackageList}) {
 			next unless ($package->canView && $package->canAdd($session) && $package->getUiLevel <= $userUiLevel);
             $categories{packages}{items}{$package->getTitle} = {
-				url		=> $asset->getUrl("func=deployPackage;assetId=".$package->getId),
+				url		=> $asset->getUrl("func=deployPackage;assetId=".$package->getId.$proceed),
 				icon	=> $package->getIcon(1),
 				};
         }
@@ -149,7 +148,7 @@ sub process {
 		foreach my $prototype (@{ $session->asset->getPrototypeList }) {
 			next unless ($prototype->canView && $prototype->canAdd($session) && $prototype->getUiLevel <= $userUiLevel);
             $categories{prototypes}{items}{$prototype->getTitle} = {
-				url		=> $asset->getUrl("func=add;class=".$prototype->get('className').";prototype=".$prototype->getId),
+				url		=> $asset->getUrl("func=add;class=".$prototype->get('className').";prototype=".$prototype->getId.$proceed),
 				icon	=> $prototype->getIcon(1),
 				};
 		}

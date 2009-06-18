@@ -36,6 +36,7 @@ use WebGUI::Form;
 use WebGUI::HTML;
 use WebGUI::HTMLForm;
 use WebGUI::Keyword;
+use WebGUI::ProgressBar;
 use WebGUI::Search::Index;
 use WebGUI::TabForm;
 use WebGUI::Utility;

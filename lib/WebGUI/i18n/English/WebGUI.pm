@@ -4470,6 +4470,11 @@ Users may override this setting in their profile.
         lastUpdated => 0,
     },
 
+    'Working...' => {
+        message => 'Working...',
+        lastUpdated => 0,
+    },
+
 };
 
 1;
