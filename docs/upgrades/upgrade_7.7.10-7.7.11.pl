@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Shop::Ship;
+use WebGUI::Shop::ShipDriver;
 
 
 my $toVersion = '7.7.11';
@@ -33,6 +35,7 @@ my $session = start(); # this line required
 # upgrade functions go here
 setDefaultIcalInterval($session);
 makeSurveyResponsesVersionAware($session);
+addShipperGroupToUse($session);
 
 finish($session); # this line required
 
@@ -56,9 +59,25 @@ sub setDefaultIcalInterval {
     print "DONE!\n" unless $quiet;
 }
 
+#----------------------------------------------------------------------------
+sub addShipperGroupToUse {
+    my $session = shift;
+    print "\tAdd Group to Use for all existing shipping drivers... " unless $quiet;
+    my $ship     = WebGUI::Shop::Ship->new($session);
+    my $shippers = $ship->getShippers($session);
+    foreach my $shipper (@{ $shippers }) {
+        my $options = $shipper->get();
+        $options->{groupToUse} = 7;
+        $shipper->update($options);
+    }
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
 sub makeSurveyResponsesVersionAware {
     my $session = shift;
-    print "\tAdding revisionDate column to Survey_response table... " unless $quiet;
+    print "\tAdding revisionDate column to Survey_response table...\n" unless $quiet;
     $session->db->write("alter table Survey_response add column revisionDate bigint(20) not null default 0");
     
     print "\tDefaulting revisionDate on existing responses to current latest revision... " unless $quiet;

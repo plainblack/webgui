@@ -26,6 +26,18 @@ our $I18N = {
 		lastUpdated => 1203569582,
 	},
 
+    'who can use' => {
+        message => q|Group to use this shipping driver|,
+        lastUpdate => 0,
+        context => q|Label for the group to use option.|,
+    },
+
+    'who can use help' => {
+        message => q|Specifies which group is allowed to use this shipping driver.|,
+        lastUpdated => 0,
+        context => q|Hover help for the group to use option.|,
+    },
+
 };
 
 1;
