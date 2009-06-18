@@ -266,6 +266,12 @@ our $I18N = {
 		context => q|Same as Copy, but lower case.|
 	},
 
+	'Paste' => {
+		message => q|Paste|,
+		lastUpdated => 1245342798,
+		context => q|To remove an item from the clipboard, and put it on the current page.|
+	},
+
 	'this asset only' => {
 		message => q|This&nbsp;Asset&nbsp;Only|,
 		lastUpdated => 0,

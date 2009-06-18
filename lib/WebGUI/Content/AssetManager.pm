@@ -481,7 +481,7 @@ ENDHTML
                     
                     .WebGUI::Form::checkList($session,{name=>"assetId",vertical=>1,options=>\%options})
                     .'<br />'
-                    .WebGUI::Form::submit($session,{value=>"Paste"})
+                    .WebGUI::Form::submit($session,{value=>$i18n->get('Paste')})
                     .WebGUI::Form::formFooter($session)
                     .' </fieldset></div> '
                     .'<script type="text/javascript">
