@@ -551,7 +551,7 @@ sub www_pasteListStatus {
 		$self->paste($clipId);
 	}
     $pb->redirect( $session->scratch->get('assetPasteReturnUrl') );
-    return "";
+    return "redirect";
 }
 
 
