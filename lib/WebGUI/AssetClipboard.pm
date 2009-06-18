@@ -169,7 +169,7 @@ sub getAssetsInClipboard {
 
 #-------------------------------------------------------------------
 
-=head2 paste ( assetId )
+=head2 paste ( assetId , [ outputSub ] )
 
 Returns 1 if can paste an asset to a Parent. Sets the Asset to published. Otherwise returns 0.
 
@@ -177,17 +177,23 @@ Returns 1 if can paste an asset to a Parent. Sets the Asset to published. Otherw
 
 Alphanumeric ID tag of Asset.
 
+=head3 outputSub
+
+A reference to a subroutine that output messages should be sent to.
+
 =cut
 
 sub paste {
 	my $self         = shift;
 	my $assetId      = shift;
+    my $outputSub   = shift;
 	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
     # Don't allow a shortcut to create an endless loop
 	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
+    $outputSub->("pasting ".$pastedAsset->getTitle) if defined $outputSub;
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
@@ -196,6 +202,7 @@ sub paste {
         my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
  
         foreach (@{$updateAssets}) {
+            $outputSub->("indexing ".$_->getTitle) if defined $outputSub;
             $_->indexContent();
         }
 
@@ -508,50 +515,16 @@ sub www_pasteList {
     my $pb      = WebGUI::ProgressBar->new($session);
     ##Need to store the list of assetIds for the status subroutine
     my @assetIds = $form->param('assetId');
-    $session->scratch->set('assetPasteList', JSON::to_json(\@assetIds));
-    if ($form->param('proceed') eq 'manageAssets') {
-        $session->scratch->set('assetPasteReturnUrl', $self->getUrl('op=assetManager'));
-    }
-    else {
-        $session->scratch->set('assetPasteReturnUrl', $self->getUrl);
-    }
     ##Need to set the URL that should be displayed when it is done
     my $i18n     = WebGUI::International->new($session, 'Asset');
-    $pb->setIcon($session->url->extras('adminConsole/assets.gif'));
-    return $pb->render({
-        title     => $i18n->get('Paste Assets'),
-        statusUrl => $self->getUrl('func=pasteListStatus'),
-    });
-}
-
-#-------------------------------------------------------------------
-
-=head2 www_pasteListStatus ( )
-
-Pastes a selection of assets. If canEdit is False, returns an insufficient privileges page.
-Returns the user to the manageAssets screen. 
-
-=cut
-
-sub www_pasteListStatus {
-	my $self    = shift;
-    my $session = $self->session;
-    my $pb      = WebGUI::ProgressBar->new($session);
-    if (! $self->canEdit ) {
-        return $session->privilege->insufficient('no style')."return to site";
-    }
-    my $assetIds = $session->scratch->get('assetPasteList') || '[]';
-    $session->scratch->delete('assetPasteList');
-    my @assetIds = @{ JSON::from_json($assetIds) };
-    my $i18n     = WebGUI::International->new($session, 'Asset');
+    $pb->start($i18n->get('Paste Assets'), $session->url->extras('adminConsole/assets.gif'));
 	ASSET: foreach my $clipId (@assetIds) {
         my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
         next ASSET unless $pasteAsset && $pasteAsset->canEdit;
-        $pb->print(sprintf $i18n->get("Pasting %s"), $pasteAsset->getTitle);
-		$self->paste($clipId);
+        #$pb->update(sprintf $i18n->get("Pasting %s"), $pasteAsset->getTitle);
+		$self->paste($clipId, sub {$pb->update(@_);});
 	}
-    $pb->redirect( $session->scratch->get('assetPasteReturnUrl') );
-    return "redirect";
+    return $pb->finish( ($form->param('proceed') eq 'manageAssets') ? $self->getUrl('op=assetManager') : $self->getUrl );
 }
 
 

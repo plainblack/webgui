@@ -28,6 +28,11 @@ Render a progress bar for the user inside a nice style.
 
  use WebGUI::ProgressBar;
 
+ my $pb = WebGUI::ProgressBar->new($session);
+ $pb->start($title, $iconUrl);
+ $pb->update($message);
+ $pb->finish($redirectUrl); 
+
 =head1 METHODS
 
 These methods are available from this class:
@@ -49,6 +54,7 @@ A reference to the current session.
 sub new {
 	my $class   = shift;
 	my $session = shift;
+    my $recordCount = shift;
     my $self    = {};
 	$self->{_session}    = $session;
     $self->{_counter}    = 1;
@@ -58,34 +64,7 @@ sub new {
 
 #-------------------------------------------------------------------
 
-=head2 print ( $message )
-
-Sends a message and increments the status bar.
-
-=head3 $message
-
-A message to be displayed in the status bar.
-
-=cut
-
-sub print {
-	my $self    = shift;
-	my $message = shift; ##JS string escaping?
-    $self->session->log->preventDebugOutput;
-    $self->{_counter} += 1;
-    my $text = sprintf(<<EOJS, $self->{_counter}, $message);
-<script>
-parent.document.getElementById("progressMeter").style.width='%dpx';
-parent.document.getElementById("progressStatus").innerHTML='%s'; 
-</script>
-EOJS
-    $self->session->output->print($text);
-    return '';
-}
-
-#-------------------------------------------------------------------
-
-=head2 redirect ( $url )
+=head2 finish ( $url )
 
 Redirects the user out of the status page.
 
@@ -95,7 +74,7 @@ The URL to send the user to.
 
 =cut
 
-sub redirect {
+sub finish {
 	my $self = shift;
 	my $url  = shift;
     my $text = sprintf(<<EOJS, $url);
@@ -103,39 +82,8 @@ sub redirect {
 parent.location.href='%s';
 </script>
 EOJS
-    $self->session->output->print($text);
-    return '';
-}
-
-#-------------------------------------------------------------------
-
-=head2 render ( $options )
-
-Returns a templated progress bar implemented in CSS and JS.
-
-=head3 options
-
-A hashref of options to configure the progress bar
-
-=head3 title
-
-A title to display above the progress bar.
-
-=head3 statusUrl
-
-The URL that the progress bar should use to get status information.
-
-=cut
-
-sub render {
-    my $self    = shift;
-    my $options = shift;
-    $self->session->http->setCacheControl("none");
-    my %var      = %{ $options };
-	$var{"icon"} = $self->{_icon};
-    my $template = WebGUI::Asset::Template->new($self->session, 'YP9WaMPJHvCJl-YwrLVcPw');
-    my $output   = $template->process(\%var);
-    return $self->session->style->process($output,"PBtmpl0000000000000137");
+    $self->session->output->print($text . $self->{_foot});
+    return 'redirect';
 }
 
 #-------------------------------------------------------------------
@@ -153,24 +101,65 @@ sub session {
 
 #-------------------------------------------------------------------
 
-=head2 setIcon ( icon )
+=head2 start ( title, icon )
 
-Sets the _function icon to parameter.
+Returns a templated progress bar implemented in CSS and JS.
+
+=head3 title
+
+A title to display above the progress bar.
 
 =head3 icon
 
-A string representing the location of the icon.
+The url to the icon you want to display.
 
 =cut
 
-sub setIcon {
-	my $self = shift;
-	my $icon = shift;
-	if ($icon) {
-		$self->{_icon} = $icon;
-	}
+sub start {
+    my ($self, $title, $icon) = @_;
+    $self->session->http->setCacheControl("none");
+    my %var      =  (
+        title   => $title,
+        icon    => $icon
+        );
+    my $template = WebGUI::Asset::Template->new($self->session, 'YP9WaMPJHvCJl-YwrLVcPw');
+    my $output = $self->session->style->process($template->process(\%var).'~~~', "PBtmpl0000000000000137");
+    my ($head, $foot) = split '~~~', $output;
+    $self->session->http->sendHeader;
+    $self->session->output->print($head);
+    $self->{_foot} = $foot;
+    return '';
 }
 
+#-------------------------------------------------------------------
+
+=head2 update ( $message )
+
+Sends a message and increments the status bar.
+
+=head3 $message
+
+A message to be displayed in the status bar.
+
+=cut
+
+sub update {
+	my $self    = shift;
+	my $message = shift; ##JS string escaping?
+    $self->session->log->preventDebugOutput;
+    $self->{_counter} += 1;
+    my $text = sprintf(<<EOJS, $self->{_counter}, $message);
+<script>
+document.getElementById("progressMeter").style.width='%dpx';
+document.getElementById("progressStatus").innerHTML='%s'; 
+</script>
+EOJS
+    $self->session->output->print($text);
+    if ($self->{_counter} > 600) {
+        $self->{_counter} = 1;
+    }
+    return '';
+}
 
 1;
 
