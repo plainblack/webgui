@@ -510,12 +510,11 @@ sub www_pasteList {
     my @assetIds = $form->param('assetId');
     $session->scratch->set('assetPasteList', JSON::to_json(\@assetIds));
     if ($form->param('proceed') eq 'manageAssets') {
-        $session->scratch->set('assetPasteReturnUrl', $self->getUrl('op=manageAssets'));
+        $session->scratch->set('assetPasteReturnUrl', $self->getUrl('op=assetManager'));
     }
     else {
         $session->scratch->set('assetPasteReturnUrl', $self->getUrl);
     }
-    $session->scratch->set('assetPasteList', JSON::to_json(\@assetIds));
     ##Need to set the URL that should be displayed when it is done
     my $i18n     = WebGUI::International->new($session, 'Asset');
     $pb->setIcon($session->url->extras('adminConsole/assets.gif'));
@@ -542,6 +541,7 @@ sub www_pasteListStatus {
         return $session->privilege->insufficient('no style')."return to site";
     }
     my $assetIds = $session->scratch->get('assetPasteList') || '[]';
+    $session->scratch->delete('assetPasteList');
     my @assetIds = @{ JSON::from_json($assetIds) };
     my $i18n     = WebGUI::International->new($session, 'Asset');
 	ASSET: foreach my $clipId (@assetIds) {

@@ -71,6 +71,7 @@ A message to be displayed in the status bar.
 sub print {
 	my $self    = shift;
 	my $message = shift; ##JS string escaping?
+    $self->session->log->preventDebugOutput;
     $self->{_counter} += 1;
     my $text = sprintf(<<EOJS, $self->{_counter}, $message);
 <script>
