@@ -31,7 +31,7 @@ my $session         = WebGUI::Test->session;
 #----------------------------------------------------------------------------
 # Tests
 
-my $tests = 37;
+my $tests = 44;
 plan tests => 1 + $tests;
 
 #----------------------------------------------------------------------------
@@ -84,7 +84,13 @@ cmp_deeply(
                 label => ignore(),
                 hoverHelp => ignore(),
                 defaultValue => 1,
-            }
+            },
+            groupToUse => {
+                fieldType => 'group',
+                label => ignore(),
+                hoverHelp => ignore(),
+                defaultValue => 7,
+            },
         }
     } ],
     ,
@@ -151,8 +157,9 @@ cmp_deeply(
 );
 
 my $options = {
-                label   => 'Slow and dangerous',
-                enabled => 1,
+                label      => 'Slow and dangerous',
+                enabled    => 1,
+                groupToUse => 7,
               };
 
 $driver = WebGUI::Shop::ShipDriver->create( $session, $options );
@@ -174,7 +181,7 @@ cmp_deeply(
     {
         shipperId => $driver->getId,
         className => ref($driver),
-        options   => q|{"label":"Slow and dangerous","enabled":1}|,
+        options   => q|{"groupToUse":7,"label":"Slow and dangerous","enabled":1}|,
     },
     'Correct data written to the db',
 );
@@ -216,7 +223,7 @@ my @forms = HTML::Form->parse($html, 'http://www.webgui.org');
 is (scalar @forms, 1, 'getEditForm generates just 1 form');
 
 my @inputs = $forms[0]->inputs;
-is (scalar @inputs, 7, 'getEditForm: the form has 7 controls');
+is (scalar @inputs, 9, 'getEditForm: the form has 9 controls');
 
 my @interestingFeatures;
 foreach my $input (@inputs) {
@@ -255,6 +262,14 @@ cmp_deeply(
         {
             name => 'enabled',
             type => 'radio',
+        },
+        {
+            name => 'groupToUse',
+            type => 'option',
+        },
+        {
+            name => '__groupToUse_isIn',
+            type => 'hidden',
         },
     ],
     'getEditForm made the correct form with all the elements'
@@ -306,11 +321,9 @@ cmp_deeply(
 
 my $driverCopy = WebGUI::Shop::ShipDriver->new($session, $driver->getId);
 
-is($driver->getId,           $driverCopy->getId,     'same id');
-is(ref $driver,       ref $driverCopy, 'same className');
+is($driver->getId,       $driverCopy->getId, 'same id');
+is(ref $driver,          ref $driverCopy,    'same className');
 cmp_deeply($driver->get, $driverCopy->get,   'same options');
-
-
 
 #######################################################################
 #
@@ -323,7 +336,7 @@ like ($@, qr/^You must override the calculate method/, 'calculate croaks to forc
 
 #######################################################################
 #
-# update
+# update, get
 #
 #######################################################################
 
@@ -337,6 +350,37 @@ cmp_deeply(
     ),
     'update takes exception to not giving it a hashref of options',
 );
+
+isa_ok( $driver->get(), 'HASH', 'get returns a hashref if called with no param');
+
+use Data::Dumper;
+diag Dumper $driver->get();
+
+is($driver->get('groupToUse'), 7, '... default group is 7');
+
+$options = $driver->get();
+$options->{groupToUse} = 3;
+
+is($driver->get('groupToUse'), 7, '... get returns a safe hashref');
+
+$driver->update($options);
+is($driver->get('groupToUse'), 3, '... update groupToUse to 3');
+
+#######################################################################
+#
+# canUse
+#
+#######################################################################
+
+$session->user({userId => 1});
+ok(! $driver->canUse, 'canUse, Visitor cannot use this driver since it is set to Admin');
+$session->user({userId => 3});
+ok(  $driver->canUse, '... Admin can use this driver');
+
+$options = $driver->get();
+$options->{groupToUse} = 7;
+$session->user({userId => 1});
+ok(! $driver->canUse, '... reset to group Everyone, and Visitor can use it');
 
 #######################################################################
 #

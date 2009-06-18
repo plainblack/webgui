@@ -99,6 +99,7 @@ sub getOptions {
     my %options = ();
     foreach my $shipper (@{$self->getShippers()}) {
         next unless $shipper->get('enabled');
+        next SHIPPER unless $shipper->canUse;
         $options{$shipper->getId} = {
             label => $shipper->get("label"),
             price => $shipper->calculate($cart),
@@ -146,8 +147,10 @@ sub getShippers {
     my @drivers = ();
     my $sth = $self->session->db->prepare('select shipperId from shipper');
     $sth->execute();
-    while (my $driver = $sth->hashRef()) {
-        push @drivers, $self->getShipper($driver->{shipperId});
+    SHIPPER: while (my $driver = $sth->hashRef()) {
+        my $shipper = $self->getShipper($driver->{shipperId});
+        next SHIPPER unless $shipper->canUse;
+        push @drivers, $shipper;
     }
     $sth->finish;
     return \@drivers;

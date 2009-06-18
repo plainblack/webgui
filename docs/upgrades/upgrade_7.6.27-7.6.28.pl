@@ -22,6 +22,8 @@ use Getopt::Long;
 use WebGUI::Session;
 use WebGUI::Storage;
 use WebGUI::Asset;
+use WebGUI::Shop::Ship;
+use WebGUI::Shop::ShipDriver;
 
 
 my $toVersion = '7.6.28';
@@ -32,6 +34,7 @@ my $session = start(); # this line required
 
 # upgrade functions go here
 setDefaultIcalInterval($session);
+addShipperGroupToUse($session);
 
 finish($session); # this line required
 
@@ -51,6 +54,21 @@ sub setDefaultIcalInterval {
     my $session = shift;
     print "\tSet default ICAL interval in older calendars... " unless $quiet;
     $session->db->write("UPDATE Calendar SET icalInterval = 7776000 where icalInterval is null or icalInterval = ''");
+    # and here's our code
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub addShipperGroupToUse {
+    my $session = shift;
+    print "\tAdd Group to Use for all existing shipping drivers... " unless $quiet;
+    my $ship     = WebGUI::Shop::Ship->new($session);
+    my $shippers = $ship->getShippers($session);
+    foreach my $shipper (@{ $shippers }) {
+        my $options = $shipper->get();
+        $options->{groupToUse} = 7;
+        $shipper->update($options);
+    }
     # and here's our code
     print "DONE!\n" unless $quiet;
 }
