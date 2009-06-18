@@ -186,14 +186,16 @@ A reference to a subroutine that output messages should be sent to.
 sub paste {
 	my $self         = shift;
 	my $assetId      = shift;
-    my $outputSub   = shift;
-	my $pastedAsset = WebGUI::Asset->newByDynamicClass($self->session,$assetId);
+    my $outputSub    = shift;
+    my $session      = $self->session;
+	my $pastedAsset  = WebGUI::Asset->newByDynamicClass($session,$assetId);
 	return 0 unless ($self->get("state") eq "published");
     return 0 unless ($pastedAsset->canPaste());  ##Allow pasted assets to have a say about pasting.
 
     # Don't allow a shortcut to create an endless loop
 	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
-    $outputSub->("pasting ".$pastedAsset->getTitle) if defined $outputSub;
+    my $i18n=WebGUI::International->new($session, 'Asset');
+    $outputSub->(sprintf $i18n->get('pasting %s'), .$pastedAsset->getTitle) if defined $outputSub;
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
@@ -202,7 +204,7 @@ sub paste {
         my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
  
         foreach (@{$updateAssets}) {
-            $outputSub->("indexing ".$_->getTitle) if defined $outputSub;
+            $outputSub->(sprintf $i18n->get('indexing %s'), .$pastedAsset->getTitle) if defined $outputSub;
             $_->indexContent();
         }
 

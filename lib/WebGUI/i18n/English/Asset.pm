@@ -277,10 +277,28 @@ our $I18N = {
 		lastUpdated => 1245342798,
 	},
 
-	'Pasting %s' => {
-		message => q|Pasting %s|,
+	'pasting %s' => {
+		message => q|pasting %s|,
 		lastUpdated => 1245343280,
 		context => q|short for "I am pasting this asset onto the page."|
+	},
+
+	'indexing %s' => {
+		message => q|indexing %s|,
+		lastUpdated => 1245343280,
+		context => q|short for "I am adding this asset to the search index"|
+	},
+
+	'skipping %s' => {
+		message => q|skipping %s|,
+		lastUpdated => 1245343280,
+		context => q|To skip, to move over, to not process|
+	},
+
+	'Editing %s' => {
+		message => q|Editing %s|,
+		lastUpdated => 1245343280,
+		context => q|To edit or change|
 	},
 
 	'this asset only' => {
