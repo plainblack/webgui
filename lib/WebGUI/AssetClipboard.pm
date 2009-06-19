@@ -485,6 +485,8 @@ $self->session->style->setLink($self->session->url->extras('assetManager/assetMa
 
 =head2 www_paste ( )
 
+THIS METHOD IS DEPRECATED 6/18/2009.  It is replaced with www_pasteList.  It will be removed in WebGUI 8.
+
 Returns "". Pastes an asset. If canEdit is False, returns an insufficient privileges page.
 
 =cut
