@@ -794,7 +794,7 @@ sub www_setRanks {
     my $pb      = WebGUI::ProgressBar->new($session);
     my $form    = $session->form;
 
-    $pb->start($i18n->get('set rank'), $session->url->extras('adminConsole/assets.gif'));
+    $pb->start($i18n->get('Set Rank'), $session->url->extras('adminConsole/assets.gif'));
     my @assetIds    = $form->get( 'assetId' );
     ASSET: for my $assetId ( @assetIds ) {
         my $asset  = WebGUI::Asset->newByDynamicClass( $session, $assetId );
