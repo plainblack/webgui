@@ -82,8 +82,8 @@ sub finish {
 parent.location.href='%s';
 </script>
 EOJS
-    $self->session->output->print($text . $self->{_foot});
-    return 'redirect';
+    $self->session->output->print($text . $self->{_foot}, 1); # skipMacros
+    return 'chunked';
 }
 
 #-------------------------------------------------------------------
@@ -125,8 +125,9 @@ sub start {
     my $template = WebGUI::Asset::Template->new($self->session, 'YP9WaMPJHvCJl-YwrLVcPw');
     my $output = $self->session->style->process($template->process(\%var).'~~~', "PBtmpl0000000000000137");
     my ($head, $foot) = split '~~~', $output;
+    local $| = 1; # Tell modperl not to buffer the output
     $self->session->http->sendHeader;
-    $self->session->output->print($head);
+    $self->session->output->print($head, 1); #skipMacros
     $self->{_foot} = $foot;
     return '';
 }
@@ -148,13 +149,16 @@ sub update {
 	my $message = shift; ##JS string escaping?
     $self->session->log->preventDebugOutput;
     $self->{_counter} += 1;
+    
+    my $modproxy_buffer_breaker = 'BUFFER BREAKER ' x 1000;
     my $text = sprintf(<<EOJS, $self->{_counter}, $message);
-<script>
-document.getElementById("progressMeter").style.width='%dpx';
-document.getElementById("progressStatus").innerHTML='%s'; 
+<script type="text/javascript">
+/* $modproxy_buffer_breaker */
+updateWgProgressBar('%dpx', '%s'); 
 </script>
 EOJS
-    $self->session->output->print($text);
+    local $| = 1; # Tell modperl not to buffer the output
+    $self->session->output->print($text, 1); #skipMacros
     if ($self->{_counter} > 600) {
         $self->{_counter} = 1;
     }
