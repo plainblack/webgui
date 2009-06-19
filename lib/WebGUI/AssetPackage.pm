@@ -302,7 +302,7 @@ sub www_deployPackage {
         return undef;
     };
 	if ($self->session->form->param("proceed") eq "manageAssets") {
-		$self->session->http->setRedirect($self->getUrl('op=assetManager'));
+		$self->session->http->setRedirect($self->getManagerUrl);
 	} else {
 		$self->session->http->setRedirect($self->getUrl());
 	}
