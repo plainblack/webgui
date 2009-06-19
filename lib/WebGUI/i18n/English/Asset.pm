@@ -217,13 +217,31 @@ our $I18N = {
 	'restore' => {
 		message => q|Restore|,
 		lastUpdated => 0,
-		context => q|Used in asset context menus.|
+		context => q|Used in asset context menus.|,
 	},
 
 	'promote' => {
 		message => q|Promote|,
 		lastUpdated => 0,
-		context => q|Used in asset context menus.|
+		context => q|Used in asset context menus.|,
+	},
+
+	'promote %s' => {
+		message => q|promote %s|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|,
+	},
+
+	'swap first' => {
+		message => q|swap first|,
+		lastUpdated => 0,
+		context => q|swap, to exchange places|,
+	},
+
+	'swap second' => {
+		message => q|swap second|,
+		lastUpdated => 0,
+		context => q|swap, to exchange places|,
 	},
 
 	'promote help' => {
@@ -240,6 +258,12 @@ our $I18N = {
 	'demote help' => {
 		message => q|Move this Asset down one spot on the page.|,
 		lastUpdated => 0,
+	},
+
+	'demote %s' => {
+		message => q|demote %s|,
+		lastUpdated => 0,
+		context => q|Used in asset context menus.|,
 	},
 
 	'cut' => {

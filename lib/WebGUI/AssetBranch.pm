@@ -333,6 +333,8 @@ sub www_editBranchSave {
     };
     delete $self->{_parent};
     $self->session->asset($self->getParent);
+    ##Since this method originally returned the user to the AssetManager, we don't need
+    ##to use $pb->finish to redirect back there.
     return $self->getParent->www_manageAssets;
 }
 
