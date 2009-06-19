@@ -21,7 +21,7 @@ my $session = WebGUI::Test->session;
 
 #----------------------------------------------------------------------------
 # Tests
-my $tests = 137;
+my $tests = 140;
 plan tests => $tests + 1 + 3;
 
 #----------------------------------------------------------------------------
@@ -160,6 +160,46 @@ cmp_deeply(
 
 ####################################################
 #
+# freeze, compress, uncompress
+#
+####################################################
+{
+my $sJSON = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session);
+my $mold = { 
+        answer => $sJSON->newAnswer,
+        question => $sJSON->newQuestion,
+        section => $sJSON->newSection,
+    };
+cmp_deeply(from_json($sJSON->freeze), {
+    sections => [ {} ],
+    mold => $mold,
+    }, 'got back appropriate frozen object for empty survey');
+
+# Set a few non-standard properties on the (default) 0th Section
+my $nonStandardSProps = { variable => 'S0', logical => '0 but true' };
+$sJSON->update( [0], $nonStandardSProps );
+
+# Create a question, and set some other non-standard properties
+$sJSON->newObject( [0] );
+my $nonStandardQProps = { randomizeAnswers => 1, textInButton => '1', text => 'blah' };
+$sJSON->update( [0, 0], $nonStandardQProps );
+
+# And create an answer
+$sJSON->updateQuestionAnswers( [0], 'Country' );
+$nonStandardQProps->{questionType} = 'Country';
+my $nonStandardAProps = { value => 0, terminal => '' };
+$sJSON->update( [0, 0, 0], $nonStandardAProps );
+
+$nonStandardSProps->{questions} = [$nonStandardQProps];
+$nonStandardQProps->{answers} = [$nonStandardAProps];
+cmp_deeply(from_json($sJSON->freeze)->{sections}, $sJSON->compress, 'freeze returns sections via compress');
+cmp_deeply($sJSON->compress, [$nonStandardSProps], 'molded data only contains non-standard properties');
+
+cmp_deeply($sJSON->uncompress($sJSON->compress), $sJSON->{_sections}, 'uncompress completes the round-trip');
+}
+
+####################################################
+#
 # new, part 2
 #
 ####################################################
@@ -199,22 +239,15 @@ $sJSON2 = WebGUI::Asset::Wobject::Survey::SurveyJSON->new($session,
 cmp_deeply(
     $sJSON2->sections,
     [
-        {
+        superhashof {
             type => 'section',
+            logical => 0, # this is added from the default-created mold
         },
     ],
-    'new: If the JSON has a section, a new one will not be added',
+    'new: If the JSON has a section, a new one will not be added (but mold defaults will be)',
 );
 
 undef $sJSON2;
-
-####################################################
-#
-# freeze
-#
-####################################################
-
-like( $surveyJSON->freeze, qr/"survey":\{\}/, 'freeze: got back something that looks like JSON, not a thorough check');
 
 ####################################################
 #

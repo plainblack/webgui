@@ -17,6 +17,7 @@
  - fixed #10551: paypal (link to section of paypal website to enter in WebGUI information)
  - fixed #10550: shipping plugins have no privileges
  - fixed: Add progress bars for paste and edit branch.
+ - fixed: SurveyJSON database bloating
 
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)

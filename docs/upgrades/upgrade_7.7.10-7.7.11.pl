@@ -36,6 +36,7 @@ my $session = start(); # this line required
 setDefaultIcalInterval($session);
 makeSurveyResponsesVersionAware($session);
 addShipperGroupToUse($session);
+shrinkSurveyJSON($session);
 
 finish($session); # this line required
 
@@ -92,6 +93,23 @@ set revisionDate = (
 where Survey_response.assetId = ?
 END_SQL
     }
+    print "DONE!\n" unless $quiet;
+}
+
+#----------------------------------------------------------------------------
+sub shrinkSurveyJSON {
+    my $session = shift;
+    print "\tCompressing surveyJSON column in Survey table (this may take some time)... " unless $quiet;
+    my $sth = $session->db->read('select assetId, revisionDate from Survey');
+    use WebGUI::Asset::Wobject::Survey;
+    while (my ($assetId, $revision) = $sth->array) {
+        my $survey = WebGUI::Asset->new($session, $assetId, 'WebGUI::Asset::Wobject::Survey', $revision);
+        $survey->persistSurveyJSON;
+    }
+    print "DONE!\n" unless $quiet;
+    
+    print "\tOptimizing Survey table... " unless $quiet;
+    $session->db->write('optimize table Survey');    
     print "DONE!\n" unless $quiet;
 }
 
