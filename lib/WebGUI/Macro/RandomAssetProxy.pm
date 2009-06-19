@@ -41,7 +41,7 @@ sub process {
 	if (defined $asset) {
 		my $children = $asset->getLineage(["children"]);
 		#randomize;
-		my $randomAssetId = $children->[rand(scalar(@{$children}))];	
+		my $randomAssetId = $children->[int(rand(scalar(@{$children})))];	
 		my $randomAsset = WebGUI::Asset->newByDynamicClass($session,$randomAssetId);
 		if (defined $randomAsset) {
 			if ($randomAsset->canView) {

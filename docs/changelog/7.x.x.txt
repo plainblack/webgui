@@ -20,6 +20,7 @@
  - fixed: Add progress bars for promote and demote.
  - fixed: Add progress bars for set rank in the Asset Manager.
  - fixed: SurveyJSON database bloating
+ - fixed #10548: Macro RandomAssetProxy failure to be random
 
 7.7.10
  - Made a change to LDAP auth that adds an OR to that query so that it also searches for a row with fieldData REGEXP '^uid=(value-from-ldap-directory-server),'. (Wes Morgan)
