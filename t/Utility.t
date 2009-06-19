@@ -17,7 +17,7 @@ use Tie::IxHash;
 use WebGUI::Test;
 use WebGUI::Session;
 
-use Test::More tests => 46; # increment this value for each test you create
+use Test::More tests => 57; # increment this value for each test you create
 use Test::Deep;
 
 my $session = WebGUI::Test->session;
@@ -123,6 +123,41 @@ is(WebGUI::Utility::round(47.6, 0), 48, 'round() - rounds up, too');
 	%hash3 = WebGUI::Utility::sortHashDescending(%hash1);
 	is_deeply([keys %hash2], [qw/e c b d a/], 'sortHash');
 	is_deeply([keys %hash3], [qw/a d b c e/], 'sortHashDescending');
+}
+
+#####################################################################
+#
+# scalarEquals
+#
+#####################################################################
+{
+    my %eq = (
+        0 => 0,
+        "0" => "0",
+        0.1 => 0.1,
+        "0.1" => "0.1",
+        "0 but true" => "0 but true",
+        "string" => "string",
+    );
+    while (my($a, $b) = each %eq) {
+        ok(WebGUI::Utility::scalarEquals($a, $b), "scalarEquals($a, $b) truthy");
+    }
+    
+    my %ne = (
+        0 => "0",
+        "0.0" => "0",
+        "0.1" => "0.10",
+        "0" => "0 but true",
+        "1" => "0 but true",
+        0 => "0 but true",
+        1 => "0 but true",
+    );
+    while (my($a, $b) = each %ne) {
+        ok(!WebGUI::Utility::scalarEquals($a, $b), "scalarEquals($a, $b) falsy");
+    }
+    ok(!WebGUI::Utility::scalarEquals(), "scalarEquals() falsy when no args");
+    ok(!WebGUI::Utility::scalarEquals(1), "falsy for 1 arg");
+    ok(!WebGUI::Utility::scalarEquals(1, undef, 1), "falsy for 3 args");
 }
 
 # isInSubnets
