@@ -12,6 +12,7 @@
  - fixed #10550: shipping plugins have no privileges
  - fixed: In the Asset Manager, if you pasted an asset, package or prototype if returned you to the page instead the manager.
  - fixed #10548: Macro RandomAssetProxy failure to be random
+ - fixed #10542: AssetVersioning: versionTag/isLockedBy updating
 
 7.6.27
  - refixed #10260: WebGUI::Asset::Wobject::Gallery.pm default search date misfunction
