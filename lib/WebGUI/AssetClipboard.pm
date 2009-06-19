@@ -195,7 +195,7 @@ sub paste {
     # Don't allow a shortcut to create an endless loop
 	return 0 if ($pastedAsset->get("className") eq "WebGUI::Asset::Shortcut" && $pastedAsset->get("shortcutToAssetId") eq $self->getId);
     my $i18n=WebGUI::International->new($session, 'Asset');
-    $outputSub->(sprintf $i18n->get('pasting %s'), .$pastedAsset->getTitle) if defined $outputSub;
+    $outputSub->(sprintf $i18n->get('pasting %s'), $pastedAsset->getTitle) if defined $outputSub;
 	if ($self->getId eq $pastedAsset->get("parentId") || $pastedAsset->setParent($self)) {
 		$pastedAsset->publish(['clipboard','clipboard-limbo']); # Paste only clipboard items
 		$pastedAsset->updateHistory("pasted to parent ".$self->getId);
@@ -204,7 +204,7 @@ sub paste {
         my $updateAssets = $pastedAsset->getLineage(['self', 'descendants'], {returnObjects => 1});
  
         foreach (@{$updateAssets}) {
-            $outputSub->(sprintf $i18n->get('indexing %s'), .$pastedAsset->getTitle) if defined $outputSub;
+            $outputSub->(sprintf $i18n->get('indexing %s'), $pastedAsset->getTitle) if defined $outputSub;
             $_->indexContent();
         }
 
@@ -522,8 +522,10 @@ sub www_pasteList {
     $pb->start($i18n->get('Paste Assets'), $session->url->extras('adminConsole/assets.gif'));
 	ASSET: foreach my $clipId (@assetIds) {
         my $pasteAsset = WebGUI::Asset->newPending($session, $clipId);
-        next ASSET unless $pasteAsset && $pasteAsset->canEdit;
-        #$pb->update(sprintf $i18n->get("Pasting %s"), $pasteAsset->getTitle);
+        if (! $pasteAsset && $pasteAsset->canEdit) {
+            $pb->update(sprintf $i18n->get('skipping %s'), $pasteAsset->getTitle);
+            next ASSET;
+        }
 		$self->paste($clipId, sub {$pb->update(@_);});
 	}
     return $pb->finish( ($form->param('proceed') eq 'manageAssets') ? $self->getUrl('op=assetManager') : $self->getUrl );
