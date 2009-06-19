@@ -232,6 +232,30 @@ our $I18N = {
 		context => q|Used in asset context menus.|,
 	},
 
+	'Set Rank' => {
+		message => q|Set Rank|,
+		lastUpdated => 0,
+		context => q|Set, to assign.  Rank, meaning order.|,
+	},
+
+	'moving %s aside' => {
+		message => q|moving %s aside|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'moving %s back' => {
+		message => q|moving %s back|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'moving %s' => {
+		message => q|moving %s|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
 	'swap first' => {
 		message => q|swap first|,
 		lastUpdated => 0,

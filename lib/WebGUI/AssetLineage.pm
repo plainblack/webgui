@@ -858,7 +858,7 @@ sub setParent {
 
 #-------------------------------------------------------------------
 
-=head2 setRank ( newRank )
+=head2 setRank ( newRank, [ $outputSub ] )
 
 Returns 1. Changes rank of Asset.
 
@@ -866,11 +866,17 @@ Returns 1. Changes rank of Asset.
 
 Value of new Rank.
 
+=head3 outputSub
+
+A reference to a subroutine that output messages should be sent to.  Typically this would
+go to ProgressBar, and it must handle doing sprintf'ed i18n calls.
+
 =cut
 
 sub setRank {
-	my $self = shift;
-	my $newRank = shift;
+	my $self      = shift;
+	my $newRank   = shift;
+    my $outputSub = shift || sub {};
 	my $currentRank = $self->getRank;
 	return 1 if ($newRank == $currentRank); # do nothing if we're moving to ourself
 	my $parentLineage = $self->getParentLineage;
@@ -881,13 +887,16 @@ sub setRank {
 	my $temp = substr($self->session->id->generate(),0,6);
 	my $previous = $self->get("lineage");
 	$self->session->db->beginTransaction;
+    $outputSub->('moving %s aside', $self->getTitle);
 	$self->cascadeLineage($temp);
 	foreach my $sibling (@{$siblings}) {
 		if (isBetween($sibling->getRank, $newRank, $currentRank)) {
+            $outputSub->('moving %s', $sibling->getTitle);
 			$sibling->cascadeLineage($previous);
 			$previous = $sibling->get("lineage");
 		}
 	}
+    $outputSub->('moving %s back', $self->getTitle);
 	$self->cascadeLineage($previous,$temp);
 	$self->{_properties}{lineage} = $previous;
 	$self->session->db->commit;
