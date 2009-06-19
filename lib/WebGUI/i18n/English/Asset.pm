@@ -295,8 +295,8 @@ our $I18N = {
 		context => q|To skip, to move over, to not process|
 	},
 
-	'Editing %s' => {
-		message => q|Editing %s|,
+	'editing %s' => {
+		message => q|editing %s|,
 		lastUpdated => 1245343280,
 		context => q|To edit or change|
 	},

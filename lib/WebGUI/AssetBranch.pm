@@ -239,30 +239,6 @@ sub www_editBranch {
 
 #-------------------------------------------------------------------
 
-=head2 www_editBranchSave ( )
-
-Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets method. If canEdit returns False, returns an insufficient privilege page.
-
-=cut
-
-sub www_editBranchSave {
-	my $self    = shift;
-    my $session = $self->session;
-    return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup('4'));
-    my $pb      = WebGUI::ProgressBar->new($session);
-    ##Need to set the URL that should be displayed when it is done
-    my $i18n     = WebGUI::International->new($session, 'Asset');
-    $pb->setIcon($session->url->extras('adminConsole/assets.gif'));
-    $session->log->warn($session->request->args());
-    return $pb->render({
-        title     => $i18n->get('Paste Assets'),
-        statusUrl => $self->getUrl('func=editBranchSaveStatus'),
-    });
-}
-
-
-#-------------------------------------------------------------------
-
 =head2 www_editBranchSaveStatus ( )
 
 Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets method. If canEdit returns False, returns an insufficient privilege page.
@@ -272,9 +248,11 @@ Verifies proper inputs in the Asset Tree and saves them. Returns ManageAssets me
 sub www_editBranchSave {
     my $self    = shift;
     my $session = $self->session;
-return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup('4'));
+    return $session->privilege->insufficient() unless ($self->canEdit && $session->user->isInGroup('4'));
     my $form    = $session->form;
     my %data;
+    my $pb      = WebGUI::ProgressBar->new($session);
+    my $i18n    = WebGUI::International->new($session, 'Asset');
     $data{isHidden}      = $form->yesNo("isHidden")        if ($form->yesNo("change_isHidden"));
     $data{newWindow}     = $form->yesNo("newWindow")       if ($form->yesNo("change_newWindow"));
     $data{encryptPage}   = $form->yesNo("encryptPage")     if ($form->yesNo("change_encryptPage"));
@@ -299,9 +277,14 @@ return $session->privilege->insufficient() unless ($self->canEdit && $session->u
         $urlBase   = $form->text("baseUrl");
         $endOfUrl  = $form->selectBox("endOfUrl");
     }
+    $pb->start($i18n->get('edit branch'), $session->url->extras('adminConsole/assets.gif'));
     my $descendants = $self->getLineage(["self","descendants"],{returnObjects=>1});	
     DESCENDANT: foreach my $descendant (@{$descendants}) {
-        next DESCENDANT unless $descendant->canEdit;
+        if ( !$descendant->canEdit ) {
+            $pb->update(sprintf $i18n->get('skipping %s'), $descendant->getTitle);
+            next DESCENDANT;
+        }
+        $pb->update(sprintf $i18n->get('editing %s'), $descendant->getTitle);
         my $url;
         if ($changeUrl) {
             if ($urlBaseBy eq "parentUrl") {
