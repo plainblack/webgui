@@ -97,6 +97,35 @@ our $I18N = {
 		context => q|help for tax rate override field|
 	},
 
+	'Switch tax plugin' => {
+		message => q|Switch tax plugin|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'Switch' => {
+		message => q|Switch|,
+		lastUpdated => 0,
+		context => q|Switch, as in to exchange one for another.|,
+	},
+
+	'Active tax plugin' => {
+		message => q|Active tax plugin|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'Stern tax warning' => {
+		message => q|Changing the active tax plugin will change the way tax is calulated on <b>all</b> products you sell. Are you really sure you want to switch?|,
+		lastUpdated => 0,
+		context => q||,
+	},
+
+	'Proceed' => {
+		message => q|Proceed|,
+		lastUpdated => 0,
+		context => q|to continue|,
+	},
 
 };
 
