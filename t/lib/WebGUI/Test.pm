@@ -60,6 +60,7 @@ my @usersToDelete;
 my @sessionsToDelete;
 my @storagesToDelete;
 my @tagsToRollback;
+my @workflowsToDelete;
 
 my $smtpdPid;
 my $smtpdStream;
@@ -174,17 +175,37 @@ END {
         $session->var->end;
         $session->close;
     }
-    foreach my $tag (@tagsToRollback) {
+    TAG: foreach my $tag (@tagsToRollback) {
         $tag->rollback;
     }
+    WORKFLOW: foreach my $workflow (@workflowsToDelete) {
+        my $workflowId = $workflow->getId;
+        next WORKFLOW if any { $workflowId eq $_ } qw/
+                AuthLDAPworkflow000001 
+                csworkflow000000000001 
+                DPWwf20061030000000002 
+                PassiveAnalytics000001 
+                pbworkflow000000000001 
+                pbworkflow000000000002 
+                pbworkflow000000000003 
+                pbworkflow000000000004 
+                pbworkflow000000000005 
+                pbworkflow000000000006 
+                pbworkflow000000000007 
+                send_webgui_statistics 
+                /;
+
+        $workflow->delete;
+    }
     if ($ENV{WEBGUI_TEST_DEBUG}) {
-        $Test->diag('Sessions: '.$SESSION->db->quickScalar('select count(*) from userSession'));
-        $Test->diag('Scratch : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
-        $Test->diag('Users   : '.$SESSION->db->quickScalar('select count(*) from users'));
-        $Test->diag('Groups  : '.$SESSION->db->quickScalar('select count(*) from groups'));
-        $Test->diag('mailQ   : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
-        $Test->diag('Tags    : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
-        $Test->diag('Assets  : '.$SESSION->db->quickScalar('select count(*) from assetData'));
+        $Test->diag('Sessions : '.$SESSION->db->quickScalar('select count(*) from userSession'));
+        $Test->diag('Scratch  : '.$SESSION->db->quickScalar('select count(*) from userSessionScratch'));
+        $Test->diag('Users    : '.$SESSION->db->quickScalar('select count(*) from users'));
+        $Test->diag('Groups   : '.$SESSION->db->quickScalar('select count(*) from groups'));
+        $Test->diag('mailQ    : '.$SESSION->db->quickScalar('select count(*) from mailQueue'));
+        $Test->diag('Tags     : '.$SESSION->db->quickScalar('select count(*) from assetVersionTag'));
+        $Test->diag('Assets   : '.$SESSION->db->quickScalar('select count(*) from assetData'));
+        $Test->diag('Workflows: '.$SESSION->db->quickScalar('select count(*) from Workflow'));
     }
     while (my ($key, $value) = each %originalConfig) {
         if (defined $value) {
@@ -603,6 +624,22 @@ This is a class method.
 sub usersToDelete {
     my $class = shift;
     push @usersToDelete, @_;
+}
+
+#----------------------------------------------------------------------------
+
+=head2 workflowsToDelete ( $workflow, [$workflow, ...] )
+
+Push a list of workflow objects onto the stack of groups to be automatically deleted
+at the end of the test.
+
+This is a class method.
+
+=cut
+
+sub workflowsToDelete {
+    my $class = shift;
+    push @workflowsToDelete, @_;
 }
 
 #----------------------------------------------------------------------------

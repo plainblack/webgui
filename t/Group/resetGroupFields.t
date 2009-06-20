@@ -89,6 +89,7 @@ my $workflow  = WebGUI::Workflow->create($session,
         mode       => 'realtime',
     },
 );
+WebGUI::Test->workflowsToDelete($workflow);
 
 WebGUI::Test->originalConfig('workflowActivities');
 $session->config->addToArray('workflowActivities/User', 'WebGUI::Workflow::Activity::AddUserToGroup');
