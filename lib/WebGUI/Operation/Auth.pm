@@ -47,6 +47,8 @@ sub getInstance {
     };
 }
 
+
+
 #-------------------------------------------------------------------
 
 =head2 www_auth ( )
@@ -70,7 +72,13 @@ sub www_auth {
 		my $i18n = WebGUI::International->new($session);
 		return $i18n->get(1077);
 	}
-	return $session->style->userStyle($authMethod->$methodCall);
+    my $out = $authMethod->$methodCall;
+    if (substr($session->http->getMimeType(),0,9) eq "text/html") {
+	    return $session->style->userStyle($out);
+    }
+    else {
+        return $out;
+    }
 }
 
 
