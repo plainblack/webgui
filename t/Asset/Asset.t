@@ -28,6 +28,7 @@ use Test::More;
 use Test::Deep;
 use Test::MockObject;
 use HTML::TokeParser;
+use Data::Dumper;
 use Storable qw/dclone/;
 
 my $session = WebGUI::Test->session;
