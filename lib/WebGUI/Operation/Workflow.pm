@@ -126,7 +126,7 @@ sub www_addWorkflow {
 	$f->submit;
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($f->print, 'add a new workflow');
+	return $ac->render($f->print, $i18n->get('add a new workflow'));
 }
 
 #-------------------------------------------------------------------
@@ -289,7 +289,7 @@ sub www_editWorkflow {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
-	return $ac->render($f->print.$addmenu.$steps, 'edit workflow');
+	return $ac->render($f->print.$addmenu.$steps, $i18n->get('edit workflow'));
 }
 
 #-------------------------------------------------------------------
@@ -447,7 +447,7 @@ sub www_manageWorkflows {
 	my $ac = WebGUI::AdminConsole->new($session,"workflow");
 	$ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
 	$ac->addSubmenuItem($session->url->page("op=showRunningWorkflows"), $i18n->get("show running workflows"));
-	return $ac->render($output, 'manage workflows');
+	return $ac->render($output, $i18n->get('manage workflows'));
 }
 
 
@@ -655,7 +655,7 @@ ENDCODE
     $ac->addSubmenuItem($session->url->page("op=addWorkflow"), $i18n->get("add a new workflow"));
     $ac->addSubmenuItem($session->url->page("op=manageWorkflows"), $i18n->get("manage workflows"));
 
-    return $ac->render($output, 'show running workflows');
+    return $ac->render($output, $i18n->get('show running workflows'));
 }
 
 1;
