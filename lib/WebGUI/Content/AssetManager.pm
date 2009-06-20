@@ -788,7 +788,6 @@ Returns the user to the manage assets screen.
 
 sub www_setRanks {
     my $session = shift;
-    $session->asset(getCurrentAsset($session));
     return $session->privilege->insufficient() unless $session->asset->canEdit;
     my $i18n    = WebGUI::International->new($session, 'Asset');
     my $pb      = WebGUI::ProgressBar->new($session);
