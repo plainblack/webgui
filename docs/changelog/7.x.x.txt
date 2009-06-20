@@ -1,3 +1,5 @@
+7.7.12
+
 7.7.11
  - Fixed a bug where empty version tags were not deleted. (Martin Kamerbeek / Oqapi)
  - fixed: deploying a package doesn't commit version tag with autocommit on
