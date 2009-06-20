@@ -1393,6 +1393,8 @@ sub www_importEventsSave {
 			}
 			if ($csv->parse($line)) {
 				my @row = $csv->fields;
+                my $start = [Time::HiRes::gettimeofday];
+        		$out->print("Processing ".join(",", @row)."\n",1);
 				my $event = undef;
 				if (defined $assetIdIndex) {
 					$event = WebGUI::Asset::Sku::EMSTicket->new($session, $row[$assetIdIndex]);
