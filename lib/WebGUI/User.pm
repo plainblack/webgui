@@ -393,6 +393,12 @@ sub delete {
 
     # remove inbox entries
     $db->write("DELETE FROM inbox WHERE userId=? AND (groupId IS NULL OR groupId='')",[$userId]);
+    
+    # remove flux user data
+    $db->write('DELETE FROM fluxRuleUserData where userId=?', [$userId]);
+    
+    # remove history rows
+    $db->write('DELETE FROM history where userId=?', [$userId]);
 
     # remove user itself
     $db->write("DELETE FROM userProfileData WHERE userId=?",[$userId]);
