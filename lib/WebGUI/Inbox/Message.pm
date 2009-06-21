@@ -428,8 +428,8 @@ sub setCompleted {
     $self->{_inbox}{completedBy}      = $userId;
     $self->{_inbox}{completedOn}      = time();
 	$self->session->db->setRow("inbox","messageId",$self->{_inbox});
-    #Completed messages should also be marked read
-    $self->setRead($userId);
+    #Completed messages should also be marked read for all users connected to this message
+    $self->setReadAll;
 }
 
 #-------------------------------------------------------------------
@@ -473,6 +473,23 @@ sub setRead {
     $self->session->db->write(
         q{update inbox_messageState set isRead=1 where messageId=? and userId=?},
         [$self->getId,$userId]
+    );
+}
+
+#-------------------------------------------------------------------
+
+=head2 setReadAll ( ) 
+
+Marks a message read for all users who are connected to this message
+
+=cut
+
+sub setReadAll {
+	my $self   = shift;
+
+    $self->session->db->write(
+        q{update inbox_messageState set isRead=1 where messageId=?},
+        [$self->getId]
     );
 }
 

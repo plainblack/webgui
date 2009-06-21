@@ -40,6 +40,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Article Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $article = $node->addChild({className=>'WebGUI::Asset::Wobject::Article'});
 
 # Test for a sane object type
@@ -99,6 +100,7 @@ $duplicateArticle->purge();
 
 # The get method will create the directory if it doesnt exist... very strange.
 $duplicateStorage = WebGUI::Storage->get($session,$duplicateStorageId);
+WebGUI::Test->storagesToDelete($duplicateStorage);
 
 # so lets check for the file instead
 $duplicateFilename = $duplicateStorage->getFiles->[0];

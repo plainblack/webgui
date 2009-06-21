@@ -8,6 +8,15 @@ versions. Be sure to heed the warnings contained herein as they will
 save you many hours of grief.
 
 
+7.7.8
+--------------------------------------------------------------------
+   * A basic behavior of the Inbox has been changed.  If a message is
+     sent to a Group of WebGUI users, and any member of the group reads
+     the message, then that message is marked as read by all members.  This
+     most often happens for commit reminders for version tags that require
+     approval.  The old behavior often resulted in several users trying
+     to approve version tags that had already been approved.
+
 7.7.7
 --------------------------------------------------------------------
    * WebGUI now requires Digest::SHA.

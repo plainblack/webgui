@@ -245,7 +245,7 @@ sub getDefaultValue {
             }
             else {
 				$value =~ s/\r//g;
-                @values = split "\n", $value;
+                @values = split /\n/, $value;
             }
         }
     }

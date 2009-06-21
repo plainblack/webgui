@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use WebGUI::Test;
 use WebGUI::Session;
-use Test::More tests => 12; # increment this value for each test you create
+use Test::More tests => 18; # increment this value for each test you create
 use Test::Deep;
 use JSON;
 use WebGUI::Asset::Wobject::Matrix;
@@ -41,6 +41,7 @@ my $newMatrixSettings = {
 	compareColorNo                  => '#aaffaa',
 	submissionApprovalWorkflowId    => 'pbworkflow000000000005',
     categories                      => "category1\ncategory2",
+    statisticsCacheTimeout          => 7200,
 };
 $matrix->update($newMatrixSettings);
 
@@ -101,6 +102,52 @@ $secondVersionTag->commit;
 # Test for sane object type
 isa_ok($matrixListing, 'WebGUI::Asset::MatrixListing');
 
+is($matrixListing->getAutoCommitWorkflowId,undef,"The matrix listings getAutoCommitWorkflowId method correctly returns undef, because the auto commit workflow should only be used on adding a new matrix listing.");
+
+is($matrixListing->hasRated,'0',"The matrix listings hasRated method returns correct value.");
+
+# Test getListings
+
+my $expectedAssetId = $matrixListing->getId;
+
+my $listings = $matrix->getListings;
+
+cmp_deeply(
+        $listings,
+        [{
+            views=>"0",
+            lastUpdated=>$matrixListing->get('lastUpdated'),
+            clicks=>"0",
+            compares=>"0",
+            assetId=>$expectedAssetId,
+            url=>$session->url->gateway($matrixListing->get('url')),
+            title=>$matrixListing->get('title')
+        }]
+        ,
+        'getListings returns correct data.'
+    );
+
+
+# Test Listings Caching
+
+my $listingsEncoded = WebGUI::Cache->new($session,"matrixListings_".$matrix->getId)->get;
+$listings = JSON->new->decode($listingsEncoded);
+
+cmp_deeply(
+        $listings,
+        [{
+            views=>"0",
+            lastUpdated=>$matrixListing->get('lastUpdated'),
+            clicks=>"0",
+            compares=>"0",
+            assetId=>$expectedAssetId,
+            url=>$session->url->gateway($matrixListing->get('url')),
+            title=>$matrixListing->get('title')
+        }]
+        ,
+        'Listings were cached correctly.'
+    );
+
 # Test getting compareFormData including the newly added listing
 
 $session->user({userId => 3});
@@ -108,7 +155,6 @@ my $json = $matrix->www_getCompareFormData('score');
 
 my $compareFormData = JSON->new->decode($json);
 
-my $expectedAssetId = $matrixListing->getId;
 $expectedAssetId =~ s/-/_____/g;
 
 cmp_deeply(
@@ -116,7 +162,7 @@ cmp_deeply(
         {ResultSet=>{
             Result=>[{
                     views=>"0",
-                    lastUpdated=>$matrixListing->get('revisionDate'),
+                    lastUpdated=>$matrixListing->get('lastUpdated'),
                     clicks=>"0",
                     compares=>"0",
                     assetId=>$expectedAssetId,
@@ -127,6 +173,72 @@ cmp_deeply(
         },
         'Getting compareFormData as JSON: www_getCompareFormData returns correct data as JSON.'
     );        
+
+# Test statistics caching by view method
+
+$matrix->view;
+
+my $varStatisticsEncoded = WebGUI::Cache->new($session,"matrixStatistics_".$matrix->getId)->get;
+my $varStatistics = JSON->new->decode($varStatisticsEncoded);
+
+cmp_deeply(
+        $varStatistics,
+        {
+        alphanumeric_sortButton=>"<span id='sortByName'><button type='button'>Sort by name</button></span><br />",
+        bestViews_url=>'/'.$matrixListing->get('url'),
+        bestViews_count=>0,
+        bestViews_name=>$matrixListing->get('title'),
+        bestViews_sortButton=>"<span id='sortByViews'><button type='button'>Sort by views</button></span><br />",
+        bestCompares_url=>'/'.$matrixListing->get('url'),
+        bestCompares_count=>0,
+        bestCompares_name=>$matrixListing->get('title'),
+        bestCompares_sortButton=>"<span id='sortByCompares'><button type='button'>Sort by compares</button></span><br />",
+        bestClicks_url=>'/'.$matrixListing->get('url'),
+        bestClicks_count=>0,
+        bestClicks_name=>$matrixListing->get('title'),
+        bestClicks_sortButton=>"<span id='sortByClicks'><button type='button'>Sort by clicks</button></span><br />",
+        last_updated_loop=>[{
+                url         => $matrixListing->getUrl,
+                name        => $matrixListing->get('title'),
+                lastUpdated => $session->datetime->epochToHuman($matrixListing->get('lastUpdated'),"%z")
+            }],
+        lastUpdated_sortButton=>"<span id='sortByUpdated'><button type='button'>Sort by updated</button></span><br />",
+        best_rating_loop=>[{
+            url=>'/',
+            category=>'category1',
+            name=>undef,
+            mean=>undef,
+            median=>undef,
+            count=>undef,
+            },
+            {
+            url=>'/',
+            category=>'category2',
+            name=>undef,
+            mean=>undef,
+            median=>undef,
+            count=>undef,
+            }],
+        worst_rating_loop=>[{
+            url=>'/',
+            category=>'category1',
+            name=>undef,
+            mean=>undef,
+            median=>undef,
+            count=>undef,
+            },
+            {
+            url=>'/',
+            category=>'category2',
+            name=>undef,
+            mean=>undef,
+            median=>undef,
+            count=>undef,
+            }],
+        listingCount=>1,
+        },
+        'Statistics were cached by view method.'
+    );
 
 END {
 	# Clean up after thy self

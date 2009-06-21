@@ -297,7 +297,7 @@ sub www_viewTransaction {
     my $transaction   = shift || WebGUI::Shop::Transaction->new( $session,$transactionId );
     my $notice        = shift;
 
-    return $session->insufficient unless $transaction->get('userId') eq $session->user->userId;
+    return $session->privilege->insufficient unless $transaction->get('userId') eq $session->user->userId;
    
     my $var = $transaction->getTransactionVars;
     $var->{ notice } = $notice;

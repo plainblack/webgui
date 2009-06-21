@@ -94,7 +94,7 @@ sub execute {
     $userAgent->env_proxy;
     $userAgent->agent("WebGUI/".$WebGUI::VERSION);
     $userAgent->timeout(30);
-    my $request = POST 'http://www.webgui.org/stats', [ func => 'receiveStats', stats => $statsAsJson ];
+    my $request = POST 'https://www.webgui.org/stats', [ func => 'receiveStats', stats => $statsAsJson ];
     my $response = $userAgent->request($request);
     if ($response->is_error) {
         $self->session->errorHandler->error("WebGUI Stats could not be sent.");

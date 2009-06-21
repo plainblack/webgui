@@ -534,6 +534,9 @@ sub view {
                         ? $self->get('thankYouText')
                         : $options->{message}
                         ;
+    if ( $options->{addedToCart} ) {
+        $var->{addedToCart} = 1;
+    }
 
     # Add form header, footer, and submit button
     $var->{ form_header }

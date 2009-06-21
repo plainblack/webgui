@@ -446,6 +446,11 @@ our $I18N = {
         lastUpdated => 0,
     },
 
+    'canEdit' => {
+        message => q|A boolean which will be true if the current user can edit this story.|,
+        lastUpdated => 0,
+    },
+
 };
 
 1;

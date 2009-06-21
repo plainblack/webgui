@@ -1,3 +1,33 @@
+7.7.8
+ - fixed: Basic Auth doesn't work if password contains colon (Arjan Widlak,
+   United Knowledge)
+ - fixed: Basic Auth causes internal server error if you use more than one
+   colon. (Arjan Widlak, United Knowledge)
+ - added date pagination, and some formatting to EMS Schedule table
+ - Removed dubious 3px padding around image based ads in an adspace.
+ - Stats now send over SSL rather than straight HTTP.
+ - fixed #8914: epoch for calendar/List View for Calendar
+ - fixed #10044: Gallery: Javascript, CSS included in body
+ - fixed #10409: Problem using hash in metadata possible values
+ - fixed a similar problem with metadata in the Shortcut Asset.
+ - fixed #10396: Syndicated Content wobject not displaying edit controls
+ - fixed #10386: Template override missing in nav shortcut
+ - fixed #10436: Story Manager - Story Edit/Delete links are Admin Only
+ - fixed a bug in Thingy where fields with list type form elements wouldn't
+   show up in Thingy search results ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where the search form would lose part of its contents
+   when searching. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where debug information would show up in the Thing
+   editor when adding/editing fields. ( Martin Kamerbeek / Oqapi )
+ - fixed a bug in Thingy where when searching using multi value search form
+   elements (eg. check lists) only one of the selected elements was taken into
+   account in the search query. ( Martin Kamerbeek / Oqapi )
+ - fixed #10439: Call to insufficient is wrong (lrobinson / Orchard Solutions )
+ - fixed #10373: Admin groups inbox messages linger after task complete
+ - fixed a bug in Thingy where the defaultValue of multi value form elements
+   would not be applied ( Martin Kamerbeek / Oqapi )
+ - added "addedToCart" var for ThingyRecord
+
 7.7.7
  - Added EMS Schedule table
  - rfe #10061: Use email as username at registration

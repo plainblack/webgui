@@ -177,7 +177,8 @@
 "paymentDrivers" : [
     "WebGUI::Shop::PayDriver::Cash",
     "WebGUI::Shop::PayDriver::ITransact",
-    "WebGUI::Shop::PayDriver::PayPal::PayPalStd"
+    "WebGUI::Shop::PayDriver::PayPal::PayPalStd",
+    "WebGUI::Shop::PayDriver::Ogone"
     ],
 
 # List the shipping drivers you have installed and wish to be
@@ -193,6 +194,11 @@
 "templateParsers" : [
     "WebGUI::Asset::Template::HTMLTemplate"
     ],
+
+# Enable the Survey Expression Engine, which allows goto expressions in
+# the config.
+
+"enableSurveyExpressionEngine" : 0,
 
 # Specify the default template parser.
 
@@ -1024,6 +1030,36 @@
           "extrasCdn" : "http://content.example.com/extras",
           "extrasSsl" : "https://content.example.com/extras",
           "extrasExclude": ["tinymce", "^blah$"]
-        }
+        },
+
+#A list of UserAgents of recognized mobile platforms.  If useMobileStyle is set in the
+#Admin settings, then the mobile style will be used for these browsers.
+   "mobileUserAgents" : [
+      "AvantGo",
+      "DoCoMo",
+      "Vodafone",
+      "EudoraWeb",
+      "Minimo",
+      "UP\\.Browser",
+      "PLink",
+      "Plucker",
+      "NetFront",
+      "^WM5 PIE$",
+      "Xiino",
+      "iPhone",
+      "Opera Mobi",
+      "BlackBerry",
+      "Opera Mini",
+      "HP iPAQ",
+      "IEMobile",
+      "Profile/MIDP",
+      "Smartphone",
+      "Symbian ?OS",
+      "J2ME/MIDP",
+      "PalmSource",
+      "PalmOS",
+      "Windows CE",
+      "Opera Mini"
+   ],
 
 }

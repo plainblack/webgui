@@ -40,6 +40,7 @@ my $node = WebGUI::Asset->getImportNode($session);
 
 my $versionTag = WebGUI::VersionTag->getWorking($session);
 $versionTag->set({name=>"Article Test"});
+WebGUI::Test->tagsToRollback($versionTag);
 my $article = $node->addChild({className=>'WebGUI::Asset::Wobject::Article'});
 
 # Test for a sane object type
@@ -138,6 +139,5 @@ TODO: {
 
 END {
 	# Clean up after thy self
-	$versionTag->rollback();
 }
 

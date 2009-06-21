@@ -138,7 +138,7 @@ sub definition {
         # List
         templateIdList => {
             fieldType       => "template",  
-            defaultValue    => '',
+            defaultValue    => 'kj3b-X3i6zRKnhLb4ZiCLw',
             tab             => "display",
             namespace       => "Calendar/List", 
             hoverHelp       => $i18n->get('editForm templateIdList description'),

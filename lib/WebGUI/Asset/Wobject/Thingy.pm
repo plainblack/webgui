@@ -850,6 +850,7 @@ sub getEditForm {
 
     my $self = shift;
     my $i18n = WebGUI::International->new($self->session, 'Asset_Thingy');
+
     my $tabform = $self->SUPER::getEditForm();
 
     my $things = $self->session->db->buildHashRef('select thingId, label from Thingy_things where assetId = ?',[$self->get("assetId")]);
@@ -862,6 +863,7 @@ sub getEditForm {
             -options=>$things,
     	);
     }
+
 	
 	return $tabform;
 }
@@ -898,6 +900,9 @@ sub getFieldValue {
     elsif ($field->{fieldType} eq "dateTime"){
         $processedValue = $self->session->datetime->epochToHuman($value,$dateTimeFormat);
     }
+    # TODO: The otherThing field type is probably also handled by getFormPlugin, so the elsif below can probably be
+    # safely removed. However, this requires more testing than I can provide right now, so for now this stays the
+    # way it was.
     elsif ($field->{fieldType} =~ m/^otherThing/x) {
         my $otherThingId = $field->{fieldType};
         $otherThingId =~ s/^otherThing_//x;
@@ -912,15 +917,13 @@ sub getFieldValue {
         }
     }
     else {
-        my %fieldProperties = %$field;
-        $fieldProperties{options} = $field->{possibleValues};
-        $processedValue 
-            = WebGUI::Form::DynamicField->new( $self->session,  %fieldProperties, defaultValue => $value  )
-            ->getValueAsHtml;
+        $field->{ value          } = $value;
+        $field->{ defaultValue   } = $value;
+        my $plugin      = $self->getFormPlugin( $field );
+        $processedValue = $plugin->getValueAsHtml;
     }
 
     return $processedValue;
-
 }
 
 #-------------------------------------------------------------------
@@ -936,9 +939,32 @@ A hashref containing the properties of this field.
 =cut
 
 sub getFormElement {
-
     my $self = shift;
-    my $data = shift;
+
+    return $self->getFormPlugin( @_, 1 )->toHtml;
+}
+
+#-------------------------------------------------------------------
+
+=head2 getFormPlugin ( properties, [ useFormPostData ] )
+
+Returns an instanciated WebGUI::Form::* plugin.
+
+=head3 proeprties
+
+The properties to configure the form plugin with. The fieldType key should contain the type of the form plugin.
+
+=head3 useFormPostData
+
+If set to true, the value of the form element will be set to the data posted by it if available.
+
+=cut
+
+sub getFormPlugin {
+    my $self            = shift;
+    my $data            = shift;
+    my $useFormPostData = shift;
+
     my %param;
     my $session = $self->session;
     my $db = $session->db;
@@ -963,18 +989,21 @@ sub getFormElement {
         }
     }
 
-    if (WebGUI::Utility::isIn($data->{fieldType},qw(SelectList CheckList SelectBox Attachments))) {
-        my @defaultValues;
-        if ($self->session->form->param($name)) {
-            @defaultValues = $session->form->selectList($name);
+    if ( WebGUI::Utility::isIn( $data->{fieldType}, qw(SelectList CheckList SelectBox Attachments) ) ) {
+        my @values;
+        if ( $useFormPostData && $self->session->form->param($name) ) {
+            $param{ value } = [ $session->form->process( $name, $data->{fieldType} ) ];
         }
-        else {
+        elsif ( $data->{ value } ) {
             foreach (split(/\n/x, $data->{value})) {
                 s/\s+$//x; # remove trailing spaces
-                push(@defaultValues, $_);
+                push(@values, $_);
             }
+            $param{value} = \@values;
         }
-        $param{value} = \@defaultValues;
+    }
+    elsif ( $useFormPostData && $self->session->form->param($name) ) {
+        $param{value} = $session->form->process( $name, $data->{fieldType} );
     }
 
     my $class = 'WebGUI::Form::'. ucfirst $data->{fieldType};
@@ -1034,8 +1063,7 @@ sub getFormElement {
     }
 
     my $formElement =  eval { WebGUI::Pluggable::instanciate($class, "new", [$session, \%param ])};
-    return $formElement->toHtml();
-
+    return $formElement;
 }
 
 #-------------------------------------------------------------------
@@ -2159,6 +2187,10 @@ sub www_editField {
         $properties{label}      = $properties{label}.' (copy)';
     }
     $dialogBody = $self->getEditFieldForm(\%properties);
+
+    # Make sure we send debug information along with the field edit screen.
+    $session->log->preventDebugOutput;
+
     $self->session->output->print($dialogBody->print);
     return "chunked";
 }
@@ -2246,6 +2278,9 @@ sub www_editFieldSave {
         ."?func=editField;fieldId=".$newFieldId.";thingId=".$properties{thingId}."','".$newFieldId."')\" value='".$i18n->get('Edit','Icon')."' type='button'>"
         ."<input onClick=\"deleteListItem('".$self->session->url->page()."','".$newFieldId
         ."','".$properties{thingId}."')\" value='".$i18n->get('Delete','Icon')."' type='button'></td>\n</tr>\n</table>";
+
+    # Make sure we send debug information along with the field.
+    $session->log->preventDebugOutput;
 
     $session->output->print($newFieldId.$listItemHTML);
     return "chunked";
@@ -3214,9 +3249,14 @@ sequenceNumber');
                 "searchFields_textForm" => $searchTextForm,
                 "searchFields_is".$fieldType => 1,
             });
-            my $searchValue = $session->form->process("field_".$field->{fieldId});
-            push @constraints, $dbh->quote_identifier("field_".$field->{fieldId}) . " LIKE "
-                . $dbh->quote('%'.$searchValue.'%') if ($searchValue);
+
+            my @searchValue = $session->form->process("field_".$field->{fieldId});
+            my $constraint  = 
+                join    ' OR ',
+                map     { $dbh->quote_identifier("field_".$field->{fieldId}) . " LIKE " . $dbh->quote('%'.$_.'%') } 
+                @searchValue ;        
+
+            push @constraints, " ( $constraint ) " if @searchValue; 
         }
         if($field->{displayInSearch}){
             my $orderByUrl = $self->session->url->append($currentUrl,"orderBy=".$field->{fieldId});
@@ -3251,7 +3291,7 @@ sequenceNumber');
         $self->session->errorHandler->warn("The default Thing has no fields selected to display in the search.");
         $noFields = 1;
     }
-    
+
     # store query in cache for thirty minutes
     WebGUI::Cache->new($self->session,"query_".$thingId)->set($query,30*60);
 

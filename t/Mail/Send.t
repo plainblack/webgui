@@ -149,7 +149,7 @@ my $smtpServerOk = 0;
 #----------------------------------------------------------------------------
 # Test emailOverride
 SKIP: {
-    my $numtests        = 1; # Number of tests in this block
+    my $numtests        = 2; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
     if ( !-w File::Spec->catfile( WebGUI::Test::root, 'etc', WebGUI::Test::file() ) ) {
@@ -305,7 +305,7 @@ WebGUI::Test->groupsToDelete($inboxGroup);
 $inboxGroup->addUsers([$emailUser->userId, $inboxUser->userId, $lonelyUser->userId]);
 
 SKIP: {
-    my $numtests        = 1; # Number of tests in this block
+    my $numtests        = 3; # Number of tests in this block
 
     # Must be able to write the config, or we'll die
     skip "Cannot test email notifications", $numtests unless $smtpServerOk;

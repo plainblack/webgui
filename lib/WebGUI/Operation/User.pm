@@ -959,37 +959,54 @@ sub www_listUsers {
         $output .= '<td class="tableData">'.$data->{email}.'</td>';
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{dateCreated},"%z").'</td>';
         $output .= '<td class="tableData">'.$session->datetime->epochToHuman($data->{lastUpdated},"%z").'</td>';
-        # Total Time Recorded is computed from userLoginLog table
-        my ($totalTimeRecorded)= $session->db->quickArray("select sum(lastPageViewed-timeStamp) from userLoginLog where userId = ?", [$data->{userId}]);
-        my ($lastLoginStatus, $lastLogin, $lastPageView) 
+
+        my ( $status, $lastLogin, $lastView, $lastSession ) 
             = $session->db->quickArray(
-                "select ull.status, ull.timeStamp, us.lastPageView 
-                from userLoginLog ull, userSession us 
-                where ull.sessionId = us.sessionId and ull.lastPageViewed != ull.timeStamp and
-                ull.userId=".$session->db->quote($data->{userId})." 
-                order by ull.timeStamp DESC"
-            );
-        if ($lastLogin) {
-            $output .= '<td class="tableData">'.$session->datetime->epochToHuman($lastLogin).'</td>';
-        } 
-        else {
-            $output .= '<td class="tableData"> - </td>';
+            q{
+                select   status, timeStamp, lastPageViewed, sessionId
+                from     userLoginLog
+                where    userId = ?
+                order by timeStamp desc
+                limit    1
+            },
+            [ $data->{userId} ]
+        );
+
+        my $trueLastView = $session->db->quickScalar(
+            q{
+                select lastPageView
+                from   userSession
+                where  sessionId = ?
+            },
+            [ $lastSession ]
+        );
+
+        # format last page view, preferring session recorded view time
+        $lastView   = $trueLastView || $lastView;
+        $lastView &&= $session->datetime->epochToHuman($lastView);
+
+        $lastLogin &&= $session->datetime->epochToHuman($lastLogin);
+
+        my $totalTime = $session->db->quickScalar(
+            q{
+                select sum(lastPageViewed - timeStamp) 
+                from   userLoginLog 
+                where  userId = ?
+            }, 
+            [$data->{userId}]
+        );
+
+        if ($totalTime) {
+            my ($interval, $units) 
+                = $session->datetime->secondsToInterval($totalTime);
+            $totalTime = "$interval $units";
         }
-        if ($lastLoginStatus) {
-            $output .= '<td class="tableData">'.$lastLoginStatus.'</td>';
-        } 
-        else {
-            $output .= '<td class="tableData"> - </td>';
+
+        foreach my $cell ($lastLogin, $status, $lastView, $totalTime) {
+            $cell  ||= ' - ';
+            $output .= qq(<td class="tableData">$cell</td>);
         }
-        if ($lastPageView) {
-            $output .= '<td class="tableData"> '.$session->datetime->epochToHuman($lastPageView).'</td>';
-            my ($interval, $units) = $session->datetime->secondsToInterval($totalTimeRecorded);
-            $output .= "<td class='tableData'>$interval $units</td></tr>";
-        } 
-        else {
-            $output .= "<td class='tableData'> - </td>";
-            $output .= "<td class='tableData'> - </td></tr>";
-        }
+
         $output .= '</tr>';
 	}
     $output .= '</table>';

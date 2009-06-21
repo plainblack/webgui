@@ -894,27 +894,28 @@ adding additional tabs.
 =cut
 
 sub getEditForm {
-	my $self = shift;
-	my $i18n = WebGUI::International->new($self->session, "Asset");
+    my $self    = shift;
+    my $session = $self->session;
+	my $i18n = WebGUI::International->new($session, "Asset");
 	my $ago = $i18n->get("ago");
-	my $tabform = WebGUI::TabForm->new($self->session,undef,undef,$self->getUrl());
-	my $overrides = $self->session->config->get("assets/".$self->get("className"));
+	my $tabform = WebGUI::TabForm->new($session,undef,undef,$self->getUrl());
+	my $overrides = $session->config->get("assets/".$self->get("className"));
 
     # Set the appropriate URL
     # If we're adding a new asset, don't set anything
-    if ( $self->session->form->get( "func" ) ne "add" ) {
+    if ( $session->form->get( "func" ) ne "add" ) {
         $tabform->formHeader( { action => $self->getUrl, method => "POST" } );
     }
 
-	if ($self->session->config->get("enableSaveAndCommit")) {
-		$tabform->submitAppend(WebGUI::Form::submit($self->session, {
+	if ($session->config->get("enableSaveAndCommit")) {
+		$tabform->submitAppend(WebGUI::Form::submit($session, {
             name    => "saveAndCommit", 
             value   => $i18n->get("save and commit"),
             }));
 	}
 
     $tabform->submitAppend( 
-        WebGUI::Form::submit ( $self->session, {
+        WebGUI::Form::submit ( $session, {
             name    => "saveAndReturn",
             value   => $i18n->get( "apply" ),
         } ) 
@@ -928,7 +929,7 @@ sub getEditForm {
 	my $class;
 	if ($self->getId eq "new") {
 		$assetId = "new";
-		$class = $self->session->form->process("class","className");
+		$class = $session->form->process("class","className");
 	}
 	else {
 		# revision history
@@ -936,13 +937,13 @@ sub getEditForm {
 		$class = $self->get('className');
 		my $ac = $self->getAdminConsole;
 		$ac->addSubmenuItem($self->getUrl("func=manageRevisions"),$i18n->get("revisions").":");
-		my $rs = $self->session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$assetId]);
+		my $rs = $session->db->read("select revisionDate from assetData where assetId=? order by revisionDate desc limit 5", [$assetId]);
 		while (my ($version) = $rs->array) {
-			my ($interval, $units) = $self->session->datetime->secondsToInterval(time() - $version);
+			my ($interval, $units) = $session->datetime->secondsToInterval(time() - $version);
 			$ac->addSubmenuItem($self->getUrl("func=edit;revision=".$version), $interval." ".$units." ".$ago);
 		}
 	}
-	if ($self->session->form->process("proceed")) {
+	if ($session->form->process("proceed")) {
 		$tabform->hidden({
 			name=>"proceed",
 			value=>$self->session->form->process("proceed")
@@ -967,7 +968,7 @@ sub getEditForm {
 	}
 
 	# process errors
-	my $errors = $self->session->stow->get('editFormErrors');
+	my $errors = $session->stow->get('editFormErrors');
 	if ($errors) {
 		$tabform->getTab("properties")->readOnly(
 			-value=>"<p>Some error(s) occurred:<ul><li>".join('</li><li>', @$errors).'</li></ul></p>',
@@ -975,7 +976,7 @@ sub getEditForm {
 	}
 
 	# build the definition to the generate form
-	my @definitions = reverse @{$self->definition($self->session)};
+	my @definitions = reverse @{$self->definition($session)};
 	tie my %baseProperties, 'Tie::IxHash';
 	%baseProperties = (
 		assetId	=> {
@@ -1008,11 +1009,11 @@ sub getEditForm {
 
 	# extend the definition with metadata
 	tie my %extendedProperties, 'Tie::IxHash';
-    if ($self->session->setting->get("metaDataEnabled")) {
+    if ($session->setting->get("metaDataEnabled")) {
 		my $meta = $self->getMetaDataFields();
 		foreach my $field (keys %$meta) {
 			my $fieldType = $meta->{$field}{fieldType} || "text";
-			my $options = $meta->{$field}{possibleValues};
+			my $options = WebGUI::Operation::Shared::secureEval($session,$meta->{$field}{possibleValues});
 			# Add a "Select..." option on top of a select list to prevent from
 			# saving the value on top of the list when no choice is made.
 			if("\l$fieldType" eq "selectBox") {
@@ -1030,7 +1031,7 @@ sub getEditForm {
 			};
 		}
 		# add metadata management
-		if ($self->session->user->isAdmin) {
+		if ($session->user->isAdmin) {
 			$extendedProperties{_metadatamanagement} = {
 				tab			=> "meta",
 				fieldType	=> "readOnly",
